@@ -9,6 +9,7 @@ from invoke import Collection, task
     'docs': 'Indicates whether to clean generated documentation or not.',
     'bytecode': 'Indicates whether to clean compiled python files or not.'})
 def clean(ctx, docs=True, bytecode=False):
+    """Cleans the local copy from compiled artifacts."""
     patterns = []
     if docs:
         patterns.append('docs/_build')
@@ -21,9 +22,16 @@ def clean(ctx, docs=True, bytecode=False):
 @task(help={
     'docs': 'Indicates whether to clean generated documentation or not.'})
 def build(ctx, docs=True):
+    """Builds the current package."""
     if docs:
         with chdir('docs/'):
             ctx.run("python make.py && make html")
+
+
+@task()
+def doctest(ctx):
+    """Runs all examples defined in docstrings for this module."""
+    ctx.run("pytest --doctest-module")
 
 
 @contextlib.contextmanager
@@ -40,6 +48,7 @@ def chdir(dirname=None):
 namespace = Collection()
 namespace.add_task(clean)
 namespace.add_task(build)
+namespace.add_task(doctest)
 
 # Workaround for Windows execution
 if sys.platform == 'win32':

@@ -5,10 +5,11 @@ MODULES = [
     'compas_robot.rfl'
 ]
 
-for name in MODULES:
-    obj = import_module(name)
+if __name__ == '__main__':
+    for name in MODULES:
+        obj = import_module(name)
 
-    print obj
+        print obj
 
-    with open('source/pages/reference/{0}.rst'.format(name), 'wb+') as fp:
-        fp.write(obj.__doc__)
+        with open('source/pages/reference/{0}.rst'.format(name), 'wb+') as fp:
+            fp.write(obj.__doc__)

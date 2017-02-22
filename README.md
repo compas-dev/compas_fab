@@ -28,10 +28,12 @@ print ('Done')
 
 ## Build
 
-All local development tasks are handled by `pyinvoke` through the `invoke` command.
+All local development tasks are handled by `pyinvoke` through the `inv` (aka `invoke`) command.
 
-### Docs
+To build the documentation locally:
 
-The build the documentation locally:
+    $ inv build
 
-    $ invoke build --docs
+To run all docstring tests/examples:
+
+    $ inv doctest
