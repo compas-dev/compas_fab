@@ -44,7 +44,6 @@ extensions = [
 autodoc_default_flags = [
     'undoc-members',
     'private-members',
-    'special-members',
     'show-inheritance',
 ]
 
