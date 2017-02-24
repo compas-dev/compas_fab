@@ -2,7 +2,7 @@ from importlib import import_module
 
 MODULES = [
     'compas_robot',
-    'compas_robot.rfl'
+    'compas_robot.robot.rfl'
 ]
 
 if __name__ == '__main__':
