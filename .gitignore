@@ -19,8 +19,8 @@ coverage.xml
 .hypothesis/
 
 # Sphinx documentation
-docs/_build/
-docs/source/pages/reference
+_docs/_build/
+_docs/source/pages/reference
 # dotenv
 .env
 

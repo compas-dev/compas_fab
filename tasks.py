@@ -12,7 +12,7 @@ def clean(ctx, docs=True, bytecode=False):
     """Cleans the local copy from compiled artifacts."""
     patterns = []
     if docs:
-        patterns.append('docs/_build')
+        patterns.append('_docs/_build')
     if bytecode:
         patterns.append('**/*.pyc')
     for pattern in patterns:
@@ -24,7 +24,7 @@ def clean(ctx, docs=True, bytecode=False):
 def build(ctx, docs=True):
     """Builds the current package."""
     if docs:
-        with chdir('docs/'):
+        with chdir('_docs/'):
             ctx.run("python make.py && make html")
 
 
