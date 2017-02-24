@@ -21,6 +21,7 @@ coverage.xml
 # Sphinx documentation
 _docs/_build/
 _docs/source/pages/reference
+
 # dotenv
 .env
 
