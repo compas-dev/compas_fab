@@ -1,8 +1,8 @@
 from importlib import import_module
 
 MODULES = [
-    'compas_robot',
-    'compas_robot.robot.rfl'
+    'compas_fabrication',
+    'compas_fabrication.fabrication.robots.rfl'
 ]
 
 if __name__ == '__main__':

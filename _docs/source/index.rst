@@ -1,7 +1,7 @@
 .. _home:
 
-compAS:Robot Documentation
-==========================
+compAS:Fabrication Documentation
+================================
 
 Documentation for the robotics package of the compAS Framework.
 

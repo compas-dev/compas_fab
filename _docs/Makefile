@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = compas_robot
+SPHINXPROJ    = compas_fabrication
 SOURCEDIR     = source
 BUILDDIR      = _build
 

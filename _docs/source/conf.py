@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# compAS:Robot documentation build configuration file, created by
+# compAS:Fabrication documentation build configuration file, created by
 # sphinx-quickstart on Tue Feb 21 12:23:43 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -76,9 +76,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'compAS:Robot'
+project = u'compAS:Fabrication'
 copyright = u'2017, Gramazio Kohler Research'
-author = u'Gonzalo Casas'
+author = u'Gramazio Kohler'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -134,7 +134,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'compas_robot'
+htmlhelp_basename = 'compas_fabrication'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -161,8 +161,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'compas_robot.tex', u'compAS:Robot Documentation',
-     u'Gonzalo Casas', 'manual'),
+    (master_doc, 'compas_fabrication.tex', u'compAS:Fabrication Documentation',
+     u'Gramazio Kohler', 'manual'),
 ]
 
 
@@ -171,7 +171,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'compas_robot', u'compAS:Robot Documentation',
+    (master_doc, 'compas_fabrication', u'compAS:Fabrication Documentation',
      [author], 1)
 ]
 
@@ -182,8 +182,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'compas_robot', u'compAS:Robot Documentation',
-     author, 'compas_robot', 'Robotics package for the compAS Framework.',
+    (master_doc, 'compas_fabrication', u'compAS:Fabrication Documentation',
+     author, 'compas_fabrication', 'Robotics package for the compAS Framework.',
      'Miscellaneous'),
 ]
 
