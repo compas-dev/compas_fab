@@ -3,7 +3,7 @@
 compAS:Fabrication Documentation
 ================================
 
-Documentation for the robotics package of the compAS Framework.
+Documentation for the robotic fabrication package of the compAS Framework.
 
 .. toctree::
    :maxdepth: 1
