@@ -11,5 +11,8 @@ if __name__ == '__main__':
 
         print obj
 
-        with open('source/pages/reference/{0}.rst'.format(name), 'wb+') as fp:
-            fp.write(obj.__doc__)
+        try:
+            with open('source/pages/reference/{0}.rst'.format(name), 'wb+') as fp:
+                fp.write(obj.__doc__)
+        except:
+            print('WARN: File cannot be opened: "source/pages/reference/{0}.rst"'.format(name))
