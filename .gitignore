@@ -20,7 +20,8 @@ coverage.xml
 
 # Sphinx documentation
 _docs/_build/
-_docs/source/pages/reference
+_docs/source/pages/reference/*.rst
+_docs/source/pages/reference/generated/
 
 # dotenv
 .env
