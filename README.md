@@ -1,29 +1,39 @@
-# README #
+# compAS:Fabrication package
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Site package to the compAS Framework aimed at providing tools for robotic fabrication.
 
-### What is this repository for? ###
+## Getting started
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+Just as the compAS Framework, the suggested usage is not through an install, but rather a local
+copy of the source code.
 
-### How do I get set up? ###
+Start off by making sure you have all the prerequisites installed:
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+    $ pip install -r requirements.txt
 
-### Contribution guidelines ###
+And add the root folder of this repository to your `PYTHONPATH` to make it importable.
 
-* Writing tests
-* Code review
-* Other guidelines
+Fire off your favorite editor and run the simplest example:
 
-### Who do I talk to? ###
+```python
+from compas_fabrication.fabrication.robots.rfl import Simulator
 
-* Repo owner or admin
-* Other community or team contact
+with Simulator() as simulator:
+    print ('Connected: ' + str(simulator.is_connected()))
+
+print ('Done')
+
+```
+
+
+## Build
+
+All local development tasks are handled by `pyinvoke` through the `inv` (aka `invoke`) command.
+
+To build the documentation locally:
+
+    $ inv build
+
+To run all docstring tests/examples:
+
+    $ inv doctest

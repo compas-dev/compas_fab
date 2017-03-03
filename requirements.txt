@@ -1,0 +1,4 @@
+Sphinx >= 1.5.2
+sphinx_rtd_theme >= 0.1.9
+invoke
+pytest
