@@ -1,12 +1,14 @@
 from __future__ import print_function
 
 import math
+import logging
 from timeit import default_timer as timer
 from compas.datastructures.mesh import Mesh
 from compas_fabrication.fabrication.robots.rfl.vrep_remote_api import vrep
 
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
 CHILD_SCRIPT_TYPE = vrep.sim_scripttype_childscript
+LOG = logging.getLogger('compas_fabrication.simulator')
 
 
 class SimulationError(Exception):
@@ -48,7 +50,7 @@ class Simulator(object):
         vrep.simxFinish(-1)
 
         if self.debug:
-            print('Connecting to V-REP...')
+            LOG.debug('Connecting to V-REP...')
 
         # Connect to V-REP, set a very large timeout for blocking commands
         self.client_id = vrep.simxStart(self.host, self.port, True, True,
@@ -69,7 +71,7 @@ class Simulator(object):
         self.client_id = None
 
         if self.debug:
-            print('Disconnected from V-REP')
+            LOG.debug('Disconnected from V-REP')
 
     def is_connected(self):
         """Indicates whether the simulator has an active connection.
@@ -163,35 +165,38 @@ class Simulator(object):
                 is specified as a fraction of the space's extent.
                 Defaults to ``0.02``.
         """
-        timers = []
         mesh_handles = []
 
         try:
-            start = timer()
+            start = timer() if self.debug else None
             if collision_meshes:
                 mesh_handles = self.add_meshes(collision_meshes)
-            timers.append(('add_meshes', round(timer() - start, 2)))
+            if self.debug:
+                LOG.debug('Execution time: add_meshes=%f.2', timer() - start)
 
-            start = timer()
+            start = timer() if self.debug else None
             self.set_metric(metric_values)
-            timers.append(('set_metric', round(timer() - start, 2)))
+            if self.debug:
+                LOG.debug('Execution time: set_metric=%f.2', timer() - start)
 
-            start = timer()
+            start = timer() if self.debug else None
             res, _, states, _, _ = self.run_child_script('searchRobotStates',
                                                          [robot.index],
                                                          goal_pose, [])
-            timers.append(('search_robot_states', round(timer() - start, 2)))
+            if self.debug:
+                LOG.debug('Execution time: search_robot_states=%f.2', timer() - start)
 
             if res != 0:
                 raise SimulationError('Failed to search robot states', res)
 
-            start = timer()
+            start = timer() if self.debug else None
             res, _, path, _, _ = self.run_child_script('searchRobotPath',
                                                        [robot.index,
                                                         trials,
                                                         (int)(resolution * 1000)],
                                                        states, [algorithm])
-            timers.append(('search_robot_path', round(timer() - start, 2)))
+            if self.debug:
+                LOG.debug('Execution time: search_robot_path=%f.2', timer() - start)
 
             if res != 0:
                 raise SimulationError('Failed to search robot path', res)
@@ -200,14 +205,14 @@ class Simulator(object):
             # TODO: Path should not be a plain list
             # we should instead return a list of list or a
             # more specialized data structure.
-            if self.debug:
-                return path, timers
-            else:
-                return path
+            return path
 
         finally:
             try:
+                start = timer() if self.debug else None
                 self.remove_meshes(mesh_handles)
+                if self.debug:
+                    LOG.debug('Execution time: remove_meshes=%f.2', timer() - start)
             except:
                 pass
 
