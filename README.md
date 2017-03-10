@@ -7,9 +7,10 @@ Site package to the compAS Framework aimed at providing tools for robotic fabric
 Just as the compAS Framework, the suggested usage is not through an install, but rather a local
 copy of the source code.
 
-Start off by making sure you have all the prerequisites installed:
+Start off by making sure you have all the prerequisites installed. Open a terminal window on the
+folder where you cloned this repository and run the following:
 
-    $ pip install -r requirements.txt
+    pip install -r requirements.txt
 
 And add the root folder of this repository to your `PYTHONPATH` to make it importable.
 
