@@ -217,11 +217,11 @@ class Simulator(object):
                 pass
 
     def add_meshes(self, meshes):
-        """Adds collision meshes to the RFL scene.
+        """Adds meshes to the RFL scene.
 
         Args:
-            collision_meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): Collision meshes
-                to be taken into account when calculating the motion plan.
+            meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): Add
+                the specified meshes to the current simulation scene.
 
         Returns
             list: List of object handles (identifiers) assigned to the meshes.
