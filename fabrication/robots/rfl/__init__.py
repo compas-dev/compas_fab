@@ -19,5 +19,6 @@ Lab) using robotic simulation tools like
 
 """
 
-from compas_fabrication.fabrication.robots.rfl.simulator import Simulator
 from compas_fabrication.fabrication.robots.rfl.robots import Robot
+from compas_fabrication.fabrication.robots.rfl.simulator import Simulator
+from compas_fabrication.fabrication.robots.rfl.simulator import SimulationError
