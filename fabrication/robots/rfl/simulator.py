@@ -219,7 +219,6 @@ class Simulator(object):
             int: Object handle (identifier) assigned to the building member.
         """
         handles = self.add_meshes([building_member_mesh])
-        self._added_handles.extend(handles)
 
         if len(handles) != 1:
             raise SimulationError('Expected one handle, but multiple found=' + str(handles), -1)
