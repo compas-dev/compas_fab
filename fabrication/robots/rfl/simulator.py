@@ -235,13 +235,12 @@ class Simulator(object):
         """Adds meshes to the RFL scene.
 
         Args:
-            meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): Add
-                the specified meshes to the current simulation scene.
+            meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): List
+                of meshes to add to the current simulation scene.
 
         Returns
             list: List of object handles (identifiers) assigned to the meshes.
         """
-
         mesh_handles = []
 
         for mesh in meshes:
