@@ -44,6 +44,7 @@ class Simulator(object):
         self.thread_cycle_in_ms = 5
         self.debug = debug
         self._lua_script_name = 'RFL'
+        self._added_handles = []
 
     def __enter__(self):
         # Stop existing simulation, if any
@@ -215,6 +216,29 @@ class Simulator(object):
                     LOG.debug('Execution time: remove_meshes=%f.2', timer() - start)
             except:
                 pass
+    def add_building_member(self, robot, building_member_mesh):
+        """Add a building member to the RFL scene and attaches it to the robot.
+
+        Args:
+            robot (:class:`.Robot`): Robot instance to attach the building member to.
+            building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh
+                of the building member that will be attached to the robot.
+
+        Returns
+            int: Object handle (identifier) assigned to the building member.
+        """
+        handles = self.add_meshes([building_member_mesh])
+        self._added_handles.extend(handles)
+
+        if len(handles) != 1:
+            raise SimulationError('Expected one handle, but multiple found=' + str(handles), -1)
+
+        handle = handles[0]
+
+        parent_handle = self.get_object_handle('customGripper' + robot.name + '_connection')
+        vrep.simxSetObjectParent(self.client_id, handle, parent_handle, True, DEFAULT_OP_MODE)
+
+        return handle
 
     def add_meshes(self, meshes):
         """Adds meshes to the RFL scene.
