@@ -64,6 +64,8 @@ class Simulator(object):
         return self
 
     def __exit__(self, *args):
+        self.remove_objects(self._added_handles)
+
         # Stop simulation
         vrep.simxStopSimulation(self.client_id, DEFAULT_OP_MODE)
 
@@ -166,56 +168,45 @@ class Simulator(object):
                 is specified as a fraction of the space's extent.
                 Defaults to ``0.02``.
         """
-        mesh_handles = []
+        start = timer() if self.debug else None
+        if collision_meshes:
+            self.add_meshes(collision_meshes)
+        if self.debug:
+            LOG.debug('Execution time: add_meshes=%f.2', timer() - start)
 
-        try:
-            start = timer() if self.debug else None
-            if collision_meshes:
-                mesh_handles = self.add_meshes(collision_meshes)
-            if self.debug:
-                LOG.debug('Execution time: add_meshes=%f.2', timer() - start)
+        start = timer() if self.debug else None
+        self.set_metric(metric_values)
+        if self.debug:
+            LOG.debug('Execution time: set_metric=%f.2', timer() - start)
 
-            start = timer() if self.debug else None
-            self.set_metric(metric_values)
-            if self.debug:
-                LOG.debug('Execution time: set_metric=%f.2', timer() - start)
+        start = timer() if self.debug else None
+        res, _, states, _, _ = self.run_child_script('searchRobotStates',
+                                                     [robot.index],
+                                                     goal_pose, [])
+        if self.debug:
+            LOG.debug('Execution time: search_robot_states=%f.2', timer() - start)
 
-            start = timer() if self.debug else None
-            res, _, states, _, _ = self.run_child_script('searchRobotStates',
-                                                         [robot.index],
-                                                         goal_pose, [])
-            if self.debug:
-                LOG.debug('Execution time: search_robot_states=%f.2', timer() - start)
+        if res != 0:
+            raise SimulationError('Failed to search robot states', res)
 
-            if res != 0:
-                raise SimulationError('Failed to search robot states', res)
+        start = timer() if self.debug else None
+        res, _, path, _, _ = self.run_child_script('searchRobotPath',
+                                                   [robot.index,
+                                                    trials,
+                                                    (int)(resolution * 1000)],
+                                                   states, [algorithm])
+        if self.debug:
+            LOG.debug('Execution time: search_robot_path=%f.2', timer() - start)
 
-            start = timer() if self.debug else None
-            res, _, path, _, _ = self.run_child_script('searchRobotPath',
-                                                       [robot.index,
-                                                        trials,
-                                                        (int)(resolution * 1000)],
-                                                       states, [algorithm])
-            if self.debug:
-                LOG.debug('Execution time: search_robot_path=%f.2', timer() - start)
+        if res != 0:
+            raise SimulationError('Failed to search robot path', res)
 
-            if res != 0:
-                raise SimulationError('Failed to search robot path', res)
+        # TODO: Document return type on docstring.
+        # TODO: Path should not be a plain list
+        # we should instead return a list of list or a
+        # more specialized data structure.
+        return path
 
-            # TODO: Document return type on docstring.
-            # TODO: Path should not be a plain list
-            # we should instead return a list of list or a
-            # more specialized data structure.
-            return path
-
-        finally:
-            try:
-                start = timer() if self.debug else None
-                self.remove_meshes(mesh_handles)
-                if self.debug:
-                    LOG.debug('Execution time: remove_meshes=%f.2', timer() - start)
-            except:
-                pass
     def add_building_member(self, robot, building_member_mesh):
         """Add a building member to the RFL scene and attaches it to the robot.
 
@@ -263,12 +254,12 @@ class Simulator(object):
             vrep_packing = ([item for sublist in vertices for item in sublist] +
                             [item for sublist in faces for item in sublist])
             params = [[len(vertices) * 3, len(faces) * 4], vrep_packing]
-
             handles = self.run_child_script('buildMesh',
                                             params[0],
                                             params[1],
                                             [])[1]
             mesh_handles.extend(handles)
+            self._added_handles.extend(handles)
 
         return mesh_handles
 
@@ -291,6 +282,8 @@ class Simulator(object):
         """
         for handle in object_handles:
             vrep.simxRemoveObject(self.client_id, handle, DEFAULT_OP_MODE)
+            if handle in self._added_handles:
+                self._added_handles.remove(handle)
 
     def run_child_script(self, function_name, in_ints, in_floats, in_strings):
         return vrep.simxCallScriptFunction(self.client_id,
