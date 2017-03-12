@@ -162,19 +162,19 @@ class Simulator(object):
         angles = [math.degrees(radians) for radians in config[3:]]
         return Configuration(config[0:3], angles)
 
-    def find_path_plan(self, robot, metric_values, goal_pose, collision_meshes=None,
+    def find_path_plan(self, robot, goal_pose, metric_values=[0.1] * 9, collision_meshes=None,
                        algorithm='rrtconnect', trials=1, resolution=0.02):
         """Finds a path plan to move the selected robot from its current position
         to the `goal_pose`.
 
         Args:
             robot (:class:`.Robot`): Robot instance to move.
+            goal_pose (:obj:`list` of :obj:`float`): Target or goal pose
+                specified as a list of 12 :obj:`float` values.
             metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
                 values (3 for gantry + 6 for joints) ranging from 0 to 1,
                 where 1 indicates the axis is blocked and cannot
                 move during inverse kinematic solving.
-            goal_pose (:obj:`list` of :obj:`float`): Target or goal pose
-                specified as a list of 12 :obj:`float` values.
             collision_meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): Collision meshes
                 to be taken into account when calculating the motion plan.
                 Defaults to ``None``.
