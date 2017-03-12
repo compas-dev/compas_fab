@@ -31,8 +31,9 @@ class Simulator(object):
 
     Examples:
 
+        >>> from compas_fabrication.fabrication.robots.rfl import *
         >>> with Simulator() as simulator:
-        ...     print ('Connected: ' + str(simulator.is_connected()))
+        ...     print ('Connected: %s' % simulator.is_connected())
         ...
         Connected: True
 
