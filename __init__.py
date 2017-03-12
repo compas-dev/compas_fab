@@ -17,3 +17,18 @@ Main package for robotics fabrication for the compAS Framework.
     compas_fabrication.fabrication.robots.rfl
 
 """
+
+import os
+
+
+HERE = os.path.dirname(__file__)
+DATA = os.path.abspath(os.path.join(HERE, 'data'))
+
+
+def _find_resource(filename):
+    filename = filename.strip('/')
+    return os.path.abspath(os.path.join(DATA, filename))
+
+
+def get_data(filename):
+    return _find_resource(filename)
