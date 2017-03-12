@@ -81,7 +81,7 @@ class Simulator(object):
         """Indicates whether the simulator has an active connection.
 
         Returns:
-            bool: Indicating if the simulator is connected.
+            bool: True if connected, False otherwise.
         """
         return self.client_id is not None and self.client_id != -1
 
@@ -109,9 +109,6 @@ class Simulator(object):
         Args:
             metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
                 values from 0 to 1.
-
-        Returns:
-            None
         """
         vrep.simxCallScriptFunction(self.client_id,
                                     self._lua_script_name,
@@ -135,7 +132,6 @@ class Simulator(object):
             ...                                Configuration([7.6, -4.5, -4.5],
             ...                                [90, 0, 0, 0, 0, -90]))
             ...
-
         """
         values = list(config.coordinates)
         values.extend([math.radians(angle) for angle in config.joint_values])
@@ -155,6 +151,9 @@ class Simulator(object):
             >>> from compas_fabrication.fabrication.robots.rfl import Robot
             >>> with Simulator() as simulator:
             ...     config = simulator.get_robot_config(Robot('A'))
+
+        Returns:
+            An instance of :class:`.Configuration`.
         """
         res, _, config, _, _ = self.run_child_script('getRobotState',
                                                      [robot.index],
@@ -232,7 +231,7 @@ class Simulator(object):
             building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh
                 of the building member that will be attached to the robot.
 
-        Returns
+        Returns:
             int: Object handle (identifier) assigned to the building member.
         """
         handles = self.add_meshes([building_member_mesh])
@@ -254,7 +253,7 @@ class Simulator(object):
             meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): List
                 of meshes to add to the current simulation scene.
 
-        Returns
+        Returns:
             list: List of object handles (identifiers) assigned to the meshes.
         """
         mesh_handles = []
