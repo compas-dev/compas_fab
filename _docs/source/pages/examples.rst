@@ -4,6 +4,8 @@
 Examples
 ********************************************************************************
 
+.. contents::
+
 There are multiple ways to run these examples. Most can be executed from any
 environment, for instance:
 
@@ -34,6 +36,8 @@ The RFL has 4 robots that can be referenced by letter: ``A``, ``B``, ``C`` and `
 
 It's important to make sure all four of them are positioned correctly and not colliding with each other at start, otherwise path planning will fail.
 
+The position of a robot is specified as an instance of :class:`compas_fabrication.fabrication.robots.rfl.Configuration`.
+
 Here's a simple example on how to position two of the robots::
 
     from compas_fabrication.fabrication.robots.rfl import *
@@ -49,4 +53,27 @@ Here's a simple example on how to position two of the robots::
 
         simulator.set_robot_config(robot_a, config_robot_a)
         simulator.set_robot_config(robot_b, config_robot_b)
+
+
+Minimal path planning example
+=============================
+
+Calculating a path plan requires several parameters to be configured in order to start
+the process. In its minimal expression, a path planning request must define a start
+configuration and a goal pose and rely on defaults for the rest. Here is an example
+of such a request::
+
+    from compas_fabrication.fabrication.robots.rfl import *
+
+    start_config    = Configuration(coordinates=[8.26, -5.32, -3.69],
+                                    joint_values=[-143, 37, -112, 0, -15, -126])
+    goal_pose       = [-1.0, 0.0, -8.97e-13, 8.11,
+                       8.97e-13, 0.0, -1.0, -7.02,
+                       0.0, -1.0, 0.0, -1.81]
+
+    with Simulator() as simulator:
+        robot = Robot('B', client=simulator)
+
+        simulator.set_robot_config(robot, start_config)
+        path = simulator.find_path_plan(robot, goal_pose)
 
