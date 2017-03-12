@@ -280,8 +280,8 @@ class Simulator(object):
         """
         for handle in object_handles:
             vrep.simxRemoveObject(self.client_id, handle, DEFAULT_OP_MODE)
-            if handle in self._added_handles:
-                self._added_handles.remove(handle)
+
+        self._added_handles = filter(lambda x: x not in object_handles, self._added_handles)
 
     def run_child_script(self, function_name, in_ints, in_floats, in_strings):
         return vrep.simxCallScriptFunction(self.client_id,
