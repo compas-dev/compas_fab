@@ -159,7 +159,7 @@ class Simulator(object):
         res, _, config, _, _ = self.run_child_script('getRobotState',
                                                      [robot.index],
                                                      [], [])
-        angles = [math.degrees(radians) for radians in config[3:]]
+        angles = map(math.degrees, config[3:])
         return Configuration(config[0:3], angles)
 
     def find_path_plan(self, robot, goal_pose, metric_values=[0.1] * 9, collision_meshes=None,
@@ -184,6 +184,10 @@ class Simulator(object):
             resolution (:obj:`float`): Validity checking resolution. This value
                 is specified as a fraction of the space's extent.
                 Defaults to ``0.02``.
+
+        Returns:
+            list: List of :class:`Configuration` objects representing the
+                collision-free path to the ``goal_pose``.
         """
         start = timer() if self.debug else None
         if collision_meshes:
@@ -218,11 +222,10 @@ class Simulator(object):
         if res != 0:
             raise SimulationError('Failed to search robot path', res)
 
-        # TODO: Document return type on docstring.
-        # TODO: Path should not be a plain list
-        # we should instead return a list of list or a
-        # more specialized data structure.
-        return path
+        return [Configuration(
+                coordinates=path[i:i + 3],
+                joint_values=map(math.degrees, path[i + 3:i + 9]))
+                for i in range(0, len(path), 9)]
 
     def add_building_member(self, robot, building_member_mesh):
         """Add a building member to the RFL scene and attaches it to the robot.
