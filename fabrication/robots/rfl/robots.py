@@ -13,9 +13,9 @@ class Configuration(object):
     """
     def __init__(self, coordinates, joint_values):
         if len(coordinates) != 3:
-            raise ValueError('Expected iterable of 3 floats: x, y, z')
+            raise ValueError('Expected 3 floats: x, y, z but got %d' % len(coordinates))
         if len(joint_values) != 6:
-            raise ValueError('Expected iterable of 6 floats expressed in degrees')
+            raise ValueError('Expected 6 floats expressed in degrees, but got %d' % len(joint_values))
 
         self.coordinates = coordinates
         self.joint_values = joint_values
