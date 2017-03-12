@@ -5,6 +5,7 @@ import logging
 from timeit import default_timer as timer
 from compas.datastructures.mesh import Mesh
 from compas_fabrication.fabrication.robots.rfl.vrep_remote_api import vrep
+from compas_fabrication.fabrication.robots.rfl import Configuration
 
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
 CHILD_SCRIPT_TYPE = vrep.sim_scripttype_childscript
@@ -118,32 +119,48 @@ class Simulator(object):
                                            [], metric_values, [],
                                            bytearray(), DEFAULT_OP_MODE)
 
-    def set_robot_config(self, robot, gantry_values, joint_values):
+    def set_robot_config(self, robot, config):
         """Moves the robot the the specified configuration.
 
         Args:
             robot (:class:`.Robot`): Robot instance to move.
-            gantry_values (:obj:`list` of :obj:`float`): Gantry position
-                in x, y, z in meters.
-            joint_values (:obj:`list` of :obj:`float`): 6 joint values
-                expressed in degrees.
+            config (:class:`.Configuration`): Instance of robot's
+                configuration.
 
         Examples:
 
             >>> from compas_fabrication.fabrication.robots.rfl import Robot
             >>> with Simulator() as simulator:
             ...     simulator.set_robot_config(Robot('A'),
-            ...                                [7.6, -4.5, -4.5],
-            ...                                [90, 0, 0, 0, 0, -90])
+            ...                                Configuration([7.6, -4.5, -4.5],
+            ...                                [90, 0, 0, 0, 0, -90]))
             ...
 
         """
-        values = list(gantry_values)
-        values.extend([math.radians(angle) for angle in joint_values])
+        values = list(config.coordinates)
+        values.extend([math.radians(angle) for angle in config.joint_values])
 
         self.set_metric([0.0] * 9)
         self.run_child_script('moveRobotFK',
                               [], values, ['robot' + robot.name])
+
+    def get_robot_config(self, robot):
+        """Gets the current configuration of the specified robot.
+
+        Args:
+            robot (:class:`.Robot`): Robot instance.
+
+        Examples:
+
+            >>> from compas_fabrication.fabrication.robots.rfl import Robot
+            >>> with Simulator() as simulator:
+            ...     config = simulator.get_robot_config(Robot('A'))
+        """
+        res, _, config, _, _ = self.run_child_script('getRobotState',
+                                                     [robot.index],
+                                                     [], [])
+        angles = [math.degrees(radians) for radians in config[3:]]
+        return Configuration(config[0:3], angles)
 
     def find_path_plan(self, robot, metric_values, goal_pose, collision_meshes=None,
                        algorithm='rrtconnect', trials=1, resolution=0.02):

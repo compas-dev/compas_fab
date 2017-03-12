@@ -1,6 +1,29 @@
 from __future__ import print_function
 
 
+class Configuration(object):
+    """Represents a configuration of an RFL robot based on its
+    coordinates (position of the gantry system) and joint angle values.
+
+    Args:
+        coordinates (:obj:`list` of :obj:`float`): Gantry position
+            in x, y, z in meters.
+        joint_values (:obj:`list` of :obj:`float`): 6 joint values
+            expressed in degrees.
+    """
+    def __init__(self, coordinates, joint_values):
+        if len(coordinates) != 3:
+            raise ValueError('Expected iterable of 3 floats: x, y, z')
+        if len(joint_values) != 6:
+            raise ValueError('Expected iterable of 6 floats expressed in degrees')
+
+        self.coordinates = coordinates
+        self.joint_values = joint_values
+
+    def __str__(self):
+        return "xyz: %s, joints: %s" % (self.coordinates, self.joint_values)
+
+
 # TODO: This should inherit from compas_fabrication.fabrication.robots.Robot
 # once that is in place.
 class Robot(object):
@@ -24,24 +47,30 @@ class Robot(object):
         self.client = client
         self.index = self.SUPPORTED_ROBOTS.index(name)
 
-    def set_config(self, gantry_values, joint_values):
+    def set_config(self, config):
         """Moves the robot the the specified configuration.
 
         Args:
-            gantry_values (:obj:`list` of :obj:`float`): Gantry position
-                in x, y, z in meters.
-            joint_values (:obj:`list` of :obj:`float`): 6 joint values
-                expressed in degrees.
+            config (:class:`.Configuration`): Instance of robot's
+                configuration.
 
         Examples:
 
             >>> from compas_fabrication.fabrication.robots.rfl import Simulator
             >>> with Simulator() as simulator:
             ...     robot = Robot('A', simulator)
-            ...     robot.set_config(
+            ...     robot.set_config(Configuration(
             ...                      [7.6, -4.5, -4.5],
-            ...                      [90, 0, 0, 0, 0, -90])
+            ...                      [90, 0, 0, 0, 0, -90]))
             ...
 
         """
-        self.client.set_robot_config(self, gantry_values, joint_values)
+        self.client.set_robot_config(self, config)
+
+    def get_config(self):
+        """Gets the current configuration of the robot.
+
+        Returns:
+            config: Instance of (:class:`.Configuration`).
+        """
+        return self.client.get_robot_config(self)
