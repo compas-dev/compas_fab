@@ -113,11 +113,11 @@ class Simulator(object):
         Returns:
             None
         """
-        return vrep.simxCallScriptFunction(self.client_id,
-                                           self._lua_script_name,
-                                           CHILD_SCRIPT_TYPE, 'setTheMetric',
-                                           [], metric_values, [],
-                                           bytearray(), DEFAULT_OP_MODE)
+        vrep.simxCallScriptFunction(self.client_id,
+                                    self._lua_script_name,
+                                    CHILD_SCRIPT_TYPE, 'setTheMetric',
+                                    [], metric_values, [],
+                                    bytearray(), DEFAULT_OP_MODE)
 
     def set_robot_config(self, robot, config):
         """Moves the robot the the specified configuration.
