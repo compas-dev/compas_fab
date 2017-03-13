@@ -1,4 +1,5 @@
 from __future__ import print_function
+import math
 
 
 class Configuration(object):
@@ -22,6 +23,11 @@ class Configuration(object):
 
     def __str__(self):
         return "xyz: %s, joints: %s" % (self.coordinates, self.joint_values)
+
+    @classmethod
+    def from_list(cls, list_of_floats):
+        angles = map(math.degrees, list_of_floats[3:])
+        return cls(list_of_floats[0:3], angles)
 
 
 # TODO: This should inherit from compas_fabrication.fabrication.robots.Robot
