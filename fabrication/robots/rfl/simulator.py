@@ -159,8 +159,7 @@ class Simulator(object):
         res, _, config, _, _ = self.run_child_script('getRobotState',
                                                      [robot.index],
                                                      [], [])
-        angles = map(math.degrees, config[3:])
-        return Configuration(config[0:3], angles)
+        return Configuration.from_list(config)
 
     def find_path_plan(self, robot, goal_pose, metric_values=[0.1] * 9, collision_meshes=None,
                        algorithm='rrtconnect', trials=1, resolution=0.02):
