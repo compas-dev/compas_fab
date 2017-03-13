@@ -222,9 +222,7 @@ class Simulator(object):
         if res != 0:
             raise SimulationError('Failed to search robot path', res)
 
-        return [Configuration(
-                coordinates=path[i:i + 3],
-                joint_values=map(math.degrees, path[i + 3:i + 9]))
+        return [Configuration.from_list(path[i:i + 9])
                 for i in range(0, len(path), 9)]
 
     def add_building_member(self, robot, building_member_mesh):
