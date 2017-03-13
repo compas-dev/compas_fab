@@ -161,8 +161,48 @@ class Simulator(object):
                                                      [], [])
         return Configuration.from_list(config)
 
+    def find_robot_states(self, robot, goal_pose, max_trials=None, max_results=1):
+        """Finds valid robot configurations for the specified goal pose.
+
+        Args:
+            robot (:class:`.Robot`): Robot instance.
+            goal_pose (:obj:`list` of :obj:`float`): Target or goal pose
+                specified as a list of 12 :obj:`float` values.
+            max_trials (:obj:`int`): Number of trials to run. Set to ``None`` to retry infinitely.
+            max_results (:obj:`int`): Maximum number of result states to return.
+
+        Returns:
+            list: List of :class:`Configuration` objects representing the
+                collision-free configuration for the ``goal_pose``.
+        """
+        states = self._find_raw_robot_states(robot, goal_pose, max_trials, max_results)
+
+        return [Configuration.from_list(states[i:i + 9])
+                for i in range(0, len(states), 9)]
+
+    def _find_raw_robot_states(self, robot, goal_pose, max_trials=None, max_results=1):
+        final_states = []
+        retry_until_success = True if not max_trials else False
+
+        while True:
+            res, _, states, _, _ = self.run_child_script('searchRobotStates',
+                                                         [robot.index,
+                                                          max_trials or 1,
+                                                          max_results],
+                                                         goal_pose, [])
+
+            if res != 0 and not retry_until_success:
+                raise SimulationError('Failed to search robot states', res)
+
+            final_states.extend(states)
+
+            if len(final_states) // 9 >= max_results:
+                break
+
+        return final_states
+
     def find_path_plan(self, robot, goal_pose, metric_values=[0.1] * 9, collision_meshes=None,
-                       algorithm='rrtconnect', trials=1, resolution=0.02):
+                       algorithm='rrtconnect', trials=1, resolution=0.02, shallow_state_search=True):
         """Finds a path plan to move the selected robot from its current position
         to the `goal_pose`.
 
@@ -183,16 +223,18 @@ class Simulator(object):
             resolution (:obj:`float`): Validity checking resolution. This value
                 is specified as a fraction of the space's extent.
                 Defaults to ``0.02``.
+            shallow_state_search (:obj:`bool`) True to search only a minimum of
+                valid states before searching a path, False to search states intensively.
 
         Returns:
             list: List of :class:`Configuration` objects representing the
                 collision-free path to the ``goal_pose``.
         """
-        start = timer() if self.debug else None
+        first_start = timer() if self.debug else None
         if collision_meshes:
             self.add_meshes(collision_meshes)
         if self.debug:
-            LOG.debug('Execution time: add_meshes=%f.2', timer() - start)
+            LOG.debug('Execution time: add_meshes=%f.2', timer() - first_start)
 
         start = timer() if self.debug else None
         self.set_metric(metric_values)
@@ -200,14 +242,11 @@ class Simulator(object):
             LOG.debug('Execution time: set_metric=%f.2', timer() - start)
 
         start = timer() if self.debug else None
-        res, _, states, _, _ = self.run_child_script('searchRobotStates',
-                                                     [robot.index],
-                                                     goal_pose, [])
+        max_trials = None if shallow_state_search else 160
+        max_results = 1 if shallow_state_search else 80
+        states = self._find_raw_robot_states(robot, goal_pose, max_trials, max_results)
         if self.debug:
             LOG.debug('Execution time: search_robot_states=%f.2', timer() - start)
-
-        if res != 0:
-            raise SimulationError('Failed to search robot states', res)
 
         start = timer() if self.debug else None
         res, _, path, _, _ = self.run_child_script('searchRobotPath',
@@ -220,6 +259,9 @@ class Simulator(object):
 
         if res != 0:
             raise SimulationError('Failed to search robot path', res)
+
+        if self.debug:
+            LOG.debug('Execution time: total=%f.2', timer() - first_start)
 
         return [Configuration.from_list(path[i:i + 9])
                 for i in range(0, len(path), 9)]
