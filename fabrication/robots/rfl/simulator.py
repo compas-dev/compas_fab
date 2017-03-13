@@ -161,20 +161,27 @@ class Simulator(object):
                                                      [], [])
         return Configuration.from_list(config)
 
-    def find_robot_states(self, robot, goal_pose, max_trials=None, max_results=1):
+    def find_robot_states(self, robot, goal_pose, metric_values=[0.1] * 9, max_trials=None, max_results=1):
         """Finds valid robot configurations for the specified goal pose.
 
         Args:
             robot (:class:`.Robot`): Robot instance.
             goal_pose (:obj:`list` of :obj:`float`): Target or goal pose
                 specified as a list of 12 :obj:`float` values.
-            max_trials (:obj:`int`): Number of trials to run. Set to ``None`` to retry infinitely.
+            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
+                values (3 for gantry + 6 for joints) ranging from 0 to 1,
+                where 1 indicates the axis is blocked and cannot
+                move during inverse kinematic solving.
+            max_trials (:obj:`int`): Number of trials to run. Set to ``None``
+                to retry infinitely.
             max_results (:obj:`int`): Maximum number of result states to return.
 
         Returns:
             list: List of :class:`Configuration` objects representing the
                 collision-free configuration for the ``goal_pose``.
         """
+        self.set_metric(metric_values)
+
         states = self._find_raw_robot_states(robot, goal_pose, max_trials, max_results)
 
         return [Configuration.from_list(states[i:i + 9])
