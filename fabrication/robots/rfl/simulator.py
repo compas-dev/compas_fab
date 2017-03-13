@@ -208,6 +208,35 @@ class Simulator(object):
 
         return final_states
 
+    def pick_building_member(self, robot, pickup_pose_or_config, metric_values=[0.1] * 9, building_member_mesh=None):
+        """Picks up a building member and attaches it to the robot.
+
+        Args:
+            robot (:class:`.Robot`): Robot instance to move.
+            pickup_pose_or_config (:obj:`list` of :obj:`float` or :class:`Configuration` instance):
+                Describes the pickup position, either as a pose (list of 12 :obj:`float` values)
+                or as a :class:`Configuration`.
+            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
+                values (3 for gantry + 6 for joints) ranging from 0 to 1,
+                where 1 indicates the axis is blocked and cannot
+                move during inverse kinematic solving.
+            building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh
+                of the building member that will be attached to the robot.
+
+        """
+        pickup_config = pickup_pose_or_config if isinstance(pickup_pose_or_config, Configuration) else None
+
+        # If we don't have a configuration, then it must be a pose. Try to find a configuration using
+        # shallow state search.
+        if not pickup_config and pickup_pose_or_config:
+            pickup_pose = pickup_pose_or_config
+            pickup_config = self.find_robot_states(robot, pickup_pose, metric_values)[-1]
+
+        if pickup_config:
+            self.set_robot_config(robot, pickup_config)
+
+        self.add_building_member(robot, building_member_mesh)
+
     def find_path_plan(self, robot, goal_pose, metric_values=[0.1] * 9, collision_meshes=None,
                        algorithm='rrtconnect', trials=1, resolution=0.02, shallow_state_search=True):
         """Finds a path plan to move the selected robot from its current position
