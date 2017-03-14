@@ -61,8 +61,8 @@ Here's a simple example on how to position two of the robots::
         simulator.set_robot_config(robot_b, config_robot_b)
 
 
-Minimal path planning example
-=============================
+Basic path planning example
+===========================
 
 Calculating a path plan requires several parameters to be configured in order to start
 the process. In its minimal expression, a path planning request must define a start
