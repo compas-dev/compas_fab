@@ -75,8 +75,8 @@ of such a request::
 
     start_config    = Configuration(coordinates=[8.26, -5.32, -3.69],
                                     joint_values=[-143, 37, -112, 0, -15, -126])
-    goal_pose       = [-1.0, 0.0, -8.97e-13, 8.11,
-                       8.97e-13, 0.0, -1.0, -7.02,
+    goal_pose       = [-1.0, 0.0, 0.0, 8.11,
+                       0.0, 0.0, -1.0, -7.02,
                        0.0, -1.0, 0.0, -1.81]
 
     with Simulator() as simulator:
@@ -84,4 +84,48 @@ of such a request::
 
         simulator.set_robot_config(robot, start_config)
         path = simulator.find_path_plan(robot, goal_pose)
+        print('Found path of %d steps' % len(path))
+
+
+Complete path planning example
+==============================
+
+The following example showcases a lot of the configuration options available when
+calculating a path plan::
+
+    import logging
+    from compas.datastructures.mesh import Mesh
+    from compas_fabrication import get_data
+    from compas_fabrication.fabrication.robots.rfl import *
+
+    # Configure logging to DEBUG to see detailed timing of the path planning
+    logging.basicConfig(level=logging.DEBUG)
+
+    # Configure parameters for path planning
+    start_pose      = [0.0, 1.0, 0.0, 7.453,
+                       -1.0, 0.0, 0.0, -10.919,
+                       0.0, 0.0, 1.0, -0.609]
+    goal_pose       = [-1.0, 0.0, 0.0, 8.11,
+                       8.97e-13, 0.0, -1.0, -6.92,
+                       0.0, -1.0, 0.0, -1.81]
+    algorithm       = 'rrtconnect'
+    max_trials      = 1
+    resolution      = 0.02
+    building_member = Mesh.from_obj(get_data('timber_beam.obj'))
+    structure       = [Mesh.from_obj(get_data('timber_structure.obj'))]
+    metric          = [0.1] * 9
+    fast_search     = True 
+
+    with Simulator(debug=True) as simulator:
+        robot = Robot(12, client=simulator)
+
+        simulator.reset_all_robots()
+        simulator.pick_building_member(robot, building_member, start_pose)
+        path = simulator.find_path_plan(robot,
+                                        goal_pose,
+                                        collision_meshes=structure,
+                                        algorithm=algorithm,
+                                        trials=max_trials,
+                                        resolution=resolution)
+
         print('Found path of %d steps' % len(path))
