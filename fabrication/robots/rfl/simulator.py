@@ -245,6 +245,8 @@ class Simulator(object):
                 where 1 indicates the axis is blocked and cannot
                 move during inverse kinematic solving.
 
+        Returns:
+            int: Object handle (identifier) assigned to the building member.
         """
         pickup_config = pickup_pose_or_config if isinstance(pickup_pose_or_config, Configuration) else None
 
@@ -257,7 +259,7 @@ class Simulator(object):
         if pickup_config:
             self.set_robot_config(robot, pickup_config)
 
-        self.add_building_member(robot, building_member_mesh)
+        return self.add_building_member(robot, building_member_mesh)
 
     def find_path_plan(self, robot, goal_pose, metric_values=[0.1] * 9, collision_meshes=None,
                        algorithm='rrtconnect', trials=1, resolution=0.02, shallow_state_search=True):
