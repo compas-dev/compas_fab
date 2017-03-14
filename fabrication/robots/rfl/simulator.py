@@ -230,11 +230,13 @@ class Simulator(object):
 
         return final_states
 
-    def pick_building_member(self, robot, pickup_pose_or_config, metric_values=[0.1] * 9, building_member_mesh=None):
+    def pick_building_member(self, robot, building_member_mesh, pickup_pose_or_config, metric_values=[0.1] * 9):
         """Picks up a building member and attaches it to the robot.
 
         Args:
             robot (:class:`.Robot`): Robot instance to move.
+            building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh
+                of the building member that will be attached to the robot.
             pickup_pose_or_config (:obj:`list` of :obj:`float` or :class:`Configuration` instance):
                 Describes the pickup position, either as a pose (list of 12 :obj:`float` values)
                 or as a :class:`Configuration`.
@@ -242,8 +244,6 @@ class Simulator(object):
                 values (3 for gantry + 6 for joints) ranging from 0 to 1,
                 where 1 indicates the axis is blocked and cannot
                 move during inverse kinematic solving.
-            building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh
-                of the building member that will be attached to the robot.
 
         """
         pickup_config = pickup_pose_or_config if isinstance(pickup_pose_or_config, Configuration) else None
