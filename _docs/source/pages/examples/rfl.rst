@@ -82,3 +82,4 @@ of such a request::
 
         simulator.set_robot_config(robot, start_config)
         path = simulator.find_path_plan(robot, goal_pose)
+        print('Found path of %d steps' % len(path))
