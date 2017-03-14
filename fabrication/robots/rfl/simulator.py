@@ -38,6 +38,11 @@ class Simulator(object):
         Connected: True
 
     """
+    SUPPORTED_ALGORITHMS = ('bitrrt', 'bkpiece1', 'est', 'kpiece1',
+                            'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst',
+                            'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar',
+                            'sbl', 'stride', 'trrt')
+
     def __init__(self, host='127.0.0.1', port=19997, debug=False):
         self.client_id = None
         self.host = host
@@ -279,6 +284,9 @@ class Simulator(object):
             list: List of :class:`Configuration` objects representing the
                 collision-free path to the ``goal_pose``.
         """
+        if algorithm not in self.SUPPORTED_ALGORITHMS:
+            raise ValueError('Unsupported algorithm. Must be one of: ' + str(self.SUPPORTED_ALGORITHMS))
+
         first_start = timer() if self.debug else None
         if collision_meshes:
             self.add_meshes(collision_meshes)
