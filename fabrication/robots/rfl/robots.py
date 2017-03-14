@@ -38,20 +38,29 @@ class Robot(object):
     Communication to the robot is delegated to the `client` instance
     passed when initializing the robot.
 
+
     Args:
-        name (:obj:`str`): Robot identifier.
+        id (:obj:`int`): Robot identifier.
         client (:obj:`object`): A client to execute the commands
             such as :class:`.Simulator`.
         index (:obj:`int`): Robot index (for internal use).
     """
-    SUPPORTED_ROBOTS = ('A', 'B', 'C', 'D')
+    SUPPORTED_ROBOTS = (11, 12, 21, 22)
+    ROBOT_SETTINGS = {
+        11: {'name': 'A', 'base_coordinates': [7, -2, -4]},
+        12: {'name': 'B', 'base_coordinates': [7, -10, -4]},
+        21: {'name': 'C', 'base_coordinates': [30, -2, -4]},
+        22: {'name': 'D', 'base_coordinates': [30, -10, -4]},
+    }
+    BASE_JOINT_VALUES = [0.] * 6
 
-    def __init__(self, name, client=None):
-        if name not in self.SUPPORTED_ROBOTS:
-            raise ValueError('Robot name is not valid')
-        self.name = name
+    def __init__(self, id, client=None):
+        if id not in self.SUPPORTED_ROBOTS:
+            raise ValueError('Robot ID is not valid, must be one of: ' + str(self.SUPPORTED_ROBOTS))
+        self.id = id
         self.client = client
-        self.index = self.SUPPORTED_ROBOTS.index(name)
+        self.name = self.ROBOT_SETTINGS[id]['name']
+        self.index = self.SUPPORTED_ROBOTS.index(id)
 
     def set_config(self, config):
         """Moves the robot the the specified configuration.
@@ -64,7 +73,7 @@ class Robot(object):
 
             >>> from compas_fabrication.fabrication.robots.rfl import Simulator
             >>> with Simulator() as simulator:
-            ...     robot = Robot('A', simulator)
+            ...     robot = Robot(11, simulator)
             ...     robot.set_config(Configuration(
             ...                      [7.6, -4.5, -4.5],
             ...                      [90, 0, 0, 0, 0, -90]))
@@ -80,3 +89,8 @@ class Robot(object):
             config: Instance of (:class:`.Configuration`).
         """
         return self.client.get_robot_config(self)
+
+    def reset_config(self):
+        """Resets a robot's configuration to a safe initial position."""
+        self.set_config(Configuration(coordinates=self.ROBOT_SETTINGS[self.id]['base_coordinates'],
+                                      joint_values=self.BASE_JOINT_VALUES))

@@ -38,7 +38,9 @@ if everything is working properly::
 Moving robots
 =============
 
-The RFL has 4 robots that can be referenced by letter: ``A``, ``B``, ``C`` and ``D``.
+The RFL has 4 robots that can be referenced by an identifier: ``11``, ``12``, ``21`` and ``22``.
+
+.. image:: rfl.png
 
 It's important to make sure all four of them are positioned correctly and not colliding with each other at start, otherwise path planning will fail.
 
@@ -54,8 +56,8 @@ Here's a simple example on how to position two of the robots::
                                     joint_values=[190, 0, 0, 0, 90, 0])
 
     with Simulator() as simulator:
-        robot_a = Robot('A', client=simulator)
-        robot_b = Robot('B', client=simulator)
+        robot_a = Robot(11, client=simulator)
+        robot_b = Robot(12, client=simulator)
 
         simulator.set_robot_config(robot_a, config_robot_a)
         simulator.set_robot_config(robot_b, config_robot_b)
@@ -78,7 +80,7 @@ of such a request::
                        0.0, -1.0, 0.0, -1.81]
 
     with Simulator() as simulator:
-        robot = Robot('B', client=simulator)
+        robot = Robot(12, client=simulator)
 
         simulator.set_robot_config(robot, start_config)
         path = simulator.find_path_plan(robot, goal_pose)

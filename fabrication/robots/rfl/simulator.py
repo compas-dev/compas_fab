@@ -5,7 +5,7 @@ import logging
 from timeit import default_timer as timer
 from compas.datastructures.mesh import Mesh
 from compas_fabrication.fabrication.robots.rfl.vrep_remote_api import vrep
-from compas_fabrication.fabrication.robots.rfl import Configuration
+from compas_fabrication.fabrication.robots.rfl import Configuration, Robot
 
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
 CHILD_SCRIPT_TYPE = vrep.sim_scripttype_childscript
@@ -117,6 +117,19 @@ class Simulator(object):
                                     [], metric_values, [],
                                     bytearray(), DEFAULT_OP_MODE)
 
+    def reset_all_robots(self):
+        """Resets all robots in the RFL to their base configuration.
+
+        Examples:
+
+            >>> from compas_fabrication.fabrication.robots.rfl import Simulator
+            >>> with Simulator() as simulator:
+            ...     simulator.reset_all_robots()
+            ...
+        """
+        for id in Robot.SUPPORTED_ROBOTS:
+            Robot(id, client=self).reset_config()
+
     def set_robot_config(self, robot, config):
         """Moves the robot the the specified configuration.
 
@@ -129,7 +142,7 @@ class Simulator(object):
 
             >>> from compas_fabrication.fabrication.robots.rfl import Robot
             >>> with Simulator() as simulator:
-            ...     simulator.set_robot_config(Robot('A'),
+            ...     simulator.set_robot_config(Robot(11),
             ...                                Configuration([7.6, -4.5, -4.5],
             ...                                [90, 0, 0, 0, 0, -90]))
             ...
@@ -151,7 +164,7 @@ class Simulator(object):
 
             >>> from compas_fabrication.fabrication.robots.rfl import Robot
             >>> with Simulator() as simulator:
-            ...     config = simulator.get_robot_config(Robot('A'))
+            ...     config = simulator.get_robot_config(Robot(11))
 
         Returns:
             An instance of :class:`.Configuration`.
