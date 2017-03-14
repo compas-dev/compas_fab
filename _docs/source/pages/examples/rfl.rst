@@ -12,7 +12,7 @@ with the RFL scene pre-loaded. There are two options to run v-rep:
  * `Download it <http://www.coppeliarobotics.com/downloads.html>`_, install it
    and open the RFL scene file contained in this package
    (``fabrication\robots\rfl\vrep_remote_api\rfl_scene.ttt``).
- * Install as a service using Docker:
+ * Install as a service using Docker (only on Windows 10 and higher):
 
    * Make sure you have `Docker <https://www.docker.com/>`_ installed.
    * Run the following commands on the command line::
