@@ -206,6 +206,7 @@ class Simulator(object):
                 for i in range(0, len(states), 9)]
 
     def _find_raw_robot_states(self, robot, goal_pose, max_trials=None, max_results=1):
+        i = 0
         final_states = []
         retry_until_success = True if not max_trials else False
 
@@ -216,7 +217,10 @@ class Simulator(object):
                                                           max_results],
                                                          goal_pose, [])
 
-            if res != 0 and not retry_until_success:
+            # Even if the retry_until_success is set to True, we short circuit
+            # at some point to prevent infinite loops caused by misconfiguration
+            i += 1
+            if i > 200 or (res != 0 and not retry_until_success):
                 raise SimulationError('Failed to search robot states', res)
 
             final_states.extend(states)
