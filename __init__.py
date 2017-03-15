@@ -15,6 +15,7 @@ Main package for robotics fabrication for the compAS Framework.
     :maxdepth: 2
 
     compas_fabrication.fabrication.robots.rfl
+    compas_fabrication.fabrication.grasshopper
 
 """
 

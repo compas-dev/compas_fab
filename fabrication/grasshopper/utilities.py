@@ -1,7 +1,13 @@
 from __future__ import print_function
 
-import rhinoscriptsyntax as rs
-import ghpythonlib.components as ghcomp
+try:
+    import rhinoscriptsyntax as rs
+    import ghpythonlib.components as ghcomp
+except ImportError:
+    import platform
+    if platform.python_implementation() == 'IronPython':
+        raise
+
 from compas.datastructures.mesh import Mesh
 
 
