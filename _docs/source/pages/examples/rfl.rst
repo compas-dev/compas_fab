@@ -35,8 +35,11 @@ if everything is working properly::
         print ('Connected: %s' % simulator.is_connected())
 
 
+Forward Kinematics
+====================
+
 Moving robots
-=============
+-------------
 
 The RFL has 4 robots that can be referenced by an identifier: ``11``, ``12``, ``21`` and ``22``.
 
@@ -46,7 +49,7 @@ It's important to make sure all four of them are positioned correctly and not co
 
 The position of a robot is specified as an instance of :class:`compas_fabrication.fabrication.robots.rfl.Configuration`.
 
-Here's a simple example on how to position two of the robots::
+Here's a simple example on how to position two of the robots using forward kinematics::
 
     from compas_fabrication.fabrication.robots.rfl import *
 
@@ -63,8 +66,11 @@ Here's a simple example on how to position two of the robots::
         simulator.set_robot_config(robot_b, config_robot_b)
 
 
+Inverse Kinematics
+==================
+
 Basic path planning example
-===========================
+---------------------------
 
 Calculating a path plan requires several parameters to be configured in order to start
 the process. In its minimal expression, a path planning request must define a start
@@ -88,7 +94,7 @@ of such a request::
 
 
 Complete path planning example
-==============================
+------------------------------
 
 The following example showcases a lot of the configuration options available when
 calculating a path plan::
