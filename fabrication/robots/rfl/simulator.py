@@ -365,6 +365,9 @@ class Simulator(object):
         mesh_handles = []
 
         for mesh in meshes:
+            if not mesh.is_trimesh():
+                raise ValueError('The simulator only supports tri-meshes')
+
             # TODO: Remove the next two lines and uncomment the third
             # if `to_vertices_and_faces` is merged into compAS.
             vertices = mesh.xyz
