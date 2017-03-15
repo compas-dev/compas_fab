@@ -71,14 +71,15 @@ class Simulator(object):
         return self
 
     def __exit__(self, *args):
-        self.remove_objects(self._added_handles)
-
         # Stop simulation
         vrep.simxStopSimulation(self.client_id, DEFAULT_OP_MODE)
 
         # Close the connection to V-REP
         vrep.simxFinish(self.client_id)
         self.client_id = None
+
+        # Objects are removed by V-REP itself when simulation stops
+        self._added_handles = []
 
         if self.debug:
             LOG.debug('Disconnected from V-REP')
