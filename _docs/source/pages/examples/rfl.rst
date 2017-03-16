@@ -129,9 +129,11 @@ calculating a path plan::
         simulator.pick_building_member(robot, building_member, start_pose)
         path = simulator.find_path_plan(robot,
                                         goal_pose,
+                                        metric_values=metric,
                                         collision_meshes=structure,
                                         algorithm=algorithm,
                                         trials=max_trials,
-                                        resolution=resolution)
+                                        resolution=resolution,
+                                        shallow_state_search=fast_search)
 
         print('Found path of %d steps' % len(path))
