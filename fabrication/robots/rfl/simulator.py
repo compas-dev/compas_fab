@@ -369,12 +369,7 @@ class Simulator(object):
             if not mesh.is_trimesh():
                 raise ValueError('The simulator only supports tri-meshes')
 
-            # TODO: Remove the next two lines and uncomment the third
-            # if `to_vertices_and_faces` is merged into compAS.
-            vertices = mesh.xyz
-            faces = [mesh.face_vertices(fkey, ordered=True) for fkey in mesh.face]
-            # vertices, faces = mesh.to_vertices_and_faces()
-
+            vertices, faces = mesh.to_vertices_and_faces()
             vrep_packing = ([item for sublist in vertices for item in sublist] +
                             [item for sublist in faces for item in sublist])
             params = [[len(vertices) * 3, len(faces) * 4], vrep_packing]
