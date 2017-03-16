@@ -52,6 +52,7 @@ class Simulator(object):
         self.debug = debug
         self._lua_script_name = 'RFL'
         self._added_handles = []
+        self._dof = 9
 
     def __enter__(self):
         # Stop existing simulation, if any
@@ -111,12 +112,22 @@ class Simulator(object):
 
         It takes a list of 9 :obj:`float` values (3 for gantry + 6 for joints)
         ranging from 0 to 1, where 1 indicates the axis is blocked and cannot
-        move during inverse kinematic solving.
+        move during inverse kinematic solving. A value of 1 on any of these
+        effectively removes one degree of freedom (DOF).
+
+        In its current implementation, it is not possible to remove one DOF and
+        then re-add it in the same simulation run.
 
         Args:
             metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
                 values from 0 to 1.
         """
+        dof = len(filter(lambda x: x < 1., metric_values))
+        if dof > self._dof:
+            raise ValueError('After lowering the degrees of freedom, they cannot be raised again in the same simulation run')
+
+        self._dof = dof
+
         vrep.simxCallScriptFunction(self.client_id,
                                     self._lua_script_name,
                                     CHILD_SCRIPT_TYPE, 'setTheMetric',
