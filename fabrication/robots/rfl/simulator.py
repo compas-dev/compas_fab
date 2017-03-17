@@ -52,7 +52,6 @@ class Simulator(object):
         self.debug = debug
         self._lua_script_name = 'RFL'
         self._added_handles = []
-        self._dof = 9
 
     def __enter__(self):
         # Stop existing simulation, if any
@@ -107,31 +106,23 @@ class Simulator(object):
                                                 DEFAULT_OP_MODE)
         return handle
 
-    def set_metric(self, metric_values):
-        """Assigns a metric defining relations between axis values.
+    def set_robot_metric(self, robot, metric_values):
+        """Assigns a metric defining relations between axis values of a robot.
 
         It takes a list of 9 :obj:`float` values (3 for gantry + 6 for joints)
         ranging from 0 to 1, where 1 indicates the axis is blocked and cannot
         move during inverse kinematic solving. A value of 1 on any of these
         effectively removes one degree of freedom (DOF).
 
-        In its current implementation, it is not possible to remove one DOF and
-        then re-add it in the same simulation run.
-
         Args:
+            robot (:class:`.Robot`): Robot instance.
             metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
                 values from 0 to 1.
         """
-        dof = len(filter(lambda x: x < 1., metric_values))
-        if dof > self._dof:
-            raise ValueError('After lowering the degrees of freedom, they cannot be raised again in the same simulation run')
-
-        self._dof = dof
-
         vrep.simxCallScriptFunction(self.client_id,
                                     self._lua_script_name,
                                     CHILD_SCRIPT_TYPE, 'setTheMetric',
-                                    [], metric_values, [],
+                                    [robot.index], metric_values, [],
                                     bytearray(), DEFAULT_OP_MODE)
 
     def reset_all_robots(self):
@@ -167,7 +158,7 @@ class Simulator(object):
         values = list(config.coordinates)
         values.extend([math.radians(angle) for angle in config.joint_values])
 
-        self.set_metric([0.0] * 9)
+        self.set_robot_metric(robot, [0.0] * 9)
         self.run_child_script('moveRobotFK',
                               [], values, ['robot' + robot.name])
 
@@ -210,7 +201,7 @@ class Simulator(object):
             list: List of :class:`Configuration` objects representing the
                 collision-free configuration for the ``goal_pose``.
         """
-        self.set_metric(metric_values)
+        self.set_robot_metric(robot, metric_values)
 
         states = self._find_raw_robot_states(robot, goal_pose, max_trials, max_results)
 
@@ -312,9 +303,9 @@ class Simulator(object):
             LOG.debug('Execution time: add_meshes=%f.2', timer() - first_start)
 
         start = timer() if self.debug else None
-        self.set_metric(metric_values)
+        self.set_robot_metric(robot, metric_values)
         if self.debug:
-            LOG.debug('Execution time: set_metric=%f.2', timer() - start)
+            LOG.debug('Execution time: set_robot_metric=%f.2', timer() - start)
 
         start = timer() if self.debug else None
         max_trials = None if shallow_state_search else 160
