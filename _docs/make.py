@@ -2,7 +2,8 @@ from importlib import import_module
 
 MODULES = [
     'compas_fabrication',
-    'compas_fabrication.fabrication.robots.rfl'
+    'compas_fabrication.fabrication.robots.rfl',
+    'compas_fabrication.fabrication.grasshopper'
 ]
 
 if __name__ == '__main__':
