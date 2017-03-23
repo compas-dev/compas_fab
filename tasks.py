@@ -6,8 +6,8 @@ from invoke import Collection, task
 
 
 @task(help={
-    'docs': 'Indicates whether to clean generated documentation or not.',
-    'bytecode': 'Indicates whether to clean compiled python files or not.'})
+    'docs': 'True to generate documentation, otherwise False',
+    'bytecode': 'Tue to generate compiled python files, otherwise False.'})
 def clean(ctx, docs=True, bytecode=False):
     """Cleans the local copy from compiled artifacts."""
     patterns = []
@@ -16,22 +16,22 @@ def clean(ctx, docs=True, bytecode=False):
     if bytecode:
         patterns.append('**/*.pyc')
     for pattern in patterns:
-        ctx.run("rm -rf %s" % pattern)
+        ctx.run('rm -rf %s' % pattern)
 
 
 @task(help={
-    'docs': 'Indicates whether to clean generated documentation or not.'})
+    'docs': 'True to clean generated documentation, otherwise False.'})
 def build(ctx, docs=True):
     """Builds the current package."""
     if docs:
         with chdir('_docs/'):
-            ctx.run("python make.py && make html")
+            ctx.run('python make.py && sphinx-build -M html source _build')
 
 
 @task()
 def doctest(ctx):
     """Runs all examples defined in docstrings for this module."""
-    ctx.run("pytest --doctest-module --ignore=fabrication/grasshopper")
+    ctx.run('pytest --doctest-module --ignore=fabrication/grasshopper')
 
 
 @contextlib.contextmanager

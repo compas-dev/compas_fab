@@ -1,33 +1,16 @@
 # compAS:Fabrication package
 
-Site package to the compAS Framework aimed at providing tools for robotic fabrication.
+Package for the compAS framework aimed at providing tools for robotic fabrication.
 
-## Getting started
+## How to use it?
 
-Just as the compAS Framework, the suggested usage is not through an install, but rather a local
-copy of the source code.
+ * [compAS Fabrication Documentation](https://gramaziokohlerresearch.bitbucket.io/compas_fabrication)
+ * [compAS Framework Documentation](http://block.arch.ethz.ch/docs/compAS/core)
 
-Start off by making sure you have all the prerequisites installed. Open a terminal window on the
-folder where you cloned this repository and run the following:
+## How to contribute?
 
-    pip install -r requirements.txt
-
-And add the root folder of this repository to your `PYTHONPATH` to make it importable.
-
-Fire off your favorite editor and run the simplest example:
-
-```python
-from compas_fabrication.fabrication.robots.rfl import Simulator
-
-with Simulator() as simulator:
-    print ('Connected: ' + str(simulator.is_connected()))
-
-print ('Done')
-
-```
-
-
-## Build
+Beyond using this package, you can also help develop it further.
+The local development environment does not differ much from just using it.
 
 All local development tasks are handled by `pyinvoke` through the `inv` (aka `invoke`) command.
 

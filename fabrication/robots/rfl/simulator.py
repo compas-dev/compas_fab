@@ -198,8 +198,8 @@ class Simulator(object):
             max_results (:obj:`int`): Maximum number of result states to return.
 
         Returns:
-            list: List of :class:`Configuration` objects representing the
-                collision-free configuration for the ``goal_pose``.
+            list: List of :class:`Configuration` objects representing
+            the collision-free configuration for the ``goal_pose``.
         """
         self.set_robot_metric(robot, metric_values)
 
@@ -237,7 +237,7 @@ class Simulator(object):
         """Picks up a building member and attaches it to the robot.
 
         Args:
-            robot (:class:`.Robot`): Robot instance to move.
+            robot (:class:`.Robot`): Robot instance to use for pick up.
             building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh
                 of the building member that will be attached to the robot.
             pickup_pose_or_config (:obj:`list` of :obj:`float` or :class:`Configuration` instance):
@@ -245,7 +245,7 @@ class Simulator(object):
                 or as a :class:`Configuration`.
             metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
                 values (3 for gantry + 6 for joints) ranging from 0 to 1,
-                where 1 indicates the axis is blocked and cannot
+                where 1 indicates the axis/joint is blocked and cannot
                 move during inverse kinematic solving.
 
         Returns:
@@ -275,23 +275,22 @@ class Simulator(object):
                 specified as a list of 12 :obj:`float` values.
             metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
                 values (3 for gantry + 6 for joints) ranging from 0 to 1,
-                where 1 indicates the axis is blocked and cannot
+                where 1 indicates the axis/joint is blocked and cannot
                 move during inverse kinematic solving.
             collision_meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): Collision meshes
                 to be taken into account when calculating the motion plan.
                 Defaults to ``None``.
-            algorithm (:obj:`list` of :obj:`float`): 6 joint values
-                expressed in degrees. Defaults to ``rrtconnect``.
+            algorithm (:obj:`string`): Name of the algorithm to use. Defaults to ``rrtconnect``.
             trials (:obj:`int`): Number of search trials to run. Defaults to ``1``.
             resolution (:obj:`float`): Validity checking resolution. This value
                 is specified as a fraction of the space's extent.
                 Defaults to ``0.02``.
-            shallow_state_search (:obj:`bool`) True to search only a minimum of
+            shallow_state_search (:obj:`bool`): True to search only a minimum of
                 valid states before searching a path, False to search states intensively.
 
         Returns:
             list: List of :class:`Configuration` objects representing the
-                collision-free path to the ``goal_pose``.
+            collision-free path to the ``goal_pose``.
         """
         if algorithm not in self.SUPPORTED_ALGORITHMS:
             raise ValueError('Unsupported algorithm. Must be one of: ' + str(self.SUPPORTED_ALGORITHMS))
@@ -333,7 +332,7 @@ class Simulator(object):
                 for i in range(0, len(path), 9)]
 
     def add_building_member(self, robot, building_member_mesh):
-        """Add a building member to the RFL scene and attaches it to the robot.
+        """Adds a building member to the RFL scene and attaches it to the robot.
 
         Args:
             robot (:class:`.Robot`): Robot instance to attach the building member to.
@@ -342,6 +341,9 @@ class Simulator(object):
 
         Returns:
             int: Object handle (identifier) assigned to the building member.
+
+        Notes:
+            All meshes are automatically removed from the scene when the simulation ends.
         """
         handles = self.add_meshes([building_member_mesh])
 
@@ -357,6 +359,8 @@ class Simulator(object):
 
     def add_meshes(self, meshes):
         """Adds meshes to the RFL scene.
+
+        All meshes are automatically removed from the scene when the simulation ends.
 
         Args:
             meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): List
@@ -400,6 +404,11 @@ class Simulator(object):
 
         Args:
             object_handles (:obj:`list` of :obj:`int`): Object handles to remove.
+
+        Notes:
+            Please note there's no need to clean up objects manually after the simulation
+            has completed, as those will be reset automatically anyway. This method is
+            only useful if you need to remove objects *during* a simulation.
         """
         for handle in object_handles:
             vrep.simxRemoveObject(self.client_id, handle, DEFAULT_OP_MODE)

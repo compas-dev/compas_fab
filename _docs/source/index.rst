@@ -9,6 +9,7 @@ Documentation for the robotic fabrication package of the compAS Framework.
    :maxdepth: 1
    :caption: Contents:
 
+   pages/gettingstarted
    pages/examples
    pages/reference
 
