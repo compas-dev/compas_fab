@@ -4,8 +4,7 @@ Package for the compAS framework aimed at providing tools for robotic fabricatio
 
 ## How to use it?
 
- * [compAS Fabrication Documentation](https://gramaziokohlerresearch.bitbucket.io/compas_fabrication)
- * [compAS Framework Documentation](http://block.arch.ethz.ch/docs/compAS/core)
+Check out the [Examples and Documentation here](https://gramaziokohlerresearch.bitbucket.io/compas_fabrication).
 
 ## How to contribute?
 
