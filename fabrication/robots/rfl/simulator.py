@@ -299,19 +299,19 @@ class Simulator(object):
         if collision_meshes:
             self.add_meshes(collision_meshes)
         if self.debug:
-            LOG.debug('Execution time: add_meshes=%f.2', timer() - first_start)
+            LOG.debug('Execution time: add_meshes=%.2f', timer() - first_start)
 
         start = timer() if self.debug else None
         self.set_robot_metric(robot, metric_values)
         if self.debug:
-            LOG.debug('Execution time: set_robot_metric=%f.2', timer() - start)
+            LOG.debug('Execution time: set_robot_metric=%.2f', timer() - start)
 
         start = timer() if self.debug else None
         max_trials = None if shallow_state_search else 160
         max_results = 1 if shallow_state_search else 80
         states = self._find_raw_robot_states(robot, goal_pose, max_trials, max_results)
         if self.debug:
-            LOG.debug('Execution time: search_robot_states=%f.2', timer() - start)
+            LOG.debug('Execution time: search_robot_states=%.2f', timer() - start)
 
         start = timer() if self.debug else None
         res, _, path, _, _ = self.run_child_script('searchRobotPath',
@@ -320,13 +320,13 @@ class Simulator(object):
                                                     (int)(resolution * 1000)],
                                                    states, [algorithm])
         if self.debug:
-            LOG.debug('Execution time: search_robot_path=%f.2', timer() - start)
+            LOG.debug('Execution time: search_robot_path=%.2f', timer() - start)
 
         if res != 0:
             raise SimulationError('Failed to search robot path', res)
 
         if self.debug:
-            LOG.debug('Execution time: total=%f.2', timer() - first_start)
+            LOG.debug('Execution time: total=%.2f', timer() - first_start)
 
         return [Configuration.from_list(path[i:i + 9])
                 for i in range(0, len(path), 9)]
