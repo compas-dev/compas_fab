@@ -51,6 +51,19 @@ class PathVisualizer(object):
         self.building_member = building_member
 
     def get_frame_meshes(self, path, frame, ctx):
+        """Retrieves all meshes required to render a specific frame of a path plan.
+
+        Args:
+            path (:obj:`list` of :class:`Configuration`): Represents a collision-free
+                path to a goal pose. It is the output of the path planning generated
+                by a :class:`Simulator` object.
+            frame (:obj:`int`): Frame number to retrieve.
+            ctx (:obj:`dict`): A dictionary to keep context. Within Grasshopper, this is
+                normally the ``sc.sticky`` object.
+
+        Returns:
+            list: list of Rhino meshes that can be used to visualize the selected frame.
+        """
         first_start = timer() if self.debug else None
         shape_handles = self.simulator.get_robot_visible_handles()
         if self.debug:
@@ -62,26 +75,7 @@ class PathVisualizer(object):
         frame_config = path[frame]
 
         if self.building_member and BUILDING_MEMBER_KEY not in ctx:
-            start = timer() if self.debug else None
-
-            self.simulator.set_robot_config(self.robot, path[0])
-            building_member_mesh = mesh_from_guid(self.building_member)
-            building_member_handle = self.simulator.add_building_member(self.robot, building_member_mesh)
-
-            _, _, building_member_matrix, _, _ = self.simulator.run_child_script('getShapeMatrices', [building_member_handle], [], [])
-
-            parent_handle = self.simulator.get_object_handle('customGripper' + self.robot.name)
-            _, _, mesh_matrix, _, _ = self.simulator.run_child_script('getShapeMatrixRelative', [building_member_handle, parent_handle], [], [])
-
-            building_member_relative_transform = xform_from_matrix(mesh_matrix)
-
-            transform = xform_from_matrix(building_member_matrix)
-            mesh_at_origin = _transform_to_origin(rs.coercemesh(self.building_member), transform)
-            ctx[BUILDING_MEMBER_KEY] = {'mesh': mesh_at_origin,
-                                        'parent_handle_index': shape_handles.index(parent_handle),
-                                        'relative_transform': building_member_relative_transform}
-            if self.debug:
-                LOG.debug('Execution time: building member=%.2f', timer() - start)
+            ctx[BUILDING_MEMBER_KEY] = self._get_building_member_info(path[0])
 
         start = timer() if self.debug else None
         self.simulator.set_robot_config(self.robot, frame_config)
@@ -90,22 +84,19 @@ class PathVisualizer(object):
 
         start = timer() if self.debug else None
         meshes = []
-        _, _, mesh_matrices, _, _ = self.simulator.run_child_script('getShapeMatrices', shape_handles, [], [])
-        for i in range(0, len(mesh_matrices), 12):
-            handle = shape_handles[i // 12]
-            mesh_matrix = mesh_matrices[i:i + 12]
-            transform = xform_from_matrix(mesh_matrix)
+        mesh_matrices = self.simulator.get_object_matrices(shape_handles)
+        for handle, mesh_matrix in mesh_matrices.iteritems():
             mesh = ctx['rfl_meshes'][handle].DuplicateShallow()
-            mesh.Transform(transform)
+            mesh.Transform(xform_from_matrix(mesh_matrix))
             meshes.append(mesh)
 
         if self.building_member:
-            mesh = ctx[BUILDING_MEMBER_KEY]['mesh'].DuplicateShallow()
-            parent_index = ctx[BUILDING_MEMBER_KEY]['parent_handle_index']
-            parent_matrix = mesh_matrices[parent_index * 12:parent_index * 12 + 12]
-            parent_transform = xform_from_matrix(parent_matrix)
+            info = ctx[BUILDING_MEMBER_KEY]
+            mesh = info['mesh'].DuplicateShallow()
+            parent_transform = xform_from_matrix(mesh_matrices[info['parent_handle']])
+            relative_transform = info['relative_transform']
 
-            mesh.Transform(Transform.Multiply(parent_transform, ctx[BUILDING_MEMBER_KEY]['relative_transform']))
+            mesh.Transform(Transform.Multiply(parent_transform, relative_transform))
             meshes.append(mesh)
 
         if self.debug:
@@ -139,6 +130,29 @@ class PathVisualizer(object):
             LOG.debug('Execution time: create RFL meshes at origin=%.2f', timer() - start)
 
         return rfl_meshes
+
+    def _get_building_member_info(self, gripping_config):
+        start = timer() if self.debug else None
+
+        self.simulator.set_robot_config(self.robot, gripping_config)
+        mesh = mesh_from_guid(self.building_member)
+        handle = self.simulator.add_building_member(self.robot, mesh)
+        matrix = self.simulator.get_object_matrices([handle])[handle]
+
+        parent_handle = self.simulator.get_object_handle('customGripper' + self.robot.name)
+        _, _, mesh_matrix, _, _ = self.simulator.run_child_script('getShapeMatrixRelative', [handle, parent_handle], [], [])
+
+        relative_transform = xform_from_matrix(mesh_matrix)
+
+        transform = xform_from_matrix(matrix)
+        mesh_at_origin = _transform_to_origin(rs.coercemesh(self.building_member), transform)
+
+        if self.debug:
+            LOG.debug('Execution time: building member=%.2f', timer() - start)
+
+        return {'mesh': mesh_at_origin,
+                'parent_handle': parent_handle,
+                'relative_transform': relative_transform}
 
 
 class InputParameterParser(object):

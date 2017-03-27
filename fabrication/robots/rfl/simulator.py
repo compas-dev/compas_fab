@@ -106,6 +106,39 @@ class Simulator(object):
                                                 DEFAULT_OP_MODE)
         return handle
 
+    def get_object_matrices(self, object_handles):
+        """Gets a dictionary of matrices keyed by object handle.
+
+        Args:
+            object_handles (:obj:`list` of :obj:`float`): List of object handles (identifiers)
+                to retrieve matrices from.
+
+        Returns:
+            dict: Dictionary of matrices represented by a :obj:`list` of 12 :obj:`float` values.
+
+        Examples:
+
+            >>> from compas_fabrication.fabrication.robots.rfl import Simulator
+            >>> with Simulator() as simulator:
+            ...     matrices = simulator.get_object_matrices([0])
+            ...     print(map(int, matrices[0]))
+            [0, 0, 0, -7, 0, 0, 0, -4, 0, 0, 0, -7]
+
+        .. note::
+            The resulting dictionary is keyed by object handle.
+        """
+        _res, _, matrices, _, _ = self.run_child_script('getShapeMatrices', object_handles, [], [])
+        return dict([(object_handles[i // 12], matrices[i:i + 12]) for i in range(0, len(matrices), 12)])
+
+    def get_robot_visible_handles(self):
+        """Gets a list of object handles (identifiers) for all visible
+        shapes of the RFL model.
+
+        Returns:
+            list: List of object handles (identifiers) of the RFL model.
+        """
+        return self.run_child_script('getRobotVisibleShapeHandles', [], [], [])[1]
+
     def set_robot_metric(self, robot, metric_values):
         """Assigns a metric defining relations between axis values of a robot.
 
@@ -407,7 +440,7 @@ class Simulator(object):
         Args:
             object_handles (:obj:`list` of :obj:`int`): Object handles to remove.
 
-        Notes:
+        .. note::
             Please note there's no need to clean up objects manually after the simulation
             has completed, as those will be reset automatically anyway. This method is
             only useful if you need to remove objects *during* a simulation.
