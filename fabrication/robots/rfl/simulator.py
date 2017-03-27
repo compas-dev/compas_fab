@@ -343,7 +343,7 @@ class Simulator(object):
         Returns:
             int: Object handle (identifier) assigned to the building member.
 
-        Notes:
+        .. note::
             All meshes are automatically removed from the scene when the simulation ends.
         """
         handles = self.add_meshes([building_member_mesh])
@@ -361,14 +361,15 @@ class Simulator(object):
     def add_meshes(self, meshes):
         """Adds meshes to the RFL scene.
 
-        All meshes are automatically removed from the scene when the simulation ends.
-
         Args:
             meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): List
                 of meshes to add to the current simulation scene.
 
         Returns:
             list: List of object handles (identifiers) assigned to the meshes.
+
+        .. note::
+            All meshes are automatically removed from the scene when the simulation ends.
         """
         mesh_handles = []
 
