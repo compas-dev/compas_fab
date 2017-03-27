@@ -138,13 +138,14 @@ class Simulator(object):
         for id in Robot.SUPPORTED_ROBOTS:
             Robot(id, client=self).reset_config()
 
-    def set_robot_config(self, robot, config):
-        """Moves the robot the the specified configuration.
+    def set_robot_config(self, robot, config_or_pose):
+        """Moves the robot the the specified configuration or pose.
 
         Args:
             robot (:class:`.Robot`): Robot instance to move.
-            config (:class:`.Configuration`): Instance of robot's
-                configuration.
+            config_or_pose (:class:`Configuration` instance or :obj:`list` of :obj:`float`):
+                Describes the position, either as a pose (list of 12 :obj:`float` values)
+                or as a :class:`Configuration`.
 
         Examples:
 
@@ -155,6 +156,15 @@ class Simulator(object):
             ...                                [90, 0, 0, 0, 0, -90]))
             ...
         """
+        config = None
+        if isinstance(config_or_pose, Configuration):
+            config = config_or_pose
+        elif isinstance(config_or_pose, list):
+            config = self.find_robot_states(robot, config_or_pose, [0.0] * 9)[-1]
+
+        if not config:
+            raise ValueError('Unsupported config value')
+
         values = list(config.coordinates)
         values.extend([math.radians(angle) for angle in config.joint_values])
 
@@ -251,16 +261,7 @@ class Simulator(object):
         Returns:
             int: Object handle (identifier) assigned to the building member.
         """
-        pickup_config = pickup_pose_or_config if isinstance(pickup_pose_or_config, Configuration) else None
-
-        # If we don't have a configuration, then it must be a pose. Try to find a configuration using
-        # shallow state search.
-        if not pickup_config and pickup_pose_or_config:
-            pickup_pose = pickup_pose_or_config
-            pickup_config = self.find_robot_states(robot, pickup_pose, metric_values)[-1]
-
-        if pickup_config:
-            self.set_robot_config(robot, pickup_config)
+        self.set_robot_config(robot, pickup_pose_or_config)
 
         return self.add_building_member(robot, building_member_mesh)
 
