@@ -1,5 +1,3 @@
-#from __future__ import print_function
-
 from compas.geometry import cross_vectors
 from compas.geometry.elements import Point, Vector, Plane
 import math
@@ -29,11 +27,13 @@ class Rotation():
     def from_quaternion(cls, quaternion):
         qw, qx, qy, qz = quaternion
         # make matrix
+        raise NotImplementedError
     
     @classmethod
     def from_axis_angle(cls, axis_angle):
         ax, ay, az = axis_angle
         # make matrix ..
+        raise NotImplementedError
     
     @classmethod
     def from_euler_angles(cls, euler_angles):
@@ -85,7 +85,6 @@ class Rotation():
     
     def __repr__(self):
         m = self.matrix
-        print 
         s = "Rotation:\n"
         s += "%.4f\t%.4f\t%.4f\n" % (m[0][0], m[1][0], m[2][0])
         s += "%.4f\t%.4f\t%.4f\n" % (m[0][1], m[1][1], m[2][1])
