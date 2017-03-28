@@ -146,4 +146,5 @@ Grasshopper integration
 Besides the examples above that can be run standalone or inside CAD software, this package contains
 a ready-made integration for Grasshopper that allows configuration of most available parameters.
 
-See :download:`this Grasshopper file <grasshopper-path-planner.ghx>`.
+See :download:`this basic example <grasshopper-basic-example.ghx>` and then
+:download:`this complete path planning example <grasshopper-path-planner.ghx>` for Grasshopper.
