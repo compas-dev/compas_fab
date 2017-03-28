@@ -130,7 +130,7 @@ class Simulator(object):
         _res, _, matrices, _, _ = self.run_child_script('getShapeMatrices', object_handles, [], [])
         return dict([(object_handles[i // 12], matrices[i:i + 12]) for i in range(0, len(matrices), 12)])
 
-    def get_robot_visible_handles(self):
+    def get_all_visible_handles(self):
         """Gets a list of object handles (identifiers) for all visible
         shapes of the RFL model.
 

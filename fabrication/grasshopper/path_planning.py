@@ -65,9 +65,9 @@ class PathVisualizer(object):
             list: list of Rhino meshes that can be used to visualize the selected frame.
         """
         first_start = timer() if self.debug else None
-        shape_handles = self.simulator.get_robot_visible_handles()
+        shape_handles = self.simulator.get_all_visible_handles()
         if self.debug:
-            LOG.debug('Execution time: get_robot_visible_handles=%.2f', timer() - first_start)
+            LOG.debug('Execution time: get_all_visible_handles=%.2f', timer() - first_start)
 
         if 'rfl_meshes' not in ctx:
             ctx['rfl_meshes'] = self._get_rfl_meshes(shape_handles)
