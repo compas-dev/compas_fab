@@ -16,30 +16,76 @@ class Rotation():
         
     @classmethod
     def from_basis_vectors(cls, xaxis, yaxis):
+        if type(xaxis) == type([]): xaxis = Vector(xaxis)
+        if type(yaxis) == type([]): yaxis = Vector(yaxis)
         xaxis.normalize()
         yaxis.normalize()
         zaxis = xaxis.cross(yaxis)
         R = cls()
-        R.matrix = [list(xaxis), list(yaxis), list(zaxis)]
+        R.matrix[0][0], R.matrix[1][0], R.matrix[2][0] = list(xaxis)
+        R.matrix[0][1], R.matrix[1][1], R.matrix[2][1] = list(yaxis)
+        R.matrix[0][2], R.matrix[1][2], R.matrix[2][2] = list(zaxis)
         return R
     
     @classmethod
     def from_quaternion(cls, quaternion):
-        qw, qx, qy, qz = quaternion
-        # make matrix
-        raise NotImplementedError
-    
+        """
+        Calculate rotation matrix from quaternion.
+        References Christoph Gohlke's implementation of quaternion_matrix(quaternion): 
+        http://www.lfd.uci.edu/~gohlke/code/transformations.py.html
+        """     
+        q = quaternion
+        n =  q[0]**2 + q[1]**2 + q[2]**2 + q[3]**2 # dot product
+        
+        epsilon = 1.0e-15
+        
+        if n < epsilon:
+            return cls()
+        
+        q = [v * math.sqrt(2.0 / n) for v in q]
+        q = [[q[i]*q[j] for i in range(4)] for j in range(4)] # outer_product
+        
+        rotation = cls()
+        rotation.matrix = [
+            [1.0 - q[2][2] - q[3][3],       q[1][2] - q[3][0],       q[1][3] + q[2][0]],
+            [      q[1][2] + q[3][0], 1.0 - q[1][1] - q[3][3],       q[2][3] - q[1][0]],
+            [      q[1][3] - q[2][0],       q[2][3] + q[1][0], 1.0 - q[1][1] - q[2][2]]]
+        return rotation
+        
+        
     @classmethod
     def from_axis_angle(cls, axis_angle):
-        ax, ay, az = axis_angle
-        # make matrix ..
-        raise NotImplementedError
+        """
+        Calculate rotation matrix from axis-angle representation.
+        References Christoph Gohlke's implementation of rotation_matrix(angle, direction, point=None): 
+        http://www.lfd.uci.edu/~gohlke/code/transformations.py.html
+        """     
+        direction = Vector(axis_angle)
+        angle = direction.length
+        direction.normalize()
+
+        sina = math.sin(angle)
+        cosa = math.cos(angle)
+        
+        R = [[cosa, 0.0, 0.0], [0.0, cosa, 0.0], [0.0, 0.0, cosa]]
+        
+        outer_product = [[direction[i]*direction[j] * (1.0 - cosa) for i in range(3)] for j in range(3)]
+        R = [[R[i][j] + outer_product[i][j] for i in range(3)] for j in range(3)]
+    
+        direction *= sina
+                
+        m = [[ 0.0,         -direction[2],  direction[1]],
+            [ direction[2], 0.0,          -direction[0]],
+            [-direction[1], direction[0],  0.0]]
+        
+        rotation = cls()
+        rotation.matrix = [[R[i][j] + m[j][i] for i in range(3)] for j in range(3)]
+        return rotation
     
     @classmethod
     def from_euler_angles(cls, euler_angles):
         #a, b, c = euler_angles
         raise NotImplementedError
-    
     
     @property
     def quaternion(self):
@@ -48,7 +94,6 @@ class Rotation():
         References Martin Baker's implementation of matrix to quaternion: 
         http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/ 
         """
-        
         m = self.matrix
         
         qw, qx, qy, qz = 0, 0, 0, 0
@@ -83,35 +128,29 @@ class Rotation():
             
         return [qw, qx, qy, qz]
     
-    def __repr__(self):
-        m = self.matrix
-        s = "Rotation:\n"
-        s += "%.4f\t%.4f\t%.4f\n" % (m[0][0], m[1][0], m[2][0])
-        s += "%.4f\t%.4f\t%.4f\n" % (m[0][1], m[1][1], m[2][1])
-        s += "%.4f\t%.4f\t%.4f\n" % (m[0][2], m[1][2], m[2][2])
-        return s
-    
     @property
     def axis_angle(self):        
         """
         Calculate axis angle representation from rotation matrix.
         References Martin Baker's implementation at
         http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm
+        More information can be found here:
+        https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
         """
         epsilon = 0.01 # margin to allow for rounding errors
         epsilon2 = 0.1 # margin to distinguish between 0 and 180 degrees
         
         m = self.matrix
         
-        if ((math.fabs(m[0][1] - m[1][0]) < epsilon) and \
-            (math.fabs(m[0][2] - m[2][0]) < epsilon) and \
+        if ((math.fabs(m[0][1] - m[1][0]) < epsilon) and 
+            (math.fabs(m[0][2] - m[2][0]) < epsilon) and 
             (math.fabs(m[1][2] - m[2][1]) < epsilon)):
             
             # Singularity found.
             # First check for identity matrix which must have + 1 for all terms in leading diagonal and zero in other terms
-            if ((math.fabs(m[0][1] + m[1][0]) < epsilon2) and \
-                (math.fabs(m[0][2] + m[2][0]) < epsilon2) and \
-                (math.fabs(m[1][2] + m[2][1]) < epsilon2) and \
+            if ((math.fabs(m[0][1] + m[1][0]) < epsilon2) and 
+                (math.fabs(m[0][2] + m[2][0]) < epsilon2) and 
+                (math.fabs(m[1][2] + m[2][1]) < epsilon2) and 
                 (math.fabs(m[0][0] + m[1][1] + m[2][2] - 3) < epsilon2)) :
                     # this singularity is identity matrix so angle = 0
                     return [0,0,0]
@@ -160,31 +199,20 @@ class Rotation():
         x = (m[2][1] - m[1][2])/s
         y = (m[0][2] - m[2][0])/s
         z = (m[1][0] - m[0][1])/s
-        return [v * angle for v in axis]
+        return [angle * x, angle * y, angle * z]
         
     @property
     def euler_angles(self):
         raise NotImplementedError
     
-class Transformation():
-    def __init__(self):
-        pass
-    
-    @classmethod
-    def identity(cls):
-        return cls([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
-    
-    @classmethod
-    def from_translation(translation):
-        x, y, z = translation
-        return cls([[1.0, 0.0, 0.0, x], [0.0, 1.0, 0.0, y], [0.0, 0.0, 1.0, z], [0.0, 0.0, 0.0, 1.0]])
-    
-    @property
-    def translation(self):
+    def __repr__(self):
         m = self.matrix
-        return [m[0][3], m[1][3], m[2][3]]
+        s = "Rotation:\n"
+        s += "%+.4f\t%+.4f\t%+.4f\n" % (m[0][0], m[0][1], m[0][2])
+        s += "%+.4f\t%+.4f\t%+.4f\n" % (m[1][0], m[1][1], m[1][2])
+        s += "%+.4f\t%+.4f\t%+.4f\n" % (m[2][0], m[2][1], m[2][2])
+        return s
     
-        
 
     
 class Frame():
@@ -202,6 +230,10 @@ class Frame():
         angle_axis definition: [ax,ay,az] (angle = length of the vector, axis = vector)
         """
         
+        if type(point) == type([]): point = Point(point)
+        if type(xaxis) == type([]): xaxis = Vector(xaxis)
+        if type(yaxis) == type([]): yaxis = Vector(yaxis)
+        
         self.point = point
         self.xaxis = xaxis
         self.yaxis = yaxis
@@ -215,11 +247,11 @@ class Frame():
         return frame
     
     @classmethod        
-    def worldXZ(cls):
+    def worldZX(cls):
         frame = cls()
         frame.point = Point([0, 0, 0])
-        frame.xaxis = Vector([1, 0, 0])
-        frame.yaxis = Vector([0, 0, 1])
+        frame.xaxis = Vector([0, 0, 1])
+        frame.yaxis = Vector([1, 0, 0])
         return frame
     
     @classmethod        
@@ -241,10 +273,8 @@ class Frame():
     @classmethod
     def from_quaternion(cls, quaternion):
         qw, qx, qy, qz = quaternion
-        R = Rotation.from_quaternion([qw, qx, qy, qz])
-        frame = cls()
-        frame.xaxis = R.xaxis
-        frame.yaxis = R.yaxis
+        rotation = Rotation.from_quaternion([qw, qx, qy, qz])
+        frame = cls.from_rotation(rotation)
         return frame
     
     @classmethod
@@ -256,10 +286,8 @@ class Frame():
     
     @classmethod 
     def from_axis_angle(cls, axis_angle):
-        R = Rotation.from_axis_angle(axis_angle)
-        frame = cls()
-        frame.xaxis = R.xaxis
-        frame.yaxis = R.yaxis
+        rotation = Rotation.from_axis_angle(axis_angle)
+        frame = cls.from_rotation(rotation)
         return frame
     
     @classmethod
@@ -271,10 +299,8 @@ class Frame():
 
     @classmethod 
     def from_euler_angles(cls, euler_angles):
-        R = Rotation.from_euler_angles(euler_angles)
-        frame = cls()
-        frame.xaxis = R.xaxis
-        frame.yaxis = R.yaxis
+        rotation = Rotation.from_euler_angles(euler_angles)
+        frame = cls.from_rotation(rotation)
         return frame
     
     @classmethod
@@ -283,10 +309,22 @@ class Frame():
         frame = cls.from_euler_angles([a, b, c])
         frame.point = Point([x, y, z])
         return frame
+    
+    @classmethod
+    def from_rotation(cls, rotation):
+        xaxis = Vector([rotation.matrix[0][0], rotation.matrix[1][0], rotation.matrix[2][0]])
+        yaxis = Vector([rotation.matrix[0][1], rotation.matrix[1][1], rotation.matrix[2][1]])
+        return cls(Point([0,0,0]), xaxis, yaxis)
         
     @property
     def normal(self):
-        return Vector(cross_vectors(self.xaxis, self.yaxis)).normalize()
+        normal = Vector(cross_vectors(self.xaxis, self.yaxis))
+        normal.normalize()
+        return normal
+    
+    @property
+    def zaxis(self):
+        return self.normal
         
     @property  
     def quaternion(self):
@@ -308,7 +346,7 @@ class Frame():
     @property
     def pose_axis_angle(self):
         """
-        Returns a list with the rotation specified in axis_angle, such as [x, y, z, ax, ay, az]
+        Returns a list with the rotation specified in axis angle, such as [x, y, z, ax, ay, az]
         """
         return list(self.point) + self.axis_angle
     
@@ -324,33 +362,29 @@ class Frame():
         """
         return list(self.point) + self.euler_angles
     
+    @property
+    def rotation(self):
+        return Rotation.from_basis_vectors(self.xaxis, self.yaxis)
+        
+    
+    def __repr__(self):
+        s = "Frame:\n"
+        s += "Point:\n"
+        s += "%+.4f\t%+.4f\t%+.4f\n" % tuple(self.point)
+        R = Rotation.from_basis_vectors(self.xaxis, self.yaxis)
+        s += str(R)
+        return s
+    
         
 
 
 if __name__ == '__main__':
-    p = Point([0, 0, 0])
-    print p
-    print p.x
     
-    R = Rotation()
-    print R
-    what = R.axis_angle
-    print what
-    x = Vector([1, 2, 3])
-    print x * 0
-    v = x * 2
-    a, b, c = v
-    print a, b, c
+    pose_quaternion =  [46.688110714374631, -1.4120551622885724, 49.438882686865952, 0.9222492523802307, -0.077292257754572713, 0.28255622706540073, 0.25227802504750946]
+    print pose_quaternion
+    frame = Frame.from_pose_quaternion(pose_quaternion)
     
-    
-    xaxis = Vector([4, 4, 4])
-    yaxis = Vector([1, 5, 3])
-    
-    R = Rotation.from_basis_vectors(xaxis, yaxis)
-    
-    print R
+    print frame.pose_quaternion
 
-    
-    
     
     
