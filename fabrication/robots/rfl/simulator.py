@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import math
+import socket
 import logging
 from timeit import default_timer as timer
 from compas.datastructures.mesh import Mesh
@@ -10,6 +11,21 @@ from compas_fabrication.fabrication.robots.rfl import Configuration, Robot
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
 CHILD_SCRIPT_TYPE = vrep.sim_scripttype_childscript
 LOG = logging.getLogger('compas_fabrication.simulator')
+
+
+def is_ipv4_address(addr):
+    try:
+        socket.inet_aton(addr)
+        return True
+    except socket.error:
+        return False
+
+
+def resolve_host(host):
+    if is_ipv4_address(host):
+        return host
+    else:
+        return socket.gethostbyname(host)
 
 
 class SimulationError(Exception):
@@ -45,7 +61,7 @@ class Simulator(object):
 
     def __init__(self, host='127.0.0.1', port=19997, debug=False):
         self.client_id = None
-        self.host = host
+        self.host = resolve_host(host)
         self.port = port
         self.default_timeout_in_ms = -50000000
         self.thread_cycle_in_ms = 5
@@ -58,7 +74,7 @@ class Simulator(object):
         vrep.simxFinish(-1)
 
         if self.debug:
-            LOG.debug('Connecting to V-REP...')
+            LOG.debug('Connecting to V-REP on %s:%d...', self.host, self.port)
 
         # Connect to V-REP, set a very large timeout for blocking commands
         self.client_id = vrep.simxStart(self.host, self.port, True, True,
