@@ -14,6 +14,7 @@ Main package for robotics fabrication for the compAS Framework.
 .. toctree::
     :maxdepth: 2
 
+    compas_fabrication.fabrication.sensors
     compas_fabrication.fabrication.robots.rfl
     compas_fabrication.fabrication.grasshopper
 
