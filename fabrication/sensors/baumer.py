@@ -103,11 +103,21 @@ class PosCon3D(SerialSensor):
         self.end()
 
     def begin(self):
-        """Locks the sensor to start RS-485 communication."""
+        """Locks the sensor to start RS-485 communication.
+
+        .. note::
+            This method only needs to be called if not using
+            a ``with`` statement to handle lifetime of the `PosCon3D` instance.
+        """
         return self.send_command(self.address, '000', '1')
 
     def end(self):
-        """Unlocks the sensor from RS-485 communication."""
+        """Unlocks the sensor from RS-485 communication.
+
+        .. note::
+            This method only needs to be called if not using
+            a ``with`` statement to handle lifetime of the `PosCon3D` instance.
+        """
         return self.send_command(self.address, '000', '0')
 
     def send_command(self, address, command, data=None):
@@ -164,12 +174,30 @@ class PosCon3D(SerialSensor):
         """
         return int(self.send_command(self.address, '013'))
 
-    def set_measurement_type(self, measure_type):
-        """Sets the measurement function to use, e.g. 'Edge L rise', etc."""
-        if measure_type not in self.MEASUREMENT_TYPES:
+    def set_measurement_type(self, measurement_type):
+        """Defines the measurement type to use.
+
+        ================  ========
+        Measurement type  Function
+        ================  ========
+        "Edge L rise"     Edge
+        "Edge L fall"     Edge
+        "Edge R rise"     Edge
+        "Edge R fall"     Edge
+        "Width"           Width
+        "Center width"    Width
+        "Gap"             Gap
+        "Center gap"      Gap
+        ================  ========
+
+        Args:
+            measurement_type (:obj:`string`): Measurement type.
+
+        """
+        if measurement_type not in self.MEASUREMENT_TYPES:
             raise ProtocolError('Unsupported measure type, must be one of ' + str(self.MEASUREMENT_TYPES))
 
-        return self.send_command(self.address, '020', str(self.MEASUREMENT_TYPES.index(measure_type)))
+        return self.send_command(self.address, '020', str(self.MEASUREMENT_TYPES.index(measurement_type)))
 
     def set_precision(self, precision):
         """Defines the precision the sensor will use to determine edges:
@@ -183,7 +211,7 @@ class PosCon3D(SerialSensor):
         =====   =========  ===============
 
         Args:
-            precision (:obj:`int`): Sensor precision to use:
+            precision (:obj:`int`): Sensor precision to use.
 
         .. note::
             The higher the precision, the slower the measurement gets.
