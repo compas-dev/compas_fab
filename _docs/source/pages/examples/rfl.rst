@@ -137,3 +137,14 @@ calculating a path plan::
                                         shallow_state_search=fast_search)
 
         print('Found path of %d steps' % len(path))
+
+Grasshopper integration
+=======================
+
+.. image:: grasshopper.png
+
+Besides the examples above that can be run standalone or inside CAD software, this package contains
+a ready-made integration for Grasshopper that allows configuration of most available parameters.
+
+See :download:`this basic example <grasshopper-basic-example.ghx>` and then
+:download:`this complete path planning example <grasshopper-path-planner.ghx>` for Grasshopper.

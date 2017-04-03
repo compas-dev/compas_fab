@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import math
+import socket
 import logging
 from timeit import default_timer as timer
 from compas.datastructures.mesh import Mesh
@@ -10,6 +11,21 @@ from compas_fabrication.fabrication.robots.rfl import Configuration, Robot
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
 CHILD_SCRIPT_TYPE = vrep.sim_scripttype_childscript
 LOG = logging.getLogger('compas_fabrication.simulator')
+
+
+def is_ipv4_address(addr):
+    try:
+        socket.inet_aton(addr)
+        return True
+    except socket.error:
+        return False
+
+
+def resolve_host(host):
+    if is_ipv4_address(host):
+        return host
+    else:
+        return socket.gethostbyname(host)
 
 
 class SimulationError(Exception):
@@ -45,7 +61,7 @@ class Simulator(object):
 
     def __init__(self, host='127.0.0.1', port=19997, debug=False):
         self.client_id = None
-        self.host = host
+        self.host = resolve_host(host)
         self.port = port
         self.default_timeout_in_ms = -50000000
         self.thread_cycle_in_ms = 5
@@ -58,7 +74,7 @@ class Simulator(object):
         vrep.simxFinish(-1)
 
         if self.debug:
-            LOG.debug('Connecting to V-REP...')
+            LOG.debug('Connecting to V-REP on %s:%d...', self.host, self.port)
 
         # Connect to V-REP, set a very large timeout for blocking commands
         self.client_id = vrep.simxStart(self.host, self.port, True, True,
@@ -106,6 +122,39 @@ class Simulator(object):
                                                 DEFAULT_OP_MODE)
         return handle
 
+    def get_object_matrices(self, object_handles):
+        """Gets a dictionary of matrices keyed by object handle.
+
+        Args:
+            object_handles (:obj:`list` of :obj:`float`): List of object handles (identifiers)
+                to retrieve matrices from.
+
+        Returns:
+            dict: Dictionary of matrices represented by a :obj:`list` of 12 :obj:`float` values.
+
+        Examples:
+
+            >>> from compas_fabrication.fabrication.robots.rfl import Simulator
+            >>> with Simulator() as simulator:
+            ...     matrices = simulator.get_object_matrices([0])
+            ...     print(map(int, matrices[0]))
+            [0, 0, 0, -7, 0, 0, 0, -4, 0, 0, 0, -7]
+
+        .. note::
+            The resulting dictionary is keyed by object handle.
+        """
+        _res, _, matrices, _, _ = self.run_child_script('getShapeMatrices', object_handles, [], [])
+        return dict([(object_handles[i // 12], matrices[i:i + 12]) for i in range(0, len(matrices), 12)])
+
+    def get_all_visible_handles(self):
+        """Gets a list of object handles (identifiers) for all visible
+        shapes of the RFL model.
+
+        Returns:
+            list: List of object handles (identifiers) of the RFL model.
+        """
+        return self.run_child_script('getRobotVisibleShapeHandles', [], [], [])[1]
+
     def set_robot_metric(self, robot, metric_values):
         """Assigns a metric defining relations between axis values of a robot.
 
@@ -138,13 +187,14 @@ class Simulator(object):
         for id in Robot.SUPPORTED_ROBOTS:
             Robot(id, client=self).reset_config()
 
-    def set_robot_config(self, robot, config):
-        """Moves the robot the the specified configuration.
+    def set_robot_config(self, robot, config_or_pose):
+        """Moves the robot the the specified configuration or pose.
 
         Args:
             robot (:class:`.Robot`): Robot instance to move.
-            config (:class:`.Configuration`): Instance of robot's
-                configuration.
+            config_or_pose (:class:`Configuration` instance or :obj:`list` of :obj:`float`):
+                Describes the position, either as a pose (list of 12 :obj:`float` values)
+                or as a :class:`Configuration`.
 
         Examples:
 
@@ -155,6 +205,15 @@ class Simulator(object):
             ...                                [90, 0, 0, 0, 0, -90]))
             ...
         """
+        config = None
+        if isinstance(config_or_pose, Configuration):
+            config = config_or_pose
+        elif isinstance(config_or_pose, list):
+            config = self.find_robot_states(robot, config_or_pose, [0.0] * 9)[-1]
+
+        if not config:
+            raise ValueError('Unsupported config value')
+
         values = list(config.coordinates)
         values.extend([math.radians(angle) for angle in config.joint_values])
 
@@ -251,16 +310,7 @@ class Simulator(object):
         Returns:
             int: Object handle (identifier) assigned to the building member.
         """
-        pickup_config = pickup_pose_or_config if isinstance(pickup_pose_or_config, Configuration) else None
-
-        # If we don't have a configuration, then it must be a pose. Try to find a configuration using
-        # shallow state search.
-        if not pickup_config and pickup_pose_or_config:
-            pickup_pose = pickup_pose_or_config
-            pickup_config = self.find_robot_states(robot, pickup_pose, metric_values)[-1]
-
-        if pickup_config:
-            self.set_robot_config(robot, pickup_config)
+        self.set_robot_config(robot, pickup_pose_or_config)
 
         return self.add_building_member(robot, building_member_mesh)
 
@@ -342,7 +392,7 @@ class Simulator(object):
         Returns:
             int: Object handle (identifier) assigned to the building member.
 
-        Notes:
+        .. note::
             All meshes are automatically removed from the scene when the simulation ends.
         """
         handles = self.add_meshes([building_member_mesh])
@@ -360,14 +410,15 @@ class Simulator(object):
     def add_meshes(self, meshes):
         """Adds meshes to the RFL scene.
 
-        All meshes are automatically removed from the scene when the simulation ends.
-
         Args:
             meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): List
                 of meshes to add to the current simulation scene.
 
         Returns:
             list: List of object handles (identifiers) assigned to the meshes.
+
+        .. note::
+            All meshes are automatically removed from the scene when the simulation ends.
         """
         mesh_handles = []
 
@@ -405,7 +456,7 @@ class Simulator(object):
         Args:
             object_handles (:obj:`list` of :obj:`int`): Object handles to remove.
 
-        Notes:
+        .. note::
             Please note there's no need to clean up objects manually after the simulation
             has completed, as those will be reset automatically anyway. This method is
             only useful if you need to remove objects *during* a simulation.

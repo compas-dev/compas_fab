@@ -3,6 +3,7 @@ from __future__ import print_function
 try:
     import rhinoscriptsyntax as rs
     import ghpythonlib.components as ghcomp
+    from Rhino.Geometry import Transform
 except ImportError:
     import platform
     if platform.python_implementation() == 'IronPython':
@@ -42,3 +43,14 @@ def vrep_pose_from_plane(plane):
     return [matrix.M00, matrix.M01, matrix.M02, matrix.M03,
             matrix.M10, matrix.M11, matrix.M12, matrix.M13,
             matrix.M20, matrix.M21, matrix.M22, matrix.M23]
+
+
+def xform_from_matrix(matrix):
+    """Creates a Transform instance from a matrix represented as a list
+    of 12 float values.
+    """
+    transform = Transform(1.0)
+    for i in range(0, len(matrix)):
+        transform[i // 4, i % 4] = matrix[i]
+
+    return transform

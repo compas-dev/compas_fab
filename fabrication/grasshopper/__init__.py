@@ -15,6 +15,19 @@ Utility functions to simplify integration with Grasshopper 3D.
     mesh_from_guid
     vrep_pose_from_plane
 
+Path planning
+=============
+
+.. currentmodule:: compas_fabrication.fabrication.grasshopper.path_planning
+
+:mod:`compas_fabrication.fabrication.grasshopper.path_planning`
+
+.. autosummary::
+    :toctree: generated/
+
+    PathVisualizer
+    InputParameterParser
+
 """
 
 from .utilities import *
