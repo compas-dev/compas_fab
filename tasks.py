@@ -31,7 +31,7 @@ def build(ctx, docs=True):
 @task()
 def doctest(ctx):
     """Runs all examples defined in docstrings for this module."""
-    ctx.run('pytest --doctest-module --ignore=fabrication/grasshopper')
+    ctx.run('pytest --doctest-module')
 
 
 @contextlib.contextmanager
