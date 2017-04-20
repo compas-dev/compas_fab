@@ -257,7 +257,7 @@ class PosCon3D(SerialSensor):
 
     def set_flex_mount(self, angle, distance):
         """Sets the FLEX Mount feature to a specific angle and distance."""
-        result = self.send_command(self.address, '060', '%2.f,%2.f' % (angle, distance))
+        result = self.send_command(self.address, '060', '%.2f,%.2f' % (angle, distance))
         return map(float, result)
 
     def deactivate_flex_mount(self):
