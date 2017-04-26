@@ -18,7 +18,7 @@ with the RFL scene pre-loaded. There are two options to run v-rep:
    * Run the following commands on the command line::
 
         docker pull gramaziokohler/vrep-rfl:3.3
-        docker run -p 19997:19997 -d gramaziokohler/vrep-rfl:3.3
+        docker run --restart=always -p 19997:19997 -d gramaziokohler/vrep-rfl:3.3
 
 Basic example
 =============
