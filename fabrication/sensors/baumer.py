@@ -220,6 +220,14 @@ class PosCon3D(SerialSensor):
             raise ProtocolError('Precision must be 0 (standard), 1 (high) or 2 (very high)')
         return self.send_command(self.address, '040', str(precision))
 
+    def set_edge_height(self, height):
+        """Defines the minimum height of an edge to be detected.
+
+        Args:
+            height (:obj:`float`): Minimum edge height.
+        """
+        return self.send_command(self.address, '042', str(height))
+
     def get_measurement(self):
         """Retrieves the current measurement of the sensor according to the current settings.
 
