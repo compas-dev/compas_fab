@@ -30,3 +30,7 @@ _docs/source/pages/reference/generated/
 .venv/
 venv/
 ENV/
+
+# eclipse
+.project
+.pydevproject

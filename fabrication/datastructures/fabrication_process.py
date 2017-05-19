@@ -6,28 +6,46 @@ Created on 15.05.2017
 
 import networkx as nx
 import matplotlib.pyplot as plt
-from graphviz import Digraph
+from graphviz import Digraph # build upon compas graph structure ?
+from fsm import FiniteStateMachine
 
 import pygraphviz as pgv
 
 
-class FabricationProcess(object):
+class FabricationProcess(FiniteStateMachine):
+    #===========================================================================
     """
-    This class helps to plan the fabrication process and . 
-    A fabrication process consists of several jobs, that can be performed one after the other,
-    or in parallel. The order is defined in the transition between two jobs (e.g. job01 and job02), 
-    that is based on a certain condition. The default condition is that job02 can be only performed,
-    when job01 is done.
-    A job can consist of several tasks, 
-     conditions define 
-    
+    This class helps to plan, visualize and control the fabrication process. 
+    A fabrication process consists of several jobs that can be performed one 
+    after the other, or, run in parallel. The sequence of the process is defined 
+    through the starting job and the transitions between the jobs (e.g. j1 and
+    j2). Those transitions may have also a certain conditions implemented, which 
+    is by default that j2 can be only performed, when j1 is done. A job can 
+    consist of several tasks, that are specific to the fabrication process.
     For more info see https://en.wikipedia.org/wiki/Finite-state_machine
     """
-    def __init__(self):
+        
+    def add_job(self, name, initial=False):
+        self.add_state(name, initial)
+    
+    def next_job(self):
         pass
     
-    def add_job(self, name):
+    def pause(self):
         pass
+    
+    def resume(self):
+        pass
+    
+    def stop(self):
+        pass
+    
+    def start(self):
+        pass
+    
+    def run(self):
+        pass
+        
     
 
 if __name__ == "__main__":
