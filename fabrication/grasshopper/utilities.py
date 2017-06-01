@@ -1,4 +1,5 @@
 from __future__ import print_function
+import sys
 
 try:
     import rhinoscriptsyntax as rs
@@ -10,6 +11,26 @@ except ImportError:
         raise
 
 from compas.datastructures.mesh import Mesh
+
+
+def unload_modules(top_level_module_name):
+    """Unloads all modules named starting with the specified string.
+
+    This function eases the development workflow when editing a library that is
+    used from Rhino/Grasshopper.
+
+    Args:
+        top_level_module_name (:obj:`string`): Name of the top-level module to unload.
+
+    Returns:
+        list: List of unloaded module names.
+    """
+    modules = filter(lambda m: m.startswith(top_level_module_name), sys.modules)
+
+    for module in modules:
+        sys.modules.pop(module)
+
+    return modules
 
 
 def mesh_from_guid(guid, **kwargs):
