@@ -1,6 +1,6 @@
 # This file is part of the REMOTE API
 # 
-# Copyright 2006-2016 Coppelia Robotics GmbH. All rights reserved. 
+# Copyright 2006-2017 Coppelia Robotics GmbH. All rights reserved. 
 # marc@coppeliarobotics.com
 # www.coppeliarobotics.com
 # 
@@ -24,7 +24,7 @@
 # along with the REMOTE API.  If not, see <http://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------
 #
-# This file was automatically created for V-REP release V3.3.2 on August 29th 2016
+# This file was automatically created for V-REP release V3.4.0 rev. 1 on April 5th 2017
 
 #constants
 #Scene object types. Values are serialized
