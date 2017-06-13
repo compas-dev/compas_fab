@@ -191,10 +191,12 @@ class InputParameterParser(object):
         if not config_values_or_plane:
             return None
 
-        if isinstance(config_values_or_plane, Configuration):
-            return config_values_or_plane
-        elif isinstance(config_values_or_plane, basestring):
-            values = map(float, config_values_or_plane.split(','))
-            return Configuration.from_list(values)
-        elif isinstance(config_values_or_plane, Plane):
+        try:
             return vrep_pose_from_plane(config_values_or_plane)
+        except (TypeError, IndexError):
+            try:
+                if config_values_or_plane.coordinates and config_values_or_plane.joint_values:
+                    return config_values_or_plane
+            except AttributeError:
+                values = map(float, config_values_or_plane.split(','))
+                return Configuration.from_degrees_list(values)

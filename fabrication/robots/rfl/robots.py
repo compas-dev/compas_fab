@@ -25,9 +25,15 @@ class Configuration(object):
         return "xyz: %s, joints: %s" % (self.coordinates, self.joint_values)
 
     @classmethod
-    def from_list(cls, list_of_floats):
+    def from_radians_list(cls, list_of_floats):
         angles = map(math.degrees, list_of_floats[3:])
-        return cls(list_of_floats[0:3], angles)
+        return cls.from_degrees_list(list_of_floats[0:3], angles)
+
+    @classmethod
+    def from_degrees_list(cls, list_of_floats):
+        config = cls(list_of_floats[0:3], list_of_floats[3:])
+        config.raw = list_of_floats
+        return config
 
 
 # TODO: This should inherit from compas_fabrication.fabrication.robots.Robot

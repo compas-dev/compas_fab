@@ -239,7 +239,7 @@ class Simulator(object):
         res, _, config, _, _ = self.run_child_script('getRobotState',
                                                      [robot.index],
                                                      [], [])
-        return Configuration.from_list(config)
+        return Configuration.from_radians_list(config)
 
     def find_robot_states(self, robot, goal_pose, metric_values=[0.1] * 9, max_trials=None, max_results=1):
         """Finds valid robot configurations for the specified goal pose.
@@ -264,7 +264,7 @@ class Simulator(object):
 
         states = self._find_raw_robot_states(robot, goal_pose, max_trials, max_results)
 
-        return [Configuration.from_list(states[i:i + 9])
+        return [Configuration.from_radians_list(states[i:i + 9])
                 for i in range(0, len(states), 9)]
 
     def _find_raw_robot_states(self, robot, goal_pose, max_trials=None, max_results=1):
@@ -378,7 +378,7 @@ class Simulator(object):
         if self.debug:
             LOG.debug('Execution time: total=%.2f', timer() - first_start)
 
-        return [Configuration.from_list(path[i:i + 9])
+        return [Configuration.from_radians_list(path[i:i + 9])
                 for i in range(0, len(path), 9)]
 
     def add_building_member(self, robot, building_member_mesh):
