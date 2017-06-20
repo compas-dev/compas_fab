@@ -38,6 +38,44 @@ class Configuration(object):
         config.raw = list_of_floats
         return config
 
+    @classmethod
+    def from_data(cls, data):
+        """Construct a configuration from its data representation.
+
+        Args:
+            data (`dict`): The data dictionary.
+
+        Returns:
+            Configuration: A :class:`.Configuration` instance.
+        """
+        if data.get('name') != 'Configuration':
+            raise ValueError('Unexpected object name, expected Configuration data, but got %s' % data.get('name'))
+
+        return cls(data.get('coordinates'), data.get('joint_values'))
+
+    def to_data(self):
+        """Return the data dict that represents the configuration, and from which it can
+        be reconstructed."""
+        return self.data
+
+    @property
+    def data(self):
+        """:obj:`dict` : The data representing the configuration.
+
+        By assigning a data dict to this property, the current data of the configuration
+        will be replaced by the data in the dict. The data getter and setter should
+        always be used in combination with each other.
+        """
+        return {'name': 'Configuration', 'coordinates': self.coordinates, 'joint_values': self.joint_values}
+
+    @data.setter
+    def data(self, data):
+        if data.get('name') != 'Configuration':
+            raise ValueError('Unexpected object name, expected Configuration data, but got %s' % data.get('name'))
+
+        self.coordinates = data.get('coordinates') or None
+        self.joints = data.get('joints') or None
+
 
 class SimulatorXform(object):
     """Represents a transformation matrix used by the simulator (V-REP) as a position in space.
