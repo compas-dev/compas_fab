@@ -315,7 +315,8 @@ class Simulator(object):
         return self.add_building_member(robot, building_member_mesh)
 
     def find_path_plan(self, robot, goal_pose, metric_values=[0.1] * 9, collision_meshes=None,
-                       algorithm='rrtconnect', trials=1, resolution=0.02, shallow_state_search=True):
+                       algorithm='rrtconnect', trials=1, resolution=0.02,
+                       gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True):
         """Finds a path plan to move the selected robot from its current position
         to the `goal_pose`.
 
@@ -335,6 +336,10 @@ class Simulator(object):
             resolution (:obj:`float`): Validity checking resolution. This value
                 is specified as a fraction of the space's extent.
                 Defaults to ``0.02``.
+            gantry_joint_limits (:obj:`list` of `float`): List of 6 floats defining the upper/lower limits of
+                gantry joints. Use this if you want to restrict the working area of the path planner.
+            arm_joint_limits (:obj:`list` of `float`): List of 12 floats defining the upper/lower limits of
+                arm joints. Use this if you want to restrict the working area of the path planner.
             shallow_state_search (:obj:`bool`): True to search only a minimum of
                 valid states before searching a path, False to search states intensively.
 
@@ -364,11 +369,18 @@ class Simulator(object):
             LOG.debug('Execution time: search_robot_states=%.2f', timer() - start)
 
         start = timer() if self.debug else None
+        string_param_list = [algorithm]
+        if gantry_joint_limits or arm_joint_limits:
+            joint_limits = []
+            joint_limits.extend(gantry_joint_limits or [])
+            joint_limits.extend(arm_joint_limits or [])
+            string_param_list.append(','.join(map(str, joint_limits)))
+
         res, _, path, _, _ = self.run_child_script('searchRobotPath',
                                                    [robot.index,
                                                     trials,
                                                     (int)(resolution * 1000)],
-                                                   states, [algorithm])
+                                                   states, string_param_list)
         if self.debug:
             LOG.debug('Execution time: search_robot_path=%.2f', timer() - start)
 
