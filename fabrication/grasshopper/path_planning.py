@@ -3,7 +3,7 @@ from __future__ import print_function
 import logging
 from timeit import default_timer as timer
 from compas_fabrication.fabrication.grasshopper import *
-from compas_fabrication.fabrication.robots.rfl import Configuration
+from compas_fabrication.fabrication.robots.rfl import Configuration, SimulatorXform, Simulator
 
 try:
     import clr
@@ -163,26 +163,26 @@ class InputParameterParser(object):
         """Compacts a list filtering all `None` values."""
         return filter(None, list)
 
-    def get_pose(self, plane_or_pose):
-        """Gets a vrep-compatible pose from a string containing
+    def get_xform(self, plane_or_pose):
+        """Gets a vrep-compatible transformation matrix from a string containing
         comma-separated floats or from a Rhino/Grasshopper plane.
 
         Args:
             plane_or_pose (comma-separated :obj:`string` of a Rhino :obj:`Plane`):
 
         Returns:
-            list: list of 12 :obj:`float` values representing a pose.
+            xform: :class:`.SimulatorXform` instance representing a transformation matrix.
         """
         if not plane_or_pose:
             return None
 
-        if isinstance(plane_or_pose, basestring):
-            return map(float, pose.split(',')) if pose else None
-        elif isinstance(plane_or_pose, Plane):
-            return vrep_pose_from_plane(plane_or_pose)
+        try:
+            return SimulatorXform(vrep_xform_from_plane(plane_or_pose))
+        except (TypeError, IndexError):
+            return map(float, plane_or_pose.split(',')) if plane_or_pose else None
 
-    def get_config_or_pose(self, config_values_or_plane):
-        """Parses multiple input data types and returns a configuration or a pose.
+    def get_config_or_xform(self, config_values_or_plane):
+        """Parses multiple input data types and returns a configuration or a transformation matrix.
 
         Args:
             config_values_or_plane (comma-separated :obj:`string`, or :class:`Configuration` instance,
@@ -192,7 +192,7 @@ class InputParameterParser(object):
             return None
 
         try:
-            return vrep_pose_from_plane(config_values_or_plane)
+            return SimulatorXform(vrep_xform_from_plane(config_values_or_plane))
         except (TypeError, IndexError):
             try:
                 if config_values_or_plane.coordinates and config_values_or_plane.joint_values:

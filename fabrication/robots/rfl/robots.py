@@ -36,6 +36,54 @@ class Configuration(object):
         return config
 
 
+class SimulatorXform(object):
+    """Represents a transformation matrix used by the simulator (V-REP) as a position in space.
+
+    Args:
+        values (:obj:`list` of :obj:`float`): list of 12 values representing a matrix.
+    """
+    def __init__(self, values):
+        if len(values) != 12:
+            raise ValueError('Expected 12 floats but got %d' % len(values))
+
+        self.values = values
+
+    def __str__(self):
+        return "[%s, %s, %s]" % (str(self.values[0:4]), str(self.values[4:8]), str(self.values[8:12]))
+
+    @classmethod
+    def from_data(cls, data):
+        """Construct a transformation matrix from its data representation.
+
+        Args:
+            data (`dict`): The data dictionary.
+
+        Returns:
+            SimulatorXform: A :class:`.SimulatorXform` instance.
+        """
+        if data.get('name') != 'SimulatorXform':
+            raise ValueError('Unexpected object name, expected SimulatorXform data, but got %s' % data.get('name'))
+
+        return cls(data.get('values'))
+
+    def to_data(self):
+        """Return the data dict that represents the transformation matrix, and from which it can
+        be reconstructed."""
+        return self.data
+
+    @property
+    def data(self):
+        """:obj:`dict` : The data representing the transformation matrix."""
+        return {'name': 'SimulatorXform', 'values': self.values}
+
+    @data.setter
+    def data(self, data):
+        if data.get('name') != 'SimulatorXform':
+            raise ValueError('Unexpected object name, expected SimulatorXform data, but got %s' % data.get('name'))
+
+        self.values = data.get('values') or None
+
+
 # TODO: This should inherit from compas_fabrication.fabrication.robots.Robot
 # once that is in place.
 class Robot(object):

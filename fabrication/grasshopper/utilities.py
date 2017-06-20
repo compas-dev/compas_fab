@@ -50,8 +50,8 @@ def mesh_from_guid(guid, **kwargs):
     return mesh
 
 
-def vrep_pose_from_plane(plane):
-    """Creates a vrep-compatible pose from a Rhino/Grasshopper plane.
+def vrep_xform_from_plane(plane):
+    """Creates a vrep-compatible transformation matrix from a Rhino/Grasshopper plane.
 
     This function might need rework as the source of the 90-deg Y rotation
     need is not entirely clear to me (related to the RFL model mismatch).
