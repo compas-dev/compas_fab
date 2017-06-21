@@ -18,8 +18,9 @@ Lab) using robotic simulation tools like
     Configuration
     Simulator
     SimulatorXform
+    SimulationCoordinator
 
 """
 
-from compas_fabrication.fabrication.robots.rfl.simulator import Simulator, SimulationError
 from compas_fabrication.fabrication.robots.rfl.robots import Robot, Configuration, SimulatorXform
+from compas_fabrication.fabrication.robots.rfl.simulator import Simulator, SimulationCoordinator, SimulationError

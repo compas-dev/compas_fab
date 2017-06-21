@@ -6,7 +6,7 @@ import logging
 from timeit import default_timer as timer
 from compas.datastructures.mesh import Mesh
 from compas_fabrication.fabrication.robots.rfl.vrep_remote_api import vrep
-from compas_fabrication.fabrication.robots.rfl import Configuration, Robot
+from compas_fabrication.fabrication.robots.rfl import Configuration, SimulatorXform, Robot
 
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
 CHILD_SCRIPT_TYPE = vrep.sim_scripttype_childscript
@@ -282,7 +282,7 @@ class Simulator(object):
             # Even if the retry_until_success is set to True, we short circuit
             # at some point to prevent infinite loops caused by misconfiguration
             i += 1
-            if i > 200 or (res != 0 and not retry_until_success):
+            if i > 5 or (res != 0 and not retry_until_success):
                 raise SimulationError('Failed to search robot states', res)
 
             final_states.extend(states)
@@ -484,3 +484,127 @@ class Simulator(object):
                                            CHILD_SCRIPT_TYPE, function_name,
                                            in_ints, in_floats, in_strings,
                                            bytearray(), DEFAULT_OP_MODE)
+
+
+class SimulationCoordinator(object):
+    """Coordinates the execution of simulation using different strategies.
+    For instance, it allows to run a path planning simulation on one node
+    or distribute it among many nodes and get multiple solutions as result.
+
+    The coordinator takes as input one large dictionary-like structure with the
+    entire definition of a path planning job. The following shows an example of
+    this, exposing all posible configuration values::
+
+        {
+            'debug': True,
+            'algorithm': 'rrtconnect',
+            'resolution': 0.02,
+            'collision_meshes': [],
+            'robots': [
+                {
+                    'robot': 12,
+                    'start': {
+                        'joint_values': [90.0, 100.0, -160.0, 180.0, 30.0, -90.0],
+                        'coordinates': [9.56226, -2.0, -3.6]
+                    },
+                }
+                {
+                    'robot': 11,
+                    'start': {
+                        'joint_values': [90.0, 100.0, -160.0, 180.0, 30.0, -90.0],
+                        'coordinates': [9.56226, -10.0, -4.6]
+                    },
+                    'goal': {
+                        'name': "SimulatorXform",
+                        'values': [-0.98, 0.16, 0.0, 10.03, 0.0, 0.0, -1.0, -5.87, -0.16, -0.98, 0.0, -1.50]
+                    },
+                    'building_member': {
+                        'attributes': {
+                            'name': 'Mesh',
+                        }
+                    },
+                    'joint_limits': {
+                        'gantry': [
+                            [0, 20],
+                            [-12, 0],
+                            [-4.6, -1]
+                        ],
+                        'arm': [
+                            [-180, 180],
+                            [-90, 150],
+                            [-180, 75],
+                            [-400, 400],
+                            [-125, 120],
+                            [-400, 400]
+                        ]
+                    },
+                    'metric_values': [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                }
+            ]
+        }
+
+    """
+
+    @classmethod
+    def local_executor(cls, options):
+        with Simulator(debug=options.get('debug') or True) as simulator:
+            active_robot_options = None
+
+            # Setup all robots' start state
+            for r in options['robots']:
+                robot = Robot(r['robot'], simulator)
+
+                if 'start' in r:
+                    klass = globals()[r['start'].get('name')]
+                    start = klass.from_data(r['start'])
+                    try:
+                        try:
+                            # If it's a configuration, nothing else to do
+                            if start.coordinates and start.joint_values:
+                                pass
+                        except AttributeError:
+                            # But if it's an xform/plane, then we need to test if the start state is reachable
+                            reachable_state = simulator.find_robot_states(robot, start, [0.] * 9, 1, 1)
+                            start = reachable_state[-1]
+                            LOG.info('Robot state found for start pose. External axis=%s, Joint values=%s', str(start.coordinates), str(start.joint_values))
+                    except SimulationError:
+                        LOG.error('Start plane is not reachable: %s', str(start))
+                        start = None
+
+                    simulator.set_robot_config(robot, start)
+
+                if 'building_member' in r:
+                    simulator.add_building_member(robot, Mesh.from_data(r['building_member']))
+
+                if 'goal' in r:
+                    active_robot_options = r
+
+            # Set global scene options
+            if 'collision_meshes' in options:
+                simulator.add_meshes(map(Mesh.from_data, options['collision_meshes']))
+
+            # Check if there's at least one active robot (i.e. one with a goal defined)
+            if active_robot_options:
+                robot = Robot(active_robot_options['robot'], simulator)
+                klass = globals()[active_robot_options['goal'].get('name')]
+                goal = klass.from_data(active_robot_options['goal'])
+
+                kwargs = {}
+                kwargs['metric_values'] = active_robot_options.get('metric_values')
+                kwargs['algorithm'] = options.get('algorithm')
+                kwargs['resolution'] = options.get('resolution')
+
+                if 'joint_limits' in active_robot_options:
+                    joint_limits = active_robot_options['joint_limits']
+                    kwargs['gantry_joint_limits'] = joint_limits.get('gantry')
+                    kwargs['arm_joint_limits'] = joint_limits.get('arm')
+
+                # shallow_state_search=True,
+
+                path = simulator.find_path_plan(robot, goal.values, **kwargs)
+                LOG.info('Found path of %d steps', len(path))
+            else:
+                robot = Robot(options['robots'][0]['robot'], simulator)
+                path = [simulator.get_robot_config(robot)]
+
+        return path

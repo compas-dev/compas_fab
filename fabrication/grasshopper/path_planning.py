@@ -3,12 +3,12 @@ from __future__ import print_function
 import logging
 from timeit import default_timer as timer
 from compas_fabrication.fabrication.grasshopper import *
-from compas_fabrication.fabrication.robots.rfl import Configuration, SimulatorXform, Simulator
+from compas_fabrication.fabrication.robots.rfl import Configuration, SimulatorXform, SimulationCoordinator
 
 try:
     import clr
     import rhinoscriptsyntax as rs
-    from Rhino.Geometry import Transform, Plane
+    from Rhino.Geometry import Transform
     from Rhino.Geometry import Mesh as RhinoMesh
 except ImportError:
     import platform
@@ -153,6 +153,66 @@ class PathVisualizer(object):
         return {'mesh': mesh_at_origin,
                 'parent_handle': parent_handle,
                 'relative_transform': relative_transform}
+
+
+class PathPlanner(object):
+    """Provides a simple/compact API to call the path planner from Grasshopper."""
+
+    @classmethod
+    def find_path(cls, **kwargs):
+        """Finds a path for the specified scene description. There is a large number
+        of parameters that can be passed as `kwargs`.
+
+        Args:
+            kwargs: Keyword arguments.
+
+        Returns:
+            list: list of configurations representing a path.
+        """
+        parser = InputParameterParser()
+        options = {'robots': []}
+        active_robot = None
+
+        if 'robots' in kwargs:
+            for i, settings in enumerate(kwargs['robots']):
+                if 'robot' not in settings:
+                    raise KeyError("'robot' not found at kwargs['robots'][%d]" % i)
+
+                robot = {'robot': settings['robot']}
+
+                if 'start' in settings:
+                    start = parser.get_config_or_xform(settings['start'])
+                    if start:
+                        robot['start'] = start.to_data()
+
+                if 'goal' in settings:
+                    if not active_robot:
+                        active_robot = robot
+                        goal = parser.get_config_or_xform(settings['goal'])
+                        if goal:
+                            robot['goal'] = goal.to_data()
+                    else:
+                        raise ValueError('Multi-move is not (yet) supported. Only one goal can be specified.')
+
+                if 'building_member' in settings:
+                    robot['building_member'] = mesh_from_guid(settings['building_member']).to_data()
+
+                if 'metric_values' in settings:
+                    robot['metric_values'] = map(float, settings['metric_values'].split(','))
+
+                if 'joint_limits' in settings:
+                    robot['joint_limits'] = settings['joint_limits']
+
+                options['robots'].append(robot)
+
+        if 'collision_meshes' in kwargs:
+            mesh_guids = parser.compact_list(kwargs['collision_meshes'])
+            options['collision_meshes'] = map(lambda m: m.to_data(), map(mesh_from_guid, mesh_guids))
+
+        options['algorithm'] = kwargs.get('algorithm', None)
+        options['resolution'] = kwargs.get('resolution', None)
+
+        return SimulationCoordinator.local_executor(options)
 
 
 class InputParameterParser(object):

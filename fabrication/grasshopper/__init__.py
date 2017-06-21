@@ -27,6 +27,7 @@ Path planning
     :toctree: generated/
 
     PathVisualizer
+    PathPlanner
     InputParameterParser
 
 """
