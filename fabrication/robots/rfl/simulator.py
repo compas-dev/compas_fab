@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+import json
+import urllib2
 import math
 import socket
 import logging
@@ -282,13 +284,16 @@ class Simulator(object):
             # Even if the retry_until_success is set to True, we short circuit
             # at some point to prevent infinite loops caused by misconfiguration
             i += 1
-            if i > 5 or (res != 0 and not retry_until_success):
+            if i > 20 or (res != 0 and not retry_until_success):
                 raise SimulationError('Failed to search robot states', res)
 
             final_states.extend(states)
 
-            if len(final_states) // 9 >= max_results:
+            if len(final_states):
+                LOG.info('Found %d valid robot states', len(final_states))
                 break
+            else:
+                LOG.info('No valid robot states found, will retry.')
 
         return final_states
 
@@ -362,7 +367,7 @@ class Simulator(object):
             LOG.debug('Execution time: set_robot_metric=%.2f', timer() - start)
 
         start = timer() if self.debug else None
-        max_trials = None if shallow_state_search else 160
+        max_trials = None if shallow_state_search else 80
         max_results = 1 if shallow_state_search else 80
         states = self._find_raw_robot_states(robot, goal_pose, max_trials, max_results)
         if self.debug:
@@ -375,6 +380,9 @@ class Simulator(object):
             joint_limits.extend(gantry_joint_limits or [])
             joint_limits.extend(arm_joint_limits or [])
             string_param_list.append(','.join(map(str, joint_limits)))
+
+        if self.debug:
+            LOG.debug('About to execute path planner: algorithm=%s, trials=%d, shallow_state_search=%s', algorithm, trials, shallow_state_search)
 
         res, _, path, _, _ = self.run_child_script('searchRobotPath',
                                                    [robot.index,
@@ -497,6 +505,8 @@ class SimulationCoordinator(object):
 
         {
             'debug': True,
+            'trials': 1,
+            'shallow_state_search': True,
             'algorithm': 'rrtconnect',
             'resolution': 0.02,
             'collision_meshes': [],
@@ -546,8 +556,23 @@ class SimulationCoordinator(object):
     """
 
     @classmethod
-    def local_executor(cls, options):
-        with Simulator(debug=options.get('debug') or True) as simulator:
+    def remote_executor(cls, options, executor_host='127.0.0.1', port=7000):
+        url = 'http://%s:%d/path-planner' % (executor_host, port)
+        data = json.dumps(options, encoding='ascii')
+        request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Content-Length': str(len(data))})
+        f = urllib2.urlopen(request)
+        response = f.read()
+        f.close()
+
+        # TODO: Do something different here
+        # Return the ID of the job and poll
+        results = json.loads(response)
+        return [[Configuration.from_radians_list(path_list[i:i + 9])
+                for i in range(0, len(path_list), 9)] for path_list in results]
+
+    @classmethod
+    def local_executor(cls, options, host='127.0.0.1', port=19997):
+        with Simulator(debug=options.get('debug', True), host=host, port=port) as simulator:
             active_robot_options = None
 
             # Setup all robots' start state
@@ -599,7 +624,8 @@ class SimulationCoordinator(object):
                     kwargs['gantry_joint_limits'] = joint_limits.get('gantry')
                     kwargs['arm_joint_limits'] = joint_limits.get('arm')
 
-                # shallow_state_search=True,
+                kwargs['trials'] = options.get('trials', 1)
+                kwargs['shallow_state_search'] = options.get('shallow_state_search', True)
 
                 path = simulator.find_path_plan(robot, goal.values, **kwargs)
                 LOG.info('Found path of %d steps', len(path))

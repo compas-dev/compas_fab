@@ -159,11 +159,16 @@ class PathPlanner(object):
     """Provides a simple/compact API to call the path planner from Grasshopper."""
 
     @classmethod
-    def find_path(cls, **kwargs):
+    def find_path(cls, host='127.0.0.1', port=7000, mode='remote', **kwargs):
         """Finds a path for the specified scene description. There is a large number
-        of parameters that can be passed as `kwargs`.
+        of parameters that can be passed as `kwargs`. It can run in two modes: *remote* or
+        *local*. In remote mode, the `host` and `port` parameters correspond to a
+        simulation coordinator, and in local mode, `host` and `port` correspond to
+        a V-REP instance.
 
         Args:
+            host (:obj:`str`): IP address of the service (simulation coordinator in `remote`, V-REP in `local` mode)
+            port (:obj:`int`): Port of the service.
             kwargs: Keyword arguments.
 
         Returns:
@@ -212,7 +217,10 @@ class PathPlanner(object):
         options['algorithm'] = kwargs.get('algorithm', None)
         options['resolution'] = kwargs.get('resolution', None)
 
-        return SimulationCoordinator.local_executor(options)
+        if mode == 'remote':
+            return SimulationCoordinator.remote_executor(options, host, port)
+        else:
+            return SimulationCoordinator.local_executor(options, host, port)
 
 
 class InputParameterParser(object):
