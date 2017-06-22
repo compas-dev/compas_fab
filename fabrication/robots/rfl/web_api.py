@@ -2,7 +2,7 @@ import yaml
 import json
 import logging
 from timeit import default_timer as timer
-from multiprocessing import Process, Manager, freeze_support
+from multiprocessing import Process, Manager
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from compas_fabrication.fabrication.robots.rfl import SimulationCoordinator, SimulationError
 
@@ -21,9 +21,7 @@ def execute_path_plan(path_list, options, host, port):
 
 
 def build_handler(instances):
-    if not instances:
-        instances = '127.0.0.1:19997'
-    instances = [tuple(i.split(':')) for i in instances.split(',')]
+    instances = [tuple(i.split(':')) for i in (instances or '127.0.0.1:19997').split(',')]
 
     ESCALATION_STRATEGY = [{'shallow_state_search': True},
                            {'shallow_state_search': False, 'algorithm': 'rrtconnect', 'trials': 20},
