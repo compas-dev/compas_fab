@@ -290,7 +290,7 @@ class Simulator(object):
             final_states.extend(states)
 
             if len(final_states):
-                LOG.info('Found %d valid robot states', len(final_states))
+                LOG.info('Found %d valid robot states', len(final_states) // 9)
                 break
             else:
                 LOG.info('No valid robot states found, will retry.')
