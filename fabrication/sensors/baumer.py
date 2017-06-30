@@ -1,33 +1,6 @@
 from compas_fabrication.fabrication.sensors import SerialSensor
 from compas_fabrication.fabrication.sensors.exceptions import ProtocolError
-
-FRAME_HEAD = '{%s,%s,%s'
-FRAME_TAIL = '%s%s}'
-
-
-def format_command(address, command, data=None):
-    data = data + ',' if data else ''
-    frame = FRAME_HEAD % (address, command, data)
-    return FRAME_TAIL % (frame, calculate_checksum(frame))
-
-
-def get_payload(result):
-    data = result.split(',')[2:-1]
-    if not data:
-        return None
-    elif len(data) == 1:
-        return data[0]
-    else:
-        if data[0] == 'E':
-            raise ProtocolError(ERROR_CODES[int(data[1])])
-
-        return data
-
-
-def calculate_checksum(command):
-    checksum = reduce(lambda acc, v: acc ^ v, map(ord, command), 0)
-    return str(checksum).zfill(3)
-
+from ctypes import c_ushort
 
 ERROR_CODES = {
     000: 'No error',
@@ -47,7 +20,6 @@ ERROR_CODES = {
     103: 'Length out of Range (see FSP)',
     200: 'Fatal Error (Reset sensor, Power Off / On)'
 }
-
 
 class PosCon3D(SerialSensor):
     """Provides an interface for the `Baumer PosCon3D edge measurement sensor
@@ -85,6 +57,9 @@ class PosCon3D(SerialSensor):
         ...         sensor.set_precision(2)                                             # doctest: +SKIP
         ...         data = sensor.get_measurement()                                     # doctest: +SKIP
     """
+    
+    FRAME_HEAD = '{%s,%s,%s'
+    FRAME_TAIL = '%s%s}'
     BROADCAST_ADDRESS = 0
     MEASUREMENT_TYPES = ('Edge L rise', 'Edge L fall', 'Edge R rise', 'Edge R fall', 'Width', 'Center width', 'Gap', 'Center gap')
     QUALITY = {
@@ -123,7 +98,28 @@ class PosCon3D(SerialSensor):
             a ``with`` statement to handle lifetime of the `PosCon3D` instance.
         """
         return self.send_command(self.address, '000', '0')
-
+    
+    def format_command(self, address, command, data=None):
+        data = data + ',' if data else ''
+        frame = self.FRAME_HEAD % (address, command, data)
+        return self.FRAME_TAIL % (frame, self.calculate_checksum(frame))
+    
+    def calculate_checksum(self, command):
+        checksum = reduce(lambda acc, v: acc ^ v, map(ord, command), 0)
+        return str(checksum).zfill(3)
+    
+    def get_payload(self, result):
+        data = result.split(',')[2:-1]
+        if not data:
+            return None
+        elif len(data) == 1:
+            return data[0]
+        else:
+            if data[0] == 'E':
+                raise ProtocolError(ERROR_CODES[int(data[1])])
+    
+            return data
+    
     def send_command(self, address, command, data=None):
         """Sends a command to the sensor's address specified. The command
         can optionally contain a data string.
@@ -146,14 +142,14 @@ class PosCon3D(SerialSensor):
         Returns:
             Result of the command. It can be a list or a single value depending on the operation.
         """
-        cmd = format_command(address, command, data)
+        cmd = self.format_command(address, command, data)
         self.serial.write(cmd)
         result = self.serial.readline()
 
         if result:
             frame_head = result[:-4]
             checksum = result[-4:-1]
-            expected = calculate_checksum(frame_head)
+            expected = self.calculate_checksum(frame_head)
             if expected != checksum:
                 raise ProtocolError('Invalid response, checksum mismatch. Expected=%s, Got=%s' % (expected, checksum))
 
@@ -161,7 +157,7 @@ class PosCon3D(SerialSensor):
             if not result.startswith(expected_frame_head):
                 raise ProtocolError('Invalid response, command/address mismatch. Expected to start with="%s", Got="%s"' % (expected_frame_head, result))
 
-            return get_payload(result)
+            return self.get_payload(result)
 
         return None
 
@@ -182,7 +178,7 @@ class PosCon3D(SerialSensor):
         """Defines the measurement type to use.
 
         ================  ======== ======
-        Measurement type  Function Number
+        Measurement type  Function Value
         ================  ======== ======
         "Edge L rise"     Edge     0 
         "Edge L fall"     Edge     1
@@ -281,7 +277,6 @@ class PosCon3D(SerialSensor):
         data = '1' if is_dark_object else '0'
         return self.send_command(self.address, '044', data)
 
-
 class PosConCM(SerialSensor):
     """Provides an interface for the `Baumer PosConCM circle measurement sensor
     <http://www.baumer.com/us-en/products/distance-measurement/light-section-sensors/poscon-cm-measurement-of-round-objects/>`_.
@@ -318,6 +313,8 @@ class PosConCM(SerialSensor):
         ...         sensor.set_precision(2)                                             # doctest: +SKIP
         ...         data = sensor.get_measurement()                                     # doctest: +SKIP
     """
+    FRAME_HEAD = ':%s%s;%s;'
+    FRAME_TAIL = '%s%s\r\n'
     BROADCAST_ADDRESS = 0
     MEASUREMENT_TYPES = {
         'diameter' : 28, 
@@ -353,7 +350,7 @@ class PosConCM(SerialSensor):
             This method only needs to be called if not using
             a ``with`` statement to handle lifetime of the `PosConCM` instance.
         """
-        return self.send_command(self.address, '000', '1')
+        return self.send_command(self.address, 'W010', '0')
 
     def end(self):
         """Unlocks the sensor from RS-485 communication.
@@ -362,8 +359,28 @@ class PosConCM(SerialSensor):
             This method only needs to be called if not using
             a ``with`` statement to handle lifetime of the `PosConCM` instance.
         """
-        return self.send_command(self.address, '000', '0')
+        return self.send_command(self.address, 'W010', '1')
+    
+    def format_command(self, address, command, data=''):
+        frame = self.FRAME_HEAD % (str(address).zfill(2), command, data)
+        return self.FRAME_TAIL % (frame, self.calculate_checksum(frame))
+    
+    def calculate_checksum(self, command):     
+        return '****'
 
+    def get_payload(self, result):
+        frame_head = result[:-6]
+        result_type = frame_head[3]
+        if result_type == 'E':
+            raise ProtocolError('Application error, Result=%s' % frame_head)
+
+        if result_type == 'B':
+            raise ProtocolError('Sensor is busy, Result=%s' % frame_head)
+        
+        print "Returning payload: ",  '_' + result[5:-6] + '_'
+        
+        return result[5:-6].split(';')
+             
     def send_command(self, address, command, data=None):
         """Sends a command to the sensor's address specified. The command
         can optionally contain a data string.
@@ -379,33 +396,24 @@ class PosConCM(SerialSensor):
                 bus. Only one sensor can be in the bus when using the
                 broadcast address to query for sensor's address.
             command (:obj:`string`): A string indicating the command number
-                to be executed.
+                to be executed with the W or R in front, depending on Writting or Reading.
             data (:obj:`string`): An optional string of data that is sent together with
                 the command.
 
         Returns:
             Result of the command. It can be a list or a single value depending on the operation.
         """
-        cmd = format_command(address, command, data)
+        cmd = self.format_command(address, command, data)
         self.serial.write(cmd)
         result = self.serial.readline()
-
+        print "send cmd", cmd
+        print "result of command", result
+        
         if result:
-            frame_head = result[:-4]
-            checksum = result[-4:-1]
-            expected = calculate_checksum(frame_head)
-            if expected != checksum:
-                raise ProtocolError('Invalid response, checksum mismatch. Expected=%s, Got=%s' % (expected, checksum))
-
-            expected_frame_head = FRAME_HEAD % (address, command, '')
-            if not result.startswith(expected_frame_head):
-                raise ProtocolError('Invalid response, command/address mismatch. Expected to start with="%s", Got="%s"' % (expected_frame_head, result))
-
-            return get_payload(result)
+            return self.get_payload(result)
 
         return None
     
-    # CAREFULL - command 013 not in the PosConCM manual.... Might not work
     def get_address(self):
         """Gets the address of the RS-485 sensors currently connected to the bus. This command
         is only really useful when this class is initialized with the broadcast address,
@@ -417,21 +425,21 @@ class PosConCM(SerialSensor):
         .. note::
             Only one PosConCM sensor can be connected to the bus for this operation to succeed.
         """
-        return int(self.send_command(self.address, '013'))
+        return int(self.send_command(self.address, 'R005'))
 
     def set_measurement_type(self, measurement_type):
         """Defines the measurement type to use.
 
-        ===================  ========  ======
-        Measurement type     Function  Value
-        ===================  ========  ======
-        "Diameter   "        ?         28 
-        "X-Center position"  ?         29
-        "Z-Center position"  ?         30
-        "X-Left position"    ?         31
-        "X-Right position"   ?         32
-        "Z-Top position"     ?         33
-        ===================  ========  ======
+        ===================  ======
+        Measurement type     Value
+        ===================  ======
+        "Diameter"           28 
+        "X-Center position"  29
+        "Z-Center position"  30
+        "X-Left position"    31
+        "X-Right position"   32
+        "Z-Top position"     33
+        ===================  ======
 
         Args:
             measurement_type (:obj:`string`): Measurement type.
@@ -439,8 +447,8 @@ class PosConCM(SerialSensor):
         """
         if measurement_type not in self.MEASUREMENT_TYPES:
             raise ProtocolError('Unsupported measure type, must be one of ' + str(self.MEASUREMENT_TYPES))
-
-        return self.send_command(self.address, '020', str(self.MEASUREMENT_TYPES[measurement_type]))
+        
+        return self.send_command(self.address, 'W020', str(self.MEASUREMENT_TYPES[measurement_type]))
 
     def set_precision(self, precision):
         """Defines the precision the sensor will use to determine edges:
@@ -461,27 +469,22 @@ class PosConCM(SerialSensor):
         """
         if precision < 0 or precision > 2:
             raise ProtocolError('Precision must be 0 (standard), 1 (high) or 2 (very high)')
-        return self.send_command(self.address, '040', str(precision))
-     
-    # not sure what this does. Non sense with this sensor...
-    #def set_edge_height(self, height):
-    #    """Defines the minimum height of an edge to be detected.
-    #
-    #   Args:
-    #        height (:obj:`float`): Minimum edge height.
-    #    """
-    #    return self.send_command(self.address, '042', str(height))
+        return self.send_command(self.address, 'W033', str(precision))
 
     def get_measurement(self):
-        """Retrieves the current measurement (circlefit values) of the sensor according to the current settings.
+        """Retrieves the current measurement of the sensor according to the current settings.
 
         Returns:
             tuple: The current measurement and additionally a value indicating the quality of the measured value.
         """
-        result = self.send_command(self.address, '026')
-        if len(result) != 2:
+        result = self.send_command(self.address, 'R021')
+        
+        print "my measurement", result[0]
+        print "my quality", result[1]
+        
+        if len(result) != 3:
             raise ProtocolError('Unexpected result: ' + str(result))
-
+        
         return (result[0], self.QUALITY[int(result[1])])
 
     def get_live_monitor_data(self):
@@ -494,7 +497,10 @@ class PosConCM(SerialSensor):
         .. note::
             This function is designed to aid in the installation of the sensor at an angle.
         """
-        result = self.send_command(self.address, '051')
+        result = self.send_command(self.address, 'R051')
+        
+        print "live", result
+        
         if len(result) != 2:
             raise ProtocolError('Unexpected result: ' + str(result))
 
@@ -512,16 +518,16 @@ class PosConCM(SerialSensor):
     
     def set_flex_mount(self, angle, distance):
         """Sets the FLEX Mount feature to a specific angle and distance."""
-        result = self.send_command(self.address, '036', '%.2f,%.2f' % (angle, distance))
+        result = self.send_command(self.address, 'W036', '%.2f,%.2f' % (angle, distance))
         return map(float, result)
 
     # command 035 - 0 disabled / 1 enabled
-    #def deactivate_flex_mount(self):
-    #    """Deactivates the FLEX Mount feature."""
-    #    self.send_command(self.address, '035')
+    def deactivate_flex_mount(self):
+        """Deactivates the FLEX Mount feature."""
+        self.send_command(self.address, 'W035', 0)
 
     def adjust_to_dark_object(self, is_dark_object):
         """Adjusts the sensor to detect darker or lighter surfaces."""
         data = '1' if is_dark_object else '0'
-        return self.send_command(self.address, '032', data)
+        return self.send_command(self.address, 'W032', data)
 
