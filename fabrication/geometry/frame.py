@@ -1,6 +1,6 @@
 from compas.geometry import cross_vectors
 from compas.geometry.elements import Point, Vector
-from fabrication.geometry.transformation import Rotation
+from compas_fabrication.fabrication.geometry.transformation import Rotation
 
 __author__     = ['Romana Rust <rust@arch.ethz.ch>', ]
 
@@ -31,9 +31,9 @@ class Frame():
         
     def copy(self):
         cls = type(self)
-        cls.point = Point([0, 0, 0])
-        cls.xaxis = Vector([1, 0, 0])
-        cls.yaxis = Vector([0, 1, 0])
+        cls.point = Point(list(self.point))
+        cls.xaxis = Vector(list(self.xaxis))
+        cls.yaxis = Vector(list(self.yaxis))
         return cls
         
     @classmethod        
@@ -58,14 +58,6 @@ class Frame():
         frame.point = Point([0, 0, 0])
         frame.xaxis = Vector([0, 1, 0])
         frame.yaxis = Vector([0, 0, 1])
-        return frame
-    
-    @classmethod
-    def from_rhino_plane(cls, plane):
-        frame = cls()
-        frame.point = Point(list(plane.Origin))
-        frame.xaxis = Vector(list(plane.XAxis))
-        frame.yaxis = Vector(list(plane.YAxis))
         return frame
     
     @classmethod
@@ -166,9 +158,9 @@ class Frame():
     
     def transform(self, transformation, copy=False):
         
-        point = transformation * self.point
-        xaxis = transformation.rotation * self.xaxis
-        yaxis = transformation.rotation * self.yaxis    
+        point = Point(transformation * self.point)
+        xaxis = Vector(transformation.rotation() * self.xaxis)
+        yaxis = Vector(transformation.rotation() * self.yaxis)
         if not copy:
             self.point = point
             self.xaxis = xaxis

@@ -1,2 +1,2 @@
 from frame import Frame
-from fabrication.geometry.transformation import Rotation
+from compas_fabrication.fabrication.geometry.transformation import Rotation

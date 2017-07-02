@@ -4,7 +4,6 @@ Created on 15.05.2017
 @author: rustr
 '''
 
-import networkx as nx
 import matplotlib.pyplot as plt
 from graphviz import Digraph # build upon compas graph structure ?
 from fsm import FiniteStateMachine

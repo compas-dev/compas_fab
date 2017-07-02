@@ -1,16 +1,25 @@
 import math
-from compas.geometry.elements import Point, Vector, Line
+from compas.geometry.elements import Point, Vector
 from compas.geometry.utilities import multiply_matrix_vector, multiply_matrices
+from compas.geometry import dot_vectors
 
 __author__     = ['Romana Rust <rust@arch.ethz.ch>', ]
 
 
-class Transformation():
+class Transformation(object):
     
     def __init__(self):
         """
-        The Transformation class 
-        Matrices describing affine transformation of the plane
+        #=======================================================================
+        A ``Transformation`` object represents a 4x4 matrix describing an affine 
+        transformation of the operations: rotation, translation, scaling,
+        projection, reflection, and shearing.
+        
+        The __mul__ operator performs a matrix multiplication on.
+
+        3D homogeneous coordinates as well as for converting between rotation matrices,
+        Euler angles, and quaternions. Also includes functions to decompose transformation matrices.
+        
         """
         self.matrix = [
             [1.0, 0.0, 0.0, 0.0], 
@@ -20,130 +29,117 @@ class Transformation():
     
     @classmethod
     def from_matrix(cls, matrix):
-        T = cls()
-        T.matrix = matrix[:]
+        transformation = cls()
+        transformation.matrix = matrix[:]
+        return transformation
+        
+    def rotation(self):
+        """ Return an instance of the Rotation class that just describes rotation."""
+        return Rotation.from_matrix(self.matrix)
     
-    @classmethod
-    def from_rotation(cls, rotation):
-        pass
-    
-    @classmethod
-    def from_translation(cls, translation):
-        pass
-    
-    @classmethod
-    def rotation(cls):
-        R = Rotation.from_matrix(cls.matrix)
-        R.matrix[0][3] = 0
-        R.matrix[1][3] = 0
-        R.matrix[2][3] = 0
-    
-    @classmethod
-    def translation(cls):
-        return Translation(cls.matrix[0][3], cls.matrix[1][3], cls.matrix[2][3])
+    def translation(self):
+        """ Return an instance of the Translation class that just describes translation."""
+        return Translation.from_matrix(self.matrix)
     
     def __mul__(self, other):
-        if type(other) == type(self): # rotation // translation // ..
-            T = self.from_matrix(multiply_matrices(self.matrix, other.matrix))
-            return T
+        """
+        The __mul__ operator performs a dot product with ``other``.
+        ``other`` could be:
+        - instance of Transformation class or derivative of Transformation class
+          This allows to concatenate a series of transformation matrices.
+        - a Point, a Vector, xyz coordinates
+        - a list of Points, Vectors or xyz coordinates
+        - a 4x4 matrix (as list) describing a transformation
+        """
+        # multiply with instances of Transformation
+        if self.__class__ == other.__class__:
+            return Transformation.from_matrix(multiply_matrices(self.matrix, other.matrix))
+        # multiply with instances of Rotation, Translation, etc.
+        elif self.__class__ == other.__class__.__bases__[0] or self.__class__.__bases__[0] == other.__class__.__bases__[0]:
+            return Transformation.from_matrix(multiply_matrices(self.matrix, other.matrix))
         else:
             try:
                 v = list(other)
-                print "==>", v
-                print "==>", type(v[0])
-                if type(v[0]) == float:
-                    print "float"
-                    if len(v) == 3: # v = point or vector 
-                        print v
+                # v = point, vector, xyz coordinates
+                if type(v[0]) == float or type(v[0]) == int:
+                    if len(v) == 3: 
                         v += [1.] # make homogeneous coordinates
-                        print v
                         v = multiply_matrix_vector(self.matrix, v)
-                        print v
                         return v[:3]
-                else:
-                    print "list"
-                    if len(v) == 4 and len(v[0]) == 4: # v = also matrix!
-                        m = multiply_matrices(self.matrix, v)
-                        return m
                     else:
-                        # could be a list of points that need to be transformed
+                        raise Exception("The type %s is not supported to be multiplied by this class." % type(other))
+                else:
+                    # v = transformation matrix
+                    if len(v) == 4 and len(v[0]) == 4:
+                        return multiply_matrices(self.matrix, v)
+                    # v = a list of xyz coordinates
+                    else:
                         xyz = zip(*v) # transpose matrix
                         xyz += [[1] * len(xyz[0])] # make homogeneous coordinates
                         xyz = multiply_matrices(self.matrix, xyz)
                         xyz = xyz[:3]
-                        return zip(*xyz)
-                        
+                        return zip(*xyz) 
             except:
-                raise
-                #raise "The type %s is not supported to be multiplied by this class." % type(other) # Input ERROr
-            """
-            elif type(other) == type(Vector([0,0,0])):
-                v = list(other) + [1.] # Homogeneous vector
-                v = multiply_matrix_vector(cls.matrix, v)
-                return Vector(v[:3])
-            elif str(type(other)) == str(type(Point([0,0,0]))):
-                v = list(other) + [1.] # Homogeneous vector
-                v = multiply_matrix_vector(cls.matrix, v)
-                return Point(v[:3])
-            elif str(type(other)) == str(type(Line([0,0,0],[0,0,0]))):
-                start = list(other.start) + [1.] # Homogeneous vector
-                start = multiply_matrix_vector(self.matrix, start)
-                end = list(other.end) + [1.] # Homogeneous vector
-                end = multiply_matrix_vector(self.matrix, end)
-                return Line(start[:3], end[:3])
-            elif type(other) == type([]):
-                if len(other) != 3:
-                    raise 'Rotation matrix shape is not compatible with vector length.'
-                else:
-                    v = other + [1.] # Homogeneous vector
-                    v = multiply_matrix_vector(self.matrix, v)
-                    return v[:3]
-            else:
-                print type(Point([0,0,0]))
-                print type(other)
-                print str(type(other)) == str(type(Point([0,0,0])))
-                raise "The type %s is not supported to be multiplied by class Rotation." % type(other)
-            """
+                raise Exception("The type %s is not supported to be multiplied by this class." % type(other))
         
-    def __imul__(self, n):
-        raise NotImplementedError
+    def __imul__(self, other):
+        return Transformation.from_matrix(self.__mul__(other))
         
-    
     def __getitem__(self, key):
-        #raise KeyError
-        raise NotImplementedError
+        i, j = key
+        return self.matrix[i][j]
 
     def __setitem__(self, key, value):
-        raise NotImplementedError
+        i, j = key
+        self.matrix[i][j] = value
 
     def __iter__(self):
         return iter(self.matrix)
 
     def __eq__(self, other):
-        raise NotImplementedError
-
-    def __add__(self, other):
-        raise NotImplementedError
-
-    def __iadd__(self, other):
-        raise NotImplementedError
-
-    def __sub__(self, other):
-        raise NotImplementedError
-
-    def __isub__(self, other):
-        raise NotImplementedError
-
+        if self.__class__ == other.__class__:
+            for i in range(4):
+                for j in range(4):
+                    if not self.matrix[i][j] == other.matrix[i][j]:
+                        return False
+            return True
+        else:
+            return False
     
-class Translation(Transformation):
+    def __repr__(self):
+        
+        def format_number(number):
+            return "%+.4f" % number if number < 0 else " %.4f" % number
+
+        m = self.matrix
+        s =  "[[%s, %s, %s, %s],\n" % tuple([format_number(n) for n in (m[0][0], m[0][1], m[0][2], m[0][3])])
+        s += " [%s, %s, %s, %s],\n" % tuple([format_number(n) for n in (m[1][0], m[1][1], m[1][2], m[1][3])])
+        s += " [%s, %s, %s, %s],\n" % tuple([format_number(n) for n in (m[2][0], m[2][1], m[2][2], m[2][3])])
+        s += " [%s, %s, %s, %s]]"   % tuple([format_number(n) for n in (m[3][0], m[3][1], m[3][2], m[3][3])])
+        return s
     
-    def __init__(self, translation):
-        super(Transformation, self).__init__()
-        self.matrix[0][3] = translation[0]
-        self.matrix[1][3] = translation[1]
-        self.matrix[2][3] = translation[2]
+    def inverse(self):
+        axis_angle_vector = Vector(self.rotation().axis_angle_vector)
+        inv_rotation = Rotation.from_axis_angle_vector(axis_angle_vector * -1)
+        trans = [self.matrix[0][3], self.matrix[1][3], self.matrix[2][3]]
+        trans = inv_rotation * trans
+        
+        cls = type(self)
+        transformation = cls.from_matrix(inv_rotation.matrix)
+        transformation.matrix[0][3] = -trans[0]
+        transformation.matrix[1][3] = -trans[1]
+        transformation.matrix[2][3] = -trans[2]
+        return transformation
+
 
 class Rotation(Transformation):
+    
+    @classmethod
+    def from_matrix(cls, matrix):
+        # clean transformation matrix, so that it contains just rotation
+        xaxis = [matrix[0][0], matrix[1][0], matrix[2][0]]
+        yaxis = [matrix[0][1], matrix[1][1], matrix[2][1]]
+        return cls.from_basis_vectors(xaxis, yaxis)
             
     @classmethod
     def from_basis_vectors(cls, xaxis, yaxis):
@@ -152,11 +148,11 @@ class Rotation(Transformation):
         xaxis.normalize()
         yaxis.normalize()
         zaxis = xaxis.cross(yaxis)
-        R = cls()
-        R.matrix[0][0], R.matrix[1][0], R.matrix[2][0] = list(xaxis)
-        R.matrix[0][1], R.matrix[1][1], R.matrix[2][1] = list(yaxis)
-        R.matrix[0][2], R.matrix[1][2], R.matrix[2][2] = list(zaxis)
-        return R
+        rotation = cls()
+        rotation.matrix[0][0], rotation.matrix[1][0], rotation.matrix[2][0] = list(xaxis)
+        rotation.matrix[0][1], rotation.matrix[1][1], rotation.matrix[2][1] = list(yaxis)
+        rotation.matrix[0][2], rotation.matrix[1][2], rotation.matrix[2][2] = list(zaxis)
+        return rotation
     
     @classmethod
     def from_quaternion(cls, quaternion):
@@ -176,12 +172,11 @@ class Rotation(Transformation):
         q = [v * math.sqrt(2.0 / n) for v in q]
         q = [[q[i]*q[j] for i in range(4)] for j in range(4)] # outer_product
         
-        rotation = cls()
-        rotation.matrix = [
+        rotation = Rotation.from_matrix([
             [1.0 - q[2][2] - q[3][3],       q[1][2] - q[3][0],       q[1][3] + q[2][0], 0.0],
             [      q[1][2] + q[3][0], 1.0 - q[1][1] - q[3][3],       q[2][3] - q[1][0], 0.0],
             [      q[1][3] - q[2][0],       q[2][3] + q[1][0], 1.0 - q[1][1] - q[2][2], 0.0],
-            [                    0.0,                     0.0,                     0.0, 1.0]]
+            [                    0.0,                     0.0,                     0.0, 1.0]])
         return rotation
     
     @classmethod
@@ -221,7 +216,7 @@ class Rotation(Transformation):
                 
                 
         if point != None:
-            
+            # rotation about axis, angle AND point includes also translation
             t = Point(point) - Point(rotation * point)            
             rotation.matrix[0][3] = t.x
             rotation.matrix[1][3] = t.y
@@ -354,26 +349,89 @@ class Rotation(Transformation):
     def euler_angles(self):
         raise NotImplementedError
     
-    def __repr__(self):
-        m = self.matrix
-        s = "Rotation:\n"
-        s += "%+.4f\t%+.4f\t%+.4f\t%+.4f\n" % (m[0][0], m[0][1], m[0][2], m[0][3])
-        s += "%+.4f\t%+.4f\t%+.4f\t%+.4f\n" % (m[1][0], m[1][1], m[1][2], m[1][3])
-        s += "%+.4f\t%+.4f\t%+.4f\t%+.4f\n" % (m[2][0], m[2][1], m[2][2], m[2][3])
-        s += "%+.4f\t%+.4f\t%+.4f\t%+.4f\n" % (m[3][0], m[3][1], m[3][2], m[3][3])
-        return s
+class Translation(Transformation):
     
+    @classmethod
+    def from_vector(cls, vector):
+        translation = cls()
+        translation.matrix[0][3] = vector[0]
+        translation.matrix[1][3] = vector[1]
+        translation.matrix[2][3] = vector[2]
+        return translation
     
+    @classmethod
+    def from_matrix(cls, matrix):
+        # clean transformation matrix, so that it contains just translation
+        return cls.from_vector([matrix[0][3], matrix[1][3], matrix[2][3]])
+
+class Scale(Transformation):
+    
+    @classmethod
+    def from_factor(cls, factor):
+        """ Creates a matrix to uniformly scale by factor. """
+        scale = cls()
+        scale.matrix[0][0] = factor
+        scale.matrix[1][1] = factor
+        scale.matrix[2][2] = factor
+        return scale
+    
+    @classmethod
+    def from_factor_vector(cls, factor_vector):
+        """ Creates a matrix to non-uniformly scale by factor_vector = [fx, fy, fz]. """
+        fx, fy, fz = factor_vector
+        scale = cls()
+        scale.matrix[0][0] = fx
+        scale.matrix[1][1] = fy
+        scale.matrix[2][2] = fz
+        return scale
+
+class Reflection(Transformation):
+    
+    @classmethod
+    def from_point_and_normal(cls, point, normal):
+        """Creates a matrix to mirror at plane, defined by point and normal vector."""
+        reflection = cls()
+        
+        if type(normal) == type([]): normal = Vector(normal)
+        normal.normalize()
+        
+        for i in range(3):
+            for j in range(3):
+                reflection.matrix[i][j] -= 2.0 * normal[i]*normal[j]
+        
+        for i in range(3):
+            reflection.matrix[i][3] = 2 * dot_vectors(point, normal) * normal[i]
+        return reflection
+    
+    @classmethod
+    def from_plane(cls, plane):
+        """Creates a matrix to mirror at plane."""
+        return cls.from_point_and_normal(plane.point, plane.normal)
+    
+
+    
+        
 if __name__ == "__main__":
     
-    T = Transformation()
-    print list(T)
-    p = Point([1,2,3])
-    print float
-    print "==========================="
-    print T * p
-    l = Line([0,0,0],[1,0,0])
-    print T * l
-    print "==========================="
-        
+    pt = [19.961266434549813, 31.35370077557657, 0.0]
+    normal = [-20.551039382110147, 22.135331787354541, 0.0]
+    
+    R = Reflection.from_point_and_normal(pt, normal)
+    print R
+    
+    print "==============="
+    
+    xaxis = [-0.1157, 0.3219, 0.9397]
+    yaxis = [0.9411, 0.3382, 0.0000]
+    vec = [40.4619, -112.5721, 170.8392]
+    
+    rotation = Rotation.from_basis_vectors(xaxis, yaxis)
+    translation = Translation.from_vector(vec)
+    transformation = translation * rotation
+    print transformation
+    print
+    print transformation.inverse()
+    print
+    
+
         

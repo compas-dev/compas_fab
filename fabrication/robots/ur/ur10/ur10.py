@@ -7,7 +7,7 @@ Created on 15.06.2017
 from compas_fabrication.fabrication.robots.ur import UR
 #from compas_fabrication.fabrication.grasshopper.mesh import draw_mesh, draw_line, mesh_transform
 from compas_fabrication.fabrication.geometry import Frame, Rotation
-from compas.geometry.elements import Line
+from compas.geometry.elements import Line, Point
 from compas.datastructures.mesh import Mesh
 from compas.geometry.utilities import multiply_matrices
 
@@ -95,15 +95,15 @@ class UR10(UR):
         j0, j1, j2, j3, j4, j5 = self.j0, self.j1, self.j2, self.j3, self.j4, self.j5
 
         R0 = Rotation.from_axis_and_angle(j0.vector, q0, j0.end)
-        j1 = R0 * j1
+        j1 = Line(R0 * j1.start, R0 * j1.end)
         R1 = Rotation.from_axis_and_angle(j1.vector, q1, j1.end) * R0
-        j2 = R1 * j2
+        j2 = Line(R1 * j2.start, R1 * j2.end)
         R2 = Rotation.from_axis_and_angle(j2.vector, q2, j2.end) * R1
-        j3 = R2 * j3
+        j3 = Line(R2 * j3.start, R2 * j3.end)
         R3 = Rotation.from_axis_and_angle(j3.vector, q3, j3.end) * R2
-        j4 = R3 * j4
+        j4 = Line(R3 * j4.start, R3 * j4.end)
         R4 = Rotation.from_axis_and_angle(j4.vector, q4, j4.end) * R3
-        j5 = R4 * j5
+        j5 = Line(R4 * j5.start, R4 * j5.end)
         R5 = Rotation.from_axis_and_angle(j5.vector, q5, j5.end) * R4
         
         return R0, R1, R2, R3, R4, R5
@@ -112,13 +112,21 @@ class UR10(UR):
         
         R0, R1, R2, R3, R4, R5 = self.get_forward_transformations(q)
         
+        """
         m0_xyz = mesh_get_transformed_vertices(self.m0, R0.matrix)
         m1_xyz = mesh_get_transformed_vertices(self.m1, R1.matrix)
         m2_xyz = mesh_get_transformed_vertices(self.m2, R2.matrix)
         m3_xyz = mesh_get_transformed_vertices(self.m3, R3.matrix)
         m4_xyz = mesh_get_transformed_vertices(self.m4, R4.matrix)
         m5_xyz = mesh_get_transformed_vertices(self.m5, R5.matrix)
-        
+        """
+        m0_xyz = R0 * self.m0.xyz
+        m1_xyz = R1 * self.m1.xyz
+        m2_xyz = R2 * self.m2.xyz
+        m3_xyz = R3 * self.m3.xyz
+        m4_xyz = R4 * self.m4.xyz
+        m5_xyz = R5 * self.m5.xyz
+                
         m0 = Mesh.from_vertices_and_faces(m0_xyz, self.m0_faces)
         m1 = Mesh.from_vertices_and_faces(m1_xyz, self.m1_faces)
         m2 = Mesh.from_vertices_and_faces(m2_xyz, self.m2_faces)
