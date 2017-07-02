@@ -1,218 +1,8 @@
 from compas.geometry import cross_vectors
-from compas.geometry.elements import Point, Vector, Plane
-import math
-
+from compas.geometry.elements import Point, Vector
+from fabrication.geometry.transformation import Rotation
 
 __author__     = ['Romana Rust <rust@arch.ethz.ch>', ]
-
-
-class Rotation():
-    
-    def __init__(self):
-        """
-        The Rotation class 
-        """
-        self.matrix = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
-        
-    @classmethod
-    def from_basis_vectors(cls, xaxis, yaxis):
-        if type(xaxis) == type([]): xaxis = Vector(xaxis)
-        if type(yaxis) == type([]): yaxis = Vector(yaxis)
-        xaxis.normalize()
-        yaxis.normalize()
-        zaxis = xaxis.cross(yaxis)
-        R = cls()
-        R.matrix[0][0], R.matrix[1][0], R.matrix[2][0] = list(xaxis)
-        R.matrix[0][1], R.matrix[1][1], R.matrix[2][1] = list(yaxis)
-        R.matrix[0][2], R.matrix[1][2], R.matrix[2][2] = list(zaxis)
-        return R
-    
-    @classmethod
-    def from_quaternion(cls, quaternion):
-        """
-        Calculate rotation matrix from quaternion.
-        References Christoph Gohlke's implementation of quaternion_matrix(quaternion): 
-        http://www.lfd.uci.edu/~gohlke/code/transformations.py.html
-        """     
-        q = quaternion
-        n =  q[0]**2 + q[1]**2 + q[2]**2 + q[3]**2 # dot product
-        
-        epsilon = 1.0e-15
-        
-        if n < epsilon:
-            return cls()
-        
-        q = [v * math.sqrt(2.0 / n) for v in q]
-        q = [[q[i]*q[j] for i in range(4)] for j in range(4)] # outer_product
-        
-        rotation = cls()
-        rotation.matrix = [
-            [1.0 - q[2][2] - q[3][3],       q[1][2] - q[3][0],       q[1][3] + q[2][0]],
-            [      q[1][2] + q[3][0], 1.0 - q[1][1] - q[3][3],       q[2][3] - q[1][0]],
-            [      q[1][3] - q[2][0],       q[2][3] + q[1][0], 1.0 - q[1][1] - q[2][2]]]
-        return rotation
-        
-        
-    @classmethod
-    def from_axis_angle(cls, axis_angle):
-        """
-        Calculate rotation matrix from axis-angle representation.
-        References Christoph Gohlke's implementation of rotation_matrix(angle, direction, point=None): 
-        http://www.lfd.uci.edu/~gohlke/code/transformations.py.html
-        """     
-        direction = Vector(axis_angle)
-        angle = direction.length
-        direction.normalize()
-
-        sina = math.sin(angle)
-        cosa = math.cos(angle)
-        
-        R = [[cosa, 0.0, 0.0], [0.0, cosa, 0.0], [0.0, 0.0, cosa]]
-        
-        outer_product = [[direction[i]*direction[j] * (1.0 - cosa) for i in range(3)] for j in range(3)]
-        R = [[R[i][j] + outer_product[i][j] for i in range(3)] for j in range(3)]
-    
-        direction *= sina
-                
-        m = [[ 0.0,         -direction[2],  direction[1]],
-            [ direction[2], 0.0,          -direction[0]],
-            [-direction[1], direction[0],  0.0]]
-        
-        rotation = cls()
-        rotation.matrix = [[R[i][j] + m[j][i] for i in range(3)] for j in range(3)]
-        return rotation
-    
-    @classmethod
-    def from_euler_angles(cls, euler_angles):
-        #a, b, c = euler_angles
-        raise NotImplementedError
-    
-    @property
-    def quaternion(self):
-        """
-        Calculate quaternion from rotation matrix.
-        References Martin Baker's implementation of matrix to quaternion: 
-        http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/ 
-        """
-        m = self.matrix
-        
-        qw, qx, qy, qz = 0, 0, 0, 0
-        trace = m[0][0] + m[1][1] + m[2][2]
-        
-        if trace > 0.0:
-            s = (0.5 / math.sqrt(trace + 1.0))
-            qw = 0.25 / s
-            qx = (m[2][1] - m[1][2]) * s 
-            qy = (m[0][2] - m[2][0]) * s
-            qz = (m[1][0] - m[0][1]) * s
-            
-        elif ( (m[0][0] > m[1][1]) and (m[0][0] > m[2][2])):
-            s = 2.0 * math.sqrt(1.0 + m[0][0] - m[1][1] - m[2][2])
-            qw = (m[2][1] - m[1][2]) / s
-            qx = 0.25 * s
-            qy = (m[0][1] + m[1][0]) / s
-            qz = (m[0][2] + m[2][0]) / s
-            
-        elif (m[1][1] > m[2][2] ):
-            s = 2.0 * math.sqrt(1.0 + m[1][1] - m[0][0] - m[2][2])
-            qw = (m[0][2] - m[2][0]) / s 
-            qx = (m[0][1] + m[1][0]) / s
-            qy = 0.25 * s
-            qz = (m[1][2] + m[2][1]) / s
-        else:
-            s = 2.0 * math.sqrt(1.0 + m[2][2] - m[0][0] - m[1][1])
-            qw = (m[1][0] - m[0][1]) / s
-            qx = (m[0][2] + m[2][0]) / s
-            qy = (m[1][2] + m[2][1]) / s
-            qz = 0.25 * s
-            
-        return [qw, qx, qy, qz]
-    
-    @property
-    def axis_angle(self):        
-        """
-        Calculate axis angle representation from rotation matrix.
-        References Martin Baker's implementation at
-        http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm
-        More information can be found here:
-        https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
-        """
-        epsilon = 0.01 # margin to allow for rounding errors
-        epsilon2 = 0.1 # margin to distinguish between 0 and 180 degrees
-        
-        m = self.matrix
-        
-        if ((math.fabs(m[0][1] - m[1][0]) < epsilon) and 
-            (math.fabs(m[0][2] - m[2][0]) < epsilon) and 
-            (math.fabs(m[1][2] - m[2][1]) < epsilon)):
-            
-            # Singularity found.
-            # First check for identity matrix which must have + 1 for all terms in leading diagonal and zero in other terms
-            if ((math.fabs(m[0][1] + m[1][0]) < epsilon2) and 
-                (math.fabs(m[0][2] + m[2][0]) < epsilon2) and 
-                (math.fabs(m[1][2] + m[2][1]) < epsilon2) and 
-                (math.fabs(m[0][0] + m[1][1] + m[2][2] - 3) < epsilon2)) :
-                    # this singularity is identity matrix so angle = 0
-                    return [0,0,0]
-            else:
-                # otherwise this singularity is angle = 180
-                angle = math.pi
-                xx = (m[0][0] + 1)/2
-                yy = (m[1][1] + 1)/2
-                zz = (m[2][2] + 1)/2
-                xy = (m[0][1] + m[1][0])/4
-                xz = (m[0][2] + m[2][0])/4
-                yz = (m[1][2] + m[2][1])/4
-                root_half = math.sqrt(0.5)
-                if ((xx > yy) and (xx > zz)) : # m[0][0] is the largest diagonal term
-                    if (xx < epsilon) :
-                        axis = [0, root_half, root_half]
-                    else:
-                        x = math.sqrt(xx)
-                        axis = [x, xy/x, xz/x]                    
-                elif (yy > zz) : # m[11 is the largest diagonal term
-                    if (yy < epsilon):
-                        axis = [root_half, 0, root_half]
-                    else :
-                        y = math.sqrt(yy)
-                        axis = [xy/y, y, yz/y]                        
-                else : # m[2][2] is the largest diagonal term so base result on this
-                    if (zz < epsilon) :
-                        axis = [root_half, root_half, 0]
-                    else :
-                        z = math.sqrt(zz)
-                        axis = [xz/z, yz/z, z]
-                                    
-                return [v * angle for v in axis] # return 180 degree rotation
-    
-        # as we have reached here there are no singularities so we can handle normally
-        s = math.sqrt(\
-            (m[2][1] - m[1][2])*(m[2][1] - m[1][2]) +
-            (m[0][2] - m[2][0])*(m[0][2] - m[2][0]) +
-            (m[1][0] - m[0][1])*(m[1][0] - m[0][1])) # used to normalize
-        
-        # prevent divide by zero][should not happen if matrix is orthogonal and should be
-        # caught by singularity test above][but I've left it in just in case
-        if (math.fabs(s) < 0.001): s = 1
-        angle = math.acos((m[0][0] + m[1][1] + m[2][2] - 1)/2)
-        
-        x = (m[2][1] - m[1][2])/s
-        y = (m[0][2] - m[2][0])/s
-        z = (m[1][0] - m[0][1])/s
-        return [angle * x, angle * y, angle * z]
-        
-    @property
-    def euler_angles(self):
-        raise NotImplementedError
-    
-    def __repr__(self):
-        m = self.matrix
-        s = "Rotation:\n"
-        s += "%+.4f\t%+.4f\t%+.4f\n" % (m[0][0], m[0][1], m[0][2])
-        s += "%+.4f\t%+.4f\t%+.4f\n" % (m[1][0], m[1][1], m[1][2])
-        s += "%+.4f\t%+.4f\t%+.4f\n" % (m[2][0], m[2][1], m[2][2])
-        return s
-    
 
     
 class Frame():
@@ -221,11 +11,9 @@ class Frame():
         """
         The class "Frame" consists of a point and two base vectors (x- and y-axis).
         It contains methods to get the axis-angle representation (UR), 
-        quaternions (ABB), or euler angles (Kuka) from this frame.
+        quaternions (ABB), or euler angles (KUKA) from this frame.
         the transformation matrix to and from another plane, and also contains some transformation methods.
-        If no plane is given as an input, the origin of the plane is in world XY.
-        If draw_geo is set to true: the axes can be visualized as lines (length = 100)
-        
+        If no parameters are given as input, the frame is the frame in world XY.        
         quaternion definition: [qw, qx, qy, qz]
         angle_axis definition: [ax,ay,az] (angle = length of the vector, axis = vector)
         """
@@ -234,10 +22,20 @@ class Frame():
         if type(xaxis) == type([]): xaxis = Vector(xaxis)
         if type(yaxis) == type([]): yaxis = Vector(yaxis)
         
+        xaxis.normalize()
+        yaxis.normalize()
+        
         self.point = point
         self.xaxis = xaxis
         self.yaxis = yaxis
-    
+        
+    def copy(self):
+        cls = type(self)
+        cls.point = Point([0, 0, 0])
+        cls.xaxis = Vector([1, 0, 0])
+        cls.yaxis = Vector([0, 1, 0])
+        return cls
+        
     @classmethod        
     def worldXY(cls):
         frame = cls()
@@ -285,15 +83,15 @@ class Frame():
         return frame
     
     @classmethod 
-    def from_axis_angle(cls, axis_angle):
-        rotation = Rotation.from_axis_angle(axis_angle)
+    def from_axis_angle_vector(cls, axis_angle_vector):
+        rotation = Rotation.from_axis_angle_vector(axis_angle_vector)
         frame = cls.from_rotation(rotation)
         return frame
     
     @classmethod
-    def from_pose_axis_angle(cls, pose_axis_angle):
-        x, y, z, ax, ay, az = pose_axis_angle
-        frame = cls.from_axis_angle([ax, ay, az])
+    def from_pose_axis_angle_vector(cls, pose_axis_angle_vector):
+        x, y, z, ax, ay, az = pose_axis_angle_vector
+        frame = cls.from_axis_angle_vector([ax, ay, az])
         frame.point = Point([x, y, z])
         return frame
 
@@ -339,16 +137,16 @@ class Frame():
         return list(self.point) + self.quaternion
             
     @property
-    def axis_angle(self):
+    def axis_angle_vector(self):
         R = Rotation.from_basis_vectors(self.xaxis, self.yaxis)
-        return R.axis_angle
+        return R.axis_angle_vector
     
     @property
-    def pose_axis_angle(self):
+    def pose_axis_angle_vector(self):
         """
         Returns a list with the rotation specified in axis angle, such as [x, y, z, ax, ay, az]
         """
-        return list(self.point) + self.axis_angle
+        return list(self.point) + self.axis_angle_vector
     
     @property
     def euler_angles(self):
@@ -365,8 +163,21 @@ class Frame():
     @property
     def rotation(self):
         return Rotation.from_basis_vectors(self.xaxis, self.yaxis)
-        
     
+    def transform(self, transformation, copy=False):
+        
+        point = transformation * self.point
+        xaxis = transformation.rotation * self.xaxis
+        yaxis = transformation.rotation * self.yaxis    
+        if not copy:
+            self.point = point
+            self.xaxis = xaxis
+            self.yaxis = yaxis
+            return self
+        else:
+            return Frame(point, xaxis, yaxis)
+            
+        
     def __repr__(self):
         s = "Frame:\n"
         s += "Point:\n"
@@ -375,16 +186,34 @@ class Frame():
         s += str(R)
         return s
     
-        
-
 
 if __name__ == '__main__':
     
+    """
     pose_quaternion =  [46.688110714374631, -1.4120551622885724, 49.438882686865952, 0.9222492523802307, -0.077292257754572713, 0.28255622706540073, 0.25227802504750946]
     print pose_quaternion
     frame = Frame.from_pose_quaternion(pose_quaternion)
     
     print frame.pose_quaternion
-
+    
+    
+    R = rotation_matrix(q1, j1_vector, j1_end)
+    print R
+    """
+    q1, j1_vector, j1_end = -2.02405833354, [-207.9183, -74.7322, 0.0], [-207.9183, -74.7322, 127.3]
+    
+    R = Rotation.from_axis_and_angle(j1_vector, q1)
+    print R
+    
+    print "================"
+    
+    R = Rotation.from_axis_and_angle(Vector(j1_vector), q1, Point(j1_end))
+    print R
+    print R * R
+    
+    """
+    print R * Vector([-207.9183, -74.7322, 0.0])
+    print R * [-207.9183, -74.7322, 0.0]
+    """
     
     

@@ -9,24 +9,21 @@ import matplotlib.pyplot as plt
 from graphviz import Digraph # build upon compas graph structure ?
 from fsm import FiniteStateMachine
 
-import pygraphviz as pgv
-
-
 class FabricationProcess(FiniteStateMachine):
     #===========================================================================
     """
     This class helps to plan, visualize and control the fabrication process. 
     A fabrication process consists of several jobs that can be performed one 
     after the other, or, run in parallel. The sequence of the process is defined 
-    through the starting job and the transitions between the jobs (e.g. j1 and
-    j2). Those transitions may have also a certain conditions implemented, which 
-    is by default that j2 can be only performed, when j1 is done. A job can 
+    through the starting job and the transitions between the jobs (e.g. job1 and
+    job2). Those transitions may have also a certain conditions implemented, which 
+    is by default that job2 can be only performed, when job1 is done. A job can 
     consist of several tasks, that are specific to the fabrication process.
     For more info see https://en.wikipedia.org/wiki/Finite-state_machine
     """
         
     def add_job(self, name, initial=False):
-        self.add_state(name, initial)
+        return self.add_state(name, initial)
     
     def next_job(self):
         pass
@@ -50,37 +47,48 @@ class FabricationProcess(FiniteStateMachine):
 
 if __name__ == "__main__":
     
+    f = FabricationProcess('fabrication process')
+    
+    job0 = f.add_job("digital model", initial=True)
+    job1 = f.add_job("data generation")
+    job2 = f.add_job("(robotic) pick and place")
+    job3 = f.add_job("(robotic) scanning process")
+    
+    f.add_transition(job0, job1, input_value=None, action='start')
+    f.add_transition(job1, job2, input_value='fabrication data', action='send')
+    f.add_transition(job2, job3)
+    f.add_transition(job3, job0, input_value='scanning data', action='update')
+        
+    
+    f.next(None)
+    f.next('fabrication data')    
+    f.next(None)
+    f.next("scanning data")
+    
+    f.show()
+    
     """
-    dot = Digraph(comment='The Round Table')
-    dot.node('A', 'King Arthur')
-    dot.node('B', 'Sir Bedevere the Wise')
-    dot.node('L', 'Sir Lancelot the Brave')
+    f = FabricationProcess('sample fabrication process')
     
-    dot.engine = 'neato'
+    job0 = fp.add_state("digital model", initial=True)
+    job1 = fp.add_state("data generation")
+    job2 = fp.add_state("send robotic paths")
+    job2 = fp.add_state("get sensor data")
+    job2 = fp.add_state("calculate and send new speed")
+    job3 = fp.add_state("(robotic) scanning process")
     
+    fsm.add_transition(job0, job1, action='start')
+    fsm.add_transition(job1, job2, 'send')
+    fsm.add_transition(job1, job3, 'send')
+    fsm.add_transition(job2, job3, 'send')
+    fsm.add_transition(job3, job0, 'update')
     
+    job2.output_values = [("send", "robotic paths")]
     
-    dot.edges(['AB', 'AL'])
-    dot.edge('B', 'L', constraint='false')
+    for key in job0:
+        print key
     
-    print(dot.source)
-    #dot.render('round-table.gv', view=True)
-    #cmd = ['dot', '-Tpdf', '-O', "C:\\Users\\rustr\\workspace\\compas_fabrication\\fabrication\\datastructures\\test-output\\round-table.gv"]
-    #proc = subprocess.Popen(cmd, startupinfo=STARTUPINFO)
-    dot.render('test-output/round-table.gv', view=True)
+    fsm.show_graph()
     """
-
-    G = pgv.AGraph()
-    G.add_node('a')
-    G.add_node('b')
-    G.add_edge('a','b')
     
-    G.node_attr['shape']='circle'
-    G.add_node(1, color='red')
-    print "here"
-    G.layout(prog='dot')
-    #G.layout()
-    print "here"
-    G.draw('file.png')
-    print "here"
     
