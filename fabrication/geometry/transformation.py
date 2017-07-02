@@ -10,16 +10,15 @@ class Transformation(object):
     
     def __init__(self):
         """
-        #=======================================================================
         A ``Transformation`` object represents a 4x4 matrix describing an affine 
-        transformation of the operations: rotation, translation, scaling,
-        projection, reflection, and shearing.
+        transformation of the operations: rotation, translation, scale and 
+        reflection.
         
-        The __mul__ operator performs a matrix multiplication on.
+        The __mul__ operator allows to concatenate a series of transformation 
+        matrices.
 
-        3D homogeneous coordinates as well as for converting between rotation matrices,
-        Euler angles, and quaternions. Also includes functions to decompose transformation matrices.
-        
+        The class contains methods for converting rotation matrices to 
+        axis-angle representations, Euler angles, and quaternions.
         """
         self.matrix = [
             [1.0, 0.0, 0.0, 0.0], 
@@ -34,19 +33,23 @@ class Transformation(object):
         return transformation
         
     def rotation(self):
-        """ Return an instance of the Rotation class that just describes rotation."""
+        """ 
+        Returns an instance of the Rotation class that just describes rotation.
+        """
         return Rotation.from_matrix(self.matrix)
     
     def translation(self):
-        """ Return an instance of the Translation class that just describes translation."""
+        """ 
+        Return an instance of the Translation class that just describes translation.
+        """
         return Translation.from_matrix(self.matrix)
     
     def __mul__(self, other):
         """
         The __mul__ operator performs a dot product with ``other``.
         ``other`` could be:
-        - instance of Transformation class or derivative of Transformation class
-          This allows to concatenate a series of transformation matrices.
+        - instance of Transformation class or derivative of Transformation class:
+          this allows to concatenate a series of transformation matrices.
         - a Point, a Vector, xyz coordinates
         - a list of Points, Vectors or xyz coordinates
         - a 4x4 matrix (as list) describing a transformation
@@ -119,16 +122,19 @@ class Transformation(object):
         return s
     
     def inverse(self):
-        axis_angle_vector = Vector(self.rotation().axis_angle_vector)
-        inv_rotation = Rotation.from_axis_angle_vector(axis_angle_vector * -1)
-        trans = [self.matrix[0][3], self.matrix[1][3], self.matrix[2][3]]
+        """
+        Get the inverse Transformation.
+        Attention: Works only if matrix is composed of translation and rotation, NOT scale or else.
+        """
+        inv_rotation = Rotation.from_matrix(self.matrix).inverse()
+        trans = [-self.matrix[0][3], -self.matrix[1][3], -self.matrix[2][3]]
         trans = inv_rotation * trans
         
         cls = type(self)
         transformation = cls.from_matrix(inv_rotation.matrix)
-        transformation.matrix[0][3] = -trans[0]
-        transformation.matrix[1][3] = -trans[1]
-        transformation.matrix[2][3] = -trans[2]
+        transformation.matrix[0][3] = trans[0]
+        transformation.matrix[1][3] = trans[1]
+        transformation.matrix[2][3] = trans[2]
         return transformation
 
 
@@ -143,6 +149,9 @@ class Rotation(Transformation):
             
     @classmethod
     def from_basis_vectors(cls, xaxis, yaxis):
+        """
+        Create rotation matrix from basis vectors (= orthonormal row vectors).
+        """
         if type(xaxis) == type([]): xaxis = Vector(xaxis)
         if type(yaxis) == type([]): yaxis = Vector(yaxis)
         xaxis.normalize()
@@ -157,7 +166,7 @@ class Rotation(Transformation):
     @classmethod
     def from_quaternion(cls, quaternion):
         """
-        Calculate rotation matrix from quaternion.
+        Create rotation matrix from quaternion.
         References Christoph Gohlke's implementation of quaternion_matrix(quaternion): 
         http://www.lfd.uci.edu/~gohlke/code/transformations.py.html
         """     
@@ -181,6 +190,9 @@ class Rotation(Transformation):
     
     @classmethod
     def from_axis_angle_vector(cls, axis_angle_vector):
+        """
+        Create rotation matrix from axis-angle representation as vector.
+        """ 
         if type(axis_angle_vector) == type([]): axis_angle_vector = Vector(axis_angle_vector)
         angle = axis_angle_vector.length
         return cls.from_axis_and_angle(axis_angle_vector, angle)
@@ -188,7 +200,7 @@ class Rotation(Transformation):
     @classmethod
     def from_axis_and_angle(cls, axis, angle, point=None):
         """
-        Calculate rotation matrix from axis-angle representation.
+        Create rotation matrix from axis-angle representation.
         References Christoph Gohlke's implementation of rotation_matrix(angle, direction, point=None): 
         http://www.lfd.uci.edu/~gohlke/code/transformations.py.html
         """
@@ -273,7 +285,7 @@ class Rotation(Transformation):
         return [qw, qx, qy, qz]
     
     @property
-    def axis_angle_vector(self):        
+    def axis_and_angle(self):        
         """
         Calculate axis angle representation from rotation matrix.
         References Martin Baker's implementation at
@@ -297,7 +309,7 @@ class Rotation(Transformation):
                 (math.fabs(m[1][2] + m[2][1]) < epsilon2) and 
                 (math.fabs(m[0][0] + m[1][1] + m[2][2] - 3) < epsilon2)) :
                     # this singularity is identity matrix so angle = 0
-                    return [0,0,0]
+                    return [0,0,0], 0
             else:
                 # otherwise this singularity is angle = 180
                 angle = math.pi
@@ -327,7 +339,7 @@ class Rotation(Transformation):
                         z = math.sqrt(zz)
                         axis = [xz/z, yz/z, z]
                                     
-                return [v * angle for v in axis] # return 180 degree rotation
+                return axis, angle # return 180 degree rotation
     
         # as we have reached here there are no singularities so we can handle normally
         s = math.sqrt(\
@@ -343,7 +355,20 @@ class Rotation(Transformation):
         x = (m[2][1] - m[1][2])/s
         y = (m[0][2] - m[2][0])/s
         z = (m[1][0] - m[0][1])/s
-        return [angle * x, angle * y, angle * z]
+
+        return [x, y, z], angle
+    
+    @property
+    def axis_angle_vector(self):
+        axis, angle = self.axis_and_angle
+        return [angle * axis[0], angle * axis[1], angle * axis[2]] 
+    
+    def inverse(self):
+        """
+        Get the inverse rotation.
+        """
+        inverse_rotation = Rotation.from_axis_angle_vector(Vector(self.axis_angle_vector) * -1)
+        return inverse_rotation
         
     @property
     def euler_angles(self):
@@ -351,8 +376,12 @@ class Rotation(Transformation):
     
 class Translation(Transformation):
     
+    
     @classmethod
     def from_vector(cls, vector):
+        """
+        Creates a matrix to translate by vector.
+        """
         translation = cls()
         translation.matrix[0][3] = vector[0]
         translation.matrix[1][3] = vector[1]
@@ -368,28 +397,22 @@ class Scale(Transformation):
     
     @classmethod
     def from_factor(cls, factor):
-        """ Creates a matrix to uniformly scale by factor. """
+        """ 
+        Creates a matrix to uniformly scale by factor. 
+        """
         scale = cls()
         scale.matrix[0][0] = factor
         scale.matrix[1][1] = factor
         scale.matrix[2][2] = factor
         return scale
     
-    @classmethod
-    def from_factor_vector(cls, factor_vector):
-        """ Creates a matrix to non-uniformly scale by factor_vector = [fx, fy, fz]. """
-        fx, fy, fz = factor_vector
-        scale = cls()
-        scale.matrix[0][0] = fx
-        scale.matrix[1][1] = fy
-        scale.matrix[2][2] = fz
-        return scale
-
 class Reflection(Transformation):
     
     @classmethod
     def from_point_and_normal(cls, point, normal):
-        """Creates a matrix to mirror at plane, defined by point and normal vector."""
+        """
+        Creates a matrix to mirror at plane, defined by point and normal vector.
+        """
         reflection = cls()
         
         if type(normal) == type([]): normal = Vector(normal)
@@ -405,10 +428,10 @@ class Reflection(Transformation):
     
     @classmethod
     def from_plane(cls, plane):
-        """Creates a matrix to mirror at plane."""
+        """
+        Creates a matrix to mirror at plane.
+        """
         return cls.from_point_and_normal(plane.point, plane.normal)
-    
-
     
         
 if __name__ == "__main__":
@@ -417,7 +440,13 @@ if __name__ == "__main__":
     normal = [-20.551039382110147, 22.135331787354541, 0.0]
     
     R = Reflection.from_point_and_normal(pt, normal)
-    print R
+    
+    print "==============="
+    
+    rot = Rotation.from_matrix(R.matrix)
+    print type(rot)
+    print rot.__class__
+    print ">>", rot.axis_and_angle
     
     print "==============="
     
