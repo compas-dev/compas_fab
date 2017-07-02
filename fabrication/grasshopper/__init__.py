@@ -12,6 +12,7 @@ Utility functions to simplify integration with Grasshopper 3D.
 .. autosummary::
     :toctree: generated/
 
+    unload_modules
     mesh_from_guid
     vrep_pose_from_plane
 
