@@ -588,8 +588,7 @@ class SimulationCoordinator(object):
                             start = reachable_state[-1]
                             LOG.info('Robot state found for start pose. External axis=%s, Joint values=%s', str(start.coordinates), str(start.joint_values))
                         except SimulationError:
-                            LOG.error('Start plane is not reachable: %s', str(r['start']))
-                            start = None
+                            raise ValueError('Start plane is not reachable: %s' % str(r['start']))
 
                     simulator.set_robot_config(robot, start)
 
