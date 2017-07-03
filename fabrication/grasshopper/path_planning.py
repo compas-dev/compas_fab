@@ -160,7 +160,7 @@ class PathPlanner(object):
     """Provides a simple/compact API to call the path planner from Grasshopper."""
 
     @classmethod
-    def find_path(cls, host='127.0.0.1', port=7000, mode='remote', **kwargs):
+    def find_path(cls, host='127.0.0.1', port=19997, mode='local', **kwargs):
         """Finds a path for the specified scene description. There is a large number
         of parameters that can be passed as `kwargs`. It can run in two modes: *remote* or
         *local*. In remote mode, the `host` and `port` parameters correspond to a
@@ -215,12 +215,17 @@ class PathPlanner(object):
             mesh_guids = parser.compact_list(kwargs['collision_meshes'])
             options['collision_meshes'] = map(lambda m: m.to_data(), map(mesh_from_guid, mesh_guids))
 
-        options['algorithm'] = kwargs.get('algorithm', None)
-        options['resolution'] = kwargs.get('resolution', None)
+        options['debug'] = kwargs.get('debug')
+        options['trials'] = kwargs.get('trials')
+        options['shallow_state_search'] = kwargs.get('shallow_state_search')
+        options['algorithm'] = kwargs.get('algorithm')
+        options['resolution'] = kwargs.get('resolution')
 
         if mode == 'remote':
+            LOG.debug('Running remote path planner executor. Host=%s:%d', host, port)
             return SimulationCoordinator.remote_executor(options, host, port)
         else:
+            LOG.debug('Running local path planner executor. Host=%s:%d', host, port)
             return SimulationCoordinator.local_executor(options, host, port)
 
 
