@@ -7,27 +7,13 @@ import socket
 import logging
 from timeit import default_timer as timer
 from compas.datastructures.mesh import Mesh
+from compas_fabrication.fabrication.robots import Pose
+from compas_fabrication.fabrication.robots.rfl import Configuration, Robot
 from compas_fabrication.fabrication.robots.rfl.vrep_remote_api import vrep
-from compas_fabrication.fabrication.robots.rfl import Configuration, SimulatorXform, Robot
 
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
 CHILD_SCRIPT_TYPE = vrep.sim_scripttype_childscript
 LOG = logging.getLogger('compas_fabrication.simulator')
-
-
-def is_ipv4_address(addr):
-    try:
-        socket.inet_aton(addr)
-        return True
-    except socket.error:
-        return False
-
-
-def resolve_host(host):
-    if is_ipv4_address(host):
-        return host
-    else:
-        return socket.gethostbyname(host)
 
 
 class SimulationError(Exception):
@@ -140,7 +126,7 @@ class Simulator(object):
             >>> with Simulator() as simulator:
             ...     matrices = simulator.get_object_matrices([0])
             ...     print(map(int, matrices[0]))
-            [0, 0, 0, -7, 0, 0, 0, -4, 0, 0, 0, -7]
+            [0, 0, 0, -6, 0, 0, 0, -7, 0, 0, 0, -5]
 
         .. note::
             The resulting dictionary is keyed by object handle.
@@ -189,37 +175,45 @@ class Simulator(object):
         for id in Robot.SUPPORTED_ROBOTS:
             Robot(id, client=self).reset_config()
 
-    def set_robot_config(self, robot, config_or_pose):
-        """Moves the robot the the specified configuration or pose.
+    def set_robot_pose(self, robot, pose):
+        """Moves the robot the the specified pose.
 
         Args:
             robot (:class:`.Robot`): Robot instance to move.
-            config_or_pose (:class:`Configuration` instance or :obj:`list` of :obj:`float`):
-                Describes the position, either as a pose (list of 12 :obj:`float` values)
-                or as a :class:`Configuration`.
+            pose (:class:`.Pose`): Target or goal pose instance.
+
+        """
+        # First check if the start state is reachable
+        config = self.find_robot_states(robot, pose, [0.] * robot.dof)[-1]
+
+        if not config:
+            raise ValueError('Cannot find a valid config for the given pose')
+
+        self.set_robot_config(robot, config)
+
+    def set_robot_config(self, robot, config):
+        """Moves the robot the the specified configuration.
+
+        Args:
+            robot (:class:`.Robot`): Robot instance to move.
+            config (:class:`Configuration` instance): Describes the position of the
+                robot as an instance of :class:`Configuration`.
 
         Examples:
 
-            >>> from compas_fabrication.fabrication.robots.rfl import Robot
+            >>> from compas_fabrication.fabrication.robots.rfl import Robot, Configuration
             >>> with Simulator() as simulator:
-            ...     simulator.set_robot_config(Robot(11),
-            ...                                Configuration([7.6, -4.5, -4.5],
-            ...                                [90, 0, 0, 0, 0, -90]))
+            ...     config = Configuration.from_joints_and_coordinates([90, 0, 0, 0, 0, -90],
+            ...                                                        [7600, -4500, -4500])
+            ...     simulator.set_robot_config(Robot(11), config)
             ...
         """
-        config = None
-        if isinstance(config_or_pose, Configuration):
-            config = config_or_pose
-        elif isinstance(config_or_pose, list):
-            config = self.find_robot_states(robot, config_or_pose, [0.0] * 9)[-1]
-
         if not config:
             raise ValueError('Unsupported config value')
 
-        values = list(config.coordinates)
-        values.extend([math.radians(angle) for angle in config.joint_values])
+        values = vrep_from_config(config)
 
-        self.set_robot_metric(robot, [0.0] * 9)
+        self.set_robot_metric(robot, [0.0] * robot.dof)
         self.run_child_script('moveRobotFK',
                               [], values, ['robot' + robot.name])
 
@@ -241,15 +235,14 @@ class Simulator(object):
         res, _, config, _, _ = self.run_child_script('getRobotState',
                                                      [robot.index],
                                                      [], [])
-        return Configuration.from_radians_list(config)
+        return config_from_vrep(config)
 
-    def find_robot_states(self, robot, goal_pose, metric_values=[0.1] * 9, max_trials=None, max_results=1):
+    def find_robot_states(self, robot, goal_pose, metric_values=None, max_trials=None, max_results=1):
         """Finds valid robot configurations for the specified goal pose.
 
         Args:
             robot (:class:`.Robot`): Robot instance.
-            goal_pose (:obj:`list` of :obj:`float`): Target or goal pose
-                specified as a list of 12 :obj:`float` values.
+            goal_pose (:class:`.Pose`): Target or goal pose instance.
             metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
                 values (3 for gantry + 6 for joints) ranging from 0 to 1,
                 where 1 indicates the axis is blocked and cannot
@@ -262,12 +255,15 @@ class Simulator(object):
             list: List of :class:`Configuration` objects representing
             the collision-free configuration for the ``goal_pose``.
         """
+        if not metric_values:
+            metric_values = [0.1] * robot.dof
+
         self.set_robot_metric(robot, metric_values)
 
-        states = self._find_raw_robot_states(robot, goal_pose, max_trials, max_results)
+        states = self._find_raw_robot_states(robot, pose_to_vrep(goal_pose), max_trials, max_results)
 
-        return [Configuration.from_radians_list(states[i:i + 9])
-                for i in range(0, len(states), 9)]
+        return [config_from_vrep(states[i:i + robot.dof])
+                for i in range(0, len(states), robot.dof)]
 
     def _find_raw_robot_states(self, robot, goal_pose, max_trials=None, max_results=1):
         i = 0
@@ -297,16 +293,14 @@ class Simulator(object):
 
         return final_states
 
-    def pick_building_member(self, robot, building_member_mesh, pickup_pose_or_config, metric_values=[0.1] * 9):
+    def pick_building_member(self, robot, building_member_mesh, pickup_pose, metric_values=None):
         """Picks up a building member and attaches it to the robot.
 
         Args:
             robot (:class:`.Robot`): Robot instance to use for pick up.
             building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh
                 of the building member that will be attached to the robot.
-            pickup_pose_or_config (:obj:`list` of :obj:`float` or :class:`Configuration` instance):
-                Describes the pickup position, either as a pose (list of 12 :obj:`float` values)
-                or as a :class:`Configuration`.
+            pickup_pose (:class:`.Pose`): Pickup pose instance.
             metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
                 values (3 for gantry + 6 for joints) ranging from 0 to 1,
                 where 1 indicates the axis/joint is blocked and cannot
@@ -315,11 +309,14 @@ class Simulator(object):
         Returns:
             int: Object handle (identifier) assigned to the building member.
         """
-        self.set_robot_config(robot, pickup_pose_or_config)
+        if not metric_values:
+            metric_values = [0.1] * robot.dof
+
+        self.set_robot_pose(robot, pickup_pose)
 
         return self.add_building_member(robot, building_member_mesh)
 
-    def find_path_plan(self, robot, goal_pose, metric_values=[0.1] * 9, collision_meshes=None,
+    def find_path_plan(self, robot, goal_pose, metric_values=None, collision_meshes=None,
                        algorithm='rrtconnect', trials=1, resolution=0.02,
                        gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True):
         """Finds a path plan to move the selected robot from its current position
@@ -327,8 +324,7 @@ class Simulator(object):
 
         Args:
             robot (:class:`.Robot`): Robot instance to move.
-            goal_pose (:obj:`list` of :obj:`float`): Target or goal pose
-                specified as a list of 12 :obj:`float` values.
+            goal_pose (:class:`.Pose`): Target or goal pose instance.
             metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
                 values (3 for gantry + 6 for joints) ranging from 0 to 1,
                 where 1 indicates the axis/joint is blocked and cannot
@@ -352,6 +348,9 @@ class Simulator(object):
             list: List of :class:`Configuration` objects representing the
             collision-free path to the ``goal_pose``.
         """
+        if not metric_values:
+            metric_values = [0.1] * robot.dof
+
         if algorithm not in self.SUPPORTED_ALGORITHMS:
             raise ValueError('Unsupported algorithm. Must be one of: ' + str(self.SUPPORTED_ALGORITHMS))
 
@@ -369,7 +368,7 @@ class Simulator(object):
         start = timer() if self.debug else None
         max_trials = None if shallow_state_search else 80
         max_results = 1 if shallow_state_search else 80
-        states = self._find_raw_robot_states(robot, goal_pose, max_trials, max_results)
+        states = self._find_raw_robot_states(robot, pose_to_vrep(goal_pose), max_trials, max_results)
         if self.debug:
             LOG.debug('Execution time: search_robot_states=%.2f', timer() - start)
 
@@ -377,7 +376,7 @@ class Simulator(object):
         string_param_list = [algorithm]
         if gantry_joint_limits or arm_joint_limits:
             joint_limits = []
-            joint_limits.extend(gantry_joint_limits or [])
+            joint_limits.extend(gantry_limits_to_vrep(gantry_joint_limits or []))
             joint_limits.extend(arm_joint_limits or [])
             string_param_list.append(','.join(map(str, joint_limits)))
 
@@ -398,8 +397,8 @@ class Simulator(object):
         if self.debug:
             LOG.debug('Execution time: total=%.2f', timer() - first_start)
 
-        return [Configuration.from_radians_list(path[i:i + 9])
-                for i in range(0, len(path), 9)]
+        return [config_from_vrep(path[i:i + robot.dof])
+                for i in range(0, len(path), robot.dof)]
 
     def add_building_member(self, robot, building_member_mesh):
         """Adds a building member to the RFL scene and attaches it to the robot.
@@ -515,18 +514,17 @@ class SimulationCoordinator(object):
                     'robot': 12,
                     'start': {
                         'joint_values': [90.0, 100.0, -160.0, 180.0, 30.0, -90.0],
-                        'coordinates': [9.56226, -2.0, -3.6]
+                        'coordinates': [9562.26, -2000, -3600]
                     },
                 }
                 {
                     'robot': 11,
                     'start': {
                         'joint_values': [90.0, 100.0, -160.0, 180.0, 30.0, -90.0],
-                        'coordinates': [9.56226, -10.0, -4.6]
+                        'coordinates': [9562.26, -1000, -4600]
                     },
                     'goal': {
-                        'name': "SimulatorXform",
-                        'values': [-0.98, 0.16, 0.0, 10.03, 0.0, 0.0, -1.0, -5.87, -0.16, -0.98, 0.0, -1.50]
+                        'values': [-0.98, 0.16, 0.0, 1003, 0.0, 0.0, -1.0, -5870, -0.16, -0.98, 0.0, -1500]
                     },
                     'building_member': {
                         'attributes': {
@@ -535,9 +533,9 @@ class SimulationCoordinator(object):
                     },
                     'joint_limits': {
                         'gantry': [
-                            [0, 20],
-                            [-12, 0],
-                            [-4.6, -1]
+                            [0, 20000],
+                            [-12000, 0],
+                            [-4600, -1000]
                         ],
                         'arm': [
                             [-180, 180],
@@ -567,7 +565,8 @@ class SimulationCoordinator(object):
         # TODO: Do something different here
         # Return the ID of the job and poll
         results = json.loads(response)
-        return [[Configuration.from_radians_list(path_list[i:i + 9])
+        # TODO: Get DOF from robot instance
+        return [[config_from_vrep(path_list[i:i + 9])
                 for i in range(0, len(path_list), 9)] for path_list in results]
 
     @classmethod
@@ -580,21 +579,17 @@ class SimulationCoordinator(object):
                 robot = Robot(r['robot'], simulator)
 
                 if 'start' in r:
-                    klass = globals()[r['start'].get('name')]
-                    start = klass.from_data(r['start'])
-                    try:
+                    if r['start'].get('joint_values'):
+                        start = Configuration.from_data(r['start'])
+                    elif r['start'].get('values'):
+                        start = Pose.from_data(r['start'])
                         try:
-                            # If it's a configuration, nothing else to do
-                            if start.coordinates and start.joint_values:
-                                pass
-                        except AttributeError:
-                            # But if it's an xform/plane, then we need to test if the start state is reachable
-                            reachable_state = simulator.find_robot_states(robot, start, [0.] * 9, 1, 1)
+                            reachable_state = simulator.find_robot_states(robot, start, [0.] * robot.dof, 1, 1)
                             start = reachable_state[-1]
                             LOG.info('Robot state found for start pose. External axis=%s, Joint values=%s', str(start.coordinates), str(start.joint_values))
-                    except SimulationError:
-                        LOG.error('Start plane is not reachable: %s', str(start))
-                        start = None
+                        except SimulationError:
+                            LOG.error('Start plane is not reachable: %s', str(r['start']))
+                            start = None
 
                     simulator.set_robot_config(robot, start)
 
@@ -611,8 +606,10 @@ class SimulationCoordinator(object):
             # Check if there's at least one active robot (i.e. one with a goal defined)
             if active_robot_options:
                 robot = Robot(active_robot_options['robot'], simulator)
-                klass = globals()[active_robot_options['goal'].get('name')]
-                goal = klass.from_data(active_robot_options['goal'])
+                if active_robot_options['goal'].get('values'):
+                    goal = Pose.from_data(active_robot_options['goal'])
+                else:
+                    raise ValueError('Unsupported goal type: %s' % str(active_robot_options['goal']))
 
                 kwargs = {}
                 kwargs['metric_values'] = active_robot_options.get('metric_values')
@@ -627,10 +624,60 @@ class SimulationCoordinator(object):
                 kwargs['trials'] = options.get('trials', 1)
                 kwargs['shallow_state_search'] = options.get('shallow_state_search', True)
 
-                path = simulator.find_path_plan(robot, goal.values, **kwargs)
+                path = simulator.find_path_plan(robot, goal, **kwargs)
                 LOG.info('Found path of %d steps', len(path))
             else:
                 robot = Robot(options['robots'][0]['robot'], simulator)
                 path = [simulator.get_robot_config(robot)]
 
         return path
+
+
+# --------------------------------------------------------------------------
+# NETWORKING HELPERS
+# A couple of simple networking helpers for host name resolution
+# --------------------------------------------------------------------------
+
+def is_ipv4_address(addr):
+    try:
+        socket.inet_aton(addr)
+        return True
+    except socket.error:
+        return False
+
+
+def resolve_host(host):
+    if is_ipv4_address(host):
+        return host
+    else:
+        return socket.gethostbyname(host)
+
+
+# --------------------------------------------------------------------------
+# MAPPINGS
+# The following mapping functions are only internal to make sure
+# all transformations from and to V-REP are consistent
+# --------------------------------------------------------------------------
+
+def pose_to_vrep(pose):
+    pose = list(pose.values)
+    pose[3] = pose[3] / 1000.
+    pose[7] = pose[7] / 1000.
+    pose[11] = pose[11] / 1000.
+    return pose
+
+
+def config_from_vrep(list_of_floats):
+    angles = map(math.degrees, list_of_floats[3:])
+    coordinates = map(lambda v: v * 1000., list_of_floats[0:3])
+    return Configuration.from_joints_and_coordinates(angles, coordinates)
+
+
+def vrep_from_config(config):
+    values = map(lambda v: v / 1000., config.coordinates)
+    values.extend([math.radians(angle) for angle in config.joint_values])
+    return values
+
+
+def gantry_limits_to_vrep(limits):
+    return [v / 1000. for v in limits]
