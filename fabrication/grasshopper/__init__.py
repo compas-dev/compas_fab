@@ -14,7 +14,6 @@ Utility functions to simplify integration with Grasshopper 3D.
 
     unload_modules
     mesh_from_guid
-    vrep_xform_from_plane
 
 Path planning
 =============

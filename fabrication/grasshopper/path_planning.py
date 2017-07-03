@@ -2,8 +2,9 @@ from __future__ import print_function
 
 import logging
 from timeit import default_timer as timer
+from compas_fabrication.fabrication.robots import Pose
+from compas_fabrication.fabrication.robots.rfl import Configuration, SimulationCoordinator
 from compas_fabrication.fabrication.grasshopper import *
-from compas_fabrication.fabrication.robots.rfl import Configuration, SimulatorXform, SimulationCoordinator
 
 try:
     import clr
@@ -186,14 +187,14 @@ class PathPlanner(object):
                 robot = {'robot': settings['robot']}
 
                 if 'start' in settings:
-                    start = parser.get_config_or_xform(settings['start'])
+                    start = parser.get_config_or_pose(settings['start'])
                     if start:
                         robot['start'] = start.to_data()
 
                 if 'goal' in settings:
                     if not active_robot:
                         active_robot = robot
-                        goal = parser.get_config_or_xform(settings['goal'])
+                        goal = parser.get_config_or_pose(settings['goal'])
                         if goal:
                             robot['goal'] = goal.to_data()
                     else:
@@ -231,26 +232,27 @@ class InputParameterParser(object):
         """Compacts a list filtering all `None` values."""
         return filter(None, list)
 
-    def get_xform(self, plane_or_pose):
-        """Gets a vrep-compatible transformation matrix from a string containing
+    def get_pose(self, plane_or_pose):
+        """Gets a pose that is compatible with V-REP from a string containing
         comma-separated floats or from a Rhino/Grasshopper plane.
 
         Args:
             plane_or_pose (comma-separated :obj:`string` of a Rhino :obj:`Plane`):
 
         Returns:
-            xform: :class:`.SimulatorXform` instance representing a transformation matrix.
+            pose: :class:`.Pose` instance representing a transformation matrix.
         """
         if not plane_or_pose:
             return None
 
         try:
-            return SimulatorXform(vrep_xform_from_plane(plane_or_pose))
+            return Pose.from_list(vrep_pose_from_plane(plane_or_pose))
         except (TypeError, IndexError):
-            return map(float, plane_or_pose.split(',')) if plane_or_pose else None
+            return Pose.from_list(map(float, plane_or_pose.split(','))) if plane_or_pose else None
 
-    def get_config_or_xform(self, config_values_or_plane):
-        """Parses multiple input data types and returns a configuration or a transformation matrix.
+    def get_config_or_pose(self, config_values_or_plane):
+        """Parses multiple input data types and returns a configuration or a pose
+        represented as a transformation matrix.
 
         Args:
             config_values_or_plane (comma-separated :obj:`string`, or :class:`Configuration` instance,
@@ -260,7 +262,7 @@ class InputParameterParser(object):
             return None
 
         try:
-            return SimulatorXform(vrep_xform_from_plane(config_values_or_plane))
+            return Pose.from_list(vrep_pose_from_plane(config_values_or_plane))
         except (TypeError, IndexError):
             try:
                 if config_values_or_plane.coordinates and config_values_or_plane.joint_values:
