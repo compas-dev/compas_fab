@@ -620,8 +620,11 @@ class SimulationCoordinator(object):
                     kwargs['gantry_joint_limits'] = joint_limits.get('gantry')
                     kwargs['arm_joint_limits'] = joint_limits.get('arm')
 
-                kwargs['trials'] = options.get('trials', 1)
-                kwargs['shallow_state_search'] = options.get('shallow_state_search', True)
+                kwargs['trials'] = options.get('trials')
+                kwargs['shallow_state_search'] = options.get('shallow_state_search')
+
+                # Filter None values
+                kwargs = {k: v for k, v in kwargs.iteritems() if v is not None}
 
                 path = simulator.find_path_plan(robot, goal, **kwargs)
                 LOG.info('Found path of %d steps', len(path))
