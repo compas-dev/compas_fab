@@ -59,8 +59,12 @@ class Robot(object):
     Communication to the robot is delegated to the `client` instance
     passed when initializing the robot.
 
-
     Args:
+        id (:obj:`int`): Robot identifier.
+        client (:obj:`object`): A client to execute the commands
+            such as :class:`.Simulator`.
+
+    Attributes:
         id (:obj:`int`): Robot identifier.
         client (:obj:`object`): A client to execute the commands
             such as :class:`.Simulator`.

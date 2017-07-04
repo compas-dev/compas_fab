@@ -5,12 +5,26 @@ class BaseConfiguration(object):
     """Represents the configuration of a robot based on its
     joint angle values and coordinates (position of external axis system, if any).
 
+    Attributes:
+        joint_values (:obj:`list` of :obj:`float`): Joint values expressed
+            in degrees.
+        coordinates (:obj:`list` of :obj:`float`): Position on the external axis
+            system (if available).
+
     Examples:
 
         >>> from compas_fabrication.fabrication.robots import BaseConfiguration
         >>> config = BaseConfiguration.from_data({'joint_values': [90., 0., 0.]})
         >>> config.joint_values
         [90.0, 0.0, 0.0]
+
+
+        >>> from compas_fabrication.fabrication.robots import BaseConfiguration
+        >>> config = BaseConfiguration.from_data({'joint_values': [90., 0., 0., 0., 180., 45.],\
+                                                 'coordinates': [8312.0]})
+        >>> str(config)
+        'joints: [90.0, 0.0, 0.0, 0.0, 180.0, 45.0], coordinates: [8312.0]'
+
     """
     def __init__(self):
         self.joint_values = None
@@ -90,7 +104,7 @@ class BaseConfiguration(object):
 class Pose(object):
     """Represents a robot pose described as a 4x4 transformation matrix.
 
-    Args:
+    Attributes:
         values (:obj:`list` of :obj:`float`): list of 12 or 16 values representing a 4x4 matrix.
             If 12 values are provided, the last row is assumed to be ``[0 0 0 1]``.
     """
