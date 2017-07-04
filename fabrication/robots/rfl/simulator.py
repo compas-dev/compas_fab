@@ -132,7 +132,7 @@ class Simulator(object):
             The resulting dictionary is keyed by object handle.
         """
         _res, _, matrices, _, _ = self.run_child_script('getShapeMatrices', object_handles, [], [])
-        return dict([(object_handles[i // 12], matrices[i:i + 12]) for i in range(0, len(matrices), 12)])
+        return dict([(object_handles[i // 12], floats_from_vrep(matrices[i:i + 12])) for i in range(0, len(matrices), 12)])
 
     def get_all_visible_handles(self):
         """Gets a list of object handles (identifiers) for all visible
@@ -211,7 +211,7 @@ class Simulator(object):
         if not config:
             raise ValueError('Unsupported config value')
 
-        values = vrep_from_config(config)
+        values = config_to_vrep(config)
 
         self.set_robot_metric(robot, [0.0] * robot.dof)
         self.run_child_script('moveRobotFK',
@@ -376,7 +376,7 @@ class Simulator(object):
         string_param_list = [algorithm]
         if gantry_joint_limits or arm_joint_limits:
             joint_limits = []
-            joint_limits.extend(gantry_limits_to_vrep(gantry_joint_limits or []))
+            joint_limits.extend(floats_to_vrep(gantry_joint_limits or []))
             joint_limits.extend(arm_joint_limits or [])
             string_param_list.append(','.join(map(str, joint_limits)))
 
@@ -446,7 +446,7 @@ class Simulator(object):
                 raise ValueError('The simulator only supports tri-meshes')
 
             vertices, faces = mesh.to_vertices_and_faces()
-            vrep_packing = ([item for sublist in vertices for item in sublist] +
+            vrep_packing = (floats_to_vrep([item for sublist in vertices for item in sublist]) +
                             [item for sublist in faces for item in sublist])
             params = [[len(vertices) * 3, len(faces) * 4], vrep_packing]
             handles = self.run_child_script('buildMesh',
@@ -675,11 +675,15 @@ def config_from_vrep(list_of_floats):
     return Configuration.from_joints_and_coordinates(angles, coordinates)
 
 
-def vrep_from_config(config):
+def config_to_vrep(config):
     values = map(lambda v: v / 1000., config.coordinates)
     values.extend([math.radians(angle) for angle in config.joint_values])
     return values
 
 
-def gantry_limits_to_vrep(limits):
-    return [v / 1000. for v in limits]
+def floats_to_vrep(list_of_floats):
+    return [v / 1000. for v in list_of_floats]
+
+
+def floats_from_vrep(list_of_floats):
+    return [v * 1000. for v in list_of_floats]
