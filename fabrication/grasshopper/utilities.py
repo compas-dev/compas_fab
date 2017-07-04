@@ -20,7 +20,7 @@ def unload_modules(top_level_module_name):
     used from Rhino/Grasshopper.
 
     Args:
-        top_level_module_name (:obj:`string`): Name of the top-level module to unload.
+        top_level_module_name (:obj:`str`): Name of the top-level module to unload.
 
     Returns:
         list: List of unloaded module names.

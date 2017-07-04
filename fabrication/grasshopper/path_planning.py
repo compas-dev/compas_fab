@@ -242,7 +242,7 @@ class InputParameterParser(object):
         comma-separated floats or from a Rhino/Grasshopper plane.
 
         Args:
-            plane_or_pose (comma-separated :obj:`string` of a Rhino :obj:`Plane`):
+            plane_or_pose (comma-separated :obj:`str` of a Rhino :obj:`Plane`):
 
         Returns:
             pose: :class:`.Pose` instance representing a transformation matrix.

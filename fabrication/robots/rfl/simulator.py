@@ -33,6 +33,12 @@ class Simulator(object):
     :class:`.Simulator` is a context manager type, so it's best used in combination
     with the ``with`` statement to ensure resource deallocation.
 
+
+    Args:
+        host (:obj:`str`): Robot identifier.
+        client (:obj:`object`): A client to execute the commands
+            such as :class:`.Simulator`.
+
     Examples:
 
         >>> from compas_fabrication.fabrication.robots.rfl import *
@@ -100,7 +106,7 @@ class Simulator(object):
         """Gets the object handle (identifier) for a given object name.
 
         Args:
-            object_name (:obj:`string`): Name of the object.
+            object_name (:obj:`str`): Name of the object.
 
         Returns:
             int: Object handle.
@@ -332,7 +338,7 @@ class Simulator(object):
             collision_meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): Collision meshes
                 to be taken into account when calculating the motion plan.
                 Defaults to ``None``.
-            algorithm (:obj:`string`): Name of the algorithm to use. Defaults to ``rrtconnect``.
+            algorithm (:obj:`str`): Name of the algorithm to use. Defaults to ``rrtconnect``.
             trials (:obj:`int`): Number of search trials to run. Defaults to ``1``.
             resolution (:obj:`float`): Validity checking resolution. This value
                 is specified as a fraction of the space's extent.
