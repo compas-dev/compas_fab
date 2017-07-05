@@ -31,6 +31,25 @@ class Transformation(object):
         transformation = cls()
         transformation.matrix = matrix[:]
         return transformation
+    
+    @classmethod
+    def from_frame(cls, frame):
+        """
+        Returns a transformation from worldXY frame to frame.
+        Is the same as from_frame_to_frame(Frame.worldXY(), frame)
+        """
+        rotation = Rotation.from_basis_vectors(frame.xaxis, frame.yaxis)
+        transformation = Transformation.from_matrix(rotation.matrix)
+        transformation[0, 3] = frame.point.x
+        transformation[1, 3] = frame.point.y
+        transformation[2, 3] = frame.point.z
+        return transformation
+    
+    @classmethod
+    def from_frame_to_frame(cls, frame_from, frame_to):
+        trans_from = Transformation.from_frame(frame_from)
+        trans_to = Transformation.from_frame(frame_to)
+        return trans_to * trans_from.inverse()
         
     def rotation(self):
         """ 
@@ -44,46 +63,47 @@ class Transformation(object):
         """
         return Translation.from_matrix(self.matrix)
     
+    def transform(self, xyz):
+        """
+        Transforms a point, vector, xyz coordinates or a list therefrom.
+        Should this be split into transform_xyz_list and transform_xyz
+        """
+        xyz = list(xyz)
+                    
+        if type(xyz[0]) == float or type(xyz[0]) == int: # point, vector, xyz coordinates
+            point = xyz + [1.] # make homogeneous coordinates
+            point = multiply_matrix_vector(self.matrix, point)
+            return point[:3]
+        else: # it is a list of xyz coordinates
+            xyz = zip(*xyz) # transpose matrix
+            xyz += [[1] * len(xyz[0])] # make homogeneous coordinates
+            xyz = multiply_matrices(self.matrix, xyz)
+            return zip(*xyz[:3]) # cutoff 1 and transpose again
+    
+    def concatenate(self, other):
+        """
+        This method performs a dot product of two transformation matrices.        
+        ``other`` could be:
+        - instance of Transformation class or derivative of Transformation class.
+        - a 4x4 matrix (as list) describing a transformation
+        """
+        if type(other) == type([]): 
+            if len(other) == 4 and len(other[0]) == 4: # concatenate with 4x4 transformation matrix
+                return Transformation.from_matrix(multiply_matrices(self.matrix, other))
+            else:
+                raise Exception("The type %s is not supported to be multiplied by this class." % type(other))
+        else: # concatenate with instances of Transformation, Rotation, Translation, etc.
+            return Transformation.from_matrix(multiply_matrices(self.matrix, other.matrix))
+        
     def __mul__(self, other):
         """
         The __mul__ operator performs a dot product with ``other``.
         ``other`` could be:
         - instance of Transformation class or derivative of Transformation class:
           this allows to concatenate a series of transformation matrices.
-        - a Point, a Vector, xyz coordinates
-        - a list of Points, Vectors or xyz coordinates
         - a 4x4 matrix (as list) describing a transformation
         """
-        # multiply with instances of Transformation
-        if self.__class__ == other.__class__:
-            return Transformation.from_matrix(multiply_matrices(self.matrix, other.matrix))
-        # multiply with instances of Rotation, Translation, etc.
-        elif self.__class__ == other.__class__.__bases__[0] or self.__class__.__bases__[0] == other.__class__.__bases__[0]:
-            return Transformation.from_matrix(multiply_matrices(self.matrix, other.matrix))
-        else:
-            try:
-                v = list(other)
-                # v = point, vector, xyz coordinates
-                if type(v[0]) == float or type(v[0]) == int:
-                    if len(v) == 3: 
-                        v += [1.] # make homogeneous coordinates
-                        v = multiply_matrix_vector(self.matrix, v)
-                        return v[:3]
-                    else:
-                        raise Exception("The type %s is not supported to be multiplied by this class." % type(other))
-                else:
-                    # v = transformation matrix
-                    if len(v) == 4 and len(v[0]) == 4:
-                        return multiply_matrices(self.matrix, v)
-                    # v = a list of xyz coordinates
-                    else:
-                        xyz = zip(*v) # transpose matrix
-                        xyz += [[1] * len(xyz[0])] # make homogeneous coordinates
-                        xyz = multiply_matrices(self.matrix, xyz)
-                        xyz = xyz[:3]
-                        return zip(*xyz) 
-            except:
-                raise Exception("The type %s is not supported to be multiplied by this class." % type(other))
+        return self.concatenate(other)
         
     def __imul__(self, other):
         return Transformation.from_matrix(self.__mul__(other))
@@ -125,16 +145,16 @@ class Transformation(object):
         """
         Get the inverse Transformation.
         Attention: Works only if matrix is composed of translation and rotation, NOT scale or else.
+        TODO: How to implement without numpy? decompose matrix from gohlke?
         """
         inv_rotation = Rotation.from_matrix(self.matrix).inverse()
         trans = [-self.matrix[0][3], -self.matrix[1][3], -self.matrix[2][3]]
-        trans = inv_rotation * trans
+        trans = inv_rotation.transform(trans)
         
-        cls = type(self)
-        transformation = cls.from_matrix(inv_rotation.matrix)
-        transformation.matrix[0][3] = trans[0]
-        transformation.matrix[1][3] = trans[1]
-        transformation.matrix[2][3] = trans[2]
+        transformation = Transformation.from_matrix(inv_rotation.matrix)
+        transformation[0, 3] = trans[0]
+        transformation[1, 3] = trans[1]
+        transformation[2, 3] = trans[2]
         return transformation
 
 
@@ -205,8 +225,9 @@ class Rotation(Transformation):
         http://www.lfd.uci.edu/~gohlke/code/transformations.py.html
         """
         if type(axis) == type([]): axis = Vector(axis)
-
-        axis.normalize()
+        
+        if axis.length:
+            axis.normalize()
 
         sina = math.sin(angle)
         cosa = math.cos(angle)
@@ -229,7 +250,7 @@ class Rotation(Transformation):
                 
         if point != None:
             # rotation about axis, angle AND point includes also translation
-            t = Point(point) - Point(rotation * point)            
+            t = Point(point) - Point(rotation.transform(point))            
             rotation.matrix[0][3] = t.x
             rotation.matrix[1][3] = t.y
             rotation.matrix[2][3] = t.z
@@ -432,20 +453,29 @@ class Reflection(Transformation):
         Creates a matrix to mirror at plane.
         """
         return cls.from_point_and_normal(plane.point, plane.normal)
+
+
+class Projection(Transformation):
     
+    def __init__(self):
+        raise NotImplementedError
+
+
+class Shear(Transformation):
+    
+    def __init__(self):
+        raise NotImplementedError
+        
         
 if __name__ == "__main__":
+    
     
     pt = [19.961266434549813, 31.35370077557657, 0.0]
     normal = [-20.551039382110147, 22.135331787354541, 0.0]
     
     R = Reflection.from_point_and_normal(pt, normal)
-    
-    print "==============="
-    
+        
     rot = Rotation.from_matrix(R.matrix)
-    print type(rot)
-    print rot.__class__
     print ">>", rot.axis_and_angle
     
     print "==============="
@@ -460,7 +490,11 @@ if __name__ == "__main__":
     print transformation
     print
     print transformation.inverse()
-    print
-    
 
+    from frame import Frame
+    frame_from = Frame([-636.57, 370.83, 293.21], [0.00000, -0.54972, -0.83535], [0.92022, -0.32695, 0.21516])
+    #frame_from = Frame.worldXY()
+    frame_to = Frame([-983.14, 80.27, 152.91], [-0.70235, 0.00000, 0.71184], [-0.26490, -0.92818, -0.26137])
+    
+    print Transformation.from_frame_to_frame(frame_from, frame_to)
         

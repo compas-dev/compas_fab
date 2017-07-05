@@ -12,7 +12,6 @@ class Frame():
         The class "Frame" consists of a point and two base vectors (x- and y-axis).
         It contains methods to get the axis-angle representation (UR), 
         quaternions (ABB), or euler angles (KUKA) from this frame.
-        the transformation matrix to and from another plane, and also contains some transformation methods.
         If no parameters are given as input, the frame is the frame in world XY.        
         quaternion definition: [qw, qx, qy, qz]
         angle_axis definition: [ax,ay,az] (angle = length of the vector, axis = vector)
@@ -27,7 +26,8 @@ class Frame():
         
         self.point = point
         self.xaxis = xaxis
-        self.yaxis = yaxis
+        self.yaxis = yaxis        
+        self.yaxis = self.normal.cross(self.xaxis) # slight correction
         
     def copy(self):
         cls = type(self)
@@ -156,18 +156,15 @@ class Frame():
     def rotation(self):
         return Rotation.from_basis_vectors(self.xaxis, self.yaxis)
     
-    def transform(self, transformation, copy=False):
-        
-        point = Point(transformation * self.point)
-        xaxis = Vector(transformation.rotation() * self.xaxis)
-        yaxis = Vector(transformation.rotation() * self.yaxis)
-        if not copy:
-            self.point = point
-            self.xaxis = xaxis
-            self.yaxis = yaxis
-            return self
-        else:
-            return Frame(point, xaxis, yaxis)
+    def transform(self, transformation):
+        """
+        Transforms the frame with transformation matrix and returns the 
+        transformed frame.
+        """
+        point = Point(transformation.transform(self.point))
+        xaxis = Vector(transformation.rotation().transform(self.xaxis))
+        yaxis = Vector(transformation.rotation().transform(self.yaxis))
+        return Frame(point, xaxis, yaxis)
             
         
     def __repr__(self):
@@ -207,5 +204,9 @@ if __name__ == '__main__':
     print R * Vector([-207.9183, -74.7322, 0.0])
     print R * [-207.9183, -74.7322, 0.0]
     """
+    xaxis = Vector([1, 0, 0])
+    yaxis = Vector([0, 1, 0])
+    zaxis = xaxis.cross(yaxis)
     
+    print zaxis.cross(xaxis) # = yaxis
     

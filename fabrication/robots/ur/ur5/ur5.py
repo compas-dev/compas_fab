@@ -4,10 +4,10 @@ Created on 15.06.2017
 @author: rustr
 '''
 
-from compas_fabrication.fabrication.robots import Robot
+from compas_fabrication.fabrication.robots.ur import UR
 
 
-class UR5(Robot):
+class UR5(UR):
     """
     #define UR5_PARAMS
     https://github.com/ros-industrial/universal_robot/blob/kinetic-devel/ur_kinematics/src/ur_kin.cpp
@@ -35,10 +35,10 @@ class UR5(Robot):
         """
     
     def forward(self, q):
-        Robot.forward(self)
+        UR.forward(self)
     
     def inverse(self):
-        Robot.inverse(self)
+        UR.inverse(self)
         
     
 if __name__ == "__main__":
