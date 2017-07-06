@@ -1,6 +1,7 @@
 from compas_fabrication.fabrication.sensors import SerialSensor
-from compas_fabrication.fabrication.sensors.exceptions import ProtocolError
+from compas_fabrication.fabrication.sensors.exceptions import ProtocolError, SensorTimeoutError
 from ctypes import c_ushort
+import time
 
 ERROR_CODES = {
     000: 'No error',
@@ -371,9 +372,13 @@ class PosConCM(SerialSensor):
     def get_payload(self, result):
         frame_head = result[:-6]
         result_type = frame_head[3]
+        
+        if result_type == 'a':
+            raise SensorTimeoutError('Sensor has not completed reading')
+        
         if result_type == 'E':
             raise ProtocolError('Application error, Result=%s' % frame_head)
-
+        
         if result_type == 'B':
             raise ProtocolError('Sensor is busy, Result=%s' % frame_head)
         
@@ -403,16 +408,22 @@ class PosConCM(SerialSensor):
         Returns:
             Result of the command. It can be a list or a single value depending on the operation.
         """
-        cmd = self.format_command(address, command, data)
-        self.serial.write(cmd)
-        result = self.serial.readline()
-        print "send cmd", cmd
-        print "result of command", result
-        
-        if result:
-            return self.get_payload(result)
-
-        return None
+        for i in range(2):
+            cmd = self.format_command(address, command, data)
+            self.serial.write(cmd)
+            result = self.serial.readline()
+            print "send cmd", cmd
+            print "result of command", result
+            
+            if result:
+                try:
+                    return self.get_payload(result)
+                    
+                except SensorTimeoutError:
+                    time.sleep(0.5)
+                    continue
+                
+            return None
     
     def get_address(self):
         """Gets the address of the RS-485 sensors currently connected to the bus. This command
