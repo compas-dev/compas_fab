@@ -102,7 +102,7 @@ class Robot(object):
         return tcp_plane_in_RCS
         """
 
-    
+
 class BaseConfiguration(object):
     """Represents the configuration of a robot based on its
     joint angle values and coordinates (position of external axis system, if any).
@@ -265,13 +265,8 @@ class Pose(object):
 
 
 if __name__ == "__main__":
-    
     basis_frame = Frame([-636.57, 370.83, 293.21], [0.00000, -0.54972, -0.83535], [0.92022, -0.32695, 0.21516])
     robot = Robot(basis_frame)
     T1 = robot.transformation_WCS_RCS
     T2 = robot.transformation_RCS_WCS
-    print T1 * T2
-    
-    
-    
-    
+    print(T1 * T2)
