@@ -11,6 +11,7 @@ from compas_fabrication.fabrication.robots import Pose
 from compas_fabrication.fabrication.robots.rfl import Configuration, Robot
 from compas_fabrication.fabrication.robots.rfl.vrep_remote_api import vrep
 
+DEFAULT_SCALE = 1000.
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
 CHILD_SCRIPT_TYPE = vrep.sim_scripttype_childscript
 LOG = logging.getLogger('compas_fabrication.simulator')
@@ -35,9 +36,10 @@ class Simulator(object):
 
 
     Args:
-        host (:obj:`str`): Robot identifier.
-        client (:obj:`object`): A client to execute the commands
-            such as :class:`.Simulator`.
+        host (:obj:`str`): IP address or DNS name of the V-REP simulator.
+        port (:obj:`int`): Port of the simulator.
+        scale(:obj:`int`): Scaling of the model. Defaults to millimeters (``1000``).
+        debug (:obj:`bool`): True to enable debug messages, False otherwise.
 
     Examples:
 
@@ -53,13 +55,14 @@ class Simulator(object):
                             'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar',
                             'sbl', 'stride', 'trrt')
 
-    def __init__(self, host='127.0.0.1', port=19997, debug=False):
+    def __init__(self, host='127.0.0.1', port=19997, scale=DEFAULT_SCALE, debug=False):
         self.client_id = None
         self.host = resolve_host(host)
         self.port = port
         self.default_timeout_in_ms = -50000000
         self.thread_cycle_in_ms = 5
         self.debug = debug
+        self.scale = float(scale)
         self._lua_script_name = 'RFL'
         self._added_handles = []
 
@@ -138,7 +141,7 @@ class Simulator(object):
             The resulting dictionary is keyed by object handle.
         """
         _res, _, matrices, _, _ = self.run_child_script('getShapeMatrices', object_handles, [], [])
-        return dict([(object_handles[i // 12], floats_from_vrep(matrices[i:i + 12])) for i in range(0, len(matrices), 12)])
+        return dict([(object_handles[i // 12], floats_from_vrep(matrices[i:i + 12], self.scale)) for i in range(0, len(matrices), 12)])
 
     def get_all_visible_handles(self):
         """Gets a list of object handles (identifiers) for all visible
@@ -217,7 +220,7 @@ class Simulator(object):
         if not config:
             raise ValueError('Unsupported config value')
 
-        values = config_to_vrep(config)
+        values = config_to_vrep(config, self.scale)
 
         self.set_robot_metric(robot, [0.0] * robot.dof)
         self.run_child_script('moveRobotFK',
@@ -241,7 +244,7 @@ class Simulator(object):
         res, _, config, _, _ = self.run_child_script('getRobotState',
                                                      [robot.index],
                                                      [], [])
-        return config_from_vrep(config)
+        return config_from_vrep(config, self.scale)
 
     def find_robot_states(self, robot, goal_pose, metric_values=None, max_trials=None, max_results=1):
         """Finds valid robot configurations for the specified goal pose.
@@ -266,9 +269,9 @@ class Simulator(object):
 
         self.set_robot_metric(robot, metric_values)
 
-        states = self._find_raw_robot_states(robot, pose_to_vrep(goal_pose), max_trials, max_results)
+        states = self._find_raw_robot_states(robot, pose_to_vrep(goal_pose, self.scale), max_trials, max_results)
 
-        return [config_from_vrep(states[i:i + robot.dof])
+        return [config_from_vrep(states[i:i + robot.dof], self.scale)
                 for i in range(0, len(states), robot.dof)]
 
     def _find_raw_robot_states(self, robot, goal_pose, max_trials=None, max_results=1):
@@ -374,7 +377,7 @@ class Simulator(object):
         start = timer() if self.debug else None
         max_trials = None if shallow_state_search else 80
         max_results = 1 if shallow_state_search else 80
-        states = self._find_raw_robot_states(robot, pose_to_vrep(goal_pose), max_trials, max_results)
+        states = self._find_raw_robot_states(robot, pose_to_vrep(goal_pose, self.scale), max_trials, max_results)
         if self.debug:
             LOG.debug('Execution time: search_robot_states=%.2f', timer() - start)
 
@@ -382,7 +385,7 @@ class Simulator(object):
         string_param_list = [algorithm]
         if gantry_joint_limits or arm_joint_limits:
             joint_limits = []
-            joint_limits.extend(floats_to_vrep(gantry_joint_limits or []))
+            joint_limits.extend(floats_to_vrep(gantry_joint_limits or [], self.scale))
             joint_limits.extend(arm_joint_limits or [])
             string_param_list.append(','.join(map(str, joint_limits)))
 
@@ -403,7 +406,7 @@ class Simulator(object):
         if self.debug:
             LOG.debug('Execution time: total=%.2f', timer() - first_start)
 
-        return [config_from_vrep(path[i:i + robot.dof])
+        return [config_from_vrep(path[i:i + robot.dof], self.scale)
                 for i in range(0, len(path), robot.dof)]
 
     def add_building_member(self, robot, building_member_mesh):
@@ -452,7 +455,7 @@ class Simulator(object):
                 raise ValueError('The simulator only supports tri-meshes')
 
             vertices, faces = mesh.to_vertices_and_faces()
-            vrep_packing = (floats_to_vrep([item for sublist in vertices for item in sublist]) +
+            vrep_packing = (floats_to_vrep([item for sublist in vertices for item in sublist], self.scale) +
                             [item for sublist in faces for item in sublist])
             params = [[len(vertices) * 3, len(faces) * 4], vrep_packing]
             handles = self.run_child_script('buildMesh',
@@ -572,7 +575,7 @@ class SimulationCoordinator(object):
         # Return the ID of the job and poll
         results = json.loads(response)
         # TODO: Get DOF from robot instance
-        return [[config_from_vrep(path_list[i:i + 9])
+        return [[config_from_vrep(path_list[i:i + 9], DEFAULT_SCALE)
                 for i in range(0, len(path_list), 9)] for path_list in results]
 
     @classmethod
@@ -667,29 +670,29 @@ def resolve_host(host):
 # all transformations from and to V-REP are consistent
 # --------------------------------------------------------------------------
 
-def pose_to_vrep(pose):
+def pose_to_vrep(pose, scale):
     pose = list(pose.values)
-    pose[3] = pose[3] / 1000.
-    pose[7] = pose[7] / 1000.
-    pose[11] = pose[11] / 1000.
+    pose[3] = pose[3] / scale
+    pose[7] = pose[7] / scale
+    pose[11] = pose[11] / scale
     return pose
 
 
-def config_from_vrep(list_of_floats):
+def config_from_vrep(list_of_floats, scale):
     angles = map(math.degrees, list_of_floats[3:])
-    coordinates = map(lambda v: v * 1000., list_of_floats[0:3])
+    coordinates = map(lambda v: v * scale, list_of_floats[0:3])
     return Configuration.from_joints_and_coordinates(angles, coordinates)
 
 
-def config_to_vrep(config):
-    values = map(lambda v: v / 1000., config.coordinates)
+def config_to_vrep(config, scale):
+    values = map(lambda v: v / scale, config.coordinates)
     values.extend([math.radians(angle) for angle in config.joint_values])
     return values
 
 
-def floats_to_vrep(list_of_floats):
-    return [v / 1000. for v in list_of_floats]
+def floats_to_vrep(list_of_floats, scale):
+    return [v / scale for v in list_of_floats]
 
 
-def floats_from_vrep(list_of_floats):
-    return [v * 1000. for v in list_of_floats]
+def floats_from_vrep(list_of_floats, scale):
+    return [v * scale for v in list_of_floats]

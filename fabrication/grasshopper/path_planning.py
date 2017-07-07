@@ -170,6 +170,7 @@ class PathPlanner(object):
         Args:
             host (:obj:`str`): IP address of the service (simulation coordinator in `remote`, V-REP in `local` mode)
             port (:obj:`int`): Port of the service.
+            mode (:obj:`str`): Execution mode, either ``local`` or ``remote``.
             kwargs: Keyword arguments.
 
         Returns:
