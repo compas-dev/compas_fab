@@ -1,25 +1,31 @@
 from compas.geometry import cross_vectors
 from compas.geometry.elements import Point, Vector
 from compas_fabrication.fabrication.geometry.transformation import Rotation
+from fabrication.geometry.transformation import Transformation
 
 __author__     = ['Romana Rust <rust@arch.ethz.ch>', ]
 
     
 class Frame():
+    """The Frame consists of a point and and two orthonormal base vectors.
     
-    def __init__(self, point = Point([0,0,0]), xaxis = Vector([1,0,0]), yaxis = Vector([0,1,0])):
-        """
-        The class "Frame" consists of a point and two base vectors (x- and y-axis).
-        It contains methods to get the axis-angle representation (UR), 
-        quaternions (ABB), or euler angles (KUKA) from this frame.
-        If no parameters are given as input, the frame is the frame in world XY.        
-        quaternion definition: [qw, qx, qy, qz]
-        angle_axis definition: [ax,ay,az] (angle = length of the vector, axis = vector)
-        """
+    Examples:
+        frame = Frame.worldXY()
+        frame = Frame.from_pose_quaternion([x, y, z, qw, qx, qy, qz])
+        frame = Frame.from_pose_axis_angle_vector([x, y, z, ax, ay, az])
+        frame = Frame.from_pose_euler_angles([x, y, z, a, b, c])
+        frame = Frame.from_transformation(transformation)
+        frame = Frame.from_rotation(rotation)
+    """
+    
+    def __init__(self, point = Point([0, 0, 0]), xaxis=Vector([1, 0, 0]), yaxis=Vector([0, 1, 0])):
         
-        if type(point) == type([]): point = Point(point)
-        if type(xaxis) == type([]): xaxis = Vector(xaxis)
-        if type(yaxis) == type([]): yaxis = Vector(yaxis)
+        if type(point) == type([]): 
+            point = Point(point)
+        if type(xaxis) == type([]): 
+            xaxis = Vector(xaxis)
+        if type(yaxis) == type([]): 
+            yaxis = Vector(yaxis)
         
         xaxis.normalize()
         yaxis.normalize()
@@ -27,7 +33,7 @@ class Frame():
         self.point = point
         self.xaxis = xaxis
         self.yaxis = yaxis        
-        self.yaxis = self.normal.cross(self.xaxis) # slight correction
+        self.yaxis = self.zaxis.cross(self.xaxis) # slight correction
         
     def copy(self):
         cls = type(self)
@@ -62,8 +68,7 @@ class Frame():
     
     @classmethod
     def from_quaternion(cls, quaternion):
-        qw, qx, qy, qz = quaternion
-        rotation = Rotation.from_quaternion([qw, qx, qy, qz])
+        rotation = Rotation.from_quaternion(quaternion)
         frame = cls.from_rotation(rotation)
         return frame
     
@@ -102,9 +107,14 @@ class Frame():
     
     @classmethod
     def from_rotation(cls, rotation):
-        xaxis = Vector([rotation.matrix[0][0], rotation.matrix[1][0], rotation.matrix[2][0]])
-        yaxis = Vector([rotation.matrix[0][1], rotation.matrix[1][1], rotation.matrix[2][1]])
+        xaxis, yaxis = rotation.basis_vectors
         return cls(Point([0,0,0]), xaxis, yaxis)
+    
+    @classmethod
+    def from_transformation(cls, transformation):
+        xaxis, yaxis = transformation.basis_vectors
+        point = transformation.translation.vector
+        return cls(point, xaxis, yaxis)
         
     @property
     def normal(self):
@@ -118,25 +128,31 @@ class Frame():
         
     @property  
     def quaternion(self):
-        R = Rotation.from_basis_vectors(self.xaxis, self.yaxis)
-        return R.quaternion
+        rotation = Rotation.from_basis_vectors(self.xaxis, self.yaxis)
+        return rotation.quaternion
     
     @property
     def pose_quaternion(self):
-        """
-        Returns a list with the rotation specified in quaternion, such as [x, y, z, qw, qx, qy, qz]
+        """Get pose quaternion.
+        
+        Returns:
+            list: coordinates and the rotation specified in quaternion, such as
+            [x, y, z, qw, qx, qy, qz]
         """
         return list(self.point) + self.quaternion
             
     @property
     def axis_angle_vector(self):
-        R = Rotation.from_basis_vectors(self.xaxis, self.yaxis)
-        return R.axis_angle_vector
+        rotation = Rotation.from_basis_vectors(self.xaxis, self.yaxis)
+        return rotation.axis_angle_vector
     
     @property
     def pose_axis_angle_vector(self):
-        """
-        Returns a list with the rotation specified in axis angle, such as [x, y, z, ax, ay, az]
+        """Get pose axis angle.
+
+        Returns:
+            (list): coordinates and rotation specified in axis angle 
+            representation, such as [x, y, z, ax, ay, az]
         """
         return list(self.point) + self.axis_angle_vector
     
@@ -147,8 +163,10 @@ class Frame():
     
     @property
     def pose_euler_angles(self):
-        """
-        Returns a list with the rotation specified in euler angles, such as [x, y, z, a, b, c]
+        """Get the frame represented as xyz coordinates with Euler angles.
+        
+        Returns:
+            (list): [x, y, z, a, b, c]
         """
         return list(self.point) + self.euler_angles
     
@@ -157,23 +175,22 @@ class Frame():
         return Rotation.from_basis_vectors(self.xaxis, self.yaxis)
     
     def transform(self, transformation):
-        """
-        Transforms the frame with transformation matrix and returns the 
-        transformed frame.
+        """Transforms the frame with transformation matrix.
+        
+        Returns:
+            (Frame): the transformed frame.
         """
         point = Point(transformation.transform(self.point))
         xaxis = Vector(transformation.rotation().transform(self.xaxis))
         yaxis = Vector(transformation.rotation().transform(self.yaxis))
         return Frame(point, xaxis, yaxis)
             
-        
     def __repr__(self):
-        s = "Frame:\n"
-        s += "Point:\n"
-        s += "%+.4f\t%+.4f\t%+.4f\n" % tuple(self.point)
-        R = Rotation.from_basis_vectors(self.xaxis, self.yaxis)
-        s += str(R)
-        return s
+        """
+        TODO: Change this.
+        """
+        T = Transformation.from_frame(self)
+        return str(T)
     
 
 if __name__ == '__main__':
