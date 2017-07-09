@@ -172,8 +172,8 @@ class Rotation(Transformation):
         """
         Create rotation matrix from basis vectors (= orthonormal row vectors).
         """
-        if type(xaxis) == type([]): xaxis = Vector(xaxis)
-        if type(yaxis) == type([]): yaxis = Vector(yaxis)
+        if type(xaxis) == type([]) or type(xaxis) == type(()): xaxis = Vector(xaxis)
+        if type(yaxis) == type([]) or type(yaxis) == type(()): yaxis = Vector(yaxis)
         xaxis.normalize()
         yaxis.normalize()
         zaxis = xaxis.cross(yaxis)
@@ -224,7 +224,7 @@ class Rotation(Transformation):
         References Christoph Gohlke's implementation of rotation_matrix(angle, direction, point=None): 
         http://www.lfd.uci.edu/~gohlke/code/transformations.py.html
         """
-        if type(axis) == type([]): axis = Vector(axis)
+        if type(axis) == type([]) or type(axis) == type(()): axis = Vector(axis)
         
         if axis.length:
             axis.normalize()
@@ -436,7 +436,7 @@ class Reflection(Transformation):
         """
         reflection = cls()
         
-        if type(normal) == type([]): normal = Vector(normal)
+        if type(normal) == type([]) or type(normal) == type(()): normal = Vector(normal)
         normal.normalize()
         
         for i in range(3):

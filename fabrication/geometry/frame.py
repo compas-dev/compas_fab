@@ -17,9 +17,9 @@ class Frame():
         angle_axis definition: [ax,ay,az] (angle = length of the vector, axis = vector)
         """
         
-        if type(point) == type([]): point = Point(point)
-        if type(xaxis) == type([]): xaxis = Vector(xaxis)
-        if type(yaxis) == type([]): yaxis = Vector(yaxis)
+        if type(point) == type([]) or type(point) == type(()): point = Point(point)
+        if type(xaxis) == type([]) or type(xaxis) == type(()): xaxis = Vector(xaxis)
+        if type(yaxis) == type([]) or type(yaxis) == type(()): yaxis = Vector(yaxis)
         
         xaxis.normalize()
         yaxis.normalize()
