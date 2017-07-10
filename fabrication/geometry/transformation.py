@@ -1,7 +1,6 @@
 import math
-from compas.geometry.elements import Point, Vector
 from compas.geometry.utilities import multiply_matrix_vector, multiply_matrices
-from compas.geometry import dot_vectors
+from compas.geometry import dot_vectors, normalize_vector, cross_vectors, length_vector, subtract_vectors, scale_vector
 
 __author__     = ['Romana Rust <rust@arch.ethz.ch>', ]
 
@@ -51,9 +50,9 @@ class Transformation(object):
         """
         rotation = Rotation.from_basis_vectors(frame.xaxis, frame.yaxis)
         transformation = Transformation.from_matrix(rotation.matrix)
-        transformation[0, 3] = frame.point.x
-        transformation[1, 3] = frame.point.y
-        transformation[2, 3] = frame.point.z
+        transformation[0, 3] = frame.point[0]
+        transformation[1, 3] = frame.point[1]
+        transformation[2, 3] = frame.point[2]
         return transformation
     
     @classmethod
@@ -65,23 +64,24 @@ class Transformation(object):
     @property
     def basis_vectors(self):
         # TODO: if it also consists of scale, this does not work!
-        xaxis = Vector([rotation.matrix[0][0], rotation.matrix[1][0], rotation.matrix[2][0]])
-        yaxis = Vector([rotation.matrix[0][1], rotation.matrix[1][1], rotation.matrix[2][1]])
+        xaxis = [self.matrix[0][0], self.matrix[1][0], self.matrix[2][0]]
+        yaxis = [self.matrix[0][1], self.matrix[1][1], self.matrix[2][1]]
         return xaxis, yaxis
             
     @classmethod
     def from_basis_vectors(cls, xaxis, yaxis):
         """Create rotation matrix from basis vectors (= orthonormal vectors).
         """
-        if type(xaxis) == type([]): xaxis = Vector(xaxis)
-        if type(yaxis) == type([]): yaxis = Vector(yaxis)
-        xaxis.normalize()
-        yaxis.normalize()
-        zaxis = xaxis.cross(yaxis)
+    
+        xaxis = normalize_vector(list(xaxis))
+        yaxis = normalize_vector(list(yaxis))
+        zaxis = cross_vectors(xaxis, yaxis)
+        yaxis = cross_vectors(zaxis, xaxis) # slight correction
+
         rotation = cls()
-        rotation.matrix[0][0], rotation.matrix[1][0], rotation.matrix[2][0] = list(xaxis)
-        rotation.matrix[0][1], rotation.matrix[1][1], rotation.matrix[2][1] = list(yaxis)
-        rotation.matrix[0][2], rotation.matrix[1][2], rotation.matrix[2][2] = list(zaxis)
+        rotation.matrix[0][0], rotation.matrix[1][0], rotation.matrix[2][0] = xaxis
+        rotation.matrix[0][1], rotation.matrix[1][1], rotation.matrix[2][1] = yaxis
+        rotation.matrix[0][2], rotation.matrix[1][2], rotation.matrix[2][2] = zaxis
         return rotation
         
     def rotation(self):
@@ -239,8 +239,8 @@ class Rotation(Transformation):
         """Create rotation matrix from axis-angle representation as vector.
         """ 
         
-        if type(axis_angle_vector) == type([]): axis_angle_vector = Vector(axis_angle_vector)
-        angle = axis_angle_vector.length
+        axis_angle_vector = list(axis_angle_vector)
+        angle = length_vector(axis_angle_vector)
         return cls.from_axis_and_angle(axis_angle_vector, angle)
     
     @classmethod
@@ -251,11 +251,10 @@ class Rotation(Transformation):
         http://www.lfd.uci.edu/~gohlke/code/transformations.py.html
         """
         
-        if type(axis) == type([]): axis = Vector(axis)
+        axis = list(axis)
+        if length_vector(axis):
+            axis = normalize_vector(axis)
         
-        if axis.length:
-            axis.normalize()
-
         sina = math.sin(angle)
         cosa = math.cos(angle)
         
@@ -264,7 +263,7 @@ class Rotation(Transformation):
         outer_product = [[axis[i]*axis[j] * (1.0 - cosa) for i in range(3)] for j in range(3)]
         R = [[R[i][j] + outer_product[i][j] for i in range(3)] for j in range(3)]
     
-        axis *= sina            
+        axis = scale_vector(axis, sina)            
         m = [[    0.0, -axis[2],  axis[1]],
             [ axis[2],      0.0, -axis[0]],
             [-axis[1],  axis[0],      0.0]]
@@ -277,10 +276,10 @@ class Rotation(Transformation):
                 
         if point != None:
             # rotation about axis, angle AND point includes also translation
-            t = Point(point) - Point(rotation.transform(point))            
-            rotation.matrix[0][3] = t.x
-            rotation.matrix[1][3] = t.y
-            rotation.matrix[2][3] = t.z
+            t = subtract_vectors(point, rotation.transform(point))       
+            rotation.matrix[0][3] = t[0]
+            rotation.matrix[1][3] = t[1]
+            rotation.matrix[2][3] = t[2]
             return Transformation.from_matrix(rotation.matrix)
         else:
             return rotation 
@@ -414,7 +413,7 @@ class Rotation(Transformation):
     def inverse(self):
         """Get the inverse rotation.
         """
-        inverse_rotation = Rotation.from_axis_angle_vector(Vector(self.axis_angle_vector) * -1)
+        inverse_rotation = Rotation.from_axis_angle_vector(scale_vector(self.axis_angle_vector,-1))
         return inverse_rotation
         
     @property
@@ -436,7 +435,7 @@ class Translation(Transformation):
     
     @property
     def vector(self):
-        return Vector([self.matrix[0][3], self.matrix[1][3], self.matrix[2][3]])
+        return [self.matrix[0][3], self.matrix[1][3], self.matrix[2][3]]
     
     @classmethod
     def from_matrix(cls, matrix):
@@ -463,8 +462,7 @@ class Reflection(Transformation):
         """
         reflection = cls()
         
-        if type(normal) == type([]): normal = Vector(normal)
-        normal.normalize()
+        normal = normalize_vector((list(normal)))
         
         for i in range(3):
             for j in range(3):
@@ -475,10 +473,10 @@ class Reflection(Transformation):
         return reflection
     
     @classmethod
-    def from_plane(cls, plane):
+    def from_frame(cls, frame):
         """Creates a matrix to mirror at plane.
         """
-        return cls.from_point_and_normal(plane.point, plane.normal)
+        return cls.from_point_and_normal(frame.point, frame.normal)
 
 
 class Projection(Transformation):
