@@ -166,11 +166,10 @@ class Frame():
             return self
             
     def __repr__(self):
-        """
-        TODO: Change this.
-        """
-        T = Transformation.from_frame(self)
-        return str(T)
+        s = "[[%.4f, %.4f, %.4f], " % tuple(self.point)
+        s += "[%.4f, %.4f, %.4f], " % tuple(self.xaxis)
+        s += "[%.4f, %.4f, %.4f]]" % tuple(self.yaxis)
+        return s
     
 
 if __name__ == '__main__':
