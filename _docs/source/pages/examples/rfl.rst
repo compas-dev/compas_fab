@@ -17,8 +17,8 @@ with the RFL scene pre-loaded. There are two options to run v-rep:
    * Make sure you have `Docker <https://www.docker.com/>`_ installed.
    * Run the following commands on the command line::
 
-        docker pull gramaziokohler/vrep-rfl:3.3
-        docker run --restart=always -p 19997:19997 -d gramaziokohler/vrep-rfl:3.3
+        docker pull gramaziokohler/vrep-rfl
+        docker run --restart=always -p 19997:19997 -d gramaziokohler/vrep-rfl
 
 Basic example
 =============
@@ -53,10 +53,10 @@ Here's a simple example on how to position two of the robots using forward kinem
 
     from compas_fabrication.fabrication.robots.rfl import *
 
-    config_robot_a    = Configuration(joint_values=[190, 0, 0, 0, 90, 0],
-                                    coordinates=[8260, -1000, -3690])
-    config_robot_b    = Configuration(joint_values=[190, 0, 0, 0, 90, 0],
-                                    coordinates=[8260, -8320, -3690])
+    config_robot_a    = Configuration.from_joints_and_coordinates([190, 0, 0, 0, 90, 0],
+                                                                  [8260, -1000, -3690])
+    config_robot_b    = Configuration.from_joints_and_coordinates([190, 0, 0, 0, 90, 0],
+                                                                  [8260, -8320, -3690])
 
     with Simulator() as simulator:
         robot_a = Robot(11, client=simulator)
@@ -77,13 +77,14 @@ the process. In its minimal expression, a path planning request must define a st
 configuration and a goal pose and rely on defaults for the rest. Here is an example
 of such a request::
 
+    from compas_fabrication.fabrication.robots import Pose
     from compas_fabrication.fabrication.robots.rfl import *
 
-    start_config    = Configuration(joint_values=[-143, 37, -112, 0, -15, -126],
-                                    coordinates=[8260, -5320, -3690])
-    goal_pose       = [-1.0, 0.0, 0.0, 8.11,
-                       0.0, 0.0, -1.0, -7.02,
-                       0.0, -1.0, 0.0, -1.81]
+    start_config    = Configuration.from_joints_and_coordinates([-143, 37, -112, 0, -15, -126],
+                                                                [8260, -5320, -3690])
+    goal_pose       = Pose.from_list([-1.0, 0.0, 0.0, 8110,
+                       0.0, 0.0, -1.0, 7020,
+                       0.0, -1.0, 0.0, 1810])
 
     with Simulator() as simulator:
         robot = Robot(12, client=simulator)
@@ -102,18 +103,19 @@ calculating a path plan::
     import logging
     from compas.datastructures.mesh import Mesh
     from compas_fabrication import get_data
+    from compas_fabrication.fabrication.robots import Pose
     from compas_fabrication.fabrication.robots.rfl import *
 
     # Configure logging to DEBUG to see detailed timing of the path planning
     logging.basicConfig(level=logging.DEBUG)
 
     # Configure parameters for path planning
-    start_pose      = [0.0, 1.0, 0.0, 7.453,
-                       -1.0, 0.0, 0.0, -10.919,
-                       0.0, 0.0, 1.0, -0.609]
-    goal_pose       = [-1.0, 0.0, 0.0, 8.11,
-                       8.97e-13, 0.0, -1.0, -6.92,
-                       0.0, -1.0, 0.0, -1.81]
+    start_pose      = Pose.from_list([0.0, 1.0, 0.0, 7453,
+                       -1.0, 0.0, 0.0, 10919,
+                       0.0, 0.0, 1.0, 609])
+    goal_pose       = Pose.from_list([-1.0, 0.0, 0.0, 8110,
+                       8.97e-13, 0.0, -1.0, 6920,
+                       0.0, -1.0, 0.0, 1810])
     algorithm       = 'rrtconnect'
     max_trials      = 1
     resolution      = 0.02

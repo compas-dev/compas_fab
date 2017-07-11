@@ -509,7 +509,7 @@ class SimulationCoordinator(object):
 
     The coordinator takes as input one large dictionary-like structure with the
     entire definition of a path planning job. The following shows an example of
-    this, exposing all posible configuration values::
+    this, exposing all possible configuration values::
 
         {
             'debug': True,
