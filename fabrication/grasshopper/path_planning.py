@@ -271,7 +271,7 @@ class InputParameterParser(object):
             return Pose.from_list(vrep_pose_from_plane(config_values_or_plane))
         except (TypeError, IndexError):
             try:
-                if config_values_or_plane.coordinates and config_values_or_plane.joint_values:
+                if config_values_or_plane.external_axes and config_values_or_plane.joint_values:
                     return config_values_or_plane
             except AttributeError:
                 values = map(float, config_values_or_plane.split(','))

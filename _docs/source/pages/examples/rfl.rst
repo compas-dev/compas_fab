@@ -53,9 +53,9 @@ Here's a simple example on how to position two of the robots using forward kinem
 
     from compas_fabrication.fabrication.robots.rfl import *
 
-    config_robot_a    = Configuration.from_joints_and_coordinates([190, 0, 0, 0, 90, 0],
+    config_robot_a    = Configuration.from_joints_and_external_axes([190, 0, 0, 0, 90, 0],
                                                                   [8260, -1000, -3690])
-    config_robot_b    = Configuration.from_joints_and_coordinates([190, 0, 0, 0, 90, 0],
+    config_robot_b    = Configuration.from_joints_and_external_axes([190, 0, 0, 0, 90, 0],
                                                                   [8260, -8320, -3690])
 
     with Simulator() as simulator:
@@ -80,7 +80,7 @@ of such a request::
     from compas_fabrication.fabrication.robots import Pose
     from compas_fabrication.fabrication.robots.rfl import *
 
-    start_config    = Configuration.from_joints_and_coordinates([-143, 37, -112, 0, -15, -126],
+    start_config    = Configuration.from_joints_and_external_axes([-143, 37, -112, 0, -15, -126],
                                                                 [8260, -5320, -3690])
     goal_pose       = Pose.from_list([-1.0, 0.0, 0.0, 8110,
                        0.0, 0.0, -1.0, 7020,

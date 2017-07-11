@@ -212,8 +212,8 @@ class Simulator(object):
 
             >>> from compas_fabrication.fabrication.robots.rfl import Robot, Configuration
             >>> with Simulator() as simulator:
-            ...     config = Configuration.from_joints_and_coordinates([90, 0, 0, 0, 0, -90],
-            ...                                                        [7600, -4500, -4500])
+            ...     config = Configuration.from_joints_and_external_axes([90, 0, 0, 0, 0, -90],
+            ...                                                          [7600, -4500, -4500])
             ...     simulator.set_robot_config(Robot(11), config)
             ...
         """
@@ -523,14 +523,14 @@ class SimulationCoordinator(object):
                     'robot': 12,
                     'start': {
                         'joint_values': [90.0, 100.0, -160.0, 180.0, 30.0, -90.0],
-                        'coordinates': [9562.26, -2000, -3600]
+                        'external_axes': [9562.26, -2000, -3600]
                     },
                 }
                 {
                     'robot': 11,
                     'start': {
                         'joint_values': [90.0, 100.0, -160.0, 180.0, 30.0, -90.0],
-                        'coordinates': [9562.26, -1000, -4600]
+                        'external_axes': [9562.26, -1000, -4600]
                     },
                     'goal': {
                         'values': [-0.98, 0.16, 0.0, 1003, 0.0, 0.0, -1.0, -5870, -0.16, -0.98, 0.0, -1500]
@@ -595,7 +595,7 @@ class SimulationCoordinator(object):
                         try:
                             reachable_state = simulator.find_robot_states(robot, start, [0.] * robot.dof, 1, 1)
                             start = reachable_state[-1]
-                            LOG.info('Robot state found for start pose. External axis=%s, Joint values=%s', str(start.coordinates), str(start.joint_values))
+                            LOG.info('Robot state found for start pose. External axes=%s, Joint values=%s', str(start.external_axes), str(start.joint_values))
                         except SimulationError:
                             raise ValueError('Start plane is not reachable: %s' % str(r['start']))
 
@@ -680,12 +680,12 @@ def pose_to_vrep(pose, scale):
 
 def config_from_vrep(list_of_floats, scale):
     angles = map(math.degrees, list_of_floats[3:])
-    coordinates = map(lambda v: v * scale, list_of_floats[0:3])
-    return Configuration.from_joints_and_coordinates(angles, coordinates)
+    external_axes = map(lambda v: v * scale, list_of_floats[0:3])
+    return Configuration.from_joints_and_external_axes(angles, external_axes)
 
 
 def config_to_vrep(config, scale):
-    values = map(lambda v: v / scale, config.coordinates)
+    values = map(lambda v: v / scale, config.external_axes)
     values.extend([math.radians(angle) for angle in config.joint_values])
     return values
 

@@ -105,12 +105,12 @@ class Robot(object):
 
 class BaseConfiguration(object):
     """Represents the configuration of a robot based on its
-    joint angle values and coordinates (position of external axis system, if any).
+    joint angle values and external axes values (if any).
 
     Attributes:
         joint_values (:obj:`list` of :obj:`float`): Joint values expressed
             in degrees.
-        coordinates (:obj:`list` of :obj:`float`): Position on the external axis
+        external_axes (:obj:`list` of :obj:`float`): Position on the external axis
             system (if available).
 
     Examples:
@@ -123,47 +123,45 @@ class BaseConfiguration(object):
 
         >>> from compas_fabrication.fabrication.robots import BaseConfiguration
         >>> config = BaseConfiguration.from_data({'joint_values': [90., 0., 0., 0., 180., 45.],\
-                                                 'coordinates': [8312.0]})
+                                                 'external_axes': [8312.0]})
         >>> str(config)
-        'joints: [90.0, 0.0, 0.0, 0.0, 180.0, 45.0], coordinates: [8312.0]'
+        'joints: [90.0, 0.0, 0.0, 0.0, 180.0, 45.0], external_axes: [8312.0]'
 
     """
     def __init__(self):
         self.joint_values = None
-        self.coordinates = None
+        self.external_axes = None
 
     def __str__(self):
-        return "joints: %s, coordinates: %s" % (self.joint_values, self.coordinates)
+        return "joints: %s, external_axes: %s" % (self.joint_values, self.external_axes)
 
     @classmethod
     def from_joints(cls, joint_values):
-        """Construct a configuration from joint values and coordinates.
+        """Construct a configuration from joint values.
 
         Args:
             joint_values (:obj:`list` of :obj:`float`): Joint values expressed
                 in degrees.
-            coordinates (:obj:`list` of :obj:`float`): Position on the external axis
-                system (if available).
 
         Returns:
             Configuration: A :class:`.Configuration` instance.
         """
-        return cls.from_joints_and_coordinates(joint_values, None)
+        return cls.from_joints_and_external_axes(joint_values, None)
 
     @classmethod
-    def from_joints_and_coordinates(cls, joint_values, coordinates=None):
-        """Construct a configuration from joint values and coordinates.
+    def from_joints_and_external_axes(cls, joint_values, external_axes=None):
+        """Construct a configuration from joint values and external axes values.
 
         Args:
             joint_values (:obj:`list` of :obj:`float`): Joint values expressed
                 in degrees.
-            coordinates (:obj:`list` of :obj:`float`): Position on the external axis
+            external_axes (:obj:`list` of :obj:`float`): Position on the external axis
                 system (if available).
 
         Returns:
             Configuration: A :class:`.Configuration` instance.
         """
-        return cls.from_data({'joint_values': joint_values, 'coordinates': coordinates})
+        return cls.from_data({'joint_values': joint_values, 'external_axes': external_axes})
 
     @classmethod
     def from_data(cls, data):
@@ -194,13 +192,13 @@ class BaseConfiguration(object):
         """
         return {
             'joint_values': self.joint_values,
-            'coordinates': self.coordinates
+            'external_axes': self.external_axes
         }
 
     @data.setter
     def data(self, data):
         self.joint_values = data.get('joint_values') or None
-        self.coordinates = data.get('coordinates') or None
+        self.external_axes = data.get('external_axes') or None
 
 
 class Pose(object):
