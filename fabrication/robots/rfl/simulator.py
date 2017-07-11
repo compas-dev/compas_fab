@@ -626,8 +626,10 @@ class SimulationCoordinator(object):
 
                 if 'joint_limits' in active_robot_options:
                     joint_limits = active_robot_options['joint_limits']
-                    kwargs['gantry_joint_limits'] = joint_limits.get('gantry')
-                    kwargs['arm_joint_limits'] = joint_limits.get('arm')
+                    if joint_limits.get('gantry'):
+                        kwargs['gantry_joint_limits'] = [item for sublist in joint_limits.get('gantry') for item in sublist]
+                    if joint_limits.get('arm'):
+                        kwargs['arm_joint_limits'] = [item for sublist in joint_limits.get('arm') for item in sublist]
 
                 kwargs['trials'] = options.get('trials')
                 kwargs['shallow_state_search'] = options.get('shallow_state_search')
