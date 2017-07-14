@@ -7,6 +7,7 @@ class Robot(object):
     This is the base class for all robots.
     It consists of:
     - a geometry (meshes)
+    - a base: describes where the robot is attached to. This can be also a movable base: e.g. linear axis 
     - a basis frame, the frame it resides, e.g. Frame.worldXY()
     - a transformation matrix to get coordinated represented in RCS
     - a transformation matrix to get coordinated represented in WCS
@@ -14,7 +15,7 @@ class Robot(object):
     - communication: e.g. delegated by a client instance
     - workspace: brep ?
  
-    self.joint_values = [0,0,0,0,0,0]
+    self.configuration = [0,0,0,0,0,0]
     self.tcp_frame = tcp_frame
     self.tool0_frame = tool0_frame
     
@@ -24,31 +25,36 @@ class Robot(object):
     self.T_R_W = rg.Transform.PlaneToPlane(self.basis_frame, Frame.worldXY)
     """
     
-    def __init__(self, basis_frame = Frame.worldXY()):
+    def __init__(self):
         
-        self.meshes = []
+        self.model = [] # a list of meshes
+        self.model_loaded = False
         self.basis_frame = None
         self.transformation_RCS_WCS = None
         self.transformation_WCS_RCS = None
-        self.set_basis_frame(basis_frame)
+        self.set_base(Frame.worldXY())
         self.tool = None
-        
-        
-        self.joint_angles = [0,0,0,0,0,0]
-        
-        self.tcp_frame = Frame.worldXY()
+        self.configuration = None
         self.tool0_frame = Frame.worldXY()
         
+    def load_model(self):
+        self.model_loaded = True
+        
     
-    def set_basis_frame(self, basis_frame):
-        self.basis_frame = basis_frame
+    def set_base(self, base_frame):
+        self.base_frame = base_frame
         # transformation matrix from world coordinate system to robot coordinate system
-        self.transformation_RCS_WCS = Transformation.from_frame_to_frame(Frame.worldXY(), self.basis_frame)
+        self.transformation_RCS_WCS = Transformation.from_frame_to_frame(Frame.worldXY(), self.base_frame)
         # transformation matrix from robot coordinate system to world coordinate system
-        self.transformation_WCS_RCS = Transformation.from_frame_to_frame(self.basis_frame, Frame.worldXY())
+        self.transformation_WCS_RCS = Transformation.from_frame_to_frame(self.base_frame, Frame.worldXY())
+        # modify joint axis !
+        
     
     def set_tool(self, tool):
         self.tool = tool
+        
+    def get_robot_configuration(self):
+        pass
         
     @property
     def tcp_frame(self):
@@ -56,18 +62,18 @@ class Robot(object):
         if not self.tool:
             return self.tool0_frame
     
-    def forward_kinematic(self, q):
+    def forward_kinematics(self, q):
         """
         Calculate the tcp frame according to the joint angles q.
         """
-        # return tcp_frame_RCS
         raise NotImplementedError
     
-    def inverse_kinematic(self, tcp_frame_RCS):
+    def inverse_kinematics(self, tcp_frame_RCS):
         """
         Calculate solutions (joint angles) according to the queried tcp frame
         (in RCS).
         """
+        raise NotImplementedError
     
     def get_frame_in_RCS(self, frame_WCS):
         """
@@ -263,8 +269,9 @@ class Pose(object):
 
 
 if __name__ == "__main__":
-    basis_frame = Frame([-636.57, 370.83, 293.21], [0.00000, -0.54972, -0.83535], [0.92022, -0.32695, 0.21516])
-    robot = Robot(basis_frame)
+    base_frame = Frame([-636.57, 370.83, 293.21], [0.00000, -0.54972, -0.83535], [0.92022, -0.32695, 0.21516])
+    robot = Robot()
+    robot.set_base(base_frame)
     T1 = robot.transformation_WCS_RCS
     T2 = robot.transformation_RCS_WCS
     print(T1 * T2)

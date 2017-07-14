@@ -1,69 +1,48 @@
-from compas.geometry import cross_vectors
-from compas.geometry.elements import Point, Vector
-from compas_fabrication.fabrication.geometry.transformation import Rotation
+from compas.geometry import cross_vectors, normalize_vector
+from compas_fabrication.fabrication.geometry.transformation import Rotation, Transformation
 
 __author__     = ['Romana Rust <rust@arch.ethz.ch>', ]
 
-    
+
 class Frame():
+    """The Frame consists of a point and and two orthonormal base vectors.
     
-    def __init__(self, point = Point([0,0,0]), xaxis = Vector([1,0,0]), yaxis = Vector([0,1,0])):
-        """
-        The class "Frame" consists of a point and two base vectors (x- and y-axis).
-        It contains methods to get the axis-angle representation (UR), 
-        quaternions (ABB), or euler angles (KUKA) from this frame.
-        If no parameters are given as input, the frame is the frame in world XY.        
-        quaternion definition: [qw, qx, qy, qz]
-        angle_axis definition: [ax,ay,az] (angle = length of the vector, axis = vector)
-        """
+    Examples:
+        frame = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+        frame = Frame.worldXY()
+        frame = Frame.from_pose_quaternion([x, y, z, qw, qx, qy, qz])
+        frame = Frame.from_pose_axis_angle_vector([x, y, z, ax, ay, az])
+        frame = Frame.from_pose_euler_angles([x, y, z, a, b, c])
+        frame = Frame.from_transformation(transformation)
+        frame = Frame.from_rotation(rotation)
+    """
+    
+    def __init__(self, point = [0, 0, 0], xaxis = [1, 0, 0], yaxis = [0, 1, 0]):
         
-        if type(point) == type([]) or type(point) == type(()): point = Point(point)
-        if type(xaxis) == type([]) or type(xaxis) == type(()): xaxis = Vector(xaxis)
-        if type(yaxis) == type([]) or type(yaxis) == type(()): yaxis = Vector(yaxis)
-        
-        xaxis.normalize()
-        yaxis.normalize()
-        
-        self.point = point
-        self.xaxis = xaxis
-        self.yaxis = yaxis        
-        self.yaxis = self.normal.cross(self.xaxis) # slight correction
+        self.point = list(point)
+        self.xaxis = normalize_vector(list(xaxis))
+        self.yaxis = normalize_vector(list(yaxis))
+        self.yaxis = cross_vectors(self.zaxis, self.xaxis) # slight correction
         
     def copy(self):
         cls = type(self)
-        cls.point = Point(list(self.point))
-        cls.xaxis = Vector(list(self.xaxis))
-        cls.yaxis = Vector(list(self.yaxis))
-        return cls
+        return cls(self.point[:], self.xaxis[:], self.yaxis[:])
         
     @classmethod        
     def worldXY(cls):
-        frame = cls()
-        frame.point = Point([0, 0, 0])
-        frame.xaxis = Vector([1, 0, 0])
-        frame.yaxis = Vector([0, 1, 0])
-        return frame
+        return cls([0, 0, 0], [1, 0, 0], [0, 1, 0])
     
     @classmethod        
     def worldZX(cls):
-        frame = cls()
-        frame.point = Point([0, 0, 0])
-        frame.xaxis = Vector([0, 0, 1])
-        frame.yaxis = Vector([1, 0, 0])
-        return frame
+        return cls([0, 0, 0], [0, 0, 1], [1, 0, 0])
     
     @classmethod        
     def worldYZ(cls):
-        frame = cls()
-        frame.point = Point([0, 0, 0])
-        frame.xaxis = Vector([0, 1, 0])
-        frame.yaxis = Vector([0, 0, 1])
-        return frame
+        return cls([0, 0, 0], [0, 1, 0], [0, 0, 1])
     
     @classmethod
     def from_quaternion(cls, quaternion):
-        qw, qx, qy, qz = quaternion
-        rotation = Rotation.from_quaternion([qw, qx, qy, qz])
+        rotation = Rotation.from_quaternion(quaternion)
         frame = cls.from_rotation(rotation)
         return frame
     
@@ -71,7 +50,7 @@ class Frame():
     def from_pose_quaternion(cls, pose_quaternion):
         x, y, z, qw, qx, qy, qz = pose_quaternion
         frame = cls.from_quaternion([qw, qx, qy, qz])
-        frame.point = Point([x, y, z])
+        frame.point = [x, y, z]
         return frame
     
     @classmethod 
@@ -84,7 +63,7 @@ class Frame():
     def from_pose_axis_angle_vector(cls, pose_axis_angle_vector):
         x, y, z, ax, ay, az = pose_axis_angle_vector
         frame = cls.from_axis_angle_vector([ax, ay, az])
-        frame.point = Point([x, y, z])
+        frame.point = [x, y, z]
         return frame
 
     @classmethod 
@@ -97,20 +76,23 @@ class Frame():
     def from_pose_euler_angles(cls, pose_euler_angles):
         x, y, z, a, b, c = pose_euler_angles
         frame = cls.from_euler_angles([a, b, c])
-        frame.point = Point([x, y, z])
+        frame.point = [x, y, z]
         return frame
     
     @classmethod
     def from_rotation(cls, rotation):
-        xaxis = Vector([rotation.matrix[0][0], rotation.matrix[1][0], rotation.matrix[2][0]])
-        yaxis = Vector([rotation.matrix[0][1], rotation.matrix[1][1], rotation.matrix[2][1]])
-        return cls(Point([0,0,0]), xaxis, yaxis)
+        xaxis, yaxis = rotation.basis_vectors
+        return cls([0,0,0], xaxis, yaxis)
+    
+    @classmethod
+    def from_transformation(cls, transformation):
+        xaxis, yaxis = transformation.basis_vectors
+        point = transformation.translation.vector
+        return cls(point, xaxis, yaxis)
         
     @property
     def normal(self):
-        normal = Vector(cross_vectors(self.xaxis, self.yaxis))
-        normal.normalize()
-        return normal
+        return cross_vectors(self.xaxis, self.yaxis)
     
     @property
     def zaxis(self):
@@ -118,27 +100,33 @@ class Frame():
         
     @property  
     def quaternion(self):
-        R = Rotation.from_basis_vectors(self.xaxis, self.yaxis)
-        return R.quaternion
+        rotation = Rotation.from_basis_vectors(self.xaxis, self.yaxis)
+        return rotation.quaternion
     
     @property
     def pose_quaternion(self):
+        """Get pose quaternion.
+        
+        Returns:
+            (list): coordinates and rotation specified in quaternion, such as
+            [x, y, z, qw, qx, qy, qz]
         """
-        Returns a list with the rotation specified in quaternion, such as [x, y, z, qw, qx, qy, qz]
-        """
-        return list(self.point) + self.quaternion
+        return self.point + self.quaternion
             
     @property
     def axis_angle_vector(self):
-        R = Rotation.from_basis_vectors(self.xaxis, self.yaxis)
-        return R.axis_angle_vector
+        rotation = Rotation.from_basis_vectors(self.xaxis, self.yaxis)
+        return rotation.axis_angle_vector
     
     @property
     def pose_axis_angle_vector(self):
+        """Get pose axis angle.
+
+        Returns:
+            (list): coordinates and rotation specified in axis angle 
+            representation, such as [x, y, z, ax, ay, az]
         """
-        Returns a list with the rotation specified in axis angle, such as [x, y, z, ax, ay, az]
-        """
-        return list(self.point) + self.axis_angle_vector
+        return self.point + self.axis_angle_vector
     
     @property
     def euler_angles(self):
@@ -147,32 +135,40 @@ class Frame():
     
     @property
     def pose_euler_angles(self):
+        """Get the frame represented as xyz coordinates with Euler angles.
+        
+        Returns:
+            (list): [x, y, z, a, b, c]
         """
-        Returns a list with the rotation specified in euler angles, such as [x, y, z, a, b, c]
-        """
-        return list(self.point) + self.euler_angles
+        return self.point + self.euler_angles
     
     @property
     def rotation(self):
         return Rotation.from_basis_vectors(self.xaxis, self.yaxis)
     
-    def transform(self, transformation):
-        """
-        Transforms the frame with transformation matrix and returns the 
-        transformed frame.
-        """
-        point = Point(transformation.transform(self.point))
-        xaxis = Vector(transformation.rotation().transform(self.xaxis))
-        yaxis = Vector(transformation.rotation().transform(self.yaxis))
-        return Frame(point, xaxis, yaxis)
-            
+    def transform(self, transformation, copy=False):
+        """Transforms the frame with transformation matrix.
         
+        Returns:
+            (Frame): the transformed frame.
+        """
+        point = transformation.transform(self.point)
+        xaxis = transformation.rotation().transform(self.xaxis)
+        yaxis = transformation.rotation().transform(self.yaxis)
+        
+        if copy:
+            cls = type(self)
+            return cls(point, xaxis, yaxis)
+        else:
+            self.point = point
+            self.xaxis = xaxis
+            self.yaxis = yaxis
+            return self
+            
     def __repr__(self):
-        s = "Frame:\n"
-        s += "Point:\n"
-        s += "%+.4f\t%+.4f\t%+.4f\n" % tuple(self.point)
-        R = Rotation.from_basis_vectors(self.xaxis, self.yaxis)
-        s += str(R)
+        s = "[[%.4f, %.4f, %.4f], " % tuple(self.point)
+        s += "[%.4f, %.4f, %.4f], " % tuple(self.xaxis)
+        s += "[%.4f, %.4f, %.4f]]" % tuple(self.yaxis)
         return s
     
 
@@ -196,17 +192,13 @@ if __name__ == '__main__':
     
     print "================"
     
-    R = Rotation.from_axis_and_angle(Vector(j1_vector), q1, Point(j1_end))
+    R = Rotation.from_axis_and_angle(j1_vector, q1, j1_end)
     print R
     print R * R
-    
-    """
-    print R * Vector([-207.9183, -74.7322, 0.0])
-    print R * [-207.9183, -74.7322, 0.0]
-    """
-    xaxis = Vector([1, 0, 0])
-    yaxis = Vector([0, 1, 0])
-    zaxis = xaxis.cross(yaxis)
-    
-    print zaxis.cross(xaxis) # = yaxis
+    print Frame.worldXY()
+    print Frame.worldXY().normal
+    f = Frame.worldXY()
+    r = Rotation.from_basis_vectors(f.xaxis, f.yaxis)
+    print r.basis_vectors
+  
     

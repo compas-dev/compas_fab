@@ -13,6 +13,8 @@ class Tool(object):
     - geometry (meshes)
     - frame
     - transformation matrix
+    
+    more tcps for tool!
     """
     
     def __init__(self, tcp_frame):
