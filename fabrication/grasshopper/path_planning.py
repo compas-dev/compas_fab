@@ -16,7 +16,6 @@ except ImportError:
     if platform.python_implementation() == 'IronPython':
         raise
 
-BUILDING_MEMBER_KEY = 'rfl_building_member'
 LOG = logging.getLogger('compas_fabrication.grasshopper.path_planning')
 
 
@@ -75,9 +74,6 @@ class PathVisualizer(object):
 
         frame_config = path[frame]
 
-        if self.building_member and BUILDING_MEMBER_KEY not in ctx:
-            ctx[BUILDING_MEMBER_KEY] = self._get_building_member_info(path[0])
-
         start = timer() if self.debug else None
         self.simulator.set_robot_config(self.robot, frame_config)
         if self.debug:
@@ -92,7 +88,7 @@ class PathVisualizer(object):
             meshes.append(mesh)
 
         if self.building_member:
-            info = ctx[BUILDING_MEMBER_KEY]
+            info = self._get_building_member_info(path[0])
             mesh = info['mesh'].DuplicateShallow()
             parent_transform = xform_from_matrix(mesh_matrices[info['parent_handle']])
             relative_transform = info['relative_transform']
