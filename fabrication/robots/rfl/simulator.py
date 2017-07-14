@@ -575,7 +575,7 @@ class SimulationCoordinator(object):
         # Return the ID of the job and poll
         results = json.loads(response)
         # TODO: Get DOF from robot instance
-        return [[config_from_vrep(path_list[i:i + 9], DEFAULT_SCALE)
+        return [[config_from_vrep(path_list[i:i + 9], 1)
                 for i in range(0, len(path_list), 9)] for path_list in results]
 
     @classmethod
