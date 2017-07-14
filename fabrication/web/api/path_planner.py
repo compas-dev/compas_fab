@@ -14,8 +14,9 @@ def execute_path_plan(path_list, options, host, port):
     LOG.info('Starting path plan instance on %s:%d' % (host, port))
     try:
         path = SimulationCoordinator.local_executor(options, host=host, port=port)
-        for path_step in path:
-            path_list.extend(path_step.raw)
+        for config in path:
+            path_list.extend(config.external_axes)
+            path_list.extend(config.joint_values)
     except SimulationError as e:
         LOG.exception('Path planning failed: %s', e.message)
 
@@ -26,8 +27,7 @@ def build_handler(instances):
     ESCALATION_STRATEGY = [{'shallow_state_search': True},
                            {'shallow_state_search': False, 'algorithm': 'rrtconnect', 'trials': 20},
                            {'shallow_state_search': False, 'algorithm': 'sbl', 'trials': 20},
-                           {'shallow_state_search': False, 'algorithm': 'sbl', 'trials': 3},
-                           ]
+                           {'shallow_state_search': False, 'algorithm': 'sbl', 'trials': 3}]
 
     class PathPlanningHandler(BaseHTTPRequestHandler):
         def _set_headers(self, code=200):
@@ -83,8 +83,8 @@ if __name__ == '__main__':
     from sys import argv
 
     if len(argv) < 1:
-        print("Usage: python web_api.py [http_port=7000] [instances=127.0.0.1:19997]")
-        print("   eg: python web_api.py 7000 127.0.0.1:19997,127.0.0.1:19998")
+        print("Usage: python path_planner.py [http_port=7000] [instances=127.0.0.1:19997]")
+        print("   eg: python path_planner.py 7000 127.0.0.1:19997,127.0.0.1:19998")
         exit(-1)
 
     http_port = int(argv[1]) if len(argv) > 1 else 7000
