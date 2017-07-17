@@ -69,9 +69,16 @@ def xdraw_mesh(vertices, faces, vertex_normals=None, texture_coordinates=None, v
 
 
 def draw_line(line):
-    start = Rhino.Geometry.Point3d(line.start.x, line.start.y, line.start.z)
-    end = Rhino.Geometry.Point3d(line.end.x, line.end.y, line.end.z)
+    start = Rhino.Geometry.Point3d(*line.start)
+    end = Rhino.Geometry.Point3d(*line.end)
     return Rhino.Geometry.Line(start, end)
+
+def draw_frame(frame):
+    pt  = Rhino.Geometry.Point3d(*frame.point)
+    xaxis = Rhino.Geometry.Point3d(*frame.xaxis)
+    yaxis = Rhino.Geometry.Point3d(*frame.yaxis)
+    return Rhino.Geometry.Plane(pt, xaxis, yaxis)
+
 
 
 def draw_mesh(mesh, vertexcolor=None):

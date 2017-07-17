@@ -59,7 +59,7 @@ class Robot(object):
         self.tool = tool
         
     def get_robot_configuration(self):
-        pass
+        raise NotImplementedError
         
     @property
     def tcp_frame(self):
@@ -68,30 +68,27 @@ class Robot(object):
             return self.tool0_frame
     
     def forward_kinematics(self, q):
-        """
-        Calculate the tcp frame according to the joint angles q.
+        """Calculate the tcp frame according to the joint angles q.
         """
         raise NotImplementedError
     
     def inverse_kinematics(self, tcp_frame_RCS):
-        """
-        Calculate solutions (joint angles) according to the queried tcp frame
+        """Calculate solutions (joint angles) according to the queried tcp frame
         (in RCS).
         """
         raise NotImplementedError
     
     def get_frame_in_RCS(self, frame_WCS):
-        """
-        Transform the frame in world coordinate system (WCS) into a frame in 
+        """Transform the frame in world coordinate system (WCS) into a frame in 
         robot coordinate system (RCS), which is set by the robots' basis frame.
         """
         frame_RCS = frame_WCS.transform(self.transformation_WCS_RCS)
+        #frame_RCS = frame_WCS.transform(self.transformation_RCS_WCS)
         return frame_RCS
     
             
     def get_tool0_frame_from_tcp_frame(self, frame_tcp):
-        """
-        Get the tool0 frame (frame at robot) from the tool frame (tcp),
+        """Get the tool0 frame (frame at robot) from the tool frame (tcp),
         according to the set tool.
         
         """

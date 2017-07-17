@@ -17,9 +17,9 @@ class Frame():
         frame = Frame.from_rotation(rotation)
     """
     
-    def __init__(self, point = [0, 0, 0], xaxis = [1, 0, 0], yaxis = [0, 1, 0]):
+    def __init__(self, point=[0, 0, 0], xaxis=[1, 0, 0], yaxis=[0, 1, 0]):
         
-        self.point = list(point)
+        self.point = [float(f) for f in list(point)]
         self.xaxis = normalize_vector(list(xaxis))
         self.yaxis = normalize_vector(list(yaxis))
         self.yaxis = cross_vectors(self.zaxis, self.xaxis) # slight correction
@@ -150,15 +150,20 @@ class Frame():
         """Transforms the frame with transformation matrix.
         
         Returns:
-            (Frame): the transformed frame.
+            Frame: the transformed frame.
         """
-        point = transformation.transform(self.point)
+        # what is faster ?
+        #T = Transformation.from_frame(self)        
+        #T = transformation * T 
+        #point = T.translation().vector
+        #xaxis, yaxis = T.basis_vectors
+        
+        point = transformation.transform(self.point) # or?? point = multiply_matrix_vector(transformation.matrix, point + [1.])[:3]
         xaxis = transformation.rotation().transform(self.xaxis)
         yaxis = transformation.rotation().transform(self.yaxis)
         
         if copy:
-            cls = type(self)
-            return cls(point, xaxis, yaxis)
+            return Frame(point, xaxis, yaxis)
         else:
             self.point = point
             self.xaxis = xaxis
@@ -174,31 +179,22 @@ class Frame():
 
 if __name__ == '__main__':
     
-    """
     pose_quaternion =  [46.688110714374631, -1.4120551622885724, 49.438882686865952, 0.9222492523802307, -0.077292257754572713, 0.28255622706540073, 0.25227802504750946]
-    print pose_quaternion
     frame = Frame.from_pose_quaternion(pose_quaternion)
     
+    print pose_quaternion
     print frame.pose_quaternion
-    
-    
-    R = rotation_matrix(q1, j1_vector, j1_end)
-    print R
-    """
+        
     q1, j1_vector, j1_end = -2.02405833354, [-207.9183, -74.7322, 0.0], [-207.9183, -74.7322, 127.3]
+        
+    rotation = Rotation.from_axis_and_angle(j1_vector, q1, j1_end)
     
-    R = Rotation.from_axis_and_angle(j1_vector, q1)
-    print R
+    frame_t = frame.transform(rotation, copy=True)
     
-    print "================"
+    print "frame_t", frame_t
     
-    R = Rotation.from_axis_and_angle(j1_vector, q1, j1_end)
-    print R
-    print R * R
-    print Frame.worldXY()
-    print Frame.worldXY().normal
-    f = Frame.worldXY()
-    r = Rotation.from_basis_vectors(f.xaxis, f.yaxis)
-    print r.basis_vectors
+    T = Transformation.from_frame(frame)
+    
+    print rotation * T
   
     

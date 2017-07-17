@@ -99,17 +99,24 @@ class UR(Robot):
         R5 = Rotation.from_axis_and_angle(j5.vector, q5, j5.end) * R4
         
         # now apply the transformation to the base    
-        R0 = self.transformation_WCS_RCS * R0
-        R1 = self.transformation_WCS_RCS * R1
-        R2 = self.transformation_WCS_RCS * R2
-        R3 = self.transformation_WCS_RCS * R3
-        R4 = self.transformation_WCS_RCS * R4
-        R5 = self.transformation_WCS_RCS * R5
+        R0 = self.transformation_RCS_WCS * R0
+        R1 = self.transformation_RCS_WCS * R1
+        R2 = self.transformation_RCS_WCS * R2
+        R3 = self.transformation_RCS_WCS * R3
+        R4 = self.transformation_RCS_WCS * R4
+        R5 = self.transformation_RCS_WCS * R5
         
         return R0, R1, R2, R3, R4, R5
     
     def get_transformed_model(self, q):
-        """
+        """Calculate robot model according to the configuration.
+        
+        Args:
+            configuration (Configuration): the 6 joint angles in radians 
+            
+        Returns:    
+            (frame): The tool0 frame in robot coordinate system (RCS).
+        
         Get the transformed meshes of the robot model.
         """
         R0, R1, R2, R3, R4, R5 = self.get_forward_transformations(q)
@@ -122,7 +129,8 @@ class UR(Robot):
         m3_xyz = R3.transform(self.m3_xyz)
         m4_xyz = R4.transform(self.m4_xyz)
         m5_xyz = R5.transform(self.m5_xyz)
-        tool0_frame = self.tool0_frame.transform(R5)
+        
+        tool0_frame = self.tool0_frame.transform(R5, copy=True)
         
         # update the meshes
         update_mesh_vertices(self.m0, m0_xyz)
@@ -136,10 +144,10 @@ class UR(Robot):
     
         
     def forward_kinematics(self, configuration):
-        """ Forward kinematics function.
+        """Forward kinematics function.
         
         Args:
-            configuration: the 6 joint angles in radians 
+            configuration (Configuration): the 6 joint angles in radians 
             
         Returns:    
             (frame): The tool0 frame in robot coordinate system (RCS).
@@ -148,13 +156,13 @@ class UR(Robot):
         return forward_kinematics(configuration, self.params)
     
     def inverse_kinematics(self, tool0_frame_RCS):
-        """ Inverse kinematics function.
-        
+        """Inverse kinematics function.
         Args:
-            (Frame): The tool0 frame to reach in robot coordinate system (RCS).
+            tool0_frame_RCS (Frame): The tool0 frame to reach in robot 
+                coordinate system (RCS).
             
         Returns:
-            (list): A list of possible configurations.                    
+            list: A list of possible configurations.                    
         """
     
         return inverse_kinematics(tool0_frame_RCS, self.params)
