@@ -2,20 +2,20 @@ from __future__ import print_function
 
 import logging
 from timeit import default_timer as timer
+from compas_fabrication.fabrication.robots import Pose
+from compas_fabrication.fabrication.robots.rfl import Configuration, SimulationCoordinator
 from compas_fabrication.fabrication.grasshopper import *
-from compas_fabrication.fabrication.robots.rfl import Configuration
 
 try:
     import clr
     import rhinoscriptsyntax as rs
-    from Rhino.Geometry import Transform, Plane
+    from Rhino.Geometry import Transform
     from Rhino.Geometry import Mesh as RhinoMesh
 except ImportError:
     import platform
     if platform.python_implementation() == 'IronPython':
         raise
 
-BUILDING_MEMBER_KEY = 'rfl_building_member'
 LOG = logging.getLogger('compas_fabrication.grasshopper.path_planning')
 
 
@@ -74,9 +74,6 @@ class PathVisualizer(object):
 
         frame_config = path[frame]
 
-        if self.building_member and BUILDING_MEMBER_KEY not in ctx:
-            ctx[BUILDING_MEMBER_KEY] = self._get_building_member_info(path[0])
-
         start = timer() if self.debug else None
         self.simulator.set_robot_config(self.robot, frame_config)
         if self.debug:
@@ -91,7 +88,7 @@ class PathVisualizer(object):
             meshes.append(mesh)
 
         if self.building_member:
-            info = ctx[BUILDING_MEMBER_KEY]
+            info = self._get_building_member_info(path[0])
             mesh = info['mesh'].DuplicateShallow()
             parent_transform = xform_from_matrix(mesh_matrices[info['parent_handle']])
             relative_transform = info['relative_transform']
@@ -155,6 +152,80 @@ class PathVisualizer(object):
                 'relative_transform': relative_transform}
 
 
+class PathPlanner(object):
+    """Provides a simple/compact API to call the path planner from Grasshopper."""
+
+    @classmethod
+    def find_path(cls, host='127.0.0.1', port=19997, mode='local', **kwargs):
+        """Finds a path for the specified scene description. There is a large number
+        of parameters that can be passed as `kwargs`. It can run in two modes: *remote* or
+        *local*. In remote mode, the `host` and `port` parameters correspond to a
+        simulation coordinator, and in local mode, `host` and `port` correspond to
+        a V-REP instance.
+
+        Args:
+            host (:obj:`str`): IP address of the service (simulation coordinator in `remote`, V-REP in `local` mode)
+            port (:obj:`int`): Port of the service.
+            mode (:obj:`str`): Execution mode, either ``local`` or ``remote``.
+            kwargs: Keyword arguments.
+
+        Returns:
+            list: list of configurations representing a path.
+        """
+        parser = InputParameterParser()
+        options = {'robots': []}
+        active_robot = None
+
+        if 'robots' in kwargs:
+            for i, settings in enumerate(kwargs['robots']):
+                if 'robot' not in settings:
+                    raise KeyError("'robot' not found at kwargs['robots'][%d]" % i)
+
+                robot = {'robot': settings['robot']}
+
+                if 'start' in settings:
+                    start = parser.get_config_or_pose(settings['start'])
+                    if start:
+                        robot['start'] = start.to_data()
+
+                if 'goal' in settings:
+                    if not active_robot:
+                        active_robot = robot
+                        goal = parser.get_config_or_pose(settings['goal'])
+                        if goal:
+                            robot['goal'] = goal.to_data()
+                    else:
+                        raise ValueError('Multi-move is not (yet) supported. Only one goal can be specified.')
+
+                if 'building_member' in settings:
+                    robot['building_member'] = mesh_from_guid(settings['building_member']).to_data()
+
+                if 'metric_values' in settings:
+                    robot['metric_values'] = map(float, settings['metric_values'].split(','))
+
+                if 'joint_limits' in settings:
+                    robot['joint_limits'] = settings['joint_limits']
+
+                options['robots'].append(robot)
+
+        if 'collision_meshes' in kwargs:
+            mesh_guids = parser.compact_list(kwargs['collision_meshes'])
+            options['collision_meshes'] = map(lambda m: m.to_data(), map(mesh_from_guid, mesh_guids))
+
+        options['debug'] = kwargs.get('debug')
+        options['trials'] = kwargs.get('trials')
+        options['shallow_state_search'] = kwargs.get('shallow_state_search')
+        options['algorithm'] = kwargs.get('algorithm')
+        options['resolution'] = kwargs.get('resolution')
+
+        if mode == 'remote':
+            LOG.debug('Running remote path planner executor. Host=%s:%d', host, port)
+            return SimulationCoordinator.remote_executor(options, host, port)
+        else:
+            LOG.debug('Running local path planner executor. Host=%s:%d', host, port)
+            return SimulationCoordinator.local_executor(options, host, port)
+
+
 class InputParameterParser(object):
     """Simplifies some tasks related to parsing Grasshopper input parameters
     for path planning."""
@@ -164,25 +235,26 @@ class InputParameterParser(object):
         return filter(None, list)
 
     def get_pose(self, plane_or_pose):
-        """Gets a vrep-compatible pose from a string containing
+        """Gets a pose that is compatible with V-REP from a string containing
         comma-separated floats or from a Rhino/Grasshopper plane.
 
         Args:
-            plane_or_pose (comma-separated :obj:`string` of a Rhino :obj:`Plane`):
+            plane_or_pose (comma-separated :obj:`str` of a Rhino :obj:`Plane`):
 
         Returns:
-            list: list of 12 :obj:`float` values representing a pose.
+            pose: :class:`.Pose` instance representing a transformation matrix.
         """
         if not plane_or_pose:
             return None
 
-        if isinstance(plane_or_pose, basestring):
-            return map(float, pose.split(',')) if pose else None
-        elif isinstance(plane_or_pose, Plane):
-            return vrep_pose_from_plane(plane_or_pose)
+        try:
+            return Pose.from_list(vrep_pose_from_plane(plane_or_pose))
+        except (TypeError, IndexError):
+            return Pose.from_list(map(float, plane_or_pose.split(','))) if plane_or_pose else None
 
     def get_config_or_pose(self, config_values_or_plane):
-        """Parses multiple input data types and returns a configuration or a pose.
+        """Parses multiple input data types and returns a configuration or a pose
+        represented as a transformation matrix.
 
         Args:
             config_values_or_plane (comma-separated :obj:`string`, or :class:`Configuration` instance,
@@ -191,10 +263,12 @@ class InputParameterParser(object):
         if not config_values_or_plane:
             return None
 
-        if isinstance(config_values_or_plane, Configuration):
-            return config_values_or_plane
-        elif isinstance(config_values_or_plane, basestring):
-            values = map(float, config_values_or_plane.split(','))
-            return Configuration.from_list(values)
-        elif isinstance(config_values_or_plane, Plane):
-            return vrep_pose_from_plane(config_values_or_plane)
+        try:
+            return Pose.from_list(vrep_pose_from_plane(config_values_or_plane))
+        except (TypeError, IndexError):
+            try:
+                if config_values_or_plane.external_axes and config_values_or_plane.joint_values:
+                    return config_values_or_plane
+            except AttributeError:
+                values = map(float, config_values_or_plane.split(','))
+                return Configuration.from_degrees_list(values)

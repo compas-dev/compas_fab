@@ -13,6 +13,7 @@ def clean(ctx, docs=True, bytecode=False):
     patterns = []
     if docs:
         patterns.append('_docs/_build')
+        patterns.append('_docs/source/pages/reference/generated')
     if bytecode:
         patterns.append('**/*.pyc')
     for pattern in patterns:
