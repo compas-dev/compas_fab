@@ -14,7 +14,6 @@ Utility functions to simplify integration with Grasshopper 3D.
 
     unload_modules
     mesh_from_guid
-    vrep_pose_from_plane
 
 Path planning
 =============
@@ -27,6 +26,7 @@ Path planning
     :toctree: generated/
 
     PathVisualizer
+    PathPlanner
     InputParameterParser
 
 """

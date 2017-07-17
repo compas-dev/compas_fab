@@ -2,6 +2,7 @@ from importlib import import_module
 
 MODULES = [
     'compas_fabrication',
+    'compas_fabrication.fabrication.robots',
     'compas_fabrication.fabrication.robots.rfl',
     'compas_fabrication.fabrication.sensors',
     'compas_fabrication.fabrication.grasshopper'

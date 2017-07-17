@@ -14,11 +14,12 @@ Lab) using robotic simulation tools like
 .. autosummary::
     :toctree: generated/
 
-    Simulator
     Robot
     Configuration
+    Simulator
+    SimulationCoordinator
 
 """
 
-from compas_fabrication.fabrication.robots.rfl.robots import Robot, Configuration
-from compas_fabrication.fabrication.robots.rfl.simulator import Simulator, SimulationError
+from .robots import Robot, Configuration
+from .simulator import Simulator, SimulationCoordinator, SimulationError
