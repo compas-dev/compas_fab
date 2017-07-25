@@ -20,9 +20,9 @@ class Frame():
     def __init__(self, point=[0, 0, 0], xaxis=[1, 0, 0], yaxis=[0, 1, 0]):
         
         self.point = [float(f) for f in list(point)]
-        self.xaxis = normalize_vector(list(xaxis))
-        self.yaxis = normalize_vector(list(yaxis))
-        self.yaxis = cross_vectors(self.zaxis, self.xaxis) # slight correction
+        self.xaxis = list(normalize_vector(list(xaxis)))
+        self.yaxis = list(normalize_vector(list(yaxis)))
+        self.yaxis = list(cross_vectors(self.zaxis, self.xaxis)) # slight correction
         
     def copy(self):
         cls = type(self)
@@ -87,7 +87,7 @@ class Frame():
     @classmethod
     def from_transformation(cls, transformation):
         xaxis, yaxis = transformation.basis_vectors
-        point = transformation.translation.vector
+        point = transformation.translation().vector
         return cls(point, xaxis, yaxis)
         
     @property
@@ -109,7 +109,7 @@ class Frame():
         
         Returns:
             (list): coordinates and rotation specified in quaternion, such as
-            [x, y, z, qw, qx, qy, qz]
+                [x, y, z, qw, qx, qy, qz]
         """
         return self.point + self.quaternion
             
@@ -151,16 +151,10 @@ class Frame():
         
         Returns:
             Frame: the transformed frame.
-        """
-        # what is faster ?
-        #T = Transformation.from_frame(self)        
-        #T = transformation * T 
-        #point = T.translation().vector
-        #xaxis, yaxis = T.basis_vectors
-        
-        point = transformation.transform(self.point) # or?? point = multiply_matrix_vector(transformation.matrix, point + [1.])[:3]
-        xaxis = transformation.rotation().transform(self.xaxis)
-        yaxis = transformation.rotation().transform(self.yaxis)
+        """      
+        T = transformation * Transformation.from_frame(self)
+        point = T.translation().vector
+        xaxis, yaxis = T.basis_vectors
         
         if copy:
             return Frame(point, xaxis, yaxis)

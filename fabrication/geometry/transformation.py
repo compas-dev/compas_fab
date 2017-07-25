@@ -48,8 +48,7 @@ class Transformation(object):
         """Returns a transformation from worldXY frame to frame.
         Is the same as from_frame_to_frame(Frame.worldXY(), frame)
         """
-        rotation = Rotation.from_basis_vectors(frame.xaxis, frame.yaxis)
-        transformation = Transformation.from_matrix(rotation.matrix)
+        transformation = Transformation.from_basis_vectors(frame.xaxis, frame.yaxis)
         transformation[0, 3] = frame.point[0]
         transformation[1, 3] = frame.point[1]
         transformation[2, 3] = frame.point[2]

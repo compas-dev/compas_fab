@@ -6,20 +6,26 @@ Created on 06.06.2017
 
 import os
 
-def list_files_in_directory(dir, fullpath=False, extensions=[]):
-    """
-    This function lists just the files in a directory, not subdirectories.
-    Optional is a list of allowed extensions, e.g. ["jpg", "png"] if you just 
-    want to list images.
+def list_files_in_directory(directory, fullpath=False, extensions=[]):
+    """This function lists just the files in a directory, not sub-directories.
+    
+    Args:
+        directory (str): the directory to search for files.
+        fullpath (:obj:`bool`, optional): specifies if the returned list of 
+            strings is with the full path. Defaults to False.
+        extensions (:obj:`list` of :obj:`str`, optional): a list of allowed 
+            extensions, e.g. ["jpg", "png"] if you just want to list images.
+            Defaults to empty list.
     
     Returns:
-        A list of files as string, optional with its full path. 
+        files (:obj:`list` of :obj:`str`): A list of files as string if files 
+            exist, or empty list.
     """
+    directory = os.path.abspath(directory)
     files = []
     extensions = [".%s" % ext for ext in extensions if ext[0] != "."]
-    
-    for item in os.listdir(dir):
-        item_fullpath = os.path.join(dir, item)
+    for item in os.listdir(directory):
+        item_fullpath = os.path.join(directory, item)
         if os.path.isfile(item_fullpath):
             if len(extensions):
                 found = reduce(lambda x, y: x or y, [item.endswith(ext) for ext in extensions])
@@ -34,8 +40,8 @@ def list_files_in_directory(dir, fullpath=False, extensions=[]):
 
 if __name__ == "__main__":
     
-    path = r"C:\Users\rustr\workspace\compas_fabrication\fabrication\robots\ur\ur10\model\visual"
-    
+    path = os.path.join(os.path.dirname(__file__), "..", "robots", "ur", "ur10", "model")    
+    os.listdir(path)
     print list_files_in_directory(path, fullpath=True, extensions=["obj"])
     
 

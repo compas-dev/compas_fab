@@ -4,42 +4,20 @@ Created on 21.06.2017
 @author: rustr
 '''
 
-from compas_fabrication.fabrication.robots import Robot
-from kinematics import forward_kinematics, inverse_kinematics
 import os
+from compas_fabrication.fabrication.robots import Robot
+from compas_fabrication.fabrication.geometry import Frame, Rotation, Transformation
+from kinematics import forward_kinematics, inverse_kinematics
+
 from compas.datastructures.mesh import Mesh
 from compas.geometry.elements import Line
-from compas_fabrication.fabrication.geometry import Frame, Rotation
-from compas.geometry.utilities import multiply_matrices
 
-# TODO: move this somewhere else !!! to mesh algorithms
-def mesh_get_transformed_vertices(mesh, transformation_matrix):
-    xyz = zip(*mesh.xyz) # transpose matrix
-    xyz += [[1] * len(xyz[0])] # homogenize
-    xyz = multiply_matrices(transformation_matrix, xyz)
-    return zip(*xyz[:3])
+from compas_fabrication.fabrication.geometry.helpers import mesh_update_vertices
 
-def update_mesh_vertices(mesh, vertices):
-    for i in range(len(vertices)):
-        mesh.vertex[i].update({'x':vertices[i][0], 'y':vertices[i][1], 'z':vertices[i][2]})
-        
-def mesh_transform(mesh, transformation_matrix):
-    vertices = mesh_get_transformed_vertices(mesh, transformation_matrix)
-    update_mesh_vertices(mesh, vertices)
 
 class UR(Robot):
     """The UR robot class.
     """
-    
-    @property
-    def params(self):
-        """Get UR specific model parameters.
-        
-        Returns:
-            (list): UR specific model parameters.
-        """
-        return [self.d1, self.a2, self.a3, self.d4, self.d5, self.d6]
-    
         
     def __init__(self):
         super(UR, self).__init__()
@@ -55,7 +33,16 @@ class UR(Robot):
         self.j4 = Line((a2+a3, -d4, d1),          (a2+a3, -d4, d1-d5))
         self.j5 = Line((a2+a3, -d4, d1-d5),       (a2+a3, -d4-d6, d1-d5))        
         
-        self.tool0_frame = Frame(self.j5.end, [1,0,0], [0,0,1])
+        self.tool0_frame = Frame(self.j5.end, [-1,0,0], [0,0,-1])
+        
+    @property
+    def params(self):
+        """Get UR specific model parameters.
+        
+        Returns:
+            list: UR specific model parameters.
+        """
+        return [self.d1, self.a2, self.a3, self.d4, self.d5, self.d6]
     
     def get_model_path(self):
         pass
@@ -131,17 +118,20 @@ class UR(Robot):
         m5_xyz = R5.transform(self.m5_xyz)
         
         tool0_frame = self.tool0_frame.transform(R5, copy=True)
+        tcp_frame = Frame.from_transformation(Transformation.from_frame(tool0_frame) * self.transformation_tool0_tcp)
         
         # update the meshes
-        update_mesh_vertices(self.m0, m0_xyz)
-        update_mesh_vertices(self.m1, m1_xyz)
-        update_mesh_vertices(self.m2, m2_xyz)
-        update_mesh_vertices(self.m3, m3_xyz)
-        update_mesh_vertices(self.m4, m4_xyz)
-        update_mesh_vertices(self.m5, m5_xyz)
+        mesh_update_vertices(self.m0, m0_xyz)
+        mesh_update_vertices(self.m1, m1_xyz)
+        mesh_update_vertices(self.m2, m2_xyz)
+        mesh_update_vertices(self.m3, m3_xyz)
+        mesh_update_vertices(self.m4, m4_xyz)
+        mesh_update_vertices(self.m5, m5_xyz)
                 
-        return self.m0, self.m1, self.m2, self.m3, self.m4, self.m5, tool0_frame
+        return self.m0, self.m1, self.m2, self.m3, self.m4, self.m5, tool0_frame, tcp_frame
     
+    def get_transformed_tool_model(self, tcp_frame):
+        return self.tool.get_transformed_tool_model(tcp_frame)
         
     def forward_kinematics(self, configuration):
         """Forward kinematics function.

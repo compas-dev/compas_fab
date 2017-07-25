@@ -1,12 +1,12 @@
 from __future__ import print_function
 from compas_fabrication.fabrication.geometry import Frame, Transformation
-
+from tool import Tool
 
 class Robot(object):
-    """
-    This is the base class for all robots.
+    """Represents the base class for all robots.
+    
     It consists of:
-    - a geometry (meshes)
+    - a model: meshes
     - a base: describes where the robot is attached to. This can be also a movable base: e.g. linear axis 
     - a basis frame, the frame it resides, e.g. Frame.worldXY()
     - a transformation matrix to get coordinated represented in RCS
@@ -33,14 +33,13 @@ class Robot(object):
         self.transformation_RCS_WCS = None
         self.transformation_WCS_RCS = None
         self.set_base(Frame.worldXY())
-        self.tool = None
+        self.tool = Tool(Frame.worldXY())
         self.configuration = None
         self.tool0_frame = Frame.worldXY()
         
     def load_model(self):
         self.model_loaded = True
         
-    
     def set_base(self, base_frame):
         self.base_frame = base_frame
         # transformation matrix from world coordinate system to robot coordinate system
@@ -58,9 +57,15 @@ class Robot(object):
         
     @property
     def tcp_frame(self):
-        # read from tool
-        if not self.tool:
-            return self.tool0_frame
+        return self.tool.tcp_frame
+    
+    @property
+    def transformation_tool0_tcp(self):
+        return self.tool.transformation_T0_T
+    
+    @property   
+    def transformation_tcp_tool0(self):
+        return self.tool.transformation_T_T0
     
     def forward_kinematics(self, q):
         """Calculate the tcp frame according to the joint angles q.
@@ -77,7 +82,7 @@ class Robot(object):
         """Transform the frame in world coordinate system (WCS) into a frame in 
         robot coordinate system (RCS), which is set by the robots' basis frame.
         """
-        frame_RCS = frame_WCS.transform(self.transformation_WCS_RCS)
+        frame_RCS = frame_WCS.transform(self.transformation_WCS_RCS, copy=True)
         #frame_RCS = frame_WCS.transform(self.transformation_RCS_WCS)
         return frame_RCS
     
@@ -87,23 +92,8 @@ class Robot(object):
         according to the set tool.
         
         """
-        frame_tool0 = Frame()
-        return frame_tool0
-    
-
-        """
-        tool_plane_in_RCS = self.get_tool_plane_in_RCS(tp_WCS)
-
-        T_TP_in_zero_W = rg.Transform.PlaneToPlane(self.tool.plane, rg.Plane.WorldXY)
-        
-        tcp_plane_in_RCS = rg.Plane.WorldXY
-        tcp_plane_in_RCS.Transform(T_TP_in_zero_W)
-        
-        T_W_TP_in_RCS = rg.Transform.PlaneToPlane(rg.Plane.WorldXY, tool_plane_in_RCS)
-        tcp_plane_in_RCS.Transform(T_W_TP_in_RCS)
-        
-        return tcp_plane_in_RCS
-        """
+        T = Transformation.from_frame(frame_tcp)
+        return Frame.from_transformation(T * self.transformation_tool0_tcp)
 
 
 class BaseConfiguration(object):
@@ -204,6 +194,7 @@ class BaseConfiguration(object):
         self.external_axes = data.get('external_axes') or None
 
 
+# TODO this can merge with Frame, as Frame euler_axis, quaternion, ..
 class Pose(object):
     """Represents a robot pose described as a 4x4 transformation matrix.
 
@@ -272,3 +263,4 @@ if __name__ == "__main__":
     T1 = robot.transformation_WCS_RCS
     T2 = robot.transformation_RCS_WCS
     print(T1 * T2)
+    print(robot.transformation_tcp_tool0)
