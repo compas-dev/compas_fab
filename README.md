@@ -1,6 +1,6 @@
-# compAS:Fabrication package
+# compas fabrication package
 
-Package for the compAS framework aimed at providing tools for robotic fabrication.
+Package for the compas framework aimed at providing tools for robotic fabrication.
 
 ## How to use it?
 
