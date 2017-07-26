@@ -1,9 +1,9 @@
 .. _home:
 
-compAS:Fabrication Documentation
+Compas Fabrication Documentation
 ================================
 
-Documentation for the robotic fabrication package of the compAS Framework.
+Documentation for the robotic fabrication package of the compas framework.
 
 .. toctree::
    :maxdepth: 1
