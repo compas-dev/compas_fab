@@ -36,8 +36,8 @@ class Configuration(BaseConfiguration):
             list_of_floats (:obj:`list` of :obj:`float`): 9 joint values where the first 6 are radians
                 of the joint values, and the last 3 are gantry positions in millimeters.
         """
-        angles = map(math.degrees, list_of_floats[3:])
-        return cls.from_joints_and_external_axes(angles, list_of_floats[0:3])
+        angles = map(math.degrees, list_of_floats[0:6])
+        return cls.from_joints_and_external_axes(angles, list_of_floats[6:])
 
     @classmethod
     def from_degrees_list(cls, list_of_floats):
@@ -48,7 +48,7 @@ class Configuration(BaseConfiguration):
             list_of_floats (:obj:`list` of :obj:`float`): 9 joint values where the first 6 are degrees
                 of the joint values, and the last 3 are gantry positions in millimeters.
         """
-        return cls.from_joints_and_external_axes(list_of_floats[3:], list_of_floats[0:3])
+        return cls.from_joints_and_external_axes(list_of_floats[0:6], list_of_floats[6:])
 
 
 # TODO: This should inherit from compas_fabrication.fabrication.robots.Robot
