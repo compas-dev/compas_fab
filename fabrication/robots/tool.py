@@ -26,6 +26,8 @@ class Tool(object):
         self.model = None
         self.tool0_frame = Frame.worldXY()
         self.tcp_frame = tcp_frame
+        # TODO: Gonzalo: I find the single-letter part of the name a bit confusing. Maybe rename this to 
+        # self.transformation_to_tool0 and self.transformation_from_tool0 (or similar)?
         self.transformation_T0_T = Transformation.from_frame_to_frame(self.tcp_frame, self.tool0_frame)
         self.transformation_T_T0 = Transformation.from_frame_to_frame(self.tool0_frame, self.tcp_frame)
     

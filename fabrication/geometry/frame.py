@@ -5,7 +5,7 @@ __author__     = ['Romana Rust <rust@arch.ethz.ch>', ]
 
 
 class Frame():
-    """The Frame consists of a point and and two orthonormal base vectors.
+    """The ``Frame`` consists of a point and and two orthonormal base vectors.
     
     Examples:
         frame = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])

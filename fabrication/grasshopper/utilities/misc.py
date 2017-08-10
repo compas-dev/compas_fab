@@ -1,7 +1,5 @@
 import sys
 
-# TODO: A similar function exists already in compas_fabrication.fabrication.utilities.utilities.py
-
 def unload_modules(top_level_module_name):
     """Unloads all modules named starting with the specified string.
 

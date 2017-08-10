@@ -71,7 +71,6 @@ class Transformation(object):
     def from_basis_vectors(cls, xaxis, yaxis):
         """Create rotation matrix from basis vectors (= orthonormal vectors).
         """
-    
         xaxis = normalize_vector(list(xaxis))
         yaxis = normalize_vector(list(yaxis))
         zaxis = cross_vectors(xaxis, yaxis)

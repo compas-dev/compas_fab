@@ -1,9 +1,11 @@
 from __future__ import print_function
-from compas_fabrication.fabrication.robots.ur import UR
 import os
+from compas_fabrication import get_data
+from compas_fabrication.fabrication.robots.ur import UR
+
 
 class UR10(UR):
-    """ The UR 10 robot class.
+    """The UR 10 robot class.
     
     Manual link:
     #define UR10_PARAMS
@@ -32,7 +34,7 @@ class UR10(UR):
         self.load_model()
         
     def get_model_path(self):
-        return os.path.join(os.path.dirname(__file__), "model")
+        return get_data("robots/ur/ur10")
 
 def main():
     ur10 = UR10()
