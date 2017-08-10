@@ -81,6 +81,9 @@ class Simulator(object):
         # Start simulation
         vrep.simxStartSimulation(self.client_id, DEFAULT_OP_MODE)
 
+        if self.client_id == -1:
+            raise SimulationError('Unable to connect to V-REP on %s:%d' % (self.host, self.port), -1)
+
         return self
 
     def __exit__(self, *args):

@@ -7,7 +7,7 @@ compas_fabrication
 
 .. module:: compas_fabrication
 
-Main package for robotics fabrication for the compAS Framework.
+Main package for robotics fabrication for the compas framework.
 
 .. rubric:: Submodules
 

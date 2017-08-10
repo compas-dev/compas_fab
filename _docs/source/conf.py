@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# compAS:Fabrication documentation build configuration file, created by
+# compas fabrication documentation build configuration file, created by
 # sphinx-quickstart on Tue Feb 21 12:23:43 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -76,7 +76,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'compAS:Fabrication'
+project = u'compas fabrication'
 copyright = u'2017, Gramazio Kohler Research'
 author = u'Gramazio Kohler'
 
@@ -161,7 +161,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'compas_fabrication.tex', u'compAS:Fabrication Documentation',
+    (master_doc, 'compas_fabrication.tex', u'compas fabrication documentation',
      u'Gramazio Kohler', 'manual'),
 ]
 
@@ -171,7 +171,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'compas_fabrication', u'compAS:Fabrication Documentation',
+    (master_doc, 'compas_fabrication', u'compas fabrication documentation',
      [author], 1)
 ]
 
@@ -182,8 +182,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'compas_fabrication', u'compAS:Fabrication Documentation',
-     author, 'compas_fabrication', 'Robotics package for the compAS Framework.',
+    (master_doc, 'compas_fabrication', u'compas fabrication documentation',
+     author, 'compas_fabrication', 'Robotics package for the compas framework.',
      'Miscellaneous'),
 ]
 
