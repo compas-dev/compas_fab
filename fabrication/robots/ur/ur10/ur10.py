@@ -1,17 +1,11 @@
-'''
-Created on 15.06.2017
-
-@author: rustr
-'''
-
-from compas_fabrication.fabrication.robots.ur import UR
-
+from __future__ import print_function
 import os
-import time
+from compas_fabrication import get_data
+from compas_fabrication.fabrication.robots.ur import UR
 
 
 class UR10(UR):
-    """ The UR 10 robot class.
+    """The UR 10 robot class.
     
     Manual link:
     #define UR10_PARAMS
@@ -40,23 +34,23 @@ class UR10(UR):
         self.load_model()
         
     def get_model_path(self):
-        return os.path.join(os.path.dirname(__file__), "model")
+        return get_data("robots/ur/ur10")
 
 def main():
-    import time
     ur10 = UR10()
+    q = [-0.4817717618752444, 2.900620189456401, 4.466606474692679, 3.6283476234151966, 1.5707963267948974, 5.194160742259934]
+    q = [0, 0, 0, 0, 0, 0]
+    R0, R1, R2, R3, R4, R5 = ur10.get_forward_transformations(q)
+    print(ur10.forward_kinematics(q))
     
-    q = [-1.225745, -2.024058, 1.936111, -1.756499, 4.980559, 1.553081]
-    t0 = time.time()
-    ur10.get_transformed_model(q)
-    print time.time() - t0
-
+    tool0_frame = ur10.tool0_frame.transform(R5, copy=True)
+    
+    print(tool0_frame)
 
 if __name__ == "__main__":
     #import cProfile
     #cProfile.run('main()')
     main()
-    UR
     
         
         

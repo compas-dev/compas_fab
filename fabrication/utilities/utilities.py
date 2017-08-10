@@ -1,21 +1,19 @@
-'''
-Created on 19.06.2017
-
-@author: rustr
-'''
+from __future__ import print_function
 import sys
 
-def unload_module(module_name):
-    """ Reload all modules that have module_name in its name.
-        e.g. reload_module('compas')
+def sign(number): 
+    """Returns the sign of a number: +1 or -1.
     """
+    return  int(int((number) > 0 ) - int((number) < 0 ))
+
+def argsort(numbers):
+    """Returns the indices that would sort a list of numbers.
+    """
+    return [i for i, v in sorted(enumerate(numbers), key=lambda x: x[1])]
+
+
+
+if __name__ == "__main__":
     
-    modules_to_pop = []
-    for mod in sys.modules:
-        if mod.find(module_name) != -1:
-            modules_to_pop.append(mod)
-    
-    for mod in modules_to_pop:
-        if mod in sys.modules:
-            sys.modules.pop(mod)
-            print "%s unloaded." % mod
+    numbers = [1,5,7,2,0]
+    print(argsort(numbers))

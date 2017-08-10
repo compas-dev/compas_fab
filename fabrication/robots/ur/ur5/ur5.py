@@ -1,11 +1,6 @@
-'''
-Created on 15.06.2017
-
-@author: rustr
-'''
-
-from compas_fabrication.fabrication.robots.ur import UR
 import os
+from compas_fabrication import get_data
+from compas_fabrication.fabrication.robots.ur import UR
 
 class UR5(UR):
     """ The UR 5 robot class.
@@ -38,7 +33,7 @@ class UR5(UR):
         self.load_model()
         
     def get_model_path(self):
-        return os.path.join(os.path.dirname(__file__), "model")
+        return get_data("robots/ur/ur5")
 
 
     
