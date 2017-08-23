@@ -46,10 +46,11 @@ class PathVisualizer(object):
     """Handles the generation of meshes to visualize a full path plan
     in Rhino/Grasshopper.
     """
-    def __init__(self, simulator, robot, building_member=None):
+    def __init__(self, simulator, robot, building_member=None, building_member_pickup_config=None):
         self.simulator = simulator
         self.robot = robot
         self.building_member = building_member
+        self.building_member_pickup_config = building_member_pickup_config
 
     def get_frame_meshes(self, path, frame, ctx):
         """Retrieves all meshes required to render a specific frame of a path plan.
@@ -89,7 +90,8 @@ class PathVisualizer(object):
             meshes.append(mesh)
 
         if self.building_member:
-            info = self._get_building_member_info(path[0])
+            gripping_config = self.building_member_pickup_config if self.building_member_pickup_config else path[0]
+            info = self._get_building_member_info(gripping_config)
             mesh = info['mesh'].DuplicateShallow()
             parent_transform = xform_from_matrix(mesh_matrices[info['parent_handle']])
             relative_transform = info['relative_transform']

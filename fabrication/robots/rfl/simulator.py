@@ -194,6 +194,8 @@ class Simulator(object):
             robot (:class:`.Robot`): Robot instance to move.
             pose (:class:`.Pose`): Target or goal pose instance.
 
+        Returns:
+            An instance of :class:`.Configuration` found for the given pose.
         """
         # First check if the start state is reachable
         config = self.find_robot_states(robot, pose, [0.] * robot.dof)[-1]
@@ -202,6 +204,8 @@ class Simulator(object):
             raise ValueError('Cannot find a valid config for the given pose')
 
         self.set_robot_config(robot, config)
+
+        return config
 
     def set_robot_config(self, robot, config):
         """Moves the robot the the specified configuration.
