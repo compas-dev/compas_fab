@@ -253,7 +253,7 @@ class Simulator(object):
                                                      [], [])
         return config_from_vrep(config, self.scale)
 
-    def find_robot_states(self, robot, goal_pose, metric_values=None, max_trials=None, max_results=1):
+    def find_robot_states(self, robot, goal_pose, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
         """Finds valid robot configurations for the specified goal pose.
 
         Args:
@@ -263,6 +263,10 @@ class Simulator(object):
                 values (3 for gantry + 6 for joints) ranging from 0 to 1,
                 where 1 indicates the axis is blocked and cannot
                 move during inverse kinematic solving.
+            gantry_joint_limits (:obj:`list` of `float`): List of 6 floats defining the upper/lower limits of
+                gantry joints. Use this if you want to restrict the area in which to search for states.
+            arm_joint_limits (:obj:`list` of `float`): List of 12 floats defining the upper/lower limits of
+                arm joints. Use this if you want to restrict the working area in which to search for states.
             max_trials (:obj:`int`): Number of trials to run. Set to ``None``
                 to retry infinitely.
             max_results (:obj:`int`): Maximum number of result states to return.
@@ -276,22 +280,29 @@ class Simulator(object):
 
         self.set_robot_metric(robot, metric_values)
 
-        states = self._find_raw_robot_states(robot, pose_to_vrep(goal_pose, self.scale), max_trials, max_results)
+        states = self._find_raw_robot_states(robot, pose_to_vrep(goal_pose, self.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
 
         return [config_from_vrep(states[i:i + robot.dof], self.scale)
                 for i in range(0, len(states), robot.dof)]
 
-    def _find_raw_robot_states(self, robot, goal_pose, max_trials=None, max_results=1):
+    def _find_raw_robot_states(self, robot, goal_pose, gantry_joint_limits, arm_joint_limits, max_trials=None, max_results=1):
         i = 0
         final_states = []
         retry_until_success = True if not max_trials else False
 
         while True:
+            string_param_list = []
+            if gantry_joint_limits or arm_joint_limits:
+                joint_limits = []
+                joint_limits.extend(floats_to_vrep(gantry_joint_limits or [], self.scale))
+                joint_limits.extend(arm_joint_limits or [])
+                string_param_list.append(','.join(map(str, joint_limits)))
+
             res, _, states, _, _ = self.run_child_script('searchRobotStates',
                                                          [robot.index,
                                                           max_trials or 1,
                                                           max_results],
-                                                         goal_pose, [])
+                                                         goal_pose, string_param_list)
 
             # Even if the retry_until_success is set to True, we short circuit
             # at some point to prevent infinite loops caused by misconfiguration
@@ -363,7 +374,7 @@ class Simulator(object):
             start = timer() if self.debug else None
             max_trials = None if shallow_state_search else 80
             max_results = 1 if shallow_state_search else 80
-            states = self._find_raw_robot_states(robot, pose_to_vrep(goal['target'], self.scale), max_trials, max_results)
+            states = self._find_raw_robot_states(robot, pose_to_vrep(goal['target'], self.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
             if self.debug:
                 LOG.debug('Execution time: search_robot_states=%.2f', timer() - start)
 
