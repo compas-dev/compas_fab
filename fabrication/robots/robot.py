@@ -30,6 +30,7 @@ class Robot(object):
         self.model = [] # a list of meshes
         self.model_loaded = False
         self.basis_frame = None
+        # move to UR !!!!
         self.transformation_RCS_WCS = None
         self.transformation_WCS_RCS = None
         self.set_base(Frame.worldXY())
@@ -41,6 +42,7 @@ class Robot(object):
         self.model_loaded = True
         
     def set_base(self, base_frame):
+        # move to UR !!!!
         self.base_frame = base_frame
         # transformation matrix from world coordinate system to robot coordinate system
         self.transformation_RCS_WCS = Transformation.from_frame_to_frame(Frame.worldXY(), self.base_frame)
