@@ -51,6 +51,48 @@ class Configuration(BaseConfiguration):
         return cls.from_joints_and_external_axes(list_of_floats[0:6], list_of_floats[6:])
 
 
+class PathPlan(object):
+    """Represents a complete path planning for one or more robots.
+
+    Attributes:
+        paths (:obj:`dict`): Dictionary keyed by the robot identifier where the values
+            are instances of :class:`.Configuration`. Robots that do not move during the
+            plan only have one configuration in their values.
+    """
+    def __init__(self):
+        self.paths = {}
+
+    def add_robot_plan(self, robot, path_plan):
+        """Adds a path plan for a specific robot.
+
+        Args:
+            robot (:class:`.Robot`): Instance of robot.
+            path_plan (:obj:`list``or :class:`.`Configuration`): List of configurations
+                representing a full path.
+        """
+        self.paths[str(robot.id)] = path_plan
+
+    def get_robot_plan(self, robot):
+        """Gets the path plan for a specific robot.
+
+        Args:
+            robot (:class:`.Robot`): Instance of robot.
+
+        Returns:
+            List of configurations representing a full path.
+        """
+        key = str(robot.id)
+        if key not in self.paths:
+            raise ValueError('No path plan stored for the specified robot: ' + robot.id)
+
+        return self.paths[key]
+
+    def all_paths(self):
+        """Iterator over all paths currently defined."""
+        for key in self.paths:
+            yield Robot(int(key)), self.paths[key]
+
+
 # TODO: This should inherit from compas_fabrication.fabrication.robots.Robot
 # once that is in place.
 class Robot(object):

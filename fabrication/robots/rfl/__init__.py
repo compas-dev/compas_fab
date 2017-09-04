@@ -21,5 +21,5 @@ Lab) using robotic simulation tools like
 
 """
 
-from .robots import Robot, Configuration
+from .robots import Robot, Configuration, PathPlan
 from .simulator import Simulator, SimulationCoordinator, SimulationError
