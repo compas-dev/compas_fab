@@ -3,7 +3,7 @@ from __future__ import print_function
 import logging
 from timeit import default_timer as timer
 from compas_fabrication.fabrication.robots import Pose
-from compas_fabrication.fabrication.robots.rfl import Configuration, SimulationCoordinator
+from compas_fabrication.fabrication.robots.simulator import Configuration, SimulationCoordinator
 from compas_fabrication.fabrication.grasshopper.geometry import xform_from_matrix, vrep_pose_from_plane
 from compas_fabrication.fabrication.grasshopper.helpers import mesh_from_guid
 

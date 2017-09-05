@@ -47,8 +47,7 @@ class Robot(object):
         # transformation matrix from robot coordinate system to world coordinate system
         self.transformation_WCS_RCS = Transformation.from_frame_to_frame(self.base_frame, Frame.worldXY())
         # modify joint axis !
-        
-    
+
     def set_tool(self, tool):
         self.tool = tool
         

@@ -27,6 +27,48 @@ class SimulationError(Exception):
         self.error_code = error_code
 
 
+class PathPlan(object):
+    """Represents a complete path planning for one or more robots.
+
+    Attributes:
+        paths (:obj:`dict`): Dictionary keyed by the robot identifier where the values
+            are instances of :class:`.Configuration`. Robots that do not move during the
+            plan only have one configuration in their values.
+    """
+    def __init__(self):
+        self.paths = {}
+
+    def add_robot_plan(self, robot, path_plan):
+        """Adds a path plan for a specific robot.
+
+        Args:
+            robot (:class:`.Robot`): Instance of robot.
+            path_plan (:obj:`list``or :class:`.`Configuration`): List of configurations
+                representing a full path.
+        """
+        self.paths[str(robot.id)] = path_plan
+
+    def get_robot_plan(self, robot):
+        """Gets the path plan for a specific robot.
+
+        Args:
+            robot (:class:`.Robot`): Instance of robot.
+
+        Returns:
+            List of configurations representing a full path.
+        """
+        key = str(robot.id)
+        if key not in self.paths:
+            raise ValueError('No path plan stored for the specified robot: ' + robot.id)
+
+        return self.paths[key]
+
+    def all_paths(self):
+        """Iterator over all paths currently defined."""
+        for key in self.paths:
+            yield Robot(int(key)), self.paths[key]
+
+
 class Simulator(object):
     """Interface to run simulations on the RFL using VREP as
     the engine for inverse kinematics.
@@ -43,7 +85,7 @@ class Simulator(object):
 
     Examples:
 
-        >>> from compas_fabrication.fabrication.robots.rfl import *
+        >>> from compas_fabrication.fabrication.robots import *
         >>> with Simulator() as simulator:
         ...     print ('Connected: %s' % simulator.is_connected())
         ...
@@ -55,7 +97,7 @@ class Simulator(object):
                             'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar',
                             'sbl', 'stride', 'trrt')
 
-    def __init__(self, host='127.0.0.1', port=19997, scale=DEFAULT_SCALE, debug=False):
+    def __init__(self, host='127.0.0.1', port=19997, scene='RFL', scale=DEFAULT_SCALE, debug=False):
         self.client_id = None
         self.host = resolve_host(host)
         self.port = port
@@ -63,7 +105,7 @@ class Simulator(object):
         self.thread_cycle_in_ms = 5
         self.debug = debug
         self.scale = float(scale)
-        self._lua_script_name = 'RFL'
+        self._lua_script_name = scene
         self._added_handles = []
 
     def __enter__(self):
@@ -134,7 +176,7 @@ class Simulator(object):
 
         Examples:
 
-            >>> from compas_fabrication.fabrication.robots.rfl import Simulator
+            >>> from compas_fabrication.fabrication.robots import Simulator
             >>> with Simulator() as simulator:
             ...     matrices = simulator.get_object_matrices([0])
             ...     print(map(int, matrices[0]))
@@ -148,24 +190,24 @@ class Simulator(object):
 
     def get_all_visible_handles(self):
         """Gets a list of object handles (identifiers) for all visible
-        shapes of the RFL model.
+        shapes of the 3D scene model.
 
         Returns:
-            list: List of object handles (identifiers) of the RFL model.
+            list: List of object handles (identifiers) of the 3D scene model.
         """
         return self.run_child_script('getRobotVisibleShapeHandles', [], [], [])[1]
 
     def set_robot_metric(self, robot, metric_values):
         """Assigns a metric defining relations between axis values of a robot.
 
-        It takes a list of 9 :obj:`float` values (3 for gantry + 6 for joints)
+        It takes a list of `n` :obj:`float` values (where `n` equals DOF)
         ranging from 0 to 1, where 1 indicates the axis is blocked and cannot
         move during inverse kinematic solving. A value of 1 on any of these
         effectively removes one degree of freedom (DOF).
 
         Args:
             robot (:class:`.Robot`): Robot instance.
-            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
+            metric_values (:obj:`list` of :obj:`float`): :obj:`float`
                 values from 0 to 1.
         """
         vrep.simxCallScriptFunction(self.client_id,
@@ -175,11 +217,11 @@ class Simulator(object):
                                     bytearray(), DEFAULT_OP_MODE)
 
     def reset_all_robots(self):
-        """Resets all robots in the RFL to their base configuration.
+        """Resets all robots in the scene to their base configuration.
 
         Examples:
 
-            >>> from compas_fabrication.fabrication.robots.rfl import Simulator
+            >>> from compas_fabrication.fabrication.robots import Simulator
             >>> with Simulator() as simulator:
             ...     simulator.reset_all_robots()
             ...
@@ -241,7 +283,7 @@ class Simulator(object):
 
         Examples:
 
-            >>> from compas_fabrication.fabrication.robots.rfl import Robot
+            >>> from compas_fabrication.fabrication.robots import Robot
             >>> with Simulator() as simulator:
             ...     config = simulator.get_robot_config(Robot(11))
 
@@ -251,21 +293,21 @@ class Simulator(object):
         res, _, config, _, _ = self.run_child_script('getRobotState',
                                                      [robot.index],
                                                      [], [])
-        return config_from_vrep(config, self.scale)
+        return config_from_vrep(robot.config_cls, config, self.scale, external_axes=robot.external_axes)
 
-    def find_robot_states(self, robot, goal_pose, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
+    def find_robot_states(self, robot, goal_pose, metric_values=None, external_axes_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
         """Finds valid robot configurations for the specified goal pose.
 
         Args:
             robot (:class:`.Robot`): Robot instance.
             goal_pose (:class:`.Pose`): Target or goal pose instance.
-            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
-                values (3 for gantry + 6 for joints) ranging from 0 to 1,
+            metric_values (:obj:`list` of :obj:`float`): :obj:`float`
+                values (1 value per DOF) ranging from 0 to 1,
                 where 1 indicates the axis is blocked and cannot
                 move during inverse kinematic solving.
-            gantry_joint_limits (:obj:`list` of `float`): List of 6 floats defining the upper/lower limits of
-                gantry joints. Use this if you want to restrict the area in which to search for states.
-            arm_joint_limits (:obj:`list` of `float`): List of 12 floats defining the upper/lower limits of
+            external_axes_limits (:obj:`list` of `float`): List of floats defining the upper/lower limits of
+                external axes joints. Use this if you want to restrict the area in which to search for states.
+            arm_joint_limits (:obj:`list` of `float`): List of floats defining the upper/lower limits of
                 arm joints. Use this if you want to restrict the working area in which to search for states.
             max_trials (:obj:`int`): Number of trials to run. Set to ``None``
                 to retry infinitely.
@@ -280,21 +322,21 @@ class Simulator(object):
 
         self.set_robot_metric(robot, metric_values)
 
-        states = self._find_raw_robot_states(robot, pose_to_vrep(goal_pose, self.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
+        states = self._find_raw_robot_states(robot, pose_to_vrep(goal_pose, self.scale), external_axes_limits, arm_joint_limits, max_trials, max_results)
 
-        return [config_from_vrep(states[i:i + robot.dof], self.scale)
+        return [config_from_vrep(robot.config_cls, states[i:i + robot.dof], self.scale, external_axes=robot.external_axes)
                 for i in range(0, len(states), robot.dof)]
 
-    def _find_raw_robot_states(self, robot, goal_pose, gantry_joint_limits, arm_joint_limits, max_trials=None, max_results=1):
+    def _find_raw_robot_states(self, robot, goal_pose, external_axes_limits, arm_joint_limits, max_trials=None, max_results=1):
         i = 0
         final_states = []
         retry_until_success = True if not max_trials else False
 
         while True:
             string_param_list = []
-            if gantry_joint_limits or arm_joint_limits:
+            if external_axes_limits or arm_joint_limits:
                 joint_limits = []
-                joint_limits.extend(floats_to_vrep(gantry_joint_limits or [], self.scale))
+                joint_limits.extend(floats_to_vrep(external_axes_limits or [], self.scale))
                 joint_limits.extend(arm_joint_limits or [])
                 string_param_list.append(','.join(map(str, joint_limits)))
 
@@ -313,7 +355,7 @@ class Simulator(object):
             final_states.extend(states)
 
             if len(final_states):
-                LOG.info('Found %d valid robot states', len(final_states) // 9)
+                LOG.info('Found %d valid robot states', len(final_states) // robot.dof)
                 break
             else:
                 LOG.info('No valid robot states found, will retry.')
@@ -328,10 +370,10 @@ class Simulator(object):
             building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh
                 of the building member that will be attached to the robot.
             pickup_pose (:class:`.Pose`): Pickup pose instance.
-            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
-                values (3 for gantry + 6 for joints) ranging from 0 to 1,
-                where 1 indicates the axis/joint is blocked and cannot
-                move during inverse kinematic solving.
+            metric_values (:obj:`list` of :obj:`float`): :obj:`float`
+                values ranging from 0 to 1, where 1 indicates the
+                axis/joint is blocked and cannot move during
+                inverse kinematic solving.
 
         Returns:
             int: Object handle (identifier) assigned to the building member.
@@ -339,13 +381,14 @@ class Simulator(object):
         if not metric_values:
             metric_values = [0.1] * robot.dof
 
+        # TODO: Fix this, set_robot_pose is not using metric_values, hence it has no effect
         self.set_robot_pose(robot, pickup_pose)
 
         return self.add_building_member(robot, building_member_mesh)
 
     def _find_path_plan(self, robot, goal, metric_values, collision_meshes,
                         algorithm, trials, resolution,
-                        gantry_joint_limits, arm_joint_limits, shallow_state_search):
+                        external_axes_limits, arm_joint_limits, shallow_state_search):
         if not metric_values:
             metric_values = [0.1] * robot.dof
 
@@ -374,15 +417,15 @@ class Simulator(object):
             start = timer() if self.debug else None
             max_trials = None if shallow_state_search else 80
             max_results = 1 if shallow_state_search else 80
-            states = self._find_raw_robot_states(robot, pose_to_vrep(goal['target'], self.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
+            states = self._find_raw_robot_states(robot, pose_to_vrep(goal['target'], self.scale), external_axes_limits, arm_joint_limits, max_trials, max_results)
             if self.debug:
                 LOG.debug('Execution time: search_robot_states=%.2f', timer() - start)
 
         start = timer() if self.debug else None
         string_param_list = [algorithm]
-        if gantry_joint_limits or arm_joint_limits:
+        if external_axes_limits or arm_joint_limits:
             joint_limits = []
-            joint_limits.extend(floats_to_vrep(gantry_joint_limits or [], self.scale))
+            joint_limits.extend(floats_to_vrep(external_axes_limits or [], self.scale))
             joint_limits.extend(arm_joint_limits or [])
             string_param_list.append(','.join(map(str, joint_limits)))
 
@@ -403,12 +446,12 @@ class Simulator(object):
         if self.debug:
             LOG.debug('Execution time: total=%.2f', timer() - first_start)
 
-        return [config_from_vrep(path[i:i + robot.dof], self.scale)
+        return [config_from_vrep(robot.config_cls, path[i:i + robot.dof], self.scale, external_axes=robot.external_axes)
                 for i in range(0, len(path), robot.dof)]
 
     def find_path_plan_to_config(self, robot, goal_configs, metric_values=None, collision_meshes=None,
                                  algorithm='rrtconnect', trials=1, resolution=0.02,
-                                 gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True):
+                                 external_axes_limits=None, arm_joint_limits=None, shallow_state_search=True):
         """Finds a path plan to move the selected robot from its current position
         to one of the `goal_configs`.
 
@@ -418,9 +461,8 @@ class Simulator(object):
         Args:
             robot (:class:`.Robot`): Robot instance to move.
             goal_configs (:obj:`list` of :class:`Configuration`): List of target or goal configurations.
-            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
-                values (3 for gantry + 6 for joints) ranging from 0 to 1,
-                where 1 indicates the axis/joint is blocked and cannot
+            metric_values (:obj:`list` of :obj:`float`): :obj:`float`
+                values ranging from 0 to 1, where 1 indicates the axis/joint is blocked and cannot
                 move during inverse kinematic solving.
             collision_meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): Collision meshes
                 to be taken into account when calculating the motion plan.
@@ -430,9 +472,9 @@ class Simulator(object):
             resolution (:obj:`float`): Validity checking resolution. This value
                 is specified as a fraction of the space's extent.
                 Defaults to ``0.02``.
-            gantry_joint_limits (:obj:`list` of `float`): List of 6 floats defining the upper/lower limits of
+            external_axes_limits (:obj:`list` of `float`): List of floats defining the upper/lower limits of
                 gantry joints. Use this if you want to restrict the working area of the path planner.
-            arm_joint_limits (:obj:`list` of `float`): List of 12 floats defining the upper/lower limits of
+            arm_joint_limits (:obj:`list` of `float`): List of floats defining the upper/lower limits of
                 arm joints. Use this if you want to restrict the working area of the path planner.
             shallow_state_search (:obj:`bool`): True to search only a minimum of
                 valid states before searching a path, False to search states intensively.
@@ -443,20 +485,19 @@ class Simulator(object):
         """
         return self._find_path_plan(robot, {'target_type': 'config', 'target': goal_configs},
                                     metric_values, collision_meshes, algorithm, trials, resolution,
-                                    gantry_joint_limits, arm_joint_limits, shallow_state_search)
+                                    external_axes_limits, arm_joint_limits, shallow_state_search)
 
     def find_path_plan(self, robot, goal_pose, metric_values=None, collision_meshes=None,
                        algorithm='rrtconnect', trials=1, resolution=0.02,
-                       gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True):
+                       external_axes_limits=None, arm_joint_limits=None, shallow_state_search=True):
         """Finds a path plan to move the selected robot from its current position
         to the `goal_pose`.
 
         Args:
             robot (:class:`.Robot`): Robot instance to move.
             goal_pose (:class:`.Pose`): Target or goal pose instance.
-            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
-                values (3 for gantry + 6 for joints) ranging from 0 to 1,
-                where 1 indicates the axis/joint is blocked and cannot
+            metric_values (:obj:`list` of :obj:`float`): :obj:`float`
+                values ranging from 0 to 1, where 1 indicates the axis/joint is blocked and cannot
                 move during inverse kinematic solving.
             collision_meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): Collision meshes
                 to be taken into account when calculating the motion plan.
@@ -466,9 +507,9 @@ class Simulator(object):
             resolution (:obj:`float`): Validity checking resolution. This value
                 is specified as a fraction of the space's extent.
                 Defaults to ``0.02``.
-            gantry_joint_limits (:obj:`list` of `float`): List of 6 floats defining the upper/lower limits of
+            external_axes_limits (:obj:`list` of `float`): List of floats defining the upper/lower limits of
                 gantry joints. Use this if you want to restrict the working area of the path planner.
-            arm_joint_limits (:obj:`list` of `float`): List of 12 floats defining the upper/lower limits of
+            arm_joint_limits (:obj:`list` of `float`): List of floats defining the upper/lower limits of
                 arm joints. Use this if you want to restrict the working area of the path planner.
             shallow_state_search (:obj:`bool`): True to search only a minimum of
                 valid states before searching a path, False to search states intensively.
@@ -479,7 +520,7 @@ class Simulator(object):
         """
         return self._find_path_plan(robot, {'target_type': 'pose', 'target': goal_pose},
                                     metric_values, collision_meshes, algorithm, trials, resolution,
-                                    gantry_joint_limits, arm_joint_limits, shallow_state_search)
+                                    external_axes_limits, arm_joint_limits, shallow_state_search)
 
     def add_building_member(self, robot, building_member_mesh):
         """Adds a building member to the RFL scene and attaches it to the robot.
@@ -646,8 +687,8 @@ class SimulationCoordinator(object):
         # TODO: Do something different here
         # Return the ID of the job and poll
         results = json.loads(response)
-        # TODO: Get DOF from robot instance
-        return [[config_from_vrep(path_list[i:i + 9], 1)
+        # TODO: Get DOF and external_axes from robot instance
+        return [[config_from_vrep(Configuration, path_list[i:i + 9], 1, external_axes=3)
                 for i in range(0, len(path_list), 9)] for path_list in results]
 
     @classmethod
@@ -752,14 +793,19 @@ def pose_to_vrep(pose, scale):
     return pose
 
 
-def config_from_vrep(list_of_floats, scale):
-    angles = map(math.degrees, list_of_floats[3:])
-    external_axes = map(lambda v: v * scale, list_of_floats[0:3])
-    return Configuration.from_joints_and_external_axes(angles, external_axes)
+def config_from_vrep(cls, list_of_floats, scale, external_axes=None):
+    external_axes_floats = None
+    # The first n elements in the list are the external axes according to V-REP
+    if external_axes:
+        external_axes_floats = list_of_floats[0:external_axes]
+        list_of_floats = list_of_floats[external_axes:]
+    angles = map(math.degrees, list_of_floats)
+    external_axes = map(lambda v: v * scale, external_axes_floats) if external_axes_floats else None
+    return cls.from_joints_and_external_axes(angles, external_axes)
 
 
 def config_to_vrep(config, scale):
-    values = map(lambda v: v / scale, config.external_axes)
+    values = map(lambda v: v / scale, config.external_axes) if config.external_axes else []
     values.extend([math.radians(angle) for angle in config.joint_values])
     return values
 
