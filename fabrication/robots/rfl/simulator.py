@@ -665,7 +665,7 @@ class SimulationCoordinator(object):
                     elif r['start'].get('values'):
                         start = Pose.from_data(r['start'])
                         try:
-                            reachable_state = simulator.find_robot_states(robot, start, [0.] * robot.dof, 1, 1)
+                            reachable_state = simulator.find_robot_states(robot, start, metric_values=[0.] * robot.dof, max_trials=1, max_results=1)
                             start = reachable_state[-1]
                             LOG.info('Robot state found for start pose. External axes=%s, Joint values=%s', str(start.external_axes), str(start.joint_values))
                         except SimulationError:
