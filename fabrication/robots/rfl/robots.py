@@ -83,7 +83,7 @@ class PathPlan(object):
         """
         key = str(robot.id)
         if key not in self.paths:
-            raise ValueError('No path plan stored for the specified robot: ' + robot.id)
+            raise ValueError('No path plan stored for the specified robot: ' + str(robot.id))
 
         return self.paths[key]
 
