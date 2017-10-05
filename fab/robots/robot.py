@@ -1,33 +1,34 @@
 from __future__ import print_function
-from compas_fabrication.fabrication.geometry import Frame, Transformation
+from compas_fab.fab.geometry import Frame, Transformation
 from tool import Tool
+
 
 class Robot(object):
     """Represents the base class for all robots.
-    
+
     It consists of:
     - a model: meshes
-    - a base: describes where the robot is attached to. This can be also a movable base: e.g. linear axis 
+    - a base: describes where the robot is attached to. This can be also a movable base: e.g. linear axis
     - a basis frame, the frame it resides, e.g. Frame.worldXY()
     - a transformation matrix to get coordinated represented in RCS
     - a transformation matrix to get coordinated represented in WCS
     - a tool, the end-effector
     - communication: e.g. delegated by a client instance
     - workspace: brep ?
- 
+
     self.configuration = [0,0,0,0,0,0]
     self.tcp_frame = tcp_frame
     self.tool0_frame = tool0_frame
-    
+
     # transform world to robot origin
     self.T_W_R = rg.Transform.PlaneToPlane(Frame.worldXY, self.basis_frame)
     # transform robot to world
     self.T_R_W = rg.Transform.PlaneToPlane(self.basis_frame, Frame.worldXY)
     """
-    
+
     def __init__(self):
-        
-        self.model = [] # a list of meshes
+
+        self.model = []  # a list of meshes
         self.model_loaded = False
         self.basis_frame = None
         # move to UR !!!!
@@ -37,10 +38,10 @@ class Robot(object):
         self.tool = Tool(Frame.worldXY())
         self.configuration = None
         self.tool0_frame = Frame.worldXY()
-        
+
     def load_model(self):
         self.model_loaded = True
-        
+
     def set_base(self, base_frame):
         # move to UR !!!!
         self.base_frame = base_frame
@@ -49,50 +50,48 @@ class Robot(object):
         # transformation matrix from robot coordinate system to world coordinate system
         self.transformation_WCS_RCS = Transformation.from_frame_to_frame(self.base_frame, Frame.worldXY())
         # modify joint axis !
-        
-    
+
     def set_tool(self, tool):
         self.tool = tool
-        
+
     def get_robot_configuration(self):
         raise NotImplementedError
-        
+
     @property
     def tcp_frame(self):
         return self.tool.tcp_frame
-    
+
     @property
     def transformation_tool0_tcp(self):
         return self.tool.transformation_T0_T
-    
-    @property   
+
+    @property
     def transformation_tcp_tool0(self):
         return self.tool.transformation_T_T0
-    
+
     def forward_kinematics(self, q):
         """Calculate the tcp frame according to the joint angles q.
         """
         raise NotImplementedError
-    
+
     def inverse_kinematics(self, tcp_frame_RCS):
         """Calculate solutions (joint angles) according to the queried tcp frame
         (in RCS).
         """
         raise NotImplementedError
-    
+
     def get_frame_in_RCS(self, frame_WCS):
-        """Transform the frame in world coordinate system (WCS) into a frame in 
+        """Transform the frame in world coordinate system (WCS) into a frame in
         robot coordinate system (RCS), which is set by the robots' basis frame.
         """
         frame_RCS = frame_WCS.transform(self.transformation_WCS_RCS, copy=True)
         #frame_RCS = frame_WCS.transform(self.transformation_RCS_WCS)
         return frame_RCS
-    
-            
+
     def get_tool0_frame_from_tcp_frame(self, frame_tcp):
         """Get the tool0 frame (frame at robot) from the tool frame (tcp),
         according to the set tool.
-        
+
         """
         T = Transformation.from_frame(frame_tcp)
         return Frame.from_transformation(T * self.transformation_tool0_tcp)
@@ -110,19 +109,20 @@ class BaseConfiguration(object):
 
     Examples:
 
-        >>> from compas_fabrication.fabrication.robots import BaseConfiguration
+        >>> from compas_fab.fab.robots import BaseConfiguration
         >>> config = BaseConfiguration.from_data({'joint_values': [90., 0., 0.]})
         >>> config.joint_values
         [90.0, 0.0, 0.0]
 
 
-        >>> from compas_fabrication.fabrication.robots import BaseConfiguration
+        >>> from compas_fab.fab.robots import BaseConfiguration
         >>> config = BaseConfiguration.from_data({'joint_values': [90., 0., 0., 0., 180., 45.],\
                                                  'external_axes': [8312.0]})
         >>> str(config)
         'joints: [90.0, 0.0, 0.0, 0.0, 180.0, 45.0], external_axes: [8312.0]'
 
     """
+
     def __init__(self):
         self.joint_values = None
         self.external_axes = None
@@ -204,6 +204,7 @@ class Pose(object):
         values (:obj:`list` of :obj:`float`): list of 12 or 16 values representing a 4x4 matrix.
             If 12 values are provided, the last row is assumed to be ``[0 0 0 1]``.
     """
+
     def __init__(self):
         self.values = []
 

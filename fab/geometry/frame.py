@@ -1,5 +1,5 @@
 from compas.geometry import cross_vectors, normalize_vector
-from compas_fabrication.fabrication.geometry.transformation import Rotation, Transformation
+from compas_fab.fab.geometry.transformation import Rotation, Transformation
 
 __author__     = ['Romana Rust <rust@arch.ethz.ch>', ]
 

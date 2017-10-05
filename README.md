@@ -1,10 +1,10 @@
-# compas fabrication package
+# compas_fab package
 
 Package for the compas framework aimed at providing tools for robotic fabrication.
 
 ## How to use it?
 
-Check out the [Examples and Documentation here](https://gramaziokohlerresearch.bitbucket.io/compas_fabrication).
+Check out the [Examples and Documentation here](https://gramaziokohlerresearch.bitbucket.io/compas_fab).
 
 ## How to contribute?
 

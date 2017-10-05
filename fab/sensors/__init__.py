@@ -1,11 +1,11 @@
 """
-.. _compas_fabrication.fabrication.sensors:
+.. _compas_fab.fab.sensors:
 
 ********************************************************************************
-compas_fabrication.fabrication.sensors
+compas_fab.fab.sensors
 ********************************************************************************
 
-.. module:: compas_fabrication.fabrication.sensors
+.. module:: compas_fab.fab.sensors
 
 Package containing a common interface to integrate sensors of various vendors.
 
@@ -17,9 +17,9 @@ Package containing a common interface to integrate sensors of various vendors.
 Baumer sensors
 ==============
 
-.. currentmodule:: compas_fabrication.fabrication.sensors.baumer
+.. currentmodule:: compas_fab.fab.sensors.baumer
 
-:mod:`compas_fabrication.fabrication.sensors.baumer`
+:mod:`compas_fab.fab.sensors.baumer`
 
 .. autosummary::
     :toctree: generated/

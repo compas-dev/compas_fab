@@ -12,7 +12,7 @@ try:
     from System.Collections.Generic import List
     from System.Enum import ToObject
     from System.Array import CreateInstance
-    
+
     from Rhino.Geometry import Point3d
     from Rhino.Geometry import Vector3d
     from Rhino.Geometry import Line
@@ -35,7 +35,7 @@ except ImportError:
     import platform
     if platform.python_implementation() == 'IronPython':
         raise
-    
+
 __author__     = ['Romana Rust', ]
 __email__      = 'rust@arch.ethz.ch'
 

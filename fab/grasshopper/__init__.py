@@ -1,11 +1,11 @@
 """
-.. _compas_fabrication.fabrication.grasshopper:
+.. _compas_fab.fab.grasshopper:
 
 ********************************************************************************
-compas_fabrication.fabrication.grasshopper
+compas_fab.fab.grasshopper
 ********************************************************************************
 
-.. module:: compas_fabrication.fabrication.grasshopper
+.. module:: compas_fab.fab.grasshopper
 
 Utility functions to simplify integration with Grasshopper 3D.
 
@@ -18,9 +18,9 @@ Utility functions to simplify integration with Grasshopper 3D.
 Path planning
 =============
 
-.. currentmodule:: compas_fabrication.fabrication.grasshopper.path_planning
+.. currentmodule:: compas_fab.fab.grasshopper.path_planning
 
-:mod:`compas_fabrication.fabrication.grasshopper.path_planning`
+:mod:`compas_fab.fab.grasshopper.path_planning`
 
 .. autosummary::
     :toctree: generated/

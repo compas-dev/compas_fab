@@ -1,11 +1,11 @@
 """
-.. _compas_fabrication.fabrication.robots:
+.. _compas_fab.fab.robots:
 
 ********************************************************************************
-compas_fabrication.fabrication.robots
+compas_fab.fab.robots
 ********************************************************************************
 
-.. module:: compas_fabrication.fabrication.robots
+.. module:: compas_fab.fab.robots
 
 Package containing base clases for robot simulation and control.
 

@@ -93,7 +93,7 @@ class PathPlan(object):
             yield Robot(int(key)), self.paths[key]
 
 
-# TODO: This should inherit from compas_fabrication.fabrication.robots.Robot
+# TODO: This should inherit from compas_fab.fab.robots.Robot
 # once that is in place.
 class Robot(object):
     """Represents an instance of the ABB robots of the Robotic Fabrication Lab.
@@ -139,7 +139,7 @@ class Robot(object):
 
         Examples:
 
-            >>> from compas_fabrication.fabrication.robots.rfl import Simulator
+            >>> from compas_fab.fab.robots.rfl import Simulator
             >>> with Simulator() as simulator:
             ...     robot = Robot(11, simulator)
             ...     robot.set_config(Configuration.from_joints_and_external_axes(

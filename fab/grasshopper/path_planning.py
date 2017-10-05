@@ -2,10 +2,10 @@ from __future__ import print_function
 
 import logging
 from timeit import default_timer as timer
-from compas_fabrication.fabrication.robots import Pose
-from compas_fabrication.fabrication.robots.rfl import Configuration, SimulationCoordinator
-from compas_fabrication.fabrication.grasshopper.geometry import xform_from_matrix, vrep_pose_from_plane
-from compas_fabrication.fabrication.grasshopper.helpers import mesh_from_guid
+from compas_fab.fab.robots import Pose
+from compas_fab.fab.robots.rfl import Configuration, SimulationCoordinator
+from compas_fab.fab.grasshopper.geometry import xform_from_matrix, vrep_pose_from_plane
+from compas_fab.fab.grasshopper.helpers import mesh_from_guid
 
 try:
     import clr
@@ -17,7 +17,7 @@ except ImportError:
     if platform.python_implementation() == 'IronPython':
         raise
 
-LOG = logging.getLogger('compas_fabrication.grasshopper.path_planning')
+LOG = logging.getLogger('compas_fab.grasshopper.path_planning')
 
 
 def _transform_to_origin(mesh, xform):

@@ -1,5 +1,4 @@
 from __future__ import print_function
-import sys
 
 try:
     import rhinoscriptsyntax as rs
@@ -8,10 +7,11 @@ except ImportError:
     import platform
     if platform.python_implementation() == 'IronPython':
         raise
-    
+
 from compas.datastructures.mesh import Mesh
-from compas_fabrication.fabrication.grasshopper import xdraw_mesh
+from compas_fab.fab.grasshopper import xdraw_mesh
 from compas.utilities.colors import color_to_colordict
+
 
 def mesh_from_guid(guid, **kwargs):
     """Creates an instance of a compAS mesh class from an identifier
@@ -110,8 +110,8 @@ def draw_mesh(mesh,
                     faces.append(vertices)
 
         return xdraw_mesh(xyz, faces, color)
-    
-    
+
+
 #     if show_edges:
 #         lines = []
 #         color = mesh.attributes['color.edge']
@@ -123,7 +123,7 @@ def draw_mesh(mesh,
 #                 'color': edgecolor.get((u, v), color),
 #             })
 #         xdraw_lines(lines)
-# 
+#
 #     if show_wireframe:
 #         lines = []
 #         color = mesh.attributes['color.edge']
@@ -135,7 +135,7 @@ def draw_mesh(mesh,
 #                 'color': edgecolor.get((u, v), color),
 #             })
 #         xdraw_lines(lines)
-# 
+#
 #     if show_vertices:
 #         points = []
 #         color  = mesh.attributes['color.vertex']
