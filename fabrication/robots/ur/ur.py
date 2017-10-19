@@ -95,6 +95,11 @@ class UR(Robot):
         
         return R0, R1, R2, R3, R4, R5
     
+    def get_transformed_tool_frames(self, R5):
+        tool0_frame = self.tool0_frame.transform(R5, copy=True)
+        tcp_frame = Frame.from_transformation(Transformation.from_frame(tool0_frame) * self.transformation_tool0_tcp)
+        return tool0_frame, tcp_frame
+    
     def get_transformed_model(self, q):
         """Calculate robot model according to the configuration.
         
@@ -107,7 +112,9 @@ class UR(Robot):
         Get the transformed meshes of the robot model.
         """
         R0, R1, R2, R3, R4, R5 = self.get_forward_transformations(q)
-                
+        
+        tool0_frame, tcp_frame = self.get_transformed_tool_frames(R5)
+        
         # transform the original vertices, rather than the mesh.vertices,
         # otherwise the already transformed vertices are transformed
         m0_xyz = R0.transform(self.m0_xyz)
@@ -116,10 +123,7 @@ class UR(Robot):
         m3_xyz = R3.transform(self.m3_xyz)
         m4_xyz = R4.transform(self.m4_xyz)
         m5_xyz = R5.transform(self.m5_xyz)
-        
-        tool0_frame = self.tool0_frame.transform(R5, copy=True)
-        tcp_frame = Frame.from_transformation(Transformation.from_frame(tool0_frame) * self.transformation_tool0_tcp)
-        
+                
         # update the meshes
         mesh_update_vertices(self.m0, m0_xyz)
         mesh_update_vertices(self.m1, m1_xyz)

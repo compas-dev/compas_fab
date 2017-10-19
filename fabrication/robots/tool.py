@@ -1,9 +1,3 @@
-'''
-Created on 01.03.2017
-
-@author: rustr
-'''
-
 from compas_fabrication.fabrication.geometry import Frame, Transformation
 from compas_fabrication.fabrication.geometry.helpers import mesh_update_vertices
 
@@ -39,9 +33,12 @@ class Tool(object):
         return bool(self.model)
     
     def get_transformed_tool_model(self, tcp_frame):
-        T = Transformation.from_frame(tcp_frame) * self.transformation_T_T0
-        model_xyz = T.transform(self.model_xyz)
-        mesh_update_vertices(self.model, model_xyz)
-        return self.model
+        if self.has_model:
+            T = Transformation.from_frame(tcp_frame) * self.transformation_T_T0
+            model_xyz = T.transform(self.model_xyz)
+            mesh_update_vertices(self.model, model_xyz)
+            return self.model
+        else:
+            return None
             
         
