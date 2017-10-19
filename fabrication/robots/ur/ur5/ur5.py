@@ -39,4 +39,4 @@ class UR5(UR):
     
 if __name__ == "__main__":
     ur5 = UR5()
-
+    print ur5.get_forward_transformations([1,3,4,5,1,0])

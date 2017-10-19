@@ -10,7 +10,6 @@ from compas_fabrication.fabrication.geometry import Frame, Rotation, Transformat
 from kinematics import forward_kinematics, inverse_kinematics
 
 from compas.datastructures.mesh import Mesh
-from compas.geometry.elements import Line
 
 from compas_fabrication.fabrication.geometry.helpers import mesh_update_vertices
 
@@ -18,7 +17,17 @@ from compas_fabrication.fabrication.geometry.helpers import mesh_update_vertices
 class UR(Robot):
     """The UR robot class.
     """
-        
+    
+    d1 = 0
+    a2 = 0
+    a3 = 0
+    d4 = 0
+    d5 = 0
+    d6 = 0
+    
+    shoulder_offset = 0
+    elbow_offset = 0
+    
     def __init__(self):
         super(UR, self).__init__()
         
@@ -26,14 +35,14 @@ class UR(Robot):
         
         # j0 - j5 are the axes around which the joints m0 - m5 rotate, e.g. m0 
         # rotates around j0, m1 around j1, etc.
-        self.j0 = Line((0, 0, 0),                 (0, 0, d1))
-        self.j1 = Line((0, 0, d1),                (0, -self.shoulder_offset, d1))
-        self.j2 = Line((a2, -self.shoulder_offset-self.elbow_offset, d1), (a2, -self.shoulder_offset, d1))
-        self.j3 = Line((a2+a3, 0, d1),            (a2+a3,-d4, d1))
-        self.j4 = Line((a2+a3, -d4, d1),          (a2+a3, -d4, d1-d5))
-        self.j5 = Line((a2+a3, -d4, d1-d5),       (a2+a3, -d4-d6, d1-d5))        
+        self.j0 = [(0, 0, 0),                 (0, 0, d1)]
+        self.j1 = [(0, 0, d1),                (0, -self.shoulder_offset, d1)]
+        self.j2 = [(a2, -self.shoulder_offset-self.elbow_offset, d1), (a2, -self.shoulder_offset, d1)]
+        self.j3 = [(a2+a3, 0, d1),            (a2+a3,-d4, d1)]
+        self.j4 = [(a2+a3, -d4, d1),          (a2+a3, -d4, d1-d5)]
+        self.j5 = [(a2+a3, -d4, d1-d5),       (a2+a3, -d4-d6, d1-d5)]        
         
-        self.tool0_frame = Frame(self.j5.end, [-1,0,0], [0,0,-1])
+        self.tool0_frame = Frame(self.j5[1], [-1,0,0], [0,0,-1])
         
     @property
     def params(self):
@@ -70,20 +79,24 @@ class UR(Robot):
     
     def get_forward_transformations(self, joint_angles):
         
+        def vector(line):
+            start, end = line
+            return [end[0] - start[0], end[1] - start[1], end[2] - start[2]]
+        
         q0, q1, q2, q3, q4, q5 = joint_angles
         j0, j1, j2, j3, j4, j5 = self.j0, self.j1, self.j2, self.j3, self.j4, self.j5
         
-        R0 = Rotation.from_axis_and_angle(j0.vector, q0, j0.end)
-        j1 = Line(R0.transform(j1.start), R0.transform(j1.end))
-        R1 = Rotation.from_axis_and_angle(j1.vector, q1, j1.end) * R0
-        j2 = Line(R1.transform(j2.start), R1.transform(j2.end))
-        R2 = Rotation.from_axis_and_angle(j2.vector, q2, j2.end) * R1
-        j3 = Line(R2.transform(j3.start), R2.transform(j3.end))
-        R3 = Rotation.from_axis_and_angle(j3.vector, q3, j3.end) * R2
-        j4 = Line(R3.transform(j4.start), R3.transform(j4.end))
-        R4 = Rotation.from_axis_and_angle(j4.vector, q4, j4.end) * R3
-        j5 = Line(R4.transform(j5.start), R4.transform(j5.end))
-        R5 = Rotation.from_axis_and_angle(j5.vector, q5, j5.end) * R4
+        R0 = Rotation.from_axis_and_angle(vector(j0), q0, j0[1])
+        j1 = [R0.transform(j1[0]), R0.transform(j1[1])]
+        R1 = Rotation.from_axis_and_angle(vector(j1), q1, j1[1]) * R0
+        j2 = [R1.transform(j2[0]), R1.transform(j2[1])]
+        R2 = Rotation.from_axis_and_angle(vector(j2), q2, j2[1]) * R1
+        j3 = [R2.transform(j3[0]), R2.transform(j3[1])]
+        R3 = Rotation.from_axis_and_angle(vector(j3), q3, j3[1]) * R2
+        j4 = [R3.transform(j4[0]), R3.transform(j4[1])]
+        R4 = Rotation.from_axis_and_angle(vector(j4), q4, j4[1]) * R3
+        j5 = [R4.transform(j5[0]), R4.transform(j5[1])]
+        R5 = Rotation.from_axis_and_angle(vector(j5), q5, j5[1]) * R4
         
         # now apply the transformation to the base    
         R0 = self.transformation_RCS_WCS * R0
