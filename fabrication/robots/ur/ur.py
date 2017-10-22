@@ -42,7 +42,7 @@ class UR(Robot):
         self.j4 = [(a2+a3, -d4, d1),          (a2+a3, -d4, d1-d5)]
         self.j5 = [(a2+a3, -d4, d1-d5),       (a2+a3, -d4-d6, d1-d5)]        
         
-        self.tool0_frame = Frame(self.j5[1], [-1,0,0], [0,0,-1])
+        self.tool0_frame = Frame(self.j5[1], [1,0,0], [0,0,1])
         
     @property
     def params(self):
