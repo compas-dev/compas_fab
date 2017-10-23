@@ -46,11 +46,11 @@ class Robot(object):
         # move to UR !!!!
         self.base_frame = base_frame
         # transformation matrix from world coordinate system to robot coordinate system
-        self.transformation_RCS_WCS = Transformation.from_frame_to_frame(Frame.worldXY(), self.base_frame)
+        self.transformation_WCS_RCS = Transformation.from_frame_to_frame(Frame.worldXY(), self.base_frame)
         # transformation matrix from robot coordinate system to world coordinate system
-        self.transformation_WCS_RCS = Transformation.from_frame_to_frame(self.base_frame, Frame.worldXY())
-        # modify joint axis !
-
+        self.transformation_RCS_WCS = Transformation.from_frame_to_frame(self.base_frame, Frame.worldXY())
+        # modify joint axis !        
+    
     def set_tool(self, tool):
         self.tool = tool
 
@@ -82,12 +82,20 @@ class Robot(object):
 
     def get_frame_in_RCS(self, frame_WCS):
         """Transform the frame in world coordinate system (WCS) into a frame in
-        robot coordinate system (RCS), which is set by the robots' basis frame.
+        robot coordinate system (RCS), which is defined by the robots' basis frame.
         """
         frame_RCS = frame_WCS.transform(self.transformation_WCS_RCS, copy=True)
         #frame_RCS = frame_WCS.transform(self.transformation_RCS_WCS)
         return frame_RCS
-
+    
+    def get_frame_in_WCS(self, frame_RCS):
+        """Transform the frame in robot coordinate system (RCS) into a frame in 
+        world coordinate system (WCS), which is defined by the robots' basis frame.
+        """
+        frame_WCS = frame_RCS.transform(self.transformation_RCS_WCS, copy=True)
+        return frame_WCS
+    
+            
     def get_tool0_frame_from_tcp_frame(self, frame_tcp):
         """Get the tool0 frame (frame at robot) from the tool frame (tcp),
         according to the set tool.

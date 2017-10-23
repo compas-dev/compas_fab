@@ -1,4 +1,4 @@
-from compas.geometry.utilities import multiply_matrices
+from compas.geometry.basic import multiply_matrices
 
 # TODO: move this somewhere else !!! to mesh algorithms or operations ??
 def mesh_get_transformed_vertices(mesh, transformation_matrix):

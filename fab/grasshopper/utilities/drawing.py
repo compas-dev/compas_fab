@@ -196,6 +196,31 @@ def xdraw_mesh(vertices, faces, vertex_normals=None, texture_coordinates=None, v
             
     return mesh
 
+def draw_network(network):
+    """Draw a network data structure in Grasshopper.
+
+    """
+    points = []
+    for key, attr in network.vertices_iter(True):
+        points.append({
+            'pos'  : network.vertex_coordinates(key),
+        })
+
+    lines = []
+    for u, v, attr in network.edges_iter(True):
+        lines.append({
+            'start': network.vertex_coordinates(u),
+            'end'  : network.vertex_coordinates(v),
+        })
+
+    points_rg   = xdraw_points(
+        points
+    )
+    lines_rg    = xdraw_lines(
+        lines
+    )
+    
+    return points_rg, lines_rg
 
 # ==============================================================================
 # Debugging
