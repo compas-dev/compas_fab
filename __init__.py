@@ -1,11 +1,11 @@
 """
-.. _compas_fabrication:
+.. _compas_fab:
 
 ********************************************************************************
-compas_fabrication
+compas_fab
 ********************************************************************************
 
-.. module:: compas_fabrication
+.. module:: compas_fab
 
 Main package for robotics fabrication for the compas framework.
 
@@ -14,10 +14,10 @@ Main package for robotics fabrication for the compas framework.
 .. toctree::
     :maxdepth: 2
 
-    compas_fabrication.fabrication.grasshopper
-    compas_fabrication.fabrication.robots
-    compas_fabrication.fabrication.robots.rfl
-    compas_fabrication.fabrication.sensors
+    compas_fab.fab.grasshopper
+    compas_fab.fab.robots
+    compas_fab.fab.robots.rfl
+    compas_fab.fab.sensors
 
 """
 

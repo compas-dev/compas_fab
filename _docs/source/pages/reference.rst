@@ -7,4 +7,4 @@ API Reference
 .. toctree::
     :maxdepth: 2
 
-    reference/compas_fabrication
+    reference/compas_fab

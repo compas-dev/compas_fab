@@ -11,7 +11,7 @@ with the RFL scene pre-loaded. There are two options to run v-rep:
 
  * `Download it <http://www.coppeliarobotics.com/downloads.html>`_, install it
    and open the RFL scene file contained in this package
-   (``fabrication\robots\rfl\vrep_remote_api\rfl_scene.ttt``).
+   (``fab\robots\rfl\vrep_remote_api\rfl_scene.ttt``).
  * Install as a service using Docker (only on Windows 10 and higher):
 
    * Make sure you have `Docker <https://www.docker.com/>`_ installed.
@@ -29,7 +29,7 @@ is working.
 Copy and paste the following example and run it, you should see ``Connected: True``
 if everything is working properly::
 
-    from compas_fabrication.fabrication.robots.rfl import *
+    from compas_fab.fab.robots.rfl import *
 
     with Simulator() as simulator:
         print ('Connected: %s' % simulator.is_connected())
@@ -47,11 +47,11 @@ The RFL has 4 robots that can be referenced by an identifier: ``11``, ``12``, ``
 
 It's important to make sure all four of them are positioned correctly and not colliding with each other at start, otherwise path planning will fail.
 
-The position of a robot is specified as an instance of :class:`compas_fabrication.fabrication.robots.rfl.Configuration`.
+The position of a robot is specified as an instance of :class:`compas_fab.fab.robots.rfl.Configuration`.
 
 Here's a simple example on how to position two of the robots using forward kinematics::
 
-    from compas_fabrication.fabrication.robots.rfl import *
+    from compas_fab.fab.robots.rfl import *
 
     config_robot_a    = Configuration.from_joints_and_external_axes([190, 0, 0, 0, 90, 0],
                                                                   [8260, -1000, -3690])
@@ -77,8 +77,8 @@ the process. In its minimal expression, a path planning request must define a st
 configuration and a goal pose and rely on defaults for the rest. Here is an example
 of such a request::
 
-    from compas_fabrication.fabrication.robots import Pose
-    from compas_fabrication.fabrication.robots.rfl import *
+    from compas_fab.fab.robots import Pose
+    from compas_fab.fab.robots.rfl import *
 
     start_config    = Configuration.from_joints_and_external_axes([-143, 37, -112, 0, -15, -126],
                                                                 [8260, -5320, -3690])
@@ -102,9 +102,9 @@ calculating a path plan::
 
     import logging
     from compas.datastructures.mesh import Mesh
-    from compas_fabrication import get_data
-    from compas_fabrication.fabrication.robots import Pose
-    from compas_fabrication.fabrication.robots.rfl import *
+    from compas_fab import get_data
+    from compas_fab.fab.robots import Pose
+    from compas_fab.fab.robots.rfl import *
 
     # Configure logging to DEBUG to see detailed timing of the path planning
     logging.basicConfig(level=logging.DEBUG)

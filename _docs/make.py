@@ -1,11 +1,11 @@
 from importlib import import_module
 
 MODULES = [
-    'compas_fabrication',
-    'compas_fabrication.fabrication.robots',
-    'compas_fabrication.fabrication.robots.rfl',
-    'compas_fabrication.fabrication.sensors',
-    'compas_fabrication.fabrication.grasshopper'
+    'compas_fab',
+    'compas_fab.fab.robots',
+    'compas_fab.fab.robots.rfl',
+    'compas_fab.fab.sensors',
+    'compas_fab.fab.grasshopper'
 ]
 
 if __name__ == '__main__':
