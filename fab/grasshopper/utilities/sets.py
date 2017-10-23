@@ -1,6 +1,11 @@
-from Grasshopper import DataTree as Tree
-from Grasshopper.Kernel.Data import GH_Path as Path
-from System import Array
+try:
+    from Grasshopper import DataTree as Tree
+    from Grasshopper.Kernel.Data import GH_Path as Path
+    from System import Array
+except ImportError:
+    import platform
+    if platform.python_implementation() == 'IronPython':
+        raise
 
 
 def list_to_tree(alist, none_and_holes=False, base_path=[0]):

@@ -1,4 +1,9 @@
-import Grasshopper as gh
+try:
+    import Grasshopper as gh
+except ImportError:
+    import platform
+    if platform.python_implementation() == 'IronPython':
+        raise
 
 
 def gh_component_timer(ghenv, interval):
