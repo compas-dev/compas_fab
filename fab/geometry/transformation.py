@@ -1,5 +1,9 @@
 import math
-from compas.geometry.basic import multiply_matrix_vector, multiply_matrices
+# Support pre-release versions of compas
+try:
+    from compas.geometry.basic import multiply_matrix_vector, multiply_matrices
+except ImportError:
+    from compas.geometry.utilities import multiply_matrix_vector, multiply_matrices
 from compas.geometry import dot_vectors, normalize_vector, cross_vectors, length_vector, subtract_vectors, scale_vector
 
 __author__     = ['Romana Rust <rust@arch.ethz.ch>', ]
