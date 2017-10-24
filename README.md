@@ -4,7 +4,7 @@ Package for the compas framework aimed at providing tools for robotic fabricatio
 
 ## How to use it?
 
-Check out the [Examples and Documentation here](https://gramaziokohlerresearch.bitbucket.io/compas_fab).
+Check out the [Examples and Documentation here](https://gramaziokohler.github.io/compas_fab).
 
 ## How to contribute?
 
