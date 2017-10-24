@@ -1,6 +1,6 @@
 import math
-from compas_fabrication.fabrication.utilities import sign
-from compas_fabrication.fabrication.robots.ur.kinematics import inverse_kinematics
+from compas_fab.fab.utilities import sign
+from compas_fab.fab.robots.ur.kinematics import inverse_kinematics
 
 def format_joint_positions(joint_positions_a, joint_positions_b = [0,0,0,0,0,0]):
     """Add or subtract 2*pi to the joint positions a, so that they have the 
