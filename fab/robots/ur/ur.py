@@ -5,14 +5,12 @@ Created on 21.06.2017
 '''
 
 import os
+import math
+from compas.datastructures.mesh import Mesh
 from compas_fab.fab.robots import Robot
 from compas_fab.fab.geometry import Frame, Rotation, Transformation
-from kinematics import forward_kinematics, inverse_kinematics
-
-from compas.datastructures.mesh import Mesh
-
 from compas_fab.fab.geometry.helpers import mesh_update_vertices
-
+from .kinematics import forward_kinematics, inverse_kinematics
 
 class UR(Robot):
     """The UR robot class.
@@ -95,7 +93,7 @@ class UR(Robot):
         j4 = [R3.transform(j4[0]), R3.transform(j4[1])]
         R4 = Rotation.from_axis_and_angle(vector(j4), q4, j4[1]) * R3
         j5 = [R4.transform(j5[0]), R4.transform(j5[1])]
-        R5 = Rotation.from_axis_and_angle(vector(j5), q5, j5[1]) * R4
+        R5 = Rotation.from_axis_and_angle(vector(j5), q5 + math.pi, j5[1]) * R4 # this is UR specific !
         
         # now apply the transformation to the base    
         R0 = self.transformation_RCS_WCS * R0
@@ -109,7 +107,7 @@ class UR(Robot):
     
     def get_transformed_tool_frames(self, R5):
         tool0_frame = self.tool0_frame.transform(R5, copy=True)
-        tcp_frame = Frame.from_transformation(Transformation.from_frame(tool0_frame) * self.transformation_tool0_tcp)
+        tcp_frame = Frame.from_transformation(Transformation.from_frame(tool0_frame) * self.transformation_tcp_tool0)
         return tool0_frame, tcp_frame
     
     def get_transformed_model(self, q):

@@ -5,13 +5,10 @@ Created on 15.05.2017
 '''
 
 import matplotlib.pyplot as plt
-from graphviz import Digraph # build upon compas graph structure ?
 from fsm import FiniteStateMachine
 
 class FabricationProcess(FiniteStateMachine):
-    #===========================================================================
-    """
-    This class helps to plan, visualize and control the fabrication process. 
+    """This class helps to plan, visualize and control the fabrication process. 
     A fabrication process consists of several jobs that can be performed one 
     after the other, or, run in parallel. The sequence of the process is defined 
     through the starting job and the transitions between the jobs (e.g. job1 and

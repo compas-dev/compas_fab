@@ -63,11 +63,11 @@ class Robot(object):
 
     @property
     def transformation_tool0_tcp(self):
-        return self.tool.transformation_T0_T
+        return self.tool.transformation_tool0_tcp
 
     @property
     def transformation_tcp_tool0(self):
-        return self.tool.transformation_T_T0
+        return self.tool.transformation_tcp_tool0
 
     def forward_kinematics(self, q):
         """Calculate the tcp frame according to the joint angles q.
@@ -97,9 +97,7 @@ class Robot(object):
     
             
     def get_tool0_frame_from_tcp_frame(self, frame_tcp):
-        """Get the tool0 frame (frame at robot) from the tool frame (tcp),
-        according to the set tool.
-
+        """Get the tool0 frame (frame at robot) from the tool frame (frame_tcp).
         """
         T = Transformation.from_frame(frame_tcp)
         return Frame.from_transformation(T * self.transformation_tool0_tcp)

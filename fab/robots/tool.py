@@ -11,7 +11,7 @@ class Tool(object):
     - transformation matrix
 
     TODO:
-        - more tcps for tool!
+        - more tcps for one tool!
         - what about a tool with rotating/moving parts?
         - add tool kinematic?
     """
@@ -21,10 +21,8 @@ class Tool(object):
         self.model = None
         self.tool0_frame = Frame.worldXY()
         self.tcp_frame = tcp_frame
-        # TODO: Gonzalo: I find the single-letter part of the name a bit confusing. Maybe rename this to
-        # self.transformation_to_tool0 and self.transformation_from_tool0 (or similar)?
-        self.transformation_T0_T = Transformation.from_frame_to_frame(self.tcp_frame, self.tool0_frame)
-        self.transformation_T_T0 = Transformation.from_frame_to_frame(self.tool0_frame, self.tcp_frame)
+        self.transformation_tool0_tcp = Transformation.from_frame_to_frame(self.tcp_frame, self.tool0_frame)
+        self.transformation_tcp_tool0 = Transformation.from_frame_to_frame(self.tool0_frame, self.tcp_frame)
 
     def load_model(self):
         pass
@@ -35,7 +33,7 @@ class Tool(object):
 
     def get_transformed_tool_model(self, tcp_frame):
         if self.has_model:
-            T = Transformation.from_frame(tcp_frame) * self.transformation_T_T0
+            T = Transformation.from_frame(tcp_frame) * self.transformation_tool0_tcp
             model_xyz = T.transform(self.model_xyz)
             mesh_update_vertices(self.model, model_xyz)
             return self.model
