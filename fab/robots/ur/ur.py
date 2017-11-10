@@ -40,7 +40,9 @@ class UR(Robot):
         self.j4 = [(a2+a3, -d4, d1),          (a2+a3, -d4, d1-d5)]
         self.j5 = [(a2+a3, -d4, d1-d5),       (a2+a3, -d4-d6, d1-d5)]        
         
+        # check difference ur5 and ur10!!!
         self.tool0_frame = Frame(self.j5[1], [1,0,0], [0,0,1])
+        #self.tool0_frame = Frame(self.j5[1], [-1,0,0], [0,0,-1])
         
     @property
     def params(self):
@@ -93,7 +95,7 @@ class UR(Robot):
         j4 = [R3.transform(j4[0]), R3.transform(j4[1])]
         R4 = Rotation.from_axis_and_angle(vector(j4), q4, j4[1]) * R3
         j5 = [R4.transform(j5[0]), R4.transform(j5[1])]
-        R5 = Rotation.from_axis_and_angle(vector(j5), q5 + math.pi, j5[1]) * R4 # this is UR specific !
+        R5 = Rotation.from_axis_and_angle(vector(j5), q5, j5[1]) * R4
         
         # now apply the transformation to the base    
         R0 = self.transformation_RCS_WCS * R0
@@ -168,5 +170,4 @@ class UR(Robot):
         Returns:
             list: A list of possible configurations.                    
         """
-    
         return inverse_kinematics(tool0_frame_RCS, self.params)

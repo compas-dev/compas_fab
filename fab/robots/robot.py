@@ -101,6 +101,12 @@ class Robot(object):
         """
         T = Transformation.from_frame(frame_tcp)
         return Frame.from_transformation(T * self.transformation_tool0_tcp)
+    
+    def get_tcp_frame_from_tool0_frame(self, frame_tool0):
+        """Get the tcp frame from the tool0 frame.
+        """
+        T = Transformation.from_frame(frame_tool0)
+        return Frame.from_transformation(T * self.transformation_tcp_tool0)
 
 
 class BaseConfiguration(object):

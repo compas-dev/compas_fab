@@ -36,6 +36,7 @@ def inverse_kinematics(frame, ur_params, q6_des=0.0):
     T[1], T[5], T[9] = frame.xaxis
     T[2], T[6], T[10] = frame.yaxis
     T[3], T[7], T[11] = frame.point
+    T[15] = 1
 
     try:
         qsols = inverse_ros(T, ur_params, q6_des)
@@ -61,9 +62,9 @@ def forward_kinematics(configuration, ur_params):
     Returns:
         the frame
     """
-
+    
     configuration[0] += math.pi
-
+    
     T = forward_ros(configuration, ur_params)
 
     xaxis = [T[1], T[5], T[9]]
@@ -71,7 +72,7 @@ def forward_kinematics(configuration, ur_params):
     point = [T[3], T[7], T[11]]
 
     return Frame(point, xaxis, yaxis)
-
+    
 
 if __name__ == "__main__":
 

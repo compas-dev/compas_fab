@@ -1,6 +1,7 @@
+from __future__ import print_function
 from compas_fab import get_data
 from compas_fab.fab.robots.ur import UR
-
+import math
 
 class UR5(UR):
     """ The UR 5 robot class.
@@ -34,8 +35,31 @@ class UR5(UR):
 
     def get_model_path(self):
         return get_data("robots/ur/ur5")
-
+        
 
 if __name__ == "__main__":
+    from compas_fab.fab.geometry import Frame
     ur5 = UR5()
-    print ur5.get_forward_transformations([1,3,4,5,1,0])
+    R0, R1, R2, R3, R4, R5 = ur5.get_forward_transformations([1,3,4,5,1,0])
+    print(ur5.forward_kinematics([1,3,4,5,1,0]))
+    
+    print(ur5.get_transformed_tool_frames(R5))
+    
+    q = [-0.44244, -1.5318, 1.34588, -1.38512, -1.05009, -0.44941700000000001]
+    pose = [-511.698, 76.6692, 515.311, 2.02974, 2.04409, -0.72373500000000002]
+    
+    frame_RCS = Frame.from_pose_axis_angle_vector(pose)
+    
+    print("frame from robot RCS {0}".format(frame_RCS))
+
+    ur = UR5()
+    print("frame forward kin {0}".format(ur.forward_kinematics(q)))
+    R0, R1, R2, R3, R4, R5 = ur.get_forward_transformations(q)    
+    print("frame from transform {0}".format(ur.get_transformed_tool_frames(R5)[0]))
+    
+    
+    f = ur.forward_kinematics(q)
+    q = ur.inverse_kinematics(f)
+    
+    print(q)
+
