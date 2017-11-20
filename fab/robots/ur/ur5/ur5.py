@@ -35,6 +35,17 @@ class UR5(UR):
 
     def get_model_path(self):
         return get_data("robots/ur/ur5")
+    
+    def forward_kinematics(self, configuration):
+        q = configuration[:]
+        q[5] += math.pi
+        return super(UR5, self).forward_kinematics(configuration)
+                    
+    def inverse_kinematics(self, tool0_frame_RCS):
+        qsols = super(UR5, self).inverse_kinematics(tool0_frame_RCS)
+        for i in range(len(qsols)):
+            qsols[i][5] -= math.pi
+        return qsols
         
 
 if __name__ == "__main__":
