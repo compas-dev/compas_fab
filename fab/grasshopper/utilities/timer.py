@@ -6,21 +6,24 @@ except ImportError:
         raise
 
 
-def gh_component_timer(ghenv, interval):
-    """Calling this function from within a python Grasshopper component updates
-        the component after the given interval in ms.
+def update_component(ghenv, delay):
+    """Schedule an update of the Grasshopper component.
+
+    After the specified delay, the GH component will be automatically updated.
 
     Args:
-        ghenv (GhPython.Component.PythonEnvironment): just available from within the
-        python Grasshopper component
+        ghenv (:class:`GhPython.Component.PythonEnvironment`): just available from within the
+            python Grasshopper component.
 
-        interval (int): the time until the update is performed in milliseconds.
+        delay (:obj:`int`): Time in milliseconds until the update is performed.
     """
-    if interval <= 0:
-        interval = 1
-    ghComp = ghenv.Component
-    ghDoc = ghComp.OnPingDocument()
+    if delay <= 0:
+        raise ValueError('Delay must be greater than zero')
 
-    def callBack(ghDoc):
-        ghComp.ExpireSolution(False)
-    ghDoc.ScheduleSolution(interval, gh.Kernel.GH_Document.GH_ScheduleDelegate(callBack))
+    grasshopper_component = ghenv.Component
+    grasshopper_doc = grasshopper_component.OnPingDocument()
+
+    def callback(grasshopper_doc):
+        grasshopper_component.ExpireSolution(False)
+
+    grasshopper_doc.ScheduleSolution(delay, gh.Kernel.GH_Document.GH_ScheduleDelegate(callback))
