@@ -345,7 +345,7 @@ class Simulator(object):
 
     def _find_path_plan(self, robot, goal, metric_values, collision_meshes,
                         algorithm, trials, resolution,
-                        gantry_joint_limits, arm_joint_limits, shallow_state_search):
+                        gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length):
         if not metric_values:
             metric_values = [0.1] * robot.dof
 
@@ -387,12 +387,13 @@ class Simulator(object):
             string_param_list.append(','.join(map(str, joint_limits)))
 
         if self.debug:
-            LOG.debug('About to execute path planner: algorithm=%s, trials=%d, shallow_state_search=%s', algorithm, trials, shallow_state_search)
+            LOG.debug('About to execute path planner: algorithm=%s, trials=%d, shallow_state_search=%s, optimize_path_length=%s', algorithm, trials, shallow_state_search, optimize_path_length)
 
         res, _, path, _, _ = self.run_child_script('searchRobotPath',
                                                    [robot.index,
                                                     trials,
-                                                    (int)(resolution * 1000)],
+                                                    (int)(resolution * 1000),
+                                                    1 if optimize_path_length else 0],
                                                    states, string_param_list)
         if self.debug:
             LOG.debug('Execution time: search_robot_path=%.2f', timer() - start)
@@ -408,9 +409,8 @@ class Simulator(object):
 
     def find_path_plan_to_config(self, robot, goal_configs, metric_values=None, collision_meshes=None,
                                  algorithm='rrtconnect', trials=1, resolution=0.02,
-                                 gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True):
-        """Finds a path plan to move the selected robot from its current position
-        to one of the `goal_configs`.
+                                 gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
+        """Find a path plan to move the selected robot from its current position to one of the `goal_configs`.
 
         This function is useful when it is required to get a path plan that ends in one
         specific goal configuration.
@@ -436,6 +436,8 @@ class Simulator(object):
                 arm joints. Use this if you want to restrict the working area of the path planner.
             shallow_state_search (:obj:`bool`): True to search only a minimum of
                 valid states before searching a path, False to search states intensively.
+            optimize_path_length (:obj:`bool`): True to search the path with minimal total length among all `trials`,
+                False to return the first valid path found. It only affects the output if `trials > 1`.
 
         Returns:
             list: List of :class:`Configuration` objects representing the
@@ -443,13 +445,12 @@ class Simulator(object):
         """
         return self._find_path_plan(robot, {'target_type': 'config', 'target': goal_configs},
                                     metric_values, collision_meshes, algorithm, trials, resolution,
-                                    gantry_joint_limits, arm_joint_limits, shallow_state_search)
+                                    gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
 
     def find_path_plan(self, robot, goal_pose, metric_values=None, collision_meshes=None,
                        algorithm='rrtconnect', trials=1, resolution=0.02,
-                       gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True):
-        """Finds a path plan to move the selected robot from its current position
-        to the `goal_pose`.
+                       gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
+        """Find a path plan to move the selected robot from its current position to the `goal_pose`.
 
         Args:
             robot (:class:`.Robot`): Robot instance to move.
@@ -472,6 +473,8 @@ class Simulator(object):
                 arm joints. Use this if you want to restrict the working area of the path planner.
             shallow_state_search (:obj:`bool`): True to search only a minimum of
                 valid states before searching a path, False to search states intensively.
+            optimize_path_length (:obj:`bool`): True to search the path with minimal total length among all `trials`,
+                False to return the first valid path found. It only affects the output if `trials > 1`.
 
         Returns:
             list: List of :class:`Configuration` objects representing the
@@ -479,7 +482,7 @@ class Simulator(object):
         """
         return self._find_path_plan(robot, {'target_type': 'pose', 'target': goal_pose},
                                     metric_values, collision_meshes, algorithm, trials, resolution,
-                                    gantry_joint_limits, arm_joint_limits, shallow_state_search)
+                                    gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
 
     def add_building_member(self, robot, building_member_mesh):
         """Adds a building member to the RFL scene and attaches it to the robot.
@@ -587,6 +590,7 @@ class SimulationCoordinator(object):
             'debug': True,
             'trials': 1,
             'shallow_state_search': True,
+            'optimize_path_length': False,
             'algorithm': 'rrtconnect',
             'resolution': 0.02,
             'collision_meshes': [],
@@ -705,6 +709,7 @@ class SimulationCoordinator(object):
 
                 kwargs['trials'] = options.get('trials')
                 kwargs['shallow_state_search'] = options.get('shallow_state_search')
+                kwargs['optimize_path_length'] = options.get('optimize_path_length')
 
                 # Filter None values
                 kwargs = {k: v for k, v in kwargs.iteritems() if v is not None}
