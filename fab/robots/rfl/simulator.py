@@ -138,7 +138,7 @@ class Simulator(object):
             >>> with Simulator() as simulator:
             ...     matrices = simulator.get_object_matrices([0])
             ...     print(map(int, matrices[0]))
-            [569, -227, -790, 17616, -822, -157, -546, 16274, 0, 960, -276, 5461]
+            [87, 242, 966, -11851, 996, -21, -85, 6233, 0, 970, -243, 5785]
 
         .. note::
             The resulting dictionary is keyed by object handle.
