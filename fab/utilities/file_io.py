@@ -20,12 +20,15 @@ def read_csv_to_dictionary(csvfile, delimiter=';'):
     return data_dict
 
 
-def write_json_from_data(data, file):
-    obj = open(file, 'wb')
-    obj.write(data)
-    obj.close()
+def write_data_to_json(data, file):
+    """Write data to json file.
+    """
+    with open(file, 'w') as f:
+        json.dump(data, f)
 
-def read_json_from_file(file):
+def read_data_from_json(file):
+    """Read data from json file.
+    """
     with open(file) as f:    
         data = json.load(f)
     return data
