@@ -14,6 +14,7 @@ Utility functions to simplify integration with Grasshopper 3D.
 
     unload_modules
     mesh_from_guid
+    update_component
 
 Path planning
 =============

@@ -218,6 +218,7 @@ class PathPlanner(object):
         options['debug'] = kwargs.get('debug')
         options['trials'] = kwargs.get('trials')
         options['shallow_state_search'] = kwargs.get('shallow_state_search')
+        options['optimize_path_length'] = kwargs.get('optimize_path_length')
         options['algorithm'] = kwargs.get('algorithm')
         options['resolution'] = kwargs.get('resolution')
 
