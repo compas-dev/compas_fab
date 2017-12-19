@@ -1,7 +1,14 @@
 from __future__ import print_function
 
 import json
-import urllib2
+
+try:
+    # For Python 3.0 and later
+    from urllib.request import urlopen, Request
+except ImportError:
+    # Fall back to Python 2's urllib2
+    from urllib2 import urlopen, Request
+
 import math
 import socket
 import logging
@@ -642,8 +649,8 @@ class SimulationCoordinator(object):
     def remote_executor(cls, options, executor_host='127.0.0.1', port=7000):
         url = 'http://%s:%d/path-planner' % (executor_host, port)
         data = json.dumps(options, encoding='ascii')
-        request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Content-Length': str(len(data))})
-        f = urllib2.urlopen(request)
+        request = Request(url, data, {'Content-Type': 'application/json', 'Content-Length': str(len(data))})
+        f = urlopen(request)
         response = f.read()
         f.close()
 

@@ -502,9 +502,9 @@ if __name__ == "__main__":
     R = Reflection.from_point_and_normal(pt, normal)
         
     rot = Rotation.from_matrix(R.matrix)
-    print ">>", rot.axis_and_angle
+    print(rot.axis_and_angle)
     
-    print "==============="
+    print("===============")
     
     xaxis = [-0.1157, 0.3219, 0.9397]
     yaxis = [0.9411, 0.3382, 0.0000]
@@ -513,15 +513,14 @@ if __name__ == "__main__":
     rotation = Rotation.from_basis_vectors(xaxis, yaxis)
     translation = Translation.from_vector(vec)
     transformation = translation * rotation
-    print transformation
-    print
-    print transformation.inverse()
+    print(transformation)
+    print(transformation.inverse())
 
     from frame import Frame
     frame_from = Frame([-636.57, 370.83, 293.21], [0.00000, -0.54972, -0.83535], [0.92022, -0.32695, 0.21516])
     #frame_from = Frame.worldXY()
     frame_to = Frame([-983.14, 80.27, 152.91], [-0.70235, 0.00000, 0.71184], [-0.26490, -0.92818, -0.26137])
     
-    print Transformation.from_frame_to_frame(frame_from, frame_to)
+    print(Transformation.from_frame_to_frame(frame_from, frame_to))
     
     
