@@ -658,7 +658,7 @@ class SimulationCoordinator(object):
                         }
                     },
                     'joint_limits': {
-                        'gantry': [
+                        'external_axes': [
                             [0, 20000],
                             [-12000, 0],
                             [-4600, -1000]
@@ -743,8 +743,8 @@ class SimulationCoordinator(object):
 
                 if 'joint_limits' in active_robot_options:
                     joint_limits = active_robot_options['joint_limits']
-                    if joint_limits.get('gantry'):
-                        kwargs['gantry_joint_limits'] = [item for sublist in joint_limits.get('gantry') for item in sublist]
+                    if joint_limits.get('external_axes'):
+                        kwargs['external_axes_limits'] = [item for sublist in joint_limits.get('external_axes') for item in sublist]
                     if joint_limits.get('arm'):
                         kwargs['arm_joint_limits'] = [item for sublist in joint_limits.get('arm') for item in sublist]
 
