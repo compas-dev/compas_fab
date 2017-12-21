@@ -180,7 +180,7 @@ class Simulator(object):
             >>> with Simulator() as simulator:
             ...     matrices = simulator.get_object_matrices([0])
             ...     print(map(int, matrices[0]))
-            [0, 0, 0, -6, 0, 0, 0, -7, 0, 0, 0, -5]
+            [87, 242, 966, -11851, 996, -21, -85, 6233, 0, 970, -243, 5785]
 
         .. note::
             The resulting dictionary is keyed by object handle.
@@ -388,7 +388,7 @@ class Simulator(object):
 
     def _find_path_plan(self, robot, goal, metric_values, collision_meshes,
                         algorithm, trials, resolution,
-                        external_axes_limits, arm_joint_limits, shallow_state_search):
+                        external_axes_limits, arm_joint_limits, shallow_state_search, optimize_path_length):
         if not metric_values:
             metric_values = [0.1] * robot.dof
 
@@ -430,12 +430,13 @@ class Simulator(object):
             string_param_list.append(','.join(map(str, joint_limits)))
 
         if self.debug:
-            LOG.debug('About to execute path planner: algorithm=%s, trials=%d, shallow_state_search=%s', algorithm, trials, shallow_state_search)
+            LOG.debug('About to execute path planner: algorithm=%s, trials=%d, shallow_state_search=%s, optimize_path_length=%s', algorithm, trials, shallow_state_search, optimize_path_length)
 
         res, _, path, _, _ = self.run_child_script('searchRobotPath',
                                                    [robot.index,
                                                     trials,
-                                                    (int)(resolution * 1000)],
+                                                    (int)(resolution * 1000),
+                                                    1 if optimize_path_length else 0],
                                                    states, string_param_list)
         if self.debug:
             LOG.debug('Execution time: search_robot_path=%.2f', timer() - start)
@@ -451,9 +452,8 @@ class Simulator(object):
 
     def find_path_plan_to_config(self, robot, goal_configs, metric_values=None, collision_meshes=None,
                                  algorithm='rrtconnect', trials=1, resolution=0.02,
-                                 external_axes_limits=None, arm_joint_limits=None, shallow_state_search=True):
-        """Finds a path plan to move the selected robot from its current position
-        to one of the `goal_configs`.
+                                 external_axes_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
+        """Find a path plan to move the selected robot from its current position to one of the `goal_configs`.
 
         This function is useful when it is required to get a path plan that ends in one
         specific goal configuration.
@@ -478,6 +478,8 @@ class Simulator(object):
                 arm joints. Use this if you want to restrict the working area of the path planner.
             shallow_state_search (:obj:`bool`): True to search only a minimum of
                 valid states before searching a path, False to search states intensively.
+            optimize_path_length (:obj:`bool`): True to search the path with minimal total length among all `trials`,
+                False to return the first valid path found. It only affects the output if `trials > 1`.
 
         Returns:
             list: List of :class:`Configuration` objects representing the
@@ -485,13 +487,12 @@ class Simulator(object):
         """
         return self._find_path_plan(robot, {'target_type': 'config', 'target': goal_configs},
                                     metric_values, collision_meshes, algorithm, trials, resolution,
-                                    external_axes_limits, arm_joint_limits, shallow_state_search)
+                                    external_axes_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
 
     def find_path_plan(self, robot, goal_pose, metric_values=None, collision_meshes=None,
                        algorithm='rrtconnect', trials=1, resolution=0.02,
-                       external_axes_limits=None, arm_joint_limits=None, shallow_state_search=True):
-        """Finds a path plan to move the selected robot from its current position
-        to the `goal_pose`.
+                       external_axes_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
+        """Find a path plan to move the selected robot from its current position to the `goal_pose`.
 
         Args:
             robot (:class:`.Robot`): Robot instance to move.
@@ -513,6 +514,8 @@ class Simulator(object):
                 arm joints. Use this if you want to restrict the working area of the path planner.
             shallow_state_search (:obj:`bool`): True to search only a minimum of
                 valid states before searching a path, False to search states intensively.
+            optimize_path_length (:obj:`bool`): True to search the path with minimal total length among all `trials`,
+                False to return the first valid path found. It only affects the output if `trials > 1`.
 
         Returns:
             list: List of :class:`Configuration` objects representing the
@@ -520,7 +523,7 @@ class Simulator(object):
         """
         return self._find_path_plan(robot, {'target_type': 'pose', 'target': goal_pose},
                                     metric_values, collision_meshes, algorithm, trials, resolution,
-                                    external_axes_limits, arm_joint_limits, shallow_state_search)
+                                    external_axes_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
 
     def add_building_member(self, robot, building_member_mesh):
         """Adds a building member to the RFL scene and attaches it to the robot.
@@ -628,6 +631,7 @@ class SimulationCoordinator(object):
             'debug': True,
             'trials': 1,
             'shallow_state_search': True,
+            'optimize_path_length': False,
             'algorithm': 'rrtconnect',
             'resolution': 0.02,
             'collision_meshes': [],
@@ -706,7 +710,7 @@ class SimulationCoordinator(object):
                     elif r['start'].get('values'):
                         start = Pose.from_data(r['start'])
                         try:
-                            reachable_state = simulator.find_robot_states(robot, start, [0.] * robot.dof, 1, 1)
+                            reachable_state = simulator.find_robot_states(robot, start, metric_values=[0.] * robot.dof, max_trials=1, max_results=1)
                             start = reachable_state[-1]
                             LOG.info('Robot state found for start pose. External axes=%s, Joint values=%s', str(start.external_axes), str(start.joint_values))
                         except SimulationError:
@@ -746,6 +750,7 @@ class SimulationCoordinator(object):
 
                 kwargs['trials'] = options.get('trials')
                 kwargs['shallow_state_search'] = options.get('shallow_state_search')
+                kwargs['optimize_path_length'] = options.get('optimize_path_length')
 
                 # Filter None values
                 kwargs = {k: v for k, v in kwargs.iteritems() if v is not None}
