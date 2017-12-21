@@ -13,7 +13,12 @@ Package containing base clases for robot simulation and control.
     :toctree: generated/
 
     Pose
+    Robot
     BaseConfiguration
+    PathPlan
+    Simulator
+    SimulationCoordinator
+    SimulationError
 
 """
 

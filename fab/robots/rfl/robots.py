@@ -61,12 +61,12 @@ class Robot(BaseRobot):
     Args:
         id (:obj:`int`): Robot identifier.
         client (:obj:`object`): A client to execute the commands
-            such as :class:`.Simulator`.
+            such as :class:`..Simulator`.
 
     Attributes:
         id (:obj:`int`): Robot identifier.
         client (:obj:`object`): A client to execute the commands
-            such as :class:`.Simulator`.
+            such as :class:`..Simulator`.
         index (:obj:`int`): Robot index (for internal use).
         dof (:obj:`int`): Degrees of freedom.
     """
@@ -98,7 +98,7 @@ class Robot(BaseRobot):
 
         Examples:
 
-            >>> from compas_fab.fab.robots.rfl import Simulator
+            >>> from compas_fab.fab.robots import Simulator
             >>> with Simulator() as simulator:
             ...     robot = Robot(11, simulator)
             ...     robot.set_config(Configuration.from_joints_and_external_axes(

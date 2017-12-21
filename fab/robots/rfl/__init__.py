@@ -16,8 +16,6 @@ Lab) using robotic simulation tools like
 
     Robot
     Configuration
-    Simulator
-    SimulationCoordinator
 
 """
 

@@ -70,8 +70,7 @@ class PathPlan(object):
 
 
 class Simulator(object):
-    """Interface to run simulations on the RFL using VREP as
-    the engine for inverse kinematics.
+    """Interface to run robot simulations using VREP as the engine for kinematics and collision checking.
 
     :class:`.Simulator` is a context manager type, so it's best used in combination
     with the ``with`` statement to ensure resource deallocation.
@@ -80,6 +79,7 @@ class Simulator(object):
     Args:
         host (:obj:`str`): IP address or DNS name of the V-REP simulator.
         port (:obj:`int`): Port of the simulator.
+        scene(:obj:`str`): Name of the main scene model inside the V-REP simulator.
         scale(:obj:`int`): Scaling of the model. Defaults to millimeters (``1000``).
         debug (:obj:`bool`): True to enable debug messages, False otherwise.
 
@@ -283,7 +283,7 @@ class Simulator(object):
 
         Examples:
 
-            >>> from compas_fab.fab.robots import Robot
+            >>> from compas_fab.fab.robots.rfl import Robot
             >>> with Simulator() as simulator:
             ...     config = simulator.get_robot_config(Robot(11))
 

@@ -4,7 +4,7 @@ import logging
 from timeit import default_timer as timer
 from multiprocessing import Process, Manager
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from compas_fab.fab.robots.rfl import SimulationCoordinator, SimulationError
+from compas_fab.fab.robots import SimulationCoordinator, SimulationError
 
 logging.basicConfig(format='%(process)d [%(levelname)s] %(name)s: %(message)s', level=logging.DEBUG)
 LOG = logging.getLogger()
