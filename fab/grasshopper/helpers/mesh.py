@@ -91,7 +91,8 @@ def draw_mesh(mesh,
         color     = mesh.attributes['color.face']
 
         for fkey in mesh.face:
-            face = mesh.face_vertices(fkey, ordered=True)
+            #face = mesh.face_vertices(fkey, ordered=True)
+            face = mesh.face_vertices(fkey)
             v = len(face)
 
             if v < 3:
