@@ -1,6 +1,6 @@
 .. _home:
 
-Compas Fabrication Documentation
+compas_fab documentation
 ================================
 
 Documentation for the robotic fabrication package of the compas framework.
