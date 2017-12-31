@@ -7,7 +7,7 @@ Created on 21.06.2017
 import os
 import math
 from compas.datastructures.mesh import Mesh
-from compas_fab.fab.robots import Robot
+from compas_fab.fab.robots import Robot, BaseConfiguration
 from compas_fab.fab.geometry import Frame, Rotation, Transformation
 from compas_fab.fab.geometry.helpers import mesh_update_vertices
 from .kinematics import forward_kinematics, inverse_kinematics
@@ -15,20 +15,24 @@ from .kinematics import forward_kinematics, inverse_kinematics
 class UR(Robot):
     """The UR robot class.
     """
-        
+
     d1 = 0
     a2 = 0
     a3 = 0
     d4 = 0
     d5 = 0
     d6 = 0
-    
+
     shoulder_offset = 0
     elbow_offset = 0
-    
-    def __init__(self):
-        super(UR, self).__init__()
+
+    def __init__(self, client=None, client_options=None):
+        super(UR, self).__init__(client, client_options)
         
+        self.dof = 6
+        self.external_axes = 0
+        self.config_cls = BaseConfiguration
+
         d1, a2, a3, d4, d5, d6 = self.params
         
         # j0 - j5 are the axes around which the joints m0 - m5 rotate, e.g. m0 

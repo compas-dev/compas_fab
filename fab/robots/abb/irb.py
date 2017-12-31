@@ -57,6 +57,9 @@ class IRB4600(BaseRobot):
             raise ValueError('Robot ID is not valid, must be one of: ' + str(self.SUPPORTED_ROBOTS))
         self.id = id
         self.client = client
+        # TODO: Get rid of robot settings and supported ROBOT_SETTINGS
+        # index is only needed for internal V-REP usage, so it should be related
+        # to Simulator class, not specific robot classes
         self.name = self.ROBOT_SETTINGS[id]['name']
         self.index = self.SUPPORTED_ROBOTS.index(id)
         self.dof = 6

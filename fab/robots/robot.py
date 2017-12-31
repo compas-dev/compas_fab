@@ -25,12 +25,17 @@ class Robot(object):
     # transform robot to world
     self.T_R_W = rg.Transform.PlaneToPlane(self.basis_frame, Frame.worldXY)
     """
+    def __init__(self, client=None, client_options=None):
+        self.client = client
+        self.client_options = client_options
 
-    def __init__(self):
+        self.dof = 0
+        self.external_axes = 0
 
         self.model = []  # a list of meshes
         self.model_loaded = False
         self.basis_frame = None
+
         # move to UR !!!!
         self.transformation_RCS_WCS = None
         self.transformation_WCS_RCS = None
@@ -38,6 +43,43 @@ class Robot(object):
         self.tool = Tool(Frame.worldXY())
         self.configuration = None
         self.tool0_frame = Frame.worldXY()
+
+    def set_config(self, config):
+        """Move the robot the the specified configuration.
+
+        This requires a `client` to be assigned to this instance.
+
+        Args:
+            config (:class:`.BaseConfiguration`): Instance of robot's configuration.
+
+        Examples:
+
+            >>> from compas_fab.fab.robots import Simulator
+            >>> with Simulator() as simulator:
+            ...     robot = Robot(simulator)
+            ...     robot.set_config(BaseConfiguration.from_joints_and_external_axes(
+            ...                      [90, 0, 0, 0, 0, -90],
+            ...                      [7600, -4500, -4500]))
+            ...
+
+        """
+        if not self.client:
+            raise Exception('No client assigned to this robot instance')
+
+        self.client.set_robot_config(self, config)
+
+    def get_config(self):
+        """Get the current configuration of the robot.
+
+        This requires a `client` to be assigned to this instance.
+
+        Returns:
+            config: Instance of (:class:`.BaseConfiguration`).
+        """
+        if not self.client:
+            raise Exception('No client assigned to this robot instance')
+
+        return self.client.get_robot_config(self)
 
     def load_model(self):
         self.model_loaded = True
@@ -53,9 +95,6 @@ class Robot(object):
 
     def set_tool(self, tool):
         self.tool = tool
-
-    def get_robot_configuration(self):
-        raise NotImplementedError
 
     @property
     def tcp_frame(self):

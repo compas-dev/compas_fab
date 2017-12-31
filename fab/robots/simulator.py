@@ -46,7 +46,7 @@ class PathPlan(object):
             path_plan (:obj:`list``or :class:`.`Configuration`): List of configurations
                 representing a full path.
         """
-        self.paths[str(robot.id)] = path_plan
+        self.paths[str(robot.client_options['id'])] = path_plan
 
     def get_robot_plan(self, robot):
         """Gets the path plan for a specific robot.
@@ -57,7 +57,7 @@ class PathPlan(object):
         Returns:
             List of configurations representing a full path.
         """
-        key = str(robot.id)
+        key = str(robot.client_options['id'])
         if key not in self.paths:
             raise ValueError('No path plan stored for the specified robot: ' + key)
 
@@ -66,7 +66,8 @@ class PathPlan(object):
     def all_paths(self):
         """Iterator over all paths currently defined."""
         for key in self.paths:
-            yield Robot(int(key)), self.paths[key]
+            # TODO: Check calling code, the return value changed
+            yield key, self.paths[key]
 
 
 class Simulator(object):
@@ -79,7 +80,6 @@ class Simulator(object):
     Args:
         host (:obj:`str`): IP address or DNS name of the V-REP simulator.
         port (:obj:`int`): Port of the simulator.
-        scene(:obj:`str`): Name of the main scene model inside the V-REP simulator.
         scale(:obj:`int`): Scaling of the model. Defaults to millimeters (``1000``).
         debug (:obj:`bool`): True to enable debug messages, False otherwise.
 
@@ -97,7 +97,7 @@ class Simulator(object):
                             'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar',
                             'sbl', 'stride', 'trrt')
 
-    def __init__(self, host='127.0.0.1', port=19997, scene='RFL', scale=DEFAULT_SCALE, debug=False):
+    def __init__(self, host='127.0.0.1', port=19997, scale=DEFAULT_SCALE, debug=False):
         self.client_id = None
         self.host = resolve_host(host)
         self.port = port
@@ -105,7 +105,6 @@ class Simulator(object):
         self.thread_cycle_in_ms = 5
         self.debug = debug
         self.scale = float(scale)
-        self._lua_script_name = scene
         self._added_handles = []
 
     def __enter__(self):
@@ -185,17 +184,20 @@ class Simulator(object):
         .. note::
             The resulting dictionary is keyed by object handle.
         """
-        _res, _, matrices, _, _ = self.run_child_script('getShapeMatrices', object_handles, [], [])
+        _res, _, matrices, _, _ = self.run_child_script('API', 'getShapeMatrices', object_handles, [], [])
         return dict([(object_handles[i // 12], floats_from_vrep(matrices[i:i + 12], self.scale)) for i in range(0, len(matrices), 12)])
 
-    def get_all_visible_handles(self):
+    def get_all_visible_handles(self, root_name):
         """Gets a list of object handles (identifiers) for all visible
         shapes of the 3D scene model.
+
+        Args:
+            root_name (:obj:`str`): Name of the root script to get all handles.
 
         Returns:
             list: List of object handles (identifiers) of the 3D scene model.
         """
-        return self.run_child_script('getRobotVisibleShapeHandles', [], [], [])[1]
+        return self.run_child_script(root_name, 'getRobotVisibleShapeHandles', [], [], [])[1]
 
     def set_robot_metric(self, robot, metric_values):
         """Assigns a metric defining relations between axis values of a robot.
@@ -211,23 +213,10 @@ class Simulator(object):
                 values from 0 to 1.
         """
         vrep.simxCallScriptFunction(self.client_id,
-                                    self._lua_script_name,
+                                    robot.client_options['simulation_script'],
                                     CHILD_SCRIPT_TYPE, 'setTheMetric',
-                                    [robot.index], metric_values, [],
+                                    [robot.client_options['index']], metric_values, [],
                                     bytearray(), DEFAULT_OP_MODE)
-
-    def reset_all_robots(self):
-        """Resets all robots in the scene to their base configuration.
-
-        Examples:
-
-            >>> from compas_fab.fab.robots import Simulator
-            >>> with Simulator() as simulator:
-            ...     simulator.reset_all_robots()
-            ...
-        """
-        for id in Robot.SUPPORTED_ROBOTS:
-            Robot(id, client=self).reset_config()
 
     def set_robot_pose(self, robot, pose):
         """Moves the robot the the specified pose.
@@ -263,7 +252,8 @@ class Simulator(object):
             >>> with Simulator() as simulator:
             ...     config = Configuration.from_joints_and_external_axes([90, 0, 0, 0, 0, -90],
             ...                                                          [7600, -4500, -4500])
-            ...     simulator.set_robot_config(Robot(11), config)
+            ...     robot = Robot(simulator, Robot.get_options(11))
+            ...     simulator.set_robot_config(robot, config)
             ...
         """
         if not config:
@@ -272,8 +262,8 @@ class Simulator(object):
         values = config_to_vrep(config, self.scale)
 
         self.set_robot_metric(robot, [0.0] * robot.dof)
-        self.run_child_script('moveRobotFK',
-                              [], values, ['robot' + robot.name])
+        self.run_child_script(robot.client_options['simulation_script'], 'moveRobotFK',
+                              [], values, ['robot' + robot.client_options['name']])
 
     def get_robot_config(self, robot):
         """Gets the current configuration of the specified robot.
@@ -285,14 +275,16 @@ class Simulator(object):
 
             >>> from compas_fab.fab.robots.rfl import Robot
             >>> with Simulator() as simulator:
-            ...     config = simulator.get_robot_config(Robot(11))
+            ...     robot = Robot(simulator, Robot.get_options(11))
+            ...     config = simulator.get_robot_config(robot)
 
         Returns:
             An instance of :class:`.Configuration`.
         """
-        res, _, config, _, _ = self.run_child_script('getRobotState',
-                                                     [robot.index],
-                                                     [], [])
+        _res, _, config, _, _ = self.run_child_script(robot.client_options['simulation_script'],
+                                                      'getRobotState',
+                                                      [robot.client_options['index']],
+                                                      [], [])
         return config_from_vrep(robot.config_cls, config, self.scale, external_axes=robot.external_axes)
 
     def find_robot_states(self, robot, goal_pose, metric_values=None, external_axes_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
@@ -340,8 +332,9 @@ class Simulator(object):
                 joint_limits.extend(arm_joint_limits or [])
                 string_param_list.append(','.join(map(str, joint_limits)))
 
-            res, _, states, _, _ = self.run_child_script('searchRobotStates',
-                                                         [robot.index,
+            res, _, states, _, _ = self.run_child_script(robot.client_options['simulation_script'],
+                                                         'searchRobotStates',
+                                                         [robot.client_options['index'],
                                                           max_trials or 1,
                                                           max_results],
                                                          goal_pose, string_param_list)
@@ -432,8 +425,9 @@ class Simulator(object):
         if self.debug:
             LOG.debug('About to execute path planner: algorithm=%s, trials=%d, shallow_state_search=%s, optimize_path_length=%s', algorithm, trials, shallow_state_search, optimize_path_length)
 
-        res, _, path, _, _ = self.run_child_script('searchRobotPath',
-                                                   [robot.index,
+        res, _, path, _, _ = self.run_child_script(robot.client_options['simulation_script'],
+                                                   'searchRobotPath',
+                                                   [robot.client_options['index'],
                                                     trials,
                                                     (int)(resolution * 1000),
                                                     1 if optimize_path_length else 0],
@@ -546,7 +540,8 @@ class Simulator(object):
 
         handle = handles[0]
 
-        parent_handle = self.get_object_handle('customGripper' + robot.name + '_connection')
+        parent_handle = self.get_object_handle(
+            'customGripper' + robot.client_options['name'] + '_connection')
         vrep.simxSetObjectParent(self.client_id, handle, parent_handle, True, DEFAULT_OP_MODE)
 
         return handle
@@ -574,7 +569,7 @@ class Simulator(object):
             vrep_packing = (floats_to_vrep([item for sublist in vertices for item in sublist], self.scale) +
                             [item for sublist in faces for item in sublist])
             params = [[len(vertices) * 3, len(faces) * 4], vrep_packing]
-            handles = self.run_child_script('buildMesh',
+            handles = self.run_child_script('API', 'buildMesh',
                                             params[0],
                                             params[1],
                                             [])[1]
@@ -610,9 +605,9 @@ class Simulator(object):
 
         self._added_handles = filter(lambda x: x not in object_handles, self._added_handles)
 
-    def run_child_script(self, function_name, in_ints, in_floats, in_strings):
+    def run_child_script(self, script_name, function_name, in_ints, in_floats, in_strings):
         return vrep.simxCallScriptFunction(self.client_id,
-                                           self._lua_script_name,
+                                           script_name,
                                            CHILD_SCRIPT_TYPE, function_name,
                                            in_ints, in_floats, in_strings,
                                            bytearray(), DEFAULT_OP_MODE)

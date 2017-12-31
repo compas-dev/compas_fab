@@ -29,8 +29,8 @@ class UR5(UR):
     working_area_sphere_diameter = 1850.  # max. working area diameter, recommended 1700
     working_area_cylinder_diameter = 149.
 
-    def __init__(self):
-        super(UR5, self).__init__()
+    def __init__(self, client=None, client_options=None):
+        super(UR5, self).__init__(client, client_options)
         self.load_model()
 
     def get_model_path(self):
@@ -73,4 +73,3 @@ if __name__ == "__main__":
     q = ur.inverse_kinematics(f)
     
     print(q)
-

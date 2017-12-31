@@ -11,24 +11,6 @@ class Configuration(BaseConfiguration):
     """
 
     @classmethod
-    def from_joints_and_external_axes(cls, joint_values, external_axes):
-        """Construct a configuration from a list of joint values and external
-        axes values.
-
-        Args:
-            joint_values (:obj:`list` of :obj:`float`): 6 joint values
-                expressed in degrees.
-            external_axes (:obj:`list` of :obj:`float`): Gantry position
-                in x, y, z in millimeters.
-        """
-        if len(joint_values) != 6:
-            raise ValueError('Expected 6 floats expressed in degrees, but got %d' % len(joint_values))
-        if len(external_axes) != 3:
-            raise ValueError('Expected 3 floats: x, y, z but got %d' % len(external_axes))
-
-        return cls.from_data({'joint_values': joint_values, 'external_axes': external_axes})
-
-    @classmethod
     def from_radians_list(cls, list_of_floats):
         """Construct a configuration from a flat list of 6 joint values expressed in radians
         and 3 axis values in millimeters.
@@ -59,66 +41,48 @@ class Robot(BaseRobot):
     passed when initializing the robot.
 
     Args:
-        id (:obj:`int`): Robot identifier.
         client (:obj:`object`): A client to execute the commands
             such as :class:`..Simulator`.
+        client_options (:obj:`dict`): Dictionary containing client-specific options.
 
     Attributes:
-        id (:obj:`int`): Robot identifier.
         client (:obj:`object`): A client to execute the commands
             such as :class:`..Simulator`.
-        index (:obj:`int`): Robot index (for internal use).
+        client_options (:obj:`dict`): Dictionary of client-specific options.
         dof (:obj:`int`): Degrees of freedom.
+        external_axes (:obj:`int`): Number of external axes.
     """
     SUPPORTED_ROBOTS = (11, 12, 21, 22)
     ROBOT_SETTINGS = {
-        11: {'name': 'A', 'base_external_axes': [7000, -2000, -4000]},
-        12: {'name': 'B', 'base_external_axes': [7000, -10000, -4000]},
-        21: {'name': 'C', 'base_external_axes': [30000, -2000, -4000]},
-        22: {'name': 'D', 'base_external_axes': [30000, -10000, -4000]},
+        11: {'name': 'A', 'index': 0, 'base_external_axes': [7000, -2000, -4000], 'base_joint_values': [0.] * 6},
+        12: {'name': 'B', 'index': 1, 'base_external_axes': [7000, -10000, -4000], 'base_joint_values': [0.] * 6},
+        21: {'name': 'C', 'index': 2, 'base_external_axes': [30000, -2000, -4000], 'base_joint_values': [0.] * 6},
+        22: {'name': 'D', 'index': 3, 'base_external_axes': [30000, -10000, -4000], 'base_joint_values': [0.] * 6},
     }
-    BASE_JOINT_VALUES = [0.] * 6
+    SIMULATION_OPTIONS = {'simulation_script': 'RFL'}
 
-    def __init__(self, id, client=None):
-        if id not in self.SUPPORTED_ROBOTS:
+    def __init__(self, client=None, client_options=None):
+        super(Robot, self).__init__(client, client_options)
+
+        if client_options['id'] not in self.SUPPORTED_ROBOTS:
             raise ValueError('Robot ID is not valid, must be one of: ' + str(self.SUPPORTED_ROBOTS))
-        self.id = id
+
         self.client = client
-        self.name = self.ROBOT_SETTINGS[id]['name']
-        self.index = self.SUPPORTED_ROBOTS.index(id)
         self.dof = 9
         self.external_axes = 3
         self.config_cls = Configuration
 
-    def set_config(self, config):
-        """Moves the robot the the specified configuration.
+    @classmethod
+    def get_options(cls, identifier):
+        """"Get client options for a specific robot."""
+        if identifier not in Robot.SUPPORTED_ROBOTS:
+            raise ValueError(
+                'Robot identifier is not valid, must be one of: ' + str(Robot.SUPPORTED_ROBOTS))
 
-        Args:
-            config (:class:`.Configuration`): Instance of robot's configuration.
-
-        Examples:
-
-            >>> from compas_fab.fab.robots import Simulator
-            >>> with Simulator() as simulator:
-            ...     robot = Robot(11, simulator)
-            ...     robot.set_config(Configuration.from_joints_and_external_axes(
-            ...                      [90, 0, 0, 0, 0, -90],
-            ...                      [7600, -4500, -4500]))
-            ...
-
-        """
-        self.client.set_robot_config(self, config)
-
-    def get_config(self):
-        """Gets the current configuration of the robot.
-
-        Returns:
-            config: Instance of (:class:`.Configuration`).
-        """
-        return self.client.get_robot_config(self)
+        return dict([('id', identifier)] + Robot.ROBOT_SETTINGS[identifier].items() + Robot.SIMULATION_OPTIONS.items())
 
     def reset_config(self):
         """Resets a robot's configuration to a safe initial position."""
         self.set_config(Configuration.from_joints_and_external_axes(
-                        self.BASE_JOINT_VALUES,
-                        self.ROBOT_SETTINGS[self.id]['base_external_axes']))
+            self.client_options['base_joint_values'],
+            self.client_options['base_external_axes']))
