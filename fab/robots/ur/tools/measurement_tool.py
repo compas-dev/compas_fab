@@ -13,14 +13,21 @@ class MeasurementTool(Tool):
         xaxis = [0.0, 1., 0.0]
         yaxis = [1., 0.0, 0.0]
         super(MeasurementTool, self).__init__(Frame(origin, xaxis, yaxis))
-        self.load_model()
 
-    def load_model(self):
-        self.model_loaded = True
+    def load_model(self, xdraw_function=None):
+        """Load the geometry (meshes) of the tool.
+
+        Args:
+            xdraw_function (function, optional): The function to draw the
+                meshes in the respective CAD environment. Defaults to None.
+        """
         datapath = get_data("robots/ur/tools/measurement_tool.obj")
-        self.model = Mesh.from_obj(datapath)
-        self.model_xyz = self.model.xyz
+        self.model = [Mesh.from_obj(datapath)]
 
+        # draw the geometry in the respective CAD environment
+        if xdraw_function:
+            for i, m in enumerate(self.model):
+                self.model[i] = xdraw_function(m)
 
 if __name__ == "__main__":
     tool = MeasurementTool()

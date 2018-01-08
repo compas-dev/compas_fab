@@ -1,5 +1,6 @@
 from __future__ import print_function
 from compas_fab import get_data
+from compas_fab.fab.robots import BaseConfiguration
 from compas_fab.fab.robots.ur import UR
 import math
 
@@ -31,21 +32,23 @@ class UR5(UR):
 
     def __init__(self):
         super(UR5, self).__init__()
-        self.load_model()
 
     def get_model_path(self):
         return get_data("robots/ur/ur5")
 
     def forward_kinematics(self, configuration):
-        q = configuration[:]
+        q = configuration.joint_values[:]
         q[5] += math.pi
-        return super(UR5, self).forward_kinematics(configuration)
+        return super(UR5, self).forward_kinematics(BaseConfiguration.from_joints(q))
 
     def inverse_kinematics(self, tool0_frame_RCS):
-        qsols = super(UR5, self).inverse_kinematics(tool0_frame_RCS)
-        for i in range(len(qsols)):
-            qsols[i][5] -= math.pi
-        return qsols
+        configurations = super(UR5, self).inverse_kinematics(tool0_frame_RCS)
+        for q in configurations:
+            print(q)
+        for i in range(len(configurations)):
+            configurations[i].joint_values[5] -= math.pi
+        return configurations
+
 
 
 if __name__ == "__main__":
@@ -56,17 +59,14 @@ if __name__ == "__main__":
     from compas_fab.fab.robots.ur.kinematics import format_joint_positions
     ur = UR5()
 
-    q0 = [-0.44244, -1.5318, 1.34588, -1.38512, -1.05009, -0.4495]
-    print(q0)
-    print()
-    f = ur.forward_kinematics(q0)
-    qsols = ur.inverse_kinematics(f)
-
+    q = [-0.44244, -1.5318, 1.34588, -1.38512, -1.05009, -0.4495]
+    q = BaseConfiguration.from_joints(q)
+    Ts = ur.get_forward_transformations(q)
+    for T in Ts:
+        print(T)
+        print()
+    frame = ur.forward_kinematics(q)
+    qsols = ur.inverse_kinematics(frame)
     for q in qsols:
-        q = format_joint_positions(q, q0)
-        print([round(a, 5) for a in q])
-
-    print("==============================")
-
-    ur.load_model()
-    ur.get_transformed_model(q)
+        print(q)
+    ur.get_transformed_model(Ts)

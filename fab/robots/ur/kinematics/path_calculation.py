@@ -1,6 +1,9 @@
+from __future__ import print_function
 import math
 from compas_fab.fab.utilities import sign
 from compas_fab.fab.robots.ur.kinematics import inverse_kinematics
+from compas_fab.fab.robots import BaseConfiguration
+
 
 def format_joint_positions(joint_positions_a, joint_positions_b = [0,0,0,0,0,0]):
     """Add or subtract 2*pi to the joint positions a, so that they have the
@@ -25,7 +28,7 @@ def smallest_joint_pose(joint_positions):
     return format_joint_positions(joint_positions)
 
 
-def calculate_configurations_for_path(frames, robot, current_positions = []):
+def calculate_configurations_for_path(frames, robot, current_configuration = None):
     """Calculate possible configurations for a path.
 
     Args:
@@ -37,8 +40,14 @@ def calculate_configurations_for_path(frames, robot, current_positions = []):
 
     configurations = []
 
+    if not current_configuration:
+        current_positions = []
+    else:
+        current_positions = current_configuration.joint_values
+
     for i, frame in enumerate(frames):
-        qsols = robot.inverse_kinematics(frame)
+        configs = robot.inverse_kinematics(frame)
+        qsols = [c.joint_values for c in configs]
         if not len(qsols):
             return []
         if i == 0:
@@ -63,7 +72,15 @@ def calculate_configurations_for_path(frames, robot, current_positions = []):
                 selected_idx = diffs.index(min(diffs))
                 qsols_sorted.append(qsols_formatted[selected_idx])
             configurations.append(qsols_sorted)
-        configurations.append(qsols)
 
+    print(len(configurations))
+    print(len(configurations[0]))
+    configurations = list(zip(*configurations))
+    print(len(configurations))
 
-    return zip(*configurations)
+    for i in range(len(configurations)):
+        configurations[i] = list(configurations[i])
+        for j, q in enumerate(configurations[i]):
+            configurations[i][j] = BaseConfiguration.from_joints(q)
+
+    return configurations

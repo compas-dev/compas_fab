@@ -10,8 +10,8 @@ class Robot(object):
     - a model: meshes
     - a base: describes where the robot is attached to. This can be also a movable base: e.g. linear axis
     - a basis frame, the frame it resides, e.g. Frame.worldXY()
-    - a transformation matrix to get coordinated represented in RCS
-    - a transformation matrix to get coordinated represented in WCS
+    - a transformation matrix to get coordinates represented in RCS
+    - a transformation matrix to get coordinates represented in WCS
     - a tool, the end-effector
     - communication: e.g. delegated by a client instance
     - workspace: brep ?
@@ -29,7 +29,6 @@ class Robot(object):
     def __init__(self):
 
         self.model = []  # a list of meshes
-        self.model_loaded = False
         self.basis_frame = None
         # move to UR !!!!
         self.transformation_RCS_WCS = None
@@ -37,29 +36,21 @@ class Robot(object):
         self.set_base(Frame.worldXY())
         self.tool = Tool(Frame.worldXY())
         self.configuration = None
-        self.tool0_frame = Frame.worldXY()
-
-    def load_model(self):
-        self.model_loaded = True
 
     def set_base(self, base_frame):
-        # move to UR !!!!
+        # move to UR !!!! ???
         self.base_frame = base_frame
         # transformation matrix from world coordinate system to robot coordinate system
         self.transformation_WCS_RCS = Transformation.from_frame_to_frame(Frame.worldXY(), self.base_frame)
         # transformation matrix from robot coordinate system to world coordinate system
         self.transformation_RCS_WCS = Transformation.from_frame_to_frame(self.base_frame, Frame.worldXY())
-        # modify joint axis !        
-    
+        # modify joint axis !
+
     def set_tool(self, tool):
         self.tool = tool
 
     def get_robot_configuration(self):
         raise NotImplementedError
-
-    @property
-    def tcp_frame(self):
-        return self.tool.tcp_frame
 
     @property
     def transformation_tool0_tcp(self):
@@ -87,26 +78,30 @@ class Robot(object):
         frame_RCS = frame_WCS.transform(self.transformation_WCS_RCS, copy=True)
         #frame_RCS = frame_WCS.transform(self.transformation_RCS_WCS)
         return frame_RCS
-    
+
     def get_frame_in_WCS(self, frame_RCS):
-        """Transform the frame in robot coordinate system (RCS) into a frame in 
+        """Transform the frame in robot coordinate system (RCS) into a frame in
         world coordinate system (WCS), which is defined by the robots' basis frame.
         """
         frame_WCS = frame_RCS.transform(self.transformation_RCS_WCS, copy=True)
         return frame_WCS
-    
-            
+
     def get_tool0_frame_from_tcp_frame(self, frame_tcp):
         """Get the tool0 frame (frame at robot) from the tool frame (frame_tcp).
         """
         T = Transformation.from_frame(frame_tcp)
         return Frame.from_transformation(T * self.transformation_tool0_tcp)
-    
+
     def get_tcp_frame_from_tool0_frame(self, frame_tool0):
         """Get the tcp frame from the tool0 frame.
         """
         T = Transformation.from_frame(frame_tool0)
         return Frame.from_transformation(T * self.transformation_tcp_tool0)
+
+    def xdraw(configuration, xdraw_function):
+        """Draw the robot with the given configuration.
+        """
+        raise NotImplementedError
 
 
 class BaseConfiguration(object):

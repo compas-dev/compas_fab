@@ -6,6 +6,9 @@ except ImportError:
     from compas.geometry.utilities import multiply_matrix_vector, multiply_matrices
 from compas.geometry import dot_vectors, normalize_vector, cross_vectors, length_vector, subtract_vectors, scale_vector
 
+from compas.geometry.transformations import homogenize, dehomogenize
+from compas.geometry.basic import transpose_matrix
+
 __author__     = ['Romana Rust <rust@arch.ethz.ch>', ]
 
 
@@ -116,11 +119,7 @@ class Transformation(object):
         raise NotImplementedError
 
     def transform(self, xyz):
-        """Transforms a point, vector, xyz coordinates or a list therefrom.
 
-        Should this be split into transform_xyz_list and transform_xyz
-        TODO: should be attached to the elements.
-        """
         xyz = list(xyz)
 
         if type(xyz[0]) == float or type(xyz[0]) == int: # point, vector, xyz coordinates
@@ -192,7 +191,8 @@ class Transformation(object):
         """
         inv_rotation = Rotation.from_matrix(self.matrix).inverse()
         trans = [-self.matrix[0][3], -self.matrix[1][3], -self.matrix[2][3]]
-        trans = inv_rotation.transform(trans)
+        trans = transform_xyz(trans, inv_rotation)
+        #trans = inv_rotation.transform(trans)
 
         transformation = Transformation.from_matrix(inv_rotation.matrix)
         transformation[0, 3] = trans[0]
@@ -500,14 +500,12 @@ def transform_xyz(xyz, transformation):
     xyz = list(xyz)
 
     if type(xyz[0]) == float or type(xyz[0]) == int: # point, vector, xyz coordinates
-        point = xyz + [1.] # make homogeneous coordinates
-        point = multiply_matrix_vector(transformation.matrix, point)
-        return point[:3]
+        xyzw = multiply_matrix_vector(transformation.matrix, homogenize([xyz])[0])
+        return dehomogenize([xyzw])[0]
     else: # it is a list of xyz coordinates
-        xyz = list(zip(*xyz)) # transpose matrix
-        xyz += [[1] * len(xyz[0])] # make homogeneous coordinates
-        xyz = multiply_matrices(transformation.matrix, xyz)
-        return list(zip(*xyz[:3])) # cutoff 1 and transpose again
+        xyzw = homogenize(xyz)
+        xyzw = multiply_matrices(xyzw, list(transpose_matrix(transformation.matrix)))
+        return dehomogenize(xyzw)
 
 
 if __name__ == "__main__":
