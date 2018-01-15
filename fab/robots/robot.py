@@ -126,21 +126,21 @@ class Robot(object):
         frame_RCS = frame_WCS.transform(self.transformation_WCS_RCS, copy=True)
         #frame_RCS = frame_WCS.transform(self.transformation_RCS_WCS)
         return frame_RCS
-    
+
     def get_frame_in_WCS(self, frame_RCS):
-        """Transform the frame in robot coordinate system (RCS) into a frame in 
+        """Transform the frame in robot coordinate system (RCS) into a frame in
         world coordinate system (WCS), which is defined by the robots' basis frame.
         """
         frame_WCS = frame_RCS.transform(self.transformation_RCS_WCS, copy=True)
         return frame_WCS
-    
-            
+
+
     def get_tool0_frame_from_tcp_frame(self, frame_tcp):
         """Get the tool0 frame (frame at robot) from the tool frame (frame_tcp).
         """
         T = Transformation.from_frame(frame_tcp)
         return Frame.from_transformation(T * self.transformation_tool0_tcp)
-    
+
     def get_tcp_frame_from_tool0_frame(self, frame_tool0):
         """Get the tcp frame from the tool0 frame.
         """

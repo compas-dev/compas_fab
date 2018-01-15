@@ -1,3 +1,4 @@
+from __future__ import print_function
 from compas.geometry import cross_vectors, normalize_vector
 from compas_fab.fab.geometry.transformation import Rotation, Transformation
 
@@ -176,8 +177,8 @@ if __name__ == '__main__':
     pose_quaternion =  [46.688110714374631, -1.4120551622885724, 49.438882686865952, 0.9222492523802307, -0.077292257754572713, 0.28255622706540073, 0.25227802504750946]
     frame = Frame.from_pose_quaternion(pose_quaternion)
     
-    print pose_quaternion
-    print frame.pose_quaternion
+    print(pose_quaternion)
+    print(frame.pose_quaternion)
         
     q1, j1_vector, j1_end = -2.02405833354, [-207.9183, -74.7322, 0.0], [-207.9183, -74.7322, 127.3]
         
@@ -185,10 +186,10 @@ if __name__ == '__main__':
     
     frame_t = frame.transform(rotation, copy=True)
     
-    print "frame_t", frame_t
+    print("frame_t", frame_t)
     
     T = Transformation.from_frame(frame)
     
-    print rotation * T
+    print(rotation * T)
   
     
