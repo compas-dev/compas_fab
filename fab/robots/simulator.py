@@ -14,9 +14,8 @@ except ImportError:
 
 from timeit import default_timer as timer
 from compas.datastructures.mesh import Mesh
-from compas_fab.fab.robots import Pose
-from compas_fab.fab.robots.rfl import Configuration, Robot
-from compas_fab.fab.robots.rfl.vrep_remote_api import vrep
+from compas_fab.fab.robots import Robot, Pose, BaseConfiguration
+from compas_fab.fab.robots.vrep_remote_api import vrep
 
 DEFAULT_SCALE = 1000.
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
@@ -39,7 +38,7 @@ class PathPlan(object):
 
     Attributes:
         paths (:obj:`dict`): Dictionary keyed by the robot identifier where the values
-            are instances of :class:`.Configuration`. Robots that do not move during the
+            are instances of :class:`.BaseConfiguration`. Robots that do not move during the
             plan only have one configuration in their values.
     """
     def __init__(self):
@@ -49,8 +48,8 @@ class PathPlan(object):
         """Adds a path plan for a specific robot.
 
         Args:
-            robot (:class:`.Robot`): Instance of robot.
-            path_plan (:obj:`list``or :class:`.`Configuration`): List of configurations
+            robot (:class:`Robot`): Instance of robot.
+            path_plan (:obj:`list``or :class:`.`BaseConfiguration`): List of configurations
                 representing a full path.
         """
         self.paths[str(robot.client_options['id'])] = path_plan
@@ -59,7 +58,7 @@ class PathPlan(object):
         """Gets the path plan for a specific robot.
 
         Args:
-            robot (:class:`.Robot`): Instance of robot.
+            robot (:class:`Robot`): Instance of robot.
 
         Returns:
             List of configurations representing a full path.
@@ -182,7 +181,6 @@ class Simulator(object):
 
         Examples:
 
-            >>> from compas_fab.fab.robots import Simulator
             >>> with Simulator() as simulator:
             ...     matrices = simulator.get_object_matrices([0])
             ...     print(map(int, matrices[0]))
@@ -215,7 +213,7 @@ class Simulator(object):
         effectively removes one degree of freedom (DOF).
 
         Args:
-            robot (:class:`.Robot`): Robot instance.
+            robot (:class:`Robot`): Robot instance.
             metric_values (:obj:`list` of :obj:`float`): :obj:`float`
                 values from 0 to 1.
         """
@@ -229,11 +227,11 @@ class Simulator(object):
         """Moves the robot the the specified pose.
 
         Args:
-            robot (:class:`.Robot`): Robot instance to move.
+            robot (:class:`Robot`): Robot instance to move.
             pose (:class:`.Pose`): Target or goal pose instance.
 
         Returns:
-            An instance of :class:`.Configuration` found for the given pose.
+            An instance of :class:`.BaseConfiguration` found for the given pose.
         """
         # First check if the start state is reachable
         config = self.find_robot_states(robot, pose, [0.] * robot.dof)[-1]
@@ -249,9 +247,9 @@ class Simulator(object):
         """Moves the robot the the specified configuration.
 
         Args:
-            robot (:class:`.Robot`): Robot instance to move.
-            config (:class:`Configuration` instance): Describes the position of the
-                robot as an instance of :class:`Configuration`.
+            robot (:class:`Robot`): Robot instance to move.
+            config (:class:`BaseConfiguration` instance): Describes the position of the
+                robot as an instance of :class:`BaseConfiguration`.
 
         Examples:
 
@@ -276,7 +274,7 @@ class Simulator(object):
         """Gets the current configuration of the specified robot.
 
         Args:
-            robot (:class:`.Robot`): Robot instance.
+            robot (:class:`Robot`): Robot instance.
 
         Examples:
 
@@ -286,7 +284,7 @@ class Simulator(object):
             ...     config = simulator.get_robot_config(robot)
 
         Returns:
-            An instance of :class:`.Configuration`.
+            An instance of :class:`.BaseConfiguration`.
         """
         _res, _, config, _, _ = self.run_child_script(robot.client_options['simulation_script'],
                                                       'getRobotState',
@@ -298,7 +296,7 @@ class Simulator(object):
         """Finds valid robot configurations for the specified goal pose.
 
         Args:
-            robot (:class:`.Robot`): Robot instance.
+            robot (:class:`Robot`): Robot instance.
             goal_pose (:class:`.Pose`): Target or goal pose instance.
             metric_values (:obj:`list` of :obj:`float`): :obj:`float`
                 values (1 value per DOF) ranging from 0 to 1,
@@ -313,7 +311,7 @@ class Simulator(object):
             max_results (:obj:`int`): Maximum number of result states to return.
 
         Returns:
-            list: List of :class:`Configuration` objects representing
+            list: List of :class:`BaseConfiguration` objects representing
             the collision-free configuration for the ``goal_pose``.
         """
         if not metric_values:
@@ -366,7 +364,7 @@ class Simulator(object):
         """Picks up a building member and attaches it to the robot.
 
         Args:
-            robot (:class:`.Robot`): Robot instance to use for pick up.
+            robot (:class:`Robot`): Robot instance to use for pick up.
             building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh
                 of the building member that will be attached to the robot.
             pickup_pose (:class:`.Pose`): Pickup pose instance.
@@ -460,8 +458,8 @@ class Simulator(object):
         specific goal configuration.
 
         Args:
-            robot (:class:`.Robot`): Robot instance to move.
-            goal_configs (:obj:`list` of :class:`Configuration`): List of target or goal configurations.
+            robot (:class:`Robot`): Robot instance to move.
+            goal_configs (:obj:`list` of :class:`BaseConfiguration`): List of target or goal configurations.
             metric_values (:obj:`list` of :obj:`float`): :obj:`float`
                 values ranging from 0 to 1, where 1 indicates the axis/joint is blocked and cannot
                 move during inverse kinematic solving.
@@ -483,7 +481,7 @@ class Simulator(object):
                 False to return the first valid path found. It only affects the output if `trials > 1`.
 
         Returns:
-            list: List of :class:`Configuration` objects representing the
+            list: List of :class:`BaseConfiguration` objects representing the
             collision-free path to the ``goal_pose``.
         """
         return self._find_path_plan(robot, {'target_type': 'config', 'target': goal_configs},
@@ -496,7 +494,7 @@ class Simulator(object):
         """Find a path plan to move the selected robot from its current position to the `goal_pose`.
 
         Args:
-            robot (:class:`.Robot`): Robot instance to move.
+            robot (:class:`Robot`): Robot instance to move.
             goal_pose (:class:`.Pose`): Target or goal pose instance.
             metric_values (:obj:`list` of :obj:`float`): :obj:`float`
                 values ranging from 0 to 1, where 1 indicates the axis/joint is blocked and cannot
@@ -519,7 +517,7 @@ class Simulator(object):
                 False to return the first valid path found. It only affects the output if `trials > 1`.
 
         Returns:
-            list: List of :class:`Configuration` objects representing the
+            list: List of :class:`BaseConfiguration` objects representing the
             collision-free path to the ``goal_pose``.
         """
         return self._find_path_plan(robot, {'target_type': 'pose', 'target': goal_pose},
@@ -527,10 +525,10 @@ class Simulator(object):
                                     external_axes_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
 
     def add_building_member(self, robot, building_member_mesh):
-        """Adds a building member to the RFL scene and attaches it to the robot.
+        """Adds a building member to the 3D scene and attaches it to the robot.
 
         Args:
-            robot (:class:`.Robot`): Robot instance to attach the building member to.
+            robot (:class:`Robot`): Robot instance to attach the building member to.
             building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh
                 of the building member that will be attached to the robot.
 
@@ -554,7 +552,7 @@ class Simulator(object):
         return handle
 
     def add_meshes(self, meshes):
-        """Adds meshes to the RFL scene.
+        """Adds meshes to the 3D scene.
 
         Args:
             meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): List
@@ -586,7 +584,7 @@ class Simulator(object):
         return mesh_handles
 
     def remove_meshes(self, mesh_handles):
-        """Removes meshes from the RFL scene.
+        """Removes meshes from the 3D scene.
 
         This is functionally identical to ``remove_objects``, but it's here for
         symmetry reasons.
@@ -597,7 +595,7 @@ class Simulator(object):
         self.remove_objects(mesh_handles)
 
     def remove_objects(self, object_handles):
-        """Removes objects from the RFL scene.
+        """Removes objects from the 3D scene.
 
         Args:
             object_handles (:obj:`list` of :obj:`int`): Object handles to remove.
@@ -694,7 +692,7 @@ class SimulationCoordinator(object):
         # Return the ID of the job and poll
         results = json.loads(response)
         # TODO: Get DOF and external_axes from robot instance
-        return [[config_from_vrep(Configuration, path_list[i:i + 9], 1, external_axes=3)
+        return [[config_from_vrep(BaseConfiguration, path_list[i:i + 9], 1, external_axes=3)
                 for i in range(0, len(path_list), 9)] for path_list in results]
 
     @classmethod
@@ -708,7 +706,7 @@ class SimulationCoordinator(object):
 
                 if 'start' in r:
                     if r['start'].get('joint_values'):
-                        start = Configuration.from_data(r['start'])
+                        start = BaseConfiguration.from_data(r['start'])
                     elif r['start'].get('values'):
                         start = Pose.from_data(r['start'])
                         try:

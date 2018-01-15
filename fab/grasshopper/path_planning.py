@@ -2,8 +2,8 @@ from __future__ import print_function
 
 import logging
 from timeit import default_timer as timer
-from compas_fab.fab.robots import Pose
-from compas_fab.fab.robots.simulator import Configuration, SimulationCoordinator
+from compas_fab.fab.robots import Pose, BaseConfiguration
+from compas_fab.fab.robots.simulator import SimulationCoordinator
 from compas_fab.fab.grasshopper.geometry import xform_from_matrix, vrep_pose_from_plane
 from compas_fab.fab.grasshopper.helpers import mesh_from_guid
 
@@ -56,7 +56,7 @@ class PathVisualizer(object):
         """Retrieves all meshes required to render a specific frame of a path plan.
 
         Args:
-            path (:obj:`list` of :class:`Configuration`): Represents a collision-free
+            path (:obj:`list` of :class:`BaseConfiguration`): Represents a collision-free
                 path to a goal pose. It is the output of the path planning generated
                 by a :class:`Simulator` object.
             frame (:obj:`int`): Frame number to retrieve.
@@ -261,7 +261,7 @@ class InputParameterParser(object):
         represented as a transformation matrix.
 
         Args:
-            config_values_or_plane (comma-separated :obj:`string`, or :class:`Configuration` instance,
+            config_values_or_plane (comma-separated :obj:`string`, or :class:`BaseConfiguration` instance,
                 or a Rhino :obj:`Plane`).
         """
         if not config_values_or_plane:

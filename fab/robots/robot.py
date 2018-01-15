@@ -54,7 +54,7 @@ class Robot(object):
 
             >>> from compas_fab.fab.robots import Simulator
             >>> with Simulator() as simulator:
-            ...     robot = Robot(simulator)
+            ...     robot = Robot(simulator, {'simulation_script': 'RFL', 'index': 0, 'name': 'A'})
             ...     robot.set_config(BaseConfiguration.from_joints_and_external_axes(
             ...                      [90, 0, 0, 0, 0, -90],
             ...                      [7600, -4500, -4500]))

@@ -22,7 +22,6 @@ Package containing base clases for robot simulation and control.
 
 """
 
-from .robot import BaseConfiguration, Pose
-from .robot import Robot
+from .robot import BaseConfiguration, Pose, Robot
 from .tool import Tool
 from .simulator import PathPlan, Simulator, SimulationCoordinator, SimulationError
