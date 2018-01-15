@@ -1,10 +1,15 @@
 from __future__ import print_function
 
 import json
-import urllib2
 import math
 import socket
 import logging
+
+try:
+    from urllib.request import urlopen, Request
+except ImportError:
+    from urllib2 import urlopen, Request
+
 from timeit import default_timer as timer
 from compas.datastructures.mesh import Mesh
 from compas_fab.fab.robots import Pose
@@ -400,7 +405,7 @@ class Simulator(object):
             LOG.debug('Execution time: set_robot_metric=%.2f', timer() - start)
 
         if 'target_type' not in goal:
-            raise SimulationError('Invalid goal type, you are using an internal function but passed incorrect args')
+            raise SimulationError('Invalid goal type, you are using an internal function but passed incorrect args', -1)
 
         if goal['target_type'] == 'config':
             states = []
@@ -678,8 +683,8 @@ class SimulationCoordinator(object):
     def remote_executor(cls, options, executor_host='127.0.0.1', port=7000):
         url = 'http://%s:%d/path-planner' % (executor_host, port)
         data = json.dumps(options, encoding='ascii')
-        request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Content-Length': str(len(data))})
-        f = urllib2.urlopen(request)
+        request = Request(url, data, {'Content-Type': 'application/json', 'Content-Length': str(len(data))})
+        f = urlopen(request)
         response = f.read()
         f.close()
 
