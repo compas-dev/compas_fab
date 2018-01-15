@@ -7,8 +7,20 @@ except ImportError:
     from compas.geometry.utilities import multiply_matrix_vector, multiply_matrices
 from compas.geometry import dot_vectors, normalize_vector, cross_vectors, length_vector, subtract_vectors, scale_vector
 
-from compas.geometry.transformations import homogenize, dehomogenize
-from compas.geometry.basic import transpose_matrix
+# We still support pre-release versions of compas framework
+# So, if these functions fail to import, we redefine them locally
+try:
+    from compas.geometry.transformations import homogenize, dehomogenize
+except ImportError:
+    def homogenize(vectors, w=1.0):
+        return [[x / w, y / w, z / w, w] for x, y, z in vectors]
+    def dehomogenize(vectors):
+        return [[x * w, y * w, z * w] for x, y, z, w in vectors]
+try:
+    from compas.geometry.basic import transpose_matrix
+except ImportError:
+    def transpose_matrix(M):
+        return zip(*M)
 
 __author__     = ['Romana Rust <rust@arch.ethz.ch>', ]
 
