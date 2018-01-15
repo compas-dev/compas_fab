@@ -30,21 +30,24 @@ class UR10(UR):
 
     def __init__(self, client=None, client_options=None):
         super(UR10, self).__init__(client, client_options)
-        self.load_model()
 
     def get_model_path(self):
         return get_data("robots/ur/ur10")
 
     def forward_kinematics(self, configuration):
-        q = configuration[:]
+        q = configuration.joint_values[:]
         q[5] += math.pi
-        return super(UR10, self).forward_kinematics(configuration)
+		# TODO: Check with Romana, this should probably propagate client and client_options
+        return super(UR10, self).forward_kinematics(BaseConfiguration.from_joints(q))
 
     def inverse_kinematics(self, tool0_frame_RCS):
-        qsols = super(UR10, self).inverse_kinematics(tool0_frame_RCS)
-        for i in range(len(qsols)):
-            qsols[i][5] -= math.pi
-        return qsols
+		# TODO: Check with Romana, this should probably propagate client and client_options
+        configurations = super(UR10, self).inverse_kinematics(tool0_frame_RCS)
+        for q in configurations:
+            print(q)
+        for i in range(len(configurations)):
+            configurations[i].joint_values[5] -= math.pi
+        return configurations
 
 
 def main():

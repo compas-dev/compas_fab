@@ -110,7 +110,7 @@ def xdraw_faces(faces, srf=None, u=10, v=10, trim=True, tangency=True, spacing=0
             continue
         rg_breps.append(brep)
     return rg_breps
-        
+
 def xdraw_cylinders(cylinders, cap=False):
     rg_cylinders = []
     for c in iter(cylinders):
@@ -155,45 +155,45 @@ def xdraw_spheres(spheres):
     rg_sheres = []
     for s in iter(spheres):
         pos    = s['pos']
-        radius = s['radius'] 
+        radius = s['radius']
         rg_sheres.append(Sphere(Point3d(*pos), radius))
     return rg_sheres
 
 
 def xdraw_mesh(vertices, faces, vertex_normals=None, texture_coordinates=None, vertex_colors=None):
-    """Draw mesh.
+    """Draw mesh in Grasshopper.
     """
-    # TODO: This should move to compas/compas_grasshoper/utilities/drawing.py. 
+    # TODO: This should move to compas/compas_grasshoper/utilities/drawing.py.
     # TODO: This function is mainly a copy of rhinoscriptsyntax.AddMesh, just without scriptcontext adding.
-    
+
     mesh = Mesh()
-    for a, b, c in vertices: 
+    for a, b, c in vertices:
         mesh.Vertices.Add(a, b, c)
     for face in faces:
         if len(face)<4:
             mesh.Faces.AddFace(face[0], face[1], face[2])
         else:
             mesh.Faces.AddFace(face[0], face[1], face[2], face[3])
-    
+
     if vertex_normals:
         count = len(vertex_normals)
         normals = CreateInstance(Vector3f, count)
         for i, normal in enumerate(vertex_normals):
             normals[i] = Vector3f(normal[0], normal[1], normal[2])
         mesh.Normals.SetNormals(normals)
-        
+
     if texture_coordinates:
         count = len(texture_coordinates)
         tcs = CreateInstance(Point2f, count)
         for i, tc in enumerate(texture_coordinates):
             tcs[i] = Point2f(tc[0], tc[1])
         mesh.TextureCoordinates.SetTextureCoordinates(tcs)
-    
+
     if vertex_colors:
         for i, color in vertex_colors.iteritems():
             color = rs.coercecolor(color)
             mesh.VertexColors.SetColor(i, color)
-            
+
     return mesh
 
 def draw_network(network):
@@ -219,7 +219,7 @@ def draw_network(network):
     lines_rg    = xdraw_lines(
         lines
     )
-    
+
     return points_rg, lines_rg
 
 # ==============================================================================

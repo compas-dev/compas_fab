@@ -1,13 +1,7 @@
-'''
-Created on 06.07.2017
-
-@author: rustr
-'''
-
-from ur_kin_ros import forward_ros, inverse_ros
 import math
 from compas_fab.fab.geometry import Frame
 from compas_fab.fab.utilities import sign, argsort
+from .ur_kin_ros import forward_ros, inverse_ros
 
 
 def inverse_kinematics(frame, ur_params, q6_des=0.0):
@@ -62,9 +56,9 @@ def forward_kinematics(configuration, ur_params):
     Returns:
         the frame
     """
-    
+
     configuration[0] += math.pi
-    
+
     T = forward_ros(configuration, ur_params)
 
     xaxis = [T[1], T[5], T[9]]
@@ -72,7 +66,7 @@ def forward_kinematics(configuration, ur_params):
     point = [T[3], T[7], T[11]]
 
     return Frame(point, xaxis, yaxis)
-    
+
 
 if __name__ == "__main__":
 
@@ -83,6 +77,6 @@ if __name__ == "__main__":
     qsols = inverse_kinematics(frame, ur_params)
 
     for q in qsols:
-        print forward_kinematics(q, ur_params)
+        print(forward_kinematics(q, ur_params))
 
     q = [-0.4817717618752444, 2.900620189456401, 4.466606474692679, 3.6283476234151966, 1.5707963267948974, 5.194160742259934]

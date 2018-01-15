@@ -1,16 +1,14 @@
-'''
-Created on 21.06.2017
-
-@author: rustr
-'''
-
+from __future__ import absolute_import
 import os
 import math
 from compas.datastructures.mesh import Mesh
+from compas.geometry.basic import subtract_vectors
+from compas_fab.fab.geometry.transformation import transform_xyz
 from compas_fab.fab.robots import Robot, BaseConfiguration
 from compas_fab.fab.geometry import Frame, Rotation, Transformation
 from compas_fab.fab.geometry.helpers import mesh_update_vertices
-from .kinematics import forward_kinematics, inverse_kinematics
+from compas_fab.fab.robots.ur.kinematics import forward_kinematics, inverse_kinematics
+
 
 class UR(Robot):
     """The UR robot class.
@@ -28,150 +26,177 @@ class UR(Robot):
 
     def __init__(self, client=None, client_options=None):
         super(UR, self).__init__(client, client_options)
-        
         self.dof = 6
         self.external_axes = 0
         self.config_cls = BaseConfiguration
 
         d1, a2, a3, d4, d5, d6 = self.params
-        
-        # j0 - j5 are the axes around which the joints m0 - m5 rotate, e.g. m0 
+
+        # j0 - j5 are the axes around which the joints m0 - m5 rotate, e.g. m0
         # rotates around j0, m1 around j1, etc.
         self.j0 = [(0, 0, 0),                 (0, 0, d1)]
         self.j1 = [(0, 0, d1),                (0, -self.shoulder_offset, d1)]
         self.j2 = [(a2, -self.shoulder_offset-self.elbow_offset, d1), (a2, -self.shoulder_offset, d1)]
         self.j3 = [(a2+a3, 0, d1),            (a2+a3,-d4, d1)]
         self.j4 = [(a2+a3, -d4, d1),          (a2+a3, -d4, d1-d5)]
-        self.j5 = [(a2+a3, -d4, d1-d5),       (a2+a3, -d4-d6, d1-d5)]        
-        
+        self.j5 = [(a2+a3, -d4, d1-d5),       (a2+a3, -d4-d6, d1-d5)]
+
         # check difference ur5 and ur10!!!
         self.tool0_frame = Frame(self.j5[1], [1,0,0], [0,0,1])
         #self.tool0_frame = Frame(self.j5[1], [-1,0,0], [0,0,-1])
-        
+        self.model = self.load_model()
+
     @property
     def params(self):
         """Get UR specific model parameters.
-        
+
         Returns:
-            list: UR specific model parameters.
+            (:obj:`list` of :obj:`float`): UR specific model parameters.
         """
         return [self.d1, self.a2, self.a3, self.d4, self.d5, self.d6]
-    
+
     def get_model_path(self):
-        pass
-    
-    def load_model(self):
+        raise NotImplementedError
+
+    def load_model(self, xdraw_function=None):
         """Load the geometry (meshes) of the robot.
+
+        Args:
+            xdraw_function (function, ): The function to draw the
+                meshes in the respective CAD environment. Defaults to None.
         """
         path = self.get_model_path()
-        # the joints loaded as meshes
-        self.m0 = Mesh.from_obj(os.path.join(path, 'base_and_shoulder.obj'))
-        self.m1 = Mesh.from_obj(os.path.join(path, 'upperarm.obj'))
-        self.m2 = Mesh.from_obj(os.path.join(path, 'forearm.obj'))
-        self.m3 = Mesh.from_obj(os.path.join(path, 'wrist1.obj'))
-        self.m4 = Mesh.from_obj(os.path.join(path, 'wrist2.obj'))
-        self.m5 = Mesh.from_obj(os.path.join(path, 'wrist3.obj'))
-        
-        # have a copy of the mesh vertices for later transformation
-        self.m0_xyz = self.m0.xyz
-        self.m1_xyz = self.m1.xyz
-        self.m2_xyz = self.m2.xyz
-        self.m3_xyz = self.m3.xyz
-        self.m4_xyz = self.m4.xyz
-        self.m5_xyz = self.m5.xyz
-        
-    def get_forward_transformations(self, joint_angles):
-        
-        def vector(line):
-            start, end = line
-            return [end[0] - start[0], end[1] - start[1], end[2] - start[2]]
-        
-        q0, q1, q2, q3, q4, q5 = joint_angles
-        j0, j1, j2, j3, j4, j5 = self.j0, self.j1, self.j2, self.j3, self.j4, self.j5
-        
-        R0 = Rotation.from_axis_and_angle(vector(j0), q0, j0[1])
-        j1 = [R0.transform(j1[0]), R0.transform(j1[1])]
-        R1 = Rotation.from_axis_and_angle(vector(j1), q1, j1[1]) * R0
-        j2 = [R1.transform(j2[0]), R1.transform(j2[1])]
-        R2 = Rotation.from_axis_and_angle(vector(j2), q2, j2[1]) * R1
-        j3 = [R2.transform(j3[0]), R2.transform(j3[1])]
-        R3 = Rotation.from_axis_and_angle(vector(j3), q3, j3[1]) * R2
-        j4 = [R3.transform(j4[0]), R3.transform(j4[1])]
-        R4 = Rotation.from_axis_and_angle(vector(j4), q4, j4[1]) * R3
-        j5 = [R4.transform(j5[0]), R4.transform(j5[1])]
-        R5 = Rotation.from_axis_and_angle(vector(j5), q5, j5[1]) * R4
-        
-        # now apply the transformation to the base    
-        R0 = self.transformation_RCS_WCS * R0
-        R1 = self.transformation_RCS_WCS * R1
-        R2 = self.transformation_RCS_WCS * R2
-        R3 = self.transformation_RCS_WCS * R3
-        R4 = self.transformation_RCS_WCS * R4
-        R5 = self.transformation_RCS_WCS * R5
-        
-        return R0, R1, R2, R3, R4, R5
-    
-    def get_transformed_tool_frames(self, R5):
-        tool0_frame = self.tool0_frame.transform(R5, copy=True)
-        tcp_frame = Frame.from_transformation(Transformation.from_frame(tool0_frame) * self.transformation_tcp_tool0)
-        return tool0_frame, tcp_frame
-    
-    def get_transformed_model(self, q):
-        """Calculate robot model according to the configuration.
-        
+
+        # the links loaded as meshes
+        m0 = Mesh.from_obj(os.path.join(path, 'base_and_shoulder.obj'))
+        m1 = Mesh.from_obj(os.path.join(path, 'upperarm.obj'))
+        m2 = Mesh.from_obj(os.path.join(path, 'forearm.obj'))
+        m3 = Mesh.from_obj(os.path.join(path, 'wrist1.obj'))
+        m4 = Mesh.from_obj(os.path.join(path, 'wrist2.obj'))
+        m5 = Mesh.from_obj(os.path.join(path, 'wrist3.obj'))
+
+        # draw the geometry in the respective CAD environment
+        if xdraw_function:
+            m0 = xdraw_function(m0)
+            m1 = xdraw_function(m1)
+            m2 = xdraw_function(m2)
+            m3 = xdraw_function(m3)
+            m4 = xdraw_function(m4)
+            m5 = xdraw_function(m5)
+
+        self.model = [m0, m1, m2, m3, m4, m5]
+
+    def get_forward_transformations(self, configuration):
+        """Calculate the transformations according to the configuration.
+
         Args:
-            configuration (Configuration): the 6 joint angles in radians 
-            
-        Returns:    
-            (frame): The tool0 frame in robot coordinate system (RCS).
-        
-        Get the transformed meshes of the robot model.
+            configuration (:class:`Configuration`): The robot's configuration.
+
+        Returns:
+            transformations (:obj:`list` of :class:`Transformation`): The
+                transformations for each link.
         """
-        R0, R1, R2, R3, R4, R5 = self.get_forward_transformations(q)
-                
-        tool0_frame, tcp_frame = self.get_transformed_tool_frames(R5)
-        
-        # transform the original vertices, rather than the mesh.vertices,
-        # otherwise the already transformed vertices are transformed
-        m0_xyz = R0.transform(self.m0_xyz)
-        m1_xyz = R1.transform(self.m1_xyz)
-        m2_xyz = R2.transform(self.m2_xyz)
-        m3_xyz = R3.transform(self.m3_xyz)
-        m4_xyz = R4.transform(self.m4_xyz)
-        m5_xyz = R5.transform(self.m5_xyz)
-        
-        # update the meshes
-        mesh_update_vertices(self.m0, m0_xyz)
-        mesh_update_vertices(self.m1, m1_xyz)
-        mesh_update_vertices(self.m2, m2_xyz)
-        mesh_update_vertices(self.m3, m3_xyz)
-        mesh_update_vertices(self.m4, m4_xyz)
-        mesh_update_vertices(self.m5, m5_xyz)
-                
-        return self.m0, self.m1, self.m2, self.m3, self.m4, self.m5, tool0_frame, tcp_frame
-    
-    def get_transformed_tool_model(self, tcp_frame):
-        return self.tool.get_transformed_tool_model(tcp_frame)
-        
+        q0, q1, q2, q3, q4, q5 = configuration.joint_values
+        j0, j1, j2, j3, j4, j5 = self.j0, self.j1, self.j2, self.j3, self.j4, self.j5
+
+        T0 = Rotation.from_axis_and_angle(subtract_vectors(j0[1], j0[0]), q0, j0[1])
+        j1 = transform_xyz(j1, T0)
+        T1 = Rotation.from_axis_and_angle(subtract_vectors(j1[1], j1[0]), q1, j1[1]) * T0
+        j2 = transform_xyz(j2, T1)
+        T2 = Rotation.from_axis_and_angle(subtract_vectors(j2[1], j2[0]), q2, j2[1]) * T1
+        j3 = transform_xyz(j3, T2)
+        T3 = Rotation.from_axis_and_angle(subtract_vectors(j3[1], j3[0]), q3, j3[1]) * T2
+        j4 = transform_xyz(j4, T3)
+        T4 = Rotation.from_axis_and_angle(subtract_vectors(j4[1], j4[0]), q4, j4[1]) * T3
+        j5 = transform_xyz(j5, T4)
+        T5 = Rotation.from_axis_and_angle(subtract_vectors(j5[1], j5[0]), q5, j5[1]) * T4
+
+        # now apply the transformation to the base
+        T0 = self.transformation_RCS_WCS * T0
+        T1 = self.transformation_RCS_WCS * T1
+        T2 = self.transformation_RCS_WCS * T2
+        T3 = self.transformation_RCS_WCS * T3
+        T4 = self.transformation_RCS_WCS * T4
+        T5 = self.transformation_RCS_WCS * T5
+
+        return T0, T1, T2, T3, T4, T5
+
+    def get_tool0_transformation(self, T5):
+        """Get the transformation to reach tool0_frame.
+        """
+        return T5 * Transformation.from_frame(self.tool0_frame)
+
+    def get_transformed_tool_frames(self, T5):
+        T = self.get_tool0_transformation(T5)
+        tool0_frame = Frame.from_transformation(T)
+        tcp_frame = Frame.from_transformation(T * self.transformation_tcp_tool0)
+        return tool0_frame, tcp_frame
+
+    def get_transformed_model(self, transformations, xtransform_function=None):
+        """Get the transformed meshes of the robot model.
+
+        Args:
+            transformations (:obj:`list` of :class:`Transformation`): A list of
+                transformations to apply on each of the links
+            xform_function (function name, ): the name of the function
+                used to transform the model. Defaults to None.
+
+        Returns:
+            model (:obj:`list` of :class:`Mesh`): The list of meshes in the
+                respective class of the CAD environment
+        """
+        tmodel = []
+        if xtransform_function:
+            for m, T in zip(self.model, transformations):
+                tmodel.append(xtransform_function(m, T, copy=True))
+        else:
+            for m, T in zip(self.model, transformations):
+                mtxyz = transform_xyz(m.xyz, T)
+                faces = [m.face_vertices(fkey) for fkey in m.faces()]
+                tmodel.append(Mesh.from_vertices_and_faces(mtxyz, faces))
+        return tmodel
+
+
+    def get_transformed_tool_model(self, T5, xtransform_function=None):
+        """Get the transformed meshes of the tool model.
+
+        Args:
+            T5 (:class:`Transformation`): The transformation of the robot's
+                last joint.
+            xform_function (function name, ): the name of the function
+                used to transform the model. Defaults to None.
+
+        Returns:
+            model (:obj:`list` of :class:`Mesh`): The list of meshes in the
+                respective class of the CAD environment
+        """
+        T = self.get_tool0_transformation(T5)
+        return self.tool.get_transformed_model(T, xtransform_function)
+
     def forward_kinematics(self, configuration):
         """Forward kinematics function.
-        
+
         Args:
-            configuration (Configuration): the 6 joint angles in radians 
-            
-        Returns:    
-            (frame): The tool0 frame in robot coordinate system (RCS).
+            configuration (:class:`BaseConfiguration`): the 6 joint angles in radians
+
+        Returns:
+            frame (:class:`Frame`): The tool0 frame in robot coordinate system (RCS).
         """
-        
-        return forward_kinematics(configuration, self.params)
-    
+
+        return forward_kinematics(configuration.joint_values, self.params)
+
     def inverse_kinematics(self, tool0_frame_RCS):
         """Inverse kinematics function.
         Args:
-            tool0_frame_RCS (Frame): The tool0 frame to reach in robot 
+            tool0_frame_RCS (:class:`Frame`): The tool0 frame to reach in robot
                 coordinate system (RCS).
-            
+
         Returns:
-            list: A list of possible configurations.                    
+            configurations (:obj:`list` of :class:`BaseConfiguration`): A list
+                of possible configurations.
         """
-        return inverse_kinematics(tool0_frame_RCS, self.params)
+        solutions = inverse_kinematics(tool0_frame_RCS, self.params)
+        configurations = []
+        for joint_values in solutions:
+            configurations.append(BaseConfiguration.from_joints(joint_values))
+        return configurations

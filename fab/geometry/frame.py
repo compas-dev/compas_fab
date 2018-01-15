@@ -2,6 +2,7 @@ from __future__ import print_function
 from compas.geometry import cross_vectors, normalize_vector
 from compas_fab.fab.geometry.transformation import Rotation, Transformation
 
+
 __author__     = ['Romana Rust <rust@arch.ethz.ch>', ]
 
 
@@ -186,7 +187,7 @@ if __name__ == '__main__':
     
     frame_t = frame.transform(rotation, copy=True)
     
-    print("frame_t", frame_t)
+    print(frame_t)
     
     T = Transformation.from_frame(frame)
     
