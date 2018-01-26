@@ -41,7 +41,7 @@ class UR(Robot):
         # check difference ur5 and ur10!!!
         self.tool0_frame = Frame(self.j5[1], [1,0,0], [0,0,1])
         #self.tool0_frame = Frame(self.j5[1], [-1,0,0], [0,0,-1])
-        self.model = self.load_model()
+        #self.model = self.load_model()
 
     @property
     def params(self):
@@ -135,7 +135,7 @@ class UR(Robot):
         Args:
             transformations (:obj:`list` of :class:`Transformation`): A list of
                 transformations to apply on each of the links
-            xform_function (function name, ): the name of the function
+            xtransform_function (function name, ): the name of the function
                 used to transform the model. Defaults to None.
 
         Returns:
@@ -153,6 +153,24 @@ class UR(Robot):
                 tmodel.append(Mesh.from_vertices_and_faces(mtxyz, faces))
         return tmodel
 
+    def xdraw(self, configuration, xtransform_function=None):
+    	"""Get the transformed meshes of the robot and the tool model.
+
+    	Args:
+            configuration (:class:`BaseConfiguration`): the 6 joint angles in radians
+            xtransform_function (function name, ): the name of the function
+                used to transform the model. Defaults to None.
+
+        Returns:
+            model (:obj:`list` of :class:`Mesh`): The list of meshes in the
+                respective class of the CAD environment
+    	"""
+        transformations = self.get_forward_transformations(configuration)
+        tmodel = self.get_transformed_model(transformations, xtransform_function)
+        if self.tool:
+        	tmodel += self.get_transformed_tool_model(transformations[5], xtransform_function)
+        return tmodel
+
 
     def get_transformed_tool_model(self, T5, xtransform_function=None):
         """Get the transformed meshes of the tool model.
@@ -160,7 +178,7 @@ class UR(Robot):
         Args:
             T5 (:class:`Transformation`): The transformation of the robot's
                 last joint.
-            xform_function (function name, ): the name of the function
+            xtransform_function (function name, ): the name of the function
                 used to transform the model. Defaults to None.
 
         Returns:
