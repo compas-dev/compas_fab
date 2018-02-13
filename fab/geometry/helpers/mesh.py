@@ -7,10 +7,10 @@ except ImportError:
 
 # TODO: move this somewhere else !!! to mesh algorithms or operations ??
 def mesh_get_transformed_vertices(mesh, transformation_matrix):
-    xyz = zip(*mesh.xyz)  # transpose matrix
+    xyz = list(zip(*mesh.xyz))  # transpose matrix
     xyz += [[1] * len(xyz[0])]  # homogenize
     xyz = multiply_matrices(transformation_matrix, xyz)
-    return zip(*xyz[:3])
+    return list(zip(*xyz[:3]))
 
 
 def mesh_update_vertices(mesh, vertices):
