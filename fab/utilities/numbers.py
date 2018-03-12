@@ -21,7 +21,7 @@ def arange(start, stop, step):
     return [start + i*step for i in range(len)]
 
 
-def allclose(l1, l2, tol=1e-05):
+def allclose(l1, l2, tol = 1e-05):
     """Returns True if two lists are element-wise equal within a tolerance.
     
     The function is similar to NumPy's *allclose* function.

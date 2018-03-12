@@ -7,7 +7,8 @@ following online resources:
     * http://code.activestate.com/recipes/578108-determinant-of-matrix-of-any-order/
     * http://blog.acipo.com/matrix-inversion-in-javascript/
 
-Many thanks to the community for providing code and documentation.
+Many thanks to Christoph Gohlke, Martin John Baker, Sachin Joglekar and Andrew
+Ippoliti for providing code and documentation.
 """
 
 import math
@@ -79,9 +80,7 @@ def determinant(M, check=True):
                 m = 0
                 d[t1] = []
                 for m in range(dim):
-                    if (m == t):
-                        u = 0
-                    else:
+                    if (m != t):
                         d[t1].append(M[t1][m])
             M1 = [d[x] for x in d]
             sum = sum + i * M[0][t] * determinant(M1, check=False)
@@ -117,16 +116,8 @@ def inverse(M):
     dim = len(M)
 
     # create identity I and copy M into C
-    I = []
-    C = []
-    for i in range(dim):
-        I.append([0] * dim)
-        C.append([0] * dim)
-
-        for j in range(dim):
-            if i == j:
-                I[i][j] = 1
-            C[i][j] = M[i][j]
+    I = [[1. if i == j else 0. for i in range(4)] for j in range(4)]
+    C = [[M[i][j] for i in range(4)] for j in range(4)]
 
     # Perform elementary row operations
     for i in range(dim):
@@ -263,8 +254,9 @@ def decompose(M):
             math.fabs(Mt[2][3]) > _EPS:
         P = deepcopy(Mt)
         P[0][3], P[1][3], P[2][3], P[3][3] = 0.0, 0.0, 0.0, 1.0
-        perspective = multiply_matrices([Mt[0][3], Mt[1][3], Mt[2][3], 
-                            Mt[3][3]], inverse(map(list, transpose_matrix(P))))
+        Ptinv = inverse(map(list, transpose_matrix(P)))
+        perspective = multiply_matrix_vector(Ptinv, [Mt[0][3], Mt[1][3],
+                                                     Mt[2][3], Mt[3][3]])
     else:
         perspective = [0.0, 0.0, 0.0, 1.0]
 
@@ -383,21 +375,6 @@ class Transformation(object):
         T2 = Transformation.from_frame(frame_to)
         return T2 * T1.inverse()
 
-    @classmethod
-    def from_translation(cls, translation):
-        """Creates a translation transformation.
-
-        Args:
-            translation (:obj:`iterable` of :obj:`float`): a list of 3 numbers
-                defining the translation in x, y, and z.
-        """
-
-        T = cls()
-        T.matrix[0][3] = float(translation[0])
-        T.matrix[1][3] = float(translation[1])
-        T.matrix[2][3] = float(translation[2])
-        return T
-
     def inverse(self):
         """Returns the inverse transformation.
 
@@ -424,16 +401,6 @@ class Transformation(object):
 
         angles, translation, scale, shear, perspective = decompose(self.matrix)
         return angles, translation, scale, shear, perspective
-
-    @property
-    def basis_vectors(self):
-        """
-        TODO
-        """
-        # TODO: if the matrix also consists of scale, this does not work!
-        xaxis = [self.matrix[0][0], self.matrix[1][0], self.matrix[2][0]]
-        yaxis = [self.matrix[0][1], self.matrix[1][1], self.matrix[2][1]]
-        return xaxis, yaxis
 
     def rotation(self):
         """Get just rotation from transformation.
@@ -553,11 +520,13 @@ class Transformation(object):
     def __iter__(self):
         return iter(self.matrix)
 
-    def __eq__(self, other):
+    def __eq__(self, other, tol=1e-05):
         try:
+            M = self.matrix
+            O = other.matrix
             for i in range(4):
                 for j in range(4):
-                    if not self.matrix[i][j] == other.matrix[i][j]:
+                    if math.fabs(M[i][j] - O[i][j]) > tol:
                         return False
             return True
         except BaseException:
@@ -582,11 +551,9 @@ class Rotation(Transformation):
     representations, Euler angles, and quaternions.
     """
 
-    # axis sequences for Euler angles
-    _NEXT_AXIS = [1, 2, 0, 1]
-
-    # map axes strings to/from tuples of inner axis, parity, repetition, frame
-    _AXES2TUPLE = {
+    # used for Euler angles: to map rotation type and axes to tuples of inner
+    # axis, parity, repetition, frame
+    _SPEC2TUPLE = {
         'sxyz': (0, 0, 0, 0), 'sxyx': (0, 0, 1, 0), 'sxzy': (0, 1, 0, 0),
         'sxzx': (0, 1, 1, 0), 'syzx': (1, 0, 0, 0), 'syzy': (1, 0, 1, 0),
         'syxz': (1, 1, 0, 0), 'syxy': (1, 1, 1, 0), 'szxy': (2, 0, 0, 0),
@@ -596,29 +563,14 @@ class Rotation(Transformation):
         'rzxy': (1, 1, 0, 1), 'ryxy': (1, 1, 1, 1), 'ryxz': (2, 0, 0, 1),
         'rzxz': (2, 0, 1, 1), 'rxyz': (2, 1, 0, 1), 'rzyz': (2, 1, 1, 1)}
 
-    _TUPLE2AXES = dict((v, k) for k, v in _AXES2TUPLE.items())
-
-    @classmethod
-    def from_matrix(cls, matrix):
-        """Creates a clean ``Rotation`` from a 4x4 two-dimensional list of
-            numbers.
-
-        Args:
-            matrix (:obj:`iterable` of :obj:`iterable` of :obj:`float`)
-        """
-        # first decompose
-        angles, translation, scale, shear, perspective = decompose(matrix)
-        # clean transformation matrix, so that it contains just rotation
-        xaxis = [matrix[0][0], matrix[1][0], matrix[2][0]]
-        yaxis = [matrix[0][1], matrix[1][1], matrix[2][1]]
-        return cls.from_basis_vectors(xaxis, yaxis)
+    _NEXT_SPEC = [1, 2, 0, 1]
 
     @classmethod
     def from_basis_vectors(cls, xaxis, yaxis):
         """Creates a ``Rotation`` from basis vectors (= orthonormal vectors).
 
         Computes a change of basis rotation from world XY to the coordinate
-        system (frame) defined by the 2 basis vector.
+        system (frame) defined by the 2 basis vectors.
 
         Args:
             xaxis (:obj:`iterable` oof :obj:`float`): The x-axis of the frame.
@@ -661,9 +613,12 @@ class Rotation(Transformation):
              for j in range(4)]  # outer_product
 
         rotation = cls.from_matrix([
-            [1.0 - q[2][2] - q[3][3], q[1][2] - q[3][0], q[1][3] + q[2][0], 0],
-            [q[1][2] + q[3][0], 1.0 - q[1][1] - q[3][3], q[2][3] - q[1][0], 0],
-            [q[1][3] - q[2][0], q[2][3] + q[1][0], 1.0 - q[1][1] - q[2][2], 0],
+            [1.0 - q[2][2] - q[3][3], q[1][2] - q[3][0], q[1][3] + q[2][0],
+             0.0],
+            [q[1][2] + q[3][0], 1.0 - q[1][1] - q[3][3], q[2][3] - q[1][0],
+             0.0],
+            [q[1][3] - q[2][0], q[2][3] + q[1][0], 1.0 - q[1][1] - q[2][2],
+             0.0],
             [0.0, 0.0, 0.0, 1.0]])
         return rotation
 
@@ -673,17 +628,21 @@ class Rotation(Transformation):
 
         Args:
             axis_angle_vector (:obj:`iterable` of :obj:`float`): Three numbers
-                that represent the axis of rotation and angle of rotation by
-                its magnitude.
+                that represent the axis of rotation and angle of rotation
+                through the vector's magnitude.
 
         Example:
-            R = Rotation.from_axis_angle_vector([-0.043, -0.254, 0.617])
+            aav1 = [-0.043, -0.254, 0.617]
+            R = Rotation.from_axis_angle_vector(aav1)
+            aav2 = R.axis_angle_vector
+            print(allclose(aav1, aav2))
         """
 
         axis_angle_vector = list(axis_angle_vector)
         angle = length_vector(axis_angle_vector)
         return cls.from_axis_and_angle(axis_angle_vector, angle)
 
+    @classmethod
     def from_axis_and_angle(cls, axis, angle, point=None):
         """Calculates a ``Rotation`` from an rotation axis and an angle or a
             ``Transformation`` if the optional point of rotation is provided.
@@ -742,31 +701,40 @@ class Rotation(Transformation):
             return rotation
 
     @classmethod
-    def from_euler_angles(cls, euler_angles, axes='sxyz'):
+    def from_euler_angles(cls, euler_angles, static=True, axes='xyz'):
         """Calculates a ``Rotation`` from Euler angles.
 
-        A triple of Euler angles can be interpreted in 24 ways, which can be
-        specified using a 4 character string or encoded 4-tuple:
+        In 3D space any orientation can be achieved by composing three
+        elemental rotations, rotations about the axes (x,y,z) of a coordinate
+        system. A triple of Euler angles can be interpreted in 24 ways, which
+        depends on if the rotations are applied to a static (extrinsic) or
+        rotating (intrinsic) frame and the order of axes.
 
-  *Axes 4-string*: e.g. 'sxyz' or 'ryxy'
+        Args:
+            euler_angles(:obj:`iterable` of :obj:`float`): Three numbers that
+                represent the axis of rotation
+            static(:obj:`bool`, optional): If true the rotations are applied to
+                a static frame. If not, to a rotational. Defaults to true.
+            axes(:obj:`str`, optional): A 3 character string specifying order
+                of the axes. Defaults to 'xyz'.
 
-  - first character : rotations are applied to 's'tatic or 'r'otating frame
-  - remaining characters : successive rotation axis 'x', 'y', or 'z'
-
-
+        Example:
+            ea1 = 1.4, 0.5, 2.3
+            R = Rotation.from_euler_angles(ea1, static = True, 'xyz')
+            ea2 = R.euler_angles(static = True, axes = 'xyz')
+            print(allclose(ea1, ea2))
         """
 
         ai, aj, ak = euler_angles
 
-        try:
-            firstaxis, parity, repetition, frame = cls._AXES2TUPLE[axes]
-        except (AttributeError, KeyError):
-            cls._TUPLE2AXES[axes]  # validation
-            firstaxis, parity, repetition, frame = axes
+        if static:
+            firstaxis, parity, repetition, frame = cls._SPEC2TUPLE["s" + axes]
+        else:
+            firstaxis, parity, repetition, frame = cls._SPEC2TUPLE["r" + axes]
 
         i = firstaxis
-        j = cls._NEXT_AXIS[i + parity]
-        k = cls._NEXT_AXIS[i - parity + 1]
+        j = cls._NEXT_SPEC[i + parity]
+        k = cls._NEXT_SPEC[i - parity + 1]
 
         if frame:
             ai, ak = ak, ai
@@ -778,9 +746,7 @@ class Rotation(Transformation):
         cc, cs = ci * ck, ci * sk
         sc, ss = si * ck, si * sk
 
-        M = [[0, 0, 0, 0] for i in range(4)]
-        for i in range(4):
-            M[i][i] = 1
+        M = [[1. if x == y else 0. for x in range(4)] for y in range(4)]
         if repetition:
             M[i][i] = cj
             M[i][j] = sj * si
@@ -801,7 +767,6 @@ class Rotation(Transformation):
             M[k][i] = -sj
             M[k][j] = cj * si
             M[k][k] = cj * ci
-        print("M", M)
         return Rotation.from_matrix(M)
 
     @property
@@ -849,30 +814,30 @@ class Rotation(Transformation):
         epsilon = 0.01  # margin to allow for rounding errors
         epsilon2 = 0.1  # margin to distinguish between 0 and 180 degrees
 
-        m = self.matrix
+        M = self.matrix
 
-        if ((math.fabs(m[0][1] - m[1][0]) < epsilon) and
-            (math.fabs(m[0][2] - m[2][0]) < epsilon) and
-                (math.fabs(m[1][2] - m[2][1]) < epsilon)):
+        if ((math.fabs(M[0][1] - M[1][0]) < epsilon) and
+            (math.fabs(M[0][2] - M[2][0]) < epsilon) and
+                (math.fabs(M[1][2] - M[2][1]) < epsilon)):
 
             # Singularity found.
             # First check for identity matrix which must have + 1 for all terms
             # in leading diagonal and zero in other terms
-            if ((math.fabs(m[0][1] + m[1][0]) < epsilon2) and
-                (math.fabs(m[0][2] + m[2][0]) < epsilon2) and
-                (math.fabs(m[1][2] + m[2][1]) < epsilon2) and
-                    (math.fabs(m[0][0] + m[1][1] + m[2][2] - 3) < epsilon2)):
+            if ((math.fabs(M[0][1] + M[1][0]) < epsilon2) and
+                (math.fabs(M[0][2] + M[2][0]) < epsilon2) and
+                (math.fabs(M[1][2] + M[2][1]) < epsilon2) and
+                    (math.fabs(M[0][0] + M[1][1] + M[2][2] - 3) < epsilon2)):
                     # this singularity is identity matrix so angle = 0
                 return [0, 0, 0], 0
             else:
                 # otherwise this singularity is angle = 180
                 angle = math.pi
-                xx = (m[0][0] + 1) / 2
-                yy = (m[1][1] + 1) / 2
-                zz = (m[2][2] + 1) / 2
-                xy = (m[0][1] + m[1][0]) / 4
-                xz = (m[0][2] + m[2][0]) / 4
-                yz = (m[1][2] + m[2][1]) / 4
+                xx = (M[0][0] + 1) / 2
+                yy = (M[1][1] + 1) / 2
+                zz = (M[2][2] + 1) / 2
+                xy = (M[0][1] + M[1][0]) / 4
+                xz = (M[0][2] + M[2][0]) / 4
+                yz = (M[1][2] + M[2][1]) / 4
                 root_half = math.sqrt(0.5)
                 if ((xx > yy) and (xx > zz)):
                     if (xx < epsilon):
@@ -896,61 +861,67 @@ class Rotation(Transformation):
                 return axis, angle
 
         s = math.sqrt(
-            (m[2][1] - m[1][2]) * (m[2][1] - m[1][2]) +
-            (m[0][2] - m[2][0]) * (m[0][2] - m[2][0]) +
-            (m[1][0] - m[0][1]) * (m[1][0] - m[0][1]))
+            (M[2][1] - M[1][2]) * (M[2][1] - M[1][2]) +
+            (M[0][2] - M[2][0]) * (M[0][2] - M[2][0]) +
+            (M[1][0] - M[0][1]) * (M[1][0] - M[0][1]))
 
         # prevent divide by zero][should not happen if matrix is orthogonal and
         # should be
         # caught by singularity test above][but I've left it in just in case
         if (math.fabs(s) < 0.001):
             s = 1
-        angle = math.acos((m[0][0] + m[1][1] + m[2][2] - 1) / 2)
+        angle = math.acos((M[0][0] + M[1][1] + M[2][2] - 1) / 2)
 
-        x = (m[2][1] - m[1][2]) / s
-        y = (m[0][2] - m[2][0]) / s
-        z = (m[1][0] - m[0][1]) / s
+        x = (M[2][1] - M[1][2]) / s
+        y = (M[0][2] - M[2][0]) / s
+        z = (M[1][0] - M[0][1]) / s
 
         return [x, y, z], angle
 
     @property
     def axis_angle_vector(self):
         """Returns the axis-angle vector of the rotation.
+
+        Example:
+            aav1 = [-0.043, -0.254, 0.617]
+            R = Rotation.from_axis_angle_vector(aav1)
+            aav2 = R.axis_angle_vector
+            print(allclose(aav1, aav2))
         """
         axis, angle = self.axis_and_angle
         return [angle * axis[0], angle * axis[1], angle * axis[2]]
 
-    @property
-    def euler_angles(self, axes='sxyz'):
-        """Return Euler angles from rotation matrix for specified axis sequence.
+    def euler_angles(self, static=True, axes='xyz'):
+        """Returns Euler angles from the `Rotation` according to specified axis
+            sequence and rotation type.
 
-        axes : One of 24 axis sequences as string or encoded tuple
+        Args:
+            static(:obj:`bool`, optional): If true the rotations are applied to
+                a static frame. If not, to a rotational. Defaults to true.
+            axes(:obj:`str`, optional): A 3 character string specifying order
+                of the axes. Defaults to 'xyz'.
 
-        Note that many Euler angle triplets can describe one matrix.
+        Returns:
+            (:obj:`list` of :obj:`float`): The 3 Euler angles.
 
         Example:
-            R0 = euler_matrix(1, 2, 3, 'syxz')
-            al, be, ga = euler_from_matrix(R0, 'syxz')
-            R1 = euler_matrix(al, be, ga, 'syxz')
-            print(allclose(R0, R1))
-
-            angles = (4*math.pi) * (numpy.random.random(3) - 0.5)
-            for axes in _AXES2TUPLE.keys():
-                R0 = euler_matrix(axes=axes, *angles)
-                R1 = euler_matrix(axes=axes, *euler_from_matrix(R0, axes))
-                if not numpy.allclose(R0, R1): print(axes, "failed")
+            ea1 = 1.4, 0.5, 2.3
+            R = Rotation.from_euler_angles(ea1, static = True, 'xyz')
+            ea2 = R.euler_angles(static = True, axes = 'xyz')
+            print(allclose(ea1, ea2))
         """
-        try:
-            firstaxis, parity, repetition, frame = _AXES2TUPLE[axes.lower()]
-        except (AttributeError, KeyError):
-            _TUPLE2AXES[axes]  # validation
-            firstaxis, parity, repetition, frame = axes
+
+        if static:
+            firstaxis, parity, repetition, frame = self._SPEC2TUPLE["s" + axes]
+        else:
+            firstaxis, parity, repetition, frame = self._SPEC2TUPLE["r" + axes]
 
         i = firstaxis
-        j = _NEXT_AXIS[i + parity]
-        k = _NEXT_AXIS[i - parity + 1]
+        j = self._NEXT_SPEC[i + parity]
+        k = self._NEXT_SPEC[i - parity + 1]
 
-        M = numpy.array(matrix, dtype=numpy.float64, copy=False)[:3, :3]
+        M = self.matrix
+
         if repetition:
             sy = math.sqrt(M[i][j] * M[i][j] + M[i][k] * M[i][k])
             if sy > _EPS:
@@ -976,7 +947,21 @@ class Rotation(Transformation):
             ax, ay, az = -ax, -ay, -az
         if frame:
             ax, az = az, ax
-        return ax, ay, az
+
+        return [ax, ay, az]
+
+    @property
+    def basis_vectors(self):
+
+        xaxis = [self.matrix[0][0], self.matrix[1][0], self.matrix[2][0]]
+        yaxis = [self.matrix[0][1], self.matrix[1][1], self.matrix[2][1]]
+        zaxis = [self.matrix[0][2], self.matrix[1][2], self.matrix[2][2]]
+
+        print("--")
+        print("1", cross_vectors(xaxis, yaxis))
+        print("2", zaxis)
+        print("--")
+        return [xaxis, yaxis]
 
 
 class Translation(Transformation):
@@ -1011,15 +996,18 @@ class Scale(Transformation):
 
 
 class Reflection(Transformation):
-    """
-    TODO
+    """Creates a ``Reflection`` that mirrors points at a plane, defined by
+        point and normal vector.
+
+        Args:
+        point (:obj:`iterable` of :obj:`float`): A list of 3 numbers.
+        normal (:obj:`iterable` of :obj:`float`): A list of 3 numbers.
+
     """
 
-    @classmethod
-    def from_point_and_normal(cls, point, normal):
-        """Creates a matrix to mirror at plane, defined by point and normal vector.
-        """
-        reflection = cls()
+    def __init__(self, point, normal):
+
+        reflection = self()
 
         normal = normalize_vector((list(normal)))
 
@@ -1028,75 +1016,88 @@ class Reflection(Transformation):
                 reflection.matrix[i][j] -= 2.0 * normal[i] * normal[j]
 
         for i in range(3):
-            reflection.matrix[i][3] = 2 * \
-                dot_vectors(point, normal) * normal[i]
+            reflection.matrix[i][3] = 2 * dot_vectors(point, normal) *\
+                normal[i]
         return reflection
 
     @classmethod
     def from_frame(cls, frame):
-        """Creates a matrix to mirror at plane.
+        """Creates a ``Reflection`` that mirrors points at the given frame.
+
+        Args:
+            frame(:class:`Frame`)
         """
-        return cls.from_point_and_normal(frame.point, frame.normal)
+        return cls(frame.point, frame.normal)
 
 
 class Projection(Transformation):
-    """Return matrix to project onto plane defined by point and normal.
+    """Creates a ``Projection`` that projects onto a plane defined by point and
+    normal.
 
     Using either perspective point, projection direction, or none of both.
 
-    If pseudo is True, perspective projections will preserve relative depth
-    such that Perspective = dot(Orthogonal, PseudoPerspective).
+    Example:
+        from random import random as rnd
+        point = [rnd() - 0.5 for i in range(3)]
+        normal = [rnd() - 0.5 for i in range(3)]
+        direct = [rnd() - 0.5 for i in range(3)]
+        persp = [rnd() - 0.5 for i in range(3)]
 
-    >>> P = projection_matrix([0, 0, 0], [1, 0, 0])
-    >>> numpy.allclose(P[1:, 1:], numpy.identity(4)[1:, 1:])
-    True
-    >>> point = numpy.random.random(3) - 0.5
-    >>> normal = numpy.random.random(3) - 0.5
-    >>> direct = numpy.random.random(3) - 0.5
-    >>> persp = numpy.random.random(3) - 0.5
-    >>> P0 = projection_matrix(point, normal)
-    >>> P1 = projection_matrix(point, normal, direction=direct)
-    >>> P2 = projection_matrix(point, normal, perspective=persp)
-    >>> P3 = projection_matrix(point, normal, perspective=persp, pseudo=True)
-    >>> is_same_transform(P2, numpy.dot(P0, P3))
-    True
-    >>> P = projection_matrix([3, 0, 0], [1, 1, 0], [1, 0, 0])
-    >>> v0 = (numpy.random.rand(4, 5) - 0.5) * 20
-    >>> v0[3] = 1
-    >>> v1 = numpy.dot(P, v0)
-    >>> numpy.allclose(v1[1], v0[1])
-    True
-    >>> numpy.allclose(v1[0], 3-v1[1])
-    True
+        print("point =", point)
+        print("normal =", normal)
+        print("direct =", direct)
+        print("persp =", persp)
+
+        P0 = Projection(point, normal)
+        P1 = Projection(point, normal, direction=direct)
+        P2 = Projection(point, normal, perspective=persp)
+        print(P0)
+        print(P1)
+        print(P2)
 
     """
 
     def __init__(self, point, normal, direction=None, perspective=None):
-        
-        M = numpy.identity(4)
-        point = numpy.array(point[:3], dtype=numpy.float64, copy=False)
-        normal = unit_vector(normal[:3])
-        
+
+        M = [[1. if i == j else 0. for i in range(4)] for j in range(4)]
+
+        normal = normalize_vector(normal)
+
         if perspective is not None:
             # perspective projection
-            perspective = numpy.array(perspective[:3], dtype=numpy.float64,
-                                      copy=False)
-            M[0, 0] = M[1, 1] = M[2, 2] = numpy.dot(perspective-point, normal)
-            M[:3, :3] -= numpy.outer(perspective, normal)
-            M[:3, 3] = numpy.dot(point, normal) * perspective
-            M[3, :3] = -normal
-            M[3, 3] = numpy.dot(perspective, normal)
+
+            M[0][0] = M[1][1] = M[2][2] = dot_vectors(
+                subtract_vectors(perspective, point), normal)
+
+            for j in range(3):
+                for i in range(3):
+                    M[i][j] -= perspective[i] * normal[j]
+
+            M[0][3], M[1][3], M[2][3] = scale_vector(
+                perspective, dot_vectors(point, normal))
+            for i in range(3):
+                M[3][i] -= normal[i]
+            M[3][3] = dot_vectors(perspective, normal)
+
         elif direction is not None:
             # parallel projection
-            direction = numpy.array(direction[:3], dtype=numpy.float64, copy=False)
-            scale = numpy.dot(direction, normal)
-            M[:3, :3] -= numpy.outer(direction, normal) / scale
-            M[:3, 3] = direction * (numpy.dot(point, normal) / scale)
+            scale = dot_vectors(direction, normal)
+            for j in range(3):
+                for i in range(3):
+                    M[i][j] -= direction[i] * normal[j] / scale
+
+            M[0][3], M[1][3], M[2][3] = scale_vector(
+                direction, dot_vectors(point, normal) / scale)
         else:
             # orthogonal projection
-            M[:3, :3] -= numpy.outer(normal, normal)
-            M[:3, 3] = numpy.dot(point, normal) * normal
-        return M
+            for j in range(3):
+                for i in range(3):
+                    M[i][j] -= normal[i] * normal[j]  # outer_product
+
+            M[0][3], M[1][3], M[2][3] = scale_vector(
+                normal, dot_vectors(point, normal))
+
+        self.matrix = M
 
 
 class Shear(Transformation):
@@ -1137,127 +1138,106 @@ class Shear(Transformation):
             S = shear_matrix(angle, direct, point, normal)
             numpy.allclose(1, numpy.linalg.det(S))
         """
-        normal = unit_vector(normal[:3])
-        direction = unit_vector(direction[:3])
-        if abs(numpy.dot(normal, direction)) > 1e-6:
-            raise ValueError('direction and normal vectors are not orthogonal')
+
+        normal = normalize_vector(normal)
+        direction = normalize_vector(direction)
+
+        if math.fabs(dot_vectors(normal, direction)) > _EPS:
+            raise ValueError('Direction and normal vectors are not orthogonal')
+
         angle = math.tan(angle)
-        M = numpy.identity(4)
-        M[:3, :3] += angle * numpy.outer(direction, normal)
-        M[:3, 3] = -angle * numpy.dot(point[:3], normal) * direction
+        M = [[1. if i == j else 0. for i in range(4)] for j in range(4)]
 
-        """
-        if shear is not None:
-        Z = numpy.identity(4)
-        Z[1, 2] = shear[2]
-        Z[0, 2] = shear[1]
-        Z[0, 1] = shear[0]
-        """
+        for j in range(3):
+            for i in range(3):
+                M[i][j] += angle * direction[i] * normal[j]
 
-        return M
-        raise NotImplementedError
+        M[0][3], M[1][3], M[2][3] = scale_vector(
+            direction, -angle * dot_vectors(point, normal))
 
-
-def transform_xyz(xyz, transformation):
-    """Transforms a point, vector, xyz coordinates or a list therefrom.
-
-    TODO: should be attached to the elements.
-    """
-    xyz = list(xyz)
-
-    if isinstance(xyz[0], float) or isinstance(
-            xyz[0], int):  # point, vector, xyz coordinates
-        xyzw = multiply_matrix_vector(
-            transformation.matrix, homogenize([xyz])[0])
-        return dehomogenize([xyzw])[0]
-    else:  # it is a list of xyz coordinates
-        xyzw = homogenize(xyz)
-        xyzw = multiply_matrices(
-            xyzw, map(list, transpose_matrix(transformation.matrix)))
-        return dehomogenize(xyzw)
+        self.matrix = M
 
 
 if __name__ == "__main__":
 
     from compas_fab.fab.geometry import Frame
-    from compas.geometry import scale_vector, add_vectors, sum_vectors
 
-    f1 = Frame.worldXY()
-    f2 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
-    t = Transformation.from_frame_to_frame(f1, f2)
-    p = [1, 1, 1]
-    pt1 = transform_xyz(p, t)
-    pt2 = sum_vectors([f2.point, scale_vector(f2.xaxis, p[0]), scale_vector(
-        f2.yaxis, p[1]), scale_vector(f2.zaxis, p[2])])
-    print(pt1, "==", pt2, allclose(pt1, pt2))
+    aav1 = [-0.043, -0.254, 0.617]
+    R = Rotation.from_axis_angle_vector(aav1)
+    aav2 = R.axis_angle_vector
+    print("aav1 == aav2", allclose(aav1, aav2))
+    print("det", determinant(R.matrix))
+    print("=================")
 
-    T = Transformation.from_frame(f2)
-    print("--")
-    Tinv = T.inverse()
-    Tinv2 = inverse(T.matrix)
-    print(Tinv)
-    for x in Tinv2:
-        print(x)
-    print("--")
-    print(
-        "T * Tinv == I",
-        allclose(
-            (T * Tinv).list,
-            Transformation.identity().list))
+    args = True, 'xyz'
+    ea1 = [2.03, -0.1, 0.5]
+    R = Rotation.from_euler_angles(ea1, *args)
+    print(R)
+    print("det", determinant(R.matrix))
+    ea2 = R.euler_angles(*args)
+    print(allclose(ea1, ea2))
 
-    print(" ")
-    for x in iter(T.matrix):
-        print("==>", x)
+    print("=================")
+    print(">>", R.axis_angle_vector)
+    print(R.basis_vectors)
+    print("=================")
 
-    rotation = Rotation.from_frame(f2)
-    print(rotation)
-    scale = Scale(2., 2., 2)
-    translation = Transformation.from_translation([30, 30, 30])
-    T = rotation * scale * translation
-    print("T", T)
-    print("-->>")
+    from random import random as rnd
+    point = [rnd() - 0.5 for i in range(3)]
+    normal = [rnd() - 0.5 for i in range(3)]
+    direct = [rnd() - 0.5 for i in range(3)]
+    persp = [rnd() - 0.5 for i in range(3)]
 
-    Tinv = T.inverse()
-    Tinv2 = inverse(T.matrix)
-    print(Tinv)
-    for x in Tinv2:
-        print(x)
-    print("-->>")
+    point = [-0.4115985042852909, -0.1440252439994525, -0.35887224226687087]
+    normal = [0.2648560337872353, 0.17956931561274203, 0.44275624449933515]
+    direct = [0.2723206499809814, -0.40163729179666474, 0.21388354572922286]
+    persp = [-0.49300110873599023, -0.39194105941568413, 0.49221271116515697]
 
-    scale, shear, angles, translate, perspective = T.decompose()
+    P0 = Projection(point, normal)
+    P1 = Projection(point, normal, direction=direct)
+    P2 = Projection(point, normal, perspective=persp)
+    print(P0)
+    print(P1)
+    print(P2)
+    angles, translation, scale, shear, perspective = P2.decompose()
+    print(determinant(P2.matrix))
+
+    print("=================")
+    angle = 0.234
+    point = [-0.4115985042852909, -0.1440252439994525, -0.35887224226687087]
+    normal = [0.2648560337872353, 0.17956931561274203, 0.44275624449933515]
+    direction = cross_vectors(
+        normal, [
+            0.2723206499809814, -0.40163729179666474, 0.21388354572922286])
+    Sh = Shear(angle, direction, point, normal)
+    print(Sh)
+    print(determinant(Sh.matrix))
+
+    scale, shear, angles, translate, perspective = Sh.decompose()
 
     print("scale", scale)
     print("share", shear)
     print("angles", angles)
     print("translate", translate)
     print("perspective", perspective)
-    f = Frame([10, 11, 12], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
-    T = Transformation.from_frame(f)
-    print("**")
-    numbers = [1, 0, 0, 3, 0, 1, 0, 4, 0, 0, 1, 5, 0, 0, 0, 1]
-    T = Transformation.from_list(numbers)
-    print(T)
-    print("**")
-    print scale_matrix(2)
-    print("====")
-    f0 = Frame.worldXY()
-    f1 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
-    p1, p2, p3 = f1.point, add_vectors(
-        f1.point, f1.xaxis), add_vectors(
-        f1.point, f1.yaxis)
-    T = Transformation.from_frame_to_frame(f0, f1)
 
-    q1, q2, q3 = T.transform_points([f0.point, add_vectors(
-        f0.point, f0.xaxis), add_vectors(f0.point, f0.yaxis)])
-    print(p1, q1)
-    print(p2, q2)
-    print(p3, q3)
+    print("=================")
 
-    print(allclose(p1, q1))
-    print(allclose(p2, q2))
-    print(allclose(p3, q3))
+    f1 = Frame.worldXY()
+    f2 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
 
-    print(T * T)
-    T *= T
-    print(T)
-    print(">>>>>>>>>>>>")
+    R = Rotation.from_frame(f2)
+    Sc = Scale(1, 2, 3)
+    T = Translation([4, 5, 6])
+    Sh = Shear(angle, direction, point, normal)
+    P = Projection(point, normal, perspective=persp)
+    M = P * Sh * T * Sc * R
+    print("M", M)
+
+    angles, translation, scale, shear, perspective = M.decompose()
+
+    print("scale", scale)
+    print("share", shear)
+    print("angles", angles)
+    print("translate", translate)
+    print("perspective", perspective)
