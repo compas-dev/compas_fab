@@ -1,7 +1,5 @@
 from compas_fab.fab.geometry import Frame, Transformation
 from compas_fab.fab.geometry.helpers import mesh_update_vertices
-from compas_fab.fab.geometry.transformation import transform_xyz
-
 
 class Tool(object):
     """
