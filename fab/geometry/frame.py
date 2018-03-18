@@ -1,7 +1,10 @@
 from __future__ import print_function
 import math
+
 from compas.geometry.basic import cross_vectors
 from compas.geometry.basic import normalize_vector
+from compas.geometry.basic import subtract_vectors
+
 from compas_fab.fab.geometry.transformation import Transformation
 from compas_fab.fab.geometry.transformation import Rotation
 from compas_fab.fab.geometry.transformation import matrix_from_basis_vectors
@@ -13,9 +16,12 @@ from compas_fab.fab.geometry.transformation import matrix_from_axis_angle_vector
 from compas_fab.fab.geometry.transformation import euler_angles_from_matrix
 from compas_fab.fab.geometry.transformation import matrix_from_euler_angles
 from compas_fab.fab.geometry.transformation import decompose_matrix
+
 from compas_fab.fab.utilities.numbers import allclose
 
 __author__ = ['Romana Rust <rust@arch.ethz.ch>', ]
+__license__ = 'MIT License'
+__email__ = 'rust@arch.ethz.ch'
 
 
 class Frame():
@@ -68,7 +74,7 @@ class Frame():
         """Returns the world YZ frame.
         """
         return cls([0, 0, 0], [0, 1, 0], [0, 0, 1])
-    
+
     @classmethod
     def from_points(cls, point, point_xaxis, point_xyplane):
         """Calculates a frame from 3 points.
@@ -79,9 +85,9 @@ class Frame():
                 the frame.
             point_xyplane (:obj:`list` of :obj:`float`): A point within the
                 xy-plane of the frame.
-        
+
         Example:
-            f = Frame.from_points([1, 1, 1], [2, 4, 5], [4, 2, 3])
+            >>> f = Frame.from_points([1, 1, 1], [2, 4, 5], [4, 2, 3])
         """
         xaxis = subtract_vectors(point_xaxis, point)
         xyvec = subtract_vectors(point_xyplane, point)
@@ -89,7 +95,7 @@ class Frame():
         return cls(point, xaxis, yaxis)
 
     @classmethod
-    def from_rotation(cls, rotation, point = [0, 0, 0]):
+    def from_rotation(cls, rotation, point=[0, 0, 0]):
         """Calculates a frame from a ``Rotation``.
 
         Args:
@@ -127,15 +133,15 @@ class Frame():
         xaxis, yaxis = transformation.basis_vectors
         point = transformation.translation
         return cls(point, xaxis, yaxis)
-    
+
     @classmethod
     def from_matrix(cls, matrix):
         """Calculates a frame from a matrix.
-        
+
         Args:
-            matrix (:obj:`list` of :obj:`list` of :obj:`float`): The 4x4 
+            matrix (:obj:`list` of :obj:`list` of :obj:`float`): The 4x4
                 transformation matrix in row-major order.
-        
+
         Example:
             >>> ea1 = [0.5, 0.4, 0.8]
             >>> M = matrix_from_euler_angles(ea1)
@@ -150,12 +156,12 @@ class Frame():
         return cls(point, xaxis, yaxis)
 
     @classmethod
-    def from_quaternion(cls, quaternion, point = [0, 0, 0]):
-        """Calculates a frame from a rotation represented by quaternion
+    def from_quaternion(cls, quaternion, point=[0, 0, 0]):
+        """Calculates a frame from a rotation represented by quaternion \
             coefficients.
 
         Args:
-            quaternion (:obj:`list` of :obj:`float`): Four numbers that 
+            quaternion (:obj:`list` of :obj:`float`): Four numbers that
                 represent the four coefficient values of a quaternion.
             point (:obj:`list` of :obj:`float`, optional): The point of the
                 frame. Defaults to [0, 0, 0].
@@ -172,13 +178,13 @@ class Frame():
         return cls(point, xaxis, yaxis)
 
     @classmethod
-    def from_axis_angle_vector(cls, axis_angle_vector, point = [0, 0, 0]):
-        """Calculates a frame from a rotation represented by an axis-angle 
-            vector.
+    def from_axis_angle_vector(cls, axis_angle_vector, point=[0, 0, 0]):
+        """Calculates a frame from an axis-angle vector representing the \
+            rotation.
 
         Args:
             axis_angle_vector (:obj:`list` of :obj:`float`): Three numbers that
-                represent the axis of rotation and angle of rotation by its 
+                represent the axis of rotation and angle of rotation by its
                 magnitude.
             point (:obj:`list` of :obj:`float`, optional): The point of the
                 frame. Defaults to [0, 0, 0].
@@ -195,7 +201,8 @@ class Frame():
         return cls(point, xaxis, yaxis)
 
     @classmethod
-    def from_euler_angles(cls, euler_angles, static=True, axes='xyz', point = [0, 0, 0]):
+    def from_euler_angles(cls, euler_angles, static=True,
+                          axes='xyz', point=[0, 0, 0]):
         """Calculates a frame from a rotation represented by Euler angles.
 
         Args:
@@ -203,7 +210,7 @@ class Frame():
                 represent the angles of rotations about the defined axes.
             static(:obj:`bool`, optional): If true the rotations are applied to
                 a static frame. If not, to a rotational. Defaults to true.
-            axes(:obj:`str`, optional): A 3 character string specifying the 
+            axes(:obj:`str`, optional): A 3 character string specifying the
                 order of the axes. Defaults to 'xyz'.
             point (:obj:`list` of :obj:`float`, optional): The point of the
                 frame. Defaults to [0, 0, 0].
@@ -248,24 +255,25 @@ class Frame():
 
     def euler_angles(self, static=True, axes='xyz'):
         """Returns the Euler angles from the rotation given by the frame.
-        
+
          Args:
-            static(:obj:`bool`, optional): If true the rotations are applied to
-                a static frame. If not, to a rotational. Defaults to true.
-            axes(:obj:`str`, optional): A 3 character string specifying the 
+            static(:obj:`bool`, optional): If true the rotations are applied \
+                to a static frame. If not, to a rotational. Defaults to True.
+
+            axes(:obj:`str`, optional): A 3 character string specifying the \
                 order of the axes. Defaults to 'xyz'.
-        
+
         Returns:
-            (:obj:`list` of :obj:`float`): Three numbers that represent the 
+            (:obj:`list` of :obj:`float`): Three numbers that represent the \
                 angles of rotations about the defined axes.
-            
+
         Example:
             >>> ea1 = 1.4, 0.5, 2.3
             >>> f = Frame.from_euler_angles(ea1, static = True, axes = 'xyz')
             >>> ea2 = f.euler_angles(static = True, axes = 'xyz')
             >>> allclose(ea1, ea2)
             True
-        """        
+        """
         R = matrix_from_basis_vectors(self.xaxis, self.yaxis)
         return euler_angles_from_matrix(R, static, axes)
 
@@ -280,7 +288,7 @@ class Frame():
 
         Returns:
             (:class:`Frame`): The transformed frame.
-        
+
         Example:
             >>> f1 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
             >>> T = Transformation.from_frame(f1)
@@ -307,8 +315,7 @@ class Frame():
         s += "[%.4f, %.4f, %.4f], " % tuple(self.xaxis)
         s += "[%.4f, %.4f, %.4f]]" % tuple(self.yaxis)
         return s
-    
-    
+
     def __iter__(self):
         return iter([self.point, self.xaxis, self.yaxis])
 
@@ -324,39 +331,37 @@ if __name__ == '__main__':
 
     f1 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
     R = Rotation.from_frame(f1)
-    f2 = Frame.from_rotation(R, point = f1.point)
+    f2 = Frame.from_rotation(R, point=f1.point)
     print(f1 == f2)
-    
+
     f1 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
     T = Transformation.from_frame(f1)
     f2 = Frame.from_transformation(T)
     print(f1 == f2)
-    
+
     ea1 = [0.5, 0.4, 0.8]
     M = matrix_from_euler_angles(ea1)
     f = Frame.from_matrix(M)
     ea2 = f.euler_angles()
     print(allclose(ea1, ea2))
-    
+
     q1 = [0.945, -0.021, -0.125, 0.303]
-    f = Frame.from_quaternion(q1, point = [1., 1., 1.])
+    f = Frame.from_quaternion(q1, point=[1., 1., 1.])
     q2 = f.quaternion
     print(allclose(q1, q2, tol=1e-03))
-    
+
     aav1 = [-0.043, -0.254, 0.617]
-    f = Frame.from_axis_angle_vector(aav1, point = [0, 0, 0])
+    f = Frame.from_axis_angle_vector(aav1, point=[0, 0, 0])
     aav2 = f.axis_angle_vector
     print(allclose(aav1, aav2))
-    
+
     ea1 = 1.4, 0.5, 2.3
-    f = Frame.from_euler_angles(ea1, static = True, axes = 'xyz')
-    ea2 = f.euler_angles(static = True, axes = 'xyz')
+    f = Frame.from_euler_angles(ea1, static=True, axes='xyz')
+    ea2 = f.euler_angles(static=True, axes='xyz')
     print(allclose(ea1, ea2))
-    
+
     f1 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
     T = Transformation.from_frame(f1)
     f2 = Frame.worldXY()
     f2.transform(T)
     print(f1 == f2)
-
-    

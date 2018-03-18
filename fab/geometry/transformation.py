@@ -12,7 +12,6 @@ Ippoliti for providing code and documentation.
 """
 import math
 from copy import deepcopy
-from astropy.units import mV
 
 # Support pre-release versions of compas
 try:
@@ -32,13 +31,44 @@ from compas.geometry.basic import norm_vector
 from compas.geometry.basic import transpose_matrix
 
 from compas.geometry.transformations import homogenize
-from compas.geometry.transformations import dehomogenize
-from compas.geometry.transformations import scale_matrix
-from compas.geometry.transformations import translation_matrix
 
 from compas_fab.fab.utilities.numbers import allclose
 
 __author__ = ['Romana Rust <rust@arch.ethz.ch>', ]
+__license__ = 'MIT License'
+__email__ = 'rust@arch.ethz.ch'
+
+__all__ = [
+    'determinant',
+    'inverse',
+    'identity_matrix',
+    'matrix_from_frame',
+    'matrix_from_euler_angles',
+    'euler_angles_from_matrix',
+    'matrix_from_axis_and_angle',
+    'matrix_from_axis_angle_vector',
+    'axis_and_angle_from_matrix',
+    'axis_angle_vector_from_matrix',
+    'matrix_from_quaternion',
+    'quaternion_from_matrix',
+    'matrix_from_basis_vectors',
+    'basis_vectors_from_matrix',
+    'matrix_from_translation',
+    'translation_from_matrix',
+    'matrix_from_perspective_entries',
+    'matrix_from_shear_entries',
+    'matrix_from_shear',
+    'matrix_from_scale_factors',
+    'compose_matrix',
+    'decompose_matrix',
+    'Transformation',
+    'Rotation',
+    'Translation',
+    'Scale',
+    'Reflection',
+    'Projection',
+    'Shear'
+]
 
 # TODO: need to be moved ideally to compas.geometry.basic
 
@@ -65,14 +95,15 @@ def determinant(M, check=True):
     """Calculates the determinant of a square matrix M.
 
     Args:
-        M (:obj:`list` of :obj:`list` of :obj:`float`): The square
-            matrix of any dimension.
+        M (:obj:`list` of :obj:`list` of :obj:`float`): The square matrix of \
+            any dimension.
+        check (bool): If true checks if matrix is squared. Defaults to True.
 
     Raises:
         ValueError: If matrix is not a square matrix.
 
     Returns:
-        (float): The determinant.
+        (:obj:`float`): The determinant.
     """
 
     dim = len(M)
@@ -120,6 +151,11 @@ def inverse(M):
 
     Returns:
         (:obj:`list` of :obj:`list` of :obj:`float`): The inverted matrix.
+
+    Example:
+        >>> f = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+        >>> T = matrix_from_frame(f)
+        >>> I = multiply_matrices(T * inverse(T))
     """
 
     detM = determinant(M)  # raises ValueError if matrix is not squared
@@ -130,12 +166,13 @@ def inverse(M):
     dim = len(M)
 
     # create identity I and copy M into C
-    I = [[1. if i == j else 0. for i in range(4)] for j in range(4)]
-    C = [[M[i][j] for i in range(4)] for j in range(4)]
+    I = identity_matrix(dim)
+    C = [[float(M[j][i]) for i in range(dim)] for j in range(dim)]
 
     # Perform elementary row operations
     for i in range(dim):
         e = C[i][i]
+
         if e == 0:
             for ii in range(dim):
                 if C[ii][i] != 0:
@@ -150,6 +187,7 @@ def inverse(M):
             e = C[i][i]
             if e == 0:
                 ValueError("Matrix not invertible")
+
         for j in range(dim):
             C[i][j] = C[i][j] / e
             I[i][j] = I[i][j] / e
@@ -161,35 +199,63 @@ def inverse(M):
             for j in range(dim):
                 C[ii][j] -= e * C[i][j]
                 I[ii][j] -= e * I[i][j]
+
     return I
+
+
+def identity_matrix(dim):
+    return [[1. if i == j else 0. for i in range(dim)] for j in range(dim)]
+
+
+def matrix_from_frame(frame):
+    """Computes a change of basis transformation from world XY to the frame.
+
+    Args:
+        frame (:class:`Frame`): a frame describing the targeted Cartesian
+            coordinate system
+
+    Example:
+        >>> f = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+        >>> T = matrix_from_frame(f)
+    """
+
+    M = identity_matrix(4)
+    M[0][0], M[1][0], M[2][0] = frame.xaxis
+    M[0][1], M[1][1], M[2][1] = frame.yaxis
+    M[0][2], M[1][2], M[2][2] = frame.zaxis
+    M[0][3], M[1][3], M[2][3] = frame.point
+    return M
 
 
 def matrix_from_euler_angles(euler_angles, static=True, axes='xyz'):
     """Calculates a rotation matrix from Euler angles.
 
-    In 3D space any orientation can be achieved by composing three elemental 
-    rotations, rotations about the axes (x,y,z) of a coordinate system. A 
-    triple of Euler angles can be interpreted in 24 ways, which depends on if 
-    the rotations are applied to a static (extrinsic) or rotating (intrinsic) 
+    In 3D space any orientation can be achieved by composing three elemental
+    rotations, rotations about the axes (x,y,z) of a coordinate system. A
+    triple of Euler angles can be interpreted in 24 ways, which depends on if
+    the rotations are applied to a static (extrinsic) or rotating (intrinsic)
     frame and the order of axes.
 
     Args:
         euler_angles(:obj:`list` of :obj:`float`): Three numbers that represent
             the angles of rotations about the defined axes.
-        static(:obj:`bool`, optional): If true the rotations are applied to a 
+        static(:obj:`bool`, optional): If true the rotations are applied to a
             static frame. If not, to a rotational. Defaults to true.
-        axes(:obj:`str`, optional): A 3 character string specifying order of 
+        axes(:obj:`str`, optional): A 3 character string specifying order of
             the axes. Defaults to 'xyz'.
 
     Example:
-        ea1 = 1.4, 0.5, 2.3
-        R = matrix_from_euler_angles(ea1, static = True, axes = 'xyz')
-        ea2 = euler_angles_from_matrix(static = True, axes = 'xyz')
-        print(allclose(ea1, ea2))
+        >>> ea1 = 1.4, 0.5, 2.3
+        >>> args = True, 'xyz'
+        >>> R = matrix_from_euler_angles(ea1, *args)
+        >>> ea2 = euler_angles_from_matrix(*args)
+        >>> allclose(ea1, ea2)
+        True
     """
+
     global _SPEC2TUPLE
     global _NEXT_SPEC
-    
+
     ai, aj, ak = euler_angles
 
     if static:
@@ -232,31 +298,34 @@ def matrix_from_euler_angles(euler_angles, static=True, axes='xyz'):
         M[k][i] = -sj
         M[k][j] = cj * si
         M[k][k] = cj * ci
-        
+
     return M
 
+
 def euler_angles_from_matrix(M, static=True, axes='xyz'):
-    """Returns Euler angles from the `Rotation` according to specified axis
-        sequence and rotation type.
+    """Returns Euler angles from the rotation matrix M according to specified
+        axis sequence and type of rotation.
 
     Args:
-        M (:obj:`list` of :obj:`list` of :obj:`float`): The 3x3 or 4x4 matrix 
+        M (:obj:`list` of :obj:`list` of :obj:`float`): The 3x3 or 4x4 matrix
             in row-major order.
-        static(:obj:`bool`, optional): If true the rotations are applied to a 
-            static frame. If not, to a rotational. Defaults to true.
-        axes(:obj:`str`, optional): A 3 character string specifying order of 
+        static(:obj:`bool`, optional): If true the rotations are applied to a
+            static frame. If not, to a rotational. Defaults to True.
+        axes(:obj:`str`, optional): A 3 character string specifying order of
             the axes. Defaults to 'xyz'.
 
     Returns:
         (:obj:`list` of :obj:`float`): The 3 Euler angles.
 
     Example:
-        ea1 = 1.4, 0.5, 2.3
-        R = matrix_from_euler_angles(ea1, static = True, axes = 'xyz')
-        ea2 = euler_angles_from_matrix(static = True, axes = 'xyz')
-        print(allclose(ea1, ea2))
+        >>> ea1 = 1.4, 0.5, 2.3
+        >>> args = True, 'xyz'
+        >>> R = matrix_from_euler_angles(ea1, *args)
+        >>> ea2 = euler_angles_from_matrix(*args)
+        >>> allclose(ea1, ea2)
+        True
     """
-    
+
     global _SPEC2TUPLE
     global _NEXT_SPEC
     global _EPS
@@ -299,14 +368,8 @@ def euler_angles_from_matrix(M, static=True, axes='xyz'):
     return [ax, ay, az]
 
 
-def matrix_from_axis_angle_vector(axis_angle_vector, point=None):
-    axis = list(axis_angle_vector)
-    angle = length_vector(axis_angle_vector)
-    return matrix_from_axis_and_angle(axis, angle, point)
-
-
-def matrix_from_axis_and_angle(axis, angle, point=None):
-    """Calculates a rotation matrix from an rotation axis, an angle and an 
+def matrix_from_axis_and_angle(axis, angle, point=[0, 0, 0]):
+    """Calculates a rotation matrix from an rotation axis, an angle and an
         optional point of rotation.
 
     Note:
@@ -318,13 +381,20 @@ def matrix_from_axis_and_angle(axis, angle, point=None):
             represent the axis of rotation
         angle (:obj:`float`): The rotaion angle in radians.
         point (:obj:`list` of :obj:`float`, optional): A point to
-            perform a rotation around an origin other than (0, 0, 0).
-
-    Example:
-        R = Rotation.from_axis_and_angle([-0.043, -0.254, 0.617], 0.1)
+            perform a rotation around an origin other than [0, 0, 0].
 
     Returns:
         (:obj:`list` of :obj:`list` of :obj:`float`): The matrix.
+
+    Example:
+        >>> axis1 = normalize_vector([-0.043, -0.254, 0.617])
+        >>> angle1 = 0.1
+        >>> R = matrix_from_axis_and_angle(axis1, angle1)
+        >>> axis2, angle2 = axis_and_angle_from_matrix(R)
+        >>> allclose(axis1, axis2)
+        True
+        >>> allclose([angle1], [angle2])
+        True
     """
 
     axis = list(axis)
@@ -345,28 +415,48 @@ def matrix_from_axis_and_angle(axis, angle, point=None):
     m = [[0.0, -axis[2], axis[1]],
          [axis[2], 0.0, -axis[0]],
          [-axis[1], axis[0], 0.0]]
-    
+
     M = [[1. if x == y else 0. for x in range(4)] for y in range(4)]
     for i in range(3):
         for j in range(3):
             R[i][j] += m[i][j]
             M[i][j] = R[i][j]
-    
-    if point is not None:
-        # rotation about axis, angle AND point includes also translation
-        t = subtract_vectors(point, multiply_matrix_vector(R, point))
-        M[0][3] = t[0]
-        M[1][3] = t[1]
-        M[2][3] = t[2]
-    
+
+    # rotation about axis, angle AND point includes also translation
+    t = subtract_vectors(point, multiply_matrix_vector(R, point))
+    M[0][3] = t[0]
+    M[1][3] = t[1]
+    M[2][3] = t[2]
+
     return M
 
-def axis_angle_vector_from_matrix(M):
-    axis, angle = axis_and_angle_from_matrix(M)
-    return scale_vector(axis, angle)
+
+def matrix_from_axis_angle_vector(axis_angle_vector, point=[0, 0, 0]):
+    """Calculates a rotation matrix from an axis-angle vector.
+
+    Args:
+        axis_angle_vector (:obj:`list` of :obj:`float`): Three numbers
+            that represent the axis of rotation and angle of rotation
+            through the vector's magnitude.
+        point (:obj:`list` of :obj:`float`, optional): A point to
+            perform a rotation around an origin other than [0, 0, 0].
+
+    Example:
+        >>> aav1 = [-0.043, -0.254, 0.617]
+        >>> R = matrix_from_axis_angle_vector(aav1)
+        >>> aav2 = axis_and_angle_from_matrix(R)
+        >>> allclose(aav1, aav2)
+        True
+    """
+    axis = list(axis_angle_vector)
+    angle = length_vector(axis_angle_vector)
+    return matrix_from_axis_and_angle(axis, angle, point)
+
 
 def axis_and_angle_from_matrix(M):
-    """Returns the axis and the angle of rotation.
+    """Returns the axis and the angle of the rotation matrix M.
+
+
     """
     epsilon = 0.01  # margin to allow for rounding errors
     epsilon2 = 0.1  # margin to distinguish between 0 and 180 degrees
@@ -424,7 +514,14 @@ def axis_and_angle_from_matrix(M):
     z = (M[1][0] - M[0][1]) / s
 
     return [x, y, z], angle
-    
+
+
+def axis_angle_vector_from_matrix(M):
+    """Returns the axis-angle vector of the rotation matrix M.
+    """
+    axis, angle = axis_and_angle_from_matrix(M)
+    return scale_vector(axis, angle)
+
 
 def matrix_from_quaternion(quaternion):
     """Calculates a ``Rotation`` from quaternion coefficients.
@@ -433,9 +530,12 @@ def matrix_from_quaternion(quaternion):
         quaternion (:obj:`list` of :obj:`float`): Four numbers that
             represents the four coefficient values of a quaternion.
 
+    Raises:
+        ValueError: If quaternion is invalid.
+
     Example:
         >>> q1 = [0.945, -0.021, -0.125, 0.303]
-        >>> R = matrix_from_quaternion(q)
+        >>> R = matrix_from_quaternion(q1)
         >>> q2 = quaternion_from_matrix(R)
         >>> allclose(q1, q2)
         True
@@ -446,7 +546,7 @@ def matrix_from_quaternion(quaternion):
     epsilon = 1.0e-15
 
     if n < epsilon:
-        return cls()
+        raise ValueError("Invalid quaternion, dot product must be != 0.")
 
     q = [v * math.sqrt(2.0 / n) for v in q]
     q = [[q[i] * q[j] for i in range(4)]
@@ -458,14 +558,14 @@ def matrix_from_quaternion(quaternion):
         [q[1][3] - q[2][0], q[2][3] + q[1][0], 1.0 - q[1][1] - q[2][2], 0.0],
         [0.0, 0.0, 0.0, 1.0]]
     return rotation
-    
+
 
 def quaternion_from_matrix(M):
     """Returns the 4 quaternion coefficients from a rotation matrix.
-    
+
     Args:
         M (:obj:`list` of :obj:`list` of :obj:`float`): The rotation matrix.
-        
+
     Returns:
         (:obj:`list` of :obj:`float`): The quaternion coefficients.
 
@@ -476,7 +576,7 @@ def quaternion_from_matrix(M):
         >>> allclose(q1, q2)
         True
     """
-    
+
     qw, qx, qy, qz = 0, 0, 0, 0
     trace = M[0][0] + M[1][1] + M[2][2]
 
@@ -506,31 +606,215 @@ def quaternion_from_matrix(M):
         qx = (M[0][2] + M[2][0]) / s
         qy = (M[1][2] + M[2][1]) / s
         qz = 0.25 * s
-    
+
     return [qw, qx, qy, qz]
 
 
+def matrix_from_basis_vectors(xaxis, yaxis):
+    """Creates a rotation matrix from basis vectors (= orthonormal vectors).
+
+    Args:
+        xaxis (:obj:`list` oof :obj:`float`): The x-axis of the frame.
+        yaxis (:obj:`list` oof :obj:`float`): The y-axis of the frame.
+
+    Example:
+        >>> xaxis = [0.68, 0.68, 0.27]
+        >>> yaxis = [-0.67, 0.73, -0.15]
+        >>> R = matrix_from_basis_vectors(xaxis, yaxis)
+    """
+    xaxis = normalize_vector(list(xaxis))
+    yaxis = normalize_vector(list(yaxis))
+    zaxis = cross_vectors(xaxis, yaxis)
+    yaxis = cross_vectors(zaxis, xaxis)  # correction
+
+    R = identity_matrix(4)
+    R[0][0], R[1][0], R[2][0] = xaxis
+    R[0][1], R[1][1], R[2][1] = yaxis
+    R[0][2], R[1][2], R[2][2] = zaxis
+    return R
+
+
+def basis_vectors_from_matrix(R):
+    """Returns the basis vectors from the rotation matrix R.
+
+    Raises:
+        ValueError: If rotation matrix is invalid.
+
+    Example:
+        >>> f = Frame([0, 0, 0], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+        >>> R = matrix_from_frame(f)
+        >>> xaxis, yaxis = basis_vectors_from_matrix(R)
+    """
+    xaxis = [R[0][0], R[1][0], R[2][0]]
+    yaxis = [R[0][1], R[1][1], R[2][1]]
+    zaxis = [R[0][2], R[1][2], R[2][2]]
+    if not allclose(zaxis, cross_vectors(xaxis, yaxis)):
+        raise ValueError("Matrix is invalid rotation matrix.")
+    else:
+        return [xaxis, yaxis]
+
+
+def matrix_from_translation(translation):
+    """Returns a translation matrix.
+
+    Args:
+        translation (:obj:`list` of :obj:`float`): a list of 3 numbers defining
+            the translation in x, y, and z.
+
+    Example:
+        >>> T = matrix_from_translation([1, 2, 3])
+    """
+    M = identity_matrix(4)
+    M[0][3] = float(translation[0])
+    M[1][3] = float(translation[1])
+    M[2][3] = float(translation[2])
+    return M
+
+
+def translation_from_matrix(M):
+    """Returns the 3 values of translation from the matrix M.
+    """
+    return [M[0][3], M[1][3], M[2][3]]
+
+
+def matrix_from_perspective_entries(perspective):
+    """Returns a matrix from perspective entries.
+
+    Args:
+        values(:obj:`list` of :obj:`float`): The 4 perspective entries of a
+            matrix.
+    """
+    M = identity_matrix(4)
+    M[3][0] = float(perspective[0])
+    M[3][1] = float(perspective[1])
+    M[3][2] = float(perspective[2])
+    M[3][3] = float(perspective[3])
+    return M
+
+
+def matrix_from_shear_entries(shear_entries):
+    """Returns a shear matrix from the 3 factors for x-y, x-z, and y-z axes.
+
+    Args:
+        shear_entries (:obj:`list` of :obj:`float`): The 3 shear factors for
+            x-y, x-z, and y-z axes.
+
+    Example:
+        >>> Sh = matrix_from_shear_entries([1, 2, 3])
+    """
+    M = identity_matrix(4)
+    M[0][1] = float(shear_entries[0])
+    M[0][2] = float(shear_entries[1])
+    M[1][2] = float(shear_entries[2])
+    return M
+
+
+def matrix_from_shear(angle, direction, point, normal):
+    """Constructs a shear matrix by an angle along the direction vector on \
+        the shear plane (defined by point and normal).
+
+    A point P is transformed by the shear matrix into P" such that
+    the vector P-P" is parallel to the direction vector and its extent is
+    given by the angle of P-P'-P", where P' is the orthogonal projection
+    of P onto the shear plane (defined by point and normal).
+
+    Args:
+        angle (:obj:`float`): The angle in radians.
+        direction (:obj:`list` of :obj:`float`): The direction vector as
+            list of 3 numbers. It must be orthogonal to the normal vector.
+        point (:obj:`list` of :obj:`float`): The point of the shear plane
+            as list of 3 numbers.
+        normal (:obj:`list` of :obj:`float`): The normal of the shear plane
+            as list of 3 numbers.
+
+    Raises:
+        ValueError: If direction and normal are not orthogonal.
+
+    Example:
+        >>> angle = 0.1
+        >>> direction = [0.1, 0.2, 0.3]
+        >>> point = [4, 3, 1]
+        >>> normal = cross_vectors(direction, [1, 0.3, -0.1])
+        >>> S = matrix_from_shear(angle, direction, point, normal)
+    """
+
+    normal = normalize_vector(normal)
+    direction = normalize_vector(direction)
+
+    if math.fabs(dot_vectors(normal, direction)) > _EPS:
+        raise ValueError('Direction and normal vectors are not orthogonal')
+
+    angle = math.tan(angle)
+    M = [[1. if i == j else 0. for i in range(4)] for j in range(4)]
+
+    for j in range(3):
+        for i in range(3):
+            M[i][j] += angle * direction[i] * normal[j]
+
+    M[0][3], M[1][3], M[2][3] = scale_vector(
+        direction, -angle * dot_vectors(point, normal))
+
+    return M
+
+
+def matrix_from_scale_factors(scale_factors):
+    """Returns a scaling transformation.
+
+    Args:
+        scale_factors (:obj:`list` of :obj:`float`):  Three numbers defining
+            the scaling factors in x, y, and z respectively.
+
+    Example:
+        >>> Sc = matrix_from_scale_factors([1, 2, 3])
+    """
+    M = identity_matrix(4)
+    M[0][0] = float(scale_factors[0])
+    M[1][1] = float(scale_factors[1])
+    M[2][2] = float(scale_factors[2])
+    return M
+
+
 def decompose_matrix(M):
-    """Calculates the components of rotation, translation, scale, shear,
+    """Calculates the components of rotation, translation, scale, shear, \
         and perspective of a given transformation matrix M.
 
     Returns:
-        scale (:obj:`list` of :obj:`float`): The 3 scale factors in x-, y-,
+
+        scale (:obj:`list` of :obj:`float`): The 3 scale factors in x-, y-, \
             and z-direction.
-        shear (:obj:`list` of :obj:`float`): The 3 shear factors for x-y,
+
+        shear (:obj:`list` of :obj:`float`): The 3 shear factors for x-y, \
             x-z, and y-z axes.
-        angles (:obj:`list` of :obj:`float`): The rotation specified
-            through the 3 Euler angles about static x, y, z axes.
-        translation (:obj:`list` of :obj:`float`): The 3 values of
+
+        angles (:obj:`list` of :obj:`float`): The rotation specified through \
+            the 3 Euler angles about static x, y, z axes.
+
+        translation (:obj:`list` of :obj:`float`): The 3 values of \
             translation
-        perspective (:obj:`list` of :obj:`float`): perspective partition
-            of the matrix
-            
+
+        perspective (:obj:`list` of :obj:`float`): The 4 perspective entries \
+            of the matrix.
+
     Raises:
         ValueError: If matrix is singular or degenerative.
 
     Example:
-       
+        >>> trans1 = [1, 2, 3]
+        >>> angle1 = [-2.142, 1.141, -0.142]
+        >>> scale1 = [0.123, 2, 0.5]
+        >>> T = matrix_from_translation(trans1)
+        >>> R = matrix_from_euler_angles(angle1)
+        >>> S = matrix_from_scale_factors(scale1)
+        >>> M = multiply_matrices(multiply_matrices(T, R), S)
+        >>> # M = compose_matrix(scale1, None, angle1, trans1, None)
+        >>> scale2, shear2, angle2, trans2, persp2 = decompose_matrix(M)
+        >>> allclose(scale1, scale2)
+        True
+        >>> allclose(angle1, angle2)
+        True
+        >>> allclose(trans1, trans2)
+        True
+
     """
 
     detM = determinant(M)  # raises ValueError if matrix is not squared
@@ -609,78 +893,53 @@ def decompose_matrix(M):
 
     return scale, shear, angles, translation, perspective
 
-def identity_matrix(dim):
-    return [[1. if i == j else 0. for i in range(dim)] for j in range(dim)]
 
-def matrix_from_translation(translation):
-    M = identity_matrix(4)
-    M[0][3] = float(translation[0])
-    M[1][3] = float(translation[1])
-    M[2][3] = float(translation[2])
-    return M
-
-def translation_from_matrix(M):
-    return [M[0][3], M[1][3], M[2][3]]
-
-def matrix_from_perspective_entries(perspective):
-    M = identity_matrix(4)
-    M[3][0] = float(perspective[0])
-    M[3][1] = float(perspective[1])
-    M[3][2] = float(perspective[2])
-    M[3][3] = float(perspective[3])
-    return M
-
-def matrix_from_shear_entries(shear):
-    M = identity_matrix(4)
-    M[0][1] = float(shear[0])
-    M[0][2] = float(shear[1])
-    M[1][2] = float(shear[2])
-    return M
-
-def matrix_from_scale_factors(scale):
-    M = identity_matrix(4)
-    M[0][0] = float(scale[0])
-    M[1][1] = float(scale[1])
-    M[2][2] = float(scale[2])
-    return M
-
-def matrix_from_frame(frame):
-    """Computes a change of basis transformation from world XY to frame.
-
-    It is the same as from_frame_to_frame(Frame.worldXY(), frame).
+def compose_matrix(scale=None, shear=None, angles=None,
+                   translation=None, perspective=None):
+    """Calculates a matrix from the components of scale, shear, euler_angles, \
+        translation and perspective.
 
     Args:
-        frame (:class:`Frame`): a frame describing the targeted Cartesian
-            coordinate system
+        scale (:obj:`list` of :obj:`float`): The 3 scale factors in x-, y-,
+            and z-direction. Defaults to None.
+        shear (:obj:`list` of :obj:`float`): The 3 shear factors for x-y,
+            x-z, and y-z axes. Defaults to None.
+        angles (:obj:`list` of :obj:`float`): The rotation specified
+            through the 3 Euler angles about static x, y, z axes. Defaults to
+            None.
+        translation (:obj:`list` of :obj:`float`): The 3 values of
+            translation. Defaults to None.
+        perspective (:obj:`list` of :obj:`float`): The 4 perspective entries
+            of the matrix. Defaults to None.
 
     Example:
-        f = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
-        T = matrix_from_frame(f)
+        >>> trans1 = [1, 2, 3]
+        >>> angle1 = [-2.142, 1.141, -0.142]
+        >>> scale1 = [0.123, 2, 0.5]
+        >>> M = compose_matrix(scale1, None, angle1, trans1, None)
+        >>> scale2, shear2, angle2, trans2, persp2 = decompose_matrix(M)
+        >>> allclose(scale1, scale2)
+        True
+        >>> allclose(angle1, angle2)
+        True
+        >>> allclose(trans1, trans2)
+        True
     """
-    
-    M = identity_matrix(4)
-    M[0][0], M[1][0], M[2][0] = frame.xaxis
-    M[0][1], M[1][1], M[2][1] = frame.yaxis
-    M[0][2], M[1][2], M[2][2] = frame.zaxis
-    M[0][3], M[1][3], M[2][3] = frame.point
-    return M
 
-def compose_matrix(scale = None, shear = None, angles = None, translation = None, perspective = None):
-    
     M = [[1. if i == j else 0. for i in range(4)] for j in range(4)]
-    if perspective != None:
+    if perspective is not None:
         P = matrix_from_perspective_entries(perspective)
         M = multiply_matrices(M, P)
-    if translation != None:
+    if translation is not None:
         T = matrix_from_translation(translation)
         M = multiply_matrices(M, T)
-    if angles != None:
-        R = matrix_from_euler_angles(angles, static = True, axes = "xyz")
+    if angles is not None:
+        R = matrix_from_euler_angles(angles, static=True, axes="xyz")
         M = multiply_matrices(M, R)
-    if shear != None:
+    if shear is not None:
         Sh = matrix_from_shear_entries(shear)
         M = multiply_matrices(M, Sh)
-    if scale != None:
+    if scale is not None:
         Sc = matrix_from_scale_factors(scale)
         M = multiply_matrices(M, Sc)
     for i in range(4):
@@ -689,74 +948,39 @@ def compose_matrix(scale = None, shear = None, angles = None, translation = None
     return M
 
 
-def matrix_from_basis_vectors(xaxis, yaxis):
-    """Creates a rotation matrix from basis vectors (= orthonormal vectors).
-    
-    Args:
-        xaxis (:obj:`list` oof :obj:`float`): The x-axis of the frame.
-        yaxis (:obj:`list` oof :obj:`float`): The y-axis of the frame.
-    """
-    xaxis = normalize_vector(list(xaxis))
-    yaxis = normalize_vector(list(yaxis))
-    zaxis = cross_vectors(xaxis, yaxis)
-    yaxis = cross_vectors(zaxis, xaxis)  # correction
-
-    R = identity_matrix(4)
-    R[0][0], R[1][0], R[2][0] = xaxis
-    R[0][1], R[1][1], R[2][1] = yaxis
-    R[0][2], R[1][2], R[2][2] = zaxis
-    return R
-
-def basis_vectors_from_matrix(R):
-    """Returns the basis vectors of the rotation matrix.
-    
-    Raises:
-        ValueError: If rotation matrix is invalid.
-    """
-    xaxis = [R[0][0], R[1][0], R[2][0]]
-    yaxis = [R[0][1], R[1][1], R[2][1]]
-    zaxis = [R[0][2], R[1][2], R[2][2]]
-    if not allclose(zaxis, cross_vectors(xaxis, yaxis)):
-        raise ValueError("Matrix is invalid rotation matrix.")
-    else:
-        return [xaxis, yaxis]
-   
-
 class Transformation(object):
     """The ``Transformation`` represents a 4x4 transformation matrix.
 
-    It is the base class for transformations like ``Rotation``, ``Translation``, 
-    reflection, scale, shear, and projection. The class contains methods for 
-    converting rotation matrices to axis-angle representations, Euler angles, 
-    and quaternions. It also allows to concatenate Transformations by 
-    multiplication, to calulate the inverse transformation and to decompose a 
-    transformation into its components of rotation, translation, scale, shear,
-    and perspective. It follows the row-major order, such that translation 
-    components x, y, z are in the right column of the matrix, i.e. M[0][3], 
-    M[1][3], M[2][3] = x, y, z
-    
+    It is the base class for transformations like ``Rotation``,
+    ``Translation``, ``Scale``, ``Reflection``, ``Projection`` and ``Shear``.
+    The class allows to concatenate Transformations by multiplication, to
+    calculate the inverse transformation and to decompose a transformation into
+    its components of rotation, translation, scale, shear, and perspective.
+    The matrix follows the row-major order, such that translation components
+    x, y, z are in the right column of the matrix, i.e. M[0][3], M[1][3],
+    M[2][3] = x, y, z
+
     Attributes:
         matrix (:obj:`list` of :obj:`list` of :obj:`float`)
 
     Examples:
-        T = Transformation.from_matrix(M)
-        T = Transformation.from_matrix(M)
-        f = Frame()
-        T.decompose()
-        Tinv = T.inverse()
-
+        >>> T = Transformation()
+        >>> f1 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+        >>> T = Transformation.from_frame(f1)
+        >>> Sc, Sh, R, T, P = T.decompose()
+        >>> Tinv = T.inverse()
     """
 
-    def __init__(self, matrix = identity_matrix(4)):
+    def __init__(self, matrix=identity_matrix(4)):
         self.matrix = matrix
 
     @classmethod
     def from_matrix(cls, matrix):
-        """Creates a ``Transformation`` from a 4x4 two-dimensional list of
+        """Creates a ``Transformation`` from a 4x4 two-dimensional list of \
             numbers.
 
         Args:
-            matrix (:obj:`list` of :obj:`list` of float)
+            matrix (:obj:`list` of :obj:`list` of `float`)
         """
         T = cls()
         for i in range(4):
@@ -768,15 +992,16 @@ class Transformation(object):
     def from_list(cls, numbers):
         """Creates a ``Transformation`` from a list of 16 numbers.
 
-        Since the transformation matrix follows the row-major order, the
-        translational components must be at the list's indices 3, 7, 11.
+        Note:
+            Since the transformation matrix follows the row-major order, the
+            translational components must be at the list's indices 3, 7, 11.
 
         Args:
             numbers (:obj:`list` of :obj:`float`)
 
         Example:
-            numbers = [1, 0, 0, 3, 0, 1, 0, 4, 0, 0, 1, 5, 0, 0, 0, 1]
-            T = Transformation.from_list(numbers)
+            >>> numbers = [1, 0, 0, 3, 0, 1, 0, 4, 0, 0, 1, 5, 0, 0, 0, 1]
+            >>> T = Transformation.from_list(numbers)
         """
         T = cls()
         for i in range(4):
@@ -820,118 +1045,97 @@ class Transformation(object):
                 Cartesian coordinate system
 
         Example:
-            f1 = Frame([0, 0, 0], [0.12, 0.58, 0.81], [-0.80, 0.53, -0.26])
-            f2 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
-            T = Transformation.from_frame_to_Frame(f1, f2)
+            >>> f1 = Frame([2, 2, 2], [0.12, 0.58, 0.81], [-0.80, 0.53, -0.26])
+            >>> f2 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+            >>> T = Transformation.from_frame_to_frame(f1, f2)
+            >>> f1.transform(T)
+            >>> f1 == f2
+            True
         """
-        T1 = Transformation.from_frame(frame_from)
-        T2 = Transformation.from_frame(frame_to)
-        
         T1 = matrix_from_frame(frame_from)
         T2 = matrix_from_frame(frame_to)
-        
-        T = cls()
-        T.matrix = multiply_matrices(T2, inverse(T1))
-        
-        return T
+
+        return cls(multiply_matrices(T2, inverse(T1)))
 
     def inverse(self):
         """Returns the inverse transformation.
 
         Example:
-            f = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
-            T = Transformation.from_frame(f)
-            Tinv = T.inverse()
+            >>> f = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+            >>> T = Transformation.from_frame(f)
+            >>> I = Transformation() # identity matrix
+            >>> I == T * T.inverse()
+            True
         """
-        inv = inverse(self.matrix)
-        return self.from_matrix(inv)
+        cls = type(self)
+        return cls(inverse(self.matrix))
 
     def decompose(self):
-        """Calculates the transformation's components of rotation, translation,
-            scale, shear, and perspective.
-
-        Returns:
-        rotation (:obj:`list` of :obj:`float`): The rotation specified
-            through the 3 Euler angles about static x, y, z axes TODO
-        translation (:obj:`list` of :obj:`float`): The 3 values of
-            translation
-        scale (:obj:`list` of :obj:`float`): The 3 scale factors in x-, y-,
-            and z-direction.
-        shear (:obj:`list` of :obj:`float`): The 3 shear factors for x-y,
-            x-z, and y-z axes. TODO make shear from these factors
-        perspective (:obj:`list` of :obj:`float`): perspective partition
-            of the matrix
-
-
-        Raises:
-            ValueError: If matrix is of wrong type or degenerative.
+        """Decomposes the ``Transformation`` into ``Scale``, ``Shear``, \
+            ``Rotation``, ``Translation`` and ``Perspective``.
 
         Example:
-
+            >>> trans1 = [1, 2, 3]
+            >>> angle1 = [-2.142, 1.141, -0.142]
+            >>> scale1 = [0.123, 2, 0.5]
+            >>> T1 = Translation(trans1)
+            >>> R1 = Rotation.from_euler_angles(angle1)
+            >>> S1 = Scale(scale1)
+            >>> M = (T1 * R1) * S1
+            >>> Sc, Sh, R, T, P = M.decompose()
+            >>> S1 == Sc
+            True
+            >>> R1 == R
+            True
+            >>> T1 == T
+            True
         """
-        scale_factors, shear_entries, angles, translation, perspective_entries = decompose_matrix(self.matrix)
-        
-        Sc = Scale(scale_factors)
-        Sh = Shear.from_entries(shear_entries)
-        R = Rotation.from_euler_angles(angles)
-        T = Translation(translation)
-        P = Projection.from_entries(perspective_entries)
+        sc, sh, a, t, p = decompose_matrix(self.matrix)
+
+        Sc = Scale(sc)
+        Sh = Shear.from_entries(sh)
+        R = Rotation.from_euler_angles(a, static=True, axes='xyz')
+        T = Translation(t)
+        P = Projection.from_entries(p)
         return Sc, Sh, R, T, P
-    
+
     @property
     def rotation(self):
-        """Get just rotation from transformation.
-
-        Returns:
-            (Rotation)
+        """Returns the ``Rotation`` component from the ``Transformation``.
         """
-        sc, sh, a, t, p = self.decompose()
-        return Rotation.from_euler_angles(a, static=True, axes='xyz')
-    
+        Sc, Sh, R, T, P = self.decompose()
+        return R
+
     @property
     def translation(self):
-        """Returns the 3 values of translation from the transformation.
+        """Returns the 3 values of translation from the ``Transformation``.
         """
         return translation_from_matrix(self.matrix)
-    
+
     @property
     def basis_vectors(self):
+        """Returns the basis vectors from the ``Rotation`` component of the
+            ``Transformation``.
+        """
         sc, sh, a, t, p = decompose_matrix(self.matrix)
         R = matrix_from_euler_angles(a, static=True, axes='xyz')
         return basis_vectors_from_matrix(R)
-    
-    def shear_factors(self):
-        """
-        """
-        angles, translation, scale, shear, perspective = self.decompose()
-        return shear
-
-    def perspective_values(self):
-        """
-        """
-        angles, translation, scale, shear, perspective = self.decompose()
-        return shear
-
-    def scale_factors(self):
-        """
-        """
-        angles, translation, scale, shear, perspective = self.decompose()
-        return scale
 
     def transform_point(self, point):
         """Transforms a point.
 
         Args:
-            point (:obj:`iterable of :obj:`float`)
+            point (:obj:`list` of :obj:`float`)
 
         Example:
-            f = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
-            T = Transformation.from_frame(f)
-            q = T.transform_point([0,0,0])
-            print(allclose(f.origin, q))
+            >>> f = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+            >>> T = Transformation.from_frame(f)
+            >>> q = T.transform_point([0,0,0])
+            >>> allclose(f.point, q)
+            True
 
         Returns:
-            (:obj:`list of :obj:`float`): The transformed point.
+            (:obj:`list` of :obj:`float`): The transformed point.
         """
 
         ph = list(point) + [1.]  # make homogeneous coordinates
@@ -942,23 +1146,17 @@ class Transformation(object):
         """Transforms a list of points.
 
         Args:
-            points (:obj:`list` of :obj:`iterable of :obj:`float`): A list
-                of points.
+            points (:obj:`list` of :obj:`list` of :obj:`float`): A list of
+                points.
 
         Example:
-            f0 = Frame.worldXY()
-            f1 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
-            T = Transformation.from_frame_to_frame(f0, f1)
-            p1, p2, p3 = f1.point, add_vectors(f1.point, f1.xaxis), \
-                add_vectors(f1.point, f1.yaxis)
-            q1, q2, q3 = T.transform_points([f0.point, add_vectors(f0.point, \
-                f0.xaxis), add_vectors(f0.point, f0.yaxis)])
-            print(allclose(p1, q1))
-            print(allclose(p2, q2))
-            print(allclose(p3, q3))
+            >>> f1 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+            >>> T = Transformation.from_frame(f1)
+            >>> pts = [[1.0, 1.0, 1.0], [1.68, 1.68, 1.27], [0.33, 1.73, 0.85]]
+            >>> pts_ = T.transform_points(pts)
 
         Returns:
-            (:obj:`list` of :obj:`list of :obj:`float`): The transformed
+            (:obj:`list` of :obj:`list` of :obj:`float`): The transformed \
                 points.
         """
         P = homogenize(points)
@@ -968,22 +1166,22 @@ class Transformation(object):
 
     @property
     def list(self):
-        """Flattens the transformation matrix into a list of numbers.
+        """Flattens the ``Transformation`` into a list of numbers.
         """
         return [a for c in self.matrix for a in c]
 
     def concatenate(self, other):
-        """Concatenate two transformations to one transformation.
+        """Concatenate two transformations into one ``Transformation``.
 
-        Args:
-            other (:class:`Transformation`)
-
-        Returns:
-            (:class:`Transformation`)
-
+        Note:
+            Rz * Ry * Rx means that Rx is first transformation, Ry second, and
+            Rz third.
         """
-        return Transformation.from_matrix(multiply_matrices(self.matrix,
-                                                            other.matrix))
+        cls = type(self)
+        if not isinstance(other, cls):
+            return Transformation(multiply_matrices(self.matrix, other.matrix))
+        else:
+            return cls(multiply_matrices(self.matrix, other.matrix))
 
     def __mul__(self, other):
         return self.concatenate(other)
@@ -1028,12 +1226,28 @@ class Transformation(object):
 
 
 class Rotation(Transformation):
-    """The ``Rotation`` represents a 4x4 rotation matrix.
+    """The ``Rotation`` represents a 4x4 rotation matrix and is based on \
+        ``Transformation``.
 
     The class contains methods for converting rotation matrices to axis-angle
-    representations, Euler angles, and quaternions.
+    representations, Euler angles, quaternion and basis vectors.
+
+    Example:
+        >>> f1 = Frame([0, 0, 0], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+        >>> R = Rotation.from_frame(f1)
+        >>> args = False, 'xyz'
+        >>> alpha, beta, gamma = R.euler_angles(*args)
+        >>> xaxis, yaxis, zaxis = [1, 0, 0], [0, 1, 0], [0, 0, 1]
+        >>> Rx = Rotation.from_axis_and_angle(xaxis, alpha)
+        >>> Ry = Rotation.from_axis_and_angle(yaxis, beta)
+        >>> Rz = Rotation.from_axis_and_angle(zaxis, gamma)
+        >>> f2 = Frame.worldXY()
+        >>> f2.transform(Rx * Ry * Rz)
+        >>> f1 == f2
+        True
+
     """
-    
+
     @classmethod
     def from_basis_vectors(cls, xaxis, yaxis):
         """Creates a ``Rotation`` from basis vectors (= orthonormal vectors).
@@ -1041,6 +1255,12 @@ class Rotation(Transformation):
         Args:
             xaxis (:obj:`list` oof :obj:`float`): The x-axis of the frame.
             yaxis (:obj:`list` oof :obj:`float`): The y-axis of the frame.
+
+        Example:
+            >>> xaxis = [0.68, 0.68, 0.27]
+            >>> yaxis = [-0.67, 0.73, -0.15]
+            >>> R = Rotation.from_basis_vectors(xaxis, yaxis)
+
         """
         xaxis = normalize_vector(list(xaxis))
         yaxis = normalize_vector(list(yaxis))
@@ -1062,110 +1282,66 @@ class Rotation(Transformation):
                 represents the four coefficient values of a quaternion.
 
         Example:
-            q1 = [0.945, -0.021, -0.125, 0.303]
-            R = Rotation.from_quaternion(q)
-            q2 = R.quaternion
-            print("q1 == q2 ?", allclose(q1, q2))
+            >>> q1 = [0.945, -0.021, -0.125, 0.303]
+            >>> R = Rotation.from_quaternion(q1)
+            >>> q2 = R.quaternion
+            >>> allclose(q1, q2, tol=1e-3)
+            True
         """
-        q = quaternion
-        n = q[0]**2 + q[1]**2 + q[2]**2 + q[3]**2  # dot product
-
-        epsilon = 1.0e-15
-
-        if n < epsilon:
-            return cls()
-
-        q = [v * math.sqrt(2.0 / n) for v in q]
-        q = [[q[i] * q[j] for i in range(4)]
-             for j in range(4)]  # outer_product
-
-        rotation = cls.from_matrix([
-            [1.0 - q[2][2] - q[3][3], q[1][2] - q[3][0], q[1][3] + q[2][0],
-             0.0],
-            [q[1][2] + q[3][0], 1.0 - q[1][1] - q[3][3], q[2][3] - q[1][0],
-             0.0],
-            [q[1][3] - q[2][0], q[2][3] + q[1][0], 1.0 - q[1][1] - q[2][2],
-             0.0],
-            [0.0, 0.0, 0.0, 1.0]])
-        return rotation
+        R = matrix_from_quaternion(quaternion)
+        return cls(R)
 
     @classmethod
-    def from_axis_angle_vector(cls, axis_angle_vector):
+    def from_axis_angle_vector(cls, axis_angle_vector, point=[0, 0, 0]):
         """Calculates a ``Rotation`` from an axis-angle vector.
 
         Args:
             axis_angle_vector (:obj:`list` of :obj:`float`): Three numbers
                 that represent the axis of rotation and angle of rotation
                 through the vector's magnitude.
+            point (:obj:`list` of :obj:`float`, optional): A point to
+                perform a rotation around an origin other than [0, 0, 0].
 
         Example:
-            aav1 = [-0.043, -0.254, 0.617]
-            R = Rotation.from_axis_angle_vector(aav1)
-            aav2 = R.axis_angle_vector
-            print("aav1 == aav2?", allclose(aav1, aav2))
+            >>> aav1 = [-0.043, -0.254, 0.617]
+            >>> R = Rotation.from_axis_angle_vector(aav1)
+            >>> aav2 = R.axis_angle_vector
+            >>> allclose(aav1, aav2)
+            True
         """
 
         axis_angle_vector = list(axis_angle_vector)
         angle = length_vector(axis_angle_vector)
-        return cls.from_axis_and_angle(axis_angle_vector, angle)
+        return cls.from_axis_and_angle(axis_angle_vector, angle, point)
 
     @classmethod
-    def from_axis_and_angle(cls, axis, angle, point=None):
-        """Calculates a ``Rotation`` from an rotation axis and an angle or a
-            ``Transformation`` if the optional point of rotation is provided.
+    def from_axis_and_angle(cls, axis, angle, point=[0, 0, 0]):
+        """Calculates a ``Rotation`` from a rotation axis and an angle and \
+            an optional point of rotation.
 
         Note:
             The rotation is based on the right hand rule, i.e. anti-clockwise
             if the axis of rotation points towards the observer.
 
         Args:
-            axis (:obj:`list` of :obj:`float`): Three numbers that
-                represent the axis of rotation
-            angle (:obj:`float`): The rotaion angle in radians.
+            axis (:obj:`list` of :obj:`float`): Three numbers that represent
+                the axis of rotation
+            angle (:obj:`float`): The rotation angle in radians.
             point (:obj:`list` of :obj:`float`, optional): A point to
-                perform a rotation around an origin other than (0, 0, 0).
+                perform a rotation around an origin other than [0, 0, 0].
 
         Example:
-            R = Rotation.from_axis_and_angle([-0.043, -0.254, 0.617], 0.1)
-
-        Returns:
-            (:class:`Rotation`): If point is None.
-            (:class:`Transformation`): If optional point is not None.
+            >>> axis1 = normalize_vector([-0.043, -0.254, 0.617])
+            >>> angle1 = 0.1
+            >>> R = Rotation.from_axis_and_angle(axis1, angle1)
+            >>> axis2, angle2 = R.axis_and_angle
+            >>> allclose(axis1, axis2)
+            True
+            >>> allclose([angle1], [angle2])
+            True
         """
-
-        axis = list(axis)
-        if length_vector(axis):
-            axis = normalize_vector(axis)
-
-        sina = math.sin(angle)
-        cosa = math.cos(angle)
-
-        R = [[cosa, 0.0, 0.0], [0.0, cosa, 0.0], [0.0, 0.0, cosa]]
-
-        outer_product = [[axis[i] * axis[j] *
-                          (1.0 - cosa) for i in range(3)] for j in range(3)]
-        R = [[R[i][j] + outer_product[i][j]
-              for i in range(3)] for j in range(3)]
-
-        axis = scale_vector(axis, sina)
-        m = [[0.0, -axis[2], axis[1]],
-             [axis[2], 0.0, -axis[0]],
-             [-axis[1], axis[0], 0.0]]
-
-        rotation = cls()
-        for i in range(3):
-            for j in range(3):
-                rotation.matrix[i][j] = R[i][j] + m[i][j]
-
-        if point is not None:
-            # rotation about axis, angle AND point includes also translation
-            t = subtract_vectors(point, rotation.transform(point))
-            rotation.matrix[0][3] = t[0]
-            rotation.matrix[1][3] = t[1]
-            rotation.matrix[2][3] = t[2]
-            return Transformation.from_matrix(rotation.matrix)
-        else:
-            return rotation
+        M = matrix_from_axis_and_angle(axis, angle, point)
+        return cls(M)
 
     @classmethod
     def from_euler_angles(cls, euler_angles, static=True, axes='xyz'):
@@ -1186,92 +1362,95 @@ class Rotation(Transformation):
                 of the axes. Defaults to 'xyz'.
 
         Example:
-            ea1 = 1.4, 0.5, 2.3
-            R = Rotation.from_euler_angles(ea1, static = True, 'xyz')
-            ea2 = R.euler_angles(static = True, axes = 'xyz')
-            print(allclose(ea1, ea2))
+            >>> ea1 = 1.4, 0.5, 2.3
+            >>> args = False, 'xyz'
+            >>> R1 = Rotation.from_euler_angles(ea1, *args)
+            >>> ea2 = R1.euler_angles(*args)
+            >>> allclose(ea1, ea2)
+            True
+            >>> alpha, beta, gamma = ea1
+            >>> xaxis, yaxis, zaxis = [1, 0, 0], [0, 1, 0], [0, 0, 1]
+            >>> Rx = Rotation.from_axis_and_angle(xaxis, alpha)
+            >>> Ry = Rotation.from_axis_and_angle(yaxis, beta)
+            >>> Rz = Rotation.from_axis_and_angle(zaxis, gamma)
+            >>> R2 = Rx * Ry * Rz
+            >>> R1 == R2
+            True
         """
-        
+
         M = matrix_from_euler_angles(euler_angles, static, axes)
-        return Rotation.from_matrix(M)
+        return Rotation(M)
 
     @property
     def quaternion(self):
-        """Returns the 4 quaternion coefficients from the rotation.
+        """Returns the 4 quaternion coefficients from the ``Rotation``.
+
+        Example:
+            >>> q1 = [0.945, -0.021, -0.125, 0.303]
+            >>> R = Rotation.from_quaternion(q1)
+            >>> q2 = R.quaternion
+            >>> allclose(q1, q2, tol=1e-3)
+            True
         """
-        m = self.matrix
-
-        qw, qx, qy, qz = 0, 0, 0, 0
-        trace = m[0][0] + m[1][1] + m[2][2]
-
-        if trace > 0.0:
-            s = (0.5 / math.sqrt(trace + 1.0))
-            qw = 0.25 / s
-            qx = (m[2][1] - m[1][2]) * s
-            qy = (m[0][2] - m[2][0]) * s
-            qz = (m[1][0] - m[0][1]) * s
-
-        elif ((m[0][0] > m[1][1]) and (m[0][0] > m[2][2])):
-            s = 2.0 * math.sqrt(1.0 + m[0][0] - m[1][1] - m[2][2])
-            qw = (m[2][1] - m[1][2]) / s
-            qx = 0.25 * s
-            qy = (m[0][1] + m[1][0]) / s
-            qz = (m[0][2] + m[2][0]) / s
-
-        elif (m[1][1] > m[2][2]):
-            s = 2.0 * math.sqrt(1.0 + m[1][1] - m[0][0] - m[2][2])
-            qw = (m[0][2] - m[2][0]) / s
-            qx = (m[0][1] + m[1][0]) / s
-            qy = 0.25 * s
-            qz = (m[1][2] + m[2][1]) / s
-        else:
-            s = 2.0 * math.sqrt(1.0 + m[2][2] - m[0][0] - m[1][1])
-            qw = (m[1][0] - m[0][1]) / s
-            qx = (m[0][2] + m[2][0]) / s
-            qy = (m[1][2] + m[2][1]) / s
-            qz = 0.25 * s
-        
-        return [qw, qx, qy, qz]
+        return quaternion_from_matrix(self.matrix)
 
     @property
     def axis_and_angle(self):
-        """Returns the axis and the angle of rotation.
+        """Returns the axis and the angle of the ``Rotation``.
+
+        Example:
+            >>> axis1 = normalize_vector([-0.043, -0.254, 0.617])
+            >>> angle1 = 0.1
+            >>> R = Rotation.from_axis_and_angle(axis1, angle1)
+            >>> axis2, angle2 = R.axis_and_angle
+            >>> allclose(axis1, axis2)
+            True
+            >>> allclose([angle1], [angle2])
+            True
         """
         return axis_and_angle_from_matrix(self.matrix)
 
     @property
     def axis_angle_vector(self):
-        """Returns the axis-angle vector of the rotation.
+        """Returns the axis-angle vector of the ``Rotation``.
+
+        Returns:
+            (:obj:`list` of :obj:`float`): Three numbers that represent the \
+                axis of rotation and angle of rotation through the vector's \
+                magnitude.
 
         Example:
-            aav1 = [-0.043, -0.254, 0.617]
-            R = Rotation.from_axis_angle_vector(aav1)
-            aav2 = R.axis_angle_vector
-            print(allclose(aav1, aav2))
+            >>> aav1 = [-0.043, -0.254, 0.617]
+            >>> R = Rotation.from_axis_angle_vector(aav1)
+            >>> aav2 = R.axis_angle_vector
+            >>> allclose(aav1, aav2)
+            True
         """
         axis, angle = self.axis_and_angle
         return scale_vector(axis, angle)
 
     def euler_angles(self, static=True, axes='xyz'):
-        """Returns Euler angles from the `Rotation` according to specified axis
-            sequence and rotation type.
+        """Returns Euler angles from the ``Rotation`` according to specified \
+            axis sequence and rotation type.
 
         Args:
             static(:obj:`bool`, optional): If true the rotations are applied to
-                a static frame. If not, to a rotational. Defaults to true.
-            axes(:obj:`str`, optional): A 3 character string specifying order
-                of the axes. Defaults to 'xyz'.
+                a static frame. If not, to a rotational. Defaults to True.
+            axes(:obj:`str`, optional): A 3 character string specifying the
+                order of the axes. Defaults to 'xyz'.
 
         Returns:
             (:obj:`list` of :obj:`float`): The 3 Euler angles.
 
         Example:
-            ea1 = 1.4, 0.5, 2.3
-            R = Rotation.from_euler_angles(ea1, static = True, axes = 'xyz')
-            ea2 = R.euler_angles(static = True, axes = 'xyz')
-            print(allclose(ea1, ea2))
+            >>> ea1 = 1.4, 0.5, 2.3
+            >>> args = False, 'xyz'
+            >>> R1 = Rotation.from_euler_angles(ea1, *args)
+            >>> ea2 = R1.euler_angles(*args)
+            >>> allclose(ea1, ea2)
+            True
         """
-        
+
         return euler_angles_from_matrix(self.matrix, static, axes)
 
     @property
@@ -1280,28 +1459,31 @@ class Rotation(Transformation):
         """
         return basis_vectors_from_matrix(self.matrix)
 
+
 class Translation(Transformation):
     """Creates a translation transformation.
 
     Args:
         translation (:obj:`list` of :obj:`float`): a list of 3 numbers
             defining the translation in x, y, and z.
+
+    Example:
+        >>> T = Translation([1, 2, 3])
     """
 
     def __init__(self, translation):
-        super(Translation, self).__init__()
-        self.matrix[0][3] = float(translation[0])
-        self.matrix[1][3] = float(translation[1])
-        self.matrix[2][3] = float(translation[2])
+        self.matrix = matrix_from_translation(translation)
 
 
 class Scale(Transformation):
     """Creates a scaling transformation.
 
     Args:
-        xfactor (float): Scaling factor along x-axis.
-        yfactor (float): Scaling factor along y-axis.
-        zfactor (float): Scaling factor along z-axis.
+        scale_factors (:obj:`list` of :obj:`float`): a list of 3 numbers
+            defining the scaling factors in x, y, and z respectively.
+
+    Example:
+        >>> S = Scale([1, 2, 3])
     """
 
     def __init__(self, scale_factors):
@@ -1312,9 +1494,14 @@ class Reflection(Transformation):
     """Creates a ``Reflection`` that mirrors points at a plane, defined by
         point and normal vector.
 
-        Args:
-        point (:obj:`list` of :obj:`float`): A list of 3 numbers.
-        normal (:obj:`list` of :obj:`float`): A list of 3 numbers.
+    Args:
+        point (:obj:`list` of :obj:`float`): The point of the mirror plane.
+        normal (:obj:`list` of :obj:`float`): The normal of the mirror plane.
+
+    Example:
+        >>> point = [1, 1, 1]
+        >>> normal = [0, 0, 1]
+        >>> R = Reflection(point, normal)
 
     """
 
@@ -1335,7 +1522,7 @@ class Reflection(Transformation):
 
     @classmethod
     def from_frame(cls, frame):
-        """Creates a ``Reflection`` that mirrors points at the given frame.
+        """Creates a ``Reflection`` that mirrors at the ``Frame``.
 
         Args:
             frame(:class:`Frame`)
@@ -1344,55 +1531,51 @@ class Reflection(Transformation):
 
 
 class Projection(Transformation):
-    """Creates a ``Projection`` that projects onto a plane defined by point and
-    normal.
 
-    Using either perspective point, projection direction, or none of both.
-
-    Example:
-        from random import random as rnd
-        point = [rnd() - 0.5 for i in range(3)]
-        normal = [rnd() - 0.5 for i in range(3)]
-        direct = [rnd() - 0.5 for i in range(3)]
-        persp = [rnd() - 0.5 for i in range(3)]
-
-        print("point =", point)
-        print("normal =", normal)
-        print("direct =", direct)
-        print("persp =", persp)
-
-        P0 = Projection(point, normal)
-        P1 = Projection(point, normal, direction=direct)
-        P2 = Projection(point, normal, perspective=persp)
-        print(P0)
-        print(P1)
-        print(P2)
-
-    """
-    
     @classmethod
-    def perspective(cls, point, normal, perspective):
+    def orthogonal(cls, point, normal):
+        """Returns an orthogonal ``Projection`` to project onto a plane \
+            defined by point and normal.
+
+        Args:
+            point(:obj:`list` of :obj:`float`)
+            normal(:obj:`list` of :obj:`float`)
+
+        Example:
+            >>> point = [0, 0, 0]
+            >>> normal = [0, 0, 1]
+            >>> P = Projection.ortogonal(point, normal)
+        """
         T = cls()
         normal = normalize_vector(normal)
-        
-        T[0, 0] = T[1, 1] = T[2, 2] = dot_vectors(
-            subtract_vectors(perspective, point), normal)
 
         for j in range(3):
             for i in range(3):
-                T[i, j] -= perspective[i] * normal[j]
+                T[i, j] -= normal[i] * normal[j]  # outer_product
 
-        T[0, 3], T[1, 3], T[2, 3] = scale_vector(perspective, dot_vectors(point, normal))
-        for i in range(3):
-            T[3, i] -= normal[i]
-        T[3, 3] = dot_vectors(perspective, normal)
+        T[0, 3], T[1, 3], T[2, 3] = scale_vector(
+            normal, dot_vectors(point, normal))
         return T
-    
+
     @classmethod
     def parallel(cls, point, normal, direction):
+        """Returns an parallel ``Projection`` to project onto a plane defined \
+            by point, normal and direction.
+
+        Args:
+            point(:obj:`list` of :obj:`float`)
+            normal(:obj:`list` of :obj:`float`)
+            direction(:obj:`list` of :obj:`float`)
+
+        Example:
+            >>> point = [0, 0, 0]
+            >>> normal = [0, 0, 1]
+            >>> direction = [1, 1, 0]
+            >>> P = Projection.parallel(point, normal, direction)
+        """
         T = cls()
         normal = normalize_vector(normal)
-        
+
         scale = dot_vectors(direction, normal)
         for j in range(3):
             for i in range(3):
@@ -1401,36 +1584,56 @@ class Projection(Transformation):
         T[0, 3], T[1, 3], T[2, 3] = scale_vector(
             direction, dot_vectors(point, normal) / scale)
         return T
-    
+
     @classmethod
-    def orthogonal(cls, point, normal):
+    def perspective(cls, point, normal, perspective):
+        """Returns an perspective ``Projection`` to project onto a plane \
+            defined by point, normal and perspective.
+
+        Args:
+            point(:obj:`list` of :obj:`float`)
+            normal(:obj:`list` of :obj:`float`)
+            perspective(:obj:`list` of :obj:`float`)
+
+        Example:
+            >>> point = [0, 0, 0]
+            >>> normal = [0, 0, 1]
+            >>> perspective = [1, 1, 0]
+            >>> P = Projection.perspective(point, normal, perspective)
+        """
         T = cls()
         normal = normalize_vector(normal)
-        
+
+        T[0, 0] = T[1, 1] = T[2, 2] = dot_vectors(
+            subtract_vectors(perspective, point), normal)
+
         for j in range(3):
             for i in range(3):
-                T[i, j] -= normal[i] * normal[j]  # outer_product
+                T[i, j] -= perspective[i] * normal[j]
 
-        T[0, 3], T[1, 3], T[2, 3] = scale_vector(normal, dot_vectors(point, normal))
+        T[0, 3], T[1, 3], T[2, 3] = scale_vector(
+            perspective, dot_vectors(point, normal))
+        for i in range(3):
+            T[3, i] -= normal[i]
+        T[3, 3] = dot_vectors(perspective, normal)
         return T
-
 
     @classmethod
     def from_entries(cls, perspective_entries):
-        """Construct a perspective transformation by the values from the 
-            perspective partition of a matrix.
-        
+        """Constructs a perspective transformation by the perspective entries \
+            of a matrix.
+
         Args:
-            values(:obj:`list` of :obj:`float`): The perspective partition
-                of a matrix.
+            perspective_entries(:obj:`list` of :obj:`float`): The 4 perspective
+                entries of a matrix.
         """
         M = matrix_from_perspective_entries(perspective_entries)
-        return cls.from_matrix(M)
+        return cls(M)
 
 
 class Shear(Transformation):
-    """Constructs a Shear transformation by an angle along the direction 
-        vector on the shear plane (defined by point and normal).
+    """Constructs a ``Shear`` transformation by an angle along the \
+        direction vector on the shear plane (defined by point and normal).
 
     A point P is transformed by the shear matrix into P" such that
     the vector P-P" is parallel to the direction vector and its extent is
@@ -1439,171 +1642,160 @@ class Shear(Transformation):
 
     Args:
         angle (:obj:`float`): The angle in radians.
-        direction (:obj:`list` of :obj:`float`): The direction vector as 
+        direction (:obj:`list` of :obj:`float`): The direction vector as
             list of 3 numbers. It must be orthogonal to the normal vector.
         point (:obj:`list` of :obj:`float`): The point of the shear plane
             as list of 3 numbers.
         normal (:obj:`list` of :obj:`float`): The normal of the shear plane
             as list of 3 numbers.
 
+    Raises:
+        ValueError: If direction and normal are not orthogonal.
+
     Example:
-        angle = (random.random() - 0.5) * 4*math.pi
-        direct = numpy.random.random(3) - 0.5
-        point = numpy.random.random(3) - 0.5
-        normal = numpy.cross(direct, numpy.random.random(3))
-        S = shear_matrix(angle, direct, point, normal)
+        >>> angle = 0.1
+        >>> direction = [0.1, 0.2, 0.3]
+        >>> point = [4, 3, 1]
+        >>> normal = cross_vectors(direction, [1, 0.3, -0.1])
+        >>> S = Shear(angle, direction, point, normal)
     """
-    
-    @classmethod
-    def from_vectors(cls, angle, direction, point, normal):
-        
 
-        normal = normalize_vector(normal)
-        direction = normalize_vector(direction)
+    def __init__(self, angle=0., direction=[1, 0, 0],
+                 point=[1, 1, 1], normal=[0, 0, 1]):
 
-        if math.fabs(dot_vectors(normal, direction)) > _EPS:
-            raise ValueError('Direction and normal vectors are not orthogonal')
+        self.matrix = matrix_from_shear(angle, direction, point, normal)
 
-        angle = math.tan(angle)
-        M = [[1. if i == j else 0. for i in range(4)] for j in range(4)]
-
-        for j in range(3):
-            for i in range(3):
-                M[i][j] += angle * direction[i] * normal[j]
-
-        M[0][3], M[1][3], M[2][3] = scale_vector(direction, 
-                                        -angle * dot_vectors(point, normal))
-
-        return cls.from_matrix(M)
-    
     @classmethod
     def from_entries(cls, shear_entries):
         """Creates a ``Shear`` from the 3 factors for x-y, x-z, and y-z axes.
-        
+
         Args:
-            shear_factors (:obj:`list` of :obj:`float`): The 3 shear factors 
+            shear_factors (:obj:`list` of :obj:`float`): The 3 shear factors
                 for x-y, x-z, and y-z axes.
-        """ 
+
+        Example:
+            >>> S = Shear.from_entries([1, 2, 3])
+        """
         M = matrix_from_shear_entries(shear_entries)
         return cls.from_matrix(M)
-        
 
 
 if __name__ == "__main__":
 
-    from compas_fab.fab.geometry import frame
-    
-    """
-    print("Transformation", "========================================================")
-    
-    print("Rotation", "========================================================")
+    from compas_fab.fab.geometry.frame import Frame
+    f1 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+    T = Transformation.from_frame(f1)
+    f2 = Frame.from_transformation(T)
+    print(f1 == f2)
+
+    f = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+    T = Transformation.from_frame(f)
+    Tinv = T.inverse()
+    I = Transformation()
+    print(I == T * Tinv)
+
+    f1 = Frame([2, 2, 2], [0.12, 0.58, 0.81], [-0.80, 0.53, -0.26])
+    f2 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+    T = Transformation.from_frame_to_frame(f1, f2)
+    f1.transform(T)
+    print(f1 == f2)
+
+    trans1 = [1, 2, 3]
+    angle1 = [-2.142, 1.141, -0.142]
+    scale1 = [0.123, 2, 0.5]
+    T = matrix_from_translation(trans1)
+    R = matrix_from_euler_angles(angle1)
+    S = matrix_from_scale_factors(scale1)
+    M = multiply_matrices(multiply_matrices(T, R), S)
+    # M = compose_matrix(scale1, None, angle1, trans1, None)
+    scale2, shear2, angle2, trans2, persp2 = decompose_matrix(M)
+    print(allclose(scale1, scale2))
+    print(allclose(angle1, angle2))
+    print(allclose(trans1, trans2))
+
+    T1 = Translation(trans1)
+    R1 = Rotation.from_euler_angles(angle1)
+    S1 = Scale(scale1)
+    M = (T1 * R1) * S1
+    S2, Sh, R2, T2, P = M.decompose()
+    print(S1 == S2)
+    print(R1 == R2)
+    print(T1 == T2)
+
+    shear1 = [-0.41, -0.14, -0.35]
+    persp1 = [0.3, 0.1, 0.1, 1]
+    Sh1 = Shear.from_entries(shear1)
+    S2, Sh, R2, T2, P = Sh1.decompose()
+    # print("Sh", Sh)
+
+    P1 = Projection.from_entries(persp1)
+    S2, Sh, R2, T2, P = P1.decompose()
+    # print("P", P)
+
+    f = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+    T = Transformation.from_frame(f)
+    q = T.transform_point([0, 0, 0])
+    print(allclose(f.point, q))
+
+    f1 = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+    T = Transformation.from_frame(f1)
+    pts = [[1.0, 1.0, 1.0], [1.68, 1.68, 1.27], [0.33, 1.73, 0.85]]
+    pts_ = T.transform_points(pts)
+
+    xaxis = [0.68, 0.68, 0.27]
+    yaxis = [-0.67, 0.73, -0.15]
+    R = Rotation.from_basis_vectors(xaxis, yaxis)
+
+    q1 = [0.945, -0.021, -0.125, 0.303]
+    R = Rotation.from_quaternion(q1)
+    q2 = R.quaternion
+    print(allclose(q1, q2, tol=1e-3))
 
     aav1 = [-0.043, -0.254, 0.617]
     R = Rotation.from_axis_angle_vector(aav1)
     aav2 = R.axis_angle_vector
-    print("aav1 == aav2", allclose(aav1, aav2))
-    print("det", determinant(R.matrix))
-    print("=================")
+    print(allclose(aav1, aav2))
 
-    args = True, 'xyz'
-    ea1 = [2.03, -0.1, 0.5]
-    R = Rotation.from_euler_angles(ea1, *args)
-    print(R)
-    print("det", determinant(R.matrix))
-    ea2 = R.euler_angles(*args)
+    axis1 = normalize_vector([-0.043, -0.254, 0.617])
+    angle1 = 0.1
+    R = Rotation.from_axis_and_angle(axis1, angle1)
+    axis2, angle2 = R.axis_and_angle
+    print(allclose(axis1, axis2))
+    print(allclose([angle1], [angle2]))
+
+    ea1 = 1.4, 0.5, 2.3
+    args = False, 'xyz'
+    R1 = Rotation.from_euler_angles(ea1, *args)
+    ea2 = R1.euler_angles(*args)
     print(allclose(ea1, ea2))
 
-    print("=================")
-    print(">>", R.axis_angle_vector)
-    print(R.basis_vectors)
-    print("=================")
+    alpha, beta, gamma = ea1
+    origin, xaxis, yaxis, zaxis = [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]
+    Rx = Rotation.from_axis_and_angle(xaxis, alpha)
+    Ry = Rotation.from_axis_and_angle(yaxis, beta)
+    Rz = Rotation.from_axis_and_angle(zaxis, gamma)
+    R2 = Rx * Ry * Rz
+    print(R1 == R2)
 
-    print("Projection", "========================================================")
-    
-    from random import random as rnd
-    point = [rnd() - 0.5 for i in range(3)]
-    normal = [rnd() - 0.5 for i in range(3)]
-    direct = [rnd() - 0.5 for i in range(3)]
-    persp = [rnd() - 0.5 for i in range(3)]
+    f1 = Frame([0, 0, 0], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+    R = Rotation.from_frame(f1)
+    args = False, 'xyz'
+    alpha, beta, gamma = R.euler_angles(*args)
+    xaxis, yaxis, zaxis = [1, 0, 0], [0, 1, 0], [0, 0, 1]
+    Rx = Rotation.from_axis_and_angle(xaxis, alpha)
+    Ry = Rotation.from_axis_and_angle(yaxis, beta)
+    Rz = Rotation.from_axis_and_angle(zaxis, gamma)
+    f2 = Frame.worldXY()
+    f2.transform(Rx * Ry * Rz)
+    print(f1 == f2)
 
-    point = [-0.4115985042852909, -0.1440252439994525, -0.35887224226687087]
-    normal = [0.2648560337872353, 0.17956931561274203, 0.44275624449933515]
-    direction = [0.2723206499809814, -0.40163729179666474, 0.21388354572922286]
-    perspective = [-0.49300110873599023, -0.39194105941568413, 0.49221271116515697]
+    angle = 0.1
+    direction = [0.1, 0.2, 0.3]
+    point = [4, 3, 1]
+    normal = cross_vectors(direction, [1, 0.3, -0.1])
+    S = Shear(angle, direction, point, normal)
+    print(S)
+    S = Shear.from_entries([1, 2, 3])
 
-    P0 = Projection.orthogonal(point, normal)
-    P1 = Projection.parallel(point, normal, direction)
-    P2 = Projection.perspective(point, normal, perspective)
-    print(determinant(P2.matrix))
-
-    print("Shear", "========================================================")
-    
-    angle = 0.234
-    point = [-0.4115985042852909, -0.1440252439994525, -0.35887224226687087]
-    normal = [0.2648560337872353, 0.17956931561274203, 0.44275624449933515]
-    direction = cross_vectors(
-        normal, [
-            0.2723206499809814, -0.40163729179666474, 0.21388354572922286])
-    Sh = Shear.from_vectors(angle, direction, point, normal)
-    print(Sh)
-    print(determinant(Sh.matrix))
-
-    """
-
-    print("Compose", "========================================================")
-    
-    scale1 = [0.3, 0.6, 1.]
-    trans1 = [4, 5, 6]
-    shear1 = [-0.41, -0.14, -0.35]
-    persp1 = [0.3, 0.1, 0.1, 1]
-    angle1 = [2.03, -0.1, 0.5]
-    
-    M = compose_matrix(None, None, None, None, persp1)
-    M = compose_matrix(None, None, None, trans1, persp1)
-    M = compose_matrix(None, None, angle1, trans1, persp1)
-    M = compose_matrix(None, shear1, angle1, trans1, persp1)
-    M = compose_matrix(scale1, shear1, angle1, trans1, persp1)
-    print()
-    print(">>>", M)
-    print()
-    
-    scale1, shear1, angle1, trans1, persp1 = decompose_matrix(M)
- 
-    print("scale", scale1)
-    print("share", shear1)
-    print("angles", angle1)
-    print("translation", trans1)
-    print("perspective", persp1)
-    
-    """
-    ('scale', [0.09090909090909091, 0.1818181818181818, 0.33811990309729395])
-    ('share', [-0.41000000000000003, -0.12547100018550197, -0.31367750046375464])
-    ('angles', [2.19594522260845, -0.1, 0.5000000000000001])
-    ('translation', [1.2121212121212122, 1.5151515151515151, 1.8181818181818183])
-    ('perspective', [0.3, 0.1, 0.10000000000000003, 0.303030303030303])
-
-    """
-    
-    """
-    M2 = Projection.from_values(perspective)
-    M2 *= Translation(translation)
-    M2 *= Rotation.from_euler_angles(angles, *args)
-    M2 *= Shear.from_factors(shear)
-    M2 *= Scale(*scale)
-    
-    print("")
-    print(M2)
-    
-    def is_same_transform(matrix0, matrix1):
-        import numpy
-        matrix0 = numpy.array(matrix0, dtype=numpy.float64, copy=True)
-        matrix0 /= matrix0[3, 3]
-        matrix1 = numpy.array(matrix1, dtype=numpy.float64, copy=True)
-        matrix1 /= matrix1[3, 3]
-        print matrix0
-        print matrix1
-        return numpy.allclose(matrix0, matrix1)
-    
-    print(is_same_transform(M.matrix, M2.matrix))
-    """
-    
+    import inspect
+    name, suffix, mode, mtype = inspect.getmoduleinfo(__file__)
