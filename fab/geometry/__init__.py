@@ -47,3 +47,4 @@ Package containing base clases for robot simulation and control.
 
 from .frame import Frame
 from .transformation import *
+from .utilities import *
