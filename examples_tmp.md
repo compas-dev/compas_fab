@@ -8,3 +8,5 @@
 1. Send path to robot and execute. Wait until done to send again.
 1. Send path to robot and turn digital output on/off while moving.
 
+TODO:
+rename grasshopper to ghpython
