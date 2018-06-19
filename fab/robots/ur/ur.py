@@ -3,7 +3,8 @@ import os
 import math
 from compas.datastructures.mesh import Mesh
 from compas.geometry.basic import subtract_vectors
-from compas_fab.fab.geometry.transformation import transform_xyz
+#from compas_fab.fab.geometry.transformation import transform_xyz
+from compas.geometry.transformations import transform as transform_xyz
 from compas_fab.fab.robots import Robot, BaseConfiguration
 from compas_fab.fab.geometry import Frame, Rotation, Transformation
 from compas_fab.fab.geometry.helpers import mesh_update_vertices
@@ -154,9 +155,9 @@ class UR(Robot):
         return tmodel
 
     def xdraw(self, configuration, xtransform_function=None):
-    	"""Get the transformed meshes of the robot and the tool model.
+        """Get the transformed meshes of the robot and the tool model.
 
-    	Args:
+        Args:
             configuration (:class:`BaseConfiguration`): the 6 joint angles in radians
             xtransform_function (function name, ): the name of the function
                 used to transform the model. Defaults to None.
@@ -164,11 +165,11 @@ class UR(Robot):
         Returns:
             model (:obj:`list` of :class:`Mesh`): The list of meshes in the
                 respective class of the CAD environment
-    	"""
+        """
         transformations = self.get_forward_transformations(configuration)
         tmodel = self.get_transformed_model(transformations, xtransform_function)
         if self.tool:
-        	tmodel += self.get_transformed_tool_model(transformations[5], xtransform_function)
+            tmodel += self.get_transformed_tool_model(transformations[5], xtransform_function)
         return tmodel
 
 
