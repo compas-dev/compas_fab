@@ -19,4 +19,3 @@ from compas.geometry import matrix_from_translation
 from compas.geometry import matrix_from_euler_angles
 from compas.geometry import matrix_from_scale_factors
 from compas.geometry import decompose_matrix
-
