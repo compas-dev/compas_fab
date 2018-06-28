@@ -6,6 +6,9 @@ from compas.geometry import Reflection
 from compas.geometry import Projection
 from compas.geometry import Shear
 
+from compas.geometry import identity_matrix
+from compas.geometry import inverse
+from compas.geometry import determinant
 from compas.geometry import matrix_from_frame
 from compas.geometry import matrix_from_euler_angles
 from compas.geometry import euler_angles_from_matrix
