@@ -1,21 +1,30 @@
-import math
-from copy import deepcopy
-
-# Support pre-release versions of compas
-try:
-    from compas.geometry.basic import multiply_matrix_vector
-    from compas.geometry.basic import multiply_matrices
-except ImportError:
-    from compas.geometry.utilities import multiply_matrix_vector
-    from compas.geometry.utilities import multiply_matrices
-
 from compas.geometry import Transformation
 from compas.geometry import Rotation
 from compas.geometry import Translation
 from compas.geometry import Scale
-from compas.geometry import Shear
+from compas.geometry import Reflection
 from compas.geometry import Projection
-from compas.geometry import matrix_from_translation
+from compas.geometry import Shear
+
+from compas.geometry import matrix_from_frame
 from compas.geometry import matrix_from_euler_angles
+from compas.geometry import euler_angles_from_matrix
+from compas.geometry import matrix_from_axis_and_angle
+from compas.geometry import axis_and_angle_from_matrix
+from compas.geometry import axis_angle_vector_from_matrix
+from compas.geometry import matrix_from_axis_angle_vector
+from compas.geometry import matrix_from_quaternion
+from compas.geometry import quaternion_from_matrix
+from compas.geometry import matrix_from_basis_vectors
+from compas.geometry import basis_vectors_from_matrix
+from compas.geometry import matrix_from_translation
+from compas.geometry import translation_from_matrix
+from compas.geometry import matrix_from_orthogonal_projection
+from compas.geometry import matrix_from_parallel_projection
+from compas.geometry import matrix_from_perspective_projection
+from compas.geometry import matrix_from_perspective_entries
+from compas.geometry import matrix_from_shear_entries
+from compas.geometry import matrix_from_shear
 from compas.geometry import matrix_from_scale_factors
+from compas.geometry import compose_matrix
 from compas.geometry import decompose_matrix
