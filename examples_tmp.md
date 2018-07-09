@@ -19,3 +19,21 @@
 TODO:
 * rename grasshopper to ghpython
 * ROS in a box
+
+# [Draft] Schedule pre-workshop
+* 09:00
+    * Brief intro to COMPAS (perhaps Tom is interested in presenting this part, I have asked him in a separate email)
+    * Overview about compas_fab (GC)
+    * Path planning
+        * Rationale (AG)
+        * Implementation (GC)
+* 10:30 Break 15’
+* 10:45
+    * ROS concepts
+    * Robot control with compas_fab + ROS
+* 12:00 Lunch break 60’
+* 13:00
+    * Hands-on session
+    * Setup RobotStudio & libraries on every machine (Send upfront instructions to participants to prepare setup if possible)
+    * Run examples on simulation (on each participants’ machine)
+    * Demo at the RFL (only on instructors’ machine)
