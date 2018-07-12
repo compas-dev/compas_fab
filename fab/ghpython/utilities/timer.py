@@ -20,10 +20,10 @@ def update_component(ghenv, delay):
     if delay <= 0:
         raise ValueError('Delay must be greater than zero')
 
-    grasshopper_component = ghenv.Component
-    grasshopper_doc = grasshopper_component.OnPingDocument()
+    ghcomp = ghenv.Component
+    ghdoc = ghcomp.OnPingDocument()
 
-    def callback(grasshopper_doc):
-        grasshopper_component.ExpireSolution(False)
+    def callback(ghdoc):
+        ghcomp.ExpireSolution(False)
 
-    grasshopper_doc.ScheduleSolution(delay, gh.Kernel.GH_Document.GH_ScheduleDelegate(callback))
+    ghdoc.ScheduleSolution(delay, gh.Kernel.GH_Document.GH_ScheduleDelegate(callback))

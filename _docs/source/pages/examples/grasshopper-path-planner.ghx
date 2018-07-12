@@ -807,8 +807,8 @@
                     <item name="CodeInput" type_name="gh_string" type_code="10">import logging
 from compas_fab.fab.robots import Pose
 from compas_fab.fab.robots.rfl import *
-from compas_fab.fab.grasshopper import *
-from compas_fab.fab.grasshopper.path_planning import InputParameterParser, PathPlanner
+from compas_fab.fab.ghpython import *
+from compas_fab.fab.ghpython.path_planning import InputParameterParser, PathPlanner
 
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger()
@@ -1416,7 +1416,7 @@ if trigger:
 import scriptcontext as sc
 
 from compas_fab.fab.robots.rfl import Simulator, Robot
-from compas_fab.fab.grasshopper.path_planning import PathVisualizer, InputParameterParser
+from compas_fab.fab.ghpython.path_planning import PathVisualizer, InputParameterParser
 
 LOG = logging.getLogger()
 path = InputParameterParser().compact_list(path)

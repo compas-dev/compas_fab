@@ -15,7 +15,7 @@ Main package for robotics fabrication for the compas framework.
     :maxdepth: 2
 
     compas_fab.fab.geometry
-    compas_fab.fab.grasshopper
+    compas_fab.fab.ghpython
     compas_fab.fab.robots
     compas_fab.fab.robots.rfl
     compas_fab.fab.sensors

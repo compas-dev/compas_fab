@@ -1,11 +1,11 @@
 """
-.. _compas_fab.fab.grasshopper:
+.. _compas_fab.fab.ghpython:
 
 ********************************************************************************
-compas_fab.fab.grasshopper
+compas_fab.fab.ghpython
 ********************************************************************************
 
-.. module:: compas_fab.fab.grasshopper
+.. module:: compas_fab.fab.ghpython
 
 Utility functions to simplify integration with Grasshopper 3D.
 
@@ -19,9 +19,9 @@ Utility functions to simplify integration with Grasshopper 3D.
 Path planning
 =============
 
-.. currentmodule:: compas_fab.fab.grasshopper.path_planning
+.. currentmodule:: compas_fab.fab.ghpython.path_planning
 
-:mod:`compas_fab.fab.grasshopper.path_planning`
+:mod:`compas_fab.fab.ghpython.path_planning`
 
 .. autosummary::
     :toctree: generated/

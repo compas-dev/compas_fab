@@ -5,7 +5,7 @@ MODULES = [
     'compas_fab.fab.geometry',
     'compas_fab.fab.robots',
     'compas_fab.fab.robots.rfl',
-    'compas_fab.fab.grasshopper'
+    'compas_fab.fab.ghpython'
 ]
 
 if __name__ == '__main__':
