@@ -42,21 +42,44 @@ of frame F2.::
 	T = Transformation.from_frame_to_frame(F1, F2)
 	Pt = T.transform_point(Pw)
 
-.. image:: frame_transformation.jpg
+.. image:: frame_transformation-01.jpg
 
 
-From the frame, or resp. from the orientation (``Rotation``) that is defined 
-through the frame, we can derive several other representations of rotation, such
-as axis-angle representations, Euler angles, quaternion and basis vectors.::
+From the frame, or resp. from the orientation (``Rotation``) of the frame, 
+several other representations of rotation can be derived, such
+as Euler angles, axis-angle representation, and quaternion.::
 
     from compas.geometry import Frame
+    from compas.geometry import Rotation
+
     F1 = Frame([0, 0, 0], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
-    R = Rotation.from_frame(F1)
+
+    # euler angles
     args = False, 'xyz'
-    alpha, beta, gamma = R.euler_angles(*args)
+    alpha, beta, gamma = F1.euler_angles(*args)
+
+    # check if angles are correct
     xaxis, yaxis, zaxis = [1, 0, 0], [0, 1, 0], [0, 0, 1]
     Rx = Rotation.from_axis_and_angle(xaxis, alpha)
     Ry = Rotation.from_axis_and_angle(yaxis, beta)
     Rz = Rotation.from_axis_and_angle(zaxis, gamma)
     F2 = Frame.worldXY()
     F1 == F2.transform(Rx * Ry * Rz)
+
+    # quaternion
+    q = F1.quaternion
+    F2 = Frame.from_quaternion(q)
+    F1 == F2
+
+    # axis-angle
+    ax = F1.axis_angle_vector
+    F2 = Frame.from_axis_angle_vector(ax)
+    F1 == F2
+
+Further information:
+
+* `Rotation <https://en.wikipedia.org/wiki/Rotation>`_
+* `Euler angles <https://en.wikipedia.org/wiki/Euler_angles>`_
+* `Quaternion <https://en.wikipedia.org/wiki/Quaternion>`_
+* `Axis–angle representation <https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation>`_
+
