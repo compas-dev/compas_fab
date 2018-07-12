@@ -1,6 +1,8 @@
 from __future__ import print_function
-from compas_fab.fab.geometry import Frame, Transformation
-from .tool import Tool
+from compas.geometry import Frame
+from compas.geometry import Transformation
+
+from compas_fab.fab.robots import Tool
 
 
 class Robot(object):
