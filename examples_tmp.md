@@ -28,6 +28,8 @@ TODO:
 * rename grasshopper to ghpython
 * rename compas_fab to compas_rfab or compas_robfab
 * ROS in a box
+* mm (scale model) to m?
+* degrees (for Config) or radians?
 
 # [Draft] Schedule pre-workshop
 * 09:00
