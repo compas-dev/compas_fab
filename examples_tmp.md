@@ -6,7 +6,7 @@
     * URDF (GC)
     * `BaseConfiguration` => `Configuration`
     * `Link`, `Joint`,  (URDF) (GC)
-    * `Robot`,  (RR, KD): all definitions, make describtion, make example, (look up in simulater rfl)
+    * `Robot`,  (RR, KD): convention, make describtion, make example, (look up in simulater rfl)
       * Client: connect to simulator or real robot
     * `UR` (RR): inherits from Robot, inverse (through ROS and direct), forward
     * `ABB` (KD)
