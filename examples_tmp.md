@@ -2,23 +2,31 @@
 
 1. Introduction of `Frame`, `Transformation`, (RR)
    * Better examples (RR)
-1. Introduction of `Pose`, `BaseConfiguration`, `Link`, `Joint`, `Robot`, `UR`, `ABB`
-   * Check overlaps of ROS `Pose` and other classes
-   * Clean `Robot`, `Link`, `Joint`, `Tool`
-   * Change `BaseConfiguration`
-1. Robot model and kinematic chain (have the same model in Rhino and Blender?)
-   * Robot model from URDF (GC)
-1. Plan a path with XX robot in setup (change robot model, calculate new path, obstacles?)
-   * For ROBArch (Pre-)WS: With Vrep? (AG)
-   * For ROBArch Pre-WS: With moveit? (GC, RR)
+1. Introduction of `Robot`
+    * URDF (GC)
+    * `BaseConfiguration` => `Configuration`
+    * `Link`, `Joint`,  (URDF) (GC)
+    * `Robot`,  (RR, KD): all definitions, make describtion, make example, (look up in simulater rfl)
+      * Client: connect to simulator or real robot
+    * `UR` (RR): inherits from Robot, inverse (through ROS and direct), forward
+    * `ABB` (KD)
+   * `Pose`: Frame + dict in RCS
+   * `Tool`
+   * Example: Show same model in Rhino and Blender
+1. Pathplanning lan a path with XX robot in setup (change robot model, calculate new path, obstacles?)
+   * For ROBArch Pre-WS: Plan path with RFL (Vrep) (AG)
+   * For ROBArch Pre-WS: With moveit (GC, RR)
+      load UR, set 2 planes, send it over roslibpy to model movit, get path back.
+      (change tool dynamically?, add box?)
 1. Robot communication
-   * Changing the driver (ABB, UR)?
-   * Extend to cartesian pose?
-1. Send path to robot and execute. Wait until done to send again.
-1. Send path to robot and turn digital output on/off while moving.
+   * UR in real (send path to UR), ABB in simulation?
+   (NOT FOR WORKSHOP:  Extend to cartesian pose)
+   * Example 1: Send path to robot and execute. Wait until done to send again.
+   * Example 2: Send path to robot and turn digital output on/off while moving.
 
 TODO:
 * rename grasshopper to ghpython
+* rename compas_fab to compas_rfab or compas_robfab
 * ROS in a box
 
 # [Draft] Schedule pre-workshop
