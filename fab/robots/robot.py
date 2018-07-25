@@ -2,7 +2,7 @@ from __future__ import print_function
 from compas.geometry import Frame
 from compas.geometry import Transformation
 
-from compas_fab.fab.robots import Tool
+from .tool import Tool
 
 
 class Robot(object):
