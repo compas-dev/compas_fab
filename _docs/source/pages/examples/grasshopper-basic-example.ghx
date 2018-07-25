@@ -545,7 +545,7 @@ if trigger:
 import scriptcontext as sc
 
 from compas_fab.fab.robots.rfl import Simulator, Robot
-from compas_fab.fab.grasshopper.path_planning import PathVisualizer, InputParameterParser
+from compas_fab.fab.ghpython.path_planning import PathVisualizer, InputParameterParser
 
 LOG = logging.getLogger()
 path = InputParameterParser().compact_list(path)
@@ -1083,7 +1083,7 @@ if path:
                 <chunk name="Container">
                   <items count="10">
                     <item name="CodeInput" type_name="gh_string" type_code="10">import scriptcontext as sc
-from compas_fab.fab.grasshopper import unload_modules
+from compas_fab.fab.ghpython import unload_modules
 print unload_modules('compas_fab')
 
 if "rfl_meshes" in sc.sticky:
