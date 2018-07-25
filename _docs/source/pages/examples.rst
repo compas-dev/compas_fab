@@ -19,3 +19,5 @@ List of examples
 
     examples/rfl
     examples/frame_and_transformation
+    examples/coordinate_systems
+    examples/robot
