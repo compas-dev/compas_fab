@@ -2,7 +2,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 
-from math import fabs
+import math
 
 from compas.utilities import pairwise
 
@@ -186,53 +186,50 @@ def intersection_sphere_sphere(sphere1, sphere2):
     --------
     https://gamedev.stackexchange.com/questions/75756/sphere-sphere-intersection-and-circle-sphere-intersection
 
-    d; abs distance between c_1, c_2
     """
-
-    #c_1; center of first circle    
-    #r_1; radii of first cirlce
-    #c_2; center of 2nd circle
-    #r_2; radii of 2nd cirlce
-
+    
     center1, radius1 = sphere1
     center2, radius2 = sphere2
 
-    d = distance_point_point(center1, center2)
+    distance = distance_point_point(center1, center2)
 
-    if r_1 + r_2 < d:
-        print("d=%s; no intersection between the spheres" % round(d, 2))
-        return None, None, None
-    elif d + min(r_1, r_2) < max(r_1, r_2):
-        print("no intersection, circle lies within a circle")
-        return None, None, None
-    elif r_1 + r_2 == d:
-        c_i = c_1 + (c_2 - c_1) * r_1/d
-        print("intersection is a single point")
-        return c_i, None, None
-    elif d + min(r_1, r_2) == max(r_1, r_2):
-        c_i = c_larger + (c_smaller - c_larger) * r_larger/d
-        print("single point of intersection lies on the larger sphere")
-        return c_i, None, None
+    # Case 4: No intersection
+    if radius1 + radius2 < distance:
+        return None
+    # Case 4: No intersection, sphere is within the other sphere
+    elif distance + min(radius1, radius2) < max(radius1, radius2):
+        return None
+    # Case 2: point intersection
+    elif radius1 + radius2 == distance:
+        ipt = subtract_vectors(center2, center1)
+        ipt = scale_vector(ipt, radius1/distance)
+        ipt = add_vectors(center1, ipt)
+        return "point", ipt
+    # Case 2: point intersection, smaller sphere is within the bigger
+    elif distance + min(radius1, radius2) == max(radius1, radius2):
+        if radius1 > radius2:
+            center_larger = center1
+            center_smaller = center2
+            radius_larger = radius1
+        else:
+            center_larger = center2
+            center_smaller = center1
+            radius_larger = radius2
+            
+        ipt = subtract_vectors(center_smaller, center_larger)
+        ipt = scale_vector(ipt, radius_larger/distance)
+        ipt = add_vectors(center_larger, ipt)
+        return "point", ipt
     else:
-        h = 0.5 + (r_1 * r_1 - r_2 * r_2)/(2 * d*d)
-
-        c_1 = Point(c_1[0], c_1[1], c_1[2])
-        c_2 = Point(c_2[0], c_2[1], c_2[2])
-        c_i = c_1 + (c_2 - c_1).__imul__(h)
-        r_i = m.sqrt(r_1*r_1 - h*h*d*d)
-        #n_i = (c_2 - c_1).__imul__(1/d)
-        n_normal = (c_2 - c_1)
-        n_i = Plane.from_point_and_normal(c_i, n_normal)
+        h  = 0.5 + (radius1**2 - radius2**2)/(2 * distance**2)
+        ci = subtract_vectors(center2, center1)
+        ci = scale_vector(ci, h)
+        ci = add_vectors(center1, ci)
         
+        ri = math.sqrt(radius1**2 - h**2 * distance**2)
+        normal = scale_vector(subtract_vectors(center2, center1), 1/distance)
         
-        #following describes a point within the circle on the plane n_i
-        """
-        p_i(theta) = c_i + r_i * (t_i * cos(theta) + b_i sin(theta))
-        t_i = normalize(cross(axis, n_i))
-        b_i = cross(t_i, n_i)
-        """
-
-        return c_i, r_i, n_i
+        return "circle", (ci, ri, normal)
 
 if __name__ == "__main__":
 
@@ -240,4 +237,5 @@ if __name__ == "__main__":
     circle = (0,0,0), 5
     circle_normal = (1,0,0)
 
-    intersection_plane_circle(plane, circle, circle_normal)
+    print(min(2,4))
+    #intersection_plane_circle(plane, circle, circle_normal)
