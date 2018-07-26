@@ -6,6 +6,8 @@ from math import fabs
 
 from compas.utilities import pairwise
 
+from compas.geometry import intersection_plane_plane
+
 from compas.geometry.basic import add_vectors
 from compas.geometry.basic import subtract_vectors
 from compas.geometry.basic import scale_vector
@@ -18,6 +20,7 @@ from compas.geometry.queries import is_point_on_segment
 from compas.geometry.queries import is_point_on_segment_xy
 
 
+
 __author__ = ['Matthias Helmreich', ]
 __copyright__ = 'Copyright 2018 - Gramazio Kohler Research, ETH Zurich'
 __license__ = 'MIT License'
@@ -27,40 +30,53 @@ __email__ = 'helmreich@arch.ethz.ch'
 __all__ = [
     'intersection_plane_circle',
     'intersection_sphere_sphere'
-
 ]
 
 
-def intersection_plane_circle(fr_0, c_1, n_1, r_1):
-    """Computes the intersection points of a plane with a circle.
+def intersection_plane_circle(plane, circle, circle_normal):
+    """Computes the intersection of a plane with a circle.
+
+    There are 5 cases of plane-circle intersection : 1) the plane coincides with
+    the plane containing the circle, 2) the plane is parallel to the plane
+    containing the circle, 3) they do not interect, 4) the plane cuts the circle
+    in 2 points (secant) and 5) the plane meets the circle in 1 point (tangent).
 
     Parameters
     ----------
+    plane : tuple
+        The base point and normal defining the plane.
+    circle : tuple
+        center, radius of the circle in the xy plane.
+    circle_normal : tuple
+        the normal of the plane containing the circle
+
+    Returns
+    -------
+    list :
+        XYZ coordinates of either 2 (case 4) or 1 intersection point (case 5)
+    None
+        for cases 1), 2), 3)
+
+    Examples
+    --------
+    >>>
+
+    References
+    --------
+    """
+
+    # fr_0, c_1, n_1, r_1
     #fr_0; intersecting frame
     #c_1; center of circle    
     #r_1; radii cirlce
     #n_1; normal of circle
 
-    Returns
-    -------
-    CASE 1: line intersects circle in two points
-            returns p1, p2
-
-    CASE 2: line intersect circle in one point -> tangent
-            returns p1, False
-
-    CASE 3: line does not intersect circle
-            returns False, False
-
-    """
-
-    T_0 = Transformation.from_frame_to_frame(fr_0, Frame([0,0,0], [1,0,0], [0,1,0])) 
-    T = Transformation.from_frame_to_frame(Frame([0,0,0], [1,0,0], [0,1,0]), fr_0) 
+    #T_0 = Transformation.from_frame_to_frame(fr_0, Frame([0,0,0], [1,0,0], [0,1,0])) 
+    #T = Transformation.from_frame_to_frame(Frame([0,0,0], [1,0,0], [0,1,0]), fr_0) 
 
     p1 = Plane.from_point_and_normal(c_1, n_1.normal)
     p2 = Plane.from_point_and_two_vectors(Point(fr_0.point[0], fr_0.point[1], fr_0.point[2]), Vector(fr_0.xaxis[0], fr_0.xaxis[1], fr_0.xaxis[2]),  Vector(fr_0.yaxis[0], fr_0.yaxis[1], fr_0.yaxis[2]))
     
-    from compas.geometry import intersection_plane_plane
     line_p1, line_p2= intersection_plane_plane(p1, p2)
 
     circle_p0 = Point(c_1.x, c_1.y, c_1.z)
@@ -203,3 +219,11 @@ def intersection_sphere_sphere(c_1, r_1, c_2, r_2):
         """
 
         return c_i, r_i, n_i
+
+if __name__ == "__main__":
+
+    plane = (0,0,0), (0,0,1)
+    circle = (0,0,0), 5
+    circle_normal = (1,0,0)
+
+    intersection_plane_circle(plane, circle, circle_normal)
