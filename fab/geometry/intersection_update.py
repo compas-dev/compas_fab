@@ -7,6 +7,7 @@ from math import fabs
 from compas.utilities import pairwise
 
 from compas.geometry import intersection_plane_plane
+from compas.geometry import distance_point_point
 
 from compas.geometry.basic import add_vectors
 from compas.geometry.basic import subtract_vectors
@@ -15,6 +16,8 @@ from compas.geometry.basic import cross_vectors
 from compas.geometry.basic import dot_vectors
 from compas.geometry.basic import length_vector_xy
 from compas.geometry.basic import subtract_vectors_xy
+
+
 
 from compas.geometry.queries import is_point_on_segment
 from compas.geometry.queries import is_point_on_segment_xy
@@ -52,7 +55,7 @@ def intersection_plane_circle(plane, circle, circle_normal):
 
     Returns
     -------
-    list :
+    list
         XYZ coordinates of either 2 (case 4) or 1 intersection point (case 5)
     None
         for cases 1), 2), 3)
@@ -151,39 +154,50 @@ def intersection_plane_circle(plane, circle, circle_normal):
         return False, False
 
 
-def intersection_sphere_sphere(c_1, r_1, c_2, r_2):
-    """Computes the intersection points of a plane with a circle.
+def intersection_sphere_sphere(sphere1, sphere2):
+    """Computes the intersection of 2 spheres.
 
+    There are 4 cases of sphere-sphere intersection : 1) the spheres intersect
+    in a circle, 2) they intersect in a point, 3) they overlap, 4) they do not
+    intersect.
+    
     Parameters
     ----------
+    sphere1 : tuple
+        center, radius of the sphere.
+    sphere2 : tuple
+        center, radius of the sphere.
+
+    Returns
+    -------
+    tuple
+        case (str): "circle" or "point"
+        result (tuple): 
+            circle: center, radius, normal
+            point: xyz coordinates
+    None
+        for case 3) (overlap) and case 4) (no intersection)
+
+    Examples
+    --------
+    >>>
+
+    References
+    --------
+    https://gamedev.stackexchange.com/questions/75756/sphere-sphere-intersection-and-circle-sphere-intersection
+
+    d; abs distance between c_1, c_2
+    """
+
     #c_1; center of first circle    
     #r_1; radii of first cirlce
     #c_2; center of 2nd circle
     #r_2; radii of 2nd cirlce
 
+    center1, radius1 = sphere1
+    center2, radius2 = sphere2
 
-    geometric description
-    --------
-
-    https://gamedev.stackexchange.com/questions/75756/sphere-sphere-intersection-and-circle-sphere-intersection
-    
-
-    Returns
-    -------
-    CASE 1: no intersection between the spheres
-            returns None, None, None
-
-    CASE 2: no intersection, circle lies within a circle
-            returns None, None, None
-    CASE 3: intersection is a single point
-            returns c_i; intersection center, None, None
-
-    CASE 4: sphere intersects with sphere
-            returns c_i; center intersection circle, r_i; radii of intersection circle, n_i; normal of circle frame
-
-    d; abs distance between c_1, c_2
-    """
-    d = c_1.distance_to_point(c_2)
+    d = distance_point_point(center1, center2)
 
     if r_1 + r_2 < d:
         print("d=%s; no intersection between the spheres" % round(d, 2))
