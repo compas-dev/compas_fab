@@ -141,12 +141,12 @@ def intersection_plane_circle(plane, circle, circle_normal):
         return p2, p1
 
     elif( LEC == R ):
-        print "tangent point to circle is E"
+        print("tangent point to circle is E")
         
         return False, False
     
     else:
-        print "line doesn't touch circle"
+        print("line doesn't touch circle")
 
         return False, False
 
