@@ -1,28 +1,12 @@
 from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import division
 
 import math
 
-from compas.utilities import pairwise
-
+from compas.geometry import add_vectors
+from compas.geometry import subtract_vectors
+from compas.geometry import scale_vector
 from compas.geometry import intersection_plane_plane
 from compas.geometry import distance_point_point
-
-from compas.geometry.basic import add_vectors
-from compas.geometry.basic import subtract_vectors
-from compas.geometry.basic import scale_vector
-from compas.geometry.basic import cross_vectors
-from compas.geometry.basic import dot_vectors
-from compas.geometry.basic import length_vector_xy
-from compas.geometry.basic import subtract_vectors_xy
-
-
-
-from compas.geometry.queries import is_point_on_segment
-from compas.geometry.queries import is_point_on_segment_xy
-
-
 
 __author__ = ['Matthias Helmreich', ]
 __copyright__ = 'Copyright 2018 - Gramazio Kohler Research, ETH Zurich'
@@ -39,10 +23,11 @@ __all__ = [
 def intersection_plane_circle(plane, circle):
     """Computes the intersection of a plane with a circle.
 
-    There are 5 cases of plane-circle intersection : 1) the plane coincides with
-    the plane containing the circle, 2) the plane is parallel to the plane
-    containing the circle, 3) they do not interect, 4) the plane cuts the circle
-    in 2 points (secant) and 5) the plane meets the circle in 1 point (tangent).
+    There are 5 cases of plane-circle intersection : 1) the plane coincides
+    with the plane containing the circle, 2) the plane is parallel to the plane
+    containing the circle, 3) they do not interect, 4) the plane cuts the 
+    circle in 2 points (secant) and 5) the plane meets the circle in 1 point
+    (tangent).
 
     Parameters
     ----------
@@ -67,15 +52,17 @@ def intersection_plane_circle(plane, circle):
     """
 
     # fr_0, c_1, n_1, r_1
-    #fr_0; intersecting frame
-    #c_1; center of circle    
-    #r_1; radii cirlce
-    #n_1; normal of circle
+    # fr_0; intersecting frame
+    # c_1; center of circle    
+    # r_1; radii cirlce
+    # n_1; normal of circle
 
-    #T_0 = Transformation.from_frame_to_frame(fr_0, Frame([0,0,0], [1,0,0], [0,1,0])) 
-    #T = Transformation.from_frame_to_frame(Frame([0,0,0], [1,0,0], [0,1,0]), fr_0) 
+    # T_0 = Transformation.from_frame_to_frame(fr_0, Frame([0,0,0], [1,0,0], [0,1,0])) 
+    # T = Transformation.from_frame_to_frame(Frame([0,0,0], [1,0,0], [0,1,0]), fr_0) 
 
+    plane_point, plane_normal = plane
     circle_center, circle_radius, circle_normal = circle
+
     circle_plane = circle_center, circle_normal
     
     p1, p2= intersection_plane_plane(plane, circle_plane)
@@ -145,7 +132,7 @@ def intersection_plane_circle(plane, circle):
         print("tangent point to circle is E")
         
         return False, False
-    
+
     else:
         print("line doesn't touch circle")
 
@@ -158,7 +145,7 @@ def intersection_sphere_sphere(sphere1, sphere2):
     There are 4 cases of sphere-sphere intersection : 1) the spheres intersect
     in a circle, 2) they intersect in a point, 3) they overlap, 4) they do not
     intersect.
-    
+
     Parameters
     ----------
     sphere1 : tuple
@@ -168,38 +155,39 @@ def intersection_sphere_sphere(sphere1, sphere2):
 
     Returns
     -------
-    tuple
-        case (str): "point", "circle", or "sphere"
-        result (tuple): 
-            point: xyz coordinates
-            circle: center, radius, normal
-            sphere: center, radius
+    dict
+        'point' (list): Either the intersection point or the center of the
+            intersection circle or sphere (cases 1, 2, 3)
+        'radius' (float): The radius of of the intersection circle or sphere
+            (cases 2, 3)
+        'normal' (list): The normal of the intersection circle (case 3)
     None
-        for case 4) (no intersection)
+        no intersection (case 4)
 
     Examples
     --------
     >>> sphere1 = (3.0, 7.0, 4.0), 10.0
     >>> sphere2 = (7.0, 4.0, 0.0), 5.0
-    >>> result = intersection_sphere_sphere(sphere1, sphere1)
+    >>> result = intersection_sphere_sphere(sphere1, sphere2)
     >>> if result:
-    >>>    case, res = result
-    >>>    if case == "circle": 
-    >>>        center, radius, normal = res
-    >>>    elif case == "point":
-    >>>        point = res
-    >>>    elif case == "sphere":
-    >>>        center, radius = res
+    >>>     if 'normal' in result:  # intersection is a circle
+    >>>         circle = result['point'], result['radius'], result['normal']
+    >>>     elif 'radius' in result:  # intersection is a sphere
+    >>>         sphere = result['point'], result['radius']
+    >>>     else:  # intersection is a point
+    >>>         point = result['point']
+    >>> print(result)
 
     References
     --------
     https://gamedev.stackexchange.com/questions/75756/sphere-sphere-intersection-and-circle-sphere-intersection
 
     """
-    
+
     center1, radius1 = sphere1
     center2, radius2 = sphere2
 
+    print(radius1, radius2)
     distance = distance_point_point(center1, center2)
 
     # Case 4: No intersection
@@ -210,13 +198,13 @@ def intersection_sphere_sphere(sphere1, sphere2):
         return None
     # Case 3: sphere's overlap
     elif radius1 == radius2 and distance == 0:
-        return "sphere", sphere1
+        return {'point': center1, 'radius': radius1}
     # Case 2: point intersection
     elif radius1 + radius2 == distance:
         ipt = subtract_vectors(center2, center1)
         ipt = scale_vector(ipt, radius1/distance)
         ipt = add_vectors(center1, ipt)
-        return "point", ipt
+        return {'point': ipt}
     # Case 2: point intersection, smaller sphere is within the bigger
     elif distance + min(radius1, radius2) == max(radius1, radius2):
         if radius1 > radius2:
@@ -227,34 +215,37 @@ def intersection_sphere_sphere(sphere1, sphere2):
             ipt = subtract_vectors(center1, center2)
             ipt = scale_vector(ipt, radius2/distance)
             ipt = add_vectors(center2, ipt)
-        return "point", ipt
+        return {'point': ipt}
     # Case 1: circle intersection
     else:
-        h  = 0.5 + (radius1**2 - radius2**2)/(2 * distance**2)
+        h = 0.5 + (radius1**2 - radius2**2)/(2 * distance**2)
         ci = subtract_vectors(center2, center1)
         ci = scale_vector(ci, h)
         ci = add_vectors(center1, ci)
         ri = math.sqrt(radius1**2 - h**2 * distance**2)
         normal = scale_vector(subtract_vectors(center2, center1), 1/distance)
-        return "circle", (ci, ri, normal)
+        return {'point': ci, 'radius': ri, 'normal': normal}
+
 
 if __name__ == "__main__":
 
-    plane = (0,0,0), (0,0,1)
-    circle = (0,0,0), 5
-    circle_normal = (1,0,0)
+    # example 1
+    plane = (0, 0, 0), (0, 0, 1)
+    circle = (0, 0, 0), 5
+    circle_normal = (1, 0, 0)
 
-    print(min(2,4))
-    #intersection_plane_circle(plane, circle, circle_normal)
+    # intersection_plane_circle(plane, circle, circle_normal)
 
+    # example 2
     sphere1 = (3.0, 7.0, 4.0), 10.0
     sphere2 = (7.0, 4.0, 0.0), 5.0
-    result = intersection_sphere_sphere(sphere1, sphere1)
+    result = intersection_sphere_sphere(sphere1, sphere2)
+
     if result:
-        case, res = result
-        if case == "circle": 
-            center, radius, normal = res
-        elif case == "point":
-            point = res
-        elif case == "sphere":
-            center, radius = res
+        if 'normal' in result:  # intersection is a circle
+            circle = result['point'], result['radius'], result['normal']
+        elif 'radius' in result:  # intersection is a sphere
+            sphere = result['point'], result['radius']
+        else:  # intersection is a point
+            point = result['point']
+    print(result)
