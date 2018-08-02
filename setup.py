@@ -9,7 +9,7 @@ from os.path import abspath, basename, dirname, join, splitext
 
 from setuptools import find_packages, setup
 
-requirements = ['pyserial']
+requirements = ['roslibpy', 'pyserial']
 keywords_list = ['robotic fabrication', 'digital fabrication', 'architecture', 'robotics', 'ros']
 
 here = abspath(dirname(__file__))
