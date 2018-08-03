@@ -17,7 +17,6 @@ List of examples
 .. toctree::
     :maxdepth: 2
 
-    examples/rfl
     examples/frame_and_transformation
     examples/coordinate_systems
     examples/robot
