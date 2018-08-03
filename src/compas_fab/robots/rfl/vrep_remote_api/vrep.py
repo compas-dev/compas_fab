@@ -1,30 +1,30 @@
-# This file is part of the REMOTE API
-# 
-# Copyright 2006-2017 Coppelia Robotics GmbH. All rights reserved. 
-# marc@coppeliarobotics.com
-# www.coppeliarobotics.com
-# 
-# The REMOTE API is licensed under the terms of GNU GPL:
-# 
-# -------------------------------------------------------------------
-# The REMOTE API is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# 
-# THE REMOTE API IS DISTRIBUTED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
-# WARRANTY. THE USER WILL USE IT AT HIS/HER OWN RISK. THE ORIGINAL
-# AUTHORS AND COPPELIA ROBOTICS GMBH WILL NOT BE LIABLE FOR DATA LOSS,
-# DAMAGES, LOSS OF PROFITS OR ANY OTHER KIND OF LOSS WHILE USING OR
-# MISUSING THIS SOFTWARE.
-# 
-# See the GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with the REMOTE API.  If not, see <http://www.gnu.org/licenses/>.
-# -------------------------------------------------------------------
+# BSD License 2.0
 #
-# This file was automatically created for V-REP release V3.4.0 rev. 1 on April 5th 2017
+# Copyright (c) 2018, Coppelia Robotics GmbH
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Coppelia Robotics nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL COPPELIA ROBOTICS GMBH BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# -----------------------------------------------------------------------
 
 import platform
 import struct
@@ -55,7 +55,7 @@ except:
     print ('----------------------------------------------------')
     print ('')
 
-#ctypes wrapper prototypes 
+#ctypes wrapper prototypes
 c_GetJointPosition          = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct.POINTER(ct.c_float), ct.c_int32)(("simxGetJointPosition", libsimx))
 c_SetJointPosition          = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct.c_float, ct.c_int32)(("simxSetJointPosition", libsimx))
 c_GetJointMatrix            = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct.POINTER(ct.c_float), ct.c_int32)(("simxGetJointMatrix", libsimx))
@@ -92,8 +92,10 @@ c_AuxiliaryConsoleClose     = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct
 c_AuxiliaryConsolePrint     = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct.POINTER(ct.c_char), ct.c_int32)(("simxAuxiliaryConsolePrint", libsimx))
 c_AuxiliaryConsoleShow      = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct.c_ubyte, ct.c_int32)(("simxAuxiliaryConsoleShow", libsimx))
 c_GetObjectOrientation      = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct.c_int32, ct.POINTER(ct.c_float), ct.c_int32)(("simxGetObjectOrientation", libsimx))
+c_GetObjectQuaternion       = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct.c_int32, ct.POINTER(ct.c_float), ct.c_int32)(("simxGetObjectQuaternion", libsimx))
 c_GetObjectPosition         = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct.c_int32, ct.POINTER(ct.c_float), ct.c_int32)(("simxGetObjectPosition", libsimx))
 c_SetObjectOrientation      = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct.c_int32, ct.POINTER(ct.c_float), ct.c_int32)(("simxSetObjectOrientation", libsimx))
+c_SetObjectQuaternion       = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct.c_int32, ct.POINTER(ct.c_float), ct.c_int32)(("simxSetObjectQuaternion", libsimx))
 c_SetObjectPosition         = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct.c_int32, ct.POINTER(ct.c_float), ct.c_int32)(("simxSetObjectPosition", libsimx))
 c_SetObjectParent           = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct.c_int32, ct.c_ubyte, ct.c_int32)(("simxSetObjectParent", libsimx))
 c_SetUIButtonLabel          = ct.CFUNCTYPE(ct.c_int32,ct.c_int32, ct.c_int32, ct.c_int32, ct.POINTER(ct.c_char), ct.POINTER(ct.c_char), ct.c_int32)(("simxSetUIButtonLabel", libsimx))
@@ -248,7 +250,7 @@ def simxReadForceSensor(clientID, forceSensorHandle, operationMode):
     #    state=state.value
     #else:
     #    state=ord(state.value)
-    return ret, state.value, arr1, arr2 
+    return ret, state.value, arr1, arr2
 
 def simxBreakForceSensor(clientID, forceSensorHandle, operationMode):
     '''
@@ -265,7 +267,7 @@ def simxReadVisionSensor(clientID, sensorHandle, operationMode):
     auxValues      = ct.POINTER(ct.c_float)()
     auxValuesCount = ct.POINTER(ct.c_int)()
     ret = c_ReadVisionSensor(clientID, sensorHandle, ct.byref(detectionState), ct.byref(auxValues), ct.byref(auxValuesCount), operationMode)
-    
+
     auxValues2 = []
     if ret == 0:
         s = 0
@@ -277,7 +279,7 @@ def simxReadVisionSensor(clientID, sensorHandle, operationMode):
         c_ReleaseBuffer(auxValues)
         c_ReleaseBuffer(auxValuesCount)
 
-    return ret, bool(detectionState.value!=0), auxValues2 
+    return ret, bool(detectionState.value!=0), auxValues2
 
 def simxGetObjectHandle(clientID, objectName, operationMode):
     '''
@@ -387,7 +389,7 @@ def simxLoadUI(clientID, uiPathAndName, options, operationMode):
     if (sys.version_info[0] == 3) and (type(uiPathAndName) is str):
         uiPathAndName=uiPathAndName.encode('utf-8')
     ret = c_LoadUI(clientID, uiPathAndName, options, ct.byref(count), ct.byref(uiHandles), operationMode)
-    
+
     handles = []
     if ret == 0:
         for i in range(count.value):
@@ -477,7 +479,7 @@ def simxSetUIButtonProperty(clientID, uiHandle, uiButtonID, prop, operationMode)
     '''
     Please have a look at the function description/documentation in the V-REP user manual
     '''
-    
+
     return c_SetUIButtonProperty(clientID, uiHandle, uiButtonID, prop, operationMode)
 
 def simxAddStatusbarMessage(clientID, message, operationMode):
@@ -549,6 +551,17 @@ def simxGetObjectOrientation(clientID, objectHandle, relativeToObjectHandle, ope
         arr.append(eulerAngles[i])
     return ret, arr
 
+def simxGetObjectQuaternion(clientID, objectHandle, relativeToObjectHandle, operationMode):
+    '''
+    Please have a look at the function description/documentation in the V-REP user manual
+    '''
+    quaternion = (ct.c_float*4)()
+    ret = c_GetObjectQuaternion(clientID, objectHandle, relativeToObjectHandle, quaternion, operationMode)
+    arr = []
+    for i in range(4):
+        arr.append(quaternion[i])
+    return ret, arr
+
 def simxGetObjectPosition(clientID, objectHandle, relativeToObjectHandle, operationMode):
     '''
     Please have a look at the function description/documentation in the V-REP user manual
@@ -567,6 +580,14 @@ def simxSetObjectOrientation(clientID, objectHandle, relativeToObjectHandle, eul
 
     angles = (ct.c_float*3)(*eulerAngles)
     return c_SetObjectOrientation(clientID, objectHandle, relativeToObjectHandle, angles, operationMode)
+
+def simxSetObjectQuaternion(clientID, objectHandle, relativeToObjectHandle, quaternion, operationMode):
+    '''
+    Please have a look at the function description/documentation in the V-REP user manual
+    '''
+
+    quat = (ct.c_float*4)(*quaternion)
+    return c_SetObjectQuaternion(clientID, objectHandle, relativeToObjectHandle, quat, operationMode)
 
 def simxSetObjectPosition(clientID, objectHandle, relativeToObjectHandle, position, operationMode):
     '''
@@ -691,7 +712,7 @@ def simxGetStringParameter(clientID, paramIdentifier, operationMode):
     '''
     paramValue = ct.POINTER(ct.c_char)()
     ret = c_GetStringParameter(clientID, paramIdentifier, ct.byref(paramValue), operationMode)
-    
+
     a = bytearray()
     if ret == 0:
         i = 0
@@ -834,7 +855,7 @@ def simxGetDialogInput(clientID, dialogHandle, operationMode):
     '''
     inputText = ct.POINTER(ct.c_char)()
     ret = c_GetDialogInput(clientID, dialogHandle, ct.byref(inputText), operationMode)
-    
+
     a = bytearray()
     if ret == 0:
         i = 0
@@ -1100,9 +1121,9 @@ def simxGetObjectFloatParameter(clientID, objectHandle, parameterID, operationMo
     '''
     Please have a look at the function description/documentation in the V-REP user manual
     '''
-    
+
     parameterValue = ct.c_float()
-    return c_GetObjectFloatParameter(clientID, objectHandle, parameterID, ct.byref(parameterValue), operationMode), parameterValue.value 
+    return c_GetObjectFloatParameter(clientID, objectHandle, parameterID, ct.byref(parameterValue), operationMode), parameterValue.value
 
 def simxSetObjectFloatParameter(clientID, objectHandle, parameterID, parameterValue, operationMode):
     '''
@@ -1116,7 +1137,7 @@ def simxGetObjectIntParameter(clientID, objectHandle, parameterID, operationMode
     Please have a look at the function description/documentation in the V-REP user manual
     '''
 
-    parameterValue = ct.c_int() 
+    parameterValue = ct.c_int()
     return c_GetObjectIntParameter(clientID, objectHandle, parameterID, ct.byref(parameterValue), operationMode), parameterValue.value
 
 def simxSetObjectIntParameter(clientID, objectHandle, parameterID, parameterValue, operationMode):
@@ -1312,7 +1333,7 @@ def simxGetObjectGroupData(clientID, objectType, dataType, operationMode):
     stringDataC = ct.c_int()
     stringDataP = ct.POINTER(ct.c_char)()
     ret = c_GetObjectGroupData(clientID, objectType, dataType, ct.byref(handlesC), ct.byref(handlesP), ct.byref(intDataC), ct.byref(intDataP), ct.byref(floatDataC), ct.byref(floatDataP), ct.byref(stringDataC), ct.byref(stringDataP), operationMode)
-    
+
     if ret == 0:
         for i in range(handlesC.value):
             handles.append(handlesP[i])
@@ -1335,7 +1356,7 @@ def simxGetObjectGroupData(clientID, objectType, dataType, operationMode):
             else:
                 a=str(a)
             stringData.append(a)
- 
+
     return ret, handles, intData, floatData, stringData
 
 def simxCallScriptFunction(clientID, scriptDescription, options, functionName, inputInts, inputFloats, inputStrings, inputBuffer, operationMode):
@@ -1432,13 +1453,13 @@ def simxGetObjectVelocity(clientID, objectHandle, operationMode):
     arr2 = []
     for i in range(3):
         arr2.append(angularVel[i])
-    return ret, arr1, arr2 
+    return ret, arr1, arr2
 
 def simxPackInts(intList):
     '''
     Please have a look at the function description/documentation in the V-REP user manual
     '''
-    
+
     if sys.version_info[0] == 3:
         s=bytes()
         for i in range(len(intList)):
