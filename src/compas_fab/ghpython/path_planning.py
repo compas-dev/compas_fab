@@ -2,10 +2,10 @@ from __future__ import print_function
 
 import logging
 from timeit import default_timer as timer
-from compas_fab.fab.robots import Pose
-from compas_fab.fab.robots.rfl import Configuration, SimulationCoordinator
-from compas_fab.fab.grasshopper.geometry import xform_from_matrix, vrep_pose_from_plane
-from compas_fab.fab.grasshopper.helpers import mesh_from_guid
+from compas_fab.robots import Pose
+from compas_fab.robots.rfl import Configuration, SimulationCoordinator
+from compas_fab.grasshopper.geometry import xform_from_matrix, vrep_pose_from_plane
+from compas_fab.grasshopper.helpers import mesh_from_guid
 
 try:
     import clr

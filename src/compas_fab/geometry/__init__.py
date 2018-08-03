@@ -1,13 +1,13 @@
 """
-.. _compas_fab.fab.geometry:
+.. _compas_fab.geometry:
 
 ********************************************************************************
-compas_fab.fab.geometry
+compas_fab.geometry
 ********************************************************************************
 
-.. module:: compas_fab.fab.geometry
+.. module:: compas_fab.geometry
 
-Package containing base clases for robot simulation and control.
+Package containing classes and functions for geometry representation and manipulation.
 
 .. autosummary::
     :toctree: generated/
@@ -42,7 +42,7 @@ Package containing base clases for robot simulation and control.
     matrix_from_shear_entries
     matrix_from_translation
     quaternion_from_matrix
-    translation_from_matrix 
+    translation_from_matrix
 """
 
 from .frame import Frame

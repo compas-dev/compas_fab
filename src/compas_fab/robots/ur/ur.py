@@ -3,11 +3,11 @@ import os
 import math
 from compas.datastructures.mesh import Mesh
 from compas.geometry.basic import subtract_vectors
-from compas_fab.fab.geometry.transformation import transform_xyz
-from compas_fab.fab.robots import Robot, BaseConfiguration
-from compas_fab.fab.geometry import Frame, Rotation, Transformation
-from compas_fab.fab.geometry.helpers import mesh_update_vertices
-from compas_fab.fab.robots.ur.kinematics import forward_kinematics, inverse_kinematics
+from compas_fab.geometry.transformation import transform_xyz
+from compas_fab.robots import Robot, BaseConfiguration
+from compas_fab.geometry import Frame, Rotation, Transformation
+from compas_fab.geometry.helpers import mesh_update_vertices
+from compas_fab.robots.ur.kinematics import forward_kinematics, inverse_kinematics
 
 
 class UR(Robot):

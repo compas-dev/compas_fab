@@ -1,6 +1,6 @@
 from __future__ import print_function
-from compas_fab.fab.robots import Tool
-from compas_fab.fab.geometry import Frame
+from compas_fab.robots import Tool
+from compas_fab.geometry import Frame
 from compas.datastructures.mesh import Mesh
 from compas_fab import get_data
 

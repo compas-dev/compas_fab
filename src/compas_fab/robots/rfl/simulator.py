@@ -14,9 +14,9 @@ import socket
 import logging
 from timeit import default_timer as timer
 from compas.datastructures.mesh import Mesh
-from compas_fab.fab.robots import Pose
-from compas_fab.fab.robots.rfl import Configuration, Robot
-from compas_fab.fab.robots.rfl.vrep_remote_api import vrep
+from compas_fab.robots import Pose
+from compas_fab.robots.rfl import Configuration, Robot
+from compas_fab.robots.rfl.vrep_remote_api import vrep
 
 DEFAULT_SCALE = 1000.
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
@@ -50,7 +50,7 @@ class Simulator(object):
 
     Examples:
 
-        >>> from compas_fab.fab.robots.rfl import *
+        >>> from compas_fab.robots.rfl import *
         >>> with Simulator() as simulator:
         ...     print ('Connected: %s' % simulator.is_connected())
         ...
@@ -141,7 +141,7 @@ class Simulator(object):
 
         Examples:
 
-            >>> from compas_fab.fab.robots.rfl import Simulator
+            >>> from compas_fab.robots.rfl import Simulator
             >>> with Simulator() as simulator:
             ...     matrices = simulator.get_object_matrices([0])
             ...     print(map(int, matrices[0]))
@@ -186,7 +186,7 @@ class Simulator(object):
 
         Examples:
 
-            >>> from compas_fab.fab.robots.rfl import Simulator
+            >>> from compas_fab.robots.rfl import Simulator
             >>> with Simulator() as simulator:
             ...     simulator.reset_all_robots()
             ...
@@ -224,7 +224,7 @@ class Simulator(object):
 
         Examples:
 
-            >>> from compas_fab.fab.robots.rfl import Robot, Configuration
+            >>> from compas_fab.robots.rfl import Robot, Configuration
             >>> with Simulator() as simulator:
             ...     config = Configuration.from_joints_and_external_axes([90, 0, 0, 0, 0, -90],
             ...                                                          [7600, -4500, -4500])
@@ -248,7 +248,7 @@ class Simulator(object):
 
         Examples:
 
-            >>> from compas_fab.fab.robots.rfl import Robot
+            >>> from compas_fab.robots.rfl import Robot
             >>> with Simulator() as simulator:
             ...     config = simulator.get_robot_config(Robot(11))
 

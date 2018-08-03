@@ -1,6 +1,6 @@
 from __future__ import print_function
 from compas_fab import get_data
-from compas_fab.fab.robots.ur import UR
+from compas_fab.robots.ur import UR
 import math
 
 class UR10(UR):
@@ -59,8 +59,8 @@ def main():
 
 
 if __name__ == "__main__":
-    from compas_fab.fab.geometry import Frame
-    from compas_fab.fab.robots.ur.kinematics.path_calculation import smallest_joint_pose
+    from compas_fab.geometry import Frame
+    from compas_fab.robots.ur.kinematics.path_calculation import smallest_joint_pose
 
     ur = UR10()
 

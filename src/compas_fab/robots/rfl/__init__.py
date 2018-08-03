@@ -1,11 +1,11 @@
 """
-.. _compas_fab.fab.robots.rfl:
+.. _compas_fab.robots.rfl:
 
 ********************************************************************************
-compas_fab.fab.robots.rfl
+compas_fab.robots.rfl
 ********************************************************************************
 
-.. module:: compas_fab.fab.robots.rfl
+.. module:: compas_fab.robots.rfl
 
 Package with functionality to run simulations on the RFL (Robotic Fabrication
 Lab) using robotic simulation tools like

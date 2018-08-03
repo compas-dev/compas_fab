@@ -1,6 +1,6 @@
 import math
-from compas_fab.fab.geometry import Frame
-from compas_fab.fab.utilities import sign, argsort
+from compas_fab.geometry import Frame
+from compas_fab.utilities import sign, argsort
 from .ur_kin_ros import forward_ros, inverse_ros
 
 

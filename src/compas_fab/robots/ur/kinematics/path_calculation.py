@@ -1,8 +1,8 @@
 from __future__ import print_function
 import math
-from compas_fab.fab.utilities import sign
-from compas_fab.fab.robots.ur.kinematics import inverse_kinematics
-from compas_fab.fab.robots import BaseConfiguration
+from compas_fab.utilities import sign
+from compas_fab.robots.ur.kinematics import inverse_kinematics
+from compas_fab.robots import BaseConfiguration
 
 
 def format_joint_positions(joint_positions_a, joint_positions_b = [0,0,0,0,0,0]):

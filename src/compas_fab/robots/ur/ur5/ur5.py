@@ -1,7 +1,7 @@
 from __future__ import print_function
 from compas_fab import get_data
-from compas_fab.fab.robots import BaseConfiguration
-from compas_fab.fab.robots.ur import UR
+from compas_fab.robots import BaseConfiguration
+from compas_fab.robots.ur import UR
 import math
 
 class UR5(UR):
@@ -54,9 +54,9 @@ class UR5(UR):
 if __name__ == "__main__":
 
     import math
-    from compas_fab.fab.utilities import sign
-    from compas_fab.fab.geometry import Frame
-    from compas_fab.fab.robots.ur.kinematics import format_joint_positions
+    from compas_fab.utilities import sign
+    from compas_fab.geometry import Frame
+    from compas_fab.robots.ur.kinematics import format_joint_positions
     ur = UR5()
 
     q = [-0.44244, -1.5318, 1.34588, -1.38512, -1.05009, -0.4495]

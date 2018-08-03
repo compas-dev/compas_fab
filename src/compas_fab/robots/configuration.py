@@ -11,13 +11,13 @@ class BaseConfiguration(object):
 
     Examples:
 
-        >>> from compas_fab.fab.robots import BaseConfiguration
+        >>> from compas_fab.robots import BaseConfiguration
         >>> config = BaseConfiguration.from_data({'joint_values': [90., 0., 0.]})
         >>> config.joint_values
         [90.0, 0.0, 0.0]
 
 
-        >>> from compas_fab.fab.robots import BaseConfiguration
+        >>> from compas_fab.robots import BaseConfiguration
         >>> config = BaseConfiguration.from_data({'joint_values': [90., 0., 0., 0., 180., 45.],\
                                                  'external_axes': [8312.0]})
         >>> str(config)
@@ -102,5 +102,5 @@ if __name__ == "__main__":
     q = [4.5, 1.7, 0.5, 2.1, 0.1, 2.1]
     configuration = BaseConfiguration.from_joints(q)
     print(configuration)
-    from compas_fab.fab.robots import BaseConfiguration
-    from compas_fab.fab.robots import Pose
+    from compas_fab.robots import BaseConfiguration
+    from compas_fab.robots import Pose

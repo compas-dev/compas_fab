@@ -1,7 +1,7 @@
 from compas.geometry import Frame
 from compas.geometry import Transformation
 
-from compas_fab.fab.geometry.helpers import mesh_transform
+from compas_fab.geometry.helpers import mesh_transform
 
 """
 TODO:
@@ -15,17 +15,17 @@ class Tool(object):
     """Represents the base class for robot end-effectors.
 
     Attributes:
-        tcp_frame (:class:`Frame`): The tcp_frame defines the tool coordinate 
+        tcp_frame (:class:`Frame`): The tcp_frame defines the tool coordinate
             system with the tool center point (tcp) as origin and is relative
             to the tool0_frame, the mounting frame on the robot's flange.
-        meshes (:obj:`list` of :class:`Mesh`, optional): The geometry of the 
-            tool positioned such that the tool0_frame (flange) is in worldXY 
+        meshes (:obj:`list` of :class:`Mesh`, optional): The geometry of the
+            tool positioned such that the tool0_frame (flange) is in worldXY
             origin.
-        draw_function (function, optional): The function to draw the meshes in 
+        draw_function (function, optional): The function to draw the meshes in
             the respective CAD environment. Defaults to None.
-        transform_function (function, optional): The function to transform 
+        transform_function (function, optional): The function to transform
             the meshes of the respective CAD environment. Defaults to None.
-    
+
     Examples:
         >>> from compas_ghpython.helpers import mesh_draw
         >>> from compas_ghpython.helpers import mesh_transform
@@ -34,13 +34,13 @@ class Tool(object):
         >>> tool = Tool(frame, meshes, mesh_draw, mesh_transform)
     """
 
-    def __init__(self, tcp_frame, meshes=[], 
+    def __init__(self, tcp_frame, meshes=[],
             draw_function=None, transform_function=None):
 
         self.tcp_frame = tcp_frame
         self.tool0_frame = Frame.worldXY()
         self.meshes = meshes
-    
+
         # Either both draw and transform functions have to be set or none
         if draw_function and not transform_function:
             raise Exception("The transform function has to be set as well.")
@@ -48,11 +48,11 @@ class Tool(object):
             raise Exception("The draw function has to be set as well.")
         self.draw_function = draw_function
         self.transform_function = transform_function
-    
+
     @property
     def transformation_tool0_tcp(self):
         return Transformation.from_frame_to_frame(self.tcp_frame, self.tool0_frame)
-    
+
     @property
     def transformation_tcp_tool0(self):
         return Transformation.from_frame_to_frame(self.tool0_frame, self.tcp_frame)

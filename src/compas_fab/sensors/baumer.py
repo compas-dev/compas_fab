@@ -1,5 +1,5 @@
-from compas_fab.fab.sensors import SerialSensor
-from compas_fab.fab.sensors.exceptions import ProtocolError
+from compas_fab.sensors import SerialSensor
+from compas_fab.sensors.exceptions import ProtocolError
 
 FRAME_HEAD = '{%s,%s,%s'
 FRAME_TAIL = '%s%s}'
