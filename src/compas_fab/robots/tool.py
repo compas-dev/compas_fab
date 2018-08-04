@@ -1,5 +1,5 @@
 from compas.geometry import Frame
-from compas.geometry import Transformation
+from compas.geometry.xforms import Transformation
 
 from compas_fab.geometry.helpers import mesh_transform
 

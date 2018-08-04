@@ -1,11 +1,11 @@
-from compas.geometry.objects.frame import Frame
+from compas.geometry import Frame
 from compas.geometry.transformations import matrix_from_quaternion
 from compas.geometry.transformations import basis_vectors_from_matrix
 
 class Pose(Frame):
     """Represents a robot pose.
-    
-    In principal the ``Pose`` is a wrapper object around the frame to derive 
+
+    In principal the ``Pose`` is a wrapper object around the frame to derive
     rosbridge messages therefrom.
 
     Examples:
@@ -33,7 +33,7 @@ class Pose(Frame):
         R = matrix_from_quaternion(quaternion)
         xaxis, yaxis = basis_vectors_from_matrix(R)
         return cls(point, xaxis, yaxis)
-    
+
     @property
     def msg(self):
         """Returns the pose as dictionary to use with rosbridge.

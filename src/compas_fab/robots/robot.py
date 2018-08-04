@@ -1,6 +1,6 @@
 from __future__ import print_function
 from compas.geometry import Frame
-from compas.geometry import Transformation
+from compas.geometry.xforms import Transformation
 
 from .tool import Tool
 
