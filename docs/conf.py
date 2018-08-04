@@ -37,6 +37,7 @@ extlinks = {
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 html_theme = 'alabaster'
 html_theme_options = {
+    'logo': 'logo.png'
     'description': 'Robotic Fabrication for COMPAS',
     'github_user': 'gramaziokohler',
     'github_repo': project,
@@ -46,6 +47,7 @@ html_theme_options = {
 html_use_smartypants = True
 html_last_updated_fmt = '%b %d, %Y'
 html_split_index = False
+html_static_path = ['_static']
 html_sidebars = {
    '**': ['about.html', 'navigation.html', 'searchbox.html'],
 }
