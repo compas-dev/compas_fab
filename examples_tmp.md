@@ -75,3 +75,9 @@ TODO:
       * Demo (instructors): control ABB (simulation), sending path.
       * Demo (instructors): control UR (real) sending path and wait until done, then send again.
       * Demo (instructors): control UR (real) sending path and use a sensor in parallel (TBD: one option is to use the Baumer Edge sensor to track an object)
+
+# Internal session: intro to compas_fab
+
+* Based on the morning of the pre-workshop
+* Google Slides presentation
+* Include visuale examples of implementation, code, GH, etc.
