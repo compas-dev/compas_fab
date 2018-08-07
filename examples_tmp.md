@@ -33,18 +33,45 @@ TODO:
 
 # [Draft] Schedule pre-workshop
 * 09:00
-    * Brief intro to COMPAS (perhaps Tom is interested in presenting this part, I have asked him in a separate email)
-    * Overview about compas_fab (GC)
+    * Brief intro to COMPAS (Tom will provide some material)
+    * Overview about `compas_fab` (GC)
+        * Tools for planning and execution of robotic fabrication
+        * CAD-Agnostic modeling of robotic fabrication process: `Frame`, `Transformation`, `Robot`, `Link`, `Joint`, etc
+        * Multiple backends for simulation and execution: V-REP Simulator, ROS Client.
     * Path planning
-        * Rationale (AG)
-        * Implementation (GC)
+        * Rationale (why is it important in architecture, etc) (AG)
+        * Implementation (two implementations: V-REP and MoveIt) (GC)
 * 10:30 Break 15’
 * 10:45
-    * ROS concepts
+    * ROS concepts:
+      * `Master & Nodes`
+      * `Messages, Topics, Services (blocking) & Actions (non-blocking)`
+      * `Message and Service Types`
+      * `URDF`
+      * `Transform library: tf2`
+      * `Parameter Server`, `ROS Units` [(link)](http://www.ros.org/reps/rep-0103.html)
+      * `RViz`, `rqt_graph`, `roswtf`
+      * `ROS Distributions`
     * Robot control with compas_fab + ROS
 * 12:00 Lunch break 60’
 * 13:00
-    * Hands-on session
-    * Setup RobotStudio & libraries on every machine (Send upfront instructions to participants to prepare setup if possible)
-    * Run examples on simulation (on each participants’ machine)
-    * Demo at the RFL (only on instructors’ machine)
+    * Hands-on session:
+      * Setup: install `compas` & `compas_fab` using conda recipe
+      * Exercise: examples with `Frame` & `Transformation`
+      * Exercise: load robot model and show same model in both Rhino and Blender
+      * Setup: start up V-REP either as dockerized app or from the Raspberry Pi
+      * Exercise: Examples with V-REP path planner:
+        * Test connection
+        * Simple forward kinematics
+        * Simple inverse kinematics
+        * Basic path planning
+        * Advanced path planning
+      * Setup: connect Raspberry Pi to use ROS (mention WSL?)
+      * Exercise: Examples with ROS:
+        * Test connection to ROS
+        * Load robot model from ROS
+        * Inverse kinematics over MoveIt
+        * Path planning over MoveIt (UR, from A to B)
+      * Demo (instructors): control UR (real) sending path and wait until done, then send again.
+      * Demo (instructors): control UR (real) sending path and turning IOs on/off while moving.
+      * Demo (instructors): control ABB (simulation) (TBD)
