@@ -1,4 +1,5 @@
 from __future__ import print_function
+
 from compas.geometry import Frame
 from compas.geometry.xforms import Transformation
 

@@ -18,7 +18,7 @@ bring a point P in the coordinate system of frame F1 into the coordinate system
 of frame F2.::
 
 	from compas.geometry import Frame
-	from compas.geometry import Transformation
+	from compas.geometry.xforms import Transformation
 
 	point =  [0.0, 0.0, 63.0]
 	xaxis =  [1.0, 0.0, 0.0]
@@ -50,7 +50,7 @@ several other representations of rotation can be derived, such
 as Euler angles, axis-angle representation, and quaternion.::
 
     from compas.geometry import Frame
-    from compas.geometry import Rotation
+    from compas.geometry.xforms import Rotation
 
     F1 = Frame([0, 0, 0], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
 
