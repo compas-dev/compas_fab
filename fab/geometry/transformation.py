@@ -1,10 +1,10 @@
-from compas.geometry import Transformation
-from compas.geometry import Rotation
-from compas.geometry import Translation
-from compas.geometry import Scale
-from compas.geometry import Reflection
-from compas.geometry import Projection
-from compas.geometry import Shear
+from compas.geometry.xforms import Transformation
+from compas.geometry.xforms import Rotation
+from compas.geometry.xforms import Translation
+from compas.geometry.xforms import Scale
+from compas.geometry.xforms import Reflection
+from compas.geometry.xforms import Projection
+from compas.geometry.xforms import Shear
 
 from compas.geometry import identity_matrix
 from compas.geometry import inverse
