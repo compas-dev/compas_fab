@@ -37,7 +37,7 @@ extlinks = {
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 html_theme = 'alabaster'
 html_theme_options = {
-    'logo': 'logo.png'
+    'logo': 'logo.png',
     'description': 'Robotic Fabrication for COMPAS',
     'github_user': 'gramaziokohler',
     'github_repo': project,
