@@ -1,5 +1,5 @@
-# TODO: rename to Configuration
-class BaseConfiguration(object):
+
+class Configuration(object):
     """Represents the configuration of a robot based on its
     joint angle values and external axes values (if any).
 

@@ -1,12 +1,97 @@
 from __future__ import print_function
+import os
 
 from compas.geometry import Frame
+from compas.geometry import add_vectors
 from compas.geometry.xforms import Transformation
+from compas.geometry.xforms import Rotation
+from compas.geometry.xforms import Scale
 
-from .tool import Tool
+from compas.datastructures.mesh import Mesh as CMesh
+#from .tool import Tool
 
+from compas.robots import Origin as UrdfOrigin
+from compas.robots import Visual as UrdfVisual
+from compas.robots import Collision as UrdfCollision
+from compas.robots import Link as UrdfLink
+from compas.robots import Joint as UrdfJoint
+from compas.robots import MeshDescriptor as UrdfMeshDescriptor
+from compas.robots import Robot as UrdfRobot
+from compas.robots.model import SCALE_FACTOR
+
+from compas.geometry.transformations import mesh_transform
+from compas.geometry.transformations import mesh_transformed
+
+
+from compas_fab.fab.robots.urdf_importer import UrdfImporter
+
+
+# TODO add other types with create as well
+
+class MeshDescriptor(UrdfMeshDescriptor):
+
+    def __init__(self, filename, scale='1.0 1.0 1.0'):
+        super(MeshDescriptor, self).__init__(filename, scale)
+        self.mesh = None
+        self.transformation = Transformation() # the transformation of the mesh
+    
+    @classmethod
+    def from_parent_instance(cls, instance):
+        return cls.__init__(instance.filename, instance.scale)
+
+    def create(self, parent): # paremt = Gameobj
+        # get robot name?
+        # GameObject meshObject = LocateAssetHandler.FindUrdfAsset<GameObject>(self.filename);
+        local_filename = os.path.abspath(self.filename.replace('package:/', PATH))
+        self.mesh = self.read_mesh_from_filename(local_filename)
+        self.set_scale(SCALE_FACTOR)
+        #gameObject.transform.SetParentAndAlign(parent.transform);
+        return self.mesh 
+
+
+
+class Mesh(CMesh):
+    """
+    """
+    def transform(self, transformation):
+        mesh_transform(self, transformation)
+    
+    def transformed(self, transformation):
+        return mesh_transformed(self, transformation)
 
 class Robot(object):
+    """
+        resource_path (str): the directory where all robot mesh files are stored
+    """
+    def __init__(self, resource_path, client=None):
+        # it needs a filename because it also sources the meshes from the directory
+        # model, urdf_importer, resource_path = None, client = None, viewer={}
+        
+        urdf_file = os.path.join(resource_path, "robot_description.urdf")
+        if not os.path.isfile(urdf_file):
+            raise ValueError("The file 'robot_description.urdf' is not in resource_path")
+        self.model = UrdfRobot.from_urdf_file(urdf_file)
+        self.urdf_importer = UrdfImporter.from_robot_resource_path(resource_path)
+        """
+        self.name = name
+        self.joints = joints
+        self.links = links
+        self.materials = materials
+        self.attr = kwargs
+        self.filename = None
+        """
+
+    def create(self, meshcls):
+        # create(self, urdf_importer, transform_func)
+
+        #if (UrdfAssetPathHandler.IsValidAssetPath(robot.filename))
+        #   Debug.LogError("URDF file and ressources must be placed in Assets Folder:\n" + Application.dataPath);
+
+        #self.model.root.create(urdf_importer, transform_func)
+        self.model.root.create(self.urdf_importer, meshcls)
+
+
+class OldRobot(object):
     """Represents the base class for all robots.
 
     It consists of:
@@ -107,169 +192,9 @@ class Robot(object):
         raise NotImplementedError
 
 
-class BaseConfiguration(object):
-    """Represents the configuration of a robot based on its
-    joint angle values and external axes values (if any).
-
-    Attributes:
-        joint_values (:obj:`list` of :obj:`float`): Joint values expressed
-            in degrees.
-        external_axes (:obj:`list` of :obj:`float`): Position on the external axis
-            system (if available).
-
-    Examples:
-
-        >>> from compas_fab.fab.robots import BaseConfiguration
-        >>> config = BaseConfiguration.from_data({'joint_values': [90., 0., 0.]})
-        >>> config.joint_values
-        [90.0, 0.0, 0.0]
-
-
-        >>> from compas_fab.fab.robots import BaseConfiguration
-        >>> config = BaseConfiguration.from_data({'joint_values': [90., 0., 0., 0., 180., 45.],\
-                                                 'external_axes': [8312.0]})
-        >>> str(config)
-        'joints: [90.0, 0.0, 0.0, 0.0, 180.0, 45.0], external_axes: [8312.0]'
-
-    """
-
-    def __init__(self):
-        self.joint_values = None
-        self.external_axes = None
-
-    def __str__(self):
-        return "joints: %s, external_axes: %s" % (self.joint_values, self.external_axes)
-
-    @classmethod
-    def from_joints(cls, joint_values):
-        """Construct a configuration from joint values.
-
-        Args:
-            joint_values (:obj:`list` of :obj:`float`): Joint values expressed
-                in degrees.
-
-        Returns:
-            Configuration: A :class:`.Configuration` instance.
-        """
-        return cls.from_joints_and_external_axes(joint_values, None)
-
-    @classmethod
-    def from_joints_and_external_axes(cls, joint_values, external_axes=None):
-        """Construct a configuration from joint values and external axes values.
-
-        Args:
-            joint_values (:obj:`list` of :obj:`float`): Joint values expressed
-                in degrees.
-            external_axes (:obj:`list` of :obj:`float`): Position on the external axis
-                system (if available).
-
-        Returns:
-            Configuration: A :class:`.Configuration` instance.
-        """
-        return cls.from_data({'joint_values': joint_values, 'external_axes': external_axes})
-
-    @classmethod
-    def from_data(cls, data):
-        """Construct a configuration from its data representation.
-
-        Args:
-            data (`dict`): The data dictionary.
-
-        Returns:
-            Configuration: A :class:`.Configuration` instance.
-        """
-        config = cls()
-        config.data = data
-        return config
-
-    def to_data(self):
-        """Return the data dict that represents the configuration, and from which it can
-        be reconstructed."""
-        return self.data
-
-    @property
-    def data(self):
-        """:obj:`dict` : The data representing the configuration.
-
-        By assigning a data dict to this property, the current data of the configuration
-        will be replaced by the data in the dict. The data getter and setter should
-        always be used in combination with each other.
-        """
-        return {
-            'joint_values': self.joint_values,
-            'external_axes': self.external_axes
-        }
-
-    @data.setter
-    def data(self, data):
-        self.joint_values = data.get('joint_values') or None
-        self.external_axes = data.get('external_axes') or None
-
-
-# TODO this can merge with Frame, as Frame euler_axis, quaternion, ..
-class Pose(object):
-    """Represents a robot pose described as a 4x4 transformation matrix.
-
-    Attributes:
-        values (:obj:`list` of :obj:`float`): list of 12 or 16 values representing a 4x4 matrix.
-            If 12 values are provided, the last row is assumed to be ``[0 0 0 1]``.
-    """
-
-    def __init__(self):
-        self.values = []
-
-    def __str__(self):
-        return "[%s, %s, %s, %s]" % (self.values[0:4], self.values[4:8], self.values[8:12], self.values[12:16])
-
-    @classmethod
-    def from_list(cls, list):
-        """Construct a pose from a list of 12 or 16 :obj:`float` values.
-
-        Args:
-            list (:obj:`list` of :obj:`float`): list of 12 or 16 values representing a 4x4 matrix.
-
-        Returns:
-            Pose: A :class:`.Pose` instance.
-        """
-        return cls.from_data({'values': list})
-
-    @classmethod
-    def from_data(cls, data):
-        """Construct a pose from its data representation.
-
-        Args:
-            data (`dict`): The data dictionary.
-
-        Returns:
-            Pose: A :class:`.Pose` instance.
-        """
-        pose = cls()
-        pose.data = data
-        return pose
-
-    def to_data(self):
-        """Return the data dict that represents the pose, and from which it can
-        be reconstructed."""
-        return self.data
-
-    @property
-    def data(self):
-        """:obj:`dict` : The data representing the pose."""
-        return {'values': self.values}
-
-    @data.setter
-    def data(self, data):
-        values = data.get('values') or None
-
-        if len(values) == 12:
-            values.extend([0., 0., 0., 1.])
-        elif len(values) != 16:
-            raise ValueError('Expected 12 or 16 floats but got %d' % len(values))
-
-        self.values = values
-
 
 if __name__ == "__main__":
+    """
     base_frame = Frame([-636.57, 370.83, 293.21], [0.00000, -0.54972, -0.83535], [0.92022, -0.32695, 0.21516])
     robot = Robot()
     robot.set_base(base_frame)
@@ -277,3 +202,9 @@ if __name__ == "__main__":
     T2 = robot.transformation_RCS_WCS
     print(T1 * T2)
     print(robot.transformation_tcp_tool0)
+    """
+    #filename = r"C:\Users\rustr\robot_description\staubli_tx60l\robot_description.urdf"
+    #model = UrdfRobot.from_urdf_file(filename)
+    robot = Robot(r"C:\Users\rustr\robot_description\staubli_tx60l")
+    #robot = Robot(r"C:\Users\rustr\robot_description\ur5")
+    robot.create(Mesh)
