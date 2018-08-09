@@ -25,7 +25,7 @@ class UrdfImporter(object):
         status (dict): To check the status of the process.
     """
 
-    def __init__(self, client, local_directory=os.path.join(os.path.expanduser('~'), "robot_description")):
+    def __init__(self, client=None, local_directory=os.path.join(os.path.expanduser('~'), "robot_description")):
         self.client = client
         self.local_directory = local_directory
         self.robot_name = None
@@ -33,6 +33,23 @@ class UrdfImporter(object):
         self.status = {"robot_description_received": False,
                        "resource_files_received": False,
                        "robot_name_received": False}
+    
+    @classmethod
+    def from_robot_resource_path(cls, path):
+        local_directory = os.path.abspath(os.path.join(path, ".."))
+        importer = cls(local_directory=local_directory)
+        importer.robot_name = os.path.basename(os.path.normpath(path))
+        return importer
+    
+    @property
+    def robot_resource_path(self):
+        if self.robot_name:
+            return os.path.join(self.local_directory, self.robot_name)
+        else:
+            return None # or error
+        
+    def robot_resource_filename(self, resource_file_uri):
+        return os.path.abspath(os.path.join(self.robot_resource_path, resource_file_uri[len('package://'):]))
 
     def check_status(self):
         if all(self.status.values()):
@@ -44,13 +61,13 @@ class UrdfImporter(object):
         self.robot_name = robot_name
         self.status.update({"robot_name_received": True})
         self.import_resource_files(uris)
-        filename = os.path.join(self.local_directory, self.robot_name, "robot_description.urdf")
+        filename = os.path.join(self.robot_resource_path, "robot_description.urdf")
         LOGGER.info("Saving URDF file to %s" % filename)
         self.write_file(filename, robot_description)
         self.status.update({"robot_description_received": True})
         self.check_status()
 
-    def load(self):
+    def load(self): # cannot use 'import' as method name...
         param = roslibpy.Param(self.client, '/robot_description')
         param.get(self.receive_robot_description)
 
@@ -76,9 +93,12 @@ class UrdfImporter(object):
     def import_resource_files(self, uris):
         for resource_file_uri in uris:
             self.requested_resource_files.update({resource_file_uri: False})
-            local_filename = os.path.abspath(os.path.join(self.local_directory,
-                self.robot_name, resource_file_uri[len('package://'):]))
-            self.receive_resource_file(local_filename, str(resource_file_uri))
+            local_filename = self.robot_resource_filename(resource_file_uri)
+            if os.path.isfile(local_filename):
+                LOGGER.info("Resource file already exists in %s, aborting download." % (local_filename))
+                self.update_file_request_status(resource_file_uri)
+            else:
+                self.receive_resource_file(local_filename, str(resource_file_uri))
 
     def write_file(self, filename, filecontents):
         dirname = os.path.dirname(filename)
@@ -93,7 +113,30 @@ class UrdfImporter(object):
         if all(self.requested_resource_files.values()):
             self.status.update({"resource_files_received": True})
             self.check_status()
+    
+    def read_mesh_from_resource_file_uri(self, resource_file_uri, meshcls):
+        filename = self.robot_resource_filename(resource_file_uri)
+        return self.read_mesh_from_filename(filename, meshcls)
 
+    def read_mesh_from_filename(self, filename, meshcls):
+        if not os.path.isfile(filename):
+            raise FileNotFoundError("No such file: '%s'" % filename)
+        extension = filename[(filename.rfind(".") + 1):]
+        if extension == "dae": # no dae support yet
+            #mesh = Mesh.from_dae(filename)
+            obj_filename = filename.replace(".dae", ".obj")
+            if os.path.isfile(obj_filename):
+                mesh = meshcls.from_obj(obj_filename)
+            else:
+                raise FileNotFoundError("Please convert '%s' into an OBJ file, since DAE is currently not supported yet." % filename)
+        elif extension == "obj":
+            mesh = meshcls.from_obj(filename)
+        elif extension == "stl":
+            mesh = meshcls.from_stl(filename)
+        else:
+            raise ValueError("%s file types not yet supported" % 
+                extension.upper())
+        return mesh
 
 if __name__ == "__main__":
 
