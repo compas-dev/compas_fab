@@ -2,11 +2,14 @@ from __future__ import print_function
 import os
 import logging
 import xml.etree.ElementTree as ET
+import binascii
 
 import roslibpy
 
 LOGGER = logging.getLogger('urdf_importer')
 
+
+from compas.datastructures import Mesh
 
 class UrdfImporter(object):
     """Allows to retrieve the mesh files specified in the robot urdf from the
@@ -74,8 +77,9 @@ class UrdfImporter(object):
     def receive_resource_file(self, local_filename, resource_file_uri):
 
         def write_binary_response_to_file(response):
-            LOGGER.info("Saving %s to %s" % (resource_file_uri, local_filename))
-            self.write_file(local_filename, response.data['value'])
+            LOGGER.info("Saving %s to %s" % (resource_file_uri, local_filename))            
+            self.write_file(local_filename, binascii.a2b_base64(response.data['value']), 'wb')
+            #self.write_file(local_filename, response.data['value'])
             self.update_file_request_status(resource_file_uri)
 
         service = roslibpy.Service(self.client, "/file_server/get_file",
@@ -100,11 +104,11 @@ class UrdfImporter(object):
             else:
                 self.receive_resource_file(local_filename, str(resource_file_uri))
 
-    def write_file(self, filename, filecontents):
+    def write_file(self, filename, filecontents, mode='w'):
         dirname = os.path.dirname(filename)
         if not os.path.isdir(dirname):
             os.makedirs(dirname)
-        f = open(filename, 'w')
+        f = open(filename, mode)
         f.write(filecontents)
         f.close()
 
@@ -126,17 +130,18 @@ class UrdfImporter(object):
             #mesh = Mesh.from_dae(filename)
             obj_filename = filename.replace(".dae", ".obj")
             if os.path.isfile(obj_filename):
-                mesh = meshcls.from_obj(obj_filename)
+                mesh = Mesh.from_obj(obj_filename)
             else:
                 raise FileNotFoundError("Please convert '%s' into an OBJ file, since DAE is currently not supported yet." % filename)
         elif extension == "obj":
-            mesh = meshcls.from_obj(filename)
+            mesh = Mesh.from_obj(filename)
         elif extension == "stl":
-            mesh = meshcls.from_stl(filename)
+            mesh = Mesh.from_stl(filename)
         else:
             raise ValueError("%s file types not yet supported" % 
                 extension.upper())
-        return mesh
+        
+        return meshcls.from_mesh(mesh)
 
 if __name__ == "__main__":
 
