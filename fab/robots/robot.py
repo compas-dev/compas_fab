@@ -7,7 +7,6 @@ from compas.geometry.xforms import Transformation
 from compas.geometry.xforms import Rotation
 from compas.geometry.xforms import Scale
 
-from compas.datastructures.mesh import Mesh as CMesh
 #from .tool import Tool
 
 from compas.robots import Origin as UrdfOrigin
@@ -50,14 +49,22 @@ class MeshDescriptor(UrdfMeshDescriptor):
 
 
 
-class Mesh(CMesh):
-    """
-    """
+class Mesh(object):
+
+    def __init__(self, mesh):
+        self.mesh = mesh
+
+    @classmethod
+    def from_mesh(cls, mesh):
+        return cls(mesh)
+
     def transform(self, transformation):
-        mesh_transform(self, transformation)
+        mesh_transform(self.mesh, transformation)
     
     def transformed(self, transformation):
-        return mesh_transformed(self, transformation)
+        return mesh_transformed(self.mesh, transformation)
+    
+    
 
 class Robot(object):
     """
@@ -72,23 +79,68 @@ class Robot(object):
             raise ValueError("The file 'robot_description.urdf' is not in resource_path")
         self.model = UrdfRobot.from_urdf_file(urdf_file)
         self.urdf_importer = UrdfImporter.from_robot_resource_path(resource_path)
+        
+        self.name = self.model.name
+
+        # how is this set = via frame?
+        self.transformation_RCF_WCF = None
+        self.transformation_WCF_RCF = None
+
         """
-        self.name = name
         self.joints = joints
         self.links = links
         self.materials = materials
         self.attr = kwargs
         self.filename = None
         """
+    
+    def get_joint_state(self):
+        pass
+        #return all revolute and linear joints
 
     def create(self, meshcls):
-        # create(self, urdf_importer, transform_func)
-
-        #if (UrdfAssetPathHandler.IsValidAssetPath(robot.filename))
-        #   Debug.LogError("URDF file and ressources must be placed in Assets Folder:\n" + Application.dataPath);
-
-        #self.model.root.create(urdf_importer, transform_func)
         self.model.root.create(self.urdf_importer, meshcls)
+    
+    # draw_visual
+    # draw_collision
+    # draw_frames
+    # draw_axes
+    # transform(joint_state)
+    # set_RCF(frame)
+    # set_tool(??tool) Tool
+    # compute_ik(pose)
+    # compute_cartesian_path(poses)
+    # send_pose, (check service name with ros)
+    # send_joint_state (check service name with ros)
+    # send_trajectory (check service name with ros)
+    # 
+
+    def draw(self):
+        meshes = []
+        for link in self.model.iter_links():
+            for item in link.visual:
+                m = item.geometry.shape.geometry
+                meshes.append(m.mesh)
+    
+    def update(self):
+        for link in self.iter_links():
+            #get_link_transfroms() link.name, vis_pos, vis_orientation, collision_pos, coll_orientation)
+            # link->setTransforms( visual_position, visual_orientation, collision_position, collision_orientation );
+            for joint in link.joints:
+                # joint->setTransforms(visual_position, visual_orientation);
+                pass
+    
+    def apply_transformations(self, joint_state):
+        """
+        """
+        self.model.root.apply_transformation(joint_state, parent_transformation=Transformation())
+    
+    def reset_transformations(self):
+        self.model.root.reset_transformation()
+
+    
+
+
 
 
 class OldRobot(object):
@@ -205,6 +257,48 @@ if __name__ == "__main__":
     """
     #filename = r"C:\Users\rustr\robot_description\staubli_tx60l\robot_description.urdf"
     #model = UrdfRobot.from_urdf_file(filename)
-    robot = Robot(r"C:\Users\rustr\robot_description\staubli_tx60l")
-    #robot = Robot(r"C:\Users\rustr\robot_description\ur5")
+    #robot = Robot(r"C:\Users\rustr\robot_description\staubli_tx60l")
+    robot = Robot(r"C:\Users\rustr\robot_description\ur5")
     robot.create(Mesh)
+    robot.reset_transformations()
+
+    joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+    #joint_positions = [6.254248742364907, -0.06779616254839081, 4.497665741209763, -4.429869574230193, -4.741325546996638, 3.1415926363120015]
+    joint_positions = [6.254248737006559, -5.874885906732766, 4.110686942268209, -1.3773936859827733, -1.5418597546004678, -6.2831853]
+
+    joint_state = {}
+    for k,v in zip(joint_names, joint_positions):
+        joint_state[k] = v
+
+    robot.apply_transformations(joint_state)
+    print("==========================")
+    """
+    [[0.0000, 0.0000, 0.0000],  [-1.0000, 0.0000, 0.0000],  [0.0000, -1.0000, 0.0000]] 
+    [[0.0000, 0.0000, 89.1590],  [1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[0.0000, 135.8500, 89.1590],  [0.0000, 0.0000, -1.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[425.0000, 16.1500, 89.1590],  [0.0000, 0.0000, -1.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[817.2500, 16.1500, 89.1590],  [-1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[817.2500, 109.1500, 89.1590],  [-1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[817.2500, 109.1500, -5.4910],  [-1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[817.2500, 191.4500, -5.4910],  [-1.0000, 0.0000, 0.0000],  [0.0000, 0.0000, 1.0000]] 
+    """
+
+    robot.reset_transformations()
+
+    for link in robot.model.iter_links():
+        pass
+        #print(link.name)
+        #print(link.init_transformation)
+        #print(link.current_transformation)
+        """
+        for j in link.joints:
+            if j.origin:
+                print("\t", j.origin)
+            if j.origin.init:
+                print("\t >>", j.origin.init)
+            #if j.axis:
+            #    print("\t", j.name)
+            #    print("\t", j.axis)
+
+        print()
+        """
