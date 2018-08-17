@@ -12,7 +12,7 @@ A variety of robot controllers exist for different types of tasks and robotic sy
 
 Task space
 ==================
-Robots are programmed and controlled to execute specific tasks defined in the task space, i.e., in the Cartesian coordinate system.
+Robots are programmed and controlled to execute specific tasks defined in the task space, i.e., in the Cartesian coordinate system. E.g., a robot trajectory is described as a set of target end effector poses in the robot coordinate frame.
 
 Joint space
 ==================
