@@ -13,6 +13,7 @@ the convention of a specific relationship between coordinate frames, for example
 
 * World coordinate frame (WCF)
 * Robot coordinate frame (RCF)
+* Tool0 coordinate frame (T0CF)
 * Tool coordinate frame (TCF)
 * Object coordinate frame (OCF)
 
