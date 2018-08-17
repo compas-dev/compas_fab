@@ -18,8 +18,8 @@ Joints
 ==================
 The joints are the elements in a robot which helps the links to travel in different kind of movements. The two major types of joints are:
 
-  * Rotational joint
-  * Linear joint
+* Rotational joint
+* Linear joint
 
 
 
