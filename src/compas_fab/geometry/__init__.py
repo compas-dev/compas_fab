@@ -54,8 +54,22 @@ Transformations
     matrix_from_translation
     quaternion_from_matrix
     translation_from_matrix
+
+
+Utilities
+===============
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    box_corners
+    box_faces
+    intersection_sphere_sphere
+
 """
 
 from .frame import Frame
 from .transformation import *
+from .intersection_update import *
 from .utilities import *

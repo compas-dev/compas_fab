@@ -1,6 +1,12 @@
 from compas.geometry.basic import add_vectors
 from compas.geometry.basic import scale_vector
 
+__all__ = [
+    'box_corners',
+    'box_faces'
+]
+
+
 def box_corners(frame, xsize, ysize, zsize):
     """Returns the 8 points that define a box in a plane.
 
@@ -12,13 +18,14 @@ def box_corners(frame, xsize, ysize, zsize):
     """
     corners = []
     for z in [0, 1]:
-        for x, y in zip([0, 1, 1, 0],[0, 0, 1, 1]):
+        for x, y in zip([0, 1, 1, 0], [0, 0, 1, 1]):
             pt = frame.point[:]
             pt = add_vectors(pt, scale_vector(frame.xaxis, x * xsize))
             pt = add_vectors(pt, scale_vector(frame.yaxis, y * ysize))
             pt = add_vectors(pt, scale_vector(frame.zaxis, z * zsize))
             corners.append(pt)
     return corners
+
 
 def box_faces():
     """Returns the indices of 8 points that define the faces of a box.

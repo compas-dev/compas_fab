@@ -161,14 +161,12 @@ def intersection_sphere_sphere(sphere1, sphere2):
 
     Returns
     -------
-    tuple
-        case (str): "point", "circle", or "sphere"
-        result (tuple):
-            point: xyz coordinates
-            circle: center, radius, normal
-            sphere: center, radius
-    None
-        for case 4) (no intersection)
+    case : str
+        `point`, `circle`, or `sphere`
+    result : tuple
+        - point: xyz coordinates
+        - circle: center, radius, normal
+        - sphere: center, radius
 
     Examples
     --------
