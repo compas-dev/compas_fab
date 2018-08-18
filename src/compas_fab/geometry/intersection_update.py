@@ -24,12 +24,6 @@ from compas.geometry.queries import is_point_on_segment_xy
 
 
 
-__author__ = ['Matthias Helmreich', ]
-__copyright__ = 'Copyright 2018 - Gramazio Kohler Research, ETH Zurich'
-__license__ = 'MIT License'
-__email__ = 'helmreich@arch.ethz.ch'
-
-
 __all__ = [
     'intersection_plane_circle',
     'intersection_sphere_sphere'
