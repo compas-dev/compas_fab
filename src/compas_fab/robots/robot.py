@@ -2,7 +2,7 @@ from __future__ import print_function
 import os
 
 import logging
-LOGGER = logging.getLogger('robot')
+LOGGER = logging.getLogger('compas_fab.robots.robot')
 
 from compas.geometry import Frame
 from compas.geometry import add_vectors
@@ -213,39 +213,31 @@ class Robot(object):
             js[k] = v
         self.model.root.update(js, Transformation(), Transformation())
 
-    def check_client(self):
+    def ensure_client(self):
         if not self.client:
-            print("This method is only callable if connected to ROS")
-            return False
-        else:
-            return True
+            raise Exception('This method is only callable once a client is assigned')
 
     def compute_ik(self, pose):
-        if not self.check_client():
-            return
+        self.ensure_client()
         raise NotImplementedError
 
     def compute_cartesian_path(self, poses):
-        if not self.check_client():
-            return
+        self.ensure_client()
         raise NotImplementedError
 
     def send_pose(self):
         #(check service name with ros)
-        if not self.check_client():
-            return
+        self.ensure_client()
         raise NotImplementedError
 
     def send_joint_state(self):
         #(check service name with ros)
-        if not self.check_client():
-            return
+        self.ensure_client()
         raise NotImplementedError
 
     def send_trajectory(self):
         #(check service name with ros)
-        if not self.check_client():
-            return
+        self.ensure_client()
         raise NotImplementedError
 
 class OldRobot(object):
