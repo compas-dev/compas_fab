@@ -13,6 +13,7 @@ In the kinematic model of a robot, the connection of different manipulator joint
 
 .. image:: link.png
    :width: 200 px
+   :scale: 50 %
 Tree structure of a robot describing the kinematic model.
 
 Links
