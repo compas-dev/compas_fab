@@ -134,12 +134,16 @@ def clean(ctx, docs=True, bytecode=True, builds=True):
 
 @task(help={
       'rebuild': 'True to clean all previously built docs before starting, otherwise False.',
+      'doctest': 'True to run doctests, otherwise False.',
       'check_links': 'True to check all web links in docs for validity, otherwise False.'})
-def docs(ctx, rebuild=True, check_links=False):
+def docs(ctx, doctest=False, rebuild=True, check_links=False):
     """Builds package's HTML documentation."""
     if rebuild:
         clean(ctx)
-    ctx.run('sphinx-build -b doctest docs dist/docs')
+
+    if doctest:
+        ctx.run('sphinx-build -b doctest docs dist/docs')
+
     ctx.run('sphinx-build -b html docs dist/docs')
     if check_links:
         ctx.run('sphinx-build -b linkcheck docs dist/docs')
