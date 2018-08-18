@@ -13,11 +13,11 @@ Package containing base clases for robot simulation and control.
     :toctree: generated/
 
     Pose
-    BaseConfiguration
+    Configuration
 
 """
 
-from .configuration import BaseConfiguration
+from .configuration import Configuration
 from .pose import Pose
 from .robot import Robot
 from .tool import Tool

@@ -1,12 +1,121 @@
 from __future__ import print_function
+import os
 
 from compas.geometry import Frame
+from compas.geometry import add_vectors
 from compas.geometry.xforms import Transformation
+from compas.geometry.xforms import Rotation
+from compas.geometry.xforms import Scale
 
-from .tool import Tool
+#from .tool import Tool
 
+from compas.robots import Origin as UrdfOrigin
+from compas.robots import Visual as UrdfVisual
+from compas.robots import Collision as UrdfCollision
+from compas.robots import Link as UrdfLink
+from compas.robots import Joint as UrdfJoint
+from compas.robots import MeshDescriptor as UrdfMeshDescriptor
+from compas.robots import Robot as UrdfRobot
+from compas.robots.model import SCALE_FACTOR
+
+from compas.geometry.transformations import mesh_transform
+from compas.geometry.transformations import mesh_transformed
+
+
+from compas_fab.fab.robots.urdf_importer import UrdfImporter
+from compas_fab.fab.robots.urdf_importer import check_mesh_class
+
+
+class Mesh(object):
+
+    def __init__(self, mesh):
+        self.mesh = mesh
+
+    def transform(self, transformation):
+        mesh_transform(self.mesh, transformation)
+    
+    def draw(self):
+        return self.mesh
+        
 
 class Robot(object):
+    """
+        resource_path (str): the directory where all robot mesh files are stored
+    """
+    def __init__(self, resource_path, client=None):
+        # it needs a filename because it also sources the meshes from the directory
+        # model, urdf_importer, resource_path = None, client = None, viewer={}
+
+        self.urdf_importer = UrdfImporter.from_robot_resource_path(resource_path)
+        
+        urdf_file = self.urdf_importer.get_robot_description_filename()
+        if not os.path.isfile(urdf_file):
+            raise ValueError("The file 'robot_description.urdf' is not in resource_path")
+
+        self.model = UrdfRobot.from_urdf_file(urdf_file)      
+        self.name = self.model.name
+        self.semantics = self.urdf_importer.read_robot_semantics()
+
+        # how is this set = via frame?
+        self.transformation_RCF_WCF = None
+        self.transformation_WCF_RCF = None
+
+        """
+        self.joints = joints
+        self.links = links
+        self.materials = materials
+        self.attr = kwargs
+        self.filename = None
+        """
+    
+    def get_joint_state(self):
+        pass
+        #return all revolute and linear joints
+
+    def create(self, meshcls):
+        check_mesh_class(meshcls)
+        self.model.root.create(self.urdf_importer, meshcls)
+
+    def get_joint_state_names(self):
+        """This should be read from robot semantics...
+        """
+        joint_state_names = []
+        for joint in self.model.iter_joints():
+            if joint.type == "revolute":
+                joint_state_names.append(joint.name)
+        return joint_state_names
+    
+    # draw_visual
+    # draw_collision
+    # draw_frames
+    # draw_axes
+    # transform(joint_state)
+    # set_RCF(frame)
+    # set_tool(??tool) Tool
+    # compute_ik(pose)
+    # compute_cartesian_path(poses)
+    # send_pose, (check service name with ros)
+    # send_joint_state (check service name with ros)
+    # send_trajectory (check service name with ros)
+    # 
+
+    def draw_visual(self):
+        return self.model.draw_visual()
+    
+    def draw_collision(self):
+        return self.model.draw_collision()
+
+    def draw(self):
+        return self.model.draw()
+    
+    def update(self, joint_state):
+        """
+        """
+        self.model.root.update(joint_state, Transformation(), Transformation())
+        
+
+
+class OldRobot(object):
     """Represents the base class for all robots.
 
     It consists of:
@@ -107,169 +216,9 @@ class Robot(object):
         raise NotImplementedError
 
 
-class BaseConfiguration(object):
-    """Represents the configuration of a robot based on its
-    joint angle values and external axes values (if any).
-
-    Attributes:
-        joint_values (:obj:`list` of :obj:`float`): Joint values expressed
-            in degrees.
-        external_axes (:obj:`list` of :obj:`float`): Position on the external axis
-            system (if available).
-
-    Examples:
-
-        >>> from compas_fab.robots import BaseConfiguration
-        >>> config = BaseConfiguration.from_data({'joint_values': [90., 0., 0.]})
-        >>> config.joint_values
-        [90.0, 0.0, 0.0]
-
-
-        >>> from compas_fab.robots import BaseConfiguration
-        >>> config = BaseConfiguration.from_data({'joint_values': [90., 0., 0., 0., 180., 45.],\
-                                                 'external_axes': [8312.0]})
-        >>> str(config)
-        'joints: [90.0, 0.0, 0.0, 0.0, 180.0, 45.0], external_axes: [8312.0]'
-
-    """
-
-    def __init__(self):
-        self.joint_values = None
-        self.external_axes = None
-
-    def __str__(self):
-        return "joints: %s, external_axes: %s" % (self.joint_values, self.external_axes)
-
-    @classmethod
-    def from_joints(cls, joint_values):
-        """Construct a configuration from joint values.
-
-        Args:
-            joint_values (:obj:`list` of :obj:`float`): Joint values expressed
-                in degrees.
-
-        Returns:
-            Configuration: A :class:`.Configuration` instance.
-        """
-        return cls.from_joints_and_external_axes(joint_values, None)
-
-    @classmethod
-    def from_joints_and_external_axes(cls, joint_values, external_axes=None):
-        """Construct a configuration from joint values and external axes values.
-
-        Args:
-            joint_values (:obj:`list` of :obj:`float`): Joint values expressed
-                in degrees.
-            external_axes (:obj:`list` of :obj:`float`): Position on the external axis
-                system (if available).
-
-        Returns:
-            Configuration: A :class:`.Configuration` instance.
-        """
-        return cls.from_data({'joint_values': joint_values, 'external_axes': external_axes})
-
-    @classmethod
-    def from_data(cls, data):
-        """Construct a configuration from its data representation.
-
-        Args:
-            data (`dict`): The data dictionary.
-
-        Returns:
-            Configuration: A :class:`.Configuration` instance.
-        """
-        config = cls()
-        config.data = data
-        return config
-
-    def to_data(self):
-        """Return the data dict that represents the configuration, and from which it can
-        be reconstructed."""
-        return self.data
-
-    @property
-    def data(self):
-        """:obj:`dict` : The data representing the configuration.
-
-        By assigning a data dict to this property, the current data of the configuration
-        will be replaced by the data in the dict. The data getter and setter should
-        always be used in combination with each other.
-        """
-        return {
-            'joint_values': self.joint_values,
-            'external_axes': self.external_axes
-        }
-
-    @data.setter
-    def data(self, data):
-        self.joint_values = data.get('joint_values') or None
-        self.external_axes = data.get('external_axes') or None
-
-
-# TODO this can merge with Frame, as Frame euler_axis, quaternion, ..
-class Pose(object):
-    """Represents a robot pose described as a 4x4 transformation matrix.
-
-    Attributes:
-        values (:obj:`list` of :obj:`float`): list of 12 or 16 values representing a 4x4 matrix.
-            If 12 values are provided, the last row is assumed to be ``[0 0 0 1]``.
-    """
-
-    def __init__(self):
-        self.values = []
-
-    def __str__(self):
-        return "[%s, %s, %s, %s]" % (self.values[0:4], self.values[4:8], self.values[8:12], self.values[12:16])
-
-    @classmethod
-    def from_list(cls, list):
-        """Construct a pose from a list of 12 or 16 :obj:`float` values.
-
-        Args:
-            list (:obj:`list` of :obj:`float`): list of 12 or 16 values representing a 4x4 matrix.
-
-        Returns:
-            Pose: A :class:`.Pose` instance.
-        """
-        return cls.from_data({'values': list})
-
-    @classmethod
-    def from_data(cls, data):
-        """Construct a pose from its data representation.
-
-        Args:
-            data (`dict`): The data dictionary.
-
-        Returns:
-            Pose: A :class:`.Pose` instance.
-        """
-        pose = cls()
-        pose.data = data
-        return pose
-
-    def to_data(self):
-        """Return the data dict that represents the pose, and from which it can
-        be reconstructed."""
-        return self.data
-
-    @property
-    def data(self):
-        """:obj:`dict` : The data representing the pose."""
-        return {'values': self.values}
-
-    @data.setter
-    def data(self, data):
-        values = data.get('values') or None
-
-        if len(values) == 12:
-            values.extend([0., 0., 0., 1.])
-        elif len(values) != 16:
-            raise ValueError('Expected 12 or 16 floats but got %d' % len(values))
-
-        self.values = values
-
 
 if __name__ == "__main__":
+    """
     base_frame = Frame([-636.57, 370.83, 293.21], [0.00000, -0.54972, -0.83535], [0.92022, -0.32695, 0.21516])
     robot = Robot()
     robot.set_base(base_frame)
@@ -277,3 +226,105 @@ if __name__ == "__main__":
     T2 = robot.transformation_RCS_WCS
     print(T1 * T2)
     print(robot.transformation_tcp_tool0)
+    """
+    #filename = r"C:\Users\rustr\robot_description\staubli_tx60l\robot_description.urdf"
+    #model = UrdfRobot.from_urdf_file(filename)
+    #robot = Robot(r"C:\Users\rustr\robot_description\staubli_tx60l")
+    robot = Robot(r"C:\Users\rustr\robot_description\ur5")
+    robot.create(Mesh)
+
+    joint_names = robot.get_joint_state_names()
+    print(joint_names)
+
+    joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+    joint_positions = [6.254248742364907, -0.06779616254839081, 4.497665741209763, -4.429869574230193, -4.741325546996638, 3.1415926363120015]
+    #joint_positions = [6.254248737006559, -5.874885906732766, 4.110686942268209, -1.3773936859827733, -1.5418597546004678, -6.2831853]
+    # 400, 100, 400
+    #joint_positions = [6.254248737006559, -5.874885906732766, 4.110686942268209, -1.3773936859827733, -1.5418597546004678, -6.2831853]
+    joint_positions = [0.5, -0.1, 3, -1, 0.5, 2]
+
+    joint_state = {}
+    for k,v in zip(joint_names, joint_positions):
+        joint_state[k] = v
+
+    robot.update(joint_state)
+
+
+    joint_positions = [6.254248737006559, -5.874885906732766, 4.110686942268209, -1.3773936859827733, -1.5418597546004678, -6.2831853]
+
+    joint_state = {}
+    for k,v in zip(joint_names, joint_positions):
+        joint_state[k] = v
+
+    robot.update(joint_state)
+
+    print("==========================")
+
+    for link in robot.model.iter_links():
+        for j in link.joints:
+            if j.origin:
+                print(j.origin)
+
+
+    visual = robot.draw_visual()
+    print(visual)
+    collision = robot.draw_collision()
+    print(collision)
+
+    """
+    [[0.0000, 0.0000, 0.0000],  [-1.0000, 0.0000, 0.0000],  [0.0000, -1.0000, 0.0000]] 
+    [[0.0000, 0.0000, 89.1590],  [1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[0.0000, 135.8500, 89.1590],  [0.0000, 0.0000, -1.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[425.0000, 16.1500, 89.1590],  [0.0000, 0.0000, -1.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[817.2500, 16.1500, 89.1590],  [-1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[817.2500, 109.1500, 89.1590],  [-1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[817.2500, 109.1500, -5.4910],  [-1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[817.2500, 191.4500, -5.4910],  [-1.0000, 0.0000, 0.0000],  [0.0000, 0.0000, 1.0000]] 
+
+    [[0.0000, 0.0000, 0.0000],  [1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[0.0000, 0.0000, 89.1590],  [0.9996, -0.0289, 0.0000],  [0.0289, 0.9996, 0.0000]] 
+    [[0.0000, 0.0000, 0.0000],  [-1.0000, 0.0000, 0.0000],  [0.0000, -1.0000, 0.0000]] 
+    [[3.9305, 135.7931, 89.1590],  [-0.3969, 0.0115, -0.9178],  [0.0289, 0.9996, 0.0000]] 
+    [[390.3678, 4.8577, -79.5869],  [0.9809, -0.0284, 0.1922],  [0.0289, 0.9996, 0.0000]] 
+    [[315.0093, 7.0389, 305.3500],  [0.9996, -0.0289, 0.0000],  [0.0289, 0.9996, 0.0000]] 
+    [[317.7000, 100.0000, 305.3500],  [0.0000, -1.0000, 0.0000],  [1.0000, 0.0000, 0.0000]] 
+    [[317.7000, 100.0000, 400.0000],  [0.0000, -1.0000, 0.0000],  [1.0000, 0.0000, 0.0000]] 
+    [[400.0000, 100.0000, 400.0000],  [1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
+    [[400.0000, 100.0000, 400.0000],  [0.0000, -1.0000, 0.0000],  [0.0000, 0.0000, -1.0000]] 
+    """
+
+    """
+    transformations = robot.model.root.calculate_transformations(joint_state, Transformation())
+    for k,v in transformations.items():
+        print(k, v)
+
+    #robot.reset_transformations()
+
+    for link in robot.model.iter_links():
+        #print(link.name)
+        #print(link.init_transformation)
+        #print(link.current_transformation)
+
+        for j in link.joints:
+            if j.origin:
+                j.origin.transform(transformations[j.name])
+                print(j.origin)
+            #if j.axis:
+            #    print("\t", j.name)
+            #    print("\t", j.axis)
+
+
+    transformations = robot.model.root.calculate_reset_transformations()
+
+    for link in robot.model.iter_links():
+        #print(link.name)
+        #print(link.init_transformation)
+        #print(link.current_transformation)
+
+        for j in link.joints:
+            if j.origin:
+                j.origin.transform(transformations[j.name])
+                print(j.origin)
+
+    robot.calculate_transformations(joint_state)
+    """

@@ -1,7 +1,8 @@
 from compas.geometry import Frame
 from compas.geometry.xforms import Transformation
 
-from compas_fab.geometry.helpers import mesh_transform
+from compas.geometry.transformations import mesh_transform
+from compas.geometry.transformations import mesh_transformed
 
 """
 TODO:
