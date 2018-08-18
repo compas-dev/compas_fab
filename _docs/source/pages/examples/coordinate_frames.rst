@@ -17,7 +17,8 @@ the convention of a specific relationship between coordinate frames, for example
 * Tool coordinate frame (TCF)
 * Object coordinate frame (OCF)
 
-.. image:: coord_sys.jpg
+.. image:: coord_frames.jpg
+Coordinate frame convention of a robtoic setup.
 
 To describe these coordinate frames, the ``Frame`` class of the compas libray is used.
 
