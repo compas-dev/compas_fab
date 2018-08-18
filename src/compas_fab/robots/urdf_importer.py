@@ -25,7 +25,7 @@ def check_mesh_class(meshcls):
 
     if not hasattr(meshcls, 'transform'):
         raise TypeError("The class %s has no method named 'transform'" % meshcls)
-    
+
     if not hasattr(meshcls, 'draw'):
         raise TypeError("The class %s has no method named 'draw'" % meshcls)
 
@@ -47,30 +47,30 @@ class UrdfImporter(object):
         status (dict): To check the status of the process.
     """
 
-    def __init__(self, client=None, local_directory=os.path.join(os.path.expanduser('~'), "robot_description")):
+    def __init__(self, client=None, local_directory=None):
         self.client = client
-        self.local_directory = local_directory
+        self.local_directory = local_directory or os.path.join(os.path.expanduser('~'), 'robot_description')
         self.robot_name = None
         self.requested_resource_files = {}
         self.status = {"robot_description_received": False,
                        "robot_description_semantic_received": False,
                        "resource_files_received": False,
                        "robot_name_received": False}
-    
+
     @classmethod
     def from_robot_resource_path(cls, path):
         local_directory = os.path.abspath(os.path.join(path, ".."))
         importer = cls(local_directory=local_directory)
         importer.robot_name = os.path.basename(os.path.normpath(path))
         return importer
-    
+
     @property
     def robot_resource_path(self):
         if self.robot_name:
             return os.path.join(self.local_directory, self.robot_name)
         else:
             return None # or error
-        
+
     def robot_resource_filename(self, resource_file_uri):
         return os.path.abspath(os.path.join(self.robot_resource_path, resource_file_uri[len('package://'):]))
 
@@ -92,13 +92,13 @@ class UrdfImporter(object):
         param.get(self.save_robot_description_semantic)
         # Update status
         self.check_status()
-    
+
     def get_robot_description_filename(self):
         return os.path.join(self.robot_resource_path, "robot_description.urdf")
-    
+
     def get_robot_description_semantic_filename(self):
         return os.path.join(self.robot_resource_path, "robot_description_semantic.urdf")
-    
+
     def save_robot_description(self, robot_description):
         # Save robot_description.urdf
         filename = self.get_robot_description_filename()
@@ -107,7 +107,7 @@ class UrdfImporter(object):
         self.status.update({"robot_description_received": True})
         # Update status
         self.check_status()
-    
+
     def save_robot_description_semantic(self, robot_description_semantic):
         # Save robot_description_semantic.urdf
         filename = self.get_robot_description_semantic_filename()
@@ -124,7 +124,7 @@ class UrdfImporter(object):
     def receive_resource_file(self, local_filename, resource_file_uri):
 
         def write_binary_response_to_file(response):
-            LOGGER.info("Saving %s to %s" % (resource_file_uri, local_filename))            
+            LOGGER.info("Saving %s to %s" % (resource_file_uri, local_filename))
             self.write_file(local_filename, binascii.a2b_base64(response.data['value']), 'wb')
             #self.write_file(local_filename, response.data['value'])
             self.update_file_request_status(resource_file_uri)
@@ -164,9 +164,9 @@ class UrdfImporter(object):
         if all(self.requested_resource_files.values()):
             self.status.update({"resource_files_received": True})
             self.check_status()
-    
+
     def read_mesh_from_resource_file_uri(self, resource_file_uri, meshcls):
-        """Reads the mesh from a file uri and creates a mesh type based on the 
+        """Reads the mesh from a file uri and creates a mesh type based on the
         passed mesh class.
 
         Args:
@@ -193,11 +193,11 @@ class UrdfImporter(object):
         elif extension == "stl":
             mesh = Mesh.from_stl(filename)
         else:
-            raise ValueError("%s file types not yet supported" % 
+            raise ValueError("%s file types not yet supported" %
                 extension.upper())
-        
+
         return meshcls(mesh)
-    
+
     def read_robot_semantics(self):
         semantics = {}
 
@@ -219,7 +219,7 @@ class UrdfImporter(object):
                 #raise NotImplementedError
                 #for elem in list(group):
                 #    print(elem.tag)
-            
+
             semantics['groups'][group.attrib['name']] = {}
             semantics['groups'][group.attrib['name']]['chain'] = chain
 
@@ -236,7 +236,7 @@ class UrdfImporter(object):
                     break
 
         return semantics
-        
+
 
 
 if __name__ == "__main__":
@@ -248,12 +248,12 @@ if __name__ == "__main__":
 
         def transform(self, transformation):
             mesh_transform(self.mesh, transformation)
-        
+
         def draw(self):
             return self.mesh
 
     check_mesh_class(ExampleMesh)
-    
+
     """
     Start following processes on client side:
     roslaunch YOUR_ROBOT_moveit_config demo.launch rviz_tutorial:=true
