@@ -1,19 +1,20 @@
 """
-.. _compas_fab.robots:
-
 ********************************************************************************
 compas_fab.robots
 ********************************************************************************
 
-.. module:: compas_fab.robots
+.. currentmodule:: compas_fab.robots
 
-Package containing base clases for robot simulation and control.
+:mod:`compas_fab.robots` contains base clases for robot simulation and control.
 
 .. autosummary::
     :toctree: generated/
+    :nosignatures:
 
     Pose
     Configuration
+    Robot
+    Tool
 
 """
 

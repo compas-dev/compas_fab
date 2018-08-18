@@ -32,6 +32,4 @@ Path planning
 
 """
 
-from .utilities import *
-from .helpers import *
-from .geometry import *
+from .path_planning import *

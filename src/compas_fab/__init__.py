@@ -1,5 +1,7 @@
 """
 
+.. currentmodule:: compas_fab
+
 This library provides tools to plan and execute robotic fabrication processes using
 the COMPAS Framework with a special focus on enabling its usage from within CAD
 environments such a `Rhinoceros 3D <https://www.rhino3d.com/>`_.
@@ -7,7 +9,7 @@ environments such a `Rhinoceros 3D <https://www.rhino3d.com/>`_.
 .. rubric:: Submodules
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     compas_fab.communication
     compas_fab.datastructures

@@ -2,8 +2,8 @@ from __future__ import print_function
 
 import logging
 from timeit import default_timer as timer
-from compas_fab.fab.robots import Pose
-from compas_fab.fab.robots.rfl import Configuration, SimulationCoordinator
+from compas_fab.robots import Pose
+from compas_fab.robots.rfl import Configuration, SimulationCoordinator
 from compas_ghpython.utilities import xform_from_transformation_matrix
 from compas_ghpython.helpers import mesh_from_guid
 from compas.datastructures import Mesh

@@ -119,6 +119,7 @@ def clean(ctx, docs=True, bytecode=True, builds=True):
 
     if docs:
         folders.append('docs/_build/')
+        folders.append('docs/reference/generated')
         folders.append('dist/')
 
     if bytecode:

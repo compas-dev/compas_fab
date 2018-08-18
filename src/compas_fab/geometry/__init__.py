@@ -1,16 +1,20 @@
 """
-.. _compas_fab.geometry:
-
 ********************************************************************************
 compas_fab.geometry
 ********************************************************************************
 
-.. module:: compas_fab.geometry
+.. currentmodule:: compas_fab.geometry
 
-Package containing classes and functions for geometry representation and manipulation.
+:mod:`compas_fab.geometry` contains classes and functions for
+geometry representation and manipulation.
+
+
+Classes
+=======
 
 .. autosummary::
     :toctree: generated/
+    :nosignatures:
 
     Frame
     Transformation
@@ -20,6 +24,13 @@ Package containing classes and functions for geometry representation and manipul
     Reflection
     Projection
     Shear
+
+Transformations
+===============
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
 
     axis_and_angle_from_matrix
     axis_angle_vector_from_matrix

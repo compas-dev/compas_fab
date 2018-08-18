@@ -1,7 +1,7 @@
 from __future__ import print_function
 import math
 
-from ..robot import BaseConfiguration
+from ..configuration import Configuration as BaseConfiguration
 
 
 class Configuration(BaseConfiguration):

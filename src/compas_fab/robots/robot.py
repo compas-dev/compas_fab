@@ -16,14 +16,14 @@ from compas.robots import Link as UrdfLink
 from compas.robots import Joint as UrdfJoint
 from compas.robots import MeshDescriptor as UrdfMeshDescriptor
 from compas.robots import Robot as UrdfRobot
-from compas.robots.model import SCALE_FACTOR
+from compas.robots.model.geometry import SCALE_FACTOR
 
 from compas.geometry.transformations import mesh_transform
 from compas.geometry.transformations import mesh_transformed
 
 
-from compas_fab.fab.robots.urdf_importer import UrdfImporter
-from compas_fab.fab.robots.urdf_importer import check_mesh_class
+from compas_fab.robots.urdf_importer import UrdfImporter
+from compas_fab.robots.urdf_importer import check_mesh_class
 
 
 class Mesh(object):
@@ -33,10 +33,10 @@ class Mesh(object):
 
     def transform(self, transformation):
         mesh_transform(self.mesh, transformation)
-    
+
     def draw(self):
         return self.mesh
-        
+
 
 class Robot(object):
     """
@@ -47,12 +47,12 @@ class Robot(object):
         # model, urdf_importer, resource_path = None, client = None, viewer={}
 
         self.urdf_importer = UrdfImporter.from_robot_resource_path(resource_path)
-        
+
         urdf_file = self.urdf_importer.get_robot_description_filename()
         if not os.path.isfile(urdf_file):
             raise ValueError("The file 'robot_description.urdf' is not in resource_path")
 
-        self.model = UrdfRobot.from_urdf_file(urdf_file)      
+        self.model = UrdfRobot.from_urdf_file(urdf_file)
         self.name = self.model.name
         self.semantics = self.urdf_importer.read_robot_semantics()
 
@@ -67,7 +67,7 @@ class Robot(object):
         self.attr = kwargs
         self.filename = None
         """
-    
+
     def get_joint_state(self):
         pass
         #return all revolute and linear joints
@@ -84,7 +84,7 @@ class Robot(object):
             if joint.type == "revolute":
                 joint_state_names.append(joint.name)
         return joint_state_names
-    
+
     # draw_visual
     # draw_collision
     # draw_frames
@@ -97,22 +97,22 @@ class Robot(object):
     # send_pose, (check service name with ros)
     # send_joint_state (check service name with ros)
     # send_trajectory (check service name with ros)
-    # 
+    #
 
     def draw_visual(self):
         return self.model.draw_visual()
-    
+
     def draw_collision(self):
         return self.model.draw_collision()
 
     def draw(self):
         return self.model.draw()
-    
+
     def update(self, joint_state):
         """
         """
         self.model.root.update(joint_state, Transformation(), Transformation())
-        
+
 
 
 class OldRobot(object):
@@ -272,25 +272,25 @@ if __name__ == "__main__":
     print(collision)
 
     """
-    [[0.0000, 0.0000, 0.0000],  [-1.0000, 0.0000, 0.0000],  [0.0000, -1.0000, 0.0000]] 
-    [[0.0000, 0.0000, 89.1590],  [1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
-    [[0.0000, 135.8500, 89.1590],  [0.0000, 0.0000, -1.0000],  [0.0000, 1.0000, 0.0000]] 
-    [[425.0000, 16.1500, 89.1590],  [0.0000, 0.0000, -1.0000],  [0.0000, 1.0000, 0.0000]] 
-    [[817.2500, 16.1500, 89.1590],  [-1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
-    [[817.2500, 109.1500, 89.1590],  [-1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
-    [[817.2500, 109.1500, -5.4910],  [-1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
-    [[817.2500, 191.4500, -5.4910],  [-1.0000, 0.0000, 0.0000],  [0.0000, 0.0000, 1.0000]] 
+    [[0.0000, 0.0000, 0.0000],  [-1.0000, 0.0000, 0.0000],  [0.0000, -1.0000, 0.0000]]
+    [[0.0000, 0.0000, 89.1590],  [1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]]
+    [[0.0000, 135.8500, 89.1590],  [0.0000, 0.0000, -1.0000],  [0.0000, 1.0000, 0.0000]]
+    [[425.0000, 16.1500, 89.1590],  [0.0000, 0.0000, -1.0000],  [0.0000, 1.0000, 0.0000]]
+    [[817.2500, 16.1500, 89.1590],  [-1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]]
+    [[817.2500, 109.1500, 89.1590],  [-1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]]
+    [[817.2500, 109.1500, -5.4910],  [-1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]]
+    [[817.2500, 191.4500, -5.4910],  [-1.0000, 0.0000, 0.0000],  [0.0000, 0.0000, 1.0000]]
 
-    [[0.0000, 0.0000, 0.0000],  [1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
-    [[0.0000, 0.0000, 89.1590],  [0.9996, -0.0289, 0.0000],  [0.0289, 0.9996, 0.0000]] 
-    [[0.0000, 0.0000, 0.0000],  [-1.0000, 0.0000, 0.0000],  [0.0000, -1.0000, 0.0000]] 
-    [[3.9305, 135.7931, 89.1590],  [-0.3969, 0.0115, -0.9178],  [0.0289, 0.9996, 0.0000]] 
-    [[390.3678, 4.8577, -79.5869],  [0.9809, -0.0284, 0.1922],  [0.0289, 0.9996, 0.0000]] 
-    [[315.0093, 7.0389, 305.3500],  [0.9996, -0.0289, 0.0000],  [0.0289, 0.9996, 0.0000]] 
-    [[317.7000, 100.0000, 305.3500],  [0.0000, -1.0000, 0.0000],  [1.0000, 0.0000, 0.0000]] 
-    [[317.7000, 100.0000, 400.0000],  [0.0000, -1.0000, 0.0000],  [1.0000, 0.0000, 0.0000]] 
-    [[400.0000, 100.0000, 400.0000],  [1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]] 
-    [[400.0000, 100.0000, 400.0000],  [0.0000, -1.0000, 0.0000],  [0.0000, 0.0000, -1.0000]] 
+    [[0.0000, 0.0000, 0.0000],  [1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]]
+    [[0.0000, 0.0000, 89.1590],  [0.9996, -0.0289, 0.0000],  [0.0289, 0.9996, 0.0000]]
+    [[0.0000, 0.0000, 0.0000],  [-1.0000, 0.0000, 0.0000],  [0.0000, -1.0000, 0.0000]]
+    [[3.9305, 135.7931, 89.1590],  [-0.3969, 0.0115, -0.9178],  [0.0289, 0.9996, 0.0000]]
+    [[390.3678, 4.8577, -79.5869],  [0.9809, -0.0284, 0.1922],  [0.0289, 0.9996, 0.0000]]
+    [[315.0093, 7.0389, 305.3500],  [0.9996, -0.0289, 0.0000],  [0.0289, 0.9996, 0.0000]]
+    [[317.7000, 100.0000, 305.3500],  [0.0000, -1.0000, 0.0000],  [1.0000, 0.0000, 0.0000]]
+    [[317.7000, 100.0000, 400.0000],  [0.0000, -1.0000, 0.0000],  [1.0000, 0.0000, 0.0000]]
+    [[400.0000, 100.0000, 400.0000],  [1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]]
+    [[400.0000, 100.0000, 400.0000],  [0.0000, -1.0000, 0.0000],  [0.0000, 0.0000, -1.0000]]
     """
 
     """

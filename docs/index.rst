@@ -20,7 +20,7 @@ Contents
 
    readme
    examples
-   reference/index
+   reference
    contributing
    authors
    changelog

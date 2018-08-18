@@ -1,16 +1,15 @@
 """
-.. _compas_fab.sensors:
-
 ********************************************************************************
 compas_fab.sensors
 ********************************************************************************
 
-.. module:: compas_fab.sensors
+.. currentmodule:: compas_fab.sensors
 
 Package containing a common interface to integrate sensors of various vendors.
 
 .. autosummary::
     :toctree: generated/
+    :nosignatures:
 
     SerialSensor
 
@@ -23,6 +22,7 @@ Baumer sensors
 
 .. autosummary::
     :toctree: generated/
+    :nosignatures:
 
     PosCon3D
 
