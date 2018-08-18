@@ -13,9 +13,10 @@ the convention of a specific relationship between coordinate frames, for example
 * Tool coordinate frame (TCF)
 * Object coordinate frame (OCF)
 
-.. figure:: coord_sys.jpg
+.. figure:: coord_frames.jpg
     :figclass: figure
     :class: figure-img img-fluid
+Coordinate frame convention of a robotic setup.
 
 To describe these coordinate frames, the ``Frame`` class of the compas libray is used.
 
