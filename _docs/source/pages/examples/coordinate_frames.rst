@@ -68,7 +68,7 @@ it as a target pose to the robot.::
 	object_frame_WCS = frame(point, xaxis, yaxis)
 	object_frame_RCS = robot.get_frame_in_RCS(object_frame_WCS)
   
-  robot.send_pose(object_frame_RCS)
+  	robot.send_pose(object_frame_RCS)
   
 
 Links:
