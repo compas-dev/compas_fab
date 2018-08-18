@@ -18,5 +18,6 @@ List of examples
     :maxdepth: 2
 
     examples/frame_and_transformation
-    examples/coordinate_systems
-    examples/robot
+    examples/coordinate_frames
+    examples/kinematic_model
+    examples/robot_control
