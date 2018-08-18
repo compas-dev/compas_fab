@@ -93,7 +93,7 @@ For more details, check the `Contributor's Guide <CONTRIBUTING.rst>`_.
 Releasing this project
 ----------------------
 
-Ready to release a new version **compas_fab**? Here's how to do it:
+Ready to release a new version of **compas_fab**? Here's how to do it:
 
 * We use `semver <http://semver.org/>`_, i.e. we bump versions as follows:
 
