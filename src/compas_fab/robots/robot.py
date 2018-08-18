@@ -163,7 +163,7 @@ class Robot(object):
 
     def get_end_effector_frame(self):
         end_effector_link = self.get_end_effector_link()
-        return end_effector_link.parentjoint.origin.copy()
+        return end_effector_link.parent_joint.origin.copy()
 
 
     def get_base_link_name(self):
