@@ -1,14 +1,15 @@
 from __future__ import print_function
-import os
-import logging
-import xml.etree.ElementTree as ET
+
 import binascii
+import logging
+import os
+import xml.etree.ElementTree as ET
 
 import roslibpy
-
-LOGGER = logging.getLogger('urdf_importer')
-
 from compas.datastructures import Mesh
+
+LOGGER = logging.getLogger('compas_fab.robots.urdf_importer')
+
 
 def check_mesh_class(meshcls):
     """Checks if the passed mesh class has the necessary constructor and methods.
@@ -37,7 +38,7 @@ class UrdfImporter(object):
     https://github.com/siemens/ros-sharp/blob/master/Libraries/RosBridgeClient/UrdfImporter.cs
 
     Attributes:
-        client (:class:`Ros`): The ROS client
+        ros (:class:`Ros`): The ROS client
         local_directory (str, optional): A directory to store the files.
             Defaults to ~/robot_description
         robot_name (str or None): The name of the robot, will be read from the
@@ -46,8 +47,8 @@ class UrdfImporter(object):
         status (dict): To check the status of the process.
     """
 
-    def __init__(self, client=None, local_directory=None):
-        self.client = client
+    def __init__(self, ros=None, local_directory=None):
+        self.ros = ros
         self.local_directory = local_directory or os.path.join(os.path.expanduser('~'), 'robot_description')
         self.robot_name = None
         self.requested_resource_files = {}
@@ -75,8 +76,8 @@ class UrdfImporter(object):
 
     def check_status(self):
         if all(self.status.values()):
-            self.client.close()
-            self.client.terminate()
+            self.ros.close()
+            self.ros.terminate()
 
     def receive_robot_description(self, robot_description):
         robot_name, uris = self.read_robot_name_and_uris_from_urdf(robot_description)
@@ -87,7 +88,7 @@ class UrdfImporter(object):
         # Save robot_description.urdf
         self.save_robot_description(robot_description)
         # Save robot_description_semantic.urdf
-        param = roslibpy.Param(self.client, '/robot_description_semantic')
+        param = roslibpy.Param(self.ros, '/robot_description_semantic')
         param.get(self.save_robot_description_semantic)
         # Update status
         self.check_status()
@@ -117,7 +118,7 @@ class UrdfImporter(object):
         self.check_status()
 
     def load(self): # cannot use 'import' as method name...
-        param = roslibpy.Param(self.client, '/robot_description')
+        param = roslibpy.Param(self.ros, '/robot_description')
         param.get(self.receive_robot_description)
 
     def receive_resource_file(self, local_filename, resource_file_uri):
@@ -128,7 +129,7 @@ class UrdfImporter(object):
             #self.write_file(local_filename, response.data['value'])
             self.update_file_request_status(resource_file_uri)
 
-        service = roslibpy.Service(self.client, "/file_server/get_file",
+        service = roslibpy.Service(self.ros, "/file_server/get_file",
                                    "file_server/GetBinaryFile")
         service.call(roslibpy.ServiceRequest({'name': resource_file_uri}),
                      write_binary_response_to_file, errback=None)
@@ -265,11 +266,11 @@ if __name__ == "__main__":
     FORMAT = '%(asctime)-15s [%(levelname)s] %(message)s'
     logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
-    ros_client = roslibpy.Ros("127.0.0.1", 9090)
+    ros = roslibpy.Ros("127.0.0.1", 9090)
 
     local_directory = os.path.join(os.path.expanduser('~'), "workspace", "robot_description")
-    importer = UrdfImporter(ros_client, local_directory)
+    importer = UrdfImporter(ros, local_directory)
     importer.load()
-    ros_client.call_later(50, ros_client.close)
-    ros_client.call_later(52, ros_client.terminate)
-    ros_client.run_forever()
+    ros.call_later(50, ros.close)
+    ros.call_later(52, ros.terminate)
+    ros.run_forever()
