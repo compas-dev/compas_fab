@@ -27,7 +27,7 @@ from compas.geometry.transformations import mesh_transformed
 from compas_fab.robots.urdf_importer import UrdfImporter
 from compas_fab.robots.urdf_importer import check_mesh_class
 
-from compas_fab.fab.robots.pose import JointState
+from compas_fab.robots.pose import JointState
 
 
 class Mesh(object):
@@ -47,7 +47,7 @@ class Robot(object):
 
     Some clever text
 
-        resource_path (str): the directory, where the urdf_importer has stored 
+        resource_path (str): the directory, where the urdf_importer has stored
             the urdf files and the robot mesh files
     """
     def __init__(self, resource_path, client=None):
@@ -73,7 +73,7 @@ class Robot(object):
         # how is this set = via frame? / property
         self.transformation_RCF_WCF = Transformation()
         self.transformation_WCF_RCF = Transformation()
-    
+
     def set_tool(self, tool):
         raise NotImplementedError
 
@@ -89,7 +89,7 @@ class Robot(object):
         """Returns the current joint state.
         """
         names = self.get_joint_state_names()
-        positions = [] 
+        positions = []
         for joint in self.model.iter_joints():
             if joint.name in names:
                 positions.append(joint.position)
@@ -101,7 +101,7 @@ class Robot(object):
 
     def get_planning_groups(self):
         return list(self.semantics['groups'].keys())
-    
+
     def get_main_planning_group(self):
         # get the group that has the chain with the most links
         main_planning_group = None
@@ -128,12 +128,12 @@ class Robot(object):
             return links
 
         return func(link_start.joints, [link_start])
-        
+
     def get_joint_state_names(self, planning_group=None):
         """This should be read from robot semantics...
         """
         if not planning_group:
-            planning_group = self.main_planning_group   
+            planning_group = self.main_planning_group
 
         joint_state_names = []
 
@@ -160,15 +160,15 @@ class Robot(object):
             if link.name == end_effector_name:
                 return link
         return None
-    
+
     def get_end_effector_frame(self):
         end_effector_link = self.get_end_effector_link()
         return end_effector_link.parentjoint.origin.copy()
 
-    
+
     def get_base_link_name(self):
         return self.semantics['groups'][self.main_planning_group]['chain']['base_link']
-    
+
     def get_base_link(self):
         base_link_name = self.get_base_link_name()
         if base_link_name:
@@ -177,7 +177,7 @@ class Robot(object):
                     return link
         else:
             return None
-    
+
     def get_base_frame(self):
         base_link = self.get_base_link()
         # return the joint that is fixed
@@ -191,7 +191,7 @@ class Robot(object):
 
     def get_frames(self):
         return self.model.get_frames()
-    
+
     def get_axes(self):
         return self.model.get_axes()
 
@@ -212,14 +212,14 @@ class Robot(object):
         for k, v in zip(joint_state.name, joint_state.position):
             js[k] = v
         self.model.root.update(js, Transformation(), Transformation())
-    
+
     def check_client(self):
         if not self.client:
             print("This method is only callable if connected to ROS")
             return False
         else:
             return True
-    
+
     def compute_ik(self, pose):
         if not self.check_client():
             return
@@ -229,7 +229,7 @@ class Robot(object):
         if not self.check_client():
             return
         raise NotImplementedError
-    
+
     def send_pose(self):
         #(check service name with ros)
         if not self.check_client():
@@ -406,7 +406,7 @@ if __name__ == "__main__":
 
     for link in robot.model.iter_links():
         for v in link.visual:
-            print(link.name, v.origin) 
+            print(link.name, v.origin)
 
     """
     [[0.0000, 0.0000, 0.0000],  [-1.0000, 0.0000, 0.0000],  [0.0000, -1.0000, 0.0000]]

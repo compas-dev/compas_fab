@@ -1,10 +1,10 @@
 from compas.geometry import Frame
-from compas.geometry.transformations import matrix_from_quaternion
-from compas.geometry.transformations import basis_vectors_from_matrix
+from compas.geometry.transformations import basis_vectors_from_matrix, matrix_from_quaternion
+from compas.robots.model.geometry import SCALE_FACTOR
 
 __all__ = ['Pose', 'Header', 'PoseStamped', 'PositionIKRequest']
 
-SCALE_FACTOR = 1000.
+
 
 # TODO :rename in messages??
 
@@ -51,7 +51,7 @@ class Pose(Frame):
         qw, qx, qy, qz = self.quaternion
         pose['orientation'] = {'x': qx, 'y': qy, 'z': qz, 'w': qw}
         return pose
-    
+
     @property
     def pose_quaternion(self):
         """Implemented for Kathrin.
@@ -72,7 +72,7 @@ class ROSmsg(object):
             else:
                 msg[key] = value
         return msg
-    
+
     @classmethod
     def from_msg(cls, msg):
         pass
@@ -84,7 +84,7 @@ class Header(ROSmsg):
         self.frame_id = frame_id
         self.seq = seq
         self.stamp = {'secs': secs, 'nsecs': nsecs}
-            
+
     @classmethod
     def from_msg(cls, msg):
         frame_id = msg['frame_id']
@@ -99,7 +99,7 @@ class PoseStamped(ROSmsg):
     def __init__(self, header, pose):
         self.header = header
         self.pose = pose
-    
+
 class PositionIKRequest(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionIKRequest.html
     """
@@ -120,7 +120,7 @@ class JointState(ROSmsg):
         self.position = position
         self.velocity = velocity
         self.effort = effort
-    
+
     @classmethod
     def from_name_and_position(cls, name, position):
         return cls(Header(), name, position, [], [])
@@ -174,7 +174,7 @@ if __name__ == '__main__':
 
     joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
     joint_positions = [6.254248742364907, -0.06779616254839081, 4.497665741209763, -4.429869574230193, -4.741325546996638, 3.1415926363120015]
-    
+
     joint_state = JointState.from_name_and_position(joint_names, joint_positions)
     print(joint_state.msg)
 
