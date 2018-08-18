@@ -1,6 +1,12 @@
 import csv
 import json
 
+__all__ = [
+    'read_csv_to_dictionary',
+    'write_data_to_json',
+    'read_data_from_json'
+]
+
 def read_csv_to_dictionary(csvfile, delimiter=';'):
     """Reads a csv file and returns a dictionary with the respective keys
     specified in the first row of the csv file.
@@ -29,6 +35,6 @@ def write_data_to_json(data, file):
 def read_data_from_json(file):
     """Read data from json file.
     """
-    with open(file) as f:    
+    with open(file) as f:
         data = json.load(f)
     return data

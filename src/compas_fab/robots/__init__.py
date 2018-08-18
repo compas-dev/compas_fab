@@ -15,6 +15,7 @@ compas_fab.robots
     Configuration
     Robot
     Tool
+    UrdfImporter
 
 """
 
@@ -22,3 +23,4 @@ from .configuration import Configuration
 from .pose import Pose
 from .robot import Robot
 from .tool import Tool
+from .urdf_importer import UrdfImporter
