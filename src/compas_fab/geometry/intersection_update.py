@@ -6,6 +6,7 @@ import math
 
 from compas.utilities import pairwise
 
+from compas.geometry import Point
 from compas.geometry import intersection_plane_plane
 from compas.geometry import distance_point_point
 
@@ -16,8 +17,6 @@ from compas.geometry.basic import cross_vectors
 from compas.geometry.basic import dot_vectors
 from compas.geometry.basic import length_vector_xy
 from compas.geometry.basic import subtract_vectors_xy
-
-
 
 from compas.geometry.queries import is_point_on_segment
 from compas.geometry.queries import is_point_on_segment_xy
@@ -62,84 +61,84 @@ def intersection_plane_circle(plane, circle):
 
     # fr_0, c_1, n_1, r_1
     #fr_0; intersecting frame
-    #c_1; center of circle    
+    #c_1; center of circle
     #r_1; radii cirlce
     #n_1; normal of circle
 
-    #T_0 = Transformation.from_frame_to_frame(fr_0, Frame([0,0,0], [1,0,0], [0,1,0])) 
-    #T = Transformation.from_frame_to_frame(Frame([0,0,0], [1,0,0], [0,1,0]), fr_0) 
+    #T_0 = Transformation.from_frame_to_frame(fr_0, Frame([0,0,0], [1,0,0], [0,1,0]))
+    #T = Transformation.from_frame_to_frame(Frame([0,0,0], [1,0,0], [0,1,0]), fr_0)
 
-    circle_center, circle_radius, circle_normal = circle
+    circle_center, _circle_radius, circle_normal = circle
     circle_plane = circle_center, circle_normal
-    
+
     p1, p2= intersection_plane_plane(plane, circle_plane)
 
     circle_p0 = Point(c_1.x, c_1.y, c_1.z)
     line_p1_0 = Point(line_p1[0], line_p1[1], line_p1[2])
     line_p2_0 = Point(line_p2[0], line_p2[1], line_p2[2])
-    
+
     circle_p0.transform(T_0)
     line_p1_0.transform(T_0)
     line_p2_0.transform(T_0)
 
     Ax = line_p1_0.x
     Ay = line_p1_0.y
-    
+
     Bx = line_p2_0.x
     By = line_p2_0.y
-    
+
     Cx = circle_p0.x
     Cy = circle_p0.y
-    
+
     R = r_1
-    
+
     #compute the euclidean distance between A and B
-    LAB = m.sqrt( (Bx-Ax)**2+(By-Ay)**2)
-    
+    LAB = math.sqrt( (Bx-Ax)**2+(By-Ay)**2)
+
     #compute the direction vector D from A to B
     Dx = (Bx-Ax)/LAB
     Dy = (By-Ay)/LAB
-    
+
     #Now the line equation is x = Dx*t + Ax, y = Dy*t + Ay with 0 <= t <= 1.
-    
+
     #compute the value t of the closest point to the circle center (Cx, Cy)
-    t = Dx*(Cx-Ax) + Dy*(Cy-Ay)    
-    
+    t = Dx*(Cx-Ax) + Dy*(Cy-Ay)
+
     #This is the projection of C on the line from A to B.
-    
+
     #compute the coordinates of the point E on line and closest to C
     Ex = t*Dx+Ax
     Ey = t*Dy+Ay
-    
+
     #compute the euclidean distance from E to C
-    LEC = m.sqrt( (Ex-Cx)**2+(Ey-Cy)**2 )
-    
+    LEC = math.sqrt( (Ex-Cx)**2+(Ey-Cy)**2 )
+
     #test if the line intersects the circle
     if( LEC < R ):
         #compute distance from t to circle intersection point
-        dt = m.sqrt( R**2 - LEC**2)
-    
+        dt = math.sqrt( R**2 - LEC**2)
+
         #compute first intersection point
         Fx = (t-dt)*Dx + Ax
         Fy = (t-dt)*Dy + Ay
-    
+
         #compute second intersection point
         Gx = (t+dt)*Dx + Ax
         Gy = (t+dt)*Dy + Ay
-        
+
         p1 = Point(Fx, Fy, 0)
         p2 = Point(Gx, Gy, 0)
-        
+
         p1.transform(T)
         p2.transform(T)
-    
+
         return p2, p1
 
     elif( LEC == R ):
         print("tangent point to circle is E")
-        
+
         return False, False
-    
+
     else:
         print("line doesn't touch circle")
 
@@ -152,7 +151,7 @@ def intersection_sphere_sphere(sphere1, sphere2):
     There are 4 cases of sphere-sphere intersection : 1) the spheres intersect
     in a circle, 2) they intersect in a point, 3) they overlap, 4) they do not
     intersect.
-    
+
     Parameters
     ----------
     sphere1 : tuple
@@ -164,7 +163,7 @@ def intersection_sphere_sphere(sphere1, sphere2):
     -------
     tuple
         case (str): "point", "circle", or "sphere"
-        result (tuple): 
+        result (tuple):
             point: xyz coordinates
             circle: center, radius, normal
             sphere: center, radius
@@ -178,7 +177,7 @@ def intersection_sphere_sphere(sphere1, sphere2):
     >>> result = intersection_sphere_sphere(sphere1, sphere1)
     >>> if result:
     >>>    case, res = result
-    >>>    if case == "circle": 
+    >>>    if case == "circle":
     >>>        center, radius, normal = res
     >>>    elif case == "point":
     >>>        point = res
@@ -190,7 +189,7 @@ def intersection_sphere_sphere(sphere1, sphere2):
     https://gamedev.stackexchange.com/questions/75756/sphere-sphere-intersection-and-circle-sphere-intersection
 
     """
-    
+
     center1, radius1 = sphere1
     center2, radius2 = sphere2
 
@@ -246,7 +245,7 @@ if __name__ == "__main__":
     result = intersection_sphere_sphere(sphere1, sphere1)
     if result:
         case, res = result
-        if case == "circle": 
+        if case == "circle":
             center, radius, normal = res
         elif case == "point":
             point = res
