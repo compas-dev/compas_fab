@@ -24,7 +24,7 @@ from compas.geometry.queries import is_point_on_segment_xy
 
 
 __all__ = [
-    'intersection_plane_circle',
+    # 'intersection_plane_circle',
     'intersection_sphere_sphere'
 ]
 
