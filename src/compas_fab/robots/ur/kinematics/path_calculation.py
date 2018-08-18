@@ -2,7 +2,7 @@ from __future__ import print_function
 import math
 from compas_fab.utilities import sign
 from compas_fab.robots.ur.kinematics import inverse_kinematics
-from compas_fab.robots import BaseConfiguration
+from compas_fab.robots import Configuration
 
 
 def format_joint_positions(joint_positions_a, joint_positions_b = [0,0,0,0,0,0]):
@@ -81,6 +81,6 @@ def calculate_configurations_for_path(frames, robot, current_configuration = Non
     for i in range(len(configurations)):
         configurations[i] = list(configurations[i])
         for j, q in enumerate(configurations[i]):
-            configurations[i][j] = BaseConfiguration.from_joints(q)
+            configurations[i][j] = Configuration.from_joints(q)
 
     return configurations

@@ -7,19 +7,19 @@ class Configuration(object):
         joint_values (:obj:`list` of :obj:`float`): Joint values expressed
             in degrees.
         external_axes (:obj:`list` of :obj:`float`): Position on the external axis
-            system (if available).
+            system expressed in millimeters (if available).
 
     Examples:
 
-        >>> from compas_fab.robots import BaseConfiguration
-        >>> config = BaseConfiguration.from_data({'joint_values': [90., 0., 0.]})
+        >>> from compas_fab.robots import Configuration
+        >>> config = Configuration.from_data({'joint_values': [90., 0., 0.]})
         >>> config.joint_values
         [90.0, 0.0, 0.0]
 
 
-        >>> from compas_fab.robots import BaseConfiguration
-        >>> config = BaseConfiguration.from_data({'joint_values': [90., 0., 0., 0., 180., 45.],\
-                                                 'external_axes': [8312.0]})
+        >>> from compas_fab.robots import Configuration
+        >>> config = Configuration.from_data({'joint_values': [90., 0., 0., 0., 180., 45.],\
+                                              'external_axes': [8312.0]})
         >>> str(config)
         'joints: [90.0, 0.0, 0.0, 0.0, 180.0, 45.0], external_axes: [8312.0]'
 
@@ -53,7 +53,7 @@ class Configuration(object):
             joint_values (:obj:`list` of :obj:`float`): Joint values expressed
                 in degrees.
             external_axes (:obj:`list` of :obj:`float`): Position on the external axis
-                system (if available).
+                system in millimeters (if available).
 
         Returns:
             Configuration: A :class:`.Configuration` instance.
@@ -68,7 +68,7 @@ class Configuration(object):
             data (`dict`): The data dictionary.
 
         Returns:
-            Configuration: A :class:`.Configuration` instance.
+            Configuration: A :class:`Configuration` instance.
         """
         config = cls()
         config.data = data
@@ -100,7 +100,7 @@ class Configuration(object):
 
 if __name__ == "__main__":
     q = [4.5, 1.7, 0.5, 2.1, 0.1, 2.1]
-    configuration = BaseConfiguration.from_joints(q)
+    configuration = Configuration.from_joints(q)
     print(configuration)
-    from compas_fab.robots import BaseConfiguration
+    from compas_fab.robots import Configuration
     from compas_fab.robots import Pose
