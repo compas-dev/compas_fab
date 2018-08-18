@@ -10,7 +10,6 @@ LOGGER = logging.getLogger('urdf_importer')
 
 from compas.datastructures import Mesh
 
-
 def check_mesh_class(meshcls):
     """Checks if the passed mesh class has the necessary constructor and methods.
     """
@@ -215,7 +214,7 @@ class UrdfImporter(object):
             if chain != None:
                 chain = {'base_link': chain.attrib['base_link'], 'tip_link': chain.attrib['tip_link']}
             else: # get links or joints
-                print("no chain")
+                pass
                 #raise NotImplementedError
                 #for elem in list(group):
                 #    print(elem.tag)
@@ -261,7 +260,6 @@ if __name__ == "__main__":
     roslaunch file_server.launch
     """
 
-    """
     import logging
 
     FORMAT = '%(asctime)-15s [%(levelname)s] %(message)s'
@@ -275,4 +273,3 @@ if __name__ == "__main__":
     ros_client.call_later(50, ros_client.close)
     ros_client.call_later(52, ros_client.terminate)
     ros_client.run_forever()
-    """

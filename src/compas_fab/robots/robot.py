@@ -1,6 +1,9 @@
 from __future__ import print_function
 import os
 
+import logging
+LOGGER = logging.getLogger('robot')
+
 from compas.geometry import Frame
 from compas.geometry import add_vectors
 from compas.geometry.xforms import Transformation
@@ -21,9 +24,10 @@ from compas.robots.model.geometry import SCALE_FACTOR
 from compas.geometry.transformations import mesh_transform
 from compas.geometry.transformations import mesh_transformed
 
-
 from compas_fab.robots.urdf_importer import UrdfImporter
 from compas_fab.robots.urdf_importer import check_mesh_class
+
+from compas_fab.fab.robots.pose import JointState
 
 
 class Mesh(object):
@@ -39,13 +43,18 @@ class Mesh(object):
 
 
 class Robot(object):
-    """
-        resource_path (str): the directory where all robot mesh files are stored
+    """The robot base class.
+
+    Some clever text
+
+        resource_path (str): the directory, where the urdf_importer has stored 
+            the urdf files and the robot mesh files
     """
     def __init__(self, resource_path, client=None):
         # it needs a filename because it also sources the meshes from the directory
         # model, urdf_importer, resource_path = None, client = None, viewer={}
 
+        self.client = client
         self.urdf_importer = UrdfImporter.from_robot_resource_path(resource_path)
 
         urdf_file = self.urdf_importer.get_robot_description_filename()
@@ -55,49 +64,136 @@ class Robot(object):
         self.model = UrdfRobot.from_urdf_file(urdf_file)
         self.name = self.model.name
         self.semantics = self.urdf_importer.read_robot_semantics()
+        # the following would be good to be read from semantics
+        self.main_planning_group = self.get_main_planning_group()
+        # self.base_link = self.get_base_link()
+        # self.ee_link = self.get_ee_link()
+        # self.planning_groups = self.get_planning_groups()
 
-        # how is this set = via frame?
-        self.transformation_RCF_WCF = None
-        self.transformation_WCF_RCF = None
+        # how is this set = via frame? / property
+        self.transformation_RCF_WCF = Transformation()
+        self.transformation_WCF_RCF = Transformation()
+    
+    def set_tool(self, tool):
+        raise NotImplementedError
 
-        """
-        self.joints = joints
-        self.links = links
-        self.materials = materials
-        self.attr = kwargs
-        self.filename = None
-        """
+    def set_RCF(self, robot_coordinate_frame):
+        raise NotImplementedError
+        self.RCF = robot_coordinate_frame
+        # transformation matrix from world coordinate system to robot coordinate system
+        self.transformation_RCF_WCF = Transformation.from_frame_to_frame(Frame.worldXY(), self.RCF)
+        # transformation matrix from robot coordinate system to world coordinate system
+        self.transformation_RCF_WCF = Transformation.from_frame_to_frame(self.RCF, Frame.worldXY())
 
     def get_joint_state(self):
-        pass
-        #return all revolute and linear joints
+        """Returns the current joint state.
+        """
+        names = self.get_joint_state_names()
+        positions = [] 
+        for joint in self.model.iter_joints():
+            if joint.name in names:
+                positions.append(joint.position)
+        return JointState.from_name_and_position(names, positions)
 
     def create(self, meshcls):
         check_mesh_class(meshcls)
-        self.model.root.create(self.urdf_importer, meshcls)
+        self.model.root.create(self.urdf_importer, meshcls, Frame.worldXY())
 
-    def get_joint_state_names(self):
+    def get_planning_groups(self):
+        return list(self.semantics['groups'].keys())
+    
+    def get_main_planning_group(self):
+        # get the group that has the chain with the most links
+        main_planning_group = None
+        main_planning_group_link_number = 0
+        for group_name, v in self.semantics['groups'].items():
+            if v['chain'] != None:
+                chain_links = self.get_chain(v['chain']['base_link'], v['chain']['tip_link'])
+                if len(chain_links) > main_planning_group_link_number:
+                    main_planning_group_link_number = len(chain_links)
+                    main_planning_group = group_name
+        return main_planning_group
+
+    def get_chain(self, link_start_name, link_end_name):
+        link_start = self.model.find_link_by_name(link_start_name)
+
+        def func(cjoints, links):
+            for j in cjoints:
+                link = j.childlink
+                links.append(link)
+                if link.name == link_end_name:
+                    return links
+                else:
+                    links += func(link.joints, [])
+            return links
+
+        return func(link_start.joints, [link_start])
+        
+    def get_joint_state_names(self, planning_group=None):
         """This should be read from robot semantics...
         """
+        if not planning_group:
+            planning_group = self.main_planning_group   
+
         joint_state_names = []
-        for joint in self.model.iter_joints():
-            if joint.type == "revolute":
-                joint_state_names.append(joint.name)
+
+        chain = self.semantics['groups'][planning_group]['chain']
+        if chain == None:
+            # return all revoulte joints
+            for joint in self.model.iter_joints():
+                if joint.type == "revolute":
+                    joint_state_names.append(joint.name)
+        else:
+            chainlinks = self.get_chain(chain['base_link'], chain['tip_link'])
+            for link in chainlinks:
+                for joint in link.joints:
+                    if joint.type == "revolute":
+                        joint_state_names.append(joint.name)
         return joint_state_names
 
-    # draw_visual
-    # draw_collision
-    # draw_frames
-    # draw_axes
-    # transform(joint_state)
-    # set_RCF(frame)
-    # set_tool(??tool) Tool
-    # compute_ik(pose)
-    # compute_cartesian_path(poses)
-    # send_pose, (check service name with ros)
-    # send_joint_state (check service name with ros)
-    # send_trajectory (check service name with ros)
-    #
+    def get_end_effector_link_name(self):
+        return self.semantics['end_effector']
+
+    def get_end_effector_link(self):
+        end_effector_name = self.get_end_effector_link_name()
+        for link in self.model.iter_links():
+            if link.name == end_effector_name:
+                return link
+        return None
+    
+    def get_end_effector_frame(self):
+        end_effector_link = self.get_end_effector_link()
+        return end_effector_link.parentjoint.origin.copy()
+
+    
+    def get_base_link_name(self):
+        return self.semantics['groups'][self.main_planning_group]['chain']['base_link']
+    
+    def get_base_link(self):
+        base_link_name = self.get_base_link_name()
+        if base_link_name:
+            for link in self.model.iter_links():
+                if link.name == base_link_name:
+                    return link
+        else:
+            return None
+    
+    def get_base_frame(self):
+        base_link = self.get_base_link()
+        # return the joint that is fixed
+        if base_link:
+            # TODO: check this! for staubli does not work...
+            for joint in base_link.joints:
+                if joint.type == "fixed":
+                    return joint.origin.copy()
+        else:
+            return Frame.worldXY()
+
+    def get_frames(self):
+        return self.model.get_frames()
+    
+    def get_axes(self):
+        return self.model.get_axes()
 
     def draw_visual(self):
         return self.model.draw_visual()
@@ -111,9 +207,46 @@ class Robot(object):
     def update(self, joint_state):
         """
         """
-        self.model.root.update(joint_state, Transformation(), Transformation())
+        # TODO : where to make boundary between message and type
+        js = {}
+        for k, v in zip(joint_state.name, joint_state.position):
+            js[k] = v
+        self.model.root.update(js, Transformation(), Transformation())
+    
+    def check_client(self):
+        if not self.client:
+            print("This method is only callable if connected to ROS")
+            return False
+        else:
+            return True
+    
+    def compute_ik(self, pose):
+        if not self.check_client():
+            return
+        raise NotImplementedError
 
+    def compute_cartesian_path(self, poses):
+        if not self.check_client():
+            return
+        raise NotImplementedError
+    
+    def send_pose(self):
+        #(check service name with ros)
+        if not self.check_client():
+            return
+        raise NotImplementedError
 
+    def send_joint_state(self):
+        #(check service name with ros)
+        if not self.check_client():
+            return
+        raise NotImplementedError
+
+    def send_trajectory(self):
+        #(check service name with ros)
+        if not self.check_client():
+            return
+        raise NotImplementedError
 
 class OldRobot(object):
     """Represents the base class for all robots.
@@ -210,12 +343,6 @@ class OldRobot(object):
         T = Transformation.from_frame(frame_tool0)
         return Frame.from_transformation(T * self.transformation_tcp_tool0)
 
-    def xdraw(configuration, xdraw_function):
-        """Draw the robot with the given configuration.
-        """
-        raise NotImplementedError
-
-
 
 if __name__ == "__main__":
     """
@@ -229,12 +356,22 @@ if __name__ == "__main__":
     """
     #filename = r"C:\Users\rustr\robot_description\staubli_tx60l\robot_description.urdf"
     #model = UrdfRobot.from_urdf_file(filename)
-    #robot = Robot(r"C:\Users\rustr\robot_description\staubli_tx60l")
-    robot = Robot(r"C:\Users\rustr\robot_description\ur5")
+    robot = Robot(r"C:\Users\rustr\workspace\robot_description\staubli_tx60l")
+    #robot = Robot(r"C:\Users\rustr\workspace\robot_description\ur5")
+    #robot = Robot(r"C:\Users\rustr\workspace\robot_description\abb_irb6640_185_280")
     robot.create(Mesh)
 
-    joint_names = robot.get_joint_state_names()
-    print(joint_names)
+    planning_groups = robot.get_planning_groups()
+    print("planning_groups", planning_groups)
+    main_planning_group = robot.get_main_planning_group()
+    print("main_planning_group", main_planning_group)
+    for group in planning_groups:
+        joint_state_names = robot.get_joint_state_names(group)
+        print(group, joint_state_names)
+
+    print("ee_frame", robot.get_end_effector_frame())
+    print("base_link_name", robot.get_base_link_name())
+    print("base_frame", robot.get_base_frame())
 
     joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
     joint_positions = [6.254248742364907, -0.06779616254839081, 4.497665741209763, -4.429869574230193, -4.741325546996638, 3.1415926363120015]
@@ -243,18 +380,14 @@ if __name__ == "__main__":
     #joint_positions = [6.254248737006559, -5.874885906732766, 4.110686942268209, -1.3773936859827733, -1.5418597546004678, -6.2831853]
     joint_positions = [0.5, -0.1, 3, -1, 0.5, 2]
 
-    joint_state = {}
-    for k,v in zip(joint_names, joint_positions):
-        joint_state[k] = v
+    joint_state = JointState.from_name_and_position(joint_names, joint_positions)
 
     robot.update(joint_state)
 
 
     joint_positions = [6.254248737006559, -5.874885906732766, 4.110686942268209, -1.3773936859827733, -1.5418597546004678, -6.2831853]
 
-    joint_state = {}
-    for k,v in zip(joint_names, joint_positions):
-        joint_state[k] = v
+    joint_state = JointState.from_name_and_position(joint_names, joint_positions)
 
     robot.update(joint_state)
 
@@ -270,6 +403,10 @@ if __name__ == "__main__":
     print(visual)
     collision = robot.draw_collision()
     print(collision)
+
+    for link in robot.model.iter_links():
+        for v in link.visual:
+            print(link.name, v.origin) 
 
     """
     [[0.0000, 0.0000, 0.0000],  [-1.0000, 0.0000, 0.0000],  [0.0000, -1.0000, 0.0000]]
@@ -293,38 +430,3 @@ if __name__ == "__main__":
     [[400.0000, 100.0000, 400.0000],  [0.0000, -1.0000, 0.0000],  [0.0000, 0.0000, -1.0000]]
     """
 
-    """
-    transformations = robot.model.root.calculate_transformations(joint_state, Transformation())
-    for k,v in transformations.items():
-        print(k, v)
-
-    #robot.reset_transformations()
-
-    for link in robot.model.iter_links():
-        #print(link.name)
-        #print(link.init_transformation)
-        #print(link.current_transformation)
-
-        for j in link.joints:
-            if j.origin:
-                j.origin.transform(transformations[j.name])
-                print(j.origin)
-            #if j.axis:
-            #    print("\t", j.name)
-            #    print("\t", j.axis)
-
-
-    transformations = robot.model.root.calculate_reset_transformations()
-
-    for link in robot.model.iter_links():
-        #print(link.name)
-        #print(link.init_transformation)
-        #print(link.current_transformation)
-
-        for j in link.joints:
-            if j.origin:
-                j.origin.transform(transformations[j.name])
-                print(j.origin)
-
-    robot.calculate_transformations(joint_state)
-    """
