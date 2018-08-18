@@ -4,12 +4,12 @@ import logging
 from timeit import default_timer as timer
 from compas_fab.robots import Pose
 from compas_fab.robots.rfl import Configuration, SimulationCoordinator
-from compas_ghpython.utilities import xform_from_transformation_matrix
-from compas_ghpython.helpers import mesh_from_guid
+from compas_ghpython.geometry import xform_from_transformation_matrix
 from compas.datastructures import Mesh
 
 try:
     import clr
+    import ghcomp
     import rhinoscriptsyntax as rs
     from Rhino.Geometry import Transform
     from Rhino.Geometry import Mesh as RhinoMesh
@@ -19,6 +19,23 @@ except ImportError:
         raise
 
 LOG = logging.getLogger('compas_fab.grasshopper.path_planning')
+
+
+def _trimesh_from_guid(guid, **kwargs):
+    """Creates an instance of a :class:`Mesh` class from an identifier
+    in Rhino/Grasshopper making sure it is a trimesh.
+
+    This function is almost identical to ``mesh_from_guid`` in the core
+    framework, but there were some import issues when used from within
+    Grasshopper, but eventually, it should be migrated into the core.
+    """
+    trimesh = ghcomp.Triangulate(rs.coercemesh(guid))[0]
+    vertices = [map(float, vertex) for vertex in rs.MeshVertices(trimesh)]
+    faces = map(list, rs.MeshFaceVertices(trimesh))
+    faces = [face[: -1] if face[-2] == face[-1] else face for face in faces]
+    mesh = Mesh.from_vertices_and_faces(vertices, faces)
+    mesh.attributes.update(kwargs)
+    return mesh
 
 
 def vrep_pose_from_plane(plane):
@@ -153,7 +170,7 @@ class PathVisualizer(object):
         start = timer() if self.debug else None
 
         self.simulator.set_robot_config(self.robot, gripping_config)
-        mesh = mesh_from_guid(Mesh, self.building_member)
+        mesh = _mesh_from_guid(self.building_member)
         handle = self.simulator.add_building_member(self.robot, mesh)
         matrix = self.simulator.get_object_matrices([handle])[handle]
 
@@ -219,7 +236,7 @@ class PathPlanner(object):
                         raise ValueError('Multi-move is not (yet) supported. Only one goal can be specified.')
 
                 if 'building_member' in settings:
-                    robot['building_member'] = mesh_from_guid(Mesh, settings['building_member']).to_data()
+                    robot['building_member'] = _mesh_from_guid(settings['building_member']).to_data()
 
                 if 'metric_values' in settings:
                     robot['metric_values'] = map(float, settings['metric_values'].split(','))
@@ -231,7 +248,7 @@ class PathPlanner(object):
 
         if 'collision_meshes' in kwargs:
             mesh_guids = parser.compact_list(kwargs['collision_meshes'])
-            options['collision_meshes'] = map(lambda m: m.to_data(), map(mesh_from_guid, [Mesh for i in range(len(mesh_guids))], mesh_guids))
+            options['collision_meshes'] = map(lambda m: m.to_data(), map(_mesh_from_guid, mesh_guids))
 
         options['debug'] = kwargs.get('debug')
         options['trials'] = kwargs.get('trials')
