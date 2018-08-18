@@ -1,10 +1,6 @@
-.. _examples_coordinate_systems:
-
 ********************************************************************************
 Coordinate frames
 ********************************************************************************
-
-.. contents::
 
 Developers and users of robot drivers, models, and libraries need a shared convention
 for coordinate frames in order to better integrate and re-use software components. To
@@ -17,7 +13,9 @@ the convention of a specific relationship between coordinate frames, for example
 * Tool coordinate frame (TCF)
 * Object coordinate frame (OCF)
 
-.. image:: coord_sys.jpg
+.. figure:: coord_sys.jpg
+    :figclass: figure
+    :class: figure-img img-fluid
 
 To describe these coordinate frames, the ``Frame`` class of the compas libray is used.
 

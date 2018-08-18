@@ -1,19 +1,17 @@
-.. _examples_frame_and_transformation:
-
 ********************************************************************************
 Frame and Transformation
 ********************************************************************************
 
-.. contents::
+.. currentmodule:: compas_fab.geometry
 
-``Frame`` and ``Transformation`` are two basic classes in the compas library and
-can be used to describe position/orientation and coordinate systems. The 
-``Frame`` consists of a point and and two orthonormal base vectors (xaxis, 
-yaxis). ``Transformation`` is the base class for transformations like 
-``Rotation``, ``Translation``, ``Scale``, ``Reflection``, ``Projection`` and 
-``Shear``.
+:class:`Frame` and :class:`Transformation` are two basic classes in the compas library and
+can be used to describe position/orientation and coordinate systems. The
+:class:`Frame` consists of a point and and two orthonormal base vectors (xaxis,
+yaxis). :class:`Transformation` is the base class for transformations like
+:class:`Rotation`, :class:`Translation`, :class:`Scale`, :class:`Reflection`,
+:class:`Projection` and :class:`Shear`.
 
-Here is a simple example of how to use Frame and Transformation: We want to 
+Here is a simple example of how to use Frame and Transformation: We want to
 bring a point P in the coordinate system of frame F1 into the coordinate system
 of frame F2.::
 
@@ -42,10 +40,12 @@ of frame F2.::
 	T = Transformation.from_frame_to_frame(F1, F2)
 	Pt = T.transform_point(Pw)
 
-.. image:: frame_transformation-01.jpg
+.. figure:: frame_transformation-01.jpg
+    :figclass: figure
+    :class: figure-img img-fluid
 
 
-From the frame, or resp. from the orientation (``Rotation``) of the frame, 
+From the frame, or resp. from the orientation (:class:`Rotation`) of the frame,
 several other representations of rotation can be derived, such
 as Euler angles, axis-angle representation, and quaternion.::
 

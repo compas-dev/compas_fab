@@ -2,13 +2,11 @@
 Kinematic model
 ********************************************************************************
 
-.. contents::
-
 In the kinematic model of a robot, the connection of different manipulator joints is known as link, and the integration of two or more links is called a joint. This kinematic model can be represented as a tree structure. The tree describes the kinematic chain, i.e., the connection of robotic links with joints, and the inter-dependendencies of these links. In ROS, this tree structure plus the underlying geometric information is stored in XML format in a URDF file.
 
-
-.. image:: link.png
-
+.. figure:: link.png
+    :figclass: figure
+    :class: figure-img img-fluid
 
 Links
 ==================
