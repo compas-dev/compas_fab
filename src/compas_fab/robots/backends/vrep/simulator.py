@@ -14,9 +14,8 @@ import socket
 import logging
 from timeit import default_timer as timer
 from compas.datastructures.mesh import Mesh
-from compas_fab.robots import Pose
-from compas_fab.robots.rfl import Configuration, Robot
-from compas_fab.robots.rfl.vrep_remote_api import vrep
+from compas_fab.robots import Configuration, Pose, Robot
+from compas_fab.robots.backends.vrep.vrep_remote_api import vrep
 
 DEFAULT_SCALE = 1000.
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
@@ -35,8 +34,8 @@ class SimulationError(Exception):
 
 
 class Simulator(object):
-    """Interface to run simulations on the RFL using VREP as
-    the engine for inverse kinematics.
+    """Interface to run simulations using VREP as
+    the engine for kinematics and path planning.
 
     :class:`.Simulator` is a context manager type, so it's best used in combination
     with the ``with`` statement to ensure resource deallocation.
@@ -50,7 +49,7 @@ class Simulator(object):
 
     Examples:
 
-        >>> from compas_fab.robots.rfl import *
+        >>> from compas_fab.robots.backends.vrep import *
         >>> with Simulator() as simulator:
         ...     print ('Connected: %s' % simulator.is_connected())
         ...
@@ -141,7 +140,7 @@ class Simulator(object):
 
         Examples:
 
-            >>> from compas_fab.robots.rfl import Simulator
+            >>> from compas_fab.robots.backends.vrep import Simulator
             >>> with Simulator() as simulator:
             ...     matrices = simulator.get_object_matrices([0])
             ...     print(map(int, matrices[0]))
@@ -155,10 +154,10 @@ class Simulator(object):
 
     def get_all_visible_handles(self):
         """Gets a list of object handles (identifiers) for all visible
-        shapes of the RFL model.
+        shapes of the 3D model.
 
         Returns:
-            list: List of object handles (identifiers) of the RFL model.
+            list: List of object handles (identifiers) of the 3D model.
         """
         return self.run_child_script('getRobotVisibleShapeHandles', [], [], [])[1]
 
@@ -180,19 +179,6 @@ class Simulator(object):
                                     CHILD_SCRIPT_TYPE, 'setTheMetric',
                                     [robot.index], metric_values, [],
                                     bytearray(), DEFAULT_OP_MODE)
-
-    def reset_all_robots(self):
-        """Resets all robots in the RFL to their base configuration.
-
-        Examples:
-
-            >>> from compas_fab.robots.rfl import Simulator
-            >>> with Simulator() as simulator:
-            ...     simulator.reset_all_robots()
-            ...
-        """
-        for id in Robot.SUPPORTED_ROBOTS:
-            Robot(id, client=self).reset_config()
 
     def set_robot_pose(self, robot, pose):
         """Moves the robot the the specified pose.
@@ -224,7 +210,7 @@ class Simulator(object):
 
         Examples:
 
-            >>> from compas_fab.robots.rfl import Robot, Configuration
+            >>> from compas_fab.robots import Robot, Configuration
             >>> with Simulator() as simulator:
             ...     config = Configuration.from_joints_and_external_axes([90, 0, 0, 0, 0, -90],
             ...                                                          [7600, -4500, -4500])
@@ -248,7 +234,7 @@ class Simulator(object):
 
         Examples:
 
-            >>> from compas_fab.robots.rfl import Robot
+            >>> from compas_fab.robots import Robot
             >>> with Simulator() as simulator:
             ...     config = simulator.get_robot_config(Robot(11))
 
@@ -492,7 +478,7 @@ class Simulator(object):
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
 
     def add_building_member(self, robot, building_member_mesh):
-        """Adds a building member to the RFL scene and attaches it to the robot.
+        """Adds a building member to the 3D scene and attaches it to the robot.
 
         Args:
             robot (:class:`.Robot`): Robot instance to attach the building member to.
@@ -518,7 +504,7 @@ class Simulator(object):
         return handle
 
     def add_meshes(self, meshes):
-        """Adds meshes to the RFL scene.
+        """Adds meshes to the 3D scene.
 
         Args:
             meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): List
@@ -550,7 +536,7 @@ class Simulator(object):
         return mesh_handles
 
     def remove_meshes(self, mesh_handles):
-        """Removes meshes from the RFL scene.
+        """Removes meshes from the 3D scene.
 
         This is functionally identical to ``remove_objects``, but it's here for
         symmetry reasons.
@@ -561,7 +547,7 @@ class Simulator(object):
         self.remove_objects(mesh_handles)
 
     def remove_objects(self, object_handles):
-        """Removes objects from the RFL scene.
+        """Removes objects from the 3D scene.
 
         Args:
             object_handles (:obj:`list` of :obj:`int`): Object handles to remove.
