@@ -21,7 +21,7 @@ except ImportError:
     if platform.python_implementation() == 'IronPython':
         raise
 
-LOG = logging.getLogger('compas_fab.grasshopper.path_planning')
+LOG = logging.getLogger('compas_fab.ghpython.path_planning')
 
 
 def _trimesh_from_guid(guid, **kwargs):
