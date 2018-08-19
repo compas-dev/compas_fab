@@ -173,7 +173,7 @@ class PathVisualizer(object):
         start = timer() if self.debug else None
 
         self.simulator.set_robot_config(self.robot, gripping_config)
-        mesh = _mesh_from_guid(self.building_member)
+        mesh = _trimesh_from_guid(self.building_member)
         handle = self.simulator.add_building_member(self.robot, mesh)
         matrix = self.simulator.get_object_matrices([handle])[handle]
 
@@ -239,7 +239,7 @@ class PathPlanner(object):
                         raise ValueError('Multi-move is not (yet) supported. Only one goal can be specified.')
 
                 if 'building_member' in settings:
-                    robot['building_member'] = _mesh_from_guid(settings['building_member']).to_data()
+                    robot['building_member'] = _trimesh_from_guid(settings['building_member']).to_data()
 
                 if 'metric_values' in settings:
                     robot['metric_values'] = map(float, settings['metric_values'].split(','))
@@ -251,7 +251,7 @@ class PathPlanner(object):
 
         if 'collision_meshes' in kwargs:
             mesh_guids = parser.compact_list(kwargs['collision_meshes'])
-            options['collision_meshes'] = map(lambda m: m.to_data(), map(_mesh_from_guid, mesh_guids))
+            options['collision_meshes'] = map(lambda m: m.to_data(), map(_trimesh_from_guid, mesh_guids))
 
         options['debug'] = kwargs.get('debug')
         options['trials'] = kwargs.get('trials')
