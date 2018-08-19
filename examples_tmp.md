@@ -1,7 +1,6 @@
 # Examples for compas_fab introduction
 
-1. Introduction of `Frame`, `Transformation`, (RR)
-   * Better examples (RR)
+1. Introduction of `Frame`, `Transformation`, (RR) (done)
 1. Introduction of `Robot`
     * URDF (GC)
     * `BaseConfiguration` => `Configuration`
