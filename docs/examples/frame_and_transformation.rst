@@ -15,6 +15,7 @@ Here is a simple example of how to use Frame and Transformation: We want to
 bring a point P in the coordinate system of frame F1 into the coordinate system
 of frame F2.::
 
+    from compas.geometry import Point
 	from compas.geometry import Frame
 	from compas.geometry.xforms import Transformation
 
@@ -30,15 +31,20 @@ of frame F2.::
 
 	F2 = Frame(point, xaxis, yaxis)
 
-	P = [35., 35., 35.] # point in frame F1
+	P = Point(35., 35., 35.) # point in frame F1
 
 	# bring P into worldXY frame.
 	Tw = Transformation.from_frame_to_frame(Frame.worldXY(), F1)
-	Pw = T0.transform_point(P)
+	Pw = P.transformed(Tw)
 
 	# bring Pw into frame F2
 	T = Transformation.from_frame_to_frame(F1, F2)
-	Pt = T.transform_point(Pw)
+	Pt1 = Pw.transformed(T)
+    print(Pt1)
+
+    # This here yields to the same result
+    Pt2 = F2.represent_in_global_coordinates(P)
+    print(Pt2)
 
 .. figure:: frame_transformation-01.jpg
     :figclass: figure
@@ -64,7 +70,7 @@ as Euler angles, axis-angle representation, and quaternion.::
     Ry = Rotation.from_axis_and_angle(yaxis, beta)
     Rz = Rotation.from_axis_and_angle(zaxis, gamma)
     F2 = Frame.worldXY()
-    F1 == F2.transform(Rx * Ry * Rz)
+    F1 == F2.transformed(Rx * Ry * Rz)
 
     # quaternion
     q = F1.quaternion
