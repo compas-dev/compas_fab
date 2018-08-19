@@ -2,10 +2,13 @@ from __future__ import print_function
 
 import logging
 from timeit import default_timer as timer
-from compas_fab.robots import Pose
-from compas_fab.robots.rfl import Configuration, SimulationCoordinator
-from compas_ghpython.geometry import xform_from_transformation_matrix
+
 from compas.datastructures import Mesh
+from compas_ghpython.geometry import xform_from_transformation_matrix
+
+from compas_fab.robots import Configuration
+from compas_fab.robots import Pose
+from compas_fab.robots.backends.vrep.coordinator import SimulationCoordinator
 
 try:
     import clr
