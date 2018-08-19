@@ -5,7 +5,10 @@ compas_fab.robots
 
 .. currentmodule:: compas_fab.robots
 
-:mod:`compas_fab.robots` contains base clases for robot simulation and control.
+:mod:`compas_fab.robots` contains base classes for robot simulation and control.
+
+Classses
+--------
 
 .. autosummary::
     :toctree: generated/
