@@ -108,26 +108,12 @@ class Robot(object):
         main_planning_group_link_number = 0
         for group_name, v in self.semantics['groups'].items():
             if v['chain'] != None:
-                chain_links = self.get_chain(v['chain']['base_link'], v['chain']['tip_link'])
+                # TODO: Does this really work, since the chain is an iterator
+                chain_links = self.model.iter_link_chain(v['chain']['base_link'], v['chain']['tip_link'])
                 if len(chain_links) > main_planning_group_link_number:
                     main_planning_group_link_number = len(chain_links)
                     main_planning_group = group_name
         return main_planning_group
-
-    def get_chain(self, link_start_name, link_end_name):
-        link_start = self.model.find_link_by_name(link_start_name)
-
-        def func(cjoints, links):
-            for j in cjoints:
-                link = j.childlink
-                links.append(link)
-                if link.name == link_end_name:
-                    return links
-                else:
-                    links += func(link.joints, [])
-            return links
-
-        return func(link_start.joints, [link_start])
 
     def get_joint_state_names(self, planning_group=None):
         """This should be read from robot semantics...
@@ -144,7 +130,7 @@ class Robot(object):
                 if joint.type == "revolute":
                     joint_state_names.append(joint.name)
         else:
-            chainlinks = self.get_chain(chain['base_link'], chain['tip_link'])
+            chainlinks = self.model.iter_link_chain(chain['base_link'], chain['tip_link'])
             for link in chainlinks:
                 for joint in link.joints:
                     if joint.type == "revolute":
