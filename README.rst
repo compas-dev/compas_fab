@@ -43,7 +43,7 @@ an open-source Python-based framework for collaboration and research in architec
 Main features
 -------------
 
-* Based on `ROS: Robot Operating System <https://ros.org>`_
+* Multiple backends for simulation and execution (e.g. `ROS: Robot Operating System <https://ros.org>`_)
 * Planning tools: kinematic solvers, path planning, etc.
 * Execution tools: feedback loops, robot control, etc.
 
