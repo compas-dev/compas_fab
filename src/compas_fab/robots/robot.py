@@ -34,6 +34,7 @@ from compas_fab.robots.urdf_importer import UrdfImporter
 LOGGER = logging.getLogger('compas_fab.robots.robot')
 
 
+# RobotArtist?
 class Mesh(object):
 
     def __init__(self, mesh):
