@@ -1,32 +1,37 @@
 from __future__ import print_function
-import os
 
 import logging
-LOGGER = logging.getLogger('compas_fab.robots.robot')
+import os
 
 from compas.geometry import Frame
 from compas.geometry import add_vectors
-from compas.geometry.xforms import Transformation
+from compas.geometry.transformations import mesh_transform
+from compas.geometry.transformations import mesh_transformed
 from compas.geometry.xforms import Rotation
 from compas.geometry.xforms import Scale
+from compas.geometry.xforms import Transformation
+
 from compas.geometry.transformations import mesh_transform
 from compas.geometry.transformations import mesh_transformed
 
 from compas.robots import Origin as UrdfOrigin
 from compas.robots import Visual as UrdfVisual
 from compas.robots import Collision as UrdfCollision
-from compas.robots import Link as UrdfLink
 from compas.robots import Joint as UrdfJoint
+from compas.robots import Link as UrdfLink
 from compas.robots import MeshDescriptor as UrdfMeshDescriptor
+from compas.robots import Origin as UrdfOrigin
 from compas.robots import Robot as UrdfRobot
+from compas.robots import Visual as UrdfVisual
 from compas.robots.model.geometry import SCALE_FACTOR
 
 
 #from compas_fab.robots.tool import Tool
 
+from compas_fab.robots.pose import JointState
 from compas_fab.robots.urdf_importer import UrdfImporter
 
-from compas_fab.robots.pose import JointState
+LOGGER = logging.getLogger('compas_fab.robots.robot')
 
 
 class Mesh(object):
@@ -64,7 +69,8 @@ class Robot(object):
         if not os.path.isfile(urdf_file):
             raise ValueError("The file 'robot_description.urdf' is not in resource_path")
 
-
+        # move outside
+        self.model = UrdfRobot.from_urdf_file(urdf_file)
        
         self.name = self.model.name
         self.semantics = self.urdf_importer.read_robot_semantics()
@@ -420,4 +426,3 @@ if __name__ == "__main__":
     [[400.0000, 100.0000, 400.0000],  [1.0000, 0.0000, 0.0000],  [0.0000, 1.0000, 0.0000]]
     [[400.0000, 100.0000, 400.0000],  [0.0000, -1.0000, 0.0000],  [0.0000, 0.0000, -1.0000]]
     """
-

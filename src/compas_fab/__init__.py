@@ -10,8 +10,7 @@ the COMPAS Framework with a special focus on enabling its usage from within CAD
 environments such a `Rhinoceros 3D <https://www.rhino3d.com/>`_.
 
 .. toctree::
-    :maxdepth: 1
-    :titlesonly:
+    :maxdepth: 3
 
     compas_fab.geometry
     compas_fab.ghpython
