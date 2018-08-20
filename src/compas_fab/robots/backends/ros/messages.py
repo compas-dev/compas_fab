@@ -112,6 +112,10 @@ class PoseStamped(ROSmsg):
         self.header = header
         self.pose = pose
 
+class Transform(ROSmsg):
+    """http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Transform.html
+    """
+    pass
 
 # ------------------------------------------------------------------------------
 # sensor_msgs
@@ -159,14 +163,62 @@ class MultiDOFJointState(ROSmsg):
 # trajectory_msgs
 # ------------------------------------------------------------------------------
 
+class JointTrajectoryPoint(ROSmsg):
+    """http://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectoryPoint.html
+    """
+    def __init__(self, positions=[], velocities=[], accelerations=[], effort=[], time_from_start=Time()):
+        self.positions = positions
+        self.velocities = velocities
+        self.accelerations = accelerations
+        self.effort = effort
+        self.time_from_start = time_from_start
+    
+    @classmethod
+    def from_msg(cls, msg):
+        time_from_start = Time.from_msg(msg['time_from_start'])
+        return cls(msg['positions'], msg['velocities'], msg['accelerations'], msg['effort'], time_from_start)
 
 class JointTrajectory(ROSmsg):
     """http://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectory.html
     """
     def __init__(self, header=Header(), joint_names=[], points=[]):
         self.header = header
-        self.joint_names = joint_names
-        self.points = points
+        self.joint_names = joint_names # string[]
+        self.points = points # JointTrajectoryPoint[]
+    
+    @classmethod
+    def from_msg(cls, msg):
+        header = Header.from_msg(msg['header'])
+        joint_names = msg['joint_names']
+        points = [JointTrajectoryPoint.from_msg(item) for item in msg['points']]
+        return cls(header, joint_names, points)
+
+
+class MultiDOFJointTrajectoryPoint(ROSmsg):
+    """http://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectoryPoint.html
+    """
+    def __init__(self, transforms=[], velocities=[], accelerations=[], time_from_start=Time()):
+        self.transforms = transforms # geometry_msgs/Transform[] 
+        self.velocities = velocities # geometry_msgs/Twist[] 
+        self.accelerations = accelerations # geometry_msgs/Twist[] 
+        self.time_from_start = time_from_start # duration 
+
+
+class MultiDOFJointTrajectory(ROSmsg):
+    """http://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectory.html
+    """
+    def __init__(self, header=Header(), joint_names=[], points=[]):
+        self.header = header
+        self.joint_names = joint_names # string[] 
+        self.points = points # trajectory_msgs/MultiDOFJointTrajectoryPoint[]
+    
+    @classmethod
+    def from_msg(cls, msg):
+        header = Header.from_msg(msg['header'])
+        joint_names = msg['joint_names']
+        points = [MultiDOFJointTrajectoryPoint.from_msg(item) for item in msg['points']]
+        return cls(header, joint_names, points)
+
 
 # ------------------------------------------------------------------------------
 # object_recognition_msgs
@@ -283,10 +335,38 @@ class RobotState(ROSmsg):
         self.multi_dof_joint_state = multi_dof_joint_state
         self.attached_collision_objects = attached_collision_objects
         self.is_diff = is_diff
+    
+    @classmethod
+    def from_msg(cls, msg):
+        joint_state = JointState.from_msg(msg['joint_state'])
+        multi_dof_joint_state = MultiDOFJointState.from_msg(msg['multi_dof_joint_state'])
+        attached_collision_objects = [AttachedCollisionObject.from_msg(item) for item in msg['attached_collision_objects']]
+        return cls(joint_state, multi_dof_joint_state, attached_collision_objects, msg['is_diff'])
 
 
 class PositionIKRequest(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionIKRequest.html
+
+    Examples
+    --------
+    >>> base_link = 'base_link'
+    >>> planning_group = 'manipulator'
+    >>> pose = Pose([420, -25, 459], [1, 0, 0], [0, 1, 0])
+    >>> joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint', 
+                       'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 
+                       'wrist_3_joint']
+    >>> joint_positions = [3.39, -1.47, -2.05, 0.38, -4.96, -6.28]
+    >>> header = Header(frame_id='base_link')
+    >>> pose_stamped = PoseStamped(header, pose)
+    >>> joint_state = JointState(name=joint_names, position=joint_positions, 
+                                 header=header)
+    >>> multi_dof_joint_state = MultiDOFJointState(header=header, 
+                                                   joint_names=joint_names)
+    >>> start_state = RobotState(joint_state, multi_dof_joint_state)
+    >>> ik_request = PositionIKRequest(group_name=planning_group, 
+                                       robot_state=start_state, 
+                                       pose_stamped=pose_stamped, 
+                                       avoid_collisions=True)
     """
     def __init__(self, group_name="robot", robot_state=RobotState(),
                  constraints=Constraints(), pose_stamped=PoseStamped(),
@@ -298,7 +378,64 @@ class PositionIKRequest(ROSmsg):
         self.pose_stamped = pose_stamped
         self.timeout = timeout
         self.attempts = attempts
+    
+class RobotTrajectory(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/RobotTrajectory.html
+    """
+    def __init__(self, joint_trajectory=JointTrajectory(), 
+                 multi_dof_joint_trajectory=MultiDOFJointTrajectory()):
+        self.joint_trajectory = joint_trajectory
+        self.multi_dof_joint_trajectory = multi_dof_joint_trajectory
+    
+    @classmethod
+    def from_msg(cls, msg):
+        joint_trajectory = JointTrajectory.from_msg(msg['joint_trajectory'])
+        multi_dof_joint_trajectory = MultiDOFJointTrajectory.from_msg(msg['multi_dof_joint_trajectory'])
+        return cls(joint_trajectory, multi_dof_joint_trajectory)
 
+class MoveItErrorCodes(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MoveItErrorCodes.html
+    """
+    # overall behavior
+    SUCCESS = 1
+    FAILURE = 99999
+
+    PLANNING_FAILED = -1
+    INVALID_MOTION_PLAN = -2
+    MOTION_PLAN_INVALIDATED_BY_ENVIRONMENT_CHANGE = -3
+    CONTROL_FAILED = -4
+    UNABLE_TO_AQUIRE_SENSOR_DATA = -5
+    TIMED_OUT = -6
+    PREEMPTED = -7
+
+    # planning & kinematics request errors
+    START_STATE_IN_COLLISION = -10
+    START_STATE_VIOLATES_PATH_CONSTRAINTS = -11
+
+    GOAL_IN_COLLISION = -12
+    GOAL_VIOLATES_PATH_CONSTRAINTS = -13
+    GOAL_CONSTRAINTS_VIOLATED = -14
+
+    INVALID_GROUP_NAME = -15
+    INVALID_GOAL_CONSTRAINTS = -16
+    INVALID_ROBOT_STATE = -17
+    INVALID_LINK_NAME = -18
+    INVALID_OBJECT_NAME = -19
+
+    # system errors
+    FRAME_TRANSFORM_FAILURE = -21
+    COLLISION_CHECKING_UNAVAILABLE = -22
+    ROBOT_STATE_STALE = -23
+    SENSOR_INFO_STALE = -24
+
+    # kinematics errors
+    NO_IK_SOLUTION = -31
+
+    def __init__(self, val=-31):
+        self.val = val
+    
+    def __eq__(self, other):
+        return self.val == other
 
 if __name__ == '__main__':
 
@@ -316,3 +453,6 @@ if __name__ == '__main__':
 
     joint_state = JointState(name=joint_names, position=joint_positions)
     print(joint_state, "\n")
+    msg = joint_state.msg
+    js = JointState.from_msg(msg)
+    print(js, "\n")
