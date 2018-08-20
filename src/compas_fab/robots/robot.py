@@ -9,8 +9,8 @@ from compas.geometry import add_vectors
 from compas.geometry.xforms import Transformation
 from compas.geometry.xforms import Rotation
 from compas.geometry.xforms import Scale
-
-#from .tool import Tool
+from compas.geometry.transformations import mesh_transform
+from compas.geometry.transformations import mesh_transformed
 
 from compas.robots import Origin as UrdfOrigin
 from compas.robots import Visual as UrdfVisual
@@ -21,11 +21,10 @@ from compas.robots import MeshDescriptor as UrdfMeshDescriptor
 from compas.robots import Robot as UrdfRobot
 from compas.robots.model.geometry import SCALE_FACTOR
 
-from compas.geometry.transformations import mesh_transform
-from compas.geometry.transformations import mesh_transformed
+
+#from compas_fab.robots.tool import Tool
 
 from compas_fab.robots.urdf_importer import UrdfImporter
-from compas_fab.robots.urdf_importer import check_mesh_class
 
 from compas_fab.robots.pose import JointState
 
@@ -40,6 +39,10 @@ class Mesh(object):
 
     def draw(self):
         return self.mesh
+    
+    def set_color(self, color):
+        # set colours
+        pass
 
 
 class Robot(object):
@@ -50,7 +53,7 @@ class Robot(object):
         resource_path (str): the directory, where the urdf_importer has stored
             the urdf files and the robot mesh files
     """
-    def __init__(self, resource_path, client=None):
+    def __init__(self, resource_path, model=None, client=None):
         # it needs a filename because it also sources the meshes from the directory
         # model, urdf_importer, resource_path = None, client = None, viewer={}
 
@@ -61,7 +64,8 @@ class Robot(object):
         if not os.path.isfile(urdf_file):
             raise ValueError("The file 'robot_description.urdf' is not in resource_path")
 
-        self.model = UrdfRobot.from_urdf_file(urdf_file)
+
+       
         self.name = self.model.name
         self.semantics = self.urdf_importer.read_robot_semantics()
         # the following would be good to be read from semantics
@@ -86,7 +90,7 @@ class Robot(object):
         self.transformation_RCF_WCF = Transformation.from_frame_to_frame(self.RCF, Frame.worldXY())
 
     def get_joint_state(self):
-        """Returns the current joint state.
+        """Returns the current joint state. // or the current "configuraion ?"
         """
         names = self.get_joint_state_names()
         positions = []
@@ -96,7 +100,7 @@ class Robot(object):
         return JointState.from_name_and_position(names, positions)
 
     def create(self, meshcls):
-        check_mesh_class(meshcls)
+        self.urdf_importer.check_mesh_class(meshcls)
         self.model.root.create(self.urdf_importer, meshcls, Frame.worldXY())
 
     def get_planning_groups(self):
@@ -109,7 +113,8 @@ class Robot(object):
         for group_name, v in self.semantics['groups'].items():
             if v['chain'] != None:
                 # TODO: Does this really work, since the chain is an iterator
-                chain_links = self.model.iter_link_chain(v['chain']['base_link'], v['chain']['tip_link'])
+                chain_links_it = self.model.iter_link_chain(v['chain']['base_link'], v['chain']['tip_link'])
+                chain_links = list(chain_links_it)
                 if len(chain_links) > main_planning_group_link_number:
                     main_planning_group_link_number = len(chain_links)
                     main_planning_group = group_name
@@ -334,6 +339,14 @@ if __name__ == "__main__":
     """
     #filename = r"C:\Users\rustr\robot_description\staubli_tx60l\robot_description.urdf"
     #model = UrdfRobot.from_urdf_file(filename)
+
+
+    #model = UrdfRobot.from_urdf_files(robot_descriptions, robot_senmantics)
+    # have resouce path in model, resolve meshes
+
+    #robot(model, client)
+    
+
     robot = Robot(r"C:\Users\rustr\workspace\robot_description\staubli_tx60l")
     #robot = Robot(r"C:\Users\rustr\workspace\robot_description\ur5")
     #robot = Robot(r"C:\Users\rustr\workspace\robot_description\abb_irb6640_185_280")

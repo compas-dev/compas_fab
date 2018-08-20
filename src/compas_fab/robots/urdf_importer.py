@@ -11,25 +11,6 @@ from compas.datastructures import Mesh
 LOGGER = logging.getLogger('compas_fab.robots.urdf_importer')
 
 
-def check_mesh_class(meshcls):
-    """Checks if the passed mesh class has the necessary constructor and methods.
-    """
-    import compas
-    from compas.datastructures import Mesh
-
-    try:
-        cm = Mesh.from_obj(compas.get('faces.obj'))
-        meshcls(cm)
-    except:
-        raise TypeError("The class %s cannot be constructed from a %s" % (meshcls, Mesh))
-
-    if not hasattr(meshcls, 'transform'):
-        raise TypeError("The class %s has no method named 'transform'" % meshcls)
-
-    if not hasattr(meshcls, 'draw'):
-        raise TypeError("The class %s has no method named 'draw'" % meshcls)
-
-
 class UrdfImporter(object):
     """Allows to retrieve the mesh files specified in the robot urdf from the
     ROS file_server and stores it on the local file system.
@@ -236,6 +217,26 @@ class UrdfImporter(object):
                     break
 
         return semantics
+    
+    def check_mesh_class(self, meshcls):
+        """Checks if the passed mesh class has the necessary constructor and 
+        methods.
+        """
+        # TODO: is this even necessary if we add a RobotMesh to each CAD
+        import compas
+        from compas.datastructures import Mesh
+
+        try:
+            cm = Mesh.from_obj(compas.get('faces.obj'))
+            meshcls(cm)
+        except:
+            raise TypeError("The class %s cannot be constructed from a %s" % (meshcls, Mesh))
+
+        if not hasattr(meshcls, 'transform'):
+            raise TypeError("The class %s has no method named 'transform'" % meshcls)
+
+        if not hasattr(meshcls, 'draw'):
+            raise TypeError("The class %s has no method named 'draw'" % meshcls)
 
 
 
