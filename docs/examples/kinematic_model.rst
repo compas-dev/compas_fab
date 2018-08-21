@@ -9,11 +9,11 @@ In ROS, the RobotModel_ and RobotState_ classes are the core classes that give y
 
 In the kinematic model of a robot, the connection of different manipulator joints is known as link, and the integration of two or more links is called a joint. This kinematic model can be represented as a tree structure. The tree describes the kinematic chain, i.e., the connection of robotic links with joints, and the inter-dependendencies of these links. In ROS, this tree structure plus the underlying geometric information is defined in XML format in a URDF file, and is stored in the class RobotModel_.
 
-.. figure:: link.png
+.. figure:: robot_links_and_joints.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
-    Tree structure of a robot describing the kinematic model.
+    An industrial robot's links and joints, and the according tree structure describing the kinematic model.
 
 Links
 ==================
