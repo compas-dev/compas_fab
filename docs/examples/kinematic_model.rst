@@ -13,7 +13,7 @@ In the kinematic model of a robot, the connection of different manipulator joint
     :figclass: figure
     :class: figure-img img-fluid
 
-    Tree structure of a robot describing the kinematic model.
+    An industrial robot's links and joints, and the according tree structure describing the kinematic model.
 
 Links
 ==================
