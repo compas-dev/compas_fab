@@ -73,8 +73,8 @@ class GetCartesianPathRequest(ROSmsg):
     >>> base_link = 'base_link' # robot.get_base_link_name()
     >>> ee_link = 'ee_link' # robot.get_end_effector_link_name()
     >>> main_planning_group = 'manipulator' # robot.main_planning_group
-    >>> joint_names = ['j0', 'j1', 'j2', 'j3', 'j4', 'j5'] # robot.get_joint_state_names()
-    >>> position = [0, 0, 0, 0, 0, 0] # robot.get_joint_state_names()
+    >>> joint_names = ['j0', 'j1', 'j2', 'j3', 'j4', 'j5']
+    >>> position = [0, 0, 0, 0, 0, 0] # robot.get_configurable_joint_names()
     >>> header = Header(frame_id=base_link)
     >>> joint_state = JointState(header=header, name=joint_names, position=position) # or: robot.get_joint_state()
     >>> multi_dof_joint_state = MultiDOFJointState(header=header, joint_names=joint_names)
@@ -102,7 +102,7 @@ class GetCartesianPathRequest(ROSmsg):
         self.group_name = group_name
         self.link_name = link_name  # ee_link
         self.waypoints = waypoints  # geometry_msgs/Pose[]
-        self.max_step = max_step
+        self.max_step = float(max_step)
         self.jump_threshold = jump_threshold
         self.avoid_collisions = avoid_collisions
         self.path_constraints = constraints  # moveit_msgs/Constraints
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     planning_group = 'manipulator'  # robot.main_planning_group
     pose = Pose([420, -25, 459], [1, 0, 0], [0, 1, 0])
     joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
-                   'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']  # robot.get_joint_state_names()
+                   'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']  # robot.get_configurable_joint_names()
     joint_positions = [3.39, -1.47, -2.05, 0.38, -4.96, -6.28]
     header = Header(frame_id='base_link')
     pose_stamped = PoseStamped(header, pose)
@@ -165,8 +165,8 @@ if __name__ == '__main__':
     ee_link = 'ee_link'  # robot.get_end_effector_link_name()
     main_planning_group = 'manipulator'  # robot.main_planning_group
     joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
-                   'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']  # robot.get_joint_state_names()
-    position = [0, 0, 0, 0, 0, 0]  # robot.get_joint_state_names()
+                   'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']  # robot.get_configurable_joint_names()
+    position = [0, 0, 0, 0, 0, 0]
     header = Header(frame_id=base_link)
     joint_state = JointState(header=header, name=joint_names, position=position)  # or: robot.get_configuration()
     multi_dof_joint_state = MultiDOFJointState(header=header, joint_names=joint_names)

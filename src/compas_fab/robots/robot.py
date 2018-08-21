@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import logging
 import os
+import math
 
 from compas.geometry import Frame
 from compas.geometry import add_vectors
@@ -28,7 +29,8 @@ from compas.robots.model.geometry import SCALE_FACTOR
 
 #from compas_fab.robots.tool import Tool
 
-from compas_fab.robots.pose import JointState
+#from compas_fab.robots.pose import JointState
+from compas_fab.robots import Configuration
 from compas_fab.robots.urdf_importer import UrdfImporter
 
 LOGGER = logging.getLogger('compas_fab.robots.robot')
@@ -84,6 +86,9 @@ class Robot(object):
         # how is this set = via frame? / property
         self.transformation_RCF_WCF = Transformation()
         self.transformation_WCF_RCF = Transformation()
+    
+    def set_client(self, client):
+        self.client = client
 
     def set_tool(self, tool):
         raise NotImplementedError
@@ -96,15 +101,31 @@ class Robot(object):
         # transformation matrix from robot coordinate system to world coordinate system
         self.transformation_RCF_WCF = Transformation.from_frame_to_frame(self.RCF, Frame.worldXY())
 
-    def get_joint_state(self):
+    def get_configuration(self, planning_group=None):
+        """Returns the current configuration
+        """
+        names = self.get_configurable_joint_names(planning_group)
+        positions = []
+        for joint in self.model.iter_joints():
+            # TODO: move this to joint, likewise with setting positions
+            if joint.name in names:
+                if joint.type in ["revolute", "continuous"]:
+                    positions.append(math.degrees(joint.position))
+                elif joint.type == ["prismatic", "planar"]:
+                    positions.append(joint.position * SCALE_FACTOR)
+                else: # floating, fixed
+                    positions.append(joint.position)
+        return positions
+
+    def get_joint_state(self, planning_group=None):
         """Returns the current joint state. // or the current "configuraion ?"
         """
-        names = self.get_joint_state_names()
+        names = self.get_configurable_joint_names(planning_group)
         positions = []
         for joint in self.model.iter_joints():
             if joint.name in names:
                 positions.append(joint.position)
-        return JointState.from_name_and_position(names, positions)
+        return positions
 
     def create(self, meshcls):
         self.urdf_importer.check_mesh_class(meshcls)
@@ -127,7 +148,7 @@ class Robot(object):
                     main_planning_group = group_name
         return main_planning_group
 
-    def get_joint_state_names(self, planning_group=None):
+    def get_configurable_joint_names(self, planning_group=None):
         """This should be read from robot semantics...
         """
         if not planning_group:
@@ -139,7 +160,7 @@ class Robot(object):
         if chain == None:
             # return all revoulte joints
             for joint in self.model.iter_joints():
-                if joint.type == "revolute":
+                if joint.type != "fixed":
                     joint_state_names.append(joint.name)
         else:
             chainlinks = self.model.iter_link_chain(chain['base_link'], chain['tip_link'])
@@ -162,7 +183,6 @@ class Robot(object):
     def get_end_effector_frame(self):
         end_effector_link = self.get_end_effector_link()
         return end_effector_link.parent_joint.origin.copy()
-
 
     def get_base_link_name(self):
         return self.semantics['groups'][self.main_planning_group]['chain']['base_link']
@@ -202,12 +222,14 @@ class Robot(object):
     def draw(self):
         return self.model.draw()
 
-    def update(self, joint_state):
+    def update(self, configuration, planning_group=None):
         """
         """
+        joint_names = self.get_configurable_joint_names(planning_group)
+        print('joint_names', joint_names)
         # TODO : where to make boundary between message and type
         js = {}
-        for k, v in zip(joint_state.name, joint_state.position):
+        for k, v in zip(joint_names, configuration):
             js[k] = v
         self.model.root.update(js, Transformation(), Transformation())
 
@@ -215,20 +237,26 @@ class Robot(object):
         if not self.client:
             raise Exception('This method is only callable once a client is assigned')
 
-    def compute_ik(self, pose):
+    def inverse_kinematics(self, frame):
+        self.ensure_client()
+        raise NotImplementedError
+        # return configuration
+    
+    def forward_kinematics(self, configuration):
+        self.ensure_client()
+        raise NotImplementedError
+        # return frame
+
+    def compute_cartesian_path(self, frames):
         self.ensure_client()
         raise NotImplementedError
 
-    def compute_cartesian_path(self, poses):
-        self.ensure_client()
-        raise NotImplementedError
-
-    def send_pose(self):
+    def send_frame(self):
         #(check service name with ros)
         self.ensure_client()
         raise NotImplementedError
 
-    def send_joint_state(self):
+    def send_configuration(self):
         #(check service name with ros)
         self.ensure_client()
         raise NotImplementedError
@@ -283,9 +311,6 @@ class OldRobot(object):
 
     def set_tool(self, tool):
         self.tool = tool
-
-    def get_robot_configuration(self):
-        raise NotImplementedError
 
     @property
     def transformation_tool0_tcp(self):
@@ -354,8 +379,8 @@ if __name__ == "__main__":
     #robot(model, client)
     
 
-    robot = Robot(r"C:\Users\rustr\workspace\robot_description\staubli_tx60l")
-    #robot = Robot(r"C:\Users\rustr\workspace\robot_description\ur5")
+    #robot = Robot(r"C:\Users\rustr\workspace\robot_description\staubli_tx60l")
+    robot = Robot(r"C:\Users\rustr\workspace\robot_description\ur5")
     #robot = Robot(r"C:\Users\rustr\workspace\robot_description\abb_irb6640_185_280")
     robot.create(Mesh)
 
@@ -364,7 +389,7 @@ if __name__ == "__main__":
     main_planning_group = robot.get_main_planning_group()
     print("main_planning_group", main_planning_group)
     for group in planning_groups:
-        joint_state_names = robot.get_joint_state_names(group)
+        joint_state_names = robot.get_configurable_joint_names(group)
         print(group, joint_state_names)
 
     print("ee_frame", robot.get_end_effector_frame())
@@ -378,16 +403,18 @@ if __name__ == "__main__":
     #joint_positions = [6.254248737006559, -5.874885906732766, 4.110686942268209, -1.3773936859827733, -1.5418597546004678, -6.2831853]
     joint_positions = [0.5, -0.1, 3, -1, 0.5, 2]
 
-    joint_state = JointState.from_name_and_position(joint_names, joint_positions)
+    #joint_state = JointState.from_name_and_position(joint_names, joint_positions)
 
-    robot.update(joint_state)
+    configuration = joint_positions
+
+    robot.update(configuration)
 
 
     joint_positions = [6.254248737006559, -5.874885906732766, 4.110686942268209, -1.3773936859827733, -1.5418597546004678, -6.2831853]
+    configuration = joint_positions
+    #joint_state = JointState.from_name_and_position(joint_names, joint_positions)
 
-    joint_state = JointState.from_name_and_position(joint_names, joint_positions)
-
-    robot.update(joint_state)
+    robot.update(configuration)
 
     print("==========================")
 

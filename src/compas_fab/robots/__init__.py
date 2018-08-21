@@ -23,7 +23,6 @@ Classses
 """
 
 from .configuration import Configuration
-from .pose import Pose
 from .robot import Robot
 from .tool import Tool
 from .urdf_importer import UrdfImporter

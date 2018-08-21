@@ -23,7 +23,7 @@ class UrdfImporter(object):
         local_directory (str, optional): A directory to store the files.
             Defaults to ~/robot_description
         robot_name (str or None): The name of the robot, will be read from the
-            urdf string
+            urdf
         requested_resource_files (dict): The mesh files from the urdf
         status (dict): To check the status of the process.
     """
@@ -241,20 +241,7 @@ class UrdfImporter(object):
 
 
 if __name__ == "__main__":
-
-    class ExampleMesh(object):
-
-        def __init__(self, mesh):
-            self.mesh = mesh
-
-        def transform(self, transformation):
-            mesh_transform(self.mesh, transformation)
-
-        def draw(self):
-            return self.mesh
-
-    check_mesh_class(ExampleMesh)
-
+    
     """
     Start following processes on client side:
     roslaunch YOUR_ROBOT_moveit_config demo.launch rviz_tutorial:=true

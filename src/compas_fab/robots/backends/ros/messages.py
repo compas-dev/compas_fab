@@ -472,7 +472,14 @@ class MoveItErrorCodes(ROSmsg):
 
     def __eq__(self, other):
         return self.val == other
-
+    
+    @property
+    def human_readable(self):
+        cls = type(self)
+        for k, v in cls.__dict__.items():
+            if v == self.val:
+                return k
+        return ''
 
 if __name__ == '__main__':
 
@@ -496,3 +503,6 @@ if __name__ == '__main__':
     msg = joint_state.msg
     js = JointState.from_msg(msg)
     print(js, "\n")
+
+    error = MoveItErrorCodes()
+    print(error.human_readable)
