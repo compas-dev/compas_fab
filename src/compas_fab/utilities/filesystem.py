@@ -41,4 +41,4 @@ if __name__ == "__main__":
 
     path = os.path.join(os.path.dirname(__file__), "..", "robots", "ur", "ur10", "model")
     os.listdir(path)
-    print list_files_in_directory(path, fullpath=True, extensions=["obj"])
+    print(list_files_in_directory(path, fullpath=True, extensions=["obj"]))

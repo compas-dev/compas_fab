@@ -7,10 +7,10 @@ from compas_fab.robots.backends.ros import JointState
 from compas_fab.robots.backends.ros import MultiDOFJointState
 from compas_fab.robots.backends.ros import Constraints
 from compas_fab.robots.backends.ros import RobotState
-from compas_fab.robots.backends.ros.messages import PoseStamped
-from compas_fab.robots.backends.ros.messages import MoveItErrorCodes
-from compas_fab.robots.backends.ros.messages import RobotTrajectory
-from compas_fab.robots.backends.ros.messages import PositionIKRequest
+from compas_fab.robots.backends.ros import PoseStamped
+from compas_fab.robots.backends.ros import MoveItErrorCodes
+from compas_fab.robots.backends.ros import RobotTrajectory
+from compas_fab.robots.backends.ros import PositionIKRequest
 
 __all__ = ['GetCartesianPathRequest', 'GetCartesianPathResponse',
            'GetPositionIKRequest', 'GetPositionIKResponse']
