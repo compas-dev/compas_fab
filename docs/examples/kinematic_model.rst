@@ -21,12 +21,11 @@ Robot links are thee solid mechanical elements. Depending on the kinematic model
 
 Joints
 ==================
-The joints are the elements in a robot which helps the links to travel in different kind of movements. The two major types of joints are:
+The joints are the elements in a robot which helps the links to travel in different kind of movements. The three major types of joints are:
 
-* Rotational joint
-* Linear joint
-
-Furthermode, joints can be defined as fixed, active (controllable), or passive (uncontrollable).
+* revolute - a hinge joint that rotates along the axis and has a limited range specified by the upper and lower limits
+* prismatic - a sliding joint that slides along the axis, and has a limited range specified by the upper and lower limits
+* fixed - not really a joint because it cannot move, all degrees of freedom are locked. 
 
 The RobotState_ class in ROS contains information about the robot at a snapshot in time, storing vectors of joint positions and optionally velocities and accelerations. The RobotState_ also contains helper functions for setting the arm location based on the end effector location (Cartesian pose) and for computing Cartesian trajectories.
 
