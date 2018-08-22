@@ -4,10 +4,11 @@ Kinematic model
 
 .. _RobotModel: http://docs.ros.org/kinetic/api/moveit_core/html/classmoveit_1_1core_1_1RobotModel.html
 .. _RobotState: http://docs.ros.org/kinetic/api/moveit_core/html/classmoveit_1_1core_1_1RobotState.html
+.. _UR5urdf: https://github.com/ros-industrial/universal_robot/blob/kinetic-devel/ur_description/urdf/ur5.urdf.xacro
 
-In ROS, the RobotModel_ and RobotState_ classes are the core classes that give you access to a robot's kinematics.
+.. In ROS, the RobotModel_ and RobotState_ classes are the core classes that give you access to a robot's kinematics.
 
-In the kinematic model of a robot, the connection of different manipulator joints is known as link, and the integration of two or more links is called a joint. This kinematic model can be represented as a tree structure. The tree describes the kinematic chain, i.e., the connection of robotic links with joints, and the inter-dependendencies of these links. In ROS, this tree structure plus the underlying geometric information is defined in XML format in a URDF file, and is stored in the class RobotModel_.
+In the kinematic model of a robot, the connection of different manipulator joints is known as link, and the integration of two or more links is called a joint. This kinematic model can be represented as a tree structure. The tree describes the kinematic chain, i.e., the connection of robotic links with joints, and the inter-dependendencies of these links. This tree structure plus the underlying geometric information is defined in XML format in a URDF file (For example, see UR5urdf_)
 
 .. figure:: robot_links_and_joints.jpg
     :figclass: figure
@@ -17,7 +18,7 @@ In the kinematic model of a robot, the connection of different manipulator joint
 
 Links
 ==================
-Robot links are thee solid mechanical elements. Depending on the kinematic model, movement of certain input links allows the output links to move at various motions.
+Robot links are solid mechanical elements. Depending on the kinematic model, movement of certain input links allows the output links to move at various motions.
 
 Joints
 ==================
@@ -25,9 +26,18 @@ The joints are the elements in a robot which helps the links to travel in differ
 
 * revolute - a hinge joint that rotates along the axis and has a limited range specified by the upper and lower limits
 * prismatic - a sliding joint that slides along the axis, and has a limited range specified by the upper and lower limits
-* fixed - not really a joint because it cannot move, all degrees of freedom are locked. 
+* fixed - not really a joint because it cannot move, all degrees of freedom are locked. ::
 
-The RobotState_ class in ROS contains information about the robot at a snapshot in time, storing vectors of joint positions and optionally velocities and accelerations. The RobotState_ also contains helper functions for setting the arm location based on the end effector location (Cartesian pose) and for computing Cartesian trajectories.
+    from compas.robots import Joint
+    from compas.robots import Link
+    
+    link = Link("world")
+    joint = Joint("world-joint", parent="world")
+    link = Link("j0")
+    joint = Joint("j0")
+    # TODO: built own robot here
+
+.. The RobotState_ class in ROS contains information about the robot at a snapshot in time, storing vectors of joint positions and optionally velocities and accelerations. The RobotState_ also contains helper functions for setting the arm location based on the end effector location (Cartesian pose) and for computing Cartesian trajectories.
 
 .. figure:: robot_model.jpg
     :figclass: figure
