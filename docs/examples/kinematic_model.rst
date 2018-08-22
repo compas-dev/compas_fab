@@ -47,5 +47,7 @@ The joints are the elements in a robot which helps the links to travel in differ
     Coordinate frames in each joint of the robot.
 
 More info:
-http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file
-https://www.codemade.io/create-your-own-urdf-file/
+
+* http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file
+* https://www.codemade.io/create-your-own-urdf-file/
+
