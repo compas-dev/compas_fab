@@ -39,10 +39,20 @@ class UrdfImporter(object):
                        "robot_name_received": False}
 
     @classmethod
-    def from_robot_resource_path(cls, path):
+    def from_robot_resource_path(cls, path, ros=None):
         local_directory = os.path.abspath(os.path.join(path, ".."))
-        importer = cls(local_directory=local_directory)
+        importer = cls(ros, local_directory)
         importer.robot_name = os.path.basename(os.path.normpath(path))
+        return importer
+    
+    @classmethod
+    def from_urdf_robot(cls, urdf_robot, ros=None):
+        if urdf_robot.resource_file:
+            local_directory = os.path.abspath(os.path.join(os.path.dirname(urdf_robot.resource_file), ".."))
+        else:
+            local_directory = None
+        importer = cls(ros, local_directory)
+        importer.robot_name = os.path.basename(urdf_robot.name)
         return importer
 
     @property
@@ -74,15 +84,17 @@ class UrdfImporter(object):
         # Update status
         self.check_status()
 
-    def get_robot_description_filename(self):
+    @property
+    def urdf_filename(self):
         return os.path.join(self.robot_resource_path, "robot_description.urdf")
 
-    def get_robot_description_semantic_filename(self):
+    @property
+    def srdf_filename(self):
         return os.path.join(self.robot_resource_path, "robot_description_semantic.urdf")
 
     def save_robot_description(self, robot_description):
         # Save robot_description.urdf
-        filename = self.get_robot_description_filename()
+        filename = self.urdf_filename
         LOGGER.info("Saving URDF file to %s" % filename)
         self.write_file(filename, robot_description)
         self.status.update({"robot_description_received": True})
@@ -91,7 +103,7 @@ class UrdfImporter(object):
 
     def save_robot_description_semantic(self, robot_description_semantic):
         # Save robot_description_semantic.urdf
-        filename = self.get_robot_description_semantic_filename()
+        filename = self.srdf_filename
         LOGGER.info("Saving URDF file to %s" % filename)
         self.write_file(filename, robot_description_semantic)
         self.status.update({"robot_description_semantic_received": True})
@@ -179,44 +191,6 @@ class UrdfImporter(object):
 
         return meshcls(mesh)
 
-    def read_robot_semantics(self):
-        semantics = {}
-
-        semantic_filename = self.get_robot_description_semantic_filename()
-        tree = ET.parse(semantic_filename)
-        root = tree.getroot()
-
-        # 1. Find planning groups
-        groups = [group.attrib['name'] for group in root.iter('group')]
-
-        semantics['groups'] = {}
-
-        for group in root.iter('group'):
-            chain = group.find('chain')
-            if chain != None:
-                chain = {'base_link': chain.attrib['base_link'], 'tip_link': chain.attrib['tip_link']}
-            else: # get links or joints
-                pass
-                #raise NotImplementedError
-                #for elem in list(group):
-                #    print(elem.tag)
-
-            semantics['groups'][group.attrib['name']] = {}
-            semantics['groups'][group.attrib['name']]['chain'] = chain
-
-        # 2. Find end-effector (= goal link)
-        elem = root.find('end_effector')
-        if elem != None:
-            semantics['end_effector'] = elem.attrib['parent_link']
-        else:
-            semantics['end_effector'] = None
-            for group in root.iter('group'):
-                chain = group.find('chain')
-                if chain != None:
-                    semantics['end_effector'] = chain.attrib['tip_link']
-                    break
-
-        return semantics
     
     def check_mesh_class(self, meshcls):
         """Checks if the passed mesh class has the necessary constructor and 
