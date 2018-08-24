@@ -57,44 +57,111 @@ class Mesh(object):
 class Robot(object):
     """The robot base class.
 
-    Some clever text
+    Attributes:
+        urdf_model (:class:`UrdfRobot`): the model built from URDF structure.
+        urdf_importer (class:)
 
         resource_path (str): the directory, where the urdf_importer has stored
             the urdf files and the robot mesh files
     """
-    def __init__(self, model, resource_path, client=None):
+    def __init__(self, urdf_model, urdf_importer, srdf_model=None, client=None):
         # it needs a filename because it also sources the meshes from the directory
         # model, urdf_importer, resource_path = None, client = None, viewer={}
 
-
-        self.model = model
+        self.urdf_model = urdf_model
+        self.urdf_importer = urdf_importer
+        self.srdf_model = srdf_model
         self.client = client
-        self.urdf_importer = UrdfImporter.from_robot_resource_path(resource_path)
+        self.name = self.urdf_model.name
 
-        """
-        urdf_file = self.urdf_importer.get_robot_description_filename()
-        if not os.path.isfile(urdf_file):
-            raise ValueError("The file 'robot_description.urdf' is not in resource_path")
-        """
-        
-       
-        self.name = self.model.name
-        self.semantics = self.urdf_importer.read_robot_semantics()
-        # the following would be good to be read from semantics
-        self.main_planning_group = self.get_main_planning_group()
-        # self.base_link = self.get_base_link()
-        # self.ee_link = self.get_ee_link()
-        # self.planning_groups = self.get_planning_groups()
+        # TODO: if client is ros client: tell urdf importer...
 
         # how is this set = via frame? / property
         self.transformation_RCF_WCF = Transformation()
         self.transformation_WCF_RCF = Transformation()
     
-    def set_client(self, client):
-        self.client = client
+    @classmethod
+    def from_urdf_model(cls, urdf_model, client=None)
+        urdf_importer = UrdfImporter.from_urdf_model(urdf_robot)
+        srdf_file = urdf_importer.srdf_filename
+        if os.path.isfile(srdf_file):
+            srdf_model = SrdfRobot.from_urdf_file(srdf_file, urdf_model)
+        else:
+            srdf_model = None
+        return cls(urdf_model, urdf_importer, srdf_model, client)
 
-    def set_tool(self, tool):
-        raise NotImplementedError
+    def from_urdf_and_srdf_models(cls, urdf_model, srdf_model, client=None)
+        urdf_importer = UrdfImporter.from_urdf_model(urdf_model)
+        return cls(urdf_model, urdf_importer, srdf_model, client)
+    
+    @classmethod
+    def from_resource_path(cls, directory, client=None):
+        """Creates a robot from a directory with the necessary resource files.
+
+        The directory must contain a .urdf, a .srdf file and a directory with 
+        the robot's geometry as indicated in the urdf file.
+        """
+        urdf_importer = UrdfImporter.from_robot_resource_path(directory)
+        urdf_file = urdf_importer.urdf_filename
+        srdf_file = urdf_importer.srdf_filename
+        urdf_robot = UrdfRobot.from_urdf_file(urdf_file)
+        srdf_robot = SrdfRobot.from_urdf_file(srdf_file, urdf_model)
+        return cls(urdf_model, urdf_importer, srdf_model, client)
+    
+    @property
+    def group_names(self):
+        return self.srdf_model.group_names
+
+    @property
+    def main_group_name(self):
+        return self.srdf_model.main_group_name
+    
+    def get_ee_link_name(self, group=None):
+        return self.srdf_model.get_ee_link_name(group)
+    
+    def get_ee_link(self, group=None):
+        name = self.get_ee_link_name(group)
+        return self.urdf_model.get_link_by_name(name)
+    
+    def get_ee_frame(self, group=None):
+        link = self.get_ee_link()
+        return link.parent_joint.origin.copy()
+    
+    def get_base_link_name(self, group=None):
+        return self.srdf_model.get_base_link_name(group)
+
+    def get_base_link(self, group=None):
+        name = self.get_base_link_name(group)
+        return self.urdf_model.get_link_by_name(name)
+
+    def get_base_frame(self, group=None):
+        link = self.get_base_link(group)
+        # TODO check this, for staubli is is not correct
+        for joint in base_link.joints:
+            if joint.type == "fixed":
+                return joint.origin.copy()
+        else:
+            return Frame.worldXY()
+    
+    def get_configurable_joints(self, group=None):
+        if self.srdf_model:
+            names = self.srdf_model.get_configurable_joint_names(group)
+            return [self.urdf_model.get_joint_by_name(name) for name in names]
+        else:
+            joints = []
+            for joint in self.urdf_model.iter_joints():
+                if joint.is_configurable():
+                    joints.append(joint)
+            return joints
+
+    def get_configurable_joint_names(self, group=None):
+        if self.srdf_model:
+            return self.srdf_model.get_configurable_joint_names(group)
+        else:
+            # passive joints are only defined in the srdf model, so we just get
+            # the ones that are configurable
+            joints = self.get_configurable_joints(group)
+            return [j.name for j in joints]
 
     def set_RCF(self, robot_coordinate_frame):
         raise NotImplementedError
@@ -121,6 +188,7 @@ class Robot(object):
         return positions
 
     def get_joint_state(self, planning_group=None):
+        # remove joint state and continue use configuration
         """Returns the current joint state. // or the current "configuraion ?"
         """
         names = self.get_configurable_joint_names(planning_group)
@@ -131,84 +199,8 @@ class Robot(object):
         return positions
 
     def create(self, meshcls):
-        self.urdf_importer.check_mesh_class(meshcls)
+        self.urdf_importer.check_mesh_class(meshcls) # TODO not important if using mesh class
         self.model.root.create(self.urdf_importer, meshcls, Frame.worldXY())
-
-    def get_planning_groups(self):
-        return list(self.semantics['groups'].keys())
-
-    def get_main_planning_group(self):
-        # get the group that has the chain with the most links
-        main_planning_group = None
-        main_planning_group_link_number = 0
-        for group_name, v in self.semantics['groups'].items():
-            if v['chain'] != None:
-                # TODO: Does this really work, since the chain is an iterator
-                chain_links_it = self.model.iter_link_chain(v['chain']['base_link'], v['chain']['tip_link'])
-                chain_links = list(chain_links_it)
-                if len(chain_links) > main_planning_group_link_number:
-                    main_planning_group_link_number = len(chain_links)
-                    main_planning_group = group_name
-        return main_planning_group
-
-    def get_configurable_joint_names(self, planning_group=None):
-        """This should be read from robot semantics...
-        """
-        if not planning_group:
-            planning_group = self.main_planning_group
-
-        joint_state_names = []
-
-        chain = self.semantics['groups'][planning_group]['chain']
-        if chain == None:
-            # return all revoulte joints
-            for joint in self.model.iter_joints():
-                if joint.type != "fixed":
-                    joint_state_names.append(joint.name)
-        else:
-            chainlinks = self.model.iter_link_chain(chain['base_link'], chain['tip_link'])
-            for link in chainlinks:
-                for joint in link.joints:
-                    if joint.type == "revolute":
-                        joint_state_names.append(joint.name)
-        return joint_state_names
-
-    def get_end_effector_link_name(self):
-        return self.semantics['end_effector']
-
-    def get_end_effector_link(self):
-        end_effector_name = self.get_end_effector_link_name()
-        for link in self.model.iter_links():
-            if link.name == end_effector_name:
-                return link
-        return None
-
-    def get_end_effector_frame(self):
-        end_effector_link = self.get_end_effector_link()
-        return end_effector_link.parent_joint.origin.copy()
-
-    def get_base_link_name(self):
-        return self.semantics['groups'][self.main_planning_group]['chain']['base_link']
-
-    def get_base_link(self):
-        base_link_name = self.get_base_link_name()
-        if base_link_name:
-            for link in self.model.iter_links():
-                if link.name == base_link_name:
-                    return link
-        else:
-            return None
-
-    def get_base_frame(self):
-        base_link = self.get_base_link()
-        # return the joint that is fixed
-        if base_link:
-            # TODO: check this! for staubli does not work...
-            for joint in base_link.joints:
-                if joint.type == "fixed":
-                    return joint.origin.copy()
-        else:
-            return Frame.worldXY()
 
     def get_frames(self):
         return self.model.get_frames()
@@ -238,6 +230,10 @@ class Robot(object):
 
     def ensure_client(self):
         if not self.client:
+            raise Exception('This method is only callable once a client is assigned')
+    
+    def ensure_srdf_model(self):
+        if not self.srdf_robot:
             raise Exception('This method is only callable once a client is assigned')
 
     def inverse_kinematics(self, frame):
