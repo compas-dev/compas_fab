@@ -10,10 +10,11 @@ from compas.datastructures import Mesh
 
 LOGGER = logging.getLogger('compas_fab.robots.urdf_importer')
 
+# TODO: Loading from url:// or file://
 
 class UrdfImporter(object):
     """Allows to retrieve the mesh files specified in the robot urdf from the
-    ROS file_server and stores it on the local file system.
+    ROS file_server and to store it on the local file system.
 
     It is implemented similar to
     https://github.com/siemens/ros-sharp/blob/master/Libraries/RosBridgeClient/UrdfImporter.cs
@@ -46,13 +47,9 @@ class UrdfImporter(object):
         return importer
     
     @classmethod
-    def from_urdf_robot(cls, urdf_robot, ros=None):
-        if urdf_robot.resource_file:
-            local_directory = os.path.abspath(os.path.join(os.path.dirname(urdf_robot.resource_file), ".."))
-        else:
-            local_directory = None
-        importer = cls(ros, local_directory)
-        importer.robot_name = os.path.basename(urdf_robot.name)
+    def from_urdf_model(cls, urdf_model, ros=None):
+        importer = cls(ros, None)
+        importer.robot_name = os.path.basename(urdf_model.name)
         return importer
 
     @property
@@ -90,7 +87,7 @@ class UrdfImporter(object):
 
     @property
     def srdf_filename(self):
-        return os.path.join(self.robot_resource_path, "robot_description_semantic.urdf")
+        return os.path.join(self.robot_resource_path, "robot_description_semantic.srdf")
 
     def save_robot_description(self, robot_description):
         # Save robot_description.urdf
@@ -180,7 +177,9 @@ class UrdfImporter(object):
             if os.path.isfile(obj_filename):
                 mesh = Mesh.from_obj(obj_filename)
             else:
-                raise FileNotFoundError("Please convert '%s' into an OBJ file, since DAE is currently not supported yet." % filename)
+                raise FileNotFoundError("Please convert '%s' into an OBJ file, \
+                                         since DAE is currently not supported \
+                                         yet." % filename)
         elif extension == "obj":
             mesh = Mesh.from_obj(filename)
         elif extension == "stl":
@@ -190,7 +189,6 @@ class UrdfImporter(object):
                 extension.upper())
 
         return meshcls(mesh)
-
     
     def check_mesh_class(self, meshcls):
         """Checks if the passed mesh class has the necessary constructor and 

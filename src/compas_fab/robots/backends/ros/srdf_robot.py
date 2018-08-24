@@ -109,6 +109,10 @@ class SrdfRobot(object):
             group = self.main_group_name
         return self._group_dict[group]["links"][0]
     
+    def get_configurable_joints(self, group=None):
+        joint_names = self.get_configurable_joint_names(group)
+        return [self.urdf_robot.get_joint_by_name(name) for name in joint_names]
+    
     def get_configurable_joint_names(self, group=None):
         if not group:
             group = self.main_group_name

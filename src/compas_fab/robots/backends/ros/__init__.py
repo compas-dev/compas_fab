@@ -27,3 +27,5 @@ from .service_messages import GetCartesianPathRequest
 from .service_messages import GetCartesianPathResponse
 from .service_messages import GetPositionIKRequest
 from .service_messages import GetPositionIKResponse
+
+from .srdf_robot import SrdfRobot

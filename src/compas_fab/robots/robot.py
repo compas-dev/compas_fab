@@ -32,6 +32,7 @@ from compas.robots.model.geometry import SCALE_FACTOR
 #from compas_fab.robots.pose import JointState
 from compas_fab.robots import Configuration
 from compas_fab.robots.urdf_importer import UrdfImporter
+from compas_fab.robots.backends.ros import SrdfRobot
 
 LOGGER = logging.getLogger('compas_fab.robots.robot')
 
@@ -55,23 +56,21 @@ class Mesh(object):
 
 
 class Robot(object):
-    """The robot base class.
+    """Represents a robot based on an URDF model.
 
     Attributes:
-        urdf_model (:class:`UrdfRobot`): the model built from URDF structure.
-        urdf_importer (class:)
-
-        resource_path (str): the directory, where the urdf_importer has stored
-            the urdf files and the robot mesh files
+        urdf_model (:class:`UrdfRobot`): The model built from URDF structure.
+        urdf_importer (class:`UrdfImporter`): The importer for loading the meshes.
+        srdf_model (class:`SrdfRobot`, optional): The SRDF model.
+        client, optional: The client for communication, i.e. class:`Ros`
+        name (str): The name of the robot 
     """
     def __init__(self, urdf_model, urdf_importer, srdf_model=None, client=None):
-        # it needs a filename because it also sources the meshes from the directory
-        # model, urdf_importer, resource_path = None, client = None, viewer={}
 
         self.urdf_model = urdf_model
         self.urdf_importer = urdf_importer
         self.srdf_model = srdf_model
-        self.client = client
+        self.client = client # setter and getter
         self.name = self.urdf_model.name
 
         # TODO: if client is ros client: tell urdf importer...
@@ -81,16 +80,12 @@ class Robot(object):
         self.transformation_WCF_RCF = Transformation()
     
     @classmethod
-    def from_urdf_model(cls, urdf_model, client=None)
-        urdf_importer = UrdfImporter.from_urdf_model(urdf_robot)
-        srdf_file = urdf_importer.srdf_filename
-        if os.path.isfile(srdf_file):
-            srdf_model = SrdfRobot.from_urdf_file(srdf_file, urdf_model)
-        else:
-            srdf_model = None
-        return cls(urdf_model, urdf_importer, srdf_model, client)
+    def from_urdf_model(cls, urdf_model, client=None):
+        urdf_importer = UrdfImporter.from_urdf_model(urdf_model)
+        return cls(urdf_model, urdf_importer, None, client)
 
-    def from_urdf_and_srdf_models(cls, urdf_model, srdf_model, client=None)
+    @classmethod
+    def from_urdf_and_srdf_models(cls, urdf_model, srdf_model, client=None):
         urdf_importer = UrdfImporter.from_urdf_model(urdf_model)
         return cls(urdf_model, urdf_importer, srdf_model, client)
     
@@ -104,20 +99,25 @@ class Robot(object):
         urdf_importer = UrdfImporter.from_robot_resource_path(directory)
         urdf_file = urdf_importer.urdf_filename
         srdf_file = urdf_importer.srdf_filename
-        urdf_robot = UrdfRobot.from_urdf_file(urdf_file)
-        srdf_robot = SrdfRobot.from_urdf_file(srdf_file, urdf_model)
+        urdf_model = UrdfRobot.from_urdf_file(urdf_file)
+        srdf_model = SrdfRobot.from_srdf_file(srdf_file, urdf_model)
         return cls(urdf_model, urdf_importer, srdf_model, client)
     
     @property
     def group_names(self):
+        self.ensure_srdf_model()
         return self.srdf_model.group_names
 
     @property
     def main_group_name(self):
+        self.ensure_srdf_model()
         return self.srdf_model.main_group_name
     
     def get_ee_link_name(self, group=None):
-        return self.srdf_model.get_ee_link_name(group)
+        if not self.srdf_model:
+            return self.urdf_model.get_ee_link_name()
+        else:
+            return self.srdf_model.get_ee_link_name(group)
     
     def get_ee_link(self, group=None):
         name = self.get_ee_link_name(group)
@@ -128,7 +128,10 @@ class Robot(object):
         return link.parent_joint.origin.copy()
     
     def get_base_link_name(self, group=None):
-        return self.srdf_model.get_base_link_name(group)
+        if not self.srdf_model:
+            return self.urdf_model.get_base_link_name()
+        else:
+            return self.srdf_model.get_base_link_name(group)
 
     def get_base_link(self, group=None):
         name = self.get_base_link_name(group)
@@ -136,8 +139,8 @@ class Robot(object):
 
     def get_base_frame(self, group=None):
         link = self.get_base_link(group)
-        # TODO check this, for staubli is is not correct
-        for joint in base_link.joints:
+        # TODO check this, for staubli this is not correct
+        for joint in link.joints:
             if joint.type == "fixed":
                 return joint.origin.copy()
         else:
@@ -145,14 +148,9 @@ class Robot(object):
     
     def get_configurable_joints(self, group=None):
         if self.srdf_model:
-            names = self.srdf_model.get_configurable_joint_names(group)
-            return [self.urdf_model.get_joint_by_name(name) for name in names]
+            return self.srdf_model.get_configurable_joints(group)
         else:
-            joints = []
-            for joint in self.urdf_model.iter_joints():
-                if joint.is_configurable():
-                    joints.append(joint)
-            return joints
+            return self.urdf_model.get_configurable_joints()
 
     def get_configurable_joint_names(self, group=None):
         if self.srdf_model:
@@ -160,8 +158,7 @@ class Robot(object):
         else:
             # passive joints are only defined in the srdf model, so we just get
             # the ones that are configurable
-            joints = self.get_configurable_joints(group)
-            return [j.name for j in joints]
+            return self.urdf_model.get_configurable_joint_names()
 
     def set_RCF(self, robot_coordinate_frame):
         raise NotImplementedError
@@ -171,80 +168,43 @@ class Robot(object):
         # transformation matrix from robot coordinate system to world coordinate system
         self.transformation_RCF_WCF = Transformation.from_frame_to_frame(self.RCF, Frame.worldXY())
 
-    def get_configuration(self, planning_group=None):
+    def get_configuration(self, group=None):
         """Returns the current configuration
         """
-        names = self.get_configurable_joint_names(planning_group)
-        positions = []
-        for joint in self.model.iter_joints():
-            # TODO: move this to joint, likewise with setting positions
-            if joint.name in names:
-                if joint.type in ["revolute", "continuous"]:
-                    positions.append(math.degrees(joint.position))
-                elif joint.type == ["prismatic", "planar"]:
-                    positions.append(joint.position * SCALE_FACTOR)
-                else: # floating, fixed
-                    positions.append(joint.position)
-        return positions
-
-    def get_joint_state(self, planning_group=None):
-        # remove joint state and continue use configuration
-        """Returns the current joint state. // or the current "configuraion ?"
-        """
-        names = self.get_configurable_joint_names(planning_group)
-        positions = []
-        for joint in self.model.iter_joints():
-            if joint.name in names:
-                positions.append(joint.position)
-        return positions
+        configurations = []
+        for joint in self.get_configurable_joints(group):
+            configurations.append(joint.position)
+        return configurations
 
     def create(self, meshcls):
-        self.urdf_importer.check_mesh_class(meshcls) # TODO not important if using mesh class
-        self.model.root.create(self.urdf_importer, meshcls, Frame.worldXY())
+        """Loades and creates the meshes with the passed mesh class.
+        """
+        self.urdf_importer.check_mesh_class(meshcls) # TODO not necessary if using mesh artist
+        self.urdf_model.create(self.urdf_importer, meshcls)
 
-    def get_frames(self):
-        return self.model.get_frames()
-
-    def get_axes(self):
-        return self.model.get_axes()
-
-    def draw_visual(self):
-        return self.model.draw_visual()
-
-    def draw_collision(self):
-        return self.model.draw_collision()
-
-    def draw(self):
-        return self.model.draw()
-
-    def update(self, configuration, planning_group=None):
+    def update(self, configuration, group=None):
         """
         """
-        joint_names = self.get_configurable_joint_names(planning_group)
-        print('joint_names', joint_names)
-        # TODO : where to make boundary between message and type
-        js = {}
-        for k, v in zip(joint_names, configuration):
-            js[k] = v
-        self.model.root.update(js, Transformation(), Transformation())
+        names = self.get_configurable_joint_names(group)
+        self.urdf_model.update(names, configuration)
 
     def ensure_client(self):
         if not self.client:
             raise Exception('This method is only callable once a client is assigned')
     
     def ensure_srdf_model(self):
-        if not self.srdf_robot:
-            raise Exception('This method is only callable once a client is assigned')
+        if not self.srdf_model:
+            raise Exception('This method is only callable once a srdf model is assigned')
 
     def inverse_kinematics(self, frame):
         self.ensure_client()
         raise NotImplementedError
+        positions = self.client.inverse_kinematics(frame)
         # return configuration
     
     def forward_kinematics(self, configuration):
         self.ensure_client()
         raise NotImplementedError
-        # return frame
 
     def compute_cartesian_path(self, frames):
         self.ensure_client()
@@ -264,10 +224,61 @@ class Robot(object):
         #(check service name with ros)
         self.ensure_client()
         raise NotImplementedError
+    
+    @property
+    def frames(self): # get?
+        return self.urdf_model.frames
+
+    @property
+    def axes(self): # get?
+        return self.urdf_model.axes
+
+    def draw_visual(self):
+        return self.urdf_model.draw_visual()
+
+    def draw_collision(self):
+        return self.urdf_model.draw_collision()
+
+    def draw(self):
+        return self.urdf_model.draw()
 
 
 if __name__ == "__main__":
    
+    import os
+    from compas.robots import Robot as UrdfRobot
+
+    path = r"C:\Users\rustr\workspace\robot_description"
+
+    for item in os.listdir(path):
+        fullpath = os.path.join(path, item)
+        if os.path.isdir(fullpath) and item[0] != ".":
+            urdf_file = os.path.join(fullpath, 'robot_description.urdf')
+            srdf_file = os.path.join(fullpath, 'robot_description_semantic.srdf')
+        
+            urdf_model = UrdfRobot.from_urdf_file(urdf_file)
+            srdf_model = SrdfRobot.from_srdf_file(srdf_file, urdf_model)
+
+            r1 = Robot.from_urdf_model(urdf_model)
+            r2 = Robot.from_urdf_and_srdf_models(urdf_model, srdf_model)
+            r3 = Robot.from_resource_path(fullpath)
+            print("base_link_name:", r1.get_base_link_name())
+            print("base_link_name:", r2.get_base_link_name())
+            print("ee_link_name:", r1.get_ee_link_name())
+            print("ee_link_name:", r2.get_ee_link_name())
+            print("configurable_joints:", r1.get_configurable_joint_names())
+            print("configurable_joints:", r2.get_configurable_joint_names())
+
+            r3.create(Mesh)
+            configuration = [0, 90, 90, 45, 90, 0]
+            r3.update(configuration)
+            print(r3.get_configuration())
+            frames = r3.frames
+            for frame in frames:
+                print(frame)
+            print()
+
+    """
     import os
     path = os.path.join(os.path.expanduser('~'), "workspace", "robot_description")
     robot_name = "ur5"
@@ -281,3 +292,4 @@ if __name__ == "__main__":
     robot = Robot(model, resource_path, client=None)
     
     robot.create(Mesh)
+    """
