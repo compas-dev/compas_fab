@@ -99,7 +99,7 @@ class SrdfRobot(object):
     def __get_end_effectors(self):
         return [ee.attrib['parent_link'] for ee in self.root.iter('end_effector')]
 
-    def get_ee_link_name(self, group=None):
+    def get_end_effector_link_name(self, group=None):
         if not group:
             group = self.main_group_name
         return self._group_dict[group]["links"][-1]
@@ -138,6 +138,6 @@ if __name__ == "__main__":
             print("group_names:", srdf_model.group_names)
             print("main_group_name:", srdf_model.main_group_name)
             print("base_link_name:", srdf_model.get_base_link_name())
-            print("ee_link_name:", srdf_model.get_ee_link_name())
+            print("ee_link_name:", srdf_model.get_end_effector_link_name())
             print("configurable_joints:", srdf_model.get_configurable_joint_names())
             print()
