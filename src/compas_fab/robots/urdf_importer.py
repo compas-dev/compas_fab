@@ -6,7 +6,11 @@ import os
 import xml.etree.ElementTree as ET
 
 import roslibpy
+
 from compas.datastructures import Mesh
+from compas.geometry import Frame
+from compas.geometry import Transformation
+from compas.geometry.transformations.helpers import mesh_transform
 
 LOGGER = logging.getLogger('compas_fab.robots.urdf_importer')
 
@@ -176,6 +180,11 @@ class UrdfImporter(object):
             obj_filename = filename.replace(".dae", ".obj")
             if os.path.isfile(obj_filename):
                 mesh = Mesh.from_obj(obj_filename)
+                # former DAE files have yaxis and zaxis swapped
+                # TODO: already fix in conversion to obj
+                frame = Frame([0,0,0], [1,0,0], [0,0,1])
+                T = Transformation.from_frame(frame)
+                mesh_transform(mesh, T)
             else:
                 raise FileNotFoundError("Please convert '%s' into an OBJ file, \
                                          since DAE is currently not supported \
