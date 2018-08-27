@@ -1,5 +1,4 @@
 from compas.geometry import Frame
-from compas.robots.model.geometry import SCALE_FACTOR
 
 from compas.geometry.transformations import basis_vectors_from_matrix
 from compas.geometry.transformations import matrix_from_quaternion
@@ -69,60 +68,54 @@ class Header(ROSmsg):
 # geometry_msgs
 # ------------------------------------------------------------------------------
 
-
-class Pose(Frame):
-    """Represents a robot pose.
-
-    In principal the ``Pose`` is a wrapper object around the frame to derive
-    rosbridge messages therefrom.
-
-    Examples:
-        >>> f = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
-        >>> p1 = Pose.from_frame(f)
-        >>> msg = p1.msg
-        >>> p2 = Pose.from_msg(msg)
-        >>> print(p1 == p2)
+class Point(ROSmsg):
+    """http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Point.html
     """
+    def __init__(self, x ,y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+class Quaternion(ROSmsg):
+    """http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Quaternion.html
+    """
+    def __init__(self, x ,y, z, w):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.w = w
+
+class Pose(ROSmsg):
+    """http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Pose.html
+    """
+
+    def __init__(self, position=Point(0,0,0), orientation=Quaternion(0,0,0,1)):
+        self.position = position
+        self.orientation = orientation
 
     @classmethod
     def from_frame(cls, frame):
-        return cls(frame.point, frame.xaxis, frame.yaxis)
+        point = frame.point
+        qw, qx, qy, qz = frame.quaternion
+        return cls(Point(*list(point)), Quaternion(qx, qy, qz, qw))
 
     @property
     def frame(self):
-        return Frame(self.point, self.xaxis, self.yaxis)
+        point = [self.position.x, self.position.y, self.position.z]
+        quaternion = [self.orientation.w, self.orientation.x, self.orientation.y, self.orientation.z]
+        return Frame.from_quaternion(quaternion, point=point)
 
     @classmethod
     def from_msg(cls, msg):
-        point = [msg['position']['x'] * SCALE_FACTOR,
-                 msg['position']['y'] * SCALE_FACTOR,
-                 msg['position']['z'] * SCALE_FACTOR]
-        quaternion = [msg['orientation']['w'], msg['orientation']['x'],
-                      msg['orientation']['y'], msg['orientation']['z']]
-        R = matrix_from_quaternion(quaternion)
-        xaxis, yaxis = basis_vectors_from_matrix(R)
-        return cls(point, xaxis, yaxis)
-
-    @property
-    def msg(self):
-        """Returns the pose as dictionary to use with rosbridge.
-
-        http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Pose.html
-        """
-        pose = {}
-        pose['position'] = {'x': self.point[0]/SCALE_FACTOR,
-                            'y': self.point[1]/SCALE_FACTOR,
-                            'z': self.point[2]/SCALE_FACTOR}
-        qw, qx, qy, qz = self.quaternion
-        pose['orientation'] = {'x': qx, 'y': qy, 'z': qz, 'w': qw}
-        return pose
-
+        position = Point.from_msg(msg['position'])
+        orientation = Quaternion.from_msg(msg['orientation'])
+        return cls(position, orientation)
 
 class PoseStamped(ROSmsg):
     """http://docs.ros.org/melodic/api/geometry_msgs/html/msg/PoseStamped.html
     """
 
-    def __init__(self, header=Header(), pose=Pose.worldXY()):
+    def __init__(self, header=Header(), pose=Pose()):
         self.header = header
         self.pose = pose
 
@@ -152,6 +145,14 @@ class JointState(ROSmsg):
     @classmethod
     def from_name_and_position(cls, name, position):
         return cls(Header(), name, position, [], [])
+    
+    @classmethod
+    def from_configuration(cls):
+        pass
+    
+    @property
+    def configuration(self):
+        pass
 
     @classmethod
     def from_msg(cls, msg):
@@ -483,6 +484,18 @@ class MoveItErrorCodes(ROSmsg):
 
 if __name__ == '__main__':
 
+    from compas.geometry import Frame
+
+    f = Frame.worldXY()
+    f = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
+
+    pose = Pose.from_frame(f)
+    msg = pose.msg
+    print(msg)
+    pose = pose.from_msg(msg)
+    print(pose.frame)
+
+    """
     header = Header(frame_id='base_link')
     pose = Pose([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
     pose_stamped = PoseStamped(header=header, pose=pose)
@@ -506,3 +519,4 @@ if __name__ == '__main__':
 
     error = MoveItErrorCodes()
     print(error.human_readable)
+    """

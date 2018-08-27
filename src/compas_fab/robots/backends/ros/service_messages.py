@@ -1,5 +1,3 @@
-from compas.robots.model.geometry import SCALE_FACTOR
-
 from compas_fab.robots.backends.ros import ROSmsg
 from compas_fab.robots.backends.ros import Header
 from compas_fab.robots.backends.ros import Pose
@@ -110,7 +108,7 @@ class GetCartesianPathRequest(ROSmsg):
     @property
     def msg(self):
         msg = super(GetCartesianPathRequest, self).msg
-        msg['max_step'] = msg['max_step'] / SCALE_FACTOR
+        msg['max_step'] = msg['max_step']
         return msg
 
 
