@@ -24,8 +24,6 @@ from compas.robots import MeshDescriptor as UrdfMeshDescriptor
 from compas.robots import Origin as UrdfOrigin
 from compas.robots import Robot as UrdfRobot
 from compas.robots import Visual as UrdfVisual
-from compas.robots.model.geometry import SCALE_FACTOR
-
 
 #from compas_fab.robots.tool import Tool
 
@@ -113,18 +111,18 @@ class Robot(object):
         self.ensure_srdf_model()
         return self.srdf_model.main_group_name
     
-    def get_ee_link_name(self, group=None):
+    def get_end_effector_link_name(self, group=None):
         if not self.srdf_model:
-            return self.urdf_model.get_ee_link_name()
+            return self.urdf_model.get_end_effector_link_name()
         else:
-            return self.srdf_model.get_ee_link_name(group)
+            return self.srdf_model.get_end_effector_link_name(group)
     
-    def get_ee_link(self, group=None):
-        name = self.get_ee_link_name(group)
+    def get_end_effector_link(self, group=None):
+        name = self.get_end_effector_link_name(group)
         return self.urdf_model.get_link_by_name(name)
     
-    def get_ee_frame(self, group=None):
-        link = self.get_ee_link()
+    def get_end_effector_frame(self, group=None):
+        link = self.get_end_effector_link()
         return link.parent_joint.origin.copy()
     
     def get_base_link_name(self, group=None):
@@ -169,12 +167,16 @@ class Robot(object):
         self.transformation_RCF_WCF = Transformation.from_frame_to_frame(self.RCF, Frame.worldXY())
 
     def get_configuration(self, group=None):
-        """Returns the current configuration
+        """Returns the current joint configuration.
         """
-        configurations = []
+        positions = []
+        types = []
+        
         for joint in self.get_configurable_joints(group):
-            configurations.append(joint.position)
-        return configurations
+            positions.append(joint.position)
+            types.append(joint.type)
+
+        return Configuration(positions, types)
 
     def create(self, meshcls):
         """Loades and creates the meshes with the passed mesh class.
@@ -186,7 +188,13 @@ class Robot(object):
         """
         """
         names = self.get_configurable_joint_names(group)
-        self.urdf_model.update(names, configuration)
+        positions = []
+        for v, t in zip(configuration.values, configuration.types):
+            if t == UrdfJoint.REVOLUTE:
+                positions.append(math.radians(v))
+            else:
+                positions.append(v)
+        self.urdf_model.update(names, configuration.values)
 
     def ensure_client(self):
         if not self.client:
@@ -199,8 +207,8 @@ class Robot(object):
     def inverse_kinematics(self, frame):
         self.ensure_client()
         raise NotImplementedError
-        positions = self.client.inverse_kinematics(frame)
-        # return configuration
+        configuration = self.client.inverse_kinematics(frame)
+        return configuration
     
     def forward_kinematics(self, configuration):
         self.ensure_client()
@@ -241,6 +249,11 @@ class Robot(object):
 
     def draw(self):
         return self.urdf_model.draw()
+    
+    def scale(self):
+        """Scale the robot.
+        """
+        raise NotImplementedError
 
 
 if __name__ == "__main__":
@@ -264,13 +277,13 @@ if __name__ == "__main__":
             r3 = Robot.from_resource_path(fullpath)
             print("base_link_name:", r1.get_base_link_name())
             print("base_link_name:", r2.get_base_link_name())
-            print("ee_link_name:", r1.get_ee_link_name())
-            print("ee_link_name:", r2.get_ee_link_name())
+            print("ee_link_name:", r1.get_end_effector_link_name())
+            print("ee_link_name:", r2.get_end_effector_link_name())
             print("configurable_joints:", r1.get_configurable_joint_names())
             print("configurable_joints:", r2.get_configurable_joint_names())
 
             r3.create(Mesh)
-            configuration = [0, 90, 90, 45, 90, 0]
+            configuration = Configuration.from_revolute_values([0, 90, 90, 45, 90, 0])
             r3.update(configuration)
             print(r3.get_configuration())
             frames = r3.frames
