@@ -184,17 +184,11 @@ class Robot(object):
         self.urdf_importer.check_mesh_class(meshcls) # TODO not necessary if using mesh artist
         self.urdf_model.create(self.urdf_importer, meshcls)
 
-    def update(self, configuration, group=None):
+    def update(self, configuration, group=None, collision=False):
         """
         """
         names = self.get_configurable_joint_names(group)
-        positions = []
-        for v, t in zip(configuration.values, configuration.types):
-            if t == UrdfJoint.REVOLUTE:
-                positions.append(math.radians(v))
-            else:
-                positions.append(v)
-        self.urdf_model.update(names, configuration.values)
+        self.urdf_model.update(names, configuration.values, collision)
 
     def ensure_client(self):
         if not self.client:
@@ -250,10 +244,10 @@ class Robot(object):
     def draw(self):
         return self.urdf_model.draw()
     
-    def scale(self):
+    def scale(self, factor):
         """Scale the robot.
         """
-        raise NotImplementedError
+        self.urdf_model.scale(factor)
 
 
 if __name__ == "__main__":
@@ -268,21 +262,44 @@ if __name__ == "__main__":
         if os.path.isdir(fullpath) and item[0] != ".":
             urdf_file = os.path.join(fullpath, 'robot_description.urdf')
             srdf_file = os.path.join(fullpath, 'robot_description_semantic.srdf')
+
+            if item != "panda":
+                continue
         
             urdf_model = UrdfRobot.from_urdf_file(urdf_file)
             srdf_model = SrdfRobot.from_srdf_file(srdf_file, urdf_model)
 
-            r1 = Robot.from_urdf_model(urdf_model)
-            r2 = Robot.from_urdf_and_srdf_models(urdf_model, srdf_model)
-            r3 = Robot.from_resource_path(fullpath)
+            #r1 = Robot.from_urdf_model(urdf_model)
+            #r2 = Robot.from_urdf_and_srdf_models(urdf_model, srdf_model)
+            robot = Robot.from_resource_path(fullpath)
+            robot.create(Mesh)
+
+            """
             print("base_link_name:", r1.get_base_link_name())
             print("base_link_name:", r2.get_base_link_name())
             print("ee_link_name:", r1.get_end_effector_link_name())
             print("ee_link_name:", r2.get_end_effector_link_name())
             print("configurable_joints:", r1.get_configurable_joint_names())
             print("configurable_joints:", r2.get_configurable_joint_names())
+            """
+
+            for joint in robot.get_configurable_joints():
+                print(joint.name)
+                print(joint.origin)
+                print(joint.axis)
+                print()
+
+            """
 
             r3.create(Mesh)
+            for f in r3.frames:
+                print(frame)
+
+            r3.scale(1000.)
+
+            for f in r3.frames:
+                print(frame)
+
             configuration = Configuration.from_revolute_values([0, 90, 90, 45, 90, 0])
             r3.update(configuration)
             print(r3.get_configuration())
@@ -290,6 +307,10 @@ if __name__ == "__main__":
             for frame in frames:
                 print(frame)
             print()
+            
+            
+            break
+            """
 
     """
     import os
