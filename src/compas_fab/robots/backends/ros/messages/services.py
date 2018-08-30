@@ -11,9 +11,7 @@ from .moveit_msgs import RobotState
 from .moveit_msgs import MoveItErrorCodes
 from .moveit_msgs import RobotTrajectory
 from .moveit_msgs import PositionIKRequest
-
-__all__ = ['GetCartesianPathRequest', 'GetCartesianPathResponse',
-           'GetPositionIKRequest', 'GetPositionIKResponse']
+from .moveit_msgs import PlannerParams
 
 
 class GetPositionIKRequest(ROSmsg):
@@ -33,8 +31,7 @@ class GetPositionIKRequest(ROSmsg):
     >>> pose_stamped = PoseStamped(header, pose)
     >>> joint_state = JointState(name=joint_names, position=joint_positions,
                                  header=header)
-    >>> multi_dof_joint_state = MultiDOFJointState(header=header, 
-                                                   joint_names=joint_names)
+    >>> multi_dof_joint_state = MultiDOFJointState(header=header)
     >>> start_state = RobotState(joint_state, multi_dof_joint_state)
     >>> ik_request = PositionIKRequest(group_name=planning_group, 
                                        robot_state=start_state,
@@ -64,6 +61,38 @@ class GetPositionIKResponse(ROSmsg):
         return cls(solution, error_code)
 
 
+
+
+class GetPositionFKRequest(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html
+    """
+
+    def __init__(self, header=Header(), fk_link_names=[], robot_state=RobotState()):
+        self.header = header
+        self.fk_link_names = fk_link_names
+        self.robot_state = robot_state
+
+
+class GetPositionFKResponse(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html
+    """
+
+    def __init__(self, pose_stamped=[], fk_link_names=[], error_code=MoveItErrorCodes()):
+        
+        self.pose_stamped = pose_stamped # PoseStamped[]
+        self.fk_link_names = fk_link_names
+        self.error_code = error_code  # moveit_msgs/MoveItErrorCodes
+
+    @classmethod
+    def from_msg(cls, msg):
+        pose_stamped = [PoseStamped.from_msg(d) for d in msg['pose_stamped']]
+        fk_link_names = msg['fk_link_names']
+        error_code = MoveItErrorCodes.from_msg(msg['error_code'])
+        return cls(pose_stamped, fk_link_names, error_code)
+
+
+
+
 class GetCartesianPathRequest(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetCartesianPath.html
 
@@ -77,7 +106,7 @@ class GetCartesianPathRequest(ROSmsg):
     >>> position = [0, 0, 0, 0, 0, 0] # robot.get_configurable_joint_names()
     >>> header = Header(frame_id=base_link)
     >>> joint_state = JointState(header=header, name=joint_names, position=position) # or: robot.get_joint_state()
-    >>> multi_dof_joint_state = MultiDOFJointState(header=header, joint_names=joint_names)
+    >>> multi_dof_joint_state = MultiDOFJointState(header=header)
     >>> start_state = RobotState(joint_state=joint_state, multi_dof_joint_state=multi_dof_joint_state)
     >>> start_pose = Pose([0.1068, -0.1818, 0.5930], [1., 0., 0.], [-0., 0., 1.])
     >>> end_pose = Pose([0.1041, -0.2946, 0.1843], [1., 0., 0.], [0., 1., 0.])
@@ -125,3 +154,14 @@ class GetCartesianPathResponse(ROSmsg):
         solution = RobotTrajectory.from_msg(msg['solution'])
         error_code = MoveItErrorCodes.from_msg(msg['error_code'])
         return cls(start_state, solution, msg['fraction'], error_code)
+
+
+class SetPlannerParamsRequest(ROSmsg):
+    """http://docs.ros.org/melodic/api/moveit_msgs/html/srv/SetPlannerParams.html
+    """
+
+    def __init__(self, planner_config='', group='', params=PlannerParams(), replace=True):
+        self.planner_config = planner_config
+        self.group = group
+        self.params = params
+        self.replace = replace

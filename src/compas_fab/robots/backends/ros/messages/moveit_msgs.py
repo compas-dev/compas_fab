@@ -190,31 +190,22 @@ class MoveItErrorCodes(ROSmsg):
                 return k
         return ''
 
-"""
-rosservice info /set_planner_params
-Node: /move_group
-URI: rosrpc://ITA-GRAM-W-57:64060
-Type: moveit_msgs/SetPlannerParams
-Args: planner_config group params replace
-"""
-"""
-http://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPositionFK.html
+
+class PlannerParams(ROSmsg):
+    """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlannerParams.html
+    """
+
+    def __init__(self, keys=[], values=[], descriptions=[]):
+        self.keys = keys # parameter names (same size as values)
+        self.values = values # parameter values (same size as keys)
+        self.descriptions = descriptions # parameter description (can be empty)
 
 
+
+"""
 rostopic info /attached_collision_object
 Type: moveit_msgs/AttachedCollisionObject
 
-Publishers:
- * /rviz_ITA_GRAM_W_57_10546_4125280199122169442 (http://ITA-GRAM-W-57:64097/)
-
-Subscribers:
- * /move_group (http://ITA-GRAM-W-57:64061/)
-
 rostopic info /collision_object
 Type: moveit_msgs/CollisionObject
-
-Publishers: None
-
-Subscribers:
- * /move_group (http://ITA-GRAM-W-57:64061/)
 """
