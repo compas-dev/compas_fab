@@ -27,6 +27,39 @@ Once installed, you can verify your setup. Start Python from the command line an
     >>> import compas_fab
 
 
+Environments
+============
+
+Just like the main library of **COMPAS**, the core functionality of **compas_fab**
+is independent of CAD software and can be used from the terminal, in standalone scripts.
+
+
+Working in Rhino
+----------------
+
+*Installing* **compas_fab** for Rhino is very simple. Just open the *command prompt*
+and type the following
+
+::
+
+    $ python -m compas_fab.install_rhino
+
+
+Optionally, you could provide a Rhino version number (``'5.0', '6.0'``).
+The default is ``'5.0'``.
+
+::
+
+    $ python -m compas_fab.install_rhino '6.0'
+
+
+Working in Blender
+------------------
+
+Once **COMPAS** itself is installed for Blender following the documented procedure,
+**compas_fab** will automatically be available as well after installing it.
+
+
 First Steps
 ===========
 
