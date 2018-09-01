@@ -24,11 +24,11 @@
    * Example 2: Send path to robot and turn digital output on/off while moving.
 
 TODO:
-* rename grasshopper to ghpython
-* rename compas_fab to compas_rfab or compas_robfab
-* ROS in a box
-* mm (scale model) to m?
-* degrees (for Config) or radians?
+* [x] rename grasshopper to ghpython
+* [x] rename compas_fab to compas_rfab or compas_robfab
+* [x] ROS in a box
+* [x] mm (scale model) to m?
+* [x] degrees (for Config) or radians?
 
 # [Draft] Schedule pre-workshop
 * 09:00
@@ -58,14 +58,14 @@ TODO:
       * Setup: install `compas` & `compas_fab` using conda recipe
       * Exercise: examples with `Frame` & `Transformation`
       * Exercise: load robot model and show same model in both Rhino and Blender
-      * Setup: start up V-REP either as dockerized app or from the Raspberry Pi
+      * Setup: pull and start V-REP docker container
       * Exercise: Examples with V-REP path planner:
         * Test connection
         * Simple forward kinematics
         * Simple inverse kinematics
         * Basic path planning
         * Advanced path planning
-      * Setup: connect Raspberry Pi to use ROS (mention WSL?)
+      * Setup: pull and start ROS docker containers (Mention WSL as alternative install)
       * Exercise: Examples with ROS:
         * Test connection to ROS
         * Load robot model from ROS
@@ -74,9 +74,3 @@ TODO:
       * Demo (instructors): control ABB (simulation), sending path.
       * Demo (instructors): control UR (real) sending path and wait until done, then send again.
       * Demo (instructors): control UR (real) sending path and use a sensor in parallel (TBD: one option is to use the Baumer Edge sensor to track an object)
-
-# Internal session: intro to compas_fab
-
-* Based on the morning of the pre-workshop
-* Google Slides presentation
-* Include visuale examples of implementation, code, GH, etc.
