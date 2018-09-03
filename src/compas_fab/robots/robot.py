@@ -48,9 +48,7 @@ class Mesh(object):
         return self.mesh
     
     def set_color(self, color_rgba):
-        # set colours
         r, g, b, a = color_rgba
-        print("color", color_rgba)
 
 
 class Robot(object):
@@ -72,10 +70,8 @@ class Robot(object):
         self.name = self.urdf_model.name
 
         # TODO: if client is ros client: tell urdf importer...
-
-        # how is this set = via frame? / property
-        self.transformation_RCF_WCF = Transformation()
-        self.transformation_WCF_RCF = Transformation()
+        # should be corrected by urdf_model
+        self.RCF = Frame.worldXY()
     
     @classmethod
     def from_urdf_model(cls, urdf_model, client=None):
@@ -122,7 +118,7 @@ class Robot(object):
         return self.urdf_model.get_link_by_name(name)
     
     def get_end_effector_frame(self, group=None):
-        link = self.get_end_effector_link()
+        link = self.get_end_effector_link(group)
         return link.parent_joint.origin.copy()
     
     def get_base_link_name(self, group=None):
@@ -137,7 +133,6 @@ class Robot(object):
 
     def get_base_frame(self, group=None):
         link = self.get_base_link(group)
-        # TODO check this, for staubli this is not correct
         for joint in link.joints:
             if joint.type == "fixed":
                 return joint.origin.copy()
@@ -158,13 +153,18 @@ class Robot(object):
             # the ones that are configurable
             return self.urdf_model.get_configurable_joint_names()
 
-    def set_RCF(self, robot_coordinate_frame):
-        raise NotImplementedError
-        self.RCF = robot_coordinate_frame
+    @property
+    def transformation_RCF_WCF(self):
         # transformation matrix from world coordinate system to robot coordinate system
-        self.transformation_RCF_WCF = Transformation.from_frame_to_frame(Frame.worldXY(), self.RCF)
-        # transformation matrix from robot coordinate system to world coordinate system
-        self.transformation_RCF_WCF = Transformation.from_frame_to_frame(self.RCF, Frame.worldXY())
+        return Transformation.from_frame_to_frame(Frame.worldXY(), self.RCF)
+    
+    @property
+    def transformation_WCF_RCF(self):
+         # transformation matrix from robot coordinate system to world coordinate system
+        return Transformation.from_frame_to_frame(self.RCF, Frame.worldXY())
+
+    def set_RCF(self, robot_coordinate_frame):
+        self.RCF = robot_coordinate_frame
 
     def get_configuration(self, group=None):
         """Returns the current joint configuration.
@@ -228,18 +228,18 @@ class Robot(object):
         raise NotImplementedError
     
     @property
-    def frames(self): # get?
-        return self.urdf_model.frames
+    def frames(self):
+        return self.urdf_model.get_frames(self.transformation_RCF_WCF)
 
     @property
-    def axes(self): # get?
-        return self.urdf_model.axes
+    def axes(self):
+        return self.urdf_model.get_axes(self.transformation_RCF_WCF)
 
     def draw_visual(self):
-        return self.urdf_model.draw_visual()
+        return self.urdf_model.draw_visual(self.transformation_RCF_WCF)
 
     def draw_collision(self):
-        return self.urdf_model.draw_collision()
+        return self.urdf_model.draw_collision(self.transformation_RCF_WCF)
 
     def draw(self):
         return self.urdf_model.draw()
@@ -249,33 +249,34 @@ class Robot(object):
         """
         self.urdf_model.scale(factor)
 
+    @property
+    def scale_factor(self):
+        return self.urdf_model.scale_factor
+
 
 if __name__ == "__main__":
    
     import os
     from compas.robots import Robot as UrdfRobot
+    import xml
 
     path = r"C:\Users\rustr\workspace\robot_description"
 
     for item in os.listdir(path):
         fullpath = os.path.join(path, item)
         if os.path.isdir(fullpath) and item[0] != ".":
-            urdf_file = os.path.join(fullpath, 'robot_description.urdf')
-            srdf_file = os.path.join(fullpath, 'robot_description_semantic.srdf')
 
-            if item != "panda":
-                continue
-        
-            urdf_model = UrdfRobot.from_urdf_file(urdf_file)
-            srdf_model = SrdfRobot.from_srdf_file(srdf_file, urdf_model)
+            try:
+                robot = Robot.from_resource_path(fullpath)
+                robot.create(Mesh)
+                print("base_link:", robot.get_base_frame())
+            except xml.etree.ElementTree.ParseError:
+                print(">>>>>>>>>>>>>>>>>> ERROR", item)
 
-            #r1 = Robot.from_urdf_model(urdf_model)
-            #r2 = Robot.from_urdf_and_srdf_models(urdf_model, srdf_model)
-            robot = Robot.from_resource_path(fullpath)
-            robot.create(Mesh)
 
+            
+            
             """
-            print("base_link_name:", r1.get_base_link_name())
             print("base_link_name:", r2.get_base_link_name())
             print("ee_link_name:", r1.get_end_effector_link_name())
             print("ee_link_name:", r2.get_end_effector_link_name())
@@ -283,34 +284,8 @@ if __name__ == "__main__":
             print("configurable_joints:", r2.get_configurable_joint_names())
             """
 
-            for joint in robot.get_configurable_joints():
-                print(joint.name)
-                print(joint.origin)
-                print(joint.axis)
-                print()
 
-            """
 
-            r3.create(Mesh)
-            for f in r3.frames:
-                print(frame)
-
-            r3.scale(1000.)
-
-            for f in r3.frames:
-                print(frame)
-
-            configuration = Configuration.from_revolute_values([0, 90, 90, 45, 90, 0])
-            r3.update(configuration)
-            print(r3.get_configuration())
-            frames = r3.frames
-            for frame in frames:
-                print(frame)
-            print()
-            
-            
-            break
-            """
 
     """
     import os
