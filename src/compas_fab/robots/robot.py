@@ -12,9 +12,6 @@ from compas.geometry.xforms import Rotation
 from compas.geometry.xforms import Scale
 from compas.geometry.xforms import Transformation
 
-from compas.geometry.transformations import mesh_transform
-from compas.geometry.transformations import mesh_transformed
-
 from compas.robots import Origin as UrdfOrigin
 from compas.robots import Visual as UrdfVisual
 from compas.robots import Collision as UrdfCollision
@@ -46,7 +43,7 @@ class Mesh(object):
 
     def draw(self):
         return self.mesh
-    
+
     def set_color(self, color_rgba):
         # set colours
         r, g, b, a = color_rgba
@@ -61,7 +58,7 @@ class Robot(object):
         urdf_importer (class:`UrdfImporter`): The importer for loading the meshes.
         srdf_model (class:`SrdfRobot`, optional): The SRDF model.
         client, optional: The client for communication, i.e. class:`Ros`
-        name (str): The name of the robot 
+        name (str): The name of the robot
     """
     def __init__(self, urdf_model, urdf_importer, srdf_model=None, client=None):
 
@@ -76,7 +73,7 @@ class Robot(object):
         # how is this set = via frame? / property
         self.transformation_RCF_WCF = Transformation()
         self.transformation_WCF_RCF = Transformation()
-    
+
     @classmethod
     def from_urdf_model(cls, urdf_model, client=None):
         urdf_importer = UrdfImporter.from_urdf_model(urdf_model)
@@ -86,12 +83,12 @@ class Robot(object):
     def from_urdf_and_srdf_models(cls, urdf_model, srdf_model, client=None):
         urdf_importer = UrdfImporter.from_urdf_model(urdf_model)
         return cls(urdf_model, urdf_importer, srdf_model, client)
-    
+
     @classmethod
     def from_resource_path(cls, directory, client=None):
         """Creates a robot from a directory with the necessary resource files.
 
-        The directory must contain a .urdf, a .srdf file and a directory with 
+        The directory must contain a .urdf, a .srdf file and a directory with
         the robot's geometry as indicated in the urdf file.
         """
         urdf_importer = UrdfImporter.from_robot_resource_path(directory)
@@ -100,7 +97,7 @@ class Robot(object):
         urdf_model = UrdfRobot.from_urdf_file(urdf_file)
         srdf_model = SrdfRobot.from_srdf_file(srdf_file, urdf_model)
         return cls(urdf_model, urdf_importer, srdf_model, client)
-    
+
     @property
     def group_names(self):
         self.ensure_srdf_model()
@@ -110,21 +107,21 @@ class Robot(object):
     def main_group_name(self):
         self.ensure_srdf_model()
         return self.srdf_model.main_group_name
-    
+
     def get_end_effector_link_name(self, group=None):
         if not self.srdf_model:
             return self.urdf_model.get_end_effector_link_name()
         else:
             return self.srdf_model.get_end_effector_link_name(group)
-    
+
     def get_end_effector_link(self, group=None):
         name = self.get_end_effector_link_name(group)
         return self.urdf_model.get_link_by_name(name)
-    
+
     def get_end_effector_frame(self, group=None):
         link = self.get_end_effector_link()
         return link.parent_joint.origin.copy()
-    
+
     def get_base_link_name(self, group=None):
         if not self.srdf_model:
             return self.urdf_model.get_base_link_name()
@@ -143,7 +140,7 @@ class Robot(object):
                 return joint.origin.copy()
         else:
             return Frame.worldXY()
-    
+
     def get_configurable_joints(self, group=None):
         if self.srdf_model:
             return self.srdf_model.get_configurable_joints(group)
@@ -171,18 +168,12 @@ class Robot(object):
         """
         positions = []
         types = []
-        
+
         for joint in self.get_configurable_joints(group):
             positions.append(joint.position)
             types.append(joint.type)
 
         return Configuration(positions, types)
-
-    def create(self, meshcls):
-        """Loades and creates the meshes with the passed mesh class.
-        """
-        self.urdf_importer.check_mesh_class(meshcls) # TODO not necessary if using mesh artist
-        self.urdf_model.create(self.urdf_importer, meshcls)
 
     def update(self, configuration, group=None, collision=False):
         """
@@ -193,7 +184,7 @@ class Robot(object):
     def ensure_client(self):
         if not self.client:
             raise Exception('This method is only callable once a client is assigned')
-    
+
     def ensure_srdf_model(self):
         if not self.srdf_model:
             raise Exception('This method is only callable once a srdf model is assigned')
@@ -203,7 +194,7 @@ class Robot(object):
         raise NotImplementedError
         configuration = self.client.inverse_kinematics(frame)
         return configuration
-    
+
     def forward_kinematics(self, configuration):
         self.ensure_client()
         raise NotImplementedError
@@ -226,7 +217,7 @@ class Robot(object):
         #(check service name with ros)
         self.ensure_client()
         raise NotImplementedError
-    
+
     @property
     def frames(self): # get?
         return self.urdf_model.frames
@@ -243,7 +234,7 @@ class Robot(object):
 
     def draw(self):
         return self.urdf_model.draw()
-    
+
     def scale(self, factor):
         """Scale the robot.
         """
@@ -251,11 +242,11 @@ class Robot(object):
 
 
 if __name__ == "__main__":
-   
+
     import os
     from compas.robots import Robot as UrdfRobot
 
-    path = r"C:\Users\rustr\workspace\robot_description"
+    path = r"C:\\Users\\gcasas\\eth\\Labs\\robot_description"
 
     for item in os.listdir(path):
         fullpath = os.path.join(path, item)
@@ -265,7 +256,7 @@ if __name__ == "__main__":
 
             if item != "panda":
                 continue
-        
+
             urdf_model = UrdfRobot.from_urdf_file(urdf_file)
             srdf_model = SrdfRobot.from_srdf_file(srdf_file, urdf_model)
 
@@ -307,8 +298,8 @@ if __name__ == "__main__":
             for frame in frames:
                 print(frame)
             print()
-            
-            
+
+
             break
             """
 
@@ -324,6 +315,6 @@ if __name__ == "__main__":
     model = UrdfRobot.from_urdf_file(filename)
 
     robot = Robot(model, resource_path, client=None)
-    
+
     robot.create(Mesh)
     """

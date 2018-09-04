@@ -7,8 +7,8 @@ class Configuration(object):
 
     Attributes:
         values (:obj:`list` of :obj:`float`): Joint values expressed
-            in radians or m, depending on the respective type
-        types (:obj:`list` of :class:`Joint.TYPE`): Joint types, e.g. a list of 
+            in radians or meters, depending on the respective type
+        types (:obj:`list` of :class:`Joint.TYPE`): Joint types, e.g. a list of
             Joint.REVOLUTE for revolute joints
 
     Examples:
@@ -62,9 +62,9 @@ class Configuration(object):
         """Construct a configuration from prismatic and revolute joint values.
 
         Args:
-            prismatic_values (:obj:`list` of :obj:`float`): Positions on the 
+            prismatic_values (:obj:`list` of :obj:`float`): Positions on the
                 external axis system in meters.
-            revolute_values (:obj:`list` of :obj:`float`): Joint values 
+            revolute_values (:obj:`list` of :obj:`float`): Joint values
                 expressed in radians.
 
         Returns:
@@ -89,7 +89,7 @@ class Configuration(object):
         return config
 
     def to_data(self):
-        """Return the data dict that represents the configuration, and from 
+        """Return the data dict that represents the configuration, and from
         which it can be reconstructed."""
         return self.data
 
@@ -97,7 +97,7 @@ class Configuration(object):
     def data(self):
         """:obj:`dict` : The data representing the configuration.
 
-        By assigning a data dict to this property, the current data of the 
+        By assigning a data dict to this property, the current data of the
         configuration will be replaced by the data in the dict. The data getter
         and setter should always be used in combination with each other.
         """
@@ -110,7 +110,7 @@ class Configuration(object):
     def data(self, data):
         self.values = data.get('values') or []
         self.types = data.get('types') or []
-    
+
 
 if __name__ == "__main__":
     from math import pi
