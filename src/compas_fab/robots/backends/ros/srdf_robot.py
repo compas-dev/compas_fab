@@ -1,10 +1,10 @@
 from __future__ import print_function
 
-import xml.etree.ElementTree as ET
+from compas.files.xml import XML
 
 class SrdfRobot(object):
     """Reads semantic information from the robot SRDF.
-    
+
     References:
     http://wiki.ros.org/srdf
     """
@@ -18,18 +18,17 @@ class SrdfRobot(object):
         self.main_group = None
         self.urdf_robot = urdf_robot
         self.__source_attributes()
-    
+
     @classmethod
     def from_srdf_file(cls, file, urdf_robot):
-        tree = ET.parse(file)
-        root = tree.getroot()
-        return cls(root, urdf_robot)
+        xml = XML.from_file(file)
+        return cls(xml.root, urdf_robot)
 
     @classmethod
     def from_srdf_string(cls, text, urdf_robot):
-        root = ET.fromstring(text)
-        return cls(root, urdf_robot)
-    
+        xml = XML.from_string(text)
+        return cls(xml.root, urdf_robot)
+
     def __get_group_link_names(self, group):
         link_names = []
         for link in group.iter('link'):
@@ -54,7 +53,7 @@ class SrdfRobot(object):
                     if name not in link_names:
                         link_names.append(name)
         return link_names
-    
+
     def __get_group_joints(self, group):
         link_names = self.__get_group_link_names(group)
         joints = []
@@ -68,7 +67,7 @@ class SrdfRobot(object):
     def __get_group_joint_names(self, group):
         joints = self.__get_group_joints(group)
         return [j.name for j in joints]
-    
+
     def __source_attributes(self):
 
         gnames = []
@@ -84,15 +83,15 @@ class SrdfRobot(object):
             group_dict[name]["joints"] = joint_names
             gnames.append(name)
             glenth.append(len(link_names))
-                
+
         idx = glenth.index(max(glenth))
 
         self._group_dict = group_dict
         self.main_group_name = gnames[idx]
-                
+
     def __get_group_names(self):
         return [group.attrib['name'] for group in self.root.iter('group')]
-    
+
     def __get_passive_joints(self):
         return [pjoint.attrib['name'] for pjoint in self.root.iter('passive_joint')]
 
@@ -103,23 +102,23 @@ class SrdfRobot(object):
         if not group:
             group = self.main_group_name
         return self._group_dict[group]["links"][-1]
-    
+
     def get_base_link_name(self, group=None):
         if not group:
             group = self.main_group_name
         return self._group_dict[group]["links"][0]
-    
+
     def get_configurable_joints(self, group=None):
         joint_names = self.get_configurable_joint_names(group)
         return [self.urdf_robot.get_joint_by_name(name) for name in joint_names]
-    
+
     def get_configurable_joint_names(self, group=None):
         if not group:
             group = self.main_group_name
         return self._group_dict[group]["joints"]
 
 if __name__ == "__main__":
-    
+
     import os
     from compas.robots import Robot as UrdfRobot
 
@@ -130,7 +129,7 @@ if __name__ == "__main__":
         if os.path.isdir(fullpath) and item[0] != ".":
             urdf_file = os.path.join(fullpath, 'robot_description.urdf')
             srdf_file = os.path.join(fullpath, 'robot_description_semantic.srdf')
-        
+
             urdf_model = UrdfRobot.from_urdf_file(urdf_file)
             srdf_model = SrdfRobot.from_srdf_file(srdf_file, urdf_model)
 

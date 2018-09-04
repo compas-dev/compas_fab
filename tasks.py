@@ -197,39 +197,6 @@ def release(ctx, release_type):
         raise Exit('Aborted release')
 
 
-@task()
-def add_to_rhino(ctx):
-    """Adds the current project to Rhino Python search paths."""
-    try:
-        python_source_path = os.path.join(os.getcwd(), 'src')
-        rhino_setting_per_version = [
-            ('5.0', 'settings.xml'), ('6.0', 'settings-Scheme__Default.xml')]
-        setting_files_updated = 0
-
-        for version, filename in rhino_setting_per_version:
-            ironpython_path = get_ironpython_path(version)
-
-            if not ironpython_path:
-                continue
-
-            settings_file = os.path.join(ironpython_path, filename)
-            if not os.path.isfile(settings_file):
-                log.warn('IronPython settings for Rhino ' + version + ' not found')
-            else:
-                updateSearchPaths(settings_file, python_source_path)
-                log.write('Updated search path for Rhino ' + version)
-                setting_files_updated += 1
-
-        if setting_files_updated == 0:
-            raise Exit('[ERROR] No Rhino settings file found\n' +
-                       'Could not automatically make this project available to IronPython\n' +
-                       'To add manually, open EditPythonScript on Rhinoceros, go to Tools -> Options\n' +
-                       'and add the project path to the module search paths')
-
-    except RuntimeError as error:
-        raise Exit(error)
-
-
 @contextlib.contextmanager
 def chdir(dirname=None):
     current_dir = os.getcwd()

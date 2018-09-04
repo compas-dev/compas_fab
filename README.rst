@@ -1,5 +1,5 @@
 ============================================================
-Overview
+compas_fab: Robotic Fabrication for COMPAS
 ============================================================
 
 .. start-badges
@@ -50,44 +50,55 @@ Main features
 **compas_fab** runs on Python 2.x, 3.x and IronPython 2.7.
 
 
-Documentation
--------------
+Getting Started
+---------------
 
-The full documentation, including examples and API reference
-is available `here <https://gramaziokohler.github.io/compas_fab/>`_.
+The recommended way to install **compas_fab** is to use `Anaconda/conda <https://conda.io/docs/>`_:
+
+::
+
+    $ conda config --add channels conda-forge
+    $ conda install compas_fab
 
 
-Installation
-------------
+But it can also be installed using ``pip``:
 
+::
+
+    $ pip install compas_fab
+
+
+Once installed, you can verify your setup. Start Python from the command line and run the following:
+
+.. code-block:: python
+
+    >>> import compas_fab
+
+
+First Steps
+-----------
+
+* `Documentation <https://gramaziokohler.github.io/compas_fab/>`_
+* `Examples <https://gramaziokohler.github.io/compas_fab/examples.html>`_
+* `API Reference <https://gramaziokohler.github.io/compas_fab/reference.html>`_
+* `COMPAS Examples <https://compas-dev.github.io/main/examples.html>`_
+* `COMPAS Tutorials <https://compas-dev.github.io/main/tutorial.html>`_
+* `COMPAS API Reference <https://compas-dev.github.io/main/api.html>`_
+
+
+Questions and feedback
+----------------------
+
+We encourage the use of the `**COMPAS** framework forum <http://forum.compas-framework.org/>`_
+for questions and discussions.
 
 
 Contributing
 ------------
 
-Make sure you setup your local development environment correctly:
+We love contributions!
 
-* Clone the `compas_fab <https://github.com/gramaziokohler/compas_fab>`_ repository.
-* Install development dependencies and make the project accessible from Rhino:
-
-::
-
-    pip install -r requirements-dev.txt
-    invoke add-to-rhino
-
-**You're ready to start working!**
-
-During development, use tasks on the
-command line to ease recurring operations:
-
-* ``invoke clean``: Clean all generated artifacts.
-* ``invoke check``: Run various code and documentation style checks.
-* ``invoke docs``: Generate documentation.
-* ``invoke test``: Run all tests and checks in one swift command.
-* ``invoke add-to-rhino``: Make the project accessible from Rhino.
-* ``invoke``: Show available tasks.
-
-For more details, check the `Contributor's Guide <CONTRIBUTING.rst>`_.
+Check the `Contributor's Guide <CONTRIBUTING.rst>`_ for more details.
 
 
 Releasing this project
@@ -114,3 +125,4 @@ Credits
 -------
 
 This package is maintained by Gramazio Kohler Research `@gramaziokohler <https://github.com/gramaziokohler>`_
+and a long list of `contributors <AUTHORS.rst>`_

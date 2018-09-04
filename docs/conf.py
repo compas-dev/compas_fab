@@ -56,10 +56,12 @@ autosummary_generate = True
 
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-html_theme = 'compas'
+html_theme = 'compaspkg'
 html_theme_path = ['../../sphinx_compas_theme', '../temp/sphinx_compas_theme']
 html_theme_options = {
-    'navbar_active': 'packages',
+    "package_name": 'compas_fab',
+    "package_title": project,
+    "package_version": release,
 }
 
 html_split_index = False
