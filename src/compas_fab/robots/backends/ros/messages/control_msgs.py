@@ -75,8 +75,9 @@ class FollowJointTrajectoryResult(ROSmsg):
     PATH_TOLERANCE_VIOLATED = -4
     GOAL_TOLERANCE_VIOLATED = -5
 
-    def __init__(self, error_code=0):
+    def __init__(self, error_code=0, error_string=""):
         self.error_code = error_code
+        self.error_string = error_string
     
     @classmethod
     def from_msg(cls, msg):
