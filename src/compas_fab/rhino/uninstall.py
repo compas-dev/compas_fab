@@ -1,40 +1,43 @@
+from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
+import os
 import sys
 
-import compas_rhino.install
+import compas_rhino
+import compas_rhino.uninstall
+import compas_fab.rhino.install
+
+from compas._os import remove_symlink
 
 __all__ = []
 
-INSTALLABLE_PACKAGES = ('compas_fab', 'roslibpy')
 
-
-def install(version='5.0', packages=None):
-    """Install compas_fab for Rhino.
+def uninstall(version='5.0', packages=None):
+    """Uninstall compas_fab from Rhino.
 
     Parameters
     ----------
     version : {'5.0', '6.0'}
         The version number of Rhino.
     packages : list of str
-        List of packages to install or None to use default package list.
+        List of packages to uninstall or None to use default package list.
 
     Examples
     --------
     .. code-block:: python
 
         >>> import compas_fab
-        >>> compas_fab.install_rhino('5.0')
+        >>> compas_fab.rhino.uninstall('5.0')
 
     .. code-block:: python
 
-        $ python -m compas_fab.install_rhino 5.0
+        $ python -m compas_fab.rhino.uninstall 5.0
 
     """
 
-    compas_rhino.install.install(version, packages)
+    compas_rhino.uninstall.uninstall(version, packages)
 
 
 # ==============================================================================
@@ -45,7 +48,7 @@ if __name__ == "__main__":
 
     import sys
 
-    print('\nusage: python -m compas_fab.install_rhino [version]\n')
+    print('\nusage: python -m compas_rhino.uninstall [version]\n')
     print('  version       Rhino version (5.0 or 6.0)\n')
 
     try:
@@ -58,5 +61,6 @@ if __name__ == "__main__":
         except Exception:
             version = '5.0'
 
-    packages = set(compas_rhino.install.INSTALLABLE_PACKAGES + INSTALLABLE_PACKAGES)
-    install(version=version, packages=packages)
+    packages = set(compas_rhino.install.INSTALLABLE_PACKAGES +
+                   compas_fab.rhino.install.INSTALLABLE_PACKAGES)
+    uninstall(version=version, packages=packages)
