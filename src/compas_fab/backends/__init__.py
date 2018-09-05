@@ -33,13 +33,15 @@ Exceptions
     :nosignatures:
 
     BackendError
+    VrepError
 
 """
 
-from .vrep.client import VrepClient
+from .exceptions import *
+from .vrep.client import *
 from .ros.client import Client as RosClient
 
-from .exceptions import *
 from .exceptions import __all__ as a
+from .vrep.client import __all__ as b
 
-__all__ = ['VrepClient', 'RosClient'] + a
+__all__ = a + b + ['RosClient']

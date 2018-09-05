@@ -3,7 +3,6 @@ import math
 
 from ..configuration import Configuration as BaseConfiguration
 
-
 class Configuration(BaseConfiguration):
     """Represents the configuration of an RFL robot based on its
     joint angle values and external axes values in the gantry system.
