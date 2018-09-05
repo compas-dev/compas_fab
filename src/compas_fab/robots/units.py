@@ -22,7 +22,7 @@ def to_radians(degrees):
     list of :obj:`float`
         List of radians.
     """
-    return map(math.radians, degrees)
+    return [math.radians(d) for d in degrees]
 
 
 def to_degrees(radians):
@@ -38,4 +38,4 @@ def to_degrees(radians):
     list of :obj:`float`
         List of degress.
     """
-    return map(math.degrees, radians)
+    return [math.degrees(r) for r in radians]
