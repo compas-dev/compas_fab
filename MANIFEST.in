@@ -1,17 +1,21 @@
-graft docs
 graft src
-graft tests
 
-include .bumpversion.cfg
-include .editorconfig
+prune data
+prune docs
+prune tests
+prune temp
 
 include AUTHORS.rst
 include CHANGELOG.rst
 include CONTRIBUTING.rst
-include ISSUE_TEMPLATE.md
 include LICENSE
 include README.rst
 
-include requirements-dev.txt tasks.py pytest.ini
+exclude requirements-dev.txt
+exclude .bumpversion.cfg
+exclude .editorconfig
+exclude tasks.py
+exclude pytest.ini
+exclude ISSUE_TEMPLATE.md
 
-global-exclude *.py[cod] __pycache__ *.so *.dylib
+global-exclude *.py[cod] __pycache__ *.dylib *.nb[ic] .DS_Store
