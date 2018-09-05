@@ -48,10 +48,10 @@ class Configuration(object):
             raise ValueError("%d values must have %d types, but %d given." % (len(values), len(values), len(types)))
         self.values = values
         self.types = types
-        self._precision = 3
+        self._precision = compas.PRECISION or '3f'
 
     def __str__(self):
-        vs = "%." + str(self._precision) + "f"
+        vs = '%.' + self._precision
         return "Configuration(%s)" % (", ".join([vs] * len(self.values)) % tuple(self.values))
 
     @classmethod
