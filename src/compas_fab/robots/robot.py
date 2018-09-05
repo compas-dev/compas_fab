@@ -3,10 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 import logging
-import math
-import os
 
-import compas
 import compas.robots.model
 from compas.geometry import Frame
 from compas.geometry.xforms import Transformation
@@ -43,7 +40,6 @@ class Robot(object):
     """
 
     def __init__(self, robot_model, semantics=None, client=None):
-
         self.model = robot_model
         self.semantics = semantics
         self.client = client  # setter and getter
@@ -157,8 +153,8 @@ class Robot(object):
         if self.semantics:
             return self.semantics.get_configurable_joint_names(group)
         else:
-            # passive joints are only defined in the srdf model, so we just get
-            # the ones that are configurable
+            # passive joints are only defined in the semantic model,
+            # so we just get the ones that are configurable
             return self.model.get_configurable_joint_names()
 
     @property
