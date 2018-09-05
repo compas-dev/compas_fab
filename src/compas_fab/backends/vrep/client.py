@@ -13,7 +13,7 @@ from compas_fab.backends.vrep.remote_api import vrep
 from compas_fab.robots import Configuration
 from compas_fab.robots import Robot
 
-DEFAULT_SCALE = 1000.
+DEFAULT_SCALE = 1.
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
 CHILD_SCRIPT_TYPE = vrep.sim_scripttype_childscript
 LOG = logging.getLogger('compas_fab.backends.vrep.client')
@@ -45,7 +45,7 @@ class VrepClient(object):
     Args:
         host (:obj:`str`): IP address or DNS name of the V-REP simulator.
         port (:obj:`int`): Port of the V-REP simulator.
-        scale(:obj:`int`): Scaling of the model. Defaults to millimeters (``1000``).
+        scale (:obj:`int`): Scaling of the model. Defaults to meters (``1``).
         lua_script (:obj:`str`): Name of the LUA script on the V-REP scene.
         debug (:obj:`bool`): True to enable debug messages, False otherwise.
 
@@ -143,11 +143,11 @@ class VrepClient(object):
 
         Examples:
 
-            >>> from compas_fab.backends.vrep import VrepClient
+            >>> from compas_fab.backends.vrep import *
             >>> with VrepClient() as client:
             ...     matrices = client.get_object_matrices([0])
             ...     print([int(i) for i in matrices[0]])
-            [87, 242, 966, -11851, 996, -21, -85, 6233, 0, 970, -243, 5785]
+            [0, 0, 0, 18, 0, 0, 0, 7, 0, 0, 0, 6]
 
         .. note::
             The resulting dictionary is keyed by object handle.
@@ -177,10 +177,12 @@ class VrepClient(object):
             metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
                 values from 0 to 1.
         """
+        assert_robot(robot)
+
         vrep.simxCallScriptFunction(self.client_id,
                                     self.lua_script,
                                     CHILD_SCRIPT_TYPE, 'setTheMetric',
-                                    [robot.index], metric_values, [],
+                                    [robot.model.attr['index']], metric_values, [],
                                     bytearray(), DEFAULT_OP_MODE)
 
     def set_robot_pose(self, robot, pose):
@@ -193,6 +195,8 @@ class VrepClient(object):
         Returns:
             An instance of :class:`.Configuration` found for the given pose.
         """
+        assert_robot(robot)
+
         # First check if the start state is reachable
         config = self.find_robot_states(robot, pose, [0.] * robot.dof)[-1]
 
@@ -204,7 +208,7 @@ class VrepClient(object):
         return config
 
     def set_robot_config(self, robot, config):
-        """Moves the robot the the specified configuration.
+        """Moves the robot to the specified configuration.
 
         Args:
             robot (:class:`.Robot`): Robot instance to move.
@@ -213,19 +217,21 @@ class VrepClient(object):
 
         Examples:
 
-            >>> from compas_fab.robots import Robot, Configuration
+            >>> from compas_fab.robots import *
             >>> with VrepClient() as client:
-            ...     config = Configuration.from_joints_and_external_axes([90, 0, 0, 0, 0, -90],
-            ...                                                          [7600, -4500, -4500])
-            ...     client.set_robot_config(Robot(11), config)
+            ...     config = Configuration.from_prismatic_and_revolute_values([7.600, -4.500, -5.500],
+            ...                                                               to_radians([90, 0, 0, 0, 0, -90]))
+            ...     client.set_robot_config(Robot.basic('A', index=0), config)
             ...
         """
+        assert_robot(robot)
+
         if not config:
             raise ValueError('Unsupported config value')
 
         values = config_to_vrep(config, self.scale)
 
-        self.set_robot_metric(robot, [0.0] * robot.dof)
+        self.set_robot_metric(robot, [0.0] * len(config.values))
         self.run_child_script('moveRobotFK',
                               [], values, ['robot' + robot.name])
 
@@ -239,13 +245,15 @@ class VrepClient(object):
 
             >>> from compas_fab.robots import Robot
             >>> with VrepClient() as client:
-            ...     config = client.get_robot_config(Robot(11))
+            ...     config = client.get_robot_config(Robot.basic('A', index=0))
 
         Returns:
             An instance of :class:`.Configuration`.
         """
+        assert_robot(robot)
+
         _res, _, config, _, _ = self.run_child_script('getRobotState',
-                                                      [robot.index],
+                                                      [robot.model.attr['index']],
                                                       [], [])
         return config_from_vrep(config, self.scale)
 
@@ -271,6 +279,8 @@ class VrepClient(object):
             list: List of :class:`Configuration` objects representing
             the collision-free configuration for the ``goal_pose``.
         """
+        assert_robot(robot)
+
         if not metric_values:
             metric_values = [0.1] * robot.dof
 
@@ -295,7 +305,7 @@ class VrepClient(object):
                 string_param_list.append(','.join(map(str, joint_limits)))
 
             res, _, states, _, _ = self.run_child_script('searchRobotStates',
-                                                         [robot.index,
+                                                         [robot.model.attr['index'],
                                                           max_trials or 1,
                                                           max_results],
                                                          goal_pose, string_param_list)
@@ -332,6 +342,8 @@ class VrepClient(object):
         Returns:
             int: Object handle (identifier) assigned to the building member.
         """
+        assert_robot(robot)
+
         if not metric_values:
             metric_values = [0.1] * robot.dof
 
@@ -387,7 +399,7 @@ class VrepClient(object):
                       algorithm, trials, shallow_state_search, optimize_path_length)
 
         res, _, path, _, _ = self.run_child_script('searchRobotPath',
-                                                   [robot.index,
+                                                   [robot.model.attr['index'],
                                                     trials,
                                                     (int)(resolution * 1000),
                                                     1 if optimize_path_length else 0],
@@ -440,6 +452,7 @@ class VrepClient(object):
             list: List of :class:`Configuration` objects representing the
             collision-free path to the ``goal_pose``.
         """
+        assert_robot(robot)
         return self._find_path_plan(robot, {'target_type': 'config', 'target': goal_configs},
                                     metric_values, collision_meshes, algorithm, trials, resolution,
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
@@ -477,6 +490,7 @@ class VrepClient(object):
             list: List of :class:`Configuration` objects representing the
             collision-free path to the ``goal_pose``.
         """
+        assert_robot(robot)
         return self._find_path_plan(robot, {'target_type': 'pose', 'target': goal_pose},
                                     metric_values, collision_meshes, algorithm, trials, resolution,
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
@@ -495,6 +509,8 @@ class VrepClient(object):
         .. note::
             All meshes are automatically removed from the scene when the simulation ends.
         """
+        assert_robot(robot)
+
         handles = self.add_meshes([building_member_mesh])
 
         if len(handles) != 1:
@@ -502,7 +518,7 @@ class VrepClient(object):
 
         handle = handles[0]
 
-        parent_handle = self.get_object_handle('customGripper' + robot.name + '_connection')
+        parent_handle = self.get_object_handle('customGripper' + robot.name + '_connection') #OK
         vrep.simxSetObjectParent(self.client_id, handle, parent_handle, True, DEFAULT_OP_MODE)
 
         return handle
@@ -568,16 +584,26 @@ class VrepClient(object):
 
     def run_child_script(self, function_name, in_ints, in_floats, in_strings):
         return vrep.simxCallScriptFunction(self.client_id,
-                                           self._lua_script_name,
+                                           self.lua_script,
                                            CHILD_SCRIPT_TYPE, function_name,
                                            in_ints, in_floats, in_strings,
                                            bytearray(), DEFAULT_OP_MODE)
+
+
+def assert_robot(robot):
+    if not robot:
+        raise ValueError('No instance of robot found')
+    if not robot.model:
+        raise ValueError('The robot instance has no model information attached')
+    if 'index' not in robot.model.attr:
+        raise ValueError('Robot model needs to define an index as part of the model.attr dictionary')
 
 
 # --------------------------------------------------------------------------
 # NETWORKING HELPERS
 # A couple of simple networking helpers for host name resolution
 # --------------------------------------------------------------------------
+
 
 def is_ipv4_address(addr):
     try:
@@ -601,6 +627,8 @@ def resolve_host(host):
 # --------------------------------------------------------------------------
 
 def pose_to_vrep(pose, scale):
+    # compas_fab uses meters, just like V-REP,
+    # so in general, scale should always be 1
     pose = list(pose.values)
     pose[3] = pose[3] / scale
     pose[7] = pose[7] / scale
@@ -609,14 +637,18 @@ def pose_to_vrep(pose, scale):
 
 
 def config_from_vrep(list_of_floats, scale):
-    angles = map(math.degrees, list_of_floats[3:])
-    external_axes = map(lambda v: v * scale, list_of_floats[0:3])
-    return Configuration.from_joints_and_external_axes(angles, external_axes)
+    # compas_fab uses radians and meters, just like V-REP,
+    # so in general, scale should always be 1
+    radians = list_of_floats[3:]
+    prismatic_values = map(lambda v: v * scale, list_of_floats[0:3])
+    return Configuration.from_prismatic_and_revolute_values(prismatic_values, radians)
 
 
 def config_to_vrep(config, scale):
-    values = list(map(lambda v: v / scale, config.external_axes))
-    values.extend([math.radians(angle) for angle in config.joint_values])
+    # compas_fab uses radians and meters, just like V-REP,
+    # so in general, scale should always be 1
+    values = list(map(lambda v: v / scale, config.prismatic_values))
+    values.extend(config.revolute_values)
     return values
 
 
