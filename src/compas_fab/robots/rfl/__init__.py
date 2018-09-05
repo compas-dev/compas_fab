@@ -16,10 +16,7 @@ Lab) using robotic simulation tools like
 
     Robot
     Configuration
-    Simulator
-    SimulationCoordinator
 
 """
 
 from .robots import Robot, Configuration, PathPlan
-from .simulator import Simulator, SimulationCoordinator, SimulationError

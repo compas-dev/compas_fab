@@ -3,7 +3,9 @@ import math
 from compas.robots import Joint
 
 class Configuration(object):
-    """Represents the configuration of a robot based on its joints.
+    """Represents the configuration of a robot based on the
+    state of its joints. This concept is also refered to
+    as `Joint State`.
 
     Attributes:
         values (:obj:`list` of :obj:`float`): Joint values expressed
