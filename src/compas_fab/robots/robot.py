@@ -23,7 +23,10 @@ __all__ = [
 
 
 class Robot(object):
-    """Primary representation of a robot that can be manipulated.
+    """Represents a **robot** instance.
+
+    This class binds several building blocks, such as the robot's descriptive model, its semantic information
+    and an instance of a backend client into a cohesive programmable interface.
 
     This representation builds upon the model described in the class :class:`compas.robots.model.Robot`
     of the **COMPAS** framework.
