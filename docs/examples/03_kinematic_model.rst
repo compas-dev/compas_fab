@@ -2,13 +2,13 @@
 Kinematic model
 ********************************************************************************
 
-.. _RobotModel: http://docs.ros.org/kinetic/api/moveit_core/html/classmoveit_1_1core_1_1RobotModel.html
-.. _RobotState: http://docs.ros.org/kinetic/api/moveit_core/html/classmoveit_1_1core_1_1RobotState.html
+.. _RobotModel: https://docs.ros.org/kinetic/api/moveit_core/html/classmoveit_1_1core_1_1RobotModel.html
+.. _RobotState: https://docs.ros.org/kinetic/api/moveit_core/html/classmoveit_1_1core_1_1RobotState.html
 .. _UR5urdf: https://github.com/ros-industrial/universal_robot/blob/kinetic-devel/ur_description/urdf/ur5.urdf.xacro
 
 .. In ROS, the RobotModel_ and RobotState_ classes are the core classes that give you access to a robot's kinematics.
 
-In the kinematic model of a robot, the connection of different manipulator joints is known as link, and the integration of two or more links is called a joint. This kinematic model can be represented as a tree structure. The tree describes the kinematic chain, i.e., the connection of robotic links with joints, and the inter-dependendencies of these links. This tree structure plus the underlying geometric information can be defined in Unified Robot Description Format (URDF), which describes any robot (see for example UR5urdf_). If the robot is mounted on external axes, these links and joints can be added as well. 
+In the kinematic model of a robot, the connection of different manipulator joints is known as link, and the integration of two or more links is called a joint. This kinematic model can be represented as a tree structure. The tree describes the kinematic chain, i.e., the connection of robotic links with joints, and the inter-dependendencies of these links. This tree structure plus the underlying geometric information can be defined in Unified Robot Description Format (URDF), which describes any robot (see for example UR5urdf_). If the robot is mounted on external axes, these links and joints can be added as well.
 
 .. figure:: robot_links_and_joints.jpg
     :figclass: figure
@@ -27,11 +27,13 @@ The joints are the elements in a robot which helps the links to travel in differ
 
 * revolute - a hinge joint that rotates along the axis and has a limited range specified by the upper and lower limits
 * prismatic - a sliding joint that slides along the axis, and has a limited range specified by the upper and lower limits
-* fixed - not really a joint because it cannot move, all degrees of freedom are locked. ::
+* fixed - not really a joint because it cannot move, all degrees of freedom are locked.
+
+.. code-block:: python
 
     from compas.robots import Joint
     from compas.robots import Link
-    
+
     link = Link("world")
     joint = Joint("world-joint", parent="world")
     link = Link("j0")
@@ -48,6 +50,6 @@ The joints are the elements in a robot which helps the links to travel in differ
 
 More info:
 
-* http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file
+* https://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file
 * https://www.codemade.io/create-your-own-urdf-file/
 

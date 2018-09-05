@@ -5,48 +5,54 @@ import math
 import socket
 from timeit import default_timer as timer
 
-from compas.datastructures.mesh import Mesh
+from compas.datastructures import Mesh
 
+from compas_fab.backends.exceptions import BackendError
+from compas_fab.backends.vrep.remote_api import vrep
+# from compas_fab.robots import Pose
 from compas_fab.robots import Configuration
-from compas_fab.robots import Pose
 from compas_fab.robots import Robot
-from compas_fab.robots.backends.vrep.remote_api import vrep
 
 DEFAULT_SCALE = 1000.
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
 CHILD_SCRIPT_TYPE = vrep.sim_scripttype_childscript
-LOG = logging.getLogger('compas_fab.robots.backends.vrep.simulator')
+LOG = logging.getLogger('compas_fab.backends.vrep.client')
+
+__all__ = [
+    'VrepError',
+    'VrepClient',
+]
 
 
-class SimulationError(Exception):
+class VrepError(BackendError):
     """Wraps an exception that occurred inside the simulation engine."""
 
     def __init__(self, message, error_code):
-        super(SimulationError, self).__init__('Error code: ' +
-                                              str(error_code) +
-                                              '; ' + message)
+        super(VrepError, self).__init__('Error code: ' +
+                                        str(error_code) +
+                                        '; ' + message)
         self.error_code = error_code
 
 
-class Simulator(object):
+class VrepClient(object):
     """Interface to run simulations using VREP as
     the engine for kinematics and path planning.
 
-    :class:`.Simulator` is a context manager type, so it's best used in combination
+    :class:`.VrepClient` is a context manager type, so it's best used in combination
     with the ``with`` statement to ensure resource deallocation.
 
 
     Args:
         host (:obj:`str`): IP address or DNS name of the V-REP simulator.
-        port (:obj:`int`): Port of the simulator.
+        port (:obj:`int`): Port of the V-REP simulator.
         scale(:obj:`int`): Scaling of the model. Defaults to millimeters (``1000``).
         debug (:obj:`bool`): True to enable debug messages, False otherwise.
 
     Examples:
 
-        >>> from compas_fab.robots.backends.vrep import *
-        >>> with Simulator() as simulator:
-        ...     print ('Connected: %s' % simulator.is_connected())
+        >>> from compas_fab.backends.vrep import *
+        >>> with VrepClient() as client:
+        ...     print ('Connected: %s' % client.is_connected())
         ...
         Connected: True
 
@@ -57,6 +63,7 @@ class Simulator(object):
                             'sbl', 'stride', 'trrt')
 
     def __init__(self, host='127.0.0.1', port=19997, scale=DEFAULT_SCALE, debug=False):
+        super(VrepClient, self).__init__()
         self.client_id = None
         self.host = resolve_host(host)
         self.port = port
@@ -83,7 +90,7 @@ class Simulator(object):
         vrep.simxStartSimulation(self.client_id, DEFAULT_OP_MODE)
 
         if self.client_id == -1:
-            raise SimulationError('Unable to connect to V-REP on %s:%d' % (self.host, self.port), -1)
+            raise VrepError('Unable to connect to V-REP on %s:%d' % (self.host, self.port), -1)
 
         return self
 
@@ -102,7 +109,7 @@ class Simulator(object):
             LOG.debug('Disconnected from V-REP')
 
     def is_connected(self):
-        """Indicates whether the simulator has an active connection.
+        """Indicates whether the client has an active connection.
 
         Returns:
             bool: True if connected, False otherwise.
@@ -135,10 +142,10 @@ class Simulator(object):
 
         Examples:
 
-            >>> from compas_fab.robots.backends.vrep import Simulator
-            >>> with Simulator() as simulator:
-            ...     matrices = simulator.get_object_matrices([0])
-            ...     print(map(int, matrices[0]))
+            >>> from compas_fab.backends.vrep import VrepClient
+            >>> with VrepClient() as client:
+            ...     matrices = client.get_object_matrices([0])
+            ...     print([int(i) for i in matrices[0]])
             [87, 242, 966, -11851, 996, -21, -85, 6233, 0, 970, -243, 5785]
 
         .. note::
@@ -206,10 +213,10 @@ class Simulator(object):
         Examples:
 
             >>> from compas_fab.robots import Robot, Configuration
-            >>> with Simulator() as simulator:
+            >>> with VrepClient() as client:
             ...     config = Configuration.from_joints_and_external_axes([90, 0, 0, 0, 0, -90],
             ...                                                          [7600, -4500, -4500])
-            ...     simulator.set_robot_config(Robot(11), config)
+            ...     client.set_robot_config(Robot(11), config)
             ...
         """
         if not config:
@@ -230,15 +237,15 @@ class Simulator(object):
         Examples:
 
             >>> from compas_fab.robots import Robot
-            >>> with Simulator() as simulator:
-            ...     config = simulator.get_robot_config(Robot(11))
+            >>> with VrepClient() as client:
+            ...     config = client.get_robot_config(Robot(11))
 
         Returns:
             An instance of :class:`.Configuration`.
         """
         _res, _, config, _, _ = self.run_child_script('getRobotState',
-                                                     [robot.index],
-                                                     [], [])
+                                                      [robot.index],
+                                                      [], [])
         return config_from_vrep(config, self.scale)
 
     def find_robot_states(self, robot, goal_pose, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
@@ -296,7 +303,7 @@ class Simulator(object):
             # at some point to prevent infinite loops caused by misconfiguration
             i += 1
             if i > 20 or (res != 0 and not retry_until_success):
-                raise SimulationError('Failed to search robot states', res)
+                raise VrepError('Failed to search robot states', res)
 
             final_states.extend(states)
 
@@ -375,7 +382,8 @@ class Simulator(object):
             string_param_list.append(','.join(map(str, joint_limits)))
 
         if self.debug:
-            LOG.debug('About to execute path planner: algorithm=%s, trials=%d, shallow_state_search=%s, optimize_path_length=%s', algorithm, trials, shallow_state_search, optimize_path_length)
+            LOG.debug('About to execute path planner: algorithm=%s, trials=%d, shallow_state_search=%s, optimize_path_length=%s',
+                      algorithm, trials, shallow_state_search, optimize_path_length)
 
         res, _, path, _, _ = self.run_child_script('searchRobotPath',
                                                    [robot.index,
@@ -387,7 +395,7 @@ class Simulator(object):
             LOG.debug('Execution time: search_robot_path=%.2f', timer() - start)
 
         if res != 0:
-            raise SimulationError('Failed to search robot path', res)
+            raise VrepError('Failed to search robot path', res)
 
         if self.debug:
             LOG.debug('Execution time: total=%.2f', timer() - first_start)
@@ -489,7 +497,7 @@ class Simulator(object):
         handles = self.add_meshes([building_member_mesh])
 
         if len(handles) != 1:
-            raise SimulationError('Expected one handle, but multiple found=' + str(handles), -1)
+            raise VrepError('Expected one handle, but multiple found=' + str(handles), -1)
 
         handle = handles[0]
 
@@ -515,7 +523,7 @@ class Simulator(object):
 
         for mesh in meshes:
             if not mesh.is_trimesh():
-                raise ValueError('The simulator only supports tri-meshes')
+                raise ValueError('The V-REP client only supports tri-meshes')
 
             vertices, faces = mesh.to_vertices_and_faces()
             vrep_packing = (floats_to_vrep([item for sublist in vertices for item in sublist], self.scale) +
@@ -565,7 +573,6 @@ class Simulator(object):
                                            bytearray(), DEFAULT_OP_MODE)
 
 
-
 # --------------------------------------------------------------------------
 # NETWORKING HELPERS
 # A couple of simple networking helpers for host name resolution
@@ -607,7 +614,7 @@ def config_from_vrep(list_of_floats, scale):
 
 
 def config_to_vrep(config, scale):
-    values = map(lambda v: v / scale, config.external_axes)
+    values = list(map(lambda v: v / scale, config.external_axes))
     values.extend([math.radians(angle) for angle in config.joint_values])
     return values
 

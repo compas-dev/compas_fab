@@ -1,7 +1,7 @@
 from __future__ import absolute_import
-from .base import BaseRobotArtist
+
+from compas_fab.robots.artists.base import BaseRobotArtist
 
 __all__ = [
     'BaseRobotArtist'
 ]
-

@@ -89,7 +89,7 @@ First Steps
 Questions and feedback
 ----------------------
 
-We encourage the use of the `**COMPAS** framework forum <http://forum.compas-framework.org/>`_
+We encourage the use of the `**COMPAS** framework forum <https://forum.compas-framework.org/>`_
 for questions and discussions.
 
 
@@ -106,7 +106,7 @@ Releasing this project
 
 Ready to release a new version of **compas_fab**? Here's how to do it:
 
-* We use `semver <http://semver.org/>`_, i.e. we bump versions as follows:
+* We use `semver <https://semver.org/>`_, i.e. we bump versions as follows:
 
   * ``patch``: bugfixes.
   * ``minor``: backwards-compatible features added.

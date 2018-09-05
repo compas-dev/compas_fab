@@ -27,7 +27,7 @@ from compas_fab.robots.backends.ros import FollowJointTrajectoryGoal
 class Client(Ros):
 
     def inverse_kinematics(self, frame, base_link, group, joint_names, joint_positions):
-        
+
         header = Header(frame_id=base_link)
         pose = Pose.from_frame(frame)
         pose_stamped = PoseStamped(header, pose)
@@ -52,7 +52,7 @@ class Client(Ros):
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
 
-    
+
     def forward_kinematics(self, configuration, base_link, group, joint_names, ee_link):
         
         joint_positions = configuration.values
@@ -77,7 +77,7 @@ class Client(Ros):
     def compute_cartesian_path(self, frames, base_link, ee_link, group,
                                joint_names, joint_positions, max_step,
                                avoid_collisions):
-        
+
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
         joint_state = JointState(header=header, name=joint_names, position=joint_positions)

@@ -70,7 +70,7 @@ class PathPlan(object):
             path_plan (:obj:`list``or :class:`.`Configuration`): List of configurations
                 representing a full path.
         """
-        self.paths[str(robot.id)] = path_plan
+        self.paths[robot.name] = path_plan
 
     def get_robot_plan(self, robot):
         """Gets the path plan for a specific robot.
@@ -81,16 +81,15 @@ class PathPlan(object):
         Returns:
             List of configurations representing a full path.
         """
-        key = str(robot.id)
-        if key not in self.paths:
-            raise ValueError('No path plan stored for the specified robot: ' + str(robot.id))
+        if robot.name not in self.paths:
+            raise ValueError('No path plan stored for the specified robot: ' + robot.name)
 
-        return self.paths[key]
+        return self.paths[robot.name]
 
     def all_paths(self):
         """Iterator over all paths currently defined."""
         for key in self.paths:
-            yield Robot(int(key)), self.paths[key]
+            yield key, self.paths[key]
 
 
 # TODO: This should inherit from compas_fab.robots.Robot
@@ -113,22 +112,22 @@ class Robot(object):
         index (:obj:`int`): Robot index (for internal use).
         dof (:obj:`int`): Degrees of freedom.
     """
-    SUPPORTED_ROBOTS = (11, 12, 21, 22)
+    SUPPORTED_ROBOTS = ['A', 'B', 'C', 'D']
     ROBOT_SETTINGS = {
-        11: {'name': 'A', 'base_external_axes': [7000, -2000, -4000]},
-        12: {'name': 'B', 'base_external_axes': [7000, -10000, -4000]},
-        21: {'name': 'C', 'base_external_axes': [30000, -2000, -4000]},
-        22: {'name': 'D', 'base_external_axes': [30000, -10000, -4000]},
+        'A': {'id': 11, 'base_external_axes': [7000, -2000, -4000]},
+        'B': {'id': 12, 'base_external_axes': [7000, -10000, -4000]},
+        'C': {'id': 21, 'base_external_axes': [30000, -2000, -4000]},
+        'D': {'id': 22, 'base_external_axes': [30000, -10000, -4000]},
     }
     BASE_JOINT_VALUES = [0.] * 6
 
-    def __init__(self, id, client=None):
-        if id not in self.SUPPORTED_ROBOTS:
-            raise ValueError('Robot ID is not valid, must be one of: ' + str(self.SUPPORTED_ROBOTS))
-        self.id = id
+    def __init__(self, name, client=None):
+        if name not in self.SUPPORTED_ROBOTS:
+            raise ValueError('Robot name is not valid, must be one of: ' + str(self.SUPPORTED_ROBOTS))
+        self.name = name
         self.client = client
-        self.name = self.ROBOT_SETTINGS[id]['name']
-        self.index = self.SUPPORTED_ROBOTS.index(id)
+        self.id = self.ROBOT_SETTINGS[name]['id']
+        self.index = self.SUPPORTED_ROBOTS.index(name)
         self.dof = 9
 
     def set_config(self, config):
@@ -162,4 +161,4 @@ class Robot(object):
         """Resets a robot's configuration to a safe initial position."""
         self.set_config(Configuration.from_joints_and_external_axes(
                         self.BASE_JOINT_VALUES,
-                        self.ROBOT_SETTINGS[self.id]['base_external_axes']))
+                        self.ROBOT_SETTINGS[self.name]['base_external_axes']))

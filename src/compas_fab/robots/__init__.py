@@ -5,7 +5,8 @@ compas_fab.robots
 
 .. currentmodule:: compas_fab.robots
 
-:mod:`compas_fab.robots` contains base classes for robot simulation and control.
+This package contains classes for robot modeling and they are used by the
+simulation, planning and execution backends to exchange information.
 
 Classses
 --------
@@ -17,7 +18,7 @@ Classses
     Pose
     Configuration
     Robot
-    Tool
+    RobotSemantics
     UrdfImporter
 
 Artists
@@ -34,10 +35,32 @@ of the CAD environment.
 
     BaseRobotArtist
 
+Unit conversion
+---------------
+
+The following functions help with converting units from one system to the other.
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    to_degrees
+    to_radians
+
 """
 
-from .configuration import Configuration
-from .robot import Robot
-from .tool import Tool
-from .urdf_importer import UrdfImporter
-from .artists import BaseRobotArtist
+from .configuration import *
+from .units import *
+from .robot import *
+from .semantics import *
+from .artists import *
+from .urdf_importer import *
+
+from .configuration import __all__ as a
+from .units import __all__ as b
+from .robot import __all__ as c
+from .semantics import __all__ as d
+from .artists import __all__ as e
+from .urdf_importer import __all__ as f
+
+__all__ = a + b + c + d + e + f

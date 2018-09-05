@@ -8,7 +8,7 @@ from compas_ghpython.geometry import xform_from_transformation_matrix
 
 from compas_fab.robots import Configuration
 from compas_fab.robots import Pose
-from compas_fab.robots.backends.vrep.coordinator import SimulationCoordinator
+from compas_fab.backends.vrep.coordinator import SimulationCoordinator
 
 try:
     import clr
