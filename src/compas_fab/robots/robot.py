@@ -35,11 +35,28 @@ class Robot(object):
 
         self.urdf_model = urdf_model
         self.semantics = semantics
-        self.client = client # setter and getter
+        self.client = client  # setter and getter
 
         # TODO: if client is ros client: tell urdf importer...
         # should be corrected by urdf_model
         self.RCF = Frame.worldXY()
+
+    @classmethod
+    def basic(cls, name, **kwargs):
+        """Convenience method to create the most basic instance of a robot, based only on a name.
+
+        Parameters
+        ----------
+        name : str
+            Name of the robot
+
+        Returns
+        -------
+        :class:`Robot`
+            Newly created instance of a robot.
+        """
+        model = compas.robots.model.Robot(name, joints=[], links=[], materials=[], **kwargs)
+        return cls(model)
 
     @classmethod
     def from_urdf_model(cls, urdf_model, client=None):
