@@ -38,3 +38,5 @@ Path planning
 
 from .artists import RobotArtist
 # from .path_planning import *
+
+__all__ = ['RobotArtist']
