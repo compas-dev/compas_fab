@@ -60,19 +60,22 @@ Example
 ==================
 Here is a simple example of how to express the frame of an object that is defined
 in the world coordinate frame in the robot's own coordinate frame before sending
-it as a target pose to the robot.::
+it as a target pose to the robot.
 
-	from compas.geometry import Frame
-	from compas.geometry.xforms import Transformation
+.. code-block:: python
 
-	point =  [3.0, 0.0, 0.0]
-	xaxis =  [1.0, 0.0, 0.0]
-	yaxis =  [0.0, 1.0, 0.0]
 
-	object_frame_WCS = frame(point, xaxis, yaxis)
-	object_frame_RCS = robot.get_frame_in_RCS(object_frame_WCS)
+    from compas.geometry import Frame
+    from compas.geometry.xforms import Transformation
 
-  	robot.send_pose(object_frame_RCS)
+    point =  [3.0, 0.0, 0.0]
+    xaxis =  [1.0, 0.0, 0.0]
+    yaxis =  [0.0, 1.0, 0.0]
+
+    object_frame_WCS = frame(point, xaxis, yaxis)
+    object_frame_RCS = robot.get_frame_in_RCS(object_frame_WCS)
+
+    robot.send_pose(object_frame_RCS)
 
 
 Links:

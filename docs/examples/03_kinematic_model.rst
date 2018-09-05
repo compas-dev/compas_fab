@@ -27,7 +27,9 @@ The joints are the elements in a robot which helps the links to travel in differ
 
 * revolute - a hinge joint that rotates along the axis and has a limited range specified by the upper and lower limits
 * prismatic - a sliding joint that slides along the axis, and has a limited range specified by the upper and lower limits
-* fixed - not really a joint because it cannot move, all degrees of freedom are locked. ::
+* fixed - not really a joint because it cannot move, all degrees of freedom are locked.
+
+.. code-block:: python
 
     from compas.robots import Joint
     from compas.robots import Link

@@ -13,38 +13,41 @@ yaxis). :class:`Transformation` is the base class for transformations like
 
 Here is a simple example of how to use Frame and Transformation: We want to
 bring a point P in the coordinate system of frame F1 into the coordinate system
-of frame F2.::
+of frame F2.
+
+.. code-block:: python
 
     from compas.geometry import Point
-	from compas.geometry import Frame
-	from compas.geometry.xforms import Transformation
+    from compas.geometry import Frame
+    from compas.geometry.xforms import Transformation
 
-	point =  [0.0, 0.0, 63.0]
-	xaxis =  [1.0, 0.0, 0.0]
-	yaxis =  [0.0, 1.0, 0.0]
+    point =  [0.0, 0.0, 63.0]
+    xaxis =  [1.0, 0.0, 0.0]
+    yaxis =  [0.0, 1.0, 0.0]
 
-	F1 = Frame(point, xaxis, yaxis)
+    F1 = Frame(point, xaxis, yaxis)
 
-	point =  [146.00, 150.00, 161.50]
-	xaxis =  [0.9767, 0.0010, -0.214]
-	yaxis =  [0.1002, 0.8818, 0.4609]
+    point =  [146.00, 150.00, 161.50]
+    xaxis =  [0.9767, 0.0010, -0.214]
+    yaxis =  [0.1002, 0.8818, 0.4609]
 
-	F2 = Frame(point, xaxis, yaxis)
+    F2 = Frame(point, xaxis, yaxis)
 
-	P = Point(35., 35., 35.) # point in frame F1
+    P = Point(35., 35., 35.) # point in frame F1
 
-	# bring P into worldXY frame.
-	Tw = Transformation.from_frame_to_frame(Frame.worldXY(), F1)
-	Pw = P.transformed(Tw)
+    # bring P into worldXY frame.
+    Tw = Transformation.from_frame_to_frame(Frame.worldXY(), F1)
+    Pw = P.transformed(Tw)
 
-	# bring Pw into frame F2
-	T = Transformation.from_frame_to_frame(F1, F2)
-	Pt1 = Pw.transformed(T)
+    # bring Pw into frame F2
+    T = Transformation.from_frame_to_frame(F1, F2)
+    Pt1 = Pw.transformed(T)
     print(Pt1)
 
     # This here yields to the same result
     Pt2 = F2.represent_in_global_coordinates(P)
     print(Pt2)
+
 
 .. figure:: frame_transformation-01.jpg
     :figclass: figure
@@ -53,7 +56,9 @@ of frame F2.::
 
 From the frame, or resp. from the orientation (:class:`Rotation`) of the frame,
 several other representations of rotation can be derived, such
-as Euler angles, axis-angle representation, and quaternion.::
+as Euler angles, axis-angle representation, and quaternion.
+
+.. code-block:: python
 
     from compas.geometry import Frame
     from compas.geometry.xforms import Rotation
@@ -81,6 +86,7 @@ as Euler angles, axis-angle representation, and quaternion.::
     ax = F1.axis_angle_vector
     F2 = Frame.from_axis_angle_vector(ax)
     F1 == F2
+
 
 Further information:
 
