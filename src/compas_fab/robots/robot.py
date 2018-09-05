@@ -7,25 +7,13 @@ import math
 import os
 
 import compas
+import compas.robots.model
 from compas.geometry import Frame
-from compas.geometry import add_vectors
-from compas.geometry.transformations import mesh_transform
-from compas.geometry.transformations import mesh_transformed
-from compas.geometry.xforms import Rotation
-from compas.geometry.xforms import Scale
 from compas.geometry.xforms import Transformation
-from compas.robots import Collision as UrdfCollision
-from compas.robots import Joint as UrdfJoint
-from compas.robots import Link as UrdfLink
-from compas.robots import MeshDescriptor as UrdfMeshDescriptor
-from compas.robots import Origin as UrdfOrigin
-from compas.robots import Robot as UrdfRobot
-from compas.robots import Visual as UrdfVisual
 
-#from compas_fab.robots.pose import JointState
-from compas_fab.robots import Configuration
-from compas_fab.robots.semantics import RobotSemantics
-from compas_fab.robots.urdf_importer import UrdfImporter
+from .configuration import Configuration
+from .semantics import RobotSemantics
+from .urdf_importer import UrdfImporter
 
 LOGGER = logging.getLogger('compas_fab.robots.robot')
 
@@ -37,17 +25,16 @@ class Robot(object):
     """Represents a robot based on an URDF model.
 
     Attributes:
-        urdf_model (:class:`UrdfRobot`): The model built from URDF structure.
-        urdf_importer (class:`UrdfImporter`): The importer for loading the meshes.
-        srdf_model (class:`RobotSemantics`, optional): The semantic model of the robot.
-        client, optional: The client for communication, i.e. class:`Ros`
+        urdf_model (:class:`compas.robots.model.Robot`): The robot model from URDF structure.
+        semantics (:class:`RobotSemantics`, optional): The semantic model of the robot.
+        client, optional: The backend client to use for communication, e.g. :class:`RosClient`
         name (str): The name of the robot
     """
-    def __init__(self, urdf_model, urdf_importer, srdf_model=None, client=None):
+
+    def __init__(self, urdf_model, semantics=None, client=None):
 
         self.urdf_model = urdf_model
-        self.urdf_importer = urdf_importer
-        self.srdf_model = srdf_model
+        self.semantics = semantics
         self.client = client # setter and getter
         self.name = self.urdf_model.name
 
@@ -58,12 +45,12 @@ class Robot(object):
     @classmethod
     def from_urdf_model(cls, urdf_model, client=None):
         urdf_importer = UrdfImporter.from_urdf_model(urdf_model)
-        return cls(urdf_model, urdf_importer, None, client)
+        return cls(urdf_model, None, client)
 
     @classmethod
     def from_urdf_and_srdf_models(cls, urdf_model, srdf_model, client=None):
         urdf_importer = UrdfImporter.from_urdf_model(urdf_model)
-        return cls(urdf_model, urdf_importer, srdf_model, client)
+        return cls(urdf_model, srdf_model, client)
 
     @classmethod
     def from_resource_path(cls, directory, client=None):
@@ -75,25 +62,25 @@ class Robot(object):
         urdf_importer = UrdfImporter.from_robot_resource_path(directory)
         urdf_file = urdf_importer.urdf_filename
         srdf_file = urdf_importer.srdf_filename
-        urdf_model = UrdfRobot.from_urdf_file(urdf_file)
+        urdf_model = compas.robots.model.Robot.from_urdf_file(urdf_file)
         srdf_model = RobotSemantics.from_srdf_file(srdf_file, urdf_model)
-        return cls(urdf_model, urdf_importer, srdf_model, client)
+        return cls(urdf_model, srdf_model, client)
 
     @property
     def group_names(self):
-        self.ensure_srdf_model()
-        return self.srdf_model.group_names
+        self.ensure_semantics()
+        return self.semantics.group_names
 
     @property
     def main_group_name(self):
-        self.ensure_srdf_model()
-        return self.srdf_model.main_group_name
+        self.ensure_semantics()
+        return self.semantics.main_group_name
 
     def get_end_effector_link_name(self, group=None):
-        if not self.srdf_model:
+        if not self.semantics:
             return self.urdf_model.get_end_effector_link_name()
         else:
-            return self.srdf_model.get_end_effector_link_name(group)
+            return self.semantics.get_end_effector_link_name(group)
 
     def get_end_effector_link(self, group=None):
         name = self.get_end_effector_link_name(group)
@@ -104,10 +91,10 @@ class Robot(object):
         return link.parent_joint.origin.copy()
 
     def get_base_link_name(self, group=None):
-        if not self.srdf_model:
+        if not self.semantics:
             return self.urdf_model.get_base_link_name()
         else:
-            return self.srdf_model.get_base_link_name(group)
+            return self.semantics.get_base_link_name(group)
 
     def get_base_link(self, group=None):
         name = self.get_base_link_name(group)
@@ -122,14 +109,14 @@ class Robot(object):
             return Frame.worldXY()
 
     def get_configurable_joints(self, group=None):
-        if self.srdf_model:
-            return self.srdf_model.get_configurable_joints(group)
+        if self.semantics:
+            return self.semantics.get_configurable_joints(group)
         else:
             return self.urdf_model.get_configurable_joints()
 
     def get_configurable_joint_names(self, group=None):
-        if self.srdf_model:
-            return self.srdf_model.get_configurable_joint_names(group)
+        if self.semantics:
+            return self.semantics.get_configurable_joint_names(group)
         else:
             # passive joints are only defined in the srdf model, so we just get
             # the ones that are configurable
@@ -170,9 +157,9 @@ class Robot(object):
         if not self.client:
             raise Exception('This method is only callable once a client is assigned')
 
-    def ensure_srdf_model(self):
-        if not self.srdf_model:
-            raise Exception('This method is only callable once a srdf model is assigned')
+    def ensure_semantics(self):
+        if not self.semantics:
+            raise Exception('This method is only callable once a semantic model is assigned')
 
     def inverse_kinematics(self, frame):
         self.ensure_client()
@@ -233,7 +220,7 @@ class Robot(object):
 if __name__ == "__main__":
 
     import os
-    from compas.robots import Robot as UrdfRobot
+    import compas.robots.model
     import xml
 
     path = r"C:\\Users\\gcasas\\eth\\Labs\\robot_description"
@@ -274,7 +261,7 @@ if __name__ == "__main__":
     resource_path = os.path.join(path, robot_name)
 
     filename = os.path.join(resource_path, "robot_description.urdf")
-    model = UrdfRobot.from_urdf_file(filename)
+    model = compas.robots.model.Robot.from_urdf_file(filename)
 
     robot = Robot(model, resource_path, client=None)
 
