@@ -70,6 +70,7 @@ class Configuration(object):
         :class:`Configuration`
              An instance of :class:`Configuration` instance.
         """
+        values = list(values)
         return cls.from_data({'values': values, 'types': [Joint.REVOLUTE] * len(values)})
 
     @classmethod
@@ -88,6 +89,9 @@ class Configuration(object):
         :class:`Configuration`
              An instance of :class:`Configuration` instance.
         """
+        # Force iterables into lists
+        prismatic_values = list(prismatic_values)
+        revolute_values = list(revolute_values)
         values = prismatic_values + revolute_values
         types = [Joint.PRISMATIC] * len(prismatic_values) + [Joint.REVOLUTE] * len(revolute_values)
         return cls.from_data({'values': values, 'types': types})
@@ -163,7 +167,7 @@ if __name__ == "__main__":
     config = Configuration([pi/2, 3., 0.1], [Joint.REVOLUTE, Joint.PRISMATIC, Joint.PLANAR])
     print(str(config))
 
-    config = Configuration.from_prismatic_and_revolute_values([2., 3., 1.33], list(map(radians, [90, 0, 0, 20])))
+    config = Configuration.from_prismatic_and_revolute_values([2., 3., 1.33], map(radians, [90, 0, 0, 20]))
     print(str(config))
     print(config.revolute_values)
     print(config.prismatic_values)
