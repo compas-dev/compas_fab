@@ -11,7 +11,7 @@ class RobotSemantics(object):
     References
     ----------
 
-    .. _SRDF: http://wiki.ros.org/srdf
+    .. _SRDF: https://wiki.ros.org/srdf
 
     """
 
