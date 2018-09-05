@@ -2,12 +2,13 @@
 Kinematic model
 ********************************************************************************
 
-.. In ROS, the RobotModel_ and RobotState_ classes are the core classes that
-give you access to a robot's kinematics.
+A kinematic model describes the motion of a robot in mathematical form without
+considering the forces that affect motion and concerns itself with the geometric
+relationship between elements.
 
 In the kinematic model of a robot, the connection of different manipulator
-joints is known as link, and the integration of two or more links is called
-a joint. This kinematic model can be represented as a tree structure. The tree
+joints is known as **link**, and the integration of two or more links is called
+a **joint**. This kinematic model can be represented as a tree structure. The tree
 describes the kinematic chain, i.e., the connection of robotic links with
 joints, and the inter-dependendencies of these links. This tree structure plus
 the underlying geometric information can be defined in Unified Robot
@@ -23,6 +24,9 @@ can be added as well.
     describing the kinematic model.
 
 .. Actually it would be good to have here a robot on a linear axis...
+
+In ROS, the RobotModel_ and RobotState_ classes are the core classes that
+give you access to a robot's kinematics.
 
 .. _RobotModel: https://docs.ros.org/kinetic/api/moveit_core/html/classmoveit_1_1core_1_1RobotModel.html
 .. _RobotState: https://docs.ros.org/kinetic/api/moveit_core/html/classmoveit_1_1core_1_1RobotState.html
