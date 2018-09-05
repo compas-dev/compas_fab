@@ -25,15 +25,14 @@ __all__ = [
 class Robot(object):
     """Represents a **robot** instance.
 
-    This class binds several building blocks, such as the robot's descriptive model, its semantic information
-    and an instance of a backend client into a cohesive programmable interface.
-
-    This representation builds upon the model described in the class :class:`compas.robots.model.Robot`
-    of the **COMPAS** framework.
+    This class binds together several building blocks, such as the robot's descriptive model,
+    its semantic information and an instance of a backend client
+    into a cohesive programmable interface. This representation builds upon the model
+    described in the class :class:`compas.robots.Robot` of the **COMPAS** framework.
 
     Attributes
     ----------
-    robot_model : :class:`compas.robots.model.Robot`
+    robot_model : :class:`compas.robots.Robot`
         The robot model, usually created out of an URDF structure.
     semantics : :class:`RobotSemantics`, optional
         The semantic model of the robot.
@@ -96,6 +95,14 @@ class Robot(object):
 
     @property
     def name(self):
+        """Name of the robot, as defined by its model
+
+        Returns
+        -------
+        str
+            Name of the robot.
+        """
+
         return self.model.name
 
     @property
