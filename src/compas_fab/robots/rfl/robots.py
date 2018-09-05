@@ -113,7 +113,7 @@ class Robot(object):
         index (:obj:`int`): Robot index (for internal use).
         dof (:obj:`int`): Degrees of freedom.
     """
-    SUPPORTED_ROBOTS = (11, 12, 21, 22)
+    SUPPORTED_ROBOTS = [11, 12, 21, 22]
     ROBOT_SETTINGS = {
         11: {'name': 'A', 'base_external_axes': [7000, -2000, -4000]},
         12: {'name': 'B', 'base_external_axes': [7000, -10000, -4000]},
