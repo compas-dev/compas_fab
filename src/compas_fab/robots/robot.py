@@ -36,7 +36,6 @@ class Robot(object):
         self.urdf_model = urdf_model
         self.semantics = semantics
         self.client = client # setter and getter
-        self.name = self.urdf_model.name
 
         # TODO: if client is ros client: tell urdf importer...
         # should be corrected by urdf_model
@@ -65,6 +64,10 @@ class Robot(object):
         urdf_model = compas.robots.model.Robot.from_urdf_file(urdf_file)
         srdf_model = RobotSemantics.from_srdf_file(srdf_file, urdf_model)
         return cls(urdf_model, srdf_model, client)
+
+    @property
+    def name(self):
+        return self.urdf_model.name
 
     @property
     def group_names(self):
