@@ -1,10 +1,20 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 from compas_ghpython import mesh_draw
 from compas_ghpython.geometry import xform_from_transformation
 
 from compas_fab.robots.artists import BaseRobotArtist
 
+__all__ = [
+    'RobotArtist',
+]
+
 
 class RobotArtist(BaseRobotArtist):
+    """Visualizer for robots inside a Grasshopper environment."""
+
     def __init__(self, robot):
         super(RobotArtist, self).__init__(robot)
 
