@@ -1,20 +1,24 @@
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 
 import binascii
 import logging
 import os
-import xml.etree.ElementTree as ET
 
 import roslibpy
-
 from compas.datastructures import Mesh
+from compas.files.xml import XML
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas.geometry.transformations.helpers import mesh_transform
 
 LOGGER = logging.getLogger('compas_fab.robots.urdf_importer')
 
-# TODO: Loading from url:// or file://
+__all__ = [
+    'UrdfImporter',
+]
+
 
 class UrdfImporter(object):
     """Allows to retrieve the mesh files specified in the robot urdf from the
@@ -129,9 +133,9 @@ class UrdfImporter(object):
                      write_binary_response_to_file, errback=None)
 
     def read_robot_name_and_uris_from_urdf(self, robot_description):
-        root = ET.fromstring(robot_description)
-        robot_name = root.attrib['name']
-        uris = [mesh.attrib['filename'] for mesh in root.iter('mesh')
+        xml = XML.from_string(robot_description)
+        robot_name = xml.root.attrib['name']
+        uris = [mesh.attrib['filename'] for mesh in xml.root.iter('mesh')
             if mesh.attrib['filename'] != '']
         return robot_name, uris
 
