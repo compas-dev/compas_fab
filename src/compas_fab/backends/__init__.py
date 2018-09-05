@@ -7,8 +7,8 @@ compas_fab.backends
 
 This package contains classes backends for simulation, planning and execution.
 
-Vrep
---------
+V-REP
+-----
 
 .. autosummary::
     :toctree: generated/
@@ -17,7 +17,7 @@ Vrep
     VrepClient
 
 ROS
--------
+---
 
 .. autosummary::
     :toctree: generated/
@@ -25,7 +25,21 @@ ROS
 
     RosClient
 
+Exceptions
+----------
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    BackendError
+
 """
 
-from .vrep import Simulator as VrepClient
+from .vrep.client import VrepClient
 from .ros.client import Client as RosClient
+
+from .exceptions import *
+from .exceptions import __all__ as a
+
+__all__ = ['VrepClient', 'RosClient'] + a

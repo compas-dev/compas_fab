@@ -3,13 +3,13 @@ import logging
 
 from compas.datastructures.mesh import Mesh
 
+# from compas_fab.robots import Pose
 from compas_fab.robots import Configuration
-from compas_fab.robots import Pose
 from compas_fab.robots import Robot
 
-from .simulator import SimulationError
-from .simulator import Simulator
-from .simulator import config_from_vrep
+from .client import VrepClient
+from .client import VrepError
+from .client import config_from_vrep
 
 try:
     # For Python 3.0 and later
@@ -19,6 +19,11 @@ except ImportError:
     from urllib2 import urlopen, Request
 
 LOG = logging.getLogger('compas_fab.backends.vrep.coordinator')
+
+__all__ = [
+    'SimulationCoordinator',
+]
+
 
 class SimulationCoordinator(object):
     """Coordinates the execution of simulation using different strategies.
@@ -99,12 +104,12 @@ class SimulationCoordinator(object):
 
     @classmethod
     def local_executor(cls, options, host='127.0.0.1', port=19997):
-        with Simulator(debug=options.get('debug', True), host=host, port=port) as simulator:
+        with VrepClient(debug=options.get('debug', True), host=host, port=port) as client:
             active_robot_options = None
 
             # Setup all robots' start state
             for r in options['robots']:
-                robot = Robot(r['robot'], simulator)
+                robot = Robot(r['robot'], client)
 
                 if 'start' in r:
                     if r['start'].get('joint_values'):
@@ -112,27 +117,27 @@ class SimulationCoordinator(object):
                     elif r['start'].get('values'):
                         start = Pose.from_data(r['start'])
                         try:
-                            reachable_state = simulator.find_robot_states(robot, start, metric_values=[0.] * robot.dof, max_trials=1, max_results=1)
+                            reachable_state = client.find_robot_states(robot, start, metric_values=[0.] * robot.dof, max_trials=1, max_results=1)
                             start = reachable_state[-1]
                             LOG.info('Robot state found for start pose. External axes=%s, Joint values=%s', str(start.external_axes), str(start.joint_values))
-                        except SimulationError:
+                        except VrepError:
                             raise ValueError('Start plane is not reachable: %s' % str(r['start']))
 
-                    simulator.set_robot_config(robot, start)
+                    client.set_robot_config(robot, start)
 
                 if 'building_member' in r:
-                    simulator.add_building_member(robot, Mesh.from_data(r['building_member']))
+                    client.add_building_member(robot, Mesh.from_data(r['building_member']))
 
                 if 'goal' in r:
                     active_robot_options = r
 
             # Set global scene options
             if 'collision_meshes' in options:
-                simulator.add_meshes(map(Mesh.from_data, options['collision_meshes']))
+                client.add_meshes(map(Mesh.from_data, options['collision_meshes']))
 
             # Check if there's at least one active robot (i.e. one with a goal defined)
             if active_robot_options:
-                robot = Robot(active_robot_options['robot'], simulator)
+                robot = Robot(active_robot_options['robot'], client)
                 if active_robot_options['goal'].get('values'):
                     goal = Pose.from_data(active_robot_options['goal'])
                 else:
@@ -157,10 +162,10 @@ class SimulationCoordinator(object):
                 # Filter None values
                 kwargs = {k: v for k, v in kwargs.iteritems() if v is not None}
 
-                path = simulator.find_path_plan(robot, goal, **kwargs)
+                path = client.find_path_plan(robot, goal, **kwargs)
                 LOG.info('Found path of %d steps', len(path))
             else:
-                robot = Robot(options['robots'][0]['robot'], simulator)
-                path = [simulator.get_robot_config(robot)]
+                robot = Robot(options['robots'][0]['robot'], client)
+                path = [client.get_robot_config(robot)]
 
         return path

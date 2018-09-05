@@ -18,8 +18,8 @@ Classses
     Pose
     Configuration
     Robot
-    UrdfImporter
     RobotSemantics
+    UrdfImporter
 
 Artists
 -------
