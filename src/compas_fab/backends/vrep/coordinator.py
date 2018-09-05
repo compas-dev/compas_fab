@@ -18,7 +18,7 @@ except ImportError:
     # Fall back to Python 2's urllib2
     from urllib2 import urlopen, Request
 
-LOG = logging.getLogger('compas_fab.robots.backends.vrep.coordinator')
+LOG = logging.getLogger('compas_fab.backends.vrep.coordinator')
 
 class SimulationCoordinator(object):
     """Coordinates the execution of simulation using different strategies.

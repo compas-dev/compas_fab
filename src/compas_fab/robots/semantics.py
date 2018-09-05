@@ -2,11 +2,17 @@ from __future__ import print_function
 
 from compas.files.xml import XML
 
-class SrdfRobot(object):
-    """Reads semantic information from the robot SRDF.
+class RobotSemantics(object):
+    """Represents semantic information of a robot.
 
-    References:
-    http://wiki.ros.org/srdf
+    The semantic model is based on the
+    `Semantic Robot Description Format` (`SRDF`_).
+
+    References
+    ----------
+
+    .. _SRDF: http://wiki.ros.org/srdf
+
     """
 
     def __init__(self, root, urdf_robot):
@@ -131,7 +137,7 @@ if __name__ == "__main__":
             srdf_file = os.path.join(fullpath, 'robot_description_semantic.srdf')
 
             urdf_model = UrdfRobot.from_urdf_file(urdf_file)
-            srdf_model = SrdfRobot.from_srdf_file(srdf_file, urdf_model)
+            srdf_model = RobotSemantics.from_srdf_file(srdf_file, urdf_model)
 
             print(urdf_model.name)
             print("group_names:", srdf_model.group_names)

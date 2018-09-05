@@ -10,12 +10,12 @@ from compas.datastructures.mesh import Mesh
 from compas_fab.robots import Configuration
 from compas_fab.robots import Pose
 from compas_fab.robots import Robot
-from compas_fab.robots.backends.vrep.remote_api import vrep
+from compas_fab.backends.vrep.remote_api import vrep
 
 DEFAULT_SCALE = 1000.
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
 CHILD_SCRIPT_TYPE = vrep.sim_scripttype_childscript
-LOG = logging.getLogger('compas_fab.robots.backends.vrep.simulator')
+LOG = logging.getLogger('compas_fab.backends.vrep.simulator')
 
 
 class SimulationError(Exception):
@@ -44,7 +44,7 @@ class Simulator(object):
 
     Examples:
 
-        >>> from compas_fab.robots.backends.vrep import *
+        >>> from compas_fab.backends.vrep import *
         >>> with Simulator() as simulator:
         ...     print ('Connected: %s' % simulator.is_connected())
         ...
@@ -135,7 +135,7 @@ class Simulator(object):
 
         Examples:
 
-            >>> from compas_fab.robots.backends.vrep import Simulator
+            >>> from compas_fab.backends.vrep import Simulator
             >>> with Simulator() as simulator:
             ...     matrices = simulator.get_object_matrices([0])
             ...     print(map(int, matrices[0]))

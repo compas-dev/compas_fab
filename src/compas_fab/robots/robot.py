@@ -27,7 +27,7 @@ from compas.robots import Visual as UrdfVisual
 #from compas_fab.robots.pose import JointState
 from compas_fab.robots import Configuration
 from compas_fab.robots.urdf_importer import UrdfImporter
-from compas_fab.robots.backends.ros import SrdfRobot
+from compas_fab.robots.semantics import RobotSemantics
 
 LOGGER = logging.getLogger('compas_fab.robots.robot')
 
@@ -54,7 +54,7 @@ class Robot(object):
     Attributes:
         urdf_model (:class:`UrdfRobot`): The model built from URDF structure.
         urdf_importer (class:`UrdfImporter`): The importer for loading the meshes.
-        srdf_model (class:`SrdfRobot`, optional): The SRDF model.
+        srdf_model (class:`RobotSemantics`, optional): The semantic model of the robot.
         client, optional: The client for communication, i.e. class:`Ros`
         name (str): The name of the robot
     """
@@ -91,7 +91,7 @@ class Robot(object):
         urdf_file = urdf_importer.urdf_filename
         srdf_file = urdf_importer.srdf_filename
         urdf_model = UrdfRobot.from_urdf_file(urdf_file)
-        srdf_model = SrdfRobot.from_srdf_file(srdf_file, urdf_model)
+        srdf_model = RobotSemantics.from_srdf_file(srdf_file, urdf_model)
         return cls(urdf_model, urdf_importer, srdf_model, client)
 
     @property
@@ -154,7 +154,7 @@ class Robot(object):
     def transformation_RCF_WCF(self):
         # transformation matrix from world coordinate system to robot coordinate system
         return Transformation.from_frame_to_frame(Frame.worldXY(), self.RCF)
-    
+
     @property
     def transformation_WCF_RCF(self):
          # transformation matrix from robot coordinate system to world coordinate system
@@ -266,8 +266,8 @@ if __name__ == "__main__":
 
 
 
-            
-            
+
+
             """
             print("base_link_name:", r2.get_base_link_name())
             print("ee_link_name:", r1.get_end_effector_link_name())

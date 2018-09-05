@@ -5,7 +5,8 @@ compas_fab.robots
 
 .. currentmodule:: compas_fab.robots
 
-:mod:`compas_fab.robots` contains base classes for robot simulation and control.
+This package contains classes for robot modeling and they are used by the
+simulation, planning and execution backends to exchange information.
 
 Classses
 --------
@@ -19,6 +20,7 @@ Classses
     Robot
     Tool
     UrdfImporter
+    RobotSemantics
 
 Artists
 -------
@@ -41,3 +43,4 @@ from .robot import Robot
 from .tool import Tool
 from .urdf_importer import UrdfImporter
 from .artists import BaseRobotArtist
+from .semantics import RobotSemantics

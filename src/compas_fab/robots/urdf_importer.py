@@ -49,7 +49,7 @@ class UrdfImporter(object):
         importer = cls(ros, local_directory)
         importer.robot_name = os.path.basename(os.path.normpath(path))
         return importer
-    
+
     @classmethod
     def from_urdf_model(cls, urdf_model, ros=None):
         importer = cls(ros, None)

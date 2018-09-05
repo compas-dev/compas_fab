@@ -4,24 +4,24 @@ from roslibpy import ServiceRequest
 
 from compas.geometry import Frame
 
-from compas_fab.robots.backends.ros import Header
-from compas_fab.robots.backends.ros import Pose
-from compas_fab.robots.backends.ros import PoseStamped
-from compas_fab.robots.backends.ros import JointState
-from compas_fab.robots.backends.ros import MultiDOFJointState
-from compas_fab.robots.backends.ros import RobotState
-from compas_fab.robots.backends.ros import PositionIKRequest
-from compas_fab.robots.backends.ros import GetPositionIKRequest
-from compas_fab.robots.backends.ros import GetPositionIKResponse
-from compas_fab.robots.backends.ros import GetPositionFKRequest
-from compas_fab.robots.backends.ros import GetPositionFKResponse
-from compas_fab.robots.backends.ros import GetCartesianPathRequest
-from compas_fab.robots.backends.ros import GetCartesianPathResponse
+from compas_fab.backends.ros import Header
+from compas_fab.backends.ros import Pose
+from compas_fab.backends.ros import PoseStamped
+from compas_fab.backends.ros import JointState
+from compas_fab.backends.ros import MultiDOFJointState
+from compas_fab.backends.ros import RobotState
+from compas_fab.backends.ros import PositionIKRequest
+from compas_fab.backends.ros import GetPositionIKRequest
+from compas_fab.backends.ros import GetPositionIKResponse
+from compas_fab.backends.ros import GetPositionFKRequest
+from compas_fab.backends.ros import GetPositionFKResponse
+from compas_fab.backends.ros import GetCartesianPathRequest
+from compas_fab.backends.ros import GetCartesianPathResponse
 
 class Client(Ros):
 
     def inverse_kinematics(self, frame, base_link, group, joint_names, joint_positions):
-        
+
         header = Header(frame_id=base_link)
         pose = Pose.from_frame(frame)
         pose_stamped = PoseStamped(header, pose)
@@ -36,9 +36,9 @@ class Client(Ros):
         reqmsg = GetPositionIKRequest(ik_request)
 
 
-    
+
     def forward_kinematics(self, configuration, base_link, group, joint_names, ee_link):
-        
+
         header = Header(frame_id=base_link)
         fk_link_names = [ee_link]
         joint_state = JointState(name=joint_names, position=joint_positions, header=header)
@@ -62,7 +62,7 @@ class Client(Ros):
     def compute_cartesian_path(self, frames, base_link, ee_link, group,
                                joint_names, joint_positions, max_step,
                                avoid_collisions):
-        
+
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
         joint_state = JointState(header=header, name=joint_names, position=joint_positions)
