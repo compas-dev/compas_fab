@@ -46,6 +46,7 @@ class VrepClient(object):
         host (:obj:`str`): IP address or DNS name of the V-REP simulator.
         port (:obj:`int`): Port of the V-REP simulator.
         scale(:obj:`int`): Scaling of the model. Defaults to millimeters (``1000``).
+        lua_script (:obj:`str`): Name of the LUA script on the V-REP scene.
         debug (:obj:`bool`): True to enable debug messages, False otherwise.
 
     Examples:
@@ -62,7 +63,7 @@ class VrepClient(object):
                             'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar',
                             'sbl', 'stride', 'trrt')
 
-    def __init__(self, host='127.0.0.1', port=19997, scale=DEFAULT_SCALE, debug=False):
+    def __init__(self, host='127.0.0.1', port=19997, scale=DEFAULT_SCALE, lua_script='RFL', debug=False):
         super(VrepClient, self).__init__()
         self.client_id = None
         self.host = resolve_host(host)
@@ -71,7 +72,7 @@ class VrepClient(object):
         self.thread_cycle_in_ms = 5
         self.debug = debug
         self.scale = float(scale)
-        self._lua_script_name = 'RFL'
+        self.lua_script = lua_script
         self._added_handles = []
 
     def __enter__(self):
@@ -177,7 +178,7 @@ class VrepClient(object):
                 values from 0 to 1.
         """
         vrep.simxCallScriptFunction(self.client_id,
-                                    self._lua_script_name,
+                                    self.lua_script,
                                     CHILD_SCRIPT_TYPE, 'setTheMetric',
                                     [robot.index], metric_values, [],
                                     bytearray(), DEFAULT_OP_MODE)
