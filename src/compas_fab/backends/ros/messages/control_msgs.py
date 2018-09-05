@@ -7,9 +7,6 @@ from .trajectory_msgs import JointTrajectoryPoint
 from .trajectory_msgs import JointTrajectory
 
 
-# C:\Users\rustr\AppData\Local\lxss\rootfs\opt\ros\kinetic\lib\python2.7\dist-packages
-
-
 class JointTolerance(ROSmsg):
     """http://docs.ros.org/api/control_msgs/html/msg/JointTolerance.html
     """
@@ -75,13 +72,22 @@ class FollowJointTrajectoryResult(ROSmsg):
     PATH_TOLERANCE_VIOLATED = -4
     GOAL_TOLERANCE_VIOLATED = -5
 
-    def __init__(self, error_code=0):
+    def __init__(self, error_code=0, error_string=""):
         self.error_code = error_code
+        self.error_string = error_string
     
     @classmethod
     def from_msg(cls, msg):
         error_code = msg['error_code']
         return cls(error_code)
+
+    @property
+    def human_readable(self):
+        cls = type(self)
+        for k, v in cls.__dict__.items():
+            if v == self.error_code:
+                return k
+        return ''
 
 
 class FollowJointTrajectoryActionResult(ROSmsg):
@@ -99,16 +105,3 @@ class FollowJointTrajectoryActionResult(ROSmsg):
         result = FollowJointTrajectoryResult.from_msg(msg['result'])
         return cls(header, status, result)
 
-
-"""
-rostopic info /follow_joint_trajectory/feedback
-Type: control_msgs/FollowJointTrajectoryActionFeedback
-
-rostopic info /follow_joint_trajectory/result
-Type: control_msgs/FollowJointTrajectoryActionResult
-
-rostopic info /follow_joint_trajectory/goal
-Type: control_msgs/FollowJointTrajectoryActionGoal
-
-
-"""

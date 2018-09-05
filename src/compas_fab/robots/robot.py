@@ -258,11 +258,14 @@ if __name__ == "__main__":
     import compas.robots.model
     import xml
 
-    path = r"C:\\Users\\gcasas\\eth\\Labs\\robot_description"
+    resource_path = "C:\\Users\\rustr\\workspace\\robot_description\\ur5"
+    package = 'ur_description'
+    urdf = 'robot_description.urdf'
+    srdf = 'robot_description_semantic.srdf'
 
-    for item in os.listdir(path):
-        fullpath = os.path.join(path, item)
-        if os.path.isdir(fullpath) and item[0] != ".":
+    loader = LocalPackageMeshLoader(resource_path, package)
+    urdf_robot = UrdfRobot.from_urdf_file(loader.load_urdf(urdf))
+    urdf_robot.load_geometry(loader)
 
             try:
                 robot = Robot.from_resource_path(fullpath)

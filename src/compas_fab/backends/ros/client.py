@@ -2,6 +2,9 @@ from compas.geometry import Frame
 from roslibpy import Ros
 from roslibpy import Service
 from roslibpy import ServiceRequest
+from roslibpy import Message
+from roslibpy.actionlib import ActionClient
+from roslibpy.actionlib import Goal
 
 from compas_fab.backends.ros import GetCartesianPathRequest
 from compas_fab.backends.ros import GetCartesianPathResponse
@@ -39,8 +42,21 @@ class RosClient(Ros):
                                        avoid_collisions=True)
         reqmsg = GetPositionIKRequest(ik_request)
 
-    def forward_kinematics(self, configuration, base_link, group, joint_names, ee_link):
+        def receive_message(msg):
+            response = GetPositionIKResponse.from_msg(msg)
+            if response.error_code == MoveItErrorCodes.SUCCESS:
+                configuration = response.solution.joint_state.position
+                print(configuration)
+            print(response.error_code.human_readable)
 
+        srv = Service(self, '/compute_ik', 'GetPositionIK')
+        request = ServiceRequest(reqmsg.msg)
+        srv.call(request, receive_message, receive_message)
+
+
+    def forward_kinematics(self, configuration, base_link, group, joint_names, ee_link):
+        
+        joint_positions = configuration.values
         header = Header(frame_id=base_link)
         fk_link_names = [ee_link]
         joint_state = JointState(name=joint_names, position=joint_positions, header=header)
@@ -54,8 +70,8 @@ class RosClient(Ros):
                 frames = [ps.pose.frame for ps in response.pose_stamped]
             print(response.error_code.human_readable)
 
-        srv = roslibpy.Service(ros, '/compute_fk', 'GetPositionFK')
-        request = roslibpy.ServiceRequest(reqmsg.msg)
+        srv = Service(self, '/compute_fk', 'GetPositionFK')
+        request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
 
     def compute_cartesian_path(self, frames, base_link, ee_link, group,
@@ -81,6 +97,30 @@ class RosClient(Ros):
         srv = Service(self, '/compute_cartesian_path', 'GetCartesianPath')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
+
+    def follow_joint_trajectory(self, joint_trajectory):
+        """Follow the joint trajectory as computed by Moveit Planner.
+
+        Args:
+            joint_trajectory (JointTrajectory)
+        """
+
+        def handle_result(msg, client):
+            result = FollowJointTrajectoryResult.from_msg(msg)
+            print(result.human_readable)
+
+        action_client = ActionClient(self, '/follow_joint_trajectory', 
+                       'control_msgs/FollowJointTrajectoryAction', timeout=3000)
+        goal = Goal(action_client, Message(joint_trajectory.msg))
+
+        goal.on('result', lambda result: handle_result(result, action_client))
+        goal.on('feedback', lambda feedback: print(feedback))
+        goal.on('timeout', lambda: print('TIMEOUT'))
+        action_client.on('timeout', lambda: print('CLIENT TIMEOUT'))
+
+        goal.send(60000)
+
+
 
     def send_frame(self):
         # (check service name with ros)
