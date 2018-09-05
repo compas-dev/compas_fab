@@ -10,7 +10,7 @@ Kinematic model
 
 In the kinematic model of a robot, the connection of different manipulator joints is known as link, and the integration of two or more links is called a joint. This kinematic model can be represented as a tree structure. The tree describes the kinematic chain, i.e., the connection of robotic links with joints, and the inter-dependendencies of these links. This tree structure plus the underlying geometric information can be defined in Unified Robot Description Format (URDF), which describes any robot (see for example UR5urdf_). If the robot is mounted on external axes, these links and joints can be added as well.
 
-.. figure:: robot_links_and_joints.jpg
+.. figure:: 03_robot_links_and_joints.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -42,7 +42,7 @@ The joints are the elements in a robot which helps the links to travel in differ
 
 .. The RobotState_ class in ROS contains information about the robot at a snapshot in time, storing vectors of joint positions and optionally velocities and accelerations. The RobotState_ also contains helper functions for setting the arm location based on the end effector location (Cartesian pose) and for computing Cartesian trajectories.
 
-.. figure:: robot_model.jpg
+.. figure:: 03_robot_model.jpg
     :figclass: figure
     :class: figure-img img-fluid
 

@@ -13,7 +13,7 @@ the convention of a specific relationship between coordinate frames, for example
 * Tool coordinate frame (TCF)
 * Object coordinate frame (OCF)
 
-.. figure:: coord_frames.jpg
+.. figure:: 02_coord_frames.jpg
     :figclass: figure
     :class: figure-img img-fluid
 

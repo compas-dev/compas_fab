@@ -49,7 +49,7 @@ of frame F2.
     print(Pt2)
 
 
-.. figure:: frame_transformation-01.jpg
+.. figure:: 01_frame_transformation.jpg
     :figclass: figure
     :class: figure-img img-fluid
 

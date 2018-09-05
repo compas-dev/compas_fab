@@ -4,7 +4,7 @@ The control of robotic manipulators
 
 A variety of robot controllers exist for different types of tasks and robotic systems. Position controllers have been developed for free motion control and force controllers for constrained tasks. Industrial robots are typically position controlled and use joint-space-based controllers.
 
-.. figure:: robot_axis.jpg
+.. figure:: 04_robot_axis.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
