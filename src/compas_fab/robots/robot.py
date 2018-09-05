@@ -23,23 +23,31 @@ __all__ = [
 
 
 class Robot(object):
-    """Represents a robot based on an URDF model.
+    """Primary representation of a robot that can be manipulated.
 
-    Attributes:
-        urdf_model (:class:`compas.robots.model.Robot`): The robot model, usually created out of an URDF structure.
-        semantics (:class:`RobotSemantics`, optional): The semantic model of the robot.
-        client, optional: The backend client to use for communication, e.g. :class:`RosClient`
-        name (str): The name of the robot
+    This representation builds upon the model described in the class :class:`compas.robots.model.Robot`
+    of the **COMPAS** framework.
+
+    Attributes
+    ----------
+    robot_model : :class:`compas.robots.model.Robot`
+        The robot model, usually created out of an URDF structure.
+    semantics : :class:`RobotSemantics`, optional
+        The semantic model of the robot.
+    client : optional
+        The backend client to use for communication, e.g. :class:`RosClient`
+    name : :obj:`str`
+        The name of the robot
     """
 
-    def __init__(self, urdf_model, semantics=None, client=None):
+    def __init__(self, robot_model, semantics=None, client=None):
 
-        self.urdf_model = urdf_model
+        self.model = robot_model
         self.semantics = semantics
         self.client = client  # setter and getter
 
         # TODO: if client is ros client: tell urdf importer...
-        # should be corrected by urdf_model
+        # should be corrected by self.model
         self.RCF = Frame.worldXY()
 
     @classmethod
@@ -85,7 +93,7 @@ class Robot(object):
 
     @property
     def name(self):
-        return self.urdf_model.name
+        return self.model.name
 
     @property
     def group_names(self):
@@ -99,13 +107,13 @@ class Robot(object):
 
     def get_end_effector_link_name(self, group=None):
         if not self.semantics:
-            return self.urdf_model.get_end_effector_link_name()
+            return self.model.get_end_effector_link_name()
         else:
             return self.semantics.get_end_effector_link_name(group)
 
     def get_end_effector_link(self, group=None):
         name = self.get_end_effector_link_name(group)
-        return self.urdf_model.get_link_by_name(name)
+        return self.model.get_link_by_name(name)
 
     def get_end_effector_frame(self, group=None):
         link = self.get_end_effector_link(group)
@@ -113,13 +121,13 @@ class Robot(object):
 
     def get_base_link_name(self, group=None):
         if not self.semantics:
-            return self.urdf_model.get_base_link_name()
+            return self.model.get_base_link_name()
         else:
             return self.semantics.get_base_link_name(group)
 
     def get_base_link(self, group=None):
         name = self.get_base_link_name(group)
-        return self.urdf_model.get_link_by_name(name)
+        return self.model.get_link_by_name(name)
 
     def get_base_frame(self, group=None):
         link = self.get_base_link(group)
@@ -133,7 +141,7 @@ class Robot(object):
         if self.semantics:
             return self.semantics.get_configurable_joints(group)
         else:
-            return self.urdf_model.get_configurable_joints()
+            return self.model.get_configurable_joints()
 
     def get_configurable_joint_names(self, group=None):
         if self.semantics:
@@ -141,7 +149,7 @@ class Robot(object):
         else:
             # passive joints are only defined in the srdf model, so we just get
             # the ones that are configurable
-            return self.urdf_model.get_configurable_joint_names()
+            return self.model.get_configurable_joint_names()
 
     @property
     def transformation_RCF_WCF(self):
@@ -172,7 +180,7 @@ class Robot(object):
         """
         """
         names = self.get_configurable_joint_names(group)
-        self.urdf_model.update(names, configuration.values, collision)
+        self.model.update(names, configuration.values, collision)
 
     def ensure_client(self):
         if not self.client:
@@ -213,29 +221,29 @@ class Robot(object):
 
     @property
     def frames(self):
-        return self.urdf_model.get_frames(self.transformation_RCF_WCF)
+        return self.model.get_frames(self.transformation_RCF_WCF)
 
     @property
     def axes(self):
-        return self.urdf_model.get_axes(self.transformation_RCF_WCF)
+        return self.model.get_axes(self.transformation_RCF_WCF)
 
     def draw_visual(self):
-        return self.urdf_model.draw_visual(self.transformation_RCF_WCF)
+        return self.model.draw_visual(self.transformation_RCF_WCF)
 
     def draw_collision(self):
-        return self.urdf_model.draw_collision(self.transformation_RCF_WCF)
+        return self.model.draw_collision(self.transformation_RCF_WCF)
 
     def draw(self):
-        return self.urdf_model.draw()
+        return self.model.draw()
 
     def scale(self, factor):
         """Scale the robot.
         """
-        self.urdf_model.scale(factor)
+        self.model.scale(factor)
 
     @property
     def scale_factor(self):
-        return self.urdf_model.scale_factor
+        return self.model.scale_factor
 
 
 if __name__ == "__main__":
