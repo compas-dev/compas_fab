@@ -1,6 +1,13 @@
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 
 from compas.files.xml import XML
+
+__all__ = [
+    'RobotSemantics',
+]
+
 
 class RobotSemantics(object):
     """Represents semantic information of a robot.
@@ -122,6 +129,7 @@ class RobotSemantics(object):
         if not group:
             group = self.main_group_name
         return self._group_dict[group]["joints"]
+
 
 if __name__ == "__main__":
 

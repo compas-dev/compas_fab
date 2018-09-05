@@ -1,9 +1,12 @@
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 
 import logging
-import os
 import math
+import os
 
+import compas
 from compas.geometry import Frame
 from compas.geometry import add_vectors
 from compas.geometry.transformations import mesh_transform
@@ -11,9 +14,6 @@ from compas.geometry.transformations import mesh_transformed
 from compas.geometry.xforms import Rotation
 from compas.geometry.xforms import Scale
 from compas.geometry.xforms import Transformation
-
-from compas.robots import Origin as UrdfOrigin
-from compas.robots import Visual as UrdfVisual
 from compas.robots import Collision as UrdfCollision
 from compas.robots import Joint as UrdfJoint
 from compas.robots import Link as UrdfLink
@@ -22,31 +22,16 @@ from compas.robots import Origin as UrdfOrigin
 from compas.robots import Robot as UrdfRobot
 from compas.robots import Visual as UrdfVisual
 
-#from compas_fab.robots.tool import Tool
-
 #from compas_fab.robots.pose import JointState
 from compas_fab.robots import Configuration
-from compas_fab.robots.urdf_importer import UrdfImporter
 from compas_fab.robots.semantics import RobotSemantics
+from compas_fab.robots.urdf_importer import UrdfImporter
 
 LOGGER = logging.getLogger('compas_fab.robots.robot')
 
-
-# RobotArtist?
-class Mesh(object):
-
-    def __init__(self, mesh):
-        self.mesh = mesh
-
-    def transform(self, transformation):
-        mesh_transform(self.mesh, transformation)
-
-    def draw(self):
-        return self.mesh
-
-    def set_color(self, color_rgba):
-        r, g, b, a = color_rgba
-
+__all__ = [
+    'Robot',
+]
 
 class Robot(object):
     """Represents a robot based on an URDF model.
@@ -259,7 +244,8 @@ if __name__ == "__main__":
 
             try:
                 robot = Robot.from_resource_path(fullpath)
-                robot.create(Mesh)
+                # TODO: Replace with the new RobotArtist
+                # robot.create(Mesh)
                 print("base_link:", robot.get_base_frame())
             except xml.etree.ElementTree.ParseError:
                 print(">>>>>>>>>>>>>>>>>> ERROR", item)
