@@ -11,6 +11,7 @@ TODO:
 * Add forward and inverse kinematic?
 * load from urdf
 """
+__all__ = ['Tool']
 
 class Tool(object):
     """Represents the base class for robot end-effectors.

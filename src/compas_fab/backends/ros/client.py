@@ -1,3 +1,4 @@
+from compas.geometry import Frame
 from roslibpy import Ros
 from roslibpy import Service
 from roslibpy import ServiceRequest
@@ -5,26 +6,26 @@ from roslibpy import Message
 from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
-from compas.geometry import Frame
+from compas_fab.backends.ros import GetCartesianPathRequest
+from compas_fab.backends.ros import GetCartesianPathResponse
+from compas_fab.backends.ros import GetPositionFKRequest
+from compas_fab.backends.ros import GetPositionFKResponse
+from compas_fab.backends.ros import GetPositionIKRequest
+from compas_fab.backends.ros import GetPositionIKResponse
+from compas_fab.backends.ros import Header
+from compas_fab.backends.ros import JointState
+from compas_fab.backends.ros import MultiDOFJointState
+from compas_fab.backends.ros import Pose
+from compas_fab.backends.ros import PoseStamped
+from compas_fab.backends.ros import PositionIKRequest
+from compas_fab.backends.ros import RobotState
 
-from compas_fab.robots.backends.ros import Header
-from compas_fab.robots.backends.ros import Pose
-from compas_fab.robots.backends.ros import PoseStamped
-from compas_fab.robots.backends.ros import JointState
-from compas_fab.robots.backends.ros import MultiDOFJointState
-from compas_fab.robots.backends.ros import RobotState
-from compas_fab.robots.backends.ros import MoveItErrorCodes
-from compas_fab.robots.backends.ros import PositionIKRequest
-from compas_fab.robots.backends.ros import GetPositionIKRequest
-from compas_fab.robots.backends.ros import GetPositionIKResponse
-from compas_fab.robots.backends.ros import GetPositionFKRequest
-from compas_fab.robots.backends.ros import GetPositionFKResponse
-from compas_fab.robots.backends.ros import GetCartesianPathRequest
-from compas_fab.robots.backends.ros import GetCartesianPathResponse
-from compas_fab.robots.backends.ros import FollowJointTrajectoryResult
-from compas_fab.robots.backends.ros import FollowJointTrajectoryGoal
+__all__ = [
+    'RosClient'
+]
 
-class Client(Ros):
+
+class RosClient(Ros):
 
     def inverse_kinematics(self, frame, base_link, group, joint_names, joint_positions):
 
@@ -73,7 +74,6 @@ class Client(Ros):
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
 
-
     def compute_cartesian_path(self, frames, base_link, ee_link, group,
                                joint_names, joint_positions, max_step,
                                avoid_collisions):
@@ -90,6 +90,7 @@ class Client(Ros):
                                          waypoints=waypoints,
                                          max_step=float(max_step)/1000.,
                                          avoid_collisions=bool(avoid_collisions))
+
         def receive_message(msg):
             response = GetCartesianPathResponse.from_msg(msg)
 
@@ -122,16 +123,16 @@ class Client(Ros):
 
 
     def send_frame(self):
-        #(check service name with ros)
+        # (check service name with ros)
         self.ensure_client()
         raise NotImplementedError
 
     def send_configuration(self):
-        #(check service name with ros)
+        # (check service name with ros)
         self.ensure_client()
         raise NotImplementedError
 
     def send_trajectory(self):
-        #(check service name with ros)
+        # (check service name with ros)
         self.ensure_client()
         raise NotImplementedError
