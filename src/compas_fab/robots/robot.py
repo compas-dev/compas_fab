@@ -248,49 +248,23 @@ class Robot(object):
 if __name__ == "__main__":
 
     import os
+    from compas.robots import LocalPackageMeshLoader
     from compas.robots import Robot as UrdfRobot
-    import xml
+    from compas_fab.robots import BaseRobotArtist
 
-    path = r"C:\\Users\\gcasas\\eth\\Labs\\robot_description"
+    resource_path = "C:\\Users\\rustr\\workspace\\robot_description\\ur5"
+    package = 'ur_description'
+    urdf = 'robot_description.urdf'
+    srdf = 'robot_description_semantic.srdf'
 
-    for item in os.listdir(path):
-        fullpath = os.path.join(path, item)
-        if os.path.isdir(fullpath) and item[0] != ".":
+    loader = LocalPackageMeshLoader(resource_path, package)
+    urdf_robot = UrdfRobot.from_urdf_file(loader.load_urdf(urdf))
+    urdf_robot.load_geometry(loader)
 
-            try:
-                robot = Robot.from_resource_path(fullpath)
-                robot.create(Mesh)
-                print("base_link:", robot.get_base_frame())
-            except xml.etree.ElementTree.ParseError:
-                print(">>>>>>>>>>>>>>>>>> ERROR", item)
+    srdf_file = os.path.join(resource_path, package, "srdf", srdf)
+    srdf_model = SrdfRobot.from_srdf_file(srdf_file, urdf_robot)
 
+    robot = Robot.from_urdf_and_srdf_models(urdf_robot, srdf_model)
+    artist = BaseRobotArtist(robot)
+    robot.artist = artist
 
-
-            
-            
-            """
-            print("base_link_name:", r2.get_base_link_name())
-            print("ee_link_name:", r1.get_end_effector_link_name())
-            print("ee_link_name:", r2.get_end_effector_link_name())
-            print("configurable_joints:", r1.get_configurable_joint_names())
-            print("configurable_joints:", r2.get_configurable_joint_names())
-            """
-
-
-
-
-    """
-    import os
-    path = os.path.join(os.path.expanduser('~'), "workspace", "robot_description")
-    robot_name = "ur5"
-    robot_name = "staubli_tx60l"
-    #robot_name = "abb_irb6640_185_280"
-    resource_path = os.path.join(path, robot_name)
-
-    filename = os.path.join(resource_path, "robot_description.urdf")
-    model = UrdfRobot.from_urdf_file(filename)
-
-    robot = Robot(model, resource_path, client=None)
-
-    robot.create(Mesh)
-    """
