@@ -21,11 +21,12 @@ __all__ = [
     'Robot',
 ]
 
+
 class Robot(object):
     """Represents a robot based on an URDF model.
 
     Attributes:
-        urdf_model (:class:`compas.robots.model.Robot`): The robot model from URDF structure.
+        urdf_model (:class:`compas.robots.model.Robot`): The robot model, usually created out of an URDF structure.
         semantics (:class:`RobotSemantics`, optional): The semantic model of the robot.
         client, optional: The backend client to use for communication, e.g. :class:`RosClient`
         name (str): The name of the robot
@@ -196,17 +197,17 @@ class Robot(object):
         raise NotImplementedError
 
     def send_frame(self):
-        #(check service name with ros)
+        # (check service name with ros)
         self.ensure_client()
         raise NotImplementedError
 
     def send_configuration(self):
-        #(check service name with ros)
+        # (check service name with ros)
         self.ensure_client()
         raise NotImplementedError
 
     def send_trajectory(self):
-        #(check service name with ros)
+        # (check service name with ros)
         self.ensure_client()
         raise NotImplementedError
 
@@ -257,10 +258,6 @@ if __name__ == "__main__":
             except xml.etree.ElementTree.ParseError:
                 print(">>>>>>>>>>>>>>>>>> ERROR", item)
 
-
-
-
-
             """
             print("base_link_name:", r2.get_base_link_name())
             print("ee_link_name:", r1.get_end_effector_link_name())
@@ -268,9 +265,6 @@ if __name__ == "__main__":
             print("configurable_joints:", r1.get_configurable_joint_names())
             print("configurable_joints:", r2.get_configurable_joint_names())
             """
-
-
-
 
     """
     import os
