@@ -63,6 +63,7 @@ Once **COMPAS** itself is installed for Blender following the documented procedu
 First Steps
 ===========
 
+* :ref:`Working with backends <backends>`
 * :ref:`Examples <examples>`
 * :ref:`API Reference <reference>`
 * `COMPAS Examples <https://compas-dev.github.io/main/examples.html>`_

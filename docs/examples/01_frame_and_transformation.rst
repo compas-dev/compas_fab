@@ -4,16 +4,16 @@ Frame and Transformation
 
 .. currentmodule:: compas_fab.geometry
 
-:class:`Frame` and :class:`Transformation` are two basic classes in the compas library and
-can be used to describe position/orientation and coordinate systems. The
-:class:`Frame` consists of a point and and two orthonormal base vectors (xaxis,
-yaxis). :class:`Transformation` is the base class for transformations like
-:class:`Rotation`, :class:`Translation`, :class:`Scale`, :class:`Reflection`,
-:class:`Projection` and :class:`Shear`.
+:class:`Frame` and :class:`Transformation` are two basic classes in the
+**COMPAS** framework and can be used to describe position/orientation and
+coordinate systems. The :class:`Frame` consists of a point and and two
+orthonormal base vectors (xaxis, yaxis). :class:`Transformation` is the base
+class for transformations like :class:`Rotation`, :class:`Translation`,
+:class:`Scale`, :class:`Reflection`, :class:`Projection` and :class:`Shear`.
 
 Here is a simple example of how to use Frame and Transformation: We want to
-bring a point P in the coordinate system of frame F1 into the coordinate system
-of frame F2.
+bring a point ``P`` in the coordinate system of frame ``F1`` into the
+coordinate system of frame ``F2``.
 
 .. code-block:: python
 
@@ -88,7 +88,8 @@ as Euler angles, axis-angle representation, and quaternion.
     F1 == F2
 
 
-Further information:
+Further information
+===================
 
 * `Rotation <https://en.wikipedia.org/wiki/Rotation>`_
 * `Euler angles <https://en.wikipedia.org/wiki/Euler_angles>`_

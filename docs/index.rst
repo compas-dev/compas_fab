@@ -19,6 +19,7 @@ Contents
 
    overview
    getting_started
+   backends
    examples
    reference
    contributing

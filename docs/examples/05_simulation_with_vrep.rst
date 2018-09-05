@@ -3,24 +3,11 @@ Simulation examples with V-REP
 ********************************************************************************
 
 The following examples demonstrate the `V-REP <http://www.coppeliarobotics.com/>`_
-simulation backend. They are based on a sample scene of the RFL (Robotic Fabrication
-Lab).
+simulation backend. They are based on a sample scene of the RFL
+(Robotic Fabrication Lab).
 
-Before running them, you need to have the software running
-
-RFL simulation requires a running instance of
-with the RFL scene pre-loaded. There are two options to run v-rep:
-
-* `Download it <http://www.coppeliarobotics.com/downloads.html>`_, install it
-and open the RFL scene file contained in this package
-(``fab\robots\rfl\vrep_remote_api\rfl_scene.ttt``).
-* Install as a service using Docker (only on Windows 10 and higher):
-
-  * Make sure you have `Docker <https://www.docker.com/>`_ installed.
-  * Run the following commands on the command line::
-
-    docker pull gramaziokohler/vrep-rfl
-    docker run --restart=always -p 19997:19997 -d gramaziokohler/vrep-rfl
+Before running them, make sure you have configured the
+:ref:`V-REP backend <vrep_backend>` correctly.
 
 First step
 ==========
@@ -28,15 +15,16 @@ First step
 The first step is just connect to the simulator and verify the connection
 is working.
 
-Copy and paste the following example into any Python environment (a standalong script, a CAD environment, etc)
-and run it, you should see ``Connected: True`` if everything is working properly:
+Copy and paste the following example into any Python environment
+(a standalong script, a CAD environment, etc) and run it, you should
+see the output ``Connected: True`` if everything is working properly:
 
 .. code-block:: python
 
-    from compas_fab.fab.robots.rfl import *
+    from compas_fab.backends import VrepClient
 
-    with Simulator() as simulator:
-        print ('Connected: %s' % simulator.is_connected())
+    with VrepClient() as client:
+        print ('Connected: %s' % client.is_connected())
 
 
 Forward Kinematics
@@ -45,9 +33,10 @@ Forward Kinematics
 Moving robots
 -------------
 
-The RFL scene used on these examples has 4 robots that can be referenced by an identifier: ``11``, ``12``, ``21`` and ``22``.
+The RFL scene used on these examples has 4 robots that can be
+referenced by the identifiers: ``A``, ``B``, ``C`` and ``D``.
 
-.. figure:: 05_rfl.jpg
+.. figure:: 05_rfl.png
     :figclass: figure
     :class: figure-img img-fluid
 

@@ -2,6 +2,8 @@
 Coordinate frames
 ********************************************************************************
 
+.. currentmodule:: compas_fab.geometry
+
 Developers and users of robot drivers, models, and libraries need a shared convention
 for coordinate frames in order to better integrate and re-use software components. To
 plan robotic fabrication processes, the definition of robotic targets has to follow
@@ -19,22 +21,24 @@ the convention of a specific relationship between coordinate frames, for example
 
     Coordinate frame convention of a robotic setup.
 
-To describe these coordinate frames, the ``Frame`` class of the compas libray is used.
+To describe these coordinate frames, the :class:`Frame` class of the **COMPAS**
+framework is used.
 
 World coordinate frame (WCF)
 ============================
 
 The world coordinate frame (WCF) has its origin on a fixed position with
-its Z-axis pointing upwards (= map in ROS convention). The WCF is important for processes
-that use several robots which share one space, robots with external axes, and mobile robots.
-By default, the WCF coincides with the robot coordinate system (RCF).
+its Z-axis pointing upwards (= map in ROS convention).
+The WCF is important for processes that use several robots which share one space,
+robots with external axes, and mobile robots. By default, the WCF coincides
+with the robot coordinate system (RCF).
 
 Robot coordinate frame (RCF)
 ============================
 
 The robot coordinate frame (RCF) (= base_link in ROS convention) has its origin
-in the base of the robot and is the reference system for the mechanical buildup of the robot.
-It must be defined in reference to the fixed coordinate frame WCF.
+in the base of the robot and is the reference system for the mechanical buildup
+of the robot. It must be defined in reference to the fixed coordinate frame WCF.
 
 Tool0 coordinate frame (T0CF)
 =============================
@@ -58,6 +62,7 @@ coordinate frame (WCF).
 
 Example
 ==================
+
 Here is a simple example of how to express the frame of an object that is defined
 in the world coordinate frame in the robot's own coordinate frame before sending
 it as a target pose to the robot.
@@ -78,7 +83,9 @@ it as a target pose to the robot.
     robot.send_pose(object_frame_RCS)
 
 
-Links:
-http://www.ros.org/reps/rep-0105.html#id15
-http://developercenter.robotstudio.com/BlobProxy/manuals/IRC5FlexPendantOpManual/doc210.html
+Links
+=====
+
+* `ROS REP-105: Coordinate Frames for Mobile Platforms <http://www.ros.org/reps/rep-0105.html#id15>`_
+* `ABB: What is a coordinate system? <http://developercenter.robotstudio.com/BlobProxy/manuals/IRC5FlexPendantOpManual/doc210.html>`_
 
