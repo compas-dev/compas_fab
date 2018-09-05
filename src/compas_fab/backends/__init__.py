@@ -38,10 +38,11 @@ Exceptions
 """
 
 from .exceptions import *
+from .ros.client import *
 from .vrep.client import *
-from .ros.client import Client as RosClient
 
 from .exceptions import __all__ as a
-from .vrep.client import __all__ as b
+from .ros.client import __all__ as b
+from .vrep.client import __all__ as c
 
-__all__ = a + b + ['RosClient']
+__all__ = a + b + c
