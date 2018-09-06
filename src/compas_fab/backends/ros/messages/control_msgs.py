@@ -22,7 +22,7 @@ class FollowJointTrajectoryGoal(ROSmsg):
     """
 
     def __init__(self, trajectory=JointTrajectory(), path_tolerance=[],
-                 goal_tolerance=[], goal_time_tolerance=Time()):
+                 goal_tolerance=[], goal_time_tolerance=Time(secs=1.)):
         self.trajectory = trajectory #trajectory_msgs/JointTrajectory 
         self.path_tolerance = path_tolerance #control_msgs/JointTolerance[] 
         self.goal_tolerance = goal_tolerance #control_msgs/JointTolerance[] 

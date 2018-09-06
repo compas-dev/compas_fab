@@ -17,11 +17,22 @@ class JointTrajectoryPoint(ROSmsg):
         self.accelerations = accelerations
         self.effort = effort
         self.time_from_start = time_from_start
+        # TODO: check if we need to enter zeros to all
 
     @classmethod
     def from_msg(cls, msg):
         time_from_start = Time.from_msg(msg['time_from_start'])
         return cls(msg['positions'], msg['velocities'], msg['accelerations'], msg['effort'], time_from_start)
+    
+    @property
+    def msg(self):
+        msg = super(JointTrajectoryPoint, self).msg
+        if not len(self.accelerations):
+            del msg['accelerations']
+        if not len(self.effort):
+            del msg['effort']
+        return msg
+        
 
 
 class JointTrajectory(ROSmsg):
