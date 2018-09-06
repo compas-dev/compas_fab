@@ -6,10 +6,13 @@ import contextlib
 import glob
 import os
 import sys
+from shutil import copytree
 from shutil import rmtree
 from xml.dom.minidom import parse
 
-from invoke import Collection, Exit, task
+from invoke import Collection
+from invoke import Exit
+from invoke import task
 
 try:
     input = raw_input
@@ -164,6 +167,28 @@ def check(ctx):
     # log.write('Checking python imports...')
     # ctx.run('isort --check-only --diff --recursive src tests setup.py')
 
+
+@task()
+def deploy_docs(ctx):
+    """Deploy docs."""
+    temp_folder = os.path.join(BASE_FOLDER, 'temp')
+    docs_folder = os.path.join(temp_folder, 'docs')
+    log.write('Cleaning up temp docs folder %s' % docs_folder)
+    rmtree(docs_folder, ignore_errors=True)
+
+    log.write('Cloning github repository %s/docs' % temp_folder)
+    with chdir(temp_folder):
+        ctx.run('git clone https://github.com/gramaziokohler/gramaziokohler.github.io.git docs')
+
+    target_doc_folder = os.path.join(docs_folder, 'compas_fab', 'latest')
+    log.write('Removing old docs from folder %s' % target_doc_folder)
+    rmtree(target_doc_folder, ignore_errors=True)
+
+    log.write('Copy current docs')
+    copytree(os.path.join(BASE_FOLDER, 'dist', 'docs'), target_doc_folder)
+
+    with chdir(target_doc_folder):
+        ctx.run('git add . && git commit -m doc-deployer && git push')
 
 @task(help={
       'checks': 'True to run all checks before testing, otherwise False.'})
