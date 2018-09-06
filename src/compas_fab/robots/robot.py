@@ -233,15 +233,6 @@ class Robot(object):
     def axes(self):
         return self.model.get_axes(self.transformation_RCF_WCF)
 
-    def draw_visual(self):
-        return self.model.draw_visual(self.transformation_RCF_WCF)
-
-    def draw_collision(self):
-        return self.model.draw_collision(self.transformation_RCF_WCF)
-
-    def draw(self):
-        return self.model.draw()
-
     def scale(self, factor):
         """Scale the robot.
         """
