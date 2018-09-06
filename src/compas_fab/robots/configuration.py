@@ -48,8 +48,8 @@ class Configuration(object):
     def __init__(self, values=[], types=[]):
         if len(values) != len(types):
             raise ValueError("%d values must have %d types, but %d given." % (len(values), len(values), len(types)))
-        self.values = values
-        self.types = types
+        self.values = list(values)
+        self.types = list(types)
         self._precision = compas.PRECISION or '3f'
 
     def __str__(self):
