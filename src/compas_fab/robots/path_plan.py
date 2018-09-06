@@ -2,8 +2,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas_fab.robots import Configuration
-from compas_fab.robots import Robot
+from compas_fab.robots.configuration import Configuration
+from compas_fab.robots.robot import Robot
 
 __all__ = [
     'PathPlan',
@@ -31,7 +31,7 @@ class PathPlan(object):
         ----------
         robot : :class:`Robot`
             Instance of robot.
-        path_plan : :obj:`list`` of :class:``Configuration`
+        path_plan : :obj:`list` of :class:`Configuration`
             List of configurations representing a full path.
         """
         self.paths[robot.name] = path_plan
