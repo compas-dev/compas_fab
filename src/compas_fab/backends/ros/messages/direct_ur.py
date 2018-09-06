@@ -43,7 +43,7 @@ class AxisAngle(URmsg):
         return '%.6f, %.6f, %.6f' % (self.x ,self.y, self.z)
 
 
-class Pose(URmsg):
+class URPose(URmsg):
     """
     """
     def __init__(self, position=Point(0,0,0), orientation=AxisAngle(0,0,0)):
@@ -60,10 +60,10 @@ class Pose(URmsg):
         return "p[%s, %s]" % (self.position, self.orientation)
 
 
-class PoseTrajectoryPoint(URmsg):
+class URPoseTrajectoryPoint(URmsg):
     """
     """
-    def __init__(self, pose=Pose(), acceleration=None, velocity=None, time=None, radius=None):
+    def __init__(self, pose=URPose(), acceleration=None, velocity=None, time=None, radius=None):
         self.pose = pose
         self.acceleration = acceleration # [m/s^2]
         self.velocity = velocity # [m/s]
@@ -83,20 +83,20 @@ class PoseTrajectoryPoint(URmsg):
         return result
 
 
-class MoveInJointSpace(URmsg):
+class URMovej(URmsg):
     """
     """
-    def __init__(self, pose_trajectory_point=PoseTrajectoryPoint()):
+    def __init__(self, pose_trajectory_point=URPoseTrajectoryPoint()):
         self.pose_trajectory_point = pose_trajectory_point
 
     def __str__(self):
         return "movej(%s)" % self.pose_trajectory_point
 
 
-class MoveInToolSpace(URmsg):
+class URMovel(URmsg):
     """
     """
-    def __init__(self, pose_trajectory_point=PoseTrajectoryPoint()):
+    def __init__(self, pose_trajectory_point=URPoseTrajectoryPoint()):
         self.pose_trajectory_point = pose_trajectory_point
 
     def __str__(self):
@@ -106,11 +106,33 @@ class MoveInToolSpace(URmsg):
 class URGoal(URmsg):
     """
     """
-    def __init__(self, ur_script_lines=[]):
-        self.data = [str(line) for line in ur_script_lines]
+    def __init__(self, script_lines=[]):
+        self.script_lines = "def prog():\n\t" + "\n\t".join([str(line) for line in script_lines]) + "\nend\nprog()\n\n"
     
     @property
     def msg(self):
-        return {"script_lines": self.data}
+        return {"script_lines": self.script_lines}
 
 
+if __name__ == "__main__":
+
+    from compas.geometry import Frame
+    f1 = Frame((0., -193, 1001.), (-1., 0., 0.), (0., 0., -1.))
+    f2 = Frame((0., -193, 709.0), (-1., 0., 0.), (0., 0., -1.))
+    f1.point /= 1000.
+    f2.point /= 1000.
+    frames = [f1, f2]
+
+    acceleration = 0.35
+    velocity = 0.17
+    time = 5.
+    script_lines = []
+    
+    for frame in frames:        
+        ptp = URPoseTrajectoryPoint(URPose.from_frame(frame), acceleration, velocity, time, None)
+        move = URMovej(ptp)
+        #move = Movel(ptp)
+        script_lines.append(move)
+
+    urgoal = URGoal(script_lines)
+    print(urgoal.msg["script_lines"])
