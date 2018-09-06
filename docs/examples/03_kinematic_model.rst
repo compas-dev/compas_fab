@@ -48,14 +48,28 @@ kind of movements. The three major types of joints are:
 
 .. code-block:: python
 
+    from compas.robots import Robot
     from compas.robots import Joint
     from compas.robots import Link
 
-    link = Link("world")
-    joint = Joint("world-joint", parent="world")
-    link = Link("j0")
-    joint = Joint("j0")
-    # TODO: built own robot here
+    robot = Robot('ur5',
+                  joints=[
+                      Joint('shoulder_pan_joint', 'revolute', parent='base_link', child='shoulder_link'),
+                      Joint('shoulder_lift_joint', 'revolute', parent='shoulder_link', child='upper_arm_link'),
+                      Joint('elbow_joint', 'revolute', parent='upper_arm_link', child='forearm_link'),
+                      Joint('wrist_1_joint', 'revolute', parent='forearm_link', child='wrist_1_link'),
+                      Joint('wrist_2_joint', 'revolute', parent='wrist_1_link', child='wrist_2_link'),
+                      Joint('wrist_3_joint', 'revolute', parent='wrist_2_link', child='wrist_3_link'),
+                  ], links=[
+                      Link('base_link'),
+                      Link('shoulder_link'),
+                      Link('upper_arm_link'),
+                      Link('forearm_link'),
+                      Link('wrist_1_link'),
+                      Link('wrist_2_link'),
+                      Link('wrist_3_link'),
+                  ])
+    print(robot)
 
 .. The RobotState_ class in ROS contains information about the robot at a snapshot in time, storing vectors of joint positions and optionally velocities and accelerations. The RobotState_ also contains helper functions for setting the arm location based on the end effector location (Cartesian pose) and for computing Cartesian trajectories.
 
