@@ -15,8 +15,8 @@ Classses
     :toctree: generated/
     :nosignatures:
 
-    Pose
     Configuration
+    PathPlan
     Robot
     RobotSemantics
     UrdfImporter
@@ -38,6 +38,7 @@ of the CAD environment.
 Unit conversion
 ---------------
 
+The unit systems most commonly used in ``compas_fab`` are **meters** and **radians**.
 The following functions help with converting units from one system to the other.
 
 .. autosummary::
@@ -50,6 +51,7 @@ The following functions help with converting units from one system to the other.
 """
 
 from .configuration import *
+from .path_plan import *
 from .units import *
 from .robot import *
 from .semantics import *
@@ -57,10 +59,11 @@ from .artists import *
 from .urdf_importer import *
 
 from .configuration import __all__ as a
-from .units import __all__ as b
-from .robot import __all__ as c
-from .semantics import __all__ as d
-from .artists import __all__ as e
-from .urdf_importer import __all__ as f
+from .path_plan import __all__ as b
+from .units import __all__ as c
+from .robot import __all__ as d
+from .semantics import __all__ as e
+from .artists import __all__ as f
+from .urdf_importer import __all__ as g
 
-__all__ = a + b + c + d + e + f
+__all__ = a + b + c + d + e + f + g

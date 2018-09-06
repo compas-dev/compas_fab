@@ -6,10 +6,11 @@ import socket
 from timeit import default_timer as timer
 
 from compas.datastructures import Mesh
+from compas.geometry import Frame
+from compas.geometry import matrix_from_frame
 
 from compas_fab.backends.exceptions import BackendError
 from compas_fab.backends.vrep.remote_api import vrep
-# from compas_fab.robots import Pose
 from compas_fab.robots import Configuration
 from compas_fab.robots import Robot
 
@@ -51,12 +52,14 @@ class VrepClient(object):
 
     Examples:
 
-        >>> from compas_fab.backends.vrep import VrepClient
+        >>> from compas_fab.backends import VrepClient
         >>> with VrepClient() as client:
         ...     print ('Connected: %s' % client.is_connected())
         ...
         Connected: True
 
+    Note:
+        For more examples, check out the :ref:`V-REP examples page <vrep_examples>`.
     """
     SUPPORTED_ALGORITHMS = ('bitrrt', 'bkpiece1', 'est', 'kpiece1',
                             'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst',
@@ -143,11 +146,11 @@ class VrepClient(object):
 
         Examples:
 
-            >>> from compas_fab.backends.vrep import *
+            >>> from compas_fab.backends import VrepClient
             >>> with VrepClient() as client:
             ...     matrices = client.get_object_matrices([0])
             ...     print([int(i) for i in matrices[0]])
-            [0, 0, 0, 18, 0, 0, 0, 7, 0, 0, 0, 6]
+            [0, 0, 0, 19, 0, 0, 0, 10, 0, 0, 0, 6]
 
         .. note::
             The resulting dictionary is keyed by object handle.
@@ -167,15 +170,15 @@ class VrepClient(object):
     def set_robot_metric(self, robot, metric_values):
         """Assigns a metric defining relations between axis values of a robot.
 
-        It takes a list of 9 :obj:`float` values (3 for gantry + 6 for joints)
-        ranging from 0 to 1, where 1 indicates the axis is blocked and cannot
+        It takes a list containing one value per configurable joint. Each value
+        ranges from 0 to 1, where 1 indicates the axis is blocked and cannot
         move during inverse kinematic solving. A value of 1 on any of these
         effectively removes one degree of freedom (DOF).
 
         Args:
-            robot (:class:`.Robot`): Robot instance.
-            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
-                values from 0 to 1.
+            robot (:class:`Robot`): Robot instance.
+            metric_values (:obj:`list` of :obj:`float`): List containing one value
+                per configurable joint. Each value ranges from 0 to 1.
         """
         assert_robot(robot)
 
@@ -185,20 +188,21 @@ class VrepClient(object):
                                     [robot.model.attr['index']], metric_values, [],
                                     bytearray(), DEFAULT_OP_MODE)
 
-    def set_robot_pose(self, robot, pose):
-        """Moves the robot the the specified pose.
+    def set_robot_pose(self, robot, frame):
+        """Moves the robot to a given pose, specified as a frame.
 
         Args:
-            robot (:class:`.Robot`): Robot instance to move.
-            pose (:class:`.Pose`): Target or goal pose instance.
+            robot (:class:`Robot`): Robot instance to move.
+            frame (:class:`Frame`): Target or goal frame.
 
         Returns:
-            An instance of :class:`.Configuration` found for the given pose.
+            An instance of :class:`Configuration` found for the given pose.
         """
         assert_robot(robot)
 
         # First check if the start state is reachable
-        config = self.find_robot_states(robot, pose, [0.] * robot.dof)[-1]
+        joints = len(robot.get_configurable_joints())
+        config = self.find_robot_states(robot, frame, [0.] * joints)[-1]
 
         if not config:
             raise ValueError('Cannot find a valid config for the given pose')
@@ -211,7 +215,7 @@ class VrepClient(object):
         """Moves the robot to the specified configuration.
 
         Args:
-            robot (:class:`.Robot`): Robot instance to move.
+            robot (:class:`Robot`): Robot instance to move.
             config (:class:`Configuration` instance): Describes the position of the
                 robot as an instance of :class:`Configuration`.
 
@@ -239,11 +243,11 @@ class VrepClient(object):
         """Gets the current configuration of the specified robot.
 
         Args:
-            robot (:class:`.Robot`): Robot instance.
+            robot (:class:`Robot`): Robot instance.
 
         Examples:
 
-            >>> from compas_fab.robots import Robot
+            >>> from compas_fab.robots import *
             >>> with VrepClient() as client:
             ...     config = client.get_robot_config(Robot.basic('A', index=0))
 
@@ -257,15 +261,15 @@ class VrepClient(object):
                                                       [], [])
         return config_from_vrep(config, self.scale)
 
-    def find_robot_states(self, robot, goal_pose, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
-        """Finds valid robot configurations for the specified goal pose.
+    def find_robot_states(self, robot, goal_frame, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
+        """Finds valid robot configurations for the specified goal frame.
 
         Args:
-            robot (:class:`.Robot`): Robot instance.
-            goal_pose (:class:`.Pose`): Target or goal pose instance.
-            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
-                values (3 for gantry + 6 for joints) ranging from 0 to 1,
-                where 1 indicates the axis is blocked and cannot
+            robot (:class:`Robot`): Robot instance.
+            goal_frame (:class:`Frame`): Target or goal frame.
+            metric_values (:obj:`list` of :obj:`float`): List containing one value
+                per configurable joint. Each value ranges from 0 to 1,
+                where 1 indicates the axis/joint is blocked and cannot
                 move during inverse kinematic solving.
             gantry_joint_limits (:obj:`list` of `float`): List of 6 floats defining the upper/lower limits of
                 gantry joints. Use this if you want to restrict the area in which to search for states.
@@ -277,21 +281,22 @@ class VrepClient(object):
 
         Returns:
             list: List of :class:`Configuration` objects representing
-            the collision-free configuration for the ``goal_pose``.
+            the collision-free configuration for the ``goal_frame``.
         """
         assert_robot(robot)
 
+        joints = len(robot.get_configurable_joints())
         if not metric_values:
-            metric_values = [0.1] * robot.dof
+            metric_values = [0.1] * joints
 
         self.set_robot_metric(robot, metric_values)
 
-        states = self._find_raw_robot_states(robot, pose_to_vrep(goal_pose, self.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
+        states = self._find_raw_robot_states(robot, frame_to_vrep_pose(goal_frame, self.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
 
-        return [config_from_vrep(states[i:i + robot.dof], self.scale)
-                for i in range(0, len(states), robot.dof)]
+        return [config_from_vrep(states[i:i + joints], self.scale)
+                for i in range(0, len(states), joints)]
 
-    def _find_raw_robot_states(self, robot, goal_pose, gantry_joint_limits, arm_joint_limits, max_trials=None, max_results=1):
+    def _find_raw_robot_states(self, robot, goal_vrep_pose, gantry_joint_limits, arm_joint_limits, max_trials=None, max_results=1):
         i = 0
         final_states = []
         retry_until_success = True if not max_trials else False
@@ -308,7 +313,7 @@ class VrepClient(object):
                                                          [robot.model.attr['index'],
                                                           max_trials or 1,
                                                           max_results],
-                                                         goal_pose, string_param_list)
+                                                         goal_vrep_pose, string_param_list)
 
             # Even if the retry_until_success is set to True, we short circuit
             # at some point to prevent infinite loops caused by misconfiguration
@@ -326,16 +331,16 @@ class VrepClient(object):
 
         return final_states
 
-    def pick_building_member(self, robot, building_member_mesh, pickup_pose, metric_values=None):
+    def pick_building_member(self, robot, building_member_mesh, pickup_frame, metric_values=None):
         """Picks up a building member and attaches it to the robot.
 
         Args:
-            robot (:class:`.Robot`): Robot instance to use for pick up.
-            building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh
+            robot (:class:`Robot`): Robot instance to use for pick up.
+            building_member_mesh (:class:`compas.datastructures.Mesh`): Mesh
                 of the building member that will be attached to the robot.
-            pickup_pose (:class:`.Pose`): Pickup pose instance.
-            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
-                values (3 for gantry + 6 for joints) ranging from 0 to 1,
+            pickup_pose (:class:`Frame`): Pickup frame.
+            metric_values (:obj:`list` of :obj:`float`): List containing one value
+                per configurable joint. Each value ranges from 0 to 1,
                 where 1 indicates the axis/joint is blocked and cannot
                 move during inverse kinematic solving.
 
@@ -344,18 +349,21 @@ class VrepClient(object):
         """
         assert_robot(robot)
 
+        joints = len(robot.get_configurable_joints())
         if not metric_values:
-            metric_values = [0.1] * robot.dof
+            metric_values = [0.1] * joints
 
-        self.set_robot_pose(robot, pickup_pose)
+        self.set_robot_pose(robot, pickup_frame)
 
         return self.add_building_member(robot, building_member_mesh)
 
     def _find_path_plan(self, robot, goal, metric_values, collision_meshes,
                         algorithm, trials, resolution,
                         gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length):
+
+        joints = len(robot.get_configurable_joints())
         if not metric_values:
-            metric_values = [0.1] * robot.dof
+            metric_values = [0.1] * joints
 
         if algorithm not in self.SUPPORTED_ALGORITHMS:
             raise ValueError('Unsupported algorithm. Must be one of: ' + str(self.SUPPORTED_ALGORITHMS))
@@ -382,7 +390,7 @@ class VrepClient(object):
             start = timer() if self.debug else None
             max_trials = None if shallow_state_search else 80
             max_results = 1 if shallow_state_search else 80
-            states = self._find_raw_robot_states(robot, pose_to_vrep(goal['target'], self.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
+            states = self._find_raw_robot_states(robot, frame_to_vrep_pose(goal['target'], self.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
             if self.debug:
                 LOG.debug('Execution time: search_robot_states=%.2f', timer() - start)
 
@@ -413,8 +421,8 @@ class VrepClient(object):
         if self.debug:
             LOG.debug('Execution time: total=%.2f', timer() - first_start)
 
-        return [config_from_vrep(path[i:i + robot.dof], self.scale)
-                for i in range(0, len(path), robot.dof)]
+        return [config_from_vrep(path[i:i + joints], self.scale)
+                for i in range(0, len(path), joints)]
 
     def find_path_plan_to_config(self, robot, goal_configs, metric_values=None, collision_meshes=None,
                                  algorithm='rrtconnect', trials=1, resolution=0.02,
@@ -425,13 +433,13 @@ class VrepClient(object):
         specific goal configuration.
 
         Args:
-            robot (:class:`.Robot`): Robot instance to move.
+            robot (:class:`Robot`): Robot instance to move.
             goal_configs (:obj:`list` of :class:`Configuration`): List of target or goal configurations.
-            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
-                values (3 for gantry + 6 for joints) ranging from 0 to 1,
+            metric_values (:obj:`list` of :obj:`float`): List containing one value
+                per configurable joint. Each value ranges from 0 to 1,
                 where 1 indicates the axis/joint is blocked and cannot
                 move during inverse kinematic solving.
-            collision_meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): Collision meshes
+            collision_meshes (:obj:`list` of :class:`compas.datastructures.Mesh`): Collision meshes
                 to be taken into account when calculating the motion plan.
                 Defaults to ``None``.
             algorithm (:obj:`str`): Name of the algorithm to use. Defaults to ``rrtconnect``.
@@ -450,26 +458,26 @@ class VrepClient(object):
 
         Returns:
             list: List of :class:`Configuration` objects representing the
-            collision-free path to the ``goal_pose``.
+            collision-free path to the ``goal_configs``.
         """
         assert_robot(robot)
         return self._find_path_plan(robot, {'target_type': 'config', 'target': goal_configs},
                                     metric_values, collision_meshes, algorithm, trials, resolution,
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
 
-    def find_path_plan(self, robot, goal_pose, metric_values=None, collision_meshes=None,
+    def find_path_plan(self, robot, goal_frame, metric_values=None, collision_meshes=None,
                        algorithm='rrtconnect', trials=1, resolution=0.02,
                        gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
-        """Find a path plan to move the selected robot from its current position to the `goal_pose`.
+        """Find a path plan to move the selected robot from its current position to the `goal_frame`.
 
         Args:
-            robot (:class:`.Robot`): Robot instance to move.
-            goal_pose (:class:`.Pose`): Target or goal pose instance.
-            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`
-                values (3 for gantry + 6 for joints) ranging from 0 to 1,
+            robot (:class:`Robot`): Robot instance to move.
+            goal_frame (:class:`Frame`): Target or goal frame.
+            metric_values (:obj:`list` of :obj:`float`): List containing one value
+                per configurable joint. Each value ranges from 0 to 1,
                 where 1 indicates the axis/joint is blocked and cannot
                 move during inverse kinematic solving.
-            collision_meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): Collision meshes
+            collision_meshes (:obj:`list` of :class:`compas.datastructures.Mesh`): Collision meshes
                 to be taken into account when calculating the motion plan.
                 Defaults to ``None``.
             algorithm (:obj:`str`): Name of the algorithm to use. Defaults to ``rrtconnect``.
@@ -488,10 +496,10 @@ class VrepClient(object):
 
         Returns:
             list: List of :class:`Configuration` objects representing the
-            collision-free path to the ``goal_pose``.
+            collision-free path to the ``goal_frame``.
         """
         assert_robot(robot)
-        return self._find_path_plan(robot, {'target_type': 'pose', 'target': goal_pose},
+        return self._find_path_plan(robot, {'target_type': 'pose', 'target': goal_frame},
                                     metric_values, collision_meshes, algorithm, trials, resolution,
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
 
@@ -499,8 +507,8 @@ class VrepClient(object):
         """Adds a building member to the 3D scene and attaches it to the robot.
 
         Args:
-            robot (:class:`.Robot`): Robot instance to attach the building member to.
-            building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh
+            robot (:class:`Robot`): Robot instance to attach the building member to.
+            building_member_mesh (:class:`compas.datastructures.Mesh`): Mesh
                 of the building member that will be attached to the robot.
 
         Returns:
@@ -518,7 +526,7 @@ class VrepClient(object):
 
         handle = handles[0]
 
-        parent_handle = self.get_object_handle('customGripper' + robot.name + '_connection') #OK
+        parent_handle = self.get_object_handle('customGripper' + robot.name + '_connection')
         vrep.simxSetObjectParent(self.client_id, handle, parent_handle, True, DEFAULT_OP_MODE)
 
         return handle
@@ -527,7 +535,7 @@ class VrepClient(object):
         """Adds meshes to the 3D scene.
 
         Args:
-            meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): List
+            meshes (:obj:`list` of :class:`compas.datastructures.Mesh`): List
                 of meshes to add to the current simulation scene.
 
         Returns:
@@ -626,14 +634,15 @@ def resolve_host(host):
 # all transformations from and to V-REP are consistent
 # --------------------------------------------------------------------------
 
-def pose_to_vrep(pose, scale):
+
+def frame_to_vrep_pose(frame, scale):
     # compas_fab uses meters, just like V-REP,
     # so in general, scale should always be 1
-    pose = list(pose.values)
-    pose[3] = pose[3] / scale
-    pose[7] = pose[7] / scale
-    pose[11] = pose[11] / scale
-    return pose
+    pose = matrix_from_frame(frame)
+    pose[0][3] = pose[0][3] / scale
+    pose[1][3] = pose[1][3] / scale
+    pose[2][3] = pose[2][3] / scale
+    return pose[0] + pose[1] + pose[2] + pose[3]
 
 
 def config_from_vrep(list_of_floats, scale):
