@@ -45,26 +45,27 @@ referenced by the identifiers: ``A``, ``B``, ``C`` and ``D``.
 When planning on a multi-robotic setup, it's important to make sure all robots on the setup of them are positioned correctly
 and not colliding with each other at start, otherwise path planning will fail.
 
-The position of a robot is specified as an instance of :class:`compas_fab.fab.robots.rfl.Configuration`.
+The state of a robot is specified as an instance of :class:`compas_fab.robots.Configuration`.
 
 Here's a simple example on how to position two of the robots using forward kinematics:
 
 .. code-block:: python
 
-    from compas_fab.fab.robots.rfl import *
+    from compas_fab.robots import *
+    from compas_fab.robots import rfl
+    from compas_fab.backends import VrepClient
 
-    config_robot_a    = Configuration.from_joints_and_external_axes([190, 0, 0, 0, 90, 0],
-                                                                  [8260, -1000, -3690])
-    config_robot_b    = Configuration.from_joints_and_external_axes([190, 0, 0, 0, 90, 0],
-                                                                  [8260, -8320, -3690])
+    config_robot_a    = Configuration.from_prismatic_and_revolute_values([8.260, -1.000, -3.690],
+                                                                         to_radians([190, 0, 0, 0, 90, 0]))
 
-    with Simulator() as simulator:
-        robot_a = Robot(11, client=simulator)
-        robot_b = Robot(12, client=simulator)
+    config_robot_b    = Configuration.from_prismatic_and_revolute_values([8.260, -8.320, -3.690],
+                                                                         to_radians([190, 0, 0, 0, 90, 0]))
 
-        simulator.set_robot_config(robot_a, config_robot_a)
-        simulator.set_robot_config(robot_b, config_robot_b)
-
+    with VrepClient() as client:
+        robot_a = rfl.Robot('A')
+        robot_b = rfl.Robot('B')
+        client.set_robot_config(robot_a, config_robot_a)
+        client.set_robot_config(robot_b, config_robot_b)
 
 Inverse Kinematics
 ==================
@@ -81,20 +82,22 @@ of such a request:
 
 .. code-block:: python
 
-    from compas_fab.fab.robots import Pose
-    from compas_fab.fab.robots.rfl import *
+    from compas.geometry import Frame
+    from compas_fab.robots import *
+    from compas_fab.robots import rfl
+    from compas_fab.backends import VrepClient
 
-    start_config    = Configuration.from_joints_and_external_axes([-143, 37, -112, 0, -15, -126],
-                                                                [8260, -5320, -3690])
-    goal_pose       = Pose.from_list([-1.0, 0.0, 0.0, 8110,
-                       0.0, 0.0, -1.0, 7020,
-                       0.0, -1.0, 0.0, 1810])
+    start_config    = Configuration.from_prismatic_and_revolute_values([8.260, -5.320, -3.690],
+                                                                       to_radians([-143, 37, -112, 0, -15, -126]))
+    goal_pose       = Frame.from_list([-1.0, 0.0, 0.0, 8.110,
+                                       0.0, 0.0, -1.0, 7.020,
+                                       0.0, -1.0, 0.0, 1.810])
 
-    with Simulator() as simulator:
-        robot = Robot(12, client=simulator)
+    with VrepClient() as client:
+        robot = rfl.Robot('B')
 
-        simulator.set_robot_config(robot, start_config)
-        path = simulator.find_path_plan(robot, goal_pose)
+        client.set_robot_config(robot, start_config)
+        path = client.find_path_plan(robot, goal_pose)
         print('Found path of %d steps' % len(path))
 
 
@@ -107,42 +110,43 @@ calculating a path plan:
 .. code-block:: python
 
     import logging
-    from compas.datastructures.mesh import Mesh
-    from compas_fab import get_data
-    from compas_fab.fab.robots import Pose
-    from compas_fab.fab.robots.rfl import *
+
+    from compas.geometry import Frame
+    from compas.datastructures import Mesh
+
+    from compas_fab.robots import *
+    from compas_fab.robots import rfl
+    from compas_fab.backends import VrepClient
 
     # Configure logging to DEBUG to see detailed timing of the path planning
     logging.basicConfig(level=logging.DEBUG)
 
     # Configure parameters for path planning
-    start_pose      = Pose.from_list([0.0, 1.0, 0.0, 7453,
-                       -1.0, 0.0, 0.0, 10919,
-                       0.0, 0.0, 1.0, 609])
-    goal_pose       = Pose.from_list([-1.0, 0.0, 0.0, 8110,
-                       8.97e-13, 0.0, -1.0, 6920,
-                       0.0, -1.0, 0.0, 1810])
+    start_pose      = Frame.from_list([0.0, 1.0, 0.0, 7.453,
+                                       -1.0, 0.0, 0.0, 10.919,
+                                       0.0, 0.0, 1.0, 0.609])
+    goal_pose       = Frame.from_list([-1.0, 0.0, 0.0, 8.110,
+                                       8.97e-13, 0.0, -1.0, 6.920,
+                                       0.0, -1.0, 0.0, 1.810])
     algorithm       = 'rrtconnect'
     max_trials      = 1
     resolution      = 0.02
-    building_member = Mesh.from_obj(get_data('timber_beam.obj'))
-    structure       = [Mesh.from_obj(get_data('timber_structure.obj'))]
+    building_member = Mesh.from_obj('timber_beam.obj')
+    structure       = [Mesh.from_obj('timber_structure.obj')]
     metric          = [0.1] * 9
     fast_search     = True
 
-    with Simulator(debug=True) as simulator:
-        robot = Robot(12, client=simulator)
-
-        simulator.reset_all_robots()
-        simulator.pick_building_member(robot, building_member, start_pose)
-        path = simulator.find_path_plan(robot,
-                                        goal_pose,
-                                        metric_values=metric,
-                                        collision_meshes=structure,
-                                        algorithm=algorithm,
-                                        trials=max_trials,
-                                        resolution=resolution,
-                                        shallow_state_search=fast_search)
+    with VrepClient(debug=True) as client:
+        robot = rfl.Robot('B', client=client)
+        client.pick_building_member(robot, building_member, start_pose)
+        path = client.find_path_plan(robot,
+                                     goal_pose,
+                                     metric_values=metric,
+                                     collision_meshes=structure,
+                                     algorithm=algorithm,
+                                     trials=max_trials,
+                                     resolution=resolution,
+                                     shallow_state_search=fast_search)
 
         print('Found path of %d steps' % len(path))
 

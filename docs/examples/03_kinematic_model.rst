@@ -46,6 +46,9 @@ kind of movements. The three major types of joints are:
 * **Prismatic**: A sliding joint that slides along the axis, and has a limited range specified by the upper and lower limits
 * **Fixed**: Not really a joint because it cannot move, all degrees of freedom are locked.
 
+
+**COMPAS** Framework provides classes to describe robot models. The following snippet shows how to describe a UR5 robot:
+
 .. code-block:: python
 
     from compas.robots import Robot

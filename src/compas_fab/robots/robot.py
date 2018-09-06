@@ -49,7 +49,7 @@ class Robot(object):
         self.RCF = Frame.worldXY()
 
     @classmethod
-    def basic(cls, name, **kwargs):
+    def basic(cls, name, joints=[], links=[], materials=[], **kwargs):
         """Convenience method to create the most basic instance of a robot, based only on a name.
 
         Parameters
@@ -62,7 +62,7 @@ class Robot(object):
         :class:`Robot`
             Newly created instance of a robot.
         """
-        model = compas.robots.model.Robot(name, joints=[], links=[], materials=[], **kwargs)
+        model = compas.robots.model.Robot(name, joints=joints, links=links, materials=materials, **kwargs)
         return cls(model)
 
     @classmethod
