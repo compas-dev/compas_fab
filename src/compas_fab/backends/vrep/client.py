@@ -51,12 +51,14 @@ class VrepClient(object):
 
     Examples:
 
-        >>> from compas_fab.backends.vrep import VrepClient
+        >>> from compas_fab.backends import VrepClient
         >>> with VrepClient() as client:
         ...     print ('Connected: %s' % client.is_connected())
         ...
         Connected: True
 
+    Note:
+        For more examples, check out the :ref:`V-REP examples page <vrep_examples>`.
     """
     SUPPORTED_ALGORITHMS = ('bitrrt', 'bkpiece1', 'est', 'kpiece1',
                             'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst',
@@ -143,11 +145,11 @@ class VrepClient(object):
 
         Examples:
 
-            >>> from compas_fab.backends.vrep import *
+            >>> from compas_fab.backends import VrepClient
             >>> with VrepClient() as client:
             ...     matrices = client.get_object_matrices([0])
             ...     print([int(i) for i in matrices[0]])
-            [0, 0, 0, 18, 0, 0, 0, 7, 0, 0, 0, 6]
+            [0, 0, 0, 19, 0, 0, 0, 10, 0, 0, 0, 6]
 
         .. note::
             The resulting dictionary is keyed by object handle.
