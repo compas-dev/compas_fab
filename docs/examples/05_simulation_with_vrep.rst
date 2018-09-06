@@ -70,7 +70,26 @@ Here's a simple example on how to position two of the robots using forward kinem
 Inverse Kinematics
 ==================
 
-TODO: Add here IK before full on path planning
+When the configuration required to reach a certain frame with a robot is not know, we use inverse kinematics
+to resolve it and find a suitable pose. The following example shows how to calculate this. In this case, it will
+take collisions into account, but does not find a path to the goal pose, only that there is at least one
+valid configuration to reach the goal pose.
+
+.. code-block:: python
+
+    from compas.geometry import Frame
+    from compas_fab.robots import rfl
+    from compas_fab.backends import VrepClient
+
+    goal_pose       = Frame.from_list([-1.0, 0.0, 0.0, 8.110,
+                                       0.0, 0.0, -1.0, 7.020,
+                                       0.0, -1.0, 0.0, 1.810])
+
+    with VrepClient() as client:
+        robot = rfl.Robot('B')
+
+        config = client.set_robot_pose(robot, goal_pose)
+        print('Found valid configuration: ', str(config))
 
 Basic path planning example
 ---------------------------
