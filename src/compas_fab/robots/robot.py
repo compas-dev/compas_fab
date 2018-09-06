@@ -253,4 +253,48 @@ class Robot(object):
 
 
 if __name__ == "__main__":
-    pass
+
+    import os
+    import compas.robots.model
+    import xml
+
+    resource_path = "C:\\Users\\rustr\\workspace\\robot_description\\ur5"
+    package = 'ur_description'
+    urdf = 'robot_description.urdf'
+    srdf = 'robot_description_semantic.srdf'
+
+    loader = LocalPackageMeshLoader(resource_path, package)
+    urdf_robot = UrdfRobot.from_urdf_file(loader.load_urdf(urdf))
+    urdf_robot.load_geometry(loader)
+
+    try:
+        robot = Robot.from_resource_path(fullpath)
+        # TODO: Replace with the new RobotArtist
+        # robot.create(Mesh)
+        print("base_link:", robot.get_base_frame())
+    except xml.etree.ElementTree.ParseError:
+        print(">>>>>>>>>>>>>>>>>> ERROR", item)
+
+    """
+    print("base_link_name:", r2.get_base_link_name())
+    print("ee_link_name:", r1.get_end_effector_link_name())
+    print("ee_link_name:", r2.get_end_effector_link_name())
+    print("configurable_joints:", r1.get_configurable_joint_names())
+    print("configurable_joints:", r2.get_configurable_joint_names())
+    """
+
+    """
+    import os
+    path = os.path.join(os.path.expanduser('~'), "workspace", "robot_description")
+    robot_name = "ur5"
+    robot_name = "staubli_tx60l"
+    #robot_name = "abb_irb6640_185_280"
+    resource_path = os.path.join(path, robot_name)
+
+    filename = os.path.join(resource_path, "robot_description.urdf")
+    model = compas.robots.model.Robot.from_urdf_file(filename)
+
+    robot = Robot(model, resource_path, client=None)
+
+    robot.create(Mesh)
+    """

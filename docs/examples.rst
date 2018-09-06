@@ -17,8 +17,7 @@ List of examples
 
 .. toctree::
     :maxdepth: 2
+    :glob:
 
-    examples/01_frame_and_transformation
-    examples/02_coordinate_frames
-    examples/03_kinematic_model
-    examples/04_robot_control
+    examples/*
+

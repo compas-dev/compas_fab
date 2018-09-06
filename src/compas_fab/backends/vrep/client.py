@@ -51,7 +51,7 @@ class VrepClient(object):
 
     Examples:
 
-        >>> from compas_fab.backends.vrep import *
+        >>> from compas_fab.backends.vrep import VrepClient
         >>> with VrepClient() as client:
         ...     print ('Connected: %s' % client.is_connected())
         ...

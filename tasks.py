@@ -152,22 +152,22 @@ def docs(ctx, doctest=False, rebuild=True, check_links=False):
 @task()
 def check(ctx):
     """Check the consistency of documentation, coding style and a few other things."""
+    log.write('Checking MANIFEST.in...')
+    ctx.run('check-manifest --ignore-bad-ideas=remoteApi.so')
+
     log.write('Checking ReStructuredText formatting...')
     ctx.run('python setup.py check --strict --metadata --restructuredtext')
 
-    log.write('Running flake8 python linter...')
-    ctx.run('flake8 src setup.py')
+    # log.write('Running flake8 python linter...')
+    # ctx.run('flake8 src setup.py')
 
-    log.write('Checking python imports...')
-    ctx.run('isort --check-only --diff --recursive src tests setup.py')
-
-    log.write('Checking MANIFEST.in...')
-    ctx.run('check-manifest')
+    # log.write('Checking python imports...')
+    # ctx.run('isort --check-only --diff --recursive src tests setup.py')
 
 
 @task(help={
       'checks': 'True to run all checks before testing, otherwise False.'})
-def test(ctx, checks=True):
+def test(ctx, checks=False):
     """Run all tests."""
     if checks:
         check(ctx)
@@ -181,10 +181,16 @@ def release(ctx, release_type):
     if release_type not in ('patch', 'minor', 'major'):
         raise Exit('The release type parameter is invalid.\nMust be one of: major, minor, patch')
 
+    # Run checks
+    ctx.run('invoke check test')
+
+    # Bump version and git tag it
     ctx.run('bumpversion %s --verbose' % release_type)
-    ctx.run('invoke docs test')
+
+    # Build project
     ctx.run('python setup.py clean --all sdist bdist_wheel')
 
+    # Upload to pypi
     if confirm('You are about to upload the release to pypi.org. Are you sure? [y/N]'):
         files = ['dist/*.whl', 'dist/*.gz', 'dist/*.zip']
         dist_files = ' '.join([pattern for f in files for pattern in glob.glob(f)])

@@ -64,10 +64,10 @@ Bug reports
 When `reporting a bug <https://github.com/gramaziokohler/compas_fab/issues>`_
 please include:
 
-    * Operating system name and version.
-    * Python version.
-    * Any details about your local setup that might be helpful in troubleshooting.
-    * Detailed steps to reproduce the bug.
+* Operating system name and version.
+* Python version.
+* Any details about your local setup that might be helpful in troubleshooting.
+* Detailed steps to reproduce the bug.
 
 Feature requests and feedback
 -----------------------------
