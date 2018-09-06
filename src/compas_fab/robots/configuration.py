@@ -35,13 +35,14 @@ class Configuration(object):
     >>> from compas_fab.robots import Configuration
     >>> config = Configuration.from_prismatic_and_revolute_values([8.312], [pi/2, 0., 0., 0., 2*pi, 0.8])
     >>> str(config)
-    Configuration(8.312, 1.571, 0.000, 0.000, 0.000, 6.283, 0.800)
+    'Configuration(8.312, 1.571, 0.000, 0.000, 0.000, 6.283, 0.800)'
 
     >>> from math import pi
     >>> from compas_fab.robots import Configuration
     >>> from compas.robots import Joint
     >>> config = Configuration([pi/2, 3., 0.1], [Joint.REVOLUTE, Joint.PRISMATIC, Joint.PLANAR])
-    Configuration(1.571, 3.000, 0.100)
+    >>> str(config)
+    'Configuration(1.571, 3.000, 0.100)'
 
     """
 
