@@ -267,21 +267,21 @@ if __name__ == "__main__":
     urdf_robot = UrdfRobot.from_urdf_file(loader.load_urdf(urdf))
     urdf_robot.load_geometry(loader)
 
-            try:
-                robot = Robot.from_resource_path(fullpath)
-                # TODO: Replace with the new RobotArtist
-                # robot.create(Mesh)
-                print("base_link:", robot.get_base_frame())
-            except xml.etree.ElementTree.ParseError:
-                print(">>>>>>>>>>>>>>>>>> ERROR", item)
+    try:
+        robot = Robot.from_resource_path(fullpath)
+        # TODO: Replace with the new RobotArtist
+        # robot.create(Mesh)
+        print("base_link:", robot.get_base_frame())
+    except xml.etree.ElementTree.ParseError:
+        print(">>>>>>>>>>>>>>>>>> ERROR", item)
 
-            """
-            print("base_link_name:", r2.get_base_link_name())
-            print("ee_link_name:", r1.get_end_effector_link_name())
-            print("ee_link_name:", r2.get_end_effector_link_name())
-            print("configurable_joints:", r1.get_configurable_joint_names())
-            print("configurable_joints:", r2.get_configurable_joint_names())
-            """
+    """
+    print("base_link_name:", r2.get_base_link_name())
+    print("ee_link_name:", r1.get_end_effector_link_name())
+    print("ee_link_name:", r2.get_end_effector_link_name())
+    print("configurable_joints:", r1.get_configurable_joint_names())
+    print("configurable_joints:", r2.get_configurable_joint_names())
+    """
 
     """
     import os
