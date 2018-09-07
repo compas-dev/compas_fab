@@ -261,6 +261,28 @@ class VrepClient(object):
                                                       [], [])
         return config_from_vrep(config, self.scale)
 
+    def get_end_effector_pose(self, robot):
+        """Gets the current end-effector pose.
+
+        Args:
+            robot (:class:`Robot`): Robot instance.
+
+        Examples:
+
+            >>> from compas_fab.robots import *
+            >>> with VrepClient() as client:
+            ...     frame = client.get_end_effector_pose(Robot.basic('A', index=0))
+
+        Returns:
+            An instance of :class:`Frame`.
+        """
+        assert_robot(robot)
+
+        _res, _, pose, _, _ = self.run_child_script('getIkTipPose',
+                                                      [robot.model.attr['index']],
+                                                      [], [])
+        return vrep_pose_to_frame(pose, self.scale)
+
     def find_robot_states(self, robot, goal_frame, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
         """Finds valid robot configurations for the specified goal frame.
 
@@ -633,6 +655,9 @@ def resolve_host(host):
 # The following mapping functions are only internal to make sure
 # all transformations from and to V-REP are consistent
 # --------------------------------------------------------------------------
+
+def vrep_pose_to_frame(pose, scale):
+    return Frame.from_list(floats_from_vrep(pose, scale))
 
 
 def frame_to_vrep_pose(frame, scale):
