@@ -40,8 +40,7 @@ class AxisAngle(URmsg):
         self.z = z
     
     def __str__(self):
-        #return '%.6f, %.6f, %.6f' % (self.x ,self.y, self.z)
-        return "0.000000, 2.221441, -2.221441"
+        return '%.6f, %.6f, %.6f' % (self.x ,self.y, self.z)
 
 
 class URPose(URmsg):
