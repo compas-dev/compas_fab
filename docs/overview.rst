@@ -17,3 +17,7 @@ Main features
 * Multiple robotic backends (e.g. `ROS: Robot Operating System <https://ros.org>`_)
 
 **compas_fab** runs on Python 2.x, 3.x and IronPython 2.7.
+
+**compas_fab** is still under very active development, with new versions being released
+frequently. The interface is not guaranteed to remain stable until the package
+reaches version ``1.0.0``.
