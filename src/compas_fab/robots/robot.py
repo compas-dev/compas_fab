@@ -159,15 +159,21 @@ class Robot(object):
 
     @property
     def transformation_RCF_WCF(self):
-        # transformation matrix from world coordinate system to robot coordinate system
+        """Returns the transformation matrix from world coordinate system to 
+            robot coordinate system.
+        """
         return Transformation.from_frame_to_frame(Frame.worldXY(), self.RCF)
 
     @property
     def transformation_WCF_RCF(self):
-         # transformation matrix from robot coordinate system to world coordinate system
+        """Returns the transformation matrix from robot coordinate system to 
+            world coordinate system
+        """
         return Transformation.from_frame_to_frame(self.RCF, Frame.worldXY())
 
     def set_RCF(self, robot_coordinate_frame):
+        """Moves the origin frame of the robot to the robot_coordinate_frame.
+        """
         self.RCF = robot_coordinate_frame
 
     def get_configuration(self, group=None):
@@ -196,19 +202,112 @@ class Robot(object):
         if not self.semantics:
             raise Exception('This method is only callable once a semantic model is assigned')
 
-    def inverse_kinematics(self, frame):
-        self.ensure_client()
-        raise NotImplementedError
-        configuration = self.client.inverse_kinematics(frame)
-        return configuration
+    def inverse_kinematics(self, frame, current_configuration=None, 
+                           callback_result=None, group=None):
+        """Calculate the robot's inverse kinematic.
 
-    def forward_kinematics(self, configuration):
+        Parameters
+        ----------
+            frame (:class:`Frame`): The frame to calculate the inverse for
+            current_configuration (:class:`Configuration`, optional): If passed,
+                the inverse will be calculated such that the calculated joint 
+                positions differ the least from the current configuration.
+                Defaults to the zero position for all joints.
+            callback_result (function, optional): the function to call for the 
+                processing the result. Defaults to the print function.
+            group (str, optional): The planning group used for calculation.
+                Defaults to the robot's main planning group. 
+        
+        Examples
+        --------
+        """
         self.ensure_client()
-        raise NotImplementedError
+        if not group:
+            group = self.main_group_name # ensure semantics
+        base_link = self.get_base_link_name(group)
+        joint_names = self.get_configurable_joint_names(group)
+        if not current_configuration:
+            joint_positions = [0] * len(joint_names)
+        else:
+            joint_positions = current_configuration.values
+        if not callback_result:
+            callback_result = print
+        frame_scaled = frame.copy()
+        frame_scaled.point /= self.scale_factor # must be in meters
 
-    def compute_cartesian_path(self, frames):
+        self.client.inverse_kinematics(callback_result, frame_scaled, base_link,
+                                       group, joint_names, joint_positions)
+
+    def forward_kinematics(self, configuration, callback_result=None, group=None):
+        """Calculate the robot's forward kinematic.
+
+        Parameters
+        ----------
+            configuration (:class:`Configuration`, optional): The configuration
+                to calculate the forward kinematic for.
+            callback_result (function, optional): the function to call for the 
+                processing the result. Defaults to the print function.
+            group (str, optional): The planning group used for calculation.
+                Defaults to the robot's main planning group. 
+        
+        Examples
+        --------
+        """
         self.ensure_client()
-        raise NotImplementedError
+        if not group:
+            group = self.main_group_name # ensure semantics
+        if not callback_result:
+            callback_result = print
+        joint_positions = configuration.values
+        base_link = self.get_base_link_name(group)
+        joint_names = self.get_configurable_joint_names(group)
+        ee_link = self.get_end_effector_link_name(group)
+        self.client.forward_kinematics(callback_result, joint_positions, 
+                                       base_link, group, joint_names, ee_link)
+        
+
+    def compute_cartesian_path(self, frames, start_configuration, max_step,
+                               avoid_collisions=True, callback_result=None, group=None):
+        """Calculates a path defined by frames (Cartesian coordinate system).
+
+        Parameters
+        ----------
+            frames (:class:`Frame`): The frames of which the path is defined.
+            start_configuration (:class:`Configuration`, optional): The robot's
+                configuration at the starting position.
+            max_step (float): the approximate distance between the calculated 
+                points. (Defined in the robot's units)
+            avoid_collisions (bool)
+            callback_result (function, optional): the function to call for the 
+                processing the result. Defaults to the print function.
+            group (str, optional): The planning group used for calculation.
+                Defaults to the robot's main planning group. 
+        
+        Examples
+        --------
+        """
+        self.ensure_client()
+        if not group:
+            group = self.main_group_name # ensure semantics
+        if not callback_result:
+            callback_result = print
+        frames_scaled = []
+        for frame in frames:
+            frame_scaled = frame.copy()
+            frame_scaled.point /= self.scale_factor
+            frames_scaled.append(frame_scaled)
+        base_link = self.get_base_link_name(group)
+        joint_names = self.get_configurable_joint_names(group)
+        if not start_configuration:
+            joint_positions = [0] * len(joint_names)
+        else:
+            joint_positions = start_configuration.values
+        ee_link = self.get_end_effector_link_name(group)
+        max_step_scaled = max_step/self.scale_factor
+        
+        self.client.compute_cartesian_path(callback_result, frames_scaled, base_link, 
+                                           ee_link, group, joint_names, joint_positions,
+                                           max_step_scaled, avoid_collisions)
 
     def send_frame(self):
         # (check service name with ros)
@@ -233,6 +332,15 @@ class Robot(object):
     def axes(self):
         return self.model.get_axes(self.transformation_RCF_WCF)
 
+    def draw_visual(self):
+        return self.model.draw_visual(self.transformation_RCF_WCF)
+
+    def draw_collision(self):
+        return self.model.draw_collision(self.transformation_RCF_WCF)
+
+    def draw(self):
+        return self.model.draw()
+
     def scale(self, factor):
         """Scale the robot.
         """
@@ -243,49 +351,3 @@ class Robot(object):
         return self.model.scale_factor
 
 
-if __name__ == "__main__":
-
-    import os
-    import compas.robots.model
-    import xml
-
-    resource_path = "C:\\Users\\rustr\\workspace\\robot_description\\ur5"
-    package = 'ur_description'
-    urdf = 'robot_description.urdf'
-    srdf = 'robot_description_semantic.srdf'
-
-    loader = LocalPackageMeshLoader(resource_path, package)
-    urdf_robot = UrdfRobot.from_urdf_file(loader.load_urdf(urdf))
-    urdf_robot.load_geometry(loader)
-
-    try:
-        robot = Robot.from_resource_path(fullpath)
-        # TODO: Replace with the new RobotArtist
-        # robot.create(Mesh)
-        print("base_link:", robot.get_base_frame())
-    except xml.etree.ElementTree.ParseError:
-        print(">>>>>>>>>>>>>>>>>> ERROR", item)
-
-    """
-    print("base_link_name:", r2.get_base_link_name())
-    print("ee_link_name:", r1.get_end_effector_link_name())
-    print("ee_link_name:", r2.get_end_effector_link_name())
-    print("configurable_joints:", r1.get_configurable_joint_names())
-    print("configurable_joints:", r2.get_configurable_joint_names())
-    """
-
-    """
-    import os
-    path = os.path.join(os.path.expanduser('~'), "workspace", "robot_description")
-    robot_name = "ur5"
-    robot_name = "staubli_tx60l"
-    #robot_name = "abb_irb6640_185_280"
-    resource_path = os.path.join(path, robot_name)
-
-    filename = os.path.join(resource_path, "robot_description.urdf")
-    model = compas.robots.model.Robot.from_urdf_file(filename)
-
-    robot = Robot(model, resource_path, client=None)
-
-    robot.create(Mesh)
-    """

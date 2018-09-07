@@ -82,6 +82,7 @@ class RosClient(Ros):
         super(RosClient, self).__init__(host, port, is_secure)
 
     def inverse_kinematics(self, callback, frame, base_link, group, joint_names, joint_positions):
+    def inverse_kinematics(self, callback_result, frame, base_link, group, joint_names, joint_positions):
 
         header = Header(frame_id=base_link)
         pose = Pose.from_frame(frame)
@@ -98,11 +99,10 @@ class RosClient(Ros):
 
         def receive_message(msg):
             response = GetPositionIKResponse.from_msg(msg)
-            callback(response)
+            callback_result(response)
             """
             if response.error_code == MoveItErrorCodes.SUCCESS:
                 configuration = response.solution.joint_state.position
-                print(configuration)
             print(response.error_code.human_readable)
             """
 
@@ -111,9 +111,8 @@ class RosClient(Ros):
         srv.call(request, receive_message, receive_message)
 
 
-    def forward_kinematics(self, callback, configuration, base_link, group, joint_names, ee_link):
+    def forward_kinematics(self, callback_result, joint_positions, base_link, group, joint_names, ee_link):
 
-        joint_positions = configuration.values
         header = Header(frame_id=base_link)
         fk_link_names = [ee_link]
         joint_state = JointState(name=joint_names, position=joint_positions, header=header)
@@ -126,13 +125,13 @@ class RosClient(Ros):
             #if response.error_code == MoveItErrorCodes.SUCCESS:
             #    frames = [ps.pose.frame for ps in response.pose_stamped]
             #print(response.error_code.human_readable)
-            callback(response)
+            callback_result(response)
 
         srv = Service(self, '/compute_fk', 'GetPositionFK')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
 
-    def compute_cartesian_path(self, callback, frames, base_link, ee_link, group,
+    def compute_cartesian_path(self, callback_result, frames, base_link, ee_link, group,
                                joint_names, joint_positions, max_step,
                                avoid_collisions):
 
@@ -151,13 +150,13 @@ class RosClient(Ros):
 
         def receive_message(msg):
             response = GetCartesianPathResponse.from_msg(msg)
-            callback(response)
+            callback_result(response)
 
         srv = Service(self, '/compute_cartesian_path', 'GetCartesianPath')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
 
-    def follow_configurations(self, callback, joint_names, configurations, timesteps, timeout=None):
+    def follow_configurations(self, callback_result, joint_names, configurations, timesteps, timeout=None):
 
         if len(configurations) != len(timesteps):
             raise ValueError("%d configurations must have %d timesteps, but %d given." % (len(configurations), len(timesteps), len(timesteps)))
@@ -172,10 +171,9 @@ class RosClient(Ros):
             points.append(pt)
 
         joint_trajectory = JointTrajectory(Header(), joint_names, points) # specify header necessary?
-        self.follow_joint_trajectory(callback, joint_trajectory, timeout)
+        self.follow_joint_trajectory(callback_result, joint_trajectory, timeout)
 
-
-    def follow_joint_trajectory(self, callback, joint_trajectory, timeout=3000):
+    def follow_joint_trajectory(self, callback_result, joint_trajectory, timeout=3000):
         """Follow the joint trajectory as computed by Moveit Planner.
 
         Args:
@@ -186,7 +184,7 @@ class RosClient(Ros):
 
         def handle_result(msg, client):
             result = FollowJointTrajectoryResult.from_msg(msg)
-            callback(result)
+            callback_result(result)
             #print(result.human_readable)
 
         action_client = ActionClient(self, '/follow_joint_trajectory',
@@ -200,7 +198,7 @@ class RosClient(Ros):
         goal.send(60000)
 
 
-    def direct_ur_movel(self, callback, frames, acceleration=None, velocity=None, time=None, radius=None):
+    def direct_ur_movel(self, callback_result, frames, acceleration=None, velocity=None, time=None, radius=None):
 
         action_client = DirectUrActionClient(self, timeout=50000)
 
@@ -216,5 +214,5 @@ class RosClient(Ros):
         goal = Goal(action_client, Message(urgoal.msg))
         action_client.on('timeout', lambda: print('CLIENT TIMEOUT'))
         # goal.on('feedback', lambda feedback: print(feedback))
-        goal.on('result', callback)
+        goal.on('result', callback_result)
         action_client.send_goal(goal)
