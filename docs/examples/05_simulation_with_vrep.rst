@@ -124,46 +124,22 @@ Complete path planning example
 ------------------------------
 
 The following example showcases a lot of the configuration options available when
-calculating a path plan:
+calculating a path plan.
 
-.. code-block:: python
+To run this example, first download the following meshes:
 
-    import logging
+* :download:`Timber beam (.OBJ) <files/timber_beam.obj>`
+* :download:`Timber structure (.OBJ) <files/timber_structure.obj>`
 
-    from compas.geometry import Frame
-    from compas.datastructures import Mesh
+For convenience, you can also download the full script:
 
-    from compas_fab.robots import *
-    from compas_fab.robots import rfl
-    from compas_fab.backends import VrepClient
+* :download:`Path planning example (.PY) <files/complete_path_planning_example.py>`
 
-    # Configure logging to DEBUG to see detailed timing of the path planning
-    logging.basicConfig(level=logging.DEBUG)
+Or Copy & Paste the following code into a Python file, making sure it
+resides in the same folder where the two mesh files are stored:
 
-    # Configure parameters for path planning
-    start_pose      = Frame((7.453, 2.905, 0.679), (1, 0, 0), (0, -1, 0))
-    goal_pose       = Frame((5.510, 5.900, 1.810), (0, 0, -1), (0, 1, 0))
-    algorithm       = 'rrtconnect'
-    max_trials      = 1
-    resolution      = 0.02
-    building_member = Mesh.from_obj('timber_beam.obj')
-    structure       = [Mesh.from_obj('timber_structure.obj')]
-    metric          = [0.1] * 9
-    fast_search     = True
-
-    with VrepClient(debug=True) as client:
-        robot = rfl.Robot('B', client=client)
-        client.pick_building_member(robot, building_member, start_pose)
-        path = client.find_path_plan(robot,
-                                     goal_pose,
-                                     metric_values=metric,
-                                     collision_meshes=structure,
-                                     algorithm=algorithm,
-                                     trials=max_trials,
-                                     resolution=resolution,
-                                     shallow_state_search=fast_search)
-
-        print('Found path of %d steps' % len(path))
+.. literalinclude :: files/complete_path_planning_example.py
+   :language: python
 
 Grasshopper integration
 =======================
@@ -172,8 +148,11 @@ Grasshopper integration
     :figclass: figure
     :class: figure-img img-fluid
 
-Besides the examples above that can be run standalone or inside CAD software, this package contains
-a ready-made integration for Grasshopper that allows configuration of most available parameters.
+Besides the examples above that can be run standalone or inside CAD software,
+this package contains a ready-made integration for Grasshopper that allows
+configuration of most available parameters.
 
-See :download:`this basic example <grasshopper-basic-example.ghx>` and then
-:download:`this complete path planning example <grasshopper-path-planner.ghx>` for Grasshopper.
+Download the following Grasshoper examples:
+
+* :download:`Basic path planning example <files/grasshopper-basic-example.ghx>`
+* :download:`Complete path planning example <files/grasshopper-path-planner.ghx>`.
