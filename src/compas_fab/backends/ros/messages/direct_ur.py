@@ -107,11 +107,13 @@ class URGoal(URmsg):
     """
     """
     def __init__(self, script_lines=[]):
-        self.script_lines = "def prog():\n\t" + "\n\t".join([str(line) for line in script_lines]) + "\nend\nprog()\n\n"
+        self.script = "def prog():\n\t"
+        self.script += "\n\t".join([str(line) for line in script_lines]) 
+        self.script += "\nend\nprog()\n\n"
     
     @property
     def msg(self):
-        return {"script_lines": self.script_lines}
+        return {"script": self.script}
 
 
 if __name__ == "__main__":

@@ -76,7 +76,6 @@ kind of movements. The three major types of joints are:
                   ])
     print(robot)
 
-.. The RobotState_ class in ROS contains information about the robot at a snapshot in time, storing vectors of joint positions and optionally velocities and accelerations. The RobotState_ also contains helper functions for setting the arm location based on the end effector location (Cartesian pose) and for computing Cartesian trajectories.
 
 .. figure:: 03_robot_model.jpg
     :figclass: figure

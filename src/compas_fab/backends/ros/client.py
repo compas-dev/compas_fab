@@ -187,7 +187,7 @@ class RosClient(Ros):
             #print(result.human_readable)
 
         action_client = ActionClient(self, '/follow_joint_trajectory',
-                       'control_msgs/FollowJointTrajectory', timeout)
+                       'control_msgs/FollowJointTrajectoryAction', timeout)
         goal = Goal(action_client, Message(goal.msg))
 
         goal.on('result', lambda result: handle_result(result, action_client))
@@ -204,12 +204,11 @@ class RosClient(Ros):
         script_lines = []
         for frame in frames:
             ptp = URPoseTrajectoryPoint(URPose.from_frame(frame), acceleration, velocity, time, radius)
-            #move = URMovej(ptp)
             move = URMovel(ptp)
             script_lines.append(move)
 
         urgoal = URGoal(script_lines)
-
+        
         goal = Goal(action_client, Message(urgoal.msg))
         action_client.on('timeout', lambda: print('CLIENT TIMEOUT'))
         # goal.on('feedback', lambda feedback: print(feedback))

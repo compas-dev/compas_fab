@@ -8,7 +8,7 @@ compas_fab.robots
 This package contains classes for robot modeling and they are used by the
 simulation, planning and execution backends to exchange information.
 
-Classses
+Classes
 --------
 
 .. autosummary::
