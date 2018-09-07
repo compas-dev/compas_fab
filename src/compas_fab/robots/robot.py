@@ -175,6 +175,27 @@ class Robot(object):
         """Moves the origin frame of the robot to the robot_coordinate_frame.
         """
         self.RCF = robot_coordinate_frame
+    
+    def get_RCF(self):
+        """Returns the origin frame of the robot.
+        """
+        return self.RCF
+
+    def represent_frame_in_RCF(self, frame_WCF):
+        """
+        Returns the representation of a frame in the world coordinate frame 
+        in the robot's coordinate frame
+        """
+        frame_RCF = frame_WCF.transformed(self.transformation_RCF_WCF)
+        return frame_RCF
+    
+    def represent_frame_in_WCF(self, frame_RCF):
+        """
+        Returns the representation of a frame in the robot's coordinate frame 
+        in the world coordinate frame
+        """
+        frame_WCF = frame_RCF.transformed(self.transformation_WCF_RCF)
+        return frame_WCF
 
     def get_configuration(self, group=None):
         """Returns the current joint configuration.
