@@ -28,13 +28,13 @@ of these tools, otherwise each of them is potentially a very time consuming task
 
 Download `Docker Community Edition`_:
 
-* `For Windows <https://store.docker.com/editions/community/docker-ce-desktop-windows>`_
-* `For Mac <https://store.docker.com/editions/community/docker-ce-desktop-mac>`_
+* `Docker for Windows <https://store.docker.com/editions/community/docker-ce-desktop-windows>`_
+* `Docker for Mac <https://store.docker.com/editions/community/docker-ce-desktop-mac>`_
 
 Optionally, install `Kitematic` to have a visual overview of the running containers:
 
-* `For Windows <https://download.docker.com/kitematic/Kitematic-Windows.zip>`_
-* `For Mac <https://download.docker.com/kitematic/Kitematic-Mac.zip>`_
+* `Kitematic for Windows <https://download.docker.com/kitematic/Kitematic-Windows.zip>`_
+* `Kitematic for Mac <https://download.docker.com/kitematic/Kitematic-Mac.zip>`_
 
 .. note::
 
