@@ -67,6 +67,10 @@ Here's a simple example on how to position two of the robots using forward kinem
         client.set_robot_config(robot_a, config_robot_a)
         client.set_robot_config(robot_b, config_robot_b)
 
+        frame_a = client.get_end_effector_pose(robot_a)
+        frame_b = client.get_end_effector_pose(robot_b)
+        print('End effector poses: ', str(frame_a), str(frame_b))
+
 Inverse Kinematics
 ==================
 
@@ -81,9 +85,7 @@ valid configuration to reach the goal pose.
     from compas_fab.robots import rfl
     from compas_fab.backends import VrepClient
 
-    goal_pose       = Frame.from_list([-1.0, 0.0, 0.0, 8.110,
-                                       0.0, 0.0, -1.0, 7.020,
-                                       0.0, -1.0, 0.0, 1.810])
+    goal_pose = Frame((8.110, 7.020, 1.810), (-1, 0, 0), (-0, -0, -1))
 
     with VrepClient() as client:
         robot = rfl.Robot('B')
@@ -108,9 +110,7 @@ of such a request:
 
     start_config    = Configuration.from_prismatic_and_revolute_values([8.260, -5.320, -3.690],
                                                                        to_radians([-143, 37, -112, 0, -15, -126]))
-    goal_pose       = Frame.from_list([-1.0, 0.0, 0.0, 8.110,
-                                       0.0, 0.0, -1.0, 7.020,
-                                       0.0, -1.0, 0.0, 1.810])
+    goal_pose       = Frame((8.110, 7.020, 1.810), (-1, 0, 0), (-0, -0, -1))
 
     with VrepClient() as client:
         robot = rfl.Robot('B')
@@ -141,12 +141,8 @@ calculating a path plan:
     logging.basicConfig(level=logging.DEBUG)
 
     # Configure parameters for path planning
-    start_pose      = Frame.from_list([0.0, 1.0, 0.0, 7.453,
-                                       -1.0, 0.0, 0.0, 10.919,
-                                       0.0, 0.0, 1.0, 0.609])
-    goal_pose       = Frame.from_list([-1.0, 0.0, 0.0, 8.110,
-                                       8.97e-13, 0.0, -1.0, 6.920,
-                                       0.0, -1.0, 0.0, 1.810])
+    start_pose      = Frame((7.453, 2.905, 0.679), (1, 0, 0), (0, -1, 0))
+    goal_pose       = Frame((5.510, 5.900, 1.810), (0, 0, -1), (0, 1, 0))
     algorithm       = 'rrtconnect'
     max_trials      = 1
     resolution      = 0.02

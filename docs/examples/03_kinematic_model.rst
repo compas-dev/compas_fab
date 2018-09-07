@@ -34,11 +34,13 @@ give you access to a robot's kinematics.
 
 Links
 ==================
+
 Robot links are solid mechanical elements. Depending on the kinematic model, movement
 of certain input links allows the output links to move at various motions.
 
 Joints
 ==================
+
 The joints are the elements in a robot which helps the links to travel in different
 kind of movements. The three major types of joints are:
 
@@ -78,9 +80,49 @@ kind of movements. The three major types of joints are:
 
 .. figure:: 03_robot_model.jpg
     :figclass: figure
-    :class: figure-img img-fluid
+    :class: figure-img img-fluid w-50
 
     Coordinate frames in each joint of the robot.
+
+Forward Kinematics
+==================
+
+The Forward Kinematics function/algorithm takes the joint states, or configuration,
+as the input, and calculates the pose of the end effector in the task space
+as the output. This means the state of each joint in the articulated body
+of a robot needs to be defined.
+
+Joint states are described in **compas_fab** with the
+:class:`compas_fab.robots.Configuration` class.
+
+.. code-block:: python
+
+    config = Configuration.from_revolute_values(to_radians([90, 90, 0, 0, 0, 0])
+
+    with VrepClient() as client:
+        client.set_robot_config(robot, config)
+
+        frame = client.get_end_effector_pose(robot)
+        print('End effector pose: ', str(frame))
+
+Inverse Kinematics
+==================
+
+Inverse Kinematics is the inverse function/algorithm of Forward Kinematics. The
+Forward Kinematics function/algorithm takes a target end-effector pose in the
+task space as the input, and calculates the joint states required for the
+end effector to reach the target pose . The output of an inverse kinematics
+are the joint states, i.e. the configuration of the robot.
+
+The following code exemplifies how to calculate this:
+
+.. code-block:: python
+
+    goal_pose = Frame((8.110, 7.020, 1.810), (-1, 0, 0), (-0, -0, -1))
+
+    with VrepClient() as client:
+        config = client.set_robot_pose(rfl.Robot('B'), goal_pose)
+        print('Found configuration: ', str(config))
 
 Links
 =====
