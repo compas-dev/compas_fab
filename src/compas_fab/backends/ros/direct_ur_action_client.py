@@ -3,7 +3,7 @@ from roslibpy import Message, Ros, Topic
 from roslibpy.actionlib import ActionClient, Goal
 from roslibpy.event_emitter import EventEmitterMixin
 
-from compas_fab.backends.ros.messages.direct_ur import PoseTrajectoryPoint
+from compas_fab.backends.ros.messages.direct_ur import URPoseTrajectoryPoint
 
 class DirectUrActionClient(EventEmitterMixin):
     """Direct UR Script action client to simulate an action interface
@@ -81,7 +81,7 @@ class DirectUrActionClient(EventEmitterMixin):
 
         if not self.omit_status:
             self.status_listener.unsubscribe(self._on_status_message)
-    
+
 
     def send_goal(self, goal, result_callback=None, timeout=None):
         """Send goal to the action server.
