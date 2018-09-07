@@ -10,13 +10,7 @@ The recommended way to install **compas_fab** is to use `Anaconda/conda <https:/
 ::
 
     conda config --add channels conda-forge
-    conda install compas_fab
-
-
-But it can also be installed using ``pip``:
-
-::
-
+    conda install COMPAS
     pip install compas_fab
 
 
