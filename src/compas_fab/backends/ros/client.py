@@ -1,13 +1,17 @@
 from __future__ import print_function
 
 from compas.geometry import Frame
+from roslibpy import Message
 from roslibpy import Ros
 from roslibpy import Service
 from roslibpy import ServiceRequest
-from roslibpy import Message
 from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
+from compas_fab.backends.exceptions import BackendError
+from compas_fab.backends.ros import DirectUrActionClient
+from compas_fab.backends.ros import FollowJointTrajectoryGoal
+from compas_fab.backends.ros import FollowJointTrajectoryResult
 from compas_fab.backends.ros import GetCartesianPathRequest
 from compas_fab.backends.ros import GetCartesianPathResponse
 from compas_fab.backends.ros import GetPositionFKRequest
@@ -16,32 +20,66 @@ from compas_fab.backends.ros import GetPositionIKRequest
 from compas_fab.backends.ros import GetPositionIKResponse
 from compas_fab.backends.ros import Header
 from compas_fab.backends.ros import JointState
+from compas_fab.backends.ros import JointTrajectory
+from compas_fab.backends.ros import JointTrajectoryPoint
+from compas_fab.backends.ros import MoveItErrorCodes
 from compas_fab.backends.ros import MultiDOFJointState
 from compas_fab.backends.ros import Pose
 from compas_fab.backends.ros import PoseStamped
 from compas_fab.backends.ros import PositionIKRequest
 from compas_fab.backends.ros import RobotState
-from compas_fab.backends.ros import MoveItErrorCodes
-from compas_fab.backends.ros import FollowJointTrajectoryResult
-from compas_fab.backends.ros import FollowJointTrajectoryGoal
-from compas_fab.backends.ros import JointTrajectoryPoint
-from compas_fab.backends.ros import JointTrajectory
 from compas_fab.backends.ros import Time
 
-from compas_fab.backends.ros import DirectUrActionClient
-from compas_fab.backends.ros.messages.direct_ur import URPose
-from compas_fab.backends.ros.messages.direct_ur import URPoseTrajectoryPoint
+from compas_fab.backends.ros.messages.direct_ur import URGoal
 from compas_fab.backends.ros.messages.direct_ur import URMovej
 from compas_fab.backends.ros.messages.direct_ur import URMovel
-from compas_fab.backends.ros.messages.direct_ur import URGoal
-
+from compas_fab.backends.ros.messages.direct_ur import URPose
+from compas_fab.backends.ros.messages.direct_ur import URPoseTrajectoryPoint
 
 __all__ = [
-    'RosClient'
+    'RosClient',
+    'RosError',
 ]
 
 
+class RosError(BackendError):
+    """Wraps an exception that occurred on the communication with ROS."""
+    pass
+
+
 class RosClient(Ros):
+    """Interface to use ROS as backend via the **rosbridge**.
+
+    The connection is managed by ``roslibpy``.
+
+    Parameters
+    ----------
+    host : :obj:`str`
+        ROS bridge host. Defaults to ``localhost``.
+    port : :obj:`int`
+        Port of the ROS Bridge. Defaults to ``9090``.
+    is_secure : :obj:`bool`
+        ``True`` to indicate it should use a secure web socket, otherwise ``False``.
+
+    Examples
+    --------
+
+    >>> from compas_fab.backends import RosClient
+    >>> client = RosClient()
+    >>> def hello_ros():
+    >>>     print('Connected: %s' % client.is_connected)
+    >>>     client.terminate()
+    >>> client.on_ready(hello_ros)
+    >>> client.run_forever()
+    Connected: True
+
+    Note
+    ----
+    For more examples, check out the :ref:`ROS examples page <ros_examples>`.
+    """
+
+    def __init__(self, host='localhost', port=9090, is_secure=False):
+        super(RosClient, self).__init__(host, port, is_secure)
 
     def inverse_kinematics(self, callback, frame, base_link, group, joint_names, joint_positions):
 
@@ -74,7 +112,7 @@ class RosClient(Ros):
 
 
     def forward_kinematics(self, callback, configuration, base_link, group, joint_names, ee_link):
-        
+
         joint_positions = configuration.values
         header = Header(frame_id=base_link)
         fk_link_names = [ee_link]
@@ -118,7 +156,7 @@ class RosClient(Ros):
         srv = Service(self, '/compute_cartesian_path', 'GetCartesianPath')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
-    
+
     def follow_configurations(self, callback, joint_names, configurations, timesteps, timeout=None):
 
         if len(configurations) != len(timesteps):
@@ -135,7 +173,7 @@ class RosClient(Ros):
 
         joint_trajectory = JointTrajectory(Header(), joint_names, points) # specify header necessary?
         self.follow_joint_trajectory(callback, joint_trajectory, timeout)
-    
+
 
     def follow_joint_trajectory(self, callback, joint_trajectory, timeout=3000):
         """Follow the joint trajectory as computed by Moveit Planner.
@@ -151,7 +189,7 @@ class RosClient(Ros):
             callback(result)
             #print(result.human_readable)
 
-        action_client = ActionClient(self, '/follow_joint_trajectory', 
+        action_client = ActionClient(self, '/follow_joint_trajectory',
                        'control_msgs/FollowJointTrajectory', timeout)
         goal = Goal(action_client, Message(goal.msg))
 
@@ -161,13 +199,13 @@ class RosClient(Ros):
         action_client.on('timeout', lambda: print('CLIENT TIMEOUT'))
         goal.send(60000)
 
-    
+
     def direct_ur_movel(self, callback, frames, acceleration=None, velocity=None, time=None, radius=None):
 
         action_client = DirectUrActionClient(self, timeout=50000)
 
         script_lines = []
-        for frame in frames:        
+        for frame in frames:
             ptp = URPoseTrajectoryPoint(URPose.from_frame(frame), acceleration, velocity, time, radius)
             #move = URMovej(ptp)
             move = URMovel(ptp)
@@ -180,5 +218,3 @@ class RosClient(Ros):
         # goal.on('feedback', lambda feedback: print(feedback))
         goal.on('result', callback)
         action_client.send_goal(goal)
-
-

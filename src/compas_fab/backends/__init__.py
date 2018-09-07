@@ -33,6 +33,7 @@ Exceptions
     :nosignatures:
 
     BackendError
+    RosError
     VrepError
 
 """
