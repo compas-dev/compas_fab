@@ -96,13 +96,9 @@ class DirectUrActionClient(EventEmitterMixin):
         if result_callback:
             goal.on('result', result_callback)
 
-        ur_script_line = goal.goal_message['goal']['script_lines']
-        message = Message({'data': ur_script_line})
+        ur_script = goal.goal_message['goal']['script']
+        message = Message({'data': ur_script})
         self._urscript_topic.publish(message)
-
-        #for ur_script_line in goal.goal_message['goal']['script_lines']:
-        #    message = Message({'data': ur_script_line})
-        #    self._urscript_topic.publish(message)
 
         if timeout:
             self.ros.call_later(

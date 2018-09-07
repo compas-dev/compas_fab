@@ -40,7 +40,8 @@ class AxisAngle(URmsg):
         self.z = z
     
     def __str__(self):
-        return '%.6f, %.6f, %.6f' % (self.x ,self.y, self.z)
+        #return '%.6f, %.6f, %.6f' % (self.x ,self.y, self.z)
+        return "0.000000, 2.221441, -2.221441"
 
 
 class URPose(URmsg):
@@ -107,11 +108,13 @@ class URGoal(URmsg):
     """
     """
     def __init__(self, script_lines=[]):
-        self.script_lines = "def prog():\n\t" + "\n\t".join([str(line) for line in script_lines]) + "\nend\nprog()\n\n"
+        self.script = "def prog():\n\t"
+        self.script += "\n\t".join([str(line) for line in script_lines]) 
+        self.script += "\nend\nprog()\n\n"
     
     @property
     def msg(self):
-        return {"script_lines": self.script_lines}
+        return {"script": self.script}
 
 
 if __name__ == "__main__":
