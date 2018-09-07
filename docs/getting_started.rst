@@ -25,7 +25,8 @@ Environments
 ============
 
 Just like the main library of **COMPAS**, the core functionality of **compas_fab**
-is independent of CAD software and can be used from the terminal, in standalone scripts.
+is independent of CAD software and can be used from the command line,
+in standalone scripts.
 
 
 Working in Rhino
