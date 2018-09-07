@@ -75,17 +75,17 @@ as Euler angles, axis-angle representation, and quaternion.
     Ry = Rotation.from_axis_and_angle(yaxis, beta)
     Rz = Rotation.from_axis_and_angle(zaxis, gamma)
     F2 = Frame.worldXY()
-    F1 == F2.transformed(Rx * Ry * Rz)
+    print('Are equal?', F1 == F2.transformed(Rx * Ry * Rz))
 
     # quaternion
     q = F1.quaternion
     F2 = Frame.from_quaternion(q)
-    F1 == F2
+    print('Are equal?', F1 == F2)
 
     # axis-angle
     ax = F1.axis_angle_vector
     F2 = Frame.from_axis_angle_vector(ax)
-    F1 == F2
+    print('Are equal?', F1 == F2)
 
 
 Further information
