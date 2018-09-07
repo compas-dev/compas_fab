@@ -123,12 +123,15 @@ class RosClient(Ros):
         goal.send(60000)
 
 
-
+    # NOTE: Suggested method signature
+    # def set_robot_pose(self, robot, frame):
     def send_frame(self):
         # (check service name with ros)
         self.ensure_client()
         raise NotImplementedError
 
+    # NOTE: Suggested method signature
+    # def set_robot_config(self, robot, configuration):
     def send_configuration(self):
         # (check service name with ros)
         self.ensure_client()
