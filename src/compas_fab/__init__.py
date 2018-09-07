@@ -14,10 +14,18 @@ environments.
 
     compas_fab.backends
     compas_fab.geometry
-    compas_fab.ghpython
     compas_fab.robots
     compas_fab.sensors
     compas_fab.utilities
+
+CAD Interfaces
+--------------
+
+.. toctree::
+    :maxdepth: 3
+
+    compas_fab.ghpython
+    compas_fab.rhino
 
 """
 
