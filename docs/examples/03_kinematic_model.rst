@@ -96,7 +96,7 @@ Joint states are described in **compas_fab** with the
 
 .. code-block:: python
 
-    config = Configuration.from_revolute_values(to_radians([90, 90, 0, 0, 0, 0])
+    config = Configuration.from_revolute_values(to_radians([90, 90, 0, 0, 0, 0]))
 
     with VrepClient() as client:
         client.set_robot_config(robot, config)
