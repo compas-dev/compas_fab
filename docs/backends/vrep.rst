@@ -27,7 +27,7 @@ container with the following commands on the command line::
 .. note::
 
     If your operating system does not support running Docker, an alternative is
-    is to `download V-REP <http://www.coppeliarobotics.com/downloads.html>`_ and
+    to `download V-REP <http://www.coppeliarobotics.com/downloads.html>`_ and
     install it as a normal application.
 
 .. _Docker: https://www.docker.com/
