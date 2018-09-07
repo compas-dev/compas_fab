@@ -38,7 +38,7 @@ of the CAD environment.
 Unit conversion
 ---------------
 
-The unit systems most commonly used in ``compas_fab`` are **meters** and **radians**.
+The unit systems most commonly used in **compas_fab** are **meters** and **radians**.
 The following functions help with converting units from one system to the other.
 
 .. autosummary::

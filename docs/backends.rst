@@ -8,7 +8,7 @@ One of the driving principles of **COMPAS** framework is to create an ecosystem
 and serve as an interface between different front-ends (e.g. CAD software) and
 back-ends.
 
-In the case of ``compas_fab``, it provides access to multiple robot platforms
+In the case of **compas_fab**, it provides access to multiple robot platforms
 as backends. This chapter highlights the available ones and explains how to
 obtain them and set them up.
 
