@@ -81,7 +81,6 @@ class RosClient(Ros):
     def __init__(self, host='localhost', port=9090, is_secure=False):
         super(RosClient, self).__init__(host, port, is_secure)
 
-    def inverse_kinematics(self, callback, frame, base_link, group, joint_names, joint_positions):
     def inverse_kinematics(self, callback_result, frame, base_link, group, joint_names, joint_positions):
 
         header = Header(frame_id=base_link)
