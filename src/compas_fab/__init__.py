@@ -17,12 +17,6 @@ environments.
     compas_fab.robots
     compas_fab.utilities
 
-CAD Interfaces
---------------
-
-.. toctree::
-    :maxdepth: 3
-
     compas_fab.ghpython
     compas_fab.rhino
 
