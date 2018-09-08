@@ -123,6 +123,38 @@ The following code exemplifies how to calculate this:
         config = client.set_robot_pose(rfl.Robot('B'), goal_pose)
         print('Found configuration: ', str(config))
 
+Visualizing robot models
+========================
+
+**COMPAS** includes the concept of `artists`: classes that assist with the
+visualization of datastructures and models, in a way that maintains the data
+separated from the specific CAD interfaces, while providing a way to leverage
+native performance of the CAD environment.
+
+In the main library there are artists for various datastructures (meshes, networks,
+etc), and **compas_fab** adds a ``RobotArtist`` to them. Robot artists allow
+visualizing robot models easily and efficiently.
+
+The following example illustrates how to load an entire robot model from an open source
+repository and render it in Rhino:
+
+.. literalinclude :: files/robot-artist-rhino.py
+   :language: python
+
+.. raw:: html
+
+    <div class="card bg-light">
+    <div class="card-body">
+    <div class="card-title">Downloads</div>
+
+* :download:`Robot artist (Rhino) (.PY) <files/robot-artist-rhino.py>`
+* :download:`Robot artist (Blender) (.PY) <files/robot-artist-blender.py>`
+
+.. raw:: html
+
+    </div>
+    </div>
+
 Links
 =====
 
