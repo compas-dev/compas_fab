@@ -10,6 +10,10 @@ and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.
 Unreleased
 ----------
 
+**Added**
+
+* Robot artist for Blender
+
 0.2.0
 -----
 
