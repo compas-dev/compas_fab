@@ -4,10 +4,6 @@ compas_fab: Robotic Fabrication for COMPAS
 
 .. start-badges
 
-.. image:: https://readthedocs.org/projects/compas_fab/badge/?style=flat
-    :target: https://readthedocs.org/projects/compas_fab
-    :alt: Documentation Status
-
 .. image:: https://travis-ci.org/gramaziokohler/compas_fab.svg?branch=master
     :target: https://travis-ci.org/gramaziokohler/compas_fab
     :alt: Travis-CI Build Status
