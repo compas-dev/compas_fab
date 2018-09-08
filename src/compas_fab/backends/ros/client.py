@@ -144,7 +144,7 @@ class RosClient(Ros):
                                          group_name=group,
                                          link_name=ee_link,
                                          waypoints=waypoints,
-                                         max_step=float(max_step)/1000.,
+                                         max_step=float(max_step),
                                          avoid_collisions=bool(avoid_collisions))
 
         def receive_message(msg):
