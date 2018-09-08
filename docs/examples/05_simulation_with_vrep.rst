@@ -152,7 +152,16 @@ Besides the examples above that can be run standalone or inside CAD software,
 this package contains a ready-made integration for Grasshopper that allows
 configuration of most available parameters.
 
-Download the following Grasshoper examples:
+.. raw:: html
+
+    <div class="card bg-light">
+    <div class="card-body">
+    <div class="card-title">Downloads</div>
 
 * :download:`Basic path planning example <files/grasshopper-basic-example.ghx>`
 * :download:`Complete path planning example <files/grasshopper-path-planner.ghx>`.
+
+.. raw:: html
+
+    </div>
+    </div>
