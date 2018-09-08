@@ -99,14 +99,14 @@ Now let's move on to the listener side:
 Running the example
 -------------------
 
-Open a command line prompts and start the talker:
+Open a command prompt and start the talker:
 
 ::
 
     python ros-hello-world-talker.py
 
 
-Now open a second command line prompt and start the listener:
+Now open a second command prompt and start the listener:
 
 ::
 

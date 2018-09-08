@@ -58,7 +58,7 @@ The recommended way to install **compas_fab** is to use `Anaconda/conda <https:/
     pip install compas_fab
 
 
-Once installed, you can verify your setup. Start Python from the command line and run the following:
+Once installed, you can verify your setup. Start Python from the command prompt and run the following:
 
 .. code-block:: python
 

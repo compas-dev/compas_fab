@@ -14,7 +14,7 @@ inside a container in only a few steps with the added benefit of ensuring
 repeatability.
 
 Once you made sure `Docker`_ is running, you can download and install the V-REP
-container with the following commands on the command line::
+container with the following commands on the command prompt::
 
     docker pull gramaziokohler/vrep-rfl
     docker run --restart=always -p 19997:19997 -d gramaziokohler/vrep-rfl

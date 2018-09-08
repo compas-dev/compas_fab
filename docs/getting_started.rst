@@ -14,7 +14,7 @@ The recommended way to install **compas_fab** is to use `Anaconda/conda <https:/
     pip install compas_fab
 
 
-Once installed, you can verify your setup. Start Python from the command line and run the following:
+Once installed, you can verify your setup. Start Python from the command prompt and run the following:
 
 .. code-block:: python
 
@@ -25,7 +25,7 @@ Environments
 ============
 
 Just like the main library of **COMPAS**, the core functionality of **compas_fab**
-is independent of CAD software and can be used from the command line,
+is independent of CAD software and can be used from the command prompt,
 in standalone scripts.
 
 
