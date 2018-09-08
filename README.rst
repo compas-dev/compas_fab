@@ -88,7 +88,8 @@ Contributing
 
 We love contributions!
 
-Check the `Contributor's Guide <CONTRIBUTING.rst>`_ for more details.
+Check the `Contributor's Guide <https://github.com/gramaziokohler/compas_fab/blob/master/CONTRIBUTING.rst>`_
+for more details.
 
 
 Releasing this project
@@ -115,4 +116,4 @@ Credits
 -------
 
 This package is maintained by Gramazio Kohler Research `@gramaziokohler <https://github.com/gramaziokohler>`_
-and a long list of `contributors <AUTHORS.rst>`_
+and a long list of `contributors <https://github.com/gramaziokohler/compas_fab/blob/master/AUTHORS.rst>`_
