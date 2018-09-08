@@ -2,10 +2,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas_ghpython import mesh_draw
-from compas_ghpython.geometry import xform_from_transformation
+import time
+
+import compas
+from compas_blender import xdraw_mesh
 
 from compas_fab.artists import BaseRobotArtist
+
+try:
+    import mathutils
+except ImportError:
+    pass
 
 __all__ = [
     'RobotArtist',
@@ -13,17 +20,14 @@ __all__ = [
 
 
 class RobotArtist(BaseRobotArtist):
-    """Visualizer for robots inside a Grasshopper environment."""
+    """Visualizer for robots inside a Blender environment."""
 
     def __init__(self, robot):
         super(RobotArtist, self).__init__(robot)
 
     def transform(self, native_mesh, transformation):
-        T = xform_from_transformation(transformation)
-        native_mesh.Transform(T)
+        native_mesh.matrix_world *= mathutils.Matrix(transformation.matrix)
 
     def draw_mesh(self, compas_mesh):
-        return mesh_draw(compas_mesh)
-
-    # def set_color(self, color_rgba):
-    #     r, g, b, a = color_rgba
+        v, f = compas_mesh.to_vertices_and_faces()
+        return xdraw_mesh(v, f)

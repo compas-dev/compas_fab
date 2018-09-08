@@ -21,20 +21,6 @@ Classes
     RobotSemantics
     UrdfImporter
 
-Artists
--------
-
-In **COMPAS**, the `artists` are classes that assist with the visualization of
-datastructures and models, in a way that maintains the data separated from the
-specific CAD interfaces, while providing a way to leverage native performance
-of the CAD environment.
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    BaseRobotArtist
-
 Unit conversion
 ---------------
 
@@ -55,7 +41,6 @@ from .path_plan import *
 from .units import *
 from .robot import *
 from .semantics import *
-from .artists import *
 from .urdf_importer import *
 
 from .configuration import __all__ as a
@@ -63,7 +48,6 @@ from .path_plan import __all__ as b
 from .units import __all__ as c
 from .robot import __all__ as d
 from .semantics import __all__ as e
-from .artists import __all__ as f
-from .urdf_importer import __all__ as g
+from .urdf_importer import __all__ as f
 
-__all__ = a + b + c + d + e + f + g
+__all__ = a + b + c + d + e + f

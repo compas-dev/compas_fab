@@ -12,11 +12,13 @@ environments.
 .. toctree::
     :maxdepth: 3
 
+    compas_fab.artists
     compas_fab.backends
     compas_fab.geometry
     compas_fab.robots
     compas_fab.utilities
 
+    compas_fab.blender
     compas_fab.ghpython
     compas_fab.rhino
 

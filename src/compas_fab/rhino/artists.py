@@ -7,7 +7,7 @@ import time
 import compas
 import compas_rhino
 
-from compas_fab.robots.artists import BaseRobotArtist
+from compas_fab.artists import BaseRobotArtist
 
 try:
     import Rhino.Geometry
