@@ -31,12 +31,10 @@ Path planning
     :nosignatures:
 
     PathVisualizer
-    PathPlanner
-    InputParameterParser
 
 """
 
 from .artists import RobotArtist
-# from .path_planning import *
+from .path_planning import *
 
-__all__ = ['RobotArtist']
+__all__ = ['RobotArtist', 'PathVisualizer']

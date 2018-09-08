@@ -1,44 +1,34 @@
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 
 import logging
 from timeit import default_timer as timer
 
+import compas
 from compas.datastructures import Mesh
-from compas_ghpython.geometry import xform_from_transformation_matrix
+from compas.geometry import Frame
+from compas.geometry.xforms import Transformation
+from compas_ghpython.geometry import xform_from_transformation
+from compas_rhino.helpers import mesh_from_guid
 
-from compas_fab.robots import Configuration
-from compas_fab.robots import Pose
 from compas_fab.backends.vrep.coordinator import SimulationCoordinator
+from compas_fab.robots import Configuration
 
 try:
     import clr
-    import ghcomp
+    import ghpythonlib.components as ghcomp
     import rhinoscriptsyntax as rs
     from Rhino.Geometry import Transform
     from Rhino.Geometry import Mesh as RhinoMesh
 except ImportError:
-    import platform
-    if platform.python_implementation() == 'IronPython':
-        raise
+    compas.raise_if_ironpython()
+
+__all__ = [
+    'PathVisualizer',
+]
 
 LOG = logging.getLogger('compas_fab.ghpython.path_planning')
-
-
-def _trimesh_from_guid(guid, **kwargs):
-    """Creates an instance of a :class:`Mesh` class from an identifier
-    in Rhino/Grasshopper making sure it is a trimesh.
-
-    This function is almost identical to ``mesh_from_guid`` in the core
-    framework, but there were some import issues when used from within
-    Grasshopper, but eventually, it should be migrated into the core.
-    """
-    trimesh = ghcomp.Triangulate(rs.coercemesh(guid))[0]
-    vertices = [map(float, vertex) for vertex in rs.MeshVertices(trimesh)]
-    faces = map(list, rs.MeshFaceVertices(trimesh))
-    faces = [face[: -1] if face[-2] == face[-1] else face for face in faces]
-    mesh = Mesh.from_vertices_and_faces(vertices, faces)
-    mesh.attributes.update(kwargs)
-    return mesh
 
 
 def vrep_pose_from_plane(plane):
@@ -80,6 +70,14 @@ def _create_rhino_mesh(vertices, faces):
     return mesh
 
 
+def _to_xform(m):
+    m = m if len(m) == 16 else m + [0, 0, 0, 1]
+    return xform_from_transformation(Transformation.from_list(m))
+
+
+# TODO: This module needs to be heavily refactored
+# Currently only compatible with V-REP client and most helper functions
+# are not superceeded by compas features
 class PathVisualizer(object):
     """Handles the generation of meshes to visualize a full path plan
     in Rhino/Grasshopper.
@@ -109,8 +107,8 @@ class PathVisualizer(object):
         if self.debug:
             LOG.debug('Execution time: get_all_visible_handles=%.2f', timer() - first_start)
 
-        if 'rfl_meshes' not in ctx:
-            ctx['rfl_meshes'] = self._get_rfl_meshes(shape_handles)
+        if 'scene_meshes' not in ctx:
+            ctx['scene_meshes'] = self._get_scene_meshes(shape_handles)
 
         frame_config = path[frame]
 
@@ -123,15 +121,15 @@ class PathVisualizer(object):
         meshes = []
         mesh_matrices = self.simulator.get_object_matrices(shape_handles)
         for handle, mesh_matrix in mesh_matrices.iteritems():
-            mesh = ctx['rfl_meshes'][handle].DuplicateShallow()
-            mesh.Transform(xform_from_transformation_matrix(mesh_matrix))
+            mesh = ctx['scene_meshes'][handle].DuplicateShallow()
+            mesh.Transform(_to_xform(mesh_matrix))
             meshes.append(mesh)
 
         if self.building_member:
             gripping_config = self.building_member_pickup_config if self.building_member_pickup_config else path[0]
             info = self._get_building_member_info(gripping_config)
             mesh = info['mesh'].DuplicateShallow()
-            parent_transform = xform_from_transformation_matrix(mesh_matrices[info['parent_handle']])
+            parent_transform = _to_xform(mesh_matrices[info['parent_handle']])
             relative_transform = info['relative_transform']
 
             mesh.Transform(Transform.Multiply(parent_transform, relative_transform))
@@ -148,41 +146,40 @@ class PathVisualizer(object):
         """Indicates whether the path visualizer is in debug mode or not."""
         return self.simulator.debug
 
-    def _get_rfl_meshes(self, shape_handles):
+    def _get_scene_meshes(self, shape_handles):
         start = timer() if self.debug else None
         shape_geometry = []
         for handle in shape_handles:
             _, faces, vertices, _, _ = self.simulator.run_child_script('getShapeMesh', [handle], [], [])
             shape_geometry.append((vertices, faces))
 
-        rfl_meshes = {}
+        scene_meshes = {}
         _, _, mesh_matrices, _, _ = self.simulator.run_child_script('getShapeMatrices', shape_handles, [], [])
         for i in range(0, len(mesh_matrices), 12):
             handle = shape_handles[i // 12]
             vertices, faces = shape_geometry[i // 12]
-            transform = xform_from_transformation_matrix(mesh_matrices[i:i + 12])
+            transform = _to_xform(mesh_matrices[i:i + 12])
             mesh = _transform_to_origin(_create_rhino_mesh(vertices, faces), transform)
-            rfl_meshes[handle] = mesh
+            scene_meshes[handle] = mesh
 
         if self.debug:
             LOG.debug('Execution time: create RFL meshes at origin=%.2f', timer() - start)
 
-        return rfl_meshes
+        return scene_meshes
 
     def _get_building_member_info(self, gripping_config):
         start = timer() if self.debug else None
-
         self.simulator.set_robot_config(self.robot, gripping_config)
-        mesh = _trimesh_from_guid(self.building_member)
+        mesh = mesh_from_guid(Mesh, self.building_member)
         handle = self.simulator.add_building_member(self.robot, mesh)
         matrix = self.simulator.get_object_matrices([handle])[handle]
 
         parent_handle = self.simulator.get_object_handle('customGripper' + self.robot.name)
         _, _, mesh_matrix, _, _ = self.simulator.run_child_script('getShapeMatrixRelative', [handle, parent_handle], [], [])
 
-        relative_transform = xform_from_transformation_matrix(mesh_matrix)
+        relative_transform = _to_xform(mesh_matrix)
 
-        transform = xform_from_transformation_matrix(matrix)
+        transform = _to_xform(matrix)
         mesh_at_origin = _transform_to_origin(rs.coercemesh(self.building_member), transform)
 
         if self.debug:
@@ -239,7 +236,7 @@ class PathPlanner(object):
                         raise ValueError('Multi-move is not (yet) supported. Only one goal can be specified.')
 
                 if 'building_member' in settings:
-                    robot['building_member'] = _trimesh_from_guid(settings['building_member']).to_data()
+                    robot['building_member'] = mesh_from_guid(Mesh, settings['building_member']).to_data()
 
                 if 'metric_values' in settings:
                     robot['metric_values'] = map(float, settings['metric_values'].split(','))
@@ -251,7 +248,7 @@ class PathPlanner(object):
 
         if 'collision_meshes' in kwargs:
             mesh_guids = parser.compact_list(kwargs['collision_meshes'])
-            options['collision_meshes'] = map(lambda m: m.to_data(), map(_trimesh_from_guid, mesh_guids))
+            options['collision_meshes'] = [mesh_from_guid(Mesh, m).to_data() for m in mesh_guids]
 
         options['debug'] = kwargs.get('debug')
         options['trials'] = kwargs.get('trials')

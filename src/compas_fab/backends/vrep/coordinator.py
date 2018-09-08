@@ -3,7 +3,7 @@ import logging
 
 from compas.datastructures.mesh import Mesh
 
-# from compas_fab.robots import Pose
+from compas.geometry import Frame
 from compas_fab.robots import Configuration
 from compas_fab.robots import Robot
 
@@ -47,17 +47,17 @@ class SimulationCoordinator(object):
                     'robot': 12,
                     'start': {
                         'joint_values': [90.0, 100.0, -160.0, 180.0, 30.0, -90.0],
-                        'external_axes': [9562.26, -2000, -3600]
+                        'external_axes': [9.56226, -2.000, -3.600]
                     },
                 }
                 {
                     'robot': 11,
                     'start': {
                         'joint_values': [90.0, 100.0, -160.0, 180.0, 30.0, -90.0],
-                        'external_axes': [9562.26, -1000, -4600]
+                        'external_axes': [9.56226, -1.000, -4.600]
                     },
                     'goal': {
-                        'values': [-0.98, 0.16, 0.0, 1003, 0.0, 0.0, -1.0, -5870, -0.16, -0.98, 0.0, -1500]
+                        'values': [-0.98, 0.16, 0.0, 1.003, 0.0, 0.0, -1.0, -5.870, -0.16, -0.98, 0.0, -1.500]
                     },
                     'building_member': {
                         'attributes': {
@@ -66,9 +66,9 @@ class SimulationCoordinator(object):
                     },
                     'joint_limits': {
                         'gantry': [
-                            [0, 20000],
-                            [-12000, 0],
-                            [-4600, -1000]
+                            [0, 20.000],
+                            [-12.000, 0],
+                            [-4.600, -1.000]
                         ],
                         'arm': [
                             [-180, 180],
@@ -115,7 +115,7 @@ class SimulationCoordinator(object):
                     if r['start'].get('joint_values'):
                         start = Configuration.from_data(r['start'])
                     elif r['start'].get('values'):
-                        start = Pose.from_data(r['start'])
+                        start = Frame.from_data(r['start'])
                         try:
                             reachable_state = client.find_robot_states(robot, start, metric_values=[0.] * robot.dof, max_trials=1, max_results=1)
                             start = reachable_state[-1]
