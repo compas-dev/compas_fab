@@ -1,0 +1,10 @@
+.. _reference:
+
+*************
+API Reference
+*************
+
+.. toctree::
+    :maxdepth: 2
+
+    reference/compas_fab

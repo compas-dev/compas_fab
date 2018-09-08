@@ -1,0 +1,21 @@
+graft src
+
+prune data
+prune docs
+prune tests
+prune temp
+
+include AUTHORS.rst
+include CHANGELOG.rst
+include CONTRIBUTING.rst
+include LICENSE
+include README.rst
+
+exclude requirements-dev.txt
+exclude .bumpversion.cfg
+exclude .editorconfig
+exclude tasks.py
+exclude pytest.ini
+exclude ISSUE_TEMPLATE.md
+
+global-exclude *.py[cod] __pycache__ *.dylib *.nb[ic] .DS_Store

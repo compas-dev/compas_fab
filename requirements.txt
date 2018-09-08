@@ -1,5 +1,0 @@
-invoke
-pyserial >= 3.3
-pytest
-Sphinx >= 1.5.3
-sphinx_rtd_theme >= 0.2.4
