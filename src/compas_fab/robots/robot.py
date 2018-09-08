@@ -6,6 +6,7 @@ import logging
 
 import compas.robots.model
 from compas.geometry import Frame
+from compas.geometry import Point
 from compas.geometry.xforms import Transformation
 
 from .configuration import Configuration
@@ -254,7 +255,14 @@ class Robot(object):
         if not callback_result:
             callback_result = print
         frame_scaled = frame.copy()
-        frame_scaled.point /= self.scale_factor # must be in meters
+        # must be in meters
+        # TODO: current compas release (0.3.2) does not implement
+        # point division correctly, next release does it, so this
+        # line could be replaced by the one commented out.
+        frame_scaled.point = Point(frame_scaled.point.x / self.scale_factor,
+                                   frame_scaled.point.y / self.scale_factor,
+                                   frame_scaled.point.z / self.scale_factor)
+        # frame_scaled.point /= self.scale_factor
 
         self.client.inverse_kinematics(callback_result, frame_scaled, base_link,
                                        group, joint_names, joint_positions)
@@ -315,7 +323,13 @@ class Robot(object):
         frames_scaled = []
         for frame in frames:
             frame_scaled = frame.copy()
-            frame_scaled.point /= self.scale_factor
+            # TODO: current compas release (0.3.2) does not implement
+            # point division correctly, next release does it, so this
+            # line could be replaced by the one commented out.
+            frame_scaled.point = Point(frame_scaled.point.x / self.scale_factor,
+                                       frame_scaled.point.y / self.scale_factor,
+                                       frame_scaled.point.z / self.scale_factor)
+            # frame_scaled.point /= self.scale_factor
             frames_scaled.append(frame_scaled)
         base_link = self.get_base_link_name(group)
         joint_names = self.get_configurable_joint_names(group)
