@@ -10,18 +10,17 @@ and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.
 Unreleased
 ----------
 
+0.2.0
+-----
+
 **Added**
 
 * First open source release!
 * V-REP and ROS clients
 * Updated to COMPAS 0.3.2
 
-Unreleased
-----------
-
-0.2.0
+0.1.0
 -----
-----------
 
 **Added**
 
