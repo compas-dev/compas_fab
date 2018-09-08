@@ -160,14 +160,14 @@ class Robot(object):
 
     @property
     def transformation_RCF_WCF(self):
-        """Returns the transformation matrix from world coordinate system to 
+        """Returns the transformation matrix from world coordinate system to
             robot coordinate system.
         """
         return Transformation.from_frame_to_frame(Frame.worldXY(), self.RCF)
 
     @property
     def transformation_WCF_RCF(self):
-        """Returns the transformation matrix from robot coordinate system to 
+        """Returns the transformation matrix from robot coordinate system to
             world coordinate system
         """
         return Transformation.from_frame_to_frame(self.RCF, Frame.worldXY())
@@ -176,7 +176,7 @@ class Robot(object):
         """Moves the origin frame of the robot to the robot_coordinate_frame.
         """
         self.RCF = robot_coordinate_frame
-    
+
     def get_RCF(self):
         """Returns the origin frame of the robot.
         """
@@ -184,15 +184,15 @@ class Robot(object):
 
     def represent_frame_in_RCF(self, frame_WCF):
         """
-        Returns the representation of a frame in the world coordinate frame 
+        Returns the representation of a frame in the world coordinate frame
         in the robot's coordinate frame
         """
         frame_RCF = frame_WCF.transformed(self.transformation_RCF_WCF)
         return frame_RCF
-    
+
     def represent_frame_in_WCF(self, frame_RCF):
         """
-        Returns the representation of a frame in the robot's coordinate frame 
+        Returns the representation of a frame in the robot's coordinate frame
         in the world coordinate frame
         """
         frame_WCF = frame_RCF.transformed(self.transformation_WCF_RCF)
@@ -224,7 +224,7 @@ class Robot(object):
         if not self.semantics:
             raise Exception('This method is only callable once a semantic model is assigned')
 
-    def inverse_kinematics(self, frame, current_configuration=None, 
+    def inverse_kinematics(self, frame, current_configuration=None,
                            callback_result=None, group=None):
         """Calculate the robot's inverse kinematic.
 
@@ -232,14 +232,14 @@ class Robot(object):
         ----------
             frame (:class:`Frame`): The frame to calculate the inverse for
             current_configuration (:class:`Configuration`, optional): If passed,
-                the inverse will be calculated such that the calculated joint 
+                the inverse will be calculated such that the calculated joint
                 positions differ the least from the current configuration.
                 Defaults to the zero position for all joints.
-            callback_result (function, optional): the function to call for the 
+            callback_result (function, optional): the function to call for the
                 processing the result. Defaults to the print function.
             group (str, optional): The planning group used for calculation.
-                Defaults to the robot's main planning group. 
-        
+                Defaults to the robot's main planning group.
+
         Examples
         --------
         """
@@ -274,11 +274,11 @@ class Robot(object):
         ----------
             configuration (:class:`Configuration`, optional): The configuration
                 to calculate the forward kinematic for.
-            callback_result (function, optional): the function to call for the 
+            callback_result (function, optional): the function to call for the
                 processing the result. Defaults to the print function.
             group (str, optional): The planning group used for calculation.
-                Defaults to the robot's main planning group. 
-        
+                Defaults to the robot's main planning group.
+
         Examples
         --------
         """
@@ -291,9 +291,9 @@ class Robot(object):
         base_link = self.get_base_link_name(group)
         joint_names = self.get_configurable_joint_names(group)
         ee_link = self.get_end_effector_link_name(group)
-        self.client.forward_kinematics(callback_result, joint_positions, 
+        self.client.forward_kinematics(callback_result, joint_positions,
                                        base_link, group, joint_names, ee_link)
-        
+
 
     def compute_cartesian_path(self, frames, start_configuration, max_step,
                                avoid_collisions=True, callback_result=None, group=None):
@@ -304,14 +304,14 @@ class Robot(object):
             frames (:class:`Frame`): The frames of which the path is defined.
             start_configuration (:class:`Configuration`, optional): The robot's
                 configuration at the starting position.
-            max_step (float): the approximate distance between the calculated 
+            max_step (float): the approximate distance between the calculated
                 points. (Defined in the robot's units)
             avoid_collisions (bool)
-            callback_result (function, optional): the function to call for the 
+            callback_result (function, optional): the function to call for the
                 processing the result. Defaults to the print function.
             group (str, optional): The planning group used for calculation.
-                Defaults to the robot's main planning group. 
-        
+                Defaults to the robot's main planning group.
+
         Examples
         --------
         """
@@ -339,8 +339,8 @@ class Robot(object):
             joint_positions = start_configuration.values
         ee_link = self.get_end_effector_link_name(group)
         max_step_scaled = max_step/self.scale_factor
-        
-        self.client.compute_cartesian_path(callback_result, frames_scaled, base_link, 
+
+        self.client.compute_cartesian_path(callback_result, frames_scaled, base_link,
                                            ee_link, group, joint_names, joint_positions,
                                            max_step_scaled, avoid_collisions)
 
@@ -384,5 +384,3 @@ class Robot(object):
     @property
     def scale_factor(self):
         return self.model.scale_factor
-
-
