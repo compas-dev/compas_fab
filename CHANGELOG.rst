@@ -16,7 +16,11 @@ Unreleased
 * V-REP and ROS clients
 * Updated to COMPAS 0.3.2
 
-0.1.0
+Unreleased
+----------
+
+0.2.0
+-----
 ----------
 
 **Added**
