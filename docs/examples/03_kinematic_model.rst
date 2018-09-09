@@ -149,6 +149,7 @@ repository and render it in Rhino:
 
 * :download:`Robot artist (Rhino) (.PY) <files/robot-artist-rhino.py>`
 * :download:`Robot artist (Blender) (.PY) <files/robot-artist-blender.py>`
+* :download:`Robot artist (Grasshopper) (.GHX) <files/robot-artist-grasshopper.ghx>`
 
 .. raw:: html
 
