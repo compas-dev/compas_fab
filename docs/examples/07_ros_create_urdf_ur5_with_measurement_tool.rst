@@ -17,6 +17,12 @@ In ROS robot link (and end-effector) geometry is defined with 2 different meshes
 
 Before exporting, please position your end-effector, such that the connection point to the flange (tool0) is in (0,0,0). The geometry of your end-effector has to be defined in *meters*. Then export both visual and a collision meshes of your end-effector in a ROS-friendly format, like .stl or .obj. (Please see picture)
 
+.. figure:: 07_urdf_tool_00.jpg
+    :figclass: figure
+    :class: figure-img img-fluid
+
+    Screenshot of exporting a tool geometry from Rhino3D positioned in (0,0,0).
+
 
 2. Prepare your catkin workspace
 ================================
@@ -25,7 +31,7 @@ Open your linux bash console and go to your home directory::
 
   cd ~
 
-If not yet there, make a new catkin workspace for all your robotic setups.::
+If not yet there, make a new catkin workspace for all your robotic setups::
 
   mkdir -p robotic_setups/src
   cd robotic_setups
@@ -37,7 +43,7 @@ Then go to your src folder and make a package with your new setup "ur5_with_meas
   catkin_create_pkg ur5_with_measurement_tool
 
 This will create a ur5_with_measurement_tool folder which contains a ``package.xml`` and a ``CMakeLists.txt``, which have been partially filled out with the information you gave ``catkin_create_pkg``.
-Then open package.xml and add the following lines after the line '<buildtool_depend>catkin</buildtool_depend>'::
+Then open ``package.xml`` and add the following lines after the line ``<buildtool_depend>catkin</buildtool_depend>``::
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roslaunch</build_depend>
@@ -48,19 +54,21 @@ Then open package.xml and add the following lines after the line '<buildtool_dep
 
 Also, modify email and licence, version tags.
 
-Then create 3 folders: launch, urdf and meshes (with visual and collision folders). LAUNCH NECESSARY??
-mkdir launch
-mkdir urdf
-mkdir -p meshes/visual
-mkdir -p meshes/collision
+Then create 3 folders: launch, urdf and meshes (with visual and collision folders). LAUNCH NECESSARY??::
 
-Copy your meshes into visual and collision:
+  mkdir launch
+  mkdir urdf
+  mkdir -p meshes/visual
+  mkdir -p meshes/collision
 
-cp /mnt/c/Users/YOURPATH/meshes/visual/measurement_tool.stl meshes/visual/
-cp /mnt/c/Users/YOURPATH/meshes/collision/measurement_tool.stl meshes/collision/
+Copy your meshes into visual and collision::
+
+  cp /mnt/c/Users/YOURPATH/meshes/visual/measurement_tool.stl meshes/visual/
+  cp /mnt/c/Users/YOURPATH/meshes/collision/measurement_tool.stl meshes/collision/
 
 
-3. Making the xacros and generate urdf
+3. Create xacros and generate urdf
+==================================
 
 What are xacros
 
