@@ -1,11 +1,17 @@
-#Creating a URDF with an UR5 robot and a custom end-effector
+.. _ros_examples:
+
+********************************************************************************
+Creating a URDF with an UR5 robot and a custom end-effector
+********************************************************************************
 
 0. Install
+==========
 
 Before continuing, make sure you have the joint_state_publisher package installed. If you installed urdf_tutorial using apt-get
 
 
 1. Export your meshes
+=====================
 
 In ROS robot link (and end-effector) geometry is defined with 2 different meshes: *visual* and *collision*. The visual mesh represents how the robot looks like and the collision mesh is used for collision detection. You could have the same collision and visual meshes, but a less detailed collision mesh saves some processing time in the collision checks. Also, you might want to built the collision geometry slightly larger than the visual geometry to guarantee for safe zones.
 
@@ -13,26 +19,32 @@ Before exporting, please position your end-effector, such that the connection po
 
 
 2. Prepare your catkin workspace
+================================
 
-Open your linux bash console and go to your home directory
-cd ~
-If not yet there, make a new catkin workspace for all your robotic setups.
-mkdir -p robotic_setups/src
-cd robotic_setups
-catkin_make
-Then go to your src folder and make a package with your new setup "ur5_with_measurement_tool"
-cd src
-catkin_create_pkg ur5_with_measurement_tool
+Open your linux bash console and go to your home directory::
 
-This will create a ur5_with_measurement_tool folder which contains a package.xml and a CMakeLists.txt, which have been partially filled out with the information you gave catkin_create_pkg.
-Then open package.xml and add the following lines after the line '<buildtool_depend>catkin</buildtool_depend>'
+  cd ~
 
-<buildtool_depend>catkin</buildtool_depend>
-<build_depend>roslaunch</build_depend>
-<run_depend>joint_state_publisher</run_depend>
-<run_depend>robot_state_publisher</run_depend>
-<run_depend>rviz</run_depend>
-<run_depend>xacro</run_depend>
+If not yet there, make a new catkin workspace for all your robotic setups.::
+
+  mkdir -p robotic_setups/src
+  cd robotic_setups
+  catkin_make
+
+Then go to your src folder and make a package with your new setup "ur5_with_measurement_tool"::
+
+  cd src
+  catkin_create_pkg ur5_with_measurement_tool
+
+This will create a ur5_with_measurement_tool folder which contains a ``package.xml`` and a ``CMakeLists.txt``, which have been partially filled out with the information you gave ``catkin_create_pkg``.
+Then open package.xml and add the following lines after the line '<buildtool_depend>catkin</buildtool_depend>'::
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roslaunch</build_depend>
+  <run_depend>joint_state_publisher</run_depend>
+  <run_depend>robot_state_publisher</run_depend>
+  <run_depend>rviz</run_depend>
+  <run_depend>xacro</run_depend>
 
 Also, modify email and licence, version tags.
 
