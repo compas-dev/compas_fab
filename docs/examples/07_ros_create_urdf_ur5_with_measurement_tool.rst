@@ -11,6 +11,7 @@ Before continuing, make sure you have the following packages installed on your l
 
   sudo apt-get install ros-kinetic-urdf-tutorial
   sudo apt-get install joint-state-publisher
+  sudo apt-get install liburdfdom-tools
 
 
 1. Export your meshes
@@ -49,6 +50,8 @@ This will create a ``ur5_with_measurement_tool`` folder which contains a ``packa
 Then open ``package.xml`` and add the following lines after the line ``<buildtool_depend>catkin</buildtool_depend>``.
 
 .. code-block:: xml
+  <package>
+
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roslaunch</build_depend>
@@ -77,7 +80,7 @@ Copy your meshes into visual and collision::
 
 What are xacros
 
-Go to the urdf folder and create the xacro for your tool
+Go to the urdf folder and create the xacro for your tool::
 
   cd urdf
   subl measurement_tool.xacro
@@ -87,8 +90,8 @@ This will open sublime text editor. Paste the following into the file:
 .. code-block:: xml
 
   <?xml version="1.0" encoding="utf-8"?>
-  <robot xmlns:xacro="http://wiki.ros.org/xacro" name="measurement_tool">
-    <xacro:macro name="measurement_tool">
+  <robot xmlns:xacro="http://ros.org/wiki/xacro" name="measurement_tool">
+    <xacro:macro name="measurement_tool" params="prefix flange_name">
       <joint name="${prefix}measurement_tool_joint" type="fixed">
         <parent link="${flange_name}"/>
         <child link="${prefix}measurement_tool"/>
@@ -117,12 +120,12 @@ Now create a new xaxro file
 .. code-block:: xml
 
   <?xml version="1.0"?>
-  <robot xmlns:xacro="http://wiki.ros.org/xacro" name="ur5_with_measurement_tool">
-    
+  <robot xmlns:xacro="http://ros.org/wiki/xacro" name="ur5_with_measurement_tool" params="prefix flange_name">
+
     <!-- ur5 -->
     <xacro:include filename="$(find ur_description)/urdf/ur5.urdf.xacro" />
     <!-- end-effector -->
-    <xacro:include filename="$(find ur5_with_measurement_tool)/urdf/measurement_tool.xacro" />
+    <xacro:include filename="measurement_tool.xacro" />
 
     <!-- ur5 -->
     <xacro:ur5_robot prefix="" joint_limited="true"/>
@@ -139,8 +142,19 @@ Now create a new xaxro file
     
   </robot>
 
-Now run the
+Now we need to source the package as path::
 
+  cd ~/robotic_setups
+  catkin_make
+  source devel/setup.bash
+
+Go back in the urdf folder::
+
+  cd src/ur5_with_measurement_tool/urdf
+
+Now create the urdf.:
+
+  rosrun xacro xacro --inorder -o ur5_with_measurement_tool.urdf ur5_with_measurement_tool.xacro
 
 
 
@@ -166,24 +180,3 @@ Further links
 * http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file
 
 
-<robot xmlns:xacro="http://ros.org/wiki/xacro"
-       name="ur5" >
-
-  <!-- common stuff -->
-  <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro" />
-
-  <!-- ur5 -->
-  <xacro:include filename="$(find ur_description)/urdf/ur5.urdf.xacro" />
-
-  <!-- arm -->
-  <xacro:ur5_robot prefix="" joint_limited="true"/>
-
-  <link name="world" />
-
-  <joint name="world_joint" type="fixed">
-    <parent link="world" />
-    <child link = "base_link" />
-    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-  </joint>
-
-</robot>
