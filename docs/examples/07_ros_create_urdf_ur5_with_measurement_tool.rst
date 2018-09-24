@@ -7,7 +7,7 @@ Creating a URDF with an UR5 robot and a custom end-effector
 0. Install
 ==========
 
-Before continuing, make sure you have the following packages installed on your linux system.
+Before continuing, make sure you have the following packages installed on your linux system::
 
   sudo apt-get install ros-kinetic-urdf-tutorial
   sudo apt-get install joint-state-publisher
@@ -113,9 +113,11 @@ This will open sublime text editor. Paste the following into the file:
   </robot>
 
 This are a fixed joint with the link including the geometry. Variables will a "$" sign can be set via arguments.
-Now create a new xaxro file
+Now create a new xaxro file::
 
   subl ur5_with_measurement_tool.xacro
+
+And paste the following:
 
 .. code-block:: xml
 
@@ -130,7 +132,7 @@ Now create a new xaxro file
     <!-- ur5 -->
     <xacro:ur5_robot prefix="" joint_limited="true"/>
     <!-- end-effector -->
-    <xacro:measurement_tool prefix="" flange_name="flange"/>
+    <xacro:measurement_tool prefix="" flange_name="tool0"/>
     
     <!-- define the ur5's position and orientation in the world coordinate system -->
     <link name="world" />
@@ -152,17 +154,45 @@ Go back in the urdf folder::
 
   cd src/ur5_with_measurement_tool/urdf
 
-Now create the urdf.:
+Now create the urdf.::
 
   rosrun xacro xacro --inorder -o ur5_with_measurement_tool.urdf ur5_with_measurement_tool.xacro
 
+This will create ur5_with_measurement_tool.urdf in the directory.
 
+4. View urdf
+============
 
+Create display.launch in directory::
 
-get display.launch
+  cd ..
+  mkdir launch
+  cd launch
+  pico display.launch
 
-cd launch
-wget https://raw.githubusercontent.com/ros/urdf_tutorial/master/launch/display.launch
+paste the following:
+
+.. code-block:: xml
+
+  <launch>
+
+    <arg name="model" default="$(find ur5_with_measurement_tool)/urdf/ur5_with_measurement_tool.urdf"/>
+    <arg name="gui" default="true" />
+    <arg name="rvizconfig" default="$(find urdf_tutorial)/rviz/urdf.rviz" />
+
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)" />
+    <param name="use_gui" value="$(arg gui)"/>
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+  </launch>
+
+And then run::
+
+  roslaunch ur5_with_measurement_tool display.launch
+
 
 http://wiki.ros.org/urdf/Tutorials/Building%20a%20Visual%20Robot%20Model%20with%20URDF%20from%20Scratch
 roslaunch urdf_tutorial display.launch model:=urdf/01-myfirst.urdf
