@@ -17,7 +17,13 @@ Before continuing, make sure you have the following packages installed on your l
 1. Export your meshes
 =====================
 
-In ROS robot link (and end-effector) geometry is defined with 2 different meshes: *visual* and *collision*. The visual mesh represents how the robot looks like and the collision mesh is used for collision detection. You could have the same collision and visual meshes, but a less detailed collision mesh saves some processing time in the collision checks. Also, you might want to built the collision geometry slightly larger than the visual geometry to guarantee for safe zones.
+In ROS robot link (and end-effector) geometry is defined with 2 different
+meshes: *visual* and *collision*. The visual mesh represents how the robot looks
+like and the collision mesh is used for collision detection. You could have the
+same collision and visual meshes, but a less detailed collision mesh saves some
+processing time while performing collision checks. Also, you might want to built
+the collision geometry slightly larger than the visual geometry to guarantee for
+safe zones.
 
 Before exporting, please position your end-effector, such that the connection point to the flange (tool0) is in (0,0,0). The geometry of your end-effector has to be defined in *meters*. Then export both visual and a collision meshes of your end-effector in a ROS-friendly format, like .stl or .obj (see below).
 
