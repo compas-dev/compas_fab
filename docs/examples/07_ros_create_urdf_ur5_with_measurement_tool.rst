@@ -211,6 +211,14 @@ And then run::
 
   roslaunch ur5_with_measurement_tool display.launch
 
+
+.. figure:: 07_urdf_tool_01.jpg
+    :figclass: figure
+    :class: figure-img img-fluid
+
+    Screenshot of RViz showing the ur5 with the custom end-effector.
+
+
 Further links
 =============
 
