@@ -7,7 +7,8 @@ Creating a URDF with an UR5 robot and a custom end-effector
 0. Install
 ==========
 
-Before continuing, make sure you have the following packages installed on your linux system::
+Before continuing, make sure you have the following packages installed on your
+linux system::
 
   sudo apt-get install ros-kinetic-urdf-tutorial
   sudo apt-get install joint-state-publisher
@@ -25,7 +26,10 @@ processing time while performing collision checks. Also, you might want to built
 the collision geometry slightly larger than the visual geometry to guarantee for
 safe zones.
 
-Before exporting, please position your end-effector, such that the connection point to the flange (tool0) is in (0,0,0). The geometry of your end-effector has to be defined in *meters*. Then export both visual and a collision meshes of your end-effector in a ROS-friendly format, like .stl or .obj (see below).
+Before exporting, please position your end-effector such that the connection 
+point to the flange (tool0) is in (0,0,0). The geometry of your end-effector has
+to be defined in *meters*. Then export both visual and a collision meshes of 
+your end-effector in a ROS-friendly format, like .stl or .obj (see below).
 
 .. figure:: 07_urdf_tool_00.jpg
     :figclass: figure
@@ -37,7 +41,7 @@ Before exporting, please position your end-effector, such that the connection po
 2. Prepare your catkin workspace
 ================================
 
-Open your linux bash console and go to your home directory::
+Open your bash console and go to your home directory::
 
   cd ~
 
@@ -47,13 +51,15 @@ If not yet there, make a new catkin workspace for all your robotic setups::
   cd robotic_setups
   catkin_make
 
-Then go to your src folder and make a package with your new setup ``ur5_with_measurement_tool``::
+Then go to your src folder and make a package with your new setup
+``ur5_with_measurement_tool``::
 
   cd src
   catkin_create_pkg ur5_with_measurement_tool
 
-This will create a ``ur5_with_measurement_tool`` folder which contains a ``package.xml`` and a ``CMakeLists.txt``.
-Then open ``package.xml`` and add the following lines after the line ``<buildtool_depend>catkin</buildtool_depend>``.
+This will create a ``ur5_with_measurement_tool`` folder which contains a
+``package.xml`` and a ``CMakeLists.txt``. Then open ``package.xml`` and add the
+following lines after the line ``<buildtool_depend>catkin</buildtool_depend>``.
 
 .. code-block:: xml
 
@@ -77,7 +83,8 @@ Then create 3 folders: ``launch``, ``urdf`` and ``meshes`` (with visual and coll
   mkdir -p meshes/visual
   mkdir -p meshes/collision
 
-Copy your meshes into visual and collision (replace YOURPATH wherever you stored the files)::
+Copy your meshes into visual and collision (replace YOURPATH with wherever you
+stored the files)::
 
   cp /mnt/c/Users/YOURPATH/meshes/visual/measurement_tool.stl meshes/visual/
   cp /mnt/c/Users/YOURPATH/meshes/collision/measurement_tool.stl meshes/collision/
@@ -92,25 +99,30 @@ language. The language allows to use constants, to perform simple math
 operations and to parameterize macros simple by using ``${}``.
 
 For examples please have a look at:
+
   * http://wiki.ros.org/urdf/Tutorials/Using%20Xacro%20to%20Clean%20Up%20a%20URDF%20File
 
  
-First go to the urdf folder and create a xacro file for your tool::
+Go to the urdf folder and create a xacro file for your end-effector::
 
   cd urdf
   pico measurement_tool.xacro
 
-Pico is a terminal based text editor. Paste the following into the file:
+(Pico is a terminal based text editor.) Paste the following into the file:
 
 .. code-block:: xml
 
   <?xml version="1.0" encoding="utf-8"?>
   <robot xmlns:xacro="http://ros.org/wiki/xacro">
-    <xacro:macro name="measurement_tool" params="prefix flange_name"> <!-- Here we define the 2 parameters of the macro -->
-      <joint name="${prefix}measurement_tool_joint" type="fixed"> <!-- Create a fixed joint with a parameterized name. -->
-        <parent link="${flange_name}"/> <!-- The parent link must be read from the robot model it is attached to. -->
+    <!-- Here we define the 2 parameters of the macro -->
+    <xacro:macro name="measurement_tool" params="prefix flange_name">
+      <!-- Create a fixed joint with a parameterized name. -->
+      <joint name="${prefix}measurement_tool_joint" type="fixed">
+        <!-- The parent link must be read from the robot model it is attached to. -->
+        <parent link="${flange_name}"/> 
         <child link="${prefix}measurement_tool"/>
-        <origin rpy="0 0 0" xyz="0 0 0"/>  <!-- The tool is directly attached to the flange. -->
+        <!-- The tool is directly attached to the flange. -->
+        <origin rpy="0 0 0" xyz="0 0 0"/>
       </joint>
       <link name="${prefix}measurement_tool">
         <visual>
