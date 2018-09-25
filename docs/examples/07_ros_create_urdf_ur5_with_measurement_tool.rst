@@ -46,30 +46,32 @@ Then go to your src folder and make a package with your new setup ``ur5_with_mea
   cd src
   catkin_create_pkg ur5_with_measurement_tool
 
-This will create a ``ur5_with_measurement_tool`` folder which contains a ``package.xml`` and a ``CMakeLists.txt``, which have been partially filled out with the information you gave ``catkin_create_pkg``.
+This will create a ``ur5_with_measurement_tool`` folder which contains a ``package.xml`` and a ``CMakeLists.txt``.
 Then open ``package.xml`` and add the following lines after the line ``<buildtool_depend>catkin</buildtool_depend>``.
 
 .. code-block:: xml
-  <package>
-
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>roslaunch</build_depend>
-  <run_depend>joint_state_publisher</run_depend>
-  <run_depend>robot_state_publisher</run_depend>
-  <run_depend>rviz</run_depend>
-  <run_depend>xacro</run_depend>
+  <test_depend>roslaunch</test_depend>
+  <build_export_depend>joint_state_publisher</build_export_depend>
+  <build_export_depend>robot_state_publisher</build_export_depend>
+  <build_export_depend>rviz</build_export_depend>
+  <build_export_depend>xacro</build_export_depend>
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rviz</exec_depend>
+  <exec_depend>xacro</exec_depend>
 
 Optionally, modify ``email`` and ``licence``, ``version`` tags.
 
-Then create 3 folders: ``launch``, ``urdf`` and ``meshes`` (with visual and collision folders). LAUNCH NECESSARY??::
+Then create 3 folders: ``launch``, ``urdf`` and ``meshes`` (with visual and collision folders)::
 
   mkdir launch
   mkdir urdf
   mkdir -p meshes/visual
   mkdir -p meshes/collision
 
-Copy your meshes into visual and collision::
+Copy your meshes into visual and collision (replace YOURPATH wherever you stored the files)::
 
   cp /mnt/c/Users/YOURPATH/meshes/visual/measurement_tool.stl meshes/visual/
   cp /mnt/c/Users/YOURPATH/meshes/collision/measurement_tool.stl meshes/collision/
@@ -78,33 +80,42 @@ Copy your meshes into visual and collision::
 3. Create xacros and generate urdf
 ==================================
 
-What are xacros
+Rather than writing urdf files directly, it is more convinient to write xacro 
+files from which urdfs are generated. As its name implies, xacro is a macro 
+language. The language allows to use constants, to perform simple math 
+operations and to parameterize macros simple by using ``${}``.
 
-Go to the urdf folder and create the xacro for your tool::
+For examples please have a look at:
+  * http://wiki.ros.org/urdf/Tutorials/Using%20Xacro%20to%20Clean%20Up%20a%20URDF%20File
+
+ 
+First go to the urdf folder and create a xacro file for your tool::
 
   cd urdf
-  subl measurement_tool.xacro
+  pico measurement_tool.xacro
 
-This will open sublime text editor. Paste the following into the file:
+Pico is a terminal based text editor. Paste the following into the file:
 
 .. code-block:: xml
 
   <?xml version="1.0" encoding="utf-8"?>
-  <robot xmlns:xacro="http://ros.org/wiki/xacro" name="measurement_tool">
-    <xacro:macro name="measurement_tool" params="prefix flange_name">
-      <joint name="${prefix}measurement_tool_joint" type="fixed">
-        <parent link="${flange_name}"/>
+  <robot xmlns:xacro="http://ros.org/wiki/xacro">
+    <xacro:macro name="measurement_tool" params="prefix flange_name"> <!-- Here we define the 2 parameters of the macro -->
+      <joint name="${prefix}measurement_tool_joint" type="fixed"> <!-- Create a fixed joint with a parameterized name. -->
+        <parent link="${flange_name}"/> <!-- The parent link must be read from the robot model it is attached to. -->
         <child link="${prefix}measurement_tool"/>
-        <origin rpy="0 0 0" xyz="0 0 0"/>  
+        <origin rpy="0 0 0" xyz="0 0 0"/>  <!-- The tool is directly attached to the flange. -->
       </joint>
       <link name="${prefix}measurement_tool">
         <visual>
           <geometry>
-            <mesh filename="package://ur5_with_measurement_tool/meshes/visual/measurement_tool.stl"/>
+            <!-- The path to the visual meshes in the package. -->
+            <mesh filename="package://ur5_with_measurement_tool/meshes/visual/measurement_tool.stl"/> 
           </geometry>
         </visual>
         <collision>
           <geometry>
+            <!-- The path to the collision meshes in the package. -->
             <mesh filename="package://ur5_with_measurement_tool/meshes/collision/measurement_tool.stl"/>
           </geometry>
         </collision>
@@ -112,17 +123,25 @@ This will open sublime text editor. Paste the following into the file:
     </xacro:macro>
   </robot>
 
-This are a fixed joint with the link including the geometry. Variables will a "$" sign can be set via arguments.
-Now create a new xaxro file::
+Explanation:
 
-  subl ur5_with_measurement_tool.xacro
+The end-effector only consists of one fixed joint and the link geometry. We create a
+parameterized macro with 2 parameters (prefix, flange_name) because maybe once 
+we want to attach the tool to a different robot with a different flange name or,
+if we want to use the end-effector twice in the same urdf we would need to set a
+prefix to differenciate. Whatever is defined like ``${}`` will later be replaced
+when generating the urdf.
 
-And paste the following:
+Now we create a new xaxro file, which combines the ur5 with the end-effector::
+
+  pico ur5_with_measurement_tool.xacro
+
+Paste the following:
 
 .. code-block:: xml
 
   <?xml version="1.0"?>
-  <robot xmlns:xacro="http://ros.org/wiki/xacro" name="ur5_with_measurement_tool" params="prefix flange_name">
+  <robot xmlns:xacro="http://ros.org/wiki/xacro" name="ur5_with_measurement_tool">
 
     <!-- ur5 -->
     <xacro:include filename="$(find ur_description)/urdf/ur5.urdf.xacro" />
@@ -132,33 +151,26 @@ And paste the following:
     <!-- ur5 -->
     <xacro:ur5_robot prefix="" joint_limited="true"/>
     <!-- end-effector -->
+    <!-- Here we include the end-effector by setting the parameters -->
+    <!-- TODO: check end-effector link name of robot -->
     <xacro:measurement_tool prefix="" flange_name="tool0"/>
     
     <!-- define the ur5's position and orientation in the world coordinate system -->
     <link name="world" />
     <joint name="world_joint" type="fixed">
       <parent link="world" />
-      <child link = "base_link" /> 
+      <child link = "base_link" /> <!-- TODO: check base_link name of robot -->
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
     </joint>
-    
   </robot>
 
-Now we need to source the package as path::
-
-  cd ~/robotic_setups
-  catkin_make
-  source devel/setup.bash
-
-Go back in the urdf folder::
-
-  cd src/ur5_with_measurement_tool/urdf
 
 Now create the urdf.::
 
   rosrun xacro xacro --inorder -o ur5_with_measurement_tool.urdf ur5_with_measurement_tool.xacro
 
 This will create ur5_with_measurement_tool.urdf in the directory.
+
 
 4. View urdf
 ============
@@ -189,24 +201,22 @@ paste the following:
 
   </launch>
 
+Now we need to source the package path in our catkin workspace::
+
+  cd ~/robotic_setups
+  catkin_make
+  source devel/setup.bash
+
 And then run::
 
   roslaunch ur5_with_measurement_tool display.launch
 
-
-http://wiki.ros.org/urdf/Tutorials/Building%20a%20Visual%20Robot%20Model%20with%20URDF%20from%20Scratch
-roslaunch urdf_tutorial display.launch model:=urdf/01-myfirst.urdf
-
-
-
- So, in order to attach an end-effector to the robot model, you have to export a visual and a collision mesh of your end-effector.
-
-
-
-sudo apt-get install liburdfdom-tools
-
 Further links
+=============
+
+* http://wiki.ros.org/urdf/Tutorials/Building%20a%20Visual%20Robot%20Model%20with%20URDF%20from%20Scratch
 * http://wiki.ros.org/urdf/Tutorials/Adding%20Physical%20and%20Collision%20Properties%20to%20a%20URDF%20Model
 * http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file
+
 
 
