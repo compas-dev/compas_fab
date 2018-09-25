@@ -147,7 +147,7 @@ The end-effector only consists of one fixed joint and one link with geometry. We
 create a parameterized macro with 2 parameters (prefix, flange_name) because 
 maybe once  we want to attach the tool to a different robot with a different 
 flange name or, if we once want to use the end-effector twice in the same urdf
-we would need to use both with a different prefixes to distinguish them. 
+we would need to use both with different prefixes to distinguish them. 
 Whatever is defined like ``${}`` will later be replaced when generating the 
 urdf.
 
@@ -168,6 +168,7 @@ Paste the following:
     <xacro:include filename="measurement_tool.xacro" />
 
     <!-- ur5 -->
+    <!-- The ur5 xacro must be included with passing parameters -->
     <xacro:ur5_robot prefix="" joint_limited="true"/>
     <!-- end-effector -->
     <!-- Here we include the end-effector by setting the parameters -->
@@ -178,7 +179,7 @@ Paste the following:
     <link name="world" />
     <joint name="world_joint" type="fixed">
       <parent link="world" />
-      <child link = "base_link" /> <!-- TODO: check base_link name of robot -->
+      <child link="base_link" /> <!-- TODO: check base_link name of robot -->
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
     </joint>
   </robot>
