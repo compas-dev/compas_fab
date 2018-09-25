@@ -100,7 +100,7 @@ operations and to parameterize macros simple by using ``${}``.
 
 For examples please have a look at:
 
-  * http://wiki.ros.org/urdf/Tutorials/Using%20Xacro%20to%20Clean%20Up%20a%20URDF%20File
+* http://wiki.ros.org/urdf/Tutorials/Using%20Xacro%20to%20Clean%20Up%20a%20URDF%20File
 
  
 Go to the urdf folder and create a xacro file for your end-effector::
@@ -143,12 +143,13 @@ Go to the urdf folder and create a xacro file for your end-effector::
 
 Explanation:
 
-The end-effector only consists of one fixed joint and the link geometry. We create a
-parameterized macro with 2 parameters (prefix, flange_name) because maybe once 
-we want to attach the tool to a different robot with a different flange name or,
-if we want to use the end-effector twice in the same urdf we would need to set a
-prefix to differenciate. Whatever is defined like ``${}`` will later be replaced
-when generating the urdf.
+The end-effector only consists of one fixed joint and one link with geometry. We
+create a parameterized macro with 2 parameters (prefix, flange_name) because 
+maybe once  we want to attach the tool to a different robot with a different 
+flange name or, if we once want to use the end-effector twice in the same urdf
+we would need to use both with a different prefixes to distinguish them. 
+Whatever is defined like ``${}`` will later be replaced when generating the 
+urdf.
 
 Now we create a new xaxro file, which combines the ur5 with the end-effector::
 
@@ -193,11 +194,9 @@ This will create ur5_with_measurement_tool.urdf in the directory.
 4. View urdf
 ============
 
-Create display.launch in directory::
+Now create display.launch in the ``launch`` directory::
 
-  cd ..
-  mkdir launch
-  cd launch
+  cd ../launch
   pico display.launch
 
 paste the following:
