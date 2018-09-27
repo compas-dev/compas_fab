@@ -76,9 +76,10 @@ following lines after the line ``<buildtool_depend>catkin</buildtool_depend>``.
 
 Optionally, modify ``email`` and ``licence``, ``version`` tags.
 
-Then create 3 folders: ``launch``, ``urdf`` and ``meshes`` (with visual and collision folders)::
+Then create 4(+2) folders: ``launch``, ``rviz``, ``urdf`` and ``meshes`` (with visual and collision folders)::
 
   mkdir launch
+  mkdir rviz
   mkdir urdf
   mkdir -p meshes/visual
   mkdir -p meshes/collision
@@ -115,11 +116,11 @@ Go to the urdf folder and create a xacro file for your end-effector::
   <?xml version="1.0" encoding="utf-8"?>
   <robot xmlns:xacro="http://ros.org/wiki/xacro">
     <!-- Here we define the 2 parameters of the macro -->
-    <xacro:macro name="measurement_tool" params="prefix flange_name">
+    <xacro:macro name="measurement_tool" params="prefix connected_to">
       <!-- Create a fixed joint with a parameterized name. -->
       <joint name="${prefix}measurement_tool_joint" type="fixed">
         <!-- The parent link must be read from the robot model it is attached to. -->
-        <parent link="${flange_name}"/> 
+        <parent link="${connected_to}"/> 
         <child link="${prefix}measurement_tool"/>
         <!-- The tool is directly attached to the flange. -->
         <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -144,8 +145,8 @@ Go to the urdf folder and create a xacro file for your end-effector::
 Explanation:
 
 The end-effector only consists of one fixed joint and one link with geometry. We
-create a parameterized macro with 2 parameters (prefix, flange_name) because 
-maybe once  we want to attach the tool to a different robot with a different 
+create a parameterized macro with 2 parameters (prefix, connected_to) because 
+maybe once we want to attach the tool to a different robot with a different 
 flange name or, if we once want to use the end-effector twice in the same urdf
 we would need to use both with different prefixes to distinguish them. 
 Whatever is defined like ``${}`` will later be replaced when generating the 
@@ -173,7 +174,7 @@ Paste the following:
     <!-- end-effector -->
     <!-- Here we include the end-effector by setting the parameters -->
     <!-- TODO: check end-effector link name of robot -->
-    <xacro:measurement_tool prefix="" flange_name="tool0"/>
+    <xacro:measurement_tool prefix="" connected_to="tool0"/>
     
     <!-- define the ur5's position and orientation in the world coordinate system -->
     <link name="world" />
@@ -184,10 +185,33 @@ Paste the following:
     </joint>
   </robot>
 
+To define the link name we want to attach the tool to, we search in the robot's
+xacro file the last link which does not have a geometry anymore. For 
+example, for a 6-axis robot the last joint is *joint6*, joint6 has the child 
+link *link6* which contains the geometry. Usually, *link6* is parent to another
+joint, which child link (without geometry) is the link we attach the tool to 
+(usually named with tool0).
 
-Now create the urdf.::
+*tool0*
+
+The tool0 frame (pronounced: 'tool-zero') shall match exactly an all-zeros
+TCP configuration as defined on the robot controller. For most controllers, this
+is equal to an unconfigured TCP, which lies on the physical robot's mounting
+flange.
+
+*base_link*
+
+The base_link shall be positioned in the logical base position (oriented by 
+convention, z-axis up, x-axis forward). This frame name is by ROS convention.
+Typically this frame is the first frame of the robot tied to the first link.
+
+To define the base_link name we search in the robot's xacro file the link which
+is never child to a joint (first link). 
+
+Now create and check the urdf.::
 
   rosrun xacro xacro --inorder -o ur5_with_measurement_tool.urdf ur5_with_measurement_tool.xacro
+  check_urdf ur5_with_measurement_tool.urdf
 
 This will create ur5_with_measurement_tool.urdf in the directory.
 
@@ -195,12 +219,20 @@ This will create ur5_with_measurement_tool.urdf in the directory.
 4. View urdf
 ============
 
-Now create display.launch in the ``launch`` directory::
+Now locate the path where you stored the urdf_tutorial, e.g. YOURPATH and copy
+2 files to your package folder
+  
+    cd ..
+    cp YOURPATH/urdf_tutorial/rviz/urdf.rviz rviz/
+    cp YOURPATH/urdf_tutorial/launch/display.launch launch
 
-  cd ../launch
+Now modify display.launch in the ``launch`` directory::
+
+  cd launch
   pico display.launch
 
-paste the following:
+Change the 2 ``arg`` tags with ``name="model"`` and ``name="rvizconfig"`` such 
+that they match the following:
 
 .. code-block:: xml
 
@@ -208,7 +240,7 @@ paste the following:
 
     <arg name="model" default="$(find ur5_with_measurement_tool)/urdf/ur5_with_measurement_tool.urdf"/>
     <arg name="gui" default="true" />
-    <arg name="rvizconfig" default="$(find urdf_tutorial)/rviz/urdf.rviz" />
+    <arg name="rvizconfig" default="$(find ur5_with_measurement_tool)/rviz/urdf.rviz" />
 
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)" />
     <param name="use_gui" value="$(arg gui)"/>
@@ -229,12 +261,13 @@ And then run::
 
   roslaunch ur5_with_measurement_tool display.launch
 
-
 .. figure:: 07_urdf_tool_01.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
     Screenshot of RViz showing the ur5 with the custom end-effector.
+
+In RViz you can customize the display settings and save the ``urdf.rviz``
 
 
 Further links
@@ -243,6 +276,8 @@ Further links
 * http://wiki.ros.org/urdf/Tutorials/Building%20a%20Visual%20Robot%20Model%20with%20URDF%20from%20Scratch
 * http://wiki.ros.org/urdf/Tutorials/Adding%20Physical%20and%20Collision%20Properties%20to%20a%20URDF%20Model
 * http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file
+* http://wiki.ros.org/Industrial/Tutorials/Create%20a%20URDF%20for%20an%20Industrial%20Robot
+* http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages
 
 
 
