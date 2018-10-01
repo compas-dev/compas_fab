@@ -6,6 +6,7 @@ import itertools
 
 from compas.geometry import Frame
 from compas.geometry import Transformation
+from compas.geometry import Scale
 
 __all__ = [
     'BaseRobotArtist'
@@ -83,8 +84,9 @@ class BaseRobotArtist(object):
 
         for item in itertools.chain(link.visual, link.collision):
             item.native_geometry_reset = parent_transformation.inverse()
-            item.native_geometry = self.draw_mesh(item.geometry.geo)
-            self.transform(item.native_geometry, parent_transformation)
+            if item.geometry.geo:
+                item.native_geometry = self.draw_mesh(item.geometry.geo)
+                self.transform(item.native_geometry, parent_transformation)
 
         for child_joint in link.joints:
             child_joint.reset_transform()
@@ -92,6 +94,35 @@ class BaseRobotArtist(object):
 
             # Recursively call creation
             self.create(child_joint.child_link, child_joint.current_transformation)
+    
+    def scale(self, factor):
+        # first bring into initial state
+        names = self.robot.get_configurable_joint_names()
+        self.update_links(names, [0] * len(names), collision=True)
+        # and then transform
+        transformation = Scale([factor, factor, factor])
+        self.scale_links(transformation)
+        self.robot.scale_factor *= factor
+    
+    def scale_links(self, transformation):
+        self.scale_link(self.robot.root, transformation)
+
+    def scale_link(self, link, transformation):
+        """Recursive function to apply the scale transformation on each link 
+            geometry.
+        """
+        for item in itertools.chain(link.visual, link.collision):
+            # some links have only collision geometry, not visual. These meshes
+            # have not been loaded.
+            if hasattr(item, "native_geometry"):
+                self.transform(item.native_geometry, transformation)
+
+        for child_joint in link.joints:
+            factor = transformation[0,0]
+            child_joint.scale(factor)
+            child_joint.transform(transformation)
+            # Recursive call
+            self.scale_link(child_joint.child_link, transformation)
 
     # TODO: Move this method to compas_fab robot
     def update(self, configuration, collision=True):
@@ -154,8 +185,10 @@ class BaseRobotArtist(object):
 
         if collision:
             for item in link.collision:
-                self.transform(item.native_geometry, parent_transformation * item.native_geometry_reset)
-                item.native_geometry_reset = parent_transformation.inverse()
+                # some links have only collision geometry, not visual. These meshes have not been loaded.
+                if hasattr(item, "native_geometry"):
+                    self.transform(item.native_geometry, parent_transformation * item.native_geometry_reset)
+                    item.native_geometry_reset = parent_transformation.inverse()
 
         for child_joint in link.joints:
             # 1. Reset child joint transformation
