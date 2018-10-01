@@ -13,16 +13,19 @@ from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas.geometry.transformations.helpers import mesh_transform
 
-LOGGER = logging.getLogger('compas_fab.robots.urdf_importer')
+from compas.robots.resources.basic import _get_file_format
+
+LOGGER = logging.getLogger('compas_fab.robots.ros')
 
 __all__ = [
-    'UrdfImporter',
+    'RosFileServerLoader',
 ]
 
 
-class UrdfImporter(object):
+class RosFileServerLoader(object):
     """Allows to retrieve the mesh files specified in the robot urdf from the
-    ROS file_server and to store it on the local file system.
+    ROS file_server, stores it on the local file system and allows to load the 
+    meshes afterwards.
 
     It is implemented similar to
     https://github.com/siemens/ros-sharp/blob/master/Libraries/RosBridgeClient/UrdfImporter.cs
@@ -46,6 +49,8 @@ class UrdfImporter(object):
                        "robot_description_semantic_received": False,
                        "resource_files_received": False,
                        "robot_name_received": False}
+        
+        self.schema_prefix = 'package://'
 
     @classmethod
     def from_robot_resource_path(cls, path, ros=None):
@@ -91,7 +96,7 @@ class UrdfImporter(object):
 
     @property
     def urdf_filename(self):
-        return os.path.join(self.robot_resource_path, "robot_description.urdf")
+        return os.path.join(self.robot_resource_path, "urdf", "robot_description.urdf")
 
     @property
     def srdf_filename(self):
@@ -203,27 +208,87 @@ class UrdfImporter(object):
 
         return meshcls(mesh)
     
-    def check_mesh_class(self, meshcls):
-        """Checks if the passed mesh class has the necessary constructor and 
-        methods.
+    def _get_local_path(self, url):
+        _prefix, path = url.split(self.schema_prefix)
+        return os.path.abspath(os.path.join(self.robot_resource_path, path))
+        
+    def can_load_mesh(self, url):
+        """Determine whether this loader can load a given mesh URL.
+
+        Parameters
+        ----------
+        url : str
+            Mesh URL.
+
+        Returns
+        -------
+        bool
+            ``True`` if the URL uses the ``package://` scheme and the package name
+            matches the specified in the constructor and the file exists locally,
+            otherwise ``False``.
         """
-        # TODO: is this even necessary if we add a RobotMesh to each CAD
-        import compas
-        from compas.datastructures import Mesh
+        if not url.startswith(self.schema_prefix):
+            return False
 
-        try:
-            cm = Mesh.from_obj(compas.get('faces.obj'))
-            meshcls(cm)
-        except:
-            raise TypeError("The class %s cannot be constructed from a %s" % (meshcls, Mesh))
+        local_file = self._get_local_path(url)
+        return os.path.isfile(local_file)
 
-        if not hasattr(meshcls, 'transform'):
-            raise TypeError("The class %s has no method named 'transform'" % meshcls)
+    def load_mesh(self, url):
+        """Loads a mesh from local storage.
 
-        if not hasattr(meshcls, 'draw'):
-            raise TypeError("The class %s has no method named 'draw'" % meshcls)
+        Parameters
+        ----------
+        url : str
+            Mesh location
+
+        Returns
+        -------
+        :class:`Mesh`
+            Instance of a mesh.
+        """
+        local_file = self._get_local_path(url)
+        return _mesh_import(url, local_file)
 
 
+
+SUPPORTED_FORMATS = ('obj', 'stl', 'ply', 'dae')
+
+def _mesh_import(url, filename):
+    """Internal function to load meshes using the correct loader.
+
+    Name and file might be the same but not always, e.g. temp files."""
+    file_extension = _get_file_format(url)
+
+    if file_extension not in SUPPORTED_FORMATS:
+        raise NotImplementedError(
+            'Mesh type not supported: {}'.format(file_extension))
+    
+    print(filename)
+    
+    if file_extension == "dae": # no dae support yet
+        #mesh = Mesh.from_dae(filename)
+        obj_filename = filename.replace(".dae", ".obj")
+        if os.path.isfile(obj_filename):
+            mesh = Mesh.from_obj(obj_filename)
+            # former DAE files have yaxis and zaxis swapped
+            # TODO: already fix in conversion to obj
+            frame = Frame([0,0,0], [1,0,0], [0,0,1])
+            T = Transformation.from_frame(frame)
+            mesh_transform(mesh, T)
+            return mesh
+        else:
+            raise FileNotFoundError("Please convert '%s' into an OBJ file, \
+                                        since DAE is currently not supported \
+                                        yet." % filename)
+
+    if file_extension == 'obj':
+        return Mesh.from_obj(filename)
+    elif file_extension == 'stl':
+        return Mesh.from_stl(filename)
+    elif file_extension == 'ply':
+        return Mesh.from_ply(filename)
+
+    raise Exception
 
 if __name__ == "__main__":
     
@@ -234,6 +299,7 @@ if __name__ == "__main__":
     roslaunch file_server.launch
     """
 
+    """
     import logging
 
     FORMAT = '%(asctime)-15s [%(levelname)s] %(message)s'
@@ -247,3 +313,12 @@ if __name__ == "__main__":
     ros.call_later(50, ros.close)
     ros.call_later(52, ros.terminate)
     ros.run_forever()
+    """
+
+    path = r"C:\Users\rustr\workspace\robot_description\ur5_with_measurement_tool"
+    loader = RosFileServerLoader.from_robot_resource_path(path)
+
+    from compas.robots import Robot
+
+    robot = Robot.from_urdf_file(loader.urdf_filename)
+    robot.load_geometry(loader)
