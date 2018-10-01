@@ -12,6 +12,8 @@ from .moveit_msgs import MoveItErrorCodes
 from .moveit_msgs import RobotTrajectory
 from .moveit_msgs import PositionIKRequest
 from .moveit_msgs import PlannerParams
+from .moveit_msgs import WorkspaceParameters
+from .moveit_msgs import TrajectoryConstraints
 
 
 class GetPositionIKRequest(ROSmsg):
@@ -165,3 +167,51 @@ class SetPlannerParamsRequest(ROSmsg):
         self.group = group
         self.params = params
         self.replace = replace
+
+class MotionPlanRequest(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanRequest.html
+    """
+    def __init__(self, workspace_parameters=WorkspaceParameters(), start_state=RobotState(), 
+                 goal_constraints=[], path_constraints=Constraints(), 
+                 trajectory_constraints=TrajectoryConstraints(), planner_id="",
+                 group_name="", num_planning_attempts=8, allowed_planning_time=2.,
+                 max_velocity_scaling_factor=1., max_acceleration_scaling_factor=1.):
+        self.workspace_parameters = workspace_parameters # moveit_msgs/WorkspaceParameters
+        self.start_state = start_state # moveit_msgs/RobotState 
+        self.goal_constraints = goal_constraints # moveit_msgs/Constraints[] 
+        self.path_constraints = path_constraints # moveit_msgs/Constraints 
+        self.trajectory_constraints = trajectory_constraints # moveit_msgs/TrajectoryConstraints 
+        self.planner_id = planner_id # string 
+        self.group_name = group_name # string 
+        self.num_planning_attempts = num_planning_attempts # int32 
+        self.allowed_planning_time = allowed_planning_time # float64 
+        self.max_velocity_scaling_factor = max_velocity_scaling_factor # float64 
+        self.max_acceleration_scaling_factor = max_acceleration_scaling_factor # float64
+    
+    @property
+    def msg(self):
+        msg = super(MotionPlanRequest, self).msg
+        return {"motion_plan_request":msg}
+
+class MotionPlanResponse(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanResponse.html
+    """
+
+    def __init__(self, trajectory_start=RobotState(), group_name="", 
+                 trajectory=RobotTrajectory(), planning_time=3., 
+                 error_code=MoveItErrorCodes()):
+        self.trajectory_start = trajectory_start
+        self.group_name = group_name
+        self.trajectory = trajectory
+        self.planning_time = planning_time
+        self.error_code = error_code
+        
+    @classmethod
+    def from_msg(cls, msg):
+        msg = msg["motion_plan_response"]
+        trajectory_start = RobotState.from_msg(msg['trajectory_start'])
+        trajectory = RobotTrajectory.from_msg(msg['trajectory'])
+        error_code = MoveItErrorCodes.from_msg(msg['error_code'])
+        return cls(trajectory_start, msg['group_name'], trajectory, msg['planning_time'], error_code)
+
+

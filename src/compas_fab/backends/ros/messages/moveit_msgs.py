@@ -4,6 +4,8 @@ from .std_msgs import ROSmsg
 from .std_msgs import Header
 
 from .geometry_msgs import PoseStamped
+from .geometry_msgs import Vector3
+from .geometry_msgs import Quaternion
 
 from .sensor_msgs import JointState
 from .sensor_msgs import MultiDOFJointState
@@ -200,7 +202,68 @@ class PlannerParams(ROSmsg):
         self.values = values # parameter values (same size as keys)
         self.descriptions = descriptions # parameter description (can be empty)
 
+class WorkspaceParameters(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/WorkspaceParameters.html
+    """
+    def __init__(self, header=Header(), min_corner=Vector3(-100,-100,-100), max_corner=Vector3(100,100,100)):
+        self.header = header
+        self.min_corner = min_corner
+        self.max_corner = max_corner
 
+class TrajectoryConstraints(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/TrajectoryConstraints.html
+    """
+    def __init__(self, constraints=[]):
+        self.constraints = constraints #Constraints[]
+
+
+class JointConstraint(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/JointConstraint.html
+    """
+    def __init__(self):
+        raise NotImplementedError
+
+class VisibilityConstraint(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/VisibilityConstraint.html
+    """
+    def __init__(self):
+        raise NotImplementedError
+
+class BoundingVolume(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/BoundingVolume.html
+    """
+    def __init__(self, primitives=[], primitive_poses=[], meshes=[], 
+                 mesh_poses=[]):
+        self.primitives = primitives #shape_msgs/SolidPrimitive[] 
+        self.primitive_poses = primitive_poses #geometry_msgs/Pose[] 
+        self.meshes = meshes #shape_msgs/Mesh[] 
+        self.mesh_poses = mesh_poses #geometry_msgs/Pose[] 
+
+class PositionConstraint(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionConstraint.html
+    """
+    def __init__(self, header=Header(), link_name="", 
+                 target_point_offset=Vector3(0.1,0.1,0.1), 
+                 constraint_region=BoundingVolume(), weight=1):
+        self.header = header
+        self.link_name = link_name
+        self.target_point_offset = target_point_offset # geometry_msgs/Vector3 
+        self.constraint_region = constraint_region # moveit_msgs/BoundingVolume 
+        self.weight = weight # float64 
+
+class OrientationConstraint(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/OrientationConstraint.html
+    """
+    def __init__(self, header=Header(), orientation=Quaternion(), link_name="", 
+                 absolute_x_axis_tolerance=0.005, absolute_y_axis_tolerance=0.005,
+                 absolute_z_axis_tolerance=0.005, weight=1):
+        self.header = header
+        self.orientation = orientation #geometry_msgs/Quaternion 
+        self.link_name = link_name
+        self.absolute_x_axis_tolerance = absolute_x_axis_tolerance
+        self.absolute_y_axis_tolerance = absolute_y_axis_tolerance
+        self.absolute_z_axis_tolerance = absolute_z_axis_tolerance
+        self.weight = weight # float64 
 
 """
 rostopic info /attached_collision_object
