@@ -12,6 +12,8 @@ from .configuration import Configuration
 from .semantics import RobotSemantics
 from .ros_fileserver_loader import RosFileServerLoader
 
+from compas_fab.artists import BaseRobotArtist
+
 LOGGER = logging.getLogger('compas_fab.robots.robot')
 
 __all__ = [
@@ -29,8 +31,10 @@ class Robot(object):
 
     Attributes
     ----------
-    robot_model : :class:`compas.robots.Robot`
+    model : :class:`compas.robots.Robot`
         The robot model, usually created out of an URDF structure.
+    artist : :class:`compas_fab.artists.BaseRobotArtist`
+        TODO
     semantics : :class:`RobotSemantics`, optional
         The semantic model of the robot.
     client : optional
@@ -39,8 +43,9 @@ class Robot(object):
         The name of the robot
     """
 
-    def __init__(self, robot_model, semantics=None, client=None):
+    def __init__(self, robot_model, robot_artist, semantics=None, client=None):
         self.model = robot_model
+        self.artist = robot_artist
         self.semantics = semantics
         self.client = client  # setter and getter
 
@@ -208,12 +213,6 @@ class Robot(object):
 
         return Configuration(positions, types)
 
-    def update(self, configuration, group=None, collision=False):
-        """
-        """
-        names = self.get_configurable_joint_names(group)
-        self.model.update(names, configuration.values, collision)
-
     def ensure_client(self):
         if not self.client:
             raise Exception('This method is only callable once a client is assigned')
@@ -346,29 +345,35 @@ class Robot(object):
 
     @property
     def frames(self):
-        return self.model.get_frames(self.transformation_RCF_WCF)
+        frames = self.model.frames
+        #[frame.transform(self.transformation_RCF_WCF) for frame in frames]
+        return frames
 
     @property
     def axes(self):
-        return self.model.get_axes(self.transformation_RCF_WCF)
+        axes = self.model.axes
+        #[axis.transform(self.transformation_RCF_WCF) for axis in axes]
+        return axes
+    
+    def update(self, configuration, collision=True):
+        self.artist.update(configuration, collision)
 
     def draw_visual(self):
-        return self.model.draw_visual(self.transformation_RCF_WCF)
+        return self.artist.draw_visual()
 
     def draw_collision(self):
-        return self.model.draw_collision(self.transformation_RCF_WCF)
+        return self.artist.draw_collision()
 
     def draw(self):
-        return self.model.draw()
+        return self.draw_visual()
 
     def scale(self, factor):
         """Scale the robot.
         """
-        if hasattr(self.model, "artist"):
-            self.model.artist.scale(factor)
+        self.artist.scale(factor)
 
     @property
     def scale_factor(self):
-        return self.model.scale_factor
+        return self.artist.scale_factor
 
 

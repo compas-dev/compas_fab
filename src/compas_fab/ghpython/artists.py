@@ -22,8 +22,8 @@ class RobotArtist(BaseRobotArtist):
         T = xform_from_transformation(transformation)
         native_mesh.Transform(T)
 
-    def draw_mesh(self, compas_mesh):
-        return mesh_draw(compas_mesh)
+    def draw_mesh(self, compas_mesh, color=None):
+        return mesh_draw(compas_mesh, vertexcolor=color)
 
     # def set_color(self, color_rgba):
     #     r, g, b, a = color_rgba
