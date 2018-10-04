@@ -151,20 +151,21 @@ Go to the urdf folder and create a xacro file for your end-effector::
     </xacro:macro>
   </robot>
 
-Explanation:
+Explanation
+-----------
 
 The end-effector consists of one fixed joint (that will be attacted to the tool0
 of the robot), one link with geometry (the tool geometry), one fixed joint (the
 tcp joint, defining the TCP frame) and the tcp link without geometry.
 
-We define a parameterized macro with 2 parameters (prefix, connected_to) because 
+We define a parameterized macro with 2 parameters (``${prefix}``, ``${connected_to}``) because 
 maybe once we want to attach the tool to a different robot with a different 
 flange name or, if we once want to use the end-effector twice in the same urdf
 we would need to use both with different prefixes to distinguish them. 
 Whatever is defined like ``${}`` will later be replaced when generating the 
 urdf.
 
-Now we create a new xaxro file, which combines the ur5 with the end-effector::
+Now we create a new xacro file, which combines the ur5 with the end-effector::
 
   pico ur5_with_measurement_tool.xacro
 
