@@ -175,7 +175,9 @@ You are almost there. One last step!
 * Click *Browse*, select the ``robotic_setups/src`` location. Click *Create New Folder*, call it "ur5_with_measurement_tool_moveit_config", and click *Choose*. 
 * Click on the *Generate Package* button. The Setup Assistant will now generate and write a set of launch and config files into the directory of your choosing. All the generated files will appear in the Generated Files/Folders tab and you can click on each of them for a description of what they contain.
 
-Further links (where this tutorial was mainly copied from)
+Further links
+=============
 
+This example was mainly copied from:
 * http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html
 * http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/urdf_srdf/urdf_srdf_tutorial.html
