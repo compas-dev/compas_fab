@@ -97,7 +97,7 @@ stored the files)::
 Rather than writing urdf files directly, it is more convinient to write xacro 
 files from which urdfs are generated. As its name implies, xacro is a macro 
 language. The language allows to use constants, to perform simple math 
-operations and to parameterize macros simple by using ``${}``.
+operations and to parameterize macros simply by using ``${}``.
 
 For examples please have a look at:
 
@@ -139,13 +139,25 @@ Go to the urdf folder and create a xacro file for your end-effector::
           </geometry>
         </collision>
       </link>
+
+      <!-- TCP frame -->
+      <joint name="${prefix}tcp_joint" type="fixed">
+        <origin xyz="0 0 0.116" rpy="0 0 0"/>
+        <parent link="${prefix}measurement_tool"/>
+        <child link="${prefix}tcp"/>
+      </joint>
+      <link name="${prefix}tcp"/>
+
     </xacro:macro>
   </robot>
 
 Explanation:
 
-The end-effector only consists of one fixed joint and one link with geometry. We
-create a parameterized macro with 2 parameters (prefix, connected_to) because 
+The end-effector consists of one fixed joint (that will be attacted to the tool0
+of the robot), one link with geometry (the tool geometry), one fixed joint (the
+tcp joint, defining the TCP frame) and the tcp link without geometry.
+
+We define a parameterized macro with 2 parameters (prefix, connected_to) because 
 maybe once we want to attach the tool to a different robot with a different 
 flange name or, if we once want to use the end-effector twice in the same urdf
 we would need to use both with different prefixes to distinguish them. 
@@ -208,19 +220,40 @@ Typically this frame is the first frame of the robot tied to the first link.
 To define the base_link name we search in the robot's xacro file the link which
 is never child to a joint (first link). 
 
-Now create and check the urdf.::
+Now create the urdf.::
 
   rosrun xacro xacro --inorder -o ur5_with_measurement_tool.urdf ur5_with_measurement_tool.xacro
-  check_urdf ur5_with_measurement_tool.urdf
 
 This will create ur5_with_measurement_tool.urdf in the directory.
+
+You can also check the urdf with::
+
+  check_urdf ur5_with_measurement_tool.urdf
+
+This will output::
+
+  robot name is: ur5_with_measurement_tool
+  ---------- Successfully Parsed XML ---------------
+  root Link: world has 1 child(ren)
+      child(1):  base_link
+          child(1):  base
+          child(2):  shoulder_link
+              child(1):  upper_arm_link
+                  child(1):  forearm_link
+                      child(1):  wrist_1_link
+                          child(1):  wrist_2_link
+                              child(1):  wrist_3_link
+                                  child(1):  ee_link
+                                  child(2):  tool0
+                                      child(1):  measurement_tool
+                                          child(1):  tcp
 
 
 4. View urdf
 ============
 
 Now locate the path where you stored the urdf_tutorial, e.g. YOURPATH and copy
-2 files to your package folder
+2 files to your package folder::
   
     cd ..
     cp YOURPATH/urdf_tutorial/rviz/urdf.rviz rviz/
