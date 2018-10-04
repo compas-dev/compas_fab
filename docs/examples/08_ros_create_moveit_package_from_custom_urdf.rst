@@ -53,7 +53,7 @@ frame. We will define only one virtual joint, attaching the
 
 * Click on the *Virtual Joints* pane selector. Click on *Add Virtual Joint*
 * Set the joint name as "virtual_joint"
-* Set the child link as "base_link" and the parent frame name as "world".
+* Set the child link as "world" and the parent frame name as "world".
 * Set the Joint Type as "fixed".
 * Click *Save*.
 
@@ -186,6 +186,19 @@ You are almost there. One last step!
 .. figure:: 08_ros_create_moveit_package_09.jpg
     :figclass: figure
     :class: figure-img img-fluid
+
+
+10. Start the newly generated MoveIt! Configuration
+
+    cd ~/robotic_setups
+    catkin_make
+    source devel/setup.bash
+    roslaunch ur5_with_measurement_tool_moveit_config  demo.launch rviz_tutorial:=true
+
+.. figure:: 08_ros_create_moveit_package_10.jpg
+    :figclass: figure
+    :class: figure-img img-fluid
+
 
 Further links
 =============
