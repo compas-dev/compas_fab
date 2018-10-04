@@ -15,8 +15,7 @@ Description Format (SRDF) file for your robot.
 
     roslaunch moveit_setup_assistant setup_assistant.launch
     
-and press *Create New MoveIt Configuration Package*
-
+* Press *Create New MoveIt Configuration Package*
 * Click on the browse button and navigate to the ``ur5_with_measurement_tool.urdf`` 
   file you created in the last example. Choose that file and then click 
   *Load Files.* The Setup Assistant will load the files (this might take a few 
@@ -53,7 +52,11 @@ frame. We will define only one virtual joint, attaching the
 * Set the joint name as "virtual_joint"
 * Set the child link as "base_link" and the parent frame name as "world".
 * Set the Joint Type as "fixed".
-* Click Save.
+* Click *Save*.
+
+.. figure:: 08_ros_create_moveit_package_02_2.jpg
+    :figclass: figure
+    :class: figure-img img-fluid
 
 
 4. Add Planning Groups
@@ -71,26 +74,26 @@ is later used for the path- and motion planning.
     :class: figure-img img-fluid
 
 **Add the arm**
- ``ur5_with_measurement_tool`` as a planning group.
 
 * Enter *Group Name* as "manipulator"
-* Choose ur_kinematics/UR5KinematicsPlugin as the kinematics solver. *Note: if 
-you have a custom robot and would like a powerful custom IK solver, see Kinematics/IKFast*
+* Choose ur_kinematics/UR5KinematicsPlugin as the kinematics solver.
 * Let *Kin. Search Resolution*, *Kin. Search Timeout (sec)*, *Kin. Solver Attempts* and
-*Group Default Planner* stay at their default values.
+  *Group Default Planner* stay at their default values.
 
 .. figure:: 08_ros_create_moveit_package_04.JPG
     :figclass: figure
     :class: figure-img img-fluid
 
 * Click on the *Add Kin. Chain* button. Then you need to open the kinematic
-chain.
-* Select the "base_link" as *Base Link* and the "tcp" as *Tip Link*
-* Press the *Save* button.
+  chain.
 
 .. figure:: 08_ros_create_moveit_package_05.JPG
     :figclass: figure
     :class: figure-img img-fluid
+    
+* Select the "base_link" as *Base Link* and the "tcp" as *Tip Link*
+* Press the *Save* button.
+
 
 **Add the gripper**
 
@@ -100,12 +103,10 @@ a different procedure than adding the arm.
 * Click on the *Add Group* button.
 * Enter *Group Name* as "measurement_tool"
 * Let *Kinematic Solver*, *Kin. Search Resolution*, *Kin. Search Timeout (sec)*, *Kin. Solver Attempts* and
-*Group Default Planner* stay at their default values.
+  *Group Default Planner* stay at their default values.
 * Click on the *Add Links* button.
-* Choose measurment_tool and tcp (The links you defined in the measurement_tool.xacro) and add them to the list of *Selected Links* on the right hand side.
+* Choose measurment_tool and tcp (The links you defined in the measurement_tool.xacro) and add them to the list of *Selected Links* on     the right hand side.
 * Click *Save*
-
-
 
 
 5. Add Robot Poses
@@ -117,12 +118,12 @@ of the robot as a *Home* position.
 
 * Click on the *Robot Poses* pane.
 * Click *Add Pose*. Choose a name for the pose. The robot will be in its 
-*Default* position where the joint values are set to the mid-range of the 
-allowed joint value range. Move the individual joints around until you are happy
-and then *Save* the pose. Note how poses are associated with particular groups.
-You can save individual poses for each group.
+  *Default* position where the joint values are set to the mid-range of the 
+  allowed joint value range. Move the individual joints around until you are happy
+  and then *Save* the pose. Note how poses are associated with particular groups.
+  You can save individual poses for each group.
 * IMPORTANT TIP: Try to move all the joints around. If there is something wrong 
-with the joint limits in your URDF, you should be able to see it immediately here.
+  with the joint limits in your URDF, you should be able to see it immediately here.
 
 .. figure:: 08_ros_create_moveit_package_06.JPG
     :figclass: figure
