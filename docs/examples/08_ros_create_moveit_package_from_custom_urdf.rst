@@ -64,7 +64,7 @@ frame. We will define only one virtual joint, attaching the
 
 Planning groups are used for semantically describing different parts of your 
 robot, such as defining what an arm is, or an end-effector. The planning group
-is later used for the path- and motion planning.
+is later used for path- and motion planning.
 
 * Click on the *Planning Groups* pane selector.
 * Click on *Add Group* and you should see the following screen:
@@ -73,7 +73,8 @@ is later used for the path- and motion planning.
     :figclass: figure
     :class: figure-img img-fluid
 
-**Add the arm**
+Add the arm
+-----------
 
 * Enter *Group Name* as "manipulator"
 * Choose ur_kinematics/UR5KinematicsPlugin as the kinematics solver.
@@ -84,8 +85,7 @@ is later used for the path- and motion planning.
     :figclass: figure
     :class: figure-img img-fluid
 
-* Click on the *Add Kin. Chain* button. Then you need to open the kinematic
-  chain.
+* Click on the *Add Kin. Chain* button. Press *Expand All*
 
 .. figure:: 08_ros_create_moveit_package_05.JPG
     :figclass: figure
@@ -95,10 +95,13 @@ is later used for the path- and motion planning.
 * Press the *Save* button.
 
 
-**Add the gripper**
+Add the gripper
+---------------
 
-We will also add a group for the end-effector. NOTE that you will do this using
-a different procedure than adding the arm.
+We will also add a group for the end-effector. 
+
+Note:
+    You will do this using a different procedure than adding the arm.
 
 * Click on the *Add Group* button.
 * Enter *Group Name* as "measurement_tool"
@@ -107,6 +110,10 @@ a different procedure than adding the arm.
 * Click on the *Add Links* button.
 * Choose measurment_tool and tcp (The links you defined in the measurement_tool.xacro) and add them to the list of *Selected Links* on     the right hand side.
 * Click *Save*
+
+.. figure:: 08_ros_create_moveit_package_05_3.jpg
+    :figclass: figure
+    :class: figure-img img-fluid
 
 
 5. Add Robot Poses
@@ -147,7 +154,26 @@ effectors allows some special operations to happen on them internally.
 .. figure:: 08_ros_create_moveit_package_07.jpg
     :figclass: figure
     :class: figure-img img-fluid
+    
+7. Add Passive Joints
+=====================
 
+Skip this step.
+
+8. Add Author Information
+=========================
+
+* Click on the *Author Information* pane.
+* Enter your name and email address.
+
+9. Generate Configuration Files
+===============================
+
+You are almost there. One last step - generating all the configuration files that you will need to start using MoveIt!
+
+* Click on the Configuration Files pane. 
+* Click *Browse*, select the ``robotic_setups/src`` location. Click *Create New Folder*, call it "ur5_with_measurement_tool_moveit_config", and click *Choose*. 
+* Click on the *Generate Package* button. The Setup Assistant will now generate and write a set of launch and config files into the directory of your choosing. All the generated files will appear in the Generated Files/Folders tab and you can click on each of them for a description of what they contain.
 
 Further links (where this tutorial was mainly copied from)
 
