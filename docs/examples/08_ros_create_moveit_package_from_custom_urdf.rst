@@ -189,11 +189,15 @@ You are almost there. One last step!
 
 
 10. Start the newly generated MoveIt! Configuration
+===================================================
+
+Now, optionally, you can already start the MoveIt! Demo and play::
 
     cd ~/robotic_setups
     catkin_make
     source devel/setup.bash
     roslaunch ur5_with_measurement_tool_moveit_config  demo.launch rviz_tutorial:=true
+
 
 .. figure:: 08_ros_create_moveit_package_10.jpg
     :figclass: figure
