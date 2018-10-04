@@ -9,16 +9,16 @@ Creating a MoveIt! package from the custom created URDF
 
 The MoveIt! Setup Assistant is a graphical user interface for configuring any 
 robot for use with MoveIt!. Its primary function is generating a Semantic Robot
-Description Format (SRDF) file for your robot.:
+Description Format (SRDF) file for your robot.::
 
     roslaunch moveit_setup_assistant setup_assistant.launch
-
+    
 and press *Create New MoveIt Configuration Package*
 
 * Click on the browse button and navigate to the ``ur5_with_measurement_tool.urdf`` 
-    file you created in the last example. Choose that file and then click 
-    *Load Files.* The Setup Assistant will load the files (this might take a few 
-    seconds) and present you with this screen:
+  file you created in the last example. Choose that file and then click 
+  *Load Files.* The Setup Assistant will load the files (this might take a few 
+  seconds) and present you with this screen:
 
 .. figure:: 08_ros_create_moveit_package_00.JPG
     :figclass: figure
