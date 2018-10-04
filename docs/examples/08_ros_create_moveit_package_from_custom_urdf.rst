@@ -4,6 +4,9 @@
 Creating a MoveIt! package from the custom created URDF
 ********************************************************************************
 
+This example is mainly copied from `MoveIt! Setup Assistant Tutorial <http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html/>`_
+
+
 1. Start the MoveIt! Setup Assistant
 ====================================
 
@@ -177,8 +180,6 @@ You are almost there. One last step!
 
 Further links
 =============
-
-This example was mainly copied from:
 
 * http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html
 * http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/urdf_srdf/urdf_srdf_tutorial.html
