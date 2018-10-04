@@ -9,16 +9,18 @@ Creating a MoveIt! package from the custom created URDF
 
 The MoveIt! Setup Assistant is a graphical user interface for configuring any 
 robot for use with MoveIt!. Its primary function is generating a Semantic Robot
-Description Format (SRDF) file for your robot.:
+Description Format (SRDF) file for your robot.
+
+* To start the MoveIt! Setup Assistant::
 
     roslaunch moveit_setup_assistant setup_assistant.launch
-
+    
 and press *Create New MoveIt Configuration Package*
 
 * Click on the browse button and navigate to the ``ur5_with_measurement_tool.urdf`` 
-    file you created in the last example. Choose that file and then click 
-    *Load Files.* The Setup Assistant will load the files (this might take a few 
-    seconds) and present you with this screen:
+  file you created in the last example. Choose that file and then click 
+  *Load Files.* The Setup Assistant will load the files (this might take a few 
+  seconds) and present you with this screen:
 
 .. figure:: 08_ros_create_moveit_package_00.JPG
     :figclass: figure
@@ -27,16 +29,13 @@ and press *Create New MoveIt Configuration Package*
 2. Generate Self-Collision Matrix
 ====================================
 
-The sampling density specifies how many random robot positions to check for self
-collision. The default value of 10'000 collision checks should be fine.
+* Click on the *Self-Collisions* pane selector on the left-hand side.
+* Click on the *Generate Collision Matrix* button. The Setup Assistant will work for a few
+  seconds before presenting you the results of its computation in the main table.
 
-* Click on the *Self-Collisions* pane selector on the left-hand side and click 
-on the *Generate Collision Matrix* button. The Setup Assistant will work for a few
-seconds before presenting you the results of its computation in the main table.
-
-.. figure:: 08_ros_create_moveit_package_01.JPG
-    :figclass: figure
-    :class: figure-img img-fluid
+Note:
+    The sampling density specifies how many random robot positions to check for self
+    collision. The default value of 10'000 collision checks should be fine.
 
 .. figure:: 08_ros_create_moveit_package_02.JPG
     :figclass: figure
