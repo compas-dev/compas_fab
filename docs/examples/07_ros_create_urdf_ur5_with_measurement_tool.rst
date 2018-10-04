@@ -303,6 +303,14 @@ And then run::
 
 In RViz you can customize the display settings and save the ``urdf.rviz``
 
+Add path to search paths
+========================
+
+For convinience add the path to your .bashrc::
+    
+    echo 'source ~/robotic_setups/devel/setup.bash' >> ~/.bashrc
+
+
 
 Further links
 =============
