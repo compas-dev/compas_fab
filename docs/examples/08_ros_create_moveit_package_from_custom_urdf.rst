@@ -127,10 +127,11 @@ of the robot as a *Home* position.
 * Click *Add Pose*. Choose a name for the pose. The robot will be in its 
   *Default* position where the joint values are set to the mid-range of the 
   allowed joint value range. Move the individual joints around until you are happy
-  and then *Save* the pose. Note how poses are associated with particular groups.
-  You can save individual poses for each group.
-* IMPORTANT TIP: Try to move all the joints around. If there is something wrong 
-  with the joint limits in your URDF, you should be able to see it immediately here.
+  and then *Save* the pose.
+
+Tip:
+    Try to move all the joints around. If there is something wrong 
+    with the joint limits in your URDF, you should be able to see it immediately here.
 
 .. figure:: 08_ros_create_moveit_package_06.JPG
     :figclass: figure
@@ -140,8 +141,7 @@ of the robot as a *Home* position.
 ======================
 
 We have already added the measurement_tool of the ur5. Now, we will designate 
-this group as a special group: end effectors. Designating this group as end 
-effectors allows some special operations to happen on them internally.
+this group as a special group: end effectors. 
 
 * Click on the *End Effectors* pane.
 * Click *Add End Effector*.
@@ -169,7 +169,7 @@ Skip this step.
 9. Generate Configuration Files
 ===============================
 
-You are almost there. One last step - generating all the configuration files that you will need to start using MoveIt!
+You are almost there. One last step!
 
 * Click on the Configuration Files pane. 
 * Click *Browse*, select the ``robotic_setups/src`` location. Click *Create New Folder*, call it "ur5_with_measurement_tool_moveit_config", and click *Choose*. 
