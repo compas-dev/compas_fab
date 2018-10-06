@@ -86,7 +86,10 @@ class BaseRobotArtist(object):
         for item in itertools.chain(link.visual, link.collision):
             item.native_geometry_reset = parent_transformation.inverse()
             if item.geometry.geo:
-                item.native_geometry = self.draw_mesh(item.geometry.geo)
+                color = None
+                if hasattr(item, "get_color"):
+                    color = item.get_color()
+                item.native_geometry = self.draw_mesh(item.geometry.geo, color)
                 self.transform(item.native_geometry, parent_transformation)
 
         for child_joint in link.joints:
@@ -105,7 +108,7 @@ class BaseRobotArtist(object):
             The factor to scale the robot with.
         """
         relative_factor = factor/self.scale_factor # relative scaling factor
-        self.scale_factor = factor
+        self.scale_factor = factor  
         transformation = Scale([relative_factor, relative_factor, relative_factor])
         self.scale_links(transformation)
     
@@ -133,7 +136,7 @@ class BaseRobotArtist(object):
             self.scale_link(child_joint.child_link, transformation)
 
     # TODO: Move this method to compas_fab robot
-    def update(self, configuration, collision=True):
+    def update(self, configuration, collision=True, names=[]):
         """Trigger the update of the robot geometry.
 
         Parameters
@@ -145,7 +148,8 @@ class BaseRobotArtist(object):
             Defaults to ``True``.
         """
         #        return self.srdf_model.get_configurable_joint_names(group)
-        names = self.robot.get_configurable_joint_names()
+        if not len(names):
+            names = self.robot.get_configurable_joint_names()
         positions = configuration.values
         self.update_links(names, positions, collision)
 
@@ -163,8 +167,7 @@ class BaseRobotArtist(object):
             Defaults to ``True``.
         """
         if len(names) != len(positions):
-            return ValueError("len(names): %d is not len(positions) %d" % (len(names), len(positions)))
-
+            raise ValueError("len(names): %d is not len(positions) %d" % (len(names), len(positions)))
         joint_state = dict(zip(names, positions))
         self.update_link(self.robot.root, joint_state, Transformation(), collision)
 
@@ -201,7 +204,6 @@ class BaseRobotArtist(object):
         for child_joint in link.joints:
             # 1. Reset child joint transformation
             child_joint.reset_transform()
-
             # 2. Calculate transformation for next joints in the chain
             if child_joint.name in joint_state.keys():
                 position = joint_state[child_joint.name]

@@ -5,6 +5,8 @@ from __future__ import print_function
 import logging
 
 import compas.robots.model
+from compas.robots import Joint
+
 from compas.geometry import Frame
 from compas.geometry.xforms import Transformation
 
@@ -89,11 +91,13 @@ class Robot(object):
         """
         urdf_importer = RosFileServerLoader.from_robot_resource_path(directory)
         urdf_file = urdf_importer.urdf_filename
-        print("urdf_file", urdf_file)
+        
         srdf_file = urdf_importer.srdf_filename
         urdf_model = compas.robots.model.Robot.from_urdf_file(urdf_file)
         srdf_model = RobotSemantics.from_srdf_file(srdf_file, urdf_model)
-        return cls(urdf_model, srdf_model, client)
+        print("urdf_model", urdf_model)
+        print("srdf_model", srdf_model)
+        return cls(urdf_model, None, srdf_model, client)
 
     @property
     def name(self):
@@ -143,8 +147,9 @@ class Robot(object):
 
     def get_base_frame(self, group=None):
         link = self.get_base_link(group)
+        #return link.parent_joint.origin.copy() # TODO: check
         for joint in link.joints:
-            if joint.type == "fixed":
+            if joint.type == Joint.FIXED:
                 return joint.origin.copy()
         else:
             return Frame.worldXY()
@@ -286,7 +291,8 @@ class Robot(object):
         
 
     def compute_cartesian_path(self, frames, start_configuration, max_step,
-                               avoid_collisions=True, callback_result=None, group=None):
+                               avoid_collisions=True, callback_result=None, 
+                               group=None):
         """Calculates a path defined by frames (Cartesian coordinate system).
 
         Parameters
@@ -355,8 +361,9 @@ class Robot(object):
         #[axis.transform(self.transformation_RCF_WCF) for axis in axes]
         return axes
     
-    def update(self, configuration, collision=True):
-        self.artist.update(configuration, collision)
+    def update(self, configuration, collision=True, group=None):
+        names = self.get_configurable_joint_names(group)
+        self.artist.update(configuration, collision, names)
 
     def draw_visual(self):
         return self.artist.draw_visual()
@@ -374,6 +381,9 @@ class Robot(object):
 
     @property
     def scale_factor(self):
-        return self.artist.scale_factor
+        if self.artist:
+            return self.artist.scale_factor
+        else:
+            return 1.
 
 

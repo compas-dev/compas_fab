@@ -8,7 +8,7 @@ import os
 
 import roslibpy
 from compas.datastructures import Mesh
-from compas.files.xml import XML
+from compas.files.xml_ import XML
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas.geometry.transformations.helpers import mesh_transform
@@ -148,11 +148,7 @@ class RosFileServerLoader(object):
         for resource_file_uri in uris:
             self.requested_resource_files.update({resource_file_uri: False})
             local_filename = self.robot_resource_filename(resource_file_uri)
-            if os.path.isfile(local_filename):
-                LOGGER.info("Resource file already exists in %s, aborting download." % (local_filename))
-                self.update_file_request_status(resource_file_uri)
-            else:
-                self.receive_resource_file(local_filename, str(resource_file_uri))
+            self.receive_resource_file(local_filename, str(resource_file_uri))
 
     def write_file(self, filename, filecontents, mode='w'):
         dirname = os.path.dirname(filename)
@@ -299,7 +295,7 @@ if __name__ == "__main__":
     roslaunch file_server.launch
     """
 
-    """
+
     import logging
 
     FORMAT = '%(asctime)-15s [%(levelname)s] %(message)s'
@@ -308,17 +304,9 @@ if __name__ == "__main__":
     ros = roslibpy.Ros("127.0.0.1", 9090)
 
     local_directory = os.path.join(os.path.expanduser('~'), "workspace", "robot_description")
-    importer = UrdfImporter(ros, local_directory)
+    importer = RosFileServerLoader(ros, local_directory)
     importer.load()
     ros.call_later(50, ros.close)
     ros.call_later(52, ros.terminate)
     ros.run_forever()
-    """
 
-    path = r"C:\Users\rustr\workspace\robot_description\ur5_with_measurement_tool"
-    loader = RosFileServerLoader.from_robot_resource_path(path)
-
-    from compas.robots import Robot
-
-    robot = Robot.from_urdf_file(loader.urdf_filename)
-    robot.load_geometry(loader)
