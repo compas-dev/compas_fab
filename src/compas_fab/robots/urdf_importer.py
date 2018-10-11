@@ -8,7 +8,7 @@ import os
 
 import roslibpy
 from compas.datastructures import Mesh
-from compas.files.xml import XML
+from compas.files import XML
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas.geometry.transformations.helpers import mesh_transform
