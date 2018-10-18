@@ -195,18 +195,18 @@ towers with different prefixes to distinguish links and joints.
 
 The tower consists of 3 links and 2 prismatic joints in between:
 
-    * ``tower`` (link): The geometry that is fixed
-    * ``axis1_joint`` (joint): The prismatic joint along which the model moves in 
-      z-axis. Define the ``axis`` as z-axis (0 0 1) and for the ``origin``
-      enter the point you defined before exporting. For the ``limit`` please enter
-      the minimal and maximal position (translation) of the joint. 
-    * ``axis1`` (link): The geometry that moves along the tower in z-axis
-    * ``axis2_joint`` (joint): The prismatic joint along which the model moves in 
-      x-axis. Define the ``axis`` as x-axis (1 0 0) and for the ``origin`` 
-      calculate from the point you defined before exporting the **RELATIVE** 
-      translation to ``axis1_joint``. For the ``limit`` please enter
-      the minimal and maximal position (translation) of the joint. 
-    * ``axis2`` (link): The geometry that moves along ``axis1`` in x-axis
+* ``tower`` (link): The geometry that is fixed
+* ``axis1_joint`` (joint): The prismatic joint along which the model moves in 
+  z-axis. Define the ``axis`` as z-axis (0 0 1) and for the ``origin``
+  enter the point you defined before exporting. For the ``limit`` please enter
+  the minimal and maximal position (translation) of the joint. 
+* ``axis1`` (link): The geometry that moves along the tower in z-axis
+* ``axis2_joint`` (joint): The prismatic joint along which the model moves in 
+  x-axis. Define the ``axis`` as x-axis (1 0 0) and for the ``origin`` 
+  calculate from the point you defined before exporting the **RELATIVE** 
+  translation to ``axis1_joint``. For the ``limit`` please enter
+  the minimal and maximal position (translation) of the joint. 
+* ``axis2`` (link): The geometry that moves along ``axis1`` in x-axis
 
 
 ur10_tower.xacro
