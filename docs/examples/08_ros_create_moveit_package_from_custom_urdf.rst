@@ -6,13 +6,16 @@ Creating a MoveIt! package from the custom created URDF
 
 This example is mainly copied from `MoveIt! Setup Assistant Tutorial <http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html>`_
 
+It is based on the previous example: `Creating a URDF with an UR5 robot and a custom
+end-effector <07_ros_create_urdf_ur5_with_measurement_tool.rst>`_
 
 1. Start the MoveIt! Setup Assistant
 ====================================
 
 The MoveIt! Setup Assistant is a graphical user interface for configuring any 
-robot for use with MoveIt!. Its primary function is generating a Semantic Robot
-Description Format (SRDF) file for your robot.
+robot for use with MoveIt!. Its primary functions are to generate a Semantic Robot
+Description Format (SRDF) file, to create the collision matrix of your robot
+and to define the planning groups.
 
 * To start the MoveIt! Setup Assistant::
 
