@@ -99,7 +99,7 @@ Go to the ``urdf`` folder and create a xacro file for the tower::
   cd urdf
   pico tower.xacro
 
-(Pico is a terminal based text editor.) Paste the following into the file:
+Paste the following into the file:
 
 .. code-block:: xml
 
@@ -127,7 +127,7 @@ Go to the ``urdf`` folder and create a xacro file for the tower::
                     <child link="${prefix}axis1"/>
                     <!-- Here we enter the joint position just defined before -->
                     <origin xyz="0 -0.121 0.537" rpy="0 0 0"/>
-                    <!-- Here we define the axis along the geometry is moved -->
+                    <!-- Here we define the axis along which the geometry is moved -->
                     <axis xyz="0 0 1"/>
                     <!-- Here we define the joint's upper and lower limits -->
                     <limit effort="1000.0" lower="0.0" upper="1.86" velocity="0.5"/>
@@ -154,7 +154,7 @@ Go to the ``urdf`` folder and create a xacro file for the tower::
                     <child link="${prefix}axis2"/>
                      <!-- Here we enter the joint position just defined before -->
                     <origin xyz="0.467 -0.054 0" rpy="0 0 0"/>
-                    <!-- Here we define the axis along the geometry is moved -->
+                    <!-- Here we define the axis along which the geometry is moved -->
                     <axis xyz="1 0 0"/>
                     <limit effort="1000.0" lower="0.0" upper="1.07" velocity="0.5"/>
                 </joint>
@@ -181,23 +181,24 @@ Go to the ``urdf`` folder and create a xacro file for the tower::
 Explanation:
 ------------
 
-We define a parameterized macro with 1 parameter (prefix) because if we want to
-use the tower twice in the same urdf we need to use both towers with different
-prefixes to distinguish links and joints. 
+We define a parameterized macro with 1 parameter (``prefix``). That is practical
+if we want to use the tower twice in the same urdf, then we need to use both 
+towers with different prefixes to distinguish links and joints. 
 
 The tower consists of 3 links and 2 prismatic joints in between:
-    * *tower* (link): The geometry that is fixed
-    * *axis1_joint* (joint): The prismatic joint along which the model moves in 
-      z-axis. Define the *axis* as z-axis (0 0 1) and for the *origin* please
-      enter the point you defined before exporting. For the *limit* please enter
+
+    * ``tower`` (link): The geometry that is fixed
+    * ``axis1_joint`` (joint): The prismatic joint along which the model moves in 
+      z-axis. Define the ``axis`` as z-axis (0 0 1) and for the ``origin``
+      enter the point you defined before exporting. For the ``limit`` please enter
       the minimal and maximal position (translation) of the joint. 
-    * *axis1* (link): The geometry that moves along the tower in z-axis
-    * *axis2_joint* (joint): The prismatic joint along which the model moves in 
-      x-axis. Define the *axis* as x-axis (1 0 0) and for the *origin* please 
-      calculate from the point you defined before exporting the *RELATIVE* 
-      translation to *axis1_joint*. For the *limit* please enter
+    * ``axis1`` (link): The geometry that moves along the tower in z-axis
+    * ``axis2_joint`` (joint): The prismatic joint along which the model moves in 
+      x-axis. Define the ``axis`` as x-axis (1 0 0) and for the ``origin`` 
+      calculate from the point you defined before exporting the **RELATIVE** 
+      translation to ``axis1_joint``. For the ``limit`` please enter
       the minimal and maximal position (translation) of the joint. 
-    * *axis2* (link): The geometry that moves along axis1 in x-axis
+    * ``axis2`` (link): The geometry that moves along ``axis1`` in x-axis
 
 Now we create a new xacro file, which combines the ur10 with the tower::
 
@@ -238,9 +239,9 @@ Explanation:
 ------------
 
 * To define the tower in regard to the world coordinate frame, we add first the
-  world link (no geometry) with the world joint in the worldXY frame and add the 
-  world link as parent and the tower link as child.
-* Then we include the tower.xacro with parameter ``prefix=""``.
+  ``world`` link (no geometry) with the ``world_joint`` in the worldXY frame and add the 
+  ``world`` link as parent and the ``tower`` link as child.
+* Then we include the ``tower.xacro`` with parameter ``prefix=""``.
 * We define another joint between the ``axis2`` link (parent) and the 
   ``base_link`` (child) of the robot (the first link in the robot's 
   kinematic model). This joint is fixed, has no translation in
@@ -263,7 +264,7 @@ Now create the urdf.::
 
   rosrun xacro xacro --inorder -o ur10_tower.urdf ur10_tower.xacro
 
-This will create  ur10_tower.urdf in the directory.
+This will create ``ur10_tower.urdf`` in the directory.
 
 You can also check the urdf with::
 
@@ -271,22 +272,22 @@ You can also check the urdf with::
 
 This will output::
 
-robot name is: ur10_tower
----------- Successfully Parsed XML ---------------
-root Link: world has 1 child(ren)
-    child(1):  tower
-        child(1):  axis1
-            child(1):  axis2
-                child(1):  base_link
-                    child(1):  base
-                    child(2):  shoulder_link
-                        child(1):  upper_arm_link
-                            child(1):  forearm_link
-                                child(1):  wrist_1_link
-                                    child(1):  wrist_2_link
-                                        child(1):  wrist_3_link
-                                            child(1):  ee_link
-                                            child(2):  tool0
+    robot name is: ur10_tower
+    ---------- Successfully Parsed XML ---------------
+    root Link: world has 1 child(ren)
+        child(1):  tower
+            child(1):  axis1
+                child(1):  axis2
+                    child(1):  base_link
+                        child(1):  base
+                        child(2):  shoulder_link
+                            child(1):  upper_arm_link
+                                child(1):  forearm_link
+                                    child(1):  wrist_1_link
+                                        child(1):  wrist_2_link
+                                            child(1):  wrist_3_link
+                                                child(1):  ee_link
+                                                child(2):  tool0
 
 
 4. View urdf
