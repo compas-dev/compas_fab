@@ -5,7 +5,7 @@ Creating a URDF of the UR10 on the tower
 ********************************************************************************
 
 **ATTENTION:**
-*This example is not yet ready. The tower still has to be compared to the real 
+*This example is not yet finished. The tower still has to be compared to the real 
 tower. Limits and joint origins are only assumed.*
 
 1. Install
