@@ -370,6 +370,12 @@ Then you should see something like that:
 
 You can play with the sliders on the side to move the elements and check if all is fine.
 
+And later create a MoveIt! package from it.
+
+.. figure:: 09_ur10_tower_urdf_07.jpg
+    :figclass: figure
+    :class: figure-img img-fluid
+
 Further links
 =============
 
