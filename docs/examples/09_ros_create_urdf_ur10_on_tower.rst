@@ -376,6 +376,10 @@ And later create a MoveIt! package from it.
     :figclass: figure
     :class: figure-img img-fluid
 
+.. figure:: 09_ur10_tower_urdf_08.jpg
+    :figclass: figure
+    :class: figure-img img-fluid
+
 Further links
 =============
 
