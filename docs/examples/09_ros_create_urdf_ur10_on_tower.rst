@@ -4,6 +4,11 @@
 Creating a URDF of the UR10 on the tower
 ********************************************************************************
 
+::
+
+    **ATTENTION: The tower has to be compared to the real tower. Limits and joint
+    origins are only assumed.**
+
 1. Install
 ==========
 
@@ -12,7 +17,7 @@ end-effector <07_ros_create_urdf_ur5_with_measurement_tool.rst>`_,
 install the requirements in point **0.** and prepare the catkin workspace.
 
 
-1. Export meshes
+2. Export meshes
 ================
 
 * Before exporting, please move the elements of the tower's axes such that they are 
@@ -45,7 +50,7 @@ install the requirements in point **0.** and prepare the catkin workspace.
     :class: figure-img img-fluid
 
 
-2. Prepare your catkin workspace
+3. Prepare your catkin workspace
 ================================
 
 Open your bash console and go to your robotic setups src folder::
@@ -91,8 +96,11 @@ stored the files)::
   cp /mnt/c/Users/YOURPATH/meshes/collision/* meshes/collision/
 
 
-3. Create xacros and generate urdf
+4. Create xacros and generate urdf
 ==================================
+
+tower.xacro
+-----------
 
 Go to the ``urdf`` folder and create a xacro file for the tower::
 
@@ -199,6 +207,10 @@ The tower consists of 3 links and 2 prismatic joints in between:
       translation to ``axis1_joint``. For the ``limit`` please enter
       the minimal and maximal position (translation) of the joint. 
     * ``axis2`` (link): The geometry that moves along ``axis1`` in x-axis
+
+
+ur10_tower.xacro
+-----------
 
 Now we create a new xacro file, which combines the ur10 with the tower::
 
@@ -334,13 +346,24 @@ And then run::
 
   roslaunch ur10_tower display.launch
 
+.. figure:: 09_ur10_tower_urdf_04.jpg
+    :figclass: figure
+    :class: figure-img img-fluid
+
+This shows the model turned, but no worries. It is only because the default 
+value for the global fixed frame is ``base_link`` which is not correct in our case.
+
+Under Global Options > Fixed Frame > change ``base_link`` to ``tower`` or 
+``world`` and press save.
+
+Then you should see something like that:
+
 .. figure:: 09_ur10_tower_urdf_06.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
     Screenshot of RViz showing the ur10 on the tower.
 
-In RViz you can customize the display settings and save the ``urdf.rviz``
 
 
 Further links
