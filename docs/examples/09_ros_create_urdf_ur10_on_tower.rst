@@ -13,7 +13,7 @@ tower. Limits and joint origins are only assumed.*
 
 Please read through the example  `Creating a URDF with an UR5 robot and a custom
 end-effector <07_ros_create_urdf_ur5_with_measurement_tool.rst>`_,
-install the requirements in point **0.** and prepare the catkin workspace.
+install the requirements in point **1.** and prepare the catkin workspace.
 
 
 2. Export meshes
