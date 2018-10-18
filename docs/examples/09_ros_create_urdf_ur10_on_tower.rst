@@ -7,17 +7,19 @@ Creating a URDF of the UR10 on the tower
 1. Install
 ==========
 
-Please read through the example XXX, prepare the catkin workspace and install the requirements in point 0.
+Please read through the example  `Creating a URDF with an UR5 robot and a custom
+end-effector <07_ros_create_urdf_ur5_with_measurement_tool.rst>`_,
+install the requirements in point **0.** and prepare the catkin workspace.
 
 
 1. Export meshes
 ================
 
-* Before exporting, please move the geometry of the tower such that they are 
+* Before exporting, please move the elements of the tower's axes such that they are 
   positioned in their zero-positions and make sure that the model is defined in 
   *meters*. 
 * Define the axes with lines and mark the initial joint positions with a point.
-* Then export both visual and a collision meshes. For the moveable meshes select 
+* Then export both visual and collision meshes: For the moveable meshes choose 
   "Export with origin" and select the respective point you just defined before.
   The export format must be ROS-friendly, like .stl or .obj (see below). (Here 
   we use the same visual and collision meshes.)
@@ -26,11 +28,11 @@ Please read through the example XXX, prepare the catkin workspace and install th
     :figclass: figure
     :class: figure-img img-fluid
 
-.. figure:: 09_ur10_tower_urdf_01-1.jpg
+.. figure:: 09_ur10_tower_urdf_00-1.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
-.. figure:: 09_ur10_tower_urdf_01-2.jpg
+.. figure:: 09_ur10_tower_urdf_00-2.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
