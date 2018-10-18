@@ -4,10 +4,9 @@
 Creating a URDF of the UR10 on the tower
 ********************************************************************************
 
-::
-
-    **ATTENTION: The tower has to be compared to the real tower. Limits and joint
-    origins are only assumed.**
+**ATTENTION:**
+*This example is not yet ready. The tower still has to be compared to the real 
+tower. Limits and joint origins are only assumed.*
 
 1. Install
 ==========
@@ -254,12 +253,13 @@ Explanation:
   ``world`` link (no geometry) with the ``world_joint`` in the worldXY frame and add the 
   ``world`` link as parent and the ``tower`` link as child.
 * Then we include the ``tower.xacro`` with parameter ``prefix=""``.
-* We define another joint between the ``axis2`` link (parent) and the 
+* We define another joint (``attachment_joint``) between the ``axis2`` link (parent) and the 
   ``base_link`` (child) of the robot (the first link in the robot's 
   kinematic model). This joint is fixed, has no translation in
   regard to its previous joint (which is ``axis2_joint``), however it has a 
   rotation (``rpy="${pi/2} 0.0 ${pi/2}"``) since the robot is mounted on the
   side. The rotation is expressed in static "xyz" euler angles.
+  
   Just as a quick reminder, this can be calculated as such:
 
 .. code-block:: python
@@ -271,6 +271,9 @@ Explanation:
     f2 = Frame.worldYZ()
     T = Transformation.from_frame_to_frame(f1, f2)
     euler_angles = T.rotation.euler_angles(static=True, axes='xyz')
+
+Create URDF
+-----------
 
 Now create the urdf.::
 
@@ -302,7 +305,7 @@ This will output::
                                                 child(2):  tool0
 
 
-4. View urdf
+5. View urdf
 ============
 
 Now locate the path where you stored the urdf_tutorial, e.g. YOURPATH and copy
@@ -331,7 +334,8 @@ that they match the following:
         <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)" />
         <param name="use_gui" value="$(arg gui)"/>
 
-        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publishe$  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
         <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
 
     </launch>
@@ -364,7 +368,7 @@ Then you should see something like that:
 
     Screenshot of RViz showing the ur10 on the tower.
 
-
+You can play with the sliders on the side to move the elements and check if all is fine.
 
 Further links
 =============
