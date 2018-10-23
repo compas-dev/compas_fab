@@ -30,7 +30,7 @@ def range_geometric_row(number, d, r=1.1):
     numbers = [n0]
     for i in range(d - 1):
         numbers.append(numbers[-1] / r)
-        return numbers
+    return numbers
 
 def arange(start, stop, step):
     """Returns evenly spaced values within a given interval.

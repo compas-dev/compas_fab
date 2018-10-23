@@ -23,7 +23,7 @@ class RobotArtist(BaseRobotArtist):
         native_mesh.Transform(T)
 
     def draw_mesh(self, compas_mesh, color=None):
-        return mesh_draw(compas_mesh, vertexcolor=color)
+        return mesh_draw(compas_mesh, color=color)
 
     # def set_color(self, color_rgba):
     #     r, g, b, a = color_rgba
