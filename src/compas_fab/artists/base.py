@@ -107,7 +107,7 @@ class BaseRobotArtist(object):
         factor : float
             The factor to scale the robot with.
         """
-        relative_factor = factor/self.scale_factor # relative scaling factor
+        relative_factor = factor / self.scale_factor # relative scaling factor
         self.scale_factor = factor  
         transformation = Scale([relative_factor, relative_factor, relative_factor])
         self.scale_links(transformation)
