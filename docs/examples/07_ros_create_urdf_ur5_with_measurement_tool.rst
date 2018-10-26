@@ -80,9 +80,10 @@ files from which urdfs are generated. As its name implies, xacro is a macro
 language. The language allows to use constants, to perform simple math 
 operations and to parameterize macros simply by using ``${}``.
 
-For examples please have a look at:
+.. note::
 
-* http://wiki.ros.org/urdf/Tutorials/Using%20Xacro%20to%20Clean%20Up%20a%20URDF%20File
+  For more examples, have a look at the 
+  `Xacro tutorials on the ROS Wiki <http://wiki.ros.org/urdf/Tutorials/Using%20Xacro%20to%20Clean%20Up%20a%20URDF%20File>`_.
 
  
 Go to the urdf folder and create a xacro file for your end-effector::
@@ -234,17 +235,16 @@ This will output::
 4. View urdf
 ============
 
-Now locate the path where you stored the urdf_tutorial, e.g. YOURPATH and copy
-2 files to your package folder::
-  
-    cd ..
-    cp YOURPATH/urdf_tutorial/rviz/urdf.rviz rviz/
-    cp YOURPATH/urdf_tutorial/launch/display.launch launch
+Copy some boilerplate files from the ``urdf_tutorial`` package with the following commands::
 
-Now modify display.launch in the ``launch`` directory::
+  roscd urdf_tutorial
+  cp rviz/urdf.rviz ~/robotic_setups/src/rviz/
+  cp launch/display.launch ~/robotic_setups/src/launch/
+  cd ~/robotic_setups
 
-  cd launch
-  pico display.launch
+Now modify ``display.launch`` in the ``launch`` directory::
+
+  pico ~/robotic_setups/src/launch/display.launch
 
 Change the 2 ``arg`` tags with ``name="model"`` and ``name="rvizconfig"`` such 
 that they match the following:
@@ -296,11 +296,11 @@ For convinience add the path to your .bashrc::
 Further links
 =============
 
-* http://wiki.ros.org/urdf/Tutorials/Building%20a%20Visual%20Robot%20Model%20with%20URDF%20from%20Scratch
-* http://wiki.ros.org/urdf/Tutorials/Adding%20Physical%20and%20Collision%20Properties%20to%20a%20URDF%20Model
-* http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file
-* http://wiki.ros.org/Industrial/Tutorials/Create%20a%20URDF%20for%20an%20Industrial%20Robot
-* http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages
+* `Building a visual robot model with URDF from scratch <http://wiki.ros.org/urdf/Tutorials/Building%20a%20Visual%20Robot%20Model%20with%20URDF%20from%20Scratch>`_
+* `Adding Physical and Collision Properties to a URDF Model <http://wiki.ros.org/urdf/Tutorials/Adding%20Physical%20and%20Collision%20Properties%20to%20a%20URDF%20Model>`_
+* `Create your own URDF file <http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file>`_
+* `Create a URDF for an Industrial Robot <http://wiki.ros.org/Industrial/Tutorials/Create%20a%20URDF%20for%20an%20Industrial%20Robot>`_
+* `Working with ROS-Industrial Robot Support Packages <http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages>`_
 
 
 

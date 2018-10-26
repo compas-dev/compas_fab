@@ -6,8 +6,8 @@ Creating a MoveIt! package from the custom created URDF
 
 This example is mainly copied from `MoveIt! Setup Assistant Tutorial <http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html>`_
 
-It is based on the previous example: `Creating a URDF with an UR5 robot and a custom
-end-effector <07_ros_create_urdf_ur5_with_measurement_tool.rst>`_
+It is based on the previous example: 
+:ref:`Creating a URDF with an UR5 robot and a custom end-effector <ros_examples_create_urdf_ur5_with_measurement_tool>
 
 1. Start the MoveIt! Setup Assistant
 ====================================
