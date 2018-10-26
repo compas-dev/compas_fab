@@ -4,18 +4,7 @@
 Creating a URDF with an UR5 robot and a custom end-effector
 ********************************************************************************
 
-1. Install
-==========
-
-Before continuing, make sure you have the following packages installed on your
-ROS environment::
-
-  sudo apt-get install ros-kinetic-urdf-tutorial
-  sudo apt-get install joint-state-publisher
-  sudo apt-get install ros-kinetic-urdf-tutorial joint-state-publisher liburdfdom-tools
-
-
-2. Export your meshes
+1. Export your meshes
 =====================
 
 In ROS, robot link (and end-effector) geometry is defined with 2 different
@@ -38,7 +27,7 @@ your end-effector in a ROS-friendly format, like .stl or .obj (see below).
     Screenshot of exporting a tool geometry from Rhino3D positioned in (0,0,0).
 
 
-3. Prepare your catkin workspace
+2. Prepare your catkin workspace
 ================================
 
 Open your command prompt and go to your home directory::
@@ -87,7 +76,7 @@ stored the files)::
   cp /mnt/c/Users/YOURPATH/meshes/collision/measurement_tool.stl meshes/collision/
 
 
-4. Create xacros and generate urdf
+3. Create xacros and generate urdf
 ==================================
 
 Rather than writing urdf files directly, it is more convinient to write xacro 
@@ -246,7 +235,7 @@ This will output::
                                           child(1):  tcp
 
 
-5. View urdf
+4. View urdf
 ============
 
 Now locate the path where you stored the urdf_tutorial, e.g. YOURPATH and copy
