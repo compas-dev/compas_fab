@@ -161,8 +161,19 @@ class Robot(object):
             return self.model.get_configurable_joints()
 
     def get_configurable_joint_names(self, group=None):
+        """Returns all configurable joint names.
+
+        If semantics is set and no group is passed, it returns all configurable
+        joint names of all groups.
+        """
         if self.semantics:
-            return self.semantics.get_configurable_joint_names(group)
+            if group:
+                return self.semantics.get_configurable_joint_names(group)
+            else:
+                joint_names = []
+                for group in self.group_names:
+                    joint_names += self.semantics.get_configurable_joint_names(group)
+                return joint_names
         else:
             # passive joints are only defined in the semantic model,
             # so we just get the ones that are configurable
@@ -249,10 +260,13 @@ class Robot(object):
         if not group:
             group = self.main_group_name # ensure semantics
         base_link = self.get_base_link_name(group)
-        joint_names = self.get_configurable_joint_names(group)
+        joint_names = self.get_configurable_joint_names()
+
         if not current_configuration:
             joint_positions = [0] * len(joint_names)
         else:
+            if len(joint_names) != len(current_configuration.values):
+                raise ValueError("Please pass a configuration with %d values" % len(joint_names))
             joint_positions = current_configuration.values
         if not callback_result:
             callback_result = print
