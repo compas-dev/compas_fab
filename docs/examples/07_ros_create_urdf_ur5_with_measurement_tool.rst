@@ -8,7 +8,7 @@ Creating a URDF with an UR5 robot and a custom end-effector
 ==========
 
 Before continuing, make sure you have the following packages installed on your
-linux system::
+ROS environment::
 
   sudo apt-get install ros-kinetic-urdf-tutorial
   sudo apt-get install joint-state-publisher
