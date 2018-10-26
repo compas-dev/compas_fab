@@ -18,7 +18,7 @@ ROS environment::
 2. Export your meshes
 =====================
 
-In ROS robot link (and end-effector) geometry is defined with 2 different
+In ROS, robot link (and end-effector) geometry is defined with 2 different
 meshes: *visual* and *collision*. The visual mesh represents how the robot looks
 like and the collision mesh is used for collision detection. You could have the
 same collision and visual meshes, but a coarse collision mesh saves some
