@@ -197,14 +197,14 @@ class MotionPlanResponse(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanResponse.html
     """
 
-    def __init__(self, trajectory_start=RobotState(), group_name="", 
-                 trajectory=RobotTrajectory(), planning_time=3., 
-                 error_code=MoveItErrorCodes()):
-        self.trajectory_start = trajectory_start
-        self.group_name = group_name
-        self.trajectory = trajectory
-        self.planning_time = planning_time
-        self.error_code = error_code
+    def __init__(self, trajectory_start=None, group_name=None, trajectory=None,
+                 planning_time=None, error_code=None):
+
+        self.trajectory_start = trajectory_start if trajectory_start else RobotState()
+        self.group_name = group_name if group_name else ""
+        self.trajectory = trajectory if trajectory else RobotTrajectory()
+        self.planning_time = planning_time if planning_time else 3.
+        self.error_code = error_code if error_code else MoveItErrorCodes()
         
     @classmethod
     def from_msg(cls, msg):
