@@ -12,7 +12,7 @@ linux system::
 
   sudo apt-get install ros-kinetic-urdf-tutorial
   sudo apt-get install joint-state-publisher
-  sudo apt-get install liburdfdom-tools
+  sudo apt-get install ros-kinetic-urdf-tutorial joint-state-publisher liburdfdom-tools
 
 
 2. Export your meshes
