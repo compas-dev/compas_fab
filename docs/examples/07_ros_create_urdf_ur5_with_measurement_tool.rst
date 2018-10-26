@@ -8,17 +8,17 @@ Creating a URDF with an UR5 robot and a custom end-effector
 ==========
 
 Before continuing, make sure you have the following packages installed on your
-linux system::
+ROS environment::
 
   sudo apt-get install ros-kinetic-urdf-tutorial
   sudo apt-get install joint-state-publisher
-  sudo apt-get install liburdfdom-tools
+  sudo apt-get install ros-kinetic-urdf-tutorial joint-state-publisher liburdfdom-tools
 
 
 2. Export your meshes
 =====================
 
-In ROS robot link (and end-effector) geometry is defined with 2 different
+In ROS, robot link (and end-effector) geometry is defined with 2 different
 meshes: *visual* and *collision*. The visual mesh represents how the robot looks
 like and the collision mesh is used for collision detection. You could have the
 same collision and visual meshes, but a coarse collision mesh saves some
@@ -47,14 +47,14 @@ Open your bash console and go to your home directory::
 
 If not yet there, make a new catkin workspace for all your robotic setups::
 
-  mkdir -p robotic_setups/src
-  cd robotic_setups
+  mkdir -p ~/robotic_setups/src
+  cd ~/robotic_setups
   catkin_make
 
 Then go to your src folder and make a package with your new setup
 ``ur5_with_measurement_tool``::
 
-  cd src
+  cd ~/robotic_setups/src
   catkin_create_pkg ur5_with_measurement_tool
 
 This will create a ``ur5_with_measurement_tool`` folder which contains a
