@@ -1,4 +1,4 @@
-.. _ros_examples:
+.. _ros_examples_create_urdf_ur5_with_measurement_tool:
 
 ********************************************************************************
 Creating a URDF with an UR5 robot and a custom end-effector
@@ -86,12 +86,12 @@ operations and to parameterize macros simply by using ``${}``.
   `Xacro tutorials on the ROS Wiki <http://wiki.ros.org/urdf/Tutorials/Using%20Xacro%20to%20Clean%20Up%20a%20URDF%20File>`_.
 
  
-Go to the urdf folder and create a xacro file for your end-effector::
+Go to the ``urdf`` folder and create a xacro file for your end-effector with the text editor of your choice (e.g. ``pico``)::
 
-  cd urdf
+  cd ~/robotic_setups/src/urdf
   pico measurement_tool.xacro
 
-(Pico is a terminal based text editor.) Paste the following into the file:
+Paste the following into the file:
 
 .. code-block:: xml
 
@@ -287,7 +287,7 @@ In RViz you can customize the display settings and save the ``urdf.rviz``
 Add path to search paths
 ========================
 
-For convinience add the path to your .bashrc::
+For convenience, add the path to your ``.bashrc`` in order to make it available on every start of ROS::
     
     echo 'source ~/robotic_setups/devel/setup.bash' >> ~/.bashrc
 

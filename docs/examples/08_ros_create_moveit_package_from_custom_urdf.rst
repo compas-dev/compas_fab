@@ -1,4 +1,4 @@
-.. _ros_examples:
+.. _ros_examples_create_moveit_package_from_custom_urdf:
 
 ********************************************************************************
 Creating a MoveIt! package from the custom created URDF
@@ -17,7 +17,7 @@ robot for use with MoveIt!. Its primary functions are to generate a Semantic Rob
 Description Format (SRDF) file, to create the collision matrix of your robot
 and to define the planning groups.
 
-* To start the MoveIt! Setup Assistant::
+* To start the MoveIt! Setup Assistant, launch the following from your Linux command prompt::
 
     roslaunch moveit_setup_assistant setup_assistant.launch
     
@@ -106,7 +106,8 @@ Add the gripper
 
 We will also add a group for the end-effector. 
 
-Note:
+.. note::
+
     You will do this using a different procedure than adding the arm.
 
 * Click on the *Add Group* button.

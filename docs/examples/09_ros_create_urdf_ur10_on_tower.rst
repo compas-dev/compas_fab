@@ -1,4 +1,4 @@
-.. _ros_examples:
+.. _ros_examples_create_urdf_ur10_on_tower.rst:
 
 ********************************************************************************
 Creating a URDF of the UR10 on the tower
