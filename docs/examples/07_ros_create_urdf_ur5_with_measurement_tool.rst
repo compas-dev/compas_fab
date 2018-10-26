@@ -291,7 +291,7 @@ In RViz you can customize the display settings and save the ``urdf.rviz``
 Add path to search paths
 ========================
 
-For convinience add the path to your .bashrc::
+For convenience, add the path to your ``.bashrc`` in order to make it available on every start of ROS::
     
     echo 'source ~/robotic_setups/devel/setup.bash' >> ~/.bashrc
 
