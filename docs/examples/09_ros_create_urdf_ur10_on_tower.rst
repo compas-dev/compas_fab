@@ -1,22 +1,10 @@
-.. _ros_examples_create_urdf_ur10_on_tower.rst:
+.. _ros_examples_create_urdf_ur10_on_tower:
 
 ********************************************************************************
-Creating a URDF of the UR10 on the tower
+Creating a URDF of the UR10 on two linear axes
 ********************************************************************************
 
-**ATTENTION:**
-*This example is not yet finished. The tower still has to be compared to the real 
-tower. Limits and joint origins are only assumed.*
-
-1. Install
-==========
-
-Please read through the example  `Creating a URDF with an UR5 robot and a custom
-end-effector <07_ros_create_urdf_ur5_with_measurement_tool.rst>`_,
-install the requirements in point **1.** and prepare the catkin workspace.
-
-
-2. Export meshes
+1. Export meshes
 ================
 
 * Before exporting, please move the elements of the tower's axes such that they are 
@@ -49,7 +37,7 @@ install the requirements in point **1.** and prepare the catkin workspace.
     :class: figure-img img-fluid
 
 
-3. Prepare your catkin workspace
+2. Prepare your catkin workspace
 ================================
 
 Open your command prompt and go to your robotic setups src folder::
@@ -82,20 +70,12 @@ Optionally, modify ``email`` and ``licence``, ``version`` tags.
 
 Then create 4(+2) folders: ``launch``, ``rviz``, ``urdf`` and ``meshes`` (with visual and collision folders)::
 
-  mkdir launch
-  mkdir rviz
-  mkdir urdf
-  mkdir -p meshes/visual
-  mkdir -p meshes/collision
+  mkdir ~/robotic_setups/src/{launch,rviz,urdf,meshes/visual,meshes/collision}
 
-Copy your meshes into visual and collision (replace YOURPATH with wherever you
-stored the files)::
-
-  cp /mnt/c/Users/YOURPATH/meshes/visual/* meshes/visual/
-  cp /mnt/c/Users/YOURPATH/meshes/collision/* meshes/collision/
+Copy your meshes into ``meshes/visual`` and ``meshes/collision``.
 
 
-4. Create xacros and generate urdf
+3. Create xacros and generate urdf
 ==================================
 
 tower.xacro
@@ -103,7 +83,7 @@ tower.xacro
 
 Go to the ``urdf`` folder and create a xacro file for the tower::
 
-  cd urdf
+  cd ~/robotic_setups/src/urdf
   pico tower.xacro
 
 Paste the following into the file:
@@ -305,20 +285,19 @@ This will output::
                                                 child(2):  tool0
 
 
-5. View urdf
+4. View urdf
 ============
 
-Now locate the path where you stored the urdf_tutorial, e.g. YOURPATH and copy
-2 files to your package folder::
-  
-    cd ..
-    cp YOURPATH/urdf_tutorial/rviz/urdf.rviz rviz/
-    cp YOURPATH/urdf_tutorial/launch/display.launch launch/
+Copy some boilerplate files from the ``urdf_tutorial`` package with the following commands::
 
-Now modify display.launch in the ``launch`` directory::
+  roscd urdf_tutorial
+  cp rviz/urdf.rviz ~/robotic_setups/src/rviz/
+  cp launch/display.launch ~/robotic_setups/src/launch/
+  cd ~/robotic_setups
 
-  cd launch
-  pico display.launch
+Now modify ``display.launch`` in the ``launch`` directory::
+
+  pico ~/robotic_setups/src/launch/display.launch
 
 Change the 2 ``arg`` tags with ``name="model"`` and ``name="rvizconfig"`` such 
 that they match the following:
@@ -383,11 +362,11 @@ And later create a MoveIt! package from it.
 Further links
 =============
 
-* http://wiki.ros.org/urdf/Tutorials/Building%20a%20Visual%20Robot%20Model%20with%20URDF%20from%20Scratch
-* http://wiki.ros.org/urdf/Tutorials/Adding%20Physical%20and%20Collision%20Properties%20to%20a%20URDF%20Model
-* http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file
-* http://wiki.ros.org/Industrial/Tutorials/Create%20a%20URDF%20for%20an%20Industrial%20Robot
-* http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages
+* `Building a visual robot model with URDF from scratch <http://wiki.ros.org/urdf/Tutorials/Building%20a%20Visual%20Robot%20Model%20with%20URDF%20from%20Scratch>`_
+* `Adding Physical and Collision Properties to a URDF Model <http://wiki.ros.org/urdf/Tutorials/Adding%20Physical%20and%20Collision%20Properties%20to%20a%20URDF%20Model>`_
+* `Create your own URDF file <http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file>`_
+* `Create a URDF for an Industrial Robot <http://wiki.ros.org/Industrial/Tutorials/Create%20a%20URDF%20for%20an%20Industrial%20Robot>`_
+* `Working with ROS-Industrial Robot Support Packages <http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages>`_
 
 
 
