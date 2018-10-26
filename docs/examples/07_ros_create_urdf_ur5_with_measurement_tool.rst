@@ -54,7 +54,7 @@ If not yet there, make a new catkin workspace for all your robotic setups::
 Then go to your src folder and make a package with your new setup
 ``ur5_with_measurement_tool``::
 
-  cd src
+  cd ~/robotic_setups/src
   catkin_create_pkg ur5_with_measurement_tool
 
 This will create a ``ur5_with_measurement_tool`` folder which contains a
