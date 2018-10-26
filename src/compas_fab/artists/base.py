@@ -91,6 +91,8 @@ class BaseRobotArtist(object):
                     color = item.get_color()
                 item.native_geometry = self.draw_mesh(item.geometry.geo, color)
                 self.transform(item.native_geometry, parent_transformation)
+            else:
+                item.native_geometry = None
 
         for child_joint in link.joints:
             child_joint.reset_transform()
@@ -123,7 +125,7 @@ class BaseRobotArtist(object):
         for item in itertools.chain(link.visual, link.collision):
             # some links have only collision geometry, not visual. These meshes
             # have not been loaded.
-            if hasattr(item, 'native_geometry'):
+            if item.native_geometry:
                 self.transform(item.native_geometry, transformation)
                 # scale the translational components of the transformation
                 item.native_geometry_reset[0,3] *= relative_factor
@@ -197,7 +199,7 @@ class BaseRobotArtist(object):
         if collision:
             for item in link.collision:
                 # some links have only collision geometry, not visual. These meshes have not been loaded.
-                if hasattr(item, 'native_geometry'):
+                if item.native_geometry:
                     self.transform(item.native_geometry, parent_transformation * item.native_geometry_reset)
                     item.native_geometry_reset = parent_transformation.inverse()
 
@@ -229,5 +231,5 @@ class BaseRobotArtist(object):
         """Draws all collision geometry of the robot."""
         for link in self.robot.iter_links():
             for item in link.collision:
-                if hasattr(item, "native_geometry"):
+                if item.native_geometry:
                     yield item.native_geometry
