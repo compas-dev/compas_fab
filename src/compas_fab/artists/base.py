@@ -123,7 +123,7 @@ class BaseRobotArtist(object):
         for item in itertools.chain(link.visual, link.collision):
             # some links have only collision geometry, not visual. These meshes
             # have not been loaded.
-            if hasattr(item, "native_geometry"):
+            if hasattr(item, 'native_geometry'):
                 self.transform(item.native_geometry, transformation)
                 # scale the translational components of the transformation
                 item.native_geometry_reset[0,3] *= relative_factor
