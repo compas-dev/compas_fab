@@ -94,7 +94,7 @@ Go to the ``urdf`` folder and create a xacro file for your end-effector with the
   cd ~/robotic_setups/src/urdf
   pico measurement_tool.xacro
 
-(Pico is a terminal based text editor.) Paste the following into the file:
+Paste the following into the file:
 
 .. code-block:: xml
 
