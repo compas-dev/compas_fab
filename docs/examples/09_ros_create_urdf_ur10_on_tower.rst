@@ -52,7 +52,7 @@ install the requirements in point **1.** and prepare the catkin workspace.
 3. Prepare your catkin workspace
 ================================
 
-Open your bash console and go to your robotic setups src folder::
+Open your command prompt and go to your robotic setups src folder::
 
   cd ~/robotic_setups/src
 

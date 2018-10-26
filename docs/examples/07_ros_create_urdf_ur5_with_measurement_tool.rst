@@ -41,7 +41,7 @@ your end-effector in a ROS-friendly format, like .stl or .obj (see below).
 3. Prepare your catkin workspace
 ================================
 
-Open your bash console and go to your home directory::
+Open your command prompt and go to your home directory::
 
   cd ~
 
