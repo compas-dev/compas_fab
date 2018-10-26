@@ -69,11 +69,7 @@ Then create 4(+2) folders: ``launch``, ``rviz``, ``urdf`` and ``meshes`` (with v
 
   mkdir ~/robotic_setups/src/{launch,rviz,urdf,meshes/visual,meshes/collision}
 
-Copy your meshes into visual and collision (replace YOURPATH with wherever you
-stored the files)::
-
-  cp /mnt/c/Users/YOURPATH/meshes/visual/measurement_tool.stl meshes/visual/
-  cp /mnt/c/Users/YOURPATH/meshes/collision/measurement_tool.stl meshes/collision/
+Copy your meshes into ``meshes/visual`` and ``meshes/collision``.
 
 
 3. Create xacros and generate urdf
