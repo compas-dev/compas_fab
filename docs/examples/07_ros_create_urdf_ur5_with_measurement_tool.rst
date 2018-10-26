@@ -48,7 +48,7 @@ Open your bash console and go to your home directory::
 If not yet there, make a new catkin workspace for all your robotic setups::
 
   mkdir -p ~/robotic_setups/src
-  cd robotic_setups
+  cd ~/robotic_setups
   catkin_make
 
 Then go to your src folder and make a package with your new setup
