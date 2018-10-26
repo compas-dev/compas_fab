@@ -197,7 +197,7 @@ class BaseRobotArtist(object):
         if collision:
             for item in link.collision:
                 # some links have only collision geometry, not visual. These meshes have not been loaded.
-                if hasattr(item, "native_geometry"):
+                if hasattr(item, 'native_geometry'):
                     self.transform(item.native_geometry, parent_transformation * item.native_geometry_reset)
                     item.native_geometry_reset = parent_transformation.inverse()
 
