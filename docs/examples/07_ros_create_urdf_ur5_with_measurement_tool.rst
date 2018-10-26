@@ -1,4 +1,4 @@
-.. _ros_examples:
+.. _ros_examples_create_urdf_ur5_with_measurement_tool:
 
 ********************************************************************************
 Creating a URDF with an UR5 robot and a custom end-effector
