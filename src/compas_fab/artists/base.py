@@ -87,7 +87,7 @@ class BaseRobotArtist(object):
             item.native_geometry_reset = parent_transformation.inverse()
             if item.geometry.geo:
                 color = None
-                if hasattr(item, "get_color"):
+                if hasattr(item, 'get_color'):
                     color = item.get_color()
                 item.native_geometry = self.draw_mesh(item.geometry.geo, color)
                 self.transform(item.native_geometry, parent_transformation)
