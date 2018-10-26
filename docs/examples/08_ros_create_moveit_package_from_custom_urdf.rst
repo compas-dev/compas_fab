@@ -1,4 +1,4 @@
-.. _ros_examples:
+.. _ros_examples_create_moveit_package_from_custom_urdf:
 
 ********************************************************************************
 Creating a MoveIt! package from the custom created URDF
