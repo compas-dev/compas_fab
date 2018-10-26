@@ -106,7 +106,8 @@ Add the gripper
 
 We will also add a group for the end-effector. 
 
-Note:
+.. note::
+
     You will do this using a different procedure than adding the arm.
 
 * Click on the *Add Group* button.
