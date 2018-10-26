@@ -70,7 +70,7 @@ class Robot(object):
             Newly created instance of a robot.
         """
         model = compas.robots.model.Robot(name, joints=joints, links=links, materials=materials, **kwargs)
-        return cls(model)
+        return cls(model, None)
 
     @classmethod
     def from_urdf_model(cls, urdf_model, client=None):
@@ -95,8 +95,6 @@ class Robot(object):
         srdf_file = urdf_importer.srdf_filename
         urdf_model = compas.robots.model.Robot.from_urdf_file(urdf_file)
         srdf_model = RobotSemantics.from_srdf_file(srdf_file, urdf_model)
-        print("urdf_model", urdf_model)
-        print("srdf_model", srdf_model)
         return cls(urdf_model, None, srdf_model, client)
 
     @property
