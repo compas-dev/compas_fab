@@ -89,7 +89,7 @@ For examples please have a look at:
 * http://wiki.ros.org/urdf/Tutorials/Using%20Xacro%20to%20Clean%20Up%20a%20URDF%20File
 
  
-Go to the urdf folder and create a xacro file for your end-effector::
+Go to the ``urdf`` folder and create a xacro file for your end-effector with the text editor of your choice (e.g. ``pico``)::
 
   cd ~/robotic_setups/src/urdf
   pico measurement_tool.xacro
