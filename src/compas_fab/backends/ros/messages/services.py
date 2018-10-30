@@ -79,11 +79,11 @@ class GetPositionFKResponse(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html
     """
 
-    def __init__(self, pose_stamped=[], fk_link_names=[], error_code=MoveItErrorCodes()):
+    def __init__(self, pose_stamped=None, fk_link_names=None, error_code=None):
         
-        self.pose_stamped = pose_stamped # PoseStamped[]
-        self.fk_link_names = fk_link_names
-        self.error_code = error_code  # moveit_msgs/MoveItErrorCodes
+        self.pose_stamped = pose_stamped if pose_stamped else [] # PoseStamped[]
+        self.fk_link_names = fk_link_names if fk_link_names else []
+        self.error_code = error_code if error_code else MoveItErrorCodes()  # moveit_msgs/MoveItErrorCodes
 
     @classmethod
     def from_msg(cls, msg):
