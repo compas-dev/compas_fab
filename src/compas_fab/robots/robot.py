@@ -51,10 +51,6 @@ class Robot(object):
         self.semantics = semantics
         self.client = client  # setter and getter
 
-        # TODO: if client is ros client: tell urdf importer...
-        # should be corrected by self.model
-        self.RCF = Frame.worldXY()
-
     @classmethod
     def basic(cls, name, joints=[], links=[], materials=[], **kwargs):
         """Convenience method to create the most basic instance of a robot, based only on a name.
@@ -74,12 +70,10 @@ class Robot(object):
 
     @classmethod
     def from_urdf_model(cls, urdf_model, client=None):
-        urdf_importer = RosFileServerLoader.from_urdf_model(urdf_model)
         return cls(urdf_model, None, client)
 
     @classmethod
     def from_urdf_and_srdf_models(cls, urdf_model, srdf_model, client=None):
-        urdf_importer = RosFileServerLoader.from_urdf_model(urdf_model)
         return cls(urdf_model, srdf_model, client)
 
     @classmethod
@@ -140,79 +134,106 @@ class Robot(object):
             return self.semantics.get_base_link_name(group)
 
     def get_base_link(self, group=None):
+        """Returns the origin frame of the robot.
+        """
         name = self.get_base_link_name(group)
         return self.model.get_link_by_name(name)
 
     def get_base_frame(self, group=None):
+        # TODO: check this
         link = self.get_base_link(group)
-        #return link.parent_joint.origin.copy() # TODO: check
-        for joint in link.joints:
-            if joint.type == Joint.FIXED:
-                return joint.origin.copy()
+        if link.parent_joint:
+            base_frame = link.parent_joint.origin.copy()
         else:
-            return Frame.worldXY()
+            base_frame = None
+            for joint in link.joints:
+                if joint.type == Joint.FIXED:
+                    base_frame = joint.origin.copy()
+                    break
+            else:
+                base_frame = Frame.worldXY()
+        if not self.artist:
+            base_frame.point *= self._scale_factor
+        return base_frame
 
     def get_configurable_joints(self, group=None):
+        """Returns all configurable joints.
+
+        Parameters
+        ----------
+        group : str
+            The name of the group. Defaults to `None`.
+
+        Note
+        ----
+        If semantics is set and no group is passed, it returns all configurable
+        joints of all groups.
+        """
         if self.semantics:
-            return self.semantics.get_configurable_joints(group)
+            if group:
+                return self.semantics.get_configurable_joints(group)
+            else:
+                joints = []
+                for group in self.group_names:
+                    joints += self.semantics.get_configurable_joints(group)
+                return joints
+
         else:
             return self.model.get_configurable_joints()
 
     def get_configurable_joint_names(self, group=None):
         """Returns all configurable joint names.
 
-        If semantics is set and no group is passed, it returns all configurable
-        joint names of all groups.
-        """
-        if self.semantics:
-            if group:
-                return self.semantics.get_configurable_joint_names(group)
-            else:
-                joint_names = []
-                for group in self.group_names:
-                    joint_names += self.semantics.get_configurable_joint_names(group)
-                return joint_names
-        else:
-            # passive joints are only defined in the semantic model,
-            # so we just get the ones that are configurable
-            return self.model.get_configurable_joint_names()
+        Parameters
+        ----------
+        group : str
+            The name of the group. Defaults to `None`.
 
-    @property
-    def transformation_RCF_WCF(self):
+        Note
+        ----
+        If semantics is set and no group is passed, it returns all configurable
+        joints of all groups.
+        """
+        configurable_joints = self.get_configurable_joints(group)
+        return [j.name for j in configurable_joints]
+
+    def transformation_RCF_WCF(self, group=None):
         """Returns the transformation matrix from world coordinate system to 
             robot coordinate system.
         """
-        return Transformation.from_frame_to_frame(Frame.worldXY(), self.RCF)
+        base_frame = self.get_base_frame(group)
+        return Transformation.from_frame_to_frame(Frame.worldXY(), base_frame)
 
-    @property
-    def transformation_WCF_RCF(self):
+    def transformation_WCF_RCF(self, group=None):
         """Returns the transformation matrix from robot coordinate system to 
             world coordinate system
         """
-        return Transformation.from_frame_to_frame(self.RCF, Frame.worldXY())
+        base_frame = self.get_base_frame(group)
+        return Transformation.from_frame_to_frame(base_frame, Frame.worldXY())
 
-    def set_RCF(self, robot_coordinate_frame):
+    def set_RCF(self, robot_coordinate_frame, group=None):
         """Moves the origin frame of the robot to the robot_coordinate_frame.
         """
-        self.RCF = robot_coordinate_frame
+        # TODO: must be applied to the model, so that base_frame is RCF
+        raise NotImplementedError
     
-    def get_RCF(self):
+    def get_RCF(self, group=None):
         """Returns the origin frame of the robot.
         """
-        return self.RCF
+        return self.get_base_frame(group)
 
-    def represent_frame_in_RCF(self, frame_WCF):
+    def represent_frame_in_RCF(self, frame_WCF, group=None):
         """Returns the representation of a frame in the world coordinate frame
         (WCF) in the robot's coordinate frame (RCF).
         """
-        frame_RCF = frame_WCF.transformed(self.transformation_RCF_WCF)
+        frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
         return frame_RCF
     
-    def represent_frame_in_WCF(self, frame_RCF):
+    def represent_frame_in_WCF(self, frame_RCF, group=None):
         """Returns the representation of a frame in the robot's coordinate frame
         (RCF) in the world coordinate frame (WCF).
         """
-        frame_WCF = frame_RCF.transformed(self.transformation_WCF_RCF)
+        frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
         return frame_WCF
 
     def get_configuration(self, group=None):
@@ -235,7 +256,7 @@ class Robot(object):
         if not self.semantics:
             raise Exception('This method is only callable once a semantic model is assigned')
 
-    def inverse_kinematics(self, frame, current_configuration=None, 
+    def inverse_kinematics(self, frame_WCF, current_configuration=None, 
                            callback_result=None, group=None):
         """Calculate the robot's inverse kinematic.
 
@@ -268,10 +289,12 @@ class Robot(object):
             joint_positions = current_configuration.values
         if not callback_result:
             callback_result = print
-        frame_scaled = frame.copy()
-        frame_scaled.point /= self.scale_factor # must be in meters
-
-        self.client.inverse_kinematics(callback_result, frame_scaled, base_link,
+        
+        # represent in RCF
+        frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
+        frame_RCF.point /= self.scale_factor # must be in meters
+    
+        self.client.inverse_kinematics(callback_result, frame_RCF, base_link,
                                        group, joint_names, joint_positions)
 
     def forward_kinematics(self, configuration, callback_result=None, group=None):
@@ -302,7 +325,7 @@ class Robot(object):
                                        base_link, group, joint_names, ee_link)
         
 
-    def compute_cartesian_path(self, frames, start_configuration, max_step,
+    def compute_cartesian_path(self, frames_WCF, start_configuration, max_step,
                                avoid_collisions=True, callback_result=None, 
                                group=None):
         """Calculates a path defined by frames (Cartesian coordinate system).
@@ -328,21 +351,26 @@ class Robot(object):
             group = self.main_group_name # ensure semantics
         if not callback_result:
             callback_result = print
-        frames_scaled = []
-        for frame in frames:
-            frame_scaled = frame.copy()
-            frame_scaled.point /= self.scale_factor
-            frames_scaled.append(frame_scaled)
+        frames_RCF = []
+        for frame_WCF in frames_WCF:
+             # represent in RCF
+            frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
+            frame_RCF.point /= self.scale_factor
+            frames_RCF.append(frame_RCF)
         base_link = self.get_base_link_name(group)
-        joint_names = self.get_configurable_joint_names(group)
+        joint_names = self.get_configurable_joint_names()
+
         if not start_configuration:
             joint_positions = [0] * len(joint_names)
         else:
+            if len(joint_names) != len(start_configuration.values):
+                raise ValueError("Please pass a configuration with %d values" % len(joint_names))
             joint_positions = start_configuration.values
+        
         ee_link = self.get_end_effector_link_name(group)
         max_step_scaled = max_step/self.scale_factor
         
-        self.client.compute_cartesian_path(callback_result, frames_scaled, base_link, 
+        self.client.compute_cartesian_path(callback_result, frames_RCF, base_link, 
                                            ee_link, group, joint_names, joint_positions,
                                            max_step_scaled, avoid_collisions)
 
@@ -389,13 +417,16 @@ class Robot(object):
     def scale(self, factor):
         """Scale the robot.
         """
-        self.artist.scale(factor)
+        if self.artist:
+            self.artist.scale(factor)
+        else:
+            self._scale_factor = factor
 
     @property
     def scale_factor(self):
         if self.artist:
             return self.artist.scale_factor
         else:
-            return 1.
+            return self._scale_factor
 
 
