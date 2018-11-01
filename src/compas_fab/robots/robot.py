@@ -317,6 +317,11 @@ class Robot(object):
             group = self.main_group_name # ensure semantics
         if not callback_result:
             callback_result = print
+
+        joint_names = self.get_configurable_joint_names(group)
+        if len(joint_names) != len(configuration.values):
+            raise ValueError("Please pass a configuration with %d values" % len(joint_names))
+
         joint_positions = configuration.values
         base_link = self.get_base_link_name(group)
         joint_names = self.get_configurable_joint_names(group)
