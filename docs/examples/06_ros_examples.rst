@@ -51,7 +51,7 @@ Hello World
 
 The ``Hello world`` of ROS is to start two nodes: a talker and a listener.
 The nodes are extremely simple but they exemplify a distributed system with
-two communication between processes over the ROS infrastructure.
+communication between two processes over the ROS infrastructure.
 
 Writing the talker node
 -----------------------
