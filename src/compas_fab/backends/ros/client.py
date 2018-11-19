@@ -18,6 +18,8 @@ from compas_fab.backends.ros import GetPositionFKRequest
 from compas_fab.backends.ros import GetPositionFKResponse
 from compas_fab.backends.ros import GetPositionIKRequest
 from compas_fab.backends.ros import GetPositionIKResponse
+from compas_fab.backends.ros import MotionPlanRequest
+from compas_fab.backends.ros import MotionPlanResponse
 from compas_fab.backends.ros import Header
 from compas_fab.backends.ros import JointState
 from compas_fab.backends.ros import JointTrajectory
@@ -29,6 +31,11 @@ from compas_fab.backends.ros import PoseStamped
 from compas_fab.backends.ros import PositionIKRequest
 from compas_fab.backends.ros import RobotState
 from compas_fab.backends.ros import Time
+from compas_fab.backends.ros import PositionConstraint
+from compas_fab.backends.ros import OrientationConstraint
+from compas_fab.backends.ros import SolidPrimitive
+from compas_fab.backends.ros import Quaternion
+from compas_fab.backends.ros import Constraints
 
 from compas_fab.backends.ros.messages.direct_ur import URGoal
 from compas_fab.backends.ros.messages.direct_ur import URMovej
@@ -152,6 +159,49 @@ class RosClient(Ros):
             callback_result(response)
 
         srv = Service(self, '/compute_cartesian_path', 'GetCartesianPath')
+        request = ServiceRequest(reqmsg.msg)
+        srv.call(request, receive_message, receive_message)
+    
+    def motion_plan(self, callback_result, frame, base_link, ee_link, group,
+                    joint_names, joint_positions, tolerance_position, tolerance_angle):
+        """
+        """
+        # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
+        # TODO: path_contraints, planner_id?
+        # TODO: if list of frames (goals) => receive multiple solutions?
+
+        header = Header(frame_id=base_link)
+        joint_state = JointState(header=header, name=joint_names, position=joint_positions)
+        multi_dof_joint_state = MultiDOFJointState(header=header)
+        start_state = RobotState(joint_state=joint_state, multi_dof_joint_state=multi_dof_joint_state)
+  
+        pose = Pose.from_frame(frame)
+
+        pcm = PositionConstraint(header=header, link_name=ee_link)
+        pcm.target_point_offset.x = 0.
+        pcm.target_point_offset.y = 0.
+        pcm.target_point_offset.z = 0.
+        bv = SolidPrimitive(type=SolidPrimitive.SPHERE,dimensions=[tolerance_position])
+        pcm.constraint_region.primitives = [bv]
+        pcm.constraint_region.primitive_poses = [Pose(pose.position, Quaternion(0,0,0,1))]
+
+        ocm = OrientationConstraint(header=header, link_name=ee_link)
+        ocm.orientation = Quaternion.from_frame(frame)
+        ocm.absolute_x_axis_tolerance = tolerance_angle
+        ocm.absolute_y_axis_tolerance = tolerance_angle
+        ocm.absolute_z_axis_tolerance = tolerance_angle
+        
+        goal_constraints = [Constraints(position_constraints=[pcm], orientation_constraints=[ocm])]
+    
+        reqmsg = MotionPlanRequest(start_state=start_state, 
+                                   goal_constraints=goal_constraints, 
+                                   group_name=group)
+        
+        def receive_message(msg):
+            response = MotionPlanResponse.from_msg(msg)
+            callback_result(response)
+
+        srv = Service(self, '/plan_kinematic_path', 'GetMotionPlan')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
 

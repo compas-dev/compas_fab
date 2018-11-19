@@ -242,24 +242,23 @@ class BoundingVolume(ROSmsg):
 class PositionConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionConstraint.html
     """
-    def __init__(self, header=Header(), link_name="", 
-                 target_point_offset=Vector3(0.1,0.1,0.1), 
-                 constraint_region=BoundingVolume(), weight=1):
-        self.header = header
-        self.link_name = link_name
-        self.target_point_offset = target_point_offset # geometry_msgs/Vector3 
-        self.constraint_region = constraint_region # moveit_msgs/BoundingVolume 
-        self.weight = weight # float64 
+    def __init__(self, header=None, link_name=None, target_point_offset=None, 
+                 constraint_region=None, weight=None):
+        self.header = header if header else Header()
+        self.link_name = link_name if link_name else ""
+        self.target_point_offset = target_point_offset if target_point_offset else Vector3(0.,0.,0.) # geometry_msgs/Vector3 
+        self.constraint_region = constraint_region if constraint_region else BoundingVolume() # moveit_msgs/BoundingVolume 
+        self.weight = weight if weight else 1.# float64 
 
 class OrientationConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/OrientationConstraint.html
     """
-    def __init__(self, header=Header(), orientation=Quaternion(), link_name="", 
+    def __init__(self, header=None, orientation=None, link_name=None, 
                  absolute_x_axis_tolerance=0.005, absolute_y_axis_tolerance=0.005,
                  absolute_z_axis_tolerance=0.005, weight=1):
-        self.header = header
-        self.orientation = orientation #geometry_msgs/Quaternion 
-        self.link_name = link_name
+        self.header = header if header else Header()
+        self.orientation = orientation if orientation else Quaternion()#geometry_msgs/Quaternion 
+        self.link_name = link_name if link_name else ""
         self.absolute_x_axis_tolerance = absolute_x_axis_tolerance
         self.absolute_y_axis_tolerance = absolute_y_axis_tolerance
         self.absolute_z_axis_tolerance = absolute_z_axis_tolerance

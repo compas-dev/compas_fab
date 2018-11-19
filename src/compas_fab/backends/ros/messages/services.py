@@ -171,22 +171,23 @@ class SetPlannerParamsRequest(ROSmsg):
 class MotionPlanRequest(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanRequest.html
     """
-    def __init__(self, workspace_parameters=WorkspaceParameters(), start_state=RobotState(), 
-                 goal_constraints=[], path_constraints=Constraints(), 
-                 trajectory_constraints=TrajectoryConstraints(), planner_id="",
-                 group_name="", num_planning_attempts=8, allowed_planning_time=2.,
-                 max_velocity_scaling_factor=1., max_acceleration_scaling_factor=1.):
-        self.workspace_parameters = workspace_parameters # moveit_msgs/WorkspaceParameters
-        self.start_state = start_state # moveit_msgs/RobotState 
-        self.goal_constraints = goal_constraints # moveit_msgs/Constraints[] 
-        self.path_constraints = path_constraints # moveit_msgs/Constraints 
-        self.trajectory_constraints = trajectory_constraints # moveit_msgs/TrajectoryConstraints 
-        self.planner_id = planner_id # string 
-        self.group_name = group_name # string 
-        self.num_planning_attempts = num_planning_attempts # int32 
-        self.allowed_planning_time = allowed_planning_time # float64 
-        self.max_velocity_scaling_factor = max_velocity_scaling_factor # float64 
-        self.max_acceleration_scaling_factor = max_acceleration_scaling_factor # float64
+    def __init__(self, workspace_parameters=None, start_state=None, 
+                 goal_constraints=None, path_constraints=None, 
+                 trajectory_constraints=None, planner_id=None,
+                 group_name=None, num_planning_attempts=None, 
+                 allowed_planning_time=None, max_velocity_scaling_factor=None, 
+                 max_acceleration_scaling_factor=None):
+        self.workspace_parameters = workspace_parameters if workspace_parameters else WorkspaceParameters() # moveit_msgs/WorkspaceParameters
+        self.start_state = start_state if start_state else RobotState()# moveit_msgs/RobotState 
+        self.goal_constraints = goal_constraints if goal_constraints else []# moveit_msgs/Constraints[] 
+        self.path_constraints = path_constraints if path_constraints else Constraints()# moveit_msgs/Constraints 
+        self.trajectory_constraints = trajectory_constraints if trajectory_constraints else TrajectoryConstraints()# moveit_msgs/TrajectoryConstraints 
+        self.planner_id = planner_id if planner_id else ""# string 
+        self.group_name = group_name if group_name else ""# string 
+        self.num_planning_attempts = num_planning_attempts if num_planning_attempts else 8 # int32 
+        self.allowed_planning_time = allowed_planning_time if allowed_planning_time else 2.# float64 
+        self.max_velocity_scaling_factor = max_velocity_scaling_factor if max_velocity_scaling_factor else 1.# float64 
+        self.max_acceleration_scaling_factor = max_acceleration_scaling_factor if max_acceleration_scaling_factor else 1.# float64
     
     @property
     def msg(self):

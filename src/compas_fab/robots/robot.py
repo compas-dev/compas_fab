@@ -236,6 +236,13 @@ class Robot(object):
         frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
         return frame_WCF
 
+    def init_configuration(self, group=None):
+        """Returns the init joint configuration.
+        """
+        types = [joint.type for joint in self.get_configurable_joints(group)]
+        positions = [0.] * len(types)
+        return Configuration(positions, types)
+
     def get_configuration(self, group=None):
         """Returns the current joint configuration.
         """
@@ -378,6 +385,51 @@ class Robot(object):
         self.client.compute_cartesian_path(callback_result, frames_RCF, base_link, 
                                            ee_link, group, joint_names, joint_positions,
                                            max_step_scaled, avoid_collisions)
+    
+    def motion_plan(self, frame_WCF, start_configuration, tolerance_position, 
+                    tolerance_angle, callback_result=None, group=None):
+        """Calculates a motion from start_configuration to frame_WCF.
+
+        Parameters
+        ----------
+            frame_WCF (:class:`Frame`): The goal frame.
+            start_configuration (:class:`Configuration`, optional): The robot's
+                configuration at the starting position.
+            tolerance_position (float): the allowed tolerance to the frame's 
+                position. (Defined in the robot's units)
+            tolerance_angle (float): the allowed tolerance to the frame's 
+                orientation in radians.
+            callback_result (function, optional): the function to call for the 
+                processing the result. Defaults to the print function.
+            group (str, optional): The planning group used for calculation.
+                Defaults to the robot's main planning group. 
+        
+        Examples
+        --------
+        """
+        self.ensure_client()
+        if not group:
+            group = self.main_group_name # ensure semantics
+        if not callback_result:
+            callback_result = print
+
+        frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
+        frame_RCF.point /= self.scale_factor
+
+        base_link = self.get_base_link_name(group)
+        ee_link = self.get_end_effector_link_name(group)
+        joint_names = self.get_configurable_joint_names()
+
+        if not start_configuration:
+            joint_positions = [0] * len(joint_names)
+        else:
+            if len(joint_names) != len(start_configuration.values):
+                raise ValueError("Please pass a configuration with %d values" % len(joint_names))
+            joint_positions = start_configuration.values
+        
+        self.client.motion_plan(callback_result, frame_RCF, base_link, ee_link,
+                                group, joint_names, joint_positions, 
+                                tolerance_position, tolerance_angle)
 
     def send_frame(self):
         # (check service name with ros)
