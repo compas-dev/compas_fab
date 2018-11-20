@@ -56,7 +56,7 @@ class RobotSemantics(object):
         for joint in group.iter('joint'):
             joint = self.urdf_robot.get_joint_by_name(joint.attrib['name'])
             if joint:
-                name = joint.child_link.name
+                name = joint.parent.link
                 if name not in link_names:
                     link_names.append(name)
         for subgroup in group.iter('group'):
