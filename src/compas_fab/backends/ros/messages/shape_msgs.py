@@ -9,19 +9,31 @@ class SolidPrimitive(ROSmsg):
     SPHERE = 2
     CYLINDER = 3
     CONE = 4
+
     BOX_X = 0
     BOX_Y = 1
     BOX_Z = 2
+
     SPHERE_RADIUS = 0
+    
     CYLINDER_HEIGHT = 0
     CYLINDER_RADIUS = 1
+    
     CONE_HEIGHT = 0
     CONE_RADIUS = 1
 
-    def __init__(self, type=1, dimensions=[1, 1, 1]):
-        self.type = type
-        self.dimensions = dimensions
-
+    def __init__(self, type=None, dimensions=None):
+        self.type = type if type else self.BOX
+        self.dimensions = dimensions if dimensions else [1, 1, 1]
+        if self.type == self.BOX and len(self.dimensions) != 3:
+            raise ValueError("BOX needs 3 dimensions")
+        elif self.type == self.SPHERE and len(dimensions) != 1:
+            raise ValueError("SPHERE needs 1 dimension.")
+        elif self.type == self.CYLINDER and len(dimensions) != 2:
+            raise ValueError("CYLINDER needs 2 dimensions.")
+        elif self.type == self.CONE and len(dimensions) != 2:
+            raise ValueError("CONE needs 2 dimensions.")
+    
 
 class Mesh(ROSmsg):
     """http://docs.ros.org/kinetic/api/shape_msgs/html/msg/Mesh.html
@@ -38,3 +50,4 @@ class Plane(ROSmsg):
 
     def __init__(self, coef):
         self.coef = coef
+

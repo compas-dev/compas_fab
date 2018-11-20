@@ -18,11 +18,16 @@ class Point(ROSmsg):
 class Quaternion(ROSmsg):
     """http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Quaternion.html
     """
-    def __init__(self, x ,y, z, w):
+    def __init__(self, x=0. ,y=0., z=0., w=1.):
         self.x = x
         self.y = y
         self.z = z
         self.w = w
+    
+    @classmethod
+    def from_frame(cls, frame):
+        qw, qx, qy, qz = frame.quaternion
+        return cls(qx, qy, qz, qw)
 
 class Pose(ROSmsg):
     """http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Pose.html
@@ -71,15 +76,6 @@ class Vector3(ROSmsg):
         self.x = x
         self.y = y
         self.z = z
-
-class Quaternion(ROSmsg):
-    """http://docs.ros.org/api/geometry_msgs/html/msg/Quaternion.html
-    """
-    def __init__(self, x=0., y=0., z=0., w=1.):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.w = w
 
 class Transform(ROSmsg):
     """http://docs.ros.org/api/geometry_msgs/html/msg/Transform.html

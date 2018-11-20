@@ -141,7 +141,7 @@ if __name__ == "__main__":
     for item in os.listdir(path):
         fullpath = os.path.join(path, item)
         if os.path.isdir(fullpath) and item[0] != ".":
-            urdf_file = os.path.join(fullpath, 'robot_description.urdf')
+            urdf_file = os.path.join(fullpath, 'urdf', 'robot_description.urdf')
             srdf_file = os.path.join(fullpath, 'robot_description_semantic.srdf')
 
             urdf_model = UrdfRobot.from_urdf_file(urdf_file)

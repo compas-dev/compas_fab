@@ -12,6 +12,8 @@ from .moveit_msgs import MoveItErrorCodes
 from .moveit_msgs import RobotTrajectory
 from .moveit_msgs import PositionIKRequest
 from .moveit_msgs import PlannerParams
+from .moveit_msgs import WorkspaceParameters
+from .moveit_msgs import TrajectoryConstraints
 
 
 class GetPositionIKRequest(ROSmsg):
@@ -77,11 +79,11 @@ class GetPositionFKResponse(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html
     """
 
-    def __init__(self, pose_stamped=[], fk_link_names=[], error_code=MoveItErrorCodes()):
+    def __init__(self, pose_stamped=None, fk_link_names=None, error_code=None):
         
-        self.pose_stamped = pose_stamped # PoseStamped[]
-        self.fk_link_names = fk_link_names
-        self.error_code = error_code  # moveit_msgs/MoveItErrorCodes
+        self.pose_stamped = pose_stamped if pose_stamped else [] # PoseStamped[]
+        self.fk_link_names = fk_link_names if fk_link_names else []
+        self.error_code = error_code if error_code else MoveItErrorCodes()  # moveit_msgs/MoveItErrorCodes
 
     @classmethod
     def from_msg(cls, msg):
@@ -165,3 +167,52 @@ class SetPlannerParamsRequest(ROSmsg):
         self.group = group
         self.params = params
         self.replace = replace
+
+class MotionPlanRequest(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanRequest.html
+    """
+    def __init__(self, workspace_parameters=None, start_state=None, 
+                 goal_constraints=None, path_constraints=None, 
+                 trajectory_constraints=None, planner_id=None,
+                 group_name=None, num_planning_attempts=None, 
+                 allowed_planning_time=None, max_velocity_scaling_factor=None, 
+                 max_acceleration_scaling_factor=None):
+        self.workspace_parameters = workspace_parameters if workspace_parameters else WorkspaceParameters() # moveit_msgs/WorkspaceParameters
+        self.start_state = start_state if start_state else RobotState()# moveit_msgs/RobotState 
+        self.goal_constraints = goal_constraints if goal_constraints else []# moveit_msgs/Constraints[] 
+        self.path_constraints = path_constraints if path_constraints else Constraints()# moveit_msgs/Constraints 
+        self.trajectory_constraints = trajectory_constraints if trajectory_constraints else TrajectoryConstraints()# moveit_msgs/TrajectoryConstraints 
+        self.planner_id = planner_id if planner_id else ""# string 
+        self.group_name = group_name if group_name else ""# string 
+        self.num_planning_attempts = num_planning_attempts if num_planning_attempts else 8 # int32 
+        self.allowed_planning_time = allowed_planning_time if allowed_planning_time else 2.# float64 
+        self.max_velocity_scaling_factor = max_velocity_scaling_factor if max_velocity_scaling_factor else 1.# float64 
+        self.max_acceleration_scaling_factor = max_acceleration_scaling_factor if max_acceleration_scaling_factor else 1.# float64
+    
+    @property
+    def msg(self):
+        msg = super(MotionPlanRequest, self).msg
+        return {"motion_plan_request":msg}
+
+class MotionPlanResponse(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanResponse.html
+    """
+
+    def __init__(self, trajectory_start=None, group_name=None, trajectory=None,
+                 planning_time=None, error_code=None):
+
+        self.trajectory_start = trajectory_start if trajectory_start else RobotState()
+        self.group_name = group_name if group_name else ""
+        self.trajectory = trajectory if trajectory else RobotTrajectory()
+        self.planning_time = planning_time if planning_time else 3.
+        self.error_code = error_code if error_code else MoveItErrorCodes()
+        
+    @classmethod
+    def from_msg(cls, msg):
+        msg = msg["motion_plan_response"]
+        trajectory_start = RobotState.from_msg(msg['trajectory_start'])
+        trajectory = RobotTrajectory.from_msg(msg['trajectory'])
+        error_code = MoveItErrorCodes.from_msg(msg['error_code'])
+        return cls(trajectory_start, msg['group_name'], trajectory, msg['planning_time'], error_code)
+
+
