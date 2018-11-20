@@ -145,13 +145,7 @@ class Robot(object):
         if link.parent_joint:
             base_frame = link.parent_joint.origin.copy()
         else:
-            base_frame = None
-            for joint in link.joints:
-                if joint.type == Joint.FIXED:
-                    base_frame = joint.origin.copy()
-                    break
-            else:
-                base_frame = Frame.worldXY()
+            base_frame = Frame.worldXY()
         if not self.artist:
             base_frame.point *= self._scale_factor
         return base_frame
@@ -177,7 +171,6 @@ class Robot(object):
                 for group in self.group_names:
                     joints += self.semantics.get_configurable_joints(group)
                 return joints
-
         else:
             return self.model.get_configurable_joints()
 
@@ -459,6 +452,8 @@ class Robot(object):
         return axes
     
     def update(self, configuration, collision=True, group=None):
+        if not group:
+            group = self.main_group_name
         names = self.get_configurable_joint_names(group)
         self.artist.update(configuration, collision, names)
 
