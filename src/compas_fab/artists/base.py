@@ -72,7 +72,7 @@ class BaseRobotArtist(object):
     def create(self, link, parent_transformation):
         """Triggers the drawing of the robot geometry.
 
-        This method delegates the geometry drawing to the :meth:`draw_mesh` method.
+        This method delegates the geometry drawing to the :mesh:`draw_mesh` method.
 
         Parameters
         ----------
@@ -82,9 +82,7 @@ class BaseRobotArtist(object):
             Parent transformation to apply to the link when creating the structure.
 
         """
-
         for item in itertools.chain(link.visual, link.collision):
-            item.native_geometry_reset = parent_transformation.inverse()
             if item.geometry.geo:
                 color = None
                 if hasattr(item, 'get_color'):
@@ -95,9 +93,7 @@ class BaseRobotArtist(object):
                 item.native_geometry = None
 
         for child_joint in link.joints:
-            child_joint.reset_transform()
-            child_joint.transform(parent_transformation)
-
+            child_joint.create(parent_transformation)
             # Recursively call creation
             self.create(child_joint.child_link, child_joint.current_transformation)
     
@@ -127,17 +123,12 @@ class BaseRobotArtist(object):
             # have not been loaded.
             if item.native_geometry:
                 self.transform(item.native_geometry, transformation)
-                # scale the translational components of the transformation
-                item.native_geometry_reset[0,3] *= relative_factor
-                item.native_geometry_reset[1,3] *= relative_factor
-                item.native_geometry_reset[2,3] *= relative_factor
 
         for child_joint in link.joints:
             child_joint.scale(relative_factor)
             # Recursive call
             self.scale_link(child_joint.child_link, transformation)
 
-    # TODO: Move this method to compas_fab robot
     def update(self, configuration, collision=True, names=[]):
         """Trigger the update of the robot geometry.
 
@@ -149,7 +140,6 @@ class BaseRobotArtist(object):
             ``True`` if the collision geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
         """
-        #        return self.srdf_model.get_configurable_joint_names(group)
         if not len(names):
             names = self.robot.get_configurable_joint_names()
         positions = configuration.values
@@ -171,9 +161,9 @@ class BaseRobotArtist(object):
         if len(names) != len(positions):
             raise ValueError("len(names): %d is not len(positions) %d" % (len(names), len(positions)))
         joint_state = dict(zip(names, positions))
-        self.update_link(self.robot.root, joint_state, Transformation(), collision)
+        self.update_link(self.robot.root, joint_state, Transformation(), Transformation(), collision)
 
-    def update_link(self, link, joint_state, parent_transformation, collision=True):
+    def update_link(self, link, joint_state, parent_transformation, reset_transformation, collision=True):
         """Recursive function to apply the transformations given by the joint state.
 
         The parameter ``joint_state`` is given as absolute values,
@@ -192,18 +182,20 @@ class BaseRobotArtist(object):
             ``True`` if the collision geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
         """
+
+        relative_transformation = parent_transformation * reset_transformation
+
         for item in link.visual:
-            self.transform(item.native_geometry, parent_transformation * item.native_geometry_reset)
-            item.native_geometry_reset = parent_transformation.inverse()
+            self.transform(item.native_geometry, relative_transformation)
 
         if collision:
             for item in link.collision:
                 # some links have only collision geometry, not visual. These meshes have not been loaded.
                 if item.native_geometry:
-                    self.transform(item.native_geometry, parent_transformation * item.native_geometry_reset)
-                    item.native_geometry_reset = parent_transformation.inverse()
+                    self.transform(item.native_geometry, relative_transformation)
 
         for child_joint in link.joints:
+            reset_transformation = child_joint.reset_transformation
             # 1. Reset child joint transformation
             child_joint.reset_transform()
             # 2. Calculate transformation for next joints in the chain
@@ -219,7 +211,7 @@ class BaseRobotArtist(object):
             child_joint.transform(transformation)
 
             # 4. Apply function to all children in the chain
-            self.update_link(child_joint.child_link, joint_state, child_joint.current_transformation, collision)
+            self.update_link(child_joint.child_link, joint_state, transformation, reset_transformation, collision)
 
     def draw_visual(self):
         """Draws all visual geometry of the robot."""
