@@ -452,8 +452,6 @@ class Robot(object):
         return axes
     
     def update(self, configuration, collision=True, group=None):
-        if not group:
-            group = self.main_group_name
         names = self.get_configurable_joint_names(group)
         self.artist.update(configuration, collision, names)
 
