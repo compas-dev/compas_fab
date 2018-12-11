@@ -14,7 +14,7 @@ from compas._os import remove_symlink
 __all__ = []
 
 
-def uninstall(version='5.0', packages=None):
+def uninstall(version='6.0', packages=None):
     """Uninstall compas_fab from Rhino.
 
     Parameters
@@ -29,11 +29,11 @@ def uninstall(version='5.0', packages=None):
     .. code-block:: python
 
         >>> import compas_fab
-        >>> compas_fab.rhino.uninstall('5.0')
+        >>> compas_fab.rhino.uninstall('6.0')
 
     .. code-block:: python
 
-        $ python -m compas_fab.rhino.uninstall 5.0
+        $ python -m compas_fab.rhino.uninstall 6.0
 
     """
 
@@ -54,12 +54,12 @@ if __name__ == "__main__":
     try:
         version = sys.argv[1]
     except IndexError:
-        version = '5.0'
+        version = '6.0'
     else:
         try:
             version = str(version)
         except Exception:
-            version = '5.0'
+            version = '6.0'
 
     packages = set(compas_rhino.install.INSTALLABLE_PACKAGES +
                    compas_fab.rhino.install.INSTALLABLE_PACKAGES)
