@@ -33,9 +33,11 @@ from compas_fab.backends.ros import RobotState
 from compas_fab.backends.ros import Time
 from compas_fab.backends.ros import PositionConstraint
 from compas_fab.backends.ros import OrientationConstraint
+from compas_fab.backends.ros import JointConstraint
 from compas_fab.backends.ros import SolidPrimitive
 from compas_fab.backends.ros import Quaternion
 from compas_fab.backends.ros import Constraints
+from compas_fab.backends.ros import TrajectoryConstraints
 
 from compas_fab.backends.ros.messages.direct_ur import URGoal
 from compas_fab.backends.ros.messages.direct_ur import URMovej
@@ -163,7 +165,9 @@ class RosClient(Ros):
         srv.call(request, receive_message, receive_message)
     
     def motion_plan(self, callback_result, frame, base_link, ee_link, group,
-                    joint_names, joint_positions, tolerance_position, tolerance_angle):
+                    joint_names, joint_positions, tolerance_position, tolerance_angle, 
+                    path_constraints=None, trajectory_constraints=None, 
+                    planner_id=None):
         """
         """
         # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
@@ -192,9 +196,18 @@ class RosClient(Ros):
         ocm.absolute_z_axis_tolerance = tolerance_angle
         
         goal_constraints = [Constraints(position_constraints=[pcm], orientation_constraints=[ocm])]
-    
+
+        # TODO: add to parameters ...
+        if not path_constraints:
+            path_constraints = Constraints()
+        if not trajectory_constraints:
+            trajectory_constraints = TrajectoryConstraints()
+            
         reqmsg = MotionPlanRequest(start_state=start_state, 
                                    goal_constraints=goal_constraints, 
+                                   path_constraints=path_constraints,
+                                   trajectory_constraints=trajectory_constraints,
+                                   planner_id=planner_id,
                                    group_name=group)
         
         def receive_message(msg):
@@ -204,6 +217,50 @@ class RosClient(Ros):
         srv = Service(self, '/plan_kinematic_path', 'GetMotionPlan')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
+    
+
+    def motion_plan_joint_positions_goal(self, callback_result, 
+                    joint_positions_goal, joint_names_goal, tolerances, 
+                    base_link, group, joint_names, joint_positions,
+                    path_constraints=None, trajectory_constraints=None, 
+                    planner_id=None):
+        """
+        """
+        # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
+
+        header = Header(frame_id=base_link)
+        joint_state = JointState(header=header, name=joint_names, position=joint_positions)
+        multi_dof_joint_state = MultiDOFJointState(header=header)
+        start_state = RobotState(joint_state=joint_state, multi_dof_joint_state=multi_dof_joint_state)
+
+        joint_constraints = []
+        for position, joint_name, tolerance in zip(joint_positions_goal, joint_names_goal, tolerances):
+            jcm = JointConstraint(joint_name, position, tolerance, tolerance)
+            joint_constraints.append(jcm)
+  
+        goal_constraints = [Constraints(joint_constraints=joint_constraints)]
+
+        # TODO: add to parameters ...
+        if not path_constraints:
+            path_constraints = Constraints()
+        if not trajectory_constraints:
+            trajectory_constraints = TrajectoryConstraints()
+            
+        reqmsg = MotionPlanRequest(start_state=start_state, 
+                                   goal_constraints=goal_constraints, 
+                                   path_constraints=path_constraints,
+                                   trajectory_constraints=trajectory_constraints,
+                                   planner_id=planner_id,
+                                   group_name=group)
+        
+        def receive_message(msg):
+            response = MotionPlanResponse.from_msg(msg)
+            callback_result(response)
+
+        srv = Service(self, '/plan_kinematic_path', 'GetMotionPlan')
+        request = ServiceRequest(reqmsg.msg)
+        srv.call(request, receive_message, receive_message)
+
 
     def follow_configurations(self, callback_result, joint_names, configurations, timesteps, timeout=None):
 
