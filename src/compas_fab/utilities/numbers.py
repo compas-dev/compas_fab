@@ -54,7 +54,25 @@ def allclose(l1, l2, tol=1e-05):
             return False
     return True
 
+def argsort(numbers):
+    """Returns the indices that would sort an array of numbers.
+
+    The function is similar to NumPy's *argsort* function.
+    """
+    return [i[0] for i in sorted(enumerate(numbers), key=lambda x:x[1])]
+
+def argmin(numbers):
+    """Returns the index of the minimum value in numbers.
+    """
+    return argsort(numbers)[0]
+
+def argmax(numbers):
+    """Returns the index of the maximum value in numbers.
+    """
+    return argsort(numbers)[-1]
+
 
 if __name__ == "__main__":
     print(map_range(2, 0, 10, 0, 100))
     print(arange(3, -4, -0.2))
+    print(argsort([34,1,7,2,100]))
