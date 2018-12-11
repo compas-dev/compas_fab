@@ -22,14 +22,14 @@ def map_range(value, from_min, from_max, to_min, to_max):
 
 def range_geometric_row(number, d, r=1.1):
     """Returns a list of numbers with a certain relation to each other.
-    
+
     The function divides one number into a list of d numbers [n0, n1, ...], such
-    that their sum is number and the relation between the numbers is defined 
+    that their sum is number and the relation between the numbers is defined
     with n1 = n0 / r, n2 = n1 / r, n3 = n2 / r, ...
     """
     if r <= 0:
         raise ValueError("r must be > 0")
-        
+
     n0 = number/((1 - (1/r)**d)/(1 - 1/r))
 
     numbers = [n0]
@@ -66,7 +66,7 @@ def argsort(numbers):
 
     Note
     ----
-    For a large list of numbers reconsider using NumPy's *argsort* function, 
+    For a large list of numbers reconsider using NumPy's *argsort* function,
     since this function might take too long.
     """
     return [i[0] for i in sorted(enumerate(numbers), key=lambda x:x[1])]
@@ -78,7 +78,7 @@ def argmin(numbers):
 
     Note
     ----
-    For a large list of numbers reconsider using NumPy's *argmin* function, 
+    For a large list of numbers reconsider using NumPy's *argmin* function,
     since this function might take too long.
     """
     return argsort(numbers)[0]
@@ -90,7 +90,7 @@ def argmax(numbers):
 
     Note
     ----
-    For a large list of numbers reconsider using NumPy's *argmax* function, 
+    For a large list of numbers reconsider using NumPy's *argmax* function,
     since this function might take too long.
     """
     return argsort(numbers)[-1]
