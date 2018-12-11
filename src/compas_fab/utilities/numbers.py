@@ -2,8 +2,12 @@ import math
 
 __all__ = [
     'map_range',
+    'range_geometric_row',
     'arange',
-    'allclose'
+    'allclose',
+    'argsort',
+    'argmin',
+    'argmax',
 ]
 
 
@@ -18,9 +22,10 @@ def map_range(value, from_min, from_max, to_min, to_max):
 
 def range_geometric_row(number, d, r=1.1):
     """Returns a list of numbers with a certain relation to each other.
-        The function divides a number into d numbers [n0, n1, ...] such that 
-    their sum is number and the relation between the numbers is defined with 
-    n1 = n0 / r, n2 = n1 / r, n3 = n2 / r, ...
+    
+    The function divides one number into a list of d numbers [n0, n1, ...], such
+    that their sum is number and the relation between the numbers is defined 
+    with n1 = n0 / r, n2 = n1 / r, n3 = n2 / r, ...
     """
     if r <= 0:
         raise ValueError("r must be > 0")
@@ -58,16 +63,35 @@ def argsort(numbers):
     """Returns the indices that would sort an array of numbers.
 
     The function is similar to NumPy's *argsort* function.
+
+    Note
+    ----
+    For a large list of numbers reconsider using NumPy's *argsort* function, 
+    since this function might take too long.
     """
     return [i[0] for i in sorted(enumerate(numbers), key=lambda x:x[1])]
 
 def argmin(numbers):
     """Returns the index of the minimum value in numbers.
+
+    The function is similar to NumPy's *argmin* function.
+
+    Note
+    ----
+    For a large list of numbers reconsider using NumPy's *argmin* function, 
+    since this function might take too long.
     """
     return argsort(numbers)[0]
 
 def argmax(numbers):
     """Returns the index of the maximum value in numbers.
+
+    The function is similar to NumPy's *argmax* function.
+
+    Note
+    ----
+    For a large list of numbers reconsider using NumPy's *argmax* function, 
+    since this function might take too long.
     """
     return argsort(numbers)[-1]
 
