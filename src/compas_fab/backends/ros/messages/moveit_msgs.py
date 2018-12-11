@@ -220,8 +220,12 @@ class TrajectoryConstraints(ROSmsg):
 class JointConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/JointConstraint.html
     """
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self, joint_name="", position=0, tolerance_above=0, tolerance_below=0, weight=1.):
+        self.joint_name = joint_name
+        self.position = position
+        self.tolerance_above = tolerance_above
+        self.tolerance_below = tolerance_below
+        self.weight = weight
 
 class VisibilityConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/VisibilityConstraint.html
@@ -254,8 +258,8 @@ class OrientationConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/OrientationConstraint.html
     """
     def __init__(self, header=None, orientation=None, link_name=None, 
-                 absolute_x_axis_tolerance=0.005, absolute_y_axis_tolerance=0.005,
-                 absolute_z_axis_tolerance=0.005, weight=1):
+                 absolute_x_axis_tolerance=0.0, absolute_y_axis_tolerance=0.0,
+                 absolute_z_axis_tolerance=0.0, weight=1):
         self.header = header if header else Header()
         self.orientation = orientation if orientation else Quaternion()#geometry_msgs/Quaternion 
         self.link_name = link_name if link_name else ""
