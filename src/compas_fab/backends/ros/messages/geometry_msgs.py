@@ -10,7 +10,7 @@ from compas.geometry import Frame
 class Point(ROSmsg):
     """http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Point.html
     """
-    def __init__(self, x ,y, z):
+    def __init__(self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
