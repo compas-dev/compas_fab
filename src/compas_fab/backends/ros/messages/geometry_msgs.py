@@ -33,9 +33,9 @@ class Pose(ROSmsg):
     """http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Pose.html
     """
 
-    def __init__(self, position=Point(0,0,0), orientation=Quaternion(0,0,0,1)):
-        self.position = position
-        self.orientation = orientation
+    def __init__(self, position=None, orientation=None):
+        self.position = position if position else Point(0,0,0)
+        self.orientation = orientation if orientation else Quaternion(0,0,0,1)
 
     @classmethod
     def from_frame(cls, frame):
