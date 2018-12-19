@@ -5,6 +5,7 @@ from roslibpy import Message
 from roslibpy import Ros
 from roslibpy import Service
 from roslibpy import ServiceRequest
+from roslibpy import Topic
 from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
@@ -38,6 +39,8 @@ from compas_fab.backends.ros import SolidPrimitive
 from compas_fab.backends.ros import Quaternion
 from compas_fab.backends.ros import Constraints
 from compas_fab.backends.ros import TrajectoryConstraints
+from compas_fab.backends.ros import Mesh
+from compas_fab.backends.ros import CollisionObject
 
 from compas_fab.backends.ros.messages.direct_ur import URGoal
 from compas_fab.backends.ros.messages.direct_ur import URMovej
@@ -260,7 +263,18 @@ class RosClient(Ros):
         srv = Service(self, '/plan_kinematic_path', 'GetMotionPlan')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
-
+    
+    def add_collision_mesh_to_planning_scene(self, compas_mesh):
+        """
+        """
+        mesh = Mesh.from_mesh(compas_mesh)
+        co = CollisionObject()
+        co.meshes = [mesh]
+        co.mesh_poses = [Pose()]
+        co.operation = CollisionObject.ADD
+        
+        topic = Topic(self, '/collision_object', 'moveit_msgs/CollisionObject')
+        topic.publish(co.msg)
 
     def follow_configurations(self, callback_result, joint_names, configurations, timesteps, timeout=None):
 

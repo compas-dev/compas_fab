@@ -8,7 +8,8 @@ import compas.robots.model
 from compas.robots import Joint
 
 from compas.geometry import Frame
-from compas.geometry.xforms import Transformation
+from compas.geometry import Transformation
+from compas.datastructures import Mesh
 
 from .configuration import Configuration
 from .semantics import RobotSemantics
@@ -526,6 +527,10 @@ class Robot(object):
                     joint_positions_goal, joint_names_goal, tolerances, 
                     base_link, group, joint_names, joint_positions, 
                     path_constraints, trajectory_constraints, planner_id)
+    
+
+    def add_collision_mesh_to_planning_scene(self, mesh):
+        self.client.add_collision_mesh_to_planning_scene(mesh)
 
     def send_frame(self):
         # (check service name with ros)
