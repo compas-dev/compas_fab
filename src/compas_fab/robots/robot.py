@@ -427,10 +427,10 @@ class Robot(object):
                                            ee_link, group, joint_names, joint_positions,
                                            max_step_scaled, avoid_collisions)
     
-    def motion_plan(self, frame_WCF, start_configuration, tolerance_position, 
-                    tolerance_angle, callback_result=None, group=None, 
-                    path_constraints=None, trajectory_constraints=None,
-                    planner_id=None):
+    def motion_plan_goal_frame(self, frame_WCF, start_configuration, 
+                    tolerance_position, tolerance_angle, callback_result=None, 
+                    group=None, path_constraints=None,
+                    trajectory_constraints=None, planner_id=None):
         """Calculates a motion from start_configuration to frame_WCF.
 
         Parameters
@@ -470,13 +470,13 @@ class Robot(object):
                 raise ValueError("Please pass a configuration with %d values" % len(joint_names))
             joint_positions = start_configuration.values
         
-        self.client.motion_plan(callback_result, frame_RCF, base_link, ee_link,
+        self.client.motion_plan_goal_frame(callback_result, frame_RCF, base_link, ee_link,
                                 group, joint_names, joint_positions, 
                                 tolerance_position, tolerance_angle, 
                                 path_constraints, trajectory_constraints,
                                 planner_id)
     
-    def motion_plan_configuration_goal(self, goal_configuration, 
+    def motion_plan_goal_configuration(self, goal_configuration, 
                     start_configuration, tolerance, callback_result=None, 
                     group=None, path_constraints=None, 
                     trajectory_constraints=None, planner_id=None):
@@ -523,7 +523,7 @@ class Robot(object):
                 raise ValueError("Please pass a configuration with %d values" % len(joint_names))
             joint_positions = start_configuration.values
         
-        self.client.motion_plan_joint_positions_goal(callback_result,         
+        self.client.motion_plan_goal_joint_positions(callback_result,         
                     joint_positions_goal, joint_names_goal, tolerances, 
                     base_link, group, joint_names, joint_positions, 
                     path_constraints, trajectory_constraints, planner_id)

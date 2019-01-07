@@ -167,7 +167,7 @@ class RosClient(Ros):
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
     
-    def motion_plan(self, callback_result, frame, base_link, ee_link, group,
+    def motion_plan_goal_frame(self, callback_result, frame, base_link, ee_link, group,
                     joint_names, joint_positions, tolerance_position, tolerance_angle, 
                     path_constraints=None, trajectory_constraints=None, 
                     planner_id=None):
@@ -222,7 +222,7 @@ class RosClient(Ros):
         srv.call(request, receive_message, receive_message)
     
 
-    def motion_plan_joint_positions_goal(self, callback_result, 
+    def motion_plan_goal_joint_positions(self, callback_result, 
                     joint_positions_goal, joint_names_goal, tolerances, 
                     base_link, group, joint_names, joint_positions,
                     path_constraints=None, trajectory_constraints=None, 
