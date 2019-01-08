@@ -67,7 +67,7 @@ Optionally, modify ``email`` and ``licence``, ``version`` tags.
 
 Then create 4(+2) folders: ``launch``, ``rviz``, ``urdf`` and ``meshes`` (with visual and collision folders)::
 
-  mkdir ~/robotic_setups/src/{launch,rviz,urdf,meshes/visual,meshes/collision}
+  mkdir ~/robotic_setups/src/ur5_with_measurement_tool/{launch,rviz,urdf,meshes,meshes/visual,meshes/collision}
 
 Copy your meshes into ``meshes/visual`` and ``meshes/collision``.
 
