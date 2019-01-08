@@ -238,13 +238,13 @@ This will output::
 Copy some boilerplate files from the ``urdf_tutorial`` package with the following commands::
 
   roscd urdf_tutorial
-  cp rviz/urdf.rviz ~/robotic_setups/src/rviz/
-  cp launch/display.launch ~/robotic_setups/src/launch/
+  cp rviz/urdf.rviz ~/robotic_setups/src/ur5_with_measurement_tool/rviz/
+  cp launch/display.launch ~/robotic_setups/src/ur5_with_measurement_tool/launch/
   cd ~/robotic_setups
 
 Now modify ``display.launch`` in the ``launch`` directory::
 
-  pico ~/robotic_setups/src/launch/display.launch
+  pico ~/robotic_setups/src/ur5_with_measurement_tool/launch/display.launch
 
 Change the 2 ``arg`` tags with ``name="model"`` and ``name="rvizconfig"`` such 
 that they match the following:
