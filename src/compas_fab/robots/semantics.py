@@ -50,9 +50,8 @@ class RobotSemantics(object):
                 link_names.append(name)
         for chain in group.iter('chain'):
             for link in self.urdf_robot.iter_link_chain(chain.attrib['base_link'], chain.attrib['tip_link']):
-                name = link.name
-                if name not in link_names:
-                    link_names.append(name)
+                if link.name not in link_names:
+                    link_names.append(link.name)
         for joint in group.iter('joint'):
             joint = self.urdf_robot.get_joint_by_name(joint.attrib['name'])
             if joint:
@@ -66,20 +65,28 @@ class RobotSemantics(object):
                     if name not in link_names:
                         link_names.append(name)
         return link_names
-
-    def __get_group_joints(self, group):
-        link_names = self.__get_group_link_names(group)
-        joints = []
-        for name in link_names:
-            link = self.urdf_robot.get_link_by_name(name)
-            for joint in link.joints:
-                if joint.is_configurable() and joint.name not in self.passive_joints:
-                    joints.append(joint)
-        return joints
-
+    
     def __get_group_joint_names(self, group):
-        joints = self.__get_group_joints(group)
-        return [j.name for j in joints]
+        joint_names = []
+        for link in group.iter('link'):
+            link = self.urdf_robot.get_link_by_name(link.attrib['name'])
+            for joint in link.joints:
+                if joint.name not in joint_names:
+                    joint_names.append(joint.name)
+        for chain in group.iter('chain'):
+            for joint in self.urdf_robot.iter_joint_chain(chain.attrib['base_link'], chain.attrib['tip_link']):
+                if joint.name not in joint_names:
+                    joint_names.append(joint.name)
+        for joint in group.iter('joint'):
+            if joint.attrib['name'] not in joint_names:
+                joint_names.append(joint.attrib['name'])
+        for subgroup in group.iter('group'):
+            if subgroup.attrib['name'] != group.attrib['name']:
+                subgroup_joint_names = self.__get_group_joint_names(subgroup)
+                for name in subgroup_joint_names:
+                    if name not in joint_names:
+                        joint_names.append(name)
+        return joint_names
 
     def __source_attributes(self):
 
@@ -122,14 +129,18 @@ class RobotSemantics(object):
         return self._group_dict[group]["links"][0]
 
     def get_configurable_joints(self, group=None):
-        joint_names = self.get_configurable_joint_names(group)
-        return [self.urdf_robot.get_joint_by_name(name) for name in joint_names]
-
-    def get_configurable_joint_names(self, group=None):
         if not group:
             group = self.main_group_name
-        return self._group_dict[group]["joints"]
+        joints = []
+        for name in self._group_dict[group]["joints"]:
+            joint = self.urdf_robot.get_joint_by_name(name)
+            if joint:
+                if joint.is_configurable() and name not in self.passive_joints:
+                    joints.append(joint)
+        return joints
 
+    def get_configurable_joint_names(self, group=None):
+        return [joint.name for joint in self.get_configurable_joints(group)]
 
 if __name__ == "__main__":
 

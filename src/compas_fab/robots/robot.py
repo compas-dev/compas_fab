@@ -152,7 +152,7 @@ class Robot(object):
         return base_frame
 
     def get_configurable_joints(self, group=None):
-        """Returns all configurable joints.
+        """Returns the configurable joints.
 
         Parameters
         ----------
@@ -170,13 +170,16 @@ class Robot(object):
             else:
                 joints = []
                 for group in self.group_names:
-                    joints += self.semantics.get_configurable_joints(group)
+                    joints_in_group = self.semantics.get_configurable_joints(group)
+                    for joint in joints_in_group:
+                        if joint not in joints: # Check to not add double joints
+                            joints.append(joint)
                 return joints
         else:
             return self.model.get_configurable_joints()
 
     def get_configurable_joint_names(self, group=None):
-        """Returns all configurable joint names.
+        """Returns the configurable joint names.
 
         Parameters
         ----------
@@ -192,7 +195,7 @@ class Robot(object):
         return [j.name for j in configurable_joints]
     
     def get_configurable_joint_types(self, group=None):
-        """Returns all configurable joint types.
+        """Returns the configurable joint types.
 
         Parameters
         ----------

@@ -67,7 +67,7 @@ Optionally, modify ``email`` and ``licence``, ``version`` tags.
 
 Then create 4(+2) folders: ``launch``, ``rviz``, ``urdf`` and ``meshes`` (with visual and collision folders)::
 
-  mkdir ~/robotic_setups/src/{launch,rviz,urdf,meshes/visual,meshes/collision}
+  mkdir ~/robotic_setups/src/ur5_with_measurement_tool/{launch,rviz,urdf,meshes,meshes/visual,meshes/collision}
 
 Copy your meshes into ``meshes/visual`` and ``meshes/collision``.
 
@@ -238,13 +238,13 @@ This will output::
 Copy some boilerplate files from the ``urdf_tutorial`` package with the following commands::
 
   roscd urdf_tutorial
-  cp rviz/urdf.rviz ~/robotic_setups/src/rviz/
-  cp launch/display.launch ~/robotic_setups/src/launch/
+  cp rviz/urdf.rviz ~/robotic_setups/src/ur5_with_measurement_tool/rviz/
+  cp launch/display.launch ~/robotic_setups/src/ur5_with_measurement_tool/launch/
   cd ~/robotic_setups
 
 Now modify ``display.launch`` in the ``launch`` directory::
 
-  pico ~/robotic_setups/src/launch/display.launch
+  pico ~/robotic_setups/src/ur5_with_measurement_tool/launch/display.launch
 
 Change the 2 ``arg`` tags with ``name="model"`` and ``name="rvizconfig"`` such 
 that they match the following:
