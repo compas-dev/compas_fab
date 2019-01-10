@@ -337,7 +337,12 @@ class Robot(object):
             joint_positions = current_configuration.values
         if not callback_result:
             callback_result = print
-        
+
+        joint_types = self.get_configurable_joint_types(group)
+        for i, t in zip(range(len(joint_positions)), joint_types):
+            if t == Joint.PRISMATIC or t == Joint.PLANAR:
+                joint_positions[i] /= self.scale_factor
+
         # represent in RCF
         frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
         frame_RCF.point /= self.scale_factor # must be in meters
@@ -371,6 +376,12 @@ class Robot(object):
             raise ValueError("Please pass a configuration with %d values" % len(joint_names))
 
         joint_positions = configuration.values
+
+        joint_types = self.get_configurable_joint_types(group)
+        for i, t in zip(range(len(joint_positions)), joint_types):
+            if t == Joint.PRISMATIC or t == Joint.PLANAR:
+                joint_positions[i] /= self.scale_factor
+
         base_link = self.get_base_link_name(group)
         joint_names = self.get_configurable_joint_names(group)
         ee_link = self.get_end_effector_link_name(group)
