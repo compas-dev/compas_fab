@@ -254,6 +254,14 @@ class Robot(object):
                 gi = group_joint_names.index(name)
                 configuration.values[i] = group_configuration.values[gi]
         return configuration
+    
+    def get_position_by_joint_name(self, configuration, joint_name, group=None):
+        """Returns the value of the joint_name in the passed configuration.
+        """
+        names = self.get_configurable_joint_names(group)
+        if len(names) != len(configuration.values):
+            raise ValueError("Please pass a configuration with %d values or specify group" % len(names))
+        return configuration.values[names.index(joint_name)]
 
     def transformation_RCF_WCF(self, group=None):
         """Returns the transformation matrix from world coordinate system to 
