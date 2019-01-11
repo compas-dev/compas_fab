@@ -9,6 +9,8 @@ from compas.robots import Joint
 
 from compas.geometry import Frame
 from compas.geometry import Transformation
+from compas.geometry import Scale
+from compas.geometry import mesh_transformed
 from compas.datastructures import Mesh
 
 from .configuration import Configuration
@@ -584,7 +586,7 @@ class Robot(object):
                     start_configuration, tolerance, callback_result=None, 
                     group=None, path_constraints=None, 
                     trajectory_constraints=None, planner_id=None):
-        """Calculates a motion from start_configuration to end_configuration.
+        """Calculates a motion from start_configuration to goal_configuration.
 
         Parameters
         ----------
@@ -653,8 +655,75 @@ class Robot(object):
                     path_constraints, trajectory_constraints, planner_id)
     
 
-    def add_collision_mesh_to_planning_scene(self, mesh):
-        self.client.add_collision_mesh_to_planning_scene(mesh)
+    def add_collision_mesh_to_planning_scene(self, id_name, mesh, scale=False):
+        """Adds a collision mesh to the robot's planning scene.
+
+        Parameters
+        ----------
+            id_name (str): The identifier of the collision mesh.
+            mesh (:class:`Mesh`): A triangulated COMPAS mesh.
+        
+        Examples
+        --------
+        """
+        self.ensure_client()
+        root_link_name = self.model.root.name
+        if scale:
+            S = Scale([1./self.scale_factor] * 3)
+            mesh = mesh_transformed(mesh, S)
+        self.client.add_collision_mesh_to_planning_scene(id_name, root_link_name, mesh, 1)
+    
+    def remove_collision_mesh_from_planning_scene(self, id_name):
+        """Removes a collision mesh from the robot's planning scene.
+
+        Parameters
+        ----------
+            id_name (str): The identifier of the collision mesh.
+        
+        Examples
+        --------
+        """
+        self.ensure_client()
+        root_link_name = self.model.root.name
+        self.client.collision_mesh(id_name, root_link_name, None, 0)
+
+    
+    def add_attached_collision_mesh(self, id_name, mesh, group=None, touch_links=[], scale=False):
+        """Attaches a collision mesh to the robot's end-effector.
+
+        Parameters
+        ----------
+            id_name (str): The identifier of the object.
+            mesh (:class:`Mesh`): A triangulated COMPAS mesh.
+            group (str, optional): The planning group on which's end-effector 
+                the object should be attached. Defaults to the robot's main 
+                planning group. 
+            touch_links(str list): The list of link names that the attached mesh
+                is allowed to touch by default. The end-effector link name is 
+                already considered. 
+        """
+        if not group:
+            group = self.main_group_name # ensure semantics
+        ee_link_name = self.get_end_effector_link_name(group)
+        if scale:
+            S = Scale([1./self.scale_factor] * 3)
+            mesh = mesh_transformed(mesh, S)
+        self.client.attached_collision_mesh(id_name, ee_link_name, mesh, 1, touch_links)
+    
+    def remove_attached_collision_mesh(self, id_name, group=None):
+        """Removes an attached collision object from the robot's end-effector.
+
+        Parameters
+        ----------
+            id_name (str): The identifier of the object.
+            group (str, optional): The planning group on which's end-effector 
+                the object should be removed. Defaults to the robot's main 
+                planning group. 
+        """
+        if not group:
+            group = self.main_group_name # ensure semantics
+        ee_link_name = self.get_end_effector_link_name(group)
+        self.client.attached_collision_mesh(id_name, ee_link_name, None, 0)
 
     def send_frame(self):
         # (check service name with ros)

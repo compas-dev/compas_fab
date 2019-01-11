@@ -45,12 +45,12 @@ class AttachedCollisionObject(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html
     """
 
-    def __init__(self, link_name='ee_link', object=CollisionObject(),
-                 touch_links=[], detach_posture=JointTrajectory(), weight=0):
-        self.link_name = link_name
-        self.object = object
+    def __init__(self, link_name=None, object=None, touch_links=[], 
+                 detach_posture=None, weight=0):
+        self.link_name = link_name if link_name else 'ee_link'
+        self.object = object if object else CollisionObject()
         self.touch_links = touch_links
-        self.detach_posture = detach_posture
+        self.detach_posture = detach_posture if detach_posture else JointTrajectory()
         self.weight = weight
 
 
