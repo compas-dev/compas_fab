@@ -10,8 +10,9 @@ from compas.robots import Joint
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas.geometry import Scale
-from compas.geometry import mesh_transformed
+from compas.datastructures import mesh_transformed
 from compas.datastructures import Mesh
+from compas.datastructures import mesh_quads_to_triangles
 
 from .configuration import Configuration
 from .semantics import RobotSemantics
@@ -671,7 +672,8 @@ class Robot(object):
         if scale:
             S = Scale([1./self.scale_factor] * 3)
             mesh = mesh_transformed(mesh, S)
-        self.client.add_collision_mesh_to_planning_scene(id_name, root_link_name, mesh, 1)
+        mesh_quads_to_triangles(mesh) # ROS mesh message requires triangles
+        self.client.collision_mesh(id_name, root_link_name, mesh, 1)
     
     def remove_collision_mesh_from_planning_scene(self, id_name):
         """Removes a collision mesh from the robot's planning scene.
@@ -708,6 +710,7 @@ class Robot(object):
         if scale:
             S = Scale([1./self.scale_factor] * 3)
             mesh = mesh_transformed(mesh, S)
+        mesh_quads_to_triangles(mesh) # ROS mesh message requires triangles
         self.client.attached_collision_mesh(id_name, ee_link_name, mesh, 1, touch_links)
     
     def remove_attached_collision_mesh(self, id_name, group=None):
