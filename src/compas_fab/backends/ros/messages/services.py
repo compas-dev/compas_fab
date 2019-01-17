@@ -14,6 +14,8 @@ from .moveit_msgs import PositionIKRequest
 from .moveit_msgs import PlannerParams
 from .moveit_msgs import WorkspaceParameters
 from .moveit_msgs import TrajectoryConstraints
+from .moveit_msgs import PlanningSceneComponents
+from .moveit_msgs import PlanningScene
 
 
 class GetPositionIKRequest(ROSmsg):
@@ -215,4 +217,20 @@ class MotionPlanResponse(ROSmsg):
         error_code = MoveItErrorCodes.from_msg(msg['error_code'])
         return cls(trajectory_start, msg['group_name'], trajectory, msg['planning_time'], error_code)
 
+class GetPlanningSceneRequest(ROSmsg):
+    """http://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html
+    """
+    def __init__(self, components=None):
+        self.components = components if components else PlanningSceneComponents()
+
+
+class GetPlanningSceneResponse(ROSmsg):
+    """http://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html
+    """
+    def __init__(self, scene=None):
+        self.scene = scene if scene else PlanningScene()
+
+    @classmethod
+    def from_msg(cls, msg):
+        return PlanningScene.from_msg(msg['scene'])
 

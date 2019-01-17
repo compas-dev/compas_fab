@@ -42,6 +42,9 @@ from compas_fab.backends.ros import TrajectoryConstraints
 from compas_fab.backends.ros import Mesh
 from compas_fab.backends.ros import CollisionObject
 from compas_fab.backends.ros import AttachedCollisionObject
+from compas_fab.backends.ros import GetPlanningSceneRequest
+from compas_fab.backends.ros import GetPlanningSceneResponse
+from compas_fab.backends.ros import PlanningSceneComponents
 
 from compas_fab.backends.ros.messages.direct_ur import URGoal
 from compas_fab.backends.ros.messages.direct_ur import URMovej
@@ -361,3 +364,15 @@ class RosClient(Ros):
         # goal.on('feedback', lambda feedback: print(feedback))
         goal.on('result', callback_result)
         action_client.send_goal(goal)
+    
+    def get_planning_scene(self, callback_result, components):
+        """
+        """
+        reqmsg = GetPlanningSceneRequest(PlanningSceneComponents(components))
+        def receive_message(msg):
+            response = GetPlanningSceneResponse.from_msg(msg)
+            callback_result(response)
+
+        srv = Service(self, '/get_planning_scene', 'moveit_msgs/GetPlanningScene')
+        request = ServiceRequest(reqmsg.msg)
+        srv.call(request, receive_message, receive_message)

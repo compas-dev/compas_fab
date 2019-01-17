@@ -47,7 +47,7 @@ class AttachedCollisionObject(ROSmsg):
 
     def __init__(self, link_name=None, object=None, touch_links=[], 
                  detach_posture=None, weight=0):
-        self.link_name = link_name if link_name else 'ee_link'
+        self.link_name = link_name if link_name else ''
         self.object = object if object else CollisionObject()
         self.touch_links = touch_links
         self.detach_posture = detach_posture if detach_posture else JointTrajectory()
@@ -71,11 +71,10 @@ class RobotState(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/RobotState.html
     """
 
-    def __init__(self, joint_state=JointState(),
-                 multi_dof_joint_state=MultiDOFJointState(),
+    def __init__(self, joint_state=None, multi_dof_joint_state=None,
                  attached_collision_objects=[], is_diff=False):
-        self.joint_state = joint_state
-        self.multi_dof_joint_state = multi_dof_joint_state
+        self.joint_state = joint_state if joint_state else JointState()
+        self.multi_dof_joint_state = multi_dof_joint_state if multi_dof_joint_state else MultiDOFJointState()
         self.attached_collision_objects = attached_collision_objects
         self.is_diff = is_diff
 
@@ -271,10 +270,90 @@ class OrientationConstraint(ROSmsg):
         self.absolute_z_axis_tolerance = absolute_z_axis_tolerance
         self.weight = weight # float64 
 
-"""
-rostopic info /attached_collision_object
-Type: moveit_msgs/AttachedCollisionObject
 
-rostopic info /collision_object
-Type: moveit_msgs/CollisionObject
-"""
+class PlanningSceneComponents(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PlanningSceneComponents.html
+    """
+    SCENE_SETTINGS = 1
+    ROBOT_STATE=2
+    ROBOT_STATE_ATTACHED_OBJECTS=4
+    WORLD_OBJECT_NAMES=8
+    WORLD_OBJECT_GEOMETRY=16
+    OCTOMAP=32
+    TRANSFORMS=64
+    ALLOWED_COLLISION_MATRIX=128
+    LINK_PADDING_AND_SCALING=256
+    OBJECT_COLORS=512
+
+    def __init__(self, components=None):
+        self.components = components if components else self.SCENE_SETTINGS
+
+    def __eq__(self, other):
+        return self.components == other
+    
+    @property
+    def human_readable(self):
+        cls = type(self)
+        for k, v in cls.__dict__.items():
+            if v == self.components:
+                return k
+        return ''
+
+class  AllowedCollisionMatrix(ROSmsg):
+    """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/AllowedCollisionMatrix.html
+    """
+    def __init__(self, entry_names=[], entry_values=[], default_entry_names=[], default_entry_values=[]):
+        self.entry_names = entry_names # string[] 
+        self.entry_values = entry_values # moveit_msgs/AllowedCollisionEntry[] 
+        self.default_entry_names = default_entry_names # string[] 
+        self.default_entry_values = default_entry_values# bool[] 
+
+class PlanningSceneWorld(ROSmsg):
+    """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningSceneWorld.html
+    """
+    def __init__(self, collision_objects=[], octomap=None):
+        self.collision_objects = collision_objects #collision objects # CollisionObject[]
+        self.octomap = octomap if octomap else OctomapWithPose() # octomap_msgs/OctomapWithPose
+
+class PlanningScene(ROSmsg):
+    """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningScene.html
+    """
+    def __init__(self, name='', robot_state=None, robot_model_name='', 
+                 fixed_frame_transforms=[], allowed_collision_matrix=None,
+                 link_padding=[], link_scale=[], object_colors=[], world=None,
+                 is_diff=False):
+        self.name = name # string
+        self.robot_state = robot_state if robot_state else RobotState() # moveit_msgs/RobotState 
+        self.robot_model_name = robot_model_name # string 
+        self.fixed_frame_transforms = fixed_frame_transforms # geometry_msgs/TransformStamped[] 
+        self.allowed_collision_matrix = allowed_collision_matrix if allowed_collision_matrix else AllowedCollisionMatrix()
+        self.link_padding = link_padding # moveit_msgs/LinkPadding[] 
+        self.link_scale = link_scale # moveit_msgs/LinkScale[] 
+        self.object_colors = object_colors # moveit_msgs/ObjectColor[] 
+        self.world = world if world else PlanningSceneWorld() # moveit_msgs/PlanningSceneWorld 
+        self.is_diff = is_diff # bool
+
+        """
+        SCENE_SETTINGS = 1
+        ROBOT_STATE=2
+        ROBOT_STATE_ATTACHED_OBJECTS=4
+        WORLD_OBJECT_NAMES=8
+        WORLD_OBJECT_GEOMETRY=16
+        OCTOMAP=32
+        TRANSFORMS=64
+        ALLOWED_COLLISION_MATRIX=128
+        LINK_PADDING_AND_SCALING=256
+        OBJECT_COLORS=512
+        """
+
+
+    @classmethod
+    def from_msg(cls, msg):
+        robot_state = RobotState.from_msg(msg['robot_state'])
+        allowed_collision_matrix = msg['allowed_collision_matrix']
+        world = msg['world']
+        return cls(msg['name'], robot_state, msg['robot_model_name'], 
+                 msg['fixed_frame_transforms'], allowed_collision_matrix,
+                 msg['link_padding'], msg['link_scale'], msg['object_colors'],
+                 world, msg['is_diff'])
+

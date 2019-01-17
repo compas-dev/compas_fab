@@ -8,9 +8,9 @@ class JointState(ROSmsg):
     """http://docs.ros.org/kinetic/api/sensor_msgs/html/msg/JointState.html
     """
 
-    def __init__(self, header=Header(), name=[], position=[], velocity=[],
+    def __init__(self, header=None, name=[], position=[], velocity=[],
                  effort=[]):
-        self.header = header
+        self.header = header if header else Header()
         self.name = name
         self.position = position
         self.velocity = velocity
