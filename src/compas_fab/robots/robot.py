@@ -711,6 +711,8 @@ class Robot(object):
             S = Scale([1./self.scale_factor] * 3)
             mesh = mesh_transformed(mesh, S)
         mesh_quads_to_triangles(mesh) # ROS mesh message requires triangles
+        if ee_link_name not in touch_links:
+            touch_links.append(ee_link_name)
         self.client.attached_collision_mesh(id_name, ee_link_name, mesh, 1, touch_links)
     
     def remove_attached_collision_mesh(self, id_name, group=None):
