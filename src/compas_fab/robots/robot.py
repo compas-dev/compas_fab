@@ -8,7 +8,11 @@ import compas.robots.model
 from compas.robots import Joint
 
 from compas.geometry import Frame
-from compas.geometry.xforms import Transformation
+from compas.geometry import Transformation
+from compas.geometry import Scale
+from compas.datastructures import mesh_transformed
+from compas.datastructures import Mesh
+from compas.datastructures import mesh_quads_to_triangles
 
 from .configuration import Configuration
 from .semantics import RobotSemantics
@@ -50,6 +54,7 @@ class Robot(object):
         self.artist = robot_artist
         self.semantics = semantics
         self.client = client  # setter and getter
+        self.scale(1.)
 
     @classmethod
     def basic(cls, name, joints=[], links=[], materials=[], **kwargs):
@@ -151,7 +156,7 @@ class Robot(object):
         return base_frame
 
     def get_configurable_joints(self, group=None):
-        """Returns all configurable joints.
+        """Returns the configurable joints.
 
         Parameters
         ----------
@@ -169,13 +174,16 @@ class Robot(object):
             else:
                 joints = []
                 for group in self.group_names:
-                    joints += self.semantics.get_configurable_joints(group)
+                    joints_in_group = self.semantics.get_configurable_joints(group)
+                    for joint in joints_in_group:
+                        if joint not in joints: # Check to not add double joints
+                            joints.append(joint)
                 return joints
         else:
             return self.model.get_configurable_joints()
 
     def get_configurable_joint_names(self, group=None):
-        """Returns all configurable joint names.
+        """Returns the configurable joint names.
 
         Parameters
         ----------
@@ -189,6 +197,74 @@ class Robot(object):
         """
         configurable_joints = self.get_configurable_joints(group)
         return [j.name for j in configurable_joints]
+    
+    def get_configurable_joint_types(self, group=None):
+        """Returns the configurable joint types.
+
+        Parameters
+        ----------
+        group : str
+            The name of the group. Defaults to `None`.
+
+        Note
+        ----
+        If semantics is set and no group is passed, it returns all configurable
+        joint types of all groups.
+        """
+        configurable_joints = self.get_configurable_joints(group)
+        return [j.type for j in configurable_joints]
+    
+    def get_group_configuration(self, group, full_configuration):
+        """Returns the group's configuration.
+
+        Parameters
+        ----------
+        group : str
+            The name of the group. 
+        full_configuration (:class:`Configuration`): The configuration for all 
+            configurable joints of the robot.
+        """
+        values = []
+        types = []
+        group_joint_names = self.get_configurable_joint_names(group)
+        for i, name in enumerate(self.get_configurable_joint_names()):
+            if name in group_joint_names:
+                types.append(full_configuration.types[i])
+                values.append(full_configuration.values[i])
+        return Configuration(values, types)
+    
+    def joint_positions_to_configuration(self, joint_positions, group=None):
+        """Returns the robot's configuration from the passed joint_positions.
+        """
+        types = self.get_configurable_joint_types(group)
+        if len(types) != len(joint_positions) and group != None:
+            types = self.get_configurable_joint_types()
+            full_configuration = Configuration(joint_positions, types)
+            return self.get_group_configuration(group, full_configuration)
+        else:
+            return Configuration(joint_positions, types)
+    
+    def merge_group_with_full_configuration(self, group_configuration, full_configuration, group):
+        """Returns the robot's full configuration by merging with the group's configuration.
+        """
+        all_joint_names = self.get_configurable_joint_names()
+        if len(all_joint_names) != len(full_configuration.values):
+            raise ValueError("Please pass a full configuration with %d values" % len(all_joint_names))
+        group_joint_names = self.get_configurable_joint_names(group)
+        configuration = full_configuration.copy()
+        for i, name in enumerate(all_joint_names):
+            if name in group_joint_names:
+                gi = group_joint_names.index(name)
+                configuration.values[i] = group_configuration.values[gi]
+        return configuration
+    
+    def get_position_by_joint_name(self, configuration, joint_name, group=None):
+        """Returns the value of the joint_name in the passed configuration.
+        """
+        names = self.get_configurable_joint_names(group)
+        if len(names) != len(configuration.values):
+            raise ValueError("Please pass a configuration with %d values or specify group" % len(names))
+        return configuration.values[names.index(joint_name)]
 
     def transformation_RCF_WCF(self, group=None):
         """Returns the transformation matrix from world coordinate system to 
@@ -255,6 +331,19 @@ class Robot(object):
     def ensure_semantics(self):
         if not self.semantics:
             raise Exception('This method is only callable once a semantic model is assigned')
+    
+    def scale_joint_values(self, values, scale_factor, group=None):
+        """Scales the scaleable values with the scale_factor.
+        """
+        joint_types = self.get_configurable_joint_types(group)
+        if len(joint_types) != len(values):
+            raise ValueError("Please pass %d values for %d types." % (len(values), len(joint_types)))
+        values_scaled = []
+        for v, t in zip(values, joint_types):
+            if t == Joint.PRISMATIC or t == Joint.PLANAR: # TODO: add is_scaleable() to Joint
+                v *= scale_factor
+            values_scaled.append(v)
+        return values_scaled
 
     def inverse_kinematics(self, frame_WCF, current_configuration=None, 
                            callback_result=None, group=None):
@@ -289,12 +378,25 @@ class Robot(object):
             joint_positions = current_configuration.values
         if not callback_result:
             callback_result = print
-        
+
+        joint_positions = self.scale_joint_values(joint_positions, 1./self.scale_factor)
+
         # represent in RCF
         frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
         frame_RCF.point /= self.scale_factor # must be in meters
+
+        def pre_callback_result(response):
+            # TODO: make compas_fab response types?
+            from compas_fab.backends.ros import MoveItErrorCodes 
+            if response.error_code == MoveItErrorCodes.SUCCESS:
+                joint_positions = response.solution.joint_state.position
+                joint_positions = self.scale_joint_values(joint_positions, 
+                                                             self.scale_factor)
+                response.configuration = Configuration(joint_positions, 
+                                                       self.get_configurable_joint_types()) # full configuration
+            callback_result(response)
     
-        self.client.inverse_kinematics(callback_result, frame_RCF, base_link,
+        self.client.inverse_kinematics(pre_callback_result, frame_RCF, base_link,
                                        group, joint_names, joint_positions)
 
     def forward_kinematics(self, configuration, callback_result=None, group=None):
@@ -323,10 +425,23 @@ class Robot(object):
             raise ValueError("Please pass a configuration with %d values" % len(joint_names))
 
         joint_positions = configuration.values
+        joint_positions = self.scale_joint_values(joint_positions, 1./self.scale_factor, group)
+
         base_link = self.get_base_link_name(group)
         joint_names = self.get_configurable_joint_names(group)
         ee_link = self.get_end_effector_link_name(group)
-        self.client.forward_kinematics(callback_result, joint_positions, 
+
+        def pre_callback_result(response):
+            # TODO: make compas_fab response types?
+            from compas_fab.backends.ros import MoveItErrorCodes 
+            if response.error_code == MoveItErrorCodes.SUCCESS:
+                frame_RCF = response.pose_stamped[0].pose.frame
+                frame_RCF.point *= self.scale_factor
+                response.frame_RCF = frame_RCF
+                response.frame_WCF = self.represent_frame_in_WCF(frame_RCF, group)
+            callback_result(response)
+
+        self.client.forward_kinematics(pre_callback_result, joint_positions, 
                                        base_link, group, joint_names, ee_link)
         
 
@@ -371,16 +486,38 @@ class Robot(object):
             if len(joint_names) != len(start_configuration.values):
                 raise ValueError("Please pass a configuration with %d values" % len(joint_names))
             joint_positions = start_configuration.values
+        joint_positions = self.scale_joint_values(joint_positions, 1./self.scale_factor)
         
         ee_link = self.get_end_effector_link_name(group)
         max_step_scaled = max_step/self.scale_factor
+
+        def pre_callback_result(response):
+            # TODO: make compas_fab response types?
+            from compas_fab.backends.ros import MoveItErrorCodes 
+            if response.error_code == MoveItErrorCodes.SUCCESS:
+                # save joint_positions into configurations
+                configurations = []
+                for point in response.solution.joint_trajectory.points:
+                    joint_positions = point.positions
+                    joint_positions = self.scale_joint_values(joint_positions, self.scale_factor, group)
+                    configurations.append(Configuration(joint_positions, self.get_configurable_joint_types(group)))
+                response.configurations =  configurations
+                
+                # save start state into start_configuration
+                joint_positions = response.start_state.joint_state.position
+                joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
+                response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
+
+            callback_result(response)
         
-        self.client.compute_cartesian_path(callback_result, frames_RCF, base_link, 
+        self.client.compute_cartesian_path(pre_callback_result, frames_RCF, base_link, 
                                            ee_link, group, joint_names, joint_positions,
                                            max_step_scaled, avoid_collisions)
     
-    def motion_plan(self, frame_WCF, start_configuration, tolerance_position, 
-                    tolerance_angle, callback_result=None, group=None):
+    def motion_plan_goal_frame(self, frame_WCF, start_configuration, 
+                    tolerance_position, tolerance_angle, callback_result=None, 
+                    group=None, path_constraints=None,
+                    trajectory_constraints=None, planner_id=None):
         """Calculates a motion from start_configuration to frame_WCF.
 
         Parameters
@@ -409,6 +546,8 @@ class Robot(object):
         frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
         frame_RCF.point /= self.scale_factor
 
+        tolerance_position = tolerance_position/self.scale_factor
+
         base_link = self.get_base_link_name(group)
         ee_link = self.get_end_effector_link_name(group)
         joint_names = self.get_configurable_joint_names()
@@ -419,10 +558,175 @@ class Robot(object):
             if len(joint_names) != len(start_configuration.values):
                 raise ValueError("Please pass a configuration with %d values" % len(joint_names))
             joint_positions = start_configuration.values
+        joint_positions = self.scale_joint_values(joint_positions, 1./self.scale_factor)
+
+        def pre_callback_result(response):
+            # TODO: make compas_fab response types?
+            from compas_fab.backends.ros import MoveItErrorCodes 
+            if response.error_code == MoveItErrorCodes.SUCCESS:
+                # save joint_positions into configurations
+                configurations = []
+                for point in response.trajectory.joint_trajectory.points:
+                    joint_positions = point.positions
+                    joint_positions = self.scale_joint_values(joint_positions, self.scale_factor, group)
+                    configurations.append(Configuration(joint_positions, self.get_configurable_joint_types(group)))
+                response.configurations =  configurations
+                # save trajectory start into start_configuration
+                joint_positions = response.trajectory_start.joint_state.position
+                joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
+                response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
+            callback_result(response)
         
-        self.client.motion_plan(callback_result, frame_RCF, base_link, ee_link,
-                                group, joint_names, joint_positions, 
-                                tolerance_position, tolerance_angle)
+        self.client.motion_plan_goal_frame(pre_callback_result, frame_RCF, 
+                                base_link, ee_link, group, joint_names, 
+                                joint_positions, tolerance_position, 
+                                tolerance_angle, path_constraints,
+                                trajectory_constraints, planner_id)
+    
+    def motion_plan_goal_configuration(self, goal_configuration, 
+                    start_configuration, tolerance, callback_result=None, 
+                    group=None, path_constraints=None, 
+                    trajectory_constraints=None, planner_id=None):
+        """Calculates a motion from start_configuration to goal_configuration.
+
+        Parameters
+        ----------
+            goal_configuration (:class:`Frame`): The group's goal configuration.
+            start_configuration (:class:`Configuration`, optional): The robot's
+                configuration at the starting position.
+            tolerance (float or float list): the allowed tolerance to joints'
+                position. 
+            callback_result (function, optional): the function to call for the 
+                processing the result. Defaults to the print function.
+            group (str, optional): The planning group used for calculation.
+                Defaults to the robot's main planning group. 
+        
+        Examples
+        --------
+        """
+        self.ensure_client()
+        if not group:
+            group = self.main_group_name # ensure semantics
+        if not callback_result:
+            callback_result = print
+
+        base_link = self.get_base_link_name(group)
+        joint_names = self.get_configurable_joint_names()
+
+        joint_positions_goal = goal_configuration.values
+        joint_positions_goal = self.scale_joint_values(joint_positions_goal, 1./self.scale_factor, group)
+        joint_names_goal = self.get_configurable_joint_names(group)
+
+        if type(tolerance) != list:
+            tolerances = [tolerance] * len(joint_names_goal)
+        else:
+            if len(tolerance) != len(joint_names_goal):
+                raise ValueError("Please pass %d values for joint tolerances" % len(joint_names_goal))
+            tolerances = tolerance
+        
+        tolerances = self.scale_joint_values(tolerances, 1/self.scale_factor, group)
+
+        if not start_configuration:
+            joint_positions = [0] * len(joint_names)
+        else:
+            if len(joint_names) != len(start_configuration.values):
+                raise ValueError("Please pass a configuration with %d values" % len(joint_names))
+            joint_positions = start_configuration.values
+        
+        def pre_callback_result(response):
+            # TODO: make compas_fab response types?
+            from compas_fab.backends.ros import MoveItErrorCodes 
+            if response.error_code == MoveItErrorCodes.SUCCESS:
+                # save joint_positions into configurations
+                configurations = []
+                for point in response.trajectory.joint_trajectory.points:
+                    joint_positions = point.positions
+                    joint_positions = self.scale_joint_values(joint_positions, self.scale_factor, group)
+                    configurations.append(Configuration(joint_positions, self.get_configurable_joint_types(group)))
+                response.configurations =  configurations
+                # save trajectory start into start_configuration
+                joint_positions = response.trajectory_start.joint_state.position
+                joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
+                response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
+            callback_result(response)
+        
+        self.client.motion_plan_goal_joint_positions(pre_callback_result,         
+                    joint_positions_goal, joint_names_goal, tolerances, 
+                    base_link, group, joint_names, joint_positions, 
+                    path_constraints, trajectory_constraints, planner_id)
+    
+
+    def add_collision_mesh_to_planning_scene(self, id_name, mesh, scale=False):
+        """Adds a collision mesh to the robot's planning scene.
+
+        Parameters
+        ----------
+            id_name (str): The identifier of the collision mesh.
+            mesh (:class:`Mesh`): A triangulated COMPAS mesh.
+        
+        Examples
+        --------
+        """
+        self.ensure_client()
+        root_link_name = self.model.root.name
+        if scale:
+            S = Scale([1./self.scale_factor] * 3)
+            mesh = mesh_transformed(mesh, S)
+        mesh_quads_to_triangles(mesh) # ROS mesh message requires triangles
+        self.client.collision_mesh(id_name, root_link_name, mesh, 1)
+    
+    def remove_collision_mesh_from_planning_scene(self, id_name):
+        """Removes a collision mesh from the robot's planning scene.
+
+        Parameters
+        ----------
+            id_name (str): The identifier of the collision mesh.
+        
+        Examples
+        --------
+        """
+        self.ensure_client()
+        root_link_name = self.model.root.name
+        self.client.collision_mesh(id_name, root_link_name, None, 0)
+
+    
+    def add_attached_collision_mesh(self, id_name, mesh, group=None, touch_links=[], scale=False):
+        """Attaches a collision mesh to the robot's end-effector.
+
+        Parameters
+        ----------
+            id_name (str): The identifier of the object.
+            mesh (:class:`Mesh`): A triangulated COMPAS mesh.
+            group (str, optional): The planning group on which's end-effector 
+                the object should be attached. Defaults to the robot's main 
+                planning group. 
+            touch_links(str list): The list of link names that the attached mesh
+                is allowed to touch by default. The end-effector link name is 
+                already considered. 
+        """
+        if not group:
+            group = self.main_group_name # ensure semantics
+        ee_link_name = self.get_end_effector_link_name(group)
+        if scale:
+            S = Scale([1./self.scale_factor] * 3)
+            mesh = mesh_transformed(mesh, S)
+        mesh_quads_to_triangles(mesh) # ROS mesh message requires triangles
+        self.client.attached_collision_mesh(id_name, ee_link_name, mesh, 1, touch_links)
+    
+    def remove_attached_collision_mesh(self, id_name, group=None):
+        """Removes an attached collision object from the robot's end-effector.
+
+        Parameters
+        ----------
+            id_name (str): The identifier of the object.
+            group (str, optional): The planning group on which's end-effector 
+                the object should be removed. Defaults to the robot's main 
+                planning group. 
+        """
+        if not group:
+            group = self.main_group_name # ensure semantics
+        ee_link_name = self.get_end_effector_link_name(group)
+        self.client.attached_collision_mesh(id_name, ee_link_name, None, 0)
 
     def send_frame(self):
         # (check service name with ros)

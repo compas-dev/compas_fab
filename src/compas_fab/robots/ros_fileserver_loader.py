@@ -11,7 +11,7 @@ from compas.datastructures import Mesh
 from compas.files import XML
 from compas.geometry import Frame
 from compas.geometry import Transformation
-from compas.geometry.transformations.helpers import mesh_transform
+from compas.datastructures import mesh_transform
 
 from compas.robots.resources.basic import _get_file_format
 

@@ -5,6 +5,7 @@ from roslibpy import Message
 from roslibpy import Ros
 from roslibpy import Service
 from roslibpy import ServiceRequest
+from roslibpy import Topic
 from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
@@ -38,6 +39,9 @@ from compas_fab.backends.ros import SolidPrimitive
 from compas_fab.backends.ros import Quaternion
 from compas_fab.backends.ros import Constraints
 from compas_fab.backends.ros import TrajectoryConstraints
+from compas_fab.backends.ros import Mesh
+from compas_fab.backends.ros import CollisionObject
+from compas_fab.backends.ros import AttachedCollisionObject
 
 from compas_fab.backends.ros.messages.direct_ur import URGoal
 from compas_fab.backends.ros.messages.direct_ur import URMovej
@@ -91,7 +95,8 @@ class RosClient(Ros):
         super(RosClient, self).__init__(host, port, is_secure)
 
     def inverse_kinematics(self, callback_result, frame, base_link, group, joint_names, joint_positions):
-
+        """
+        """
         header = Header(frame_id=base_link)
         pose = Pose.from_frame(frame)
         pose_stamped = PoseStamped(header, pose)
@@ -108,11 +113,6 @@ class RosClient(Ros):
         def receive_message(msg):
             response = GetPositionIKResponse.from_msg(msg)
             callback_result(response)
-            """
-            if response.error_code == MoveItErrorCodes.SUCCESS:
-                configuration = response.solution.joint_state.position
-            print(response.error_code.human_readable)
-            """
 
         srv = Service(self, '/compute_ik', 'GetPositionIK')
         request = ServiceRequest(reqmsg.msg)
@@ -120,7 +120,8 @@ class RosClient(Ros):
 
 
     def forward_kinematics(self, callback_result, joint_positions, base_link, group, joint_names, ee_link):
-
+        """
+        """
         header = Header(frame_id=base_link)
         fk_link_names = [ee_link]
         joint_state = JointState(name=joint_names, position=joint_positions, header=header)
@@ -130,9 +131,6 @@ class RosClient(Ros):
 
         def receive_message(msg):
             response = GetPositionFKResponse.from_msg(msg)
-            #if response.error_code == MoveItErrorCodes.SUCCESS:
-            #    frames = [ps.pose.frame for ps in response.pose_stamped]
-            #print(response.error_code.human_readable)
             callback_result(response)
 
         srv = Service(self, '/compute_fk', 'GetPositionFK')
@@ -142,7 +140,8 @@ class RosClient(Ros):
     def compute_cartesian_path(self, callback_result, frames, base_link, ee_link, group,
                                joint_names, joint_positions, max_step,
                                avoid_collisions):
-
+        """
+        """
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
         joint_state = JointState(header=header, name=joint_names, position=joint_positions)
@@ -164,7 +163,7 @@ class RosClient(Ros):
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
     
-    def motion_plan(self, callback_result, frame, base_link, ee_link, group,
+    def motion_plan_goal_frame(self, callback_result, frame, base_link, ee_link, group,
                     joint_names, joint_positions, tolerance_position, tolerance_angle, 
                     path_constraints=None, trajectory_constraints=None, 
                     planner_id=None):
@@ -219,7 +218,7 @@ class RosClient(Ros):
         srv.call(request, receive_message, receive_message)
     
 
-    def motion_plan_joint_positions_goal(self, callback_result, 
+    def motion_plan_goal_joint_positions(self, callback_result, 
                     joint_positions_goal, joint_names_goal, tolerances, 
                     base_link, group, joint_names, joint_positions,
                     path_constraints=None, trajectory_constraints=None, 
@@ -260,7 +259,48 @@ class RosClient(Ros):
         srv = Service(self, '/plan_kinematic_path', 'GetMotionPlan')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
+    
+    def collision_mesh(self, id_name, root_link, compas_mesh, operation=1):
+        """
+        """
+        co = CollisionObject(header=Header(frame_id=root_link), id=id_name)
+        if compas_mesh:
+            mesh = Mesh.from_mesh(compas_mesh)
+            co.meshes = [mesh]
+            co.mesh_poses = [Pose()]
+        if operation:
+            co.operation = CollisionObject.ADD
+        else:
+            co.operation = CollisionObject.REMOVE
+        
+        topic = Topic(self, '/collision_object', 'moveit_msgs/CollisionObject')
+        topic.publish(co.msg)
+    
+    def attached_collision_mesh(self, id_name, ee_link, compas_mesh, operation=1, touch_links=[]):
+        """
+        """
+        co = CollisionObject(header=Header(frame_id=ee_link), id=id_name)
+        if compas_mesh:
+            mesh = Mesh.from_mesh(compas_mesh)
+            co.meshes = [mesh]
+            co.mesh_poses = [Pose()]
+        if operation:
+            co.operation = CollisionObject.ADD
+        else:
+            co.operation = CollisionObject.REMOVE
+        
+        aco = AttachedCollisionObject()
+        aco.link_name = ee_link 
+        # The set of links that the attached objects are allowed to touch by default.
+        aco.touch_links = touch_links
+        aco.object = co
 
+        topic = Topic(self, '/attached_collision_object', 'moveit_msgs/AttachedCollisionObject')
+        topic.publish(aco.msg)
+
+
+
+        
 
     def follow_configurations(self, callback_result, joint_names, configurations, timesteps, timeout=None):
 

@@ -23,16 +23,19 @@ class CollisionObject(ROSmsg):
     APPEND = 2
     MOVE = 3
 
-    def __init__(self, header=Header(), id="collision_obj", type=ObjectType(),
+    def __init__(self, header=None, id="collision_obj", type=None,
                  primitives=[], primitive_poses=[], meshes=[], mesh_poses=[],
                  planes=[], plane_poses=[], operation=0):
-        self.header = header
-        self.id = id
-        self.type = type
+        self.header = header if header else Header() # a header, used for interpreting the poses
+        self.id = id # the id of the object (name used in MoveIt)
+        self.type = type if type else ObjectType() # The object type in a database of known objects
+        # solid geometric primitives
         self.primitives = primitives
         self.primitive_poses = primitive_poses
+        # meshes
         self.meshes = meshes
         self.mesh_poses = mesh_poses
+        # bounding planes
         self.planes = planes
         self.plane_poses = plane_poses
         self.operation = operation  # ADD or REMOVE or APPEND or MOVE
@@ -42,12 +45,12 @@ class AttachedCollisionObject(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html
     """
 
-    def __init__(self, link_name='ee_link', object=CollisionObject(),
-                 touch_links=[], detach_posture=JointTrajectory(), weight=0):
-        self.link_name = link_name
-        self.object = object
+    def __init__(self, link_name=None, object=None, touch_links=[], 
+                 detach_posture=None, weight=0):
+        self.link_name = link_name if link_name else 'ee_link'
+        self.object = object if object else CollisionObject()
         self.touch_links = touch_links
-        self.detach_posture = detach_posture
+        self.detach_posture = detach_posture if detach_posture else JointTrajectory()
         self.weight = weight
 
 

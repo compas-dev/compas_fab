@@ -51,7 +51,7 @@ class Configuration(object):
             raise ValueError("%d values must have %d types, but %d given." % (len(values), len(values), len(types)))
         self.values = list(values)
         self.types = list(types)
-        self._precision = compas.PRECISION or '3f'
+        self._precision = '3f'
 
     def __str__(self):
         vs = '%.' + self._precision
@@ -149,6 +149,10 @@ class Configuration(object):
     def revolute_values(self):
         """:obj:`list` of :obj:`float` : Revolute joint values in radians."""
         return [v for i, v in enumerate(self.values) if self.types[i] == Joint.REVOLUTE]
+    
+    def copy(self):
+        cls = type(self)
+        return cls(self.values[:], self.types[:])
 
 
 if __name__ == "__main__":
