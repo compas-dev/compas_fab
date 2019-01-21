@@ -185,7 +185,6 @@ class MotionPlanRequest(ROSmsg):
         self.path_constraints = path_constraints if path_constraints else Constraints()# moveit_msgs/Constraints 
         self.trajectory_constraints = trajectory_constraints if trajectory_constraints else TrajectoryConstraints()# moveit_msgs/TrajectoryConstraints 
         self.planner_id = planner_id # string 
-        print(">>", self.planner_id)
         self.group_name = group_name # string 
         self.num_planning_attempts = int(num_planning_attempts) # int32 
         self.allowed_planning_time = float(allowed_planning_time) # float64 
