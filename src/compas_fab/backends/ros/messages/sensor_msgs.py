@@ -8,13 +8,13 @@ class JointState(ROSmsg):
     """http://docs.ros.org/kinetic/api/sensor_msgs/html/msg/JointState.html
     """
 
-    def __init__(self, header=None, name=[], position=[], velocity=[],
-                 effort=[]):
+    def __init__(self, header=None, name=None, position=None, velocity=None,
+                 effort=None):
         self.header = header if header else Header()
-        self.name = name
-        self.position = position
-        self.velocity = velocity
-        self.effort = effort
+        self.name = name if name else []
+        self.position = position if position else []
+        self.velocity = velocity if velocity else []
+        self.effort = effort if effort else []
 
     @classmethod
     def from_name_and_position(cls, name, position):
@@ -42,10 +42,10 @@ class MultiDOFJointState(ROSmsg):
     """http://docs.ros.org/kinetic/api/sensor_msgs/html/msg/MultiDOFJointState.html
     """
 
-    def __init__(self, header=Header(), joint_names=[], transforms=[], twist=[],
-                 wrench=[]):
-        self.header = header
-        self.joint_names = joint_names
-        self.transforms = transforms
-        self.twist = twist
-        self.wrench = wrench
+    def __init__(self, header=None, joint_names=None, transforms=None, twist=None,
+                 wrench=None):
+        self.header = header if header else Header()
+        self.joint_names = joint_names if joint_names else []
+        self.transforms = transforms if transforms else []
+        self.twist = twist if twist else []
+        self.wrench = wrench if wrench else []

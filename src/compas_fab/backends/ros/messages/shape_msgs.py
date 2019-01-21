@@ -39,9 +39,9 @@ class SolidPrimitive(ROSmsg):
 class Mesh(ROSmsg):
     """http://docs.ros.org/kinetic/api/shape_msgs/html/msg/Mesh.html
     """
-    def __init__(self, triangles=[], vertices=[]):
-        self.triangles = triangles # shape_msgs/MeshTriangle[]
-        self.vertices = vertices # geometry_msgs/Point[]
+    def __init__(self, triangles=None, vertices=None):
+        self.triangles = triangles if triangles else [] # shape_msgs/MeshTriangle[]
+        self.vertices = vertices if vertices else [] # geometry_msgs/Point[]
 
     @classmethod
     def from_mesh(cls, compas_mesh):
@@ -55,10 +55,10 @@ class Mesh(ROSmsg):
 class MeshTriangle(ROSmsg):
     """http://docs.ros.org/api/shape_msgs/html/msg/MeshTriangle.html
     """
-    def __init__(self, vertex_indices=[]):
+    def __init__(self, vertex_indices=None):
         if len(vertex_indices) != 3:
             raise ValueError("Please specify 3 indices for face, %d given." % len(vertex_indices))
-        self.vertex_indices = vertex_indices # uint32[3]
+        self.vertex_indices = vertex_indices if vertex_indices else [] # uint32[3]
 
 
 class Plane(ROSmsg):

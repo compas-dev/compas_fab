@@ -11,12 +11,12 @@ class JointTrajectoryPoint(ROSmsg):
     """http://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectoryPoint.html
     """
 
-    def __init__(self, positions=[], velocities=[], accelerations=[], effort=[], time_from_start=Time()):
-        self.positions = positions
-        self.velocities = velocities
-        self.accelerations = accelerations
-        self.effort = effort
-        self.time_from_start = time_from_start
+    def __init__(self, positions=None, velocities=None, accelerations=None, effort=None, time_from_start=None):
+        self.positions = positions if positions else []
+        self.velocities = velocities if velocities else []
+        self.accelerations = accelerations if accelerations else []
+        self.effort = effort if effort else []
+        self.time_from_start = time_from_start if time_from_start else Time()
         # TODO: check if we need to enter zeros to all
 
     @classmethod
@@ -39,10 +39,10 @@ class JointTrajectory(ROSmsg):
     """http://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectory.html
     """
 
-    def __init__(self, header=Header(), joint_names=[], points=[]):
-        self.header = header
-        self.joint_names = joint_names
-        self.points = points
+    def __init__(self, header=None, joint_names=None, points=None):
+        self.header = header if header else Header()
+        self.joint_names = joint_names if joint_names else []
+        self.points = points if points else []
 
     @classmethod
     def from_msg(cls, msg):
@@ -56,21 +56,21 @@ class MultiDOFJointTrajectoryPoint(ROSmsg):
     """http://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectoryPoint.html
     """
 
-    def __init__(self, transforms=[], velocities=[], accelerations=[], time_from_start=Time()):
-        self.transforms = transforms  # geometry_msgs/Transform[]
-        self.velocities = velocities  # geometry_msgs/Twist[]
-        self.accelerations = accelerations  # geometry_msgs/Twist[]
-        self.time_from_start = time_from_start
+    def __init__(self, transforms=None, velocities=None, accelerations=None, time_from_start=None):
+        self.transforms = transforms if transforms else []  # geometry_msgs/Transform[]
+        self.velocities = velocities if velocities else [] # geometry_msgs/Twist[]
+        self.accelerations = accelerations if accelerations else [] # geometry_msgs/Twist[]
+        self.time_from_start = time_from_start if time_from_start else Time()
 
 
 class MultiDOFJointTrajectory(ROSmsg):
     """http://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectory.html
     """
 
-    def __init__(self, header=Header(), joint_names=[], points=[]):
-        self.header = header
-        self.joint_names = joint_names
-        self.points = points
+    def __init__(self, header=None, joint_names=None, points=None):
+        self.header = header if header else Header()
+        self.joint_names = joint_names if joint_names else []
+        self.points = points if points else []
 
     @classmethod
     def from_msg(cls, msg):

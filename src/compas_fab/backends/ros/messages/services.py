@@ -71,10 +71,10 @@ class GetPositionFKRequest(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html
     """
 
-    def __init__(self, header=Header(), fk_link_names=[], robot_state=RobotState()):
+    def __init__(self, header=Header(), fk_link_names=None, robot_state=None):
         self.header = header
-        self.fk_link_names = fk_link_names
-        self.robot_state = robot_state
+        self.fk_link_names = fk_link_names if fk_link_names else []
+        self.robot_state = robot_state if robot_state else RobotState()
 
 
 class GetPositionFKResponse(ROSmsg):
@@ -127,18 +127,18 @@ class GetCartesianPathRequest(ROSmsg):
     >>> srv.call(request, GetCartesianPathResponse.from_msg, GetCartesianPathResponse.from_msg)
     """
 
-    def __init__(self, header=Header(), start_state=RobotState(), group_name='',
-                 link_name='', waypoints=[], max_step=10., jump_threshold=0.,
-                 avoid_collisions=True, constraints=Constraints()):
-        self.header = header
-        self.start_state = start_state  # moveit_msgs/RobotState
+    def __init__(self, header=None, start_state=None, group_name='',
+                 link_name='', waypoints=None, max_step=10., jump_threshold=0.,
+                 avoid_collisions=True, constraints=None):
+        self.header = header if header else Header()
+        self.start_state = start_state if start_state else RobotState() # moveit_msgs/RobotState
         self.group_name = group_name
         self.link_name = link_name  # ee_link
-        self.waypoints = waypoints  # geometry_msgs/Pose[]
+        self.waypoints = waypoints if waypoints else [] # geometry_msgs/Pose[]
         self.max_step = float(max_step)
         self.jump_threshold = jump_threshold
         self.avoid_collisions = avoid_collisions
-        self.path_constraints = constraints  # moveit_msgs/Constraints
+        self.path_constraints = constraints if constraints else Constraints() # moveit_msgs/Constraints
 
 
 class GetCartesianPathResponse(ROSmsg):
@@ -175,21 +175,22 @@ class MotionPlanRequest(ROSmsg):
     """
     def __init__(self, workspace_parameters=None, start_state=None, 
                  goal_constraints=None, path_constraints=None, 
-                 trajectory_constraints=None, planner_id=None,
-                 group_name=None, num_planning_attempts=None, 
-                 allowed_planning_time=None, max_velocity_scaling_factor=None, 
-                 max_acceleration_scaling_factor=None):
+                 trajectory_constraints=None, planner_id='',
+                 group_name='', num_planning_attempts=8, 
+                 allowed_planning_time=2., max_velocity_scaling_factor=1., 
+                 max_acceleration_scaling_factor=1.):
         self.workspace_parameters = workspace_parameters if workspace_parameters else WorkspaceParameters() # moveit_msgs/WorkspaceParameters
         self.start_state = start_state if start_state else RobotState()# moveit_msgs/RobotState 
-        self.goal_constraints = goal_constraints if goal_constraints else []# moveit_msgs/Constraints[] 
+        self.goal_constraints = goal_constraints if goal_constraints else []  # moveit_msgs/Constraints[] 
         self.path_constraints = path_constraints if path_constraints else Constraints()# moveit_msgs/Constraints 
         self.trajectory_constraints = trajectory_constraints if trajectory_constraints else TrajectoryConstraints()# moveit_msgs/TrajectoryConstraints 
-        self.planner_id = planner_id if planner_id else ""# string 
-        self.group_name = group_name if group_name else ""# string 
-        self.num_planning_attempts = num_planning_attempts if num_planning_attempts else 8 # int32 
-        self.allowed_planning_time = allowed_planning_time if allowed_planning_time else 2.# float64 
-        self.max_velocity_scaling_factor = max_velocity_scaling_factor if max_velocity_scaling_factor else 1.# float64 
-        self.max_acceleration_scaling_factor = max_acceleration_scaling_factor if max_acceleration_scaling_factor else 1.# float64
+        self.planner_id = planner_id # string 
+        print(">>", self.planner_id)
+        self.group_name = group_name # string 
+        self.num_planning_attempts = int(num_planning_attempts) # int32 
+        self.allowed_planning_time = float(allowed_planning_time) # float64 
+        self.max_velocity_scaling_factor = float(max_velocity_scaling_factor)# float64 
+        self.max_acceleration_scaling_factor = float(max_acceleration_scaling_factor) # float64
     
     @property
     def msg(self):

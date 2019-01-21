@@ -21,44 +21,43 @@ class FollowJointTrajectoryGoal(ROSmsg):
     """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryGoal.html
     """
 
-    def __init__(self, trajectory=JointTrajectory(), path_tolerance=[],
-                 goal_tolerance=[], goal_time_tolerance=Time(secs=1.)):
-        self.trajectory = trajectory #trajectory_msgs/JointTrajectory 
-        self.path_tolerance = path_tolerance #control_msgs/JointTolerance[] 
-        self.goal_tolerance = goal_tolerance #control_msgs/JointTolerance[] 
-        self.goal_time_tolerance = goal_time_tolerance
+    def __init__(self, trajectory=None, path_tolerance=None, 
+                 goal_tolerance=None, goal_time_tolerance=None):
+        self.trajectory = trajectory if trajectory else JointTrajectory() #trajectory_msgs/JointTrajectory 
+        self.path_tolerance = path_tolerance if path_tolerance else []#control_msgs/JointTolerance[] 
+        self.goal_tolerance = goal_tolerance if goal_tolerance else [] #control_msgs/JointTolerance[] 
+        self.goal_time_tolerance = goal_time_tolerance if goal_time_tolerance else Time(secs=1.)
 
 
 class FollowJointTrajectoryActionGoal(ROSmsg):
     """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionGoal.html
     """
 
-    def __init__(self, header=Header(), goal_id=GoalID(), goal=FollowJointTrajectoryGoal()):
-        self.header = header
-        self.goal_id = goal_id #actionlib_msgs/GoalID goal_id
-        self.goal = goal # FollowJointTrajectoryGoal goal
+    def __init__(self, header=None, goal_id=None, goal=None):
+        self.header = header if header else Header()
+        self.goal_id = goal_id if goal_id else GoalID() #actionlib_msgs/GoalID goal_id
+        self.goal = goal if goal else FollowJointTrajectoryGoal() # FollowJointTrajectoryGoal goal
 
 
 class FollowJointTrajectoryFeedback(ROSmsg):
     """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryFeedback.html
     """
-    def __init__(self, header=Header(), joint_names=[], 
-                 desired=JointTrajectoryPoint(), actual=JointTrajectoryPoint(),
-                 error=JointTrajectoryPoint()):
-        self.header = header
-        self.joint_names = joint_names
-        self.desired = desired
-        self.actual = actual
-        self.error = error
+    def __init__(self, header=None, joint_names=None, desired=None, actual=None,
+                 error=None):
+        self.header = header if header else Header()
+        self.joint_names = joint_names if joint_names else []
+        self.desired = desired if desired else JointTrajectoryPoint()
+        self.actual = actual if actual else JointTrajectoryPoint()
+        self.error = error if error else JointTrajectoryPoint()
 
 
 class FollowJointTrajectoryActionFeedback(ROSmsg):
     """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionFeedback.html
     """
-    def __init__(self, header=Header(), status=GoalStatus(), feedback=FollowJointTrajectoryFeedback()):
-        self.header = header
-        self.status = status
-        self.feedback = feedback
+    def __init__(self, header=None, status=None, feedback=None):
+        self.header = header if header else Header()
+        self.status = status if status else GoalStatus()
+        self.feedback = feedback if feedback else FollowJointTrajectoryFeedback()
 
 
 class FollowJointTrajectoryResult(ROSmsg):
@@ -93,10 +92,10 @@ class FollowJointTrajectoryResult(ROSmsg):
 class FollowJointTrajectoryActionResult(ROSmsg):
     """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionResult.html
     """
-    def __init__(self, header=Header(), status=GoalStatus(), result=FollowJointTrajectoryResult()):
-        self.header = header
-        self.status = status
-        self.result = result
+    def __init__(self, header=None, status=None, result=None):
+        self.header = header if header else Header()
+        self.status = status if status else GoalStatus()
+        self.result = result if result else FollowJointTrajectoryResult()
     
     @classmethod
     def from_msg(cls, msg):

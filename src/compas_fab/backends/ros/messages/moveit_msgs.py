@@ -24,20 +24,20 @@ class CollisionObject(ROSmsg):
     MOVE = 3
 
     def __init__(self, header=None, id="collision_obj", type=None,
-                 primitives=[], primitive_poses=[], meshes=[], mesh_poses=[],
-                 planes=[], plane_poses=[], operation=0):
+                 primitives=None, primitive_poses=None, meshes=None, mesh_poses=None,
+                 planes=None, plane_poses=None, operation=0):
         self.header = header if header else Header() # a header, used for interpreting the poses
         self.id = id # the id of the object (name used in MoveIt)
         self.type = type if type else ObjectType() # The object type in a database of known objects
         # solid geometric primitives
-        self.primitives = primitives
-        self.primitive_poses = primitive_poses
+        self.primitives = primitives if primitives else []
+        self.primitive_poses = primitive_poses if primitive_poses else []
         # meshes
-        self.meshes = meshes
-        self.mesh_poses = mesh_poses
+        self.meshes = meshes if meshes else []
+        self.mesh_poses = mesh_poses if mesh_poses else []
         # bounding planes
-        self.planes = planes
-        self.plane_poses = plane_poses
+        self.planes = planes if planes else []
+        self.plane_poses = plane_poses if plane_poses else []
         self.operation = operation  # ADD or REMOVE or APPEND or MOVE
 
 
@@ -45,11 +45,11 @@ class AttachedCollisionObject(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html
     """
 
-    def __init__(self, link_name=None, object=None, touch_links=[], 
+    def __init__(self, link_name=None, object=None, touch_links=None, 
                  detach_posture=None, weight=0):
         self.link_name = link_name if link_name else ''
         self.object = object if object else CollisionObject()
-        self.touch_links = touch_links
+        self.touch_links = touch_links if touch_links else []
         self.detach_posture = detach_posture if detach_posture else JointTrajectory()
         self.weight = weight
 
@@ -58,13 +58,13 @@ class Constraints(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/Constraints.html
     """
 
-    def __init__(self, name='', joint_constraints=[], position_constraints=[],
-                 orientation_constraints=[], visibility_constraints=[]):
+    def __init__(self, name='', joint_constraints=None, position_constraints=None,
+                 orientation_constraints=None, visibility_constraints=None):
         self.name = name
-        self.joint_constraints = joint_constraints
-        self.position_constraints = position_constraints
-        self.orientation_constraints = orientation_constraints
-        self.visibility_constraints = visibility_constraints
+        self.joint_constraints = joint_constraints if joint_constraints else []
+        self.position_constraints = position_constraints if position_constraints else []
+        self.orientation_constraints = orientation_constraints if orientation_constraints else []
+        self.visibility_constraints = visibility_constraints if visibility_constraints else []
 
 
 class RobotState(ROSmsg):
@@ -72,10 +72,10 @@ class RobotState(ROSmsg):
     """
 
     def __init__(self, joint_state=None, multi_dof_joint_state=None,
-                 attached_collision_objects=[], is_diff=False):
+                 attached_collision_objects=None, is_diff=False):
         self.joint_state = joint_state if joint_state else JointState()
         self.multi_dof_joint_state = multi_dof_joint_state if multi_dof_joint_state else MultiDOFJointState()
-        self.attached_collision_objects = attached_collision_objects
+        self.attached_collision_objects = attached_collision_objects if attached_collision_objects else []
         self.is_diff = is_diff
 
     @classmethod
@@ -113,14 +113,14 @@ class PositionIKRequest(ROSmsg):
                                        avoid_collisions=True)
     """
 
-    def __init__(self, group_name="robot", robot_state=RobotState(),
-                 constraints=Constraints(), pose_stamped=PoseStamped(),
-                 timeout=1.0, attempts=8, avoid_collisions=True):
+    def __init__(self, group_name="robot", robot_state=None, constraints=None, 
+                 pose_stamped=None, timeout=1.0, attempts=8, 
+                 avoid_collisions=True):
         self.group_name = group_name
-        self.robot_state = robot_state
-        self.constraints = constraints
+        self.robot_state = robot_state if robot_state else RobotState()
+        self.constraints = constraints if constraints else Constraints()
         self.avoid_collisions = avoid_collisions
-        self.pose_stamped = pose_stamped
+        self.pose_stamped = pose_stamped if pose_stamped else PoseStamped()
         self.timeout = timeout
         self.attempts = attempts
 
@@ -199,15 +199,15 @@ class PlannerParams(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlannerParams.html
     """
 
-    def __init__(self, keys=[], values=[], descriptions=[]):
-        self.keys = keys # parameter names (same size as values)
-        self.values = values # parameter values (same size as keys)
-        self.descriptions = descriptions # parameter description (can be empty)
+    def __init__(self, keys=None, values=None, descriptions=None):
+        self.keys = keys if keys else [] # parameter names (same size as values)
+        self.values = values if values else [] # parameter values (same size as keys)
+        self.descriptions = descriptions if descriptions else [] # parameter description (can be empty)
 
 class WorkspaceParameters(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/WorkspaceParameters.html
     """
-    def __init__(self, header=Header(), min_corner=Vector3(-100,-100,-100), max_corner=Vector3(100,100,100)):
+    def __init__(self, header=Header(), min_corner=Vector3(-1000,-1000,-1000), max_corner=Vector3(1000,1000,1000)):
         self.header = header
         self.min_corner = min_corner
         self.max_corner = max_corner
@@ -215,8 +215,8 @@ class WorkspaceParameters(ROSmsg):
 class TrajectoryConstraints(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/TrajectoryConstraints.html
     """
-    def __init__(self, constraints=[]):
-        self.constraints = constraints #Constraints[]
+    def __init__(self, constraints=None):
+        self.constraints = constraints if constraints else [] #Constraints[]
 
 
 class JointConstraint(ROSmsg):
@@ -238,12 +238,12 @@ class VisibilityConstraint(ROSmsg):
 class BoundingVolume(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/BoundingVolume.html
     """
-    def __init__(self, primitives=[], primitive_poses=[], meshes=[], 
-                 mesh_poses=[]):
-        self.primitives = primitives #shape_msgs/SolidPrimitive[] 
-        self.primitive_poses = primitive_poses #geometry_msgs/Pose[] 
-        self.meshes = meshes #shape_msgs/Mesh[] 
-        self.mesh_poses = mesh_poses #geometry_msgs/Pose[] 
+    def __init__(self, primitives=None, primitive_poses=None, meshes=None, 
+                 mesh_poses=None):
+        self.primitives = primitives if primitives else [] #shape_msgs/SolidPrimitive[] 
+        self.primitive_poses = primitive_poses if primitive_poses else [] #geometry_msgs/Pose[] 
+        self.meshes = meshes if meshes else [] #shape_msgs/Mesh[] 
+        self.mesh_poses = mesh_poses if mesh_poses else [] #geometry_msgs/Pose[] 
 
 class PositionConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionConstraint.html
@@ -302,34 +302,34 @@ class PlanningSceneComponents(ROSmsg):
 class  AllowedCollisionMatrix(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/AllowedCollisionMatrix.html
     """
-    def __init__(self, entry_names=[], entry_values=[], default_entry_names=[], default_entry_values=[]):
-        self.entry_names = entry_names # string[] 
-        self.entry_values = entry_values # moveit_msgs/AllowedCollisionEntry[] 
-        self.default_entry_names = default_entry_names # string[] 
-        self.default_entry_values = default_entry_values# bool[] 
+    def __init__(self, entry_names=None, entry_values=None, default_entry_names=None, default_entry_values=None):
+        self.entry_names = entry_names if entry_names else [] # string[] 
+        self.entry_values = entry_values if entry_values else [] # moveit_msgs/AllowedCollisionEntry[] 
+        self.default_entry_names = default_entry_names if default_entry_names else [] # string[] 
+        self.default_entry_values = default_entry_values if default_entry_values else [] # bool[] 
 
 class PlanningSceneWorld(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningSceneWorld.html
     """
-    def __init__(self, collision_objects=[], octomap=None):
-        self.collision_objects = collision_objects #collision objects # CollisionObject[]
+    def __init__(self, collision_objects=None, octomap=None):
+        self.collision_objects = collision_objects if collision_objects else [] #collision objects # CollisionObject[]
         self.octomap = octomap if octomap else OctomapWithPose() # octomap_msgs/OctomapWithPose
 
 class PlanningScene(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningScene.html
     """
     def __init__(self, name='', robot_state=None, robot_model_name='', 
-                 fixed_frame_transforms=[], allowed_collision_matrix=None,
-                 link_padding=[], link_scale=[], object_colors=[], world=None,
+                 fixed_frame_transforms=None, allowed_collision_matrix=None,
+                 link_padding=None, link_scale=None, object_colors=None, world=None,
                  is_diff=False):
         self.name = name # string
         self.robot_state = robot_state if robot_state else RobotState() # moveit_msgs/RobotState 
         self.robot_model_name = robot_model_name # string 
-        self.fixed_frame_transforms = fixed_frame_transforms # geometry_msgs/TransformStamped[] 
+        self.fixed_frame_transforms = fixed_frame_transforms if fixed_frame_transforms else [] # geometry_msgs/TransformStamped[] 
         self.allowed_collision_matrix = allowed_collision_matrix if allowed_collision_matrix else AllowedCollisionMatrix()
-        self.link_padding = link_padding # moveit_msgs/LinkPadding[] 
-        self.link_scale = link_scale # moveit_msgs/LinkScale[] 
-        self.object_colors = object_colors # moveit_msgs/ObjectColor[] 
+        self.link_padding = link_padding if link_padding else [] # moveit_msgs/LinkPadding[] 
+        self.link_scale = link_scale if link_scale else [] # moveit_msgs/LinkScale[] 
+        self.object_colors = object_colors if object_colors else [] # moveit_msgs/ObjectColor[] 
         self.world = world if world else PlanningSceneWorld() # moveit_msgs/PlanningSceneWorld 
         self.is_diff = is_diff # bool
 
