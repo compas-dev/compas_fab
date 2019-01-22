@@ -800,5 +800,21 @@ class Robot(object):
             return self.artist.scale_factor
         else:
             return self._scale_factor
-
-
+    
+    def info(self):
+        print("The robot's name is '%s'." % self.name)
+        if self.semantics:
+            print("The planning groups are:", self.group_names)
+            print("The main planning group is '%s'." % self.main_group_name)
+            configurable_joints = self.get_configurable_joints(self.main_group_name)
+        else:
+            configurable_joints = self.get_configurable_joints()
+        print("The end-effector's name is '%s'." % self.get_end_effector_link_name())
+        print("The base link's name is '%s'" % self.get_base_link_name())
+        print("The base_frame is:", self.get_base_frame())
+        print("The robot's joints are:")
+        for joint in configurable_joints:
+            info = "\t* '%s' is of type '%s'" % (joint.name, list(Joint.SUPPORTED_TYPES)[joint.type])
+            if joint.limit:
+                info += " and has limits [%.3f, %.3f]" % (joint.limit.upper, joint.limit.lower)
+            print(info)
