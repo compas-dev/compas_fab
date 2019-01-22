@@ -400,7 +400,7 @@ class Robot(object):
             callback_result(response)
 
         self.client.inverse_kinematics(pre_callback_result, frame_RCF, base_link,
-                                       group, joint_names, joint_positions, 
+                                       group, joint_names, joint_positions,
                                        avoid_collisions, constraints)
 
     def forward_kinematics(self, configuration, callback_result=None, group=None):
@@ -521,8 +521,8 @@ class Robot(object):
     def motion_plan_goal_frame(self, frame_WCF, start_configuration,
                     tolerance_position, tolerance_angle, callback_result=None,
                     group=None, path_constraints=None,
-                    trajectory_constraints=None, planner_id='', 
-                    num_planning_attempts=8, allowed_planning_time=2., 
+                    trajectory_constraints=None, planner_id='',
+                    num_planning_attempts=8, allowed_planning_time=2.,
                     max_velocity_scaling_factor=1., max_acceleration_scaling_factor=1.):
         """Calculates a motion from start_configuration to frame_WCF.
 
@@ -582,22 +582,22 @@ class Robot(object):
                 joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
                 response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
             callback_result(response)
-        
+
         print("path_constraints:", path_constraints)
         self.client.motion_plan_goal_frame(pre_callback_result, frame_RCF,
                                 base_link, ee_link, group, joint_names,
                                 joint_positions, tolerance_position,
                                 tolerance_angle, path_constraints,
-                                trajectory_constraints, planner_id, 
+                                trajectory_constraints, planner_id,
                                 num_planning_attempts, allowed_planning_time,
                                 max_velocity_scaling_factor, max_acceleration_scaling_factor)
 
     def motion_plan_goal_configuration(self, goal_configuration,
                     start_configuration, tolerance, callback_result=None,
                     group=None, path_constraints=None,
-                    trajectory_constraints=None, 
-                    planner_id='', num_planning_attempts=8, 
-                    allowed_planning_time=2., max_velocity_scaling_factor=1., 
+                    trajectory_constraints=None,
+                    planner_id='', num_planning_attempts=8,
+                    allowed_planning_time=2., max_velocity_scaling_factor=1.,
                     max_acceleration_scaling_factor=1.):
         """Calculates a motion from start_configuration to goal_configuration.
 
@@ -661,13 +661,13 @@ class Robot(object):
                 joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
                 response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
             callback_result(response)
-                    path_constraints, trajectory_constraints, planner_id, 
-                    num_planning_attempts, allowed_planning_time,
-                    max_velocity_scaling_factor, max_acceleration_scaling_factor)
 
         self.client.motion_plan_goal_joint_positions(pre_callback_result,
                     joint_positions_goal, joint_names_goal, tolerances,
                     base_link, group, joint_names, joint_positions,
+                    path_constraints, trajectory_constraints, planner_id,
+                    num_planning_attempts, allowed_planning_time,
+                    max_velocity_scaling_factor, max_acceleration_scaling_factor)
 
 
     def add_collision_mesh_to_planning_scene(self, id_name, mesh, scale=False):
