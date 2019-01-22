@@ -51,3 +51,9 @@ class Header(ROSmsg):
         self.seq = seq
         self.stamp = stamp
         self.frame_id = frame_id
+
+class String(ROSmsg):
+    """http://docs.ros.org/api/std_msgs/html/msg/String.html
+    """
+    def __init__(self, data=''):
+        self.data = data
