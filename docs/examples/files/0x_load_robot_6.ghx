@@ -134,7 +134,7 @@
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
 import compas
 from compas.robots import GithubPackageMeshLoader
-from compas.robots import Robot
+from compas.robots import RobotModel
 
 compas.PRECISION = '12f'
 
@@ -150,10 +150,10 @@ if load:
     #package = 'abb_irb120_support'
     package = 'abb_irb6600_support'
     branch = 'kinetic-devel'
-    
+
     loader = GithubPackageMeshLoader(repo, package, branch)
-    
-    robot = Robot.from_urdf_file(loader.load_urdf('irb6640.urdf'))
+
+    robot = RobotModel.from_urdf_file(loader.load_urdf('irb6640.urdf'))
     robot.load_geometry(loader)
 
     st[robot_key] = robot
@@ -463,7 +463,7 @@ robot = st[robot_key]</item>
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
 import compas
 from compas.robots import LocalPackageMeshLoader
-from compas.robots import Robot
+from compas.robots import RobotModel
 
 compas.PRECISION = '12f'
 
@@ -478,10 +478,10 @@ if load:
     path = "C:\\Users\\gcasas\\eth\\Projects\\ros-packages\\abb"
     #package = 'abb_irb120_support'
     package = 'abb_irb6600_support'
-    
+
     loader = LocalPackageMeshLoader(path, package)
-    
-    robot = Robot.from_urdf_file(loader.load_urdf('irb6640.urdf'))
+
+    robot = RobotModel.from_urdf_file(loader.load_urdf('irb6640.urdf'))
     robot.load_geometry(loader)
     print robot.name
     st[robot_key] = robot
@@ -1430,7 +1430,7 @@ from compas_fab.robots import Configuration
 frames = []
 
 size = .100
-radius = .001 
+radius = .001
 
 red = Color.FromArgb(255, 0, 0)
 green = Color.FromArgb(0, 255, 0)
@@ -1438,7 +1438,7 @@ blue = Color.FromArgb(0, 0, 255)
 
 frame_colors = [red, green, blue]
 
-def pipes_from_frame(frame, size, radius): 
+def pipes_from_frame(frame, size, radius):
     pipes = []
     for axis in [frame.xaxis, frame.yaxis, frame.zaxis]:
         pipe = {}
@@ -1452,12 +1452,12 @@ if robot and len(configuration):
     configuration = Configuration.from_revolute_values(configuration)
     print configuration
     robot.artist.update(configuration, collision=show_collision)
-    
+
     if show_visual:
         visual = robot.artist.draw_visual()
     if show_collision:
         collision = robot.artist.draw_collision()
-    
+
     if show_axes:
         pipes = []
         axes_color = []
@@ -1475,7 +1475,7 @@ if robot and len(configuration):
         ee_pipes = pipes_from_frame(ee_frame, size, radius)
         ee_frame = xdraw_pipes(ee_pipes, cap=1)
         ee_color = frame_colors
-        
+
     if show_base_frame:
         link = robot.get_link_by_name(str(robot.get_base_link_name()))
         for joint in link.joints:
@@ -1489,7 +1489,7 @@ if robot and len(configuration):
         base_pipes = pipes_from_frame(base_frame, size, radius)
         base_frame = xdraw_pipes(base_pipes, cap=1)
         base_color = frame_colors
-    
+
 
 
 </item>
@@ -2985,7 +2985,7 @@ if robot and len(configuration):
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
 import compas
 from compas.robots import GithubPackageMeshLoader
-from compas.robots import Robot
+from compas.robots import RobotModel
 
 compas.PRECISION = '12f'
 
@@ -3000,10 +3000,10 @@ if load:
     repo = 'ros-industrial/abb_experimental'
     package = 'abb_irb120_support'
     branch = 'kinetic-devel'
-    
+
     loader = GithubPackageMeshLoader(repo, package, branch)
-    
-    robot = Robot.from_urdf_file(loader.load_urdf('irb120t_3_58.urdf'))
+
+    robot = RobotModel.from_urdf_file(loader.load_urdf('irb120t_3_58.urdf'))
     robot.load_geometry(loader)
 
     st[robot_key] = robot
@@ -3157,7 +3157,7 @@ robot = st[robot_key]</item>
                     <item name="CodeInput" type_name="gh_string" type_code="10">from scriptcontext import sticky as st
 import compas
 from compas.robots import LocalPackageMeshLoader
-from compas.robots import Robot
+from compas.robots import RobotModel
 
 compas.PRECISION = '12f'
 
@@ -3169,14 +3169,14 @@ if robot_key not in st:
 
 if load:
     # Load robot
-    
+
     path = "C:\\Users\\gcasas\\eth\\Labs\\robot_description"
     #package = 'abb_irb120_support'
     package = 'ur_description'
-    
+
     loader = LocalPackageMeshLoader(path, package)
-    
-    robot = Robot.from_urdf_file(loader.load_urdf('ur5.urdf'))
+
+    robot = RobotModel.from_urdf_file(loader.load_urdf('ur5.urdf'))
     robot.load_geometry(loader)
     print robot.name
     st[robot_key] = robot

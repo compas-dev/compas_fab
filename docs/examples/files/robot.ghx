@@ -1101,7 +1101,7 @@ blue = Color.FromArgb(0, 0, 255)
 frame_colors = [red, green, blue]
 
 # TODO: move to frame artist?
-def pipes_from_frame(frame, size, radius): 
+def pipes_from_frame(frame, size, radius):
     pipes = []
     for axis in [frame.xaxis, frame.yaxis, frame.zaxis]:
         pipe = {}
@@ -1111,18 +1111,18 @@ def pipes_from_frame(frame, size, radius):
     return pipes
 
 if robot and configuration:
-    
+
     robot.update(configuration, collision=show_collision)
-    
+
     print("Configuration:")
     print(configuration.values)
-    
+
     if show_visual:
         visual = robot.draw_visual()
-        
+
     if show_collision:
         collision = robot.draw_collision()
-    
+
     pipe_size = 0.1 * robot.scale_factor
     pipe_radius = 0.001 * robot.scale_factor
     if show_axes:
@@ -1132,26 +1132,26 @@ if robot and configuration:
             pipes += pipes_from_frame(frame, pipe_size, pipe_radius)
             axes_color += frame_colors
         axes = xdraw_pipes(pipes, cap=1)
-    
+
     ee_frame = robot.get_end_effector_frame()
     ee_plane = xdraw_frame(ee_frame)
-    
+
     print("End-effector frame:")
     print(ee_frame)
-    
+
     if show_end_effector_frame:
         ee_pipes = pipes_from_frame(ee_frame, pipe_size, pipe_radius)
         ee_frame_geo = xdraw_pipes(ee_pipes, cap=1)
         ee_frame_color = frame_colors
-        
+
     base_frame = robot.get_base_frame()
     base_plane = xdraw_frame(base_frame)
-    
+
     if show_base_frame:
         base_pipes = pipes_from_frame(base_frame, pipe_size, pipe_radius)
         base_frame_geo = xdraw_pipes(base_pipes, cap=1)
         base_frame_color = frame_colors
-        
+
 
 
 </item>
@@ -2702,11 +2702,11 @@ response_key = "response_" + guid
 
 if response_key not in sc.sticky:
     sc.sticky[response_key] = None
-    
+
 
 def callback_result(response):
     sc.sticky[response_key] = response
-    
+
 if robot:
     if robot.client:
         if robot.client.is_connected:
@@ -2720,7 +2720,7 @@ if sc.sticky[response_key]:
     if response.error_code == MoveItErrorCodes.SUCCESS:
         configuration = response.configuration
     error = response.error_code.human_readable
-    
+
 </item>
                     <item name="Description" type_name="gh_string" type_code="10">A python scriptable component</item>
                     <item name="EditorLocation" type_name="gh_drawing_point" type_code="30">
@@ -4393,11 +4393,11 @@ if robot:
     all_joint_names = robot.get_configurable_joint_names()
     main_joint_names = robot.get_configurable_joint_names(main_group)
     base_frame = robot.get_base_frame()
-    
+
     print "planning groups:", planning_groups
     print "main planning group:", main_group
     print "base_frame:", base_frame
-    
+
     print "Joints of main planning group:"
     for joint in robot.get_configurable_joints(main_group):
         info = "    %s is of type '%s'" % (joint.name, list(Joint.SUPPORTED_TYPES)[joint.type])
@@ -5417,7 +5417,7 @@ assert os.path.isfile(srdf_filename) == True</item>
 from scriptcontext import sticky as st
 
 import compas
-import compas.robots
+from compas.robots import RobotModel
 from compas.robots import LocalPackageMeshLoader
 
 from compas_fab.robots import Robot
@@ -5435,12 +5435,12 @@ if robot_key not in st:
     st[robot_key] = None
 
 if load:
-    model = compas.robots.Robot.from_urdf_file(urdf_filename)
+    model = RobotModel.from_urdf_file(urdf_filename)
     model.load_geometry(*loaders)
     artist = RobotArtist(model)
     semantics = RobotSemantics.from_srdf_file(srdf_filename, model)
     robot = Robot(model, artist, semantics, client=None)
-    
+
     st[robot_key] = robot
 
 robot = st[robot_key]
@@ -6105,7 +6105,7 @@ if response_key not in sc.sticky:
 
 def callback_result(response):
     sc.sticky[response_key] = response
-    
+
 if robot:
     if robot.client:
         if robot.client.is_connected:
@@ -6119,7 +6119,7 @@ if sc.sticky[response_key]:
     if response.error_code == MoveItErrorCodes.SUCCESS:
         frame_WCF = response.frame_WCF
     error = response.error_code.human_readable
-    
+
 print frame_WCF</item>
                     <item name="Description" type_name="gh_string" type_code="10">A python scriptable component</item>
                     <item name="EditorLocation" type_name="gh_drawing_point" type_code="30">
@@ -6534,14 +6534,14 @@ guid = str(ghenv.Component.InstanceGuid)
 response_key = "response_" + guid
 if response_key not in sc.sticky:
     sc.sticky[response_key] = None
-    
+
 LOGGER = logging.getLogger('roslibpy')
 data = dict(requesting_solution=False)
 
 def callback_result(response):
     sc.sticky[response_key] = response
     update_component(ghenv, 100)
-    
+
 
 if robot:
     if robot.client:
@@ -8447,7 +8447,7 @@ guid = str(ghenv.Component.InstanceGuid)
 response_key = "response_" + guid
 if response_key not in sc.sticky:
     sc.sticky[response_key] = None
-    
+
 LOGGER = logging.getLogger('roslibpy')
 data = dict(requesting_solution=False)
 
@@ -8894,7 +8894,7 @@ if response:
     if response.error_code == MoveItErrorCodes.SUCCESS:
         print response.trajectory_start
         print response.planning_time
-        
+
         configurations = response.configurations
         start_configuration = response.start_configuration
     error = response.error_code.human_readable
@@ -9991,7 +9991,7 @@ pc = Constraints()
 name = robot.get_configurable_joint_names()[0]
 pos = robot.get_position_by_joint_name(start_configuration, name)/robot.scale_factor
 pc.joint_constraints.append(JointConstraint(name, pos, tol, tol, 1.))
-    
+
 print pc</item>
                     <item name="Description" type_name="gh_string" type_code="10">A python scriptable component</item>
                     <item name="EditorLocation" type_name="gh_drawing_point" type_code="30">

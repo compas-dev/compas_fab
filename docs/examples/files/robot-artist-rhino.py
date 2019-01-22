@@ -11,7 +11,7 @@ b = 'kinetic-devel'
 github = GithubPackageMeshLoader(r, p, b)
 urdf = github.load_urdf('irb6640.urdf')
 
-robot = Robot.from_urdf_file(urdf)
+robot = RobotModel.from_urdf_file(urdf)
 robot.load_geometry(github)
 
 RobotArtist(robot).draw_visual()

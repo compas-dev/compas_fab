@@ -28,7 +28,7 @@ class BaseRobotArtist(object):
 
     Attributes
     ----------
-    robot : :class:`compas.robots.Robot`
+    robot : :class:`compas.robots.RobotModel`
         Instance of a robot model.
     """
 
@@ -96,7 +96,7 @@ class BaseRobotArtist(object):
             child_joint.create(parent_transformation)
             # Recursively call creation
             self.create(child_joint.child_link, child_joint.current_transformation)
-    
+
     def scale(self, factor):
         """Scales the robot geometry by factor (absolute).
 
@@ -106,15 +106,15 @@ class BaseRobotArtist(object):
             The factor to scale the robot with.
         """
         relative_factor = factor / self.scale_factor # relative scaling factor
-        self.scale_factor = factor  
+        self.scale_factor = factor
         transformation = Scale([relative_factor, relative_factor, relative_factor])
         self.scale_links(transformation)
-    
+
     def scale_links(self, transformation):
         self.scale_link(self.robot.root, transformation)
 
     def scale_link(self, link, transformation):
-        """Recursive function to apply the scale transformation on each link 
+        """Recursive function to apply the scale transformation on each link
             geometry.
         """
         relative_factor = transformation[0,0]

@@ -65,7 +65,7 @@ class RobotSemantics(object):
                     if name not in link_names:
                         link_names.append(name)
         return link_names
-    
+
     def __get_group_joint_names(self, group):
         joint_names = []
         for link in group.iter('link'):
@@ -145,7 +145,7 @@ class RobotSemantics(object):
 if __name__ == "__main__":
 
     import os
-    from compas.robots import Robot as UrdfRobot
+    from compas.robots import RobotModel
 
     path = r"C:\Users\rustr\workspace\robot_description"
 
@@ -155,7 +155,7 @@ if __name__ == "__main__":
             urdf_file = os.path.join(fullpath, 'urdf', 'robot_description.urdf')
             srdf_file = os.path.join(fullpath, 'robot_description_semantic.srdf')
 
-            urdf_model = UrdfRobot.from_urdf_file(urdf_file)
+            urdf_model = RobotModel.from_urdf_file(urdf_file)
             srdf_model = RobotSemantics.from_srdf_file(srdf_file, urdf_model)
 
             print(urdf_model.name)
