@@ -49,11 +49,16 @@ The recommended way to install **compas_fab** is to use `Anaconda/conda <https:/
 ::
 
     conda config --add channels conda-forge
-    conda install COMPAS
+    conda install compas_fab
+
+But it can also be installed using ``pip``:
+
+::
+
     pip install compas_fab
 
 
-Once installed, you can verify your setup. Start Python from the command prompt and run the following:
+Once installed, you can verify your setup.Start Python from the command prompt and run the following:
 
 .. code-block:: python
 
