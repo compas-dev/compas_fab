@@ -97,7 +97,7 @@ class RosClient(Ros):
     def __init__(self, host='localhost', port=9090, is_secure=False):
         super(RosClient, self).__init__(host, port, is_secure)
 
-    def inverse_kinematics(self, callback_result, frame, base_link, group, 
+    def inverse_kinematics(self, callback, frame, base_link, group,
                            joint_names, joint_positions, avoid_collisions=True,
                            constraints=None):
         """
@@ -118,14 +118,14 @@ class RosClient(Ros):
 
         def receive_message(msg):
             response = GetPositionIKResponse.from_msg(msg)
-            callback_result(response)
+            callback(response)
 
         srv = Service(self, '/compute_ik', 'GetPositionIK')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
 
 
-    def forward_kinematics(self, callback_result, joint_positions, base_link, 
+    def forward_kinematics(self, callback, joint_positions, base_link,
                            group, joint_names, ee_link):
         """
         """
@@ -138,14 +138,14 @@ class RosClient(Ros):
 
         def receive_message(msg):
             response = GetPositionFKResponse.from_msg(msg)
-            callback_result(response)
+            callback(response)
 
         srv = Service(self, '/compute_fk', 'GetPositionFK')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
 
-    def compute_cartesian_path(self, callback_result, frames, base_link, 
-                               ee_link, group, joint_names, joint_positions, 
+    def compute_cartesian_path(self, callback, frames, base_link,
+                               ee_link, group, joint_names, joint_positions,
                                max_step, avoid_collisions):
         """
         """
@@ -164,20 +164,20 @@ class RosClient(Ros):
 
         def receive_message(msg):
             response = GetCartesianPathResponse.from_msg(msg)
-            callback_result(response)
+            callback(response)
 
         srv = Service(self, '/compute_cartesian_path', 'GetCartesianPath')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
-    
-    def motion_plan_goal_frame(self, callback_result, frame, base_link, ee_link,
-                               group, joint_names, joint_positions, 
-                               tolerance_position, tolerance_angle, 
-                               path_constraints=None, 
+
+    def motion_plan_goal_frame(self, callback, frame, base_link, ee_link,
+                               group, joint_names, joint_positions,
+                               tolerance_position, tolerance_angle,
+                               path_constraints=None,
                                trajectory_constraints=None,
-                               planner_id='', num_planning_attempts=8, 
-                               allowed_planning_time=2., 
-                               max_velocity_scaling_factor=1., 
+                               planner_id='', num_planning_attempts=8,
+                               allowed_planning_time=2.,
+                               max_velocity_scaling_factor=1.,
                                max_acceleration_scaling_factor=1.):
         """
         """
@@ -188,7 +188,7 @@ class RosClient(Ros):
         joint_state = JointState(header=header, name=joint_names, position=joint_positions)
         multi_dof_joint_state = MultiDOFJointState(header=header)
         start_state = RobotState(joint_state=joint_state, multi_dof_joint_state=multi_dof_joint_state)
-  
+
         pose = Pose.from_frame(frame)
 
         pcm = PositionConstraint(header=header, link_name=ee_link)
@@ -207,33 +207,33 @@ class RosClient(Ros):
 
         # TODO: possibility to hand over more goal constraints
         goal_constraints = [Constraints(position_constraints=[pcm], orientation_constraints=[ocm])]
-            
-        reqmsg = MotionPlanRequest(start_state=start_state, 
-                                   goal_constraints=goal_constraints, 
+
+        reqmsg = MotionPlanRequest(start_state=start_state,
+                                   goal_constraints=goal_constraints,
                                    path_constraints=path_constraints,
                                    trajectory_constraints=trajectory_constraints,
                                    planner_id=planner_id,
                                    group_name=group,
-                                   num_planning_attempts=num_planning_attempts, 
-                                   allowed_planning_time=allowed_planning_time, 
-                                   max_velocity_scaling_factor=max_velocity_scaling_factor, 
+                                   num_planning_attempts=num_planning_attempts,
+                                   allowed_planning_time=allowed_planning_time,
+                                   max_velocity_scaling_factor=max_velocity_scaling_factor,
                                    max_acceleration_scaling_factor=max_velocity_scaling_factor)
-        
+
         def receive_message(msg):
             response = MotionPlanResponse.from_msg(msg)
-            callback_result(response)
+            callback(response)
 
         srv = Service(self, '/plan_kinematic_path', 'GetMotionPlan')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
-    
 
-    def motion_plan_goal_joint_positions(self, callback_result, 
-                    joint_positions_goal, joint_names_goal, tolerances, 
+
+    def motion_plan_goal_joint_positions(self, callback,
+                    joint_positions_goal, joint_names_goal, tolerances,
                     base_link, group, joint_names, joint_positions,
-                    path_constraints=None, trajectory_constraints=None, 
-                    planner_id='', num_planning_attempts=8, 
-                    allowed_planning_time=2., max_velocity_scaling_factor=1., 
+                    path_constraints=None, trajectory_constraints=None,
+                    planner_id='', num_planning_attempts=8,
+                    allowed_planning_time=2., max_velocity_scaling_factor=1.,
                     max_acceleration_scaling_factor=1.):
         """
         """
@@ -251,26 +251,26 @@ class RosClient(Ros):
 
         # TODO: possibility to hand over more goal constraints
         goal_constraints = [Constraints(joint_constraints=joint_constraints)]
-            
-        reqmsg = MotionPlanRequest(start_state=start_state, 
-                                   goal_constraints=goal_constraints, 
+
+        reqmsg = MotionPlanRequest(start_state=start_state,
+                                   goal_constraints=goal_constraints,
                                    path_constraints=path_constraints,
                                    trajectory_constraints=trajectory_constraints,
                                    planner_id=planner_id,
                                    group_name=group,
-                                   num_planning_attempts=num_planning_attempts, 
-                                   allowed_planning_time=allowed_planning_time, 
-                                   max_velocity_scaling_factor=max_velocity_scaling_factor, 
+                                   num_planning_attempts=num_planning_attempts,
+                                   allowed_planning_time=allowed_planning_time,
+                                   max_velocity_scaling_factor=max_velocity_scaling_factor,
                                    max_acceleration_scaling_factor=max_velocity_scaling_factor)
-        
+
         def receive_message(msg):
             response = MotionPlanResponse.from_msg(msg)
-            callback_result(response)
+            callback(response)
 
         srv = Service(self, '/plan_kinematic_path', 'GetMotionPlan')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)
-    
+
     def collision_mesh(self, id_name, root_link, compas_mesh, operation=1):
         """
         """
@@ -283,10 +283,10 @@ class RosClient(Ros):
             co.operation = CollisionObject.ADD
         else:
             co.operation = CollisionObject.REMOVE
-        
+
         topic = Topic(self, '/collision_object', 'moveit_msgs/CollisionObject')
         topic.publish(co.msg)
-    
+
     def attached_collision_mesh(self, id_name, ee_link, compas_mesh, operation=1, touch_links=[]):
         """
         """
@@ -299,9 +299,9 @@ class RosClient(Ros):
             co.operation = CollisionObject.ADD
         else:
             co.operation = CollisionObject.REMOVE
-        
+
         aco = AttachedCollisionObject()
-        aco.link_name = ee_link 
+        aco.link_name = ee_link
         # The set of links that the attached objects are allowed to touch by default.
         aco.touch_links = touch_links
         aco.object = co
@@ -311,9 +311,9 @@ class RosClient(Ros):
 
 
 
-        
 
-    def follow_configurations(self, callback_result, joint_names, configurations, timesteps, timeout=None):
+
+    def follow_configurations(self, callback, joint_names, configurations, timesteps, timeout=None):
 
         if len(configurations) != len(timesteps):
             raise ValueError("%d configurations must have %d timesteps, but %d given." % (len(configurations), len(timesteps), len(timesteps)))
@@ -328,9 +328,9 @@ class RosClient(Ros):
             points.append(pt)
 
         joint_trajectory = JointTrajectory(Header(), joint_names, points) # specify header necessary?
-        self.follow_joint_trajectory(callback_result, joint_trajectory, timeout)
+        self.follow_joint_trajectory(callback, joint_trajectory, timeout)
 
-    def follow_joint_trajectory(self, callback_result, joint_trajectory, timeout=3000):
+    def follow_joint_trajectory(self, callback, joint_trajectory, timeout=3000):
         """Follow the joint trajectory as computed by Moveit Planner.
 
         Args:
@@ -341,7 +341,7 @@ class RosClient(Ros):
 
         def handle_result(msg, client):
             result = FollowJointTrajectoryResult.from_msg(msg)
-            callback_result(result)
+            callback(result)
             #print(result.human_readable)
 
         action_client = ActionClient(self, '/follow_joint_trajectory',
@@ -355,7 +355,7 @@ class RosClient(Ros):
         goal.send(60000)
 
 
-    def direct_ur_movel(self, callback_result, frames, acceleration=None, velocity=None, time=None, radius=None):
+    def direct_ur_movel(self, callback, frames, acceleration=None, velocity=None, time=None, radius=None):
 
         action_client = DirectUrActionClient(self, timeout=50000)
 
@@ -366,20 +366,20 @@ class RosClient(Ros):
             script_lines.append(move)
 
         urgoal = URGoal(script_lines)
-        
+
         goal = Goal(action_client, Message(urgoal.msg))
         action_client.on('timeout', lambda: print('CLIENT TIMEOUT'))
         # goal.on('feedback', lambda feedback: print(feedback))
-        goal.on('result', callback_result)
+        goal.on('result', callback)
         action_client.send_goal(goal)
-    
-    def get_planning_scene(self, callback_result, components):
+
+    def get_planning_scene(self, callback, components):
         """
         """
         reqmsg = GetPlanningSceneRequest(PlanningSceneComponents(components))
         def receive_message(msg):
             response = GetPlanningSceneResponse.from_msg(msg)
-            callback_result(response)
+            callback(response)
 
         srv = Service(self, '/get_planning_scene', 'moveit_msgs/GetPlanningScene')
         request = ServiceRequest(reqmsg.msg)

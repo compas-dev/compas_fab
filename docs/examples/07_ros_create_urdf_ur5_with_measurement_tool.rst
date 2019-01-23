@@ -88,7 +88,7 @@ operations and to parameterize macros simply by using ``${}``.
  
 Go to the ``urdf`` folder and create a xacro file for your end-effector with the text editor of your choice (e.g. ``pico``)::
 
-  cd ~/robotic_setups/src/urdf
+  cd ~/robotic_setups/src/ur5_with_measurement_tool/urdf
   pico measurement_tool.xacro
 
 Paste the following into the file:
