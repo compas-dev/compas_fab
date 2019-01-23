@@ -71,7 +71,7 @@ it as a target pose to the robot.
 
     from compas_fab.robots import Robot
 
-    from compas.robots import Robot as URDFRobot
+    from compas.robots import RobotModel
     from compas.robots import Joint
     from compas.robots import Link
 
@@ -79,7 +79,7 @@ it as a target pose to the robot.
     from compas.geometry import Transformation
 
 
-    robot_model = URDFRobot('ur5',
+    robot_model = RobotModel('ur5',
                 joints=[
                     Joint('shoulder_pan_joint', 'revolute', parent='base_link', child='shoulder_link'),
                     Joint('shoulder_lift_joint', 'revolute', parent='shoulder_link', child='upper_arm_link'),

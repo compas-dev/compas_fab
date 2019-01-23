@@ -53,11 +53,11 @@ kind of movements. The three major types of joints are:
 
 .. code-block:: python
 
-    from compas.robots import Robot
+    from compas.robots import RobotModel
     from compas.robots import Joint
     from compas.robots import Link
 
-    robot = Robot('ur5',
+    robot = RobotModel('ur5',
                   joints=[
                       Joint('shoulder_pan_joint', 'revolute', parent='base_link', child='shoulder_link'),
                       Joint('shoulder_lift_joint', 'revolute', parent='shoulder_link', child='upper_arm_link'),

@@ -135,7 +135,7 @@
 
 import compas
 
-from compas.robots import Robot
+from compas.robots import RobotModel
 from compas.robots import GithubPackageMeshLoader
 from compas_fab.ghpython import RobotArtist
 
@@ -153,12 +153,12 @@ if robot_key not in st:
 if load:
     # Load robot (try other repo/package combinations, e.g. 'abb_irb120_support')
     repo    = 'ros-industrial/abb'
-    package = 'abb_irb6600_support' 
+    package = 'abb_irb6600_support'
     branch  = 'kinetic-devel'
-    
+
     github = GithubPackageMeshLoader(repo, package, branch)
-    
-    robot = Robot.from_urdf_file(github.load_urdf('irb6640.urdf'))
+
+    robot = RobotModel.from_urdf_file(github.load_urdf('irb6640.urdf'))
     robot.load_geometry(github)
 
     st[robot_key] = robot
@@ -1151,7 +1151,7 @@ from compas_fab.robots import Configuration
 frames = []
 
 size = .100
-radius = .001 
+radius = .001
 
 red = Color.FromArgb(255, 0, 0)
 green = Color.FromArgb(0, 255, 0)
@@ -1159,7 +1159,7 @@ blue = Color.FromArgb(0, 0, 255)
 
 frame_colors = [red, green, blue]
 
-def pipes_from_frame(frame, size, radius): 
+def pipes_from_frame(frame, size, radius):
     pipes = []
     for axis in [frame.xaxis, frame.yaxis, frame.zaxis]:
         pipe = {}
@@ -1173,12 +1173,12 @@ if robot and len(configuration):
     print ('Setting robot configuration:')
     print (configuration)
     robot.artist.update(configuration, collision=show_collision)
-    
+
     if show_visual:
         visual = robot.artist.draw_visual()
     if show_collision:
         collision = robot.artist.draw_collision()
-    
+
     if show_axes:
         pipes = []
         axes_color = []
@@ -1195,7 +1195,7 @@ if robot and len(configuration):
         ee_pipes = pipes_from_frame(ee_frame, size, radius)
         ee_frame = xdraw_pipes(ee_pipes, cap=1)
         ee_color = frame_colors
-        
+
     if show_base_frame:
         link = robot.get_link_by_name(str(robot.get_base_link_name()))
         for joint in link.joints:

@@ -4,21 +4,20 @@ from __future__ import print_function
 
 import logging
 
-import compas.robots.model
-from compas.robots import Joint
-
-from compas.geometry import Frame
-from compas.geometry import Transformation
-from compas.geometry import Scale
-from compas.datastructures import mesh_transformed
 from compas.datastructures import Mesh
 from compas.datastructures import mesh_quads_to_triangles
-
-from .configuration import Configuration
-from .semantics import RobotSemantics
-from .ros_fileserver_loader import RosFileServerLoader
+from compas.datastructures import mesh_transformed
+from compas.geometry import Frame
+from compas.geometry import Scale
+from compas.geometry import Transformation
+from compas.robots import Joint
+from compas.robots import RobotModel
 
 from compas_fab.artists import BaseRobotArtist
+
+from .configuration import Configuration
+from .ros_fileserver_loader import RosFileServerLoader
+from .semantics import RobotSemantics
 
 LOGGER = logging.getLogger('compas_fab.robots.robot')
 
@@ -33,11 +32,11 @@ class Robot(object):
     This class binds together several building blocks, such as the robot's descriptive model,
     its semantic information and an instance of a backend client
     into a cohesive programmable interface. This representation builds upon the model
-    described in the class :class:`compas.robots.Robot` of the **COMPAS** framework.
+    described in the class :class:`compas.robots.RobotModel` of the **COMPAS** framework.
 
     Attributes
     ----------
-    model : :class:`compas.robots.Robot`
+    model : :class:`compas.robots.RobotModel`
         The robot model, usually created out of an URDF structure.
     artist : :class:`compas_fab.artists.BaseRobotArtist`
         Instance of the artist used to visualize the robot.
@@ -70,7 +69,7 @@ class Robot(object):
         :class:`Robot`
             Newly created instance of a robot.
         """
-        model = compas.robots.model.Robot(name, joints=joints, links=links, materials=materials, **kwargs)
+        model = RobotModel(name, joints=joints, links=links, materials=materials, **kwargs)
         return cls(model, None)
 
     @classmethod
@@ -92,7 +91,7 @@ class Robot(object):
         urdf_file = urdf_importer.urdf_filename
 
         srdf_file = urdf_importer.srdf_filename
-        urdf_model = compas.robots.model.Robot.from_urdf_file(urdf_file)
+        urdf_model = RobotModel.from_urdf_file(urdf_file)
         srdf_model = RobotSemantics.from_srdf_file(srdf_file, urdf_model)
         return cls(urdf_model, None, srdf_model, client)
 
@@ -585,7 +584,6 @@ class Robot(object):
                 response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
             callback(response)
 
-        print("path_constraints:", path_constraints)
         self.client.motion_plan_goal_frame(pre_callback_result, frame_RCF,
                                 base_link, ee_link, group, joint_names,
                                 joint_positions, tolerance_position,
