@@ -10,8 +10,8 @@ from os.path import abspath, basename, dirname, join, splitext
 from setuptools import find_packages, setup
 
 requirements = [
-    'compas==0.3.4',
-    'roslibpy',
+    'compas==0.4.6',
+    'roslibpy>=0.4.0',
     'pyserial',
 ]
 keywords_list = ['robotic fabrication', 'digital fabrication', 'architecture', 'robotics', 'ros']
