@@ -344,15 +344,15 @@ class Robot(object):
             values_scaled.append(v)
         return values_scaled
 
-    def inverse_kinematics(self, frame_WCF, current_configuration=None,
+    def inverse_kinematics(self, frame_WCF, start_configuration=None,
                            callback=None, group=None, avoid_collisions=True,
-                           constraints=None):
+                           constraints=None, attempts=8):
         """Calculate the robot's inverse kinematic.
 
         Parameters
         ----------
             frame (:class:`Frame`): The frame to calculate the inverse for
-            current_configuration (:class:`Configuration`, optional): If passed,
+            start_configuration (:class:`Configuration`, optional): If passed,
                 the inverse will be calculated such that the calculated joint
                 positions differ the least from the current configuration.
                 Defaults to the zero position for all joints.
@@ -374,12 +374,12 @@ class Robot(object):
         base_link = self.get_base_link_name(group)
         joint_names = self.get_configurable_joint_names()
 
-        if not current_configuration:
+        if not start_configuration:
             joint_positions = [0] * len(joint_names)
         else:
-            if len(joint_names) != len(current_configuration.values):
+            if len(joint_names) != len(start_configuration.values):
                 raise ValueError("Please pass a configuration with %d values" % len(joint_names))
-            joint_positions = current_configuration.values
+            joint_positions = start_configuration.values
         if not callback:
             callback = print
 
@@ -402,7 +402,7 @@ class Robot(object):
 
         self.client.inverse_kinematics(pre_callback_result, frame_RCF, base_link,
                                        group, joint_names, joint_positions,
-                                       avoid_collisions, constraints)
+                                       avoid_collisions, constraints, attempts)
 
     def forward_kinematics(self, configuration, callback=None, group=None):
         """Calculate the robot's forward kinematic.
@@ -452,7 +452,7 @@ class Robot(object):
 
     def compute_cartesian_path(self, frames_WCF, start_configuration, max_step,
                                avoid_collisions=True, callback=None,
-                               group=None):
+                               group=None, path_constraints=None):
         """Calculates a path defined by frames (Cartesian coordinate system).
 
         Parameters
@@ -517,12 +517,13 @@ class Robot(object):
 
         self.client.compute_cartesian_path(pre_callback_result, frames_RCF, base_link,
                                            ee_link, group, joint_names, joint_positions,
-                                           max_step_scaled, avoid_collisions)
+                                           max_step_scaled, avoid_collisions, path_constraints)
 
     def motion_plan_goal_frame(self, frame_WCF, start_configuration,
                     tolerance_position, tolerance_angle, callback=None,
                     group=None, path_constraints=None,
-                    trajectory_constraints=None, planner_id='',
+                    trajectory_constraints=None, joint_constraints=None,
+                    planner_id='',
                     num_planning_attempts=8, allowed_planning_time=2.,
                     max_velocity_scaling_factor=1., max_acceleration_scaling_factor=1.):
         """Calculates a motion from start_configuration to frame_WCF.
@@ -588,14 +589,15 @@ class Robot(object):
                                 base_link, ee_link, group, joint_names,
                                 joint_positions, tolerance_position,
                                 tolerance_angle, path_constraints,
-                                trajectory_constraints, planner_id,
+                                trajectory_constraints, joint_constraints,
+                                planner_id,
                                 num_planning_attempts, allowed_planning_time,
                                 max_velocity_scaling_factor, max_acceleration_scaling_factor)
 
     def motion_plan_goal_configuration(self, goal_configuration,
                     start_configuration, tolerance, callback=None,
                     group=None, path_constraints=None,
-                    trajectory_constraints=None,
+                    trajectory_constraints=None, joint_constraints=None,
                     planner_id='', num_planning_attempts=8,
                     allowed_planning_time=2., max_velocity_scaling_factor=1.,
                     max_acceleration_scaling_factor=1.):
