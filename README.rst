@@ -58,7 +58,7 @@ But it can also be installed using ``pip``:
     pip install compas_fab
 
 
-Once installed, you can verify your setup.Start Python from the command prompt and run the following:
+Once installed, you can verify your setup. Start Python from the command prompt and run the following:
 
 .. code-block:: python
 
