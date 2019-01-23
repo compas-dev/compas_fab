@@ -129,7 +129,7 @@ class GetCartesianPathRequest(ROSmsg):
 
     def __init__(self, header=None, start_state=None, group_name='',
                  link_name='', waypoints=None, max_step=10., jump_threshold=0.,
-                 avoid_collisions=True, constraints=None):
+                 avoid_collisions=True, path_constraints=None):
         self.header = header if header else Header()
         self.start_state = start_state if start_state else RobotState() # moveit_msgs/RobotState
         self.group_name = group_name
@@ -138,7 +138,7 @@ class GetCartesianPathRequest(ROSmsg):
         self.max_step = float(max_step)
         self.jump_threshold = jump_threshold
         self.avoid_collisions = avoid_collisions
-        self.path_constraints = constraints if constraints else Constraints() # moveit_msgs/Constraints
+        self.path_constraints = path_constraints if path_constraints else Constraints() # moveit_msgs/Constraints
 
 
 class GetCartesianPathResponse(ROSmsg):

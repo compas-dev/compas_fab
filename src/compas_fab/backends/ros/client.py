@@ -99,7 +99,7 @@ class RosClient(Ros):
 
     def inverse_kinematics(self, callback, frame, base_link, group,
                            joint_names, joint_positions, avoid_collisions=True,
-                           constraints=None):
+                           constraints=None, attempts=8):
         """
         """
         header = Header(frame_id=base_link)
@@ -113,8 +113,10 @@ class RosClient(Ros):
                                        robot_state=start_state,
                                        constraints=constraints,
                                        pose_stamped=pose_stamped,
-                                       avoid_collisions=avoid_collisions)
+                                       avoid_collisions=avoid_collisions,
+                                       attempts=attempts)
         reqmsg = GetPositionIKRequest(ik_request)
+        #print(reqmsg)
 
         def receive_message(msg):
             response = GetPositionIKResponse.from_msg(msg)
@@ -146,7 +148,7 @@ class RosClient(Ros):
 
     def compute_cartesian_path(self, callback, frames, base_link,
                                ee_link, group, joint_names, joint_positions,
-                               max_step, avoid_collisions):
+                               max_step, avoid_collisions, path_constraints):
         """
         """
         header = Header(frame_id=base_link)
@@ -160,8 +162,8 @@ class RosClient(Ros):
                                          link_name=ee_link,
                                          waypoints=waypoints,
                                          max_step=float(max_step),
-                                         avoid_collisions=bool(avoid_collisions))
-
+                                         avoid_collisions=bool(avoid_collisions),
+                                         path_constraints=path_constraints)
         def receive_message(msg):
             response = GetCartesianPathResponse.from_msg(msg)
             callback(response)
@@ -175,6 +177,7 @@ class RosClient(Ros):
                                tolerance_position, tolerance_angle,
                                path_constraints=None,
                                trajectory_constraints=None,
+                               joint_constraints=None,
                                planner_id='', num_planning_attempts=8,
                                allowed_planning_time=2.,
                                max_velocity_scaling_factor=1.,
@@ -206,7 +209,10 @@ class RosClient(Ros):
         ocm.absolute_z_axis_tolerance = tolerance_angle
 
         # TODO: possibility to hand over more goal constraints
-        goal_constraints = [Constraints(position_constraints=[pcm], orientation_constraints=[ocm])]
+        if joint_constraints:
+            goal_constraints = [Constraints(position_constraints=[pcm], orientation_constraints=[ocm], joint_constraints=joint_constraints)]
+        else:
+            goal_constraints = [Constraints(position_constraints=[pcm], orientation_constraints=[ocm])]
 
         reqmsg = MotionPlanRequest(start_state=start_state,
                                    goal_constraints=goal_constraints,
