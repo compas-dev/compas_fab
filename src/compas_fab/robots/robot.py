@@ -584,7 +584,6 @@ class Robot(object):
                 response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
             callback(response)
 
-        print("path_constraints:", path_constraints)
         self.client.motion_plan_goal_frame(pre_callback_result, frame_RCF,
                                 base_link, ee_link, group, joint_names,
                                 joint_positions, tolerance_position,
