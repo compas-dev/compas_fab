@@ -16,8 +16,8 @@ compas_fab: Robotic Fabrication for COMPAS
     :target: https://pypi.python.org/pypi/compas_fab
     :alt: PyPI Package latest release
 
-.. image:: https://anaconda.org/conda-forge/roslibpy/badges/version.svg
-    :target: https://anaconda.org/conda-forge/roslibpy
+.. image:: https://anaconda.org/conda-forge/compas_fab/badges/version.svg
+    :target: https://anaconda.org/conda-forge/compas_fab
 
 .. image:: https://img.shields.io/pypi/implementation/compas_fab.svg
     :target: https://pypi.python.org/pypi/compas_fab
