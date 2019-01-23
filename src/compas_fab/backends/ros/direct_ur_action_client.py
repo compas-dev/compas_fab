@@ -1,9 +1,18 @@
 import math
-from roslibpy import Message, Ros, Topic
-from roslibpy.actionlib import ActionClient, Goal
+
+from roslibpy import Message
+from roslibpy import Ros
+from roslibpy import Topic
+from roslibpy.actionlib import ActionClient
+from roslibpy.actionlib import Goal
 from roslibpy.event_emitter import EventEmitterMixin
 
+from compas_fab.backends.ros.messages.direct_ur import URGoal
+from compas_fab.backends.ros.messages.direct_ur import URMovej
+from compas_fab.backends.ros.messages.direct_ur import URMovel
+from compas_fab.backends.ros.messages.direct_ur import URPose
 from compas_fab.backends.ros.messages.direct_ur import URPoseTrajectoryPoint
+
 
 class DirectUrActionClient(EventEmitterMixin):
     """Direct UR Script action client to simulate an action interface
@@ -104,3 +113,20 @@ class DirectUrActionClient(EventEmitterMixin):
             self.ros.call_later(
                 timeout / 1000., goal._trigger_timeout)
 
+def direct_ur_movel(ros_client, callback, frames, acceleration=None, velocity=None, time=None, radius=None):
+
+    action_client = DirectUrActionClient(ros_client, timeout=50000)
+
+    script_lines = []
+    for frame in frames:
+        ptp = URPoseTrajectoryPoint(URPose.from_frame(frame), acceleration, velocity, time, radius)
+        move = URMovel(ptp)
+        script_lines.append(move)
+
+    urgoal = URGoal(script_lines)
+
+    goal = Goal(action_client, Message(urgoal.msg))
+    action_client.on('timeout', lambda: print('CLIENT TIMEOUT'))
+    # goal.on('feedback', lambda feedback: print(feedback))
+    goal.on('result', callback)
+    action_client.send_goal(goal)

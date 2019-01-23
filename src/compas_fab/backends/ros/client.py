@@ -10,47 +10,40 @@ from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
 from compas_fab.backends.exceptions import BackendError
-from compas_fab.backends.ros import DirectUrActionClient
-from compas_fab.backends.ros import FollowJointTrajectoryGoal
-from compas_fab.backends.ros import FollowJointTrajectoryResult
-from compas_fab.backends.ros import GetCartesianPathRequest
-from compas_fab.backends.ros import GetCartesianPathResponse
-from compas_fab.backends.ros import GetPositionFKRequest
-from compas_fab.backends.ros import GetPositionFKResponse
-from compas_fab.backends.ros import GetPositionIKRequest
-from compas_fab.backends.ros import GetPositionIKResponse
-from compas_fab.backends.ros import MotionPlanRequest
-from compas_fab.backends.ros import MotionPlanResponse
-from compas_fab.backends.ros import Header
-from compas_fab.backends.ros import JointState
-from compas_fab.backends.ros import JointTrajectory
-from compas_fab.backends.ros import JointTrajectoryPoint
-from compas_fab.backends.ros import MoveItErrorCodes
-from compas_fab.backends.ros import MultiDOFJointState
-from compas_fab.backends.ros import Pose
-from compas_fab.backends.ros import PoseStamped
-from compas_fab.backends.ros import PositionIKRequest
-from compas_fab.backends.ros import RobotState
-from compas_fab.backends.ros import Time
-from compas_fab.backends.ros import PositionConstraint
-from compas_fab.backends.ros import OrientationConstraint
-from compas_fab.backends.ros import JointConstraint
-from compas_fab.backends.ros import SolidPrimitive
-from compas_fab.backends.ros import Quaternion
-from compas_fab.backends.ros import Constraints
-from compas_fab.backends.ros import TrajectoryConstraints
-from compas_fab.backends.ros import Mesh
-from compas_fab.backends.ros import CollisionObject
-from compas_fab.backends.ros import AttachedCollisionObject
-from compas_fab.backends.ros import GetPlanningSceneRequest
-from compas_fab.backends.ros import GetPlanningSceneResponse
-from compas_fab.backends.ros import PlanningSceneComponents
-
-from compas_fab.backends.ros.messages.direct_ur import URGoal
-from compas_fab.backends.ros.messages.direct_ur import URMovej
-from compas_fab.backends.ros.messages.direct_ur import URMovel
-from compas_fab.backends.ros.messages.direct_ur import URPose
-from compas_fab.backends.ros.messages.direct_ur import URPoseTrajectoryPoint
+from compas_fab.backends.ros.messages import AttachedCollisionObject
+from compas_fab.backends.ros.messages import CollisionObject
+from compas_fab.backends.ros.messages import Constraints
+from compas_fab.backends.ros.messages import FollowJointTrajectoryGoal
+from compas_fab.backends.ros.messages import FollowJointTrajectoryResult
+from compas_fab.backends.ros.messages import GetCartesianPathRequest
+from compas_fab.backends.ros.messages import GetCartesianPathResponse
+from compas_fab.backends.ros.messages import GetPlanningSceneRequest
+from compas_fab.backends.ros.messages import GetPlanningSceneResponse
+from compas_fab.backends.ros.messages import GetPositionFKRequest
+from compas_fab.backends.ros.messages import GetPositionFKResponse
+from compas_fab.backends.ros.messages import GetPositionIKRequest
+from compas_fab.backends.ros.messages import GetPositionIKResponse
+from compas_fab.backends.ros.messages import Header
+from compas_fab.backends.ros.messages import JointConstraint
+from compas_fab.backends.ros.messages import JointState
+from compas_fab.backends.ros.messages import JointTrajectory
+from compas_fab.backends.ros.messages import JointTrajectoryPoint
+from compas_fab.backends.ros.messages import Mesh
+from compas_fab.backends.ros.messages import MotionPlanRequest
+from compas_fab.backends.ros.messages import MotionPlanResponse
+from compas_fab.backends.ros.messages import MoveItErrorCodes
+from compas_fab.backends.ros.messages import MultiDOFJointState
+from compas_fab.backends.ros.messages import OrientationConstraint
+from compas_fab.backends.ros.messages import PlanningSceneComponents
+from compas_fab.backends.ros.messages import Pose
+from compas_fab.backends.ros.messages import PoseStamped
+from compas_fab.backends.ros.messages import PositionConstraint
+from compas_fab.backends.ros.messages import PositionIKRequest
+from compas_fab.backends.ros.messages import Quaternion
+from compas_fab.backends.ros.messages import RobotState
+from compas_fab.backends.ros.messages import SolidPrimitive
+from compas_fab.backends.ros.messages import Time
+from compas_fab.backends.ros.messages import TrajectoryConstraints
 
 __all__ = [
     'RosClient',
@@ -310,9 +303,6 @@ class RosClient(Ros):
         topic.publish(aco.msg)
 
 
-
-
-
     def follow_configurations(self, callback, joint_names, configurations, timesteps, timeout=None):
 
         if len(configurations) != len(timesteps):
@@ -353,25 +343,6 @@ class RosClient(Ros):
         goal.on('timeout', lambda: print('TIMEOUT'))
         action_client.on('timeout', lambda: print('CLIENT TIMEOUT'))
         goal.send(60000)
-
-
-    def direct_ur_movel(self, callback, frames, acceleration=None, velocity=None, time=None, radius=None):
-
-        action_client = DirectUrActionClient(self, timeout=50000)
-
-        script_lines = []
-        for frame in frames:
-            ptp = URPoseTrajectoryPoint(URPose.from_frame(frame), acceleration, velocity, time, radius)
-            move = URMovel(ptp)
-            script_lines.append(move)
-
-        urgoal = URGoal(script_lines)
-
-        goal = Goal(action_client, Message(urgoal.msg))
-        action_client.on('timeout', lambda: print('CLIENT TIMEOUT'))
-        # goal.on('feedback', lambda feedback: print(feedback))
-        goal.on('result', callback)
-        action_client.send_goal(goal)
 
     def get_planning_scene(self, callback, components):
         """
