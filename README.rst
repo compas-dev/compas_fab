@@ -8,7 +8,7 @@ compas_fab: Robotic Fabrication for COMPAS
     :target: https://travis-ci.org/gramaziokohler/compas_fab
     :alt: Travis-CI Build Status
 
-.. image:: https://img.shields.io/pypi/l/compas_fab.svg
+.. image:: https://img.shields.io/github/license/gramaziokohler/compas_fab.svg
     :target: https://pypi.python.org/pypi/compas_fab
     :alt: License
 
@@ -16,13 +16,8 @@ compas_fab: Robotic Fabrication for COMPAS
     :target: https://pypi.python.org/pypi/compas_fab
     :alt: PyPI Package latest release
 
-.. image:: https://img.shields.io/pypi/wheel/compas_fab.svg
-    :target: https://pypi.python.org/pypi/compas_fab
-    :alt: PyPI Wheel
-
-.. image:: https://img.shields.io/pypi/pyversions/compas_fab.svg
-    :target: https://pypi.python.org/pypi/compas_fab
-    :alt: Supported versions
+.. image:: https://anaconda.org/conda-forge/compas_fab/badges/version.svg
+    :target: https://anaconda.org/conda-forge/compas_fab
 
 .. image:: https://img.shields.io/pypi/implementation/compas_fab.svg
     :target: https://pypi.python.org/pypi/compas_fab
