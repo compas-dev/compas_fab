@@ -72,7 +72,7 @@ class BaseRobotArtist(object):
     def create(self, link, parent_transformation):
         """Triggers the drawing of the robot geometry.
 
-        This method delegates the geometry drawing to the :mesh:`draw_mesh` method.
+        This method delegates the geometry drawing to the :meth:`draw_mesh` method.
 
         Parameters
         ----------
