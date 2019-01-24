@@ -1,1 +1,1 @@
-from compas.geometry.objects import Frame
+from compas.geometry import Frame
