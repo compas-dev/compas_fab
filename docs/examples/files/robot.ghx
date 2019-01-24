@@ -2704,14 +2704,12 @@ if response_key not in sc.sticky:
     sc.sticky[response_key] = None
 
 
-def callback_result(response):
-    sc.sticky[response_key] = response
-
 if robot:
     if robot.client:
         if robot.client.is_connected:
             frame = Frame(plane.Origin, plane.XAxis, plane.YAxis)
-            robot.inverse_kinematics(frame, start_configuration, callback_result, group)
+            response = robot.inverse_kinematics(frame, start_configuration, group)
+            sc.sticky[response_key] = response
         else:
             print("Robot is not connected")
 
@@ -6103,14 +6101,13 @@ response_key = "response_" + guid
 if response_key not in sc.sticky:
     sc.sticky[response_key] = None
 
-def callback_result(response):
-    sc.sticky[response_key] = response
 
 if robot:
     if robot.client:
         if robot.client.is_connected:
             configuration = robot.get_group_configuration(group, configuration)
-            robot.forward_kinematics(configuration, callback_result, group)
+            response = robot.forward_kinematics(configuration, group)
+            sc.sticky[response_key] = response
         else:
             print("Robot is not connected")
 
@@ -6538,9 +6535,6 @@ if response_key not in sc.sticky:
 LOGGER = logging.getLogger('roslibpy')
 data = dict(requesting_solution=False)
 
-def callback_result(response):
-    sc.sticky[response_key] = response
-    update_component(ghenv, 100)
 
 
 if robot:
@@ -6548,9 +6542,10 @@ if robot:
         if robot.client.is_connected:
             if start_configuration and compute:
                 frames = [Frame(plane.Origin, plane.XAxis, plane.YAxis) for plane in planes]
-                robot.compute_cartesian_path(frames, start_configuration, float(max_step),
-                                             bool(avoid_collisions), callback_result, group)
-                sc.sticky[response_key] = None
+                response = robot.compute_cartesian_path(frames, start_configuration, float(max_step),
+                                             bool(avoid_collisions), group)
+                sc.sticky[response_key] = response
+                # update_component(ghenv, 100)  # Not needed now that it is sync?
         else:
             print("Robot is not connected")
             sc.sticky[response_key] = None
@@ -8453,16 +8448,14 @@ data = dict(requesting_solution=False)
 
 frame = Frame(goal_plane.Origin, goal_plane.XAxis, goal_plane.YAxis)
 
-def callback_result(response):
-    sc.sticky[response_key] = response
-    update_component(ghenv, 100)
 
 if robot:
     if robot.client:
         if robot.client.is_connected and start_configuration and compute:
             tolerance_angle = math.radians(tolerance_angle_deg)
-            robot.motion_plan_goal_frame(frame, start_configuration, float(tolerance_position), tolerance_angle, callback_result, group, path_constraints)
-            sc.sticky[response_key] = None
+            response = robot.motion_plan_goal_frame(frame, start_configuration, float(tolerance_position), tolerance_angle, group, path_constraints)
+            sc.sticky[response_key] = response
+            # update_component(ghenv, 100)  # Not needed now that it is sync?
 response = sc.sticky[response_key]</item>
                     <item name="Description" type_name="gh_string" type_code="10">A python scriptable component</item>
                     <item name="EditorLocation" type_name="gh_drawing_point" type_code="30">
