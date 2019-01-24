@@ -5,7 +5,6 @@ from __future__ import print_function
 import logging
 
 from compas.datastructures import Mesh
-from compas.datastructures import mesh_quads_to_triangles
 from compas.datastructures import mesh_transformed
 from compas.geometry import Frame
 from compas.geometry import Scale
@@ -562,8 +561,8 @@ class Robot(object):
     def motion_plan_goal_configuration(self, goal_configuration,
                     start_configuration, tolerance,
                     group=None, path_constraints=None,
-                    trajectory_constraints=None, planner_id='RRT', 
-                    num_planning_attempts=8, allowed_planning_time=2., 
+                    trajectory_constraints=None, planner_id='RRT',
+                    num_planning_attempts=8, allowed_planning_time=2.,
                     max_velocity_scaling_factor=1.,
                     max_acceleration_scaling_factor=1.):
         """Calculates a motion from start_configuration to goal_configuration.
@@ -642,10 +641,11 @@ class Robot(object):
         """
         self.ensure_client()
         root_link_name = self.model.root.name
+
         if scale:
             S = Scale([1./self.scale_factor] * 3)
             mesh = mesh_transformed(mesh, S)
-        mesh_quads_to_triangles(mesh) # ROS mesh message requires triangles
+
         self.client.collision_mesh(id_name, root_link_name, mesh, 1)
 
     def remove_collision_mesh_from_planning_scene(self, id_name):
@@ -680,12 +680,14 @@ class Robot(object):
         if not group:
             group = self.main_group_name # ensure semantics
         ee_link_name = self.get_end_effector_link_name(group)
+
         if scale:
             S = Scale([1./self.scale_factor] * 3)
             mesh = mesh_transformed(mesh, S)
-        mesh_quads_to_triangles(mesh) # ROS mesh message requires triangles
+
         if ee_link_name not in touch_links:
             touch_links.append(ee_link_name)
+
         self.client.attached_collision_mesh(id_name, ee_link_name, mesh, 1, touch_links)
 
     def remove_attached_collision_mesh(self, id_name, group=None):

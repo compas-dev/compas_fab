@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import functools
 
+from compas.datastructures import mesh_quads_to_triangles
 from compas.geometry import Frame
 from compas.utilities import await_callback
 from roslibpy import Message
@@ -387,34 +388,34 @@ class RosClient(Ros):
 
         self.GET_MOTION_PLAN(self, request, callback, errback)
 
-    def collision_mesh(self, id_name, root_link, compas_mesh, operation=1):
-        """
-        """
-        co = CollisionObject(header=Header(frame_id=root_link), id=id_name)
+    def build_collision_object(self, frame_id, id_name, compas_mesh, operation):
+        co = CollisionObject(header=Header(frame_id=frame_id), id=id_name)
+
         if compas_mesh:
+            # ROS mesh message requires triangles
+            compas_mesh = mesh_quads_to_triangles(compas_mesh)
             mesh = Mesh.from_mesh(compas_mesh)
             co.meshes = [mesh]
             co.mesh_poses = [Pose()]
+
         if operation:
             co.operation = CollisionObject.ADD
         else:
             co.operation = CollisionObject.REMOVE
 
+        return co
+
+    def collision_mesh(self, id_name, root_link, compas_mesh, operation=1):
+        """
+        """
+        co = self.build_collision_object(root_link, id_name, compas_mesh, operation)
         topic = Topic(self, '/collision_object', 'moveit_msgs/CollisionObject')
         topic.publish(co.msg)
 
     def attached_collision_mesh(self, id_name, ee_link, compas_mesh, operation=1, touch_links=[]):
         """
         """
-        co = CollisionObject(header=Header(frame_id=ee_link), id=id_name)
-        if compas_mesh:
-            mesh = Mesh.from_mesh(compas_mesh)
-            co.meshes = [mesh]
-            co.mesh_poses = [Pose()]
-        if operation:
-            co.operation = CollisionObject.ADD
-        else:
-            co.operation = CollisionObject.REMOVE
+        co = self.build_collision_object(ee_link, id_name, compas_mesh, operation)
 
         aco = AttachedCollisionObject()
         aco.link_name = ee_link
