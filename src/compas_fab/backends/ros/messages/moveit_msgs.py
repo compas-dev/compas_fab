@@ -45,7 +45,7 @@ class AttachedCollisionObject(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html
     """
 
-    def __init__(self, link_name=None, object=None, touch_links=None, 
+    def __init__(self, link_name=None, object=None, touch_links=None,
                  detach_posture=None, weight=0):
         self.link_name = link_name if link_name else ''
         self.object = object if object else CollisionObject()
@@ -113,8 +113,8 @@ class PositionIKRequest(ROSmsg):
                                        avoid_collisions=True)
     """
 
-    def __init__(self, group_name="robot", robot_state=None, constraints=None, 
-                 pose_stamped=None, timeout=1.0, attempts=8, 
+    def __init__(self, group_name="robot", robot_state=None, constraints=None,
+                 pose_stamped=None, timeout=1.0, attempts=8,
                  avoid_collisions=True):
         self.group_name = group_name
         self.robot_state = robot_state if robot_state else RobotState()
@@ -188,7 +188,10 @@ class MoveItErrorCodes(ROSmsg):
 
     def __eq__(self, other):
         return self.val == other
-    
+
+    def __ne__(self, other):
+        return self.val != other
+
     @property
     def human_readable(self):
         cls = type(self)
@@ -241,37 +244,37 @@ class VisibilityConstraint(ROSmsg):
 class BoundingVolume(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/BoundingVolume.html
     """
-    def __init__(self, primitives=None, primitive_poses=None, meshes=None, 
+    def __init__(self, primitives=None, primitive_poses=None, meshes=None,
                  mesh_poses=None):
-        self.primitives = primitives if primitives else [] #shape_msgs/SolidPrimitive[] 
-        self.primitive_poses = primitive_poses if primitive_poses else [] #geometry_msgs/Pose[] 
-        self.meshes = meshes if meshes else [] #shape_msgs/Mesh[] 
-        self.mesh_poses = mesh_poses if mesh_poses else [] #geometry_msgs/Pose[] 
+        self.primitives = primitives if primitives else [] #shape_msgs/SolidPrimitive[]
+        self.primitive_poses = primitive_poses if primitive_poses else [] #geometry_msgs/Pose[]
+        self.meshes = meshes if meshes else [] #shape_msgs/Mesh[]
+        self.mesh_poses = mesh_poses if mesh_poses else [] #geometry_msgs/Pose[]
 
 class PositionConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionConstraint.html
     """
-    def __init__(self, header=None, link_name=None, target_point_offset=None, 
+    def __init__(self, header=None, link_name=None, target_point_offset=None,
                  constraint_region=None, weight=None):
         self.header = header if header else Header()
         self.link_name = link_name if link_name else ""
-        self.target_point_offset = target_point_offset if target_point_offset else Vector3(0.,0.,0.) # geometry_msgs/Vector3 
-        self.constraint_region = constraint_region if constraint_region else BoundingVolume() # moveit_msgs/BoundingVolume 
-        self.weight = weight if weight else 1.# float64 
+        self.target_point_offset = target_point_offset if target_point_offset else Vector3(0.,0.,0.) # geometry_msgs/Vector3
+        self.constraint_region = constraint_region if constraint_region else BoundingVolume() # moveit_msgs/BoundingVolume
+        self.weight = weight if weight else 1.# float64
 
 class OrientationConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/OrientationConstraint.html
     """
-    def __init__(self, header=None, orientation=None, link_name=None, 
+    def __init__(self, header=None, orientation=None, link_name=None,
                  absolute_x_axis_tolerance=0.0, absolute_y_axis_tolerance=0.0,
                  absolute_z_axis_tolerance=0.0, weight=1):
         self.header = header if header else Header()
-        self.orientation = orientation if orientation else Quaternion()#geometry_msgs/Quaternion 
+        self.orientation = orientation if orientation else Quaternion()#geometry_msgs/Quaternion
         self.link_name = link_name if link_name else ""
         self.absolute_x_axis_tolerance = absolute_x_axis_tolerance
         self.absolute_y_axis_tolerance = absolute_y_axis_tolerance
         self.absolute_z_axis_tolerance = absolute_z_axis_tolerance
-        self.weight = weight # float64 
+        self.weight = weight # float64
 
 
 class PlanningSceneComponents(ROSmsg):
@@ -293,7 +296,7 @@ class PlanningSceneComponents(ROSmsg):
 
     def __eq__(self, other):
         return self.components == other
-    
+
     @property
     def human_readable(self):
         cls = type(self)
@@ -306,10 +309,10 @@ class  AllowedCollisionMatrix(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/AllowedCollisionMatrix.html
     """
     def __init__(self, entry_names=None, entry_values=None, default_entry_names=None, default_entry_values=None):
-        self.entry_names = entry_names if entry_names else [] # string[] 
-        self.entry_values = entry_values if entry_values else [] # moveit_msgs/AllowedCollisionEntry[] 
-        self.default_entry_names = default_entry_names if default_entry_names else [] # string[] 
-        self.default_entry_values = default_entry_values if default_entry_values else [] # bool[] 
+        self.entry_names = entry_names if entry_names else [] # string[]
+        self.entry_values = entry_values if entry_values else [] # moveit_msgs/AllowedCollisionEntry[]
+        self.default_entry_names = default_entry_names if default_entry_names else [] # string[]
+        self.default_entry_values = default_entry_values if default_entry_values else [] # bool[]
 
 class PlanningSceneWorld(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningSceneWorld.html
@@ -321,19 +324,19 @@ class PlanningSceneWorld(ROSmsg):
 class PlanningScene(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningScene.html
     """
-    def __init__(self, name='', robot_state=None, robot_model_name='', 
+    def __init__(self, name='', robot_state=None, robot_model_name='',
                  fixed_frame_transforms=None, allowed_collision_matrix=None,
                  link_padding=None, link_scale=None, object_colors=None, world=None,
                  is_diff=False):
         self.name = name # string
-        self.robot_state = robot_state if robot_state else RobotState() # moveit_msgs/RobotState 
-        self.robot_model_name = robot_model_name # string 
-        self.fixed_frame_transforms = fixed_frame_transforms if fixed_frame_transforms else [] # geometry_msgs/TransformStamped[] 
+        self.robot_state = robot_state if robot_state else RobotState() # moveit_msgs/RobotState
+        self.robot_model_name = robot_model_name # string
+        self.fixed_frame_transforms = fixed_frame_transforms if fixed_frame_transforms else [] # geometry_msgs/TransformStamped[]
         self.allowed_collision_matrix = allowed_collision_matrix if allowed_collision_matrix else AllowedCollisionMatrix()
-        self.link_padding = link_padding if link_padding else [] # moveit_msgs/LinkPadding[] 
-        self.link_scale = link_scale if link_scale else [] # moveit_msgs/LinkScale[] 
-        self.object_colors = object_colors if object_colors else [] # moveit_msgs/ObjectColor[] 
-        self.world = world if world else PlanningSceneWorld() # moveit_msgs/PlanningSceneWorld 
+        self.link_padding = link_padding if link_padding else [] # moveit_msgs/LinkPadding[]
+        self.link_scale = link_scale if link_scale else [] # moveit_msgs/LinkScale[]
+        self.object_colors = object_colors if object_colors else [] # moveit_msgs/ObjectColor[]
+        self.world = world if world else PlanningSceneWorld() # moveit_msgs/PlanningSceneWorld
         self.is_diff = is_diff # bool
 
         """
@@ -355,7 +358,7 @@ class PlanningScene(ROSmsg):
         robot_state = RobotState.from_msg(msg['robot_state'])
         allowed_collision_matrix = msg['allowed_collision_matrix']
         world = msg['world']
-        return cls(msg['name'], robot_state, msg['robot_model_name'], 
+        return cls(msg['name'], robot_state, msg['robot_model_name'],
                  msg['fixed_frame_transforms'], allowed_collision_matrix,
                  msg['link_padding'], msg['link_scale'], msg['object_colors'],
                  world, msg['is_diff'])
