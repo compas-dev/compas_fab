@@ -144,7 +144,7 @@ class RosClient(Ros):
     @validated_response
     def inverse_kinematics(self, frame, base_link, group,
                            joint_names, joint_positions, avoid_collisions=True,
-                           constraints=None):
+                           constraints=None, attempts=8):
         kwargs = {}
         kwargs['frame'] = frame
         kwargs['base_link'] = base_link
@@ -153,6 +153,7 @@ class RosClient(Ros):
         kwargs['joint_positions'] = joint_positions
         kwargs['avoid_collisions'] = avoid_collisions
         kwargs['constraints'] = constraints
+        kwargs['attempts'] = attempts
 
         kwargs['errback_name'] = 'errback'
 
@@ -160,7 +161,7 @@ class RosClient(Ros):
 
     def inverse_kinematics_async(self, callback, errback, frame, base_link, group,
                                  joint_names, joint_positions, avoid_collisions=True,
-                                 constraints=None):
+                                 constraints=None, attempts=8):
         """
         """
         header = Header(frame_id=base_link)
@@ -173,7 +174,8 @@ class RosClient(Ros):
                                        robot_state=start_state,
                                        constraints=constraints,
                                        pose_stamped=pose_stamped,
-                                       avoid_collisions=avoid_collisions)
+                                       avoid_collisions=avoid_collisions,
+                                       attempts=attempts)
 
         self.GET_POSITION_IK(self, (ik_request, ), callback, errback)
 
@@ -204,7 +206,7 @@ class RosClient(Ros):
     @validated_response
     def compute_cartesian_path(self, frames, base_link,
                                ee_link, group, joint_names, joint_positions,
-                               max_step, avoid_collisions):
+                               max_step, avoid_collisions, path_constraints):
         kwargs = {}
         kwargs['frames'] = frames
         kwargs['base_link'] = base_link
@@ -214,6 +216,7 @@ class RosClient(Ros):
         kwargs['joint_positions'] = joint_positions
         kwargs['max_step'] = max_step
         kwargs['avoid_collisions'] = avoid_collisions
+        kwargs['path_constraints'] = path_constraints
 
         kwargs['errback_name'] = 'errback'
 
@@ -221,7 +224,7 @@ class RosClient(Ros):
 
     def compute_cartesian_path_async(self, callback, errback, frames, base_link,
                                      ee_link, group, joint_names, joint_positions,
-                                     max_step, avoid_collisions):
+                                     max_step, avoid_collisions, path_constraints):
         """
         """
         header = Header(frame_id=base_link)
@@ -235,7 +238,8 @@ class RosClient(Ros):
                        link_name=ee_link,
                        waypoints=waypoints,
                        max_step=float(max_step),
-                       avoid_collisions=bool(avoid_collisions))
+                       avoid_collisions=bool(avoid_collisions),
+                       path_constraints=path_constraints)
 
         self.GET_CARTESIAN_PATH(self, request, callback, errback)
 

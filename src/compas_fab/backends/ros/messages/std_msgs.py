@@ -42,6 +42,9 @@ class Time(ROSmsg):
         self.secs = secs
         self.nsecs = nsecs
 
+    def seconds(self):
+        return self.secs + 1e-9 * self.nsecs
+
 
 class Header(ROSmsg):
     """http://docs.ros.org/melodic/api/std_msgs/html/msg/Header.html
