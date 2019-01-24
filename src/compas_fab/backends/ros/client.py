@@ -393,7 +393,7 @@ class RosClient(Ros):
 
         if compas_mesh:
             # ROS mesh message requires triangles
-            compas_mesh = mesh_quads_to_triangles(compas_mesh)
+            mesh_quads_to_triangles(compas_mesh)
             mesh = Mesh.from_mesh(compas_mesh)
             co.meshes = [mesh]
             co.mesh_poses = [Pose()]
