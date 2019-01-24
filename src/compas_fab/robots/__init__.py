@@ -19,7 +19,7 @@ Classes
     PathPlan
     Robot
     RobotSemantics
-    UrdfImporter
+    RosFileServerLoader
 
 Unit conversion
 ---------------
