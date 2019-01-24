@@ -345,8 +345,7 @@ class Robot(object):
         return values_scaled
 
     def inverse_kinematics(self, frame_WCF, current_configuration=None,
-                           callback=None, group=None, avoid_collisions=True,
-                           constraints=None):
+                           group=None, avoid_collisions=True, constraints=None):
         """Calculate the robot's inverse kinematic.
 
         Parameters
@@ -356,8 +355,6 @@ class Robot(object):
                 the inverse will be calculated such that the calculated joint
                 positions differ the least from the current configuration.
                 Defaults to the zero position for all joints.
-            callback (function, optional): the function to call for the
-                processing the result. Defaults to the print function.
             group (str, optional): The planning group used for calculation.
                 Defaults to the robot's main planning group.
             avoid_collisions (bool)
@@ -380,8 +377,6 @@ class Robot(object):
             if len(joint_names) != len(current_configuration.values):
                 raise ValueError("Please pass a configuration with %d values" % len(joint_names))
             joint_positions = current_configuration.values
-        if not callback:
-            callback = print
 
         joint_positions = self.scale_joint_values(joint_positions, 1./self.scale_factor)
 
@@ -389,30 +384,23 @@ class Robot(object):
         frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
         frame_RCF.point /= self.scale_factor # must be in meters
 
-        def pre_callback_result(response):
-            # TODO: make compas_fab response types?
-            from compas_fab.backends.ros import MoveItErrorCodes
-            if response.error_code == MoveItErrorCodes.SUCCESS:
-                joint_positions = response.solution.joint_state.position
-                joint_positions = self.scale_joint_values(joint_positions,
-                                                             self.scale_factor)
-                response.configuration = Configuration(joint_positions,
-                                                       self.get_configurable_joint_types()) # full configuration
-            callback(response)
-
-        self.client.inverse_kinematics(pre_callback_result, frame_RCF, base_link,
+        response = self.client.inverse_kinematics(frame_RCF, base_link,
                                        group, joint_names, joint_positions,
                                        avoid_collisions, constraints)
 
-    def forward_kinematics(self, configuration, callback=None, group=None):
+        joint_positions = response.solution.joint_state.position
+        joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
+        response.configuration = Configuration(joint_positions, self.get_configurable_joint_types()) # full configuration
+
+        return response
+
+    def forward_kinematics(self, configuration, group=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
         ----------
             configuration (:class:`Configuration`, optional): The configuration
                 to calculate the forward kinematic for.
-            callback (function, optional): the function to call for the
-                processing the result. Defaults to the print function.
             group (str, optional): The planning group used for calculation.
                 Defaults to the robot's main planning group.
 
@@ -422,8 +410,6 @@ class Robot(object):
         self.ensure_client()
         if not group:
             group = self.main_group_name # ensure semantics
-        if not callback:
-            callback = print
 
         joint_names = self.get_configurable_joint_names(group)
         if len(joint_names) != len(configuration.values):
@@ -436,23 +422,17 @@ class Robot(object):
         joint_names = self.get_configurable_joint_names(group)
         ee_link = self.get_end_effector_link_name(group)
 
-        def pre_callback_result(response):
-            # TODO: make compas_fab response types?
-            from compas_fab.backends.ros import MoveItErrorCodes
-            if response.error_code == MoveItErrorCodes.SUCCESS:
-                frame_RCF = response.pose_stamped[0].pose.frame
-                frame_RCF.point *= self.scale_factor
-                response.frame_RCF = frame_RCF
-                response.frame_WCF = self.represent_frame_in_WCF(frame_RCF, group)
-            callback(response)
+        response = self.client.forward_kinematics(joint_positions, base_link, group, joint_names, ee_link)
 
-        self.client.forward_kinematics(pre_callback_result, joint_positions,
-                                       base_link, group, joint_names, ee_link)
+        frame_RCF = response.pose_stamped[0].pose.frame
+        frame_RCF.point *= self.scale_factor
+        response.frame_RCF = frame_RCF
+        response.frame_WCF = self.represent_frame_in_WCF(frame_RCF, group)
 
+        return response
 
     def compute_cartesian_path(self, frames_WCF, start_configuration, max_step,
-                               avoid_collisions=True, callback=None,
-                               group=None):
+                               avoid_collisions=True, group=None):
         """Calculates a path defined by frames (Cartesian coordinate system).
 
         Parameters
@@ -463,8 +443,6 @@ class Robot(object):
             max_step (float): the approximate distance between the calculated
                 points. (Defined in the robot's units)
             avoid_collisions (bool)
-            callback (function, optional): the function to call for the
-                processing the result. Defaults to the print function.
             group (str, optional): The planning group used for calculation.
                 Defaults to the robot's main planning group.
 
@@ -474,8 +452,6 @@ class Robot(object):
         self.ensure_client()
         if not group:
             group = self.main_group_name # ensure semantics
-        if not callback:
-            callback = print
         frames_RCF = []
         for frame_WCF in frames_WCF:
              # represent in RCF
@@ -496,31 +472,27 @@ class Robot(object):
         ee_link = self.get_end_effector_link_name(group)
         max_step_scaled = max_step/self.scale_factor
 
-        def pre_callback_result(response):
-            # TODO: make compas_fab response types?
-            from compas_fab.backends.ros import MoveItErrorCodes
-            if response.error_code == MoveItErrorCodes.SUCCESS:
-                # save joint_positions into configurations
-                configurations = []
-                for point in response.solution.joint_trajectory.points:
-                    joint_positions = point.positions
-                    joint_positions = self.scale_joint_values(joint_positions, self.scale_factor, group)
-                    configurations.append(Configuration(joint_positions, self.get_configurable_joint_types(group)))
-                response.configurations =  configurations
-
-                # save start state into start_configuration
-                joint_positions = response.start_state.joint_state.position
-                joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
-                response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
-
-            callback(response)
-
-        self.client.compute_cartesian_path(pre_callback_result, frames_RCF, base_link,
+        response = self.client.compute_cartesian_path(frames_RCF, base_link,
                                            ee_link, group, joint_names, joint_positions,
                                            max_step_scaled, avoid_collisions)
 
+        # save joint_positions into configurations
+        configurations = []
+        for point in response.solution.joint_trajectory.points:
+            joint_positions = point.positions
+            joint_positions = self.scale_joint_values(joint_positions, self.scale_factor, group)
+            configurations.append(Configuration(joint_positions, self.get_configurable_joint_types(group)))
+        response.configurations =  configurations
+
+        # save start state into start_configuration
+        joint_positions = response.start_state.joint_state.position
+        joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
+        response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
+
+        return response
+
     def motion_plan_goal_frame(self, frame_WCF, start_configuration,
-                    tolerance_position, tolerance_angle, callback=None,
+                    tolerance_position, tolerance_angle,
                     group=None, path_constraints=None,
                     trajectory_constraints=None, planner_id='',
                     num_planning_attempts=8, allowed_planning_time=2.,
@@ -536,8 +508,6 @@ class Robot(object):
                 position. (Defined in the robot's units)
             tolerance_angle (float): the allowed tolerance to the frame's
                 orientation in radians.
-            callback (function, optional): the function to call for the
-                processing the result. Defaults to the print function.
             group (str, optional): The planning group used for calculation.
                 Defaults to the robot's main planning group.
 
@@ -547,8 +517,6 @@ class Robot(object):
         self.ensure_client()
         if not group:
             group = self.main_group_name # ensure semantics
-        if not callback:
-            callback = print
 
         frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
         frame_RCF.point /= self.scale_factor
@@ -567,24 +535,7 @@ class Robot(object):
             joint_positions = start_configuration.values
         joint_positions = self.scale_joint_values(joint_positions, 1./self.scale_factor)
 
-        def pre_callback_result(response):
-            # TODO: make compas_fab response types?
-            from compas_fab.backends.ros import MoveItErrorCodes
-            if response.error_code == MoveItErrorCodes.SUCCESS:
-                # save joint_positions into configurations
-                configurations = []
-                for point in response.trajectory.joint_trajectory.points:
-                    joint_positions = point.positions
-                    joint_positions = self.scale_joint_values(joint_positions, self.scale_factor, group)
-                    configurations.append(Configuration(joint_positions, self.get_configurable_joint_types(group)))
-                response.configurations =  configurations
-                # save trajectory start into start_configuration
-                joint_positions = response.trajectory_start.joint_state.position
-                joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
-                response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
-            callback(response)
-
-        self.client.motion_plan_goal_frame(pre_callback_result, frame_RCF,
+        response = self.client.motion_plan_goal_frame(frame_RCF,
                                 base_link, ee_link, group, joint_names,
                                 joint_positions, tolerance_position,
                                 tolerance_angle, path_constraints,
@@ -592,8 +543,23 @@ class Robot(object):
                                 num_planning_attempts, allowed_planning_time,
                                 max_velocity_scaling_factor, max_acceleration_scaling_factor)
 
+        # save joint_positions into configurations
+        configurations = []
+        for point in response.trajectory.joint_trajectory.points:
+            joint_positions = point.positions
+            joint_positions = self.scale_joint_values(joint_positions, self.scale_factor, group)
+            configurations.append(Configuration(joint_positions, self.get_configurable_joint_types(group)))
+        response.configurations =  configurations
+
+        # save trajectory start into start_configuration
+        joint_positions = response.trajectory_start.joint_state.position
+        joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
+        response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
+
+        return response
+
     def motion_plan_goal_configuration(self, goal_configuration,
-                    start_configuration, tolerance, callback=None,
+                    start_configuration, tolerance,
                     group=None, path_constraints=None,
                     trajectory_constraints=None,
                     planner_id='', num_planning_attempts=8,
@@ -608,8 +574,6 @@ class Robot(object):
                 configuration at the starting position.
             tolerance (float or float list): the allowed tolerance to joints'
                 position.
-            callback (function, optional): the function to call for the
-                processing the result. Defaults to the print function.
             group (str, optional): The planning group used for calculation.
                 Defaults to the robot's main planning group.
 
@@ -619,8 +583,6 @@ class Robot(object):
         self.ensure_client()
         if not group:
             group = self.main_group_name # ensure semantics
-        if not callback:
-            callback = print
 
         base_link = self.get_base_link_name(group)
         joint_names = self.get_configurable_joint_names()
@@ -645,29 +607,25 @@ class Robot(object):
                 raise ValueError("Please pass a configuration with %d values" % len(joint_names))
             joint_positions = start_configuration.values
 
-        def pre_callback_result(response):
-            # TODO: make compas_fab response types?
-            from compas_fab.backends.ros import MoveItErrorCodes
-            if response.error_code == MoveItErrorCodes.SUCCESS:
-                # save joint_positions into configurations
-                configurations = []
-                for point in response.trajectory.joint_trajectory.points:
-                    joint_positions = point.positions
-                    joint_positions = self.scale_joint_values(joint_positions, self.scale_factor, group)
-                    configurations.append(Configuration(joint_positions, self.get_configurable_joint_types(group)))
-                response.configurations =  configurations
-                # save trajectory start into start_configuration
-                joint_positions = response.trajectory_start.joint_state.position
-                joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
-                response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
-            callback(response)
+        response = self.client.motion_plan_goal_joint_positions(joint_positions_goal, joint_names_goal, tolerances,
+                                                                base_link, group, joint_names, joint_positions,
+                                                                path_constraints, trajectory_constraints, planner_id,
+                                                                num_planning_attempts, allowed_planning_time,
+                                                                max_velocity_scaling_factor, max_acceleration_scaling_factor)
 
-        self.client.motion_plan_goal_joint_positions(pre_callback_result,
-                    joint_positions_goal, joint_names_goal, tolerances,
-                    base_link, group, joint_names, joint_positions,
-                    path_constraints, trajectory_constraints, planner_id,
-                    num_planning_attempts, allowed_planning_time,
-                    max_velocity_scaling_factor, max_acceleration_scaling_factor)
+        configurations = []
+        for point in response.trajectory.joint_trajectory.points:
+            joint_positions = point.positions
+            joint_positions = self.scale_joint_values(joint_positions, self.scale_factor, group)
+            configurations.append(Configuration(joint_positions, self.get_configurable_joint_types(group)))
+        response.configurations =  configurations
+
+        # save trajectory start into start_configuration
+        joint_positions = response.trajectory_start.joint_state.position
+        joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
+        response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
+
+        return response
 
 
     def add_collision_mesh_to_planning_scene(self, id_name, mesh, scale=False):
