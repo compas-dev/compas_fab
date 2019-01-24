@@ -7,13 +7,13 @@ Creating a URDF of the UR10 on two linear axes
 1. Export meshes
 ================
 
-* Before exporting, please move the elements of the tower's axes such that they are 
-  positioned in their zero-positions and make sure that the model is defined in 
-  *meters*. 
+* Before exporting, please move the elements of the tower's axes such that they are
+  positioned in their zero-positions and make sure that the model is defined in
+  *meters*.
 * Define the axes with lines and mark the initial joint positions with a point.
-* Then export both visual and collision meshes: For the moveable meshes choose 
+* Then export both visual and collision meshes: For the moveable meshes choose
   "Export with origin" and select the respective point you just defined before.
-  The export format must be ROS-friendly, like .stl or .obj (see below). (Here 
+  The export format must be ROS-friendly, like .stl or .obj (see below). (Here
   we use the same visual and collision meshes.)
 
 .. figure:: 09_ur10_tower_urdf_01.jpg
@@ -169,27 +169,27 @@ Explanation:
 ------------
 
 We define a parameterized macro with 1 parameter (``prefix``). That is practical
-if we want to use the tower twice in the same urdf, then we need to use both 
-towers with different prefixes to distinguish links and joints. 
+if we want to use the tower twice in the same urdf, then we need to use both
+towers with different prefixes to distinguish links and joints.
 
 The tower consists of 3 links and 2 prismatic joints in between:
 
 * ``tower`` (link): The geometry that is fixed
-* ``axis1_joint`` (joint): The prismatic joint along which the model moves in 
+* ``axis1_joint`` (joint): The prismatic joint along which the model moves in
   z-axis. Define the ``axis`` as z-axis (0 0 1) and for the ``origin``
   enter the point you defined before exporting. For the ``limit`` please enter
-  the minimal and maximal position (translation) of the joint. 
+  the minimal and maximal position (translation) of the joint.
 * ``axis1`` (link): The geometry that moves along the tower in z-axis
-* ``axis2_joint`` (joint): The prismatic joint along which the model moves in 
-  x-axis. Define the ``axis`` as x-axis (1 0 0) and for the ``origin`` 
-  calculate from the point you defined before exporting the **RELATIVE** 
+* ``axis2_joint`` (joint): The prismatic joint along which the model moves in
+  x-axis. Define the ``axis`` as x-axis (1 0 0) and for the ``origin``
+  calculate from the point you defined before exporting the **RELATIVE**
   translation to ``axis1_joint``. For the ``limit`` please enter
-  the minimal and maximal position (translation) of the joint. 
+  the minimal and maximal position (translation) of the joint.
 * ``axis2`` (link): The geometry that moves along ``axis1`` in x-axis
 
 
 ur10_tower.xacro
------------
+----------------
 
 Now we create a new xacro file, which combines the ur10 with the tower::
 
@@ -230,23 +230,23 @@ Explanation:
 ------------
 
 * To define the tower in regard to the world coordinate frame, we add first the
-  ``world`` link (no geometry) with the ``world_joint`` in the worldXY frame and add the 
+  ``world`` link (no geometry) with the ``world_joint`` in the worldXY frame and add the
   ``world`` link as parent and the ``tower`` link as child.
 * Then we include the ``tower.xacro`` with parameter ``prefix=""``.
-* We define another joint (``attachment_joint``) between the ``axis2`` link (parent) and the 
-  ``base_link`` (child) of the robot (the first link in the robot's 
+* We define another joint (``attachment_joint``) between the ``axis2`` link (parent) and the
+  ``base_link`` (child) of the robot (the first link in the robot's
   kinematic model). This joint is fixed, has no translation in
-  regard to its previous joint (which is ``axis2_joint``), however it has a 
+  regard to its previous joint (which is ``axis2_joint``), however it has a
   rotation (``rpy="${pi/2} 0.0 ${pi/2}"``) since the robot is mounted on the
   side. The rotation is expressed in static "xyz" euler angles.
-  
+
   Just as a quick reminder, this can be calculated as such:
 
 .. code-block:: python
 
     from compas.geometry import Frame
     from compas.geometry import Transformation
-    
+
     f1 = Frame.worldXY()
     f2 = Frame.worldYZ()
     T = Transformation.from_frame_to_frame(f1, f2)
@@ -299,7 +299,7 @@ Now modify ``display.launch`` in the ``launch`` directory::
 
   pico ~/robotic_setups/src/launch/display.launch
 
-Change the 2 ``arg`` tags with ``name="model"`` and ``name="rvizconfig"`` such 
+Change the 2 ``arg`` tags with ``name="model"`` and ``name="rvizconfig"`` such
 that they match the following:
 
 .. code-block:: xml
@@ -333,10 +333,10 @@ And then run::
     :figclass: figure
     :class: figure-img img-fluid
 
-This shows the model turned, but no worries. It is only because the default 
+This shows the model turned, but no worries. It is only because the default
 value for the global fixed frame is ``base_link`` which is not correct in our case.
 
-Under Global Options > Fixed Frame > change ``base_link`` to ``tower`` or 
+Under Global Options > Fixed Frame > change ``base_link`` to ``tower`` or
 ``world`` and press save.
 
 Then you should see something like that:
