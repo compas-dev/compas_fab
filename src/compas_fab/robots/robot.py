@@ -522,8 +522,7 @@ class Robot(object):
     def motion_plan_goal_frame(self, frame_WCF, start_configuration,
                     tolerance_position, tolerance_angle, callback=None,
                     group=None, path_constraints=None,
-                    trajectory_constraints=None, joint_constraints=None,
-                    planner_id='',
+                    trajectory_constraints=None, planner_id='RRT',
                     num_planning_attempts=8, allowed_planning_time=2.,
                     max_velocity_scaling_factor=1., max_acceleration_scaling_factor=1.):
         """Calculates a motion from start_configuration to frame_WCF.
@@ -589,17 +588,16 @@ class Robot(object):
                                 base_link, ee_link, group, joint_names,
                                 joint_positions, tolerance_position,
                                 tolerance_angle, path_constraints,
-                                trajectory_constraints, joint_constraints,
-                                planner_id,
+                                trajectory_constraints, planner_id,
                                 num_planning_attempts, allowed_planning_time,
                                 max_velocity_scaling_factor, max_acceleration_scaling_factor)
 
     def motion_plan_goal_configuration(self, goal_configuration,
                     start_configuration, tolerance, callback=None,
                     group=None, path_constraints=None,
-                    trajectory_constraints=None, joint_constraints=None,
-                    planner_id='', num_planning_attempts=8,
-                    allowed_planning_time=2., max_velocity_scaling_factor=1.,
+                    trajectory_constraints=None, planner_id='RRT', 
+                    num_planning_attempts=8, allowed_planning_time=2., 
+                    max_velocity_scaling_factor=1.,
                     max_acceleration_scaling_factor=1.):
         """Calculates a motion from start_configuration to goal_configuration.
 

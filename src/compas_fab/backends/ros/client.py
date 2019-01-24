@@ -177,7 +177,6 @@ class RosClient(Ros):
                                tolerance_position, tolerance_angle,
                                path_constraints=None,
                                trajectory_constraints=None,
-                               joint_constraints=None,
                                planner_id='', num_planning_attempts=8,
                                allowed_planning_time=2.,
                                max_velocity_scaling_factor=1.,
@@ -209,10 +208,7 @@ class RosClient(Ros):
         ocm.absolute_z_axis_tolerance = tolerance_angle
 
         # TODO: possibility to hand over more goal constraints
-        if joint_constraints:
-            goal_constraints = [Constraints(position_constraints=[pcm], orientation_constraints=[ocm], joint_constraints=joint_constraints)]
-        else:
-            goal_constraints = [Constraints(position_constraints=[pcm], orientation_constraints=[ocm])]
+        goal_constraints = [Constraints(position_constraints=[pcm], orientation_constraints=[ocm])]
 
         reqmsg = MotionPlanRequest(start_state=start_state,
                                    goal_constraints=goal_constraints,
