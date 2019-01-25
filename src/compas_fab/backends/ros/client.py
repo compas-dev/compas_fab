@@ -207,7 +207,8 @@ class RosClient(Ros):
     @validated_response
     def compute_cartesian_path(self, frames, base_link,
                                ee_link, group, joint_names, joint_positions,
-                               max_step, avoid_collisions, path_constraints):
+                               max_step, avoid_collisions, path_constraints,
+                               attached_collision_object):
         kwargs = {}
         kwargs['frames'] = frames
         kwargs['base_link'] = base_link
@@ -218,6 +219,7 @@ class RosClient(Ros):
         kwargs['max_step'] = max_step
         kwargs['avoid_collisions'] = avoid_collisions
         kwargs['path_constraints'] = path_constraints
+        kwargs['attached_collision_object'] = attached_collision_object
 
         kwargs['errback_name'] = 'errback'
 
@@ -225,13 +227,16 @@ class RosClient(Ros):
 
     def compute_cartesian_path_async(self, callback, errback, frames, base_link,
                                      ee_link, group, joint_names, joint_positions,
-                                     max_step, avoid_collisions, path_constraints):
+                                     max_step, avoid_collisions, path_constraints,
+                                     attached_collision_object):
         """
         """
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
         joint_state = JointState(header=header, name=joint_names, position=joint_positions)
         start_state = RobotState(joint_state, MultiDOFJointState(header=header))
+        if attached_collision_object:
+            start_state.attached_collision_objects = [attached_collision_object]
 
         request = dict(header=header,
                        start_state=start_state,
@@ -253,7 +258,8 @@ class RosClient(Ros):
                                planner_id='', num_planning_attempts=8,
                                allowed_planning_time=2.,
                                max_velocity_scaling_factor=1.,
-                               max_acceleration_scaling_factor=1.):
+                               max_acceleration_scaling_factor=1.,
+                               attached_collision_object=None):
         kwargs = {}
         kwargs['frame'] = frame
         kwargs['base_link'] = base_link
@@ -270,6 +276,7 @@ class RosClient(Ros):
         kwargs['allowed_planning_time'] = allowed_planning_time
         kwargs['max_velocity_scaling_factor'] = max_velocity_scaling_factor
         kwargs['max_acceleration_scaling_factor'] = max_acceleration_scaling_factor
+        kwargs['attached_collision_object'] = attached_collision_object
 
         kwargs['errback_name'] = 'errback'
 
@@ -283,7 +290,8 @@ class RosClient(Ros):
                                      planner_id='', num_planning_attempts=8,
                                      allowed_planning_time=2.,
                                      max_velocity_scaling_factor=1.,
-                                     max_acceleration_scaling_factor=1.):
+                                     max_acceleration_scaling_factor=1.,
+                                     attached_collision_object=None):
         """
         """
         # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
@@ -292,6 +300,8 @@ class RosClient(Ros):
         header = Header(frame_id=base_link)
         joint_state = JointState(header=header, name=joint_names, position=joint_positions)
         start_state = RobotState(joint_state, MultiDOFJointState(header=header))
+        if attached_collision_object:
+            start_state.attached_collision_objects = [attached_collision_object]
 
         pose = Pose.from_frame(frame)
 
@@ -331,7 +341,8 @@ class RosClient(Ros):
                                          path_constraints=None, trajectory_constraints=None,
                                          planner_id='', num_planning_attempts=8,
                                          allowed_planning_time=2., max_velocity_scaling_factor=1.,
-                                         max_acceleration_scaling_factor=1.):
+                                         max_acceleration_scaling_factor=1.,
+                                         attached_collision_object=None):
         kwargs = {}
         kwargs['joint_positions_goal'] = joint_positions_goal
         kwargs['joint_names_goal'] = joint_names_goal
@@ -347,6 +358,7 @@ class RosClient(Ros):
         kwargs['allowed_planning_time'] = allowed_planning_time
         kwargs['max_velocity_scaling_factor'] = max_velocity_scaling_factor
         kwargs['max_acceleration_scaling_factor'] = max_acceleration_scaling_factor
+        kwargs['attached_collision_object'] = attached_collision_object
 
         kwargs['errback_name'] = 'errback'
 
@@ -358,7 +370,8 @@ class RosClient(Ros):
                                                path_constraints=None, trajectory_constraints=None,
                                                planner_id='', num_planning_attempts=8,
                                                allowed_planning_time=2., max_velocity_scaling_factor=1.,
-                                               max_acceleration_scaling_factor=1.):
+                                               max_acceleration_scaling_factor=1.,
+                                               attached_collision_object=None):
         """
         """
         # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
@@ -366,6 +379,8 @@ class RosClient(Ros):
         header = Header(frame_id=base_link)
         joint_state = JointState(header=header, name=joint_names, position=joint_positions)
         start_state = RobotState(joint_state, MultiDOFJointState(header=header))
+        if attached_collision_object:
+            start_state.attached_collision_objects = [attached_collision_object]
 
         joint_constraints = []
         for position, joint_name, tolerance in zip(joint_positions_goal, joint_names_goal, tolerances):
@@ -398,30 +413,41 @@ class RosClient(Ros):
             co.meshes = [mesh]
             co.mesh_poses = [Pose()]
 
-        if operation:
+        if operation == 0:
             co.operation = CollisionObject.ADD
-        else:
+        elif operation == 1:
             co.operation = CollisionObject.REMOVE
+        elif operation == 2:
+            co.operation = CollisionObject.APPEND
+        else:
+            raise ValueError("Operation unknown")
 
         return co
 
-    def collision_mesh(self, id_name, root_link, compas_mesh, operation=1):
+    def collision_mesh(self, id_name, root_link, compas_mesh, operation=0):
         """
         """
         co = self.build_collision_object(root_link, id_name, compas_mesh, operation)
         topic = Topic(self, '/collision_object', 'moveit_msgs/CollisionObject')
         topic.publish(co.msg)
-
-    def attached_collision_mesh(self, id_name, ee_link, compas_mesh, operation=1, touch_links=[]):
+    
+    def build_attached_collision_mesh(self, ee_link, id_name, compas_mesh, operation, touch_links=None):
         """
         """
         co = self.build_collision_object(ee_link, id_name, compas_mesh, operation)
-
         aco = AttachedCollisionObject()
         aco.link_name = ee_link
         # The set of links that the attached objects are allowed to touch by default.
-        aco.touch_links = touch_links
+        if not touch_links:
+            aco.touch_links = [ee_link]
         aco.object = co
+        return aco
+
+
+    def attached_collision_mesh(self, id_name, ee_link, compas_mesh, operation=1, touch_links=None):
+        """
+        """
+        aco = self.build_attached_collision_mesh(ee_link, id_name, compas_mesh, operation, touch_links=None)
 
         topic = Topic(self, '/attached_collision_object', 'moveit_msgs/AttachedCollisionObject')
         topic.publish(aco.msg)

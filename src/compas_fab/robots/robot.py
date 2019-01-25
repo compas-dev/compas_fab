@@ -469,7 +469,8 @@ class Robot(object):
         return response
 
     def compute_cartesian_path(self, frames_WCF, start_configuration, max_step,
-                               avoid_collisions=True, group=None, path_constraints=None):
+                               avoid_collisions=True, group=None, path_constraints=None,
+                               attached_collision_object=None):
         """Calculates a path defined by frames (Cartesian coordinate system).
 
         Parameters
@@ -511,7 +512,8 @@ class Robot(object):
 
         response = self.client.compute_cartesian_path(frames_RCF, base_link,
                                            ee_link, group, joint_names, joint_positions,
-                                           max_step_scaled, avoid_collisions, path_constraints)
+                                           max_step_scaled, avoid_collisions, path_constraints,
+                                           attached_collision_object)
 
         # save joint_positions into configurations
         configurations = []
@@ -529,11 +531,13 @@ class Robot(object):
         return response
 
     def motion_plan_goal_frame(self, frame_WCF, start_configuration,
-                    tolerance_position, tolerance_angle,
-                    group=None, path_constraints=None,
-                    trajectory_constraints=None, planner_id='RRT',
-                    num_planning_attempts=8, allowed_planning_time=2.,
-                    max_velocity_scaling_factor=1., max_acceleration_scaling_factor=1.):
+                               tolerance_position, tolerance_angle,
+                               group=None, path_constraints=None,
+                               trajectory_constraints=None, planner_id='RRT',
+                               num_planning_attempts=8, allowed_planning_time=2.,
+                               max_velocity_scaling_factor=1., 
+                               max_acceleration_scaling_factor=1.,
+                               attached_collision_object=None):
         """Calculates a motion from start_configuration to frame_WCF.
 
         Parameters
@@ -578,7 +582,9 @@ class Robot(object):
                                 tolerance_angle, path_constraints,
                                 trajectory_constraints, planner_id,
                                 num_planning_attempts, allowed_planning_time,
-                                max_velocity_scaling_factor, max_acceleration_scaling_factor)
+                                max_velocity_scaling_factor, 
+                                max_acceleration_scaling_factor,
+                                attached_collision_object)
 
         # save joint_positions into configurations
         configurations = []
@@ -718,6 +724,16 @@ class Robot(object):
 
         self.client.collision_mesh(id_name, root_link_name, mesh, 2)
 
+    def build_attached_collision_mesh(self, id_name, mesh, group=None, touch_links=None, scale=False):
+        if not group:
+            group = self.main_group_name # ensure semantics
+        ee_link_name = self.get_end_effector_link_name(group)
+
+        if scale:
+            S = Scale([1./self.scale_factor] * 3)
+            mesh = mesh_transformed(mesh, S)
+
+        return self.client.build_attached_collision_mesh(ee_link_name, id_name, mesh, operation=0, touch_links=touch_links)
 
     def add_attached_collision_mesh(self, id_name, mesh, group=None, touch_links=[], scale=False):
         """Attaches a collision mesh to the robot's end-effector.
