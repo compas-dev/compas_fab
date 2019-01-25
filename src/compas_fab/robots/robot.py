@@ -296,6 +296,43 @@ class Robot(object):
         frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
         return frame_RCF
 
+    def represent_frame_in_transformed_RCF(self, frame_WCF, configuration, group=None):
+        """Returns the frame's representation the current robot's coordinate frame (RCF).
+
+        Parameters
+        ----------
+            frame_WCF (:class:`Frame`): A frame in the world coordinate frame.
+            configuration (:class:`Configuration`): The (full) configuration
+                from which the group's base frame is calculated.
+            group (str, optional): The planning group.
+                Defaults to the robot's main planning group.
+
+        Examples
+        --------
+        """
+
+        self.ensure_client()
+        if not group:
+            group = self.main_group_name # ensure semantics
+
+        base_link = self.get_base_link_name(group)
+        joint_names = self.get_configurable_joint_names()
+
+        if len(joint_names) != len(configuration.values):
+            raise ValueError("Please pass a configuration with %d values" % len(joint_names))
+        joint_positions = configuration.values
+        joint_positions = self.scale_joint_values(joint_positions, 1./self.scale_factor)
+
+        response = self.client.forward_kinematics(joint_positions, base_link, group, joint_names, base_link)
+        base_frame_RCF = response.pose_stamped[0].pose.frame # the group's transformed base_frame in RCF
+        base_frame = self.get_base_frame(group) # the group's original base_frame
+
+        T = Transformation.from_frame(base_frame)
+        base_frame = base_frame_RCF.transformed(T) # the current base frame
+        T = Transformation.from_frame_to_frame(base_frame, Frame.worldXY())
+        return frame_WCF.transformed(T)
+
+
     def represent_frame_in_WCF(self, frame_RCF, group=None):
         """Returns the representation of a frame in the robot's coordinate frame
         (RCF) in the world coordinate frame (WCF).
@@ -518,9 +555,9 @@ class Robot(object):
         if not group:
             group = self.main_group_name # ensure semantics
 
-        frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
-        frame_RCF.point /= self.scale_factor
-
+        frame_RCF = self.represent_frame_in_transformed_RCF(frame_WCF, start_configuration, group)
+        frame_RCF.point /= self.scale_factor # TODO: check!
+        
         tolerance_position = tolerance_position/self.scale_factor
 
         base_link = self.get_base_link_name(group)
@@ -646,7 +683,7 @@ class Robot(object):
             S = Scale([1./self.scale_factor] * 3)
             mesh = mesh_transformed(mesh, S)
 
-        self.client.collision_mesh(id_name, root_link_name, mesh, 1)
+        self.client.collision_mesh(id_name, root_link_name, mesh, 0)
 
     def remove_collision_mesh_from_planning_scene(self, id_name):
         """Removes a collision mesh from the robot's planning scene.
@@ -660,7 +697,26 @@ class Robot(object):
         """
         self.ensure_client()
         root_link_name = self.model.root.name
-        self.client.collision_mesh(id_name, root_link_name, None, 0)
+        self.client.collision_mesh(id_name, root_link_name, None, 1)
+    
+    def append_collision_mesh_to_planning_scene(self, id_name, mesh, scale=False):
+        """Appends a collision mesh to the robot's planning scene.
+
+        Parameters
+        ----------
+            id_name (str): The identifier of the collision mesh.
+            mesh (:class:`Mesh`): A triangulated COMPAS mesh.
+
+        Examples
+        --------
+        """
+        self.ensure_client()
+        root_link_name = self.model.root.name
+        if scale:
+            S = Scale([1./self.scale_factor] * 3)
+            mesh = mesh_transformed(mesh, S)
+
+        self.client.collision_mesh(id_name, root_link_name, mesh, 2)
 
 
     def add_attached_collision_mesh(self, id_name, mesh, group=None, touch_links=[], scale=False):
@@ -688,7 +744,7 @@ class Robot(object):
         if ee_link_name not in touch_links:
             touch_links.append(ee_link_name)
 
-        self.client.attached_collision_mesh(id_name, ee_link_name, mesh, 1, touch_links)
+        self.client.attached_collision_mesh(id_name, ee_link_name, mesh, 0, touch_links)
 
     def remove_attached_collision_mesh(self, id_name, group=None):
         """Removes an attached collision object from the robot's end-effector.
@@ -703,7 +759,7 @@ class Robot(object):
         if not group:
             group = self.main_group_name # ensure semantics
         ee_link_name = self.get_end_effector_link_name(group)
-        self.client.attached_collision_mesh(id_name, ee_link_name, None, 0)
+        self.client.attached_collision_mesh(id_name, ee_link_name, None, 1)
 
     def send_frame(self):
         # (check service name with ros)
@@ -722,15 +778,11 @@ class Robot(object):
 
     @property
     def frames(self):
-        frames = self.model.frames
-        #[frame.transform(self.transformation_RCF_WCF) for frame in frames]
-        return frames
+        return self.model.frames
 
     @property
     def axes(self):
-        axes = self.model.axes
-        #[axis.transform(self.transformation_RCF_WCF) for axis in axes]
-        return axes
+        return self.model.axes
 
     def update(self, configuration, collision=True, group=None):
         names = self.get_configurable_joint_names(group)
