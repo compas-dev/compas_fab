@@ -146,7 +146,7 @@ class Robot(object):
         # TODO: check this
         link = self.get_base_link(group)
         if link.parent_joint:
-            base_frame = link.parent_joint.origin.copy()
+            base_frame = link.parent_joint.init_origin.copy()
         else:
             base_frame = Frame.worldXY()
         if not self.artist:
@@ -412,15 +412,15 @@ class Robot(object):
         if not group:
             group = self.main_group_name # ensure semantics
 
-        joint_names = self.get_configurable_joint_names(group)
+        joint_names = self.get_configurable_joint_names()
         if len(joint_names) != len(configuration.values):
             raise ValueError("Please pass a configuration with %d values" % len(joint_names))
 
         joint_positions = configuration.values
-        joint_positions = self.scale_joint_values(joint_positions, 1./self.scale_factor, group)
+        joint_positions = self.scale_joint_values(joint_positions, 1./self.scale_factor)
 
         base_link = self.get_base_link_name(group)
-        joint_names = self.get_configurable_joint_names(group)
+        joint_names = self.get_configurable_joint_names()
         ee_link = self.get_end_effector_link_name(group)
 
         response = self.client.forward_kinematics(joint_positions, base_link, group, joint_names, ee_link)
