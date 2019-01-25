@@ -263,7 +263,20 @@ class Robot(object):
         if len(names) != len(configuration.values):
             raise ValueError("Please pass a configuration with %d values or specify group" % len(names))
         return configuration.values[names.index(joint_name)]
-
+    
+    def get_links_with_geometry(self, group=None):
+        """Returns the links with either visual or collision geometry.
+        """
+        if not group:
+            group = self.main_group_name
+        base_link_name = self.get_base_link_name(group)
+        ee_link_name = self.get_end_effector_link_name(group)
+        links_with_geometry = []
+        for link in self.model.iter_link_chain(base_link_name, ee_link_name):
+            if len(link.collision) or len(link.visual):
+                links_with_geometry.append(link)
+        return links_with_geometry
+ 
     def transformation_RCF_WCF(self, group=None):
         """Returns the transformation matrix from world coordinate system to
             robot coordinate system.
@@ -725,7 +738,7 @@ class Robot(object):
 
         self.client.collision_mesh(id_name, root_link_name, mesh, 2)
 
-    def build_attached_collision_mesh(self, id_name, mesh, group=None, touch_links=None, scale=False):
+    def create_collision_mesh_attached_to_end_effector(self, id_name, mesh, group=None, scale=False):
         if not group:
             group = self.main_group_name # ensure semantics
         ee_link_name = self.get_end_effector_link_name(group)
@@ -733,6 +746,10 @@ class Robot(object):
         if scale:
             S = Scale([1./self.scale_factor] * 3)
             mesh = mesh_transformed(mesh, S)
+        
+        last_link_with_geometry = self.get_links_with_geometry(group)[-1]
+        touch_links=[last_link_with_geometry.name]
+        print("touch_links", touch_links)
 
         return self.client.build_attached_collision_mesh(ee_link_name, id_name, mesh, operation=0, touch_links=touch_links)
 
