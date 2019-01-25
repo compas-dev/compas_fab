@@ -146,7 +146,7 @@ class Robot(object):
         # TODO: check this
         link = self.get_base_link(group)
         if link.parent_joint:
-            base_frame = link.parent_joint.origin.copy()
+            base_frame = link.parent_joint.init_origin.copy()
         else:
             base_frame = Frame.worldXY()
         if not self.artist:
