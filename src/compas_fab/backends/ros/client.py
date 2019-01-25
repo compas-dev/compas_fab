@@ -440,6 +440,8 @@ class RosClient(Ros):
         # The set of links that the attached objects are allowed to touch by default.
         if not touch_links:
             aco.touch_links = [ee_link]
+        else:
+            aco.touch_links = touch_links
         aco.object = co
         return aco
 
