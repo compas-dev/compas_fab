@@ -372,7 +372,8 @@ class Robot(object):
         """
         joint_types = self.get_configurable_joint_types(group)
         if len(joint_types) != len(values):
-            raise ValueError("Please pass %d values for %d types." % (len(values), len(joint_types)))
+            raise ValueError("Expected %d values but received only %d." % (len(joint_types), len(values)))
+
         values_scaled = []
         for v, t in zip(values, joint_types):
             if t == Joint.PRISMATIC or t == Joint.PLANAR: # TODO: add is_scaleable() to Joint
