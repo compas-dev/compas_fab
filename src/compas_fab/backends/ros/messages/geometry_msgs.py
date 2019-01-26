@@ -15,6 +15,11 @@ class Point(ROSmsg):
         self.y = y
         self.z = z
 
+    @classmethod
+    def from_msg(cls, msg):
+        x, y, z = msg['x'], msg['y'], msg['z']
+        return cls(x, y, z)
+
 class Quaternion(ROSmsg):
     """http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Quaternion.html
     """
@@ -23,7 +28,7 @@ class Quaternion(ROSmsg):
         self.y = y
         self.z = z
         self.w = w
-    
+
     @classmethod
     def from_frame(cls, frame):
         qw, qx, qy, qz = frame.quaternion
@@ -62,7 +67,7 @@ class PoseStamped(ROSmsg):
     def __init__(self, header=Header(), pose=Pose()):
         self.header = header
         self.pose = pose
-    
+
     @classmethod
     def from_msg(cls, msg):
         header = Header.from_msg(msg['header'])
