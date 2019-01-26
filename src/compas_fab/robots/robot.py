@@ -864,3 +864,5 @@ class Robot(object):
             if joint.limit:
                 info += " and has limits [%.3f, %.3f]" % (joint.limit.upper, joint.limit.lower)
             print(info)
+        print("The robot's links are:")
+        print([l.name for l in self.model.links])
