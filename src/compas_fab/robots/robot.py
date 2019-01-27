@@ -573,6 +573,8 @@ class Robot(object):
         if not group:
             group = self.main_group_name # ensure semantics
 
+        # Attention motion plan needs to receive the frame in the possibly 
+        # (moved) group's base frame (in difference to cartesian path).
         frame_RCF = self.represent_frame_in_transformed_RCF(frame_WCF, start_configuration, group)
         frame_RCF.point /= self.scale_factor # TODO: check!
         
