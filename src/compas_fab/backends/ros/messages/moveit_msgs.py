@@ -15,6 +15,8 @@ from .trajectory_msgs import MultiDOFJointTrajectory
 
 from .object_recognition_msgs import ObjectType
 
+from .octomap_msgs import OctomapWithPose
+
 class CollisionObject(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/CollisionObject.html
     """
