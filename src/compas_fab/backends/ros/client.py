@@ -14,7 +14,7 @@ from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
 from compas_fab.backends.exceptions import BackendError
-from compas_fab.backends.shared import CancellableTask
+from compas_fab.backends.tasks import CancellableTask
 from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import CollisionObject
 from compas_fab.backends.ros.messages import Constraints

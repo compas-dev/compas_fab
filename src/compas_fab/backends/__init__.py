@@ -25,8 +25,8 @@ ROS
 
     RosClient
 
-Common
-------
+Tasks
+-----
 
 .. autosummary::
     :toctree: generated/
@@ -47,13 +47,13 @@ Exceptions
 
 """
 
-from .shared import *
 from .exceptions import *
+from .tasks import *
 from .ros.client import *
 from .vrep.client import *
 
-from .shared import __all__ as a
-from .exceptions import __all__ as b
+from .exceptions import __all__ as a
+from .tasks import __all__ as b
 from .ros.client import __all__ as c
 from .vrep.client import __all__ as d
 
