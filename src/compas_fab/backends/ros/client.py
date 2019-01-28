@@ -14,6 +14,7 @@ from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
 from compas_fab.backends.exceptions import BackendError
+from compas_fab.backends.shared import CancellableTask
 from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import CollisionObject
 from compas_fab.backends.ros.messages import Constraints
@@ -69,6 +70,14 @@ def validated_response(func, *args, **kwargs):
         return response
 
     return validated_func
+
+
+class CancellableRosAction(CancellableTask):
+    def __init__(self, goal):
+        self.goal = goal
+
+    def cancel(self):
+        self.goal.cancel()
 
 
 class ServiceDescription(object):
@@ -430,7 +439,7 @@ class RosClient(Ros):
         co = self.build_collision_object(root_link, id_name, compas_mesh, operation)
         topic = Topic(self, '/collision_object', 'moveit_msgs/CollisionObject')
         topic.publish(co.msg)
-    
+
     def build_attached_collision_mesh(self, ee_link, id_name, compas_mesh, operation, touch_links=None):
         """
         """
@@ -469,30 +478,60 @@ class RosClient(Ros):
             points.append(pt)
 
         joint_trajectory = JointTrajectory(Header(), joint_names, points)  # specify header necessary?
-        self.follow_joint_trajectory(callback, joint_trajectory, timeout)
+        return self.follow_joint_trajectory(callback, joint_trajectory, timeout)
 
-    def follow_joint_trajectory(self, callback, joint_trajectory, timeout=3000):
-        """Follow the joint trajectory as computed by Moveit Planner.
+    def follow_joint_trajectory(self, joint_trajectory, callback=None, errback=None, feedback_callback=None, timeout=60000):
+        """Follow the joint trajectory as computed by MoveIt planner.
 
-        Args:
-            joint_trajectory (JointTrajectory)
+        Parameters
+        ----------
+        joint_trajectory : JointTrajectory
+            Joint trajectory message as computed by MoveIt planner
+        callback : callable
+            Function to be invoked when the goal is completed, requires
+            one positional parameter ``result``.
+        errback : callable
+            Function to be invoked in case of error or timeout, requires
+            one position parameter ``exception``.
+        feedback_callback : callable
+            Function to be invoked during execution to provide feedback.
+        timeout : int
+            Timeout for goal completion in milliseconds.
+
+        Returns
+        -------
+        :class:`CancellableTask`
+            An instance of a cancellable tasks.
         """
 
-        goal = FollowJointTrajectoryGoal(trajectory=joint_trajectory)
+        trajectory_goal = FollowJointTrajectoryGoal(trajectory=joint_trajectory)
 
         def handle_result(msg, client):
             result = FollowJointTrajectoryResult.from_msg(msg)
             callback(result)
 
-        action_client = ActionClient(self, '/follow_joint_trajectory',
-                                     'control_msgs/FollowJointTrajectoryAction', timeout)
-        goal = Goal(action_client, Message(goal.msg))
+        def handle_failure(error):
+            errback(error)
 
-        goal.on('result', lambda result: handle_result(result, action_client))
-        goal.on('feedback', lambda feedback: print(feedback))
-        goal.on('timeout', lambda: print('TIMEOUT'))
-        action_client.on('timeout', lambda: print('CLIENT TIMEOUT'))
-        goal.send(60000)
+        connection_timeout = 3000
+        action_client = ActionClient(self, '/joint_trajectory_action',  # '/follow_joint_trajectory',
+                                     'control_msgs/FollowJointTrajectoryAction', connection_timeout)
+
+        goal = Goal(action_client, Message(trajectory_goal.msg))
+
+        if callback:
+            goal.on('result', lambda result: handle_result(result, action_client))
+
+        if feedback_callback:
+            goal.on('feedback', feedback_callback)
+
+        if errback:
+            goal.on('timeout', lambda: handle_failure(RosError("Action Goal timeout", -1, None)))
+            action_client.on('timeout', lambda: handle_failure(RosError("Actionlib client timeout", -1, None)))
+
+        goal.send(timeout)
+
+        return CancellableRosAction(goal)
 
     def get_planning_scene(self, callback, components):
         """

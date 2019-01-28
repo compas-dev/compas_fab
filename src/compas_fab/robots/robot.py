@@ -263,7 +263,7 @@ class Robot(object):
         if len(names) != len(configuration.values):
             raise ValueError("Please pass a configuration with %d values or specify group" % len(names))
         return configuration.values[names.index(joint_name)]
-    
+
     def get_links_with_geometry(self, group=None):
         """Returns the links with either visual or collision geometry.
         """
@@ -276,7 +276,7 @@ class Robot(object):
             if len(link.collision) or len(link.visual):
                 links_with_geometry.append(link)
         return links_with_geometry
- 
+
     def transformation_RCF_WCF(self, group=None):
         """Returns the transformation matrix from world coordinate system to
             robot coordinate system.
@@ -549,7 +549,7 @@ class Robot(object):
                                group=None, path_constraints=None,
                                trajectory_constraints=None, planner_id='RRT',
                                num_planning_attempts=8, allowed_planning_time=2.,
-                               max_velocity_scaling_factor=1., 
+                               max_velocity_scaling_factor=1.,
                                max_acceleration_scaling_factor=1.,
                                attached_collision_object=None):
         """Calculates a motion from start_configuration to frame_WCF.
@@ -575,7 +575,7 @@ class Robot(object):
 
         frame_RCF = self.represent_frame_in_transformed_RCF(frame_WCF, start_configuration, group)
         frame_RCF.point /= self.scale_factor # TODO: check!
-        
+
         tolerance_position = tolerance_position/self.scale_factor
 
         base_link = self.get_base_link_name(group)
@@ -596,7 +596,7 @@ class Robot(object):
                                 tolerance_angle, path_constraints,
                                 trajectory_constraints, planner_id,
                                 num_planning_attempts, allowed_planning_time,
-                                max_velocity_scaling_factor, 
+                                max_velocity_scaling_factor,
                                 max_acceleration_scaling_factor,
                                 attached_collision_object)
 
@@ -718,7 +718,7 @@ class Robot(object):
         self.ensure_client()
         root_link_name = self.model.root.name
         self.client.collision_mesh(id_name, root_link_name, None, 1)
-    
+
     def append_collision_mesh_to_planning_scene(self, id_name, mesh, scale=False):
         """Appends a collision mesh to the robot's planning scene.
 
@@ -748,7 +748,7 @@ class Robot(object):
         if scale:
             S = Scale([1./self.scale_factor] * 3)
             mesh = mesh_transformed(mesh, S)
-        
+
         last_link_with_geometry = self.get_links_with_geometry(group)[-1]
         touch_links=[last_link_with_geometry.name]
 
