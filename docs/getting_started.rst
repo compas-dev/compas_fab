@@ -10,7 +10,13 @@ The recommended way to install **compas_fab** is to use `Anaconda/conda <https:/
 ::
 
     conda config --add channels conda-forge
-    conda install COMPAS
+    conda install compas_fab
+
+
+But it can also be installed using ``pip``:
+
+::
+
     pip install compas_fab
 
 
@@ -41,11 +47,11 @@ and type the following
 
 
 Optionally, you could provide a Rhino version number (``5.0, 6.0``).
-The default is ``5.0``.
+The default is ``6.0``.
 
 ::
 
-    python -m compas_fab.rhino.install 6.0
+    python -m compas_fab.rhino.install -v 6.0
 
 
 Working in Blender

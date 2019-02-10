@@ -72,7 +72,6 @@ First Steps
 * `Examples <https://gramaziokohler.github.io/compas_fab/latest/examples.html>`_
 * `API Reference <https://gramaziokohler.github.io/compas_fab/latest/reference.html>`_
 * `COMPAS Examples <https://compas-dev.github.io/main/examples.html>`_
-* `COMPAS Tutorials <https://compas-dev.github.io/main/tutorial.html>`_
 * `COMPAS API Reference <https://compas-dev.github.io/main/api.html>`_
 
 
