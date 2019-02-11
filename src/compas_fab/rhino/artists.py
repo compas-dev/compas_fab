@@ -5,6 +5,7 @@ from __future__ import print_function
 import time
 
 import compas
+from compas.utilities import rgb_to_rgb
 import compas_rhino
 
 from compas_fab.artists import BaseRobotArtist
@@ -13,6 +14,8 @@ try:
     import Rhino.Geometry
     import rhinoscriptsyntax as rs
     import scriptcontext as sc
+    from System.Array import CreateInstance
+    from System.Drawing import Color
 
 except ImportError:
     compas.raise_if_ironpython()
@@ -33,8 +36,10 @@ class RobotArtist(BaseRobotArtist):
         T = xform_from_transformation(transformation)
         native_mesh.Transform(T)
 
-    def draw_mesh(self, compas_mesh):
+    def draw_mesh(self, compas_mesh, color=None):
         mesh = Rhino.Geometry.Mesh()
+
+        # TODO: check mesh_draw from rhino
         vertices = compas_mesh.get_vertices_attributes('xyz')
         faces = [compas_mesh.face_vertices(fkey) for fkey in compas_mesh.faces()]
 
@@ -46,6 +51,13 @@ class RobotArtist(BaseRobotArtist):
         mesh.Normals.ComputeNormals()
         mesh.Compact()
 
+        if color:
+            color = rgb_to_rgb(color[0], color[1], color[2])
+            count = len(vertices)
+            colors = CreateInstance(Color, count)
+            for i in range(count):
+                colors[i] = rs.coercecolor(color)
+            mesh.VertexColors.SetColors(colors)
         return mesh
 
     def draw_collision(self):
