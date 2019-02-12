@@ -529,7 +529,7 @@ class RosClient(Ros):
             goal.on('timeout', lambda: handle_failure(RosError("Action Goal timeout", -1, None)))
             action_client.on('timeout', lambda: handle_failure(RosError("Actionlib client timeout", -1, None)))
 
-        goal.send(timeout)
+        goal.send(timeout=timeout)
 
         return CancellableRosAction(goal)
 
