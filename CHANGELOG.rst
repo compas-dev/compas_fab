@@ -10,6 +10,13 @@ and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.
 Unreleased
 ----------
 
+**Fixed**
+
+* Fixed missing library for V-REP on macOS
+
+**Deprecated**
+
+* The aliases for ``Frame`` and ``Transformation`` will be removed, in the future, import directly from `compas` core.
 
 0.4.0
 ----------
