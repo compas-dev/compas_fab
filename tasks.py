@@ -10,7 +10,6 @@ from shutil import copytree
 from shutil import rmtree
 from xml.dom.minidom import parse
 
-from invoke import Collection
 from invoke import Exit
 from invoke import task
 
