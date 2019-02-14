@@ -18,4 +18,4 @@ exclude tasks.py
 exclude pytest.ini
 exclude ISSUE_TEMPLATE.md
 
-global-exclude *.py[cod] __pycache__ *.dylib *.nb[ic] .DS_Store
+global-exclude *.py[cod] __pycache__ *.nb[ic] .DS_Store
