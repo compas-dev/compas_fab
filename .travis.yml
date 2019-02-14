@@ -37,5 +37,9 @@ install:
     - pip install --no-cache-dir -r requirements-dev.txt
 
 script:
+- python -c "import compas_fab"
+- python -c "import compas_fab.backends"
+- python -c "import compas_fab.robots"
+- python -c "import compas_fab.utilities"
 - pytest
 - invoke docs
