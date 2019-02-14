@@ -5,7 +5,9 @@ language: generic
 matrix:
   include:
     - python: 2.7
+      env: TRAVIS_PYTHON_VERSION=2.7
     - python: 3.6
+      env: TRAVIS_PYTHON_VERSION=3.6
 
 before_install:
     # Remove homebrew.
@@ -32,7 +34,7 @@ install:
       echo "Configuring conda."
       source /Users/travis/miniconda3/bin/activate root
     # Create environment
-    - conda create -y --quiet -c conda-forge -n compas_fab python=$TRAVIS_PYTHON_VERSION compas scipy
+    - conda create -y --quiet -c conda-forge -n compas_fab compas scipy python=$TRAVIS_PYTHON_VERSION
     - conda activate compas_fab
     - pip install --no-cache-dir -r requirements-dev.txt
 
