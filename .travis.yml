@@ -41,6 +41,7 @@ install:
 script:
 - python -c "import compas_fab"
 - python -c "import compas_fab.backends"
+- python -c "from compas_fab.backends.vrep.remote_api import vrep"
 - python -c "import compas_fab.robots"
 - python -c "import compas_fab.utilities"
 - pytest
