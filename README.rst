@@ -4,8 +4,8 @@ compas_fab: Robotic Fabrication for COMPAS
 
 .. start-badges
 
-.. image:: https://travis-ci.org/gramaziokohler/compas_fab.svg?branch=master
-    :target: https://travis-ci.org/gramaziokohler/compas_fab
+.. image:: https://travis-ci.com/gramaziokohler/compas_fab.svg?branch=master
+    :target: https://travis-ci.com/gramaziokohler/compas_fab
     :alt: Travis-CI Build Status
 
 .. image:: https://img.shields.io/github/license/gramaziokohler/compas_fab.svg
