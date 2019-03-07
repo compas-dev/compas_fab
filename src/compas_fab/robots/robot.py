@@ -740,7 +740,7 @@ class Robot(object):
 
         self.client.collision_mesh(id_name, root_link_name, mesh, 2)
 
-    def create_collision_mesh_attached_to_end_effector(self, id_name, mesh, group=None, scale=False):
+    def create_collision_mesh_attached_to_end_effector(self, id_name, mesh, group=None, scale=False, touch_links=None):
         """Creates a collision object that is added to the end effector's tcp.
         """
         if not group:
@@ -752,7 +752,12 @@ class Robot(object):
             mesh = mesh_transformed(mesh, S)
 
         last_link_with_geometry = self.get_links_with_geometry(group)[-1]
-        touch_links=[last_link_with_geometry.name]
+        if not touch_links:
+            touch_links=[last_link_with_geometry.name]
+        else:
+            touch_links = list(touch_links)
+            if last_link_with_geometry.name not in touch_links:
+                touch_links.append(last_link_with_geometry.name)
 
         return self.client.build_attached_collision_mesh(ee_link_name, id_name, mesh, operation=0, touch_links=touch_links)
 
