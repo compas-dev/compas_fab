@@ -4,6 +4,7 @@ from .std_msgs import ROSmsg
 from .geometry_msgs import Point
 
 import compas.datastructures
+from compas.datastructures import mesh_quads_to_triangles
 
 
 class SolidPrimitive(ROSmsg):
@@ -50,6 +51,7 @@ class Mesh(ROSmsg):
     def from_mesh(cls, compas_mesh):
         """Construct a ROS Mesh message from a COMPAS Mesh.
         """
+        mesh_quads_to_triangles(compas_mesh)
         vertices, faces = compas_mesh.to_vertices_and_faces()
         triangles = [MeshTriangle(face) for face in faces]
         vertices = [Point(*v) for v in vertices]
