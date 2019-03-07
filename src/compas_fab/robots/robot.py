@@ -37,19 +37,17 @@ class Robot(object):
     ----------
     model : :class:`compas.robots.RobotModel`
         The robot model, usually created out of an URDF structure.
-    artist : :class:`compas_fab.artists.BaseRobotArtist`
+    artist : :class:`compas_fab.artists.BaseRobotArtist`, optional
         Instance of the artist used to visualize the robot.
     semantics : :class:`RobotSemantics`, optional
         The semantic model of the robot.
     client : optional
         The backend client to use for communication, e.g. :class:`RosClient`
-    name : :obj:`str`
-        The name of the robot
     """
 
-    def __init__(self, robot_model, robot_artist, semantics=None, client=None):
-        self.model = robot_model
-        self.artist = robot_artist
+    def __init__(self, model, artist=None, semantics=None, client=None):
+        self.model = model
+        self.artist = artist
         self.semantics = semantics
         self.client = client  # setter and getter
         self.scale(1.)
