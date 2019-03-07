@@ -69,29 +69,6 @@ class Robot(object):
         model = RobotModel(name, joints=joints, links=links, materials=materials, **kwargs)
         return cls(model, None)
 
-    @classmethod
-    def from_urdf_model(cls, urdf_model, client=None):
-        return cls(urdf_model, None, client)
-
-    @classmethod
-    def from_urdf_and_srdf_models(cls, urdf_model, srdf_model, client=None):
-        return cls(urdf_model, srdf_model, client)
-
-    @classmethod
-    def from_resource_path(cls, directory, client=None):
-        """Creates a robot from a directory with the necessary resource files.
-
-        The directory must contain a .urdf, a .srdf file and a directory with
-        the robot's geometry as indicated in the urdf file.
-        """
-        urdf_importer = RosFileServerLoader.from_robot_resource_path(directory)
-        urdf_file = urdf_importer.urdf_filename
-
-        srdf_file = urdf_importer.srdf_filename
-        urdf_model = RobotModel.from_urdf_file(urdf_file)
-        srdf_model = RobotSemantics.from_srdf_file(srdf_file, urdf_model)
-        return cls(urdf_model, None, srdf_model, client)
-
     @property
     def name(self):
         """Name of the robot, as defined by its model
@@ -101,7 +78,6 @@ class Robot(object):
         str
             Name of the robot.
         """
-
         return self.model.name
 
     @property
