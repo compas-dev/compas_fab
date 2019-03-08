@@ -73,40 +73,6 @@ class OrientationConstraint(Constraint):
         self.euler_angles = [float(a) for a in list(euler_angles)]
         self.tolerances = [float(a) for a in list(tolerances)] if tolerances else [0.,0.,0.]
 
-class Box(object):
-    """Represents a box.
-
-    Attributes
-    ----------
-    frame: :class:`compas.geometry.Frame`
-        The position and orientation of the box as frame.
-    xsize: float
-        The size of the box in the frame's x direction.
-    ysize: float
-        The size of the box in the frame's y direction.
-    zsize: float
-        The size of the box in the frame's z direction.
-    """
-    def __init__(self, frame, xsize, ysize, zsize):
-        self.frame = frame
-        self.xsize = float(xsize)
-        self.ysize = float(ysize)
-        self.zsize = float(zsize)
-        
-class Sphere(object):
-    """Represents a sphere.
-
-    Attributes
-    ----------
-    center: :class:`compas.geometry.Point` or `list` of `float`
-        The center of the sphere.
-    radius: float
-        The radius of the sphere.
-    """
-    def __init__(self, center, radius):
-        self.center = Point(*list(center))
-        self.radius = float(radius)
-
 class BoundingVolume(object):
     """Describes a bounding volume.
     """
@@ -197,7 +163,7 @@ if __name__ == "__main__":
             elif c.bounding_volume.type == BoundingVolume.SPHERE:
                 bv = SolidPrimitive(type=SolidPrimitive.SPHERE, dimensions=[c.bounding_volume.volume.radius])
                 cr.constraint_region.primitives = [bv]
-                cr.constraint_region.primitive_poses = [Pose(Point(*c.bounding_volume.volume.center), Quaternion(0, 0, 0, 1))]
+                cr.constraint_region.primitive_poses = [Pose(Point(*c.bounding_volume.volume.point), Quaternion(0, 0, 0, 1))]
             elif c.bounding_volume.type == BoundingVolume.MESH:
                 cr.constraint_region.meshes = [Mesh.from_mesh(c.bounding_volume.volume)]
                 cr.constraint_region.mesh_poses = [Pose()]            
