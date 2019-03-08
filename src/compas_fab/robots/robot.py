@@ -456,24 +456,27 @@ class Robot(object):
 
         return response
 
-    def compute_cartesian_path(self, frames_WCF, start_configuration, max_step,
-                               avoid_collisions=True, group=None, path_constraints=None,
-                               attached_collision_object=None):
-        """Calculates a path defined by frames (Cartesian coordinate system).
+    def plan_cartesian_motion(self, frames_WCF, start_configuration=None, 
+                              max_step=0.01, avoid_collisions=True, group=None,
+                              path_constraints=None, 
+                              attached_collision_object=None):
+        """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
         ----------
-            frames (:class:`Frame`): The frames of which the path is defined.
+            frames (:class:`Frame`): The frames through which the path is defined.
             start_configuration (:class:`Configuration`, optional): The robot's
-                configuration at the starting position.
+                configuration at the starting position. Defaults to the zero
+                configuration.
             max_step (float): the approximate distance between the calculated
                 points. (Defined in the robot's units)
-            avoid_collisions (bool)
+            avoid_collisions (bool, optional): Defaults to True.
             group (str, optional): The planning group used for calculation.
                 Defaults to the robot's main planning group.
 
         Examples
         --------
+            pass
         """
         self.ensure_client()
         if not group:
@@ -498,7 +501,7 @@ class Robot(object):
         ee_link = self.get_end_effector_link_name(group)
         max_step_scaled = max_step/self.scale_factor
 
-        response = self.client.compute_cartesian_path(frames_RCF, base_link,
+        response = self.client.plan_cartesian_motion(frames_RCF, base_link,
                                            ee_link, group, joint_names, joint_positions,
                                            max_step_scaled, avoid_collisions, path_constraints,
                                            attached_collision_object)
@@ -517,6 +520,33 @@ class Robot(object):
         response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
 
         return response
+        
+    def plan_motion(goal_constraints, start_configuration=None, group=None,
+                    path_constraints=None, trajectory_constraints=None,
+                    planner_id='RRT', num_planning_attempts=8,
+                    allowed_planning_time=2., max_velocity_scaling_factor=1.,
+                    max_acceleration_scaling_factor=1.,
+                    attached_collision_object=None, workspace_parameters=None):
+        """Calculates a motion path (linear in joint space).
+
+        Parameters
+        ----------
+            goal_constraints (list of :class:`Constraint`): The goal constraints.
+            start_configuration (:class:`Configuration`, optional): The robot's
+                configuration at the starting position. Defaults to the zero
+                configuration.
+            tolerance_position (float): the allowed tolerance to the frame's
+                position. (Defined in the robot's units)
+            tolerance_angle (float): the allowed tolerance to the frame's
+                orientation in radians.
+            group (str, optional): The planning group used for calculation.
+                Defaults to the robot's main planning group.
+
+        Examples
+        --------
+            pass
+        """
+        pass
 
     def motion_plan_goal_frame(self, frame_WCF, start_configuration,
                                tolerance_position, tolerance_angle,
