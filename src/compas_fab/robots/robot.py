@@ -9,14 +9,18 @@ from compas.datastructures import mesh_transformed
 from compas.geometry import Frame
 from compas.geometry import Scale
 from compas.geometry import Transformation
+from compas.geometry import Sphere
 from compas.robots import Joint
 from compas.robots import RobotModel
 
 from compas_fab.artists import BaseRobotArtist
 
-from .configuration import Configuration
-from .ros_fileserver_loader import RosFileServerLoader
-from .semantics import RobotSemantics
+from compas_fab.robots.configuration import Configuration
+from compas_fab.robots.ros_fileserver_loader import RosFileServerLoader
+from compas_fab.robots.semantics import RobotSemantics
+from compas_fab.robots.constraints import JointConstraint
+from compas_fab.robots.constraints import OrientationConstraint
+from compas_fab.robots.constraints import PositionConstraint
 
 LOGGER = logging.getLogger('compas_fab.robots.robot')
 
@@ -357,37 +361,54 @@ class Robot(object):
     def scale_joint_values(self, values, scale_factor, group=None):
         """Scales the scaleable values with the scale_factor.
         """
-        joint_types = self.get_configurable_joint_types(group)
-        if len(joint_types) != len(values):
-            raise ValueError("Expected %d values but received only %d." % (len(joint_types), len(values)))
+        joints = self.get_configurable_joints(group)
+        if len(joints) != len(values):
+            raise ValueError("Expected %d values for group %s, but received only %d." % (len(joints), group, len(values)))
 
         values_scaled = []
-        for v, t in zip(values, joint_types):
-            if t == Joint.PRISMATIC or t == Joint.PLANAR: # TODO: add is_scaleable() to Joint
+        for v, j in zip(values, joints):
+            if j.is_scalable():
                 v *= scale_factor
             values_scaled.append(v)
         return values_scaled
 
     def inverse_kinematics(self, frame_WCF, start_configuration=None,
-                           group=None, avoid_collisions=True, constraints=None, attempts=8):
-        """Calculate the robot's inverse kinematic.
+                           group=None, avoid_collisions=True, 
+                           constraints=None, attempts=8):
+        """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
         ----------
-            frame (:class:`Frame`): The frame to calculate the inverse for
-            start_configuration (:class:`Configuration`, optional): If passed,
-                the inverse will be calculated such that the calculated joint
-                positions differ the least from the current configuration.
-                Defaults to the zero position for all joints.
-            group (str, optional): The planning group used for calculation.
-                Defaults to the robot's main planning group.
-            avoid_collisions (bool)
-            constraints (:class:`Frame`): A set of constraints that the request
-                must obey. Defaults to None.
+        frame: :class:`compas.geometry.Frame`
+            The frame to calculate the inverse for.
+        start_configuration: :class:`Configuration`, optional
+            If passed, the inverse will be calculated such that the calculated
+            joint positions differ the least from the start_configuration.
+            Defaults to the zero position for all joints.
+        group: str, optional
+            The planning group used for calculation. Defaults to the robot's
+            main planning group.
+        avoid_collisions: bool
+            Whether or not to avoid collisions.
+        constraints: list of :class:`compas_fab.robots.Constraint`
+            A set of constraints that the request must obey. Defaults to None.
+        attempts: int
+            TODO
 
 
         Examples
         --------
+        >>> from compas.geometry import Frame
+        >>> from compas_fab.robots import Configuration
+        >>> frame = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
+        >>> start_configuration = Configuration.from_revolute_values([0] * 6)
+        >>> group = robot.main_group_name
+        >>> response = robot.inverse_kinematics(frame, start_configuration)
+
+        Returns
+        -------
+        configuration: full configuration
+
         """
         self.ensure_client()
         if not group:
@@ -401,7 +422,6 @@ class Robot(object):
             if len(joint_names) != len(start_configuration.values):
                 raise ValueError("Please pass a configuration with %d values" % len(joint_names))
             joint_positions = start_configuration.values
-
 
         joint_positions = self.scale_joint_values(joint_positions, 1./self.scale_factor)
 
@@ -424,14 +444,16 @@ class Robot(object):
 
         Parameters
         ----------
-            configuration (:class:`Configuration`, optional): The configuration
-                to calculate the forward kinematic for.
-            group (str, optional): The planning group used for calculation.
-                Defaults to the robot's main planning group.
+        configuration (:class:`Configuration`, optional): The configuration
+            to calculate the forward kinematic for.
+        group (str, optional): The planning group used for calculation.
+            Defaults to the robot's main planning group.
 
         Examples
         --------
         """
+        # TODO implement no service
+
         self.ensure_client()
         if not group:
             group = self.main_group_name # ensure semantics
@@ -464,19 +486,32 @@ class Robot(object):
 
         Parameters
         ----------
-            frames (:class:`Frame`): The frames through which the path is defined.
-            start_configuration (:class:`Configuration`, optional): The robot's
-                configuration at the starting position. Defaults to the zero
-                configuration.
-            max_step (float): the approximate distance between the calculated
-                points. (Defined in the robot's units)
-            avoid_collisions (bool, optional): Defaults to True.
-            group (str, optional): The planning group used for calculation.
-                Defaults to the robot's main planning group.
+        frames_WCF: list of :class:`compas.geometry.Frame`
+            The frames through which the path is defined.
+        start_configuration: :class:`Configuration`, optional
+            The robot's configuration at the starting position. Defaults to the
+            zero configuration.
+        max_step: float
+            The approximate distance between the calculated points. (Defined in
+            the robot's units)
+        avoid_collisions: bool, optional
+            Whether or not to avoid collisions. Defaults to True.
+        group: str, optional
+            The planning group used for calculation. Defaults to the robot's 
+            main planning group.
 
         Examples
         --------
-            pass
+        >>> frames = []
+        >>> frames.append(Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]))
+        >>> frames.append(Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1]))
+        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
+        >>> group = robot.main_group_name
+        >>> response = robot.plan_cartesian_motion(frames, 
+                                                   start_configuration,
+                                                   max_step=0.01,
+                                                   avoid_collisions=True,
+                                                   group=group)
         """
         self.ensure_client()
         if not group:
@@ -519,34 +554,238 @@ class Robot(object):
         joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
         response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
 
+        # save time from start into response
+        time_from_start = response.solution.joint_trajectory.points[-1].time_from_start
+        response.time_from_start = time_from_start.secs + time_from_start.nsecs / 1e+9
+
         return response
+    
+    def constraints_from_frame(self, frame_WCF, tolerance_position, tolerance_orientation, start_configuration, group):
+        """Returns a position and orientation constraint on the group's end-effector link.
+
+        Parameters
+        ----------
+        frame_WCF: :class:`compas.geometry.Frame`
+            The frame from which we create position and orientation constraints.
+        tolerance_position: float
+            The allowed tolerance to the frame's position. (Defined in the 
+            robot's units)
+        tolerance_angle: float
+            The allowed tolerance to the frame's orientation in radians.
+        start_configuration: :class:`compas_fab.robots.Configuration`
+
+        group: str
+            The planning group for which we specify the constraint. Defaults to
+            the robot's main planning group.
         
-    def plan_motion(goal_constraints, start_configuration=None, group=None,
-                    path_constraints=None, trajectory_constraints=None,
-                    planner_id='RRT', num_planning_attempts=8,
-                    allowed_planning_time=2., max_velocity_scaling_factor=1.,
+        Examples
+        --------
+        >>> import math
+        >>> from compas.geometry import Frame
+        >>> from compas_fab.robots import Configuration
+        >>> robot = None
+        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
+        >>> tolerance_position = 0.001
+        >>> tolerance_angle = math.radians(1)
+        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
+        >>> group = robot.main_group_name
+        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerance_orientation, start_configuration, group)
+
+        Notes
+        -----
+        There are many other possibilities of how to create a position and 
+        orientation constraint. Checkout :class:`compas_fab.robots.PositionConstraint`
+        and :class:`compas_fab.robots.OrientationConstraint`.
+
+        """
+
+        # Attention motion plan needs to receive the frame in the possibly 
+        # (moved) group's base frame (in difference to cartesian path).
+        frame_RCF = self.represent_frame_in_transformed_RCF(frame_WCF, start_configuration, group)
+        frame_RCF.point /= self.scale_factor
+        tolerance_position = tolerance_position/self.scale_factor
+        frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
+
+        ee_link = self.get_end_effector_link_name(group)
+        sphere = Sphere(frame_RCF.point, tolerance_position)
+        pc = PositionConstraint.from_sphere(ee_link, sphere)
+        oc = OrientationConstraint(ee_link, frame_RCF.euler_angles(), [tolerance_orientation] * 3)
+        return [pc, oc]
+    
+    def constraints_from_configuration(self, configuration, tolerances, group=None):
+        """Returns joint constraints on all joints of the configuration.
+
+        Parameters
+        ----------
+        configuration: :class:`compas_fab.robots.Configuration`
+            The target configuration.
+        tolerances: list of float
+            The tolerances on each of the joints defining the bound to be 
+            achieved. If only one value is passed it will be used to create
+            bounds for all joint constraints.
+        group: str, optional
+            The planning group for which we specify the constraint. Defaults to
+            the robot's main planning group.
+        
+        Examples
+        --------
+        >>> from compas_fab.robots import Configuration
+        >>> robot = None
+        >>> group = robot.main_group_name
+        >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances, group)
+
+        Raises
+        ------
+        ValueError
+            If configuration does not correspond to the group.
+        ValueError
+            If tolerances have a different length than configuration.
+
+
+        Notes
+        -----
+        Check for using the correct tolerance units for prismatic and revolute
+        joints.
+
+        """
+        if not group:
+            group = self.main_group_name
+        joint_names = self.get_configurable_joint_names(group)
+        if len(joint_names) != len(configuration.values):
+            raise ValueError("The passed configuration has %d values, the group %s needs however: %d" % (len(configuration.values), group, len(joint_names)))
+        if len(tolerances) == 1:
+            tolerances = tolerances * len(joint_names)
+        elif len(tolerances) != len(configuration.values):
+            raise ValueError("The passed configuration has %d values, the tolerances however: %d" % (len(configuration.values), len(tolerances)))
+        
+        constraints = []
+        for name, value, tolerance in zip(joint_names, configuration.values, tolerances):
+            constraints.append(JointConstraint(name, value, tolerance))
+        return constraints
+
+        
+    def plan_motion(self, goal_constraints, start_configuration=None,
+                    group=None, path_constraints=None, planner_id='RRT', 
+                    num_planning_attempts=1, allowed_planning_time=2.,
+                    max_velocity_scaling_factor=1.,
                     max_acceleration_scaling_factor=1.,
-                    attached_collision_object=None, workspace_parameters=None):
+                    attached_collision_object=None):
         """Calculates a motion path (linear in joint space).
 
         Parameters
         ----------
-            goal_constraints (list of :class:`Constraint`): The goal constraints.
-            start_configuration (:class:`Configuration`, optional): The robot's
-                configuration at the starting position. Defaults to the zero
-                configuration.
-            tolerance_position (float): the allowed tolerance to the frame's
-                position. (Defined in the robot's units)
-            tolerance_angle (float): the allowed tolerance to the frame's
-                orientation in radians.
-            group (str, optional): The planning group used for calculation.
-                Defaults to the robot's main planning group.
+        goal_constraints: list of :class:`compas_fab.robots.Constraint`
+            The goal to be achieved, defined in a set of constraints.        
+            Constraints can be very specific, for example defining value domains
+            for each joint, such that the goal configuration is included,
+            or defining a volume in space, to which a specific robot link (e.g.
+            the end-effector) is required to move to.
+        start_configuration: :class:`compas_fab.robots.Configuration`, optional
+            The robot's configuration at the starting position. Defaults to the
+            all-zero configuration.
+        group: str, optional
+            The name of the group to plan for. Defaults to the robot's main 
+            planning group.
+        path_constraints: list of :class:`compas_fab.robots.Constraint`, optional
+            Optional constraints that can be imposed along the solution path. 
+            Note that path calculation won't work if the start_configuration 
+            violates these constraints. Defaults to None. 
+        planner_id: str
+            The name of the algorithm used for path planning. Defaults to 'RRT'.
+        num_planning_attempts: int, optional
+            Normally, if one motion plan is needed, one motion plan is computed.
+            However, for algorithms that use randomization in their execution 
+            (like 'RRT'), it is likely that different planner executions will 
+            produce different solutions. Setting this parameter to a value above
+            1 will run many additional motion plans, and will report the 
+            shortest solution as the final result. Defaults to 1.
+        allowed_planning_time: float
+            The number of seconds allowed to perform the planning. Defaults to 2.
+        max_velocity_scaling_factor: float
+            Defaults to 1.
+        max_acceleration_scaling_factor: float
+            Defaults to 1.
+        attached_collision_object: ?
+            Defaults to None.
+        
 
         Examples
         --------
-            pass
+        >>> import math
+        >>> from compas.geometry import Frame
+        >>> from compas_fab.robots import Configuration
+        >>> robot = None
+        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
+        >>> tolerance_position = 0.001
+        >>> tolerance_angle = math.radians(1)
+        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
+        >>> group = robot.main_group_name
+        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerance_orientation, start_configuration, group)
+        >>> response = robot.plan_motion(goal_constraints, start_configuration,
+                                         group, planner_id='RRT')
+
+        References
+        ----------
+        .. [1] Defining a Motion Plan Request.
+            Available at: http://docs.ros.org/kinetic/api/moveit_msgs/html/definePlanningRequest.html
         """
-        pass
+
+        # TODO: for the motion plan request a list of possible goal constraints
+        # can be passed, from which the planner will try to find a path that
+        # satisfies at least one of the specified goal constraints. For now only
+        # one set of goal constraints is supported.
+
+        # TODO: add workspace_parameters
+
+        self.ensure_client()
+        if not group:
+            group = self.main_group_name # ensure semantics
+
+        joint_names = self.get_configurable_joint_names()
+
+        if not start_configuration:
+            joint_positions = [0] * len(joint_names)
+        else:
+            if len(joint_names) != len(start_configuration.values):
+                raise ValueError("Please pass a configuration with %d values" % len(joint_names))
+            joint_positions = start_configuration.values
+        # scale joint positions
+        joint_positions = self.scale_joint_values(joint_positions, 1./self.scale_factor)
+
+        kwargs = {}
+        kwargs['goal_constraints'] = goal_constraints
+        kwargs['base_link'] = self.get_base_link_name(group)
+        kwargs['ee_link'] = self.get_end_effector_link_name(group)
+        kwargs['group'] = group
+        kwargs['joint_names'] = joint_names
+        kwargs['joint_positions'] = joint_positions
+        kwargs['path_constraints'] = path_constraints
+        kwargs['trajectory_constraints'] = None
+        kwargs['planner_id'] = planner_id
+        kwargs['num_planning_attempts'] = num_planning_attempts
+        kwargs['allowed_planning_time'] = allowed_planning_time
+        kwargs['max_velocity_scaling_factor'] = max_velocity_scaling_factor
+        kwargs['max_acceleration_scaling_factor'] = max_acceleration_scaling_factor
+        kwargs['attached_collision_object'] = attached_collision_object
+        kwargs['workspace_parameters'] = None
+ 
+        response = self.client.plan_motion(**kwargs)
+        
+        # save joint_positions into configurations
+        configurations = []
+        for point in response.trajectory.joint_trajectory.points:
+            joint_positions = point.positions
+            joint_positions = self.scale_joint_values(joint_positions, self.scale_factor, group)
+            configurations.append(Configuration(joint_positions, self.get_configurable_joint_types(group)))
+        response.configurations =  configurations
+
+        # save trajectory start into start_configuration
+        joint_positions = response.trajectory_start.joint_state.position
+        joint_positions = self.scale_joint_values(joint_positions, self.scale_factor)
+        response.start_configuration = Configuration(joint_positions, self.get_configurable_joint_types())
+
+        return response
+
 
     def motion_plan_goal_frame(self, frame_WCF, start_configuration,
                                tolerance_position, tolerance_angle,
@@ -877,3 +1116,23 @@ class Robot(object):
             print(info)
         print("The robot's links are:")
         print([l.name for l in self.model.links])
+
+if __name__ == "__main__":
+
+    from compas.robots import RobotModel
+    from compas_fab.robots import Robot
+    from compas_fab.robots import RobotSemantics
+    from compas_fab.robots import Configuration
+    from compas_fab.backends import RosClient
+    import compas_fab
+
+    urdf_filename = compas_fab.get("universal_robot/ur_description/urdf/ur5.urdf")
+    srdf_filename = compas_fab.get("universal_robot/ur5_moveit_config/config/ur5.srdf")
+
+    model = RobotModel.from_urdf_file(urdf_filename)
+    semantics = RobotSemantics.from_srdf_file(srdf_filename, model)
+    robot = Robot(model, semantics=semantics)
+    
+    robot.constraints_from_frame(frame, tolerance_orientation)
+    
+
