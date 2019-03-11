@@ -37,17 +37,11 @@ The following functions help with converting units from one system to the other.
 """
 
 from .configuration import *
+from .constraints import *
 from .path_plan import *
 from .units import *
 from .robot import *
 from .semantics import *
 from .ros_fileserver_loader import *
 
-from .configuration import __all__ as a
-from .path_plan import __all__ as b
-from .units import __all__ as c
-from .robot import __all__ as d
-from .semantics import __all__ as e
-from .ros_fileserver_loader import __all__ as f
-
-__all__ = a + b + c + d + e + f
+__all__ = [name for name in dir() if not name.startswith('_')]
