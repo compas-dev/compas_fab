@@ -214,7 +214,7 @@ class RosClient(Ros):
         self.GET_POSITION_FK(self, (header, fk_link_names, robot_state), callback, errback)
 
     @validated_response
-    def compute_cartesian_path(self, frames, base_link,
+    def plan_cartesian_motion(self, frames, base_link,
                                ee_link, group, joint_names, joint_positions,
                                max_step, avoid_collisions, path_constraints,
                                attached_collision_object):
@@ -232,9 +232,9 @@ class RosClient(Ros):
 
         kwargs['errback_name'] = 'errback'
 
-        return await_callback(self.compute_cartesian_path_async, **kwargs)
+        return await_callback(self.plan_cartesian_motion_async, **kwargs)
 
-    def compute_cartesian_path_async(self, callback, errback, frames, base_link,
+    def plan_cartesian_motion_async(self, callback, errback, frames, base_link,
                                      ee_link, group, joint_names, joint_positions,
                                      max_step, avoid_collisions, path_constraints,
                                      attached_collision_object):
@@ -330,6 +330,87 @@ class RosClient(Ros):
 
         # TODO: possibility to hand over more goal constraints
         goal_constraints = [Constraints(position_constraints=[pcm], orientation_constraints=[ocm])]
+
+        request = dict(start_state=start_state,
+                       goal_constraints=goal_constraints,
+                       path_constraints=path_constraints,
+                       trajectory_constraints=trajectory_constraints,
+                       planner_id=planner_id,
+                       group_name=group,
+                       num_planning_attempts=num_planning_attempts,
+                       allowed_planning_time=allowed_planning_time,
+                       max_velocity_scaling_factor=max_velocity_scaling_factor,
+                       max_acceleration_scaling_factor=max_velocity_scaling_factor)
+
+        self.GET_MOTION_PLAN(self, request, callback, errback)
+    
+    @validated_response
+    def plan_motion(self, goal_constraints, base_link, ee_link, group, 
+                    joint_names, joint_positions, path_constraints=None,
+                    trajectory_constraints=None, planner_id='', 
+                    num_planning_attempts=8, allowed_planning_time=2., 
+                    max_velocity_scaling_factor=1., 
+                    max_acceleration_scaling_factor=1.,
+                    attached_collision_object=None):
+        
+        kwargs = {}
+        kwargs['goal_constraints'] = goal_constraints
+        kwargs['base_link'] = base_link
+        kwargs['ee_link'] = ee_link
+        kwargs['group'] = group
+        kwargs['joint_names'] = joint_names
+        kwargs['joint_positions'] = joint_positions
+        kwargs['path_constraints'] = path_constraints
+        kwargs['trajectory_constraints'] = trajectory_constraints
+        kwargs['planner_id'] = planner_id
+        kwargs['num_planning_attempts'] = num_planning_attempts
+        kwargs['allowed_planning_time'] = allowed_planning_time
+        kwargs['max_velocity_scaling_factor'] = max_velocity_scaling_factor
+        kwargs['max_acceleration_scaling_factor'] = max_acceleration_scaling_factor
+        kwargs['attached_collision_object'] = attached_collision_object
+
+        kwargs['errback_name'] = 'errback'
+
+        return await_callback(self.plan_motion_async, **kwargs)
+    
+    def plan_motion_async(self, callback, errback, goal_constraints, base_link,
+                          ee_link, group, joint_names, joint_positions,
+                          path_constraints=None, trajectory_constraints=None,
+                          planner_id='', num_planning_attempts=8,
+                          allowed_planning_time=2., 
+                          max_velocity_scaling_factor=1.,
+                          max_acceleration_scaling_factor=1.,
+                          attached_collision_object=None):
+        """
+        """
+        # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
+        # TODO: if list of frames (goals) => receive multiple solutions?
+
+        header = Header(frame_id=base_link)
+        joint_state = JointState(header=header, name=joint_names, position=joint_positions)
+        start_state = RobotState(joint_state, MultiDOFJointState(header=header))
+        if attached_collision_object:
+            start_state.attached_collision_objects = [attached_collision_object]
+
+        joint_constraints = []
+        position_constraints = []
+        orientation_constraints = []
+        for c in goal_constraints:
+            if c.type == c.JOINT:
+                joint_constraints.append(JointConstraint.from_joint_constraint(c))
+            elif c.type == c.POSITION:
+                position_constraints.append(PositionConstraint.from_position_constraint(header, c))
+            elif c.type == c.ORIENTATION:
+                orientation_constraints.append(OrientationConstraint.from_orientation_constraint(header, c))
+            else:
+                raise NotImplementedError
+
+        constraints = Constraints()
+        constraints.joint_constraints = joint_constraints
+        constraints.position_constraints = position_constraints
+        constraints.orientation_constraints = orientation_constraints
+
+        goal_constraints = [constraints]
 
         request = dict(start_state=start_state,
                        goal_constraints=goal_constraints,
