@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
-from .std_msgs import ROSmsg
-from .geometry_msgs import Point
+from compas_fab.backends.ros.messages.std_msgs import ROSmsg
+from compas_fab.backends.ros.messages.geometry_msgs import Point
 
 import compas.datastructures
 from compas.datastructures import mesh_quads_to_triangles
@@ -38,7 +38,34 @@ class SolidPrimitive(ROSmsg):
             raise ValueError("CYLINDER needs 2 dimensions.")
         elif self.type == self.CONE and len(dimensions) != 2:
             raise ValueError("CONE needs 2 dimensions.")
+    
+    @classmethod
+    def from_box(cls, box):
+        """Creates a `SolidPrimitive` from a :class:`compas.geometry.Box`.
 
+        Parameters
+        ----------
+        box: `compas.geometry.Box`
+
+        Returns
+        -------
+        SolidPrimitive
+        """
+        return cls(type=cls.BOX, dimensions=[box.xsize, box.ysize, box.zsize])
+    
+    @classmethod
+    def from_sphere(cls, sphere):
+        """Creates a `SolidPrimitive` from a :class:`compas.geometry.Sphere`.
+
+        Parameters
+        ----------
+        sphere: `compas.geometry.Sphere`
+
+        Returns
+        -------
+        SolidPrimitive
+        """
+        return cls(type=cls.SPHERE, dimensions=[sphere.radius])
 
 class Mesh(ROSmsg):
     """http://docs.ros.org/kinetic/api/shape_msgs/html/msg/Mesh.html
@@ -49,7 +76,7 @@ class Mesh(ROSmsg):
 
     @classmethod
     def from_mesh(cls, compas_mesh):
-        """Construct a ROS Mesh message from a COMPAS Mesh.
+        """Construct a `Mesh` message from a :class:`compas.datastructures.Mesh`.
         """
         mesh_quads_to_triangles(compas_mesh)
         vertices, faces = compas_mesh.to_vertices_and_faces()
