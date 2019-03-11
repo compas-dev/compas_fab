@@ -2,6 +2,8 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 
+from compas.geometry import Scale
+
 __all__ = ['BoundingVolume', 'Constraint', 'JointConstraint',
            'OrientationConstraint', 'PositionConstraint']
 
@@ -80,6 +82,10 @@ class BoundingVolume(object):
         >>> bv = BoundingVolume.from_mesh(Mesh)
         """
         return cls(cls.MESH, mesh)
+    
+    def scale(self, scale_factor):
+        S = Scale([1./scale_factor] * 3)
+        self.volume.transform(S)
 
 
 class Constraint(object):
@@ -130,6 +136,10 @@ class JointConstraint(Constraint):
         self.joint_name = joint_name
         self.value = value
         self.tolerance = tolerance
+    
+    def scale(self, scale_factor):
+        self.value /= scale_factor
+        self.tolerance /= scale_factor
 
 
 class OrientationConstraint(Constraint):
@@ -233,6 +243,9 @@ class PositionConstraint(Constraint):
         """
         bounding_volume = BoundingVolume.from_mesh(mesh)
         return cls(link_name, bounding_volume, weight)
+    
+    def scale(self, scale_factor):
+        self.bounding_volume.scale(scale_factor)
 
 
 if __name__ == "__main__":
