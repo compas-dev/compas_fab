@@ -604,7 +604,6 @@ class Robot(object):
         frame_RCF = self.represent_frame_in_transformed_RCF(frame_WCF, start_configuration, group)
         frame_RCF.point /= self.scale_factor
         tolerance_position = tolerance_position/self.scale_factor
-        frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
 
         ee_link = self.get_end_effector_link_name(group)
         sphere = Sphere(frame_RCF.point, tolerance_position)
