@@ -86,6 +86,9 @@ class BoundingVolume(object):
     def scale(self, scale_factor):
         S = Scale([1./scale_factor] * 3)
         self.volume.transform(S)
+    
+    def __repr__(self):
+        return "BoundingVolume({0}, {1})".format(self.type, self.volume)
 
 
 class Constraint(object):
@@ -140,6 +143,9 @@ class JointConstraint(Constraint):
     def scale(self, scale_factor):
         self.value /= scale_factor
         self.tolerance /= scale_factor
+    
+    def __repr__(self):
+        return "JointConstraint('{0}', {1}, {2}, {3})".format(self.joint_name, self.value, self.tolerance, self.weight)
 
 
 class OrientationConstraint(Constraint):
@@ -172,6 +178,9 @@ class OrientationConstraint(Constraint):
         self.link_name = link_name
         self.euler_angles = [float(a) for a in list(euler_angles)]
         self.tolerances = [float(a) for a in list(tolerances)] if tolerances else [0., 0., 0.]
+    
+    def __repr__(self):
+        return "OrientationConstraint('{0}', {1}, {2}, {3})".format(self.link_name, self.euler_angles, self.tolerances, self.weight)
 
 
 class PositionConstraint(Constraint):
@@ -246,6 +255,9 @@ class PositionConstraint(Constraint):
     
     def scale(self, scale_factor):
         self.bounding_volume.scale(scale_factor)
+    
+    def __repr__(self):
+        return "PositionConstraint('{0}', {1}, {2})".format(self.link_name, self.bounding_volume, self.weight)
 
 
 if __name__ == "__main__":
