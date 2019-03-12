@@ -351,7 +351,8 @@ class RosClient(Ros):
                     num_planning_attempts=8, allowed_planning_time=2., 
                     max_velocity_scaling_factor=1., 
                     max_acceleration_scaling_factor=1.,
-                    attached_collision_object=None):
+                    attached_collision_object=None,
+                    workspace_parameters=None):
         
         kwargs = {}
         kwargs['goal_constraints'] = goal_constraints
@@ -368,6 +369,7 @@ class RosClient(Ros):
         kwargs['max_velocity_scaling_factor'] = max_velocity_scaling_factor
         kwargs['max_acceleration_scaling_factor'] = max_acceleration_scaling_factor
         kwargs['attached_collision_object'] = attached_collision_object
+        kwargs['workspace_parameters'] = workspace_parameters
 
         kwargs['errback_name'] = 'errback'
 
@@ -380,7 +382,8 @@ class RosClient(Ros):
                           allowed_planning_time=2., 
                           max_velocity_scaling_factor=1.,
                           max_acceleration_scaling_factor=1.,
-                          attached_collision_object=None):
+                          attached_collision_object=None,
+                          workspace_parameters=None):
         """
         """
         # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
@@ -422,6 +425,7 @@ class RosClient(Ros):
                        allowed_planning_time=allowed_planning_time,
                        max_velocity_scaling_factor=max_velocity_scaling_factor,
                        max_acceleration_scaling_factor=max_velocity_scaling_factor)
+        # workspace_parameters=workspace_parameters
 
         self.GET_MOTION_PLAN(self, request, callback, errback)
 
