@@ -45,7 +45,7 @@ coordinate system of frame ``F2``.
     print(Pt1)
 
     # This here yields to the same result
-    Pt2 = F2.represent_in_global_coordinates(P)
+    Pt2 = F2.represent_frame_in_global_coordinates(P)
     print(Pt2)
 
 
