@@ -8,6 +8,7 @@ __all__ = [
     'argsort',
     'argmin',
     'argmax',
+    'clamp',
 ]
 
 
@@ -95,8 +96,22 @@ def argmax(numbers):
     """
     return argsort(numbers)[-1]
 
+def clamp(value, min_value, max_value):
+    """Clamps value witin the bound [min_value, max_value]
+
+    Returns
+    -------
+    float
+    """
+    if min_value > max_value:
+        raise ValueError("min_value must be bigger than max_value")
+    return float(min(max(value, min_value), max_value))
+
 
 if __name__ == "__main__":
     print(map_range(2, 0, 10, 0, 100))
     print(arange(3, -4, -0.2))
     print(argsort([34,1,7,2,100]))
+    print(clamp(5, 1, 4))
+    print(clamp(0, 1, 4))
+    print(clamp(3, 1, 4))
