@@ -16,6 +16,7 @@ Classes
     :nosignatures:
 
     Configuration
+    Constraints
     PathPlan
     Robot
     RobotSemantics
