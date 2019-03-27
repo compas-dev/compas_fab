@@ -30,7 +30,7 @@ __all__ = [
 
 
 class Robot(object):
-    """Represents a **robot** instance.
+    """Represents a robot.
 
     This class binds together several building blocks, such as the robot's 
     descriptive model, its semantic information and an instance of a backend 
@@ -94,6 +94,10 @@ class Robot(object):
     def main_group_name(self):
         self.ensure_semantics()
         return self.semantics.main_group_name
+    
+    @property
+    def root_link_name(self):
+        return self.robot.model.root.name 
 
     def get_end_effector_link_name(self, group=None):
         """Returns the name of the end effector link.
@@ -434,12 +438,6 @@ class Robot(object):
         """
         return self.get_base_frame(group)
 
-    def represent_frame_in_RCF(self, frame_WCF, group=None):
-        """Returns the representation of a frame in the world coordinate frame (WCF) in the robot's coordinate frame (RCF).
-        """
-        frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
-        return frame_RCF
-
     def represent_frame_in_transformed_RCF(self, frame_WCF, configuration=None, group=None):
         """Returns the frame's representation the current robot's coordinate frame (RCF).
 
@@ -493,6 +491,30 @@ class Robot(object):
         T = Transformation.from_frame_to_frame(base_frame, Frame.worldXY())
         return frame_WCF.transformed(T)
 
+    def represent_frame_in_RCF(self, frame_WCF, group=None):
+        """Represents a frame from the world coordinate system (WCF) in the robot's coordinate system (RCF).
+
+        Parameters
+        ----------
+        frame_WCF : :class:`compas.geometry.Frame`
+            A frame in the world coordinate frame.
+        
+        Returns
+        -------
+        :class:`compas.geometry.Frame`
+            A frame in the robot's coordinate frame.
+        
+        Examples
+        --------
+        >>> from compas.geometry import Frame
+        >>> from compas_fab.robots.ur5 import Robot
+        >>> robot = Robot()
+        >>> frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
+        >>> frame_RCF = robot.represent_frame_in_RCF(frame_WCF)
+        """
+        frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
+        return frame_RCF
+
     def represent_frame_in_WCF(self, frame_RCF, group=None):
         """Represents a frame from the robot's coordinate system (RCF) in the world coordinate system (WCF).
 
@@ -528,6 +550,228 @@ class Robot(object):
     def ensure_semantics(self):
         if not self.semantics:
             raise Exception('This method is only callable once a semantic model is assigned')
+    
+    # ==========================================================================
+    # constraints
+    # ==========================================================================
+
+    def orientation_constraint_from_frame(self, frame_WCF, tolerances_axes, 
+                                          start_configuration=None, group=None):
+        """Returns an orientation constraint on the group's end-effector link.
+
+        Parameters
+        ----------
+        frame_WCF: :class:`compas.geometry.Frame`
+            The frame from which we create the orientation constraint.
+        tolerances_axes: list of float
+            Error tolerances ti for each of the frame's axes in radians. If only
+            one value is passed it will be uses for all 3 axes.
+        start_configuration: :class:`compas_fab.robots.Configuration`, optional
+            If the planning group's origin is dislocated from it's initial 
+            position, e.g. a 6-axes robot moved on a linear axis, the frame in 
+            the robot coordinate system (RCF) must be calculated based on its
+            start_configuration. Defaults to the zero position for all joints.
+        group: str
+            The planning group for which we specify the constraint. Defaults to
+            the robot's main planning group.
+        
+        Examples
+        --------
+        >>> import math
+        >>> from compas.geometry import Frame
+        >>> from compas_fab.robots import Configuration
+        >>> from compas_fab.backends import RosClient
+        >>> from compas_fab.robots.ur5 import Robot
+        >>> client = RosClient()
+        >>> client.run()
+        >>> robot = Robot(client)
+        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
+        >>> tolerances_axes = math.radians(1)
+        >>> group = robot.main_group_name
+        >>> goal_constraints = robot.constraints_from_frame(frame, [tolerances_axes], group)
+        >>> client.close()
+        >>> client.terminate()
+
+        Notes
+        -----
+        If you specify the tolerances_axes vector with [0.01, 0.01, 6.3], it 
+        means that the frame's x-axis and y-axis are allowed to rotate about the
+        z-axis by an angle of 6.3 radians, whereas the z-axis would only rotate
+        by 0.01.
+        """
+
+        # Attention motion plan needs to receive the frame in the possibly 
+        # (moved) group's base frame (in difference to cartesian path).
+        frame_RCF = self.represent_frame_in_transformed_RCF(frame_WCF, start_configuration, group)
+        frame_RCF.point /= self.scale_factor
+
+        ee_link = self.get_end_effector_link_name(group)
+
+        tolerances_axes = list(tolerances_axes)
+        if len(tolerances_axes) == 1:
+            tolerances_axes *= 3
+        elif len(tolerances_axes) != 3:
+            raise ValueError("Must give either one or 3 values")
+        return OrientationConstraint(ee_link, frame_RCF.quaternion, tolerances_axes)
+    
+    def position_constraint_from_frame(self, frame_WCF, tolerance_position, start_configuration=None, group=None):
+        """Returns a position and orientation constraint on the group's end-effector link.
+
+        Parameters
+        ----------
+        frame_WCF : :class:`compas.geometry.Frame`
+            The frame from which we create position and orientation constraints.
+        tolerance_position : float
+            The allowed tolerance to the frame's position. (Defined in the 
+            robot's units)
+        start_configuration : :class:`compas_fab.robots.Configuration`, optional
+            If the planning group's origin is dislocated from it's initial 
+            position, e.g. a 6-axes robot moved on a linear axis, the frame in 
+            the robot coordinate system (RCF) must be calculated based on its
+            start_configuration. Defaults to the init configuration.
+        group: str
+            The planning group for which we specify the constraint. Defaults to
+            the robot's main planning group.
+        
+        Examples
+        --------
+        >>> import math
+        >>> from compas.geometry import Frame
+        >>> from compas_fab.robots import Configuration
+        >>> from compas_fab.backends import RosClient
+        >>> from compas_fab.robots.ur5 import Robot
+        >>> client = RosClient()
+        >>> client.run()
+        >>> robot = Robot(client)
+        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
+        >>> tolerance_position = 0.001
+        >>> goal_constraints = robot.position_constraint_from_frame(frame, tolerance_position)
+        >>> client.close()
+        >>> client.terminate()
+
+        Notes
+        -----
+        There are many other possibilities of how to create a position and 
+        orientation constraints. Checkout :class:`compas_fab.robots.PositionConstraint`
+        and :class:`compas_fab.robots.OrientationConstraint`.
+
+        """
+        # Attention motion plan needs to receive the frame in the possibly 
+        # (moved) group's base frame (in difference to cartesian path).
+        frame_RCF = self.represent_frame_in_transformed_RCF(frame_WCF, start_configuration, group)
+        frame_RCF.point /= self.scale_factor
+        tolerance_position = tolerance_position/self.scale_factor
+
+        ee_link = self.get_end_effector_link_name(group)
+        sphere = Sphere(frame_RCF.point, tolerance_position)
+        return PositionConstraint.from_sphere(ee_link, sphere)
+    
+    def constraints_from_frame(self, frame_WCF, tolerance_position, tolerances_axes, start_configuration=None, group=None):
+        """Returns a position and orientation constraint on the group's end-effector link.
+
+        Parameters
+        ----------
+        frame_WCF: :class:`compas.geometry.Frame`
+            The frame from which we create position and orientation constraints.
+        tolerance_position: float
+            The allowed tolerance to the frame's position. (Defined in the 
+            robot's units)
+        tolerances_axes: list of float
+            Error tolerances ti for each of the frame's axes in radians. If only
+            one value is passed it will be uses for all 3 axes.
+        start_configuration: :class:`compas_fab.robots.Configuration`
+
+        group: str
+            The planning group for which we specify the constraint. Defaults to
+            the robot's main planning group.
+        
+        Examples
+        --------
+        >>> import math
+        >>> from compas.geometry import Frame
+        >>> from compas_fab.robots import Configuration
+        >>> from compas_fab.backends import RosClient
+        >>> from compas_fab.robots.ur5 import Robot
+        >>> client = RosClient()
+        >>> client.run()
+        >>> robot = Robot(client)
+        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
+        >>> tolerance_position = 0.001
+        >>> tolerances_axes = [math.radians(1)]
+        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
+        >>> group = robot.main_group_name
+        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, start_configuration, group)
+        >>> client.close()
+        >>> client.terminate()
+
+        Notes
+        -----
+        There are many other possibilities of how to create a position and 
+        orientation constraint. Checkout :class:`compas_fab.robots.PositionConstraint`
+        and :class:`compas_fab.robots.OrientationConstraint`.
+
+        """
+        pc = self.position_constraint_from_frame(frame_WCF, tolerance_position,
+                                                 start_configuration, group)
+
+        oc = self.orientation_constraint_from_frame(frame_WCF, tolerances_axes, 
+                                                    start_configuration, group)
+        return [pc, oc]
+    
+    def constraints_from_configuration(self, configuration, tolerances, group=None):
+        """Returns joint constraints on all joints of the configuration.
+
+        Parameters
+        ----------
+        configuration: :class:`compas_fab.robots.Configuration`
+            The target configuration.
+        tolerances: list of float
+            The tolerances on each of the joints defining the bound to be 
+            achieved. If only one value is passed it will be used to create
+            bounds for all joint constraints.
+        group: str, optional
+            The planning group for which we specify the constraint. Defaults to
+            the robot's main planning group.
+        
+        Examples
+        --------
+        >>> import math
+        >>> from compas_fab.robots.ur5 import Robot
+        >>> from compas_fab.robots import Configuration
+        >>> robot = Robot()
+        >>> configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
+        >>> tolerances = [math.radians(5)] * 6
+        >>> group = robot.main_group_name
+        >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances, group)
+
+        Raises
+        ------
+        ValueError
+            If the passed configuration does not correspond to the group.
+        ValueError
+            If the passed tolerances have a different length than the configuration.
+
+        Notes
+        -----
+        Check for using the correct tolerance units for prismatic and revolute
+        joints.
+
+        """
+        if not group:
+            group = self.main_group_name
+
+        joint_names = self.get_configurable_joint_names(group)
+        if len(joint_names) != len(configuration.values):
+            raise ValueError("The passed configuration has %d values, the group %s needs however: %d" % (len(configuration.values), group, len(joint_names)))
+        if len(tolerances) == 1:
+            tolerances = tolerances * len(joint_names)
+        elif len(tolerances) != len(configuration.values):
+            raise ValueError("The passed configuration has %d values, the tolerances however: %d" % (len(configuration.values), len(tolerances)))
+        
+        constraints = []
+        for name, value, tolerance in zip(joint_names, configuration.values, tolerances):
+            constraints.append(JointConstraint(name, value, tolerance))
+        return constraints
 
     # ==========================================================================
     # services
@@ -731,183 +975,6 @@ class Robot(object):
         response.time_from_start = time_from_start.secs + time_from_start.nsecs / 1e+9
 
         return response
-    
-    # ==========================================================================
-    # constraints
-    # ==========================================================================
-
-    def orientation_constraint_from_frame(self, frame_WCF, tolerances_axes, 
-                                          start_configuration=None, group=None):
-        """Returns an orientation constraint on the group's end-effector link.
-
-        Parameters
-        ----------
-        frame_WCF: :class:`compas.geometry.Frame`
-            The frame from which we create the orientation constraint.
-        tolerances_axes: list of float
-            Error tolerances ti for each of the frame's axes in radians. If only
-            one value is passed it will be uses for all 3 axes.
-        start_configuration: :class:`compas_fab.robots.Configuration`, optional
-            If the planning group's origin is dislocated from it's initial 
-            position, e.g. a 6-axes robot moved on a linear axis, the frame in 
-            the robot coordinate system (RCF) must be calculated based on its
-            start_configuration. Defaults to the zero position for all joints.
-        group: str
-            The planning group for which we specify the constraint. Defaults to
-            the robot's main planning group.
-        
-        Examples
-        --------
-        >>> import math
-        >>> from compas.geometry import Frame
-        >>> from compas_fab.robots import Configuration
-        >>> from compas_fab.backends import RosClient
-        >>> from compas_fab.robots.ur5 import Robot
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
-        >>> tolerances_axes = math.radians(1)
-        >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_frame(frame, [tolerances_axes], group)
-        >>> client.close()
-        >>> client.terminate()
-
-        Notes
-        -----
-        If you specify the tolerances_axes vector with [0.01, 0.01, 6.3], it 
-        means that the frame's x-axis and y-axis are allowed to rotate about the
-        z-axis by an angle of 6.3 radians, whereas the z-axis would only rotate
-        by 0.01.
-        """
-
-        # Attention motion plan needs to receive the frame in the possibly 
-        # (moved) group's base frame (in difference to cartesian path).
-        frame_RCF = self.represent_frame_in_transformed_RCF(frame_WCF, start_configuration, group)
-        frame_RCF.point /= self.scale_factor
-
-        ee_link = self.get_end_effector_link_name(group)
-
-        tolerances_axes = list(tolerances_axes)
-        if len(tolerances_axes) == 1:
-            tolerances_axes *= 3
-        elif len(tolerances_axes) != 3:
-            raise ValueError("Must give either one or 3 values")
-        return OrientationConstraint(ee_link, frame_RCF.quaternion, tolerances_axes)
-    
-    def constraints_from_frame(self, frame_WCF, tolerance_position, tolerances_axes, start_configuration=None, group=None):
-        """Returns a position and orientation constraint on the group's end-effector link.
-
-        Parameters
-        ----------
-        frame_WCF: :class:`compas.geometry.Frame`
-            The frame from which we create position and orientation constraints.
-        tolerance_position: float
-            The allowed tolerance to the frame's position. (Defined in the 
-            robot's units)
-        tolerances_axes: list of float
-            Error tolerances ti for each of the frame's axes in radians. If only
-            one value is passed it will be uses for all 3 axes.
-        start_configuration: :class:`compas_fab.robots.Configuration`
-
-        group: str
-            The planning group for which we specify the constraint. Defaults to
-            the robot's main planning group.
-        
-        Examples
-        --------
-        >>> import math
-        >>> from compas.geometry import Frame
-        >>> from compas_fab.robots import Configuration
-        >>> from compas_fab.backends import RosClient
-        >>> from compas_fab.robots.ur5 import Robot
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
-        >>> tolerance_position = 0.001
-        >>> tolerances_axes = [math.radians(1)]
-        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
-        >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, start_configuration, group)
-        >>> client.close()
-        >>> client.terminate()
-
-        Notes
-        -----
-        There are many other possibilities of how to create a position and 
-        orientation constraint. Checkout :class:`compas_fab.robots.PositionConstraint`
-        and :class:`compas_fab.robots.OrientationConstraint`.
-
-        """
-
-        # Attention motion plan needs to receive the frame in the possibly 
-        # (moved) group's base frame (in difference to cartesian path).
-        frame_RCF = self.represent_frame_in_transformed_RCF(frame_WCF, start_configuration, group)
-        frame_RCF.point /= self.scale_factor
-        tolerance_position = tolerance_position/self.scale_factor
-
-        ee_link = self.get_end_effector_link_name(group)
-        sphere = Sphere(frame_RCF.point, tolerance_position)
-        pc = PositionConstraint.from_sphere(ee_link, sphere)
-
-        oc = self.orientation_constraint_from_frame(frame_WCF, tolerances_axes, 
-                                                    start_configuration, group)
-        return [pc, oc]
-    
-    def constraints_from_configuration(self, configuration, tolerances, group=None):
-        """Returns joint constraints on all joints of the configuration.
-
-        Parameters
-        ----------
-        configuration: :class:`compas_fab.robots.Configuration`
-            The target configuration.
-        tolerances: list of float
-            The tolerances on each of the joints defining the bound to be 
-            achieved. If only one value is passed it will be used to create
-            bounds for all joint constraints.
-        group: str, optional
-            The planning group for which we specify the constraint. Defaults to
-            the robot's main planning group.
-        
-        Examples
-        --------
-        >>> import math
-        >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.robots import Configuration
-        >>> robot = Robot()
-        >>> configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
-        >>> tolerances = [math.radians(5)] * 6
-        >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances, group)
-
-        Raises
-        ------
-        ValueError
-            If the passed configuration does not correspond to the group.
-        ValueError
-            If the passed tolerances have a different length than the configuration.
-
-        Notes
-        -----
-        Check for using the correct tolerance units for prismatic and revolute
-        joints.
-
-        """
-        if not group:
-            group = self.main_group_name
-        joint_names = self.get_configurable_joint_names(group)
-        if len(joint_names) != len(configuration.values):
-            raise ValueError("The passed configuration has %d values, the group %s needs however: %d" % (len(configuration.values), group, len(joint_names)))
-        if len(tolerances) == 1:
-            tolerances = tolerances * len(joint_names)
-        elif len(tolerances) != len(configuration.values):
-            raise ValueError("The passed configuration has %d values, the tolerances however: %d" % (len(configuration.values), len(tolerances)))
-        
-        constraints = []
-        for name, value, tolerance in zip(joint_names, configuration.values, tolerances):
-            constraints.append(JointConstraint(name, value, tolerance))
-        return constraints
 
         
     def plan_motion(self, goal_constraints, start_configuration=None,
@@ -916,7 +983,7 @@ class Robot(object):
                     max_velocity_scaling_factor=1.,
                     max_acceleration_scaling_factor=1.,
                     attached_collision_object=None):
-        """Calculates a motion path (linear in joint space).
+        """Calculates a motion path.
 
         Parameters
         ----------
@@ -1176,6 +1243,11 @@ class Robot(object):
     @property
     def axes(self):
         return self.model.axes
+    
+
+    # ==========================================================================
+    # drawing
+    # ==========================================================================
 
     def update(self, configuration, collision=True, group=None):
         names = self.get_configurable_joint_names(group)
