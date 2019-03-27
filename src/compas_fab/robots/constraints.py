@@ -155,32 +155,38 @@ class OrientationConstraint(Constraint):
     ----------
     link_name: string
         The name of the link this contraint refers to.
-    euler_angles: list of float
-        The desired orientation of the link specified by euler angles,
-        describing rotations about static 'xyz' axes.
+    quaternion: list of float
+        The desired orientation of the link specified by a quaternion in the
+        order of [w, x, y, z].
     tolerances: list of float, optional
-        Error tolerances ti for each of the euler angles ai. The respective
-        bound to be achieved is [ai - ti, ai + ti]. Defaults to [0.,0.,0.].
+        Error tolerances ti for each of the frame's axes. The respective
+        bound to be achieved is [ai - ti, ai + ti]. Defaults to [0.01, 0.01, 0.01].
     weight: float, optional
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to 1.
+
+    Notes
+    -----
+    If you specify the tolerance vector with [0.01, 0.01, 6.3], it means that 
+    the frame's x-axis and y-axis are allowed to rotate about the z-axis by an
+    angle of 6.3 radians, whereas the z-axis can only change 0.01.
 
     Examples
     --------
     >>> from compas.geometry import Frame
     >>> from compas_fab.robots import OrientationConstraint
     >>> frame = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
-    >>> oc = OrientationConstraint("link_0", frame.euler_angles(), tolerances=[0,0,0])
+    >>> oc = OrientationConstraint("link_0", frame.quaternion)
 
     """
-    def __init__(self, link_name, euler_angles, tolerances=None, weight=1.):
+    def __init__(self, link_name, quaternion, tolerances=None, weight=1.):
         super(OrientationConstraint, self).__init__(self.ORIENTATION, weight)
         self.link_name = link_name
-        self.euler_angles = [float(a) for a in list(euler_angles)]
-        self.tolerances = [float(a) for a in list(tolerances)] if tolerances else [0., 0., 0.]
+        self.quaternion = [float(a) for a in list(quaternion)]
+        self.tolerances = [float(a) for a in list(tolerances)] if tolerances else [0.01] * 3
     
     def __repr__(self):
-        return "OrientationConstraint('{0}', {1}, {2}, {3})".format(self.link_name, self.euler_angles, self.tolerances, self.weight)
+        return "OrientationConstraint('{0}', {1}, {2}, {3})".format(self.link_name, self.quaternion, self.tolerances, self.weight)
 
 
 class PositionConstraint(Constraint):

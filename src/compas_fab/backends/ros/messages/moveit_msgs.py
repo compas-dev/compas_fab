@@ -338,6 +338,15 @@ class OrientationConstraint(ROSmsg):
     def __init__(self, header=None, orientation=None, link_name=None,
                  absolute_x_axis_tolerance=0.0, absolute_y_axis_tolerance=0.0,
                  absolute_z_axis_tolerance=0.0, weight=1):
+        """
+        Notes
+        -----
+        The naming of the absolute_x/y/z_axis_tolerances might be misleading:
+        If you specify the absolute_x/y/z_axis_tolerances with [0.01, 0.01, 6.3],
+        it means that the frame's x-axis and y-axis are allowed to rotate about
+        the z-axis by an angle of 6.3 radians, whereas the z-axis can only change
+        by 0.01.
+        """
         self.header = header if header else Header()
         self.orientation = orientation if orientation else Quaternion()#geometry_msgs/Quaternion
         self.link_name = link_name if link_name else ""
@@ -350,13 +359,12 @@ class OrientationConstraint(ROSmsg):
     def from_orientation_constraint(cls, header, orientation_constraint):
         """Creates a `OrientationConstraint` from a :class:`compas_fab.robots.OrientationConstraint`.
         """
-        frameE = Frame.from_euler_angles(orientation_constraint.euler_angles)
-        frameT = Frame.from_euler_angles(orientation_constraint.tolerances)
-        ax, ay, az = frameT.axis_angle_vector
+        qw, qx, qy, qz = orientation_constraint.quaternion
+        ax, ay, az = orientation_constraint.tolerances
 
         kwargs = {}
         kwargs['header'] = header
-        kwargs['orientation'] = Quaternion.from_frame(frameE)
+        kwargs['orientation'] = Quaternion(qx, qy, qz, qw)
         kwargs['link_name'] = orientation_constraint.link_name
         kwargs['absolute_x_axis_tolerance'] = ax
         kwargs['absolute_y_axis_tolerance'] = ay
