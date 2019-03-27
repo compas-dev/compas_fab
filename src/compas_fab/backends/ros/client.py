@@ -395,25 +395,32 @@ class RosClient(Ros):
         if attached_collision_object:
             start_state.attached_collision_objects = [attached_collision_object]
 
-        joint_constraints = []
-        position_constraints = []
-        orientation_constraints = []
+        # goal constraints
+        constraints = Constraints()
         for c in goal_constraints:
             if c.type == c.JOINT:
-                joint_constraints.append(JointConstraint.from_joint_constraint(c))
+                constraints.joint_constraints.append(JointConstraint.from_joint_constraint(c))
             elif c.type == c.POSITION:
-                position_constraints.append(PositionConstraint.from_position_constraint(header, c))
+                constraints.position_constraints.append(PositionConstraint.from_position_constraint(header, c))
             elif c.type == c.ORIENTATION:
-                orientation_constraints.append(OrientationConstraint.from_orientation_constraint(header, c))
+                constraints.orientation_constraints.append(OrientationConstraint.from_orientation_constraint(header, c))
             else:
                 raise NotImplementedError
-
-        constraints = Constraints()
-        constraints.joint_constraints = joint_constraints
-        constraints.position_constraints = position_constraints
-        constraints.orientation_constraints = orientation_constraints
-
         goal_constraints = [constraints]
+
+        # path constraints
+        if path_constraints:
+            constraints = Constraints()
+            for c in path_constraints:
+                if c.type == c.JOINT:
+                    constraints.joint_constraints.append(JointConstraint.from_joint_constraint(c))
+                elif c.type == c.POSITION:
+                    constraints.position_constraints.append(PositionConstraint.from_position_constraint(header, c))
+                elif c.type == c.ORIENTATION:
+                    constraints.orientation_constraints.append(OrientationConstraint.from_orientation_constraint(header, c))
+                else:
+                    raise NotImplementedError
+            path_constraints = constraints
 
         request = dict(start_state=start_state,
                        goal_constraints=goal_constraints,
