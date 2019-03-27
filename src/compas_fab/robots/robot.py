@@ -32,19 +32,20 @@ __all__ = [
 class Robot(object):
     """Represents a **robot** instance.
 
-    This class binds together several building blocks, such as the robot's descriptive model,
-    its semantic information and an instance of a backend client
-    into a cohesive programmable interface. This representation builds upon the model
-    described in the class :class:`compas.robots.RobotModel` of the **COMPAS** framework.
+    This class binds together several building blocks, such as the robot's 
+    descriptive model, its semantic information and an instance of a backend 
+    client into a cohesive programmable interface. This representation builds
+    upon the model described in the class :class:`compas.robots.RobotModel` of
+    the **COMPAS** framework.
 
     Attributes
     ----------
     model : :class:`compas.robots.RobotModel`
-        The robot model, usually created out of an URDF structure.
+        The robot model, usually created from an URDF structure.
     artist : :class:`compas_fab.artists.BaseRobotArtist`, optional
-        Instance of the artist used to visualize the robot.
+        Instance of the artist used to visualize the robot. Defaults to `None`.
     semantics : :class:`RobotSemantics`, optional
-        The semantic model of the robot.
+        The semantic model of the robot. Defaults to `None`.
     client : optional
         The backend client to use for communication, e.g. :class:`RosClient`
     """
@@ -53,7 +54,7 @@ class Robot(object):
         self.model = model
         self.artist = artist
         self.semantics = semantics
-        self.client = client  # setter and getter
+        self.client = client  # setter and getter ?
         self.scale(1.)
 
     @classmethod
@@ -95,32 +96,96 @@ class Robot(object):
         return self.semantics.main_group_name
 
     def get_end_effector_link_name(self, group=None):
+        """Returns the name of the end effector link.
+
+        Parameters
+        ----------
+        group : str
+            The name of the group. Defaults to `None`.
+
+        Returns
+        -------
+        str
+        """
         if not self.semantics:
             return self.model.get_end_effector_link_name()
         else:
             return self.semantics.get_end_effector_link_name(group)
 
     def get_end_effector_link(self, group=None):
+        """Returns the end effector link.
+
+        Parameters
+        ----------
+        group : str
+            The name of the group. Defaults to `None`.
+
+        Returns
+        -------
+        :class: `compas.robots.Link`
+        """
         name = self.get_end_effector_link_name(group)
         return self.model.get_link_by_name(name)
 
     def get_end_effector_frame(self, group=None):
+        """Returns the end effector's frame.
+
+        Parameters
+        ----------
+        group : str
+            The name of the group. Defaults to `None`.
+        
+        Returns
+        -------
+        :class: `compas.geometry.Frame`
+        """
         link = self.get_end_effector_link(group)
         return link.parent_joint.origin.copy()
 
     def get_base_link_name(self, group=None):
+        """Returns the name of the base link.
+
+        Parameters
+        ----------
+        group : str
+            The name of the group. Defaults to `None`.
+        
+        Returns
+        -------
+        str
+        """
         if not self.semantics:
             return self.model.get_base_link_name()
         else:
             return self.semantics.get_base_link_name(group)
 
     def get_base_link(self, group=None):
-        """Returns the origin frame of the robot.
+        """Returns the base link.
+
+        Parameters
+        ----------
+        group : str
+            The name of the group. Defaults to `None`.
+        
+        Returns
+        -------
+        :class: `compas.robots.Link`
         """
         name = self.get_base_link_name(group)
         return self.model.get_link_by_name(name)
 
     def get_base_frame(self, group=None):
+        """Returns the frame of the base link, which is the robot's origin frame.
+
+        Parameters
+        ----------
+        group : str
+            The name of the group. Defaults to `None`.
+        
+        Returns
+        -------
+        :class: `compas.geometry.Frame`
+        """
         # TODO: check this
         link = self.get_base_link(group)
         if link.parent_joint:
@@ -138,6 +203,10 @@ class Robot(object):
         ----------
         group : str
             The name of the group. Defaults to `None`.
+        
+        Returns
+        -------
+        list of :class: `compas.robots.Joint`
 
         Note
         ----
@@ -165,6 +234,10 @@ class Robot(object):
         ----------
         group : str
             The name of the group. Defaults to `None`.
+        
+        Returns
+        -------
+        list of str
 
         Note
         ----
@@ -181,6 +254,10 @@ class Robot(object):
         ----------
         group : str
             The name of the group. Defaults to `None`.
+        
+        Returns
+        -------
+        list of int
 
         Note
         ----
@@ -190,6 +267,29 @@ class Robot(object):
         configurable_joints = self.get_configurable_joints(group)
         return [j.type for j in configurable_joints]
 
+    # ==========================================================================
+    # configurations
+    # ==========================================================================
+
+    def init_configuration(self, group=None):
+        """Returns the init joint configuration.
+        """
+        types = [joint.type for joint in self.get_configurable_joints(group)]
+        positions = [0.] * len(types)
+        return Configuration(positions, types)
+
+    def get_configuration(self, group=None):
+        """Returns the current configuration.
+        """
+        positions = []
+        types = []
+
+        for joint in self.get_configurable_joints(group):
+            positions.append(joint.position)
+            types.append(joint.type)
+
+        return Configuration(positions, types)
+
     def get_group_configuration(self, group, full_configuration):
         """Returns the group's configuration.
 
@@ -197,8 +297,12 @@ class Robot(object):
         ----------
         group : str
             The name of the group.
-        full_configuration (:class:`Configuration`): The configuration for all
-            configurable joints of the robot.
+        full_configuration : :class:`compas_fab.robots.Configuration`
+            The configuration for all configurable joints of the robot.
+        
+        Returns
+        -------
+        :class:`compas_fab.robots.Configuration`
         """
         values = []
         types = []
@@ -245,6 +349,7 @@ class Robot(object):
     def get_links_with_geometry(self, group=None):
         """Returns the links with either visual or collision geometry.
         """
+        # TODO: needed?
         if not group:
             group = self.main_group_name
         base_link_name = self.get_base_link_name(group)
@@ -254,144 +359,7 @@ class Robot(object):
             if len(link.collision) or len(link.visual):
                 links_with_geometry.append(link)
         return links_with_geometry
-
-    def transformation_RCF_WCF(self, group=None):
-        """Returns the transformation matrix from world coordinate system to
-            robot coordinate system.
-        """
-        base_frame = self.get_base_frame(group)
-        return Transformation.from_frame_to_frame(Frame.worldXY(), base_frame)
-
-    def transformation_WCF_RCF(self, group=None):
-        """Returns the transformation matrix from robot coordinate system to
-            world coordinate system
-        """
-        base_frame = self.get_base_frame(group)
-        return Transformation.from_frame_to_frame(base_frame, Frame.worldXY())
-
-    def set_RCF(self, robot_coordinate_frame, group=None):
-        """Moves the origin frame of the robot to the robot_coordinate_frame.
-        """
-        # TODO: must be applied to the model, so that base_frame is RCF
-        raise NotImplementedError
-
-    def get_RCF(self, group=None):
-        """Returns the origin frame of the robot.
-        """
-        return self.get_base_frame(group)
-
-    def represent_frame_in_RCF(self, frame_WCF, group=None):
-        """Returns the representation of a frame in the world coordinate frame
-        (WCF) in the robot's coordinate frame (RCF).
-        """
-        frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
-        return frame_RCF
-
-    def represent_frame_in_transformed_RCF(self, frame_WCF, configuration=None, group=None):
-        """Returns the frame's representation the current robot's coordinate frame (RCF).
-
-        Parameters
-        ----------
-        frame_WCF: :class:`compas.geometry.Frame`
-            A frame in the world coordinate frame.
-        configuration: :class:`compas_fab.robots.Configuration`
-            The (full) configuration from which the group's base frame is 
-            calculated. Defaults to the init configuration (all zeros).
-        group (str, optional): The planning group.
-            Defaults to the robot's main planning group.
-
-        Examples
-        --------
-        >>> from compas.geometry import Frame
-        >>> from compas_fab.backends import RosClient
-        >>> from compas_fab.backends import RosError
-        >>> from compas_fab.robots.ur5 import Robot
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
-        >>> frame_RCF = robot.represent_frame_in_transformed_RCF(frame_WCF)
-        >>> client.close()
-        >>> client.terminate()
-        """
-
-        # TODO: eventually change to not necessarily pass full config, since it
-        # won't check for collisions, or?
-
-        self.ensure_client()
-        if not group:
-            group = self.main_group_name # ensure semantics
-        
-        if not configuration:
-            configuration = self.init_configuration()
-
-        base_link = self.get_base_link_name(group)
-
-        joint_names = self.get_configurable_joint_names()
-        joint_positions = self._get_scaled_joint_positions_from_start_configuration(configuration)
-
-        response = self.client.forward_kinematics(joint_positions, base_link, group, joint_names, base_link)
-        base_frame_RCF = response.pose_stamped[0].pose.frame # the group's transformed base_frame in RCF
-        base_frame = self.get_base_frame(group) # the group's original base_frame
-
-        T = Transformation.from_frame(base_frame)
-        base_frame = base_frame_RCF.transformed(T) # the current base frame
-        T = Transformation.from_frame_to_frame(base_frame, Frame.worldXY())
-        return frame_WCF.transformed(T)
-
-
-    def represent_frame_in_WCF(self, frame_RCF, group=None):
-        """Represents a frame in the robot's coordinate system (RCF) in the 
-        world coordinate system (WCF).
-
-        Parameters
-        ----------
-        frame_RCF: :class:`compas.geometry.Frame`
-            A frame in the robot coordinate frame.
-        
-        Returns
-        -------
-        :class:`compas.geometry.Frame`
-            A frame in the world coordinate frame.
-        
-        Examples
-        --------
-        >>> from compas.geometry import Frame
-        >>> from compas_fab.robots.ur5 import Robot
-        >>> robot = Robot()
-        >>> frame_RCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
-        >>> frame_WCF = robot.represent_frame_in_WCF(frame_RCF)
-        """
-        frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
-        return frame_WCF
-
-    def init_configuration(self, group=None):
-        """Returns the init joint configuration.
-        """
-        types = [joint.type for joint in self.get_configurable_joints(group)]
-        positions = [0.] * len(types)
-        return Configuration(positions, types)
-
-    def get_configuration(self, group=None):
-        """Returns the current configuration.
-        """
-        positions = []
-        types = []
-
-        for joint in self.get_configurable_joints(group):
-            positions.append(joint.position)
-            types.append(joint.type)
-
-        return Configuration(positions, types)
-
-    def ensure_client(self):
-        if not self.client:
-            raise Exception('This method is only callable once a client is assigned')
-
-    def ensure_semantics(self):
-        if not self.semantics:
-            raise Exception('This method is only callable once a semantic model is assigned')
-
+    
     def _scale_joint_values(self, values, scale_factor, group=None):
         """Scales the scaleable joint values with scale_factor.
         """
@@ -418,7 +386,152 @@ class Robot(object):
         # scale the prismatic joints
         joint_positions = self._scale_joint_values(joint_positions, 1./self.scale_factor)
         return joint_positions
+    
+    # ==========================================================================
+    # transformations, coordinate frames
+    # ==========================================================================
 
+    def transformation_RCF_WCF(self, group=None):
+        """Returns the transformation from the world coordinate system (WCF) to the robot's coordinate system (RCF).
+        
+        Parameters
+        ----------
+        group : str
+            The name of the planning group. Defaults to `None`.
+        
+        Returns
+        -------
+        :class:`compas.geometry.Transformation`
+
+        """
+        base_frame = self.get_base_frame(group)
+        return Transformation.from_frame_to_frame(Frame.worldXY(), base_frame)
+
+    def transformation_WCF_RCF(self, group=None):
+        """Returns the transformation from the robot's coordinate system (RCF) to the world coordinate system (WCF).
+
+        Parameters
+        ----------
+        group : str
+            The name of the planning group. Defaults to `None`.
+        
+        Returns
+        -------
+        :class:`compas.geometry.Transformation`
+
+        """
+        base_frame = self.get_base_frame(group)
+        return Transformation.from_frame_to_frame(base_frame, Frame.worldXY())
+
+    def set_RCF(self, robot_coordinate_frame, group=None):
+        """Moves the origin frame of the robot to the robot_coordinate_frame.
+        """
+        # TODO: must be applied to the model, so that base_frame is RCF
+        raise NotImplementedError
+
+    def get_RCF(self, group=None):
+        """Returns the origin frame of the robot.
+        """
+        return self.get_base_frame(group)
+
+    def represent_frame_in_RCF(self, frame_WCF, group=None):
+        """Returns the representation of a frame in the world coordinate frame (WCF) in the robot's coordinate frame (RCF).
+        """
+        frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
+        return frame_RCF
+
+    def represent_frame_in_transformed_RCF(self, frame_WCF, configuration=None, group=None):
+        """Returns the frame's representation the current robot's coordinate frame (RCF).
+
+        Parameters
+        ----------
+        frame_WCF : :class:`compas.geometry.Frame`
+            A frame in the world coordinate frame.
+        configuration : :class:`compas_fab.robots.Configuration`
+            The (full) configuration from which the group's base frame is 
+            calculated. Defaults to the init configuration (all zeros).
+        group : str, optional 
+            The planning group. Defaults to the robot's main planning group.
+
+        Examples
+        --------
+        >>> from compas.geometry import Frame
+        >>> from compas_fab.backends import RosClient
+        >>> from compas_fab.backends import RosError
+        >>> from compas_fab.robots.ur5 import Robot
+        >>> client = RosClient()
+        >>> client.run()
+        >>> robot = Robot(client)
+        >>> frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
+        >>> frame_RCF = robot.represent_frame_in_transformed_RCF(frame_WCF)
+        >>> client.close()
+        >>> client.terminate()
+        """
+
+        # TODO: eventually change to not necessarily pass full config, since it
+        # won't check for collisions, or?
+        # TODO: have forward kin no service
+
+        self.ensure_client()
+        if not group:
+            group = self.main_group_name # ensure semantics
+        
+        if not configuration:
+            configuration = self.init_configuration()
+
+        base_link = self.get_base_link_name(group)
+
+        joint_names = self.get_configurable_joint_names()
+        joint_positions = self._get_scaled_joint_positions_from_start_configuration(configuration)
+
+        response = self.client.forward_kinematics(joint_positions, base_link, group, joint_names, base_link)
+        base_frame_RCF = response.pose_stamped[0].pose.frame # the group's transformed base_frame in RCF
+        base_frame = self.get_base_frame(group) # the group's original base_frame
+
+        T = Transformation.from_frame(base_frame)
+        base_frame = base_frame_RCF.transformed(T) # the current base frame
+        T = Transformation.from_frame_to_frame(base_frame, Frame.worldXY())
+        return frame_WCF.transformed(T)
+
+    def represent_frame_in_WCF(self, frame_RCF, group=None):
+        """Represents a frame from the robot's coordinate system (RCF) in the world coordinate system (WCF).
+
+        Parameters
+        ----------
+        frame_RCF : :class:`compas.geometry.Frame`
+            A frame in the robot's coordinate frame.
+        
+        Returns
+        -------
+        :class:`compas.geometry.Frame`
+            A frame in the world coordinate frame.
+        
+        Examples
+        --------
+        >>> from compas.geometry import Frame
+        >>> from compas_fab.robots.ur5 import Robot
+        >>> robot = Robot()
+        >>> frame_RCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
+        >>> frame_WCF = robot.represent_frame_in_WCF(frame_RCF)
+        """
+        frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
+        return frame_WCF
+
+    # ==========================================================================
+    # checks
+    # ==========================================================================
+
+    def ensure_client(self):
+        if not self.client:
+            raise Exception('This method is only callable once a client is assigned')
+
+    def ensure_semantics(self):
+        if not self.semantics:
+            raise Exception('This method is only callable once a semantic model is assigned')
+
+    # ==========================================================================
+    # services
+    # ==========================================================================
 
     def inverse_kinematics(self, frame_WCF, start_configuration=None,
                            group=None, avoid_collisions=True, 
@@ -451,6 +564,7 @@ class Robot(object):
         Returns
         -------
         :class:`compas_fab.robots.Configuration`
+            The planning group's configuration.
 
         Examples
         --------
@@ -496,15 +610,28 @@ class Robot(object):
 
         Parameters
         ----------
-        configuration: :class:`Configuration`
+        configuration : :class:`compas_fab.robots.Configuration`
             The configuration to calculate the forward kinematic for.
-        group (str, optional): The planning group used for the calculation.
-            Defaults to the robot's main planning group.
+        group : str, optional 
+            The planning group used for the calculation. Defaults to the robot's
+            main planning group.
 
         Examples
         --------
+        >>> from compas_fab.backends import RosClient
+        >>> from compas_fab.backends import RosError
+        >>> from compas_fab.robots import Configuration
+        >>> from compas_fab.robots.ur5 import Robot
+        >>> client = RosClient()
+        >>> client.run()
+        >>> robot = Robot(client)
+        >>> configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
+        >>> group = robot.main_group_name
+        >>> response = robot.forward_kinematics(configuration, group)
+        >>> client.close()
+        >>> client.terminate()
         """
-        # TODO implement no service
+        # TODO implement with no service, only geometry transformations
 
         self.ensure_client()
         if not group:
@@ -605,6 +732,10 @@ class Robot(object):
 
         return response
     
+    # ==========================================================================
+    # constraints
+    # ==========================================================================
+
     def orientation_constraint_from_frame(self, frame_WCF, tolerances_axes, 
                                           start_configuration=None, group=None):
         """Returns an orientation constraint on the group's end-effector link.
@@ -757,7 +888,6 @@ class Robot(object):
         ValueError
             If the passed tolerances have a different length than the configuration.
 
-
         Notes
         -----
         Check for using the correct tolerance units for prismatic and revolute
@@ -844,7 +974,6 @@ class Robot(object):
         >>> response = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
         >>> client.close()
         >>> client.terminate()
-
 
         References
         ----------
