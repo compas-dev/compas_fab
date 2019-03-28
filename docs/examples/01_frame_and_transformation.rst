@@ -11,42 +11,27 @@ orthonormal base vectors (xaxis, yaxis). :class:`Transformation` is the base
 class for transformations like :class:`Rotation`, :class:`Translation`,
 :class:`Scale`, :class:`Reflection`, :class:`Projection` and :class:`Shear`.
 
-Here is a simple example of how to use Frame and Transformation: We want to
-bring a point ``P`` in the coordinate system of frame ``F1`` into the
-coordinate system of frame ``F2``.
+Here is a simple example of how to use a frame as a coordinate system: We want 
+to represent a point ``P`` in the (local) coordinate system of frame ``F`` in 
+the world (global) coordinate system.
 
 .. code-block:: python
 
     from compas.geometry import Point
+    from compas.geometry import Vector
     from compas.geometry import Frame
-    from compas.geometry.xforms import Transformation
 
-    point =  [0.0, 0.0, 63.0]
-    xaxis =  [1.0, 0.0, 0.0]
-    yaxis =  [0.0, 1.0, 0.0]
+    point = Point(146.00, 150.00, 161.50)
+    xaxis = Vector(0.9767, 0.0010, -0.214)
+    yaxis = Vector(0.1002, 0.8818, 0.4609)
 
-    F1 = Frame(point, xaxis, yaxis)
+    # coordinate system F
+    F = Frame(point, xaxis, yaxis)
 
-    point =  [146.00, 150.00, 161.50]
-    xaxis =  [0.9767, 0.0010, -0.214]
-    yaxis =  [0.1002, 0.8818, 0.4609]
-
-    F2 = Frame(point, xaxis, yaxis)
-
-    P = Point(35., 35., 35.) # point in frame F1
-
-    # bring P into worldXY frame.
-    Tw = Transformation.from_frame_to_frame(Frame.worldXY(), F1)
-    Pw = P.transformed(Tw)
-
-    # bring Pw into frame F2
-    T = Transformation.from_frame_to_frame(F1, F2)
-    Pt1 = Pw.transformed(T)
-    print(Pt1)
-
-    # This here yields to the same result
-    Pt2 = F2.represent_in_global_coordinates(P)
-    print(Pt2)
+    # point in F (local coordinates)
+    P = Point(35., 35., 35.)
+    # point in global (world) coordinates
+    P_ = F.represent_point_in_global_coordinates(P)
 
 
 .. figure:: 01_frame_transformation.jpg
@@ -54,14 +39,35 @@ coordinate system of frame ``F2``.
     :class: figure-img img-fluid
 
 
-From the frame, or resp. from the orientation (:class:`Rotation`) of the frame,
-several other representations of rotation can be derived, such
-as Euler angles, axis-angle representation, and quaternion.
+Industrial robots do not have a common way of describing the pose orientation.
+The frame provides methods to specify the orientation in various conventions. 
+
+.. code-block:: python
+
+    from compas.geometry import Point
+    from compas.geometry import Vector
+    from compas.geometry import Frame
+
+    point = Point(146.00, 150.00, 161.50)
+    xaxis = Vector(0.9767, 0.0010, -0.214)
+    yaxis = Vector(0.1002, 0.8818, 0.4609)
+
+    F = Frame(point, xaxis, yaxis)
+
+    print(F.quaternion) # ABB
+    print(F.euler_angles(static=False, axes='xyz')) # Staubli
+    print(F.euler_angles(static=False, axes='zyx')) # KUKA
+    print(F.axis_angle_vector) # UR
+
+
+From the frame, or resp. from the orientation (:class:`compas.geometry.Rotation`)
+of the frame, several other representations of rotation can be derived, such as
+Euler angles, axis-angle representation, and quaternion.
 
 .. code-block:: python
 
     from compas.geometry import Frame
-    from compas.geometry.xforms import Rotation
+    from compas.geometry import Rotation
 
     F1 = Frame([0, 0, 0], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
 
@@ -86,6 +92,10 @@ as Euler angles, axis-angle representation, and quaternion.
     ax = F1.axis_angle_vector
     F2 = Frame.from_axis_angle_vector(ax)
     print('Are equal?', F1 == F2)
+
+
+
+
 
 
 Further information
