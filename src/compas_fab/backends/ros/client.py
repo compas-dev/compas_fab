@@ -350,48 +350,53 @@ class RosClient(Ros):
 
         self.GET_MOTION_PLAN(self, request, callback, errback)
 
-    def add_collision_mesh(self, collision_mesh):
-        self.collision_mesh(collision_mesh, CollisionObject.ADD)
+    # ==========================================================================
+    # collision objects
+    # ==========================================================================
 
-    def remove_collision_mesh(self):
-        self.collision_mesh(None, CollisionObject.REMOVE)
+    def add_collision_mesh(self, collision_mesh):
+        co = CollisionObject.from_collision_mesh(collision_mesh)
+        self.collision_object(co, CollisionObject.ADD)
+
+    def remove_collision_mesh(self, id):
+        co = CollisionObject()
+        co.id = id
+        self.collision_object(co, CollisionObject.REMOVE)
 
     def append_collision_mesh(self, collision_mesh):
-        self.collision_mesh(collision_mesh, CollisionObject.APPEND)
+        co = CollisionObject.from_collision_mesh(collision_mesh)
+        self.collision_object(co, CollisionObject.APPEND)
 
-    def collision_mesh(self, collision_mesh=None, operation=CollisionObject.ADD):
+    def collision_object(self, collision_object, operation=CollisionObject.ADD):
         """
-        """
-        if collision_mesh:
-            co = CollisionObject.from_collision_mesh(collision_mesh)
-        else:
-            co = CollisionObject()
-        co.operation = operation
+        """            
+        collision_object.operation = operation
         topic = Topic(self, '/collision_object', 'moveit_msgs/CollisionObject')
-        topic.publish(co.msg)
+        topic.publish(collision_object.msg)
 
-    def build_attached_collision_mesh(self, ee_link, id_name, compas_mesh, operation, touch_links=None):
+    def add_attached_collision_mesh(self, attached_collision_mesh):
         """
         """
-        co = self.build_collision_object(ee_link, id_name, compas_mesh, operation)
+        aco = AttachedCollisionObject.from_attached_collision_mesh(attached_collision_mesh)
+        self.attached_collision_object(aco, operation=CollisionObject.ADD)
+    
+    def remove_attached_collision_mesh(self, id):
+        """
+        """
         aco = AttachedCollisionObject()
-        aco.link_name = ee_link
-        # The set of links that the attached objects are allowed to touch by default.
-        if not touch_links:
-            aco.touch_links = [ee_link]
-        else:
-            aco.touch_links = touch_links
-        aco.object = co
-        return aco
+        aco.object.id = id
+        return self.attached_collision_object(aco, operation=CollisionObject.REMOVE)
 
-
-    def attached_collision_mesh(self, id_name, ee_link, compas_mesh, operation=1, touch_links=None):
+    def attached_collision_object(self, attached_collision_object, operation=CollisionObject.ADD):
         """
         """
-        aco = self.build_attached_collision_mesh(ee_link, id_name, compas_mesh, operation, touch_links=None)
-
+        attached_collision_object.object.operation = operation
         topic = Topic(self, '/attached_collision_object', 'moveit_msgs/AttachedCollisionObject')
-        topic.publish(aco.msg)
+        topic.publish(attached_collision_object.msg)
+    
+    # ==========================================================================
+    # executing
+    # ==========================================================================
 
     def follow_configurations(self, callback, joint_names, configurations, timesteps, timeout=None):
 
