@@ -18,6 +18,7 @@ Classes
     Configuration
     Constraints
     PathPlan
+    PlanningScene
     Robot
     RobotSemantics
     RosFileServerLoader
@@ -40,6 +41,7 @@ The following functions help with converting units from one system to the other.
 from .configuration import *
 from .constraints import *
 from .path_plan import *
+from .planning_scene import *
 from .units import *
 from .robot import *
 from .semantics import *

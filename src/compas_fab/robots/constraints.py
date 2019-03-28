@@ -71,7 +71,7 @@ class BoundingVolume(object):
 
         Parameters
         ----------
-        sphere: `compas.datastructures.Mesh`
+        mesh: `compas.datastructures.Mesh`
 
         Examples
         --------
