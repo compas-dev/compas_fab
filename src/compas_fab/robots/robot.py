@@ -199,6 +199,25 @@ class Robot(object):
         if not self.artist:
             base_frame.point *= self._scale_factor
         return base_frame
+    
+    def get_link_names(self, group=None):
+        """Returns the names of the links in the chain.
+
+        Parameters
+        ----------
+        group : str
+            The name of the group. Defaults to `None`.
+        
+        Returns
+        -------
+        list of str
+        """
+        base_link_name = self.get_base_link_name(group)
+        ee_link_name = self.get_end_effector_link_name(group)
+        link_names = []
+        for link in self.model.iter_link_chain(base_link_name, ee_link_name):
+            link_names.append(link.name)
+        return link_names
 
     def get_configurable_joints(self, group=None):
         """Returns the configurable joints.
@@ -1103,69 +1122,6 @@ class Robot(object):
             joint_positions = self._scale_joint_values(joint_positions, self.scale_factor, group)
             configurations.append(Configuration(joint_positions, self.get_configurable_joint_types(group)))
         return configurations
-
-    def create_collision_mesh_attached_to_end_effector(self, id_name, mesh, group=None, scale=False, touch_links=None):
-        """Creates a collision object that is added to the end effector's tcp.
-        """
-        if not group:
-            group = self.main_group_name # ensure semantics
-        ee_link_name = self.get_end_effector_link_name(group)
-
-        if scale:
-            S = Scale([1./self.scale_factor] * 3)
-            mesh = mesh_transformed(mesh, S)
-
-        last_link_with_geometry = self.get_links_with_geometry(group)[-1]
-        if not touch_links:
-            touch_links=[last_link_with_geometry.name]
-        else:
-            touch_links = list(touch_links)
-            if last_link_with_geometry.name not in touch_links:
-                touch_links.append(last_link_with_geometry.name)
-
-        return self.client.build_attached_collision_mesh(ee_link_name, id_name, mesh, operation=0, touch_links=touch_links)
-
-    def add_attached_collision_mesh(self, id_name, mesh, group=None, touch_links=[], scale=False):
-        """Attaches a collision mesh to the robot's end-effector.
-
-        Parameters
-        ----------
-            id_name (str): The identifier of the object.
-            mesh (:class:`Mesh`): A triangulated COMPAS mesh.
-            group (str, optional): The planning group on which's end-effector
-                the object should be attached. Defaults to the robot's main
-                planning group.
-            touch_links(str list): The list of link names that the attached mesh
-                is allowed to touch by default. The end-effector link name is
-                already considered.
-        """
-        if not group:
-            group = self.main_group_name # ensure semantics
-        ee_link_name = self.get_end_effector_link_name(group)
-
-        if scale:
-            S = Scale([1./self.scale_factor] * 3)
-            mesh = mesh_transformed(mesh, S)
-
-        if ee_link_name not in touch_links:
-            touch_links.append(ee_link_name)
-
-        self.client.attached_collision_mesh(id_name, ee_link_name, mesh, 0, touch_links)
-
-    def remove_attached_collision_mesh(self, id_name, group=None):
-        """Removes an attached collision object from the robot's end-effector.
-
-        Parameters
-        ----------
-            id_name (str): The identifier of the object.
-            group (str, optional): The planning group on which's end-effector
-                the object should be removed. Defaults to the robot's main
-                planning group.
-        """
-        if not group:
-            group = self.main_group_name # ensure semantics
-        ee_link_name = self.get_end_effector_link_name(group)
-        self.client.attached_collision_mesh(id_name, ee_link_name, None, 1)
 
     def send_frame(self):
         # (check service name with ros)
