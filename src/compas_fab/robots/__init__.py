@@ -15,13 +15,18 @@ Classes
     :toctree: generated/
     :nosignatures:
 
+    AttachedCollisionMesh
+    BoundingVolume
+    CollisionMesh
     Configuration
-    Constraints
+    Constraint
+    JointConstraint
+    OrientationConstraint
     PathPlan
     PlanningScene
+    PositionConstraint
     Robot
     RobotSemantics
-    RosFileServerLoader
 
 Unit conversion
 ---------------
