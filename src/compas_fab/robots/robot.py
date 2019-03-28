@@ -1053,10 +1053,10 @@ class Robot(object):
         >>> robot = Robot(client)
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
-        >>> tolerance_angle = math.radians(1)
+        >>> tolerance_axes = [math.radians(1)] * 3
         >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
         >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerance_orientation, start_configuration, group)
+        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, start_configuration, group)
         >>> response = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
         >>> client.close()
         >>> client.terminate()

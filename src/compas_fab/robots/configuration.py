@@ -11,20 +11,18 @@ __all__ = [
 
 
 class Configuration(object):
-    """Represents the configuration of a robot based on the
-    state of its joints. This concept is also refered to
-    as `Joint State`.
+    """Represents the configuration of a robot based on the state of its joints.
+    This concept is also refered to as `Joint State`.
 
     Attributes
     ----------
-    values : :obj:`list` of :obj:`float`
+    values : list of float
         Joint values expressed in radians or meters, depending on the respective type.
-    types : :obj:`list` of :class:`Joint.TYPE`
-        Joint types, e.g. a list of ``Joint.REVOLUTE`` for revolute joints.
+    types : list of :class:`compas.robots.Joint.TYPE`
+        Joint types, e.g. a list of `compas.robots.Joint.REVOLUTE` for revolute joints.
 
     Examples
     --------
-
     >>> from math import pi
     >>> from compas_fab.robots import Configuration
     >>> config = Configuration.from_revolute_values([pi/2, 0., 0.])

@@ -348,7 +348,7 @@ class PlanningScene(object):
         self.ensure_client()
         self.client.remove_attached_collision_mesh(id)
 
-    def attach_collision_mesh_to_end_effector(self, collision_mesh, scale=False, group=None):
+    def attach_collision_mesh_to_robot_end_effector(self, collision_mesh, scale=False, group=None):
         """Attaches a collision mesh to the robot's end-effector.
 
         Parameters
@@ -379,7 +379,7 @@ class PlanningScene(object):
         >>> cm = CollisionMesh(mesh, 'tip')
         >>> # attach it to the end-effector
         >>> group = robot.main_group_name
-        >>> scene.attach_collision_mesh_to_end_effector(cm, group="group")
+        >>> scene.attach_collision_mesh_to_robot_end_effector(cm, group="group")
         >>> time.sleep(2)
         >>> scene.remove_attached_collision_mesh('tip')
         >>> # if you completely want to remove the collison mesh, you also have
@@ -406,28 +406,33 @@ if __name__ == "__main__":
 
     #import doctest
     #doctest.testmod()
-    import time
-    print([name for name in dir() if not name.startswith('_')])
-    from compas_fab.robots.ur5 import Robot
-    robot = Robot()
-    print(robot.root_link_name)
+    #print([name for name in dir() if not name.startswith('_')])
 
+    import time
     import compas_fab
     from compas.datastructures import Mesh
     from compas_fab.robots.ur5 import Robot
     from compas_fab.robots import PlanningScene
     from compas_fab.robots import CollisionMesh
     from compas_fab.backends import RosClient
+    
     client = RosClient()
     client.run()
     robot = Robot(client)
+    
     scene = PlanningScene(robot)
-    mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
-    cm = CollisionMesh(mesh, 'tip')
-    scene.attach_collision_mesh_to_end_effector(cm)
-    time.sleep(2)
-    scene.remove_attached_collision_mesh('tip')
-    scene.remove_collision_mesh('tip')
-    time.sleep(2)
+
+    mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
+    cm = CollisionMesh(mesh, 'floor')
+    scene.add_collision_mesh(cm)
+
+    #mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
+    #cm = CollisionMesh(mesh, 'tip')
+    #scene.attach_collision_mesh_to_robot_end_effector(cm)
+    #scene.remove_attached_collision_mesh('tip')
+    #scene.remove_collision_mesh('tip')
+
+    time.sleep(2) #sleep a bit before terminating the client
     client.close()
     client.terminate()
+    
