@@ -350,31 +350,23 @@ class RosClient(Ros):
 
         self.GET_MOTION_PLAN(self, request, callback, errback)
 
-    def build_collision_object(self, frame_id, id_name, compas_mesh, operation):
-        co = CollisionObject(header=Header(frame_id=frame_id), id=id_name)
+    def add_collision_mesh(self, collision_mesh):
+        self.collision_mesh(collision_mesh, CollisionObject.ADD)
 
-        if compas_mesh:
-            # ROS mesh message requires triangles
-            mesh_quads_to_triangles(compas_mesh)
-            mesh = Mesh.from_mesh(compas_mesh)
-            co.meshes = [mesh]
-            co.mesh_poses = [Pose()]
+    def remove_collision_mesh(self):
+        self.collision_mesh(None, CollisionObject.REMOVE)
 
-        if operation == 0:
-            co.operation = CollisionObject.ADD
-        elif operation == 1:
-            co.operation = CollisionObject.REMOVE
-        elif operation == 2:
-            co.operation = CollisionObject.APPEND
+    def append_collision_mesh(self, collision_mesh):
+        self.collision_mesh(collision_mesh, CollisionObject.APPEND)
+
+    def collision_mesh(self, collision_mesh=None, operation=CollisionObject.ADD):
+        """
+        """
+        if collision_mesh:
+            co = CollisionObject.from_collision_mesh(collision_mesh)
         else:
-            raise ValueError("Operation unknown")
-
-        return co
-
-    def collision_mesh(self, id_name, root_link, compas_mesh, operation=0):
-        """
-        """
-        co = self.build_collision_object(root_link, id_name, compas_mesh, operation)
+            co = CollisionObject()
+        co.operation = operation
         topic = Topic(self, '/collision_object', 'moveit_msgs/CollisionObject')
         topic.publish(co.msg)
 
