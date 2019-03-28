@@ -46,7 +46,8 @@ class Configuration(object):
 
     def __init__(self, values=[], types=[]):
         if len(values) != len(types):
-            raise ValueError("%d values must have %d types, but %d given." % (len(values), len(values), len(types)))
+            raise ValueError("%d values must have %d types, but %d given." % (
+                len(values), len(values), len(types)))
         self.values = list(values)
         self.types = list(types)
         self._precision = '3f'
@@ -54,7 +55,7 @@ class Configuration(object):
     def __str__(self):
         vs = '%.' + self._precision
         return "Configuration(%s, %s)" % ('(' + ", ".join([vs] * len(self.values)) % tuple(self.values) + ')', tuple(self.types))
-    
+
     def __repr__(self):
         return self.__str__()
 
@@ -95,7 +96,8 @@ class Configuration(object):
         prismatic_values = list(prismatic_values)
         revolute_values = list(revolute_values)
         values = prismatic_values + revolute_values
-        types = [Joint.PRISMATIC] * len(prismatic_values) + [Joint.REVOLUTE] * len(revolute_values)
+        types = [Joint.PRISMATIC] * \
+            len(prismatic_values) + [Joint.REVOLUTE] * len(revolute_values)
         return cls.from_data({'values': values, 'types': types})
 
     @classmethod
@@ -150,7 +152,7 @@ class Configuration(object):
     def revolute_values(self):
         """:obj:`list` of :obj:`float` : Revolute joint values in radians."""
         return [v for i, v in enumerate(self.values) if self.types[i] == Joint.REVOLUTE]
-    
+
     def copy(self):
         cls = type(self)
         return cls(self.values[:], self.types[:])
@@ -167,13 +169,16 @@ if __name__ == "__main__":
     config = Configuration.from_revolute_values([pi/2, 0., 0.])
     print(config.values)
 
-    config = Configuration.from_prismatic_and_revolute_values([8.312], [pi/2, 0., 0., 0., 2*pi, 0.8])
+    config = Configuration.from_prismatic_and_revolute_values(
+        [8.312], [pi/2, 0., 0., 0., 2*pi, 0.8])
     print(str(config))
 
-    config = Configuration([pi/2, 3., 0.1], [Joint.REVOLUTE, Joint.PRISMATIC, Joint.PLANAR])
+    config = Configuration(
+        [pi/2, 3., 0.1], [Joint.REVOLUTE, Joint.PRISMATIC, Joint.PLANAR])
     print(str(config))
 
-    config = Configuration.from_prismatic_and_revolute_values([2., 3., 1.33], map(radians, [90, 0, 0, 20]))
+    config = Configuration.from_prismatic_and_revolute_values(
+        [2., 3., 1.33], map(radians, [90, 0, 0, 20]))
     print(str(config))
     print(config.revolute_values)
     print(config.prismatic_values)

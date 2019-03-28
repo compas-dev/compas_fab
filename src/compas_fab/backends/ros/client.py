@@ -99,7 +99,8 @@ class ServiceDescription(object):
             request_msg = self.request_class(**request)
 
         srv = Service(client, self.name, self.type)
-        srv.call(ServiceRequest(request_msg.msg), callback=inner_handler, errback=errback)
+        srv.call(ServiceRequest(request_msg.msg),
+                 callback=inner_handler, errback=errback)
 
     def __call__(self, client, request, callback, errback):
         return self.call(client, request, callback, errback)
@@ -145,8 +146,10 @@ class RosClient(Ros):
     """
     GET_POSITION_IK = ServiceDescription('/compute_ik', 'GetPositionIK')
     GET_POSITION_FK = ServiceDescription('/compute_fk', 'GetPositionFK')
-    GET_CARTESIAN_PATH = ServiceDescription('/compute_cartesian_path', 'GetCartesianPath')
-    GET_MOTION_PLAN = ServiceDescription('/plan_kinematic_path', 'GetMotionPlan', MotionPlanRequest, MotionPlanResponse)
+    GET_CARTESIAN_PATH = ServiceDescription(
+        '/compute_cartesian_path', 'GetCartesianPath')
+    GET_MOTION_PLAN = ServiceDescription(
+        '/plan_kinematic_path', 'GetMotionPlan', MotionPlanRequest, MotionPlanResponse)
 
     def __init__(self, host='localhost', port=9090, is_secure=False):
         super(RosClient, self).__init__(host, port, is_secure)
@@ -177,8 +180,10 @@ class RosClient(Ros):
         header = Header(frame_id=base_link)
         pose = Pose.from_frame(frame)
         pose_stamped = PoseStamped(header, pose)
-        joint_state = JointState(name=joint_names, position=joint_positions, header=header)
-        start_state = RobotState(joint_state, MultiDOFJointState(header=header))
+        joint_state = JointState(
+            name=joint_names, position=joint_positions, header=header)
+        start_state = RobotState(
+            joint_state, MultiDOFJointState(header=header))
 
         ik_request = PositionIKRequest(group_name=group,
                                        robot_state=start_state,
@@ -208,16 +213,19 @@ class RosClient(Ros):
         """
         header = Header(frame_id=base_link)
         fk_link_names = [ee_link]
-        joint_state = JointState(name=joint_names, position=joint_positions, header=header)
-        robot_state = RobotState(joint_state, MultiDOFJointState(header=header))
+        joint_state = JointState(
+            name=joint_names, position=joint_positions, header=header)
+        robot_state = RobotState(
+            joint_state, MultiDOFJointState(header=header))
 
-        self.GET_POSITION_FK(self, (header, fk_link_names, robot_state), callback, errback)
+        self.GET_POSITION_FK(self, (header, fk_link_names,
+                                    robot_state), callback, errback)
 
     @validated_response
     def plan_cartesian_motion(self, frames, base_link,
-                               ee_link, group, joint_names, joint_positions,
-                               max_step, avoid_collisions, path_constraints,
-                               attached_collision_object):
+                              ee_link, group, joint_names, joint_positions,
+                              max_step, avoid_collisions, path_constraints,
+                              attached_collision_object):
         kwargs = {}
         kwargs['frames'] = frames
         kwargs['base_link'] = base_link
@@ -235,17 +243,20 @@ class RosClient(Ros):
         return await_callback(self.plan_cartesian_motion_async, **kwargs)
 
     def plan_cartesian_motion_async(self, callback, errback, frames, base_link,
-                                     ee_link, group, joint_names, joint_positions,
-                                     max_step, avoid_collisions, path_constraints,
-                                     attached_collision_object):
+                                    ee_link, group, joint_names, joint_positions,
+                                    max_step, avoid_collisions, path_constraints,
+                                    attached_collision_object):
         """
         """
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
-        joint_state = JointState(header=header, name=joint_names, position=joint_positions)
-        start_state = RobotState(joint_state, MultiDOFJointState(header=header))
+        joint_state = JointState(
+            header=header, name=joint_names, position=joint_positions)
+        start_state = RobotState(
+            joint_state, MultiDOFJointState(header=header))
         if attached_collision_object:
-            start_state.attached_collision_objects = [attached_collision_object]
+            start_state.attached_collision_objects = [
+                attached_collision_object]
 
         request = dict(header=header,
                        start_state=start_state,
@@ -259,15 +270,15 @@ class RosClient(Ros):
         self.GET_CARTESIAN_PATH(self, request, callback, errback)
 
     @validated_response
-    def plan_motion(self, goal_constraints, base_link, ee_link, group, 
+    def plan_motion(self, goal_constraints, base_link, ee_link, group,
                     joint_names, joint_positions, path_constraints=None,
-                    trajectory_constraints=None, planner_id='', 
-                    num_planning_attempts=8, allowed_planning_time=2., 
-                    max_velocity_scaling_factor=1., 
+                    trajectory_constraints=None, planner_id='',
+                    num_planning_attempts=8, allowed_planning_time=2.,
+                    max_velocity_scaling_factor=1.,
                     max_acceleration_scaling_factor=1.,
                     attached_collision_object=None,
                     workspace_parameters=None):
-        
+
         kwargs = {}
         kwargs['goal_constraints'] = goal_constraints
         kwargs['base_link'] = base_link
@@ -288,12 +299,12 @@ class RosClient(Ros):
         kwargs['errback_name'] = 'errback'
 
         return await_callback(self.plan_motion_async, **kwargs)
-    
+
     def plan_motion_async(self, callback, errback, goal_constraints, base_link,
                           ee_link, group, joint_names, joint_positions,
                           path_constraints=None, trajectory_constraints=None,
                           planner_id='', num_planning_attempts=8,
-                          allowed_planning_time=2., 
+                          allowed_planning_time=2.,
                           max_velocity_scaling_factor=1.,
                           max_acceleration_scaling_factor=1.,
                           attached_collision_object=None,
@@ -304,20 +315,26 @@ class RosClient(Ros):
         # TODO: if list of frames (goals) => receive multiple solutions?
 
         header = Header(frame_id=base_link)
-        joint_state = JointState(header=header, name=joint_names, position=joint_positions)
-        start_state = RobotState(joint_state, MultiDOFJointState(header=header))
+        joint_state = JointState(
+            header=header, name=joint_names, position=joint_positions)
+        start_state = RobotState(
+            joint_state, MultiDOFJointState(header=header))
         if attached_collision_object:
-            start_state.attached_collision_objects = [attached_collision_object]
+            start_state.attached_collision_objects = [
+                attached_collision_object]
 
         # goal constraints
         constraints = Constraints()
         for c in goal_constraints:
             if c.type == c.JOINT:
-                constraints.joint_constraints.append(JointConstraint.from_joint_constraint(c))
+                constraints.joint_constraints.append(
+                    JointConstraint.from_joint_constraint(c))
             elif c.type == c.POSITION:
-                constraints.position_constraints.append(PositionConstraint.from_position_constraint(header, c))
+                constraints.position_constraints.append(
+                    PositionConstraint.from_position_constraint(header, c))
             elif c.type == c.ORIENTATION:
-                constraints.orientation_constraints.append(OrientationConstraint.from_orientation_constraint(header, c))
+                constraints.orientation_constraints.append(
+                    OrientationConstraint.from_orientation_constraint(header, c))
             else:
                 raise NotImplementedError
         goal_constraints = [constraints]
@@ -327,11 +344,14 @@ class RosClient(Ros):
             constraints = Constraints()
             for c in path_constraints:
                 if c.type == c.JOINT:
-                    constraints.joint_constraints.append(JointConstraint.from_joint_constraint(c))
+                    constraints.joint_constraints.append(
+                        JointConstraint.from_joint_constraint(c))
                 elif c.type == c.POSITION:
-                    constraints.position_constraints.append(PositionConstraint.from_position_constraint(header, c))
+                    constraints.position_constraints.append(
+                        PositionConstraint.from_position_constraint(header, c))
                 elif c.type == c.ORIENTATION:
-                    constraints.orientation_constraints.append(OrientationConstraint.from_orientation_constraint(header, c))
+                    constraints.orientation_constraints.append(
+                        OrientationConstraint.from_orientation_constraint(header, c))
                 else:
                     raise NotImplementedError
             path_constraints = constraints
@@ -369,7 +389,7 @@ class RosClient(Ros):
 
     def collision_object(self, collision_object, operation=CollisionObject.ADD):
         """
-        """            
+        """
         collision_object.operation = operation
         topic = Topic(self, '/collision_object', 'moveit_msgs/CollisionObject')
         topic.publish(collision_object.msg)
@@ -377,9 +397,10 @@ class RosClient(Ros):
     def add_attached_collision_mesh(self, attached_collision_mesh):
         """
         """
-        aco = AttachedCollisionObject.from_attached_collision_mesh(attached_collision_mesh)
+        aco = AttachedCollisionObject.from_attached_collision_mesh(
+            attached_collision_mesh)
         self.attached_collision_object(aco, operation=CollisionObject.ADD)
-    
+
     def remove_attached_collision_mesh(self, id):
         """
         """
@@ -391,9 +412,10 @@ class RosClient(Ros):
         """
         """
         attached_collision_object.object.operation = operation
-        topic = Topic(self, '/attached_collision_object', 'moveit_msgs/AttachedCollisionObject')
+        topic = Topic(self, '/attached_collision_object',
+                      'moveit_msgs/AttachedCollisionObject')
         topic.publish(attached_collision_object.msg)
-    
+
     # ==========================================================================
     # executing
     # ==========================================================================
@@ -401,7 +423,8 @@ class RosClient(Ros):
     def follow_configurations(self, callback, joint_names, configurations, timesteps, timeout=None):
 
         if len(configurations) != len(timesteps):
-            raise ValueError("%d configurations must have %d timesteps, but %d given." % (len(configurations), len(timesteps), len(timesteps)))
+            raise ValueError("%d configurations must have %d timesteps, but %d given." % (
+                len(configurations), len(timesteps), len(timesteps)))
 
         if not timeout:
             timeout = timesteps[-1] * 1000 * 2
@@ -409,10 +432,12 @@ class RosClient(Ros):
         points = []
         num_joints = len(configurations[0].values)
         for config, time in zip(configurations, timesteps):
-            pt = JointTrajectoryPoint(positions=config.values, velocities=[0]*num_joints, time_from_start=Time(secs=(time)))
+            pt = JointTrajectoryPoint(positions=config.values, velocities=[
+                                      0]*num_joints, time_from_start=Time(secs=(time)))
             points.append(pt)
 
-        joint_trajectory = JointTrajectory(Header(), joint_names, points)  # specify header necessary?
+        joint_trajectory = JointTrajectory(
+            Header(), joint_names, points)  # specify header necessary?
         return self.follow_joint_trajectory(callback, joint_trajectory, timeout)
 
     def follow_joint_trajectory(self, joint_trajectory, callback=None, errback=None, feedback_callback=None, timeout=60000):
@@ -439,7 +464,8 @@ class RosClient(Ros):
             An instance of a cancellable tasks.
         """
 
-        trajectory_goal = FollowJointTrajectoryGoal(trajectory=joint_trajectory)
+        trajectory_goal = FollowJointTrajectoryGoal(
+            trajectory=joint_trajectory)
 
         def handle_result(msg, client):
             result = FollowJointTrajectoryResult.from_msg(msg)
@@ -455,14 +481,17 @@ class RosClient(Ros):
         goal = Goal(action_client, Message(trajectory_goal.msg))
 
         if callback:
-            goal.on('result', lambda result: handle_result(result, action_client))
+            goal.on('result', lambda result: handle_result(
+                result, action_client))
 
         if feedback_callback:
             goal.on('feedback', feedback_callback)
 
         if errback:
-            goal.on('timeout', lambda: handle_failure(RosError("Action Goal timeout", -1, None)))
-            action_client.on('timeout', lambda: handle_failure(RosError("Actionlib client timeout", -1, None)))
+            goal.on('timeout', lambda: handle_failure(
+                RosError("Action Goal timeout", -1, None)))
+            action_client.on('timeout', lambda: handle_failure(
+                RosError("Actionlib client timeout", -1, None)))
 
         goal.send(timeout=timeout)
 
@@ -477,6 +506,7 @@ class RosClient(Ros):
             response = GetPlanningSceneResponse.from_msg(msg)
             callback(response)
 
-        srv = Service(self, '/get_planning_scene', 'moveit_msgs/GetPlanningScene')
+        srv = Service(self, '/get_planning_scene',
+                      'moveit_msgs/GetPlanningScene')
         request = ServiceRequest(reqmsg.msg)
         srv.call(request, receive_message, receive_message)

@@ -82,11 +82,11 @@ class BoundingVolume(object):
         >>> bv = BoundingVolume.from_mesh(Mesh)
         """
         return cls(cls.MESH, mesh)
-    
+
     def scale(self, scale_factor):
         S = Scale([1./scale_factor] * 3)
         self.volume.transform(S)
-    
+
     def __repr__(self):
         return "BoundingVolume({0}, {1})".format(self.type, self.volume)
 
@@ -108,7 +108,8 @@ class Constraint(object):
 
     def __init__(self, type, weight=1.):
         if type not in self.possible_types:
-            raise ValueError("Type must be %d, %d or %d" % tuple(self.possible_types))
+            raise ValueError("Type must be %d, %d or %d" %
+                             tuple(self.possible_types))
         self.type = type
         self.weight = weight
 
@@ -134,16 +135,17 @@ class JointConstraint(Constraint):
     >>> jc = JointConstraint("joint_0", 1.4, 0.1)
 
     """
+
     def __init__(self, joint_name, value, tolerance=0., weight=1.):
         super(JointConstraint, self).__init__(self.JOINT, weight)
         self.joint_name = joint_name
         self.value = value
         self.tolerance = tolerance
-    
+
     def scale(self, scale_factor):
         self.value /= scale_factor
         self.tolerance /= scale_factor
-    
+
     def __repr__(self):
         return "JointConstraint('{0}', {1}, {2}, {3})".format(self.joint_name, self.value, self.tolerance, self.weight)
 
@@ -179,12 +181,14 @@ class OrientationConstraint(Constraint):
     >>> oc = OrientationConstraint("link_0", frame.quaternion)
 
     """
+
     def __init__(self, link_name, quaternion, tolerances=None, weight=1.):
         super(OrientationConstraint, self).__init__(self.ORIENTATION, weight)
         self.link_name = link_name
         self.quaternion = [float(a) for a in list(quaternion)]
-        self.tolerances = [float(a) for a in list(tolerances)] if tolerances else [0.01] * 3
-    
+        self.tolerances = [float(a) for a in list(
+            tolerances)] if tolerances else [0.01] * 3
+
     def __repr__(self):
         return "OrientationConstraint('{0}', {1}, {2}, {3})".format(self.link_name, self.quaternion, self.tolerances, self.weight)
 
@@ -258,10 +262,10 @@ class PositionConstraint(Constraint):
         """
         bounding_volume = BoundingVolume.from_mesh(mesh)
         return cls(link_name, bounding_volume, weight)
-    
+
     def scale(self, scale_factor):
         self.bounding_volume.scale(scale_factor)
-    
+
     def __repr__(self):
         return "PositionConstraint('{0}', {1}, {2})".format(self.link_name, self.bounding_volume, self.weight)
 

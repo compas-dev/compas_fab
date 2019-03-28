@@ -14,6 +14,7 @@ __all__ = [
     'PlanningScene',
 ]
 
+
 class CollisionMesh(object):
     """Represents a collision mesh.
 
@@ -29,7 +30,7 @@ class CollisionMesh(object):
     root_name : str
         The name of the root link the collision mesh with be placed in. Defaults
         to 'world'.
-    
+
     Examples
     --------
     >>> import compas_fab
@@ -44,7 +45,7 @@ class CollisionMesh(object):
         self.mesh = mesh
         self.frame = frame if frame else Frame.worldXY()
         self.root_name = 'world'
-    
+
     def scale(self, transformation):
         """Scales the collision mesh.
 
@@ -69,7 +70,7 @@ class AttachedCollisionMesh(object):
         to the link_name it is attached to.
     weight : float
         The weight of the attached object. Defaults to 1.
-    
+
     Examples
     --------
     >>> import compas_fab
@@ -88,6 +89,7 @@ class AttachedCollisionMesh(object):
     >>> # create a collision mesh attached to the end-effector
     >>> acm = AttachedCollisionMesh(cm, ee_link_name, touch_links)
     """
+
     def __init__(self, collision_mesh, link_name, touch_links=None, weight=1.):
         self.collision_mesh = collision_mesh
         self.collision_mesh.root_name = link_name
@@ -110,16 +112,17 @@ class PlanningScene(object):
 
     def __init__(self, robot):
         self.robot = robot
-    
+
     @property
     def client(self):
         """The backend client."""
         return self.robot.client
-    
+
     def ensure_client(self):
         if not self.client:
-            raise Exception('This method is only callable once a client is assigned')
-    
+            raise Exception(
+                'This method is only callable once a client is assigned')
+
     def add_collision_mesh(self, collision_mesh, scale=False):
         """Adds a collision mesh to the planning scene.
 
@@ -132,7 +135,7 @@ class PlanningScene(object):
         scale : bool, optional
             If `True`, the mesh will be scaled according to the robot's scale 
             factor.
-        
+
         Returns
         -------
         None
@@ -158,9 +161,9 @@ class PlanningScene(object):
         >>> client.terminate()
         """
         self.ensure_client()
-        
+
         collision_mesh.root_name = self.robot.root_link_name
-        
+
         if scale:
             S = Scale([1./self.robot.scale_factor] * 3)
             collision_mesh.scale(S)
@@ -174,7 +177,7 @@ class PlanningScene(object):
         ----------
         id : str
             The identifier of the collision object.
-        
+
         Returns
         -------
         None
@@ -216,7 +219,7 @@ class PlanningScene(object):
         scale : bool, optional
             If `True`, the mesh will be scaled according to the robot's scale 
             factor.
-        
+
         Returns
         -------
         None
@@ -250,7 +253,7 @@ class PlanningScene(object):
             collision_mesh.scale(S)
 
         self.robot.client.append_collision_mesh(collision_mesh)
-    
+
     def add_attached_collision_mesh(self, attached_collision_mesh):
         """Adds an attached collision object to the planning scene.
 
@@ -298,7 +301,7 @@ class PlanningScene(object):
         """
         self.ensure_client()
         self.client.add_attached_collision_mesh(attached_collision_mesh)
-    
+
     def remove_attached_collision_mesh(self, id):
         """Removes an attached collision object to the planning scene.
 
@@ -306,7 +309,7 @@ class PlanningScene(object):
         ----------
         id : str
             The identifier of the object.
-        
+
         Returns
         -------
         None
@@ -361,7 +364,7 @@ class PlanningScene(object):
         group : str
             The planning group to which we want to attach the mesh to. Defaults
             to the robot's main planning group.
-        
+
         Examples
         --------
         >>> import compas_fab
@@ -394,12 +397,11 @@ class PlanningScene(object):
         if scale:
             S = Scale([1./self.robot.scale_factor] * 3)
             collision_mesh.scale(S)
-        
+
         ee_link_name = self.robot.get_end_effector_link_name(group)
         touch_links = [ee_link_name]
         acm = AttachedCollisionMesh(collision_mesh, ee_link_name, touch_links)
         self.add_attached_collision_mesh(acm)
-
 
 
 if __name__ == "__main__":
@@ -449,4 +451,3 @@ if __name__ == "__main__":
     client.close()
     client.terminate()
     """
-    

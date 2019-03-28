@@ -17,6 +17,7 @@ __all__ = [
     'Robot',
 ]
 
+
 def Robot(client=None, load_geometry=False):
     """Returns a UR5 robot.
 
@@ -45,15 +46,18 @@ def Robot(client=None, load_geometry=False):
     >>> robot.name
     'ur5'
     """
-    
-    urdf_filename = compas_fab.get("universal_robot/ur_description/urdf/ur5.urdf")
-    srdf_filename = compas_fab.get("universal_robot/ur5_moveit_config/config/ur5.srdf")
+
+    urdf_filename = compas_fab.get(
+        "universal_robot/ur_description/urdf/ur5.urdf")
+    srdf_filename = compas_fab.get(
+        "universal_robot/ur5_moveit_config/config/ur5.srdf")
 
     model = RobotModel.from_urdf_file(urdf_filename)
     semantics = RobotSemantics.from_srdf_file(srdf_filename, model)
 
     if load_geometry:
-        loader = LocalPackageMeshLoader(compas_fab.get("universal_robot"), "ur_description")
+        loader = LocalPackageMeshLoader(
+            compas_fab.get("universal_robot"), "ur_description")
         model.load_geometry(loader)
 
     robot = compas_fab.robots.robot.Robot(model, semantics=semantics)
