@@ -404,10 +404,11 @@ class PlanningScene(object):
 
 if __name__ == "__main__":
 
-    #import doctest
-    #doctest.testmod()
+    import doctest
+    doctest.testmod()
     #print([name for name in dir() if not name.startswith('_')])
 
+    """
     import time
     import compas_fab
     from compas.datastructures import Mesh
@@ -415,6 +416,7 @@ if __name__ == "__main__":
     from compas_fab.robots import PlanningScene
     from compas_fab.robots import CollisionMesh
     from compas_fab.backends import RosClient
+    from compas.geometry import Box
     
     client = RosClient()
     client.run()
@@ -422,9 +424,20 @@ if __name__ == "__main__":
     
     scene = PlanningScene(robot)
 
-    mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-    cm = CollisionMesh(mesh, 'floor')
-    scene.add_collision_mesh(cm)
+    brick = Box.from_width_height_depth(0.11, 0.07, 0.25)
+    mesh = Mesh.from_vertices_and_faces(brick.vertices, brick.faces)
+    cm = CollisionMesh(mesh, 'brick')
+
+    cm.frame.point.y += 0.3
+
+    for i in range(5):
+        cm.frame.point.z += brick.zsize
+        scene.append_collision_mesh(cm)
+        
+
+    #mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
+    #cm = CollisionMesh(mesh, 'floor')
+    #scene.add_collision_mesh(cm)
 
     #mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
     #cm = CollisionMesh(mesh, 'tip')
@@ -435,4 +448,5 @@ if __name__ == "__main__":
     time.sleep(2) #sleep a bit before terminating the client
     client.close()
     client.terminate()
+    """
     
