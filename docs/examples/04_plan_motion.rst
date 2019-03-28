@@ -2,6 +2,11 @@
 Plan motion
 ********************************************************************************
 
+There are 2 function that allow to plan a robotic movement without collisions:
+`plan_cartesian_motion` and `plan_motion`.
+More coming soon ...
+
+
 Plan cartesian motion
 =====================
 
