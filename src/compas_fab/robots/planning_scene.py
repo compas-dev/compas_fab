@@ -16,17 +16,21 @@ class PlanningScene(object):
 
     Examples
     --------
-    >>> scene = PlanningScene(client)
+    >>> scene = PlanningScene(robot)
     >>> scene.add_collision_mesh(name, mesh, replace=True)
     >>> scene.add_collision_mesh(name, mesh)
     """
 
-    def __init__(self, robot, client):
+    def __init__(self, robot):
         self.robot = robot
-        self.client = client
+    
+    def ensure_client(self):
+        self.robot.ensure_client()
     
     def add_collision_mesh(self, name, mesh, scale=False):
-        """Adds a collision mesh to the robot's planning scene.
+        """Adds a collision mesh to the planning scene.
+
+        If the object with the same name previously existed, it is replaced.
 
         Parameters
         ----------
@@ -34,25 +38,29 @@ class PlanningScene(object):
             The identifier of the collision mesh.
         mesh : :class:`compas.datastructures.Mesh`
             A triangulated COMPAS mesh.
+        scale : bool, optional
+            If `True`, the mesh will be scaled according to the robot's scale 
+            factor.
 
         Examples
         --------
         """
         root_link_name = self.robot.root_link_name
+        self.ensure_client()
 
         if scale:
             S = Scale([1./self.robot.scale_factor] * 3)
             mesh = mesh_transformed(mesh, S)
 
-        self.client.collision_mesh(name, root_link_name, mesh, 0)
+        self.robot.client.collision_mesh(name, root_link_name, mesh, 0)
 
     def remove_collision_mesh(self, name):
-        """Removes a collision mesh from the robot's planning scene.
+        """Removes a collision object from the planning scene.
 
         Parameters
         ----------
         name : str
-            The identifier of the collision mesh.
+            The identifier of the collision object.
 
         Examples
         --------
@@ -61,7 +69,9 @@ class PlanningScene(object):
         self.robot.client.collision_mesh(name, root_link_name, None, 1)
 
     def append_collision_mesh(self, name, mesh, scale=False):
-        """Appends a collision mesh to the robot's planning scene.
+        """Appends a collision mesh that already exists in the planning scene.
+
+        If the does not exist, it is added.
 
         Parameters
         ----------
@@ -69,13 +79,18 @@ class PlanningScene(object):
             The identifier of the collision mesh.
         mesh : :class:`compas.datastructures.Mesh`
             A triangulated COMPAS mesh.
+        scale : bool, optional
+            If `True`, the mesh will be scaled according to the robot's scale 
+            factor.
 
         Examples
         --------
         """
         root_link_name = self.robot.root_link_name
+        self.ensure_client()
+
         if scale:
             S = Scale([1./self.robot.scale_factor] * 3)
             mesh = mesh_transformed(mesh, S)
 
-        self.client.collision_mesh(name, root_link_name, mesh, 2)
+        self.robot.client.collision_mesh(name, root_link_name, mesh, 2)

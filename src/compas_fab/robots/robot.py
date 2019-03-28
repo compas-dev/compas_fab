@@ -97,7 +97,7 @@ class Robot(object):
     
     @property
     def root_link_name(self):
-        return self.robot.model.root.name 
+        return self.model.root.name 
 
     def get_end_effector_link_name(self, group=None):
         """Returns the name of the end effector link.
@@ -1103,60 +1103,6 @@ class Robot(object):
             joint_positions = self._scale_joint_values(joint_positions, self.scale_factor, group)
             configurations.append(Configuration(joint_positions, self.get_configurable_joint_types(group)))
         return configurations
-
-
-    def add_collision_mesh_to_planning_scene(self, id_name, mesh, scale=False):
-        """Adds a collision mesh to the robot's planning scene.
-
-        Parameters
-        ----------
-            id_name (str): The identifier of the collision mesh.
-            mesh (:class:`Mesh`): A triangulated COMPAS mesh.
-
-        Examples
-        --------
-        """
-        self.ensure_client()
-        root_link_name = self.model.root.name
-
-        if scale:
-            S = Scale([1./self.scale_factor] * 3)
-            mesh = mesh_transformed(mesh, S)
-
-        self.client.collision_mesh(id_name, root_link_name, mesh, 0)
-
-    def remove_collision_mesh_from_planning_scene(self, id_name):
-        """Removes a collision mesh from the robot's planning scene.
-
-        Parameters
-        ----------
-            id_name (str): The identifier of the collision mesh.
-
-        Examples
-        --------
-        """
-        self.ensure_client()
-        root_link_name = self.model.root.name
-        self.client.collision_mesh(id_name, root_link_name, None, 1)
-
-    def append_collision_mesh_to_planning_scene(self, id_name, mesh, scale=False):
-        """Appends a collision mesh to the robot's planning scene.
-
-        Parameters
-        ----------
-            id_name (str): The identifier of the collision mesh.
-            mesh (:class:`Mesh`): A triangulated COMPAS mesh.
-
-        Examples
-        --------
-        """
-        self.ensure_client()
-        root_link_name = self.model.root.name
-        if scale:
-            S = Scale([1./self.scale_factor] * 3)
-            mesh = mesh_transformed(mesh, S)
-
-        self.client.collision_mesh(id_name, root_link_name, mesh, 2)
 
     def create_collision_mesh_attached_to_end_effector(self, id_name, mesh, group=None, scale=False, touch_links=None):
         """Creates a collision object that is added to the end effector's tcp.
