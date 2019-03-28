@@ -42,7 +42,18 @@ class CollisionObject(ROSmsg):
         self.planes = planes if planes else []
         self.plane_poses = plane_poses if plane_poses else []
         self.operation = operation  # ADD or REMOVE or APPEND or MOVE
+    
+    @classmethod
+    def from_collision_mesh(cls, collision_mesh):
+        """Creates a collision object from a :class:`compas_fab.robots.CollisionMesh`
+        """
+        kwargs = {}
+        kwargs['header'] = Header(frame_id=collision_mesh.root_name)
+        kwargs['id'] = collision_mesh.id
+        kwargs['meshes'] = [Mesh.from_mesh(collision_mesh.mesh)]
+        kwargs['mesh_poses'] = [Pose.from_frame(collision_mesh.frame)]
 
+        return cls(**kwargs)
 
 class AttachedCollisionObject(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html
@@ -55,6 +66,19 @@ class AttachedCollisionObject(ROSmsg):
         self.touch_links = touch_links if touch_links else []
         self.detach_posture = detach_posture if detach_posture else JointTrajectory()
         self.weight = weight
+    
+    @classmethod
+    def from_attached_collision_mesh(cls, attached_collision_mesh):
+        """Creates an attached collision object from a :class:`compas_fab.robots.AttachedCollisionMesh`
+        """
+
+        kwargs = {}
+        kwargs['link_name'] = attached_collision_mesh.link_name
+        kwargs['object'] = CollisionObject.from_collision_mesh(attached_collision_mesh.collision_mesh)
+        kwargs['touch_links'] = attached_collision_mesh.touch_links
+        kwargs['weight'] = attached_collision_mesh.weight
+
+        return cls(**kwargs)
 
 
 class Constraints(ROSmsg):
