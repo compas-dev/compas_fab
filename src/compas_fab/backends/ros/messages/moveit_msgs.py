@@ -75,7 +75,7 @@ class AttachedCollisionObject(ROSmsg):
         kwargs = {}
         kwargs['link_name'] = attached_collision_mesh.link_name
         kwargs['object'] = CollisionObject.from_collision_mesh(attached_collision_mesh.collision_mesh)
-        kwargs['touch_links'] = attached_collision_mesh.touch_links
+        kwargs['touch_links'] = [str(s) for s in attached_collision_mesh.touch_links]
         kwargs['weight'] = attached_collision_mesh.weight
 
         return cls(**kwargs)
