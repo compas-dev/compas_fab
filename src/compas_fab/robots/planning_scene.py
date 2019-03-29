@@ -254,12 +254,15 @@ class PlanningScene(object):
 
         self.robot.client.append_collision_mesh(collision_mesh)
 
-    def add_attached_collision_mesh(self, attached_collision_mesh):
+    def add_attached_collision_mesh(self, attached_collision_mesh, scale=False):
         """Adds an attached collision object to the planning scene.
 
         Parameters
         ----------
         attached_collision_mesh : :class:`compas_fab.robots.AttachedCollisionMesh`
+        scale : bool, optional
+            If `True`, the mesh will be scaled according to the robot's scale 
+            factor.
 
         Returns
         -------
@@ -300,6 +303,11 @@ class PlanningScene(object):
         >>> client.terminate()
         """
         self.ensure_client()
+
+        if scale:
+            S = Scale([1./self.robot.scale_factor] * 3)
+            attached_collision_mesh.collision_mesh.scale(S)
+
         self.client.add_attached_collision_mesh(attached_collision_mesh)
 
     def remove_attached_collision_mesh(self, id):
