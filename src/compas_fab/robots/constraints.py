@@ -237,7 +237,7 @@ class PositionConstraint(Constraint):
 
     @classmethod
     def from_sphere(cls, link_name, sphere, weight=1.):
-        """Creates a `PositionConstraint` from a :class:`compas.geometry.Sphere`.
+        """Creates a ``PositionConstraint`` from a :class:`compas.geometry.Sphere`.
 
         Examples
         --------
