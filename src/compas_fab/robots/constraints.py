@@ -67,7 +67,7 @@ class BoundingVolume(object):
 
     @classmethod
     def from_mesh(cls, mesh):
-        """Creates a `BoundingVolume` from a :class:`compas.datastructures.Mesh`.
+        """Creates a ``BoundingVolume`` from a :class:`compas.datastructures.Mesh`.
 
         Parameters
         ----------
