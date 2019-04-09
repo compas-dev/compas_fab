@@ -194,7 +194,7 @@ class OrientationConstraint(Constraint):
 
 
 class PositionConstraint(Constraint):
-    """Constrains a link to be within a certain position or volume.
+    """Constrains a link to be within a certain bounding volume.
 
     Attributes
     ----------
