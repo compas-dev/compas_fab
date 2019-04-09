@@ -251,7 +251,7 @@ class PositionConstraint(Constraint):
 
     @classmethod
     def from_mesh(cls, link_name, mesh, weight=1.):
-        """Creates a `PositionConstraint` from a :class:`compas.datastructures.Mesh`.
+        """Creates a ``PositionConstraint`` from a :class:`compas.datastructures.Mesh`.
 
         Examples
         --------
