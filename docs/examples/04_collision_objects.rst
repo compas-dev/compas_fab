@@ -2,6 +2,13 @@
 Planning scene and collision objects
 ********************************************************************************
 
+.. note::
+
+    The following examples use `ROS <http://www.ros.org/>`_ as a backend client.
+    
+    Before running them, please make sure you have the 
+    :ref:`ROS backend <ros_backend>` correctly configured. 
+
 To plan motion paths that avoid collisions with other objects than the robot
 itself, the backend's planning scene has to be updated. 
 
@@ -96,7 +103,7 @@ Attach a collision mesh to a robot's end-effector
 =================================================
 
 The following script attaches a collision mesh to the robot's end-effector.
-Collision objects can attached to any of the robot's links.
+Collision objects can be attached to any of the robot's links.
 
 .. code-block:: python
 
