@@ -223,7 +223,7 @@ class PositionConstraint(Constraint):
 
     @classmethod
     def from_box(cls, link_name, box, weight=1.):
-        """Creates a `PositionConstraint` from a :class:`compas.geometry.Box`.
+        """Creates a ``PositionConstraint`` from a :class:`compas.geometry.Box`.
 
         Examples
         --------
