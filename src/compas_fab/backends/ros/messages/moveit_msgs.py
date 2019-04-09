@@ -372,7 +372,7 @@ class OrientationConstraint(ROSmsg):
         by 0.01.
         """
         self.header = header if header else Header()
-        self.orientation = orientation if orientation else Quaternion()#geometry_msgs/Quaternion
+        self.orientation = orientation or Quaternion()#geometry_msgs/Quaternion
         self.link_name = link_name if link_name else ""
         self.absolute_x_axis_tolerance = float(absolute_x_axis_tolerance)
         self.absolute_y_axis_tolerance = float(absolute_y_axis_tolerance)
