@@ -104,7 +104,7 @@ class Constraint(object):
     JOINT = 1
     POSITION = 2
     ORIENTATION = 3
-    possible_types = [JOINT, POSITION, ORIENTATION]
+    possible_types = (JOINT, POSITION, ORIENTATION)
 
     def __init__(self, type, weight=1.):
         if type not in self.possible_types:
