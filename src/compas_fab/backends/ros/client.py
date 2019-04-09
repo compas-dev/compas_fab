@@ -2,8 +2,6 @@ from __future__ import print_function
 
 import functools
 
-from compas.datastructures import mesh_quads_to_triangles
-from compas.geometry import Frame
 from compas.utilities import await_callback
 from roslibpy import Message
 from roslibpy import Ros
@@ -122,6 +120,10 @@ class RosClient(Ros):
 
     The connection is managed by ``roslibpy``.
 
+    :class:`.RosClient` is a context manager type, so it's best
+    used in combination with the ``with`` statement to ensure
+    resource deallocation.
+
     Parameters
     ----------
     host : :obj:`str`
@@ -153,6 +155,14 @@ class RosClient(Ros):
 
     def __init__(self, host='localhost', port=9090, is_secure=False):
         super(RosClient, self).__init__(host, port, is_secure)
+
+    def __enter__(self):
+        self.run()
+        self.connect()
+        return self
+
+    def __exit__(self, *args):
+        self.close()
 
     @validated_response
     def inverse_kinematics(self, frame, base_link, group,
