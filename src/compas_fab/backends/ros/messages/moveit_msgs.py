@@ -381,7 +381,7 @@ class OrientationConstraint(ROSmsg):
 
     @classmethod
     def from_orientation_constraint(cls, header, orientation_constraint):
-        """Creates a `OrientationConstraint` from a :class:`compas_fab.robots.OrientationConstraint`.
+        """Creates a ``OrientationConstraint`` from a :class:`compas_fab.robots.OrientationConstraint`.
         """
         qw, qx, qy, qz = orientation_constraint.quaternion
         ax, ay, az = orientation_constraint.tolerances
