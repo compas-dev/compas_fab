@@ -37,7 +37,7 @@ def _find_resource(filename):
     return os.path.abspath(os.path.join(DATA, filename))
 
 def get(filename):
-    return _find_resource(filename)
+    return get_data(filename)
 
 def get_data(filename):
     return _find_resource(filename)
