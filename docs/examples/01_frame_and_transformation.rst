@@ -60,7 +60,7 @@ The frame provides methods to specify the orientation in various conventions.
     print(F.axis_angle_vector) # UR
 
 
-From the frame, or resp. from the orientation (:class:`compas.geometry.Rotation`)
+From the orientation (:class:`compas.geometry.Rotation`)
 of the frame, several other representations of rotation can be derived, such as
 Euler angles, axis-angle representation, and quaternion.
 
