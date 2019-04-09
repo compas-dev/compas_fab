@@ -45,7 +45,7 @@ class Robot(object):
     artist : :class:`compas_fab.artists.BaseRobotArtist`, optional
         Instance of the artist used to visualize the robot. Defaults to `None`.
     semantics : :class:`RobotSemantics`, optional
-        The semantic model of the robot. Defaults to `None`.
+        The semantic model of the robot. Defaults to ``None``.
     client : optional
         The backend client to use for communication, e.g. :class:`RosClient`
     """
