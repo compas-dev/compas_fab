@@ -50,7 +50,7 @@ class BoundingVolume(object):
 
     @classmethod
     def from_sphere(cls, sphere):
-        """Creates a `BoundingVolume` from a :class:`compas.geometry.Sphere`.
+        """Creates a ``BoundingVolume`` from a :class:`compas.geometry.Sphere`.
 
         Parameters
         ----------
