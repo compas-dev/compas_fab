@@ -11,9 +11,11 @@ orthonormal base vectors (xaxis, yaxis). :class:`Transformation` is the base
 class for transformations like :class:`Rotation`, :class:`Translation`,
 :class:`Scale`, :class:`Reflection`, :class:`Projection` and :class:`Shear`.
 
-Here is a simple example of how to use a frame as a coordinate system: We want 
-to represent a point ``P`` in the (local) coordinate system of frame ``F`` in 
-the world (global) coordinate system.
+Here is a simple example of how to use a frame as a coordinate system: Starting
+from a point ``P`` in the local (user-defined, relative) coordinate system of 
+frame ``F``, i.e. its position is relative to the origin and orientation of 
+``F``, we want to get the position of ``P`` in the global (world, absolute) 
+coordinate system.
 
 .. code-block:: python
 
