@@ -48,7 +48,7 @@ The backend's updated planning scene after executing the above script.
 
 
 The following script adds several boxes (bricks) to the planning scene. Here, 
-we use `append` instead of `add` to have multiple collison objects with the same
+we use ``append`` instead of ``add`` to have multiple collision objects with the same
 identifier.
 
 .. code-block:: python
