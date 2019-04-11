@@ -2,10 +2,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import time
+
 from compas.geometry import Scale
 from compas.geometry import Frame
 
+from compas.datastructures import Mesh
 from compas.datastructures import mesh_transform
+
+import compas_fab
 
 
 __all__ = [
@@ -23,7 +28,7 @@ class CollisionMesh(object):
     mesh : :class:`compas.datastructures.Mesh`
         The collision mesh. Ideally it is as coarse as possible.
     id : str
-        The id of the mesh, used to identify it for later operations (remove, 
+        The id of the mesh, used to identify it for later operations (remove,
         append, etc.)
     frame : :class:`compas.geometry.Frame`, optional
         The frame of the mesh. Defaults to the world XY frame.
@@ -33,9 +38,6 @@ class CollisionMesh(object):
 
     Examples
     --------
-    >>> import compas_fab
-    >>> from compas.datastructures import Mesh
-    >>> from compas_fab.robots import CollisionMesh
     >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
     >>> cm = CollisionMesh(mesh, 'floor')
     """
@@ -73,20 +75,10 @@ class AttachedCollisionMesh(object):
 
     Examples
     --------
-    >>> import compas_fab
-    >>> from compas.datastructures import Mesh
-    >>> from compas_fab.robots import CollisionMesh
-    >>> from compas_fab.robots.ur5 import Robot
-    >>> # create the collision mesh
     >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
     >>> cm = CollisionMesh(mesh, 'tip')
-    >>> # get robot link names
-    >>> robot = Robot()
-    >>> ee_link_name = robot.get_end_effector_link_name()
-    >>> link_names = robot.get_link_names()
-    >>> # the collision mesh is allowed to collide with the last 2 links
-    >>> touch_links = link_names[-2:]
-    >>> # create a collision mesh attached to the end-effector
+    >>> ee_link_name = 'ee_link'
+    >>> touch_links = ['wrist_3_link', 'ee_link']
     >>> acm = AttachedCollisionMesh(cm, ee_link_name, touch_links)
     """
 
@@ -104,7 +96,7 @@ class PlanningScene(object):
     Attributes
     ----------
     robot : :class:`compas_fab.robots.Robot`
-        A reference to the robot in the planning scene. 
+        A reference to the robot in the planning scene.
 
     Examples
     --------
@@ -133,32 +125,25 @@ class PlanningScene(object):
         collision_mesh : :class:`compas_fab.robots.CollisionMesh`
             The collision mesh we want to add.
         scale : bool, optional
-            If `True`, the mesh will be scaled according to the robot's scale 
+            If `True`, the mesh will be scaled according to the robot's scale
             factor.
 
         Returns
         -------
         None
 
+
         Examples
         --------
-        >>> import time
-        >>> import compas_fab
-        >>> from compas.datastructures import Mesh
         >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.robots import PlanningScene
-        >>> from compas_fab.robots import CollisionMesh
         >>> from compas_fab.backends import RosClient
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> scene = PlanningScene(robot)
-        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-        >>> cm = CollisionMesh(mesh, 'floor')
-        >>> scene.add_collision_mesh(cm)
-        >>> time.sleep(1.) #sleep a bit before terminating the client
-        >>> client.close()
-        >>> client.terminate()
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    scene = PlanningScene(robot)
+        ...    mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
+        ...    cm = CollisionMesh(mesh, 'floor')
+        ...    scene.add_collision_mesh(cm)
+        ...    time.sleep(1) #sleep a bit before terminating the client
         """
         self.ensure_client()
 
@@ -184,25 +169,13 @@ class PlanningScene(object):
 
         Examples
         --------
-        >>> import time
-        >>> import compas_fab
-        >>> from compas.datastructures import Mesh
         >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.robots import PlanningScene
-        >>> from compas_fab.robots import CollisionMesh
         >>> from compas_fab.backends import RosClient
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> scene = PlanningScene(robot)
-        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-        >>> cm = CollisionMesh(mesh, 'floor')
-        >>> scene.add_collision_mesh(cm)
-        >>> time.sleep(5.)
-        >>> scene.remove_collision_mesh('floor')
-        >>> time.sleep(1.) #sleep a bit before terminating the client
-        >>> client.close()
-        >>> client.terminate()
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    scene = PlanningScene(robot)
+        ...    scene.remove_collision_mesh('floor')
+        ...    time.sleep(1) #sleep a bit before terminating the client
         """
         self.ensure_client()
         self.robot.client.remove_collision_mesh(id)
@@ -217,7 +190,7 @@ class PlanningScene(object):
         collision_mesh : :class:`compas_fab.robots.CollisionMesh`
             The collision mesh we want to append.
         scale : bool, optional
-            If `True`, the mesh will be scaled according to the robot's scale 
+            If `True`, the mesh will be scaled according to the robot's scale
             factor.
 
         Returns
@@ -226,23 +199,15 @@ class PlanningScene(object):
 
         Examples
         --------
-        >>> import time
-        >>> import compas_fab
-        >>> from compas.datastructures import Mesh
         >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.robots import PlanningScene
-        >>> from compas_fab.robots import CollisionMesh
         >>> from compas_fab.backends import RosClient
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> scene = PlanningScene(robot)
-        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-        >>> cm = CollisionMesh(mesh, 'floor')
-        >>> scene.append_collision_mesh(cm)
-        >>> time.sleep(1.) #sleep a bit before terminating the client
-        >>> client.close()
-        >>> client.terminate()
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    scene = PlanningScene(robot)
+        ...    mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
+        ...    cm = CollisionMesh(mesh, 'floor')
+        ...    scene.append_collision_mesh(cm)
+        ...    time.sleep(1) #sleep a bit before terminating the client
         """
         self.ensure_client()
 
@@ -261,7 +226,7 @@ class PlanningScene(object):
         ----------
         attached_collision_mesh : :class:`compas_fab.robots.AttachedCollisionMesh`
         scale : bool, optional
-            If `True`, the mesh will be scaled according to the robot's scale 
+            If `True`, the mesh will be scaled according to the robot's scale
             factor.
 
         Returns
@@ -270,37 +235,18 @@ class PlanningScene(object):
 
         Examples
         --------
-        >>> import compas_fab
-        >>> from compas.datastructures import Mesh
         >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.robots import PlanningScene
-        >>> from compas_fab.robots import CollisionMesh
         >>> from compas_fab.backends import RosClient
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> scene = PlanningScene(robot)
-        >>> # create collison object
-        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
-        >>> cm = CollisionMesh(mesh, 'tip')
-        >>> # get robot link names
-        >>> robot = Robot()
-        >>> ee_link_name = robot.get_end_effector_link_name()
-        >>> link_names = robot.get_link_names()
-        >>> # the collision mesh is allowed to collide with the last 2 links
-        >>> touch_links = link_names[-2:]
-        >>> # create a collision mesh attached to the end-effector
-        >>> acm = AttachedCollisionMesh(cm, ee_link_name, touch_links)
-        >>> # attach it to the end-effector
-        >>> scene.add_attached_collision_mesh(acm)
-        >>> time.sleep(2)
-        >>> scene.remove_attached_collision_mesh('tip')
-        >>> # if you completely want to remove the collison mesh, you also have
-        >>> # to remove it from the scene
-        >>> scene.remove_collision_mesh('tip')
-        >>> time.sleep(2) #sleep a bit before terminating the client
-        >>> client.close()
-        >>> client.terminate()
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    scene = PlanningScene(robot)
+        ...    mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
+        ...    cm = CollisionMesh(mesh, 'tip')
+        ...    ee_link_name = 'ee_link'
+        ...    touch_links = ['wrist_3_link', 'ee_link']
+        ...    acm = AttachedCollisionMesh(cm, ee_link_name, touch_links)
+        ...    scene.add_attached_collision_mesh(acm)
+        ...    time.sleep(1) #sleep a bit before terminating the client
         """
         self.ensure_client()
 
@@ -311,7 +257,7 @@ class PlanningScene(object):
         self.client.add_attached_collision_mesh(attached_collision_mesh)
 
     def remove_attached_collision_mesh(self, id):
-        """Removes an attached collision object to the planning scene.
+        """Removes an attached collision object from the planning scene.
 
         Parameters
         ----------
@@ -324,37 +270,13 @@ class PlanningScene(object):
 
         Examples
         --------
-        >>> import compas_fab
-        >>> from compas.datastructures import Mesh
         >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.robots import PlanningScene
-        >>> from compas_fab.robots import CollisionMesh
         >>> from compas_fab.backends import RosClient
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> scene = PlanningScene(robot)
-        >>> # create collison object
-        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
-        >>> cm = CollisionMesh(mesh, 'tip')
-        >>> # get robot link names
-        >>> robot = Robot()
-        >>> ee_link_name = robot.get_end_effector_link_name()
-        >>> link_names = robot.get_link_names()
-        >>> # the collision mesh is allowed to collide with the last 2 links
-        >>> touch_links = link_names[-2:]
-        >>> # create a collision mesh attached to the end-effector
-        >>> acm = AttachedCollisionMesh(cm, ee_link_name, touch_links)
-        >>> # attach it to the end-effector
-        >>> scene.add_attached_collision_mesh(acm)
-        >>> time.sleep(2)
-        >>> scene.remove_attached_collision_mesh('tip')
-        >>> # if you completely want to remove the collison mesh, you also have
-        >>> # to remove it from the scene
-        >>> scene.remove_collision_mesh('tip')
-        >>> time.sleep(2) #sleep a bit before terminating the client
-        >>> client.close()
-        >>> client.terminate()
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    scene = PlanningScene(robot)
+        ...    scene.remove_attached_collision_mesh('tip')
+        ...    time.sleep(2) #sleep a bit before terminating the client
         """
         self.ensure_client()
         self.client.remove_attached_collision_mesh(id)
@@ -367,7 +289,7 @@ class PlanningScene(object):
         collision_mesh: :class:`compas_fab.robots.CollisionMesh`
             The collision mesh.
         scale : bool, optional
-            If `True`, the mesh will be scaled according to the robot's scale 
+            If `True`, the mesh will be scaled according to the robot's scale
             factor.
         group : str
             The planning group to which we want to attach the mesh to. Defaults
@@ -375,30 +297,16 @@ class PlanningScene(object):
 
         Examples
         --------
-        >>> import compas_fab
-        >>> from compas.datastructures import Mesh
         >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.robots import PlanningScene
-        >>> from compas_fab.robots import CollisionMesh
         >>> from compas_fab.backends import RosClient
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> scene = PlanningScene(robot)
-        >>> # create collison object
-        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
-        >>> cm = CollisionMesh(mesh, 'tip')
-        >>> # attach it to the end-effector
-        >>> group = robot.main_group_name
-        >>> scene.attach_collision_mesh_to_robot_end_effector(cm, group="group")
-        >>> time.sleep(2)
-        >>> scene.remove_attached_collision_mesh('tip')
-        >>> # if you completely want to remove the collison mesh, you also have
-        >>> # to remove it from the scene
-        >>> scene.remove_collision_mesh('tip')
-        >>> time.sleep(2) #sleep a bit before terminating the client
-        >>> client.close()
-        >>> client.terminate()
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    scene = PlanningScene(robot)
+        ...    mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
+        ...    cm = CollisionMesh(mesh, 'tip')
+        ...    group = robot.main_group_name
+        ...    scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)
+        ...    time.sleep(2) #sleep a bit before terminating the client
         """
         self.ensure_client()
 
@@ -416,46 +324,3 @@ if __name__ == "__main__":
 
     import doctest
     doctest.testmod()
-    #print([name for name in dir() if not name.startswith('_')])
-
-    """
-    import time
-    import compas_fab
-    from compas.datastructures import Mesh
-    from compas_fab.robots.ur5 import Robot
-    from compas_fab.robots import PlanningScene
-    from compas_fab.robots import CollisionMesh
-    from compas_fab.backends import RosClient
-    from compas.geometry import Box
-    
-    client = RosClient()
-    client.run()
-    robot = Robot(client)
-    
-    scene = PlanningScene(robot)
-
-    brick = Box.from_width_height_depth(0.11, 0.07, 0.25)
-    mesh = Mesh.from_vertices_and_faces(brick.vertices, brick.faces)
-    cm = CollisionMesh(mesh, 'brick')
-
-    cm.frame.point.y += 0.3
-
-    for i in range(5):
-        cm.frame.point.z += brick.zsize
-        scene.append_collision_mesh(cm)
-        
-
-    #mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-    #cm = CollisionMesh(mesh, 'floor')
-    #scene.add_collision_mesh(cm)
-
-    #mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
-    #cm = CollisionMesh(mesh, 'tip')
-    #scene.attach_collision_mesh_to_robot_end_effector(cm)
-    #scene.remove_attached_collision_mesh('tip')
-    #scene.remove_collision_mesh('tip')
-
-    time.sleep(2) #sleep a bit before terminating the client
-    client.close()
-    client.terminate()
-    """
