@@ -42,7 +42,7 @@ class CollisionMesh(object):
     >>> cm = CollisionMesh(mesh, 'floor')
     """
 
-    def __init__(self, mesh, id, frame=None, root_link_name=None):
+    def __init__(self, mesh, id, frame=None, root_name=None):
         self.id = id
         self.mesh = mesh
         self.frame = frame if frame else Frame.worldXY()
@@ -147,7 +147,7 @@ class PlanningScene(object):
         """
         self.ensure_client()
 
-        collision_mesh.root_name = self.robot.root_link_name
+        collision_mesh.root_name = self.robot.root_name
 
         if scale:
             S = Scale([1./self.robot.scale_factor] * 3)
@@ -211,7 +211,7 @@ class PlanningScene(object):
         """
         self.ensure_client()
 
-        collision_mesh.root_name = self.robot.root_link_name
+        collision_mesh.root_name = self.robot.root_name
 
         if scale:
             S = Scale([1./self.robot.scale_factor] * 3)

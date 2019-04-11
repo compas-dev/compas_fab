@@ -97,7 +97,7 @@ class Robot(object):
         return self.semantics.main_group_name
 
     @property
-    def root_link_name(self):
+    def root_name(self):
         return self.model.root.name
 
     def get_end_effector_link_name(self, group=None):
