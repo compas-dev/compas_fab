@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import math
 import logging
 
 from compas.datastructures import Mesh
@@ -479,17 +480,12 @@ class Robot(object):
 
         Examples
         --------
-        >>> from compas.geometry import Frame
         >>> from compas_fab.backends import RosClient
-        >>> from compas_fab.backends import RosError
         >>> from compas_fab.robots.ur5 import Robot
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
-        >>> frame_RCF = robot.represent_frame_in_transformed_RCF(frame_WCF)
-        >>> client.close()
-        >>> client.terminate()
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
+        ...    frame_RCF = robot.represent_frame_in_transformed_RCF(frame_WCF)
         """
 
         # TODO: eventually change to not necessarily pass full config, since it
@@ -536,7 +532,6 @@ class Robot(object):
 
         Examples
         --------
-        >>> from compas.geometry import Frame
         >>> from compas_fab.robots.ur5 import Robot
         >>> robot = Robot()
         >>> frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
@@ -560,7 +555,6 @@ class Robot(object):
 
         Examples
         --------
-        >>> from compas.geometry import Frame
         >>> from compas_fab.robots.ur5 import Robot
         >>> robot = Robot()
         >>> frame_RCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
@@ -609,20 +603,14 @@ class Robot(object):
 
         Examples
         --------
-        >>> import math
-        >>> from compas.geometry import Frame
-        >>> from compas_fab.robots import Configuration
         >>> from compas_fab.backends import RosClient
         >>> from compas_fab.robots.ur5 import Robot
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
-        >>> tolerances_axes = math.radians(1)
-        >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_frame(frame, [tolerances_axes], group)
-        >>> client.close()
-        >>> client.terminate()
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
+        ...    tolerances_axes = [math.radians(1)] * 3
+        ...    group = robot.main_group_name
+        ...    goal_constraints = robot.orientation_constraint_from_frame(frame, tolerances_axes, group=group)
 
         Notes
         -----
@@ -635,7 +623,7 @@ class Robot(object):
         # Attention motion plan needs to receive the frame in the possibly
         # (moved) group's base frame (in difference to cartesian path).
         frame_RCF = self.represent_frame_in_transformed_RCF(
-            frame_WCF, start_configuration, group)
+            frame_WCF, configuration=start_configuration, group=group)
         frame_RCF.point /= self.scale_factor
 
         ee_link = self.get_end_effector_link_name(group)
@@ -668,19 +656,13 @@ class Robot(object):
 
         Examples
         --------
-        >>> import math
-        >>> from compas.geometry import Frame
-        >>> from compas_fab.robots import Configuration
         >>> from compas_fab.backends import RosClient
         >>> from compas_fab.robots.ur5 import Robot
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
-        >>> tolerance_position = 0.001
-        >>> goal_constraints = robot.position_constraint_from_frame(frame, tolerance_position)
-        >>> client.close()
-        >>> client.terminate()
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
+        ...    tolerance_position = 0.001
+        ...    goal_constraints = robot.position_constraint_from_frame(frame, tolerance_position)
 
         Notes
         -----
@@ -713,30 +695,27 @@ class Robot(object):
         tolerances_axes: list of float
             Error tolerances ti for each of the frame's axes in radians. If only
             one value is passed it will be uses for all 3 axes.
-        start_configuration: :class:`compas_fab.robots.Configuration`
-
+        start_configuration: :class:`compas_fab.robots.Configuration`, optional
+            If the planning group's origin is dislocated from it's initial 
+            position, e.g. a 6-axes robot moved on a linear axis, the frame in 
+            the robot coordinate system (RCF) must be calculated based on its
+            start_configuration. Defaults to the init configuration.
         group: str
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
 
         Examples
         --------
-        >>> import math
-        >>> from compas.geometry import Frame
-        >>> from compas_fab.robots import Configuration
         >>> from compas_fab.backends import RosClient
         >>> from compas_fab.robots.ur5 import Robot
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
-        >>> tolerance_position = 0.001
-        >>> tolerances_axes = [math.radians(1)]
-        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
-        >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, start_configuration, group)
-        >>> client.close()
-        >>> client.terminate()
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
+        ...    tolerance_position = 0.001
+        ...    tolerances_axes = [math.radians(1)]
+        ...    start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
+        ...    group = robot.main_group_name
+        ...    goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, start_configuration, group)
 
         Notes
         -----
@@ -769,9 +748,7 @@ class Robot(object):
 
         Examples
         --------
-        >>> import math
         >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.robots import Configuration
         >>> robot = Robot()
         >>> configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
         >>> tolerances = [math.radians(5)] * 6
@@ -848,20 +825,14 @@ class Robot(object):
 
         Examples
         --------
-        >>> from compas.geometry import Frame
         >>> from compas_fab.backends import RosClient
-        >>> from compas_fab.backends import RosError
-        >>> from compas_fab.robots import Configuration
         >>> from compas_fab.robots.ur5 import Robot
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
-        >>> start_configuration = robot.init_configuration()
-        >>> group = robot.main_group_name
-        >>> configuration = robot.inverse_kinematics(frame_WCF, start_configuration, group)
-        >>> client.close()
-        >>> client.terminate()
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
+        ...    start_configuration = robot.init_configuration()
+        ...    group = robot.main_group_name
+        ...    configuration = robot.inverse_kinematics(frame_WCF, start_configuration, group)
         """
         self.ensure_client()
         if not group:
@@ -903,17 +874,12 @@ class Robot(object):
         Examples
         --------
         >>> from compas_fab.backends import RosClient
-        >>> from compas_fab.backends import RosError
-        >>> from compas_fab.robots import Configuration
         >>> from compas_fab.robots.ur5 import Robot
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
-        >>> group = robot.main_group_name
-        >>> response = robot.forward_kinematics(configuration, group)
-        >>> client.close()
-        >>> client.terminate()
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
+        ...    group = robot.main_group_name
+        ...    response = robot.forward_kinematics(configuration, group)
         """
         # TODO implement with no service, only geometry transformations
 
@@ -966,21 +932,18 @@ class Robot(object):
         --------
         >>> from compas_fab.backends import RosClient
         >>> from compas_fab.robots.ur5 import Robot
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> frames = []
-        >>> frames.append(Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]))
-        >>> frames.append(Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1]))
-        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
-        >>> group = robot.main_group_name
-        >>> response = robot.plan_cartesian_motion(frames,\
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    frames = []
+        ...    frames.append(Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]))
+        ...    frames.append(Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1]))
+        ...    start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
+        ...    group = robot.main_group_name
+        ...    response = robot.plan_cartesian_motion(frames,\
                                                    start_configuration,\
                                                    max_step=0.01,\
                                                    avoid_collisions=True,\
                                                    group=group)
-        >>> client.close()
-        >>> client.terminate()
         """
         self.ensure_client()
         if not group:
@@ -1069,23 +1032,17 @@ class Robot(object):
 
         Examples
         --------
-        >>> import math
-        >>> from compas.geometry import Frame
-        >>> from compas_fab.robots import Configuration
         >>> from compas_fab.backends import RosClient
         >>> from compas_fab.robots.ur5 import Robot
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = Robot(client)
-        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
-        >>> tolerance_position = 0.001
-        >>> tolerance_axes = [math.radians(1)] * 3
-        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
-        >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, start_configuration, group)
-        >>> response = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
-        >>> client.close()
-        >>> client.terminate()
+        >>> with RosClient() as client:
+        ...    robot = Robot(client)
+        ...    frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
+        ...    tolerance_position = 0.001
+        ...    tolerances_axes = [math.radians(1)] * 3
+        ...    start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
+        ...    group = robot.main_group_name
+        ...    goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, start_configuration, group)
+        ...    response = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
 
         References
         ----------
@@ -1240,37 +1197,4 @@ if __name__ == "__main__":
     import doctest
     doctest.testmod()
 
-    """
 
-    import math
-    from compas_fab.backends import RosClient
-    from compas_fab.backends import RosError
-    from compas_fab.robots.ur5 import Robot
-    client = RosClient()
-    client.run()
-    robot = Robot(client)
-
-    tolerance_position = 0.001 
-    tolerance_axes = [math.radians(angle) for angle in [5, 5, 360]]
-
-    f1 = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
-    
-    start_configuration = Configuration.from_revolute_values([0] * 6)
-
-    goal_constraints = robot.constraints_from_frame(f1, tolerance_position, tolerance_axes)
-
-    try:
-        response = robot.plan_motion(goal_constraints, start_configuration=start_configuration, planner_id='RRT', num_planning_attempts=10.)
-        last_configuration = response.configurations[-1]
-        response = robot.forward_kinematics(last_configuration)
-        f2 = response.frame_RCF
-        angles = f1.xaxis.angle(f2.xaxis), f1.yaxis.angle(f2.yaxis), f1.zaxis.angle(f2.zaxis)
-        print(tolerance_axes)
-        print(angles)
-    except RosError as error:
-        print(error)
-
-
-    client.close()
-    client.terminate()
-    """

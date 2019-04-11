@@ -70,24 +70,21 @@ all identifiers if we later want to remove them.
     from compas_fab.robots import CollisionMesh
     from compas_fab.backends import RosClient
 
-    client = RosClient()
-    client.run()
-    robot = Robot(client)
-    
-    scene = PlanningScene(robot)
+    with RosClient() as client:
+        
+        robot = Robot(client)
+        scene = PlanningScene(robot)
 
-    brick = Box.from_width_height_depth(0.11, 0.07, 0.25)
-    mesh = Mesh.from_vertices_and_faces(brick.vertices, brick.faces)
-    cm = CollisionMesh(mesh, 'brick')
-    cm.frame.point.y += 0.3
+        brick = Box.from_width_height_depth(0.11, 0.07, 0.25)
+        mesh = Mesh.from_vertices_and_faces(brick.vertices, brick.faces)
+        cm = CollisionMesh(mesh, 'brick')
+        cm.frame.point.y += 0.3
 
-    for i in range(5):
-        cm.frame.point.z += brick.zsize
-        scene.append_collision_mesh(cm)
+        for i in range(5):
+            cm.frame.point.z += brick.zsize
+            scene.append_collision_mesh(cm)
     
-    time.sleep(1.) #sleep a bit before terminating the client
-    client.close()
-    client.terminate()
+        time.sleep(1) #sleep a bit before terminating the client
 
 
 The backend's updated planning scene after executing the above script. Note the 
@@ -115,21 +112,19 @@ Collision objects can be attached to any of the robot's links.
     from compas_fab.robots import CollisionMesh
     from compas_fab.backends import RosClient
     
-    client = RosClient()
-    client.run()
-    robot = Robot(client)
-    
-    scene = PlanningScene(robot)
-    # create collison object
-    mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
-    cm = CollisionMesh(mesh, 'tip')
-    # attach it to the end-effector
-    group = robot.main_group_name
-    scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)
+    with RosClient() as client:
+        
+        robot = Robot(client)
+        scene = PlanningScene(robot)
 
-    time.sleep(2) #sleep a bit before terminating the client
-    client.close()
-    client.terminate()
+        # create collison object
+        mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
+        cm = CollisionMesh(mesh, 'tip')
+        # attach it to the end-effector
+        group = robot.main_group_name
+        scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)
+
+        time.sleep(1) #sleep a bit before terminating the client
 
 The backend's updated planning scene after executing the above script.
 
