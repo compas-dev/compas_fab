@@ -85,16 +85,19 @@ class Robot(object):
 
     @property
     def group_names(self):
+        """All planning groups of the robot."""
         self.ensure_semantics()
         return self.semantics.group_names
 
     @property
     def main_group_name(self):
+        """The robot's main planning group."""
         self.ensure_semantics()
         return self.semantics.main_group_name
 
     @property
     def root_name(self):
+        """The robot's root name."""
         return self.model.root.name
 
     def get_end_effector_link_name(self, group=None):
@@ -556,11 +559,13 @@ class Robot(object):
     # ==========================================================================
 
     def ensure_client(self):
+        """Checks if the client is set."""
         if not self.client:
             raise Exception(
                 'This method is only callable once a client is assigned')
 
     def ensure_semantics(self):
+        """Checks if semantics is set."""
         if not self.semantics:
             raise Exception(
                 'This method is only callable once a semantic model is assigned')
@@ -780,12 +785,12 @@ class Robot(object):
         group: str, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
-        avoid_collisions: bool
-            Whether or not to avoid collisions.
-        constraints: list of :class:`compas_fab.robots.Constraint`
+        avoid_collisions: bool, optional
+            Whether or not to avoid collisions. Defaults to True.
+        constraints: list of :class:`compas_fab.robots.Constraint`, optional
             A set of constraints that the request must obey. Defaults to None.
-        attempts: int
-            The maximum number of inverse kinematic attempts.
+        attempts: int, optional
+            The maximum number of inverse kinematic attempts. Defaults to 8.
 
         Raises
         ------
@@ -1086,10 +1091,12 @@ class Robot(object):
 
     @property
     def frames(self):
+        """The robot's frames."""
         return self.model.frames
 
     @property
     def axes(self):
+        """The robot's axes."""
         return self.model.axes
 
     # ==========================================================================
@@ -1097,16 +1104,24 @@ class Robot(object):
     # ==========================================================================
 
     def update(self, configuration, collision=True, group=None):
+        """Updates the robot's geometry.
+        """
         names = self.get_configurable_joint_names(group)
         self.artist.update(configuration, collision, names)
 
     def draw_visual(self):
+        """Draws the visual geometry of the robot in the respective CAD environment.
+        """
         return self.artist.draw_visual()
 
     def draw_collision(self):
+        """Draws the collision geometry of the robot in the respective CAD environment.
+        """
         return self.artist.draw_collision()
 
     def draw(self):
+        """Draws the visual geometry of the robot in the respective CAD environment.
+        """
         return self.draw_visual()
 
     def scale(self, factor):
@@ -1119,12 +1134,15 @@ class Robot(object):
 
     @property
     def scale_factor(self):
+        """The robot's scale factor."""
         if self.artist:
             return self.artist.scale_factor
         else:
             return self._scale_factor
 
     def info(self):
+        """Prints information about the robot.
+        """
         print("The robot's name is '%s'." % self.name)
         if self.semantics:
             print("The planning groups are:", self.group_names)
