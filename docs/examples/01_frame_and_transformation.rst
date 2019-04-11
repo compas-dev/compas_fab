@@ -36,11 +36,6 @@ coordinate system.
     P_ = F.represent_point_in_global_coordinates(P)
 
 
-.. figure:: 01_frame_transformation.jpg
-    :figclass: figure
-    :class: figure-img img-fluid
-
-
 Industrial robots do not have a common way of describing the pose orientation.
 The frame provides methods to specify the orientation in various conventions. 
 
