@@ -2,15 +2,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import time
 
 from compas.geometry import Scale
 from compas.geometry import Frame
 
-from compas.datastructures import Mesh
 from compas.datastructures import mesh_transform
-
-import compas_fab
 
 
 __all__ = [
@@ -135,15 +131,10 @@ class PlanningScene(object):
 
         Examples
         --------
-        >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.backends import RosClient
-        >>> with RosClient() as client:
-        ...    robot = Robot(client)
-        ...    scene = PlanningScene(robot)
-        ...    mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-        ...    cm = CollisionMesh(mesh, 'floor')
-        ...    scene.add_collision_mesh(cm)
-        ...    time.sleep(1) #sleep a bit before terminating the client
+        >>> scene = PlanningScene(robot)
+        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
+        >>> cm = CollisionMesh(mesh, 'floor')
+        >>> scene.add_collision_mesh(cm)
         """
         self.ensure_client()
 
@@ -169,13 +160,8 @@ class PlanningScene(object):
 
         Examples
         --------
-        >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.backends import RosClient
-        >>> with RosClient() as client:
-        ...    robot = Robot(client)
-        ...    scene = PlanningScene(robot)
-        ...    scene.remove_collision_mesh('floor')
-        ...    time.sleep(1) #sleep a bit before terminating the client
+        >>> scene = PlanningScene(robot)
+        >>> scene.remove_collision_mesh('floor')
         """
         self.ensure_client()
         self.robot.client.remove_collision_mesh(id)
@@ -199,15 +185,10 @@ class PlanningScene(object):
 
         Examples
         --------
-        >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.backends import RosClient
-        >>> with RosClient() as client:
-        ...    robot = Robot(client)
-        ...    scene = PlanningScene(robot)
-        ...    mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-        ...    cm = CollisionMesh(mesh, 'floor')
-        ...    scene.append_collision_mesh(cm)
-        ...    time.sleep(1) #sleep a bit before terminating the client
+        >>> scene = PlanningScene(robot)
+        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
+        >>> cm = CollisionMesh(mesh, 'floor')
+        >>> scene.append_collision_mesh(cm)
         """
         self.ensure_client()
 
@@ -235,18 +216,13 @@ class PlanningScene(object):
 
         Examples
         --------
-        >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.backends import RosClient
-        >>> with RosClient() as client:
-        ...    robot = Robot(client)
-        ...    scene = PlanningScene(robot)
-        ...    mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
-        ...    cm = CollisionMesh(mesh, 'tip')
-        ...    ee_link_name = 'ee_link'
-        ...    touch_links = ['wrist_3_link', 'ee_link']
-        ...    acm = AttachedCollisionMesh(cm, ee_link_name, touch_links)
-        ...    scene.add_attached_collision_mesh(acm)
-        ...    time.sleep(1) #sleep a bit before terminating the client
+        >>> scene = PlanningScene(robot)
+        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
+        >>> cm = CollisionMesh(mesh, 'tip')
+        >>> ee_link_name = 'ee_link'
+        >>> touch_links = ['wrist_3_link', 'ee_link']
+        >>> acm = AttachedCollisionMesh(cm, ee_link_name, touch_links)
+        >>> scene.add_attached_collision_mesh(acm)
         """
         self.ensure_client()
 
@@ -270,13 +246,8 @@ class PlanningScene(object):
 
         Examples
         --------
-        >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.backends import RosClient
-        >>> with RosClient() as client:
-        ...    robot = Robot(client)
-        ...    scene = PlanningScene(robot)
-        ...    scene.remove_attached_collision_mesh('tip')
-        ...    time.sleep(2) #sleep a bit before terminating the client
+        >>> scene = PlanningScene(robot)
+        >>> scene.remove_attached_collision_mesh('tip')
         """
         self.ensure_client()
         self.client.remove_attached_collision_mesh(id)
@@ -297,16 +268,11 @@ class PlanningScene(object):
 
         Examples
         --------
-        >>> from compas_fab.robots.ur5 import Robot
-        >>> from compas_fab.backends import RosClient
-        >>> with RosClient() as client:
-        ...    robot = Robot(client)
-        ...    scene = PlanningScene(robot)
-        ...    mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
-        ...    cm = CollisionMesh(mesh, 'tip')
-        ...    group = robot.main_group_name
-        ...    scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)
-        ...    time.sleep(2) #sleep a bit before terminating the client
+        >>> scene = PlanningScene(robot)
+        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
+        >>> cm = CollisionMesh(mesh, 'tip')
+        >>> group = robot.main_group_name
+        >>> scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)
         """
         self.ensure_client()
 
@@ -322,5 +288,15 @@ class PlanningScene(object):
 
 if __name__ == "__main__":
 
+    import time
+    from compas.datastructures import Mesh
+    import compas_fab
     import doctest
-    doctest.testmod()
+    from compas_fab.robots.ur5 import Robot
+    from compas_fab.backends import RosClient
+    client = RosClient()
+    client.run()
+    robot = Robot(client)
+    doctest.testmod(globs=globals())
+    client.close()
+    client.terminate()
