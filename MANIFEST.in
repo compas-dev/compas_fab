@@ -1,6 +1,5 @@
 graft src
 
-prune data
 prune docs
 prune tests
 prune temp
