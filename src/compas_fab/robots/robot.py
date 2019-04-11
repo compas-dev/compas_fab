@@ -33,8 +33,8 @@ __all__ = [
 class Robot(object):
     """Represents a robot.
 
-    This class binds together several building blocks, such as the robot's 
-    descriptive model, its semantic information and an instance of a backend 
+    This class binds together several building blocks, such as the robot's
+    descriptive model, its semantic information and an instance of a backend
     client into a cohesive programmable interface. This representation builds
     upon the model described in the class :class:`compas.robots.RobotModel` of
     the **COMPAS** framework.
@@ -343,7 +343,7 @@ class Robot(object):
         """Returns the robot's configuration from the passed joint_positions.
         """
         types = self.get_configurable_joint_types(group)
-        if len(types) != len(joint_positions) and group != None:
+        if len(types) != len(joint_positions) and group is not None:
             types = self.get_configurable_joint_types()
             full_configuration = Configuration(joint_positions, types)
             return self.get_group_configuration(group, full_configuration)
@@ -473,9 +473,9 @@ class Robot(object):
         frame_WCF : :class:`compas.geometry.Frame`
             A frame in the world coordinate frame.
         configuration : :class:`compas_fab.robots.Configuration`
-            The (full) configuration from which the group's base frame is 
+            The (full) configuration from which the group's base frame is
             calculated. Defaults to the init configuration (all zeros).
-        group : str, optional 
+        group : str, optional
             The planning group. Defaults to the robot's main planning group.
 
         Examples
@@ -593,8 +593,8 @@ class Robot(object):
             Error tolerances ti for each of the frame's axes in radians. If only
             one value is passed it will be uses for all 3 axes.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
-            If the planning group's origin is dislocated from it's initial 
-            position, e.g. a 6-axes robot moved on a linear axis, the frame in 
+            If the planning group's origin is dislocated from it's initial
+            position, e.g. a 6-axes robot moved on a linear axis, the frame in
             the robot coordinate system (RCF) must be calculated based on its
             start_configuration. Defaults to the zero position for all joints.
         group: str
@@ -614,7 +614,7 @@ class Robot(object):
 
         Notes
         -----
-        If you specify the tolerances_axes vector with [0.01, 0.01, 6.3], it 
+        If you specify the tolerances_axes vector with [0.01, 0.01, 6.3], it
         means that the frame's x-axis and y-axis are allowed to rotate about the
         z-axis by an angle of 6.3 radians, whereas the z-axis would only rotate
         by 0.01.
@@ -643,11 +643,11 @@ class Robot(object):
         frame_WCF : :class:`compas.geometry.Frame`
             The frame from which we create position and orientation constraints.
         tolerance_position : float
-            The allowed tolerance to the frame's position. (Defined in the 
+            The allowed tolerance to the frame's position. (Defined in the
             robot's units)
         start_configuration : :class:`compas_fab.robots.Configuration`, optional
-            If the planning group's origin is dislocated from it's initial 
-            position, e.g. a 6-axes robot moved on a linear axis, the frame in 
+            If the planning group's origin is dislocated from it's initial
+            position, e.g. a 6-axes robot moved on a linear axis, the frame in
             the robot coordinate system (RCF) must be calculated based on its
             start_configuration. Defaults to the init configuration.
         group: str
@@ -666,7 +666,7 @@ class Robot(object):
 
         Notes
         -----
-        There are many other possibilities of how to create a position and 
+        There are many other possibilities of how to create a position and
         orientation constraints. Checkout :class:`compas_fab.robots.PositionConstraint`
         and :class:`compas_fab.robots.OrientationConstraint`.
 
@@ -690,14 +690,14 @@ class Robot(object):
         frame_WCF: :class:`compas.geometry.Frame`
             The frame from which we create position and orientation constraints.
         tolerance_position: float
-            The allowed tolerance to the frame's position. (Defined in the 
+            The allowed tolerance to the frame's position. (Defined in the
             robot's units)
         tolerances_axes: list of float
             Error tolerances ti for each of the frame's axes in radians. If only
             one value is passed it will be uses for all 3 axes.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
-            If the planning group's origin is dislocated from it's initial 
-            position, e.g. a 6-axes robot moved on a linear axis, the frame in 
+            If the planning group's origin is dislocated from it's initial
+            position, e.g. a 6-axes robot moved on a linear axis, the frame in
             the robot coordinate system (RCF) must be calculated based on its
             start_configuration. Defaults to the init configuration.
         group: str
@@ -719,7 +719,7 @@ class Robot(object):
 
         Notes
         -----
-        There are many other possibilities of how to create a position and 
+        There are many other possibilities of how to create a position and
         orientation constraint. Checkout :class:`compas_fab.robots.PositionConstraint`
         and :class:`compas_fab.robots.OrientationConstraint`.
 
@@ -739,7 +739,7 @@ class Robot(object):
         configuration: :class:`compas_fab.robots.Configuration`
             The target configuration.
         tolerances: list of float
-            The tolerances on each of the joints defining the bound to be 
+            The tolerances on each of the joints defining the bound to be
             achieved. If only one value is passed it will be used to create
             bounds for all joint constraints.
         group: str, optional
@@ -867,7 +867,7 @@ class Robot(object):
         ----------
         configuration : :class:`compas_fab.robots.Configuration`
             The configuration to calculate the forward kinematic for.
-        group : str, optional 
+        group : str, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
 
@@ -925,7 +925,7 @@ class Robot(object):
         avoid_collisions: bool, optional
             Whether or not to avoid collisions. Defaults to True.
         group: str, optional
-            The planning group used for calculation. Defaults to the robot's 
+            The planning group used for calculation. Defaults to the robot's
             main planning group.
 
         Examples
@@ -950,7 +950,7 @@ class Robot(object):
             group = self.main_group_name  # ensure semantics
         frames_RCF = []
         for frame_WCF in frames_WCF:
-             # represent in RCF
+            # represent in RCF
             frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
             frame_RCF.point /= self.scale_factor
             frames_RCF.append(frame_RCF)
@@ -996,7 +996,7 @@ class Robot(object):
         Parameters
         ----------
         goal_constraints: list of :class:`compas_fab.robots.Constraint`
-            The goal to be achieved, defined in a set of constraints.        
+            The goal to be achieved, defined in a set of constraints.
             Constraints can be very specific, for example defining value domains
             for each joint, such that the goal configuration is included,
             or defining a volume in space, to which a specific robot link (e.g.
@@ -1005,20 +1005,20 @@ class Robot(object):
             The robot's configuration at the starting position. Defaults to the
             all-zero configuration.
         group: str, optional
-            The name of the group to plan for. Defaults to the robot's main 
+            The name of the group to plan for. Defaults to the robot's main
             planning group.
         path_constraints: list of :class:`compas_fab.robots.Constraint`, optional
-            Optional constraints that can be imposed along the solution path. 
-            Note that path calculation won't work if the start_configuration 
-            violates these constraints. Defaults to None. 
+            Optional constraints that can be imposed along the solution path.
+            Note that path calculation won't work if the start_configuration
+            violates these constraints. Defaults to None.
         planner_id: str
             The name of the algorithm used for path planning. Defaults to 'RRT'.
         num_planning_attempts: int, optional
             Normally, if one motion plan is needed, one motion plan is computed.
-            However, for algorithms that use randomization in their execution 
-            (like 'RRT'), it is likely that different planner executions will 
+            However, for algorithms that use randomization in their execution
+            (like 'RRT'), it is likely that different planner executions will
             produce different solutions. Setting this parameter to a value above
-            1 will run many additional motion plans, and will report the 
+            1 will run many additional motion plans, and will report the
             shortest solution as the final result. Defaults to 1.
         allowed_planning_time: float
             The number of seconds allowed to perform the planning. Defaults to 2.
@@ -1196,5 +1196,3 @@ if __name__ == "__main__":
 
     import doctest
     doctest.testmod()
-
-
