@@ -287,11 +287,10 @@ class PlanningScene(object):
 
 
 if __name__ == "__main__":
-
+    import doctest
     import time
     from compas.datastructures import Mesh
     import compas_fab
-    import doctest
     from compas_fab.robots.ur5 import Robot
     from compas_fab.backends import RosClient
     client = RosClient()
