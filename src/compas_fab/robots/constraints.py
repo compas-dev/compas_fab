@@ -86,13 +86,25 @@ class BoundingVolume(object):
 
     def scale(self, scale_factor):
         S = Scale([1./scale_factor] * 3)
-        self.volume.transform(S)
+        self.transform(S)
     
     def transform(self, transformation):
         self.volume.transform(transformation)
 
     def __repr__(self):
         return "BoundingVolume({0}, {1})".format(self.type, self.volume)
+    
+    def copy(self):
+        """Make a copy of this ``BoundingVolume``.
+
+        Returns
+        -------
+        BoundingVolume
+            The copy.
+
+        """
+        cls = type(self)
+        return cls(self.type, self.volume.copy())
 
 
 class Constraint(object):
@@ -112,10 +124,19 @@ class Constraint(object):
 
     def __init__(self, type, weight=1.):
         if type not in self.possible_types:
-            raise ValueError("Type must be %d, %d or %d" %
-                             tuple(self.possible_types))
+            raise ValueError("Type must be %d, %d or %d" % self.possible_types)
         self.type = type
         self.weight = weight
+    
+    def transform(self, transformation):
+        pass
+    
+    def scale(self, scale_factor):
+        pass
+    
+    def copy(self):
+        cls = type(self)
+        return cls(self.type, self.weight)
 
 
 class JointConstraint(Constraint):
@@ -149,12 +170,13 @@ class JointConstraint(Constraint):
     def scale(self, scale_factor):
         self.value /= scale_factor
         self.tolerance /= scale_factor
-    
-    def transform(self, transformation):
-        pass
 
     def __repr__(self):
         return "JointConstraint('{0}', {1}, {2}, {3})".format(self.joint_name, self.value, self.tolerance, self.weight)
+    
+    def copy(self):
+        cls = type(self)
+        return cls(self.joint_name, self.value, self.tolerance, self.weight)
 
 
 class OrientationConstraint(Constraint):
@@ -193,8 +215,7 @@ class OrientationConstraint(Constraint):
         super(OrientationConstraint, self).__init__(self.ORIENTATION, weight)
         self.link_name = link_name
         self.quaternion = [float(a) for a in list(quaternion)]
-        self.tolerances = [float(a) for a in list(
-            tolerances)] if tolerances else [0.01] * 3
+        self.tolerances = [float(a) for a in list(tolerances)] if tolerances else [0.01] * 3
     
     def transform(self, transformation):
         R = Rotation.from_quaternion(self.quaternion)
@@ -203,6 +224,10 @@ class OrientationConstraint(Constraint):
 
     def __repr__(self):
         return "OrientationConstraint('{0}', {1}, {2}, {3})".format(self.link_name, self.quaternion, self.tolerances, self.weight)
+    
+    def copy(self):
+        cls = type(self)
+        return cls(self.link_name, self.quaternion[:], self.tolerances[:], self.weight)
 
 
 class PositionConstraint(Constraint):
@@ -283,6 +308,10 @@ class PositionConstraint(Constraint):
 
     def __repr__(self):
         return "PositionConstraint('{0}', {1}, {2})".format(self.link_name, self.bounding_volume, self.weight)
+    
+    def copy(self):
+        cls = type(self)
+        return cls(self.link_name, self.bounding_volume.copy(), self.weight)
 
 
 if __name__ == "__main__":
