@@ -5,12 +5,12 @@ Planning scene and collision objects
 .. note::
 
     The following examples use `ROS <http://www.ros.org/>`_ as a backend client.
-    
-    Before running them, please make sure you have the 
-    :ref:`ROS backend <ros_backend>` correctly configured. 
+
+    Before running them, please make sure you have the
+    :ref:`ROS backend <ros_backend>` correctly configured.
 
 To plan motion paths that avoid collisions with other objects than the robot
-itself, the backend's planning scene has to be updated. 
+itself, the backend's planning scene has to be updated.
 
 This is the representation of the planning scene in RViz with the UR5.
 
@@ -36,12 +36,12 @@ The following script adds a floor to the planning scene.
     client = RosClient()
     client.run()
     robot = Robot(client)
-    
+
     scene = PlanningScene(robot)
-    mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
+    mesh = Mesh.from_stl(compas_fab.get('planning_scene/floor.stl'))
     cm = CollisionMesh(mesh, 'floor')
     scene.add_collision_mesh(cm)
-    
+
     time.sleep(1.) #sleep a bit before terminating the client
     client.close()
     client.terminate()
@@ -54,9 +54,9 @@ The backend's updated planning scene after executing the above script.
     :class: figure-img img-fluid
 
 
-The following script adds several boxes (bricks) to the planning scene. Here, 
+The following script adds several boxes (bricks) to the planning scene. Here,
 we use ``append`` instead of ``add`` to have multiple collision objects
-clustered under the same identifier. Like that, we don't need to keep track of 
+clustered under the same identifier. Like that, we don't need to keep track of
 all identifiers if we later want to remove them.
 
 .. code-block:: python
@@ -71,7 +71,7 @@ all identifiers if we later want to remove them.
     from compas_fab.backends import RosClient
 
     with RosClient() as client:
-        
+
         robot = Robot(client)
         scene = PlanningScene(robot)
 
@@ -83,12 +83,12 @@ all identifiers if we later want to remove them.
         for i in range(5):
             cm.frame.point.z += brick.zsize
             scene.append_collision_mesh(cm)
-    
+
         time.sleep(1) #sleep a bit before terminating the client
 
 
-The backend's updated planning scene after executing the above script. Note the 
-red robot link indicating the collision.    
+The backend's updated planning scene after executing the above script. Note the
+red robot link indicating the collision.
 
 .. figure:: 04_collision_objects_append.jpg
     :figclass: figure
@@ -111,9 +111,9 @@ Collision objects can be attached to any of the robot's links.
     from compas_fab.robots import PlanningScene
     from compas_fab.robots import CollisionMesh
     from compas_fab.backends import RosClient
-    
+
     with RosClient() as client:
-        
+
         robot = Robot(client)
         scene = PlanningScene(robot)
 
