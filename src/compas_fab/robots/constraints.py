@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 
 from compas.geometry import Scale
+from compas.geometry import Rotation
 
 __all__ = ['BoundingVolume', 'Constraint', 'JointConstraint',
            'OrientationConstraint', 'PositionConstraint']
@@ -86,6 +87,9 @@ class BoundingVolume(object):
     def scale(self, scale_factor):
         S = Scale([1./scale_factor] * 3)
         self.volume.transform(S)
+    
+    def transform(self, transformation):
+        self.volume.transform(transformation)
 
     def __repr__(self):
         return "BoundingVolume({0}, {1})".format(self.type, self.volume)
@@ -145,6 +149,9 @@ class JointConstraint(Constraint):
     def scale(self, scale_factor):
         self.value /= scale_factor
         self.tolerance /= scale_factor
+    
+    def transform(self, transformation):
+        pass
 
     def __repr__(self):
         return "JointConstraint('{0}', {1}, {2}, {3})".format(self.joint_name, self.value, self.tolerance, self.weight)
@@ -188,6 +195,11 @@ class OrientationConstraint(Constraint):
         self.quaternion = [float(a) for a in list(quaternion)]
         self.tolerances = [float(a) for a in list(
             tolerances)] if tolerances else [0.01] * 3
+    
+    def transform(self, transformation):
+        R = Rotation.from_quaternion(self.quaternion)
+        R *= transformation
+        self.quaternion = R.rotation.quaternion
 
     def __repr__(self):
         return "OrientationConstraint('{0}', {1}, {2}, {3})".format(self.link_name, self.quaternion, self.tolerances, self.weight)
@@ -265,6 +277,9 @@ class PositionConstraint(Constraint):
 
     def scale(self, scale_factor):
         self.bounding_volume.scale(scale_factor)
+
+    def transform(self, transformation):
+        self.bounding_volume.transform(transformation)
 
     def __repr__(self):
         return "PositionConstraint('{0}', {1}, {2})".format(self.link_name, self.bounding_volume, self.weight)
