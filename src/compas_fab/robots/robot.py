@@ -15,6 +15,7 @@ from compas_fab.artists import BaseRobotArtist
 from compas_fab.robots.configuration import Configuration
 from compas_fab.robots.ros_fileserver_loader import RosFileServerLoader
 from compas_fab.robots.semantics import RobotSemantics
+from compas_fab.robots.constraints import Constraint
 from compas_fab.robots.constraints import JointConstraint
 from compas_fab.robots.constraints import OrientationConstraint
 from compas_fab.robots.constraints import PositionConstraint
@@ -200,6 +201,51 @@ class Robot(object):
         if not self.artist:
             base_frame.point *= self._scale_factor
         return base_frame
+    
+    def _get_current_base_frame(self, full_configuration, group):
+        """Returns the group's current base frame, if the robot is in full_configuration.
+
+        The base_frame of a planning group can change if a parent joint was 
+        transformed. This function performs a forward kinematic request with the
+        full configuration to retrieve the (possibly) transformed base_frame of 
+        planning group. This function is only used in plan_motion since other 
+        services, such as ik or plan_cartesian_motion, do not use the 
+        transformed base_frame as the group's local coordinate system.
+
+        Parameters
+        ----------
+        full_configuration : :class:`compas_fab.robots.Configuration`
+            The (full) configuration from which the group's base frame is
+            calculated.
+        group : str
+            The planning group for which we want to get the transformed base frame.
+        
+        Returns
+        -------
+        :class:`compas.geometry.Frame`
+
+        Examples
+        --------
+        """
+        self.ensure_client()
+
+        base_link = self.get_base_link_name(group)
+        # the group's original base_frame
+        base_frame = self.get_base_frame(group)
+
+        joint_names = self.get_configurable_joint_names()
+        joint_positions = self._get_scaled_joint_positions_from_start_configuration(full_configuration)
+
+        # ideally we would call this with the planning group that includes all
+        # configurable joints, but we cannot be sure that this group exists.
+        # That's why we have to do the workaround with the Transformation.
+
+        response = self.client.forward_kinematics(joint_positions, base_link, group, joint_names, base_link)
+
+        base_frame_RCF = response.pose_stamped[0].pose.frame
+        base_frame_RCF.point *= self.scale_factor
+        T = Transformation.from_frame(base_frame)
+        return base_frame_RCF.transformed(T)
 
     def get_link_names(self, group=None):
         """Returns the names of the links in the chain.
@@ -251,6 +297,20 @@ class Robot(object):
                 return joints
         else:
             return self.model.get_configurable_joints()
+    
+    def get_joint_by_name(self, name):
+        """Returns the joint in the robot model matching its name.
+
+        Parameters
+        ----------
+        name: str
+            The name of the joint.
+
+        Returns
+        -------
+        :class:`compas.robots.Joint`
+        """
+        return self.model.get_joint_by_name(name)
 
     def get_configurable_joint_names(self, group=None):
         """Returns the configurable joint names.
@@ -422,7 +482,7 @@ class Robot(object):
     # ==========================================================================
 
     def transformation_RCF_WCF(self, group=None):
-        """Returns the transformation from the world coordinate system (WCF) to the robot's coordinate system (RCF).
+        """Returns the transformation from the robot's coordinate system (RCF) to the world coordinate system (WCF).
 
         Parameters
         ----------
@@ -436,9 +496,34 @@ class Robot(object):
         """
         base_frame = self.get_base_frame(group)
         return Transformation.from_frame_to_frame(Frame.worldXY(), base_frame)
+    
+    def _get_current_transformation_WCF_RCF(self, full_configuration, group):
+        """Returns the group's current WCF to RCF transformation, if the robot is in full_configuration.
+        
+        The base_frame of a planning group can change if a parent joint was 
+        transformed. This function performs a forward kinematic request with the
+        full configuration to retrieve the (possibly) transformed base_frame of 
+        planning group. This function is only used in plan_motion since other 
+        services, such as ik or plan_cartesian_motion, do not use the 
+        transformed base_frame as the group's local coordinate system.
+
+        Parameters
+        ----------
+        full_configuration : :class:`compas_fab.robots.Configuration`
+            The (full) configuration from which the group's base frame is
+            calculated.
+        group : str
+            The planning group for which we want to get the transformed base frame.
+        
+        Returns
+        -------
+        :class:`compas.geometry.Transformation`
+        """
+        base_frame = self._get_current_base_frame(full_configuration, group)
+        return Transformation.from_frame_to_frame(base_frame, Frame.worldXY())
 
     def transformation_WCF_RCF(self, group=None):
-        """Returns the transformation from the robot's coordinate system (RCF) to the world coordinate system (WCF).
+        """Returns the transformation from the world coordinate system (WCF) to the robot's coordinate system (RCF).
 
         Parameters
         ----------
@@ -463,54 +548,6 @@ class Robot(object):
         """Returns the origin frame of the robot.
         """
         return self.get_base_frame(group)
-
-    def represent_frame_in_transformed_RCF(self, frame_WCF, configuration=None, group=None):
-        """Returns the frame's representation the current robot's coordinate frame (RCF).
-
-        Parameters
-        ----------
-        frame_WCF : :class:`compas.geometry.Frame`
-            A frame in the world coordinate frame.
-        configuration : :class:`compas_fab.robots.Configuration`
-            The (full) configuration from which the group's base frame is
-            calculated. Defaults to the init configuration (all zeros).
-        group : str, optional
-            The planning group. Defaults to the robot's main planning group.
-
-        Examples
-        --------
-        >>> frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
-        >>> frame_RCF = robot.represent_frame_in_transformed_RCF(frame_WCF)
-        """
-
-        # TODO: eventually change to not necessarily pass full config, since it
-        # won't check for collisions, or?
-        # TODO: have forward kin no service
-
-        self.ensure_client()
-        if not group:
-            group = self.main_group_name  # ensure semantics
-
-        if not configuration:
-            configuration = self.init_configuration()
-
-        base_link = self.get_base_link_name(group)
-
-        joint_names = self.get_configurable_joint_names()
-        joint_positions = self._get_scaled_joint_positions_from_start_configuration(
-            configuration)
-
-        response = self.client.forward_kinematics(
-            joint_positions, base_link, group, joint_names, base_link)
-        # the group's transformed base_frame in RCF
-        base_frame_RCF = response.pose_stamped[0].pose.frame
-        # the group's original base_frame
-        base_frame = self.get_base_frame(group)
-
-        T = Transformation.from_frame(base_frame)
-        base_frame = base_frame_RCF.transformed(T)  # the current base frame
-        T = Transformation.from_frame_to_frame(base_frame, Frame.worldXY())
-        return frame_WCF.transformed(T)
 
     def represent_frame_in_RCF(self, frame_WCF, group=None):
         """Represents a frame from the world coordinate system (WCF) in the robot's coordinate system (RCF).
@@ -575,7 +612,7 @@ class Robot(object):
     # ==========================================================================
 
     def orientation_constraint_from_frame(self, frame_WCF, tolerances_axes,
-                                          start_configuration=None, group=None):
+                                          group=None):
         """Returns an orientation constraint on the group's end-effector link.
 
         Parameters
@@ -585,11 +622,6 @@ class Robot(object):
         tolerances_axes: list of float
             Error tolerances ti for each of the frame's axes in radians. If only
             one value is passed it will be uses for all 3 axes.
-        start_configuration: :class:`compas_fab.robots.Configuration`, optional
-            If the planning group's origin is dislocated from it's initial
-            position, e.g. a 6-axes robot moved on a linear axis, the frame in
-            the robot coordinate system (RCF) must be calculated based on its
-            start_configuration. Defaults to the zero position for all joints.
         group: str
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
@@ -609,12 +641,6 @@ class Robot(object):
         by 0.01.
         """
 
-        # Attention motion plan needs to receive the frame in the possibly
-        # (moved) group's base frame (in difference to cartesian path).
-        frame_RCF = self.represent_frame_in_transformed_RCF(
-            frame_WCF, configuration=start_configuration, group=group)
-        frame_RCF.point /= self.scale_factor
-
         ee_link = self.get_end_effector_link_name(group)
 
         tolerances_axes = list(tolerances_axes)
@@ -622,9 +648,9 @@ class Robot(object):
             tolerances_axes *= 3
         elif len(tolerances_axes) != 3:
             raise ValueError("Must give either one or 3 values")
-        return OrientationConstraint(ee_link, frame_RCF.quaternion, tolerances_axes)
+        return OrientationConstraint(ee_link, frame_WCF.quaternion, tolerances_axes)
 
-    def position_constraint_from_frame(self, frame_WCF, tolerance_position, start_configuration=None, group=None):
+    def position_constraint_from_frame(self, frame_WCF, tolerance_position, group=None):
         """Returns a position and orientation constraint on the group's end-effector link.
 
         Parameters
@@ -634,11 +660,6 @@ class Robot(object):
         tolerance_position : float
             The allowed tolerance to the frame's position. (Defined in the
             robot's units)
-        start_configuration : :class:`compas_fab.robots.Configuration`, optional
-            If the planning group's origin is dislocated from it's initial
-            position, e.g. a 6-axes robot moved on a linear axis, the frame in
-            the robot coordinate system (RCF) must be calculated based on its
-            start_configuration. Defaults to the init configuration.
         group: str
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
@@ -656,18 +677,12 @@ class Robot(object):
         and :class:`compas_fab.robots.OrientationConstraint`.
 
         """
-        # Attention motion plan needs to receive the frame in the possibly
-        # (moved) group's base frame (in difference to cartesian path).
-        frame_RCF = self.represent_frame_in_transformed_RCF(
-            frame_WCF, start_configuration, group)
-        frame_RCF.point /= self.scale_factor
-        tolerance_position = tolerance_position/self.scale_factor
 
         ee_link = self.get_end_effector_link_name(group)
-        sphere = Sphere(frame_RCF.point, tolerance_position)
+        sphere = Sphere(frame_WCF.point, tolerance_position)
         return PositionConstraint.from_sphere(ee_link, sphere)
 
-    def constraints_from_frame(self, frame_WCF, tolerance_position, tolerances_axes, start_configuration=None, group=None):
+    def constraints_from_frame(self, frame_WCF, tolerance_position, tolerances_axes, group=None):
         """Returns a position and orientation constraint on the group's end-effector link.
 
         Parameters
@@ -680,11 +695,6 @@ class Robot(object):
         tolerances_axes: list of float
             Error tolerances ti for each of the frame's axes in radians. If only
             one value is passed it will be uses for all 3 axes.
-        start_configuration: :class:`compas_fab.robots.Configuration`, optional
-            If the planning group's origin is dislocated from it's initial
-            position, e.g. a 6-axes robot moved on a linear axis, the frame in
-            the robot coordinate system (RCF) must be calculated based on its
-            start_configuration. Defaults to the init configuration.
         group: str
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
@@ -694,9 +704,8 @@ class Robot(object):
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
         >>> tolerances_axes = [math.radians(1)]
-        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
         >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, start_configuration, group)
+        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
 
         Notes
         -----
@@ -705,11 +714,8 @@ class Robot(object):
         and :class:`compas_fab.robots.OrientationConstraint`.
 
         """
-        pc = self.position_constraint_from_frame(frame_WCF, tolerance_position,
-                                                 start_configuration, group)
-
-        oc = self.orientation_constraint_from_frame(frame_WCF, tolerances_axes,
-                                                    start_configuration, group)
+        pc = self.position_constraint_from_frame(frame_WCF, tolerance_position, group)
+        oc = self.orientation_constraint_from_frame(frame_WCF, tolerances_axes, group)
         return [pc, oc]
 
     def constraints_from_configuration(self, configuration, tolerances, group=None):
@@ -829,7 +835,7 @@ class Robot(object):
         joint_positions = response.solution.joint_state.position
         joint_positions = self._scale_joint_values(
             joint_positions, self.scale_factor)
-        # full configuration # TODO group config
+        # full configuration # TODO group config?
         configuration = Configuration(
             joint_positions, self.get_configurable_joint_types())
 
@@ -929,9 +935,24 @@ class Robot(object):
         ee_link = self.get_end_effector_link_name(group)
         max_step_scaled = max_step/self.scale_factor
 
+        if path_constraints:
+            path_constraints_RCF_scaled = []
+            for c in path_constraints:
+                cp = c.copy()
+                cp.transform(T)
+                if c.type == Constraint.JOINT:
+                    joint = self.get_joint_by_name(c.joint_name)
+                    if joint.is_scalable():
+                        cp.scale(self.scale_factor)
+                else:
+                    cp.scale(self.scale_factor)
+                path_constraints_RCF_scaled.append(cp)
+        else:
+            path_constraints_RCF_scaled = None
+
         response = self.client.plan_cartesian_motion(frames_RCF, base_link,
                                                      ee_link, group, joint_names, joint_positions,
-                                                     max_step_scaled, avoid_collisions, path_constraints,
+                                                     max_step_scaled, avoid_collisions, path_constraints_RCF_scaled,
                                                      attached_collision_object)
 
         # save joint_positions into configurations
@@ -992,18 +1013,26 @@ class Robot(object):
             Defaults to 1.
         max_acceleration_scaling_factor: float
             Defaults to 1.
-        attached_collision_object: ?
+        attached_collision_object: :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
 
 
         Examples
         --------
+        >>> # Example with position and orientation constraints
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
         >>> tolerances_axes = [math.radians(1)] * 3
         >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
         >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, start_configuration, group)
+        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
+        >>> response = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
+
+        >>> # Example with joint constraints
+        >>> configuration = Configuration.from_revolute_values([0.257, 4.945, -4.423, -3.609, 6.030, 1.526])
+        >>> tolerances = [math.radians(5)] * 6
+        >>> group = robot.main_group_name
+        >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances, group)
         >>> response = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
 
         References
@@ -1024,18 +1053,46 @@ class Robot(object):
             group = self.main_group_name  # ensure semantics
 
         joint_names = self.get_configurable_joint_names()
+        joint_positions = self._get_scaled_joint_positions_from_start_configuration(start_configuration)
 
-        joint_positions = self._get_scaled_joint_positions_from_start_configuration(
-            start_configuration)
+        # Transform goal constraints to RCF and scale
+        T = self._get_current_transformation_WCF_RCF(start_configuration, group)
+        goal_constraints_RCF_scaled = []
+        for c in goal_constraints:
+            cp = c.copy()
+            cp.transform(T)
+            if c.type == Constraint.JOINT:
+                joint = self.get_joint_by_name(c.joint_name)
+                if joint.is_scalable():
+                    cp.scale(self.scale_factor)
+            else:
+                cp.scale(self.scale_factor)
+            goal_constraints_RCF_scaled.append(cp)
+        
+        # Transform path constraints to RCF and scale
+        if path_constraints:
+            path_constraints_RCF_scaled = []
+            for c in path_constraints:
+                cp = c.copy()
+                cp.transform(T)
+                if c.type == Constraint.JOINT:
+                    joint = self.get_joint_by_name(c.joint_name)
+                    if joint.is_scalable():
+                        cp.scale(self.scale_factor)
+                else:
+                    cp.scale(self.scale_factor)
+                path_constraints_RCF_scaled.append(cp)
+        else:
+            path_constraints_RCF_scaled = None
 
         kwargs = {}
-        kwargs['goal_constraints'] = goal_constraints
+        kwargs['goal_constraints'] = goal_constraints_RCF_scaled
         kwargs['base_link'] = self.get_base_link_name(group)
         kwargs['ee_link'] = self.get_end_effector_link_name(group)
         kwargs['group'] = group
         kwargs['joint_names'] = joint_names
         kwargs['joint_positions'] = joint_positions
-        kwargs['path_constraints'] = path_constraints
+        kwargs['path_constraints'] = path_constraints_RCF_scaled
         kwargs['trajectory_constraints'] = None
         kwargs['planner_id'] = planner_id
         kwargs['num_planning_attempts'] = num_planning_attempts
@@ -1175,9 +1232,11 @@ if __name__ == "__main__":
     from compas.geometry import Scale
     from compas_fab.robots.ur5 import Robot as UR5Robot
     from compas_fab.backends import RosClient
+
     client = RosClient()
     client.run()
     robot = UR5Robot(client)
     doctest.testmod(globs=globals())
     client.close()
     client.terminate()
+    
