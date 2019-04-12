@@ -201,15 +201,15 @@ class Robot(object):
         if not self.artist:
             base_frame.point *= self._scale_factor
         return base_frame
-    
+
     def _get_current_base_frame(self, full_configuration, group):
         """Returns the group's current base frame, if the robot is in full_configuration.
 
-        The base_frame of a planning group can change if a parent joint was 
+        The base_frame of a planning group can change if a parent joint was
         transformed. This function performs a forward kinematic request with the
-        full configuration to retrieve the (possibly) transformed base_frame of 
-        planning group. This function is only used in plan_motion since other 
-        services, such as ik or plan_cartesian_motion, do not use the 
+        full configuration to retrieve the (possibly) transformed base_frame of
+        planning group. This function is only used in plan_motion since other
+        services, such as ik or plan_cartesian_motion, do not use the
         transformed base_frame as the group's local coordinate system.
 
         Parameters
@@ -219,7 +219,7 @@ class Robot(object):
             calculated.
         group : str
             The planning group for which we want to get the transformed base frame.
-        
+
         Returns
         -------
         :class:`compas.geometry.Frame`
@@ -297,7 +297,7 @@ class Robot(object):
                 return joints
         else:
             return self.model.get_configurable_joints()
-    
+
     def get_joint_by_name(self, name):
         """Returns the joint in the robot model matching its name.
 
@@ -496,15 +496,15 @@ class Robot(object):
         """
         base_frame = self.get_base_frame(group)
         return Transformation.from_frame_to_frame(Frame.worldXY(), base_frame)
-    
+
     def _get_current_transformation_WCF_RCF(self, full_configuration, group):
         """Returns the group's current WCF to RCF transformation, if the robot is in full_configuration.
-        
-        The base_frame of a planning group can change if a parent joint was 
+
+        The base_frame of a planning group can change if a parent joint was
         transformed. This function performs a forward kinematic request with the
-        full configuration to retrieve the (possibly) transformed base_frame of 
-        planning group. This function is only used in plan_motion since other 
-        services, such as ik or plan_cartesian_motion, do not use the 
+        full configuration to retrieve the (possibly) transformed base_frame of
+        planning group. This function is only used in plan_motion since other
+        services, such as ik or plan_cartesian_motion, do not use the
         transformed base_frame as the group's local coordinate system.
 
         Parameters
@@ -514,7 +514,7 @@ class Robot(object):
             calculated.
         group : str
             The planning group for which we want to get the transformed base frame.
-        
+
         Returns
         -------
         :class:`compas.geometry.Transformation`
@@ -935,6 +935,7 @@ class Robot(object):
         ee_link = self.get_end_effector_link_name(group)
         max_step_scaled = max_step/self.scale_factor
 
+        T = self.transformation_WCF_RCF(group)
         if path_constraints:
             path_constraints_RCF_scaled = []
             for c in path_constraints:
@@ -1068,7 +1069,7 @@ class Robot(object):
             else:
                 cp.scale(self.scale_factor)
             goal_constraints_RCF_scaled.append(cp)
-        
+
         # Transform path constraints to RCF and scale
         if path_constraints:
             path_constraints_RCF_scaled = []
@@ -1239,4 +1240,3 @@ if __name__ == "__main__":
     doctest.testmod(globs=globals())
     client.close()
     client.terminate()
-    
