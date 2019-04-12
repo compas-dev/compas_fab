@@ -48,10 +48,10 @@
             <chunk name="Projection">
               <items count="2">
                 <item name="Target" type_name="gh_drawing_point" type_code="30">
-                  <X>305</X>
-                  <Y>69</Y>
+                  <X>885</X>
+                  <Y>84</Y>
                 </item>
-                <item name="Zoom" type_name="gh_single" type_code="5">0.4096</item>
+                <item name="Zoom" type_name="gh_single" type_code="5">0.209715217</item>
               </items>
             </chunk>
             <chunk name="Views">
@@ -3962,7 +3962,7 @@ if sc.sticky[response_key]:
                             <item name="InstanceGuid" type_name="gh_guid" type_code="9">f6c1f50d-f8f3-462a-b6e9-c58084de2b1c</item>
                             <item name="Mutable" type_name="gh_bool" type_code="1">false</item>
                             <item name="Name" type_name="gh_string" type_code="10">Stream</item>
-                            <item name="NickName" type_name="gh_string" type_code="10">S(3)</item>
+                            <item name="NickName" type_name="gh_string" type_code="10">S(0)</item>
                             <item name="Optional" type_name="gh_bool" type_code="1">false</item>
                             <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
                           </items>
@@ -4011,7 +4011,7 @@ if sc.sticky[response_key]:
                       <items count="3">
                         <item name="Expression" type_name="gh_string" type_code="10">0</item>
                         <item name="Name" type_name="gh_string" type_code="10">0 forward_kinematics</item>
-                        <item name="Selected" type_name="gh_bool" type_code="1">false</item>
+                        <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                       </items>
                     </chunk>
                     <chunk name="ListItem" index="1">
@@ -4032,7 +4032,7 @@ if sc.sticky[response_key]:
                       <items count="3">
                         <item name="Expression" type_name="gh_string" type_code="10">3</item>
                         <item name="Name" type_name="gh_string" type_code="10">3 kinetic path</item>
-                        <item name="Selected" type_name="gh_bool" type_code="1">true</item>
+                        <item name="Selected" type_name="gh_bool" type_code="1">false</item>
                       </items>
                     </chunk>
                     <chunk name="Attributes">
@@ -7297,22 +7297,23 @@ response = st[response_key]</item>
                   </items>
                   <chunks count="2">
                     <chunk name="Attributes">
-                      <items count="2">
+                      <items count="3">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>2541</X>
-                          <Y>1734</Y>
-                          <W>195</W>
-                          <H>184</H>
+                          <X>2550</X>
+                          <Y>1754</Y>
+                          <W>186</W>
+                          <H>144</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                           <X>2665</X>
                           <Y>1826</Y>
                         </item>
+                        <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                       </items>
                     </chunk>
                     <chunk name="ParameterData">
-                      <items count="13">
-                        <item name="InputCount" type_name="gh_int32" type_code="3">9</item>
+                      <items count="11">
+                        <item name="InputCount" type_name="gh_int32" type_code="3">7</item>
                         <item name="InputId" index="0" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
                         <item name="InputId" index="1" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
                         <item name="InputId" index="2" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
@@ -7320,13 +7321,11 @@ response = st[response_key]</item>
                         <item name="InputId" index="4" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
                         <item name="InputId" index="5" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
                         <item name="InputId" index="6" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
-                        <item name="InputId" index="7" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
-                        <item name="InputId" index="8" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
                         <item name="OutputCount" type_name="gh_int32" type_code="3">2</item>
                         <item name="OutputId" index="0" type_name="gh_guid" type_code="9">3ede854e-c753-40eb-84cb-b48008f14fd4</item>
                         <item name="OutputId" index="1" type_name="gh_guid" type_code="9">8ec86459-bf01-4409-baee-174d0d2b13d0</item>
                       </items>
-                      <chunks count="11">
+                      <chunks count="9">
                         <chunk name="InputParam" index="0">
                           <items count="12">
                             <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
@@ -7344,17 +7343,18 @@ response = st[response_key]</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2543</X>
-                                  <Y>1736</Y>
-                                  <W>107</W>
+                                  <X>2552</X>
+                                  <Y>1756</Y>
+                                  <W>98</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2598</X>
-                                  <Y>1746</Y>
+                                  <X>2602.5</X>
+                                  <Y>1766</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -7375,17 +7375,18 @@ response = st[response_key]</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2543</X>
-                                  <Y>1756</Y>
-                                  <W>107</W>
+                                  <X>2552</X>
+                                  <Y>1776</Y>
+                                  <W>98</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2598</X>
-                                  <Y>1766</Y>
+                                  <X>2602.5</X>
+                                  <Y>1786</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -7406,17 +7407,18 @@ response = st[response_key]</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2543</X>
-                                  <Y>1776</Y>
-                                  <W>107</W>
+                                  <X>2552</X>
+                                  <Y>1796</Y>
+                                  <W>98</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2598</X>
-                                  <Y>1786</Y>
+                                  <X>2602.5</X>
+                                  <Y>1806</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -7438,87 +7440,28 @@ response = st[response_key]</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2543</X>
-                                  <Y>1796</Y>
-                                  <W>107</W>
+                                  <X>2552</X>
+                                  <Y>1816</Y>
+                                  <W>98</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2598</X>
-                                  <Y>1806</Y>
+                                  <X>2602.5</X>
+                                  <Y>1826</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
                         </chunk>
                         <chunk name="InputParam" index="4">
-                          <items count="10">
-                            <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
-                            <item name="Description" type_name="gh_string" type_code="10">Script input tolerance_position.</item>
-                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">a29f4a75-8f14-4d0c-8a71-c0baaa89c3c0</item>
-                            <item name="Name" type_name="gh_string" type_code="10">tolerance_position</item>
-                            <item name="NickName" type_name="gh_string" type_code="10">tolerance_position</item>
-                            <item name="Optional" type_name="gh_bool" type_code="1">true</item>
-                            <item name="ScriptParamAccess" type_name="gh_int32" type_code="3">0</item>
-                            <item name="ShowTypeHints" type_name="gh_bool" type_code="1">true</item>
-                            <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
-                            <item name="TypeHintID" type_name="gh_guid" type_code="9">d60527f5-b5af-4ef6-8970-5f96fe412559</item>
-                          </items>
-                          <chunks count="1">
-                            <chunk name="Attributes">
-                              <items count="2">
-                                <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2543</X>
-                                  <Y>1816</Y>
-                                  <W>107</W>
-                                  <H>20</H>
-                                </item>
-                                <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2598</X>
-                                  <Y>1826</Y>
-                                </item>
-                              </items>
-                            </chunk>
-                          </chunks>
-                        </chunk>
-                        <chunk name="InputParam" index="5">
-                          <items count="10">
-                            <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
-                            <item name="Description" type_name="gh_string" type_code="10">Script input tolerance_angle_deg.</item>
-                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">f71ea517-2e58-4bb6-b4c7-22c4fb2c5931</item>
-                            <item name="Name" type_name="gh_string" type_code="10">tolerance_angle_deg</item>
-                            <item name="NickName" type_name="gh_string" type_code="10">tolerance_angle_deg</item>
-                            <item name="Optional" type_name="gh_bool" type_code="1">true</item>
-                            <item name="ScriptParamAccess" type_name="gh_int32" type_code="3">0</item>
-                            <item name="ShowTypeHints" type_name="gh_bool" type_code="1">true</item>
-                            <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
-                            <item name="TypeHintID" type_name="gh_guid" type_code="9">87f87f55-5b71-41f4-8aea-21d494016f81</item>
-                          </items>
-                          <chunks count="1">
-                            <chunk name="Attributes">
-                              <items count="2">
-                                <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2543</X>
-                                  <Y>1836</Y>
-                                  <W>107</W>
-                                  <H>20</H>
-                                </item>
-                                <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2598</X>
-                                  <Y>1846</Y>
-                                </item>
-                              </items>
-                            </chunk>
-                          </chunks>
-                        </chunk>
-                        <chunk name="InputParam" index="6">
                           <items count="11">
                             <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
                             <item name="Description" type_name="gh_string" type_code="10">Script input planner_id.</item>
                             <item name="InstanceGuid" type_name="gh_guid" type_code="9">ee0b1568-b152-48bd-aee6-f67089f6ecae</item>
-                            <item name="Name" type_name="gh_string" type_code="10">x</item>
+                            <item name="Name" type_name="gh_string" type_code="10">planner_id</item>
                             <item name="NickName" type_name="gh_string" type_code="10">planner_id</item>
                             <item name="Optional" type_name="gh_bool" type_code="1">true</item>
                             <item name="ScriptParamAccess" type_name="gh_int32" type_code="3">0</item>
@@ -7529,22 +7472,23 @@ response = st[response_key]</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2543</X>
-                                  <Y>1856</Y>
-                                  <W>107</W>
+                                  <X>2552</X>
+                                  <Y>1836</Y>
+                                  <W>98</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2598</X>
-                                  <Y>1866</Y>
+                                  <X>2602.5</X>
+                                  <Y>1846</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
                         </chunk>
-                        <chunk name="InputParam" index="7">
+                        <chunk name="InputParam" index="5">
                           <items count="11">
                             <item name="Access" type_name="gh_int32" type_code="3">1</item>
                             <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
@@ -7560,22 +7504,23 @@ response = st[response_key]</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2543</X>
-                                  <Y>1876</Y>
-                                  <W>107</W>
+                                  <X>2552</X>
+                                  <Y>1856</Y>
+                                  <W>98</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2598</X>
-                                  <Y>1886</Y>
+                                  <X>2602.5</X>
+                                  <Y>1866</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
                         </chunk>
-                        <chunk name="InputParam" index="8">
+                        <chunk name="InputParam" index="6">
                           <items count="11">
                             <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
                             <item name="Description" type_name="gh_string" type_code="10">Script input compute.</item>
@@ -7591,17 +7536,18 @@ response = st[response_key]</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2543</X>
-                                  <Y>1896</Y>
-                                  <W>107</W>
+                                  <X>2552</X>
+                                  <Y>1876</Y>
+                                  <W>98</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2598</X>
-                                  <Y>1906</Y>
+                                  <X>2602.5</X>
+                                  <Y>1886</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -7617,17 +7563,18 @@ response = st[response_key]</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>2680</X>
-                                  <Y>1736</Y>
+                                  <Y>1756</Y>
                                   <W>54</W>
-                                  <H>90</H>
+                                  <H>70</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                                   <X>2707</X>
-                                  <Y>1781</Y>
+                                  <Y>1791</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -7643,17 +7590,18 @@ response = st[response_key]</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>2680</X>
                                   <Y>1826</Y>
                                   <W>54</W>
-                                  <H>90</H>
+                                  <H>70</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                                   <X>2707</X>
-                                  <Y>1871</Y>
+                                  <Y>1861</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -8286,8 +8234,8 @@ if count and robot and configurations != [None]:
                     <chunk name="Attributes">
                       <items count="1">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>2388</X>
-                          <Y>1977</Y>
+                          <X>2341</X>
+                          <Y>2023</Y>
                           <W>113</W>
                           <H>22</H>
                         </item>
@@ -8371,8 +8319,8 @@ Add path constraints</item>
                     <chunk name="Attributes">
                       <items count="5">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>2340</X>
-                          <Y>1920</Y>
+                          <X>1991</X>
+                          <Y>2140</Y>
                           <W>160</W>
                           <H>53</H>
                         </item>
@@ -8380,8 +8328,8 @@ Add path constraints</item>
                         <item name="MarginRight" type_name="gh_int32" type_code="3">0</item>
                         <item name="MarginTop" type_name="gh_int32" type_code="3">0</item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                          <X>2340.52</X>
-                          <Y>1920.246</Y>
+                          <X>1991.56</X>
+                          <Y>2140.566</Y>
                         </item>
                       </items>
                     </chunk>
@@ -12503,7 +12451,7 @@ frame = Frame(goal_plane.Origin, goal_plane.XAxis, goal_plane.YAxis)
 tolerances_axes = [math.radians(tolerance_xaxis_deg), math.radians(tolerance_yaxis_deg), math.radians(tolerance_zaxis_deg)]
 
 if robot:
-    goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, start_configuration, group)</item>
+    goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)</item>
                     <item name="Description" type_name="gh_string" type_code="10">A python scriptable component</item>
                     <item name="EditorLocation" type_name="gh_drawing_point" type_code="30">
                       <X>208</X>
@@ -12523,20 +12471,20 @@ if robot:
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>2264</X>
-                          <Y>1705</Y>
+                          <X>2269</X>
+                          <Y>1753</Y>
                           <W>226</W>
-                          <H>164</H>
+                          <H>144</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                          <X>2384</X>
-                          <Y>1787</Y>
+                          <X>2389</X>
+                          <Y>1825</Y>
                         </item>
                       </items>
                     </chunk>
                     <chunk name="ParameterData">
-                      <items count="11">
-                        <item name="InputCount" type_name="gh_int32" type_code="3">8</item>
+                      <items count="10">
+                        <item name="InputCount" type_name="gh_int32" type_code="3">7</item>
                         <item name="InputId" index="0" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
                         <item name="InputId" index="1" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
                         <item name="InputId" index="2" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
@@ -12544,11 +12492,10 @@ if robot:
                         <item name="InputId" index="4" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
                         <item name="InputId" index="5" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
                         <item name="InputId" index="6" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
-                        <item name="InputId" index="7" type_name="gh_guid" type_code="9">84fa917c-1ed8-4db3-8be1-7bdc4a6495a2</item>
                         <item name="OutputCount" type_name="gh_int32" type_code="3">1</item>
                         <item name="OutputId" index="0" type_name="gh_guid" type_code="9">8ec86459-bf01-4409-baee-174d0d2b13d0</item>
                       </items>
-                      <chunks count="9">
+                      <chunks count="8">
                         <chunk name="InputParam" index="0">
                           <items count="12">
                             <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
@@ -12568,14 +12515,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2266</X>
-                                  <Y>1707</Y>
+                                  <X>2271</X>
+                                  <Y>1755</Y>
                                   <W>103</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2319</X>
-                                  <Y>1717</Y>
+                                  <X>2324</X>
+                                  <Y>1765</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -12600,14 +12547,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2266</X>
-                                  <Y>1727</Y>
+                                  <X>2271</X>
+                                  <Y>1775</Y>
                                   <W>103</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2319</X>
-                                  <Y>1737</Y>
+                                  <X>2324</X>
+                                  <Y>1785</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -12631,14 +12578,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2266</X>
-                                  <Y>1747</Y>
+                                  <X>2271</X>
+                                  <Y>1795</Y>
                                   <W>103</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2319</X>
-                                  <Y>1757</Y>
+                                  <X>2324</X>
+                                  <Y>1805</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -12662,14 +12609,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2266</X>
-                                  <Y>1767</Y>
+                                  <X>2271</X>
+                                  <Y>1815</Y>
                                   <W>103</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2319</X>
-                                  <Y>1777</Y>
+                                  <X>2324</X>
+                                  <Y>1825</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -12693,14 +12640,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2266</X>
-                                  <Y>1787</Y>
+                                  <X>2271</X>
+                                  <Y>1835</Y>
                                   <W>103</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2319</X>
-                                  <Y>1797</Y>
+                                  <X>2324</X>
+                                  <Y>1845</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -12724,14 +12671,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2266</X>
-                                  <Y>1807</Y>
+                                  <X>2271</X>
+                                  <Y>1855</Y>
                                   <W>103</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2319</X>
-                                  <Y>1817</Y>
+                                  <X>2324</X>
+                                  <Y>1865</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -12755,45 +12702,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2266</X>
-                                  <Y>1827</Y>
+                                  <X>2271</X>
+                                  <Y>1875</Y>
                                   <W>103</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2319</X>
-                                  <Y>1837</Y>
-                                </item>
-                              </items>
-                            </chunk>
-                          </chunks>
-                        </chunk>
-                        <chunk name="InputParam" index="7">
-                          <items count="11">
-                            <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
-                            <item name="Description" type_name="gh_string" type_code="10">Script input start_configuration.</item>
-                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">22868d32-64d7-4423-a2f4-1a2742abd88a</item>
-                            <item name="Name" type_name="gh_string" type_code="10">start_configuration</item>
-                            <item name="NickName" type_name="gh_string" type_code="10">start_configuration</item>
-                            <item name="Optional" type_name="gh_bool" type_code="1">true</item>
-                            <item name="ScriptParamAccess" type_name="gh_int32" type_code="3">0</item>
-                            <item name="ShowTypeHints" type_name="gh_bool" type_code="1">true</item>
-                            <item name="Source" index="0" type_name="gh_guid" type_code="9">a9139682-5866-41f7-a884-3df47c63db76</item>
-                            <item name="SourceCount" type_name="gh_int32" type_code="3">1</item>
-                            <item name="TypeHintID" type_name="gh_guid" type_code="9">87f87f55-5b71-41f4-8aea-21d494016f81</item>
-                          </items>
-                          <chunks count="1">
-                            <chunk name="Attributes">
-                              <items count="2">
-                                <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2266</X>
-                                  <Y>1847</Y>
-                                  <W>103</W>
-                                  <H>20</H>
-                                </item>
-                                <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2319</X>
-                                  <Y>1857</Y>
+                                  <X>2324</X>
+                                  <Y>1885</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -12812,14 +12728,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2399</X>
-                                  <Y>1707</Y>
+                                  <X>2404</X>
+                                  <Y>1755</Y>
                                   <W>89</W>
-                                  <H>160</H>
+                                  <H>140</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2443.5</X>
-                                  <Y>1787</Y>
+                                  <X>2448.5</X>
+                                  <Y>1825</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -12850,14 +12766,14 @@ if robot:
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>2004</X>
-                          <Y>1852</Y>
+                          <X>2009</X>
+                          <Y>1803</Y>
                           <W>222</W>
                           <H>20</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                          <X>2004.026</X>
-                          <Y>1852.05</Y>
+                          <X>2009.786</X>
+                          <Y>1803.41</Y>
                         </item>
                       </items>
                     </chunk>
@@ -12895,14 +12811,14 @@ if robot:
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>2001</X>
-                          <Y>1877</Y>
+                          <X>2007</X>
+                          <Y>1829</Y>
                           <W>229</W>
                           <H>20</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                          <X>2001.733</X>
-                          <Y>1877.714</Y>
+                          <X>2007.493</X>
+                          <Y>1829.074</Y>
                         </item>
                       </items>
                     </chunk>
@@ -12940,14 +12856,14 @@ if robot:
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>2001</X>
-                          <Y>1904</Y>
+                          <X>2007</X>
+                          <Y>1855</Y>
                           <W>229</W>
                           <H>20</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                          <X>2001.445</X>
-                          <Y>1904.508</Y>
+                          <X>2007.205</X>
+                          <Y>1855.868</Y>
                         </item>
                       </items>
                     </chunk>
@@ -12985,14 +12901,14 @@ if robot:
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>2000</X>
-                          <Y>1928</Y>
+                          <X>2006</X>
+                          <Y>1879</Y>
                           <W>229</W>
                           <H>20</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                          <X>2000.995</X>
-                          <Y>1928.14</Y>
+                          <X>2006.755</X>
+                          <Y>1879.5</Y>
                         </item>
                       </items>
                     </chunk>
@@ -13367,14 +13283,14 @@ if robot:
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>1994</X>
-                          <Y>1780</Y>
+                          <X>2247</X>
+                          <Y>1713</Y>
                           <W>143</W>
                           <H>30</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                          <X>2045</X>
-                          <Y>1795</Y>
+                          <X>2298</X>
+                          <Y>1728</Y>
                         </item>
                       </items>
                     </chunk>
@@ -13405,14 +13321,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>1996</X>
-                                  <Y>1782</Y>
+                                  <X>2249</X>
+                                  <Y>1715</Y>
                                   <W>34</W>
                                   <H>26</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2014.5</X>
-                                  <Y>1795</Y>
+                                  <X>2267.5</X>
+                                  <Y>1728</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -13431,14 +13347,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2060</X>
-                                  <Y>1782</Y>
+                                  <X>2313</X>
+                                  <Y>1715</Y>
                                   <W>75</W>
                                   <H>26</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2097.5</X>
-                                  <Y>1795</Y>
+                                  <X>2350.5</X>
+                                  <Y>1728</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -13471,14 +13387,14 @@ if robot:
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>2031</X>
-                          <Y>1754</Y>
+                          <X>2285</X>
+                          <Y>1688</Y>
                           <W>112</W>
                           <H>20</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                          <X>2087.055</X>
-                          <Y>1764.736</Y>
+                          <X>2341.135</X>
+                          <Y>1698.816</Y>
                         </item>
                       </items>
                     </chunk>
@@ -13504,14 +13420,14 @@ if robot:
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>2159</X>
-                          <Y>1743</Y>
+                          <X>2412</X>
+                          <Y>1676</Y>
                           <W>77</W>
                           <H>64</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                          <X>2191</X>
-                          <Y>1775</Y>
+                          <X>2444</X>
+                          <Y>1708</Y>
                         </item>
                       </items>
                     </chunk>
@@ -13539,14 +13455,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2161</X>
-                                  <Y>1745</Y>
+                                  <X>2414</X>
+                                  <Y>1678</Y>
                                   <W>15</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2170</X>
-                                  <Y>1755</Y>
+                                  <X>2423</X>
+                                  <Y>1688</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -13588,14 +13504,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2161</X>
-                                  <Y>1765</Y>
+                                  <X>2414</X>
+                                  <Y>1698</Y>
                                   <W>15</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2170</X>
-                                  <Y>1775</Y>
+                                  <X>2423</X>
+                                  <Y>1708</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -13617,14 +13533,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2161</X>
-                                  <Y>1785</Y>
+                                  <X>2414</X>
+                                  <Y>1718</Y>
                                   <W>15</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2170</X>
-                                  <Y>1795</Y>
+                                  <X>2423</X>
+                                  <Y>1728</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -13645,14 +13561,14 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>2206</X>
-                                  <Y>1745</Y>
+                                  <X>2459</X>
+                                  <Y>1678</Y>
                                   <W>28</W>
                                   <H>60</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>2220</X>
-                                  <Y>1775</Y>
+                                  <X>2473</X>
+                                  <Y>1708</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -13699,8 +13615,8 @@ if robot:
                     <chunk name="Attributes">
                       <items count="1">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>2088</X>
-                          <Y>1723</Y>
+                          <X>2341</X>
+                          <Y>1656</Y>
                           <W>52</W>
                           <H>22</H>
                         </item>
@@ -13773,8 +13689,8 @@ if robot:
                     <chunk name="Attributes">
                       <items count="1">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>2389</X>
-                          <Y>1881</Y>
+                          <X>2383</X>
+                          <Y>1990</Y>
                           <W>68</W>
                           <H>22</H>
                         </item>
@@ -13791,7 +13707,7 @@ if robot:
     <chunk name="Thumbnail">
       <items count="1">
         <item name="Thumbnail" type_name="gh_drawing_bitmap" type_code="37">
-          <bitmap length="8337">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</bitmap>
+          <bitmap length="5295">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</bitmap>
         </item>
       </items>
     </chunk>

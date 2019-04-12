@@ -48,7 +48,7 @@ with constraints rather than defined frames.
     from compas_fab.backends import RosClient
     from compas_fab.robots.ur5 import Robot
 
-   with RosClient() as client:
+    with RosClient() as client:
         
         robot = Robot(client)
     
@@ -62,8 +62,7 @@ with constraints rather than defined frames.
         # create goal constraints from frame
         goal_constraints = robot.constraints_from_frame(frame,
                                                         tolerance_position,
-                                                        tolerance_axes, 
-                                                        start_configuration, 
+                                                        tolerance_axes,
                                                         group)
 
         response = robot.plan_motion(goal_constraints, 
