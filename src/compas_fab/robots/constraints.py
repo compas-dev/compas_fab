@@ -87,13 +87,13 @@ class BoundingVolume(object):
     def scale(self, scale_factor):
         S = Scale([1./scale_factor] * 3)
         self.transform(S)
-    
+
     def transform(self, transformation):
         self.volume.transform(transformation)
 
     def __repr__(self):
         return "BoundingVolume({0}, {1})".format(self.type, self.volume)
-    
+
     def copy(self):
         """Make a copy of this ``BoundingVolume``.
 
@@ -127,13 +127,13 @@ class Constraint(object):
             raise ValueError("Type must be %d, %d or %d" % self.possible_types)
         self.type = type
         self.weight = weight
-    
+
     def transform(self, transformation):
         pass
-    
+
     def scale(self, scale_factor):
         pass
-    
+
     def copy(self):
         cls = type(self)
         return cls(self.type, self.weight)
@@ -173,7 +173,7 @@ class JointConstraint(Constraint):
 
     def __repr__(self):
         return "JointConstraint('{0}', {1}, {2}, {3})".format(self.joint_name, self.value, self.tolerance, self.weight)
-    
+
     def copy(self):
         cls = type(self)
         return cls(self.joint_name, self.value, self.tolerance, self.weight)
@@ -198,7 +198,7 @@ class OrientationConstraint(Constraint):
 
     Notes
     -----
-    If you specify the tolerance vector with [0.01, 0.01, 6.3], it means that 
+    If you specify the tolerance vector with [0.01, 0.01, 6.3], it means that
     the frame's x-axis and y-axis are allowed to rotate about the z-axis by an
     angle of 6.3 radians, whereas the z-axis can only change 0.01.
 
@@ -216,7 +216,7 @@ class OrientationConstraint(Constraint):
         self.link_name = link_name
         self.quaternion = [float(a) for a in list(quaternion)]
         self.tolerances = [float(a) for a in list(tolerances)] if tolerances else [0.01] * 3
-    
+
     def transform(self, transformation):
         R = Rotation.from_quaternion(self.quaternion)
         R *= transformation
@@ -224,7 +224,7 @@ class OrientationConstraint(Constraint):
 
     def __repr__(self):
         return "OrientationConstraint('{0}', {1}, {2}, {3})".format(self.link_name, self.quaternion, self.tolerances, self.weight)
-    
+
     def copy(self):
         cls = type(self)
         return cls(self.link_name, self.quaternion[:], self.tolerances[:], self.weight)
@@ -308,7 +308,7 @@ class PositionConstraint(Constraint):
 
     def __repr__(self):
         return "PositionConstraint('{0}', {1}, {2})".format(self.link_name, self.bounding_volume, self.weight)
-    
+
     def copy(self):
         cls = type(self)
         return cls(self.link_name, self.bounding_volume.copy(), self.weight)
@@ -318,4 +318,4 @@ if __name__ == "__main__":
 
     import doctest
     doctest.testmod()
-    #print([name for name in dir() if not name.startswith('_')])
+    # print([name for name in dir() if not name.startswith('_')])
