@@ -1,19 +1,40 @@
-os: osx
-osx_image: xcode9.4
-
+# Base language is Python, but that does not work on macOs & Windows builds
 language: python
-python:
-  - "2.7"
-  - "3.6"
+
+matrix:
+  include:
+    - name: "Python 2.7: Windows"
+      os: windows
+      language: shell
+      before_install: choco install python2
+      env:
+        - PATH=/c/Python27:/c/Python27/Scripts:$PATH
+        - TRAVIS_PYTHON_VERSION=2.7
+    - name: "Python 3.7: Windows"
+      os: windows
+      language: shell
+      before_install: choco install python
+      env:
+        - PATH=/c/Python37:/c/Python37/Scripts:$PATH
+        - TRAVIS_PYTHON_VERSION=3.7
+    - name: "Python 3.7: Xenial Linux"
+      python: 3.7
+      dist: xenial
+      env: TRAVIS_PYTHON_VERSION=3.7
+    - name: "Python 3.7: macOS"
+      os: osx
+      osx_image: xcode10.2  # Python 3.7.2 running on macOS 10.14.3
+      language: shell
+      env: TRAVIS_PYTHON_VERSION=3.7
 
 install:
-  - pip install --no-cache-dir -r requirements-dev.txt
+  - python -m pip install --no-cache-dir -r requirements-dev.txt
 
 script:
-- python -c "import compas_fab"
-- python -c "import compas_fab.backends"
-- python -c "from compas_fab.backends.vrep.remote_api import vrep"
-- python -c "import compas_fab.robots"
-- python -c "import compas_fab.utilities"
-- pytest
-- invoke docs
+  - python -c "import compas_fab"
+  - python -c "import compas_fab.backends"
+  - python -c "from compas_fab.backends.vrep.remote_api import vrep"
+  - python -c "import compas_fab.robots"
+  - python -c "import compas_fab.utilities"
+  - pytest
+  - invoke docs
