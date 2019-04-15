@@ -23,6 +23,7 @@ matrix:
       python: 3.7
       dist: xenial
       env: TRAVIS_PYTHON_VERSION=3.7
+      services: docker
     - name: "Python 3.7: macOS"
       os: osx
       osx_image: xcode10.2  # Python 3.7.2 running on macOS 10.14.3
