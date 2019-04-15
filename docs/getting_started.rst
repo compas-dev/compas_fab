@@ -5,7 +5,7 @@ Getting started
 Installation
 ============
 
-The recommended way to install **compas_fab** is to use `Anaconda/conda <https://conda.io/docs/>`_:
+The recommended way to install **COMPAS FAB** is to use `Anaconda/conda <https://conda.io/docs/>`_:
 
 ::
 
@@ -30,7 +30,7 @@ Once installed, you can verify your setup. Start Python from the command prompt 
 Environments
 ============
 
-Just like the main library of **COMPAS**, the core functionality of **compas_fab**
+Just like the main library of **COMPAS**, the core functionality of **COMPAS FAB**
 is independent of CAD software and can be used from the command prompt,
 in standalone scripts.
 
@@ -38,7 +38,7 @@ in standalone scripts.
 Working in Rhino
 ----------------
 
-*Installing* **compas_fab** for Rhino is very simple. Just open the *command prompt*
+*Installing* **COMPAS FAB** for Rhino is very simple. Just open the *command prompt*
 and type the following
 
 ::
@@ -58,7 +58,7 @@ Working in Blender
 ------------------
 
 Once **COMPAS** itself is installed for Blender following the documented procedure,
-**compas_fab** will automatically be available as well after installing it.
+**COMPAS FAB** will automatically be available as well after installing it.
 
 
 First Steps

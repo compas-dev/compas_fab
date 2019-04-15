@@ -1,5 +1,5 @@
 ============================================================
-compas_fab: Robotic Fabrication for COMPAS
+COMPAS FAB: Robotic Fabrication for COMPAS
 ============================================================
 
 .. start-badges
@@ -38,13 +38,13 @@ Main features
 * Planning tools: kinematic solvers, path planning, etc.
 * Execution tools: feedback loops, robot control, etc.
 
-**compas_fab** runs on Python 2.x, 3.x and IronPython 2.7.
+**COMPAS FAB** runs on Python 2.x, 3.x and IronPython 2.7.
 
 
 Getting Started
 ---------------
 
-The recommended way to install **compas_fab** is to use `Anaconda/conda <https://conda.io/docs/>`_:
+The recommended way to install **COMPAS FAB** is to use `Anaconda/conda <https://conda.io/docs/>`_:
 
 ::
 
@@ -94,7 +94,7 @@ for more details.
 Releasing this project
 ----------------------
 
-Ready to release a new version of **compas_fab**? Here's how to do it:
+Ready to release a new version of **COMPAS FAB**? Here's how to do it:
 
 * We use `semver <https://semver.org/>`_, i.e. we bump versions as follows:
 

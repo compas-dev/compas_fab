@@ -24,7 +24,7 @@ Besides simplifying the deployment, using containers has the added benefit of en
 repeatability.
 
 Once you made sure `Docker`_ is running, you can pull and run some ROS
-containers. The **compas_fab** team publishes some images on `Docker Hub`_
+containers. The **COMPAS FAB** team publishes some images on `Docker Hub`_
 but there are many more to be found online. You can start a single ROS Master
 with the following commands on the command prompt::
 

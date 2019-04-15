@@ -661,7 +661,7 @@ def vrep_pose_to_frame(pose, scale):
 
 
 def frame_to_vrep_pose(frame, scale):
-    # compas_fab uses meters, just like V-REP,
+    # COMPAS FAB uses meters, just like V-REP,
     # so in general, scale should always be 1
     pose = matrix_from_frame(frame)
     pose[0][3] = pose[0][3] / scale
@@ -671,7 +671,7 @@ def frame_to_vrep_pose(frame, scale):
 
 
 def config_from_vrep(list_of_floats, scale):
-    # compas_fab uses radians and meters, just like V-REP,
+    # COMPAS FAB uses radians and meters, just like V-REP,
     # so in general, scale should always be 1
     radians = list_of_floats[3:]
     prismatic_values = map(lambda v: v * scale, list_of_floats[0:3])
@@ -679,7 +679,7 @@ def config_from_vrep(list_of_floats, scale):
 
 
 def config_to_vrep(config, scale):
-    # compas_fab uses radians and meters, just like V-REP,
+    # COMPAS FAB uses radians and meters, just like V-REP,
     # so in general, scale should always be 1
     values = list(map(lambda v: v / scale, config.prismatic_values))
     values.extend(config.revolute_values)
