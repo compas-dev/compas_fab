@@ -14,7 +14,6 @@ environments.
 
     compas_fab.artists
     compas_fab.backends
-    compas_fab.geometry
     compas_fab.robots
     compas_fab.utilities
 

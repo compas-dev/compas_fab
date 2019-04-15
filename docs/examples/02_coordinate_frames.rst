@@ -2,7 +2,7 @@
 Coordinate frames
 ********************************************************************************
 
-.. currentmodule:: compas_fab.geometry
+.. currentmodule:: compas_fab.robots
 
 Developers and users of robot drivers, models, and libraries need a shared convention
 for coordinate frames in order to better integrate and re-use software components. To

@@ -10,8 +10,6 @@ and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.
 Unreleased
 ----------
 
-**Fixed**
-
 **Changed**
 
 * Renamed ``compute_cartesian_path`` to ``plan_cartesian_motion``
@@ -22,12 +20,13 @@ Unreleased
 **Added**
 
 * Implemented Constraints (``OrientationConstraint``, ``PositionConstraint``, ``JointConstraint``) to use with ``plan_motion``
-* Implemented ``PlanningScene``, ``CollisionMesh`` and ``AttachedCollisionMesh`` 
+* Implemented ``PlanningScene``, ``CollisionMesh`` and ``AttachedCollisionMesh``
 * Added UR5 robot model data for example purposes
 * Added several doc examples
 
-**Deprecated**
+**Removed**
 
+* Aliases for ``Frame`` and ``Transformation``. Import from ``compas.geometry`` instead.
 
 0.4.1
 ----------

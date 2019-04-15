@@ -2,7 +2,7 @@
 Frame and Transformation
 ********************************************************************************
 
-.. currentmodule:: compas_fab.geometry
+.. currentmodule:: compas.geometry
 
 :class:`Frame` and :class:`Transformation` are two basic classes in the
 **COMPAS** framework and can be used to describe position/orientation and
@@ -12,9 +12,9 @@ class for transformations like :class:`Rotation`, :class:`Translation`,
 :class:`Scale`, :class:`Reflection`, :class:`Projection` and :class:`Shear`.
 
 Here is a simple example of how to use a frame as a coordinate system: Starting
-from a point ``P`` in the local (user-defined, relative) coordinate system of 
-frame ``F``, i.e. its position is relative to the origin and orientation of 
-``F``, we want to get the position of ``P`` in the global (world, absolute) 
+from a point ``P`` in the local (user-defined, relative) coordinate system of
+frame ``F``, i.e. its position is relative to the origin and orientation of
+``F``, we want to get the position of ``P`` in the global (world, absolute)
 coordinate system.
 
 .. code-block:: python
@@ -37,7 +37,7 @@ coordinate system.
 
 
 Industrial robots do not have a common way of describing the pose orientation.
-The frame provides methods to specify the orientation in various conventions. 
+The frame provides methods to specify the orientation in various conventions.
 
 .. code-block:: python
 
