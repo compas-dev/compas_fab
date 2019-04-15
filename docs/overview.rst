@@ -10,10 +10,11 @@ an open-source Python-based framework for collaboration and research in architec
 Main features
 =============
 
-* Planning & execution tools
+* Built on top of standard model description formats
+* Motion planning tools
+* Execution tools
 * CAD-independent
 * Robotic fabrication process modeling
-* Mediates between tools & libraries
 * Multiple robotic backends (e.g. `ROS: Robot Operating System <https://ros.org>`_)
 
 **COMPAS FAB** runs on Python 2.x, 3.x and IronPython 2.7.

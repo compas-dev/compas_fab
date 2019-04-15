@@ -2,6 +2,8 @@
 COMPAS FAB: Robotic Fabrication for COMPAS
 ============================================================
 
+.. highlight:: bash
+
 .. start-badges
 
 .. image:: https://travis-ci.com/gramaziokohler/compas_fab.svg?branch=master
@@ -48,8 +50,7 @@ The recommended way to install **COMPAS FAB** is to use `Anaconda/conda <https:/
 
 ::
 
-    conda config --add channels conda-forge
-    conda install compas_fab
+    conda install -c conda-forge compas_fab
 
 But it can also be installed using ``pip``:
 
@@ -58,9 +59,16 @@ But it can also be installed using ``pip``:
     pip install compas_fab
 
 
-Once installed, you can verify your setup. Start Python from the command prompt and run the following:
+.. note::
 
-.. code-block:: python
+    On Windows, you may need to install
+    `Microsoft Visual C++ 14.0 <https://www.scivision.co/python-windows-visual-c++-14-required/>`_.
+
+
+Once the installation is completed, you can verify your setup.
+Start Python from the command prompt and run the following:
+
+::
 
     >>> import compas_fab
 
@@ -69,8 +77,8 @@ First Steps
 -----------
 
 * `Documentation <https://gramaziokohler.github.io/compas_fab/>`_
-* `Examples <https://gramaziokohler.github.io/compas_fab/latest/examples.html>`_
-* `API Reference <https://gramaziokohler.github.io/compas_fab/latest/reference.html>`_
+* `COMPAS FAB Examples <https://gramaziokohler.github.io/compas_fab/latest/examples.html>`_
+* `COMPAS FAB API Reference <https://gramaziokohler.github.io/compas_fab/latest/reference.html>`_
 * `COMPAS Examples <https://compas-dev.github.io/main/examples.html>`_
 * `COMPAS API Reference <https://compas-dev.github.io/main/api.html>`_
 
