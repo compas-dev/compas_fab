@@ -28,7 +28,7 @@ matrix:
       env: TRAVIS_PYTHON_VERSION=3.7
 
 install:
-  - python -m pip install --no-cache-dir -r requirements-dev.txt
+  - python -m pip install --user --no-cache-dir -r requirements-dev.txt
 
 script:
   - python -c "import compas_fab"
