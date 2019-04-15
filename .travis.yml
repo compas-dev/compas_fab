@@ -6,7 +6,9 @@ matrix:
     - name: "Python 2.7: Windows"
       os: windows
       language: shell
-      before_install: choco install python2
+      before_install:
+        - choco install python2
+        - choco install vcpython27
       env:
         - PATH=/c/Python27:/c/Python27/Scripts:$PATH
         - TRAVIS_PYTHON_VERSION=2.7
