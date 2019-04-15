@@ -44,12 +44,14 @@ intersphinx_mapping = {'python': ('https://docs.python.org/', None),
                        'roslibpy': ('http://roslibpy.readthedocs.org/en/latest/', None)}
 
 # autodoc options
-autodoc_default_flags = [
-    'undoc-members',
-    'private-members',
-    'special-members',
-    'show-inheritance',
-]
+autodoc_default_options = {
+    'member-order': 'bysource',
+    'special-members': '__init__',
+    'exclude-members': '__weakref__',
+    'undoc-members': True,
+    'private-members': True,
+    'show-inheritance': True,
+}
 
 autodoc_member_order = 'alphabetical'
 
