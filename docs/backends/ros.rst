@@ -4,55 +4,118 @@
 ROS
 ****************
 
-The Robot Operating System (`ROS <http://www.ros.org/>`_) is a flexible framework
-for writing robot software. It is a collection of tools, libraries, and conventions
-that aim to simplify the task of creating complex and robust robot behavior across
-a wide variety of robotic platforms.
+.. highlight:: bash
 
-Running a ROS system usually involves multiple nodes (i.e. computers, real or virtual),
-interconnected through a master controller. To massively simplify the use of these
-tools, we package entire ROS systems into sets of `Docker`_ containers. Each of
-these sets runs in a virtualized network within your computer.
+The `Robot Operating System <http://www.ros.org>`_ (ROS) is a flexible framework
+for writing robot software. It is a collection of tools, libraries, and
+conventions that aim to simplify the task of creating complex and robust
+robot behavior across a wide variety of robotic platforms.
 
-In order to run a ROS system that includes a graphical interface, first make sure
-to install and start an ``X11`` server:
+Running a ROS system usually involves multiple nodes (i.e. computers, real or
+virtual), interconnected through a master controller.
 
-* `XMing For Windows <https://sourceforge.net/projects/xming/>`_
-* `XQuartz For Mac <https://www.xquartz.org/>`_ (see here for `more details <https://medium.com/@mreichelt/how-to-show-x11-windows-within-docker-on-mac-50759f4b65cb>`_).
+There are at least 3 different ways to run ROS: using Linux, using WSL on
+Windows, and using Docker.
 
-Besides simplifying the deployment, using containers has the added benefit of ensuring
+
+ROS on Linux
+============
+
+The usual but most involved way to install ROS is on a Linux machine,
+either virtual or real. The machine should have an IP address reachable
+from your computer.
+
+Follow the `ROS installation instructions`_ for all the details, or
+alternatively, use the following commands as a brief outline of the steps
+required to install ROS on **Ubuntu 16.04**:
+
+::
+
+    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 421C365BD9FF1F717815A3895523BAEEB01FA116
+    sudo apt-get update
+    sudo apt-get install ros-kinetic-desktop-full ros-kinetic-rosbridge-server ros-kinetic-tf2-web-republisher python-rosinstall python-rosinstall-generator python-wstool
+
+    sudo rosdep init && rosdep update
+    echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+    source ~/.bashrc
+
+    mkdir -p ~/catkin_ws/src
+    cd ~/catkin_ws/
+    catkin_make
+
+    echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+    source ~/.bashrc
+
+Once ROS is installed, you can start a minimally functional ROS system,
+containing a ROS master and the `ROS Bridge`_ with the following command::
+
+    roslaunch rosbridge_server rosbridge_websocket.launch
+
+
+ROS on WSL
+==========
+
+For Windows 10 users, an alternative is to install the
+`Windows Subsystem for Linux`_ (WSL). WSL allows to run Linux within
+Windows without the need for an additional virtual machine.
+
+To install WSL, open PowerShell as administrator and run:
+
+::
+
+    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+
+Open the Microsoft Store and install ``Ubuntu 16.04`` Linux distribution.
+Once the installation is completed, run ``bash`` and follow the instructions
+above to install ROS on Linux.
+
+.. seealso::
+
+    For additional details, see `Microsoft WSL documentation`_.
+
+
+ROS on Docker
+=============
+
+To massively simplify the use of these tools, we package complete ROS systems
+into bundles of `Docker`_ containers. Each of these bundles runs in a
+virtualized network within your computer.
+
+Besides easing deployment, containers have the added benefit of ensuring
 repeatability.
 
-Once you made sure `Docker`_ is running, you can pull and run some ROS
-containers. The **COMPAS FAB** team publishes some images on `Docker Hub`_
-but there are many more to be found online. You can start a single ROS Master
-with the following commands on the command prompt::
+Once you made sure `Docker`_ is running, you can run ROS nodes as containers.
+Gramazio Kohler Research publishes ROS images on `Docker Hub`_ but there are
+many more to be found online.
 
-    docker pull gramaziokohler/ros-base
-    docker run -p 11311:11311 -t gramaziokohler/ros-base roscore
+You can start a minimally functional ROS system, containing a ROS master and
+the `ROS Bridge`_ with the following command::
 
-Entire ROS systems
-==================
+    docker run -p 9090:9090 -t gramaziokohler/ros-base roslaunch rosbridge_server rosbridge_websocket.launch
+
+Complete ROS systems
+--------------------
 
 It is usually not enough to run single ROS nodes. ROS systems are networks of
-multiple interconnected nodes. Docker provides a way to compose virtualized networks
-using the ``docker-compose`` command. These commands takes one simple configuration
-file as input, and take care of pulling, running and connecting all the nodes.
+multiple interconnected nodes. Docker provides a way to compose virtualized
+networks using the ``docker-compose`` command. These commands take one simple
+configuration file as input, and handle all tasks required to run and connect
+all the nodes.
 
-Download :download:`this basic ROS system <ros-basic/docker-compose.yml>` into any
-folder of your computer, open the command prompt, go to the folder where the file was
-downloaded, and run the following command::
+As an example, download :download:`this file <ros-basic/docker-compose.yml>`,
+open the command prompt, go to the folder where the file was downloaded,
+and run the following command::
 
     docker-compose up -d
 
-You now have a ROS system with two nodes running: ``roscore`` (**master**) and
-the `ROS Bridge`_ which adds a web socket channel to communicate to ROS.
+You now have a ROS system with two nodes running: a ROS master and
+the `ROS Bridge`_ which adds a web socket channel to communicate with ROS.
 
-.. note::
 
-    An alternative way to install ROS on Windows is to use
-    `WSL: Windows Subsystem for Linux <https://docs.microsoft.com/en-us/windows/wsl/install-win10>`_.
-
+.. _ROS installation instructions: http://wiki.ros.org/ROS/Installation
+.. _Windows Subsystem for Linux: https://docs.microsoft.com/en-us/windows/wsl/about
+.. _Microsoft WSL documentation: https://docs.microsoft.com/en-us/windows/wsl/install-win10
 .. _Docker: https://www.docker.com/
 .. _Docker Hub: https://hub.docker.com/r/gramaziokohler/
 .. _ROS Bridge: http://wiki.ros.org/rosbridge_suite

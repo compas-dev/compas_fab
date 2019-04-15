@@ -4,14 +4,16 @@
 V-REP
 ******************
 
+.. highlight:: bash
+
 `V-REP <http://www.coppeliarobotics.com/>`_ is a robotic simulation tool
 by Coppelia Robotics with an integrated development environment and various
 programmable interfaces.
 
 In order to use it as a backend for **COMPAS FAB**, it is possible to download
-and install it as a normal application (see details below), but it can also be executed as a service
-inside a container in only a few steps with the added benefit of ensuring
-repeatability.
+and install it as a normal application (see details below), but it can also be
+executed as a service inside a container in only a few steps with the added
+benefit of ensuring repeatability.
 
 Once you made sure `Docker`_ is running, you can download and install the V-REP
 container with the following commands on the command prompt::
