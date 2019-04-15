@@ -10,7 +10,7 @@ from os.path import abspath, basename, dirname, join, splitext
 from setuptools import find_packages, setup
 
 requirements = [
-    'compas==0.5.1',
+    'compas==0.5.2',
     'roslibpy>=0.4.1',
     'pyserial',
 ]
