@@ -28,6 +28,6 @@ class RobotArtist(BaseRobotArtist):
     def transform(self, native_mesh, transformation):
         native_mesh.matrix_world *= mathutils.Matrix(transformation.matrix)
 
-    def draw_mesh(self, compas_mesh):
+    def draw_mesh(self, compas_mesh, color=None):
         v, f = compas_mesh.to_vertices_and_faces()
-        return xdraw_mesh(v, f)
+        return xdraw_mesh(v, f, color=color)
