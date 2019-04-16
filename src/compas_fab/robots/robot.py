@@ -800,7 +800,7 @@ class Robot(object):
 
         Raises
         ------
-        RosError
+        compas_fab.backends.exceptions.BackendError
             If no configuration can be found.
 
         Returns
