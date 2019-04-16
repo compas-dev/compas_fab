@@ -12,9 +12,18 @@ Unreleased
 
 **Changed**
 
-* Renamed ``compute_cartesian_path`` to ``plan_cartesian_motion``
-* Renamed ``motion_plan_goal_frame`` and ``motion_plan_goal_configuration`` to ``plan_motion``
-* Removed methods from ``Robot`` that are now handled with ``PlanningScene``, e.g. ``add_collision_mesh`` and ``add_attached_collision_mesh``
+* ROS Client: renamed ``compute_cartesian_path`` to ``plan_cartesian_motion``
+* ROS Client: renamed ``motion_plan_goal_frame`` and
+  ``motion_plan_goal_configuration`` to ``plan_motion``
+* ROS Client: removed methods from ``Robot`` that are now handled with
+  ``PlanningScene``, e.g. ``add_collision_mesh`` and
+  ``add_attached_collision_mesh``
+* V-REP Client: renamed ``get_end_effector_pose`` to ``forward_kinematics``
+* V-REP Client: renamed ``find_robot_states`` to ``inverse_kinematics``
+* V-REP Client: renamed ``find_path_plan_to_config`` to
+  ``plan_motion_to_config``
+* V-REP Client: renamed ``find_path_plan`` to ``plan_motion``
+* V-REP Client: changed ``is_connected`` to become a property
 * Made ``robot_artist`` default ``None`` on ``Robot`` constructor
 
 **Added**
