@@ -3,6 +3,7 @@ import logging
 from compas.datastructures import Mesh
 from compas.geometry import Frame
 
+import compas_fab
 from compas_fab.robots import *
 from compas_fab.robots import rfl
 from compas_fab.backends import VrepClient
@@ -16,8 +17,8 @@ goal_pose       = Frame((5.510, 5.900, 1.810), (0, 0, -1), (0, 1, 0))
 algorithm       = 'rrtconnect'
 max_trials      = 1
 resolution      = 0.02
-building_member = Mesh.from_obj('timber_beam.obj')
-structure       = [Mesh.from_obj('timber_structure.obj')]
+building_member = Mesh.from_obj(compas_fab.get('planning_scene/timber_beam.obj'))
+structure       = [Mesh.from_obj(compas_fab.get('planning_scene/timber_structure.obj'))]
 metric          = [0.1] * 9
 fast_search     = True
 

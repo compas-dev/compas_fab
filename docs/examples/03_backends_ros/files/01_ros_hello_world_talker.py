@@ -11,7 +11,7 @@ talker = Topic(client, '/chatter', 'std_msgs/String')
 
 def start_talking():
     while client.is_connected:
-        talker.publish(Message({'data': 'Hello RobArch World!'}))
+        talker.publish(Message({'data': 'Hello World!'}))
         print('Sending message...')
         time.sleep(1)
 

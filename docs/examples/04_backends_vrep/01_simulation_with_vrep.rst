@@ -91,11 +91,7 @@ that there is at least one valid configuration to reach the goal pose.
 
     with VrepClient() as client:
         robot = rfl.Robot('B')
-        configs = client.inverse_kinematics(robot, goal_pose, [0.] * 6)
-
-        if not len(configs):
-            raise Exception('No valid configuration found')
-
+        configs = client.inverse_kinematics(robot, goal_pose)
         print('Found valid configuration: ', str(configs[-1]))
 
 Basic path planning example
@@ -104,6 +100,7 @@ Basic path planning example
 Calculating a path plan requires several parameters to be configured in order
 to start the process. In its minimal expression, a path planning request must
 define a start configuration and a goal pose and rely on defaults for the rest.
+
 Here is an example of such a request:
 
 .. code-block:: python
@@ -124,13 +121,24 @@ Here is an example of such a request:
         print('Found path of %d steps' % len(path))
 
 
-* :download:`Path planning example (.PY) <files/01_complete_path_planning_example.py>`
-
-Or Copy & Paste the following code into a Python file, making sure it
-resides in the same folder where the two mesh files are stored:
+Or Copy & Paste the following code into a Python file:
 
 .. literalinclude :: files/01_complete_path_planning_example.py
    :language: python
+
+.. raw:: html
+
+    <div class="card bg-light">
+    <div class="card-body">
+    <div class="card-title">Downloads</div>
+
+* :download:`Path planning example (.PY) <files/01_complete_path_planning_example.py>`
+
+.. raw:: html
+
+    </div>
+    </div>
+
 
 Grasshopper integration
 =======================

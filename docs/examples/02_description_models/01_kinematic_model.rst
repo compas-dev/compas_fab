@@ -13,7 +13,7 @@ tree describes the kinematic chain, i.e., the connection of robotic links with
 joints, and the inter-dependendencies of these links. This tree structure plus
 the underlying geometric information can be defined in Unified Robot
 Description Format (URDF), which describes any robot (see for example
-UR5urdf_). If the robot is mounted on external axes, these links and joints
+`UR5 URDF`_). If the robot is mounted on external axes, these links and joints
 can be added as well.
 
 .. figure:: files/01_robot_links_and_joints.jpg
@@ -25,7 +25,7 @@ can be added as well.
 
 .. Actually it would be good to have here a robot on a linear axis...
 
-.. _UR5urdf: https://github.com/ros-industrial/universal_robot/blob/kinetic-devel/ur_description/urdf/ur5.urdf.xacro
+.. _UR5 URDF: https://github.com/ros-industrial/universal_robot/blob/kinetic-devel/ur_description/urdf/ur5.urdf.xacro
 
 Links
 =====
@@ -83,42 +83,8 @@ snippet shows how to describe a UR5 robot:
     Coordinate frames in each joint of the robot.
 
 
-Visualizing robot models
-========================
-
-**COMPAS** includes the concept of `artists`: classes that assist with the
-visualization of datastructures and models, in a way that maintains the data
-separated from the specific CAD interfaces, while providing a way to leverage
-native performance of the CAD environment.
-
-In the main library there are artists for various datastructures (meshes,
-networks, etc), and **COMPAS FAB** adds a ``RobotArtist`` to them.
-Robot artists allow visualizing robot models easily and efficiently.
-
-The following example illustrates how to load an entire robot model from
-an open source repository and render it in Rhino:
-
-.. literalinclude :: files/01_robot_artist_rhino.py
-   :language: python
-
-.. raw:: html
-
-    <div class="card bg-light">
-    <div class="card-body">
-    <div class="card-title">Downloads</div>
-
-* :download:`Robot artist (Rhino) (.PY) <files/01_robot_artist_rhino.py>`
-* :download:`Robot artist (Blender) (.PY) <files/01_robot_artist_blender.py>`
-* :download:`Robot artist (Grasshopper) (.GHX) <files/01_robot_artist_grasshopper.ghx>`
-
-.. raw:: html
-
-    </div>
-    </div>
-
 Links
 =====
 
 * `ROS Wiki: URDF Tutorial <https://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file>`_
 * `Create your own URDF file <https://www.codemade.io/create-your-own-urdf-file/>`_
-

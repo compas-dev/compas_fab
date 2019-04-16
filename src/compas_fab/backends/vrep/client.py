@@ -59,7 +59,7 @@ class VrepClient(object):
         Connected: True
 
     Note:
-        For more examples, check out the :ref:`V-REP examples page <vrep_examples>`.
+        For more examples, check out the :ref:`V-REP examples page <examples_vrep>`.
     """
     SUPPORTED_ALGORITHMS = ('bitrrt', 'bkpiece1', 'est', 'kpiece1',
                             'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst',

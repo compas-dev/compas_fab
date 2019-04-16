@@ -2,7 +2,7 @@
 Forward and inverse kinematics
 *******************************************************************************
 
-.. figure:: file/02_forward_and_inverse_kinematics.jpg
+.. figure:: files/02_forward_and_inverse_kinematics.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -38,7 +38,8 @@ Inverse kinematics
 
 Inverse kinematics is the inverse function of forward kinematics. The
 inverse kinematics function calculates the joint states required for the
-end-effector to reach a certain target pose (joint space to cartesian space).
+end-effector to reach a certain target pose (**joint space** to
+**cartesian space**).
 
 The following code exemplifies how to calculate this:
 
