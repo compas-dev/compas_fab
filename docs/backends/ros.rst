@@ -103,7 +103,7 @@ networks using the ``docker-compose`` command. These commands take one simple
 configuration file as input, and handle all tasks required to run and connect
 all the nodes.
 
-As an example, download :download:`this file <ros-basic/docker-compose.yml>`,
+As an example, download :download:`this file <files/docker-compose.yml>`,
 open the command prompt, go to the folder where the file was downloaded,
 and run the following command::
 
@@ -123,5 +123,6 @@ the `ROS Bridge`_ which adds a web socket channel to communicate with ROS.
 Next Steps
 ==========
 
-* :ref:`Examples <examples>`
-* :ref:`API Reference <reference>`
+* :ref:`Examples: Description models <examples_description_models>`
+* :ref:`Examples: ROS Backend <examples_ros>`
+* :ref:`COMPAS FAB API Reference <reference>`

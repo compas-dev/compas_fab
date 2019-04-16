@@ -152,7 +152,7 @@ if trigger:
         client.pick_building_member(robot, building_member_mesh, start_pose)
         pickup_config = client.get_robot_config(robot)
 
-        path = client.find_path_plan(robot, goal_pose)
+        path = client.plan_motion(robot, goal_pose)
         if len(path) &gt; 0:
             path.insert(0, pickup_config)
             print('Found path of %d steps' % len(path))
@@ -562,7 +562,7 @@ if path:
     with VrepClient(debug=True) as simulator:
         frame_index = ((len(path) - 1) * frame) // 100
         LOG.debug('Rendering frame %d out of %d', frame_index + 1, len(path))
-        
+
         robot = rfl.Robot(selected_robot, client=simulator)
         visualizer = PathVisualizer(simulator, robot, building_member)
         a = visualizer.get_frame_meshes(path, frame_index, sc.sticky)

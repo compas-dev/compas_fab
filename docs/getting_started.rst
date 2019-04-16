@@ -81,11 +81,11 @@ We recommend installing the following VS Code extensions:
   *Add support for ``.editorconfig`` files to VS Code.*
 
 To install the above extensions, open the ``Extensions`` view  by clicking on
-the ``Extensions`` icon in the **Activity Bar** on the left side of VS Code
+the corresponding icon in the **Activity Bar** on the left side of VS Code
 and search the extension name in the search box. Once found, select it and
 click ``Install``.
 
-By default, VS Code will use ``PyLint`` to verify your code. To select a
+By default, VS Code will use ``Pylint`` to verify your code. To select a
 different linter: open the ``Command Palette`` (``Ctrl+Shift+P``) and
 select the ``Python: Select Linter`` command.
 

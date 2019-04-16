@@ -25,13 +25,13 @@ with VrepClient(debug=True) as client:
     robot = rfl.Robot('A', client=client)
     client.pick_building_member(robot, building_member, start_pose)
 
-    path = client.find_path_plan(robot,
-                                 goal_pose,
-                                 metric_values=metric,
-                                 collision_meshes=structure,
-                                 algorithm=algorithm,
-                                 trials=max_trials,
-                                 resolution=resolution,
-                                 shallow_state_search=fast_search)
+    path = client.plan_motion(robot,
+                              goal_pose,
+                              metric_values=metric,
+                              collision_meshes=structure,
+                              algorithm=algorithm,
+                              trials=max_trials,
+                              resolution=resolution,
+                              shallow_state_search=fast_search)
 
     print('Found path of %d steps' % len(path))

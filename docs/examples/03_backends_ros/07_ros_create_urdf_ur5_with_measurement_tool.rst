@@ -15,12 +15,12 @@ processing time while performing collision checks. Also, you might want to built
 the collision geometry slightly larger than the visual geometry to guarantee for
 safe zones.
 
-Before exporting, please position your end-effector such that the connection 
+Before exporting, please position your end-effector such that the connection
 point to the flange (tool0) is in (0,0,0). The geometry of your end-effector has
-to be defined in *meters*. Then export both visual and a collision meshes of 
+to be defined in *meters*. Then export both visual and a collision meshes of
 your end-effector in a ROS-friendly format, like .stl or .obj (see below).
 
-.. figure:: 07_urdf_tool_00.jpg
+.. figure:: files/07_urdf_tool_00.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -75,17 +75,17 @@ Copy your meshes into ``meshes/visual`` and ``meshes/collision``.
 3. Create xacros and generate urdf
 ==================================
 
-Rather than writing urdf files directly, it is more convinient to write xacro 
-files from which urdfs are generated. As its name implies, xacro is a macro 
-language. The language allows to use constants, to perform simple math 
+Rather than writing urdf files directly, it is more convinient to write xacro
+files from which urdfs are generated. As its name implies, xacro is a macro
+language. The language allows to use constants, to perform simple math
 operations and to parameterize macros simply by using ``${}``.
 
 .. note::
 
-  For more examples, have a look at the 
+  For more examples, have a look at the
   `Xacro tutorials on the ROS Wiki <http://wiki.ros.org/urdf/Tutorials/Using%20Xacro%20to%20Clean%20Up%20a%20URDF%20File>`_.
 
- 
+
 Go to the ``urdf`` folder and create a xacro file for your end-effector with the text editor of your choice (e.g. ``pico``)::
 
   cd ~/robotic_setups/src/ur5_with_measurement_tool/urdf
@@ -102,7 +102,7 @@ Paste the following into the file:
       <!-- Create a fixed joint with a parameterized name. -->
       <joint name="${prefix}measurement_tool_joint" type="fixed">
         <!-- The parent link must be read from the robot model it is attached to. -->
-        <parent link="${connected_to}"/> 
+        <parent link="${connected_to}"/>
         <child link="${prefix}measurement_tool"/>
         <!-- The tool is directly attached to the flange. -->
         <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -111,7 +111,7 @@ Paste the following into the file:
         <visual>
           <geometry>
             <!-- The path to the visual meshes in the package. -->
-            <mesh filename="package://ur5_with_measurement_tool/meshes/visual/measurement_tool.stl"/> 
+            <mesh filename="package://ur5_with_measurement_tool/meshes/visual/measurement_tool.stl"/>
           </geometry>
         </visual>
         <collision>
@@ -140,11 +140,11 @@ The end-effector consists of one fixed joint (that will be attacted to the tool0
 of the robot), one link with geometry (the tool geometry), one fixed joint (the
 tcp joint, defining the TCP frame) and the tcp link without geometry.
 
-We define a parameterized macro with 2 parameters (``${prefix}``, ``${connected_to}``) because 
-maybe once we want to attach the tool to a different robot with a different 
+We define a parameterized macro with 2 parameters (``${prefix}``, ``${connected_to}``) because
+maybe once we want to attach the tool to a different robot with a different
 flange name or, if we once want to use the end-effector twice in the same urdf
-we would need to use both with different prefixes to distinguish them. 
-Whatever is defined like ``${}`` will later be replaced when generating the 
+we would need to use both with different prefixes to distinguish them.
+Whatever is defined like ``${}`` will later be replaced when generating the
 urdf.
 
 Now we create a new xacro file, which combines the ur5 with the end-effector::
@@ -170,7 +170,7 @@ Paste the following:
     <!-- Here we include the end-effector by setting the parameters -->
     <!-- TODO: check end-effector link name of robot -->
     <xacro:measurement_tool prefix="" connected_to="tool0"/>
-    
+
     <!-- define the ur5's position and orientation in the world coordinate system -->
     <link name="world" />
     <joint name="world_joint" type="fixed">
@@ -181,10 +181,10 @@ Paste the following:
   </robot>
 
 To define the link name we want to attach the tool to, we search in the robot's
-xacro file the last link which does not have a geometry anymore. For 
-example, for a 6-axis robot the last joint is *joint6*, joint6 has the child 
+xacro file the last link which does not have a geometry anymore. For
+example, for a 6-axis robot the last joint is *joint6*, joint6 has the child
 link *link6* which contains the geometry. Usually, *link6* is parent to another
-joint, which child link (without geometry) is the link we attach the tool to 
+joint, which child link (without geometry) is the link we attach the tool to
 (usually named with tool0).
 
 *tool0*
@@ -196,12 +196,12 @@ flange.
 
 *base_link*
 
-The base_link shall be positioned in the logical base position (oriented by 
+The base_link shall be positioned in the logical base position (oriented by
 convention, z-axis up, x-axis forward). This frame name is by ROS convention.
 Typically this frame is the first frame of the robot tied to the first link.
 
 To define the base_link name we search in the robot's xacro file the link which
-is never child to a joint (first link). 
+is never child to a joint (first link).
 
 Now create the urdf.::
 
@@ -246,7 +246,7 @@ Now modify ``display.launch`` in the ``launch`` directory::
 
   pico ~/robotic_setups/src/ur5_with_measurement_tool/launch/display.launch
 
-Change the 2 ``arg`` tags with ``name="model"`` and ``name="rvizconfig"`` such 
+Change the 2 ``arg`` tags with ``name="model"`` and ``name="rvizconfig"`` such
 that they match the following:
 
 .. code-block:: xml
@@ -276,7 +276,7 @@ And then run::
 
   roslaunch ur5_with_measurement_tool display.launch
 
-.. figure:: 07_urdf_tool_01.jpg
+.. figure:: files/07_urdf_tool_01.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -288,7 +288,7 @@ Add path to search paths
 ========================
 
 For convenience, add the path to your ``.bashrc`` in order to make it available on every start of ROS::
-    
+
     echo 'source ~/robotic_setups/devel/setup.bash' >> ~/.bashrc
 
 

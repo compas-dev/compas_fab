@@ -6,13 +6,13 @@ Creating a MoveIt! package from the custom created URDF
 
 This example is mainly copied from `MoveIt! Setup Assistant Tutorial <http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html>`_
 
-It is based on the previous example: 
+It is based on the previous example:
 :ref:`Creating a URDF with an UR5 robot and a custom end-effector <ros_examples_create_urdf_ur5_with_measurement_tool>
 
 1. Start the MoveIt! Setup Assistant
 ====================================
 
-The MoveIt! Setup Assistant is a graphical user interface for configuring any 
+The MoveIt! Setup Assistant is a graphical user interface for configuring any
 robot for use with MoveIt!. Its primary functions are to generate a Semantic Robot
 Description Format (SRDF) file, to create the collision matrix of your robot
 and to define the planning groups.
@@ -20,14 +20,14 @@ and to define the planning groups.
 * To start the MoveIt! Setup Assistant, launch the following from your Linux command prompt::
 
     roslaunch moveit_setup_assistant setup_assistant.launch
-    
+
 * Press *Create New MoveIt Configuration Package*
-* Click on the browse button and navigate to the ``ur5_with_measurement_tool.urdf`` 
-  file you created in the last example. Choose that file and then click 
-  *Load Files.* The Setup Assistant will load the files (this might take a few 
+* Click on the browse button and navigate to the ``ur5_with_measurement_tool.urdf``
+  file you created in the last example. Choose that file and then click
+  *Load Files.* The Setup Assistant will load the files (this might take a few
   seconds) and present you with this screen:
 
-.. figure:: 08_ros_create_moveit_package_00.jpg
+.. figure:: files/08_ros_create_moveit_package_00.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -42,7 +42,7 @@ Note:
     The sampling density specifies how many random robot positions to check for self
     collision. The default value of 10'000 collision checks should be fine.
 
-.. figure:: 08_ros_create_moveit_package_01.jpg
+.. figure:: files/08_ros_create_moveit_package_01.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -50,8 +50,8 @@ Note:
 3. Add Virtual Joints
 =====================
 
-Virtual joints are used primarily to attach the robot to the world coordinate 
-frame. We will define only one virtual joint, attaching the 
+Virtual joints are used primarily to attach the robot to the world coordinate
+frame. We will define only one virtual joint, attaching the
 ``ur5_with_measurement_tool`` to the world coordinate frame.
 
 * Click on the *Virtual Joints* pane selector. Click on *Add Virtual Joint*
@@ -60,7 +60,7 @@ frame. We will define only one virtual joint, attaching the
 * Set the Joint Type as "fixed".
 * Click *Save*.
 
-.. figure:: 08_ros_create_moveit_package_02.jpg
+.. figure:: files/08_ros_create_moveit_package_02.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -68,14 +68,14 @@ frame. We will define only one virtual joint, attaching the
 4. Add Planning Groups
 ======================
 
-Planning groups are used for semantically describing different parts of your 
+Planning groups are used for semantically describing different parts of your
 robot, such as defining what an arm is, or an end-effector. The planning group
 is later used for path- and motion planning.
 
 * Click on the *Planning Groups* pane selector.
 * Click on *Add Group* and you should see the following screen:
 
-.. figure:: 08_ros_create_moveit_package_03.jpg
+.. figure:: files/08_ros_create_moveit_package_03.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -87,16 +87,16 @@ Add the arm
 * Let *Kin. Search Resolution*, *Kin. Search Timeout (sec)*, *Kin. Solver Attempts* and
   *Group Default Planner* stay at their default values.
 
-.. figure:: 08_ros_create_moveit_package_04.jpg
+.. figure:: files/08_ros_create_moveit_package_04.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
 * Click on the *Add Kin. Chain* button. Press *Expand All*
 
-.. figure:: 08_ros_create_moveit_package_05.jpg
+.. figure:: files/08_ros_create_moveit_package_05.jpg
     :figclass: figure
     :class: figure-img img-fluid
-    
+
 * Select the "base_link" as *Base Link* and the "tcp" as *Tip Link*
 * Press the *Save* button.
 
@@ -104,7 +104,7 @@ Add the arm
 Add the gripper
 ---------------
 
-We will also add a group for the end-effector. 
+We will also add a group for the end-effector.
 
 .. note::
 
@@ -118,7 +118,7 @@ We will also add a group for the end-effector.
 * Choose measurment_tool and tcp (The links you defined in the measurement_tool.xacro) and add them to the list of *Selected Links* on     the right hand side.
 * Click *Save*
 
-.. figure:: 08_ros_create_moveit_package_06.jpg
+.. figure:: files/08_ros_create_moveit_package_06.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -126,29 +126,29 @@ We will also add a group for the end-effector.
 5. Add Robot Poses
 ==================
 
-The *Setup Assistant* allows you to add certain fixed poses into the 
+The *Setup Assistant* allows you to add certain fixed poses into the
 configuration. This helps if, for example, you want to define a certain position
 of the robot as a *Home* position.
 
 * Click on the *Robot Poses* pane.
-* Click *Add Pose*. Choose a name for the pose. The robot will be in its 
-  *Default* position where the joint values are set to the mid-range of the 
+* Click *Add Pose*. Choose a name for the pose. The robot will be in its
+  *Default* position where the joint values are set to the mid-range of the
   allowed joint value range. Move the individual joints around until you are happy
   and then *Save* the pose.
 
 Tip:
-    Try to move all the joints around. If there is something wrong 
+    Try to move all the joints around. If there is something wrong
     with the joint limits in your URDF, you should be able to see it immediately here.
 
-.. figure:: 08_ros_create_moveit_package_07.jpg
+.. figure:: files/08_ros_create_moveit_package_07.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
 6. Label End-Effectors
 ======================
 
-We have already added the measurement_tool of the ur5. Now, we will designate 
-this group as a special group: end effectors. 
+We have already added the measurement_tool of the ur5. Now, we will designate
+this group as a special group: end effectors.
 
 * Click on the *End Effectors* pane.
 * Click *Add End Effector*.
@@ -158,10 +158,10 @@ this group as a special group: end effectors.
 * Leave *Parent Group* empty.
 * Press *Save*.
 
-.. figure:: 08_ros_create_moveit_package_08.jpg
+.. figure:: files/08_ros_create_moveit_package_08.jpg
     :figclass: figure
     :class: figure-img img-fluid
-    
+
 7. Add Passive Joints
 =====================
 
@@ -178,16 +178,16 @@ Skip this step.
 
 You are almost there. One last step!
 
-* Click on the Configuration Files pane. 
-* Click *Browse*, select the ``robotic_setups/src`` location. Click 
+* Click on the Configuration Files pane.
+* Click *Browse*, select the ``robotic_setups/src`` location. Click
   *Create New Folder*, call it "ur5_with_measurement_tool_moveit_config", and
-  click *Choose*. 
+  click *Choose*.
 * Click on the *Generate Package* button. The Setup Assistant will now generate
   and write a set of launch and config files into the directory of your choosing.
   All the generated files will appear in the Generated Files/Folders tab and you
   can click on each of them for a description of what they contain.
 
-.. figure:: 08_ros_create_moveit_package_09.jpg
+.. figure:: files/08_ros_create_moveit_package_09.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -203,7 +203,7 @@ Now, optionally, you can already start the MoveIt! Demo and play::
     roslaunch ur5_with_measurement_tool_moveit_config  demo.launch rviz_tutorial:=true
 
 
-.. figure:: 08_ros_create_moveit_package_10.jpg
+.. figure:: files/08_ros_create_moveit_package_10.jpg
     :figclass: figure
     :class: figure-img img-fluid
 

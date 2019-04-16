@@ -57,7 +57,7 @@ The frame provides methods to specify the orientation in various conventions.
     print(F.axis_angle_vector) # UR
 
 
-From the orientation (:class:`compas.geometry.Rotation`)
+From the orientation (:class:`Rotation`)
 of the frame, several other representations of rotation can be derived, such as
 Euler angles, axis-angle representation, and quaternion.
 
@@ -89,10 +89,6 @@ Euler angles, axis-angle representation, and quaternion.
     ax = F1.axis_angle_vector
     F2 = Frame.from_axis_angle_vector(ax)
     print('Are equal?', F1 == F2)
-
-
-
-
 
 
 Further information

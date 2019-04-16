@@ -1,13 +1,14 @@
-********************************************************************************
+*******************************************************************************
 Coordinate frames
-********************************************************************************
+*******************************************************************************
 
 .. currentmodule:: compas_fab.robots
 
-Developers and users of robot drivers, models, and libraries need a shared convention
-for coordinate frames in order to better integrate and re-use software components. To
-plan robotic fabrication processes, the definition of robotic targets has to follow
-the convention of a specific relationship between coordinate frames, for example:
+Developers and users of robot drivers, models, and libraries need a shared
+convention for coordinate frames in order to better integrate and re-use
+software components. To plan robotic fabrication processes, the definition of
+robotic targets has to follow the convention of a specific relationship between
+coordinate frames, for example:
 
 * World coordinate frame (WCF)
 * Robot coordinate frame (RCF)
@@ -15,36 +16,37 @@ the convention of a specific relationship between coordinate frames, for example
 * Tool coordinate frame (TCF)
 * Object coordinate frame (OCF)
 
-.. figure:: 02_coord_frames.jpg
+.. figure:: files/02_coordinate_frames.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
     Coordinate frame convention of a robotic setup.
 
-To describe these coordinate frames, the :class:`Frame` class of the **COMPAS**
-framework is used.
+To describe these coordinate frames, the :class:`compas.geometry.Frame` class
+of the **COMPAS** framework is used.
 
 World coordinate frame (WCF)
 ============================
 
 The world coordinate frame (WCF) has its origin on a fixed position with
-its Z-axis pointing upwards (= map in ROS convention).
-The WCF is important for processes that use several robots which share one space,
-robots with external axes, and mobile robots. By default, the WCF coincides
-with the robot coordinate system (RCF).
+its Z-axis pointing upwards (= ``map`` in ROS convention).
+The WCF is important for processes that use several robots which share one
+space, robots with external axes, and mobile robots. By default, the WCF
+coincides with the robot coordinate system (RCF).
 
 Robot coordinate frame (RCF)
 ============================
 
-The robot coordinate frame (RCF) (= base_link in ROS convention) has its origin
-in the base of the robot and is the reference system for the mechanical buildup
-of the robot. It must be defined in reference to the fixed coordinate frame WCF.
+The robot coordinate frame (RCF) (= ``base_link`` in ROS convention) has
+its origin in the base of the robot and is the reference system for the
+mechanical buildup of the robot. It must be defined in reference to the
+fixed coordinate frame WCF.
 
 Tool0 coordinate frame (T0CF)
 =============================
 
-The tool0 coordinate frame (T0CF) has its origin at the tip of last link of the robot.
-It is dependent on the RCF.
+The tool0 coordinate frame (T0CF) has its origin at the tip of last link
+of the robot. It is dependent on the RCF.
 
 Tool coordinate frame (TCF)
 ===========================
@@ -61,11 +63,11 @@ coordinate frame (WCF).
 
 
 Example
-==================
+=======
 
-Here is a simple example of how to express the frame of an object that is defined
-in the world coordinate frame in the robot's own coordinate frame before sending
-it as a target pose to the robot.
+Here is a simple example of how to express the frame of an object that is
+defined in the world coordinate frame in the robot's own coordinate frame
+before sending it as a target pose to the robot.
 
 .. code-block:: python
 
@@ -80,22 +82,22 @@ it as a target pose to the robot.
 
 
     robot_model = RobotModel('ur5',
-                joints=[
-                    Joint('shoulder_pan_joint', 'revolute', parent='base_link', child='shoulder_link'),
-                    Joint('shoulder_lift_joint', 'revolute', parent='shoulder_link', child='upper_arm_link'),
-                    Joint('elbow_joint', 'revolute', parent='upper_arm_link', child='forearm_link'),
-                    Joint('wrist_1_joint', 'revolute', parent='forearm_link', child='wrist_1_link'),
-                    Joint('wrist_2_joint', 'revolute', parent='wrist_1_link', child='wrist_2_link'),
-                    Joint('wrist_3_joint', 'revolute', parent='wrist_2_link', child='wrist_3_link'),
-                ], links=[
-                    Link('base_link'),
-                    Link('shoulder_link'),
-                    Link('upper_arm_link'),
-                    Link('forearm_link'),
-                    Link('wrist_1_link'),
-                    Link('wrist_2_link'),
-                    Link('wrist_3_link'),
-                ])
+                      joints=[
+                          Joint('shoulder_pan_joint', 'revolute', parent='base_link', child='shoulder_link'),
+                          Joint('shoulder_lift_joint', 'revolute', parent='shoulder_link', child='upper_arm_link'),
+                          Joint('elbow_joint', 'revolute', parent='upper_arm_link', child='forearm_link'),
+                          Joint('wrist_1_joint', 'revolute', parent='forearm_link', child='wrist_1_link'),
+                          Joint('wrist_2_joint', 'revolute', parent='wrist_1_link', child='wrist_2_link'),
+                          Joint('wrist_3_joint', 'revolute', parent='wrist_2_link', child='wrist_3_link'),
+                      ], links=[
+                          Link('base_link'),
+                          Link('shoulder_link'),
+                          Link('upper_arm_link'),
+                          Link('forearm_link'),
+                          Link('wrist_1_link'),
+                          Link('wrist_2_link'),
+                          Link('wrist_3_link'),
+                      ])
 
     print("robot model: ", robot_model)
 

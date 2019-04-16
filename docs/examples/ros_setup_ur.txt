@@ -12,7 +12,7 @@ cd ~/catkin_ws/
 catkin_make
 
 cd ~/catkin_ws/src
-git clone 
+git clone
 catkin_make
 
 roslaunch ur_modern_driver ur5_bringup.launch robot_ip:=192.168.10.10

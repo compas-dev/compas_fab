@@ -1,6 +1,6 @@
-********************************************************************************
+*******************************************************************************
 Planning scene and collision objects
-********************************************************************************
+*******************************************************************************
 
 .. note::
 
@@ -14,7 +14,7 @@ itself, the backend's planning scene has to be updated.
 
 This is the representation of the planning scene in RViz with the UR5.
 
-.. figure:: 04_collision_objects_attached_without.jpg
+.. figure:: files/03_collision_objects_attached_without.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -33,23 +33,20 @@ The following script adds a floor to the planning scene.
     from compas_fab.robots import CollisionMesh
     from compas_fab.backends import RosClient
 
-    client = RosClient()
-    client.run()
-    robot = Robot(client)
+    with RosClient() as client:
+        robot = Robot(client)
 
-    scene = PlanningScene(robot)
-    mesh = Mesh.from_stl(compas_fab.get('planning_scene/floor.stl'))
-    cm = CollisionMesh(mesh, 'floor')
-    scene.add_collision_mesh(cm)
+        scene = PlanningScene(robot)
+        mesh = Mesh.from_stl(compas_fab.get('planning_scene/floor.stl'))
+        cm = CollisionMesh(mesh, 'floor')
+        scene.add_collision_mesh(cm)
 
-    time.sleep(1.) #sleep a bit before terminating the client
-    client.close()
-    client.terminate()
+        time.sleep(1.) #sleep a bit before terminating the client
 
 
 The backend's updated planning scene after executing the above script.
 
-.. figure:: 04_collision_objects.jpg
+.. figure:: files/03_collision_objects.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -90,7 +87,7 @@ all identifiers if we later want to remove them.
 The backend's updated planning scene after executing the above script. Note the
 red robot link indicating the collision.
 
-.. figure:: 04_collision_objects_append.jpg
+.. figure:: files/03_collision_objects_append.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -120,6 +117,7 @@ Collision objects can be attached to any of the robot's links.
         # create collison object
         mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
         cm = CollisionMesh(mesh, 'tip')
+
         # attach it to the end-effector
         group = robot.main_group_name
         scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)
@@ -128,7 +126,7 @@ Collision objects can be attached to any of the robot's links.
 
 The backend's updated planning scene after executing the above script.
 
-.. figure:: 04_collision_objects_attached.jpg
+.. figure:: files/03_collision_objects_attached.jpg
     :figclass: figure
     :class: figure-img img-fluid
 

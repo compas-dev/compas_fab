@@ -1,8 +1,8 @@
 .. _ros_examples:
 
-********************************************************************************
+*******************************************************************************
 Using ROS
-********************************************************************************
+*******************************************************************************
 
 The following examples demonstrate the `ROS <http://www.ros.org/>`_
 backend.
@@ -59,7 +59,7 @@ Writing the talker node
 The following example starts a ROS node and begins to publish
 messages in loop (to terminate, press ``ctrl+c``):
 
-.. literalinclude :: files/ros-hello-world-talker.py
+.. literalinclude :: files/01_ros_hello_world_talker.py
    :language: python
 
 .. raw:: html
@@ -68,7 +68,7 @@ messages in loop (to terminate, press ``ctrl+c``):
     <div class="card-body">
     <div class="card-title">Downloads</div>
 
-* :download:`Talker node (.PY) <files/ros-hello-world-talker.py>`
+* :download:`Talker node (.PY) <files/01_ros_hello_world_talker.py>`
 
 .. raw:: html
 
@@ -80,7 +80,7 @@ Writing the listener node
 
 Now let's move on to the listener side:
 
-.. literalinclude :: files/ros-hello-world-listener.py
+.. literalinclude :: files/01_ros_hello_world_listener.py
    :language: python
 
 .. raw:: html
@@ -89,7 +89,7 @@ Now let's move on to the listener side:
     <div class="card-body">
     <div class="card-title">Downloads</div>
 
-* :download:`Listener node (.PY) <files/ros-hello-world-listener.py>`
+* :download:`Listener node (.PY) <files/01_ros_hello_world_listener.py>`
 
 .. raw:: html
 
@@ -103,20 +103,18 @@ Open a command prompt and start the talker:
 
 ::
 
-    python ros-hello-world-talker.py
+    python 01_ros_hello_world_listener.py
 
 
 Now open a second command prompt and start the listener:
 
 ::
 
-    python ros-hello-world-listener.py
+    python 01_ros_hello_world_listener.py
 
+You should see the listener printing everytime it hears the other node talking.
 
 .. note::
 
     It is not relevant where the files are located. They can be in different
     folders or even in different computers as long as the ROS master is the same.
-
-
-.. TODO: Add FK/IK/PathPlan examples
