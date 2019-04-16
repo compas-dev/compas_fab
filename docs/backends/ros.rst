@@ -103,7 +103,7 @@ networks using the ``docker-compose`` command. These commands take one simple
 configuration file as input, and handle all tasks required to run and connect
 all the nodes.
 
-As an example, download :download:`this file <files/docker-compose.yml>`,
+As an example, download :download:`this file <files/base/docker-compose.yml>`,
 open the command prompt, go to the folder where the file was downloaded,
 and run the following command::
 
