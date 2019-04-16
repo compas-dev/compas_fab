@@ -54,7 +54,7 @@ class VrepClient(object):
 
         >>> from compas_fab.backends import VrepClient
         >>> with VrepClient() as client:
-        ...     print ('Connected: %s' % client.is_connected())
+        ...     print ('Connected: %s' % client.is_connected
         ...
         Connected: True
 
@@ -112,6 +112,7 @@ class VrepClient(object):
         if self.debug:
             LOG.debug('Disconnected from V-REP')
 
+    @property
     def is_connected(self):
         """Indicates whether the client has an active connection.
 
@@ -202,7 +203,7 @@ class VrepClient(object):
 
         # First check if the start state is reachable
         joints = len(robot.get_configurable_joints())
-        config = self.find_robot_states(robot, frame, [0.] * joints)[-1]
+        config = self.inverse_kinematics(robot, frame, [0.] * joints)[-1]
 
         if not config:
             raise ValueError('Cannot find a valid config for the given pose')
@@ -261,8 +262,8 @@ class VrepClient(object):
                                                       [], [])
         return config_from_vrep(config, self.scale)
 
-    def get_end_effector_pose(self, robot):
-        """Gets the current end-effector pose.
+    def forward_kinematics(self, robot):
+        """Calculates forward kinematics to get the current end-effector pose.
 
         Args:
             robot (:class:`Robot`): Robot instance.
@@ -271,7 +272,7 @@ class VrepClient(object):
 
             >>> from compas_fab.robots import *
             >>> with VrepClient() as client:
-            ...     frame = client.get_end_effector_pose(Robot.basic('A', index=0))
+            ...     frame = client.forward_kinematics(Robot.basic('A', index=0))
 
         Returns:
             An instance of :class:`Frame`.
@@ -283,8 +284,8 @@ class VrepClient(object):
                                                       [], [])
         return vrep_pose_to_frame(pose, self.scale)
 
-    def find_robot_states(self, robot, goal_frame, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
-        """Finds valid robot configurations for the specified goal frame.
+    def inverse_kinematics(self, robot, goal_frame, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
+        """Calculates inverse kinematics to find valid robot configurations for the specified goal frame.
 
         Args:
             robot (:class:`Robot`): Robot instance.
@@ -446,9 +447,9 @@ class VrepClient(object):
         return [config_from_vrep(path[i:i + joints], self.scale)
                 for i in range(0, len(path), joints)]
 
-    def find_path_plan_to_config(self, robot, goal_configs, metric_values=None, collision_meshes=None,
-                                 algorithm='rrtconnect', trials=1, resolution=0.02,
-                                 gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
+    def plan_motion_to_config(self, robot, goal_configs, metric_values=None, collision_meshes=None,
+                              algorithm='rrtconnect', trials=1, resolution=0.02,
+                              gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
         """Find a path plan to move the selected robot from its current position to one of the `goal_configs`.
 
         This function is useful when it is required to get a path plan that ends in one
@@ -487,9 +488,9 @@ class VrepClient(object):
                                     metric_values, collision_meshes, algorithm, trials, resolution,
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
 
-    def find_path_plan(self, robot, goal_frame, metric_values=None, collision_meshes=None,
-                       algorithm='rrtconnect', trials=1, resolution=0.02,
-                       gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
+    def plan_motion(self, robot, goal_frame, metric_values=None, collision_meshes=None,
+                    algorithm='rrtconnect', trials=1, resolution=0.02,
+                    gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
         """Find a path plan to move the selected robot from its current position to the `goal_frame`.
 
         Args:
