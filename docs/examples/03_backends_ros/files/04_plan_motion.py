@@ -11,7 +11,7 @@ with RosClient() as client:
     tolerance_position = 0.001
     tolerance_axes = [math.radians(1)] * 3
 
-    start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
+    start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.])
     group = robot.main_group_name
 
     # create goal constraints from frame

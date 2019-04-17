@@ -10,7 +10,7 @@ with RosClient() as client:
     frames = []
     frames.append(Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]))
     frames.append(Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1]))
-    start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
+    start_configuration = Configuration.from_revolute_values([-0.042, 0.033, -2.174, 5.282, -1.528, 0.000])
 
     response = robot.plan_cartesian_motion(frames,
                                            start_configuration,
