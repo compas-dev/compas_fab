@@ -23,7 +23,6 @@ Joint states are described in **COMPAS FAB** with the
     from compas_fab.robots.ur5 import Robot
 
     with RosClient() as client:
-
         robot = Robot(client)
         configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.])
 
@@ -50,7 +49,6 @@ The following code exemplifies how to calculate this:
     from compas_fab.robots.ur5 import Robot
 
     with RosClient() as client:
-
         robot = Robot(client)
 
         frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])

@@ -13,11 +13,11 @@ Plan cartesian motion
 .. code-block:: python
 
     from compas.geometry import Frame
+    from compas_fab.robots import Configuration
     from compas_fab.backends import RosClient
     from compas_fab.robots.ur5 import Robot
 
     with RosClient() as client:
-
         robot = Robot(client)
 
         frames = []
@@ -50,7 +50,6 @@ goal with constraints rather than defined frames.
     from compas_fab.robots.ur5 import Robot
 
     with RosClient() as client:
-
         robot = Robot(client)
 
         frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
