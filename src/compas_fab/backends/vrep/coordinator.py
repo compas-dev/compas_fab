@@ -39,7 +39,7 @@ class SimulationCoordinator(object):
             'trials': 1,
             'shallow_state_search': True,
             'optimize_path_length': False,
-            'algorithm': 'rrtconnect',
+            'planner_id': 'rrtconnect',
             'resolution': 0.02,
             'collision_meshes': [],
             'robots': [
@@ -145,7 +145,7 @@ class SimulationCoordinator(object):
 
                 kwargs = {}
                 kwargs['metric_values'] = active_robot_options.get('metric_values')
-                kwargs['algorithm'] = options.get('algorithm')
+                kwargs['planner_id'] = options.get('planner_id')
                 kwargs['resolution'] = options.get('resolution')
 
                 if 'joint_limits' in active_robot_options:

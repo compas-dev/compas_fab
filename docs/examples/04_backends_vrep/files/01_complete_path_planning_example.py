@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.DEBUG)
 # Configure parameters for path planning
 start_pose      = Frame((7.453, 2.905, 0.679), (1, 0, 0), (0, -1, 0))
 goal_pose       = Frame((5.510, 5.900, 1.810), (0, 0, -1), (0, 1, 0))
-algorithm       = 'rrtconnect'
+planner_id      = 'rrtconnect'
 max_trials      = 1
 resolution      = 0.02
 building_member = Mesh.from_obj(compas_fab.get('planning_scene/timber_beam.obj'))
@@ -30,7 +30,7 @@ with VrepClient(debug=True) as client:
                               goal_pose,
                               metric_values=metric,
                               collision_meshes=structure,
-                              algorithm=algorithm,
+                              planner_id=planner_id,
                               trials=max_trials,
                               resolution=resolution,
                               shallow_state_search=fast_search)

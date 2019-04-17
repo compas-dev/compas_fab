@@ -61,7 +61,7 @@ class VrepClient(object):
     Note:
         For more examples, check out the :ref:`V-REP examples page <examples_vrep>`.
     """
-    SUPPORTED_ALGORITHMS = ('bitrrt', 'bkpiece1', 'est', 'kpiece1',
+    SUPPORTED_PLANNERS = ('bitrrt', 'bkpiece1', 'est', 'kpiece1',
                             'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst',
                             'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar',
                             'sbl', 'stride', 'trrt')
@@ -381,15 +381,15 @@ class VrepClient(object):
         return self.add_building_member(robot, building_member_mesh)
 
     def _find_path_plan(self, robot, goal, metric_values, collision_meshes,
-                        algorithm, trials, resolution,
+                        planner_id, trials, resolution,
                         gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length):
 
         joints = len(robot.get_configurable_joints())
         if not metric_values:
             metric_values = [0.1] * joints
 
-        if algorithm not in self.SUPPORTED_ALGORITHMS:
-            raise ValueError('Unsupported algorithm. Must be one of: ' + str(self.SUPPORTED_ALGORITHMS))
+        if planner_id not in self.SUPPORTED_PLANNERS:
+            raise ValueError('Unsupported planner_id. Must be one of: ' + str(self.SUPPORTED_PLANNERS))
 
         first_start = timer() if self.debug else None
         if collision_meshes:
@@ -418,7 +418,7 @@ class VrepClient(object):
                 LOG.debug('Execution time: search_robot_states=%.2f', timer() - start)
 
         start = timer() if self.debug else None
-        string_param_list = [algorithm]
+        string_param_list = [planner_id]
         if gantry_joint_limits or arm_joint_limits:
             joint_limits = []
             joint_limits.extend(floats_to_vrep(gantry_joint_limits or [], self.scale))
@@ -426,8 +426,8 @@ class VrepClient(object):
             string_param_list.append(','.join(map(str, joint_limits)))
 
         if self.debug:
-            LOG.debug('About to execute path planner: algorithm=%s, trials=%d, shallow_state_search=%s, optimize_path_length=%s',
-                      algorithm, trials, shallow_state_search, optimize_path_length)
+            LOG.debug('About to execute path planner: planner_id=%s, trials=%d, shallow_state_search=%s, optimize_path_length=%s',
+                      planner_id, trials, shallow_state_search, optimize_path_length)
 
         res, _, path, _, _ = self.run_child_script('searchRobotPath',
                                                    [robot.model.attr['index'],
@@ -448,7 +448,7 @@ class VrepClient(object):
                 for i in range(0, len(path), joints)]
 
     def plan_motion_to_config(self, robot, goal_configs, metric_values=None, collision_meshes=None,
-                              algorithm='rrtconnect', trials=1, resolution=0.02,
+                              planner_id='rrtconnect', trials=1, resolution=0.02,
                               gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
         """Find a path plan to move the selected robot from its current position to one of the `goal_configs`.
 
@@ -465,7 +465,7 @@ class VrepClient(object):
             collision_meshes (:obj:`list` of :class:`compas.datastructures.Mesh`): Collision meshes
                 to be taken into account when calculating the motion plan.
                 Defaults to ``None``.
-            algorithm (:obj:`str`): Name of the algorithm to use. Defaults to ``rrtconnect``.
+            planner_id (:obj:`str`): Name of the planner to use. Defaults to ``rrtconnect``.
             trials (:obj:`int`): Number of search trials to run. Defaults to ``1``.
             resolution (:obj:`float`): Validity checking resolution. This value
                 is specified as a fraction of the space's extent.
@@ -485,11 +485,11 @@ class VrepClient(object):
         """
         assert_robot(robot)
         return self._find_path_plan(robot, {'target_type': 'config', 'target': goal_configs},
-                                    metric_values, collision_meshes, algorithm, trials, resolution,
+                                    metric_values, collision_meshes, planner_id, trials, resolution,
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
 
     def plan_motion(self, robot, goal_frame, metric_values=None, collision_meshes=None,
-                    algorithm='rrtconnect', trials=1, resolution=0.02,
+                    planner_id='rrtconnect', trials=1, resolution=0.02,
                     gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
         """Find a path plan to move the selected robot from its current position to the `goal_frame`.
 
@@ -503,7 +503,7 @@ class VrepClient(object):
             collision_meshes (:obj:`list` of :class:`compas.datastructures.Mesh`): Collision meshes
                 to be taken into account when calculating the motion plan.
                 Defaults to ``None``.
-            algorithm (:obj:`str`): Name of the algorithm to use. Defaults to ``rrtconnect``.
+            planner_id (:obj:`str`): Name of the planner to use. Defaults to ``rrtconnect``.
             trials (:obj:`int`): Number of search trials to run. Defaults to ``1``.
             resolution (:obj:`float`): Validity checking resolution. This value
                 is specified as a fraction of the space's extent.
@@ -523,7 +523,7 @@ class VrepClient(object):
         """
         assert_robot(robot)
         return self._find_path_plan(robot, {'target_type': 'pose', 'target': goal_frame},
-                                    metric_values, collision_meshes, algorithm, trials, resolution,
+                                    metric_values, collision_meshes, planner_id, trials, resolution,
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
 
     def add_building_member(self, robot, building_member_mesh):

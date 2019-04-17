@@ -158,7 +158,7 @@ if trigger:
         path = client.plan_motion(robot,
                                   goal_pose,
                                   collision_meshes=collision_meshes,
-                                  algorithm=algorithm,
+                                  planner_id=planner_id,
                                   resolution=resolution,
                                   metric_values=metric_values
                                   )
@@ -409,10 +409,10 @@ if trigger:
                         <chunk name="InputParam" index="6">
                           <items count="12">
                             <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
-                            <item name="Description" type_name="gh_string" type_code="10">Script input algorithm.</item>
+                            <item name="Description" type_name="gh_string" type_code="10">Script input planner_id.</item>
                             <item name="InstanceGuid" type_name="gh_guid" type_code="9">65e02af5-61bc-405a-9abe-79e736982396</item>
-                            <item name="Name" type_name="gh_string" type_code="10">algorithm</item>
-                            <item name="NickName" type_name="gh_string" type_code="10">algorithm</item>
+                            <item name="Name" type_name="gh_string" type_code="10">planner_id</item>
+                            <item name="NickName" type_name="gh_string" type_code="10">planner_id</item>
                             <item name="Optional" type_name="gh_bool" type_code="1">true</item>
                             <item name="ScriptParamAccess" type_name="gh_int32" type_code="3">0</item>
                             <item name="ShowTypeHints" type_name="gh_bool" type_code="1">true</item>
