@@ -90,8 +90,8 @@ class ServiceDescription(object):
     def __init__(self, name, service_type, request_class=None, response_class=None):
         self.name = name
         self.type = service_type
-        self.request_class = request_class or eval(service_type + 'Request')
-        self.response_class = response_class or eval(service_type + 'Response')
+        self.request_class = request_class
+        self.response_class = response_class
 
     def call(self, client, request, callback, errback):
         def inner_handler(response_msg):
@@ -152,14 +152,22 @@ class RosClient(Ros):
     ----
     For more examples, check out the :ref:`ROS examples page <ros_examples>`.
     """
-    GET_POSITION_IK = ServiceDescription('/compute_ik', 'GetPositionIK')
-    GET_POSITION_FK = ServiceDescription('/compute_fk', 'GetPositionFK')
-    GET_CARTESIAN_PATH = ServiceDescription(
-        '/compute_cartesian_path', 'GetCartesianPath')
-    GET_MOTION_PLAN = ServiceDescription(
-        '/plan_kinematic_path', 'GetMotionPlan', MotionPlanRequest, MotionPlanResponse)
-
-    def __init__(self, host='localhost', port=9090, is_secure=False):
+    GET_POSITION_IK = ServiceDescription('/compute_ik',
+                                         'GetPositionIK',
+                                         GetPositionIKRequest,
+                                         GetPositionIKResponse)
+    GET_POSITION_FK = ServiceDescription('/compute_fk',
+                                         'GetPositionFK',
+                                         GetPositionFKRequest,
+                                         GetPositionFKResponse)
+    GET_CARTESIAN_PATH = ServiceDescription('/compute_cartesian_path',
+                                            'GetCartesianPath',
+                                            GetCartesianPathRequest,
+                                            GetCartesianPathResponse)
+    GET_MOTION_PLAN = ServiceDescription('/plan_kinematic_path',
+                                         'GetMotionPlan',
+                                         MotionPlanRequest,
+                                         MotionPlanResponse)
         super(RosClient, self).__init__(host, port, is_secure)
 
     def __enter__(self):
