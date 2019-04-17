@@ -4,12 +4,12 @@
 Using ROS
 *******************************************************************************
 
-The following examples demonstrate the `ROS <http://www.ros.org/>`_
-backend.
+.. note::
 
-Before running them, make sure you have configured the
-:ref:`ROS backend <ros_backend>` correctly.
-
+    The following examples use the `ROS <http://www.ros.org/>`_ backend.
+    Before running them, please make sure you have the
+    :ref:`ROS backend <ros_backend>` correctly configured and
+    the :ref:`Base <ros_bundles_list>` system started.
 
 First step
 ==========

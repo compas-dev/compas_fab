@@ -112,8 +112,10 @@ and run the following command::
 You now have a ROS system with two nodes running: a ROS master and
 the `ROS Bridge`_ which adds a web socket channel to communicate with ROS.
 
-Creating new ROS systems using containers is usually only a matter of combining
+Creating new ROS bundles using containers is usually only a matter of combining
 them into a new ``docker-compose.yml`` file.
+
+.. _ros_bundles_list:
 
 **List of complete ROS systems**
 

@@ -4,10 +4,10 @@ Planning scene and collision objects
 
 .. note::
 
-    The following examples use `ROS <http://www.ros.org/>`_ as a backend client.
-
-    Before running them, please make sure you have the
-    :ref:`ROS backend <ros_backend>` correctly configured.
+    The following examples use the `ROS <http://www.ros.org/>`_ backend
+    and the MoveI! planner for UR5 robots. Before running them, please
+    make sure you have the :ref:`ROS backend <ros_backend>` correctly
+    configured and the :ref:`UR5 Planner <ros_bundles_list>` started.
 
 To plan motion paths that avoid collisions with other objects than the robot
 itself, the backend's planning scene has to be updated.
