@@ -52,9 +52,4 @@ from .tasks import *
 from .ros.client import *
 from .vrep.client import *
 
-from .exceptions import __all__ as a
-from .tasks import __all__ as b
-from .ros.client import __all__ as c
-from .vrep.client import __all__ as d
-
-__all__ = a + b + c + d
+__all__ = [name for name in dir() if not name.startswith('_')]

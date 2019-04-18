@@ -11,30 +11,17 @@ from roslibpy import Topic
 from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
-from compas_fab.backends.exceptions import BackendError
-from compas_fab.backends.tasks import CancellableTask
+from compas_fab.backends.ros.exceptions import RosError
 from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import CollisionObject
-from compas_fab.backends.ros.messages import Constraints
 from compas_fab.backends.ros.messages import FollowJointTrajectoryGoal
 from compas_fab.backends.ros.messages import FollowJointTrajectoryResult
-from compas_fab.backends.ros.messages import GetCartesianPathRequest
-from compas_fab.backends.ros.messages import GetCartesianPathResponse
 from compas_fab.backends.ros.messages import GetPlanningSceneRequest
 from compas_fab.backends.ros.messages import GetPlanningSceneResponse
-from compas_fab.backends.ros.messages import GetPositionFKRequest
-from compas_fab.backends.ros.messages import GetPositionFKResponse
-from compas_fab.backends.ros.messages import GetPositionIKRequest
-from compas_fab.backends.ros.messages import GetPositionIKResponse
 from compas_fab.backends.ros.messages import Header
-from compas_fab.backends.ros.messages import JointConstraint
-from compas_fab.backends.ros.messages import JointState
 from compas_fab.backends.ros.messages import JointTrajectory
 from compas_fab.backends.ros.messages import JointTrajectoryPoint
 from compas_fab.backends.ros.messages import Mesh
-from compas_fab.backends.ros.messages import MotionPlanRequest
-from compas_fab.backends.ros.messages import MotionPlanResponse
-from compas_fab.backends.ros.messages import MoveItErrorCodes
 from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import OrientationConstraint
 from compas_fab.backends.ros.messages import PlanningSceneComponents
@@ -46,28 +33,16 @@ from compas_fab.backends.ros.messages import Quaternion
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import SolidPrimitive
 from compas_fab.backends.ros.messages import Time
-from compas_fab.backends.ros.messages import TrajectoryConstraints
+from compas_fab.backends.ros.planner_backend_moveit import MoveItPlanner
+from compas_fab.backends.tasks import CancellableTask
 
 __all__ = [
     'RosClient',
-    'RosError',
 ]
 
-
-def validated_response(func, *args, **kwargs):
-    """Decorator to wrap a function that returns a ROS response
-    and raise an exception if the response indicates an error condition."""
-    @functools.wraps(func)
-    def validated_func(*args, **kwargs):
-        response = func(*args, **kwargs)
-
-        if response.error_code != MoveItErrorCodes.SUCCESS:
-            raise RosError(response.error_code.human_readable,
-                           int(response.error_code), response)
-
-        return response
-
-    return validated_func
+PLANNER_BACKENDS = {
+    'moveit': MoveItPlanner
+}
 
 
 class CancellableRosAction(CancellableTask):
@@ -82,43 +57,6 @@ class CancellableRosAction(CancellableTask):
         be cancelled and the method will return ``True``.
         """
         self.goal.cancel()
-
-
-class ServiceDescription(object):
-    """Internal class to simplify service call code."""
-
-    def __init__(self, name, service_type, request_class=None, response_class=None):
-        self.name = name
-        self.type = service_type
-        self.request_class = request_class
-        self.response_class = response_class
-
-    def call(self, client, request, callback, errback):
-        def inner_handler(response_msg):
-            callback(self.response_class.from_msg(response_msg))
-
-        if isinstance(request, tuple):
-            request_msg = self.request_class(*request)
-        else:
-            request_msg = self.request_class(**request)
-
-        srv = Service(client, self.name, self.type)
-        srv.call(ServiceRequest(request_msg.msg),
-                 callback=inner_handler, errback=errback)
-
-    def __call__(self, client, request, callback, errback):
-        return self.call(client, request, callback, errback)
-
-
-class RosError(BackendError):
-    """Wraps an exception that occurred on the communication with ROS."""
-
-    def __init__(self, message, error_code, ros_msg):
-        super(RosError, self).__init__('Error code: ' +
-                                       str(error_code) +
-                                       '; ' + message)
-        self.error_code = error_code
-        self.ros_msg = ros_msg
 
 
 class RosClient(Ros):
@@ -138,6 +76,9 @@ class RosClient(Ros):
         Port of the ROS Bridge. Defaults to ``9090``.
     is_secure : :obj:`bool`
         ``True`` to indicate it should use a secure web socket, otherwise ``False``.
+    planner_backend: str
+        Name of the planner backend plugin to use. The plugin must be a sub-class of
+        :class:`PlannerBackend`. Defaults to :class:`moveit`.
 
     Examples
     --------
@@ -152,23 +93,13 @@ class RosClient(Ros):
     ----
     For more examples, check out the :ref:`ROS examples page <ros_examples>`.
     """
-    GET_POSITION_IK = ServiceDescription('/compute_ik',
-                                         'GetPositionIK',
-                                         GetPositionIKRequest,
-                                         GetPositionIKResponse)
-    GET_POSITION_FK = ServiceDescription('/compute_fk',
-                                         'GetPositionFK',
-                                         GetPositionFKRequest,
-                                         GetPositionFKResponse)
-    GET_CARTESIAN_PATH = ServiceDescription('/compute_cartesian_path',
-                                            'GetCartesianPath',
-                                            GetCartesianPathRequest,
-                                            GetCartesianPathResponse)
-    GET_MOTION_PLAN = ServiceDescription('/plan_kinematic_path',
-                                         'GetMotionPlan',
-                                         MotionPlanRequest,
-                                         MotionPlanResponse)
+
+    def __init__(self, host='localhost', port=9090, is_secure=False, planner_backend='moveit'):
         super(RosClient, self).__init__(host, port, is_secure)
+
+        # Dynamically mixin the planner plugin into this class
+        planner_backend_type = PLANNER_BACKENDS[planner_backend]
+        self.__class__ = type('RosClient_' + planner_backend_type.__name__, (planner_backend_type, RosClient), {})
 
     def __enter__(self):
         self.run()
@@ -178,7 +109,6 @@ class RosClient(Ros):
     def __exit__(self, *args):
         self.close()
 
-    @validated_response
     def inverse_kinematics(self, frame, base_link, group,
                            joint_names, joint_positions, avoid_collisions=True,
                            constraints=None, attempts=8):
@@ -196,29 +126,6 @@ class RosClient(Ros):
 
         return await_callback(self.inverse_kinematics_async, **kwargs)
 
-    def inverse_kinematics_async(self, callback, errback, frame, base_link, group,
-                                 joint_names, joint_positions, avoid_collisions=True,
-                                 constraints=None, attempts=8):
-        """
-        """
-        header = Header(frame_id=base_link)
-        pose = Pose.from_frame(frame)
-        pose_stamped = PoseStamped(header, pose)
-        joint_state = JointState(
-            name=joint_names, position=joint_positions, header=header)
-        start_state = RobotState(
-            joint_state, MultiDOFJointState(header=header))
-
-        ik_request = PositionIKRequest(group_name=group,
-                                       robot_state=start_state,
-                                       constraints=constraints,
-                                       pose_stamped=pose_stamped,
-                                       avoid_collisions=avoid_collisions,
-                                       attempts=attempts)
-
-        self.GET_POSITION_IK(self, (ik_request, ), callback, errback)
-
-    @validated_response
     def forward_kinematics(self, joint_positions, base_link, group, joint_names, ee_link):
         kwargs = {}
         kwargs['joint_positions'] = joint_positions
@@ -231,21 +138,6 @@ class RosClient(Ros):
 
         return await_callback(self.forward_kinematics_async, **kwargs)
 
-    def forward_kinematics_async(self, callback, errback, joint_positions, base_link,
-                                 group, joint_names, ee_link):
-        """
-        """
-        header = Header(frame_id=base_link)
-        fk_link_names = [ee_link]
-        joint_state = JointState(
-            name=joint_names, position=joint_positions, header=header)
-        robot_state = RobotState(
-            joint_state, MultiDOFJointState(header=header))
-
-        self.GET_POSITION_FK(self, (header, fk_link_names,
-                                    robot_state), callback, errback)
-
-    @validated_response
     def plan_cartesian_motion(self, frames, base_link,
                               ee_link, group, joint_names, joint_positions,
                               max_step, avoid_collisions, path_constraints,
@@ -266,34 +158,6 @@ class RosClient(Ros):
 
         return await_callback(self.plan_cartesian_motion_async, **kwargs)
 
-    def plan_cartesian_motion_async(self, callback, errback, frames, base_link,
-                                    ee_link, group, joint_names, joint_positions,
-                                    max_step, avoid_collisions, path_constraints,
-                                    attached_collision_object):
-        """
-        """
-        header = Header(frame_id=base_link)
-        waypoints = [Pose.from_frame(frame) for frame in frames]
-        joint_state = JointState(
-            header=header, name=joint_names, position=joint_positions)
-        start_state = RobotState(
-            joint_state, MultiDOFJointState(header=header))
-        if attached_collision_object:
-            start_state.attached_collision_objects = [
-                attached_collision_object]
-
-        request = dict(header=header,
-                       start_state=start_state,
-                       group_name=group,
-                       link_name=ee_link,
-                       waypoints=waypoints,
-                       max_step=float(max_step),
-                       avoid_collisions=bool(avoid_collisions),
-                       path_constraints=path_constraints)
-
-        self.GET_CARTESIAN_PATH(self, request, callback, errback)
-
-    @validated_response
     def plan_motion(self, goal_constraints, base_link, ee_link, group,
                     joint_names, joint_positions, path_constraints=None,
                     trajectory_constraints=None, planner_id='',
@@ -324,75 +188,17 @@ class RosClient(Ros):
 
         return await_callback(self.plan_motion_async, **kwargs)
 
-    def plan_motion_async(self, callback, errback, goal_constraints, base_link,
-                          ee_link, group, joint_names, joint_positions,
-                          path_constraints=None, trajectory_constraints=None,
-                          planner_id='', num_planning_attempts=8,
-                          allowed_planning_time=2.,
-                          max_velocity_scaling_factor=1.,
-                          max_acceleration_scaling_factor=1.,
-                          attached_collision_object=None,
-                          workspace_parameters=None):
-        """
-        """
-        # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
-        # TODO: if list of frames (goals) => receive multiple solutions?
+    def inverse_kinematics_async(self, *args, **kwargs):
+        raise NotImplementedError('No planner backend assigned')
 
-        header = Header(frame_id=base_link)
-        joint_state = JointState(
-            header=header, name=joint_names, position=joint_positions)
-        start_state = RobotState(
-            joint_state, MultiDOFJointState(header=header))
-        if attached_collision_object:
-            start_state.attached_collision_objects = [
-                attached_collision_object]
+    def forward_kinematics_async(self, *args, **kwargs):
+        raise NotImplementedError('No planner backend assigned')
 
-        # goal constraints
-        constraints = Constraints()
-        for c in goal_constraints:
-            if c.type == c.JOINT:
-                constraints.joint_constraints.append(
-                    JointConstraint.from_joint_constraint(c))
-            elif c.type == c.POSITION:
-                constraints.position_constraints.append(
-                    PositionConstraint.from_position_constraint(header, c))
-            elif c.type == c.ORIENTATION:
-                constraints.orientation_constraints.append(
-                    OrientationConstraint.from_orientation_constraint(header, c))
-            else:
-                raise NotImplementedError
-        goal_constraints = [constraints]
+    def plan_motion_async(self, *args, **kwargs):
+        raise NotImplementedError('No planner backend assigned')
 
-        # path constraints
-        if path_constraints:
-            constraints = Constraints()
-            for c in path_constraints:
-                if c.type == c.JOINT:
-                    constraints.joint_constraints.append(
-                        JointConstraint.from_joint_constraint(c))
-                elif c.type == c.POSITION:
-                    constraints.position_constraints.append(
-                        PositionConstraint.from_position_constraint(header, c))
-                elif c.type == c.ORIENTATION:
-                    constraints.orientation_constraints.append(
-                        OrientationConstraint.from_orientation_constraint(header, c))
-                else:
-                    raise NotImplementedError
-            path_constraints = constraints
-
-        request = dict(start_state=start_state,
-                       goal_constraints=goal_constraints,
-                       path_constraints=path_constraints,
-                       trajectory_constraints=trajectory_constraints,
-                       planner_id=planner_id,
-                       group_name=group,
-                       num_planning_attempts=num_planning_attempts,
-                       allowed_planning_time=allowed_planning_time,
-                       max_velocity_scaling_factor=max_velocity_scaling_factor,
-                       max_acceleration_scaling_factor=max_velocity_scaling_factor)
-        # workspace_parameters=workspace_parameters
-
-        self.GET_MOTION_PLAN(self, request, callback, errback)
+    def plan_cartesian_motion_async(self, *args, **kwargs):
+        raise NotImplementedError('No planner backend assigned')
 
     # ==========================================================================
     # collision objects
@@ -513,9 +319,9 @@ class RosClient(Ros):
 
         if errback:
             goal.on('timeout', lambda: handle_failure(
-                RosError("Action Goal timeout", -1, None)))
+                RosError("Action Goal timeout", -1)))
             action_client.on('timeout', lambda: handle_failure(
-                RosError("Actionlib client timeout", -1, None)))
+                RosError("Actionlib client timeout", -1)))
 
         goal.send(timeout=timeout)
 
