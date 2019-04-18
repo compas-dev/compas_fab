@@ -10,8 +10,6 @@ from compas.geometry import Sphere
 from compas.robots import Joint
 from compas.robots import RobotModel
 
-from compas_fab.artists import BaseRobotArtist
-
 from compas_fab.robots.configuration import Configuration
 from compas_fab.robots.ros_fileserver_loader import RosFileServerLoader
 from compas_fab.robots.semantics import RobotSemantics
@@ -1036,10 +1034,6 @@ class Robot(object):
         >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances, group)
         >>> response = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
 
-        References
-        ----------
-        .. [1] Defining a Motion Plan Request.
-            Available at: http://docs.ros.org/kinetic/api/moveit_msgs/html/definePlanningRequest.html
         """
 
         # TODO: for the motion plan request a list of possible goal constraints
