@@ -3,17 +3,16 @@ from __future__ import print_function
 import math
 
 from roslibpy import Message
-from roslibpy import Ros
 from roslibpy import Topic
-from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 from roslibpy.event_emitter import EventEmitterMixin
 
 from compas_fab.backends.ros.messages.direct_ur import URGoal
-from compas_fab.backends.ros.messages.direct_ur import URMovej
 from compas_fab.backends.ros.messages.direct_ur import URMovel
 from compas_fab.backends.ros.messages.direct_ur import URPose
 from compas_fab.backends.ros.messages.direct_ur import URPoseTrajectoryPoint
+
+__all__ = ['DirectUrActionClient']
 
 
 class DirectUrActionClient(EventEmitterMixin):
@@ -21,7 +20,7 @@ class DirectUrActionClient(EventEmitterMixin):
     on arbitrary URScript commands.
     """
     def __init__(self, ros, timeout=None,
-                omit_feedback=False, omit_status=False, omit_result=False):
+                 omit_feedback=False, omit_status=False, omit_result=False):
         super(DirectUrActionClient, self).__init__()
 
         self.server_name = '/ur_driver/URScript'
@@ -93,7 +92,6 @@ class DirectUrActionClient(EventEmitterMixin):
         if not self.omit_status:
             self.status_listener.unsubscribe(self._on_status_message)
 
-
     def send_goal(self, goal, result_callback=None, timeout=None):
         """Send goal to the action server.
 
@@ -114,6 +112,7 @@ class DirectUrActionClient(EventEmitterMixin):
         if timeout:
             self.ros.call_later(
                 timeout / 1000., goal._trigger_timeout)
+
 
 def direct_ur_movel(ros_client, callback, frames, acceleration=None, velocity=None, time=None, radius=None):
 
