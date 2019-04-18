@@ -50,6 +50,7 @@ Exceptions
 from .exceptions import *
 from .tasks import *
 from .ros.client import *
+from .ros.exceptions import *
 from .vrep.client import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]
