@@ -5,7 +5,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from roslibpy import Topic
+
 from compas_fab.backends.ros.exceptions import RosError
+from compas_fab.backends.ros.messages import AttachedCollisionObject
+from compas_fab.backends.ros.messages import CollisionObject
 from compas_fab.backends.ros.messages import Constraints
 from compas_fab.backends.ros.messages import GetCartesianPathRequest
 from compas_fab.backends.ros.messages import GetCartesianPathResponse
@@ -60,6 +64,10 @@ class MoveItPlanner(PlannerBackend):
                                          MotionPlanRequest,
                                          MotionPlanResponse,
                                          validate_response)
+
+    # ==========================================================================
+    # planning services
+    # ==========================================================================
 
     def inverse_kinematics_async(self, callback, errback, frame, base_link, group,
                                  joint_names, joint_positions, avoid_collisions=True,
@@ -190,3 +198,49 @@ class MoveItPlanner(PlannerBackend):
         # workspace_parameters=workspace_parameters
 
         self.GET_MOTION_PLAN(self, request, callback, errback)
+
+    # ==========================================================================
+    # collision objects
+    # ==========================================================================
+
+    def add_collision_mesh(self, collision_mesh):
+        co = CollisionObject.from_collision_mesh(collision_mesh)
+        self.collision_object(co, CollisionObject.ADD)
+
+    def remove_collision_mesh(self, id):
+        co = CollisionObject()
+        co.id = id
+        self.collision_object(co, CollisionObject.REMOVE)
+
+    def append_collision_mesh(self, collision_mesh):
+        co = CollisionObject.from_collision_mesh(collision_mesh)
+        self.collision_object(co, CollisionObject.APPEND)
+
+    def collision_object(self, collision_object, operation=CollisionObject.ADD):
+        """
+        """
+        collision_object.operation = operation
+        topic = Topic(self, '/collision_object', 'moveit_msgs/CollisionObject')
+        topic.publish(collision_object.msg)
+
+    def add_attached_collision_mesh(self, attached_collision_mesh):
+        """
+        """
+        aco = AttachedCollisionObject.from_attached_collision_mesh(
+            attached_collision_mesh)
+        self.attached_collision_object(aco, operation=CollisionObject.ADD)
+
+    def remove_attached_collision_mesh(self, id):
+        """
+        """
+        aco = AttachedCollisionObject()
+        aco.object.id = id
+        return self.attached_collision_object(aco, operation=CollisionObject.REMOVE)
+
+    def attached_collision_object(self, attached_collision_object, operation=CollisionObject.ADD):
+        """
+        """
+        attached_collision_object.object.operation = operation
+        topic = Topic(self, '/attached_collision_object',
+                      'moveit_msgs/AttachedCollisionObject')
+        topic.publish(attached_collision_object.msg)

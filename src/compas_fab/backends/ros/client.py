@@ -1,19 +1,14 @@
 from __future__ import print_function
 
-import functools
-
 from compas.utilities import await_callback
 from roslibpy import Message
 from roslibpy import Ros
 from roslibpy import Service
 from roslibpy import ServiceRequest
-from roslibpy import Topic
 from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
 from compas_fab.backends.ros.exceptions import RosError
-from compas_fab.backends.ros.messages import AttachedCollisionObject
-from compas_fab.backends.ros.messages import CollisionObject
 from compas_fab.backends.ros.messages import FollowJointTrajectoryGoal
 from compas_fab.backends.ros.messages import FollowJointTrajectoryResult
 from compas_fab.backends.ros.messages import GetPlanningSceneRequest
@@ -21,17 +16,7 @@ from compas_fab.backends.ros.messages import GetPlanningSceneResponse
 from compas_fab.backends.ros.messages import Header
 from compas_fab.backends.ros.messages import JointTrajectory
 from compas_fab.backends.ros.messages import JointTrajectoryPoint
-from compas_fab.backends.ros.messages import Mesh
-from compas_fab.backends.ros.messages import MultiDOFJointState
-from compas_fab.backends.ros.messages import OrientationConstraint
 from compas_fab.backends.ros.messages import PlanningSceneComponents
-from compas_fab.backends.ros.messages import Pose
-from compas_fab.backends.ros.messages import PoseStamped
-from compas_fab.backends.ros.messages import PositionConstraint
-from compas_fab.backends.ros.messages import PositionIKRequest
-from compas_fab.backends.ros.messages import Quaternion
-from compas_fab.backends.ros.messages import RobotState
-from compas_fab.backends.ros.messages import SolidPrimitive
 from compas_fab.backends.ros.messages import Time
 from compas_fab.backends.ros.planner_backend_moveit import MoveItPlanner
 from compas_fab.backends.tasks import CancellableTask
@@ -205,46 +190,19 @@ class RosClient(Ros):
     # ==========================================================================
 
     def add_collision_mesh(self, collision_mesh):
-        co = CollisionObject.from_collision_mesh(collision_mesh)
-        self.collision_object(co, CollisionObject.ADD)
+        raise NotImplementedError('No planner backend assigned')
 
     def remove_collision_mesh(self, id):
-        co = CollisionObject()
-        co.id = id
-        self.collision_object(co, CollisionObject.REMOVE)
+        raise NotImplementedError('No planner backend assigned')
 
     def append_collision_mesh(self, collision_mesh):
-        co = CollisionObject.from_collision_mesh(collision_mesh)
-        self.collision_object(co, CollisionObject.APPEND)
-
-    def collision_object(self, collision_object, operation=CollisionObject.ADD):
-        """
-        """
-        collision_object.operation = operation
-        topic = Topic(self, '/collision_object', 'moveit_msgs/CollisionObject')
-        topic.publish(collision_object.msg)
+        raise NotImplementedError('No planner backend assigned')
 
     def add_attached_collision_mesh(self, attached_collision_mesh):
-        """
-        """
-        aco = AttachedCollisionObject.from_attached_collision_mesh(
-            attached_collision_mesh)
-        self.attached_collision_object(aco, operation=CollisionObject.ADD)
+        raise NotImplementedError('No planner backend assigned')
 
     def remove_attached_collision_mesh(self, id):
-        """
-        """
-        aco = AttachedCollisionObject()
-        aco.object.id = id
-        return self.attached_collision_object(aco, operation=CollisionObject.REMOVE)
-
-    def attached_collision_object(self, attached_collision_object, operation=CollisionObject.ADD):
-        """
-        """
-        attached_collision_object.object.operation = operation
-        topic = Topic(self, '/attached_collision_object',
-                      'moveit_msgs/AttachedCollisionObject')
-        topic.publish(attached_collision_object.msg)
+        raise NotImplementedError('No planner backend assigned')
 
     # ==========================================================================
     # executing
