@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas
 from compas.robots import Joint
 
 __all__ = [
@@ -16,7 +15,7 @@ class Configuration(object):
 
     Attributes
     ----------
-    values : list of float
+    values : :obj:`list` of :obj:`float`
         Joint values expressed in radians or meters, depending on the respective type.
     types : list of :class:`compas.robots.Joint.TYPE`
         Joint types, e.g. a list of `compas.robots.Joint.REVOLUTE` for revolute joints.

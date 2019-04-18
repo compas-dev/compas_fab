@@ -204,42 +204,39 @@ class MoveItPlanner(PlannerBackend):
     # ==========================================================================
 
     def add_collision_mesh(self, collision_mesh):
+        """Add a collision mesh to the planning scene."""
         co = CollisionObject.from_collision_mesh(collision_mesh)
-        self.collision_object(co, CollisionObject.ADD)
+        self._collision_object(co, CollisionObject.ADD)
 
     def remove_collision_mesh(self, id):
+        """Remove a collision mesh from the planning scene."""
         co = CollisionObject()
         co.id = id
-        self.collision_object(co, CollisionObject.REMOVE)
+        self._collision_object(co, CollisionObject.REMOVE)
 
     def append_collision_mesh(self, collision_mesh):
+        """Append a collision mesh to the planning scene."""
         co = CollisionObject.from_collision_mesh(collision_mesh)
-        self.collision_object(co, CollisionObject.APPEND)
+        self._collision_object(co, CollisionObject.APPEND)
 
-    def collision_object(self, collision_object, operation=CollisionObject.ADD):
-        """
-        """
+    def _collision_object(self, collision_object, operation=CollisionObject.ADD):
         collision_object.operation = operation
         topic = Topic(self, '/collision_object', 'moveit_msgs/CollisionObject')
         topic.publish(collision_object.msg)
 
     def add_attached_collision_mesh(self, attached_collision_mesh):
-        """
-        """
+        """Add a collision mesh attached to the robot."""
         aco = AttachedCollisionObject.from_attached_collision_mesh(
             attached_collision_mesh)
-        self.attached_collision_object(aco, operation=CollisionObject.ADD)
+        self._attached_collision_object(aco, operation=CollisionObject.ADD)
 
     def remove_attached_collision_mesh(self, id):
-        """
-        """
+        """Add an attached collision mesh from the robot."""
         aco = AttachedCollisionObject()
         aco.object.id = id
-        return self.attached_collision_object(aco, operation=CollisionObject.REMOVE)
+        return self._attached_collision_object(aco, operation=CollisionObject.REMOVE)
 
-    def attached_collision_object(self, attached_collision_object, operation=CollisionObject.ADD):
-        """
-        """
+    def _attached_collision_object(self, attached_collision_object, operation=CollisionObject.ADD):
         attached_collision_object.object.operation = operation
         topic = Topic(self, '/attached_collision_object',
                       'moveit_msgs/AttachedCollisionObject')
