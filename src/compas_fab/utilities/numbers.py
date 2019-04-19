@@ -4,10 +4,12 @@ __all__ = [
     'map_range',
     'range_geometric_row',
     'arange',
+    'diffs',
     'allclose',
     'argsort',
     'argmin',
     'argmax',
+    'clamp',
 ]
 
 
@@ -48,6 +50,17 @@ def arange(start, stop, step):
     len = int(math.ceil((stop - start)/float(step)))
     return [start + i*step for i in range(len)]
 
+def diffs(l1, l2):
+    """Returns the element-wise differences between two lists.
+
+    Raises
+    ------
+    ValueError
+        If 2 lists of different length are passed.
+    """
+    if len(l1) != len(l2):
+        raise ValueError("Pass 2 lists of equal length.")
+    return [math.fabs(a - b) for a, b in zip(l1, l2)]
 
 def allclose(l1, l2, tol=1e-05):
     """Returns True if two lists are element-wise equal within a tolerance.
@@ -95,8 +108,22 @@ def argmax(numbers):
     """
     return argsort(numbers)[-1]
 
+def clamp(value, min_value, max_value):
+    """Clamps a value witin the bound [min_value, max_value]
+
+    Returns
+    -------
+    float
+    """
+    if min_value > max_value:
+        raise ValueError("min_value must be bigger than max_value")
+    return float(min(max(value, min_value), max_value))
+
 
 if __name__ == "__main__":
     print(map_range(2, 0, 10, 0, 100))
     print(arange(3, -4, -0.2))
     print(argsort([34,1,7,2,100]))
+    print(clamp(5, 1, 4))
+    print(clamp(0, 1, 4))
+    print(clamp(3, 1, 4))

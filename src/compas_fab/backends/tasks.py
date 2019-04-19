@@ -8,8 +8,13 @@ __all__ = [
 
 
 class CancellableTask(object):
-    """Preemtable task represents a long-running operation that can be cancelled."""
+    """Preemptable task represents a long-running operation that can be cancelled."""
 
     def cancel(self):
-        raise NotImplementedError('Concrete tasks need to provide an implementation')
+        """Attempt to cancel the task.
 
+        If the task is currently being executed and cannot be cancelled
+        then the method will return ``False``, otherwise the call will
+        be cancelled and the method will return ``True``.
+        """
+        raise NotImplementedError('Concrete tasks need to provide an implementation')

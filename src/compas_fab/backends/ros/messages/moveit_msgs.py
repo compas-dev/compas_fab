@@ -1,21 +1,21 @@
 from __future__ import absolute_import
 
-from .std_msgs import ROSmsg
-from .std_msgs import Header
+from compas_fab.backends.ros.messages.std_msgs import ROSmsg
+from compas_fab.backends.ros.messages.std_msgs import Header
+from compas_fab.backends.ros.messages.geometry_msgs import Point
+from compas_fab.backends.ros.messages.geometry_msgs import Pose
+from compas_fab.backends.ros.messages.geometry_msgs import PoseStamped
+from compas_fab.backends.ros.messages.geometry_msgs import Vector3
+from compas_fab.backends.ros.messages.geometry_msgs import Quaternion
+from compas_fab.backends.ros.messages.shape_msgs import SolidPrimitive
+from compas_fab.backends.ros.messages.shape_msgs import Mesh
+from compas_fab.backends.ros.messages.sensor_msgs import JointState
+from compas_fab.backends.ros.messages.sensor_msgs import MultiDOFJointState
+from compas_fab.backends.ros.messages.trajectory_msgs import JointTrajectory
+from compas_fab.backends.ros.messages.trajectory_msgs import MultiDOFJointTrajectory
+from compas_fab.backends.ros.messages.object_recognition_msgs import ObjectType
+from compas_fab.backends.ros.messages.octomap_msgs import OctomapWithPose
 
-from .geometry_msgs import PoseStamped
-from .geometry_msgs import Vector3
-from .geometry_msgs import Quaternion
-
-from .sensor_msgs import JointState
-from .sensor_msgs import MultiDOFJointState
-
-from .trajectory_msgs import JointTrajectory
-from .trajectory_msgs import MultiDOFJointTrajectory
-
-from .object_recognition_msgs import ObjectType
-
-from .octomap_msgs import OctomapWithPose
 
 class CollisionObject(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/CollisionObject.html
@@ -42,6 +42,17 @@ class CollisionObject(ROSmsg):
         self.plane_poses = plane_poses if plane_poses else []
         self.operation = operation  # ADD or REMOVE or APPEND or MOVE
 
+    @classmethod
+    def from_collision_mesh(cls, collision_mesh):
+        """Creates a collision object from a :class:`compas_fab.robots.CollisionMesh`
+        """
+        kwargs = {}
+        kwargs['header'] = Header(frame_id=collision_mesh.root_name)
+        kwargs['id'] = collision_mesh.id
+        kwargs['meshes'] = [Mesh.from_mesh(collision_mesh.mesh)]
+        kwargs['mesh_poses'] = [Pose.from_frame(collision_mesh.frame)]
+
+        return cls(**kwargs)
 
 class AttachedCollisionObject(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html
@@ -54,6 +65,19 @@ class AttachedCollisionObject(ROSmsg):
         self.touch_links = touch_links if touch_links else []
         self.detach_posture = detach_posture if detach_posture else JointTrajectory()
         self.weight = weight
+
+    @classmethod
+    def from_attached_collision_mesh(cls, attached_collision_mesh):
+        """Creates an attached collision object from a :class:`compas_fab.robots.AttachedCollisionMesh`
+        """
+
+        kwargs = {}
+        kwargs['link_name'] = attached_collision_mesh.link_name
+        kwargs['object'] = CollisionObject.from_collision_mesh(attached_collision_mesh.collision_mesh)
+        kwargs['touch_links'] = [str(s) for s in attached_collision_mesh.touch_links]
+        kwargs['weight'] = attached_collision_mesh.weight
+
+        return cls(**kwargs)
 
 
 class Constraints(ROSmsg):
@@ -232,10 +256,17 @@ class JointConstraint(ROSmsg):
     """
     def __init__(self, joint_name="", position=0, tolerance_above=0, tolerance_below=0, weight=1.):
         self.joint_name = joint_name
-        self.position = position
-        self.tolerance_above = tolerance_above
-        self.tolerance_below = tolerance_below
-        self.weight = weight
+        self.position = float(position)
+        self.tolerance_above = float(tolerance_above)
+        self.tolerance_below = float(tolerance_below)
+        self.weight = float(weight)
+
+    @classmethod
+    def from_joint_constraint(cls, joint_constraint):
+        """Creates a `JointConstraint` from a :class:`compas_fab.robots.JointConstraint`.
+        """
+        c = joint_constraint
+        return cls(c.joint_name, c.value, c.tolerance, c.tolerance, c.weight)
 
 class VisibilityConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/VisibilityConstraint.html
@@ -253,6 +284,59 @@ class BoundingVolume(ROSmsg):
         self.meshes = meshes if meshes else [] #shape_msgs/Mesh[]
         self.mesh_poses = mesh_poses if mesh_poses else [] #geometry_msgs/Pose[]
 
+    @classmethod
+    def from_box(cls, box):
+        """Creates a `BoundingVolume` from a :class:`compas.geometry.Box`.
+
+        Parameters
+        ----------
+        box: `compas.geometry.Box`
+        """
+        primitive = SolidPrimitive.from_box(box)
+        pose = Pose.from_frame(box.frame)
+        return cls(primitives=[primitive], primitive_poses=[pose])
+
+    @classmethod
+    def from_sphere(cls, sphere):
+        """Creates a `BoundingVolume` from a :class:`compas.geometry.Sphere`.
+
+        Parameters
+        ----------
+        sphere: `compas.geometry.Sphere`
+        """
+        primitive = SolidPrimitive.from_sphere(sphere)
+        pose = Pose(Point(*sphere.point), Quaternion(0, 0, 0, 1))
+        return cls(primitives=[primitive], primitive_poses=[pose])
+
+    @classmethod
+    def from_mesh(cls, mesh):
+        """Creates a `BoundingVolume` from a :class:`compas.datastructures.Mesh`.
+
+        Parameters
+        ----------
+        sphere: `compas.datastructures.Mesh`
+        """
+        mesh = Mesh.from_mesh(mesh)
+        pose = Pose()
+        return cls(meshes=[mesh], mesh_poses=[pose])
+
+    @classmethod
+    def from_bounding_volume(cls, bounding_volume):
+        """Creates a `BoundingVolume` from a :class:`compas_fab.robots.BoundingVolume`.
+
+        Parameters
+        ----------
+        bounding_volume: `compas_fab.robots.BoundingVolume`
+        """
+        if bounding_volume.type == bounding_volume.BOX:
+            return cls.from_box(bounding_volume.volume)
+        elif bounding_volume.type == bounding_volume.SPHERE:
+            return cls.from_sphere(bounding_volume.volume)
+        elif bounding_volume.type == bounding_volume.MESH:
+            return cls.from_mesh(bounding_volume.volume)
+        else:
+            raise NotImplementedError
+
 class PositionConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionConstraint.html
     """
@@ -262,7 +346,14 @@ class PositionConstraint(ROSmsg):
         self.link_name = link_name if link_name else ""
         self.target_point_offset = target_point_offset if target_point_offset else Vector3(0.,0.,0.) # geometry_msgs/Vector3
         self.constraint_region = constraint_region if constraint_region else BoundingVolume() # moveit_msgs/BoundingVolume
-        self.weight = weight if weight else 1.# float64
+        self.weight = float(weight) if weight else 1.
+
+    @classmethod
+    def from_position_constraint(cls, header, position_constraint):
+        """Creates a `PositionConstraint` from a :class:`compas_fab.robots.PositionConstraint`.
+        """
+        constraint_region = BoundingVolume.from_bounding_volume(position_constraint.bounding_volume)
+        return cls(header, position_constraint.link_name, None, constraint_region, position_constraint.weight)
 
 class OrientationConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/OrientationConstraint.html
@@ -270,13 +361,40 @@ class OrientationConstraint(ROSmsg):
     def __init__(self, header=None, orientation=None, link_name=None,
                  absolute_x_axis_tolerance=0.0, absolute_y_axis_tolerance=0.0,
                  absolute_z_axis_tolerance=0.0, weight=1):
+        """
+        Notes
+        -----
+        The naming of the absolute_x/y/z_axis_tolerances might be misleading:
+        If you specify the absolute_x/y/z_axis_tolerances with [0.01, 0.01, 6.3],
+        it means that the frame's x-axis and y-axis are allowed to rotate about
+        the z-axis by an angle of 6.3 radians, whereas the z-axis can only change
+        by 0.01.
+        """
         self.header = header if header else Header()
-        self.orientation = orientation if orientation else Quaternion()#geometry_msgs/Quaternion
+        self.orientation = orientation or Quaternion()#geometry_msgs/Quaternion
         self.link_name = link_name if link_name else ""
-        self.absolute_x_axis_tolerance = absolute_x_axis_tolerance
-        self.absolute_y_axis_tolerance = absolute_y_axis_tolerance
-        self.absolute_z_axis_tolerance = absolute_z_axis_tolerance
-        self.weight = weight # float64
+        self.absolute_x_axis_tolerance = float(absolute_x_axis_tolerance)
+        self.absolute_y_axis_tolerance = float(absolute_y_axis_tolerance)
+        self.absolute_z_axis_tolerance = float(absolute_z_axis_tolerance)
+        self.weight = float(weight)
+
+    @classmethod
+    def from_orientation_constraint(cls, header, orientation_constraint):
+        """Creates a ``OrientationConstraint`` from a :class:`compas_fab.robots.OrientationConstraint`.
+        """
+        qw, qx, qy, qz = orientation_constraint.quaternion
+        ax, ay, az = orientation_constraint.tolerances
+
+        kwargs = {}
+        kwargs['header'] = header
+        kwargs['orientation'] = Quaternion(qx, qy, qz, qw)
+        kwargs['link_name'] = orientation_constraint.link_name
+        kwargs['absolute_x_axis_tolerance'] = ax
+        kwargs['absolute_y_axis_tolerance'] = ay
+        kwargs['absolute_z_axis_tolerance'] = az
+        kwargs['weight'] = orientation_constraint.weight
+
+        return cls(**kwargs)
 
 
 class PlanningSceneComponents(ROSmsg):

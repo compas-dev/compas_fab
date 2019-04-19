@@ -37,7 +37,6 @@ class Quaternion(ROSmsg):
 class Pose(ROSmsg):
     """http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Pose.html
     """
-
     def __init__(self, position=None, orientation=None):
         self.position = position if position else Point(0,0,0)
         self.orientation = orientation if orientation else Quaternion(0,0,0,1)
@@ -63,7 +62,6 @@ class Pose(ROSmsg):
 class PoseStamped(ROSmsg):
     """http://docs.ros.org/melodic/api/geometry_msgs/html/msg/PoseStamped.html
     """
-
     def __init__(self, header=Header(), pose=Pose()):
         self.header = header
         self.pose = pose
@@ -88,8 +86,6 @@ class Transform(ROSmsg):
     def __init__(self, translation=Vector3(), rotation=Quaternion()):
         self.translation = translation
         self.rotation = rotation
-
-
 
 class Twist(ROSmsg):
     """http://docs.ros.org/api/geometry_msgs/html/msg/Twist.html

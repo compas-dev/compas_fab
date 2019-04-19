@@ -14,7 +14,6 @@ environments.
 
     compas_fab.artists
     compas_fab.backends
-    compas_fab.geometry
     compas_fab.robots
     compas_fab.utilities
 
@@ -37,8 +36,8 @@ def _find_resource(filename):
     return os.path.abspath(os.path.join(DATA, filename))
 
 
-def get_data(filename):
+def get(filename):
     return _find_resource(filename)
 
 
-__all__ = ['__author__', '__author_email__', '__copyright__', '__description__', '__license__', '__title__', '__url__', '__version__', 'get_data']
+__all__ = ['__author__', '__author_email__', '__copyright__', '__description__', '__license__', '__title__', '__url__', '__version__', 'get']

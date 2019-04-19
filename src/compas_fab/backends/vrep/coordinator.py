@@ -39,7 +39,7 @@ class SimulationCoordinator(object):
             'trials': 1,
             'shallow_state_search': True,
             'optimize_path_length': False,
-            'algorithm': 'rrtconnect',
+            'planner_id': 'rrtconnect',
             'resolution': 0.02,
             'collision_meshes': [],
             'robots': [
@@ -117,7 +117,7 @@ class SimulationCoordinator(object):
                     elif r['start'].get('values'):
                         start = Frame.from_data(r['start'])
                         try:
-                            reachable_state = client.find_robot_states(robot, start, metric_values=[0.] * robot.dof, max_trials=1, max_results=1)
+                            reachable_state = client.inverse_kinematics(robot, start, metric_values=[0.] * robot.dof, max_trials=1, max_results=1)
                             start = reachable_state[-1]
                             LOG.info('Robot state found for start pose. External axes=%s, Joint values=%s', str(start.external_axes), str(start.joint_values))
                         except VrepError:
@@ -145,7 +145,7 @@ class SimulationCoordinator(object):
 
                 kwargs = {}
                 kwargs['metric_values'] = active_robot_options.get('metric_values')
-                kwargs['algorithm'] = options.get('algorithm')
+                kwargs['planner_id'] = options.get('planner_id')
                 kwargs['resolution'] = options.get('resolution')
 
                 if 'joint_limits' in active_robot_options:
@@ -162,7 +162,7 @@ class SimulationCoordinator(object):
                 # Filter None values
                 kwargs = {k: v for k, v in kwargs.iteritems() if v is not None}
 
-                path = client.find_path_plan(robot, goal, **kwargs)
+                path = client.plan_motion(robot, goal, **kwargs)
                 LOG.info('Found path of %d steps', len(path))
             else:
                 robot = Robot(options['robots'][0]['robot'], client)

@@ -54,14 +54,14 @@ class VrepClient(object):
 
         >>> from compas_fab.backends import VrepClient
         >>> with VrepClient() as client:
-        ...     print ('Connected: %s' % client.is_connected())
+        ...     print ('Connected: %s' % client.is_connected
         ...
         Connected: True
 
     Note:
-        For more examples, check out the :ref:`V-REP examples page <vrep_examples>`.
+        For more examples, check out the :ref:`V-REP examples page <examples_vrep>`.
     """
-    SUPPORTED_ALGORITHMS = ('bitrrt', 'bkpiece1', 'est', 'kpiece1',
+    SUPPORTED_PLANNERS = ('bitrrt', 'bkpiece1', 'est', 'kpiece1',
                             'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst',
                             'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar',
                             'sbl', 'stride', 'trrt')
@@ -112,6 +112,7 @@ class VrepClient(object):
         if self.debug:
             LOG.debug('Disconnected from V-REP')
 
+    @property
     def is_connected(self):
         """Indicates whether the client has an active connection.
 
@@ -202,7 +203,7 @@ class VrepClient(object):
 
         # First check if the start state is reachable
         joints = len(robot.get_configurable_joints())
-        config = self.find_robot_states(robot, frame, [0.] * joints)[-1]
+        config = self.inverse_kinematics(robot, frame, [0.] * joints)[-1]
 
         if not config:
             raise ValueError('Cannot find a valid config for the given pose')
@@ -261,8 +262,8 @@ class VrepClient(object):
                                                       [], [])
         return config_from_vrep(config, self.scale)
 
-    def get_end_effector_pose(self, robot):
-        """Gets the current end-effector pose.
+    def forward_kinematics(self, robot):
+        """Calculates forward kinematics to get the current end-effector pose.
 
         Args:
             robot (:class:`Robot`): Robot instance.
@@ -271,7 +272,7 @@ class VrepClient(object):
 
             >>> from compas_fab.robots import *
             >>> with VrepClient() as client:
-            ...     frame = client.get_end_effector_pose(Robot.basic('A', index=0))
+            ...     frame = client.forward_kinematics(Robot.basic('A', index=0))
 
         Returns:
             An instance of :class:`Frame`.
@@ -283,8 +284,8 @@ class VrepClient(object):
                                                       [], [])
         return vrep_pose_to_frame(pose, self.scale)
 
-    def find_robot_states(self, robot, goal_frame, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
-        """Finds valid robot configurations for the specified goal frame.
+    def inverse_kinematics(self, robot, goal_frame, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
+        """Calculates inverse kinematics to find valid robot configurations for the specified goal frame.
 
         Args:
             robot (:class:`Robot`): Robot instance.
@@ -380,15 +381,15 @@ class VrepClient(object):
         return self.add_building_member(robot, building_member_mesh)
 
     def _find_path_plan(self, robot, goal, metric_values, collision_meshes,
-                        algorithm, trials, resolution,
+                        planner_id, trials, resolution,
                         gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length):
 
         joints = len(robot.get_configurable_joints())
         if not metric_values:
             metric_values = [0.1] * joints
 
-        if algorithm not in self.SUPPORTED_ALGORITHMS:
-            raise ValueError('Unsupported algorithm. Must be one of: ' + str(self.SUPPORTED_ALGORITHMS))
+        if planner_id not in self.SUPPORTED_PLANNERS:
+            raise ValueError('Unsupported planner_id. Must be one of: ' + str(self.SUPPORTED_PLANNERS))
 
         first_start = timer() if self.debug else None
         if collision_meshes:
@@ -417,7 +418,7 @@ class VrepClient(object):
                 LOG.debug('Execution time: search_robot_states=%.2f', timer() - start)
 
         start = timer() if self.debug else None
-        string_param_list = [algorithm]
+        string_param_list = [planner_id]
         if gantry_joint_limits or arm_joint_limits:
             joint_limits = []
             joint_limits.extend(floats_to_vrep(gantry_joint_limits or [], self.scale))
@@ -425,8 +426,8 @@ class VrepClient(object):
             string_param_list.append(','.join(map(str, joint_limits)))
 
         if self.debug:
-            LOG.debug('About to execute path planner: algorithm=%s, trials=%d, shallow_state_search=%s, optimize_path_length=%s',
-                      algorithm, trials, shallow_state_search, optimize_path_length)
+            LOG.debug('About to execute path planner: planner_id=%s, trials=%d, shallow_state_search=%s, optimize_path_length=%s',
+                      planner_id, trials, shallow_state_search, optimize_path_length)
 
         res, _, path, _, _ = self.run_child_script('searchRobotPath',
                                                    [robot.model.attr['index'],
@@ -446,9 +447,9 @@ class VrepClient(object):
         return [config_from_vrep(path[i:i + joints], self.scale)
                 for i in range(0, len(path), joints)]
 
-    def find_path_plan_to_config(self, robot, goal_configs, metric_values=None, collision_meshes=None,
-                                 algorithm='rrtconnect', trials=1, resolution=0.02,
-                                 gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
+    def plan_motion_to_config(self, robot, goal_configs, metric_values=None, collision_meshes=None,
+                              planner_id='rrtconnect', trials=1, resolution=0.02,
+                              gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
         """Find a path plan to move the selected robot from its current position to one of the `goal_configs`.
 
         This function is useful when it is required to get a path plan that ends in one
@@ -464,7 +465,7 @@ class VrepClient(object):
             collision_meshes (:obj:`list` of :class:`compas.datastructures.Mesh`): Collision meshes
                 to be taken into account when calculating the motion plan.
                 Defaults to ``None``.
-            algorithm (:obj:`str`): Name of the algorithm to use. Defaults to ``rrtconnect``.
+            planner_id (:obj:`str`): Name of the planner to use. Defaults to ``rrtconnect``.
             trials (:obj:`int`): Number of search trials to run. Defaults to ``1``.
             resolution (:obj:`float`): Validity checking resolution. This value
                 is specified as a fraction of the space's extent.
@@ -484,12 +485,12 @@ class VrepClient(object):
         """
         assert_robot(robot)
         return self._find_path_plan(robot, {'target_type': 'config', 'target': goal_configs},
-                                    metric_values, collision_meshes, algorithm, trials, resolution,
+                                    metric_values, collision_meshes, planner_id, trials, resolution,
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
 
-    def find_path_plan(self, robot, goal_frame, metric_values=None, collision_meshes=None,
-                       algorithm='rrtconnect', trials=1, resolution=0.02,
-                       gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
+    def plan_motion(self, robot, goal_frame, metric_values=None, collision_meshes=None,
+                    planner_id='rrtconnect', trials=1, resolution=0.02,
+                    gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False):
         """Find a path plan to move the selected robot from its current position to the `goal_frame`.
 
         Args:
@@ -502,7 +503,7 @@ class VrepClient(object):
             collision_meshes (:obj:`list` of :class:`compas.datastructures.Mesh`): Collision meshes
                 to be taken into account when calculating the motion plan.
                 Defaults to ``None``.
-            algorithm (:obj:`str`): Name of the algorithm to use. Defaults to ``rrtconnect``.
+            planner_id (:obj:`str`): Name of the planner to use. Defaults to ``rrtconnect``.
             trials (:obj:`int`): Number of search trials to run. Defaults to ``1``.
             resolution (:obj:`float`): Validity checking resolution. This value
                 is specified as a fraction of the space's extent.
@@ -522,7 +523,7 @@ class VrepClient(object):
         """
         assert_robot(robot)
         return self._find_path_plan(robot, {'target_type': 'pose', 'target': goal_frame},
-                                    metric_values, collision_meshes, algorithm, trials, resolution,
+                                    metric_values, collision_meshes, planner_id, trials, resolution,
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length)
 
     def add_building_member(self, robot, building_member_mesh):
@@ -661,7 +662,7 @@ def vrep_pose_to_frame(pose, scale):
 
 
 def frame_to_vrep_pose(frame, scale):
-    # compas_fab uses meters, just like V-REP,
+    # COMPAS FAB uses meters, just like V-REP,
     # so in general, scale should always be 1
     pose = matrix_from_frame(frame)
     pose[0][3] = pose[0][3] / scale
@@ -671,7 +672,7 @@ def frame_to_vrep_pose(frame, scale):
 
 
 def config_from_vrep(list_of_floats, scale):
-    # compas_fab uses radians and meters, just like V-REP,
+    # COMPAS FAB uses radians and meters, just like V-REP,
     # so in general, scale should always be 1
     radians = list_of_floats[3:]
     prismatic_values = map(lambda v: v * scale, list_of_floats[0:3])
@@ -679,7 +680,7 @@ def config_from_vrep(list_of_floats, scale):
 
 
 def config_to_vrep(config, scale):
-    # compas_fab uses radians and meters, just like V-REP,
+    # COMPAS FAB uses radians and meters, just like V-REP,
     # so in general, scale should always be 1
     values = list(map(lambda v: v / scale, config.prismatic_values))
     values.extend(config.revolute_values)

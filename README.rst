@@ -1,6 +1,8 @@
 ============================================================
-compas_fab: Robotic Fabrication for COMPAS
+COMPAS FAB: Robotic Fabrication for COMPAS
 ============================================================
+
+.. highlight:: bash
 
 .. start-badges
 
@@ -25,10 +27,13 @@ compas_fab: Robotic Fabrication for COMPAS
 
 .. end-badges
 
-**Robotic fabrication package for the COMPAS Framework** that facilitates the planning and execution of robotic fabrication processes.
-It provides interfaces to existing software libraries and tools available in the field of robotics (e.g. OMPL, ROS) and makes them
-accessible from within the parametric design environment. The package builds upon `COMPAS <https://compas-dev.github.io/>`_,
-an open-source Python-based framework for collaboration and research in architecture, engineering and digital fabrication.
+**Robotic fabrication package for the COMPAS Framework** that facilitates the
+planning and execution of robotic fabrication processes. It provides interfaces
+to existing software libraries and tools available in the field of robotics
+(e.g. OMPL, ROS) and makes them accessible from within the parametric design
+environment. The package builds upon `COMPAS <https://compas-dev.github.io/>`_,
+an open-source Python-based framework for collaboration and research in
+architecture, engineering and digital fabrication.
 
 
 Main features
@@ -38,18 +43,17 @@ Main features
 * Planning tools: kinematic solvers, path planning, etc.
 * Execution tools: feedback loops, robot control, etc.
 
-**compas_fab** runs on Python 2.x, 3.x and IronPython 2.7.
+**COMPAS FAB** runs on Python 2.x, 3.x and IronPython 2.7.
 
 
 Getting Started
 ---------------
 
-The recommended way to install **compas_fab** is to use `Anaconda/conda <https://conda.io/docs/>`_:
+The recommended way to install **COMPAS FAB** is to use `Anaconda/conda <https://conda.io/docs/>`_:
 
 ::
 
-    conda config --add channels conda-forge
-    conda install compas_fab
+    conda install -c conda-forge compas_fab
 
 But it can also be installed using ``pip``:
 
@@ -58,9 +62,16 @@ But it can also be installed using ``pip``:
     pip install compas_fab
 
 
-Once installed, you can verify your setup. Start Python from the command prompt and run the following:
+.. note::
 
-.. code-block:: python
+    On Windows, you may need to install
+    `Microsoft Visual C++ 14.0 <https://www.scivision.co/python-windows-visual-c++-14-required/>`_.
+
+
+Once the installation is completed, you can verify your setup.
+Start Python from the command prompt and run the following:
+
+::
 
     >>> import compas_fab
 
@@ -69,8 +80,8 @@ First Steps
 -----------
 
 * `Documentation <https://gramaziokohler.github.io/compas_fab/>`_
-* `Examples <https://gramaziokohler.github.io/compas_fab/latest/examples.html>`_
-* `API Reference <https://gramaziokohler.github.io/compas_fab/latest/reference.html>`_
+* `COMPAS FAB Examples <https://gramaziokohler.github.io/compas_fab/latest/examples.html>`_
+* `COMPAS FAB API Reference <https://gramaziokohler.github.io/compas_fab/latest/reference.html>`_
 * `COMPAS Examples <https://compas-dev.github.io/main/examples.html>`_
 * `COMPAS API Reference <https://compas-dev.github.io/main/api.html>`_
 
@@ -94,7 +105,7 @@ for more details.
 Releasing this project
 ----------------------
 
-Ready to release a new version of **compas_fab**? Here's how to do it:
+Ready to release a new version of **COMPAS FAB**? Here's how to do it:
 
 * We use `semver <https://semver.org/>`_, i.e. we bump versions as follows:
 

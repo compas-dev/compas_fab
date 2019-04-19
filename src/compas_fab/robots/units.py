@@ -9,6 +9,7 @@ __all__ = [
     'to_degrees',
 ]
 
+
 def to_radians(degrees):
     """Converts a list of floats representing degrees to a list of radians.
 

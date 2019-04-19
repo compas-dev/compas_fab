@@ -19,7 +19,7 @@ def get_payload(result):
         return data[0]
     else:
         if data[0] == 'E':
-            raise ProtocolError(ERROR_CODES[int(data[1])])
+            raise ProtocolError(ERROR_CODES[str(data[1])])
 
         return data
 
@@ -30,18 +30,18 @@ def calculate_checksum(command):
 
 
 ERROR_CODES = {
-    001: 'False checksum',
-    002: 'False command',
-    003: 'False frame',
-    004: 'False value or parameter',
-    005: 'Missed command 000 to begin RS-485 control',
-    006: 'Out of range',
-    007: 'Buffer overflow',
-    100: 'Distance out of Range (see FSP)',
-    101: 'Angle out of Range (see FSP)',
-    102: 'Flatness out of Range (see FSP)',
-    103: 'Length out of Range (see FSP)',
-    200: 'Fatal Error (Reset sensor, Power Off / On)'
+    '001': 'False checksum',
+    '002': 'False command',
+    '003': 'False frame',
+    '004': 'False value or parameter',
+    '005': 'Missed command 000 to begin RS-485 control',
+    '006': 'Out of range',
+    '007': 'Buffer overflow',
+    '100': 'Distance out of Range (see FSP)',
+    '101': 'Angle out of Range (see FSP)',
+    '102': 'Flatness out of Range (see FSP)',
+    '103': 'Length out of Range (see FSP)',
+    '200': 'Fatal Error (Reset sensor, Power Off / On)'
 }
 
 

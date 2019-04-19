@@ -7,6 +7,7 @@ from .std_msgs import Time
 from .geometry_msgs import Transform
 from .geometry_msgs import Twist
 
+
 class JointTrajectoryPoint(ROSmsg):
     """http://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectoryPoint.html
     """
@@ -23,7 +24,7 @@ class JointTrajectoryPoint(ROSmsg):
     def from_msg(cls, msg):
         time_from_start = Time.from_msg(msg['time_from_start'])
         return cls(msg['positions'], msg['velocities'], msg['accelerations'], msg['effort'], time_from_start)
-    
+
     @property
     def msg(self):
         msg = super(JointTrajectoryPoint, self).msg
@@ -32,7 +33,6 @@ class JointTrajectoryPoint(ROSmsg):
         if not len(self.effort):
             del msg['effort']
         return msg
-        
 
 
 class JointTrajectory(ROSmsg):
@@ -58,8 +58,8 @@ class MultiDOFJointTrajectoryPoint(ROSmsg):
 
     def __init__(self, transforms=None, velocities=None, accelerations=None, time_from_start=None):
         self.transforms = transforms if transforms else []  # geometry_msgs/Transform[]
-        self.velocities = velocities if velocities else [] # geometry_msgs/Twist[]
-        self.accelerations = accelerations if accelerations else [] # geometry_msgs/Twist[]
+        self.velocities = velocities if velocities else []  # geometry_msgs/Twist[]
+        self.accelerations = accelerations if accelerations else []  # geometry_msgs/Twist[]
         self.time_from_start = time_from_start if time_from_start else Time()
 
 

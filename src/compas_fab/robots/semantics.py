@@ -142,6 +142,7 @@ class RobotSemantics(object):
     def get_configurable_joint_names(self, group=None):
         return [joint.name for joint in self.get_configurable_joints(group)]
 
+
 if __name__ == "__main__":
 
     import os
