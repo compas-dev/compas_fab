@@ -24,7 +24,7 @@ __all__ = [
 
 class RosFileServerLoader(object):
     """Allows to retrieve the mesh files specified in the robot urdf from the
-    ROS file_server, stores it on the local file system and allows to load the 
+    ROS file_server, stores it on the local file system and allows to load the
     meshes afterwards.
 
     It is implemented similar to
@@ -49,7 +49,7 @@ class RosFileServerLoader(object):
                        "robot_description_semantic_received": False,
                        "resource_files_received": False,
                        "robot_name_received": False}
-        
+
         self.schema_prefix = 'package://'
 
     @classmethod
@@ -120,7 +120,7 @@ class RosFileServerLoader(object):
         # Update status
         self.check_status()
 
-    def load(self): # cannot use 'import' as method name...
+    def load(self):
         param = roslibpy.Param(self.ros, '/robot_description')
         param.get(self.receive_robot_description)
 
@@ -203,11 +203,11 @@ class RosFileServerLoader(object):
                 extension.upper())
 
         return meshcls(mesh)
-    
+
     def _get_local_path(self, url):
         _prefix, path = url.split(self.schema_prefix)
         return os.path.abspath(os.path.join(self.robot_resource_path, path))
-        
+
     def can_load_mesh(self, url):
         """Determine whether this loader can load a given mesh URL.
 
@@ -258,9 +258,9 @@ def _mesh_import(url, filename):
     if file_extension not in SUPPORTED_FORMATS:
         raise NotImplementedError(
             'Mesh type not supported: {}'.format(file_extension))
-    
+
     print(filename)
-    
+
     if file_extension == "dae": # no dae support yet
         #mesh = Mesh.from_dae(filename)
         obj_filename = filename.replace(".dae", ".obj")
@@ -287,7 +287,7 @@ def _mesh_import(url, filename):
     raise Exception
 
 if __name__ == "__main__":
-    
+
     """
     Start following processes on client side:
     roslaunch YOUR_ROBOT_moveit_config demo.launch rviz_tutorial:=true
