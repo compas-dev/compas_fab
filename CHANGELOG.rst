@@ -25,11 +25,13 @@ Unreleased
 * V-REP Client: renamed ``find_path_plan`` to ``plan_motion``
 * V-REP Client: changed ``is_connected`` to become a property
 * Made ``robot_artist`` default ``None`` on ``Robot`` constructor
+* Changed ``PathPlan`` class to use the new trajectory classes
 
 **Added**
 
 * Implemented Constraints (``OrientationConstraint``, ``PositionConstraint``, ``JointConstraint``) to use with ``plan_motion``
 * Implemented ``PlanningScene``, ``CollisionMesh`` and ``AttachedCollisionMesh``
+* Added generic representations for motion planning requests (``JointTrajectory``, ``JointTrajectoryPoint``, ``Duration``)
 * Added UR5 robot model data for example purposes
 * Added several doc examples
 
