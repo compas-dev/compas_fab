@@ -120,13 +120,15 @@ them into a new ``docker-compose.yml`` file.
 **List of complete ROS systems**
 
 .. list-table:: Table of ROS systems provided via ``docker compose``
+   :widths: 20 8 8 14 18 8 10 14
    :header-rows: 1
+   :stub-columns: 1
 
    * - Name
      - Core
      - Bridge
      - Planner
-     - Drivers
+     - Robot drivers
      - RViz
      - Web UI [#f1]_
      - Download
