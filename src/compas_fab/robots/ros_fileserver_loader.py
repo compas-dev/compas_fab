@@ -48,7 +48,7 @@ class RosFileServerLoader(object):
         self.status = {"robot_description_received": False,
                        "robot_description_semantic_received": False,
                        "resource_files_received": False,
-                       "robot_name_received": False}
+                       }
 
         self.schema_prefix = 'package://'
 
@@ -75,15 +75,9 @@ class RosFileServerLoader(object):
     def robot_resource_filename(self, resource_file_uri):
         return os.path.abspath(os.path.join(self.robot_resource_path, resource_file_uri[len('package://'):]))
 
-    def check_status(self):
-        if all(self.status.values()):
-            self.ros.close()
-            self.ros.terminate()
-
     def receive_robot_description(self, robot_description):
         robot_name, uris = self.read_robot_name_and_uris_from_urdf(robot_description)
         self.robot_name = robot_name
-        self.status.update({"robot_name_received": True})
         # Import resource files
         self.import_resource_files(uris)
         # Save robot_description.urdf
@@ -91,8 +85,6 @@ class RosFileServerLoader(object):
         # Save robot_description_semantic.urdf
         param = roslibpy.Param(self.ros, '/robot_description_semantic')
         param.get(self.save_robot_description_semantic)
-        # Update status
-        self.check_status()
 
     @property
     def urdf_filename(self):
@@ -108,8 +100,6 @@ class RosFileServerLoader(object):
         LOGGER.info("Saving URDF file to %s" % filename)
         self.write_file(filename, robot_description)
         self.status.update({"robot_description_received": True})
-        # Update status
-        self.check_status()
 
     def save_robot_description_semantic(self, robot_description_semantic):
         # Save robot_description_semantic.urdf
@@ -117,8 +107,6 @@ class RosFileServerLoader(object):
         LOGGER.info("Saving URDF file to %s" % filename)
         self.write_file(filename, robot_description_semantic)
         self.status.update({"robot_description_semantic_received": True})
-        # Update status
-        self.check_status()
 
     def load(self):
         param = roslibpy.Param(self.ros, '/robot_description')
@@ -162,7 +150,6 @@ class RosFileServerLoader(object):
         self.requested_resource_files[resource_file_uri] = True
         if all(self.requested_resource_files.values()):
             self.status.update({"resource_files_received": True})
-            self.check_status()
 
     def read_mesh_from_resource_file_uri(self, resource_file_uri, meshcls):
         """Reads the mesh from a file uri and creates a mesh type based on the
@@ -246,8 +233,8 @@ class RosFileServerLoader(object):
         return _mesh_import(url, local_file)
 
 
-
 SUPPORTED_FORMATS = ('obj', 'stl', 'ply', 'dae')
+
 
 def _mesh_import(url, filename):
     """Internal function to load meshes using the correct loader.
