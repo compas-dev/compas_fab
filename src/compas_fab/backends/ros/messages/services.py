@@ -29,7 +29,7 @@ class GetPositionIKRequest(ROSmsg):
     >>> pose = Pose([0.420, -0.025, 0.459], [1, 0, 0], [0, 1, 0])
     >>> joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint',
                        'elbow_joint', 'wrist_1_joint', 'wrist_2_joint',
-                       'wrist_3_joint'] 
+                       'wrist_3_joint']
     >>> joint_positions = [3.39, -1.47, -2.05, 0.38, -4.96, -6.28]
     >>> header = Header(frame_id='base_link')
     >>> pose_stamped = PoseStamped(header, pose)
@@ -37,7 +37,7 @@ class GetPositionIKRequest(ROSmsg):
                                  header=header)
     >>> multi_dof_joint_state = MultiDOFJointState(header=header)
     >>> start_state = RobotState(joint_state, multi_dof_joint_state)
-    >>> ik_request = PositionIKRequest(group_name=planning_group, 
+    >>> ik_request = PositionIKRequest(group_name=planning_group,
                                        robot_state=start_state,
                                        pose_stamped=pose_stamped,
                                        avoid_collisions=True)
@@ -82,7 +82,7 @@ class GetPositionFKResponse(ROSmsg):
     """
 
     def __init__(self, pose_stamped=None, fk_link_names=None, error_code=None):
-        
+
         self.pose_stamped = pose_stamped if pose_stamped else [] # PoseStamped[]
         self.fk_link_names = fk_link_names if fk_link_names else []
         self.error_code = error_code if error_code else MoveItErrorCodes()  # moveit_msgs/MoveItErrorCodes
@@ -173,24 +173,24 @@ class SetPlannerParamsRequest(ROSmsg):
 class MotionPlanRequest(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanRequest.html
     """
-    def __init__(self, workspace_parameters=None, start_state=None, 
-                 goal_constraints=None, path_constraints=None, 
+    def __init__(self, workspace_parameters=None, start_state=None,
+                 goal_constraints=None, path_constraints=None,
                  trajectory_constraints=None, planner_id='',
-                 group_name='', num_planning_attempts=8, 
-                 allowed_planning_time=2., max_velocity_scaling_factor=1., 
+                 group_name='', num_planning_attempts=8,
+                 allowed_planning_time=2., max_velocity_scaling_factor=1.,
                  max_acceleration_scaling_factor=1.):
         self.workspace_parameters = workspace_parameters if workspace_parameters else WorkspaceParameters() # moveit_msgs/WorkspaceParameters
-        self.start_state = start_state if start_state else RobotState()# moveit_msgs/RobotState 
-        self.goal_constraints = goal_constraints if goal_constraints else []  # moveit_msgs/Constraints[] 
-        self.path_constraints = path_constraints if path_constraints else Constraints()# moveit_msgs/Constraints 
-        self.trajectory_constraints = trajectory_constraints if trajectory_constraints else TrajectoryConstraints()# moveit_msgs/TrajectoryConstraints 
-        self.planner_id = planner_id # string 
-        self.group_name = group_name # string 
-        self.num_planning_attempts = int(num_planning_attempts) # int32 
-        self.allowed_planning_time = float(allowed_planning_time) # float64 
-        self.max_velocity_scaling_factor = float(max_velocity_scaling_factor)# float64 
+        self.start_state = start_state if start_state else RobotState()# moveit_msgs/RobotState
+        self.goal_constraints = goal_constraints if goal_constraints else []  # moveit_msgs/Constraints[]
+        self.path_constraints = path_constraints if path_constraints else Constraints()# moveit_msgs/Constraints
+        self.trajectory_constraints = trajectory_constraints if trajectory_constraints else TrajectoryConstraints()# moveit_msgs/TrajectoryConstraints
+        self.planner_id = planner_id # string
+        self.group_name = group_name # string
+        self.num_planning_attempts = int(num_planning_attempts) # int32
+        self.allowed_planning_time = float(allowed_planning_time) # float64
+        self.max_velocity_scaling_factor = float(max_velocity_scaling_factor)# float64
         self.max_acceleration_scaling_factor = float(max_acceleration_scaling_factor) # float64
-    
+
     @property
     def msg(self):
         msg = super(MotionPlanRequest, self).msg
@@ -208,7 +208,7 @@ class MotionPlanResponse(ROSmsg):
         self.trajectory = trajectory if trajectory else RobotTrajectory()
         self.planning_time = planning_time if planning_time else 3.
         self.error_code = error_code if error_code else MoveItErrorCodes()
-        
+
     @classmethod
     def from_msg(cls, msg):
         msg = msg["motion_plan_response"]

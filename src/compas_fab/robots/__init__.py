@@ -8,25 +8,53 @@ compas_fab.robots
 This package contains classes for robot modeling and they are used by the
 simulation, planning and execution backends to exchange information.
 
-Classes
---------
+Main classes
+------------
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    Configuration
+    Robot
+    RobotSemantics
+
+Path planning
+-------------
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    Duration
+    JointTrajectory
+    JointTrajectoryPoint
+    PathPlan
+
+Planning scene
+--------------
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
     AttachedCollisionMesh
-    BoundingVolume
     CollisionMesh
-    Configuration
+    PlanningScene
+
+Constraints
+-----------
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    BoundingVolume
     Constraint
     JointConstraint
     OrientationConstraint
-    PathPlan
-    PlanningScene
     PositionConstraint
-    Robot
-    RobotSemantics
+
+
 
 Unit conversion
 ---------------
@@ -50,6 +78,7 @@ from .planning_scene import *
 from .units import *
 from .robot import *
 from .semantics import *
+from .trajectory import *
 from .ros_fileserver_loader import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]
