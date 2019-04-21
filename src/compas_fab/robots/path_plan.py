@@ -2,8 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas_fab.robots.configuration import Configuration
-from compas_fab.robots.robot import Robot
 
 __all__ = [
     'PathPlan',
@@ -15,46 +13,48 @@ class PathPlan(object):
 
     Attributes
     ----------
-    paths : :obj:`dict`
+    trajectories : :obj:`dict`
         Dictionary keyed by the robot identifier where the values
-        are instances of :class:`Configuration`. Robots that do not move during the
-        plan only have one configuration in their values.
+        are instances of :class:`compas_fab.robots.JointTrajectory`.
+        Robots that do not move during the plan have an empty
+        trajectory.
     """
 
     def __init__(self):
-        self.paths = {}
+        self.trajectories = {}
 
-    def add_robot_plan(self, robot, path_plan):
-        """Adds a path plan for a specific robot.
+    def add_robot_trajectory(self, robot, trajectory):
+        """Adds a trajectory for a specific robot.
 
         Parameters
         ----------
-        robot : :class:`Robot`
+        robot : :class:`compas_fab.robots.Robot`
             Instance of robot.
-        path_plan : :obj:`list` of :class:`Configuration`
-            List of configurations representing a full path.
+        trajectory : :class:`compas_fab.robots.JointTrajectory`
+            Trajectory of the robot.
         """
-        self.paths[robot.name] = path_plan
+        self.trajectories[robot.name] = trajectory
 
-    def get_robot_plan(self, robot):
-        """Gets the path plan for a specific robot.
+    def get_robot_trajectory(self, robot):
+        """Gets the trajectory for a specific robot.
 
         Parameters
         ----------
-        robot : :class:`Robot`
+        robot : :class:`compas_fab.robots.Robot`
             Instance of robot.
 
         Returns
         -------
-        list
-            List of configurations representing a full path.
+        :class:`compas_fab.robots.JointTrajectory`
+            Trajectory of the robot.
         """
-        if robot.name not in self.paths:
-            raise ValueError('No path plan stored for the specified robot: ' + robot.name)
+        if robot.name not in self.trajectories:
+            raise ValueError('No trajectory stored for the specified robot: '
+                             + robot.name)
 
-        return self.paths[robot.name]
+        return self.trajectories[robot.name]
 
-    def all_paths(self):
-        """Iterator over all paths currently defined."""
-        for key in self.paths:
-            yield key, self.paths[key]
+    def all_trajectories(self):
+        """Iterator over all trajectories currently defined."""
+        for key in self.trajectories:
+            yield key, self.trajectories[key]
