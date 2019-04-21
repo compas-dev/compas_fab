@@ -119,14 +119,88 @@ them into a new ``docker-compose.yml`` file.
 
 **List of complete ROS systems**
 
-#. :download:`Base setup <files/base/docker-compose.yml>`
-    ROS master and ROS bridge.
-#. :download:`UR3 planner <files/ur3-planner/docker-compose.yml>`
-    ROS master, ROS bridge, and MoveIt! with UR3 planner configuration.
-#. :download:`UR5 planner <files/ur5-planner/docker-compose.yml>`
-    ROS master, ROS bridge, and MoveIt! with UR5 planner configuration.
-#. :download:`UR10 planner <files/ur10-planner/docker-compose.yml>`
-    ROS master, ROS bridge, and MoveIt! with UR10 planner configuration.
+.. list-table:: Table of ROS systems provided via ``docker compose``
+   :header-rows: 1
+
+   * - Name
+     - Core
+     - Bridge
+     - Planner
+     - Drivers
+     - RViz
+     - Web UI [#f1]_
+     - Download
+   * - Base setup
+     - ✅
+     - ✅
+     - ❌
+     - ❌
+     - ❌
+     - ❌
+     - :download:`Link <files/base/docker-compose.yml>`
+   * - Panda Demo
+     - ✅
+     - ✅
+     - MoveIt!
+     - ❌
+     - ✅
+     - ✅
+     - :download:`Link <files/panda-demo/docker-compose.yml>`
+   * - UR3 Planner
+     - ✅
+     - ✅
+     - MoveIt!
+     - ``ur_modern_driver``
+     - ❌
+     - ❌
+     - :download:`Link <files/ur3-planner/docker-compose.yml>`
+   * - UR5 Planner
+     - ✅
+     - ✅
+     - MoveIt!
+     - ``ur_modern_driver``
+     - ❌
+     - ❌
+     - :download:`Link <files/ur5-planner/docker-compose.yml>`
+   * - UR10 Planner
+     - ✅
+     - ✅
+     - MoveIt!
+     - ``ur_modern_driver``
+     - ❌
+     - ❌
+     - :download:`Link <files/ur10-planner/docker-compose.yml>`
+   * - UR3 Demo
+     - ✅
+     - ✅
+     - MoveIt!
+     - ``ur_modern_driver``
+     - ✅
+     - ✅
+     - :download:`Link <files/ur3-demo/docker-compose.yml>`
+   * - UR5 Demo
+     - ✅
+     - ✅
+     - MoveIt!
+     - ``ur_modern_driver``
+     - ✅
+     - ✅
+     - :download:`Link <files/ur5-demo/docker-compose.yml>`
+   * - UR10 Demo
+     - ✅
+     - ✅
+     - MoveIt!
+     - ``ur_modern_driver``
+     - ✅
+     - ✅
+     - :download:`Link <files/ur10-demo/docker-compose.yml>`
+
+For access to the web UI, start your browser and go to:
+
+::
+
+    http://localhost:8080/vnc.html?resize=scale&autoconnect=true
+
 
 .. _ROS installation instructions: http://wiki.ros.org/ROS/Installation
 .. _Windows Subsystem for Linux: https://docs.microsoft.com/en-us/windows/wsl/about
@@ -141,3 +215,7 @@ Next Steps
 * :ref:`Examples: Description models <examples_description_models>`
 * :ref:`Examples: ROS Backend <examples_ros>`
 * :ref:`COMPAS FAB API Reference <reference>`
+
+.. rubric:: Footnotes
+
+.. [#f1] Web UI is based on `NoVNC <https://novnc.com/>`_.
