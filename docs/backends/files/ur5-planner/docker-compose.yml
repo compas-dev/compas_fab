@@ -24,6 +24,20 @@ services:
       - rosbridge_server
       - rosbridge_websocket.launch
 
+  ros-fileserver:
+    image: gramaziokohler/ros-ur-planner:19.04
+    container_name: ros-fileserver
+    environment:
+      - ROS_HOSTNAME=ros-fileserver
+      - ROS_MASTER_URI=http://ros-master:11311
+    depends_on:
+      - ros-master
+    command:
+      - roslaunch
+      - --wait
+      - file_server
+      - file_server.launch
+
   ur-tf-base_link:
     image: gramaziokohler/ros-ur-planner:19.04
     container_name: ur-tf-base_link
@@ -76,3 +90,29 @@ services:
       - ur5_moveit_config
       - ur5_moveit_planning_execution.launch
       - sim:=true
+
+  ur-rviz:
+    image: gramaziokohler/ros-ur-planner:19.04
+    container_name: ur-rviz
+    environment:
+      - ROS_HOSTNAME=ur-rviz
+      - ROS_MASTER_URI=http://ros-master:11311
+      - DISPLAY=gui:0.0
+    depends_on:
+      - ros-master
+      - gui
+    command:
+      - roslaunch
+      - --wait
+      - ur5_moveit_config
+      - moveit_rviz.launch
+      - config:=true
+
+  gui:
+    image: gramaziokohler/novnc:latest
+    environment:
+      # Adjust to your screen size
+      - DISPLAY_WIDTH=1000
+      - DISPLAY_HEIGHT=600
+    ports:
+      - "8080:8080"

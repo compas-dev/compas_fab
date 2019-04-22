@@ -24,6 +24,20 @@ services:
       - rosbridge_server
       - rosbridge_websocket.launch
 
+  ros-fileserver:
+    image: gramaziokohler/ros-ur-planner:19.04
+    container_name: ros-fileserver
+    environment:
+      - ROS_HOSTNAME=ros-fileserver
+      - ROS_MASTER_URI=http://ros-master:11311
+    depends_on:
+      - ros-master
+    command:
+      - roslaunch
+      - --wait
+      - file_server
+      - file_server.launch
+
   ur-demo:
     image: gramaziokohler/ros-ur-planner:19.04
     container_name: ur-demo
