@@ -15,9 +15,10 @@ Main classes
     :toctree: generated/
     :nosignatures:
 
-    Configuration
     Robot
     RobotSemantics
+    Configuration
+    Duration
 
 Path planning
 -------------
@@ -25,7 +26,7 @@ Path planning
     :toctree: generated/
     :nosignatures:
 
-    Duration
+    Trajectory
     JointTrajectory
     JointTrajectoryPoint
     PathPlan
@@ -54,8 +55,6 @@ Constraints
     OrientationConstraint
     PositionConstraint
 
-
-
 Unit conversion
 ---------------
 
@@ -78,6 +77,7 @@ from .planning_scene import *
 from .units import *
 from .robot import *
 from .semantics import *
+from .time_ import *
 from .trajectory import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]

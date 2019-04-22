@@ -5,69 +5,10 @@ from __future__ import print_function
 from compas_fab.robots.configuration import Configuration
 
 __all__ = [
-    'Duration',
     'JointTrajectoryPoint',
     'JointTrajectory',
     'Trajectory',
 ]
-
-
-class Duration(object):
-    """Duration consists of two integers: seconds and nanoseconds.
-
-    Attributes
-    ----------
-    secs: int
-        Integer representing number of seconds.
-    nsecs: int
-        Integer representing number of nanoseconds.
-    """
-
-    def __init__(self, secs, nsecs):
-        self.secs = secs
-        self.nsecs = nsecs
-
-    def __str__(self):
-        return 'Duration({}, {})'.format(self.secs, self.nsecs)
-
-    def __repr__(self):
-        return self.__str__()
-
-    @classmethod
-    def from_data(cls, data):
-        """Construct a duration from its data representation.
-
-        Parameters
-        ----------
-        data : :obj:`dict`
-            The data dictionary.
-
-        Returns
-        -------
-        :class:`Duration`
-             An instance of :class:`Duration`.
-        """
-        duration = cls(0, 0)
-        duration.data = data
-        return duration
-
-    def to_data(self):
-        """Return the data dictionary that represents the duration, and from
-        which it can be reconstructed."""
-        return self.data
-
-    @property
-    def data(self):
-        """:obj:`dict` : The data representing the duration."""
-        return {
-            'secs': self.secs,
-            'nsecs': self.nsecs
-        }
-
-    @data.setter
-    def data(self, data):
-        self.secs = data.get('secs') or 0
-        self.nsecs = data.get('nsecs') or 0
 
 
 class JointTrajectoryPoint(Configuration):
