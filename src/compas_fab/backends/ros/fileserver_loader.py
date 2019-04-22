@@ -9,11 +9,8 @@ import tempfile
 
 import roslibpy
 from compas.datastructures import Mesh
-from compas.datastructures import mesh_transform
 from compas.datastructures import meshes_join
 from compas.files import XML
-from compas.geometry import Frame
-from compas.geometry import Transformation
 from compas.robots.resources.basic import _get_file_format
 from compas.robots.resources.basic import _mesh_import
 from compas.utilities import await_callback
@@ -254,6 +251,11 @@ def _dae_mesh_importer(filename):
             meshes.append(mesh)
 
     combined_mesh = meshes_join(meshes)
+
+    # from compas.datastructures import mesh_transform
+    # from compas.geometry import Frame
+    # from compas.geometry import Transformation
+
     # former DAE files have yaxis and zaxis swapped
     # frame = Frame([0, 0, 0], [1, 0, 0], [0, 0, 1])
     # T = Transformation.from_frame(frame)
