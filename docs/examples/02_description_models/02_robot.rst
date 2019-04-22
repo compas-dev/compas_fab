@@ -47,6 +47,14 @@ instance. The following code exemplifies how to do that.
 
     For more details about ROS, go to the :ref:`ROS Examples <ros_examples>`.
 
+The :class:`compas_fab.robots.RosFileServerLoader` allows to cache the results
+locally for faster reloads, or to be loaded using the local package loaders.
+To enable this behavior, set the corresponding parameters on constructor and
+assign a ``robot_name`` to enable locating the URDF:
+
+.. literalinclude :: files/02_robot_from_ros_with_cache.py
+   :language: python
+
 Visualizing robot models
 ========================
 

@@ -25,10 +25,34 @@ __all__ = [
 ]
 
 
+def _cache_file_exists(filename):
+    return os.path.isfile(filename)
+
+
+def _read_file(filename, mode='r'):
+    LOGGER.debug('Loading file %s from local cache dir', filename)
+
+    with open(filename, mode) as f:
+        return f.read()
+
+
+def _write_file(filename, file_contents, mode='w'):
+    LOGGER.debug('Saving file to %s', filename)
+
+    dirname = os.path.dirname(filename)
+
+    if not os.path.isdir(dirname):
+        os.makedirs(dirname)
+
+    with open(filename, mode) as f:
+        f.write(file_contents)
+
+
 class RosFileServerLoader(object):
     """Allows to retrieve the mesh files specified in the robot model from the
     ROS File Server. Optionally, it stores them on the local file system,
-    allowing them to be loaded by local package loaders afterwards.
+    allowing for faster re-loads as well as enabling them to be loaded by
+    the local package loaders afterwards.
 
     Parameters
     ----------
@@ -43,7 +67,7 @@ class RosFileServerLoader(object):
     """
 
     def __init__(self, ros=None, local_cache=False, local_cache_directory=None):
-        self._robot_name = None
+        self.robot_name = None
         self.schema_prefix = 'package://'
         self.ros = ros
         self.local_cache_directory = None
@@ -55,10 +79,13 @@ class RosFileServerLoader(object):
 
     @property
     def _robot_resource_path(self):
-        if not self._robot_name:
+        if not self.robot_name:
             raise Exception('Robot name is not assigned, make sure you loaded URDF first')
 
-        return os.path.join(self.local_cache_directory, self._robot_name)
+        if not self.local_cache_directory:
+            raise ValueError('local_cache_directory not set')
+
+        return os.path.join(self.local_cache_directory, self.robot_name)
 
     @property
     def _urdf_filename(self):
@@ -82,12 +109,21 @@ class RosFileServerLoader(object):
         str
             URDF model of the robot currently loaded in ROS.
         """
+        if self.local_cache_enabled and self.robot_name:
+            filename = self._urdf_filename
+
+            if _cache_file_exists(filename):
+                return _read_file(filename)
+
         param = roslibpy.Param(self.ros, parameter_name)
         urdf = await_callback(param.get)
-        self._robot_name = self._read_robot_name(urdf)
+
+        self.robot_name = self._read_robot_name(urdf)
 
         if self.local_cache_enabled:
-            self._write_file(self._urdf_filename, urdf)
+            # Retrieve filename again, now that robot_name
+            # has been loaded from URDF
+            _write_file(self._urdf_filename, urdf)
 
         return urdf
 
@@ -105,11 +141,17 @@ class RosFileServerLoader(object):
         str
             SRDF model of the robot currently loaded in ROS.
         """
+        if self.local_cache_enabled and self.robot_name:
+            filename = self._srdf_filename
+
+            if _cache_file_exists(filename):
+                return _read_file(filename)
+
         param = roslibpy.Param(self.ros, parameter_name)
         srdf = await_callback(param.get)
 
         if self.local_cache_enabled:
-            self._write_file(self._srdf_filename, srdf)
+            _write_file(self._srdf_filename, srdf)
 
         return srdf
 
@@ -118,17 +160,6 @@ class RosFileServerLoader(object):
         # only to read the robot's name (only used for local caching)
         xml = XML.from_string(robot_description)
         return xml.root.attrib['name']
-
-    def _write_file(self, filename, file_contents, mode='w'):
-        LOGGER.debug('Saving file to %s', filename)
-
-        dirname = os.path.dirname(filename)
-
-        if not os.path.isdir(dirname):
-            os.makedirs(dirname)
-
-        with open(filename, mode) as f:
-            f.write(file_contents)
 
     def can_load_mesh(self, url):
         """Determine whether this loader can load a given mesh URL.
@@ -159,28 +190,35 @@ class RosFileServerLoader(object):
         :class:`Mesh`
             Instance of a mesh.
         """
-
-        service = roslibpy.Service(self.ros, '/file_server/get_file', 'file_server/GetBinaryFile')
-        request = roslibpy.ServiceRequest(dict(name=url))
-        response = await_callback(service.call, 'callback', 'errback', request)
-
+        use_local_file = False
         file_extension = _get_file_format(url)
-        file_content = binascii.a2b_base64(response.data['value'])
+
         if self.local_cache_enabled:
             local_filename = self._local_mesh_filename(url)
+            use_local_file = _cache_file_exists(local_filename)
         else:
             _, local_filename = tempfile.mkstemp(suffix='.' + file_extension, prefix='ros_fileserver_')
 
-        # Just look away, we're about to do something nasty!
-        # namespaces are handled differently between the CLI and CPython
-        # XML parsers, so, we just get rid of it for DAE files
-        if file_extension == 'dae':
-            file_content = file_content.replace(b'xmlns="http://www.collada.org/2005/11/COLLADASchema"', b'')
+        if not use_local_file:
+            service = roslibpy.Service(self.ros, '/file_server/get_file', 'file_server/GetBinaryFile')
+            request = roslibpy.ServiceRequest(dict(name=url))
+            response = await_callback(service.call, 'callback', 'errback', request)
 
-        # compas.files does not support file-like objects so we need to
-        # save the file to disk always. If local caching is enabled,
-        # we store it in the cache folder, otherwise, as a temp file.
-        self._write_file(local_filename, file_content, 'wb')
+            file_content = binascii.a2b_base64(response.data['value'])
+
+            # Just look away, we're about to do something nasty!
+            # namespaces are handled differently between the CLI and CPython
+            # XML parsers, so, we just get rid of it for DAE files
+            if file_extension == 'dae':
+                file_content = file_content.replace(b'xmlns="http://www.collada.org/2005/11/COLLADASchema"', b'')
+
+            # compas.files does not support file-like objects so we need to
+            # save the file to disk always. If local caching is enabled,
+            # we store it in the cache folder, otherwise, as a temp file.
+            _write_file(local_filename, file_content, 'wb')
+        else:
+            # Nothing to do here, the file will be read by the mesh importer
+            LOGGER.debug('Loading mesh file %s from local cache dir', local_filename)
 
         return _fileserver_mesh_import(url, local_filename)
 
@@ -236,25 +274,28 @@ def _fileserver_mesh_import(url, filename):
 
 
 if __name__ == "__main__":
-
     """
     Start following processes on client side:
     roslaunch YOUR_ROBOT_moveit_config demo.launch rviz_tutorial:=true
     roslaunch rosbridge_server rosbridge_websocket.launch
     roslaunch file_server.launch
     """
-
-
     import logging
+    from compas.robots import RobotModel
+    from compas_fab.backends import RosClient
 
     FORMAT = '%(asctime)-15s [%(levelname)s] %(message)s'
     logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
-    ros = roslibpy.Ros("127.0.0.1", 9090)
+    with RosClient() as ros:
+        local_directory = os.path.join(os.path.expanduser('~'), 'workspace', 'robot_description')
+        importer = RosFileServerLoader(ros, local_cache=True, local_cache_directory=local_directory)
+        importer.robot_name = 'abb_irb1600_6_12'
 
-    local_directory = os.path.join(os.path.expanduser('~'), "workspace", "robot_description")
-    importer = RosFileServerLoader(ros, local_directory)
-    importer.load()
-    ros.call_later(50, ros.close)
-    ros.call_later(52, ros.terminate)
-    ros.run_forever()
+        urdf = importer.load_urdf()
+        srdf = importer.load_srdf()
+
+        model = RobotModel.from_urdf_string(urdf)
+        model.load_geometry(importer)
+
+    print(model)
