@@ -1,9 +1,56 @@
 *******************************************************************************
-Robot
+Robot models
 *******************************************************************************
+
+Robot models can be programatically defined, as shown in the previous examples,
+but in most cases, they are loaded from an existing location.
+**COMPAS FAB** supports loading models from local files, from remote Github
+repositories as well as from a running ROS instance.
+
+Loading model from disk
+=======================
+
+The installation of **COMPAS FAB** includes some robot models which are used
+to exemplify loading from disk:
+
+.. literalinclude :: files/02_robot_from_disk.py
+   :language: python
+
+
+Loading model from Github
+=========================
+
+Since a large amount of robot models defined in URDF are available on Github,
+**COMPAS FAB** provides a specialized loader that follows the conventions
+defined by ROS to locate a Robot's model and geometry files.
+
+.. literalinclude :: files/02_robot_from_github.py
+   :language: python
+
+Loading model from ROS
+======================
+
+.. note::
+
+    The following example uses the `ROS <http://www.ros.org/>`_ backend
+    and loads the robot description model from it. Before running it, please
+    make sure you have the :ref:`ROS backend <ros_backend>` correctly
+    configured and the :ref:`Panda Demo <ros_bundles_list>` started.
+
+In most situations, we will load the robot model directly from a running ROS
+instance. The following code exemplifies how to do that.
+
+.. literalinclude :: files/02_robot_from_ros.py
+   :language: python
+
+.. note::
+
+    For more details about ROS, go to the :ref:`ROS Examples <ros_examples>`.
 
 Visualizing robot models
 ========================
+
+Once a model is loaded, we can visualize it in our favorite design environment.
 
 **COMPAS** includes the concept of `artists`: classes that assist with the
 visualization of datastructures and models, in a way that maintains the data
