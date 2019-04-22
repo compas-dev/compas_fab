@@ -38,8 +38,8 @@ class CollisionMesh(object):
     def __init__(self, mesh, id, frame=None, root_name=None):
         self.id = id
         self.mesh = mesh
-        self.frame = frame if frame else Frame.worldXY()
-        self.root_name = 'world'
+        self.frame = frame or Frame.worldXY()
+        self.root_name = root_name or 'world'
 
     def scale(self, transformation):
         """Scales the collision mesh.
