@@ -18,7 +18,7 @@ from compas.robots.resources.basic import _get_file_format
 from compas.robots.resources.basic import _mesh_import
 from compas.utilities import await_callback
 
-LOGGER = logging.getLogger('compas_fab.robots.ros')
+LOGGER = logging.getLogger('compas_fab.backends.ros')
 
 __all__ = [
     'RosFileServerLoader',

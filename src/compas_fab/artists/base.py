@@ -134,7 +134,7 @@ class BaseRobotArtist(object):
 
         Parameters
         ----------
-        configuration : `compas_fab.robots.Configuration`
+        configuration : :class:`compas_fab.robots.Configuration`
             Instance of the configuration (joint state) to move to.
         collision : bool, optional
             ``True`` if the collision geometry should be also updated, otherwise ``False``.
