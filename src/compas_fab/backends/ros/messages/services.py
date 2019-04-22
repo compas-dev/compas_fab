@@ -1,21 +1,18 @@
 from __future__ import absolute_import
 
-from .std_msgs import ROSmsg
-from .std_msgs import Header
-from .geometry_msgs import Pose
 from .geometry_msgs import PoseStamped
-from .sensor_msgs import JointState
-from .sensor_msgs import MultiDOFJointState
 from .moveit_msgs import Constraints
-from .moveit_msgs import RobotState
 from .moveit_msgs import MoveItErrorCodes
-from .moveit_msgs import RobotTrajectory
-from .moveit_msgs import PositionIKRequest
 from .moveit_msgs import PlannerParams
-from .moveit_msgs import WorkspaceParameters
-from .moveit_msgs import TrajectoryConstraints
-from .moveit_msgs import PlanningSceneComponents
 from .moveit_msgs import PlanningScene
+from .moveit_msgs import PlanningSceneComponents
+from .moveit_msgs import PositionIKRequest
+from .moveit_msgs import RobotState
+from .moveit_msgs import RobotTrajectory
+from .moveit_msgs import TrajectoryConstraints
+from .moveit_msgs import WorkspaceParameters
+from .std_msgs import Header
+from .std_msgs import ROSmsg
 
 
 class GetPositionIKRequest(ROSmsg):
@@ -46,17 +43,17 @@ class GetPositionIKRequest(ROSmsg):
     >>> request = roslibpy.ServiceRequest(reqmsg.msg)
     >>> srv.call(request, GetPositionIKResponse.from_msg, GetPositionIKResponse.from_msg)
     """
-    def __init__(self, ik_request=PositionIKRequest()):
-        self.ik_request = ik_request
+    def __init__(self, ik_request=None):
+        self.ik_request = ik_request or PositionIKRequest()
 
 
 class GetPositionIKResponse(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionIK.html
     """
 
-    def __init__(self, solution=RobotState(), error_code=MoveItErrorCodes()):
-        self.solution = solution  # moveit_msgs/RobotState
-        self.error_code = error_code  # moveit_msgs/MoveItErrorCodes
+    def __init__(self, solution=None, error_code=None):
+        self.solution = solution or RobotState()  # moveit_msgs/RobotState
+        self.error_code = error_code or MoveItErrorCodes()  # moveit_msgs/MoveItErrorCodes
 
     @classmethod
     def from_msg(cls, msg):
@@ -65,16 +62,14 @@ class GetPositionIKResponse(ROSmsg):
         return cls(solution, error_code)
 
 
-
-
 class GetPositionFKRequest(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html
     """
 
-    def __init__(self, header=Header(), fk_link_names=None, robot_state=None):
-        self.header = header
-        self.fk_link_names = fk_link_names if fk_link_names else []
-        self.robot_state = robot_state if robot_state else RobotState()
+    def __init__(self, header=None, fk_link_names=None, robot_state=None):
+        self.header = header or Header()
+        self.fk_link_names = fk_link_names or []
+        self.robot_state = robot_state or RobotState()
 
 
 class GetPositionFKResponse(ROSmsg):
@@ -82,10 +77,9 @@ class GetPositionFKResponse(ROSmsg):
     """
 
     def __init__(self, pose_stamped=None, fk_link_names=None, error_code=None):
-
-        self.pose_stamped = pose_stamped if pose_stamped else [] # PoseStamped[]
-        self.fk_link_names = fk_link_names if fk_link_names else []
-        self.error_code = error_code if error_code else MoveItErrorCodes()  # moveit_msgs/MoveItErrorCodes
+        self.pose_stamped = pose_stamped or []  # PoseStamped[]
+        self.fk_link_names = fk_link_names or []
+        self.error_code = error_code or MoveItErrorCodes()  # moveit_msgs/MoveItErrorCodes
 
     @classmethod
     def from_msg(cls, msg):
@@ -93,8 +87,6 @@ class GetPositionFKResponse(ROSmsg):
         fk_link_names = msg['fk_link_names']
         error_code = MoveItErrorCodes.from_msg(msg['error_code'])
         return cls(pose_stamped, fk_link_names, error_code)
-
-
 
 
 class GetCartesianPathRequest(ROSmsg):
@@ -130,27 +122,27 @@ class GetCartesianPathRequest(ROSmsg):
     def __init__(self, header=None, start_state=None, group_name='',
                  link_name='', waypoints=None, max_step=10., jump_threshold=0.,
                  avoid_collisions=True, path_constraints=None):
-        self.header = header if header else Header()
-        self.start_state = start_state if start_state else RobotState() # moveit_msgs/RobotState
+        self.header = header or Header()
+        self.start_state = start_state or RobotState()  # moveit_msgs/RobotState
         self.group_name = group_name
         self.link_name = link_name  # ee_link
-        self.waypoints = waypoints if waypoints else [] # geometry_msgs/Pose[]
+        self.waypoints = waypoints if waypoints else []  # geometry_msgs/Pose[]
         self.max_step = float(max_step)
         self.jump_threshold = jump_threshold
         self.avoid_collisions = avoid_collisions
-        self.path_constraints = path_constraints if path_constraints else Constraints() # moveit_msgs/Constraints
+        self.path_constraints = path_constraints or Constraints()  # moveit_msgs/Constraints
 
 
 class GetCartesianPathResponse(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetCartesianPath.html
     """
 
-    def __init__(self, start_state=RobotState(), solution=RobotTrajectory(),
-                 fraction=0., error_code=MoveItErrorCodes()):
-        self.start_state = start_state  # moveit_msgs/RobotState
-        self.solution = solution  # moveit_msgs/RobotTrajectory
+    def __init__(self, start_state=None, solution=None,
+                 fraction=0., error_code=None):
+        self.start_state = start_state or RobotState()  # moveit_msgs/RobotState
+        self.solution = solution or RobotTrajectory()  # moveit_msgs/RobotTrajectory
         self.fraction = fraction
-        self.error_code = error_code  # moveit_msgs/MoveItErrorCodes
+        self.error_code = error_code or MoveItErrorCodes()  # moveit_msgs/MoveItErrorCodes
 
     @classmethod
     def from_msg(cls, msg):
@@ -164,11 +156,12 @@ class SetPlannerParamsRequest(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/srv/SetPlannerParams.html
     """
 
-    def __init__(self, planner_config='', group='', params=PlannerParams(), replace=True):
+    def __init__(self, planner_config='', group='', params=None, replace=True):
         self.planner_config = planner_config
         self.group = group
-        self.params = params
+        self.params = params or PlannerParams()
         self.replace = replace
+
 
 class MotionPlanRequest(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanRequest.html
@@ -179,22 +172,23 @@ class MotionPlanRequest(ROSmsg):
                  group_name='', num_planning_attempts=8,
                  allowed_planning_time=2., max_velocity_scaling_factor=1.,
                  max_acceleration_scaling_factor=1.):
-        self.workspace_parameters = workspace_parameters if workspace_parameters else WorkspaceParameters() # moveit_msgs/WorkspaceParameters
-        self.start_state = start_state if start_state else RobotState()# moveit_msgs/RobotState
-        self.goal_constraints = goal_constraints if goal_constraints else []  # moveit_msgs/Constraints[]
-        self.path_constraints = path_constraints if path_constraints else Constraints()# moveit_msgs/Constraints
-        self.trajectory_constraints = trajectory_constraints if trajectory_constraints else TrajectoryConstraints()# moveit_msgs/TrajectoryConstraints
-        self.planner_id = planner_id # string
-        self.group_name = group_name # string
-        self.num_planning_attempts = int(num_planning_attempts) # int32
-        self.allowed_planning_time = float(allowed_planning_time) # float64
-        self.max_velocity_scaling_factor = float(max_velocity_scaling_factor)# float64
-        self.max_acceleration_scaling_factor = float(max_acceleration_scaling_factor) # float64
+        self.workspace_parameters = workspace_parameters or WorkspaceParameters()  # moveit_msgs/WorkspaceParameters
+        self.start_state = start_state or RobotState()  # moveit_msgs/RobotState
+        self.goal_constraints = goal_constraints or []  # moveit_msgs/Constraints[]
+        self.path_constraints = path_constraints or Constraints()  # moveit_msgs/Constraints
+        self.trajectory_constraints = trajectory_constraints or TrajectoryConstraints()  # moveit_msgs/TrajectoryConstraints
+        self.planner_id = planner_id  # string
+        self.group_name = group_name  # string
+        self.num_planning_attempts = int(num_planning_attempts)  # int32
+        self.allowed_planning_time = float(allowed_planning_time)  # float64
+        self.max_velocity_scaling_factor = float(max_velocity_scaling_factor)  # float64
+        self.max_acceleration_scaling_factor = float(max_acceleration_scaling_factor)  # float64
 
     @property
     def msg(self):
         msg = super(MotionPlanRequest, self).msg
-        return {"motion_plan_request":msg}
+        return {"motion_plan_request": msg}
+
 
 class MotionPlanResponse(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanResponse.html
@@ -203,11 +197,11 @@ class MotionPlanResponse(ROSmsg):
     def __init__(self, trajectory_start=None, group_name=None, trajectory=None,
                  planning_time=None, error_code=None):
 
-        self.trajectory_start = trajectory_start if trajectory_start else RobotState()
-        self.group_name = group_name if group_name else ""
-        self.trajectory = trajectory if trajectory else RobotTrajectory()
-        self.planning_time = planning_time if planning_time else 3.
-        self.error_code = error_code if error_code else MoveItErrorCodes()
+        self.trajectory_start = trajectory_start or RobotState()
+        self.group_name = group_name or ''
+        self.trajectory = trajectory or RobotTrajectory()
+        self.planning_time = planning_time or 3.
+        self.error_code = error_code or MoveItErrorCodes()
 
     @classmethod
     def from_msg(cls, msg):
@@ -217,20 +211,20 @@ class MotionPlanResponse(ROSmsg):
         error_code = MoveItErrorCodes.from_msg(msg['error_code'])
         return cls(trajectory_start, msg['group_name'], trajectory, msg['planning_time'], error_code)
 
+
 class GetPlanningSceneRequest(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html
     """
     def __init__(self, components=None):
-        self.components = components if components else PlanningSceneComponents()
+        self.components = components or PlanningSceneComponents()
 
 
 class GetPlanningSceneResponse(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html
     """
     def __init__(self, scene=None):
-        self.scene = scene if scene else PlanningScene()
+        self.scene = scene or PlanningScene()
 
     @classmethod
     def from_msg(cls, msg):
         return PlanningScene.from_msg(msg['scene'])
-
