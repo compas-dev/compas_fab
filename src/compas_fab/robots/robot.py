@@ -5,14 +5,12 @@ from __future__ import print_function
 import logging
 
 from compas.geometry import Frame
-from compas.geometry import Transformation
 from compas.geometry import Sphere
+from compas.geometry import Transformation
 from compas.robots import Joint
 from compas.robots import RobotModel
 
 from compas_fab.robots.configuration import Configuration
-from compas_fab.robots.ros_fileserver_loader import RosFileServerLoader
-from compas_fab.robots.semantics import RobotSemantics
 from compas_fab.robots.constraints import Constraint
 from compas_fab.robots.constraints import JointConstraint
 from compas_fab.robots.constraints import OrientationConstraint
@@ -40,10 +38,11 @@ class Robot(object):
         The robot model, usually created from an URDF structure.
     artist : :class:`compas_fab.artists.BaseRobotArtist`, optional
         Instance of the artist used to visualize the robot. Defaults to ``None``.
-    semantics : :class:`RobotSemantics`, optional
+    semantics : :class:`compas_fab.robots.RobotSemantics`, optional
         The semantic model of the robot. Defaults to ``None``.
     client : optional
-        The backend client to use for communication, e.g. :class:`RosClient`
+        The backend client to use for communication,
+        e.g. :class:`compas_fab.backends.RosClient`
     """
 
     def __init__(self, model, artist=None, semantics=None, client=None):

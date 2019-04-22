@@ -122,7 +122,6 @@ them into a new ``docker-compose.yml`` file.
 .. list-table:: Table of ROS systems provided via ``docker compose``
    :widths: 20 8 8 14 18 8 10 14
    :header-rows: 1
-   :stub-columns: 1
 
    * - Name
      - Core
@@ -148,6 +147,14 @@ them into a new ``docker-compose.yml`` file.
      - ✅
      - ✅
      - :download:`Link <files/panda-demo/docker-compose.yml>`
+   * - ABB IRB1600 Demo
+     - ✅
+     - ✅
+     - MoveIt!
+     - ``abb_driver``
+     - ✅
+     - ✅
+     - :download:`Link <files/abb-irb1600-demo/docker-compose.yml>`
    * - UR3 Planner
      - ✅
      - ✅

@@ -18,6 +18,8 @@ Unreleased
 * ROS Client: removed methods from ``Robot`` that are now handled with
   ``PlanningScene``, e.g. ``add_collision_mesh`` and
   ``add_attached_collision_mesh``
+* ROS File Server Loader: moved to ``compas_fab.backends`` package
+* ROS File Server Loader: renamed ``load`` to ``load_urdf`` and sync'd API to other loaders.
 * V-REP Client: renamed ``get_end_effector_pose`` to ``forward_kinematics``
 * V-REP Client: renamed ``find_robot_states`` to ``inverse_kinematics``
 * V-REP Client: renamed ``find_path_plan_to_config`` to
