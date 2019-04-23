@@ -20,10 +20,10 @@ with RosClient() as client:
                                                     tolerance_axes,
                                                     group)
 
-    response = robot.plan_motion(goal_constraints,
-                                 start_configuration,
-                                 group,
-                                 planner_id='RRT')
+    trajectory = robot.plan_motion(goal_constraints,
+                                   start_configuration,
+                                   group,
+                                   planner_id='RRT')
 
-    print("Computed kinematic path with %d configurations." % len(response.configurations))
-    print("Executing this path at full speed would take approx. %.3f seconds." % response.time_from_start)
+    print("Computed kinematic path with %d configurations." % len(trajectory.points))
+    print("Executing this path at full speed would take approx. %.3f seconds." % trajectory.time_from_start)

@@ -11,6 +11,7 @@ Package with functionality to interact with `ROS <http://ros.org/>`_.
     :toctree: generated/
 
     RosClient
+    RosFileServerLoader
     RosError
     RosValidationError
 
@@ -20,6 +21,7 @@ from __future__ import absolute_import
 
 from .client import *
 from .exceptions import *
+from .fileserver_loader import *
 from .direct_ur_action_client import *
 from .messages import *
 

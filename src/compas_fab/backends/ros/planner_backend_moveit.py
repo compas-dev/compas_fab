@@ -32,6 +32,26 @@ from compas_fab.backends.ros.messages import PositionIKRequest
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.planner_backend import PlannerBackend
 from compas_fab.backends.ros.planner_backend import ServiceDescription
+from compas_fab.robots import Configuration
+from compas_fab.robots import Duration
+from compas_fab.robots import JointTrajectory
+from compas_fab.robots import JointTrajectoryPoint
+
+
+def convert_trajectory_points(points, types):
+    result = []
+
+    for pt in points:
+        jtp = JointTrajectoryPoint(values=pt.positions,
+                                   types=types,
+                                   velocities=pt.velocities,
+                                   accelerations=pt.accelerations,
+                                   effort=pt.effort,
+                                   time_from_start=Duration(pt.time_from_start.secs, pt.time_from_start.nsecs))
+
+        result.append(jtp)
+
+    return result
 
 
 def validate_response(response):
@@ -104,14 +124,14 @@ class MoveItPlanner(PlannerBackend):
                                     robot_state), callback, errback)
 
     def plan_cartesian_motion_async(self, callback, errback, frames, base_link,
-                                    ee_link, group, joint_names, joint_positions,
+                                    ee_link, group, joint_names, start_configuration,
                                     max_step, avoid_collisions, path_constraints,
                                     attached_collision_object):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
         joint_state = JointState(
-            header=header, name=joint_names, position=joint_positions)
+            header=header, name=joint_names, position=start_configuration.values)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
         if attached_collision_object:
@@ -127,10 +147,19 @@ class MoveItPlanner(PlannerBackend):
                        avoid_collisions=bool(avoid_collisions),
                        path_constraints=path_constraints)
 
-        self.GET_CARTESIAN_PATH(self, request, callback, errback)
+        def convert_to_trajectory(response):
+            trajectory = JointTrajectory()
+            trajectory.source_message = response
+            trajectory.fraction = response.fraction
+            trajectory.points = convert_trajectory_points(response.solution.joint_trajectory.points, start_configuration.types)
+            trajectory.start_configuration = Configuration(response.start_state.joint_state.position, start_configuration.types)
+
+            callback(trajectory)
+
+        self.GET_CARTESIAN_PATH(self, request, convert_to_trajectory, errback)
 
     def plan_motion_async(self, callback, errback, goal_constraints, base_link,
-                          ee_link, group, joint_names, joint_positions,
+                          ee_link, group, joint_names, start_configuration,
                           path_constraints=None, trajectory_constraints=None,
                           planner_id='', num_planning_attempts=8,
                           allowed_planning_time=2.,
@@ -145,7 +174,7 @@ class MoveItPlanner(PlannerBackend):
 
         header = Header(frame_id=base_link)
         joint_state = JointState(
-            header=header, name=joint_names, position=joint_positions)
+            header=header, name=joint_names, position=start_configuration.values)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
         if attached_collision_object:
@@ -197,7 +226,17 @@ class MoveItPlanner(PlannerBackend):
                        max_acceleration_scaling_factor=max_velocity_scaling_factor)
         # workspace_parameters=workspace_parameters
 
-        self.GET_MOTION_PLAN(self, request, callback, errback)
+        def convert_to_trajectory(response):
+            trajectory = JointTrajectory()
+            trajectory.source_message = response
+            trajectory.fraction = 1.
+            trajectory.points = convert_trajectory_points(response.trajectory.joint_trajectory.points, start_configuration.types)
+            trajectory.start_configuration = Configuration(response.trajectory_start.joint_state.position, start_configuration.types)
+            trajectory.planning_time = response.planning_time
+
+            callback(trajectory)
+
+        self.GET_MOTION_PLAN(self, request, convert_to_trajectory, errback)
 
     # ==========================================================================
     # collision objects

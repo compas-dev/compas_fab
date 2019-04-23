@@ -24,6 +24,7 @@ ROS
     :nosignatures:
 
     RosClient
+    RosFileServerLoader
 
 Tasks
 -----
@@ -43,6 +44,7 @@ Exceptions
 
     BackendError
     RosError
+    RosValidationError
     VrepError
 
 """
@@ -51,6 +53,7 @@ from .exceptions import *
 from .tasks import *
 from .ros.client import *
 from .ros.exceptions import *
+from .ros.fileserver_loader import *
 from .vrep.client import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]
