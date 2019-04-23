@@ -2,8 +2,6 @@
 COMPAS FAB: Robotic Fabrication for COMPAS
 ============================================================
 
-.. highlight:: bash
-
 .. start-badges
 
 .. image:: https://travis-ci.com/gramaziokohler/compas_fab.svg?branch=master
