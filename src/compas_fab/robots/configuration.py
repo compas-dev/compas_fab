@@ -156,6 +156,25 @@ class Configuration(object):
         cls = type(self)
         return cls(self.values[:], self.types[:])
 
+    def scale(self, scale_factor):
+        """Scales the joint positions of the current configuration.
+
+        Only scalable joints are scaled, i.e. planar and prismatic joints.
+
+        Parameters
+        ----------
+        scale_factor : float
+            Scale factor
+        """
+        values_scaled = []
+
+        for value, joint_type in zip(self.values, self.types):
+            if joint_type in (Joint.PLANAR, Joint.PRISMATIC):
+                value *= scale_factor
+            values_scaled.append(value)
+
+        self.values = values_scaled
+
 
 if __name__ == "__main__":
     from math import pi

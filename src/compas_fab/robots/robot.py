@@ -395,17 +395,6 @@ class Robot(object):
                 values.append(full_configuration.values[i])
         return Configuration(values, types)
 
-    def joint_positions_to_configuration(self, joint_positions, group=None):
-        """Returns the robot's configuration from the passed joint_positions.
-        """
-        types = self.get_configurable_joint_types(group)
-        if len(types) != len(joint_positions) and group is not None:
-            types = self.get_configurable_joint_types()
-            full_configuration = Configuration(joint_positions, types)
-            return self.get_group_configuration(group, full_configuration)
-        else:
-            return Configuration(joint_positions, types)
-
     def merge_group_with_full_configuration(self, group_configuration, full_configuration, group):
         """Returns the robot's full configuration by merging with the group's configuration.
         """
@@ -924,13 +913,13 @@ class Robot(object):
             frame_RCF.point /= self.scale_factor
             frames_RCF.append(frame_RCF)
         base_link = self.get_base_link_name(group)
-        joint_names = self.get_configurable_joint_names()
 
-        joint_positions = self._get_scaled_joint_positions_from_start_configuration(
-            start_configuration)
+        joint_names = self.get_configurable_joint_names()
+        start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
+        start_configuration.scale(1. / self.scale_factor)
 
         ee_link = self.get_end_effector_link_name(group)
-        max_step_scaled = max_step/self.scale_factor
+        max_step_scaled = max_step / self.scale_factor
 
         T = self.transformation_WCF_RCF(group)
         if path_constraints:
@@ -948,27 +937,18 @@ class Robot(object):
         else:
             path_constraints_RCF_scaled = None
 
-        response = self.client.plan_cartesian_motion(frames_RCF, base_link,
-                                                     ee_link, group, joint_names, joint_positions,
-                                                     max_step_scaled, avoid_collisions, path_constraints_RCF_scaled,
-                                                     attached_collision_object)
+        trajectory = self.client.plan_cartesian_motion(frames_RCF, base_link,
+                                                       ee_link, group, joint_names, start_configuration,
+                                                       max_step_scaled, avoid_collisions,
+                                                       path_constraints_RCF_scaled,
+                                                       attached_collision_object)
+        # Scale everything back to robot's scale
+        for pt in trajectory.points:
+            pt.scale(self.scale_factor)
 
-        # save joint_positions into configurations
-        response.configurations = self._configurations_from_joint_trajectory(
-            response.solution.joint_trajectory, group)
+        trajectory.start_configuration.scale(self.scale_factor)
 
-        # save start state into start_configuration
-        joint_positions = response.start_state.joint_state.position
-        joint_positions = self._scale_joint_values(
-            joint_positions, self.scale_factor)
-        response.start_configuration = Configuration(
-            joint_positions, self.get_configurable_joint_types())
-
-        # save time from start into response
-        time_from_start = response.solution.joint_trajectory.points[-1].time_from_start
-        response.time_from_start = time_from_start.secs + time_from_start.nsecs / 1e+9
-
-        return response
+        return trajectory
 
     def plan_motion(self, goal_constraints, start_configuration=None,
                     group=None, path_constraints=None, planner_id='RRT',
@@ -1046,9 +1026,6 @@ class Robot(object):
         if not group:
             group = self.main_group_name  # ensure semantics
 
-        joint_names = self.get_configurable_joint_names()
-        joint_positions = self._get_scaled_joint_positions_from_start_configuration(start_configuration)
-
         # Transform goal constraints to RCF and scale
         T = self._get_current_transformation_WCF_RCF(start_configuration, group)
         goal_constraints_RCF_scaled = []
@@ -1079,13 +1056,17 @@ class Robot(object):
         else:
             path_constraints_RCF_scaled = None
 
+        joint_names = self.get_configurable_joint_names()
+        start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
+        start_configuration.scale(1. / self.scale_factor)
+
         kwargs = {}
         kwargs['goal_constraints'] = goal_constraints_RCF_scaled
         kwargs['base_link'] = self.get_base_link_name(group)
         kwargs['ee_link'] = self.get_end_effector_link_name(group)
         kwargs['group'] = group
         kwargs['joint_names'] = joint_names
-        kwargs['joint_positions'] = joint_positions
+        kwargs['start_configuration'] = start_configuration
         kwargs['path_constraints'] = path_constraints_RCF_scaled
         kwargs['trajectory_constraints'] = None
         kwargs['planner_id'] = planner_id
@@ -1096,34 +1077,17 @@ class Robot(object):
         kwargs['attached_collision_object'] = attached_collision_object
         kwargs['workspace_parameters'] = None
 
-        response = self.client.plan_motion(**kwargs)
+        trajectory = self.client.plan_motion(**kwargs)
 
-        # save joint_positions into configurations
-        response.configurations = self._configurations_from_joint_trajectory(
-            response.trajectory.joint_trajectory, group)
+        # Scale everything back to robot's scale
+        for pt in trajectory.points:
+            pt.scale(self.scale_factor)
 
-        # save trajectory start into start_configuration
-        joint_positions = response.trajectory_start.joint_state.position
-        joint_positions = self._scale_joint_values(
-            joint_positions, self.scale_factor)
-        response.start_configuration = Configuration(
-            joint_positions, self.get_configurable_joint_types())
+        trajectory.start_configuration.scale(self.scale_factor)
 
-        # save time from start into response
-        time_from_start = response.trajectory.joint_trajectory.points[-1].time_from_start
-        response.time_from_start = time_from_start.secs + time_from_start.nsecs / 1e+9
+        return trajectory
 
-        return response
 
-    def _configurations_from_joint_trajectory(self, joint_trajectory, group=None):
-        configurations = []
-        for point in joint_trajectory.points:
-            joint_positions = point.positions
-            joint_positions = self._scale_joint_values(
-                joint_positions, self.scale_factor, group)
-            configurations.append(Configuration(
-                joint_positions, self.get_configurable_joint_types(group)))
-        return configurations
 
     def send_frame(self):
         # (check service name with ros)
