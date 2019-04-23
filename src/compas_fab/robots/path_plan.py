@@ -15,7 +15,7 @@ class PathPlan(object):
     ----------
     trajectories : :obj:`dict`
         Dictionary keyed by the robot identifier where the values
-        are instances of :class:`compas_fab.robots.JointTrajectory`.
+        are instances of :class:`compas_fab.robots.Trajectory`.
         Robots that do not move during the plan have an empty
         trajectory.
     """
@@ -30,7 +30,7 @@ class PathPlan(object):
         ----------
         robot : :class:`compas_fab.robots.Robot`
             Instance of robot.
-        trajectory : :class:`compas_fab.robots.JointTrajectory`
+        trajectory : :class:`compas_fab.robots.Trajectory`
             Trajectory of the robot.
         """
         self.trajectories[robot.name] = trajectory
@@ -45,7 +45,7 @@ class PathPlan(object):
 
         Returns
         -------
-        :class:`compas_fab.robots.JointTrajectory`
+        :class:`compas_fab.robots.Trajectory`
             Trajectory of the robot.
         """
         if robot.name not in self.trajectories:
