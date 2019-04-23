@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas_fab.robots.time_ import Duration
 from compas_fab.robots.configuration import Configuration
 
 __all__ = [
@@ -25,7 +26,7 @@ class JointTrajectoryPoint(Configuration):
     values : :obj:`list` of :obj:`float`
         Joint values expressed in radians or meters, depending on the respective type.
     types : :obj:`list` of :class:`compas.robots.Joint.TYPE`
-        Joint types, e.g. a list of `compas.robots.Joint.REVOLUTE` for revolute joints.
+        Joint types, e.g. a list of :class:`compas.robots.Joint.REVOLUTE` for revolute joints.
     velocities : :obj:`list` of :obj:`float`
         Velocity of each joint.
     accelerations : :obj:`list` of :obj:`float`
@@ -53,6 +54,11 @@ class JointTrajectoryPoint(Configuration):
             ', '.join(vs % i for i in self.effort),
             self.time_from_start,
         )
+
+    @property
+    def positions(self):
+        """Alias of ``values``."""
+        return self.values
 
     @property
     def velocities(self):
@@ -117,7 +123,16 @@ class JointTrajectoryPoint(Configuration):
 
 
 class Trajectory(object):
-    pass
+    """Base trajectory class.
+
+    Attributes
+    ----------
+    planning_time: :obj:`float`
+        Amount of time it took to complete the motion plan
+    """
+
+    def __init__(self):
+        self.planning_time = None
 
 
 class JointTrajectory(Trajectory):
@@ -127,10 +142,18 @@ class JointTrajectory(Trajectory):
     ----------
     points: :obj:`list` of :class:`JointTrajectoryPoint`
         List of points composing the trajectory.
+    start_configuration: :class:`Configuration`
+        Start configuration for the trajectory.
+    fraction: float
+        Indicates the percentage of requested trajectory that was calcuted,
+        e.g. ``1`` means the full trajectory was found.
     """
 
-    def __init__(self, trajectory_points=[]):
+    def __init__(self, trajectory_points=[], start_configuration=None, fraction=None):
+        super(Trajectory, self).__init__()
         self.points = trajectory_points
+        self.start_configuration = start_configuration
+        self.fraction = fraction
 
     @classmethod
     def from_data(cls, data):
@@ -160,11 +183,24 @@ class JointTrajectory(Trajectory):
         """:obj:`dict` : The data representing the trajectory."""
         return {
             'points': [p.to_data() for p in self.points],
+            'start_configuration': self.start_configuration.to_data(),
+            'fraction': self.fraction,
         }
 
     @data.setter
     def data(self, data):
         self.points = list(map(JointTrajectoryPoint.from_data, data.get('points') or []))
+        self.start_configuration = Configuration.from_data(data.get('start_configuration'))
+        self.fraction = data.get('fraction')
+
+    @property
+    def time_from_start(self):
+        """Effectively, time from start for the last point in the trajectory.
+        """
+        if not self.points:
+            return 0.
+
+        return self.points[-1].time_from_start.seconds
 
 
 if __name__ == '__main__':

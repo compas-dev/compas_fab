@@ -26,7 +26,6 @@ Path planning
     :toctree: generated/
     :nosignatures:
 
-    Trajectory
     JointTrajectory
     JointTrajectoryPoint
     PathPlan

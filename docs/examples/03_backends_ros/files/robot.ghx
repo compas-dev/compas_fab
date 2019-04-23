@@ -4884,7 +4884,7 @@ if robot:
     types = robot.get_configurable_joint_types()
     values = [0] * len(types)
     values = [-0.042, 4.295, -4.110, -3.327, 4.755, 0.]
-    
+
     configuration = Configuration(values, types)
     print configuration
 </item>
@@ -5828,9 +5828,9 @@ response = sc.sticky[response_key]</item>
 joint_positions = []
 
 if response:
-    if response.error_code == MoveItErrorCodes.SUCCESS:
-        configurations = response.configurations
-        start_configuration = response.start_configuration
+    #if response.error_code == MoveItErrorCodes.SUCCESS:
+    configurations = response.points
+    start_configuration = response.start_configuration
     fraction = response.fraction
     time = response.time_from_start
 
@@ -6735,7 +6735,7 @@ print planes</item>
 if robot:
     types = robot.get_configurable_joint_types()
     values = [0] * len(types)
-    
+
     configuration = Configuration(values, types)
     print configuration
 </item>
@@ -7272,11 +7272,11 @@ if not len(path_constraints):
     path_constraints = None
 
 if robot and robot.client and robot.client.is_connected and start_configuration and compute:
-    st[response_key] = robot.plan_motion(goal_constraints, 
-                                         start_configuration, 
-                                         group, 
+    st[response_key] = robot.plan_motion(goal_constraints,
+                                         start_configuration,
+                                         group,
                                          planner_id=str(planner_id),
-                                         path_constraints=path_constraints, 
+                                         path_constraints=path_constraints,
                                          attached_collision_object=None)
 
 response = st[response_key]</item>
@@ -7686,13 +7686,13 @@ from compas_fab.robots import Configuration
 joint_positions = []
 
 if response:
-    if response.error_code == MoveItErrorCodes.SUCCESS:
-        print response.trajectory_start
-        print response.planning_time
+    #if response.error_code == MoveItErrorCodes.SUCCESS:
+    print response.start_configuration
+    print response.planning_time
 
-        configurations = response.configurations
-        start_configuration = response.start_configuration
-    error = response.error_code.human_readable
+    configurations = response.points
+    start_configuration = response.start_configuration
+    #error = response.error_code.human_readable
 
 
 
@@ -8366,17 +8366,17 @@ if response:
     velocities = []
     accelerations = []
     time_from_start = []
-    
-    for p in response.trajectory.joint_trajectory.points:
+
+    for p in response.points:
         positions.append(p.positions)
         velocities.append(p.velocities)
         accelerations.append(p.accelerations)
-        time_from_start.append(p.time_from_start.seconds())
-    
+        time_from_start.append(p.time_from_start.seconds)
+
     P = list_to_ghtree(list(zip(*positions)))
     V = list_to_ghtree(list(zip(*velocities)))
     A = list_to_ghtree(list(zip(*accelerations)))
-    
+
     time = time_from_start[-1]
     print time</item>
                     <item name="Description" type_name="gh_string" type_code="10">A python scriptable component</item>
@@ -8891,16 +8891,16 @@ if response:
     positions = []
     velocities = []
     accelerations = []
-    
-    for p in response.solution.joint_trajectory.points:
+
+    for p in response.points:
         positions.append(p.positions)
         velocities.append(p.velocities)
         accelerations.append(p.accelerations)
-    
+
     P = list_to_ghtree(list(zip(*positions)))
     V = list_to_ghtree(list(zip(*velocities)))
     A = list_to_ghtree(list(zip(*accelerations)))
-    
+
 </item>
                     <item name="Description" type_name="gh_string" type_code="10">A python scriptable component</item>
                     <item name="EditorLocation" type_name="gh_drawing_point" type_code="30">
@@ -11130,7 +11130,7 @@ if scene:
     if remove:
         scene.remove_attached_collision_mesh(id)
         scene.remove_collision_mesh(id)
-        
+
 
 
 </item>
@@ -13102,7 +13102,7 @@ if robot:
                     <item name="Optional" type_name="gh_bool" type_code="1">false</item>
                     <item name="ScrollRatio" type_name="gh_double" type_code="6">0</item>
                     <item name="SourceCount" type_name="gh_int32" type_code="3">0</item>
-                    <item name="UserText" type_name="gh_string" type_code="10">If you specify the tolerance vector with [360, 1, 1], it means that 
+                    <item name="UserText" type_name="gh_string" type_code="10">If you specify the tolerance vector with [360, 1, 1], it means that
     the frame's y-axis and z-axis are allowed to rotate about the x-axis by an
     angle of 360 degrees, whereas the x-axis can only change 1 degree.</item>
                   </items>
@@ -13260,7 +13260,7 @@ if robot:
 if robot:
     types = robot.get_configurable_joint_types()
     values = [0] * len(types)
-    
+
     configuration = Configuration(values, types)
     print configuration
 </item>
