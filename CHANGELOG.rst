@@ -18,6 +18,8 @@ Unreleased
 * ROS Client: removed methods from ``Robot`` that are now handled with
   ``PlanningScene``, e.g. ``add_collision_mesh`` and
   ``add_attached_collision_mesh``
+* ROS Client: change the return type of ``plan_motion`` and ``plan_cartesian_motion``
+  to the new trajectory classes.
 * ROS File Server Loader: moved to ``compas_fab.backends`` package
 * ROS File Server Loader: renamed ``load`` to ``load_urdf`` and sync'd API to other loaders.
 * V-REP Client: renamed ``get_end_effector_pose`` to ``forward_kinematics``
@@ -31,6 +33,7 @@ Unreleased
 
 **Added**
 
+* Added ``scale`` method to ``Configuration``
 * Implemented Constraints (``OrientationConstraint``, ``PositionConstraint``, ``JointConstraint``) to use with ``plan_motion``
 * Implemented ``PlanningScene``, ``CollisionMesh`` and ``AttachedCollisionMesh``
 * Added generic representations for motion planning requests (``JointTrajectory``, ``JointTrajectoryPoint``, ``Duration``)
