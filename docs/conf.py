@@ -27,7 +27,7 @@ project = 'COMPAS FAB'
 year = '2018'
 author = 'Gramazio Kohler Research'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '0.4.1'
+version = release = '0.5.0'
 
 pygments_style = 'sphinx'
 show_authors = True
