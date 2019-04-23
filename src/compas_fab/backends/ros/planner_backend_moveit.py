@@ -149,6 +149,7 @@ class MoveItPlanner(PlannerBackend):
 
         def convert_to_trajectory(response):
             trajectory = JointTrajectory()
+            trajectory.source_message = response
             trajectory.fraction = response.fraction
             trajectory.points = convert_trajectory_points(response.solution.joint_trajectory.points, start_configuration.types)
             trajectory.start_configuration = Configuration(response.start_state.joint_state.position, start_configuration.types)
@@ -227,6 +228,7 @@ class MoveItPlanner(PlannerBackend):
 
         def convert_to_trajectory(response):
             trajectory = JointTrajectory()
+            trajectory.source_message = response
             trajectory.fraction = 1.
             trajectory.points = convert_trajectory_points(response.trajectory.joint_trajectory.points, start_configuration.types)
             trajectory.start_configuration = Configuration(response.trajectory_start.joint_state.position, start_configuration.types)
