@@ -712,8 +712,8 @@ class Robot(object):
         configuration: :class:`compas_fab.robots.Configuration`
             The target configuration.
         tolerances: list of float
-            The tolerances on each of the joints defining the bound to be
-            achieved. If only one value is passed it will be used to create
+            The tolerances (as +/-) on each of the joints defining the bound in radian
+            to be achieved. If only one value is passed it will be used to create
             bounds for all joint constraints.
         group: str, optional
             The planning group for which we specify the constraint. Defaults to
