@@ -891,6 +891,11 @@ class Robot(object):
             The planning group used for calculation. Defaults to the robot's
             main planning group.
 
+        Returns
+        -------
+        :class:`compas_fab.robots.JointTrajectory`
+            A joint trajectory with the resulting cartesian motion response.
+
         Examples
         --------
         >>> frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\
@@ -996,6 +1001,10 @@ class Robot(object):
         attached_collision_object: :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
 
+        Returns
+        -------
+        :class:`compas_fab.robots.JointTrajectory`
+            A joint trajectory with the resulting kinematic motion response.
 
         Examples
         --------
