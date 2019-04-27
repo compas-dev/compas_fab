@@ -124,15 +124,16 @@ class RosClient(Ros):
         return await_callback(self.forward_kinematics_async, **kwargs)
 
     def plan_cartesian_motion(self, frames, base_link,
-                              ee_link, group, joint_names, start_configuration,
-                              max_step, avoid_collisions, path_constraints,
-                              attached_collision_object):
+                              ee_link, group, joint_names, joint_types,
+                              start_configuration, max_step, avoid_collisions,
+                              path_constraints, attached_collision_object):
         kwargs = {}
         kwargs['frames'] = frames
         kwargs['base_link'] = base_link
         kwargs['ee_link'] = ee_link
         kwargs['group'] = group
         kwargs['joint_names'] = joint_names
+        kwargs['joint_types'] = joint_types
         kwargs['start_configuration'] = start_configuration
         kwargs['max_step'] = max_step
         kwargs['avoid_collisions'] = avoid_collisions
@@ -144,7 +145,7 @@ class RosClient(Ros):
         return await_callback(self.plan_cartesian_motion_async, **kwargs)
 
     def plan_motion(self, goal_constraints, base_link, ee_link, group,
-                    joint_names, start_configuration, path_constraints=None,
+                    joint_names, joint_types, start_configuration, path_constraints=None,
                     trajectory_constraints=None, planner_id='',
                     num_planning_attempts=8, allowed_planning_time=2.,
                     max_velocity_scaling_factor=1.,
@@ -158,6 +159,7 @@ class RosClient(Ros):
         kwargs['ee_link'] = ee_link
         kwargs['group'] = group
         kwargs['joint_names'] = joint_names
+        kwargs['joint_types'] = joint_types
         kwargs['start_configuration'] = start_configuration
         kwargs['path_constraints'] = path_constraints
         kwargs['trajectory_constraints'] = trajectory_constraints

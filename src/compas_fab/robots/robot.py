@@ -915,6 +915,7 @@ class Robot(object):
         base_link = self.get_base_link_name(group)
 
         joint_names = self.get_configurable_joint_names()
+        joint_types = self.get_configurable_joint_types(group)
         start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
         start_configuration.scale(1. / self.scale_factor)
 
@@ -938,7 +939,8 @@ class Robot(object):
             path_constraints_RCF_scaled = None
 
         trajectory = self.client.plan_cartesian_motion(frames_RCF, base_link,
-                                                       ee_link, group, joint_names, start_configuration,
+                                                       ee_link, group, joint_names,
+                                                       joint_types, start_configuration,
                                                        max_step_scaled, avoid_collisions,
                                                        path_constraints_RCF_scaled,
                                                        attached_collision_object)
@@ -1057,6 +1059,7 @@ class Robot(object):
             path_constraints_RCF_scaled = None
 
         joint_names = self.get_configurable_joint_names()
+        joint_types = self.get_configurable_joint_types(group)
         start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
         start_configuration.scale(1. / self.scale_factor)
 
@@ -1066,6 +1069,7 @@ class Robot(object):
         kwargs['ee_link'] = self.get_end_effector_link_name(group)
         kwargs['group'] = group
         kwargs['joint_names'] = joint_names
+        kwargs['joint_types'] = joint_types
         kwargs['start_configuration'] = start_configuration
         kwargs['path_constraints'] = path_constraints_RCF_scaled
         kwargs['trajectory_constraints'] = None
@@ -1086,8 +1090,6 @@ class Robot(object):
         trajectory.start_configuration.scale(self.scale_factor)
 
         return trajectory
-
-
 
     def send_frame(self):
         # (check service name with ros)

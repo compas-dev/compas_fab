@@ -124,9 +124,9 @@ class MoveItPlanner(PlannerBackend):
                                     robot_state), callback, errback)
 
     def plan_cartesian_motion_async(self, callback, errback, frames, base_link,
-                                    ee_link, group, joint_names, start_configuration,
-                                    max_step, avoid_collisions, path_constraints,
-                                    attached_collision_object):
+                                    ee_link, group, joint_names, joint_types,
+                                    start_configuration, max_step, avoid_collisions,
+                                    path_constraints, attached_collision_object):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
@@ -151,7 +151,7 @@ class MoveItPlanner(PlannerBackend):
             trajectory = JointTrajectory()
             trajectory.source_message = response
             trajectory.fraction = response.fraction
-            trajectory.points = convert_trajectory_points(response.solution.joint_trajectory.points, start_configuration.types)
+            trajectory.points = convert_trajectory_points(response.solution.joint_trajectory.points, joint_types)
             trajectory.start_configuration = Configuration(response.start_state.joint_state.position, start_configuration.types)
 
             callback(trajectory)
@@ -159,8 +159,9 @@ class MoveItPlanner(PlannerBackend):
         self.GET_CARTESIAN_PATH(self, request, convert_to_trajectory, errback)
 
     def plan_motion_async(self, callback, errback, goal_constraints, base_link,
-                          ee_link, group, joint_names, start_configuration,
-                          path_constraints=None, trajectory_constraints=None,
+                          ee_link, group, joint_names, joint_types,
+                          start_configuration, path_constraints=None,
+                          trajectory_constraints=None,
                           planner_id='', num_planning_attempts=8,
                           allowed_planning_time=2.,
                           max_velocity_scaling_factor=1.,
@@ -230,7 +231,7 @@ class MoveItPlanner(PlannerBackend):
             trajectory = JointTrajectory()
             trajectory.source_message = response
             trajectory.fraction = 1.
-            trajectory.points = convert_trajectory_points(response.trajectory.joint_trajectory.points, start_configuration.types)
+            trajectory.points = convert_trajectory_points(response.trajectory.joint_trajectory.points, joint_types)
             trajectory.start_configuration = Configuration(response.trajectory_start.joint_state.position, start_configuration.types)
             trajectory.planning_time = response.planning_time
 
