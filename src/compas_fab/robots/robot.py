@@ -763,7 +763,8 @@ class Robot(object):
 
     def inverse_kinematics(self, frame_WCF, start_configuration=None,
                            group=None, avoid_collisions=True,
-                           constraints=None, attempts=8):
+                           constraints=None, attempts=8, 
+                           attached_collision_mesh=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
@@ -783,6 +784,8 @@ class Robot(object):
             A set of constraints that the request must obey. Defaults to None.
         attempts: int, optional
             The maximum number of inverse kinematic attempts. Defaults to 8.
+        attached_collision_mesh: :class:`compas_fab.robots.AttachedCollisionMesh`
+            Defaults to None.
 
         Raises
         ------
@@ -816,7 +819,8 @@ class Robot(object):
 
         response = self.client.inverse_kinematics(frame_RCF, base_link,
                                                   group, joint_names, joint_positions,
-                                                  avoid_collisions, constraints, attempts)
+                                                  avoid_collisions, constraints, attempts,
+                                                  attached_collision_mesh)
 
         joint_positions = response.solution.joint_state.position
         joint_positions = self._scale_joint_values(
@@ -890,6 +894,12 @@ class Robot(object):
         group: str, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
+        path_constraints: list of :class:`compas_fab.robots.Constraint`, optional
+            Optional constraints that can be imposed along the solution path.
+            Note that path calculation won't work if the start_configuration
+            violates these constraints. Defaults to None.
+        attached_collision_mesh: :class:`compas_fab.robots.AttachedCollisionMesh`
+            Defaults to None.
 
         Examples
         --------

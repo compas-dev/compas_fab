@@ -96,7 +96,8 @@ class RosClient(Ros):
 
     def inverse_kinematics(self, frame, base_link, group,
                            joint_names, joint_positions, avoid_collisions=True,
-                           constraints=None, attempts=8):
+                           constraints=None, attempts=8, 
+                           attached_collision_mesh=None):
         kwargs = {}
         kwargs['frame'] = frame
         kwargs['base_link'] = base_link
