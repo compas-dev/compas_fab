@@ -126,7 +126,7 @@ class RosClient(Ros):
     def plan_cartesian_motion(self, frames, base_link,
                               ee_link, group, joint_names, joint_types,
                               start_configuration, max_step, avoid_collisions,
-                              path_constraints, attached_collision_object):
+                              path_constraints, attached_collision_mesh):
         kwargs = {}
         kwargs['frames'] = frames
         kwargs['base_link'] = base_link
@@ -138,7 +138,7 @@ class RosClient(Ros):
         kwargs['max_step'] = max_step
         kwargs['avoid_collisions'] = avoid_collisions
         kwargs['path_constraints'] = path_constraints
-        kwargs['attached_collision_object'] = attached_collision_object
+        kwargs['attached_collision_mesh'] = attached_collision_mesh
 
         kwargs['errback_name'] = 'errback'
 
@@ -150,7 +150,7 @@ class RosClient(Ros):
                     num_planning_attempts=8, allowed_planning_time=2.,
                     max_velocity_scaling_factor=1.,
                     max_acceleration_scaling_factor=1.,
-                    attached_collision_object=None,
+                    attached_collision_mesh=None,
                     workspace_parameters=None):
 
         kwargs = {}
@@ -168,7 +168,7 @@ class RosClient(Ros):
         kwargs['allowed_planning_time'] = allowed_planning_time
         kwargs['max_velocity_scaling_factor'] = max_velocity_scaling_factor
         kwargs['max_acceleration_scaling_factor'] = max_acceleration_scaling_factor
-        kwargs['attached_collision_object'] = attached_collision_object
+        kwargs['attached_collision_mesh'] = attached_collision_mesh
         kwargs['workspace_parameters'] = workspace_parameters
 
         kwargs['errback_name'] = 'errback'

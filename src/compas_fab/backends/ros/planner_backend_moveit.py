@@ -91,7 +91,7 @@ class MoveItPlanner(PlannerBackend):
 
     def inverse_kinematics_async(self, callback, errback, frame, base_link, group,
                                  joint_names, joint_positions, avoid_collisions=True,
-                                 constraints=None, attempts=8):
+                                 constraints=None, attempts=8, attached_collision_mesh=None):
         """Asynchronous handler of MoveIt IK service."""
         header = Header(frame_id=base_link)
         pose = Pose.from_frame(frame)
@@ -100,6 +100,9 @@ class MoveItPlanner(PlannerBackend):
             name=joint_names, position=joint_positions, header=header)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
+        if attached_collision_mesh:
+            aco = AttachedCollisionObject.from_attached_collision_mesh(attached_collision_mesh)
+            start_state.attached_collision_objects = [aco]
 
         ik_request = PositionIKRequest(group_name=group,
                                        robot_state=start_state,
@@ -126,7 +129,7 @@ class MoveItPlanner(PlannerBackend):
     def plan_cartesian_motion_async(self, callback, errback, frames, base_link,
                                     ee_link, group, joint_names, joint_types,
                                     start_configuration, max_step, avoid_collisions,
-                                    path_constraints, attached_collision_object):
+                                    path_constraints, attached_collision_mesh):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
@@ -134,9 +137,9 @@ class MoveItPlanner(PlannerBackend):
             header=header, name=joint_names, position=start_configuration.values)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
-        if attached_collision_object:
-            start_state.attached_collision_objects = [
-                attached_collision_object]
+        if attached_collision_mesh:
+            aco = AttachedCollisionObject.from_attached_collision_mesh(attached_collision_mesh)
+            start_state.attached_collision_objects = [aco]
 
         request = dict(header=header,
                        start_state=start_state,
@@ -166,7 +169,7 @@ class MoveItPlanner(PlannerBackend):
                           allowed_planning_time=2.,
                           max_velocity_scaling_factor=1.,
                           max_acceleration_scaling_factor=1.,
-                          attached_collision_object=None,
+                          attached_collision_mesh=None,
                           workspace_parameters=None):
         """Asynchronous handler of MoveIt motion planner service."""
 
@@ -178,9 +181,9 @@ class MoveItPlanner(PlannerBackend):
             header=header, name=joint_names, position=start_configuration.values)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
-        if attached_collision_object:
-            start_state.attached_collision_objects = [
-                attached_collision_object]
+        if attached_collision_mesh:
+            aco = AttachedCollisionObject.from_attached_collision_mesh(attached_collision_mesh)
+            start_state.attached_collision_objects = [aco]
 
         # goal constraints
         constraints = Constraints()
