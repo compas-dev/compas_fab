@@ -872,7 +872,7 @@ class Robot(object):
     def plan_cartesian_motion(self, frames_WCF, start_configuration=None,
                               max_step=0.01, avoid_collisions=True, group=None,
                               path_constraints=None,
-                              attached_collision_object=None):
+                              attached_collision_mesh=None):
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
@@ -943,7 +943,7 @@ class Robot(object):
                                                        joint_types, start_configuration,
                                                        max_step_scaled, avoid_collisions,
                                                        path_constraints_RCF_scaled,
-                                                       attached_collision_object)
+                                                       attached_collision_mesh)
         # Scale everything back to robot's scale
         for pt in trajectory.points:
             pt.scale(self.scale_factor)
@@ -957,7 +957,7 @@ class Robot(object):
                     num_planning_attempts=1, allowed_planning_time=2.,
                     max_velocity_scaling_factor=1.,
                     max_acceleration_scaling_factor=1.,
-                    attached_collision_object=None):
+                    attached_collision_mesh=None):
         """Calculates a motion path.
 
         Parameters
@@ -993,7 +993,7 @@ class Robot(object):
             Defaults to 1.
         max_acceleration_scaling_factor: float
             Defaults to 1.
-        attached_collision_object: :class:`compas_fab.robots.AttachedCollisionMesh`
+        attached_collision_mesh: :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
 
 
@@ -1078,7 +1078,7 @@ class Robot(object):
         kwargs['allowed_planning_time'] = allowed_planning_time
         kwargs['max_velocity_scaling_factor'] = max_velocity_scaling_factor
         kwargs['max_acceleration_scaling_factor'] = max_acceleration_scaling_factor
-        kwargs['attached_collision_object'] = attached_collision_object
+        kwargs['attached_collision_mesh'] = attached_collision_mesh
         kwargs['workspace_parameters'] = None
 
         trajectory = self.client.plan_motion(**kwargs)
