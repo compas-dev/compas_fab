@@ -56,6 +56,7 @@ class Element(object):
         self.grip_frame = frame
 
         self.mesh = None
+        self.centroid = frame[0]
 
     @property
     def frame(self):
@@ -149,6 +150,7 @@ class Element(object):
     def data(self, data):
         self.frame = Frame.from_data(data['frame'])
         self.grip_frame = data['grip_frame']
+        self.centroid = data['centroid']
 
     def to_data(self):
         """Returns the data dictionary that represents the element.
@@ -201,6 +203,23 @@ class Element(object):
         element.mesh = mesh
 
         return element
+
+    # --------------------------------------------------------------------------
+    # attributes
+    # --------------------------------------------------------------------------
+
+    def centroid(self, frame):
+        """Compute the centroid of the element.
+
+        Returns
+        -------
+        point
+            The XYZ location of the centroid.
+
+        """
+        self.centroid = frame[0]
+
+        return self.centroid
 
     # --------------------------------------------------------------------------
     # representation
