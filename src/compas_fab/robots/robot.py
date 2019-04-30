@@ -763,7 +763,8 @@ class Robot(object):
 
     def inverse_kinematics(self, frame_WCF, start_configuration=None,
                            group=None, avoid_collisions=True,
-                           constraints=None, attempts=8):
+                           constraints=None, attempts=8, 
+                           attached_collision_mesh=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
@@ -783,6 +784,8 @@ class Robot(object):
             A set of constraints that the request must obey. Defaults to None.
         attempts: int, optional
             The maximum number of inverse kinematic attempts. Defaults to 8.
+        attached_collision_mesh: :class:`compas_fab.robots.AttachedCollisionMesh`
+            Defaults to None.
 
         Raises
         ------
@@ -816,7 +819,8 @@ class Robot(object):
 
         response = self.client.inverse_kinematics(frame_RCF, base_link,
                                                   group, joint_names, joint_positions,
-                                                  avoid_collisions, constraints, attempts)
+                                                  avoid_collisions, constraints, attempts,
+                                                  attached_collision_mesh)
 
         joint_positions = response.solution.joint_state.position
         joint_positions = self._scale_joint_values(
@@ -872,7 +876,7 @@ class Robot(object):
     def plan_cartesian_motion(self, frames_WCF, start_configuration=None,
                               max_step=0.01, avoid_collisions=True, group=None,
                               path_constraints=None,
-                              attached_collision_object=None):
+                              attached_collision_mesh=None):
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
@@ -890,6 +894,12 @@ class Robot(object):
         group: str, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
+        path_constraints: list of :class:`compas_fab.robots.Constraint`, optional
+            Optional constraints that can be imposed along the solution path.
+            Note that path calculation won't work if the start_configuration
+            violates these constraints. Defaults to None.
+        attached_collision_mesh: :class:`compas_fab.robots.AttachedCollisionMesh`
+            Defaults to None.
 
         Examples
         --------
@@ -915,6 +925,7 @@ class Robot(object):
         base_link = self.get_base_link_name(group)
 
         joint_names = self.get_configurable_joint_names()
+        joint_types = self.get_configurable_joint_types(group)
         start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
         start_configuration.scale(1. / self.scale_factor)
 
@@ -938,10 +949,11 @@ class Robot(object):
             path_constraints_RCF_scaled = None
 
         trajectory = self.client.plan_cartesian_motion(frames_RCF, base_link,
-                                                       ee_link, group, joint_names, start_configuration,
+                                                       ee_link, group, joint_names,
+                                                       joint_types, start_configuration,
                                                        max_step_scaled, avoid_collisions,
                                                        path_constraints_RCF_scaled,
-                                                       attached_collision_object)
+                                                       attached_collision_mesh)
         # Scale everything back to robot's scale
         for pt in trajectory.points:
             pt.scale(self.scale_factor)
@@ -955,7 +967,7 @@ class Robot(object):
                     num_planning_attempts=1, allowed_planning_time=2.,
                     max_velocity_scaling_factor=1.,
                     max_acceleration_scaling_factor=1.,
-                    attached_collision_object=None):
+                    attached_collision_mesh=None):
         """Calculates a motion path.
 
         Parameters
@@ -991,7 +1003,7 @@ class Robot(object):
             Defaults to 1.
         max_acceleration_scaling_factor: float
             Defaults to 1.
-        attached_collision_object: :class:`compas_fab.robots.AttachedCollisionMesh`
+        attached_collision_mesh: :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
 
 
@@ -1057,6 +1069,7 @@ class Robot(object):
             path_constraints_RCF_scaled = None
 
         joint_names = self.get_configurable_joint_names()
+        joint_types = self.get_configurable_joint_types(group)
         start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
         start_configuration.scale(1. / self.scale_factor)
 
@@ -1066,6 +1079,7 @@ class Robot(object):
         kwargs['ee_link'] = self.get_end_effector_link_name(group)
         kwargs['group'] = group
         kwargs['joint_names'] = joint_names
+        kwargs['joint_types'] = joint_types
         kwargs['start_configuration'] = start_configuration
         kwargs['path_constraints'] = path_constraints_RCF_scaled
         kwargs['trajectory_constraints'] = None
@@ -1074,7 +1088,7 @@ class Robot(object):
         kwargs['allowed_planning_time'] = allowed_planning_time
         kwargs['max_velocity_scaling_factor'] = max_velocity_scaling_factor
         kwargs['max_acceleration_scaling_factor'] = max_acceleration_scaling_factor
-        kwargs['attached_collision_object'] = attached_collision_object
+        kwargs['attached_collision_mesh'] = attached_collision_mesh
         kwargs['workspace_parameters'] = None
 
         trajectory = self.client.plan_motion(**kwargs)
@@ -1086,8 +1100,6 @@ class Robot(object):
         trajectory.start_configuration.scale(self.scale_factor)
 
         return trajectory
-
-
 
     def send_frame(self):
         # (check service name with ros)
