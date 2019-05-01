@@ -25,8 +25,9 @@ class Element(object):
     data : dict
         The data representing the element.
         The dict has the following structure:
-        # * 'frame'      => :class:`compas.geometry.Frame`
-        # * 'grip_frame' => :class:`compas.geometry.Frame`
+        * 'name'       => str
+        * 'frame'      => :class:`compas.geometry.Frame`
+        * 'grip_frame' => :class:`compas.geometry.Frame`
 
     Examples
     --------
@@ -60,7 +61,7 @@ class Element(object):
 
     @property
     def frame(self):
-        """Frame: The linear element's frame."""
+        """Frame: The element's frame."""
         return self._frame
 
     @frame.setter
@@ -69,20 +70,12 @@ class Element(object):
 
     @property
     def grip_frame(self):
-        """grip_frame: The linear element's gripping frame."""
+        """grip_frame: The element's gripping frame."""
         return self._grip_frame
 
     @grip_frame.setter
     def grip_frame(self, frame):
         self._grip_frame = Frame(frame[0], frame[1], frame[2])
-
-    @classmethod
-    def update_frame(self, new_frame):
-        self.frame = Frame(new_frame[0], new_frame[1], new_frame[2])
-
-    @classmethod
-    def update_grip_frame(self, new_grip_frame):
-        self.grip_frame = Frame(new_grip_frame[0], new_grip_frame[1], new_grip_frame[2])
 
     # --------------------------------------------------------------------------
     # customisation
@@ -143,8 +136,12 @@ class Element(object):
         ...
 
         """
-        return {'frame': self.frame.data,
-                'grip_frame': self.grip_frame.data}
+        return {'name'      : "Element",
+                'frame'     : self.frame.data,
+                'grip_frame': self.grip_frame.data,
+                'mesh'      : self.mesh,
+                'centroid'  : self.centroid
+                }
 
     @data.setter
     def data(self, data):
@@ -257,5 +254,3 @@ if __name__ == "__main__":
 
     mesh = Mesh.from_polyhedron(4)
     element = Element.from_mesh(mesh)
-
-    print(element)
