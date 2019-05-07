@@ -136,7 +136,7 @@ class Element(object):
         ...
 
         """
-        return {'name'      : "Element",
+        return {'name'      : self.name,
                 'frame'     : self.frame.data,
                 'grip_frame': self.grip_frame.data,
                 'mesh'      : self.mesh,
@@ -145,6 +145,7 @@ class Element(object):
 
     @data.setter
     def data(self, data):
+        self.name = data['name']
         self.frame = Frame.from_data(data['frame'])
         self.grip_frame = data['grip_frame']
         self.centroid = data['centroid']
@@ -246,7 +247,6 @@ class Element(object):
 
 if __name__ == "__main__":
 
-    from compas_fab.assembly import Element
     from compas.datastructures import Mesh
 
     frame = Frame.worldXY()
@@ -254,3 +254,7 @@ if __name__ == "__main__":
 
     mesh = Mesh.from_polyhedron(4)
     element = Element.from_mesh(mesh)
+
+    print(element.data)
+    element.name = "Nooooone"
+    print(element.data)

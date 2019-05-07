@@ -4,6 +4,7 @@ from __future__ import division
 
 from compas.datastructures import Network
 
+
 __all__ = ['Assembly']
 
 
@@ -134,11 +135,13 @@ class Assembly(Network):
         The XYZ coordinates of the vertex are the coordinates of the centroid of the element. > decide if it should be edge
 
         """
-        attr = attr_dict or {}
-        attr.update(kwattr)
-        c = element.centroid
-        key = self.add_vertex(key=key, attr_dict=attr, x=c.x, y=c.y, z=c.z)
-        self.elements[key] = element
+
+        if isinstance(element, Element):
+            attr = attr_dict or {}
+            attr.update(kwattr)
+            c = element.centroid
+            key = self.add_vertex(key=key, attr_dict=attr, x=c.x, y=c.y, z=c.z)
+            self.elements[key] = element
 
         return key
 
@@ -146,7 +149,6 @@ if __name__ == "__main__":
 
 
     from compas.datastructures import Mesh
-    from compas_fab.assembly import Assembly
     from compas_fab.assembly import Element
 
     assembly = Assembly()
