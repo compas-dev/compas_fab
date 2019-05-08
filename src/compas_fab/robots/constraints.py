@@ -219,7 +219,7 @@ class OrientationConstraint(Constraint):
 
     def transform(self, transformation):
         R = Rotation.from_quaternion(self.quaternion)
-        R *= transformation
+        R = transformation * R
         self.quaternion = R.rotation.quaternion
 
     def __repr__(self):
