@@ -2,8 +2,8 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 
-from compas.datastructures import Network
-
+from compas.datastructures.network import Network
+from compas_fab.assembly.datastructures.element import Element
 
 __all__ = ['Assembly']
 
@@ -146,16 +146,15 @@ class Assembly(Network):
         return key
 
 if __name__ == "__main__":
+    pass
+    # from compas.datastructures import Mesh
+    # from compas_fab.assembly import Element
 
+    # assembly = Assembly()
+    # mesh = Mesh.from_polyhedron(4)
 
-    from compas.datastructures import Mesh
-    from compas_fab.assembly import Element
+    # for i in range(2):
+    #     element = Element.from_mesh(mesh)
+    #     assembly.add_element(element)
 
-    assembly = Assembly()
-    mesh = Mesh.from_polyhedron(4)
-
-    for i in range(2):
-        element = Element.from_mesh(mesh)
-        assembly.add_element(element)
-
-    print(assembly.summary())
+    # print(assembly.summary())

@@ -2,6 +2,9 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 
+# import json
+# import pickle
+
 from compas.geometry import Frame
 from compas.datastructures import Mesh
 
@@ -226,6 +229,32 @@ class Element(object):
     def __repr__(self):
         return 'Element({}, {})'.format(self.frame, self.grip_frame)
 
+    # def __str__(self):
+    #     """Generate a readable representation of the data of the element."""
+    #     return json.dumps(self.data, sort_keys=True, indent=4)
+
+    # --------------------------------------------------------------------------
+    # serialisation
+    # --------------------------------------------------------------------------
+
+    # def dumps(self):
+    #     """Dump the data representing the mesh to a string using Python's built-in
+    #     object serialisation.
+    #     Returns
+    #     -------
+    #     str
+    #         The pickled string representation of the data.
+    #     """
+
+    #     data = {'name'      : self.name,
+    #             'frame'     : self.frame.data,
+    #             'grip_frame': self.grip_frame.data,
+    #             'mesh'      : self.mesh,
+    #             'centroid'  : self.centroid
+    #     }
+
+    #     return pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL)
+
     # --------------------------------------------------------------------------
     # helpers
     # --------------------------------------------------------------------------
@@ -246,15 +275,16 @@ class Element(object):
 # ==============================================================================
 
 if __name__ == "__main__":
+    pass
+    # from compas.datastructures import Mesh
+    # from compas_fab.assembly import Element
 
-    from compas.datastructures import Mesh
+    # frame = Frame.worldXY()
+    # element = Element(frame)
 
-    frame = Frame.worldXY()
-    element = Element(frame)
+    # mesh = Mesh.from_polyhedron(4)
+    # element = Element.from_mesh(mesh)
 
-    mesh = Mesh.from_polyhedron(4)
-    element = Element.from_mesh(mesh)
-
-    print(element.data)
-    element.name = "Nooooone"
-    print(element.data)
+    # print(element.data)
+    # element.name = "An element"
+    # print(element)
