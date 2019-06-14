@@ -129,8 +129,9 @@ class MoveItPlanner(PlannerBackend):
 
     def plan_cartesian_motion_async(self, callback, errback, frames, base_link,
                                     ee_link, group, joint_names, joint_types,
-                                    start_configuration, max_step, avoid_collisions,
-                                    path_constraints, attached_collision_meshes):
+                                    start_configuration, max_step, jump_threshold,
+                                    avoid_collisions, path_constraints, 
+                                    attached_collision_meshes):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
@@ -149,6 +150,7 @@ class MoveItPlanner(PlannerBackend):
                        link_name=ee_link,
                        waypoints=waypoints,
                        max_step=float(max_step),
+                       jump_threshold=float(jump_threshold),
                        avoid_collisions=bool(avoid_collisions),
                        path_constraints=path_constraints)
 

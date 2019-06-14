@@ -126,8 +126,9 @@ class RosClient(Ros):
 
     def plan_cartesian_motion(self, frames, base_link,
                               ee_link, group, joint_names, joint_types,
-                              start_configuration, max_step, avoid_collisions,
-                              path_constraints, attached_collision_meshes):
+                              start_configuration, max_step, jump_threshold,
+                              avoid_collisions, path_constraints, 
+                              attached_collision_meshes):
         kwargs = {}
         kwargs['frames'] = frames
         kwargs['base_link'] = base_link
@@ -137,6 +138,7 @@ class RosClient(Ros):
         kwargs['joint_types'] = joint_types
         kwargs['start_configuration'] = start_configuration
         kwargs['max_step'] = max_step
+        kwargs['jump_threshold'] = jump_threshold
         kwargs['avoid_collisions'] = avoid_collisions
         kwargs['path_constraints'] = path_constraints
         kwargs['attached_collision_meshes'] = attached_collision_meshes

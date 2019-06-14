@@ -874,7 +874,8 @@ class Robot(object):
         return response
 
     def plan_cartesian_motion(self, frames_WCF, start_configuration=None,
-                              max_step=0.01, avoid_collisions=True, group=None,
+                              max_step=0.01, jump_threshold=1.57,
+                              avoid_collisions=True, group=None,
                               path_constraints=None,
                               attached_collision_meshes=None):
         """Calculates a cartesian motion path (linear in tool space).
@@ -889,6 +890,12 @@ class Robot(object):
         max_step: float
             The approximate distance between the calculated points. (Defined in
             the robot's units)
+        jump_threshold: float
+            The maximum allowed distance of joint positions between consecutive
+            points. If the distance is found to be above this threshold, the 
+            path computation fails. It must be specified in relation to max_step.
+            If this theshhold is 0, 'jumps' might occur, resulting in an invalid
+            cartesian path. Defaults to pi/2.
         avoid_collisions: bool, optional
             Whether or not to avoid collisions. Defaults to True.
         group: str, optional
@@ -910,6 +917,7 @@ class Robot(object):
         >>> response = robot.plan_cartesian_motion(frames,\
                                                    start_configuration,\
                                                    max_step=0.01,\
+                                                   jump_threshold=1.57,
                                                    avoid_collisions=True,\
                                                    group=group)
         """
@@ -951,7 +959,8 @@ class Robot(object):
         trajectory = self.client.plan_cartesian_motion(frames_RCF, base_link,
                                                        ee_link, group, joint_names,
                                                        joint_types, start_configuration,
-                                                       max_step_scaled, avoid_collisions,
+                                                       max_step_scaled, jump_threshold,
+                                                       avoid_collisions,
                                                        path_constraints_RCF_scaled,
                                                        attached_collision_meshes)
         # Scale everything back to robot's scale
