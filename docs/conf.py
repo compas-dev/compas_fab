@@ -34,8 +34,8 @@ show_authors = True
 add_module_names = True
 templates_path = ['_templates', ]
 extlinks = {
-    'issue': ('https://github.com/gramaziokohler/compas_fab/issues/%s', '#'),
-    'pr': ('https://github.com/gramaziokohler/compas_fab/pull/%s', 'PR #'),
+    'issue': ('https://github.com/compas-dev/compas_fab/issues/%s', '#'),
+    'pr': ('https://github.com/compas-dev/compas_fab/pull/%s', 'PR #'),
 }
 
 # intersphinx options
