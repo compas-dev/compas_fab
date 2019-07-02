@@ -10,3 +10,5 @@ Authors
 * Kathrin Dörfler <doerfler@arch.ethz.ch> `@Kathrin3010 <https://github.com/Kathrin3010>`_
 * Matthias Helmreich <helmreich@arch.ethz.ch> `@mhelmrei <https://github.com/mhelmrei>`_
 * Augusto Gandia <gandia@arch.ethz.ch> `@augustogandia <https://github.com/augustogandia>`_
+* Inés Ariza <ariza@arch.ethz.ch> `@inesariza <https://github.com/inesariza>`_
+* Yijiang Huang <yijiangh@mit.edu> `@yijiangh <https://github.com/yijiangh>`_

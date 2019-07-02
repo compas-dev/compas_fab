@@ -73,7 +73,10 @@ class Element(object):
 
     @property
     def grip_frame(self):
-        """grip_frame: The element's gripping frame."""
+        """grip_frame: The element's gripping frame.
+
+        TODO: in terms of what parent frame?
+        """
         return self._grip_frame
 
     @grip_frame.setter

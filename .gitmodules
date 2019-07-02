@@ -1,0 +1,3 @@
+[submodule "tests/assembly"]
+	path = tests/assembly
+	url = https://github.com/yijiangh/compas_fab.assembly_tests.git

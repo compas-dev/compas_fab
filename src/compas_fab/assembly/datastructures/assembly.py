@@ -77,41 +77,86 @@ class Assembly(Network):
 
     __module__ = 'compas_assembly.datastructures'
 
-    def __init__(self,
-                    elements=None,
-                    attributes=None,
-                    default_vertex_attributes=None,
-                    default_edge_attributes=None):
+    def __init__(self, elements=None, attributes=None, default_vertex_attributes=None,
+    default_edge_attributes=None):
+        super(Assembly, self).__init__()
 
-            super(Assembly, self).__init__()
+        # self.elements = {}
+        # self.attributes.update({'name': 'Assembly'})
+        # if attributes is not None:
+        #     self.attributes.update(attributes)
+        #
+        # self.default_vertex_attributes.update({
+        #     'is_placed': False
+        #     # 'is_support': False, # confusing name: all elements are supports of each other?
+        #     # 'course': None, # not generic enough, category for location?
+        # })
+        # if default_vertex_attributes is not None:
+        #     self.default_vertex_attributes.update(default_vertex_attributes)
+        #
+        # self.default_edge_attributes.update({
+        #     'interface_points': None,
+        #     'interface_type': None,
+        #     'interface_size': None,
+        #     'interface_uvw': None,
+        #     'interface_origin': None,
+        #     'interface_forces': None,
+        # })
+        # if default_edge_attributes is not None:
+        #     self.default_edge_attributes.update(default_edge_attributes)
+        #
+        # if elements:
+        #     for element in elements:
+        #         self.add_element(element)
 
-            self.elements = {}
-            self.attributes.update({'name': 'Assembly'})
-            if attributes is not None:
-                self.attributes.update(attributes)
+    # --------------
+    # constructors
+    # --------------
+    @classmethod
+    def from_network(cls, net):
+        """generate an assembly network from a network, which only contains
+        abstract connectivity info.
 
-            self.default_vertex_attributes.update({
-                'is_placed': False
-                # 'is_support': False, # confusing name: all elements are supports of each other?
-                # 'course': None, # not generic enough, category for location?
-            })
-            if default_vertex_attributes is not None:
-                self.default_vertex_attributes.update(default_vertex_attributes)
+        The generated assembly assumes pairwise virtual joint model. For example,
+        if three elements are joined together, calling `from_network` will create
+        three virtual joints on J(e2, e2), J(e2, e3), J(e1, e3), instead of
+        J(e1, e2, e3).
 
-            self.default_edge_attributes.update({
-                'interface_points': None,
-                'interface_type': None,
-                'interface_size': None,
-                'interface_uvw': None,
-                'interface_origin': None,
-                'interface_forces': None,
-            })
-            if default_edge_attributes is not None:
-                self.default_edge_attributes.update(default_edge_attributes)
+        # TODO: make a `merge` fn for the virtual joint object.
 
-            if elements:
-                for element in elements:
-                    self.add_element(element)
+        Parameters
+        ----------
+        cls : type
+        net : compas Network
+            a network that contains connectivity info between unit elements
+            The network's vertices represent unit assembly elements, edges
+            represents connectivity between parts.
+
+        Returns
+        -------
+        Assembly
+            an assembly object that contains only abstract connecvity info.
+
+        """
+        as_net = cls()
+        as_net.vertex = net.vertex
+        as_net.edge = net.edge
+        as_net.halfedge = net.halfedge
+        as_net.attributes = net.attributes
+        # TODO: create default virtual joints between objects
+        return as_net
+
+    @classmethod
+    def from_network_and_assembly_objects(cls, net, objs):
+        assert(net.number_of_vertices()==len(objs), \
+            "assembly objects and network vertices not aligned!")
+        as_net = cls.from_network(net)
+
+        # assign assembly object attribute
+        for i, vert_key in enumerate(as_net.vertices()):
+            objs[i].id = i
+            as_net.set_vertex_attribute(vert_key, "assembly_object", objs[i])
+        return as_net
 
     def add_element(self, element, key=None, attr_dict=None, **kwattr):
         """Add an element to the assembly.
@@ -135,15 +180,7 @@ class Assembly(Network):
         The XYZ coordinates of the vertex are the coordinates of the centroid of the element. > decide if it should be edge
 
         """
-
-        if isinstance(element, Element):
-            attr = attr_dict or {}
-            attr.update(kwattr)
-            c = element.centroid
-            key = self.add_vertex(key=key, attr_dict=attr, x=c.x, y=c.y, z=c.z)
-            self.elements[key] = element
-
-        return key
+        pass
 
 if __name__ == "__main__":
     pass
