@@ -145,24 +145,19 @@ class RobotSemantics(object):
 
 if __name__ == "__main__":
 
-    import os
+    import compas_fab
     from compas.robots import RobotModel
 
-    path = r"C:\Users\rustr\workspace\robot_description"
+    urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
+    srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
 
-    for item in os.listdir(path):
-        fullpath = os.path.join(path, item)
-        if os.path.isdir(fullpath) and item[0] != ".":
-            urdf_file = os.path.join(fullpath, 'urdf', 'robot_description.urdf')
-            srdf_file = os.path.join(fullpath, 'robot_description_semantic.srdf')
+    model = RobotModel.from_urdf_file(urdf_filename)
+    semantics = RobotSemantics.from_srdf_file(srdf_filename, model)
 
-            urdf_model = RobotModel.from_urdf_file(urdf_file)
-            srdf_model = RobotSemantics.from_srdf_file(srdf_file, urdf_model)
-
-            print(urdf_model.name)
-            print("group_names:", srdf_model.group_names)
-            print("main_group_name:", srdf_model.main_group_name)
-            print("base_link_name:", srdf_model.get_base_link_name())
-            print("ee_link_name:", srdf_model.get_end_effector_link_name())
-            print("configurable_joints:", srdf_model.get_configurable_joint_names())
-            print()
+    print(model.name)
+    print("group_names:", semantics.group_names)
+    print("main_group_name:", semantics.main_group_name)
+    print("base_link_name:", semantics.get_base_link_name())
+    print("ee_link_name:", semantics.get_end_effector_link_name())
+    print("configurable_joints:", semantics.get_configurable_joint_names())
+    print()
