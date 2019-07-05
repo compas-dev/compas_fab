@@ -11,8 +11,8 @@ from compas.geometry import Frame, cross_vectors, Transformation
 
 from .element import Element
 from .virtual_joint import VirtualJoint
-from .utils import obj_name, cframe2json, transform_cmesh, element_vert_key, \
-    virtual_joint_key
+from .utils import cframe2json, transform_cmesh, element_vert_key, \
+    virtual_joint_key, extract_element_vert_id, obj_name
 
 
 __all__ = ['Assembly']
@@ -76,8 +76,23 @@ class Assembly(object):
         pass
 
     def get_element(self, e_id):
+        if isinstance(e_id, int):
+            e_key = element_vert_key(e_id)
+        elif isinstance(e_id, str) and extract_element_vert_id(e_id):
+            e_key = e_id
+        else:
+            return None
+
         # assert(element_vert_key(e_id) in self._net.vertex)
-        return self._net.get_vertex_attribute(element_vert_key(e_id), 'element')
+        return self._net.get_vertex_attribute(e_key, 'element')
+
+    @property
+    def elements(self):
+        e_dict = dict()
+        for v_key in self._net.vertex.keys():
+            if extract_element_vert_id(v_key):
+                e_dict[v_key] = self.get_element(v_key)
+        return e_dict
 
     def get_element_neighbored_elements(self, e_id):
         # network neighbor, check vertex tag
@@ -103,109 +118,95 @@ class Assembly(object):
         return [transform_cmesh(cm, world_place_tf) \
         for cm in self._element_geometries[element_vert_key(e_id)]]
 
-    # @classmethod
-    # def from_network_and_assembly_objects(cls, net, objs):
-    #     assert(net.number_of_vertices()==len(objs), \
-    #         "assembly objects and network vertices not aligned!")
-    #     as_instance = cls.from_network(net)
-    #
-    #     # assign assembly object attribute
-    #     for i, vert_key in enumerate(as_instance.as_net.vertices()):
-    #         objs[i].id = i
-    #         as_instance.as_net.set_vertex_attribute(vert_key, "assembly_object", objs[i])
-    #     return as_net
+    # --------------
+    # exporters
+    # --------------
+    def save_element_geometries_to_objs(self, mesh_path):
+        if not os.path.isdir(mesh_path):
+            os.mkdir(mesh_path)
+        for eg_key, eg_val in self._element_geometries.items():
+            for sub_id, cm in enumerate(eg_val):
+                cm.to_obj(os.path.join(mesh_path, obj_name(eg_key, sub_id)))
 
-#     # --------------
-#     # exporters
-#     # --------------
-#     def save_assembly_object_to_objs(self, mesh_path):
-#         if not os.path.isdir(mesh_path):
-#             os.mkdir(mesh_path)
-#
-#         for as_obj in self.assembly_objects:
-#             for i, s in enumerate(as_obj.shape):
-#                 s.to_obj(os.path.join(mesh_path, obj_name(as_obj.id, i)))
-#
-#     def save_assembly_network_to_json(self, json_path, pkg_name='', \
-#             assembly_type='', model_type='', unit=''):
-#         if not os.path.isdir(json_path):
-#             os.mkdir(json_path)
-#
-#         json_file_path = os.path.join(json_path, pkg_name + '.json')
-#
-#         data = OrderedDict()
-#         data['pkg_name'] = pkg_name
-#         data['assembly_type'] = assembly_type
-#         data['model_type'] = model_type
-#         data['unit'] = unit
-#
-#         data['element_number'] = self.number_of_vertices()
-#         data['sequenced_elements'] = []
-#
-#         for v in self.vertices():
-#             assert(v == self.assembly_object(v).id)
-#             ao = self.assembly_object(v)
-#
-#             e_data = OrderedDict()
-#             e_data['order_id'] = v
-#             e_data['base_frame'] = cframe2json(ao.base_frame)
-#             e_data['element_geometry_file_names'] = [obj_name(v, sub_id) \
-#                 for sub_id in range(len(ao.shape))]
-#
-#             grasp_data = OrderedDict()
-#             grasp_data['parent_link'] = 'object' #world
-#             grasp_data['ee_poses'] = [cframe2json(ee_p) \
-#                 for ee_p in ao.object_from_ee_poses]
-#
-#             pick = OrderedDict()
-#             pick['process_name'] = 'pick'
-#             pick['base_frame'] = cframe2json(ao.base_frame)
-#             pick['target_pose'] = cframe2json(ao.shape_pick_pose)
-#             pick['allowed_collision_obj_names'] = [] # support tables
-#
-#             place = OrderedDict()
-#             place['process_name'] = 'place'
-#             place['base_frame'] = cframe2json(ao.base_frame)
-#             place['target_pose'] = cframe2json(ao.shape_place_pose)
-#             place['allowed_collision_obj_names'] = [] # support tables
-#             for nghb_id in self.vertex_neighborhood(v):
-#                 place['allowed_collision_obj_names'].extend(
-#                     [obj_name(nghb_id, sub_id) \
-#                         for sub_id in range(len(self.assembly_object(nghb_id).shape))])
-#
-#             grasp_data['processes'] = [pick, place]
-#             e_data['grasps'] = grasp_data
-#
-#             data['sequenced_elements'].append(e_data)
-#
-#         with open(json_file_path, 'w') as outfile:
-#             json.dump(data, outfile, indent=4)
-#
-#     def save_assembly_network_to_urdf(self, urdf_path):
-#         pass
-#
-#     def save_to_assembly_planning_pkg(self, save_path, pkg_name, \
-#         assembly_type="", model_type="", unit=""):
-#         root_path = os.path.join(save_path, pkg_name)
-#         if not os.path.isdir(root_path):
-#             os.mkdir(root_path)
-#
-#         json_path = os.path.join(root_path, "json")
-#         mesh_path = os.path.join(root_path, "meshes", "collision")
-#         urdf_path = os.path.join(root_path, "urdf")
-#         check_paths = [json_path, mesh_path, urdf_path]
-#         for p in check_paths:
-#             if not os.path.isdir(p):
-#                 os.mkdir(p)
-#
-#         # generate obj files
-#         self.save_assembly_object_to_objs(mesh_path)
-#
-#         # generate json
-#         self.save_assembly_network_to_json(json_path, pkg_name, assembly_type, model_type, unit)
-#
-#         # genereate urdf
-# #        self.save_assembly_network_to_urdf(urdf_path)
+    def save_assembly_to_json(self, json_path, pkg_name='', assembly_type='', model_type='', unit='', given_seq=None):
+        if not os.path.isdir(json_path):
+            os.mkdir(json_path)
+        json_file_path = os.path.join(json_path, pkg_name + '.json')
+
+        data = OrderedDict()
+        data['pkg_name'] = pkg_name
+        data['assembly_type'] = assembly_type
+        data['model_type'] = model_type
+        data['unit'] = unit
+        data['with_given_sequence'] = bool(given_seq)
+        # TODO: sanity check: vj geo + element geo = given seq
+
+        data['element_number'] = self._num_of_elements
+        data['sequenced_elements'] = []
+
+        for e, order_id in zip(self.elements.values(), given_seq):
+            e_data = OrderedDict()
+            e_data['order_id'] = order_id
+            e_data['object_id'] = e.key
+            e_data['parent_frame'] = cframe2json(e.parent_frame)
+            e_data['element_geometry_file_names'] = [obj_name(e.key, sub_id) \
+                for sub_id in range(len(self._element_geometries[e.key]))]
+
+            grasp_data = OrderedDict()
+
+            pick = OrderedDict()
+            pick['process_name'] = 'pick'
+            pick['parent_frame'] = cframe2json(e.parent_frame)
+            pick['target_pose'] = cframe2json(e.world_from_element_pick_pose)
+            pick['allowed_collision_obj_names'] = [] # support tables
+
+            place = OrderedDict()
+            place['process_name'] = 'place'
+            place['base_frame'] = cframe2json(e.parent_frame)
+            place['target_pose'] = cframe2json(e.world_from_element_place_pose)
+            place['allowed_collision_obj_names'] = [] # support tables
+            # TODO: neighbor ACM
+            # for nghb_id in self.vertex_neighborhood(v):
+            #     place['allowed_collision_obj_names'].extend(
+            #         [obj_name(nghb_id, sub_id) \
+            #             for sub_id in range(len(self.assembly_object(nghb_id).shape))])
+
+            grasp_data['processes'] = [pick, place]
+            grasp_data['parent_link'] = 'object'
+            grasp_data['ee_poses'] = [cframe2json(ee_p) \
+                for ee_p in e.obj_from_grasp_poses]
+
+            e_data['grasps'] = grasp_data
+            data['sequenced_elements'].append(e_data)
+
+        with open(json_file_path, 'w') as outfile:
+            json.dump(data, outfile, indent=4)
+
+    # def save_assembly_to_urdf(self, urdf_path):
+    #     pass
+
+    def save_to_assembly_planning_pkg(self, save_path, pkg_name, \
+        assembly_type="", model_type="", unit="", given_seq=None):
+        root_path = os.path.join(save_path, pkg_name)
+        if not os.path.isdir(root_path):
+            os.mkdir(root_path)
+
+        json_path = os.path.join(root_path, "json")
+        mesh_path = os.path.join(root_path, "meshes", "collision")
+        urdf_path = os.path.join(root_path, "urdf")
+        check_paths = [json_path, mesh_path, urdf_path]
+        for p in check_paths:
+            if not os.path.isdir(p):
+                os.mkdir(p)
+
+        # generate obj files
+        self.save_element_geometries_to_objs(mesh_path)
+
+        # generate json
+        self.save_assembly_to_json(json_path, pkg_name, assembly_type, model_type, unit, given_seq)
+
+        # TODO: genereate static collision objects urdf
+        # self.generate_env_collision_objects_urdf(collision_objs, urdf_path)
 
 if __name__ == "__main__":
     pass

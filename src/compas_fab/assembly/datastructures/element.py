@@ -6,8 +6,7 @@ from __future__ import division
 # import pickle
 
 from compas.geometry import Frame, Transformation
-from compas.datastructures import Mesh
-from .utils import element_vert_key
+from .utils import element_vert_key, extract_element_vert_id
 
 __all__ = ['Element']
 
@@ -17,6 +16,7 @@ class Element(object):
 
     def __init__(self, id):
         super(Element, self).__init__()
+        self._parent_frame = Frame.worldXY() # TODO
         self._key = element_vert_key(id)
         self._world_from_element_place_pose = None
         self._world_from_element_pick_pose = None
@@ -26,8 +26,13 @@ class Element(object):
     def key(self):
         return self._key
 
+    @property
     def key_id(self):
-        pass
+        return extract_element_vert_id(self.key)
+
+    @property
+    def parent_frame(self):
+        return self._parent_frame
 
     @property
     def world_from_element_place_pose(self):
