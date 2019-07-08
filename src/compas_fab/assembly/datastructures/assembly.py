@@ -11,7 +11,7 @@ from compas.geometry import Frame, cross_vectors, Transformation
 
 from .element import Element
 from .virtual_joint import VirtualJoint
-from .utils import cframe2json, transform_cmesh, element_vert_key, \
+from .utils import transform_cmesh, element_vert_key, \
     virtual_joint_key, extract_element_vert_id, obj_name
 
 
@@ -148,32 +148,36 @@ class Assembly(object):
             e_data = OrderedDict()
             e_data['order_id'] = order_id
             e_data['object_id'] = e.key
-            e_data['parent_frame'] = cframe2json(e.parent_frame)
+            e_data['parent_frame'] = Transformation.from_frame(e.parent_frame).list
             e_data['element_geometry_file_names'] = [obj_name(e.key, sub_id) \
                 for sub_id in range(len(self._element_geometries[e.key]))]
 
-            grasp_data = OrderedDict()
-
+            e_data['assembly_process'] = OrderedDict()
             pick = OrderedDict()
             pick['process_name'] = 'pick'
-            pick['parent_frame'] = cframe2json(e.parent_frame)
-            pick['target_pose'] = cframe2json(e.world_from_element_pick_pose)
-            pick['allowed_collision_obj_names'] = [] # support tables
+            pick['parent_frame'] = Transformation.from_frame(e.parent_frame).list
+            pick['object_target_pose'] = Transformation.from_frame(e.world_from_element_pick_pose).list
+            pick['allowed_collision_obj_names'] = [] # support tables, neighbor elements?
+            # old names: pick_contact_ngh_ids, pick_support_surface_file_names
+            pick['grasp_from_approach_tf'] = e.grasp_from_approach_tf.list
+            e_data['assembly_process']['pick'] = pick
 
             place = OrderedDict()
             place['process_name'] = 'place'
-            place['base_frame'] = cframe2json(e.parent_frame)
-            place['target_pose'] = cframe2json(e.world_from_element_place_pose)
+            place['parent_frame'] = Transformation.from_frame(e.parent_frame).list
+            place['object_target_pose'] = Transformation.from_frame(e.world_from_element_place_pose).list
             place['allowed_collision_obj_names'] = [] # support tables
+            place['grasp_from_approach_tf'] = e.grasp_from_approach_tf.list
+            e_data['assembly_process']['place'] = place
             # TODO: neighbor ACM
             # for nghb_id in self.vertex_neighborhood(v):
             #     place['allowed_collision_obj_names'].extend(
             #         [obj_name(nghb_id, sub_id) \
             #             for sub_id in range(len(self.assembly_object(nghb_id).shape))])
 
-            grasp_data['processes'] = [pick, place]
+            grasp_data = OrderedDict()
             grasp_data['parent_link'] = 'object'
-            grasp_data['ee_poses'] = [cframe2json(ee_p) \
+            grasp_data['ee_poses'] = [Transformation.from_frame(ee_p).list \
                 for ee_p in e.obj_from_grasp_poses]
 
             e_data['grasps'] = grasp_data

@@ -21,6 +21,7 @@ class Element(object):
         self._world_from_element_place_pose = None
         self._world_from_element_pick_pose = None
         self._obj_from_grasp_poses = None
+        self._grasp_from_approach_tf = None
 
     @property
     def key(self):
@@ -57,6 +58,14 @@ class Element(object):
     @obj_from_grasp_poses.setter
     def obj_from_grasp_poses(self, grasp_poses):
         self._obj_from_grasp_poses = grasp_poses
+
+    @property
+    def grasp_from_approach_tf(self):
+        return self._grasp_from_approach_tf
+
+    @grasp_from_approach_tf.setter
+    def grasp_from_approach_tf(self, tf):
+        self._grasp_from_approach_tf = tf
 
     def set_grasp_poses_from_in_scene_poses(self, world_from_obj_pose, world_from_ee_poses):
         """create obj_from_grasp poses from world
