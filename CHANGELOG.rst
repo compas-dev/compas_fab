@@ -14,6 +14,8 @@ Unreleased
 
 **Added**
 
+* Adding `jump_threshold` parameter to ``plan_cartesian_motion``
+
 **Removed**
 
 0.5.0

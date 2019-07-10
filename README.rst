@@ -4,11 +4,11 @@ COMPAS FAB: Robotic Fabrication for COMPAS
 
 .. start-badges
 
-.. image:: https://travis-ci.com/gramaziokohler/compas_fab.svg?branch=master
-    :target: https://travis-ci.com/gramaziokohler/compas_fab
+.. image:: https://travis-ci.com/compas-dev/compas_fab.svg?branch=master
+    :target: https://travis-ci.com/compas-dev/compas_fab
     :alt: Travis-CI Build Status
 
-.. image:: https://img.shields.io/github/license/gramaziokohler/compas_fab.svg
+.. image:: https://img.shields.io/github/license/compas-dev/compas_fab.svg
     :target: https://pypi.python.org/pypi/compas_fab
     :alt: License
 
@@ -96,7 +96,7 @@ Contributing
 
 We love contributions!
 
-Check the `Contributor's Guide <https://github.com/gramaziokohler/compas_fab/blob/master/CONTRIBUTING.rst>`_
+Check the `Contributor's Guide <https://github.com/compas-dev/compas_fab/blob/master/CONTRIBUTING.rst>`_
 for more details.
 
 
@@ -124,4 +124,4 @@ Credits
 -------
 
 This package is maintained by Gramazio Kohler Research `@gramaziokohler <https://github.com/gramaziokohler>`_
-and a long list of `contributors <https://github.com/gramaziokohler/compas_fab/blob/master/AUTHORS.rst>`_
+and a long list of `contributors <https://github.com/compas-dev/compas_fab/blob/master/AUTHORS.rst>`_

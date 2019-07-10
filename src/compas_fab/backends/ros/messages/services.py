@@ -128,7 +128,7 @@ class GetCartesianPathRequest(ROSmsg):
         self.link_name = link_name  # ee_link
         self.waypoints = waypoints if waypoints else []  # geometry_msgs/Pose[]
         self.max_step = float(max_step)
-        self.jump_threshold = jump_threshold
+        self.jump_threshold = float(jump_threshold)
         self.avoid_collisions = avoid_collisions
         self.path_constraints = path_constraints or Constraints()  # moveit_msgs/Constraints
 
