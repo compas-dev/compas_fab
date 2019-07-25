@@ -1139,11 +1139,11 @@ class Robot(object):
     # drawing
     # ==========================================================================
 
-    def update(self, configuration, collision=True, group=None):
+    def update(self, configuration, group=None, visual=True, collision=True):
         """Updates the robot's geometry.
         """
         names = self.get_configurable_joint_names(group)
-        self.artist.update(configuration, collision, names)
+        self.artist.update(configuration, names, visual, collision)
 
     def draw_visual(self):
         """Draws the visual geometry of the robot in the respective CAD environment.

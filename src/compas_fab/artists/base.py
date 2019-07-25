@@ -129,7 +129,7 @@ class BaseRobotArtist(object):
             # Recursive call
             self.scale_link(child_joint.child_link, transformation)
 
-    def update(self, configuration, collision=True, names=[]):
+    def update(self, configuration, names, visual=True, collision=True):
         """Trigger the update of the robot geometry.
 
         Parameters
@@ -140,12 +140,10 @@ class BaseRobotArtist(object):
             ``True`` if the collision geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
         """
-        if not len(names):
-            names = self.robot.get_configurable_joint_names()
         positions = configuration.values
-        self.update_links(names, positions, collision)
+        self.update_links(names, positions, visual, collision)
 
-    def update_links(self, names, positions, collision=True):
+    def update_links(self, names, positions, visual=True, collision=True):
         """Updates the joints and link geometries.
 
         Parameters
@@ -161,9 +159,9 @@ class BaseRobotArtist(object):
         if len(names) != len(positions):
             raise ValueError("len(names): %d is not len(positions) %d" % (len(names), len(positions)))
         joint_state = dict(zip(names, positions))
-        self.update_link(self.robot.root, joint_state, Transformation(), Transformation(), collision)
+        self.update_link(self.robot.root, joint_state, Transformation(), Transformation(), visual, collision)
 
-    def update_link(self, link, joint_state, parent_transformation, reset_transformation, collision=True):
+    def update_link(self, link, joint_state, parent_transformation, reset_transformation, visual=True, collision=True):
         """Recursive function to apply the transformations given by the joint state.
 
         The parameter ``joint_state`` is given as absolute values,
@@ -185,8 +183,9 @@ class BaseRobotArtist(object):
 
         relative_transformation = parent_transformation * reset_transformation
 
-        for item in link.visual:
-            self.transform(item.native_geometry, relative_transformation)
+        if visual:
+            for item in link.visual:
+                self.transform(item.native_geometry, relative_transformation)
 
         if collision:
             for item in link.collision:
@@ -211,7 +210,7 @@ class BaseRobotArtist(object):
             child_joint.transform(transformation)
 
             # 4. Apply function to all children in the chain
-            self.update_link(child_joint.child_link, joint_state, transformation, reset_transformation, collision)
+            self.update_link(child_joint.child_link, joint_state, transformation, reset_transformation, visual, collision)
 
     def draw_visual(self):
         """Draws all visual geometry of the robot."""
