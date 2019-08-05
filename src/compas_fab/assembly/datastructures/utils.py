@@ -5,6 +5,8 @@ ELEMENT_KEY_PREFIX = 'e'
 VIRTUAL_JOINT_KEY_PREFIX = 'vj'
 KEY_SEPARATOR = '_'
 
+STATIC_OBSTACLE_PREFIX = 'static_obstacle'
+
 def element_vert_key(id):
     return ELEMENT_KEY_PREFIX + KEY_SEPARATOR + str(id)
 

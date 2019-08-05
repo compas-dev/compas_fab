@@ -12,7 +12,7 @@ from compas.geometry import Frame, cross_vectors, Transformation
 from .element import Element
 from .virtual_joint import VirtualJoint
 from .utils import transform_cmesh, element_vert_key, \
-    virtual_joint_key, extract_element_vert_id, obj_name
+    virtual_joint_key, extract_element_vert_id, obj_name, STATIC_OBSTACLE_PREFIX
 
 
 __all__ = ['Assembly']
@@ -43,8 +43,9 @@ class Assembly(object):
     def __init__(self, elements=None, attributes=None):
         super(Assembly, self).__init__()
         self._net = Network()
-        self._element_geometries = dict() # object frame moved to world frame
-        self._virtual_joint_geometries = dict()
+        self._element_geometries = {} # object frame moved to world frame
+        self._virtual_joint_geometries = {}
+        self._static_obstacle_geometries = {}
         self._num_of_elements = 0
         self._num_of_virtual_joints = 0
 
@@ -78,7 +79,7 @@ class Assembly(object):
     def get_element(self, e_id):
         if isinstance(e_id, int):
             e_key = element_vert_key(e_id)
-        elif isinstance(e_id, str) and extract_element_vert_id(e_id):
+        elif isinstance(e_id, str) and extract_element_vert_id(e_id) is not None:
             e_key = e_id
         else:
             return None
@@ -90,8 +91,9 @@ class Assembly(object):
     def elements(self):
         e_dict = dict()
         for v_key in self._net.vertex.keys():
-            if extract_element_vert_id(v_key):
-                e_dict[v_key] = self.get_element(v_key)
+            # is_e = extract_element_vert_id(v_key)
+            # if is_e is not None:
+            e_dict[v_key] = self.get_element(v_key)
         return e_dict
 
     def get_element_neighbored_elements(self, e_id):
@@ -118,6 +120,15 @@ class Assembly(object):
         return [transform_cmesh(cm, world_place_tf) \
         for cm in self._element_geometries[element_vert_key(e_id)]]
 
+    @property
+    def static_obstacle_geometries(self):
+        return self._static_obstacle_geometries
+
+    @static_obstacle_geometries.setter
+    def static_obstacle_geometries(self, cmesh_lists):
+        # assert(isinstance(cmesh_lists, list))
+        self._static_obstacle_geometries = {STATIC_OBSTACLE_PREFIX + '_' + str(id) : cl for id, cl in enumerate(cmesh_lists)}
+
     # --------------
     # exporters
     # --------------
@@ -125,6 +136,13 @@ class Assembly(object):
         if not os.path.isdir(mesh_path):
             os.mkdir(mesh_path)
         for eg_key, eg_val in self._element_geometries.items():
+            for sub_id, cm in enumerate(eg_val):
+                cm.to_obj(os.path.join(mesh_path, obj_name(eg_key, sub_id)))
+
+    def save_static_obstacles_geometries_to_objs(self, mesh_path):
+        if not os.path.isdir(mesh_path):
+            os.mkdir(mesh_path)
+        for eg_key, eg_val in self.static_obstacle_geometries.items():
             for sub_id, cm in enumerate(eg_val):
                 cm.to_obj(os.path.join(mesh_path, obj_name(eg_key, sub_id)))
 
@@ -142,15 +160,15 @@ class Assembly(object):
         # TODO: sanity check: vj geo + element geo = given seq
 
         data['element_number'] = self._num_of_elements
-        data['sequenced_elements'] = []
+        data['sequenced_elements'] = OrderedDict()
 
         for e, order_id in zip(self.elements.values(), given_seq):
             e_data = OrderedDict()
             e_data['order_id'] = order_id
             e_data['object_id'] = e.key
             e_data['parent_frame'] = Transformation.from_frame(e.parent_frame).list
-            e_data['element_geometry_file_names'] = [obj_name(e.key, sub_id) \
-                for sub_id in range(len(self._element_geometries[e.key]))]
+            e_data['element_geometry_file_names'] = {sub_id : {'full_obj' : obj_name(e.key, sub_id)} \
+                for sub_id in range(len(self._element_geometries[e.key]))}
 
             e_data['assembly_process'] = OrderedDict()
             pick = OrderedDict()
@@ -181,7 +199,15 @@ class Assembly(object):
                 for ee_p in e.obj_from_grasp_poses]
 
             e_data['grasps'] = grasp_data
-            data['sequenced_elements'].append(e_data)
+            data['sequenced_elements'][e.key] = e_data
+
+        data['static_obstacles'] = OrderedDict()
+        for cl_key, cl in self.static_obstacle_geometries.items():
+            data['static_obstacles'][cl_key] = OrderedDict()
+            for sub_id in range(len(cl)):
+                data['static_obstacles'][cl_key][sub_id] = OrderedDict()
+                data['static_obstacles'][cl_key][sub_id]['full_obj'] = \
+                obj_name(cl_key , sub_id)
 
         with open(json_file_path, 'w') as outfile:
             json.dump(data, outfile, indent=4)
@@ -205,6 +231,7 @@ class Assembly(object):
 
         # generate obj files
         self.save_element_geometries_to_objs(mesh_path)
+        self.save_static_obstacles_geometries_to_objs(mesh_path)
 
         # generate json
         self.save_assembly_to_json(json_path, pkg_name, assembly_type, model_type, unit, given_seq)
