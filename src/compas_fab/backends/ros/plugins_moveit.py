@@ -1,5 +1,5 @@
 """
-Internal implementation of the planner backend interface for MoveIt!
+Internal implementation of the plugin interface for MoveIt!
 """
 from __future__ import absolute_import
 from __future__ import division
@@ -30,8 +30,9 @@ from compas_fab.backends.ros.messages import PoseStamped
 from compas_fab.backends.ros.messages import PositionConstraint
 from compas_fab.backends.ros.messages import PositionIKRequest
 from compas_fab.backends.ros.messages import RobotState
-from compas_fab.backends.ros.planner_backend import PlannerBackend
-from compas_fab.backends.ros.planner_backend import ServiceDescription
+from compas_fab.backends.ros.plugins import ExecutorPlugin
+from compas_fab.backends.ros.plugins import PlannerPlugin
+from compas_fab.backends.ros.plugins import ServiceDescription
 from compas_fab.robots import Configuration
 from compas_fab.robots import Duration
 from compas_fab.robots import JointTrajectory
@@ -47,7 +48,8 @@ def convert_trajectory_points(points, types):
                                    velocities=pt.velocities,
                                    accelerations=pt.accelerations,
                                    effort=pt.effort,
-                                   time_from_start=Duration(pt.time_from_start.secs, pt.time_from_start.nsecs))
+                                   time_from_start=Duration(pt.time_from_start.secs,
+                                                            pt.time_from_start.nsecs))
 
         result.append(jtp)
 
@@ -61,7 +63,11 @@ def validate_response(response):
                        int(response.error_code))
 
 
-class MoveItPlanner(PlannerBackend):
+class MoveItExecutor(ExecutorPlugin):
+    pass
+
+
+class MoveItPlanner(PlannerPlugin):
     """Implement the planner backend interface based on MoveIt!
     """
     GET_POSITION_IK = ServiceDescription('/compute_ik',
@@ -130,7 +136,7 @@ class MoveItPlanner(PlannerBackend):
     def plan_cartesian_motion_async(self, callback, errback, frames, base_link,
                                     ee_link, group, joint_names, joint_types,
                                     start_configuration, max_step, jump_threshold,
-                                    avoid_collisions, path_constraints, 
+                                    avoid_collisions, path_constraints,
                                     attached_collision_meshes):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
         header = Header(frame_id=base_link)
