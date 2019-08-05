@@ -1,5 +1,5 @@
 """
-Interface definition for planner backend implementations.
+Interface definition for planner/executor plugin implementations.
 
 This is only internal, these interfaces and their implementations
 are managed internally by the RosClient class.
@@ -14,13 +14,20 @@ from roslibpy import ServiceRequest
 from compas_fab.backends.ros.exceptions import RosValidationError
 
 __all__ = [
-    'PlannerBackend',
+    'ExecutorPlugin',
+    'PlannerPlugin',
     'ServiceDescription'
 ]
 
 
-class PlannerBackend(object):
-    """Base class for ROS planner backends."""
+class ExecutorPlugin(object):
+    """Base class for ROS executor plugins."""
+    def get_configuration(self, group=None):
+        pass
+
+
+class PlannerPlugin(object):
+    """Base class for ROS planner plugins."""
     def validate_response(self, response):
         pass
 

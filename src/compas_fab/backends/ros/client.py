@@ -18,15 +18,21 @@ from compas_fab.backends.ros.messages import JointTrajectory
 from compas_fab.backends.ros.messages import JointTrajectoryPoint
 from compas_fab.backends.ros.messages import PlanningSceneComponents
 from compas_fab.backends.ros.messages import Time
-from compas_fab.backends.ros.planner_backend_moveit import MoveItPlanner
+from compas_fab.backends.ros.plugins_moveit import MoveItExecutor
+from compas_fab.backends.ros.plugins_moveit import MoveItPlanner
 from compas_fab.backends.tasks import CancellableTask
 
 __all__ = [
     'RosClient',
 ]
 
-PLANNER_BACKENDS = {
-    'moveit': MoveItPlanner
+PLUGINS = {
+    'planners': {
+        'moveit': MoveItPlanner,
+    },
+    'executors': {
+        'moveit': MoveItExecutor,
+    }
 }
 
 
@@ -61,9 +67,12 @@ class RosClient(Ros):
         Port of the ROS Bridge. Defaults to ``9090``.
     is_secure : :obj:`bool`
         ``True`` to indicate it should use a secure web socket, otherwise ``False``.
-    planner_backend: str
-        Name of the planner backend plugin to use. The plugin must be a sub-class of
-        :class:`PlannerBackend`. Defaults to :class:`moveit`.
+    planner: :obj:`str`
+        Name of the planner plugin to use. The plugin must be a sub-class of
+        :class:`PlannerPlugin`. Defaults to ``moveit``.
+    executor: :obj:`str`
+        Name of the executor plugin to use. The plugin must be a sub-class of
+        :class:`ExecutorPlugin`. Defaults to ``moveit``.
 
     Examples
     --------
@@ -79,12 +88,15 @@ class RosClient(Ros):
     For more examples, check out the :ref:`ROS examples page <ros_examples>`.
     """
 
-    def __init__(self, host='localhost', port=9090, is_secure=False, planner_backend='moveit'):
+    def __init__(self, host='localhost', port=9090, is_secure=False, planner='moveit', executor='moveit'):
         super(RosClient, self).__init__(host, port, is_secure)
 
         # Dynamically mixin the planner plugin into this class
-        planner_backend_type = PLANNER_BACKENDS[planner_backend]
-        self.__class__ = type('RosClient_' + planner_backend_type.__name__, (planner_backend_type, RosClient), {})
+        planner_type = PLUGINS['planners'][planner]
+        executor_type = PLUGINS['executors'][executor]
+
+        self.__class__ = type('RosClient_' + planner_type.__name__ + executor_type.__name__,
+                              (executor_type, planner_type, RosClient), {})
 
     def __enter__(self):
         self.run()
@@ -179,35 +191,35 @@ class RosClient(Ros):
         return await_callback(self.plan_motion_async, **kwargs)
 
     def inverse_kinematics_async(self, *args, **kwargs):
-        raise NotImplementedError('No planner backend assigned')
+        raise NotImplementedError('No planner plugin assigned')
 
     def forward_kinematics_async(self, *args, **kwargs):
-        raise NotImplementedError('No planner backend assigned')
+        raise NotImplementedError('No planner plugin assigned')
 
     def plan_motion_async(self, *args, **kwargs):
-        raise NotImplementedError('No planner backend assigned')
+        raise NotImplementedError('No planner plugin assigned')
 
     def plan_cartesian_motion_async(self, *args, **kwargs):
-        raise NotImplementedError('No planner backend assigned')
+        raise NotImplementedError('No planner plugin assigned')
 
     # ==========================================================================
     # collision objects
     # ==========================================================================
 
     def add_collision_mesh(self, collision_mesh):
-        raise NotImplementedError('No planner backend assigned')
+        raise NotImplementedError('No planner plugin assigned')
 
     def remove_collision_mesh(self, id):
-        raise NotImplementedError('No planner backend assigned')
+        raise NotImplementedError('No planner plugin assigned')
 
     def append_collision_mesh(self, collision_mesh):
-        raise NotImplementedError('No planner backend assigned')
+        raise NotImplementedError('No planner plugin assigned')
 
     def add_attached_collision_mesh(self, attached_collision_mesh):
-        raise NotImplementedError('No planner backend assigned')
+        raise NotImplementedError('No planner plugin assigned')
 
     def remove_attached_collision_mesh(self, id):
-        raise NotImplementedError('No planner backend assigned')
+        raise NotImplementedError('No planner plugin assigned')
 
     # ==========================================================================
     # executing
