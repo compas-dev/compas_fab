@@ -27,7 +27,7 @@ and to define the planning groups.
   *Load Files.* The Setup Assistant will load the files (this might take a few
   seconds) and present you with this screen:
 
-.. figure:: files/08_ros_create_moveit_package_00.jpg
+.. figure:: files/images/08_ros_create_moveit_package_00.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -42,7 +42,7 @@ Note:
     The sampling density specifies how many random robot positions to check for self
     collision. The default value of 10'000 collision checks should be fine.
 
-.. figure:: files/08_ros_create_moveit_package_01.jpg
+.. figure:: files/images/08_ros_create_moveit_package_01.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -60,7 +60,7 @@ frame. We will define only one virtual joint, attaching the
 * Set the Joint Type as "fixed".
 * Click *Save*.
 
-.. figure:: files/08_ros_create_moveit_package_02.jpg
+.. figure:: files/images/08_ros_create_moveit_package_02.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -75,7 +75,7 @@ is later used for path- and motion planning.
 * Click on the *Planning Groups* pane selector.
 * Click on *Add Group* and you should see the following screen:
 
-.. figure:: files/08_ros_create_moveit_package_03.jpg
+.. figure:: files/images/08_ros_create_moveit_package_03.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -87,13 +87,13 @@ Add the arm
 * Let *Kin. Search Resolution*, *Kin. Search Timeout (sec)*, *Kin. Solver Attempts* and
   *Group Default Planner* stay at their default values.
 
-.. figure:: files/08_ros_create_moveit_package_04.jpg
+.. figure:: files/images/08_ros_create_moveit_package_04.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
 * Click on the *Add Kin. Chain* button. Press *Expand All*
 
-.. figure:: files/08_ros_create_moveit_package_05.jpg
+.. figure:: files/images/08_ros_create_moveit_package_05.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -118,7 +118,7 @@ We will also add a group for the end-effector.
 * Choose measurment_tool and tcp (The links you defined in the measurement_tool.xacro) and add them to the list of *Selected Links* on     the right hand side.
 * Click *Save*
 
-.. figure:: files/08_ros_create_moveit_package_06.jpg
+.. figure:: files/images/08_ros_create_moveit_package_06.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -140,7 +140,7 @@ Tip:
     Try to move all the joints around. If there is something wrong
     with the joint limits in your URDF, you should be able to see it immediately here.
 
-.. figure:: files/08_ros_create_moveit_package_07.jpg
+.. figure:: files/images/08_ros_create_moveit_package_07.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -158,7 +158,7 @@ this group as a special group: end effectors.
 * Leave *Parent Group* empty.
 * Press *Save*.
 
-.. figure:: files/08_ros_create_moveit_package_08.jpg
+.. figure:: files/images/08_ros_create_moveit_package_08.jpg
     :figclass: figure
     :class: figure-img img-fluid
 

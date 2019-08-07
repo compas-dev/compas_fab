@@ -53,7 +53,13 @@ introduction/examples/usage documentation or API documentation in docstrings.
 Documentation is written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_
 and use `Sphinx <http://sphinx-doc.org/index.html>`_ to generate the HTML output.
 
-Once you made the documentation changes locally, run the documentation generation::
+Once you made the documentation changes locally, run the documentation generation
+(the ``-b`` flag will make sphinx-build only read and parse source files that are
+new or have changed since the last run )::
+
+    sphinx-build -b html docs dist/docs
+
+After everything is finalized, you can verify the automated doc generation through::
 
     invoke docs
 

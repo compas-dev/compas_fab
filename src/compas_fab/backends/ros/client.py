@@ -20,6 +20,7 @@ from compas_fab.backends.ros.messages import PlanningSceneComponents
 from compas_fab.backends.ros.messages import Time
 from compas_fab.backends.ros.plugins_moveit import MoveItExecutor
 from compas_fab.backends.ros.plugins_moveit import MoveItPlanner
+from compas_fab.backends.ros.plugins_choreo import ChoreoPlanner
 from compas_fab.backends.tasks import CancellableTask
 
 __all__ = [
@@ -29,6 +30,7 @@ __all__ = [
 PLUGINS = {
     'planners': {
         'moveit': MoveItPlanner,
+        'choreo': ChoreoPlanner,
     },
     'executors': {
         'moveit': MoveItExecutor,
@@ -108,7 +110,7 @@ class RosClient(Ros):
 
     def inverse_kinematics(self, frame, base_link, group,
                            joint_names, joint_positions, avoid_collisions=True,
-                           constraints=None, attempts=8, 
+                           constraints=None, attempts=8,
                            attached_collision_meshes=None):
         kwargs = {}
         kwargs['frame'] = frame
@@ -139,7 +141,7 @@ class RosClient(Ros):
     def plan_cartesian_motion(self, frames, base_link,
                               ee_link, group, joint_names, joint_types,
                               start_configuration, max_step, jump_threshold,
-                              avoid_collisions, path_constraints, 
+                              avoid_collisions, path_constraints,
                               attached_collision_meshes):
         kwargs = {}
         kwargs['frames'] = frames

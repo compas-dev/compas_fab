@@ -20,7 +20,7 @@ point to the flange (tool0) is in (0,0,0). The geometry of your end-effector has
 to be defined in *meters*. Then export both visual and a collision meshes of
 your end-effector in a ROS-friendly format, like .stl or .obj (see below).
 
-.. figure:: files/07_urdf_tool_00.jpg
+.. figure:: files/images/07_urdf_tool_00.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -276,7 +276,7 @@ And then run::
 
   roslaunch ur5_with_measurement_tool display.launch
 
-.. figure:: files/07_urdf_tool_01.jpg
+.. figure:: files/images/07_urdf_tool_01.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -301,6 +301,3 @@ Further links
 * `Create your own URDF file <http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file>`_
 * `Create a URDF for an Industrial Robot <http://wiki.ros.org/Industrial/Tutorials/Create%20a%20URDF%20for%20an%20Industrial%20Robot>`_
 * `Working with ROS-Industrial Robot Support Packages <http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages>`_
-
-
-

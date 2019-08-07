@@ -16,23 +16,23 @@ Creating a URDF of the UR10 on two linear axes
   The export format must be ROS-friendly, like .stl or .obj (see below). (Here
   we use the same visual and collision meshes.)
 
-.. figure:: files/09_ur10_tower_urdf_01.jpg
+.. figure:: files/images/09_ur10_tower_urdf_01.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
-.. figure:: files/09_ur10_tower_urdf_00-1.jpg
+.. figure:: files/images/09_ur10_tower_urdf_00-1.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
-.. figure:: files/09_ur10_tower_urdf_00-2.jpg
+.. figure:: files/images/09_ur10_tower_urdf_00-2.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
-.. figure:: files/09_ur10_tower_urdf_02.jpg
+.. figure:: files/images/09_ur10_tower_urdf_02.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
-.. figure:: files/09_ur10_tower_urdf_03.jpg
+.. figure:: files/images/09_ur10_tower_urdf_03.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -329,7 +329,7 @@ And then run::
 
   roslaunch ur10_tower display.launch
 
-.. figure:: files/09_ur10_tower_urdf_04.jpg
+.. figure:: files/images/09_ur10_tower_urdf_04.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -341,7 +341,7 @@ Under Global Options > Fixed Frame > change ``base_link`` to ``tower`` or
 
 Then you should see something like that:
 
-.. figure:: files/09_ur10_tower_urdf_06.jpg
+.. figure:: files/images/09_ur10_tower_urdf_06.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -351,11 +351,11 @@ You can play with the sliders on the side to move the elements and check if all 
 
 And later create a MoveIt! package from it.
 
-.. figure:: files/09_ur10_tower_urdf_07.jpg
+.. figure:: files/images/09_ur10_tower_urdf_07.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
-.. figure:: files/09_ur10_tower_urdf_08.jpg
+.. figure:: files/images/09_ur10_tower_urdf_08.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -367,6 +367,3 @@ Further links
 * `Create your own URDF file <http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file>`_
 * `Create a URDF for an Industrial Robot <http://wiki.ros.org/Industrial/Tutorials/Create%20a%20URDF%20for%20an%20Industrial%20Robot>`_
 * `Working with ROS-Industrial Robot Support Packages <http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages>`_
-
-
-

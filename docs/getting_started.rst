@@ -40,17 +40,13 @@ Working in Rhino
 ================
 
 To make **COMPAS FAB** available inside Rhino, open the *command prompt*
-and type the following which will install it on both Rhino 5.0 and 6.0:
+and type the following which will install it on both Rhino 5.0 or 6.0, see
+the `compas rhino installation instructions <https://compas-dev.github.io/main/gettingstarted/cad/rhino.html>`_
+for more information.
 
 ::
 
-    python -m compas_fab.rhino.install -v 5.0
-    python -m compas_fab.rhino.install -v 6.0
-
-.. note:
-
-    On Windows, you might need to run the *command prompt* as administrator
-    before running the install command.
+    python -m compas_rhino.install -p compas_fab
 
 Open Rhino, start the Python script editor, type ``import compas`` and
 run it to verify that your installation is working.

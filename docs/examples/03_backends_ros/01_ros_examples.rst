@@ -59,7 +59,7 @@ Writing the talker node
 The following example starts a ROS node and begins to publish
 messages in loop (to terminate, press ``ctrl+c``):
 
-.. literalinclude :: files/01_ros_hello_world_talker.py
+.. literalinclude :: files/scripts/01_ros_hello_world_talker.py
    :language: python
 
 .. raw:: html
@@ -68,7 +68,7 @@ messages in loop (to terminate, press ``ctrl+c``):
     <div class="card-body">
     <div class="card-title">Downloads</div>
 
-* :download:`Talker node (.PY) <files/01_ros_hello_world_talker.py>`
+* :download:`Talker node (.PY) <files/scripts/01_ros_hello_world_talker.py>`
 
 .. raw:: html
 
@@ -80,7 +80,7 @@ Writing the listener node
 
 Now let's move on to the listener side:
 
-.. literalinclude :: files/01_ros_hello_world_listener.py
+.. literalinclude :: files/scripts/01_ros_hello_world_listener.py
    :language: python
 
 .. raw:: html
@@ -89,7 +89,7 @@ Now let's move on to the listener side:
     <div class="card-body">
     <div class="card-title">Downloads</div>
 
-* :download:`Listener node (.PY) <files/01_ros_hello_world_listener.py>`
+* :download:`Listener node (.PY) <files/scripts/01_ros_hello_world_listener.py>`
 
 .. raw:: html
 
@@ -103,7 +103,7 @@ Open a command prompt and start the talker:
 
 ::
 
-    python 01_ros_hello_world_listener.py
+    python 01_ros_hello_world_talker.py
 
 
 Now open a second command prompt and start the listener:

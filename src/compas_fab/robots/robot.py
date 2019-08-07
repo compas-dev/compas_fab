@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 import logging
+import os
 
 from compas.geometry import Frame
 from compas.geometry import Sphere
@@ -763,7 +764,7 @@ class Robot(object):
 
     def inverse_kinematics(self, frame_WCF, start_configuration=None,
                            group=None, avoid_collisions=True,
-                           constraints=None, attempts=8, 
+                           constraints=None, attempts=8,
                            attached_collision_meshes=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
@@ -892,7 +893,7 @@ class Robot(object):
             the robot's units)
         jump_threshold: float
             The maximum allowed distance of joint positions between consecutive
-            points. If the distance is found to be above this threshold, the 
+            points. If the distance is found to be above this threshold, the
             path computation fails. It must be specified in relation to max_step.
             If this theshhold is 0, 'jumps' might occur, resulting in an invalid
             cartesian path. Defaults to pi/2.
@@ -1145,11 +1146,74 @@ class Robot(object):
         return self.model.axes
 
     # ==========================================================================
+    # output package
+    # ==========================================================================
+
+    def generate_robot_package(file_dir, generate_ros_pkg=False):
+        """Generate a robot package with a ROS pkg file structure.
+
+        The generated pkg will have the following file structure:
+
+            <robot_name>
+                - urdf
+                    - <robot_name>.urdf
+                - config
+                    - <robot_name>.srdf
+                - meshes
+                    - visual
+                        -... .stl or .obj
+                    - collision
+                        -... .stl or .obj
+
+                (if ``generate_ros_pkg`` is True)
+                CMakeLists.txt
+                package.xml
+
+        if ``generate_ros_pkg`` is False (default), the linking path in URDF
+        will be something like:
+
+            <visual>
+                <geometry>
+                    <mesh filename="../meshes/visual/xxx.stl" scale="1 1 1" />
+                </geometry>
+            </visual>
+
+        Otherwise (``generate_ros_pkg`` is True), it will be something like:
+
+            <visual>
+                <geometry>
+                    <mesh filename="$(find <robot_name>_description)/meshes/visual/xxx.stl" scale="1 1 1" />
+                </geometry>
+            </visual>
+
+        Notice that the ``config/<robot_name>.srdf`` file should be copied to the
+        <robot_name>_moveit_config later. For convenience, we will just put it
+        together with the description files in one package here.
+
+        Parameters
+        ----------
+        file_dir : str
+            Path where the package is stored locally.
+        generate_ros_pkg : bool
+            whether generating a fully qualified ROS pkg or not (w/ package.xml etc.)
+            If set to False, only meshes, srdf, urdf are generated, the file linking
+            paths used in the URDF are relative paths to the URDF. Default set as
+            False.
+
+        Returns
+        -------
+        bool
+            success flag.
+
+        """
+        raise NotImplementedError
+
+    # ==========================================================================
     # drawing
     # ==========================================================================
 
     def update(self, configuration, collision=True, group=None):
-        """Updates the robot's geometry.
+        """Updates the robot's geometry based on the input configuration.
         """
         names = self.get_configurable_joint_names(group)
         self.artist.update(configuration, collision, names)

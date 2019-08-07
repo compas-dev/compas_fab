@@ -204,7 +204,7 @@ them into a new ``docker-compose.yml`` file.
      - ✅
      - :download:`Link <files/ur10-demo/docker-compose.yml>`
 
-For access to the web UI, start your browser and go to:
+For access to the web UI [#f1]_, start your browser and go to:
 
 ::
 
