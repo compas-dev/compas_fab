@@ -13,6 +13,8 @@ from compas_fab.backends.ros.messages import CollisionObject
 from compas_fab.backends.ros.messages import Constraints
 from compas_fab.backends.ros.messages import GetCartesianPathRequest
 from compas_fab.backends.ros.messages import GetCartesianPathResponse
+from compas_fab.backends.ros.messages import GetPlanningSceneRequest
+from compas_fab.backends.ros.messages import GetPlanningSceneResponse
 from compas_fab.backends.ros.messages import GetPositionFKRequest
 from compas_fab.backends.ros.messages import GetPositionFKResponse
 from compas_fab.backends.ros.messages import GetPositionIKRequest
@@ -25,6 +27,7 @@ from compas_fab.backends.ros.messages import MotionPlanResponse
 from compas_fab.backends.ros.messages import MoveItErrorCodes
 from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import OrientationConstraint
+from compas_fab.backends.ros.messages import PlanningSceneComponents
 from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.messages import PoseStamped
 from compas_fab.backends.ros.messages import PositionConstraint
@@ -90,6 +93,10 @@ class MoveItPlanner(PlannerPlugin):
                                          MotionPlanRequest,
                                          MotionPlanResponse,
                                          validate_response)
+    GET_PLANNING_SCENE = ServiceDescription('/get_planning_scene',
+                                            'GetPlanningScene',
+                                            GetPlanningSceneRequest,
+                                            GetPlanningSceneResponse)
 
     # ==========================================================================
     # planning services
@@ -256,6 +263,16 @@ class MoveItPlanner(PlannerPlugin):
     # ==========================================================================
     # collision objects
     # ==========================================================================
+
+    def get_planning_scene_async(self, callback, errback):
+        request = dict(components=PlanningSceneComponents(PlanningSceneComponents.SCENE_SETTINGS |
+                                                          PlanningSceneComponents.ROBOT_STATE |
+                                                          PlanningSceneComponents.ROBOT_STATE_ATTACHED_OBJECTS |
+                                                          PlanningSceneComponents.WORLD_OBJECT_NAMES |
+                                                          PlanningSceneComponents.WORLD_OBJECT_GEOMETRY |
+                                                          PlanningSceneComponents.ALLOWED_COLLISION_MATRIX |
+                                                          PlanningSceneComponents.OBJECT_COLORS))
+        self.GET_PLANNING_SCENE(self, request, callback, errback)
 
     def add_collision_mesh(self, collision_mesh):
         """Add a collision mesh to the planning scene."""

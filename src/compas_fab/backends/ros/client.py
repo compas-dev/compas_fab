@@ -3,20 +3,15 @@ from __future__ import print_function
 from compas.utilities import await_callback
 from roslibpy import Message
 from roslibpy import Ros
-from roslibpy import Service
-from roslibpy import ServiceRequest
 from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
 from compas_fab.backends.ros.exceptions import RosError
 from compas_fab.backends.ros.messages import FollowJointTrajectoryGoal
 from compas_fab.backends.ros.messages import FollowJointTrajectoryResult
-from compas_fab.backends.ros.messages import GetPlanningSceneRequest
-from compas_fab.backends.ros.messages import GetPlanningSceneResponse
 from compas_fab.backends.ros.messages import Header
 from compas_fab.backends.ros.messages import JointTrajectory
 from compas_fab.backends.ros.messages import JointTrajectoryPoint
-from compas_fab.backends.ros.messages import PlanningSceneComponents
 from compas_fab.backends.ros.messages import Time
 from compas_fab.backends.ros.plugins_moveit import MoveItExecutor
 from compas_fab.backends.ros.plugins_moveit import MoveItPlanner
@@ -205,8 +200,17 @@ class RosClient(Ros):
         raise NotImplementedError('No planner plugin assigned')
 
     # ==========================================================================
-    # collision objects
+    # collision objects and planning scene
     # ==========================================================================
+
+    def get_planning_scene(self):
+        kwargs = {}
+        kwargs['errback_name'] = 'errback'
+
+        return await_callback(self.get_planning_scene_async, **kwargs)
+
+    def get_planning_scene_async(self, *args, **kwargs):
+        raise NotImplementedError('No planner plugin assigned')
 
     def add_collision_mesh(self, collision_mesh):
         raise NotImplementedError('No planner plugin assigned')
@@ -226,6 +230,9 @@ class RosClient(Ros):
     # ==========================================================================
     # executing
     # ==========================================================================
+
+    def get_configuration(self):
+        pass
 
     def follow_configurations(self, callback, joint_names, configurations, timesteps, timeout=None):
 
@@ -247,13 +254,15 @@ class RosClient(Ros):
             Header(), joint_names, points)  # specify header necessary?
         return self.follow_joint_trajectory(callback, joint_trajectory, timeout)
 
-    def follow_joint_trajectory(self, joint_trajectory, callback=None, errback=None, feedback_callback=None, timeout=60000):
+    def follow_joint_trajectory(self, joint_trajectory, action_name='/joint_trajectory_action', callback=None, errback=None, feedback_callback=None, timeout=60000):
         """Follow the joint trajectory as computed by MoveIt planner.
 
         Parameters
         ----------
         joint_trajectory : JointTrajectory
             Joint trajectory message as computed by MoveIt planner
+        action_name : string
+            ROS action name, defaults to ``/joint_trajectory_action`` but some drivers need ``/follow_joint_trajectory``.
         callback : callable
             Function to be invoked when the goal is completed, requires
             one positional parameter ``result``.
@@ -281,9 +290,8 @@ class RosClient(Ros):
         def handle_failure(error):
             errback(error)
 
-        connection_timeout = 3000
-        action_client = ActionClient(self, '/joint_trajectory_action',  # '/follow_joint_trajectory',
-                                     'control_msgs/FollowJointTrajectoryAction', connection_timeout)
+        action_client = ActionClient(self, action_name,
+                                     'control_msgs/FollowJointTrajectoryAction')
 
         goal = Goal(action_client, Message(trajectory_goal.msg))
 
@@ -297,23 +305,8 @@ class RosClient(Ros):
         if errback:
             goal.on('timeout', lambda: handle_failure(
                 RosError("Action Goal timeout", -1)))
-            action_client.on('timeout', lambda: handle_failure(
-                RosError("Actionlib client timeout", -1)))
 
         goal.send(timeout=timeout)
 
         return CancellableRosAction(goal)
 
-    def get_planning_scene(self, callback, components):
-        """
-        """
-        reqmsg = GetPlanningSceneRequest(PlanningSceneComponents(components))
-
-        def receive_message(msg):
-            response = GetPlanningSceneResponse.from_msg(msg)
-            callback(response)
-
-        srv = Service(self, '/get_planning_scene',
-                      'moveit_msgs/GetPlanningScene')
-        request = ServiceRequest(reqmsg.msg)
-        srv.call(request, receive_message, receive_message)

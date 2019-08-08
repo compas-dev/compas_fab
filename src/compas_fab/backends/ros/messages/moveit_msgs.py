@@ -8,6 +8,7 @@ from compas_fab.backends.ros.messages.geometry_msgs import PoseStamped
 from compas_fab.backends.ros.messages.geometry_msgs import Vector3
 from compas_fab.backends.ros.messages.geometry_msgs import Quaternion
 from compas_fab.backends.ros.messages.shape_msgs import SolidPrimitive
+from compas_fab.backends.ros.messages.shape_msgs import Plane
 from compas_fab.backends.ros.messages.shape_msgs import Mesh
 from compas_fab.backends.ros.messages.sensor_msgs import JointState
 from compas_fab.backends.ros.messages.sensor_msgs import MultiDOFJointState
@@ -27,19 +28,21 @@ class CollisionObject(ROSmsg):
 
     def __init__(self, header=None, id="collision_obj", type=None,
                  primitives=None, primitive_poses=None, meshes=None, mesh_poses=None,
-                 planes=None, plane_poses=None, operation=0):
-        self.header = header if header else Header() # a header, used for interpreting the poses
-        self.id = id # the id of the object (name used in MoveIt)
-        self.type = type if type else ObjectType() # The object type in a database of known objects
+                 planes=None, plane_poses=None,
+                 subframe_names=None, subframe_poses=None, operation=0):
+        self.header = header or Header()  # a header, used for interpreting the poses
+        self.id = id  # the id of the object (name used in MoveIt)
+        self.type = type or ObjectType()  # The object type in a database of known objects
         # solid geometric primitives
-        self.primitives = primitives if primitives else []
-        self.primitive_poses = primitive_poses if primitive_poses else []
+        self.primitives = primitives or []
+        self.primitive_poses = primitive_poses or []
         # meshes
-        self.meshes = meshes if meshes else []
-        self.mesh_poses = mesh_poses if mesh_poses else []
+        self.meshes = meshes or []
+        self.mesh_poses = mesh_poses or []
         # bounding planes
-        self.planes = planes if planes else []
-        self.plane_poses = plane_poses if plane_poses else []
+        self.planes = planes or []
+        self.plane_poses = plane_poses or []
+
         self.operation = operation  # ADD or REMOVE or APPEND or MOVE
 
     @classmethod
@@ -54,16 +57,36 @@ class CollisionObject(ROSmsg):
 
         return cls(**kwargs)
 
+    @classmethod
+    def from_msg(cls, msg):
+        kwargs = {}
+
+        kwargs['header'] = Header.from_msg(msg['header'])
+        kwargs['id'] = msg['id']
+        kwargs['type'] = ObjectType.from_msg(msg['type'])
+
+        kwargs['primitives'] = [SolidPrimitive.from_msg(i) for i in msg['primitives']]
+        kwargs['primitive_poses'] = [Pose.from_msg(i) for i in msg['primitive_poses']]
+        kwargs['meshes'] = [Mesh.from_msg(i) for i in msg['meshes']]
+        kwargs['mesh_poses'] = [Pose.from_msg(i) for i in msg['mesh_poses']]
+        kwargs['planes'] = [Plane.from_msg(i) for i in msg['planes']]
+        kwargs['plane_poses'] = [Pose.from_frame(i) for i in msg['plane_poses']]
+
+        kwargs['operation'] = msg['operation']
+
+        return cls(**kwargs)
+
+
 class AttachedCollisionObject(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html
     """
 
     def __init__(self, link_name=None, object=None, touch_links=None,
                  detach_posture=None, weight=0):
-        self.link_name = link_name if link_name else ''
-        self.object = object if object else CollisionObject()
-        self.touch_links = touch_links if touch_links else []
-        self.detach_posture = detach_posture if detach_posture else JointTrajectory()
+        self.link_name = link_name or ''
+        self.object = object or CollisionObject()
+        self.touch_links = touch_links or []
+        self.detach_posture = detach_posture or JointTrajectory()
         self.weight = weight
 
     @classmethod
@@ -401,18 +424,18 @@ class PlanningSceneComponents(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PlanningSceneComponents.html
     """
     SCENE_SETTINGS = 1
-    ROBOT_STATE=2
-    ROBOT_STATE_ATTACHED_OBJECTS=4
-    WORLD_OBJECT_NAMES=8
-    WORLD_OBJECT_GEOMETRY=16
-    OCTOMAP=32
-    TRANSFORMS=64
-    ALLOWED_COLLISION_MATRIX=128
-    LINK_PADDING_AND_SCALING=256
-    OBJECT_COLORS=512
+    ROBOT_STATE = 2
+    ROBOT_STATE_ATTACHED_OBJECTS = 4
+    WORLD_OBJECT_NAMES = 8
+    WORLD_OBJECT_GEOMETRY = 16
+    OCTOMAP = 32
+    TRANSFORMS = 64
+    ALLOWED_COLLISION_MATRIX = 128
+    LINK_PADDING_AND_SCALING = 256
+    OBJECT_COLORS = 512
 
     def __init__(self, components=None):
-        self.components = components if components else self.SCENE_SETTINGS
+        self.components = components or self.SCENE_SETTINGS
 
     def __eq__(self, other):
         return self.components == other
@@ -425,21 +448,31 @@ class PlanningSceneComponents(ROSmsg):
                 return k
         return ''
 
+
 class  AllowedCollisionMatrix(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/AllowedCollisionMatrix.html
     """
     def __init__(self, entry_names=None, entry_values=None, default_entry_names=None, default_entry_values=None):
-        self.entry_names = entry_names if entry_names else [] # string[]
-        self.entry_values = entry_values if entry_values else [] # moveit_msgs/AllowedCollisionEntry[]
-        self.default_entry_names = default_entry_names if default_entry_names else [] # string[]
-        self.default_entry_values = default_entry_values if default_entry_values else [] # bool[]
+        self.entry_names = entry_names or []  # string[]
+        self.entry_values = entry_values or []  # moveit_msgs/AllowedCollisionEntry[]
+        self.default_entry_names = default_entry_names or []  # string[]
+        self.default_entry_values = default_entry_values or []  # bool[]
+
 
 class PlanningSceneWorld(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningSceneWorld.html
     """
     def __init__(self, collision_objects=None, octomap=None):
-        self.collision_objects = collision_objects if collision_objects else [] #collision objects # CollisionObject[]
-        self.octomap = octomap if octomap else OctomapWithPose() # octomap_msgs/OctomapWithPose
+        self.collision_objects = collision_objects or []  # collision objects # CollisionObject[]
+        self.octomap = octomap or OctomapWithPose()  # octomap_msgs/OctomapWithPose
+
+    @classmethod
+    def from_msg(cls, msg):
+        collision_objects = [CollisionObject.from_msg(i) for i in msg['collision_objects']]
+        octomap = msg['octomap']  # TODO: Add OctomapWithPose.from_msg(msg['octomap'])
+
+        return cls(collision_objects, octomap)
+
 
 class PlanningScene(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningScene.html
@@ -448,16 +481,16 @@ class PlanningScene(ROSmsg):
                  fixed_frame_transforms=None, allowed_collision_matrix=None,
                  link_padding=None, link_scale=None, object_colors=None, world=None,
                  is_diff=False):
-        self.name = name # string
-        self.robot_state = robot_state if robot_state else RobotState() # moveit_msgs/RobotState
-        self.robot_model_name = robot_model_name # string
-        self.fixed_frame_transforms = fixed_frame_transforms if fixed_frame_transforms else [] # geometry_msgs/TransformStamped[]
-        self.allowed_collision_matrix = allowed_collision_matrix if allowed_collision_matrix else AllowedCollisionMatrix()
-        self.link_padding = link_padding if link_padding else [] # moveit_msgs/LinkPadding[]
-        self.link_scale = link_scale if link_scale else [] # moveit_msgs/LinkScale[]
-        self.object_colors = object_colors if object_colors else [] # moveit_msgs/ObjectColor[]
-        self.world = world if world else PlanningSceneWorld() # moveit_msgs/PlanningSceneWorld
-        self.is_diff = is_diff # bool
+        self.name = name  # string
+        self.robot_state = robot_state or RobotState()  # moveit_msgs/RobotState
+        self.robot_model_name = robot_model_name  # string
+        self.fixed_frame_transforms = fixed_frame_transforms or []  # geometry_msgs/TransformStamped[]
+        self.allowed_collision_matrix = allowed_collision_matrix or AllowedCollisionMatrix()
+        self.link_padding = link_padding or []  # moveit_msgs/LinkPadding[]
+        self.link_scale = link_scale or []  # moveit_msgs/LinkScale[]
+        self.object_colors = object_colors or []  # moveit_msgs/ObjectColor[]
+        self.world = world or PlanningSceneWorld()  # moveit_msgs/PlanningSceneWorld
+        self.is_diff = is_diff  # bool
 
         """
         SCENE_SETTINGS = 1
@@ -472,14 +505,13 @@ class PlanningScene(ROSmsg):
         OBJECT_COLORS=512
         """
 
-
     @classmethod
     def from_msg(cls, msg):
         robot_state = RobotState.from_msg(msg['robot_state'])
         allowed_collision_matrix = msg['allowed_collision_matrix']
-        world = msg['world']
-        return cls(msg['name'], robot_state, msg['robot_model_name'],
-                 msg['fixed_frame_transforms'], allowed_collision_matrix,
-                 msg['link_padding'], msg['link_scale'], msg['object_colors'],
-                 world, msg['is_diff'])
+        world = PlanningSceneWorld.from_msg(msg['world'])
 
+        return cls(msg['name'], robot_state, msg['robot_model_name'],
+                   msg['fixed_frame_transforms'], allowed_collision_matrix,
+                   msg['link_padding'], msg['link_scale'], msg['object_colors'],
+                   world, msg['is_diff'])
