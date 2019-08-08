@@ -48,8 +48,11 @@ class PlannerPlugin(object):
         pass
 
     # ==========================================================================
-    # collision objects
+    # collision objects and planning scene
     # ==========================================================================
+
+    def get_planning_scene_async(self, *args, **kwargs):
+        pass
 
     def add_collision_mesh(self, collision_mesh):
         pass

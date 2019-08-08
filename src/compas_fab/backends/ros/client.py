@@ -3,20 +3,15 @@ from __future__ import print_function
 from compas.utilities import await_callback
 from roslibpy import Message
 from roslibpy import Ros
-from roslibpy import Service
-from roslibpy import ServiceRequest
 from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
 from compas_fab.backends.ros.exceptions import RosError
 from compas_fab.backends.ros.messages import FollowJointTrajectoryGoal
 from compas_fab.backends.ros.messages import FollowJointTrajectoryResult
-from compas_fab.backends.ros.messages import GetPlanningSceneRequest
-from compas_fab.backends.ros.messages import GetPlanningSceneResponse
 from compas_fab.backends.ros.messages import Header
 from compas_fab.backends.ros.messages import JointTrajectory
 from compas_fab.backends.ros.messages import JointTrajectoryPoint
-from compas_fab.backends.ros.messages import PlanningSceneComponents
 from compas_fab.backends.ros.messages import Time
 from compas_fab.backends.ros.plugins_moveit import MoveItExecutor
 from compas_fab.backends.ros.plugins_moveit import MoveItPlanner
@@ -108,7 +103,7 @@ class RosClient(Ros):
 
     def inverse_kinematics(self, frame, base_link, group,
                            joint_names, joint_positions, avoid_collisions=True,
-                           constraints=None, attempts=8, 
+                           constraints=None, attempts=8,
                            attached_collision_meshes=None):
         kwargs = {}
         kwargs['frame'] = frame
@@ -139,7 +134,7 @@ class RosClient(Ros):
     def plan_cartesian_motion(self, frames, base_link,
                               ee_link, group, joint_names, joint_types,
                               start_configuration, max_step, jump_threshold,
-                              avoid_collisions, path_constraints, 
+                              avoid_collisions, path_constraints,
                               attached_collision_meshes):
         kwargs = {}
         kwargs['frames'] = frames
@@ -203,8 +198,17 @@ class RosClient(Ros):
         raise NotImplementedError('No planner plugin assigned')
 
     # ==========================================================================
-    # collision objects
+    # collision objects and planning scene
     # ==========================================================================
+
+    def get_planning_scene(self):
+        kwargs = {}
+        kwargs['errback_name'] = 'errback'
+
+        return await_callback(self.get_planning_scene_async, **kwargs)
+
+    def get_planning_scene_async(self, *args, **kwargs):
+        raise NotImplementedError('No planner plugin assigned')
 
     def add_collision_mesh(self, collision_mesh):
         raise NotImplementedError('No planner plugin assigned')
@@ -224,6 +228,9 @@ class RosClient(Ros):
     # ==========================================================================
     # executing
     # ==========================================================================
+
+    def get_configuration(self):
+        pass
 
     def follow_configurations(self, callback, joint_names, configurations, timesteps, timeout=None):
 
@@ -301,16 +308,3 @@ class RosClient(Ros):
 
         return CancellableRosAction(goal)
 
-    def get_planning_scene(self, callback, components):
-        """
-        """
-        reqmsg = GetPlanningSceneRequest(PlanningSceneComponents(components))
-
-        def receive_message(msg):
-            response = GetPlanningSceneResponse.from_msg(msg)
-            callback(response)
-
-        srv = Service(self, '/get_planning_scene',
-                      'moveit_msgs/GetPlanningScene')
-        request = ServiceRequest(reqmsg.msg)
-        srv.call(request, receive_message, receive_message)
