@@ -28,8 +28,9 @@ class SolidPrimitive(ROSmsg):
     CONE_RADIUS = 1
 
     def __init__(self, type=None, dimensions=None):
-        self.type = type if type else self.BOX
-        self.dimensions = dimensions if dimensions else [1, 1, 1]
+        self.type = type or self.BOX
+        self.dimensions = dimensions or [1, 1, 1]
+
         if self.type == self.BOX and len(self.dimensions) != 3:
             raise ValueError("BOX needs 3 dimensions")
         elif self.type == self.SPHERE and len(dimensions) != 1:
@@ -38,7 +39,7 @@ class SolidPrimitive(ROSmsg):
             raise ValueError("CYLINDER needs 2 dimensions.")
         elif self.type == self.CONE and len(dimensions) != 2:
             raise ValueError("CONE needs 2 dimensions.")
-    
+
     @classmethod
     def from_box(cls, box):
         """Creates a `SolidPrimitive` from a :class:`compas.geometry.Box`.
@@ -52,7 +53,7 @@ class SolidPrimitive(ROSmsg):
         SolidPrimitive
         """
         return cls(type=cls.BOX, dimensions=[box.xsize, box.ysize, box.zsize])
-    
+
     @classmethod
     def from_sphere(cls, sphere):
         """Creates a `SolidPrimitive` from a :class:`compas.geometry.Sphere`.
@@ -66,6 +67,11 @@ class SolidPrimitive(ROSmsg):
         SolidPrimitive
         """
         return cls(type=cls.SPHERE, dimensions=[sphere.radius])
+
+    @classmethod
+    def from_msg(cls, msg):
+        return cls(msg['type'], msg['dimensions'])
+
 
 class Mesh(ROSmsg):
     """http://docs.ros.org/kinetic/api/shape_msgs/html/msg/Mesh.html
@@ -97,6 +103,7 @@ class Mesh(ROSmsg):
         faces = [t.vertex_indices for t in self.triangles]
         return cls.from_vertices_and_faces(vertices, faces)
 
+
 class MeshTriangle(ROSmsg):
     """http://docs.ros.org/api/shape_msgs/html/msg/MeshTriangle.html
     """
@@ -110,6 +117,7 @@ class MeshTriangle(ROSmsg):
         vertex_indices = msg['vertex_indices']
         return cls(vertex_indices)
 
+
 class Plane(ROSmsg):
     """http://docs.ros.org/kinetic/api/shape_msgs/html/msg/Plane.html
     """
@@ -117,3 +125,6 @@ class Plane(ROSmsg):
     def __init__(self, coef):
         self.coef = coef
 
+    @classmethod
+    def from_msg(cls, msg):
+        return cls(msg['coef'])
