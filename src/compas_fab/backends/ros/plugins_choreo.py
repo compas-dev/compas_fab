@@ -6,9 +6,11 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-from compas.files import URDF
+from tempfile import TemporaryDirectory
 
 from compas_fab.backends.ros.plugins import PlannerPlugin
+
+from conrob_pybullet import create_obj, set_pose
 
 __all__ = [
     'ChoreoPlanner',
@@ -53,7 +55,6 @@ def generate_rel_path_URDF_pkg(input_urdf_path, pkg_name):
         absolute path for the generated URDF file
 
     """
-    # urdf = URDF.from_file(input_urdf_path)
     with open(input_urdf_path, 'r') as file :
         filedata = file.read()
 
@@ -73,6 +74,18 @@ def generate_rel_path_URDF_pkg(input_urdf_path, pkg_name):
         file.write(filedata)
 
     return urdf_rel_path
+
+def convert_Frame_to_pybullet_pose():
+
+def convert_mesh_to_pybullet_body(mesh, frame):
+    # for now, py3.2+: https://stackoverflow.com/questions/6884991/how-to-delete-dir-created-by-python-tempfile-mkdtemp
+    with TemporaryDirectory() as temp_dir:
+        print('temp_dir: {}'.format(temp_dir))
+        tmp_obj_path = os.path.join(temp_dir, 'compas_mesh_temp.obj')
+        mesh.to_obj(tmp_obj_path)
+
+
+
 
 class ChoreoPlanner(PlannerPlugin):
     """Implement the planner backend interface based on choreo

@@ -45,6 +45,24 @@ def test_convert_compas_robot_to_pybullet_robot():
 
     os.remove(rel_urdf_path)
 
+
+@pytest.mark.wip
+def test_convert_planning_scene_collision_objects_to_pybullet_obstacles():
+    with RosClient() as client:
+        assert client.is_connected
+        robot = Robot(client)
+
+        scene = PlanningScene(robot)
+        mesh = Mesh.from_stl(compas_fab.get('planning_scene/floor.stl'))
+        cm = CollisionMesh(mesh, 'floor')
+        scene.add_collision_mesh(cm)
+
+        # See: https://github.com/compas-dev/compas_fab/issues/63#issuecomment-519525879
+        time.sleep(1)
+
+        co_dict = client.get_collision_meshes_and_poses()
+
+
 # def test_choreo_plan_single_cartesian_motion():
     ## this test should not reply on client's existence
     # robot = Robot(client)
