@@ -245,13 +245,15 @@ class RosClient(Ros):
             Header(), joint_names, points)  # specify header necessary?
         return self.follow_joint_trajectory(callback, joint_trajectory, timeout)
 
-    def follow_joint_trajectory(self, joint_trajectory, callback=None, errback=None, feedback_callback=None, timeout=60000):
+    def follow_joint_trajectory(self, joint_trajectory, action_name='/joint_trajectory_action', callback=None, errback=None, feedback_callback=None, timeout=60000):
         """Follow the joint trajectory as computed by MoveIt planner.
 
         Parameters
         ----------
         joint_trajectory : JointTrajectory
             Joint trajectory message as computed by MoveIt planner
+        action_name : string
+            ROS action name, defaults to ``/joint_trajectory_action`` but some drivers need ``/follow_joint_trajectory``.
         callback : callable
             Function to be invoked when the goal is completed, requires
             one positional parameter ``result``.
@@ -279,9 +281,8 @@ class RosClient(Ros):
         def handle_failure(error):
             errback(error)
 
-        connection_timeout = 3000
-        action_client = ActionClient(self, '/joint_trajectory_action',  # '/follow_joint_trajectory',
-                                     'control_msgs/FollowJointTrajectoryAction', connection_timeout)
+        action_client = ActionClient(self, action_name,
+                                     'control_msgs/FollowJointTrajectoryAction')
 
         goal = Goal(action_client, Message(trajectory_goal.msg))
 
@@ -295,8 +296,6 @@ class RosClient(Ros):
         if errback:
             goal.on('timeout', lambda: handle_failure(
                 RosError("Action Goal timeout", -1)))
-            action_client.on('timeout', lambda: handle_failure(
-                RosError("Actionlib client timeout", -1)))
 
         goal.send(timeout=timeout)
 
