@@ -11,7 +11,7 @@ from setuptools import find_packages, setup
 
 requirements = [
     'compas==0.5.2',
-    'roslibpy>=0.4.1',
+    'roslibpy>=0.6.0',
     'pyserial',
 ]
 keywords_list = ['robotic fabrication', 'digital fabrication', 'architecture', 'robotics', 'ros']
