@@ -227,6 +227,9 @@ class RosClient(Ros):
     def remove_attached_collision_mesh(self, id):
         raise NotImplementedError('No planner plugin assigned')
 
+    def get_collision_meshes_and_poses(self):
+        raise NotImplementedError('No planner plugin assigned')
+
     # ==========================================================================
     # executing
     # ==========================================================================
@@ -309,4 +312,3 @@ class RosClient(Ros):
         goal.send(timeout=timeout)
 
         return CancellableRosAction(goal)
-

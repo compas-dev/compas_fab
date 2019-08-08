@@ -7,6 +7,8 @@ from __future__ import print_function
 
 from roslibpy import Topic
 
+from compas.utilities import await_callback
+
 from compas_fab.backends.ros.exceptions import RosError
 from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import CollisionObject
@@ -312,3 +314,26 @@ class MoveItPlanner(PlannerPlugin):
         topic = Topic(self, '/attached_collision_object',
                       'moveit_msgs/AttachedCollisionObject')
         topic.publish(attached_collision_object.msg)
+
+    def get_collision_meshes_and_poses(self):
+        """get a dict of collision objects' compas.Mesh and compas.Frame
+
+        Returns
+        -------
+        dict
+            {id : {'meshes': [compas.Mesh, ],
+                   'mesh_poses' : [compas.Frame, ]
+                   }
+            }
+
+        """
+        kwargs = {}
+        kwargs['errback_name'] = 'errback'
+        # planning_scene = self.get_planning_scene_async()
+        planning_scene = await_callback(self.get_planning_scene_async, **kwargs)
+        co_dict = {}
+        for co_msg in planning_scene.world.collision_objects:
+            co_dict[co_msg.id] = {}
+            co_dict[co_msg.id]['meshes'] = [mesh_msg.mesh for mesh_msg in co_msg.meshes]
+            co_dict[co_msg.id]['mesh_poses'] = [pose_msg.frame for pose_msg in co_msg.mesh_poses]
+        return co_dict

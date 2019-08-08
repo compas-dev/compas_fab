@@ -6,13 +6,18 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-from compas.files import URDF
+from tempfile import TemporaryDirectory
 
 from compas_fab.backends.ros.plugins import PlannerPlugin
+
+from conrob_pybullet import Pose
+from conrob_pybullet import create_obj, set_pose, quat_from_matrix, add_body_name, \
+    quat_from_euler
 
 __all__ = [
     'ChoreoPlanner',
     'generate_rel_path_URDF_pkg',
+    'convert_Frame_to_pybullet_pose',
 ]
 
 def generate_rel_path_URDF_pkg(input_urdf_path, pkg_name):
@@ -53,7 +58,6 @@ def generate_rel_path_URDF_pkg(input_urdf_path, pkg_name):
         absolute path for the generated URDF file
 
     """
-    # urdf = URDF.from_file(input_urdf_path)
     with open(input_urdf_path, 'r') as file :
         filedata = file.read()
 
@@ -73,6 +77,61 @@ def generate_rel_path_URDF_pkg(input_urdf_path, pkg_name):
         file.write(filedata)
 
     return urdf_rel_path
+
+
+def convert_Frame_to_pybullet_pose(frame):
+    """ convert compas.Frame to (point, quat).
+
+    Parameters
+    ----------
+    frame : compas Frame
+
+    Returns
+    -------
+    tuple
+        (point, euler),
+        where point: [x, y, z]
+              quat:  [roll, pitch, yaw]
+
+    """
+    point = [frame.point.x, frame.point.y, frame.point.z]
+    # zaxis = frame.xaxis.cross(frame.yaxis)
+    # mat = [list(frame.xaxis), list(frame.xaxis), list(zaxis)]
+    # quat = list(quat_from_matrix(mat))
+    euler = frame.euler_angles()
+    return (point, quat_from_euler(euler))
+
+
+def convert_mesh_to_pybullet_body(mesh, frame, name=None):
+    """ convert compas mesh and its frame to a pybullet body
+
+    Parameters
+    ----------
+    mesh : compas Mesh
+    frame : compas Frame
+    name : str
+        Optional, name of the mesh for tagging in pybullet's GUI
+
+    Returns
+    -------
+    pybullet body
+
+    """
+    # for now, py3.2+ only:
+    # https://stackoverflow.com/questions/6884991/how-to-delete-dir-created-by-python-tempfile-mkdtemp
+    with TemporaryDirectory() as temp_dir:
+        print('temp_dir: {}'.format(temp_dir))
+        tmp_obj_path = os.path.join(temp_dir, 'compas_mesh_temp.obj')
+        mesh.to_obj(tmp_obj_path)
+        pyb_body = create_obj(tmp_obj_path)
+        body_pose = convert_Frame_to_pybullet_pose(frame)
+        set_pose(pyb_body, body_pose)
+        if not name:
+            # this is just adding a tag on the GUI
+            # its name might be different to the planning scene name...
+            add_body_name(pyb_body, name)
+    return pyb_body
+
 
 class ChoreoPlanner(PlannerPlugin):
     """Implement the planner backend interface based on choreo
