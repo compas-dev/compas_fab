@@ -19,8 +19,7 @@ from compas_fab.robots import CollisionMesh
 from compas_fab.robots.ur5 import Robot
 
 from compas_fab.backends.ros.plugins_choreo import ChoreoPlanner
-from compas_fab.backends.ros.plugins_choreo import generate_rel_path_URDF_pkg, \
-attach_end_effector_geometry, convert_mesh_to_pybullet_body, get_TCP_pose
+from compas_fab.backends.ros.plugins_choreo import attach_end_effector_geometry, convert_mesh_to_pybullet_body, get_TCP_pose, create_pb_robot_from_ros_urdf
 
 from conrob_pybullet import load_pybullet, connect, disconnect, wait_for_user, \
     LockRenderer, has_gui, get_model_info, get_pose, euler_from_quat, draw_pose, \
@@ -35,6 +34,7 @@ def test_convert_compas_robot_to_pybullet_robot():
     urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
     srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
     ee_filename = compas_fab.get('universal_robot/ur_description/meshes/pychoreo_workshop_gripper/collision/pychoreo-workshop-gripper.stl')
+    urdf_pkg_name = 'ur_description'
 
     # geometry file is not loaded here
     model = RobotModel.from_urdf_file(urdf_filename)
@@ -49,35 +49,24 @@ def test_convert_compas_robot_to_pybullet_robot():
     # define TCP transformation
     tcp_tf = Translation([0.2, 0, 0]) # in meters
 
-    rel_urdf_path = generate_rel_path_URDF_pkg(urdf_filename, 'ur_description')
-    print('\nURDF with relative path generated: {}'.format(rel_urdf_path))
+    connect(use_gui=False)
+    # if the following returns without error, we are good
+    pb_robot = create_pb_robot_from_ros_urdf(urdf_filename, urdf_pkg_name)
 
-    try:
-        connect(use_gui=False)
-        # if the following returns without pybullet.error
-        # we are good
-        pb_robot = load_pybullet(rel_urdf_path, fixed_base=True)
+    # get disabled collisions
+    disabled_collisions = semantics.get_disabled_collisions()
+    assert len(disabled_collisions) == 10
+    assert ('base_link', 'shoulder_link') in disabled_collisions
 
-        # get disabled collisions
-        disabled_collisions = semantics.get_disabled_collisions()
-        assert len(disabled_collisions) == 10
-        assert ('base_link', 'shoulder_link') in disabled_collisions
+    # attach tool
+    ee_bodies = attach_end_effector_geometry([ee_mesh], pb_robot, ee_link_name)
 
-        # attach tool
-        ee_bodies = attach_end_effector_geometry([ee_mesh], pb_robot, ee_link_name)
+    # draw TCP frame in pybullet
+    TCP_pb_pose = get_TCP_pose(pb_robot, ee_link_name, tcp_tf, return_pb_pose=True)
+    draw_pose(TCP_pb_pose, length=0.04)
 
-        # draw TCP frame in pybullet
-        TCP_pb_pose = get_TCP_pose(pb_robot, ee_link_name, tcp_tf, return_pb_pose=True)
-        draw_pose(TCP_pb_pose, length=0.04)
+    # wait_for_user()
 
-        # wait_for_user()
-    except:
-        print('pybullet fails!')
-        os.remove(rel_urdf_path)
-        assert False
-
-    if os.path.exists(rel_urdf_path):
-        os.remove(rel_urdf_path)
 
 def test_convert_planning_scene_collision_objects_to_pybullet_obstacles():
     with RosClient() as client:
@@ -109,7 +98,6 @@ def test_convert_planning_scene_collision_objects_to_pybullet_obstacles():
         assert pyb_pose[0] == input_frame.point
         assert_array_almost_equal(euler_from_quat(pyb_pose[1]), input_frame.euler_angles())
         # wait_for_user()
-
 
 # def test_choreo_plan_single_cartesian_motion():
     ## this test should not reply on client's existence

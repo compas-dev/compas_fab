@@ -14,7 +14,7 @@ from compas_fab.backends.ros.plugins import PlannerPlugin
 from conrob_pybullet import Pose
 from conrob_pybullet import create_obj, set_pose, quat_from_matrix, add_body_name, \
     quat_from_euler, link_from_name, get_link_pose, add_fixed_constraint, euler_from_quat, \
-    multiply
+    multiply, is_connected, load_pybullet
 
 from conrob_pybullet import wait_for_user
 
@@ -239,6 +239,41 @@ def get_TCP_pose(robot, ee_link_name, ee_link_from_TCP_tf, return_pb_pose=False)
         return Frame_from_pb_pose(world_from_TCP)
     else:
         return world_from_TCP
+
+
+def create_pb_robot_from_ros_urdf(urdf_path, pkg_name, keep_temp_urdf=False):
+    """Create pybullet robot from ros package-based urdf.
+
+    Parameters
+    ----------
+    urdf_path : str
+        absolute path to the ros urdf file
+    pkg_name : str
+        name of the ros package where the urdf resides, e.g. 'ur_description' or
+        'abb_irb4600_support'
+    keep_temp_urdf : bool
+        Defaults to False, the generated temporal urdf where all the mesh links
+        are changed to relative path, is deleted after the py_robot is created.
+        Otherwise, the file is kept at the `urdf_path`.
+
+    Returns
+    -------
+    type
+        Description of returned object.
+
+    """
+    assert is_connected()
+    try:
+        rel_urdf_path = generate_rel_path_URDF_pkg(urdf_path, pkg_name)
+        pb_robot = load_pybullet(rel_urdf_path, fixed_base=True)
+    except:
+        if os.path.exists(rel_urdf_path):
+            os.remove(rel_urdf_path)
+        assert False, 'pybullet create robot from ros urdf fails.'
+    if not keep_temp_urdf:
+        if os.path.exists(rel_urdf_path):
+            os.remove(rel_urdf_path)
+    return pb_robot
 
 
 class ChoreoPlanner(PlannerPlugin):
