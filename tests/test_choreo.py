@@ -27,45 +27,6 @@ from conrob_pybullet import load_pybullet, connect, disconnect, wait_for_user, \
     create_obj, set_pose
 
 
-# @pytest.mark.wip
-# def test_ikfast():
-#     urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
-#     srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
-#     ee_filename = compas_fab.get('universal_robot/ur_description/meshes/pychoreo_workshop_gripper/collision/pychoreo-workshop-gripper.stl')
-#     urdf_pkg_name = 'ur_description'
-#
-#     # geometry file is not loaded here
-#     model = RobotModel.from_urdf_file(urdf_filename)
-#     semantics = RobotSemantics.from_srdf_file(srdf_filename, model)
-#     robot = RobotClass(model, semantics=semantics)
-#     ee_link_name = robot.get_end_effector_link_name()
-#     print('ee link: {}'.format(ee_link_name))
-#
-#     # parse end effector mesh
-#     ee_mesh = Mesh.from_stl(ee_filename)
-#
-#     # define TCP transformation
-#     tcp_tf = Translation([0.2, 0, 0]) # in meters
-#
-#     connect(use_gui=False)
-#     # if the following returns without error, we are good
-#     pb_robot = create_pb_robot_from_ros_urdf(urdf_filename, urdf_pkg_name)
-#
-#     # get disabled collisions
-#     disabled_collisions = semantics.get_disabled_collisions()
-#     assert len(disabled_collisions) == 10
-#     assert ('base_link', 'shoulder_link') in disabled_collisions
-#
-#     # attach tool
-#     ee_bodies = attach_end_effector_geometry([ee_mesh], pb_robot, ee_link_name)
-#
-#     # draw TCP frame in pybullet
-#     TCP_pb_pose = get_TCP_pose(pb_robot, ee_link_name, tcp_tf, return_pb_pose=True)
-#     draw_pose(TCP_pb_pose, length=0.04)
-#
-#     # wait_for_user()
-
-
 # def test_choreo_plan_single_cartesian_motion():
     ## this test should not reply on client's existence
     # robot = Robot(client)

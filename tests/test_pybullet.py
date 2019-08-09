@@ -63,9 +63,10 @@ def test_convert_compas_robot_to_pybullet_robot():
 
     # draw TCP frame in pybullet
     TCP_pb_pose = get_TCP_pose(pb_robot, ee_link_name, tcp_tf, return_pb_pose=True)
-    draw_pose(TCP_pb_pose, length=0.04)
 
-    # wait_for_user()
+    if has_gui():
+        draw_pose(TCP_pb_pose, length=0.04)
+        wait_for_user()
 
 
 def test_convert_planning_scene_collision_objects_to_pybullet_obstacles():
@@ -96,4 +97,5 @@ def test_convert_planning_scene_collision_objects_to_pybullet_obstacles():
         input_frame = list(co_dict.values())[0]['mesh_poses'][0]
         assert pyb_pose[0] == input_frame.point
         assert_array_almost_equal(euler_from_quat(pyb_pose[1]), input_frame.euler_angles())
-        # wait_for_user()
+        if has_gui():
+            wait_for_user()

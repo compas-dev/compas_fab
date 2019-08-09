@@ -207,7 +207,7 @@ def attach_end_effector_geometry(ee_meshes, robot, ee_link_name, scale=1.0):
     return ee_bodies
 
 
-def get_TCP_pose(robot, ee_link_name, ee_link_from_TCP_tf, return_pb_pose=False):
+def get_TCP_pose(robot, ee_link_name, ee_link_from_TCP_tf=None, return_pb_pose=False):
     """ get current TCP pose in pybullet, based on its current configuration state
 
     Parameters
@@ -216,7 +216,7 @@ def get_TCP_pose(robot, ee_link_name, ee_link_from_TCP_tf, return_pb_pose=False)
     ee_link_name : str
         name of the link where the end effector is attached to, usually is `ee_link`
     ee_link_from_TCP_tf : compas Transformation
-        ee_link to TCP transformation
+        ee_link to TCP transformation, if any, default to None
     return_pb_pose : bool
         if set True, return pb pose. Otherwise return compas Frame
 
@@ -228,8 +228,11 @@ def get_TCP_pose(robot, ee_link_name, ee_link_from_TCP_tf, return_pb_pose=False)
     """
     pyb_ee_link = link_from_name(robot, ee_link_name)
     world_from_ee_link = get_link_pose(robot, pyb_ee_link)
-    ee_link_from_TCP = pb_pose_from_Transformation(ee_link_from_TCP_tf)
-    world_from_TCP = multiply(world_from_ee_link, ee_link_from_TCP)
+    if ee_link_from_TCP_tf:
+        ee_link_from_TCP = pb_pose_from_Transformation(ee_link_from_TCP_tf)
+        world_from_TCP = multiply(world_from_ee_link, ee_link_from_TCP)
+    else:
+        world_from_TCP = world_from_ee_link
     if not return_pb_pose:
         return Frame_from_pb_pose(world_from_TCP)
     else:
