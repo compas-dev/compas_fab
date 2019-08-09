@@ -1,6 +1,9 @@
-"""Interface definition for the choreo planer.
+"""Interface utililty functions for connecting compas_fab and pybullet.
+
+Note: Now these functions are mainly used for connecting compas_fab and pychoreo.
 
 """
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -9,23 +12,15 @@ import os
 from tempfile import TemporaryDirectory
 
 from compas.geometry import Frame, Transformation
-from compas_fab.backends.ros.plugins import PlannerPlugin
 
 from conrob_pybullet import Pose
 from conrob_pybullet import create_obj, set_pose, quat_from_matrix, add_body_name, \
     quat_from_euler, link_from_name, get_link_pose, add_fixed_constraint, euler_from_quat, \
     multiply, is_connected, load_pybullet
 
-from conrob_pybullet import wait_for_user
-
-# let's do this later...
+# TODO: this will be added later
 # __all__ = [
-#     'ChoreoPlanner',
-#     'generate_rel_path_URDF_pkg',
-#     'convert_mesh_to_pybullet_body',
-#     'attach_end_effector_geometry',
-#     'pb_pose_from_Frame',
-#     'get_TCP_pose',
+#            ''
 # ]
 
 def generate_rel_path_URDF_pkg(input_urdf_path, pkg_name):
@@ -274,24 +269,3 @@ def create_pb_robot_from_ros_urdf(urdf_path, pkg_name, keep_temp_urdf=False):
         if os.path.exists(rel_urdf_path):
             os.remove(rel_urdf_path)
     return pb_robot
-
-
-class ChoreoPlanner(PlannerPlugin):
-    """Implement the planner backend interface based on choreo
-    """
-
-    def inverse_kinematics_async(self, callback, errback, frame, base_link, group,
-                                 joint_names, joint_positions, avoid_collisions=True,
-                                 constraints=None, attempts=8, attached_collision_meshes=None):
-        raise NotImplementedError
-
-    def forward_kinematics_async(self, callback, errback, joint_positions, base_link,
-                                 group, joint_names, ee_link):
-        raise NotImplementedError
-
-    def plan_cartesian_motions_async(self, callback, errback, frames, base_link,
-                                     ee_link, group, joint_names, joint_types,
-                                     start_configuration, max_step, jump_threshold,
-                                     avoid_collisions, path_constraints,
-                                     attached_collision_meshes):
-        raise NotImplementedError
