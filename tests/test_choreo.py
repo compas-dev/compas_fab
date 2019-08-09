@@ -5,6 +5,7 @@ import pytest
 from numpy.testing import assert_array_almost_equal
 
 from compas.geometry import Frame
+from compas.geometry import Translation
 from compas.datastructures import Mesh
 from compas.robots import LocalPackageMeshLoader
 from compas.robots import RobotModel
@@ -18,20 +19,36 @@ from compas_fab.robots import CollisionMesh
 from compas_fab.robots.ur5 import Robot
 
 from compas_fab.backends.ros.plugins_choreo import ChoreoPlanner
-from compas_fab.backends.ros.plugins_choreo import generate_rel_path_URDF_pkg
-from compas_fab.backends.ros.plugins_choreo import convert_mesh_to_pybullet_body
+from compas_fab.backends.ros.plugins_choreo import generate_rel_path_URDF_pkg, \
+attach_end_effector_geometry, convert_mesh_to_pybullet_body, get_TCP_pose
 
 from conrob_pybullet import load_pybullet, connect, disconnect, wait_for_user, \
-    LockRenderer, has_gui, get_model_info, get_pose, euler_from_quat
+    LockRenderer, has_gui, get_model_info, get_pose, euler_from_quat, draw_pose, \
+    get_link_pose, link_from_name, create_attachment, add_fixed_constraint,\
+    create_obj, set_pose
 
+@pytest.mark.wip
 def test_convert_compas_robot_to_pybullet_robot():
     # get ur robot model from local test data that's shipped with compas_fab
     # does not need client connection here
+
     urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
     srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
+    ee_filename = compas_fab.get('universal_robot/ur_description/meshes/pychoreo_workshop_gripper/collision/pychoreo-workshop-gripper.stl')
 
     # geometry file is not loaded here
     model = RobotModel.from_urdf_file(urdf_filename)
+    semantics = RobotSemantics.from_srdf_file(srdf_filename, model)
+    robot = RobotClass(model, semantics=semantics)
+    ee_link_name = robot.get_end_effector_link_name()
+    print('ee link: {}'.format(ee_link_name))
+
+    # parse end effector mesh
+    ee_mesh = Mesh.from_stl(ee_filename)
+
+    # define TCP transformation
+    tcp_tf = Translation([0.2, 0, 0]) # in meters
+
     rel_urdf_path = generate_rel_path_URDF_pkg(urdf_filename, 'ur_description')
     print('\nURDF with relative path generated: {}'.format(rel_urdf_path))
 
@@ -42,18 +59,26 @@ def test_convert_compas_robot_to_pybullet_robot():
         pb_robot = load_pybullet(rel_urdf_path, fixed_base=True)
 
         # get disabled collisions
-        semantics = RobotSemantics.from_srdf_file(srdf_filename, model)
         disabled_collisions = semantics.get_disabled_collisions()
         assert len(disabled_collisions) == 10
         assert ('base_link', 'shoulder_link') in disabled_collisions
 
+        # attach tool
+        ee_bodies = attach_end_effector_geometry([ee_mesh], pb_robot, ee_link_name)
+
+        # draw TCP frame in pybullet
+        TCP_pb_pose = get_TCP_pose(pb_robot, ee_link_name, tcp_tf, return_pb_pose=True)
+        draw_pose(TCP_pb_pose, length=0.04)
+
+        # wait_for_user()
     except:
+        print('pybullet fails!')
+        os.remove(rel_urdf_path)
+        assert False
+
+    if os.path.exists(rel_urdf_path):
         os.remove(rel_urdf_path)
 
-    os.remove(rel_urdf_path)
-
-
-@pytest.mark.wip
 def test_convert_planning_scene_collision_objects_to_pybullet_obstacles():
     with RosClient() as client:
         assert client.is_connected

@@ -8,17 +8,25 @@ from __future__ import print_function
 import os
 from tempfile import TemporaryDirectory
 
+from compas.geometry import Frame, Transformation
 from compas_fab.backends.ros.plugins import PlannerPlugin
 
 from conrob_pybullet import Pose
 from conrob_pybullet import create_obj, set_pose, quat_from_matrix, add_body_name, \
-    quat_from_euler
+    quat_from_euler, link_from_name, get_link_pose, add_fixed_constraint, euler_from_quat, \
+    multiply
 
-__all__ = [
-    'ChoreoPlanner',
-    'generate_rel_path_URDF_pkg',
-    'convert_Frame_to_pybullet_pose',
-]
+from conrob_pybullet import wait_for_user
+
+# let's do this later...
+# __all__ = [
+#     'ChoreoPlanner',
+#     'generate_rel_path_URDF_pkg',
+#     'convert_mesh_to_pybullet_body',
+#     'attach_end_effector_geometry',
+#     'pb_pose_from_Frame',
+#     'get_TCP_pose',
+# ]
 
 def generate_rel_path_URDF_pkg(input_urdf_path, pkg_name):
     """generate a URDF file with relative linking paths in the input file's dir
@@ -79,7 +87,7 @@ def generate_rel_path_URDF_pkg(input_urdf_path, pkg_name):
     return urdf_rel_path
 
 
-def convert_Frame_to_pybullet_pose(frame):
+def pb_pose_from_Frame(frame):
     """ convert compas.Frame to (point, quat).
 
     Parameters
@@ -102,7 +110,45 @@ def convert_Frame_to_pybullet_pose(frame):
     return (point, quat_from_euler(euler))
 
 
-def convert_mesh_to_pybullet_body(mesh, frame, name=None):
+def pb_pose_from_Transformation(tf):
+    """ convert compas.Transformation to (point, quat).
+
+    Parameters
+    ----------
+    tf : compas Transformation
+
+    Returns
+    -------
+    tuple
+        (point, euler),
+        where point: [x, y, z]
+              quat:  [roll, pitch, yaw]
+
+    """
+    point = [tf[i, 3] for i in range(3)]
+    quat = quat_from_matrix([tf[i, :3] for i in range(3)])
+    return (point, quat)
+
+
+def Frame_from_pb_pose(pose):
+    """ convert (point, quat) to compas.Frame
+
+    Parameters
+    ----------
+    pose : ([x,y,z], [roll, pitch, yaw])
+
+    Returns
+    -------
+    frame : compas Frame
+
+    """
+    frame = Frame()
+    frame.from_euler_angles(euler_from_quat(pose[1]))
+    frame.point = pose[0]
+    return frame
+
+
+def convert_mesh_to_pybullet_body(mesh, frame, name=None, scale=1.0):
     """ convert compas mesh and its frame to a pybullet body
 
     Parameters
@@ -123,14 +169,76 @@ def convert_mesh_to_pybullet_body(mesh, frame, name=None):
         print('temp_dir: {}'.format(temp_dir))
         tmp_obj_path = os.path.join(temp_dir, 'compas_mesh_temp.obj')
         mesh.to_obj(tmp_obj_path)
-        pyb_body = create_obj(tmp_obj_path)
-        body_pose = convert_Frame_to_pybullet_pose(frame)
+        pyb_body = create_obj(tmp_obj_path, scale=scale)
+        body_pose = pb_pose_from_Frame(frame)
         set_pose(pyb_body, body_pose)
-        if not name:
+        if name:
             # this is just adding a tag on the GUI
             # its name might be different to the planning scene name...
             add_body_name(pyb_body, name)
     return pyb_body
+
+
+def attach_end_effector_geometry(ee_meshes, robot, ee_link_name, scale=1.0):
+    """ create and attach a list of end effector meshes to the robot's ee_link.
+
+    Note: for now, only collision mesh is supported, no virual mesh.
+
+    Parameters
+    ----------
+    ee_meshes : list of compas.Mesh
+        Should be a list of meshes from the convex decomposition of the end effector geometry
+    robot : pybullet robot
+    ee_link_name : str
+        name of the link where the end effector is attached to, usually is `ee_link`
+    scale: float
+        unit conversion factor to meter, default 1.0. For example, if the model
+        is in millimeter, set it to 1e-3.
+
+    Returns
+    -------
+    list of pybullet bodies
+        a list of pybullet object for the ee_meshes
+
+    """
+    pyb_ee_link = link_from_name(robot, ee_link_name)
+    ee_link_pose = get_link_pose(robot, pyb_ee_link)
+    ee_bodies = []
+    for mesh in ee_meshes:
+        ee_body = convert_mesh_to_pybullet_body(mesh, Frame.worldXY())
+        set_pose(ee_body, ee_link_pose)
+        add_fixed_constraint(ee_body, robot, pyb_ee_link)
+        ee_bodies.append(ee_body)
+    return ee_bodies
+
+
+def get_TCP_pose(robot, ee_link_name, ee_link_from_TCP_tf, return_pb_pose=False):
+    """ get current TCP pose in pybullet, based on its current configuration state
+
+    Parameters
+    ----------
+    robot : pybullet robot
+    ee_link_name : str
+        name of the link where the end effector is attached to, usually is `ee_link`
+    ee_link_from_TCP_tf : compas Transformation
+        ee_link to TCP transformation
+    return_pb_pose : bool
+        if set True, return pb pose. Otherwise return compas Frame
+
+    Returns
+    -------
+    TCP_frame : compas Frame or (point, quat)
+        in the world coordinate
+
+    """
+    pyb_ee_link = link_from_name(robot, ee_link_name)
+    world_from_ee_link = get_link_pose(robot, pyb_ee_link)
+    ee_link_from_TCP = pb_pose_from_Transformation(ee_link_from_TCP_tf)
+    world_from_TCP = multiply(world_from_ee_link, ee_link_from_TCP)
+    if not return_pb_pose:
+        return Frame_from_pb_pose(world_from_TCP)
+    else:
+        return world_from_TCP
 
 
 class ChoreoPlanner(PlannerPlugin):
