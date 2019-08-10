@@ -19,7 +19,8 @@ from compas_fab.robots import CollisionMesh
 from compas_fab.robots.ur5 import Robot
 
 from compas_fab.backends.pybullet import attach_end_effector_geometry, \
-convert_mesh_to_pybullet_body, get_TCP_pose, create_pb_robot_from_ros_urdf
+convert_mesh_to_pybullet_body, get_TCP_pose, create_pb_robot_from_ros_urdf, \
+convert_meshes_and_poses_to_pybullet_bodies
 
 from conrob_pybullet import load_pybullet, connect, disconnect, wait_for_user, \
     LockRenderer, has_gui, get_model_info, get_pose, euler_from_quat, draw_pose, \
@@ -84,18 +85,14 @@ def test_convert_planning_scene_collision_objects_to_pybullet_obstacles():
 
         connect(use_gui=False)
         co_dict = client.get_collision_meshes_and_poses()
-        body_dict = {}
-        for name, item_dict in co_dict.items():
-            n_obj = len(item_dict['meshes'])
-            for i, mesh, frame in zip(range(n_obj), item_dict['meshes'], item_dict['mesh_poses']):
-                body_name = name + '_' + str(i)
-                body = convert_mesh_to_pybullet_body(mesh, frame, body_name)
-                body_dict[body_name] = body
+        body_dict = convert_meshes_and_poses_to_pybullet_bodies(co_dict)
 
-        assert len(body_dict) == 1
-        pyb_pose = get_pose(list(body_dict.values())[0])
+        assert 'floor' in body_dict
+        pyb_pose = get_pose(body_dict['floor'][0])
         input_frame = list(co_dict.values())[0]['mesh_poses'][0]
         assert pyb_pose[0] == input_frame.point
         assert_array_almost_equal(euler_from_quat(pyb_pose[1]), input_frame.euler_angles())
         if has_gui():
             wait_for_user()
+
+        scene.remove_collision_mesh('floor')

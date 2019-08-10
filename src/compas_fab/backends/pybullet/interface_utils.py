@@ -160,6 +160,7 @@ def convert_mesh_to_pybullet_body(mesh, frame, name=None, scale=1.0):
     """
     # for now, py3.2+ only:
     # https://stackoverflow.com/questions/6884991/how-to-delete-dir-created-by-python-tempfile-mkdtemp
+    assert is_connected()
     with TemporaryDirectory() as temp_dir:
         print('temp_dir: {}'.format(temp_dir))
         tmp_obj_path = os.path.join(temp_dir, 'compas_mesh_temp.obj')
@@ -172,6 +173,35 @@ def convert_mesh_to_pybullet_body(mesh, frame, name=None, scale=1.0):
             # its name might be different to the planning scene name...
             add_body_name(pyb_body, name)
     return pyb_body
+
+
+def convert_meshes_and_poses_to_pybullet_bodies(co_dict, scale=1.0):
+    """Convert collision mesh/pose dict fetched from compas_fab client to
+    a pybullet body dict, and add them to the pybullet env
+
+    Parameters
+    ----------
+    co_dict : dict
+        {object_id : {'meshes' : [compas.Mesh],
+                      'mesh_poses' : [compas.Frame]}}
+    scale : float
+        unit scale conversion to meter, default to 1.0
+
+    Returns
+    -------
+    dict of pybullet bodies
+        {object_id : [pybullet_body, ]}
+
+    """
+    body_dict = {}
+    for name, item_dict in co_dict.items():
+        n_obj = len(item_dict['meshes'])
+        body_dict[name] = []
+        for i, mesh, frame in zip(range(n_obj), item_dict['meshes'], item_dict['mesh_poses']):
+            body_name = name + str(i) if len(item_dict['meshes']) > 1 else name
+            body = convert_mesh_to_pybullet_body(mesh, frame, body_name)
+            body_dict[name].append(body)
+    return body_dict
 
 
 def attach_end_effector_geometry(ee_meshes, robot, ee_link_name, scale=1.0):
@@ -264,6 +294,7 @@ def create_pb_robot_from_ros_urdf(urdf_path, pkg_name, keep_temp_urdf=False):
     try:
         rel_urdf_path = generate_rel_path_URDF_pkg(urdf_path, pkg_name)
         pb_robot = load_pybullet(rel_urdf_path, fixed_base=True)
+        # TODO: set_joint_pose based on current joint conf in the planning scene
     except:
         if os.path.exists(rel_urdf_path):
             os.remove(rel_urdf_path)
