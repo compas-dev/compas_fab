@@ -1,6 +1,7 @@
 from __future__ import print_function
 import os
 import time
+import random
 import pytest
 import numpy as np
 from numpy.testing import assert_array_almost_equal
@@ -17,9 +18,13 @@ from compas_fab.robots import PlanningScene
 from compas_fab.robots import CollisionMesh
 from compas_fab.robots.ur5 import Robot
 
+# pybullet interface utils
 from compas_fab.backends.pybullet import attach_end_effector_geometry, \
 convert_mesh_to_pybullet_body, get_TCP_pose, create_pb_robot_from_ros_urdf, \
-convert_meshes_and_poses_to_pybullet_bodies
+convert_meshes_and_poses_to_pybullet_bodies, pb_pose_from_Transformation
+
+# pybullet grasp utils
+from compas_fab.backends.pybullet import plan_pickup_object, get_grasp_gen
 
 from compas_fab.backends.ros.plugins_choreo import get_ik_tool_link_pose, \
  sample_tool_ik
@@ -28,7 +33,12 @@ from conrob_pybullet import load_pybullet, connect, disconnect, wait_for_user, \
     LockRenderer, has_gui, get_model_info, get_pose, euler_from_quat, draw_pose, \
     get_link_pose, link_from_name, create_attachment, add_fixed_constraint, \
     create_obj, set_pose, get_sample_fn, violates_limits, joints_from_names, \
-    set_joint_positions, remove_debug, get_joint_limits
+    set_joint_positions, remove_debug, get_joint_limits, WorldSaver, \
+    LockRenderer, update_state, end_effector_from_body, approach_from_grasp, \
+    unit_pose, approximate_as_prism, point_from_pose, multiply, quat_from_euler, \
+    approximate_as_cylinder
+
+from conrob_pybullet import Pose, Point, BodyPose, GraspInfo
 
 try:
     import ikfast_ur5
@@ -170,7 +180,48 @@ def test_ikfast_forward_kinematics():
             assert False
 
 
-@pytest.mark.wip
+def get_side_grasps(body, under=False, tool_pose=Pose(), body_pose=unit_pose(),
+                    max_width=np.inf, grasp_length=0, top_offset=0.03):
+    center, (w, l, h) = approximate_as_prism(body, body_pose=body_pose)
+    translate_center = Pose(point=point_from_pose(body_pose)-center)
+    grasps = []
+    x_offset = 0
+    # x_offset = h/2 - top_offset
+    for j in range(1 + under):
+        swap_xz = Pose(euler=[0, -np.pi / 2 + j * np.pi, 0])
+        # swap_xz = Pose()
+        if w <= max_width:
+            translate_z = Pose(point=[x_offset, 0, l / 2 - grasp_length])
+            for i in range(2):
+                rotate_z = Pose(euler=[np.pi / 2 + i * np.pi, 0, 0])
+                grasps += [multiply(tool_pose, translate_z, rotate_z, #swap_xz,
+                                    translate_center, body_pose)]  # , np.array([w])
+        if l <= max_width:
+            translate_z = Pose(point=[x_offset, 0, w / 2 - grasp_length])
+            for i in range(2):
+                rotate_z = Pose(euler=[i * np.pi, 0, 0])
+                grasps += [multiply(tool_pose, translate_z, rotate_z, #swap_xz,
+                                    translate_center, body_pose)]  # , np.array([l])
+    return grasps
+
+
+def get_side_cylinder_grasps(body, under=False, tool_pose=Pose(), body_pose=unit_pose(),
+                             max_width=np.inf, grasp_length=0, top_offset=0.03):
+    center, (diameter, height) = approximate_as_cylinder(body, body_pose=body_pose)
+    translate_center = Pose(point_from_pose(body_pose)-center)
+    #x_offset = 0
+    x_offset = height/2 - top_offset
+    if max_width < diameter:
+        return
+    while True:
+        theta = random.uniform(0, 2*np.pi)
+        translate_rotate = ([x_offset, 0, diameter / 2 - grasp_length], quat_from_euler([theta, 0, 0]))
+        for j in range(1 + under):
+            swap_xz = Pose(euler=[0, -np.pi / 2 + j * np.pi, 0])
+            yield multiply(tool_pose, translate_rotate, swap_xz, translate_center, body_pose)
+
+
+# @pytest.mark.wip
 def test_pickup_cylinder():
     """TODO: this test_function can by pybullet-free"""
     urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
@@ -181,6 +232,7 @@ def test_pickup_cylinder():
 
     # define TCP transformation
     tcp_tf = Translation([0.2, 0, 0]) # in meters
+    pb_tool_from_tcp = pb_pose_from_Transformation(tcp_tf)
     ee_mesh = Mesh.from_stl(ee_filename)
 
     # create robot model in compas_fab
@@ -226,6 +278,8 @@ def test_pickup_cylinder():
 
         co_dict = client.get_collision_meshes_and_poses()
         body_from_name = convert_meshes_and_poses_to_pybullet_bodies(co_dict)
+        floor_body = body_from_name['floor'][0]
+        cylinder_body = body_from_name['cylinder'][0]
 
         # attach end effector mesh
         # ikfast is built for base_link - ee_link, so here ee_link coincides with
@@ -235,34 +289,32 @@ def test_pickup_cylinder():
         if has_gui():
             TCP_pb_pose = get_TCP_pose(pb_robot, ik_tool_link_name, tcp_tf, return_pb_pose=True)
             handles = draw_pose(TCP_pb_pose, length=0.04)
-            wait_for_user()
-            for h in handles : remove_debug(h)
+            print('initial env, press enter to continue')
+            # wait_for_user()
+            # for h in handles : remove_debug(h)
 
+            # grasp_gen = get_grasp_gen(pb_robot, 'side', ik_tool_link_name, pb_tool_from_tcp)
+            side_get_grasp_fn = lambda body: get_side_cylinder_grasps(body, under=True, \
+                                                             tool_pose=Pose(), \
+                                                             max_width=np.inf, grasp_length=0)
+            side_grasp_info = GraspInfo(side_get_grasp_fn, Pose(0.1*Point(x=-1)))
+
+            grasp_gen = get_grasp_gen(pb_robot, ik_tool_link_name, side_grasp_info)
+            body_pose = BodyPose(cylinder_body)
+            draw_pose(body_pose.pose, length=0.04)
+
+        # keep the world state
+        # saved_world = WorldSaver()
+        # with LockRenderer():
+        #     command = plan_pickup_object(robot, block, fixed=[floor], teleport=False)
+        #
+        # assert command is None, 'Unable to find a plan!'
+        #
+        # if has_gui():
+        #     saved_world.restore()
+        #     update_state()
+        #     command.refine(num_steps=10).execute(time_step=0.002)
+
+        # clean up the planning scene in the ros backend
         scene.remove_collision_mesh('floor')
         scene.remove_collision_mesh('cylinder')
-
-
-    # # randomly sample within joint limits
-    # conf = sample_fn()
-    # # sanity joint limit violation check
-    # assert not violates_limits(pb_robot, pb_ik_joints, conf)
-    #
-    # # ikfast's FK
-    # fk_fn = ikfast_ur5.get_fk
-    # ikfast_FK_pb_pose = get_ik_tool_link_pose(fk_fn, pb_robot, ik_joint_names, base_link_name, conf)
-    #
-    # if has_gui():
-    #     print('test round #{}: ground truth conf: {}'.format(i, conf))
-    #     handles = draw_pose(ikfast_FK_pb_pose, length=0.04)
-    #     set_joint_positions(pb_robot, pb_ik_joints, conf)
-    #     wait_for_user()
-    #
-    # # ikfast's IK
-    # ik_fn = ikfast_ur5.get_ik
-    # ik_sols = sample_tool_ik(ik_fn, pb_robot, ik_joint_names, base_link_name,
-    #                 ikfast_FK_pb_pose, get_all=True)
-    #
-    # # TODO: UR robot or in general joint w/ domain over 4 pi
-    # # needs specialized distance function
-    # q_selected = sample_tool_ik(ik_fn, pb_robot, ik_joint_names, base_link_name,
-    #                 ikfast_FK_pb_pose, nearby_conf=True)
