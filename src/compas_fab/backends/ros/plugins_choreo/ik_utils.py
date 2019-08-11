@@ -12,10 +12,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import numpy as np
+from copy import copy, deepcopy
 from conrob_pybullet import multiply, get_link_pose, get_movable_joints, \
     link_from_name, get_joint_positions, invert, violates_limits, get_pose, \
     get_distance, joints_from_names, quat_from_matrix, matrix_from_quat, \
-    point_from_pose, quat_from_pose
+    point_from_pose, quat_from_pose, violates_limit
 
 
 def get_ik_tool_link_pose(fk_fn, robot, ik_joint_names, base_link_name, \
@@ -92,7 +94,9 @@ def get_ik_generator(ik_fn, robot, base_link_name, world_from_tcp, ik_tool_link_
     yield compute_inverse_kinematics(ik_fn, base_from_ik_tool_link)
 
 
-def sample_tool_ik(ik_fn, robot, ik_joint_names, base_link_name, world_from_tcp, ik_tool_link_from_tcp=None, get_all=False, **kwargs):
+def sample_tool_ik(ik_fn, robot, ik_joint_names, base_link_name, world_from_tcp,
+                   add_2pi_sols=False, ik_tool_link_from_tcp=None,
+                   get_all=False, **kwargs):
     """ sample ik joints for a given tcp pose in the world frame
 
     Parameters
@@ -126,9 +130,24 @@ def sample_tool_ik(ik_fn, robot, ik_joint_names, base_link_name, world_from_tcp,
     """
     ik_joints = joints_from_names(robot, ik_joint_names)
     generator = get_ik_generator(ik_fn, robot, base_link_name, world_from_tcp, ik_tool_link_from_tcp)
-    solutions = next(generator)
-    solutions = list(filter(lambda conf: not violates_limits(robot, ik_joints, conf), solutions))
-    return solutions if get_all else select_solution(robot, ik_joints, solutions, **kwargs)
+    sols = next(generator)
+
+    # if add_2pi_sols:
+    #     extra_sol_addup = []
+    #     for test_sol in sols:
+    #         print('---')
+    #         # for each sol, we add each combination of +- 2pi
+    #         add_ups = [[0] for _ in range(6)]
+    #         for i in range(6):
+    #             for add_ang in [-2.*np.pi, 2.*np.pi]:
+    #                 if not violates_limit(robot, ik_joints[i], test_sol[i] + add_ang):
+    #                     add_ups[i].append(add_ang)
+    #         extra_sol_addup.append(add_ups)
+    #         print(extra_sol_addup)
+    #     sols = extra_sols
+
+    sols = list(filter(lambda conf: not violates_limits(robot, ik_joints, conf), sols))
+    return sols if get_all else select_solution(robot, ik_joints, sols, **kwargs)
 
 
 def compute_forward_kinematics(fk_fn, conf):
@@ -222,3 +241,28 @@ def select_solution(body, joints, solutions, nearby_conf=True, random=False, **k
         return min(solutions, key=lambda conf: get_distance(nearby_conf, conf, **kwargs))
     else:
         return random.choice(solutions)
+
+
+def best_sol(sols, q_guess, weights):
+    """get the best solution based on UR's joint domain value and weighted joint diff
+
+    ported from https://github.com/ros-industrial/universal_robot/blob/kinetic-devel/ur_kinematics/src/ur_kinematics/test_analytical_ik.py
+
+    Specific for UR setup (4 pi domain ranges)
+    """
+    valid_sols = []
+    for sol in sols:
+        test_sol = np.ones(6)*9999.
+        for i in range(6):
+            for add_ang in [-2.*np.pi, 0, 2.*np.pi]:
+                test_ang = sol[i] + add_ang
+                if (abs(test_ang) <= 2.*np.pi and
+                    # snap solution to the one that's closer to q_guess
+                    abs(test_ang - q_guess[i]) < abs(test_sol[i] - q_guess[i])):
+                    test_sol[i] = test_ang
+        if np.all(test_sol != 9999.):
+            valid_sols.append(test_sol)
+    if len(valid_sols) == 0:
+        return None
+    best_sol_ind = np.argmin(np.sum((weights*(valid_sols - np.array(q_guess)))**2,1))
+    return valid_sols[best_sol_ind]

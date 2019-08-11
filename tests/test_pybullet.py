@@ -36,7 +36,7 @@ from conrob_pybullet import load_pybullet, connect, disconnect, wait_for_user, \
     set_joint_positions, remove_debug, get_joint_limits, WorldSaver, \
     LockRenderer, update_state, end_effector_from_body, approach_from_grasp, \
     unit_pose, approximate_as_prism, point_from_pose, multiply, quat_from_euler, \
-    approximate_as_cylinder
+    approximate_as_cylinder, invert, matrix_from_quat, quat_from_matrix
 
 from conrob_pybullet import Pose, Point, BodyPose, GraspInfo
 
@@ -152,7 +152,17 @@ def get_side_cylinder_grasps(body, under=False, tool_pose=Pose(), body_pose=unit
             yield multiply(tool_pose, translate_rotate, swap_xz, translate_center, body_pose)
 
 
-@pytest.mark.wip
+def convert_pose_z2x_y2z(pose):
+    """for UR's "strange" TCP setup..."""
+    point, quat = pose
+    tform_mat = matrix_from_quat(quat)
+    xaxis = tform_mat[:,0]
+    yaxis = tform_mat[:,1]
+    zaxis = tform_mat[:,2]
+    swapped_mat = np.vstack([zaxis, np.cross(yaxis, zaxis), yaxis])
+    return (point, quat_from_matrix(swapped_mat))
+
+
 def test_grasp_generator():
     urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
     srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
@@ -175,7 +185,7 @@ def test_grasp_generator():
     ik_tool_link_name = robot.get_end_effector_link_name()
 
     # start pybullet env & convert compas_fab.robot to pybullet robot body
-    connect(use_gui=True)
+    connect(use_gui=False)
     pb_robot = create_pb_robot_from_ros_urdf(urdf_filename, urdf_pkg_name)
     pb_ik_joints = joints_from_names(pb_robot, ik_joint_names)
 
@@ -221,18 +231,22 @@ def test_grasp_generator():
         side_get_grasp_fn = lambda body: get_side_cylinder_grasps(body, under=True, \
                                                          tool_pose=Pose(), \
                                                          max_width=np.inf, grasp_length=0)
-        side_grasp_info = GraspInfo(side_get_grasp_fn, Pose(0.1*Point(x=-1)))
+        side_grasp_info = GraspInfo(side_get_grasp_fn, Pose(0.1*Point(z=-1)))
 
         grasp_gen = get_grasp_gen(pb_robot, ik_tool_link_name, side_grasp_info)
         body_pose = BodyPose(cylinder_body)
         if has_gui():
             draw_pose(body_pose.pose, length=0.04)
 
-        for body_grasp, in grasp_gen(cylinder_body):
-            world_from_gripper = end_effector_from_body(body_pose.pose, \
-                                                        body_grasp.grasp_pose)
-            world_from_approach = approach_from_grasp(body_grasp.approach_pose, \
-                                                world_from_gripper)
+        check_attempts = 5
+        for i, (body_grasp,) in zip(range(check_attempts), grasp_gen(cylinder_body)):
+            world_from_gripper = multiply(body_pose.pose,
+                                          invert(body_grasp.grasp_pose))
+            world_from_approach = multiply(world_from_gripper,
+                                           body_grasp.approach_pose)
+            world_from_gripper = convert_pose_z2x_y2z(world_from_gripper)
+            world_from_approach = convert_pose_z2x_y2z(world_from_approach)
+
             if has_gui():
                 draw_pose(world_from_gripper, length=0.04)
                 draw_pose(world_from_approach, length=0.02)

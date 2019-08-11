@@ -27,7 +27,7 @@ convert_meshes_and_poses_to_pybullet_bodies, pb_pose_from_Transformation
 from compas_fab.backends.pybullet import plan_pickup_object, get_grasp_gen
 
 from compas_fab.backends.ros.plugins_choreo import get_ik_tool_link_pose, \
- sample_tool_ik
+ sample_tool_ik, best_sol
 
 from conrob_pybullet import load_pybullet, connect, disconnect, wait_for_user, \
     LockRenderer, has_gui, get_model_info, get_pose, euler_from_quat, draw_pose, \
@@ -36,7 +36,7 @@ from conrob_pybullet import load_pybullet, connect, disconnect, wait_for_user, \
     set_joint_positions, remove_debug, get_joint_limits, WorldSaver, \
     LockRenderer, update_state, end_effector_from_body, approach_from_grasp, \
     unit_pose, approximate_as_prism, point_from_pose, multiply, quat_from_euler, \
-    approximate_as_cylinder
+    approximate_as_cylinder, quat_from_matrix, matrix_from_quat
 
 from conrob_pybullet import Pose, Point, BodyPose, GraspInfo
 
@@ -87,32 +87,7 @@ def test_ikfast_forward_kinematics():
         assert_array_almost_equal(TCP_pb_pose[1], ikfast_FK_pb_pose[1])
 
 
-def best_sol(sols, q_guess, weights):
-    """get the best solution based on UR's joint domain value and weighted joint diff
-
-    ported from https://github.com/ros-industrial/universal_robot/blob/kinetic-devel/ur_kinematics/src/ur_kinematics/test_analytical_ik.py
-
-    Specific for UR setup (4 pi domain ranges)
-    """
-    valid_sols = []
-    for sol in sols:
-        test_sol = np.ones(6)*9999.
-        for i in range(6):
-            for add_ang in [-2.*np.pi, 0, 2.*np.pi]:
-                test_ang = sol[i] + add_ang
-                if (abs(test_ang) <= 2.*np.pi and
-                    # snap solution to the one that's closer to q_guess
-                    abs(test_ang - q_guess[i]) < abs(test_sol[i] - q_guess[i])):
-                    test_sol[i] = test_ang
-        if np.all(test_sol != 9999.):
-            valid_sols.append(test_sol)
-    if len(valid_sols) == 0:
-        return None
-    best_sol_ind = np.argmin(np.sum((weights*(valid_sols - np.array(q_guess)))**2,1))
-    return valid_sols[best_sol_ind]
-
-
-def test_ikfast_forward_kinematics():
+def test_ikfast_inverse_kinematics():
     """TODO: this test_function can by pybullet-free"""
     urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
     srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
@@ -160,8 +135,8 @@ def test_ikfast_forward_kinematics():
         q_selected = sample_tool_ik(ik_fn, pb_robot, ik_joint_names, base_link_name,
                         ikfast_FK_pb_pose, nearby_conf=True)
         qsol = best_sol(ik_sols, conf, [1.]*6)
-        # print('q selected: {}'.format(q_selected))
-        # print('q best: {}'.format(qsol))
+        print('q selected: {}'.format(q_selected))
+        print('q best: {}'.format(qsol))
 
         if has_gui():
             set_joint_positions(pb_robot, pb_ik_joints, qsol)
@@ -180,30 +155,6 @@ def test_ikfast_forward_kinematics():
             assert False
 
 
-def get_side_grasps(body, under=False, tool_pose=Pose(), body_pose=unit_pose(),
-                    max_width=np.inf, grasp_length=0, top_offset=0.03):
-    center, (w, l, h) = approximate_as_prism(body, body_pose=body_pose)
-    translate_center = Pose(point=point_from_pose(body_pose)-center)
-    grasps = []
-    x_offset = 0
-    # x_offset = h/2 - top_offset
-    for j in range(1 + under):
-        swap_xz = Pose(euler=[0, -np.pi / 2 + j * np.pi, 0])
-        # swap_xz = Pose()
-        if w <= max_width:
-            translate_z = Pose(point=[x_offset, 0, l / 2 - grasp_length])
-            for i in range(2):
-                rotate_z = Pose(euler=[np.pi / 2 + i * np.pi, 0, 0])
-                grasps += [multiply(tool_pose, translate_z, rotate_z, #swap_xz,
-                                    translate_center, body_pose)]  # , np.array([w])
-        if l <= max_width:
-            translate_z = Pose(point=[x_offset, 0, w / 2 - grasp_length])
-            for i in range(2):
-                rotate_z = Pose(euler=[i * np.pi, 0, 0])
-                grasps += [multiply(tool_pose, translate_z, rotate_z, #swap_xz,
-                                    translate_center, body_pose)]  # , np.array([l])
-    return grasps
-
 
 def get_side_cylinder_grasps(body, under=False, tool_pose=Pose(), body_pose=unit_pose(),
                              max_width=np.inf, grasp_length=0, top_offset=0.03):
@@ -221,100 +172,116 @@ def get_side_cylinder_grasps(body, under=False, tool_pose=Pose(), body_pose=unit
             yield multiply(tool_pose, translate_rotate, swap_xz, translate_center, body_pose)
 
 
+def convert_pose_z2x_y2z(pose):
+    """for UR's "strange" TCP setup..."""
+    point, quat = pose
+    tform_mat = matrix_from_quat(quat)
+    xaxis = tform_mat[:,0]
+    yaxis = tform_mat[:,1]
+    zaxis = tform_mat[:,2]
+    swapped_mat = np.vstack([zaxis, np.cross(yaxis, zaxis), yaxis])
+    return (point, quat_from_matrix(swapped_mat))
+
+
 # @pytest.mark.wip
-def test_pickup_cylinder():
-    """TODO: this test_function can by pybullet-free"""
-    urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
-    srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
-    urdf_pkg_name = 'ur_description'
-
-    ee_filename = compas_fab.get('universal_robot/ur_description/meshes/pychoreo_workshop_gripper/collision/pychoreo-workshop-gripper.stl')
-
-    # define TCP transformation
-    tcp_tf = Translation([0.2, 0, 0]) # in meters
-    pb_tool_from_tcp = pb_pose_from_Transformation(tcp_tf)
-    ee_mesh = Mesh.from_stl(ee_filename)
-
-    # create robot model in compas_fab
-    model = RobotModel.from_urdf_file(urdf_filename)
-    semantics = RobotSemantics.from_srdf_file(srdf_filename, model)
-    robot = RobotClass(model, semantics=semantics)
-
-    base_link_name = robot.get_base_link_name()
-    ik_joint_names = robot.get_configurable_joint_names()
-    ik_tool_link_name = robot.get_end_effector_link_name()
-
-    # get disabled collisions
-    disabled_collisions = semantics.get_disabled_collisions()
-    assert len(disabled_collisions) == 10
-    assert ('base_link', 'shoulder_link') in disabled_collisions
-
-    # start pybullet env & convert compas_fab.robot to pybullet robot body
-    connect(use_gui=True)
-    pb_robot = create_pb_robot_from_ros_urdf(urdf_filename, urdf_pkg_name)
-    pb_ik_joints = joints_from_names(pb_robot, ik_joint_names)
-
-    # set start conf
-    ur5_start_conf = np.array([104., -80., -103., -86., 89., 194.]) / 180.0 * np.pi
-    set_joint_positions(pb_robot, pb_ik_joints, ur5_start_conf)
-
-    # add objects to pybullet scene & convert them into pybullet
-    with RosClient() as client:
-        assert client.is_connected, 'ros client not connected!'
-        robot.client = client
-
-        scene = PlanningScene(robot)
-        floor_mesh = Mesh.from_stl(compas_fab.get('planning_scene/floor.stl'))
-        floor_cm = CollisionMesh(floor_mesh, 'floor')
-        scene.add_collision_mesh(floor_cm)
-
-        cylinder_mesh = Mesh.from_stl(compas_fab.get('planning_scene/cylinder.stl'))
-        offset = Translation([0.4, 0, 0.001]) # in meters
-        mesh_transform(cylinder_mesh, offset)
-        cylinder_cm = CollisionMesh(cylinder_mesh, 'cylinder')
-        scene.add_collision_mesh(cylinder_cm)
-
-        time.sleep(1)
-
-        co_dict = client.get_collision_meshes_and_poses()
-        body_from_name = convert_meshes_and_poses_to_pybullet_bodies(co_dict)
-        floor_body = body_from_name['floor'][0]
-        cylinder_body = body_from_name['cylinder'][0]
-
-        # attach end effector mesh
-        # ikfast is built for base_link - ee_link, so here ee_link coincides with
-        # the tool mounting link
-        ee_bodies = attach_end_effector_geometry([ee_mesh], pb_robot, ik_tool_link_name)
-
-        if has_gui():
-            TCP_pb_pose = get_TCP_pose(pb_robot, ik_tool_link_name, tcp_tf, return_pb_pose=True)
-            handles = draw_pose(TCP_pb_pose, length=0.04)
-            print('initial env, press enter to continue')
-            # wait_for_user()
-            # for h in handles : remove_debug(h)
-
-            # grasp_gen = get_grasp_gen(pb_robot, 'side', ik_tool_link_name, pb_tool_from_tcp)
-            side_get_grasp_fn = lambda body: get_side_cylinder_grasps(body, under=True, \
-                                                             tool_pose=Pose(), \
-                                                             max_width=np.inf, grasp_length=0)
-            side_grasp_info = GraspInfo(side_get_grasp_fn, Pose(0.1*Point(x=-1)))
-
-            grasp_gen = get_grasp_gen(pb_robot, ik_tool_link_name, side_grasp_info)
-            body_pose = BodyPose(cylinder_body)
-            draw_pose(body_pose.pose, length=0.04)
-
-        # keep the world state
-        # saved_world = WorldSaver()
-        # with LockRenderer():
-        #     command = plan_pickup_object(robot, block, fixed=[floor], teleport=False)
-        #
-        # assert command is None, 'Unable to find a plan!'
-        #
-        # if has_gui():
-        #     saved_world.restore()
-        #     update_state()
-        #     command.refine(num_steps=10).execute(time_step=0.002)
-
-        # clean up the planning scene in the ros backend
-        scene.remove_collision_mesh('floor')
-        scene.remove_collision_mesh('cylinder')
+# def test_pickup_cylinder():
+#     """TODO: this test_function can by pybullet-free"""
+#     urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
+#     srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
+#     urdf_pkg_name = 'ur_description'
+#
+#     ee_filename = compas_fab.get('universal_robot/ur_description/meshes/pychoreo_workshop_gripper/collision/pychoreo-workshop-gripper.stl')
+#
+#     # define TCP transformation
+#     tcp_tf = Translation([0.2, 0, 0]) # in meters
+#     pb_tool_from_tcp = pb_pose_from_Transformation(tcp_tf)
+#     ee_mesh = Mesh.from_stl(ee_filename)
+#
+#     # create robot model in compas_fab
+#     model = RobotModel.from_urdf_file(urdf_filename)
+#     semantics = RobotSemantics.from_srdf_file(srdf_filename, model)
+#     robot = RobotClass(model, semantics=semantics)
+#
+#     base_link_name = robot.get_base_link_name()
+#     ik_joint_names = robot.get_configurable_joint_names()
+#     ik_tool_link_name = robot.get_end_effector_link_name()
+#
+#     # get disabled collisions
+#     disabled_collisions = semantics.get_disabled_collisions()
+#     assert len(disabled_collisions) == 10
+#     assert ('base_link', 'shoulder_link') in disabled_collisions
+#
+#     # start pybullet env & convert compas_fab.robot to pybullet robot body
+#     connect(use_gui=True)
+#     pb_robot = create_pb_robot_from_ros_urdf(urdf_filename, urdf_pkg_name)
+#     pb_ik_joints = joints_from_names(pb_robot, ik_joint_names)
+#
+#     # set start conf
+#     ur5_start_conf = np.array([104., -80., -103., -86., 89., 194.]) / 180.0 * np.pi
+#     set_joint_positions(pb_robot, pb_ik_joints, ur5_start_conf)
+#
+#     # add objects to pybullet scene & convert them into pybullet
+#     with RosClient() as client:
+#         assert client.is_connected, 'ros client not connected!'
+#         robot.client = client
+#
+#         scene = PlanningScene(robot)
+#         floor_mesh = Mesh.from_stl(compas_fab.get('planning_scene/floor.stl'))
+#         floor_cm = CollisionMesh(floor_mesh, 'floor')
+#         scene.add_collision_mesh(floor_cm)
+#
+#         cylinder_mesh = Mesh.from_stl(compas_fab.get('planning_scene/cylinder.stl'))
+#         offset = Translation([0.4, 0, 0.001]) # in meters
+#         mesh_transform(cylinder_mesh, offset)
+#         cylinder_cm = CollisionMesh(cylinder_mesh, 'cylinder')
+#         scene.add_collision_mesh(cylinder_cm)
+#
+#         time.sleep(1)
+#
+#         co_dict = client.get_collision_meshes_and_poses()
+#         body_from_name = convert_meshes_and_poses_to_pybullet_bodies(co_dict)
+#         floor_body = body_from_name['floor'][0]
+#         cylinder_body = body_from_name['cylinder'][0]
+#
+#         # attach end effector mesh
+#         # ikfast is built for base_link - ee_link, so here ee_link coincides with
+#         # the tool mounting link
+#         ee_bodies = attach_end_effector_geometry([ee_mesh], pb_robot, ik_tool_link_name)
+#
+#         if has_gui():
+#             TCP_pb_pose = get_TCP_pose(pb_robot, ik_tool_link_name, tcp_tf, return_pb_pose=True)
+#             handles = draw_pose(TCP_pb_pose, length=0.04)
+#             print('initial env, press enter to continue')
+#             # wait_for_user()
+#             # for h in handles : remove_debug(h)
+#
+#             # grasp_gen = get_grasp_gen(pb_robot, 'side', ik_tool_link_name, pb_tool_from_tcp)
+#             side_get_grasp_fn = lambda body: get_side_cylinder_grasps(body, under=True, \
+#                                                              tool_pose=Pose(), \
+#                                                              max_width=np.inf, grasp_length=0)
+#             side_grasp_info = GraspInfo(side_get_grasp_fn, Pose(0.1*Point(z=-1)))
+#
+#             grasp_gen = get_grasp_gen(pb_robot, ik_tool_link_name, side_grasp_info)
+#             body_pose = BodyPose(cylinder_body)
+#             draw_pose(body_pose.pose, length=0.04)
+#
+#             ik_fn = ikfast_ur5.get_ik
+#
+#             # keep the world state
+#             saved_world = WorldSaver()
+#             # with LockRenderer():
+#             command = plan_pickup_object(pb_robot, ik_tool_link_name, ik_joint_names, \
+#                                          base_link_name, ik_fn, cylinder_body, grasp_gen, \
+#                                          fixed=[], enable_self_collision=False,
+#                                          extra_tcp_tf_fn=convert_pose_z2x_y2z)
+#
+#             assert command is None, 'Unable to find a plan!'
+#
+#             if has_gui():
+#                 saved_world.restore()
+#                 update_state()
+#                 command.refine(num_steps=10).execute(time_step=0.002)
+#
+#         # clean up the planning scene in the ros backend
+#         scene.remove_collision_mesh('floor')
+#         scene.remove_collision_mesh('cylinder')

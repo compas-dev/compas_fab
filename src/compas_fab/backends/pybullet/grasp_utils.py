@@ -6,6 +6,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas_fab.backends.ros.plugins_choreo import sample_tool_ik, best_sol
+
 from conrob_pybullet import BodyPose, BodyConf, Command, \
     get_free_motion_gen, get_holding_motion_gen, BodyPath, Attach
 
@@ -15,62 +17,53 @@ from conrob_pybullet import WorldSaver, connect, dump_world, set_pose, \
     draw_pose, get_movable_joints, set_joint_positions, enable_gravity, \
     end_effector_from_body, approach_from_grasp, inverse_kinematics, \
     pairwise_collision, get_sample_fn, plan_direct_joint_motion, \
-    HideOutput, joints_from_names, link_from_name, multiply, multiply
+    HideOutput, joints_from_names, link_from_name, multiply, invert, has_gui, \
+    wait_for_user, remove_debug, get_joint_positions
 from conrob_pybullet import Pose, Point, BodyGrasp
 
-def get_grasp_ik_fn(sample_tool_ik_fn, robot, ik_joint_names,
+def get_grasp_ik_fn(ik_fn, robot, ik_joint_names, base_link_name,
                     fixed=[], num_attempts=10, self_collisions=True, teleport=False):
-    """get ik function handle for picking up objects, getting ik poses for
-    both approach and grasp poses
-
-    Parameters
-    ----------
-    robot : pybullet robot
-    fixed : list of pybullet bodies
-        fixed obstables
-    num_attempts : int
-        number of attempts to get ik
-    self_collisions : bool
-
-    Returns
-    -------
-    fn : function handle
-
-    """
     ik_joints = joints_from_names(robot, ik_joint_names)
-    def ik_for_grasp_fn(body, body_pose, grasp):
+    def ik_for_grasp_fn(body, body_pose, body_grasp, extra_tcp_tf_fn=None):
         """get ik solutions for grasp the body object in pose with given grasp info
-
-        Parameters
-        ----------
-        body : pybullet body
-        body_pose : BodyPose
-        grasp : BodyGrasp
-
-        Returns
-        -------
-        type
-            Description of returned object.
 
         """
         obstacles = [body] + fixed
-        # grasp.grasp_pose = gripper_from_body
-        world_from_gripper = end_effector_from_body(pose.pose, grasp.grasp_pose)
-        approach_pose = approach_from_grasp(grasp.approach_pose, world_from_gripper)
+        world_from_gripper = multiply(body_pose.pose,
+                                      invert(body_grasp.grasp_pose))
+        world_from_approach = multiply(world_from_gripper,
+                                       body_grasp.approach_pose)
+        if extra_tcp_tf_fn:
+            world_from_gripper = extra_tcp_tf_fn(world_from_gripper)
+            world_from_approach = extra_tcp_tf_fn(world_from_approach)
+
         if has_gui():
-            draw_pose(world_from_gripper, length=0.04)
-            draw_pose(approach_pose, length=0.04)
+            h1 = draw_pose(world_from_gripper, length=0.04)
+            h2 = draw_pose(world_from_approach, length=0.02)
+            wait_for_user()
+            for h in h1+h2: remove_debug(h)
 
         for _ in range(num_attempts):
-            q_approach = sample_tool_ik_fn(robot, approach_pose)
+            # nearest conf will be returned by default
+            q_approach_sols = sample_tool_ik(ik_fn, robot, ik_joint_names, \
+                                             base_link_name, world_from_approach,
+                                             get_all=True)
+            current_conf = get_joint_positions(robot, ik_joints)
+            q_approach = best_sol(q_approach_sols, current_conf, [1.]*6)
             if q_approach is not None:
                 set_joint_positions(robot, ik_joints, q_approach)
+                wait_for_user()
 
             if (q_approach is None) or any(pairwise_collision(robot, b) for b in obstacles):
+                # TODO: gripper world collision check...
                 continue
             conf = BodyConf(robot, joints=ik_joints)
 
-            q_grasp = sample_tool_ik_fn(robot, world_from_gripper, closest_only=True)
+            q_grasp_sols = sample_tool_ik(ik_fn, robot, ik_joint_names, \
+                                          base_link_name, world_from_approach,
+                                          get_all=True)
+            current_conf = get_joint_positions(robot, ik_joints)
+            q_grasp = best_sol(q_grasp_sols, current_conf, [1.]*6)
             if q_grasp is not None:
                 set_joint_positions(robot, ik_joints, q_grasp)
 
@@ -78,13 +71,15 @@ def get_grasp_ik_fn(sample_tool_ik_fn, robot, ik_joint_names,
                 continue
 
             conf.assign()
+            wait_for_user()
             path = plan_direct_joint_motion(robot, conf.joints, q_grasp, obstacles=obstacles, \
                                             self_collisions=self_collisions)
             if path is None:
                 continue
             command = Command([BodyPath(robot, path, joints=ik_joints),
-                               Attach(body, robot, grasp.link),
-                               BodyPath(robot, path[::-1], joints=ik_joints, attachments=[grasp])])
+                               Attach(body, robot, body_grasp.link),
+                               BodyPath(robot, path[::-1], joints=ik_joints,
+                                        attachments=[body_grasp])])
             return (conf, command)
             # TODO: holding collisions
         return None
@@ -125,8 +120,9 @@ def get_grasp_gen(robot, tool_frame_name, grasp_info, tool_from_tcp=None):
     return gen
 
 
-def plan_pickup_object(robot, tool_frame_name, ik_joint_names, sample_tool_ik_fn, \
-                       block, grasp_gen, \
+def plan_pickup_object(robot, tool_frame_name, ik_joint_names, base_link_name, \
+                       ik_fn, block, grasp_gen, \
+                       extra_tcp_tf_fn=None,
                        fixed=[], teleport=False, enable_self_collision=True):
     """ plan trajectories for picking up the block
 
@@ -138,8 +134,10 @@ def plan_pickup_object(robot, tool_frame_name, ik_joint_names, sample_tool_ik_fn
         approach pose -> start conf
 
     """
-    ik_fn = get_grasp_ik_fn(sample_tool_ik_fn, robot, fixed=fixed, teleport=teleport, \
-                            self_collisions=enable_self_collision)
+    ik_grasp_fn = get_grasp_ik_fn(ik_fn, robot, ik_joint_names, base_link_name, \
+                                  fixed=[], num_attempts=10,
+                                  self_collisions=enable_self_collision,
+                                  teleport=teleport)
     free_motion_fn = get_free_motion_gen(robot, fixed=([block] + fixed), \
                                          teleport=teleport, \
                                          self_collisions=enable_self_collision)
@@ -154,7 +152,7 @@ def plan_pickup_object(robot, tool_frame_name, ik_joint_names, sample_tool_ik_fn
     saved_world = WorldSaver()
     for grasp, in grasp_gen(block):
         saved_world.restore()
-        result1 = ik_fn(block, pose0, grasp)
+        result1 = ik_grasp_fn(block, pose0, grasp, extra_tcp_tf_fn=extra_tcp_tf_fn)
         if result1 is None:
             continue
         conf1, path2 = result1
