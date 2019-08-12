@@ -155,7 +155,6 @@ def test_ikfast_inverse_kinematics():
             assert False
 
 
-
 def get_side_cylinder_grasps(body, under=False, tool_pose=Pose(), body_pose=unit_pose(),
                              max_width=np.inf, grasp_length=0, top_offset=0.03):
     center, (diameter, height) = approximate_as_cylinder(body, body_pose=body_pose)

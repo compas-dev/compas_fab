@@ -3,7 +3,6 @@ from __future__ import absolute_import
 from __future__ import division
 
 # import json
-# import pickle
 
 from compas.geometry import Frame
 from compas.datastructures import Mesh

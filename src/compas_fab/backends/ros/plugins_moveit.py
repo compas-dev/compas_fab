@@ -329,7 +329,6 @@ class MoveItPlanner(PlannerPlugin):
         """
         kwargs = {}
         kwargs['errback_name'] = 'errback'
-        # planning_scene = self.get_planning_scene_async()
         planning_scene = await_callback(self.get_planning_scene_async, **kwargs)
         co_dict = {}
         for co_msg in planning_scene.world.collision_objects:
@@ -337,3 +336,37 @@ class MoveItPlanner(PlannerPlugin):
             co_dict[co_msg.id]['meshes'] = [mesh_msg.mesh for mesh_msg in co_msg.meshes]
             co_dict[co_msg.id]['mesh_poses'] = [pose_msg.frame for pose_msg in co_msg.mesh_poses]
         return co_dict
+
+    def get_collision_object_names(self):
+        # TODO: maybe not necessary, just use `get_collision_meshes_and_poses`
+        kwargs = {}
+        kwargs['errback_name'] = 'errback'
+        planning_scene = await_callback(self.get_planning_scene_async, **kwargs)
+        co_names = []
+        for co_msg in planning_scene.world.collision_objects:
+            co_names.append(co_msg.id)
+        return co_names
+
+    def get_attached_collision_objects(self):
+        # TODO: solid_primitives?
+        kwargs = {}
+        kwargs['errback_name'] = 'errback'
+        planning_scene = await_callback(self.get_planning_scene_async, **kwargs)
+        aco_dict = {}
+        for aco_msg in planning_scene.robot_state.attached_collision_objects:
+            aco_dict[aco_msg.object.id] = {}
+            aco_dict[aco_msg.object.id]['link_name'] = aco_msg['link_name']
+            aco_dict[aco_msg.object.id]['meshes'] = [mesh_msg.mesh for mesh_msg in aco_msg.meshes]
+            aco_dict[aco_msg.object.id]['mesh_poses'] = [pose_msg.frame for pose_msg in aco_msg.mesh_poses]
+        return aco_dict
+
+    def get_joint_state(self):
+        kwargs = {}
+        kwargs['errback_name'] = 'errback'
+        planning_scene = await_callback(self.get_planning_scene_async, **kwargs)
+        jt_names = planning_scene.robot_state.joint_state.name
+        jt_values = planning_scene.robot_state.joint_state.position
+        return {name : val for name, val in zip(jt_names, jt_values)}
+
+    def set_joint_positions(self, group, joint_state):
+        raise NotImplementedError

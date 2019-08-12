@@ -16,7 +16,7 @@ from compas.geometry import Frame, Transformation
 from conrob_pybullet import Pose
 from conrob_pybullet import create_obj, set_pose, quat_from_matrix, add_body_name, \
     quat_from_euler, link_from_name, get_link_pose, add_fixed_constraint, euler_from_quat, \
-    multiply, is_connected, load_pybullet
+    multiply, is_connected, load_pybullet, joints_from_names, set_joint_positions
 
 # TODO: this will be added later
 # __all__ = [
@@ -162,7 +162,7 @@ def convert_mesh_to_pybullet_body(mesh, frame, name=None, scale=1.0):
     # https://stackoverflow.com/questions/6884991/how-to-delete-dir-created-by-python-tempfile-mkdtemp
     assert is_connected()
     with TemporaryDirectory() as temp_dir:
-        print('temp_dir: {}'.format(temp_dir))
+        # print('temp_dir: {}'.format(temp_dir))
         tmp_obj_path = os.path.join(temp_dir, 'compas_mesh_temp.obj')
         mesh.to_obj(tmp_obj_path)
         pyb_body = create_obj(tmp_obj_path, scale=scale)
@@ -269,8 +269,12 @@ def get_TCP_pose(robot, ee_link_name, ee_link_from_TCP_tf=None, return_pb_pose=F
         return world_from_TCP
 
 
-def create_pb_robot_from_ros_urdf(urdf_path, pkg_name, keep_temp_urdf=False):
+def create_pb_robot_from_ros_urdf(urdf_path, pkg_name, planning_scene=None, ee_link_name=None,
+                                  keep_temp_urdf=False):
     """Create pybullet robot from ros package-based urdf.
+
+    TODO: Ideally, the input would be a compas_fab.robots.Robot class, we generate
+    the urdf from there. But, this will require some new functions in the compas.xml...
 
     Parameters
     ----------
@@ -294,7 +298,21 @@ def create_pb_robot_from_ros_urdf(urdf_path, pkg_name, keep_temp_urdf=False):
     try:
         rel_urdf_path = generate_rel_path_URDF_pkg(urdf_path, pkg_name)
         pb_robot = load_pybullet(rel_urdf_path, fixed_base=True)
-        # TODO: set_joint_pose based on current joint conf in the planning scene
+        if planning_scene:
+            # update joint conf according to the planning scene
+            jt_state = planning_scene.get_joint_state()
+            pb_ik_joints = joints_from_names(pb_robot, jt_state.keys())
+            set_joint_positions(pb_robot, pb_ik_joints, jt_state.values())
+
+        ee_attached_bodies = []
+        # BUG: id is not in aco!
+        # if planning_scene and ee_link_name:
+        #     # update attached object according to the planning scene
+        #     aco_dict = planning_scene.get_attached_collision_objects()
+        #     for aco_name, aco in aco_dict.items():
+        #         # print('{}: {} {}'.format(aco_name, aco['meshes'], aco['link_name']))
+        #         ee_attached_bodies.extend(
+        #             attach_end_effector_geometry(aco['meshes'], pb_robot, aco['link_name']))
     except:
         if os.path.exists(rel_urdf_path):
             os.remove(rel_urdf_path)
@@ -302,4 +320,7 @@ def create_pb_robot_from_ros_urdf(urdf_path, pkg_name, keep_temp_urdf=False):
     if not keep_temp_urdf:
         if os.path.exists(rel_urdf_path):
             os.remove(rel_urdf_path)
-    return pb_robot
+    if ee_attached_bodies:
+        return pb_robot, ee_attached_bodies
+    else:
+        return pb_robot

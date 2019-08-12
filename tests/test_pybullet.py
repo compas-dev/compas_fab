@@ -47,7 +47,8 @@ def test_convert_compas_robot_to_pybullet_robot():
 
     urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
     srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
-    ee_filename = compas_fab.get('universal_robot/ur_description/meshes/pychoreo_workshop_gripper/collision/pychoreo-workshop-gripper.stl')
+    ee_filename = compas_fab.get('universal_robot/ur_description/meshes/' +
+                                 'pychoreo_workshop_gripper/collision/victor_gripper_jaw03.stl')
     urdf_pkg_name = 'ur_description'
 
     # geometry file is not loaded here
@@ -163,17 +164,18 @@ def convert_pose_z2x_y2z(pose):
     return (point, quat_from_matrix(swapped_mat))
 
 
+@pytest.mark.viz
 def test_grasp_generator():
     urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
     srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
     urdf_pkg_name = 'ur_description'
 
-    ee_filename = compas_fab.get('universal_robot/ur_description/meshes/pychoreo_workshop_gripper/collision/pychoreo-workshop-gripper.stl')
+    ee_filename = compas_fab.get('universal_robot/ur_description/meshes/pychoreo_workshop_gripper/collision/victor_gripper_jaw03.obj')
 
     # define TCP transformation
-    tcp_tf = Translation([0.2, 0, 0]) # in meters
+    tcp_tf = Translation([0.099, 0, 0]) # in meters
     pb_tool_from_tcp = pb_pose_from_Transformation(tcp_tf)
-    ee_mesh = Mesh.from_stl(ee_filename)
+    ee_mesh = Mesh.from_obj(ee_filename)
 
     # create robot model in compas_fab
     model = RobotModel.from_urdf_file(urdf_filename)
@@ -185,7 +187,7 @@ def test_grasp_generator():
     ik_tool_link_name = robot.get_end_effector_link_name()
 
     # start pybullet env & convert compas_fab.robot to pybullet robot body
-    connect(use_gui=False)
+    connect(use_gui=True)
     pb_robot = create_pb_robot_from_ros_urdf(urdf_filename, urdf_pkg_name)
     pb_ik_joints = joints_from_names(pb_robot, ik_joint_names)
 
@@ -204,9 +206,8 @@ def test_grasp_generator():
         scene.add_collision_mesh(floor_cm)
 
         cylinder_mesh = Mesh.from_stl(compas_fab.get('planning_scene/cylinder.stl'))
-        offset = Translation([0.4, 0, 0.001]) # in meters
-        mesh_transform(cylinder_mesh, offset)
-        cylinder_cm = CollisionMesh(cylinder_mesh, 'cylinder')
+        initial_frame = Frame.from_transformation(Translation([0.4, 0, 0.001]))
+        cylinder_cm = CollisionMesh(cylinder_mesh, 'cylinder', frame=initial_frame)
         scene.add_collision_mesh(cylinder_cm)
 
         time.sleep(1)

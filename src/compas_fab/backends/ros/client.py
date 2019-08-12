@@ -227,8 +227,29 @@ class RosClient(Ros):
     def remove_attached_collision_mesh(self, id):
         raise NotImplementedError('No planner plugin assigned')
 
+    # TODO: the following get_x functions should be named as "_async" ?
     def get_collision_meshes_and_poses(self):
         raise NotImplementedError('No planner plugin assigned')
+
+    def get_collision_object_names(self):
+        raise NotImplementedError('No planner plugin assigned')
+
+    def get_joint_state(self):
+        """Note: this is getting the current joint state in the planning scene,
+        can be different to the execution one
+        """
+        raise NotImplementedError('No planner plugin assigned')
+
+    def get_attached_collision_objects(self):
+        raise NotImplementedError('No planner plugin assigned')
+
+    def set_joint_positions(self, group, joint_state):
+        raise NotImplementedError('No planner plugin assigned')
+
+    def is_joint_state_colliding(self, joint_names, joint_state):
+        # see here: http://docs.ros.org/indigo/api/moveit_core/html/planning__scene_8cpp_source.html
+        raise NotImplementedError('No planner plugin assigned')
+
 
     # ==========================================================================
     # executing

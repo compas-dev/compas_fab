@@ -46,14 +46,17 @@ class CollisionObject(ROSmsg):
         self.operation = operation  # ADD or REMOVE or APPEND or MOVE
 
     @classmethod
-    def from_collision_mesh(cls, collision_mesh):
+    def from_collision_mesh(cls, collision_mesh, mesh_frame=None):
         """Creates a collision object from a :class:`compas_fab.robots.CollisionMesh`
         """
         kwargs = {}
         kwargs['header'] = Header(frame_id=collision_mesh.root_name)
         kwargs['id'] = collision_mesh.id
         kwargs['meshes'] = [Mesh.from_mesh(collision_mesh.mesh)]
-        kwargs['mesh_poses'] = [Pose.from_frame(collision_mesh.frame)]
+        if not mesh_frame:
+            kwargs['mesh_poses'] = [Pose.from_frame(collision_mesh.frame)]
+        else:
+            kwargs['mesh_poses'] = [Pose.from_frame(mesh_frame)]
 
         return cls(**kwargs)
 

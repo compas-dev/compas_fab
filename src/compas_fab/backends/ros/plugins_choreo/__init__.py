@@ -20,6 +20,7 @@ Note that the transition planning module of choreo is supported by Moveit! on
 from __future__ import absolute_import
 
 from .ik_utils import *
+from .file_io import *
 from .planner_interface import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]

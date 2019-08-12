@@ -282,6 +282,28 @@ class PlanningScene(object):
         acm = AttachedCollisionMesh(collision_mesh, ee_link_name, touch_links)
         self.add_attached_collision_mesh(acm)
 
+    def remove_all_collision_objects(self):
+        self.ensure_client()
+        co_names = self.client.get_collision_object_names()
+        for co_name in co_names:
+            self.client.remove_collision_mesh(co_name)
+
+    def get_collision_meshes_and_poses(self):
+        self.ensure_client()
+        return self.client.get_collision_meshes_and_poses()
+
+    def get_collision_object_names(self):
+        self.ensure_client()
+        return self.client.get_collision_object_names()
+
+    def get_attached_collision_objects(self):
+        self.ensure_client()
+        return self.client.get_attached_collision_objects()
+
+    def get_joint_state(self):
+        self.ensure_client()
+        return self.client.get_joint_state()
+
 
 if __name__ == "__main__":
     import doctest
