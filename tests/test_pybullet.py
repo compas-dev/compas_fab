@@ -48,7 +48,7 @@ def test_convert_compas_robot_to_pybullet_robot():
     urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
     srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
     ee_filename = compas_fab.get('universal_robot/ur_description/meshes/' +
-                                 'pychoreo_workshop_gripper/collision/victor_gripper_jaw03.stl')
+                                 'pychoreo_workshop_gripper/collision/victor_gripper_jaw03.obj')
     urdf_pkg_name = 'ur_description'
 
     # geometry file is not loaded here
@@ -59,7 +59,7 @@ def test_convert_compas_robot_to_pybullet_robot():
     # print('ee link: {}'.format(ee_link_name))
 
     # parse end effector mesh
-    ee_mesh = Mesh.from_stl(ee_filename)
+    ee_mesh = Mesh.from_obj(ee_filename)
 
     # define TCP transformation
     tcp_tf = Translation([0.2, 0, 0]) # in meters
@@ -164,13 +164,14 @@ def convert_pose_z2x_y2z(pose):
     return (point, quat_from_matrix(swapped_mat))
 
 
-@pytest.mark.viz
+# @pytest.mark.viz
 def test_grasp_generator():
     urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
     srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
     urdf_pkg_name = 'ur_description'
 
-    ee_filename = compas_fab.get('universal_robot/ur_description/meshes/pychoreo_workshop_gripper/collision/victor_gripper_jaw03.obj')
+    ee_filename = compas_fab.get('universal_robot/ur_description/meshes/' +
+    'pychoreo_workshop_gripper/collision/victor_gripper_jaw03.obj')
 
     # define TCP transformation
     tcp_tf = Translation([0.099, 0, 0]) # in meters
@@ -187,7 +188,7 @@ def test_grasp_generator():
     ik_tool_link_name = robot.get_end_effector_link_name()
 
     # start pybullet env & convert compas_fab.robot to pybullet robot body
-    connect(use_gui=True)
+    connect(use_gui=False)
     pb_robot = create_pb_robot_from_ros_urdf(urdf_filename, urdf_pkg_name)
     pb_ik_joints = joints_from_names(pb_robot, ik_joint_names)
 
@@ -201,6 +202,7 @@ def test_grasp_generator():
         robot.client = client
 
         scene = PlanningScene(robot)
+        scene.remove_all_collision_objects()
         floor_mesh = Mesh.from_stl(compas_fab.get('planning_scene/floor.stl'))
         floor_cm = CollisionMesh(floor_mesh, 'floor')
         scene.add_collision_mesh(floor_cm)

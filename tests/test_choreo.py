@@ -24,7 +24,7 @@ from compas_fab.robots.configuration import Configuration
 
 from compas_fab.backends.pybullet import attach_end_effector_geometry, \
 convert_mesh_to_pybullet_body, get_TCP_pose, create_pb_robot_from_ros_urdf, \
-convert_meshes_and_poses_to_pybullet_bodies
+convert_meshes_and_poses_to_pybullet_bodies, sanity_check_collisions
 
 from compas_fab.backends.ros.plugins_choreo import load_pick_and_place
 
@@ -58,6 +58,7 @@ def test_choreo_plan_single_cartesian_motion():
         # TODO: attach end effector to the robot in planning scene
         # https://github.com/compas-dev/compas_fab/issues/66
         scene = PlanningScene(robot)
+        scene.remove_all_collision_objects()
 
         # parse end effector mesh
         ee_mesh = Mesh.from_obj(ee_filename)
@@ -86,23 +87,19 @@ def test_choreo_plan_single_cartesian_motion():
             cm = CollisionMesh(static_obs_mesh, static_obs_name)
             scene.add_collision_mesh(cm)
 
-        for unit_name, unit_geo in unit_geos.items():
-            for sub_id, mesh in enumerate(unit_geo.mesh):
-                cm = CollisionMesh(mesh, unit_name + '_' + str(sub_id), frame=unit_geo.initial_frame)
-                scene.add_collision_mesh(cm)
-
         # See: https://github.com/compas-dev/compas_fab/issues/63#issuecomment-519525879
         time.sleep(1)
 
         # start pybullet environment & load pybullet robot
-        connect(use_gui=True)
+        connect(use_gui=False)
         pb_robot = create_pb_robot_from_ros_urdf(urdf_filename, urdf_pkg_name,
                                                  planning_scene=scene,
                                                  ee_link_name=ee_link_name)
-        ee_bodies = attach_end_effector_geometry([ee_mesh], pb_robot, ee_link_name)
+        ee_attachs = attach_end_effector_geometry([ee_mesh], pb_robot, ee_link_name)
 
         pb_ik_joints = joints_from_names(pb_robot, ik_joint_names)
         set_joint_positions(pb_robot, pb_ik_joints, ur5_start_conf)
+        for e_at in ee_attachs: e_at.assign()
 
         # draw TCP frame in pybullet
         if has_gui():
@@ -112,9 +109,23 @@ def test_choreo_plan_single_cartesian_motion():
         # deliver ros collision meshes to pybullet
         # TODO: this co_dict shouldn't be a ROS message
         co_dict = scene.get_collision_meshes_and_poses()
-        body_dict = convert_meshes_and_poses_to_pybullet_bodies(co_dict)
+        static_obstacles_from_name = convert_meshes_and_poses_to_pybullet_bodies(co_dict)
+        # for now...
+        for so_key, so_val in static_obstacles_from_name.items():
+            static_obstacles_from_name[so_key] = so_val[0]
+        print(static_obstacles_from_name)
 
-        wait_for_user()
+        for unit_name, unit_geo in unit_geos.items():
+            geo_bodies = []
+            for sub_id, mesh in enumerate(unit_geo.mesh):
+                geo_bodies.append(convert_mesh_to_pybullet_body(mesh))
+            unit_geo.pybullet_bodies = geo_bodies
+
+        # check collision between obstacles and element geometries
+        assert not sanity_check_collisions(unit_geos, static_obstacles_from_name)
+
+        if has_gui():
+            wait_for_user()
 
         scene.remove_all_collision_objects()
 

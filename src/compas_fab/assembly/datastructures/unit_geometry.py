@@ -18,12 +18,16 @@ class UnitGeometry(object):
         self._goal_supports = goal_supports
 
     @property
-    def pybullet_body(self):
+    def name(self):
+        return self._name
+
+    @property
+    def pybullet_bodies(self):
         # TODO: if no body is stored, create from compas mesh
         return self._body
 
-    @pybullet_body.setter
-    def pybullet_body(self, body):
+    @pybullet_bodies.setter
+    def pybullet_bodies(self, body):
         self._body = body
 
     @property

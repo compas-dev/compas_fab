@@ -16,7 +16,9 @@ from compas.geometry import Frame, Transformation
 from conrob_pybullet import Pose
 from conrob_pybullet import create_obj, set_pose, quat_from_matrix, add_body_name, \
     quat_from_euler, link_from_name, get_link_pose, add_fixed_constraint, euler_from_quat, \
-    multiply, is_connected, load_pybullet, joints_from_names, set_joint_positions
+    multiply, is_connected, load_pybullet, joints_from_names, set_joint_positions, \
+    get_constraint_info, create_attachment, get_pose, pairwise_collision, set_color, \
+    wait_for_user
 
 # TODO: this will be added later
 # __all__ = [
@@ -143,7 +145,7 @@ def Frame_from_pb_pose(pose):
     return frame
 
 
-def convert_mesh_to_pybullet_body(mesh, frame, name=None, scale=1.0):
+def convert_mesh_to_pybullet_body(mesh, frame=Frame.worldXY(), name=None, scale=1.0):
     """ convert compas mesh and its frame to a pybullet body
 
     Parameters
@@ -228,13 +230,15 @@ def attach_end_effector_geometry(ee_meshes, robot, ee_link_name, scale=1.0):
     """
     pyb_ee_link = link_from_name(robot, ee_link_name)
     ee_link_pose = get_link_pose(robot, pyb_ee_link)
-    ee_bodies = []
+    ee_attachs = []
     for mesh in ee_meshes:
         ee_body = convert_mesh_to_pybullet_body(mesh, Frame.worldXY())
         set_pose(ee_body, ee_link_pose)
-        add_fixed_constraint(ee_body, robot, pyb_ee_link)
-        ee_bodies.append(ee_body)
-    return ee_bodies
+        # constr = add_fixed_constraint(ee_body, robot, pyb_ee_link)
+        # print(get_constraint_info(constr))
+        attach = create_attachment(robot, pyb_ee_link, ee_body)
+        ee_attachs.append(attach)
+    return ee_attachs
 
 
 def get_TCP_pose(robot, ee_link_name, ee_link_from_TCP_tf=None, return_pb_pose=False):
@@ -324,3 +328,32 @@ def create_pb_robot_from_ros_urdf(urdf_path, pkg_name, planning_scene=None, ee_l
         return pb_robot, ee_attached_bodies
     else:
         return pb_robot
+
+def sanity_check_collisions(brick_from_index, obstacle_from_name):
+    in_collision = False
+    init_pose = None
+    for brick in brick_from_index.values():
+        for e_body in brick.pybullet_bodies:
+            if not init_pose:
+                init_pose = get_pose(e_body)
+            for so_id, so in obstacle_from_name.items():
+                set_pose(e_body, pb_pose_from_Frame(brick.initial_frame))
+                if pairwise_collision(e_body, so):
+                    set_color(e_body, (1, 0, 0, 0.6))
+                    set_color(so, (0, 0, 1, 0.6))
+
+                    in_collision = True
+                    print('collision detected between brick #{} and static #{} in its pick pose'.format(brick.name, so_id))
+                    wait_for_user()
+
+                set_pose(e_body, pb_pose_from_Frame(brick.goal_frame))
+                if pairwise_collision(e_body, so):
+                    in_collision = True
+                    print('collision detected between brick #{} and static #{} in its place pose'.format(brick.name, so_id))
+                    wait_for_user()
+
+    # # reset their poses for visual...
+    for brick in brick_from_index.values():
+        for e_body in brick.pybullet_bodies:
+            set_pose(e_body, init_pose)
+    return in_collision
