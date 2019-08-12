@@ -93,12 +93,19 @@ class RosClient(Ros):
         self.__class__ = type('RosClient_' + planner_type.__name__ + executor_type.__name__,
                               (executor_type, planner_type, RosClient), {})
 
+
     def __enter__(self):
         self.run()
         self.connect()
+
+        # Planners usually need to initialize/advertise topics and/or services
+        self.init_planner()
+
         return self
 
     def __exit__(self, *args):
+        self.dispose_planner()
+
         self.close()
 
     def inverse_kinematics(self, frame, base_link, group,
