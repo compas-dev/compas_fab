@@ -92,6 +92,20 @@ class MoveItPlanner(PlannerBackend):
                                             GetPlanningSceneRequest,
                                             GetPlanningSceneResponse)
 
+    def init_planner(self):
+        self.collision_object_topic = Topic(self, '/collision_object',
+                                            'moveit_msgs/CollisionObject', queue_size=None)
+        self.collision_object_topic.advertise()
+
+        self.attached_collision_object_topic = Topic(
+            self, '/attached_collision_object',
+            'moveit_msgs/AttachedCollisionObject', queue_size=None)
+        self.attached_collision_object_topic.advertise()
+
+    def dispose_planner(self):
+        self.collision_object_topic.unadvertise()
+        self.attached_collision_object_topic.unadvertise()
+
     # ==========================================================================
     # planning services
     # ==========================================================================
@@ -286,8 +300,7 @@ class MoveItPlanner(PlannerBackend):
 
     def _collision_object(self, collision_object, operation=CollisionObject.ADD):
         collision_object.operation = operation
-        topic = Topic(self, '/collision_object', 'moveit_msgs/CollisionObject')
-        topic.publish(collision_object.msg)
+        self.collision_object_topic.publish(collision_object.msg)
 
     def add_attached_collision_mesh(self, attached_collision_mesh):
         """Add a collision mesh attached to the robot."""
@@ -303,6 +316,4 @@ class MoveItPlanner(PlannerBackend):
 
     def _attached_collision_object(self, attached_collision_object, operation=CollisionObject.ADD):
         attached_collision_object.object.operation = operation
-        topic = Topic(self, '/attached_collision_object',
-                      'moveit_msgs/AttachedCollisionObject')
-        topic.publish(attached_collision_object.msg)
+        self.attached_collision_object_topic.publish(attached_collision_object.msg)
