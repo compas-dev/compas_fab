@@ -2,7 +2,7 @@
 or a determinate mesh object
 
 """
-
+from compas_fab.backends.pybullet import pb_pose_from_Frame
 
 class UnitGeometry(object):
     def __init__(self, name, mesh=None, body=None,
@@ -50,12 +50,15 @@ class UnitGeometry(object):
 
     @property
     def initial_frame(self):
-        # TODO: if no body is stored, create from compas mesh
         return self._initial_frame
 
     @initial_frame.setter
     def initial_frame(self, frame):
         self._initial_frame = frame
+
+    @property
+    def initial_pb_pose(self):
+        return pb_pose_from_Frame(self._initial_frame)
 
     @property
     def goal_frame(self):
@@ -65,6 +68,10 @@ class UnitGeometry(object):
     @goal_frame.setter
     def goal_frame(self, frame):
         self._goal_frame = frame
+
+    @property
+    def goal_pb_pose(self):
+        return pb_pose_from_Frame(self._goal_frame)
 
     # --------------------------------------------------------------------------
     # attributes

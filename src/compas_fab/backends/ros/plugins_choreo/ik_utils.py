@@ -12,7 +12,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import numpy as np
 from copy import copy, deepcopy
 from conrob_pybullet import multiply, get_link_pose, get_movable_joints, \
     link_from_name, get_joint_positions, invert, violates_limits, get_pose, \
@@ -250,6 +249,7 @@ def best_sol(sols, q_guess, weights):
 
     Specific for UR setup (4 pi domain ranges)
     """
+    import numpy as np
     valid_sols = []
     for sol in sols:
         test_sol = np.ones(6)*9999.

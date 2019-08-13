@@ -22,12 +22,7 @@ from compas_fab.robots.ur5 import Robot
 from compas_fab.backends.pybullet import attach_end_effector_geometry, \
 convert_mesh_to_pybullet_body, get_TCP_pose, create_pb_robot_from_ros_urdf, \
 convert_meshes_and_poses_to_pybullet_bodies, pb_pose_from_Transformation
-from compas_fab.backends.pybullet import get_grasp_gen
-
-# from conrob_pybullet import load_pybullet, connect, disconnect, wait_for_user, \
-#     LockRenderer, has_gui, get_model_info, get_pose, euler_from_quat, draw_pose, \
-#     get_link_pose, link_from_name, create_attachment, add_fixed_constraint,\
-#     create_obj, set_pose
+from compas_fab.backends.pybullet.grasp_utils import get_grasp_gen
 
 from conrob_pybullet import load_pybullet, connect, disconnect, wait_for_user, \
     LockRenderer, has_gui, get_model_info, get_pose, euler_from_quat, draw_pose, \

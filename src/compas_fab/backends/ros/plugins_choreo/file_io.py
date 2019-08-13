@@ -78,10 +78,17 @@ def load_pick_and_place(instance_dir, instance_name, scale=1.0):
         # TODO: pick and place might have different approach tfs
         ee_from_approach_tf = Transformation.from_list(
             parse_transform(json_element['assembly_process']['place']['grasp_from_approach_tf'], scale=scale))
+
+        def multiply_frame_tf(frame, tf):
+            tf_frame = Transformation.from_frame(frame)
+            return Frame.from_transformation(\
+                Transformation.concatenate(tf_frame, tf))
+
         obj_from_ee_grasps = [Grasp(index, grasp_id, \
-                                    obj_from_ee_pose.transformed(ee_from_approach_tf),
+                                    multiply_frame_tf(obj_from_ee_pose, ee_from_approach_tf),
                                     obj_from_ee_pose,
-                                    obj_from_ee_pose.transformed(ee_from_approach_tf),
+                                    multiply_frame_tf(obj_from_ee_pose, ee_from_approach_tf),
+                                    # obj_from_ee_pose.transformed(ee_from_approach_tf),
                                      ) \
                               for grasp_id, obj_from_ee_pose in enumerate(obj_from_ee_grasp_poses)]
 

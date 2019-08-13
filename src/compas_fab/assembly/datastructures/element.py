@@ -20,8 +20,8 @@ class Element(object):
         self._key = element_vert_key(id)
         self._world_from_element_place_pose = None
         self._world_from_element_pick_pose = None
-        self._obj_from_grasp_poses = None
-        self._grasp_from_approach_tf = None
+        self._obj_from_grasp_poses = []
+        self._grasp_from_approach_tfs = []
 
     @property
     def key(self):
@@ -59,13 +59,21 @@ class Element(object):
     def obj_from_grasp_poses(self, grasp_poses):
         self._obj_from_grasp_poses = grasp_poses
 
-    @property
-    def grasp_from_approach_tf(self):
-        return self._grasp_from_approach_tf
+    def set_approach_poses_world(self, world_from_grasps, world_from_approachs):
+        self.grasp_from_approach_tfs = []
+        for world_from_grasp, world_from_approach in zip(world_from_grasps, world_from_approachs):
+            grasp_from_approach = Transformation.concatenate(
+                Transformation.from_frame(world_from_grasp).inverse(), Transformation.from_frame(world_from_approach))
+            self.grasp_from_approach_tfs.append(grasp_from_approach)
+            # print(grasp_from_approach)
 
-    @grasp_from_approach_tf.setter
-    def grasp_from_approach_tf(self, tf):
-        self._grasp_from_approach_tf = tf
+    @property
+    def grasp_from_approach_tfs(self):
+        return self._grasp_from_approach_tfs
+
+    @grasp_from_approach_tfs.setter
+    def grasp_from_approach_tfs(self, tfs):
+        self._grasp_from_approach_tfs = tfs
 
     def set_grasp_poses_from_in_scene_poses(self, world_from_obj_pose, world_from_ee_poses):
         """create obj_from_grasp poses from world

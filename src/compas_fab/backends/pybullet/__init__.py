@@ -24,8 +24,10 @@ But I haven't looked into that too much.
 """
 
 from __future__ import absolute_import
+import compas
 
 from .interface_utils import *
-from .grasp_utils import *
+if not compas.IPY:
+    from .grasp_utils import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]

@@ -177,7 +177,7 @@ class Assembly(object):
             pick['object_target_pose'] = Transformation.from_frame(e.world_from_element_pick_pose).list
             pick['allowed_collision_obj_names'] = [] # support tables, neighbor elements?
             # old names: pick_contact_ngh_ids, pick_support_surface_file_names
-            pick['grasp_from_approach_tf'] = e.grasp_from_approach_tf.list
+            pick['grasp_from_approach_tf'] = e.grasp_from_approach_tfs[0].list
             e_data['assembly_process']['pick'] = pick
 
             place = OrderedDict()
@@ -185,7 +185,7 @@ class Assembly(object):
             place['parent_frame'] = Transformation.from_frame(e.parent_frame).list
             place['object_target_pose'] = Transformation.from_frame(e.world_from_element_place_pose).list
             place['allowed_collision_obj_names'] = [] # support tables
-            place['grasp_from_approach_tf'] = e.grasp_from_approach_tf.list
+            place['grasp_from_approach_tf'] = e.grasp_from_approach_tfs[0].list
             e_data['assembly_process']['place'] = place
             # TODO: neighbor ACM
             # for nghb_id in self.vertex_neighborhood(v):

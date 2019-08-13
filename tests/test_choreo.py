@@ -24,14 +24,19 @@ from compas_fab.robots.configuration import Configuration
 
 from compas_fab.backends.pybullet import attach_end_effector_geometry, \
 convert_mesh_to_pybullet_body, get_TCP_pose, create_pb_robot_from_ros_urdf, \
-convert_meshes_and_poses_to_pybullet_bodies, sanity_check_collisions
+convert_meshes_and_poses_to_pybullet_bodies, sanity_check_collisions, \
+pb_pose_from_Transformation
 
-from compas_fab.backends.ros.plugins_choreo import load_pick_and_place
+from compas_fab.backends.ros.plugins_choreo import load_pick_and_place, display_picknplace_trajectories
 
 from conrob_pybullet import load_pybullet, connect, disconnect, wait_for_user, \
     LockRenderer, has_gui, get_model_info, get_pose, euler_from_quat, draw_pose, \
     get_link_pose, link_from_name, create_attachment, add_fixed_constraint,\
-    create_obj, set_pose, joints_from_names, set_joint_positions, get_fixed_constraints
+    create_obj, set_pose, joints_from_names, set_joint_positions, get_fixed_constraints, \
+    remove_debug
+from choreo import direct_ladder_graph_solve_picknplace, divide_nested_list_chunks
+
+import ikfast_ur5
 
 @pytest.mark.wip
 def test_choreo_plan_single_cartesian_motion():
@@ -62,41 +67,28 @@ def test_choreo_plan_single_cartesian_motion():
 
         # parse end effector mesh
         ee_mesh = Mesh.from_obj(ee_filename)
-        # ee_mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
-        # cm = CollisionMesh(ee_mesh, 'gripper')
-        # touch_links = ['wrist_3_link', ee_link_name]
-        # acm = AttachedCollisionMesh(cm, ee_link_name, touch_links)
-        # scene.add_attached_collision_mesh(acm)
 
         # define TCP transformation
         tcp_tf = Translation([0.099, 0, 0]) # in meters
-
         ur5_start_conf = np.array([104., -80., -103., -86., 89., 194.]) / 180.0 * np.pi
-
-        # group = robot.main_group_name
-        # current_jt_state = scene.get_joint_state()
-        # st_conf = Configuration.from_revolute_values(current_jt_state.values())
-        # goal_conf = Configuration.from_revolute_values(list(ur5_start_conf))
-        # goal_constraints = robot.constraints_from_configuration(goal_conf, 0.001, group)
-        # reset_traj = robot.plan_motion(goal_constraints, st_conf, group, planner_id='RRT')
-        # TODO: execute it!
-        # TODO: or simply: client.set_joint_positions(group, ur5_start_conf)
 
         # add static collision obstacles
         for static_obs_name, static_obs_mesh in static_obstacles.items():
-            cm = CollisionMesh(static_obs_mesh, static_obs_name)
+            # offset the table a bit...
+            cm = CollisionMesh(static_obs_mesh, static_obs_name, frame=Frame.from_transformation(Translation([0, 0, -0.02])))
             scene.add_collision_mesh(cm)
 
         # See: https://github.com/compas-dev/compas_fab/issues/63#issuecomment-519525879
         time.sleep(1)
 
         # start pybullet environment & load pybullet robot
-        connect(use_gui=False)
+        connect(use_gui=True)
         pb_robot = create_pb_robot_from_ros_urdf(urdf_filename, urdf_pkg_name,
                                                  planning_scene=scene,
                                                  ee_link_name=ee_link_name)
         ee_attachs = attach_end_effector_geometry([ee_mesh], pb_robot, ee_link_name)
 
+        # update current joint conf and attach end effector
         pb_ik_joints = joints_from_names(pb_robot, ik_joint_names)
         set_joint_positions(pb_robot, pb_ik_joints, ur5_start_conf)
         for e_at in ee_attachs: e_at.assign()
@@ -124,8 +116,52 @@ def test_choreo_plan_single_cartesian_motion():
         # check collision between obstacles and element geometries
         assert not sanity_check_collisions(unit_geos, static_obstacles_from_name)
 
+        from random import shuffle
+        seq_assignment = list(range(len(unit_geos)))
+        # shuffle(seq_assignment)
+        element_seq = {seq_id : e_id for seq_id, e_id in enumerate(seq_assignment)}
+
+        for key, val in element_seq.items():
+            element_seq[key] = 'e_' + str(val)
+
+        if has_gui():
+            handles = []
+            for e_id in element_seq.values():
+                # for e_body in brick_from_index[e_id].body: set_pose(e_body, brick_from_index[e_id].goal_pose)
+                handles.extend(draw_pose(unit_geos[e_id].initial_pb_pose, length=0.02))
+                handles.extend(draw_pose(unit_geos[e_id].goal_pb_pose, length=0.02))
+                for e_body in unit_geos[e_id].pybullet_bodies:
+                    set_pose(e_body, unit_geos[e_id].initial_pb_pose)
+            print('pybullet env loaded.')
+            wait_for_user()
+            for h in handles:
+                remove_debug(h)
+
+        ik_fn = ikfast_ur5.get_ik
+        tot_traj, graph_sizes = \
+        direct_ladder_graph_solve_picknplace(pb_robot, ik_joint_names, base_link_name, ee_link_name, ik_fn,
+            unit_geos, element_seq, static_obstacles_from_name,
+            tcp_transf=pb_pose_from_Transformation(tcp_tf),
+            ee_attachs=ee_attachs,
+            max_attempts=100, viz=True)
+
+        picknplace_cart_plans = divide_nested_list_chunks(tot_traj, graph_sizes)
+        print(picknplace_cart_plans)
+        print('Cartesian planning finished.')
         if has_gui():
             wait_for_user()
+
+        print('\n*************************\nplanning completed. Simulate?')
+        if has_gui():
+            wait_for_user()
+        for e_id in element_seq.values():
+            for e_body in unit_geos[e_id].pybullet_bodies:
+                set_pose(e_body, unit_geos[e_id].initial_pb_pose)
+
+        display_picknplace_trajectories(pb_robot, ik_joint_names, ee_link_name,
+                                        unit_geos, element_seq, picknplace_cart_plans, \
+                                        ee_attachs=ee_attachs,
+                                        cartesian_time_step=0.075, transition_time_step=0.1, step_sim=True)
 
         scene.remove_all_collision_objects()
 
