@@ -37,6 +37,7 @@ from conrob_pybullet import Pose, Point, BodyPose, GraspInfo
 
 
 def test_convert_compas_robot_to_pybullet_robot():
+    VIZ = True
     # get ur robot model from local test data that's shipped with compas_fab
     # does not need client connection here
 
@@ -57,9 +58,9 @@ def test_convert_compas_robot_to_pybullet_robot():
     ee_mesh = Mesh.from_obj(ee_filename)
 
     # define TCP transformation
-    tcp_tf = Translation([0.2, 0, 0]) # in meters
+    tcp_tf = Translation([0.099, 0, 0]) # in meters
 
-    connect(use_gui=False)
+    connect(use_gui=VIZ)
     # if the following returns without error, we are good
     pb_robot = create_pb_robot_from_ros_urdf(urdf_filename, urdf_pkg_name)
 
@@ -70,6 +71,13 @@ def test_convert_compas_robot_to_pybullet_robot():
 
     # attach tool
     ee_bodies = attach_end_effector_geometry([ee_mesh], pb_robot, ee_link_name)
+
+    # idle conf
+    ur5_start_conf = np.array([104., -80., -103., -86., 89., 194.]) / 180.0 * np.pi
+    ik_joint_names = robot.get_configurable_joint_names()
+    pb_ik_joints = joints_from_names(pb_robot, ik_joint_names)
+    set_joint_positions(pb_robot, pb_ik_joints, ur5_start_conf)
+    for ee_b in ee_bodies: ee_b.assign()
 
     # draw TCP frame in pybullet
     TCP_pb_pose = get_TCP_pose(pb_robot, ee_link_name, tcp_tf, return_pb_pose=True)

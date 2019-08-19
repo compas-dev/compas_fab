@@ -43,6 +43,10 @@ from compas_fab.robots import Duration
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
 
+from roslibpy import Service
+from roslibpy import ServiceRequest
+from compas_fab.backends.ros.messages import ROSmsg
+
 
 def convert_trajectory_points(points, types):
     result = []
@@ -99,6 +103,14 @@ class MoveItPlanner(PlannerPlugin):
                                             'GetPlanningScene',
                                             GetPlanningSceneRequest,
                                             GetPlanningSceneResponse)
+    # GET_STATE_VALIDITY = ServiceDescription('/get_state_validity',
+    #                                         'GetStateValidity',
+    #                                         GetStateValidtyRequest,
+    #                                         GetStateValidtyResponse)
+    GET_STATE_VALIDITY_SRV_TOPIC_NAME = '/check_state_validity'
+
+    SET_JOINT_STATE_SRV_TOPIC_NAME = '/joint_command'
+
 
     # ==========================================================================
     # planning services
@@ -200,6 +212,7 @@ class MoveItPlanner(PlannerPlugin):
             header=header, name=joint_names, position=start_configuration.values)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
+
         if attached_collision_meshes:
             for acm in attached_collision_meshes:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
@@ -261,6 +274,45 @@ class MoveItPlanner(PlannerPlugin):
             callback(trajectory)
 
         self.GET_MOTION_PLAN(self, request, convert_to_trajectory, errback)
+
+    # ==========================================================================
+    # check services
+    # ==========================================================================
+
+    def is_joint_state_colliding(self, group_name, joint_names, joint_state):
+        reponse_msg = self.get_state_validity(group_name, joint_names, joint_state, Constraints())
+        return reponse_msg['valid']
+
+    def get_state_validity(self, group_name, joint_names, joint_state, constraints):
+        """Check if if state is valid.
+
+        Note: now this function will block until service call returns.
+        TODO: add attached collision objects, is_diff
+        http://docs.ros.org/api/moveit_msgs/html/msg/RobotState.html
+
+        Parameters
+        ----------
+        group_name : str
+            manipulation group
+        joint_names : str
+            joint names
+        joint_state : list of float
+            joint state to be checked
+        constraints : .., optional
+            Not supported now, by default None
+        """
+
+        joint_state = JointState(name=joint_names, position=joint_state)
+        robot_state = RobotState(joint_state=joint_state)
+        request_msg = ROSmsg(robot_state=robot_state, group_name=group_name,
+                             constraints=constraints).msg
+
+        # TODO: make the service function call conforms with other srv calls in this file
+        # use ServiceDescription and async (?)
+        srv = Service(self, self.GET_STATE_VALIDITY_SRV_TOPIC_NAME, 'GetStateValidity')
+        request = ServiceRequest(request_msg)
+        reponse = srv.call(request)
+        return reponse
 
     # ==========================================================================
     # collision objects

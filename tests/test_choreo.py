@@ -40,7 +40,8 @@ import ikfast_ur5
 # TODO: test ignore if ros client is not running
 @pytest.mark.wip
 def test_choreo_plan_single_cartesian_motion():
-    VIZ=False
+    VIZ = False # True to see detailed IKfast solutions
+    plan_transition = False
 
     choreo_problem_instance_dir = compas_fab.get('choreo_instances')
     unit_geos, static_obstacles = load_pick_and_place(choreo_problem_instance_dir,
@@ -136,7 +137,7 @@ def test_choreo_plan_single_cartesian_motion():
                 for e_body in unit_geos[e_id].pybullet_bodies:
                     set_pose(e_body, unit_geos[e_id].initial_pb_pose)
             print('pybullet env loaded.')
-            wait_for_user()
+            # wait_for_user()
             for h in handles:
                 remove_debug(h)
 
@@ -149,7 +150,7 @@ def test_choreo_plan_single_cartesian_motion():
             max_attempts=100, viz=VIZ)
 
         picknplace_cart_plans = divide_nested_list_chunks(tot_traj, graph_sizes)
-        print(picknplace_cart_plans)
+        # print(picknplace_cart_plans)
         print('Cartesian planning finished.')
 
         # reset robot and parts for better visualization
@@ -159,52 +160,59 @@ def test_choreo_plan_single_cartesian_motion():
             for e_body in unit_geos[e_id].pybullet_bodies:
                 set_pose(e_body, unit_geos[e_id].initial_pb_pose)
 
-        if has_gui():
-            wait_for_user()
+        # if has_gui():
+        #     wait_for_user()
 
-        print('Transition planning started.')
+        print(list(ur5_start_conf))
+        print(list(picknplace_cart_plans[0]['pick_approach'][0]))
 
-        group = robot.main_group_name
-        for seq_id, unit_picknplace in enumerate(picknplace_cart_plans):
-            print('transition seq#{}'.format(seq_id))
+        if plan_transition:
+            print('Transition planning started.')
 
-            if seq_id != 0:
-                tr_start_conf = picknplace_cart_plans[seq_id-1]['place_retreat'][-1]
-            else:
-                tr_start_conf = ur5_start_conf
-            # set_joint_positions(robot, movable_joints, tr_start_conf)
+            group = robot.main_group_name
+            for seq_id, unit_picknplace in enumerate(picknplace_cart_plans):
+                print('transition seq#{}'.format(seq_id))
+
+                if seq_id != 0:
+                    tr_start_conf = picknplace_cart_plans[seq_id-1]['place_retreat'][-1]
+                else:
+                    tr_start_conf = ur5_start_conf
+                # set_joint_positions(robot, movable_joints, tr_start_conf)
 
 
-            # cur_mo_list = []
-            # for mo_id, mo in brick_from_index.items():
-            #     if mo_id in element_seq.values():
-            #         cur_mo_list.extend(mo.body)
+                # cur_mo_list = []
+                # for mo_id, mo in brick_from_index.items():
+                #     if mo_id in element_seq.values():
+                #         cur_mo_list.extend(mo.body)
 
-            # obstacles=static_obstacles + cur_mo_list
-            st_conf = Configuration.from_revolute_values(tr_start_conf)
-            goal_conf = Configuration.from_revolute_values(picknplace_cart_plans[seq_id]['pick_approach'][0])
-            goal_constraints = robot.constraints_from_configuration(goal_conf, [0.001], group)
-            place2pick_path = robot.plan_motion(goal_constraints, st_conf, group, planner_id='RRT')
+                # obstacles=static_obstacles + cur_mo_list
+                print(list(tr_start_conf))
+                print(list(picknplace_cart_plans[seq_id]['pick_approach'][0]))
 
-            # # create attachement without needing to keep track of grasp...
-            # set_joint_positions(robot, movable_joints, picknplace_cart_plans[seq_id]['pick_retreat'][0])
-            # # attachs = [Attachment(robot, tool_link, invert(grasp.attach), e_body) for e_body in brick.body]
-            # attachs = [create_attachment(robot, end_effector_link, e_body) for e_body in brick_from_index[e_id].body]
+                st_conf = Configuration.from_revolute_values(list(tr_start_conf))
+                goal_conf = Configuration.from_revolute_values(list(picknplace_cart_plans[seq_id]['pick_approach'][0]))
+                goal_constraints = robot.constraints_from_configuration(goal_conf, [0.001], group)
+                place2pick_path = robot.plan_motion(goal_constraints, st_conf, group, planner_id='RRT')
 
-            # cur_mo_list = []
-            # for mo_id, mo in brick_from_index.items():
-            #     if mo_id != e_id and mo_id in element_seq.values():
-            #         cur_mo_list.extend(mo.body)
+                # # create attachement without needing to keep track of grasp...
+                # set_joint_positions(robot, movable_joints, picknplace_cart_plans[seq_id]['pick_retreat'][0])
+                # # attachs = [Attachment(robot, tool_link, invert(grasp.attach), e_body) for e_body in brick.body]
+                # attachs = [create_attachment(robot, end_effector_link, e_body) for e_body in brick_from_index[e_id].body]
 
-            st_conf = Configuration.from_revolute_values(picknplace_cart_plans[seq_id]['pick_retreat'][-1])
-            goal_conf = Configuration.from_revolute_values(picknplace_cart_plans[seq_id]['place_approach'][0])
-            goal_constraints = robot.constraints_from_configuration(goal_conf, [0.001], group)
-            pick2place_path = robot.plan_motion(goal_constraints, st_conf, group, planner_id='RRT')
+                # cur_mo_list = []
+                # for mo_id, mo in brick_from_index.items():
+                #     if mo_id != e_id and mo_id in element_seq.values():
+                #         cur_mo_list.extend(mo.body)
 
-            picknplace_cart_plans[seq_id]['place2pick'] = [traj_pt.positions for traj_pt in place2pick_path]
-            picknplace_cart_plans[seq_id]['pick2place'] = [traj_pt.positions for traj_pt in pick2place_path]
+                st_conf = Configuration.from_revolute_values(picknplace_cart_plans[seq_id]['pick_retreat'][-1])
+                goal_conf = Configuration.from_revolute_values(picknplace_cart_plans[seq_id]['place_approach'][0])
+                goal_constraints = robot.constraints_from_configuration(goal_conf, [0.001], group)
+                pick2place_path = robot.plan_motion(goal_constraints, st_conf, group, planner_id='RRT')
 
-        print('Transition planning finished.')
+                picknplace_cart_plans[seq_id]['place2pick'] = [traj_pt.positions for traj_pt in place2pick_path]
+                picknplace_cart_plans[seq_id]['pick2place'] = [traj_pt.positions for traj_pt in pick2place_path]
+
+            print('Transition planning finished.')
 
         print('\n*************************\nplanning completed. Simulate?')
         if has_gui():

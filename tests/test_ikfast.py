@@ -89,6 +89,7 @@ def test_ikfast_forward_kinematics():
 
 def test_ikfast_inverse_kinematics():
     """TODO: this test_function can by pybullet-free"""
+    VIZ = False
     urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
     srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
     urdf_pkg_name = 'ur_description'
@@ -101,7 +102,7 @@ def test_ikfast_inverse_kinematics():
     ik_joint_names = robot.get_configurable_joint_names()
     ik_tool_link_name = robot.get_end_effector_link_name()
 
-    connect(use_gui=False)
+    connect(use_gui=VIZ)
     pb_robot = create_pb_robot_from_ros_urdf(urdf_filename, urdf_pkg_name)
     pb_ik_joints = joints_from_names(pb_robot, ik_joint_names)
 
@@ -118,10 +119,11 @@ def test_ikfast_inverse_kinematics():
         # ikfast's FK
         fk_fn = ikfast_ur5.get_fk
         ikfast_FK_pb_pose = get_ik_tool_link_pose(fk_fn, pb_robot, ik_joint_names, base_link_name, conf)
+        # ikfast_FK_pb_pose = Pose(point=Point(-0.1, 0.1, 0.2))
 
         if has_gui():
             print('test round #{}: ground truth conf: {}'.format(i, conf))
-            handles = draw_pose(ikfast_FK_pb_pose, length=0.04)
+            handles = draw_pose(ikfast_FK_pb_pose, length=0.1)
             set_joint_positions(pb_robot, pb_ik_joints, conf)
             wait_for_user()
 
@@ -129,6 +131,13 @@ def test_ikfast_inverse_kinematics():
         ik_fn = ikfast_ur5.get_ik
         ik_sols = sample_tool_ik(ik_fn, pb_robot, ik_joint_names, base_link_name,
                         ikfast_FK_pb_pose, get_all=True)
+
+        if has_gui():
+            print('test round #{}: ik fast find {} confs'.format(i, len(ik_sols)))
+            for q in ik_sols:
+                print(q)
+                set_joint_positions(pb_robot, pb_ik_joints, q)
+                wait_for_user()
 
         # TODO: UR robot or in general joint w/ domain over 4 pi
         # needs specialized distance function
