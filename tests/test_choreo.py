@@ -17,8 +17,7 @@ from compas_fab.backends import RosClient
 from compas_fab.robots import Robot as RobotClass
 from compas_fab.robots import RobotSemantics
 from compas_fab.robots import PlanningScene
-from compas_fab.robots import CollisionMesh
-from compas_fab.robots import AttachedCollisionMesh
+from compas_fab.robots import CollisionMesh, AttachedCollisionMesh
 from compas_fab.robots.ur5 import Robot
 from compas_fab.robots.configuration import Configuration
 
@@ -38,17 +37,22 @@ from choreo import direct_ladder_graph_solve_picknplace, divide_nested_list_chun
 
 import ikfast_ur5
 
+# TODO: test ignore if ros client is not running
 @pytest.mark.wip
 def test_choreo_plan_single_cartesian_motion():
+    VIZ=False
+
     choreo_problem_instance_dir = compas_fab.get('choreo_instances')
     unit_geos, static_obstacles = load_pick_and_place(choreo_problem_instance_dir,
-                                                      'ur_picknplace_single_piece', scale=1e-3)
+                                                        'ur_picknplace_single_piece', scale=1e-3)
+    # unit_geos, static_obstacles = load_pick_and_place(choreo_problem_instance_dir,
+    #                                                     'ur_picknplace_multiple_piece', scale=1e-3)
 
     with RosClient() as client:
         urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
         srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
         ee_filename = compas_fab.get('universal_robot/ur_description/meshes/' +
-                                     'pychoreo_workshop_gripper/collision/victor_gripper_jaw03.obj')
+                                        'pychoreo_workshop_gripper/collision/victor_gripper_jaw03.obj')
         urdf_pkg_name = 'ur_description'
 
         # geometry file is not loaded here
@@ -84,8 +88,8 @@ def test_choreo_plan_single_cartesian_motion():
         # start pybullet environment & load pybullet robot
         connect(use_gui=True)
         pb_robot = create_pb_robot_from_ros_urdf(urdf_filename, urdf_pkg_name,
-                                                 planning_scene=scene,
-                                                 ee_link_name=ee_link_name)
+                                                    planning_scene=scene,
+                                                    ee_link_name=ee_link_name)
         ee_attachs = attach_end_effector_geometry([ee_mesh], pb_robot, ee_link_name)
 
         # update current joint conf and attach end effector
@@ -99,7 +103,6 @@ def test_choreo_plan_single_cartesian_motion():
             handles = draw_pose(TCP_pb_pose, length=0.04)
 
         # deliver ros collision meshes to pybullet
-        # TODO: this co_dict shouldn't be a ROS message
         co_dict = scene.get_collision_meshes_and_poses()
         static_obstacles_from_name = convert_meshes_and_poses_to_pybullet_bodies(co_dict)
         # for now...
@@ -116,7 +119,7 @@ def test_choreo_plan_single_cartesian_motion():
         # check collision between obstacles and element geometries
         assert not sanity_check_collisions(unit_geos, static_obstacles_from_name)
 
-        from random import shuffle
+        # from random import shuffle
         seq_assignment = list(range(len(unit_geos)))
         # shuffle(seq_assignment)
         element_seq = {seq_id : e_id for seq_id, e_id in enumerate(seq_assignment)}
@@ -143,20 +146,69 @@ def test_choreo_plan_single_cartesian_motion():
             unit_geos, element_seq, static_obstacles_from_name,
             tcp_transf=pb_pose_from_Transformation(tcp_tf),
             ee_attachs=ee_attachs,
-            max_attempts=100, viz=True)
+            max_attempts=100, viz=VIZ)
 
         picknplace_cart_plans = divide_nested_list_chunks(tot_traj, graph_sizes)
         print(picknplace_cart_plans)
         print('Cartesian planning finished.')
+
+        # reset robot and parts for better visualization
+        set_joint_positions(pb_robot, pb_ik_joints, ur5_start_conf)
+        for ee in ee_attachs: ee.assign()
+        for e_id in element_seq.values():
+            for e_body in unit_geos[e_id].pybullet_bodies:
+                set_pose(e_body, unit_geos[e_id].initial_pb_pose)
+
         if has_gui():
             wait_for_user()
+
+        print('Transition planning started.')
+
+        group = robot.main_group_name
+        for seq_id, unit_picknplace in enumerate(picknplace_cart_plans):
+            print('transition seq#{}'.format(seq_id))
+
+            if seq_id != 0:
+                tr_start_conf = picknplace_cart_plans[seq_id-1]['place_retreat'][-1]
+            else:
+                tr_start_conf = ur5_start_conf
+            # set_joint_positions(robot, movable_joints, tr_start_conf)
+
+
+            # cur_mo_list = []
+            # for mo_id, mo in brick_from_index.items():
+            #     if mo_id in element_seq.values():
+            #         cur_mo_list.extend(mo.body)
+
+            # obstacles=static_obstacles + cur_mo_list
+            st_conf = Configuration.from_revolute_values(tr_start_conf)
+            goal_conf = Configuration.from_revolute_values(picknplace_cart_plans[seq_id]['pick_approach'][0])
+            goal_constraints = robot.constraints_from_configuration(goal_conf, [0.001], group)
+            place2pick_path = robot.plan_motion(goal_constraints, st_conf, group, planner_id='RRT')
+
+            # # create attachement without needing to keep track of grasp...
+            # set_joint_positions(robot, movable_joints, picknplace_cart_plans[seq_id]['pick_retreat'][0])
+            # # attachs = [Attachment(robot, tool_link, invert(grasp.attach), e_body) for e_body in brick.body]
+            # attachs = [create_attachment(robot, end_effector_link, e_body) for e_body in brick_from_index[e_id].body]
+
+            # cur_mo_list = []
+            # for mo_id, mo in brick_from_index.items():
+            #     if mo_id != e_id and mo_id in element_seq.values():
+            #         cur_mo_list.extend(mo.body)
+
+            st_conf = Configuration.from_revolute_values(picknplace_cart_plans[seq_id]['pick_retreat'][-1])
+            goal_conf = Configuration.from_revolute_values(picknplace_cart_plans[seq_id]['place_approach'][0])
+            goal_constraints = robot.constraints_from_configuration(goal_conf, [0.001], group)
+            pick2place_path = robot.plan_motion(goal_constraints, st_conf, group, planner_id='RRT')
+
+            picknplace_cart_plans[seq_id]['place2pick'] = [traj_pt.positions for traj_pt in place2pick_path]
+            picknplace_cart_plans[seq_id]['pick2place'] = [traj_pt.positions for traj_pt in pick2place_path]
+
+        print('Transition planning finished.')
 
         print('\n*************************\nplanning completed. Simulate?')
         if has_gui():
             wait_for_user()
-        for e_id in element_seq.values():
-            for e_body in unit_geos[e_id].pybullet_bodies:
-                set_pose(e_body, unit_geos[e_id].initial_pb_pose)
 
         display_picknplace_trajectories(pb_robot, ik_joint_names, ee_link_name,
                                         unit_geos, element_seq, picknplace_cart_plans, \
@@ -164,17 +216,3 @@ def test_choreo_plan_single_cartesian_motion():
                                         cartesian_time_step=0.075, transition_time_step=0.1, step_sim=True)
 
         scene.remove_all_collision_objects()
-
-    # frames = []
-    # frames.append(Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]))
-    # frames.append(Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1]))
-    # start_configuration = Configuration.from_revolute_values([-0.042, 0.033, -2.174, 5.282, -1.528, 0.000])
-
-    # # trajectory = robot.plan_cartesian_motion(frames,
-    # #                                          start_configuration,
-    # #                                          max_step=0.01,
-    # #                                          avoid_collisions=True)
-
-    # print("Computed cartesian path with %d configurations, " % len(trajectory.points))
-    # print("following %d%% of requested trajectory." % (trajectory.fraction * 100))
-    # print("Executing this path at full speed would take approx. %.3f seconds." % trajectory.time_from_start)
