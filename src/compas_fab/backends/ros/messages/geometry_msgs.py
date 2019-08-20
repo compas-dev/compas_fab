@@ -87,6 +87,14 @@ class Transform(ROSmsg):
         self.translation = translation
         self.rotation = rotation
 
+class TransformStamped(ROSmsg):
+    """http://docs.ros.org/api/geometry_msgs/html/msg/TransformStamped.html
+    """
+    def __init__(self, header=Header(), child_frame_id='', transform=Transform()):
+        self.header = header
+        self.child_frame_id = child_frame_id
+        self.transform = transform
+
 class Twist(ROSmsg):
     """http://docs.ros.org/api/geometry_msgs/html/msg/Twist.html
     """

@@ -5,6 +5,7 @@ from compas_fab.backends.ros.messages.std_msgs import Header
 from compas_fab.backends.ros.messages.geometry_msgs import Point
 from compas_fab.backends.ros.messages.geometry_msgs import Pose
 from compas_fab.backends.ros.messages.geometry_msgs import PoseStamped
+from compas_fab.backends.ros.messages.geometry_msgs import TransformStamped
 from compas_fab.backends.ros.messages.geometry_msgs import Vector3
 from compas_fab.backends.ros.messages.geometry_msgs import Quaternion
 from compas_fab.backends.ros.messages.shape_msgs import SolidPrimitive

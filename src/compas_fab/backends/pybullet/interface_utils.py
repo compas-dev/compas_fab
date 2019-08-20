@@ -18,7 +18,7 @@ from conrob_pybullet import create_obj, set_pose, quat_from_matrix, add_body_nam
     quat_from_euler, link_from_name, get_link_pose, add_fixed_constraint, euler_from_quat, \
     multiply, is_connected, load_pybullet, joints_from_names, set_joint_positions, \
     get_constraint_info, create_attachment, get_pose, pairwise_collision, set_color, \
-    wait_for_user
+    wait_for_user, has_link
 
 # TODO: this will be added later
 # __all__ = [
@@ -357,3 +357,24 @@ def sanity_check_collisions(brick_from_index, obstacle_from_name):
         for e_body in brick.pybullet_bodies:
             set_pose(e_body, init_pose)
     return in_collision
+
+def get_pb_robot_disabled_self_collisions(pb_robot, disabled_collision_names):
+    """get disabled robot link pairs for pybullet collision
+
+    Parameters
+    ----------
+    pb_robot : pybullet robot
+    disabled_collision_names : list of string-tuples
+        DISABLED_COLLISIONS = [
+            ('robot_link_4', 'workspace_objects'),
+            ('robot_link_5', 'eef_base_link'),
+        ]
+
+    Returns
+    -------
+    [type]
+        [description]
+    """
+
+    return {tuple(link_from_name(pb_robot, link) for link in pair if has_link(pb_robot, link))
+                  for pair in disabled_collision_names}

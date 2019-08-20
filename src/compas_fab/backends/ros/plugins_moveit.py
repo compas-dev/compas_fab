@@ -30,6 +30,7 @@ from compas_fab.backends.ros.messages import MoveItErrorCodes
 from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import OrientationConstraint
 from compas_fab.backends.ros.messages import PlanningSceneComponents
+from compas_fab.backends.ros.messages import PlanningScene
 from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.messages import PoseStamped
 from compas_fab.backends.ros.messages import PositionConstraint
@@ -103,14 +104,17 @@ class MoveItPlanner(PlannerPlugin):
                                             'GetPlanningScene',
                                             GetPlanningSceneRequest,
                                             GetPlanningSceneResponse)
+
     # GET_STATE_VALIDITY = ServiceDescription('/get_state_validity',
     #                                         'GetStateValidity',
     #                                         GetStateValidtyRequest,
     #                                         GetStateValidtyResponse)
+
     GET_STATE_VALIDITY_SRV_TOPIC_NAME = '/check_state_validity'
 
-    SET_JOINT_STATE_SRV_TOPIC_NAME = '/joint_command'
+    APPLY_PLANNING_SCENE_SRV_TOPIC_NAME = '/apply_planning_scene'
 
+    # SET_JOINT_STATE_TOPIC_NAME = 'joint_states'
 
     # ==========================================================================
     # planning services
@@ -275,6 +279,63 @@ class MoveItPlanner(PlannerPlugin):
 
         self.GET_MOTION_PLAN(self, request, convert_to_trajectory, errback)
 
+
+    # ==========================================================================
+    # set states services
+    # ==========================================================================
+
+    def set_joint_positions(self, group_name, joint_names, joint_state):
+        """Set joint positions in the planning scene
+
+        Parameters
+        ----------
+        group_name : str
+            manipulation group name
+        joint_names : list of str
+            joint names
+        joint_state : list of float
+            joint values
+
+        Returns
+        -------
+        bool
+            if set_joint_state is success or not
+        """
+        # msg-based, seems not working
+        # joint_state = JointState(name=joint_names, position=joint_state)
+        # topic = Topic(self, '/joint_states', 'sensor_msgs/JointState')
+        # topic.publish(joint_state.msg)
+
+        # srv-based, get current, modify robot state, make service call to apply
+        kwargs = {}
+        kwargs['errback_name'] = 'errback'
+        prev_planning_scene = await_callback(self.get_planning_scene_async, **kwargs)
+        joint_state = JointState(name=joint_names, position=joint_state)
+        robot_state = RobotState(joint_state=joint_state)
+        prev_planning_scene.robot_state = robot_state
+        scene_request_msg = ROSmsg(scene=prev_planning_scene).msg
+        return self._apply_planning_scene(scene_request_msg)
+
+    def _apply_planning_scene(self, scene_request_msg):
+        """make apply_planning_scene call
+
+        Parameters
+        ----------
+        scene_request_msg : dict
+            {'scene' : PlanningScene.msg}
+
+        Returns
+        -------
+        bool
+            apply_planning_scene respond.success
+        """
+        # TODO: make the service function call conforms with other srv calls in this file
+        # use ServiceDescription and async (?)
+        srv = Service(self, self.APPLY_PLANNING_SCENE_SRV_TOPIC_NAME, 'moveit_msgs/ApplyPlanningScene')
+        request = ServiceRequest(scene_request_msg)
+        reponse = srv.call(request)
+        return reponse['success']
+
     # ==========================================================================
     # check services
     # ==========================================================================
@@ -301,7 +362,6 @@ class MoveItPlanner(PlannerPlugin):
         constraints : .., optional
             Not supported now, by default None
         """
-
         joint_state = JointState(name=joint_names, position=joint_state)
         robot_state = RobotState(joint_state=joint_state)
         request_msg = ROSmsg(robot_state=robot_state, group_name=group_name,
@@ -314,7 +374,22 @@ class MoveItPlanner(PlannerPlugin):
         reponse = srv.call(request)
         return reponse
 
-    # ==========================================================================
+    def get_joint_state(self):
+        kwargs = {}
+        kwargs['errback_name'] = 'errback'
+        planning_scene = await_callback(self.get_planning_scene_async, **kwargs)
+        jt_names = planning_scene.robot_state.joint_state.name
+        jt_values = planning_scene.robot_state.joint_state.position
+        return {name : val for name, val in zip(jt_names, jt_values)}
+
+        # msg-based implementation?
+        # sensor_msgs::JointStateConstPtr state = ros::topic::waitForMessage<sensor_msgs::JointState>(
+        #   "joint_states", ros::Duration(DEFAULT_JOINT_WAIT_TIME));
+        # if (!state)
+        #   throw std::runtime_error("Joint state message capture failed");
+        # return state->position;
+
+    # ===============================================
     # collision objects
     # ==========================================================================
 
@@ -411,14 +486,3 @@ class MoveItPlanner(PlannerPlugin):
             aco_dict[aco_msg.object.id]['meshes'] = [mesh_msg.mesh for mesh_msg in aco_msg.meshes]
             aco_dict[aco_msg.object.id]['mesh_poses'] = [pose_msg.frame for pose_msg in aco_msg.mesh_poses]
         return aco_dict
-
-    def get_joint_state(self):
-        kwargs = {}
-        kwargs['errback_name'] = 'errback'
-        planning_scene = await_callback(self.get_planning_scene_async, **kwargs)
-        jt_names = planning_scene.robot_state.joint_state.name
-        jt_values = planning_scene.robot_state.joint_state.position
-        return {name : val for name, val in zip(jt_names, jt_values)}
-
-    def set_joint_positions(self, group, joint_state):
-        raise NotImplementedError

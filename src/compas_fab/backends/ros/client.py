@@ -243,8 +243,9 @@ class RosClient(Ros):
     def get_attached_collision_objects(self):
         raise NotImplementedError('No planner plugin assigned')
 
-    def set_joint_positions(self, group, joint_state):
-        raise NotImplementedError('No planner plugin assigned')
+    # ==========================================================================
+    # check services
+    # ==========================================================================
 
     def is_joint_state_colliding(self, group_name, joint_names, joint_state):
         # see here: http://docs.ros.org/indigo/api/moveit_core/html/planning__scene_8cpp_source.html
@@ -254,6 +255,9 @@ class RosClient(Ros):
     # ==========================================================================
     # executing
     # ==========================================================================
+
+    def set_joint_positions(self, group_name, joint_names, joint_state):
+        raise NotImplementedError('No planner plugin assigned')
 
     def get_configuration(self):
         """Is this linked to ``get_joint_state``? """

@@ -19,11 +19,11 @@ class JointState(ROSmsg):
     @classmethod
     def from_name_and_position(cls, name, position):
         return cls(Header(), name, position, [], [])
-    
+
     @classmethod
     def from_configuration(cls):
         pass
-    
+
     @property
     def configuration(self):
         pass
