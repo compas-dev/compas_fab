@@ -12,6 +12,9 @@ Unreleased
 
 **Changed**
 
+* Moving functionality from `compas_fab.artists.BaseRobotArtist` to `compas.robots.RobotModel`
+* `compas_fab.Robot` inverse_kinematics returns now group configuration
+
 **Added**
 
 * Adding `jump_threshold` parameter to ``plan_cartesian_motion``
