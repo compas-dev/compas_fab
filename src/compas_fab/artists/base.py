@@ -23,7 +23,7 @@ class BaseRobotArtist(object):
 
     There are two methods that implementors of this base class should provide, one
     is concerned with the actual creation of geometry in the native format of the
-    CAD environment (:meth:`draw_mesh`) and the other is one to apply a transformation
+    CAD environment (:meth:`draw_geometry`) and the other is one to apply a transformation
     to geometry (:meth:`transform`).
 
     Attributes
@@ -35,23 +35,23 @@ class BaseRobotArtist(object):
     def __init__(self, robot):
         super(BaseRobotArtist, self).__init__()
         self.robot = robot
-        self.create(robot.root, Transformation())
+        self.create()
         self.scale_factor = 1.
 
-    def transform(self, native_mesh, transformation):
-        """Transforms a CAD-specific mesh using a **COMPAS** transformation.
+    def transform(self, geometry, transformation):
+        """Transforms a CAD-specific geometry using a **COMPAS** transformation.
 
         Parameters
         ----------
-        native_mesh : object
-            A CAD-specific (i.e. native) geometry object as returned by :meth:`draw_mesh`.
+        geometry : object
+            A CAD-specific (i.e. native) geometry object as returned by :meth:`draw_geometry`.
         transformation : `Transformation`
             **COMPAS** transformation to update the geometry object.
         """
         raise NotImplementedError
 
-    def draw_mesh(self, mesh, color=None):
-        """Draw a **COMPAS** mesh into the CAD environment.
+    def draw_geometry(self, geometry, color=None):
+        """Draw a **COMPAS** geometry in the respective CAD environment.
 
         Note
         ----
@@ -59,7 +59,7 @@ class BaseRobotArtist(object):
 
         Parameters
         ----------
-        mesh : :class:`compas.datastructures.Mesh`
+        geometry : :class:`compas.datastructures.Mesh`
             Instance of a **COMPAS** mesh.
 
         Returns
@@ -69,33 +69,38 @@ class BaseRobotArtist(object):
         """
         raise NotImplementedError
 
-    def create(self, link, parent_transformation):
-        """Triggers the drawing of the robot geometry.
+    def create(self, link=None):
+        """Recursive function that triggers the drawing of the robot geometry.
 
-        This method delegates the geometry drawing to the :meth:`draw_mesh` method.
+        This method delegates the geometry drawing to the :meth:`draw_geometry`
+        method. It transforms the geometry based on the saved initial
+        transformation from the robot model.
 
         Parameters
         ----------
-        link : :class:`compas.robots.Link`
-            Link instance to create.
-        parent_transformation : :class:`Transformation`
-            Parent transformation to apply to the link when creating the structure.
+        link : :class:`compas.robots.Link`, optional
+            Link instance to create. Defaults to the robot model's root.
 
+        Returns
+        -------
+        None
         """
+        if link is None:
+            link = self.robot.root
+
         for item in itertools.chain(link.visual, link.collision):
             if item.geometry.geo:
                 color = None
                 if hasattr(item, 'get_color'):
                     color = item.get_color()
-                item.native_geometry = self.draw_mesh(item.geometry.geo, color)
-                self.transform(item.native_geometry, parent_transformation)
-            else:
-                item.native_geometry = None
+                # create native geometry
+                item.native_geometry = self.draw_geometry(item.geometry.geo, color)
+                # transform native geometry based on saved init transform
+                self.transform(item.native_geometry, item.init_transformation)
+                item.current_transformation = Transformation()
 
         for child_joint in link.joints:
-            child_joint.create(parent_transformation)
-            # Recursively call creation
-            self.create(child_joint.child_link, child_joint.current_transformation)
+            self.create(child_joint.child_link)
 
     def scale(self, factor):
         """Scales the robot geometry by factor (absolute).
@@ -105,21 +110,17 @@ class BaseRobotArtist(object):
         factor : float
             The factor to scale the robot with.
         """
-        relative_factor = factor / self.scale_factor # relative scaling factor
+        relative_factor = factor / self.scale_factor  # relative scaling factor
         self.scale_factor = factor
         transformation = Scale([relative_factor, relative_factor, relative_factor])
-        self.scale_links(transformation)
-
-    def scale_links(self, transformation):
         self.scale_link(self.robot.root, transformation)
 
     def scale_link(self, link, transformation):
-        """Recursive function to apply the scale transformation on each link
-            geometry.
+        """Recursive function to apply the scale transformation on each link.
         """
-        relative_factor = transformation[0,0]
+        relative_factor = transformation[0, 0]
         for item in itertools.chain(link.visual, link.collision):
-            # some links have only collision geometry, not visual. These meshes
+            # Some links have only collision geometry, not visual. These meshes
             # have not been loaded.
             if item.native_geometry:
                 self.transform(item.native_geometry, transformation)
@@ -129,88 +130,54 @@ class BaseRobotArtist(object):
             # Recursive call
             self.scale_link(child_joint.child_link, transformation)
 
-    def update(self, configuration, names, visual=True, collision=True):
-        """Trigger the update of the robot geometry.
+    def _apply_transformation_on_transformed_link(self, item, transformation):
+        """Applies a transformation on a link that is already transformed.
+
+        Calculates the relative transformation and applies it to the link
+        geometry. This is to prevent the recreation of large meshes.
+
+        Parameters
+        ----------
+        item: :class:`compas.robots.Visual` or :class:`compas.robots.Collision`
+            The visual or collidable object of a link.
+        transformation: :class:`Transformation`
+            The (absolute) transformation to apply onto the link's geometry.
+
+        Returns
+        -------
+        None
+        """
+        relative_transformation = transformation * item.current_transformation.inverse()
+        self.transform(item.native_geometry, relative_transformation)
+        item.current_transformation = transformation
+
+    def update(self, configuration, names, collision=True):
+        """Triggers the update of the robot geometry.
 
         Parameters
         ----------
         configuration : :class:`compas_fab.robots.Configuration`
             Instance of the configuration (joint state) to move to.
+        names : list of string
+            The names of the configurable joints to update.
         collision : bool, optional
             ``True`` if the collision geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
         """
         positions = configuration.values
-        self.update_links(names, positions, visual, collision)
-
-    def update_links(self, names, positions, visual=True, collision=True):
-        """Updates the joints and link geometries.
-
-        Parameters
-        ----------
-        names : list of :obj:`str`
-          A list of the joints names that are updated.
-        positions : list of :obj:`float`
-            A list of the respective joint positions, in radians and meters.
-        collision : bool
-            ``True`` if the collision geometry should be also updated, otherwise ``False``.
-            Defaults to ``True``.
-        """
         if len(names) != len(positions):
             raise ValueError("len(names): %d is not len(positions) %d" % (len(names), len(positions)))
         joint_state = dict(zip(names, positions))
-        self.update_link(self.robot.root, joint_state, Transformation(), Transformation(), visual, collision)
-
-    def update_link(self, link, joint_state, parent_transformation, reset_transformation, visual=True, collision=True):
-        """Recursive function to apply the transformations given by the joint state.
-
-        The parameter ``joint_state`` is given as absolute values,
-        so it is necessary to reset the current transformation.
-
-        Parameters
-        ----------
-        link : :class:`compas.robots.Link`
-            Link instance to update.
-        joint_state : dict
-            A dictionary with the joint names as keys and values
-            in radians and meters (depending on the joint type).
-        parent_transformation : :class:`Transformation`
-            The transfomation of the parent joint.
-        collision : bool
-            ``True`` if the collision geometry should be also updated, otherwise ``False``.
-            Defaults to ``True``.
-        """
-
-        relative_transformation = parent_transformation * reset_transformation
-
-        if visual:
+        transformations = self.robot.compute_transformations(joint_state)
+        for j in self.robot.iter_joints():
+            link = j.child_link
             for item in link.visual:
-                self.transform(item.native_geometry, relative_transformation)
-
-        if collision:
-            for item in link.collision:
-                # some links have only collision geometry, not visual. These meshes have not been loaded.
-                if item.native_geometry:
-                    self.transform(item.native_geometry, relative_transformation)
-
-        for child_joint in link.joints:
-            reset_transformation = child_joint.reset_transformation
-            # 1. Reset child joint transformation
-            child_joint.reset_transform()
-            # 2. Calculate transformation for next joints in the chain
-            if child_joint.name in joint_state.keys():
-                position = joint_state[child_joint.name]
-                transformation = child_joint.calculate_transformation(position)
-                transformation = parent_transformation * transformation
-                child_joint.position = position
-            else:
-                transformation = parent_transformation
-
-            # 3. Apply on joint
-            child_joint.transform(transformation)
-
-            # 4. Apply function to all children in the chain
-            self.update_link(child_joint.child_link, joint_state, transformation, reset_transformation, visual, collision)
+                self._apply_transformation_on_transformed_link(item, transformations[j.name])
+            if collision:
+                for item in link.collision:
+                    # some links have only collision geometry, not visual. These meshes have not been loaded.
+                    if item.native_geometry:
+                        self._apply_transformation_on_transformed_link(item, transformations[j.name])
 
     def draw_visual(self):
         """Draws all visual geometry of the robot."""
