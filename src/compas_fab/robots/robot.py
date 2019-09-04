@@ -36,7 +36,7 @@ class Robot(object):
     ----------
     model : :class:`compas.robots.RobotModel`
         The robot model, usually created from an URDF structure.
-    artist : :class:`compas_fab.artists.BaseRobotArtist`, optional
+    artist : :class:`BaseRobotArtist`, optional
         Instance of the artist used to visualize the robot. Defaults to ``None``.
     semantics : :class:`compas_fab.robots.RobotSemantics`, optional
         The semantic model of the robot. Defaults to ``None``.
@@ -46,11 +46,21 @@ class Robot(object):
     """
 
     def __init__(self, model, artist=None, semantics=None, client=None):
+        self._scale_factor = 1.
         self.model = model
-        self.artist = artist
+        self._artist = None
+        self.artist = artist  # setter and getter (because of scale)
         self.semantics = semantics
         self.client = client  # setter and getter ?
-        self.scale(1.)
+
+    @property
+    def artist(self):
+        return self._artist
+
+    @artist.setter
+    def artist(self, artist):
+        self._artist = artist
+        self.scale(self._scale_factor)
 
     @classmethod
     def basic(cls, name, joints=[], links=[], materials=[], **kwargs):
@@ -192,7 +202,7 @@ class Robot(object):
         # TODO: check this
         link = self.get_base_link(group)
         if link.parent_joint:
-            base_frame = link.parent_joint.init_origin.copy()
+            base_frame = link.parent_joint.origin.copy()
         else:
             base_frame = Frame.worldXY()
         if not self.artist:
@@ -237,9 +247,15 @@ class Robot(object):
         # configurable joints, but we cannot be sure that this group exists.
         # That's why we have to do the workaround with the Transformation.
 
-        response = self.client.forward_kinematics(joint_positions, base_link, group, joint_names, base_link)
+        # response = self.client.forward_kinematics(joint_positions, base_link, group, joint_names, base_link)
+        # base_frame_RCF = response.pose_stamped[0].pose.frame
 
-        base_frame_RCF = response.pose_stamped[0].pose.frame
+        joint_state = dict(zip(joint_names, joint_positions))
+        base_frame_WCF = self.model.forward_kinematics(joint_state, link_name=base_link.name)
+        base_frame_RCF = self.represent_frame_in_RCF(base_frame_WCF, group)
+
+        # TODO: compare
+
         base_frame_RCF.point *= self.scale_factor
         T = Transformation.from_frame(base_frame)
         return base_frame_RCF.transformed(T)
@@ -360,6 +376,22 @@ class Robot(object):
         positions = [0.] * len(types)
         return Configuration(positions, types)
 
+    def random_configuration(self, group=None):
+        """Returns a random configuration.
+
+        Note that no collision checking is involved, so the configuration may be invalid.
+        """
+        import random
+        configurable_joints = self.get_configurable_joints(group)
+        values = []
+        types = [j.type for j in configurable_joints]
+        for joint in configurable_joints:
+            if joint.limit:
+                values.append(joint.limit.lower + (joint.limit.upper - joint.limit.lower) * random.random())
+            else:
+                values.append(0)
+        return Configuration(values, types)
+
     def get_configuration(self, group=None):
         """Returns the current configuration.
         """
@@ -460,7 +492,7 @@ class Robot(object):
             joint_positions = start_configuration.values
         # scale the prismatic joints
         joint_positions = self._scale_joint_values(
-            joint_positions, 1./self.scale_factor)
+            joint_positions, 1. / self.scale_factor)
         return joint_positions
 
     # ==========================================================================
@@ -763,7 +795,7 @@ class Robot(object):
 
     def inverse_kinematics(self, frame_WCF, start_configuration=None,
                            group=None, avoid_collisions=True,
-                           constraints=None, attempts=8, 
+                           constraints=None, attempts=8,
                            attached_collision_meshes=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
@@ -848,7 +880,6 @@ class Robot(object):
         >>> group = robot.main_group_name
         >>> response = robot.forward_kinematics(configuration, group)
         """
-        # TODO implement with no service, only geometry transformations
 
         self.ensure_client()
         if not group:
@@ -892,7 +923,7 @@ class Robot(object):
             the robot's units)
         jump_threshold: float
             The maximum allowed distance of joint positions between consecutive
-            points. If the distance is found to be above this threshold, the 
+            points. If the distance is found to be above this threshold, the
             path computation fails. It must be specified in relation to max_step.
             If this theshhold is 0, 'jumps' might occur, resulting in an invalid
             cartesian path. Defaults to pi/2.
@@ -1048,7 +1079,8 @@ class Robot(object):
             group = self.main_group_name  # ensure semantics
 
         # Transform goal constraints to RCF and scale
-        T = self._get_current_transformation_WCF_RCF(start_configuration, group)
+        T = self._get_current_transformation_WCF_RCF(start_configuration, group)  # TODO!!!
+        #T = self.transformation_WCF_RCF(group)
         goal_constraints_RCF_scaled = []
         for c in goal_constraints:
             cp = c.copy()
@@ -1139,11 +1171,11 @@ class Robot(object):
     # drawing
     # ==========================================================================
 
-    def update(self, configuration, group=None, visual=True, collision=True):
+    def update(self, configuration, group=None, collision=True):
         """Updates the robot's geometry.
         """
         names = self.get_configurable_joint_names(group)
-        self.artist.update(configuration, names, visual, collision)
+        self.artist.update(configuration, names, collision)
 
     def draw_visual(self):
         """Draws the visual geometry of the robot in the respective CAD environment.
