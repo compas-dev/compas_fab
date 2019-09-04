@@ -234,7 +234,6 @@ class Robot(object):
         Examples
         --------
         """
-        self.ensure_client()
 
         base_link = self.get_base_link_name(group)
         # the group's original base_frame
@@ -247,14 +246,9 @@ class Robot(object):
         # configurable joints, but we cannot be sure that this group exists.
         # That's why we have to do the workaround with the Transformation.
 
-        # response = self.client.forward_kinematics(joint_positions, base_link, group, joint_names, base_link)
-        # base_frame_RCF = response.pose_stamped[0].pose.frame
-
         joint_state = dict(zip(joint_names, joint_positions))
-        base_frame_WCF = self.model.forward_kinematics(joint_state, link_name=base_link.name)
+        base_frame_WCF = self.model.forward_kinematics(joint_state, link_name=base_link)
         base_frame_RCF = self.represent_frame_in_RCF(base_frame_WCF, group)
-
-        # TODO: compare
 
         base_frame_RCF.point *= self.scale_factor
         T = Transformation.from_frame(base_frame)
@@ -450,20 +444,6 @@ class Robot(object):
             raise ValueError(
                 "Please pass a configuration with %d values or specify group" % len(names))
         return configuration.values[names.index(joint_name)]
-
-    def get_links_with_geometry(self, group=None):
-        """Returns the links with either visual or collision geometry.
-        """
-        # TODO: needed?
-        if not group:
-            group = self.main_group_name
-        base_link_name = self.get_base_link_name(group)
-        ee_link_name = self.get_end_effector_link_name(group)
-        links_with_geometry = []
-        for link in self.model.iter_link_chain(base_link_name, ee_link_name):
-            if len(link.collision) or len(link.visual):
-                links_with_geometry.append(link)
-        return links_with_geometry
 
     def _scale_joint_values(self, values, scale_factor, group=None):
         """Scales the scaleable joint values with scale_factor.
@@ -855,11 +835,9 @@ class Robot(object):
                                                   attached_collision_meshes)
 
         joint_positions = response.solution.joint_state.position
-        joint_positions = self._scale_joint_values(
-            joint_positions, self.scale_factor)
+        joint_positions = self._scale_joint_values(joint_positions, self.scale_factor)
         # full configuration # TODO group config?
-        configuration = Configuration(
-            joint_positions, self.get_configurable_joint_types())
+        configuration = Configuration(joint_positions, self.get_configurable_joint_types())
 
         return configuration
 
@@ -895,14 +873,39 @@ class Robot(object):
         response = self.client.forward_kinematics(
             joint_positions, base_link, group, joint_names, ee_link)
 
-        # TODO implement response types
-
         frame_RCF = response.pose_stamped[0].pose.frame
         frame_RCF.point *= self.scale_factor
         response.frame_RCF = frame_RCF
         response.frame_WCF = self.represent_frame_in_WCF(frame_RCF, group)
 
         return response
+
+    def forward_kinematics_robot_model(self, configuration, group=None, link_name=None):
+        """Calculate the robot's forward kinematic with the robot model.
+
+        Parameters
+        ----------
+        configuration : :class:`compas_fab.robots.Configuration`
+            The configuration to calculate the forward kinematic for.
+        group : str, optional
+            The planning group used for the calculation. Defaults to the robot's
+            main planning group.
+        link_name : str
+            The name of the link to calculate the forward kinematics for.
+            Defaults to the group's end effector link.
+
+        Examples
+        --------
+        >>> configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
+        >>> group = robot.main_group_name
+        >>> frame_WCF = robot.forward_kinematics(configuration, group)
+        """
+        if link_name is None:
+            link_name = self.get_end_effector_link_name(group)
+
+        joint_names = self.get_configurable_joint_names(group)
+        joint_state = dict(zip(joint_names, configuration.values))
+        return self.model.forward_kinematics(joint_state, link_name)
 
     def plan_cartesian_motion(self, frames_WCF, start_configuration=None,
                               max_step=0.01, jump_threshold=1.57,
@@ -1079,8 +1082,7 @@ class Robot(object):
             group = self.main_group_name  # ensure semantics
 
         # Transform goal constraints to RCF and scale
-        T = self._get_current_transformation_WCF_RCF(start_configuration, group)  # TODO!!!
-        #T = self.transformation_WCF_RCF(group)
+        T = self._get_current_transformation_WCF_RCF(start_configuration, group)
         goal_constraints_RCF_scaled = []
         for c in goal_constraints:
             cp = c.copy()
