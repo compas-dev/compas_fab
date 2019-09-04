@@ -839,7 +839,7 @@ class Robot(object):
         # full configuration # TODO group config?
         configuration = Configuration(joint_positions, self.get_configurable_joint_types())
 
-        return configuration
+        return self.get_group_configuration(group, configuration)
 
     def forward_kinematics(self, configuration, group=None):
         """Calculate the robot's forward kinematic.
