@@ -4,8 +4,8 @@
 Creating a URDF with an UR5 robot and a custom end-effector
 ********************************************************************************
 
-1. Export your meshes
-=====================
+Export your meshes
+==================
 
 In ROS, robot link (and end-effector) geometry is defined with 2 different
 meshes: *visual* and *collision*. The visual mesh represents how the robot looks
@@ -27,8 +27,8 @@ your end-effector in a ROS-friendly format, like .stl or .obj (see below).
     Screenshot of exporting a tool geometry from Rhino3D positioned in (0,0,0).
 
 
-2. Prepare your catkin workspace
-================================
+Prepare your catkin workspace
+=============================
 
 Open your command prompt and go to your home directory::
 
@@ -72,8 +72,8 @@ Then create 4(+2) folders: ``launch``, ``rviz``, ``urdf`` and ``meshes`` (with v
 Copy your meshes into ``meshes/visual`` and ``meshes/collision``.
 
 
-3. Create xacros and generate urdf
-==================================
+Create xacros and generate urdf
+===============================
 
 Rather than writing urdf files directly, it is more convinient to write xacro
 files from which urdfs are generated. As its name implies, xacro is a macro
@@ -232,8 +232,8 @@ This will output::
                                           child(1):  tcp
 
 
-4. View urdf
-============
+View urdf
+=========
 
 Copy some boilerplate files from the ``urdf_tutorial`` package with the following commands::
 

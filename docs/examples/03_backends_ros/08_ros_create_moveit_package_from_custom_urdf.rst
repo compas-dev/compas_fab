@@ -9,8 +9,8 @@ This example is mainly copied from `MoveIt! Setup Assistant Tutorial <http://doc
 It is based on the previous example:
 :ref:`Creating a URDF with an UR5 robot and a custom end-effector <ros_examples_create_urdf_ur5_with_measurement_tool>
 
-1. Start the MoveIt! Setup Assistant
-====================================
+Start the MoveIt! Setup Assistant
+=================================
 
 The MoveIt! Setup Assistant is a graphical user interface for configuring any
 robot for use with MoveIt!. Its primary functions are to generate a Semantic Robot
@@ -31,8 +31,8 @@ and to define the planning groups.
     :figclass: figure
     :class: figure-img img-fluid
 
-2. Generate Self-Collision Matrix
-====================================
+Generate Self-Collision Matrix
+==============================
 
 * Click on the *Self-Collisions* pane selector on the left-hand side.
 * Click on the *Generate Collision Matrix* button. The Setup Assistant will work for a few
@@ -47,8 +47,8 @@ Note:
     :class: figure-img img-fluid
 
 
-3. Add Virtual Joints
-=====================
+Add Virtual Joints
+==================
 
 Virtual joints are used primarily to attach the robot to the world coordinate
 frame. We will define only one virtual joint, attaching the
@@ -65,8 +65,8 @@ frame. We will define only one virtual joint, attaching the
     :class: figure-img img-fluid
 
 
-4. Add Planning Groups
-======================
+Add Planning Groups
+===================
 
 Planning groups are used for semantically describing different parts of your
 robot, such as defining what an arm is, or an end-effector. The planning group
@@ -123,8 +123,8 @@ We will also add a group for the end-effector.
     :class: figure-img img-fluid
 
 
-5. Add Robot Poses
-==================
+Add Robot Poses
+===============
 
 The *Setup Assistant* allows you to add certain fixed poses into the
 configuration. This helps if, for example, you want to define a certain position
@@ -144,8 +144,8 @@ Tip:
     :figclass: figure
     :class: figure-img img-fluid
 
-6. Label End-Effectors
-======================
+Label End-Effectors
+===================
 
 We have already added the measurement_tool of the ur5. Now, we will designate
 this group as a special group: end effectors.
@@ -162,19 +162,19 @@ this group as a special group: end effectors.
     :figclass: figure
     :class: figure-img img-fluid
 
-7. Add Passive Joints
-=====================
+Add Passive Joints
+==================
 
 Skip this step.
 
-8. Add Author Information
-=========================
+Add Author Information
+======================
 
 * Click on the *Author Information* pane.
 * Enter your name and email address.
 
-9. Generate Configuration Files
-===============================
+Generate Configuration Files
+============================
 
 You are almost there. One last step!
 
@@ -192,8 +192,8 @@ You are almost there. One last step!
     :class: figure-img img-fluid
 
 
-10. Start the newly generated MoveIt! Configuration
-===================================================
+Start the newly generated MoveIt! Configuration
+===============================================
 
 Now, optionally, you can already start the MoveIt! Demo and play::
 

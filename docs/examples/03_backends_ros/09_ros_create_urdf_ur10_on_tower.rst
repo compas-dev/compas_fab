@@ -4,8 +4,8 @@
 Creating a URDF of the UR10 on two linear axes
 ********************************************************************************
 
-1. Export meshes
-================
+Export meshes
+=============
 
 * Before exporting, please move the elements of the tower's axes such that they are
   positioned in their zero-positions and make sure that the model is defined in
@@ -37,8 +37,8 @@ Creating a URDF of the UR10 on two linear axes
     :class: figure-img img-fluid
 
 
-2. Prepare your catkin workspace
-================================
+Prepare your catkin workspace
+=============================
 
 Open your command prompt and go to your robotic setups src folder::
 
@@ -75,8 +75,8 @@ Then create 4(+2) folders: ``launch``, ``rviz``, ``urdf`` and ``meshes`` (with v
 Copy your meshes into ``meshes/visual`` and ``meshes/collision``.
 
 
-3. Create xacros and generate urdf
-==================================
+Create xacros and generate urdf
+===============================
 
 tower.xacro
 -----------
@@ -285,8 +285,8 @@ This will output::
                                                 child(2):  tool0
 
 
-4. View urdf
-============
+View urdf
+=========
 
 Copy some boilerplate files from the ``urdf_tutorial`` package with the following commands::
 
