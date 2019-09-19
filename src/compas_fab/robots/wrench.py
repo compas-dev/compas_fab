@@ -95,7 +95,7 @@ class Wrench():
         return cls(force, torque, inertia=inertia)
 
     @classmethod
-    def by_samples(cls, forces, torques, inertia=None, proportiontocut=0.1):
+    def by_samples(cls, wrenches, inertia=None, proportiontocut=0.1):
         """
         Construct the wrench by sampled data, allowing to filter.
 
@@ -115,15 +115,21 @@ class Wrench():
 
         Examples
         --------
-        >>> forces = [[1,1,1], [2,2,2], [3,3,3]]
-        >>> torques = [[.1,.1,.1], [.2,.2,.2], [.3,.3,.3]]
-        >>> w = Wrench.by_samples(forces, torques)
+        >>> w1 = Wrench([1,1,1], [.1,.1,.1])
+        >>> w2 = Wrench([2,2,2], [.2,.2,.2])
+        >>> w3 = Wrench([3,3,3], [.3,.3,.3])
+        >>> w = Wrench.by_samples([w1,w2,w3])
+        >>> print(w)
+        Wrench(Vector(2.000, 2.000, 2.000), Vector(0.200, 0.200, 0.200))
         """
         if not stats:
             raise NotImplementedError("Not supported on this platform")
-        f = stats.trim_mean(forces, proportiontocut, axis=0).tolist()
-        t = stats.trim_mean(torques, proportiontocut, axis=0).tolist()
-        return cls(f, t, inertia=inertia)
+
+        forces = [w.force for w in wrenches]
+        torques = [w.torque for w in wrenches]
+        force = stats.trim_mean(forces, proportiontocut, axis=0).tolist()
+        torque = stats.trim_mean(torques, proportiontocut, axis=0).tolist()
+        return cls(force, torque, inertia=inertia)
 
     # ==========================================================================
     # descriptors
