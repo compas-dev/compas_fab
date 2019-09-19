@@ -15,7 +15,8 @@ If you use COMPAS FAB in a project, please use the following citation:
             Jenny, D. and
             D\"{o}rfler, K. and
             Helmreich, M. and
-            Gandia, A.
+            Gandia, A. and
+            Ma, Z
             },
         howpublished={\url{https://github.com/compas-dev/compas\_fab/}},
         note={Gramazio Kohler Research, ETH Z\"{u}rich},
@@ -33,3 +34,4 @@ Authors
 * Kathrin Dörfler <doerfler@arch.ethz.ch> `@Kathrin3010 <https://github.com/Kathrin3010>`_
 * Matthias Helmreich <helmreich@arch.ethz.ch> `@mhelmrei <https://github.com/mhelmrei>`_
 * Augusto Gandia <gandia@arch.ethz.ch> `@augustogandia <https://github.com/augustogandia>`_
+* Zhao Ma <ma@arch.ethz.ch> `@xarthurx <https://github.com/xarthurx>`_
