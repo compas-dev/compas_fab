@@ -1,3 +1,27 @@
+********************************************************************************
+Citing
+********************************************************************************
+
+If you use COMPAS FAB in a project, please use the following citation:
+
+.. code-block:: none
+
+    @misc{compas-fab,
+        title={{COMPAS~FAB}: Robotic fabrication package for the COMPAS Framework},
+        author={
+            Rust, R. and
+            Casas, G. and
+            Parascho, S. and
+            Jenny, D. and
+            D\"{o}rfler, K. and
+            Helmreich, M. and
+            Gandia, A. and
+            Ma, Z
+            },
+        howpublished={\url{https://github.com/compas-dev/compas\_fab/}},
+        note={Gramazio Kohler Research, ETH Z\"{u}rich},
+        year={2018}
+    }
 
 Authors
 =======
@@ -10,3 +34,4 @@ Authors
 * Kathrin Dörfler <doerfler@arch.ethz.ch> `@Kathrin3010 <https://github.com/Kathrin3010>`_
 * Matthias Helmreich <helmreich@arch.ethz.ch> `@mhelmrei <https://github.com/mhelmrei>`_
 * Augusto Gandia <gandia@arch.ethz.ch> `@augustogandia <https://github.com/augustogandia>`_
+* Zhao Ma <ma@arch.ethz.ch> `@xarthurx <https://github.com/xarthurx>`_
