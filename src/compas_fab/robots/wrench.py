@@ -340,7 +340,7 @@ class Wrench():
 
     def gravity_compensated(self, frame):
         """
-        Removes the force and torque in effect of gravity.
+        Removes the force and torque in effect of gravity from the wrench.
 
         Parameters
         ----------
@@ -356,11 +356,16 @@ class Wrench():
         --------
         >>> from compas.geometry import Frame
         >>> from inertia import Inertia
-        >>> i = Inertia(10, [10,5,1])
+        >>> i = Inertia(10, [0,0,1])
         >>> f = Frame([0,0,0], [1,0,0], [0,1,0])
-        >>> w = Wrench([1, 2, 3], [0.1, 0.2, 0.3], inertia=i)
+        >>> w = Wrench([0,0,-98], [0,0,0], inertia=i)
         >>> w.gravity_compensated(f)
-        Wrench(Vector(1.000, 2.000, 101.000), Vector(490.100, -979.800, 0.300), Mass(10), CoM(Vector(10.000, 5.000, 1.000)), Tensor(None), Gravity magnitude(9.8))
+        Wrench(Vector(0.000, 0.000, 0.000), Vector(0.000, 0.000, 0.000), Mass(10), CoM(Vector(0.000, 0.000, 1.000)), Tensor(None), Gravity magnitude(9.8))
+        >>> i = Inertia(10, [1,1,1])
+        >>> f = Frame([0,0,0], [1,0,0], [0,1,0])
+        >>> w = Wrench([0,0,-98], [-98,98,0], inertia=i)
+        >>> w.gravity_compensated(f)
+        Wrench(Vector(0.000, 0.000, 0.000), Vector(0.000, 0.000, 0.000), Mass(10), CoM(Vector(1.000, 1.000, 1.000)), Tensor(None), Gravity magnitude(9.8))
         """
         if frame and self.inertia:
             # transform gravity vector to FT Sensor coordinate system (FTSCS)
