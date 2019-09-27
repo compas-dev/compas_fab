@@ -1206,14 +1206,14 @@ class Robot(object):
         self.ensure_client()
         raise NotImplementedError
 
-    def updated_frames(self, configuration, group=None):
-        """Returns the robot's updated frames."""
+    def transformed_frames(self, configuration, group=None):
+        """Returns the robot's transformed frames."""
         joint_names = self.get_configurable_joint_names(group)
         joint_state = dict(zip(joint_names, configuration.values))
-        return self.model.updated_frames(joint_state)
+        return self.model.transformed_frames(joint_state)
 
-    def updated_axes(self, configuration, group=None):
-        """Returns the robot's updated axes."""
+    def transformed_axes(self, configuration, group=None):
+        """Returns the robot's transformed axes."""
         joint_names = self.get_configurable_joint_names(group)
         joint_state = dict(zip(joint_names, configuration.values))
         return self.model.updated_axes(joint_state)
