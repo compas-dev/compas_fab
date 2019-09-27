@@ -151,7 +151,7 @@ class BaseRobotArtist(object):
         self.transform(item.native_geometry, relative_transformation)
         item.current_transformation = transformation
 
-    def update(self, configuration, names, collision=True):
+    def update(self, configuration, names, visual=True, collision=True):
         """Triggers the update of the robot geometry.
 
         Parameters
@@ -160,6 +160,9 @@ class BaseRobotArtist(object):
             Instance of the configuration (joint state) to move to.
         names : list of string
             The names of the configurable joints to update.
+        visual : bool, optional
+            ``True`` if the visual geometry should be also updated, otherwise ``False``.
+            Defaults to ``True``.
         collision : bool, optional
             ``True`` if the collision geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
