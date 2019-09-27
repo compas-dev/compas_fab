@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 import logging
+import random
 
 from compas.geometry import Frame
 from compas.geometry import Sphere
@@ -48,13 +49,13 @@ class Robot(object):
     def __init__(self, model, artist=None, semantics=None, client=None):
         self._scale_factor = 1.
         self.model = model
-        self._artist = None
         self.artist = artist  # setter and getter (because of scale)
         self.semantics = semantics
         self.client = client  # setter and getter ?
 
     @property
     def artist(self):
+        """The artist which is used to visualize the robot."""
         return self._artist
 
     @artist.setter
@@ -375,7 +376,6 @@ class Robot(object):
 
         Note that no collision checking is involved, so the configuration may be invalid.
         """
-        import random
         configurable_joints = self.get_configurable_joints(group)
         values = []
         types = [j.type for j in configurable_joints]
@@ -1175,11 +1175,25 @@ class Robot(object):
     # drawing
     # ==========================================================================
 
-    def update(self, configuration, group=None, collision=True):
+    def update(self, configuration, group=None, visual=True, collision=True):
         """Updates the robot's geometry.
+
+        Parameters
+        ----------
+        configuration : :class:`compas_fab.robots.Configuration`
+            Instance of the configuration (joint state) to move to.
+        group: str, optional
+            The name of the group to plan for. Defaults to the robot's main
+            planning group.
+        visual : bool, optional
+            ``True`` if the visual geometry should be also updated, otherwise ``False``.
+            Defaults to ``True``.
+        collision : bool, optional
+            ``True`` if the collision geometry should be also updated, otherwise ``False``.
+            Defaults to ``True``.
         """
         names = self.get_configurable_joint_names(group)
-        self.artist.update(configuration, names, collision)
+        self.artist.update(configuration, names, visual, collision)
 
     def draw_visual(self):
         """Draws the visual geometry of the robot in the respective CAD environment.
