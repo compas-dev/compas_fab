@@ -59,8 +59,8 @@ class BaseRobotArtist(object):
 
         Parameters
         ----------
-        geometry : :class:`compas.datastructures.Mesh`
-            Instance of a **COMPAS** mesh.
+        geometry : :class:`compas.datastructures.Mesh` or :class:`compas.geometry.Shape`
+            Instance of a **COMPAS** mesh or **COMPAS** shape
 
         Returns
         -------

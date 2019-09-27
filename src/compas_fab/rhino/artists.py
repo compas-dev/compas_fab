@@ -36,12 +36,12 @@ class RobotArtist(BaseRobotArtist):
         T = xform_from_transformation(transformation)
         native_mesh.Transform(T)
 
-    def draw_geometry(self, compas_mesh, color=None):
+    def draw_geometry(self, geometry, color=None):
         mesh = Rhino.Geometry.Mesh()
 
         # TODO: check mesh_draw from rhino
-        vertices = compas_mesh.get_vertices_attributes('xyz')
-        faces = [compas_mesh.face_vertices(fkey) for fkey in compas_mesh.faces()]
+        vertices = geometry.get_vertices_attributes('xyz')
+        faces = [geometry.face_vertices(fkey) for fkey in geometry.faces()]
 
         for v in vertices:
             mesh.Vertices.Add(*v)
