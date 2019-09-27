@@ -109,16 +109,21 @@ class BaseRobotArtist(object):
         ----------
         factor : float
             The factor to scale the robot with.
+
+        Returns
+        -------
+        None
         """
+        self.robot.scale(factor)  # scale the model
+
         relative_factor = factor / self.scale_factor  # relative scaling factor
-        self.scale_factor = factor
         transformation = Scale([relative_factor, relative_factor, relative_factor])
         self.scale_link(self.robot.root, transformation)
+        self.scale_factor = factor
 
     def scale_link(self, link, transformation):
         """Recursive function to apply the scale transformation on each link.
         """
-        relative_factor = transformation[0, 0]
         for item in itertools.chain(link.visual, link.collision):
             # Some links have only collision geometry, not visual. These meshes
             # have not been loaded.
@@ -126,7 +131,6 @@ class BaseRobotArtist(object):
                 self.transform(item.native_geometry, transformation)
 
         for child_joint in link.joints:
-            child_joint.scale(relative_factor)
             # Recursive call
             self.scale_link(child_joint.child_link, transformation)
 
