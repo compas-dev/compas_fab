@@ -411,6 +411,7 @@ class Robot(object):
         Returns
         -------
         :class:`compas_fab.robots.Configuration`
+            The configuration of the group.
         """
         values = []
         types = []
@@ -422,19 +423,35 @@ class Robot(object):
         return Configuration(values, types)
 
     def merge_group_with_full_configuration(self, group_configuration, full_configuration, group):
-        """Returns the robot's full configuration by merging with the group's configuration.
+        """Returns a robot's full configuration by merging a group's configuration with a full configuration.
+
+        Parameters
+        ----------
+        group_configuration : :class:`compas_fab.robots.Configuration`
+            The configuration for one of the robot's planning groups.
+        full_configuration : :class:`compas_fab.robots.Configuration`
+            The configuration for all configurable joints of the robot.
+        group : str
+            The name of the group.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Configuration`
+            A full configuration: with values for all configurable joints.
         """
         all_joint_names = self.get_configurable_joint_names()
         if len(all_joint_names) != len(full_configuration.values):
-            raise ValueError(
-                "Please pass a full configuration with %d values" % len(all_joint_names))
-        group_joint_names = self.get_configurable_joint_names(group)
-        configuration = full_configuration.copy()
-        for i, name in enumerate(all_joint_names):
-            if name in group_joint_names:
-                gi = group_joint_names.index(name)
-                configuration.values[i] = group_configuration.values[gi]
-        return configuration
+            raise ValueError("Please pass a full configuration with %d values" % len(all_joint_names))
+        elif len(all_joint_names) != len(group_configuration.values):  # group config == full config
+            return group_configuration
+        else:
+            group_joint_names = self.get_configurable_joint_names(group)
+            configuration = full_configuration.copy()
+            for i, name in enumerate(all_joint_names):
+                if name in group_joint_names:
+                    gi = group_joint_names.index(name)
+                    configuration.values[i] = group_configuration.values[gi]
+            return configuration
 
     def get_position_by_joint_name(self, configuration, joint_name, group=None):
         """Returns the value of the joint_name in the passed configuration.
@@ -467,8 +484,7 @@ class Robot(object):
         joint_positions = [0] * len(joint_names)
         if start_configuration:
             if len(joint_names) != len(start_configuration.values):
-                raise ValueError(
-                    "Please pass a configuration with %d values" % len(joint_names))
+                raise ValueError("Please pass a configuration with %d values" % len(joint_names))
             joint_positions = start_configuration.values
         # scale the prismatic joints
         joint_positions = self._scale_joint_values(
@@ -841,7 +857,7 @@ class Robot(object):
 
         return self.get_group_configuration(group, configuration)
 
-    def forward_kinematics(self, configuration, group=None):
+    def forward_kinematics(self, configuration, group=None, backend=None, link_name=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
@@ -851,34 +867,65 @@ class Robot(object):
         group : str, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
+        backend : None or str
+            If `None` calculates fk with the client if it exists or with the robot model.
+            If 'model' use the robot model to calculate fk. Anything else is open
+            for implementation, possibly 'kdl', 'ikfast'
+        link_name : str, optional
+            The name of the link to calculate the forward kinematics for.
+            Defaults to the group's end effector link.
+
+        Returns
+        -------
+        :class:`Frame`
+            The frame in the robot's coordinate system (RCF).
 
         Examples
         --------
         >>> configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
         >>> group = robot.main_group_name
-        >>> response = robot.forward_kinematics(configuration, group)
+        >>> frame_RCF_c = robot.forward_kinematics(configuration, group)
+        >>> frame_RCF_m = robot.forward_kinematics(configuration, group, backend='model')
+        >>> frame_RCF_c == frame_RCF_m
+        True
+        >>> frame_WCF = robot.represent_frame_in_WCF(frame_RCF_m, group)
+
         """
-
-        self.ensure_client()
         if not group:
-            group = self.main_group_name  # ensure semantics
+            group = self.main_group_name
 
-        joint_positions = self._get_scaled_joint_positions_from_start_configuration(
-            configuration)
+        if link_name is None:
+            link_name = self.get_end_effector_link_name(group)
+        else:
+            # check
+            if link_name not in self.get_link_names(group):
+                raise ValueError("Link name %s does not exist in planning group" % link_name)
 
-        base_link = self.get_base_link_name(group)
-        joint_names = self.get_configurable_joint_names()
-        ee_link = self.get_end_effector_link_name(group)
+        full_configuration = self.merge_group_with_full_configuration(configuration, self.init_configuration(), group)
+        full_joint_positions = self._get_scaled_joint_positions_from_start_configuration(full_configuration)
+        full_joint_names = self.get_configurable_joint_names()
+        base_link_name = self.get_base_link_name(group)
 
-        response = self.client.forward_kinematics(
-            joint_positions, base_link, group, joint_names, ee_link)
+        group_configuration = self.get_group_configuration(group, full_configuration)
+        group_joint_names = self.get_configurable_joint_names(group)
+        group_joint_state = dict(zip(group_joint_names, group_configuration.values))  # assuming configuration is group configuration
 
-        frame_RCF = response.pose_stamped[0].pose.frame
-        frame_RCF.point *= self.scale_factor
-        response.frame_RCF = frame_RCF
-        response.frame_WCF = self.represent_frame_in_WCF(frame_RCF, group)
+        if not backend:
+            if self.client:
+                response = self.client.forward_kinematics(full_joint_positions, base_link_name, group, full_joint_names, link_name)
+                frame_RCF = response.pose_stamped[0].pose.frame
+                frame_RCF.point *= self.scale_factor
+            else:
+                frame_WCF = self.model.forward_kinematics(group_joint_state, link_name)
+                frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
+        elif backend == 'model':
+            frame_WCF = self.model.forward_kinematics(group_joint_state, link_name)
+            frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
+        else:
+            # pass to backend, kdl, ikfast,...
+            raise NotImplementedError
 
-        return response
+        return frame_RCF
 
     def forward_kinematics_robot_model(self, configuration, group=None, link_name=None):
         """Calculate the robot's forward kinematic with the robot model.
@@ -951,7 +998,7 @@ class Robot(object):
         >>> response = robot.plan_cartesian_motion(frames,\
                                                    start_configuration,\
                                                    max_step=0.01,\
-                                                   jump_threshold=1.57,
+                                                   jump_threshold=1.57,\
                                                    avoid_collisions=True,\
                                                    group=group)
         """
@@ -1211,8 +1258,18 @@ class Robot(object):
         return self.draw_visual()
 
     def scale(self, factor):
-        """Scale the robot.
+        """Scales the robot geometry by factor (absolute).
+
+        Parameters
+        ----------
+        factor : float
+            The factor to scale the robot with.
+
+        Returns
+        -------
+        None
         """
+        self.model.scale(factor)
         if self.artist:
             self.artist.scale(factor)
         else:
