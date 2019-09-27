@@ -1216,7 +1216,7 @@ class Robot(object):
         """Returns the robot's transformed axes."""
         joint_names = self.get_configurable_joint_names(group)
         joint_state = dict(zip(joint_names, configuration.values))
-        return self.model.updated_axes(joint_state)
+        return self.model.transformed_axes(joint_state)
 
     # ==========================================================================
     # drawing
