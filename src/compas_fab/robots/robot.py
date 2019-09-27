@@ -386,18 +386,6 @@ class Robot(object):
                 values.append(0)
         return Configuration(values, types)
 
-    def get_configuration(self, group=None):
-        """Returns the current configuration.
-        """
-        positions = []
-        types = []
-
-        for joint in self.get_configurable_joints(group):
-            positions.append(joint.position)
-            types.append(joint.type)
-
-        return Configuration(positions, types)
-
     def get_group_configuration(self, group, full_configuration):
         """Returns the group's configuration.
 
