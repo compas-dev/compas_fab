@@ -103,13 +103,6 @@ before sending it as a target pose to the robot.
 
     robot = Robot(robot_model)
 
-    point =  [3.0, 2.0, 1.0]
-    xaxis =  [1.0, 0.0, 0.0]
-    yaxis =  [0.0, 1.0, 0.0]
-
-    robot_coordinate_frame = Frame(point, xaxis, yaxis)
-    robot.set_RCF(robot_coordinate_frame)
-
     print("robot coordinate frame", robot.get_RCF())
 
     point =  [6.0, 4.0, 2.0]
