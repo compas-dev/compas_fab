@@ -18,6 +18,7 @@ Unreleased
 * ``Robot``: ``forward_kinematics`` has new parameter ``backend`` to select either ``client`` FK or ``model`` FK.
 * ``Robot``: ``forward_kinematics`` returns now ``frame_RCF``
 * ``Robot``: ``forward_kinematics`` doesn't need full configuration anymore
+* Fixed delays when modifying the planning scene of ROS.
 
 **Added**
 
