@@ -9,6 +9,7 @@ from __future__ import division
 from __future__ import print_function
 
 from compas.robots import Joint
+from compas.robots import Limit
 from compas.robots import Link
 
 import compas_fab.robots.robot
@@ -64,17 +65,18 @@ def Robot(name, client=None):
 
     return robot
 
+
 def _create_model():
     joints = [
-        Joint('joint_x', 'prismatic', parent='rfl', child='bridge'),
-        Joint('joint_y', 'prismatic', parent='bridge', child='vertical'),
-        Joint('joint_z', 'prismatic', parent='vertical', child='base_link'),
-        Joint('joint_1', 'revolute', parent='base_link', child='link_1'),
-        Joint('joint_2', 'revolute', parent='link_1', child='link_2'),
-        Joint('joint_3', 'revolute', parent='link_2', child='link_3'),
-        Joint('joint_4', 'revolute', parent='link_3', child='link_4'),
-        Joint('joint_5', 'revolute', parent='link_4', child='link_5'),
-        Joint('joint_6', 'revolute', parent='link_5', child='link_6'),
+        Joint('joint_x', 'prismatic', parent='rfl', child='bridge', limit=Limit()),
+        Joint('joint_y', 'prismatic', parent='bridge', child='vertical', limit=Limit()),
+        Joint('joint_z', 'prismatic', parent='vertical', child='base_link', limit=Limit()),
+        Joint('joint_1', 'revolute', parent='base_link', child='link_1', limit=Limit()),
+        Joint('joint_2', 'revolute', parent='link_1', child='link_2', limit=Limit()),
+        Joint('joint_3', 'revolute', parent='link_2', child='link_3', limit=Limit()),
+        Joint('joint_4', 'revolute', parent='link_3', child='link_4', limit=Limit()),
+        Joint('joint_5', 'revolute', parent='link_4', child='link_5', limit=Limit()),
+        Joint('joint_6', 'revolute', parent='link_5', child='link_6', limit=Limit()),
     ]
     links = [
         Link('rfl'), Link('bridge'), Link('vertical'), Link('base_link'),
