@@ -23,7 +23,17 @@ state of each joint in the articulated body of a robot needs to be defined.
 Joint states are described in **COMPAS FAB** with the
 :class:`compas_fab.robots.Configuration` class.
 
+The simplest way to calculate forward kinematics is based on the properties defined
+by the robot model and does not require ROS to be running:
+
 .. literalinclude :: files/02_forward_kinematics.py
+   :language: python
+
+Additionally, if the :class:`compas_fab.robots.Robot` is assigned a ``client``, it
+will try to use it to resolve forward kinematics. The following example shows the same
+solutions but calculated by ROS:
+
+.. literalinclude :: files/02_forward_kinematics_ros.py
    :language: python
 
 Inverse kinematics
