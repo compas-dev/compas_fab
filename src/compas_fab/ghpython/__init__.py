@@ -23,15 +23,6 @@ in Grasshopper.
     RobotArtist
 
 
-Path planning
--------------
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    PathVisualizer
-
 """
 
 from .artists import RobotArtist
