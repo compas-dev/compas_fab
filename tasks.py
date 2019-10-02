@@ -139,7 +139,7 @@ def clean(ctx, docs=True, bytecode=True, builds=True):
       'rebuild': 'True to clean all previously built docs before starting, otherwise False.',
       'doctest': 'True to run doctests, otherwise False.',
       'check_links': 'True to check all web links in docs for validity, otherwise False.'})
-def docs(ctx, doctest=False, rebuild=True, check_links=False):
+def docs(ctx, doctest=False, rebuild=False, check_links=False):
     """Builds package's HTML documentation."""
     if rebuild:
         clean(ctx)
