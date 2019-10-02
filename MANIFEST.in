@@ -1,5 +1,6 @@
 graft src
 
+prune .github
 prune docs
 prune tests
 prune temp
