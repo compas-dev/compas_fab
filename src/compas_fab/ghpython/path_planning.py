@@ -8,7 +8,7 @@ from timeit import default_timer as timer
 import compas
 from compas.datastructures import Mesh
 from compas.geometry import Frame
-from compas.geometry.xforms import Transformation
+from compas.geometry import Transformation
 from compas_ghpython.geometry import xform_from_transformation
 from compas_rhino.helpers import mesh_from_guid
 
