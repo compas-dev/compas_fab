@@ -12,18 +12,22 @@ Unreleased
 
 **Changed**
 
-* Moving functionality from `compas_fab.artists.BaseRobotArtist` to `compas.robots.RobotModel`
-* `compas_fab.Robot` inverse_kinematics returns now group configuration
-* `compas_fab.Robot` forward_kinematics has new parameter 'backend' to select either 'client' fk or 'model' fk
-* `compas_fab.Robot` forward_kinematics returns now frame_RCF
-* `compas_fab.Robot` forward_kinematics doesn't need full configuration anymore
+* Updated ``COMPAS`` dependency to ``0.8.1``
+* Base robot artist functionality moved to ``compas.robots.RobotModel``
+* ``Robot``: ``inverse_kinematics`` returns now group configuration
+* ``Robot``: ``forward_kinematics`` has new parameter ``backend`` to select either ``client`` FK or ``model`` FK.
+* ``Robot``: ``forward_kinematics`` returns now ``frame_RCF``
+* ``Robot``: ``forward_kinematics`` doesn't need full configuration anymore
 
 **Added**
 
-* Adding `jump_threshold` parameter to ``plan_cartesian_motion``
+* Added ``jump_threshold`` parameter to ``plan_cartesian_motion``
+* Added ``action_name`` parameter to reconfigure joint trajectory follower action.
+* Added support to retrieve the full planning scene.
 
 **Removed**
-* `compas_fab.Robot.get_configuration`
+
+* Removed ``compas_fab.Robot.get_configuration``
 
 0.5.0
 ----------
