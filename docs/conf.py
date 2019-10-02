@@ -66,6 +66,7 @@ html_theme_options = {
     "package_name": 'compas_fab',
     "package_title": project,
     "package_version": release,
+    "package_repo": 'https://github.com/compas-dev/compas_fab',
 }
 
 html_split_index = False

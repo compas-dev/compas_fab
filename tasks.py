@@ -134,6 +134,7 @@ def clean(ctx, docs=True, bytecode=True, builds=True):
     for folder in folders:
         rmtree(os.path.join(BASE_FOLDER, folder), ignore_errors=True)
 
+
 @task(help={
       'rebuild': 'True to clean all previously built docs before starting, otherwise False.',
       'doctest': 'True to run doctests, otherwise False.',
