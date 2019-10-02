@@ -59,7 +59,7 @@ Working in Blender
 ==================
 
 Once **COMPAS** itself is installed for Blender following the
-`documented procedure <https://compas-dev.github.io/main/environments/blender.html>`_,
+`documented procedure <https://compas-dev.github.io/main/gettingstarted/cad/blender.html>`_,
 **COMPAS FAB** will automatically be available as well after installing it.
 
 

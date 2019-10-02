@@ -5,7 +5,7 @@ from __future__ import print_function
 import time
 
 import compas
-from compas_blender import xdraw_mesh
+from compas_blender import draw_mesh
 
 from compas_fab.artists import BaseRobotArtist
 
@@ -30,4 +30,4 @@ class RobotArtist(BaseRobotArtist):
 
     def draw_mesh(self, compas_mesh, color=None):
         v, f = compas_mesh.to_vertices_and_faces()
-        return xdraw_mesh(v, f, color=color)
+        return draw_mesh(v, f, color=color)
