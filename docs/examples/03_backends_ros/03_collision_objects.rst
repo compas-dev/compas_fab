@@ -18,6 +18,11 @@ This is the representation of the planning scene in RViz with the UR5.
     :figclass: figure
     :class: figure-img img-fluid
 
+.. note::
+
+    If using Docker to run ROS, you can open
+    `RViz on your browser <http://localhost:8080/vnc.html?resize=scale&autoconnect=true>`_.
+
 Collision meshes
 ================
 

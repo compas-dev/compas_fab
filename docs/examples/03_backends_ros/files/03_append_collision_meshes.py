@@ -14,12 +14,13 @@ with RosClient() as client:
     scene = PlanningScene(robot)
 
     brick = Box.from_width_height_depth(0.11, 0.07, 0.25)
-    mesh = Mesh.from_vertices_and_faces(brick.vertices, brick.faces)
-    cm = CollisionMesh(mesh, 'brick')
-    cm.frame.point.y += 0.3
 
     for i in range(5):
-        cm.frame.point.z += brick.zsize
+        mesh = Mesh.from_vertices_and_faces(brick.vertices, brick.faces)
+        cm = CollisionMesh(mesh, 'brick')
+        cm.frame.point.y += 0.5
+        cm.frame.point.z += brick.zsize * i
+
         scene.append_collision_mesh(cm)
 
     # sleep a bit before terminating the client
