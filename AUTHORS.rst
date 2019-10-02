@@ -31,7 +31,7 @@ Authors
 * Gonzalo Casas <casas@arch.ethz.ch> `@gonzalocasas <https://github.com/gonzalocasas>`_
 * Stefana Parascho <parascho@arch.ethz.ch> `@stefanaparascho <https://github.com/stefanaparascho>`_
 * David Jenny <jenny@arch.ethz.ch> `@DavidJenny <https://github.com/DavidJenny>`_
-* Kathrin Dörfler <doerfler@arch.ethz.ch> `@Kathrin3010 <https://github.com/Kathrin3010>`_
+* Kathrin Dörfler <doerfler@arch.ethz.ch> `@kathrindoerfler <https://github.com/kathrindoerfler>`_
 * Matthias Helmreich <helmreich@arch.ethz.ch> `@mhelmrei <https://github.com/mhelmrei>`_
 * Augusto Gandia <gandia@arch.ethz.ch> `@augustogandia <https://github.com/augustogandia>`_
 * Zhao Ma <ma@arch.ethz.ch> `@xarthurx <https://github.com/xarthurx>`_

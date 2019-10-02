@@ -8,7 +8,7 @@ Code contributions
 
 We love pull requests from everyone! Here's a quick guide to improve the code:
 
-1. Fork `the repository <https://github.com/gramaziokohler/compas_fab>`_ and clone the fork.
+1. Fork `the repository <https://github.com/compas-dev/compas_fab>`_ and clone the fork.
 2. Create a virtual environment using your tool of choice (e.g. ``virtualenv``, ``conda``, etc).
 3. Install development dependencies:
 
@@ -61,7 +61,7 @@ Once you made the documentation changes locally, run the documentation generatio
 Bug reports
 -----------
 
-When `reporting a bug <https://github.com/gramaziokohler/compas_fab/issues>`_
+When `reporting a bug <https://github.com/compas-dev/compas_fab/issues>`_
 please include:
 
 * Operating system name and version.
@@ -73,7 +73,7 @@ Feature requests and feedback
 -----------------------------
 
 The best way to send feedback is to file an issue on
-`Github <https://github.com/gramaziokohler/compas_fab/issues>`_. If you are proposing a feature:
+`Github <https://github.com/compas-dev/compas_fab/issues>`_. If you are proposing a feature:
 
 * Explain in detail how it would work.
 * Keep the scope as narrow as possible, to make it easier to implement.

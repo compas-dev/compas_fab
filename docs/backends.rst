@@ -104,7 +104,7 @@ Check documentation for your backend of choice:
 .. _Docker: https://www.docker.com/
 .. _Docker Community Edition: https://www.docker.com/get-started
 .. _Docker containers: https://www.docker.com/resources/what-container
-.. _Docker for Windows: https://store.docker.com/editions/community/docker-ce-desktop-windows
-.. _Docker for Mac: https://store.docker.com/editions/community/docker-ce-desktop-mac
+.. _Docker for Windows: https://hub.docker.com/editions/community/docker-ce-desktop-windows
+.. _Docker for Mac: https://hub.docker.com/editions/community/docker-ce-desktop-mac
 .. _Kitematic for Windows: https://download.docker.com/kitematic/Kitematic-Windows.zip
 .. _Kitematic for Mac: https://download.docker.com/kitematic/Kitematic-Mac.zip
