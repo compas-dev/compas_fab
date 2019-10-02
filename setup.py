@@ -10,8 +10,9 @@ from os.path import abspath, basename, dirname, join, splitext
 from setuptools import find_packages, setup
 
 requirements = [
-    'compas==0.5.2',
-    'roslibpy>=0.4.1',
+    # Until COMPAS reaches 1.0, we pin major.minor and allow patch version updates
+    'compas>=0.8.1,<0.9',
+    'roslibpy>=0.7',
     'pyserial',
 ]
 keywords_list = ['robotic fabrication', 'digital fabrication', 'architecture', 'robotics', 'ros']
