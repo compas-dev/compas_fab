@@ -6,17 +6,15 @@ from roslibpy import Topic
 from compas_fab.backends import RosClient
 
 client = RosClient()
+client.run()
+
 talker = Topic(client, '/chatter', 'std_msgs/String')
 
+while client.is_connected:
+    talker.publish(Message({'data': 'Hello World!'}))
+    print('Sending message...')
+    time.sleep(1)
 
-def start_talking():
-    while client.is_connected:
-        talker.publish(Message({'data': 'Hello World!'}))
-        print('Sending message...')
-        time.sleep(1)
+talker.unadvertise()
 
-    talker.unadvertise()
-
-
-client.on_ready(start_talking)
-client.run_forever()
+client.terminate()

@@ -24,21 +24,15 @@ see the output ``Connected: True`` if everything is working properly:
 
     from compas_fab.backends import RosClient
     client = RosClient()
+    client.run()
+    print('Connected: %s' % client.is_connected)
+    client.terminate()
 
-    def hello_ros():
-        print('Connected: %s' % client.is_connected)
-        client.terminate()
-
-    client.on_ready(hello_ros)
-    client.run_forever()
-
-
-The first thing to notice in this example is that the ROS client relies
-on **callbacks** to work. This allows to use event-based programming and
-build more reactive software that does not need to block when it is not
-required.
+*Yay! Our first connection to ROS!*
 
 .. note::
+
+    ``RosClient`` also supports using *callbacks* instead of blocking calls.
 
     A *callback* is a function that is passed to another function as a
     parameter such that the latter function can call the former at any time
