@@ -719,7 +719,7 @@ import Grasshopper
 from compas_fab.robots import Configuration
 
 if set_joint_positions:
-    
+
     j = 0
     for i in range(ghenv.Component.Params.Input.Count):
         nslider = ghenv.Component.Params.Input[i].Sources[0]
@@ -1263,7 +1263,7 @@ def pipes_from_frame(frame, size, radius):
 
 if robot and configuration:
 
-    robot.update(configuration, collision=show_collision)
+    robot.artist.update(configuration, robot.get_configurable_joint_names(), visual=show_visual, collision=show_collision)
 
     print("Configuration:")
     print(configuration.values)
@@ -1276,12 +1276,12 @@ if robot and configuration:
 
     pipe_size = 0.1 * robot.scale_factor
     pipe_radius = 0.001 * robot.scale_factor
-    
-    
+
+
     axes = robot.transformed_axes(configuration)
 
     frames = robot.transformed_frames(configuration)
-    
+
     if show_frames:
 
         pipes = []

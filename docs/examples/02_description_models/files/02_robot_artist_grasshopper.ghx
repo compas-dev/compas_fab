@@ -1138,8 +1138,7 @@ if robot:
 from compas.geometry import Vector
 from compas.geometry import Point
 from compas.geometry import Frame
-from compas_ghpython.utilities import xdraw_frame
-from compas_ghpython.utilities import xdraw_pipes
+from compas_ghpython import draw_pipes
 
 from compas_fab.robots import Configuration
 
@@ -1163,11 +1162,11 @@ def pipes_from_frame(frame, size, radius):
         pipes.append(pipe)
     return pipes
 
-if robot and len(configuration):
+if robot and configuration:
     configuration = Configuration.from_revolute_values(configuration)
     print ('Setting robot configuration:')
     print (configuration)
-    robot.artist.update(configuration, collision=show_collision)
+    robot.artist.update(configuration, robot.get_configurable_joint_names(), visual=show_visual, collision=show_collision)
 
     if show_visual:
         visual = robot.artist.draw_visual()
@@ -1180,7 +1179,7 @@ if robot and len(configuration):
         for frame in robot.frames:
             pipes += pipes_from_frame(frame, size, radius)
             axes_color += frame_colors
-        axes = xdraw_pipes(pipes, cap=1)
+        axes = draw_pipes(pipes, cap=1)
 
 
 
@@ -1188,7 +1187,7 @@ if robot and len(configuration):
         link = robot.get_link_by_name(str(robot.get_end_effector_link_name()))
         ee_frame = link.parent_joint.origin.copy()
         ee_pipes = pipes_from_frame(ee_frame, size, radius)
-        ee_frame = xdraw_pipes(ee_pipes, cap=1)
+        ee_frame = draw_pipes(ee_pipes, cap=1)
         ee_color = frame_colors
 
     if show_base_frame:
@@ -1201,7 +1200,7 @@ if robot and len(configuration):
             base_frame = Frame.worldXY()
 
         base_pipes = pipes_from_frame(base_frame, size, radius)
-        base_frame = xdraw_pipes(base_pipes, cap=1)
+        base_frame = draw_pipes(base_pipes, cap=1)
         base_color = frame_colors
 </item>
                     <item name="Description" type_name="gh_string" type_code="10">GhPython provides a Python script component</item>
