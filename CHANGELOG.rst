@@ -11,11 +11,22 @@ Unreleased
 ----------
 
 **Changed**
+* Changed example for loading PosConCM (includes parity argument, differs from PosCon3D)
+* Changed/cleaned documentation style
+* Changed tasks.py to run ``invoke test``
+
 
 **Added**
 
+* Added ``compas_fab.sensors.baumer.PosCon3D.reset()``
+* Added ``compas_fab.sensors.baumer.PosConCM.reset()``
+* Added checks for Python 2 and 3
+
+
 **Removed**
 
+* Removed ``compas_fab.sensors.baumer.PosConCM.set_flex_mount()``
+* Removed ``compas_fab.sensors.baumer.PosConCM.get_live_monitor_data()``
 
 0.6.0
 ----------
