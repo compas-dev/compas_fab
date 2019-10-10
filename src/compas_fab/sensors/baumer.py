@@ -590,41 +590,21 @@ class PosConCM(SerialSensor):
         result = self.send_command(self.address, 'W035', '0')
         return map(float, result)
 
+    def set_flex_mount(self, angle, distance):
+        """Sets the FLEX Mount feature to a specific angle and distance."""
+        data='{:.2f};{:.2f}'.format(angle, distance)
+        return self.send_command(self.address, 'W036', data)
+
+    def teach_flex_mount(self, reference_thickness):
+        """Sets the FLEX Mount feature to a specific angle and distance."""
+        return self.send_command(self.address, 'W037', str(reference_thickness))
+
     def adjust_to_dark_object(self, is_dark_object):
         """Adjusts the sensor to detect darker or lighter surfaces."""
         data = '1' if is_dark_object else '0'
         result = self.send_command(self.address, 'W032', data)
         return map(float, result)
 
-    # def set_flex_mount(self, angle, distance):
-    #     """Sets the FLEX Mount feature to a specific angle and distance."""
-    #     # result = self.send_command(self.address, 'W036', ('{:.2f}'.format(angle), '{:.2f}'.format(distance)))
-    #     # return map(float, result)
-    #     # data = ('{:.2f}'.format(angle), '{:.2f}'.format(distance))
-    #     data=('{:.2f}'.format(angle),'{:.2f}'.format(angle))
-    #     result = self.send_command(self.address, 'W036', data)
-    #     return map(float, result)
-
-    # def get_live_monitor_data(self):
-    #     """Retrieves the distance to the surface in the center of the laser beam and the
-    #     angle at which it's found.
-
-    #     Returns:
-    #     `list`
-    #         angle and distance to the reference surface.
-
-    #     Note
-    #     ----
-    #     This function is designed to aid in the installation of the sensor at an angle.
-    #     """
-    #     result = self.send_command(self.address, 'R051')
-
-    #     if len(result) != 2:
-    #         raise ProtocolError('Unexpected result: ' + str(result))
-
-    #     return map(float, result[0])
-
     def reset(self):
         """Resets the sensor to factory settings."""
         self.send_command(self.address, 'W202', '0')
-
