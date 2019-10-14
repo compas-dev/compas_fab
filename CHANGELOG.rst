@@ -11,6 +11,7 @@ Unreleased
 ----------
 
 **Changed**
+
 * Changed example for loading PosConCM (includes parity argument, differs from PosCon3D)
 * Changed format ``compas_fab.sensors.baumer.PosConCM.set_flex_mount()``
 * Changed tasks.py to run ``invoke test``
