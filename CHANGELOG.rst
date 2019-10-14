@@ -16,6 +16,9 @@ Unreleased
 
 **Removed**
 
+**Fixed**
+
+- Fixed missing planner initialization when used without context manager.
 
 0.6.0
 ----------
