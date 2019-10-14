@@ -469,8 +469,6 @@ class PosConCM(SerialSensor):
         frame_head = result[:-6]
         result_type = frame_head[3]
 
-        print(frame_head)
-
         if result_type == 'a':
             raise SensorTimeoutError('Sensor has not completed reading')
 
