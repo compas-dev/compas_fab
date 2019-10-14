@@ -103,8 +103,10 @@ class MoveItPlanner(PlannerBackend):
         self.attached_collision_object_topic.advertise()
 
     def dispose_planner(self):
-        self.collision_object_topic.unadvertise()
-        self.attached_collision_object_topic.unadvertise()
+        if hasattr(self, 'collision_object_topic') and self.collision_object_topic:
+            self.collision_object_topic.unadvertise()
+        if hasattr(self, 'attached_collision_object_topic') and self.attached_collision_object_topic:
+            self.attached_collision_object_topic.unadvertise()
 
     # ==========================================================================
     # planning services
@@ -151,7 +153,7 @@ class MoveItPlanner(PlannerBackend):
     def plan_cartesian_motion_async(self, callback, errback, frames, base_link,
                                     ee_link, group, joint_names, joint_types,
                                     start_configuration, max_step, jump_threshold,
-                                    avoid_collisions, path_constraints, 
+                                    avoid_collisions, path_constraints,
                                     attached_collision_meshes):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
         header = Header(frame_id=base_link)
@@ -299,6 +301,9 @@ class MoveItPlanner(PlannerBackend):
         self._collision_object(co, CollisionObject.APPEND)
 
     def _collision_object(self, collision_object, operation=CollisionObject.ADD):
+        if not hasattr(self, 'collision_object_topic') or not self.collision_object_topic:
+            self.init_planner()
+
         collision_object.operation = operation
         self.collision_object_topic.publish(collision_object.msg)
 
@@ -315,5 +320,8 @@ class MoveItPlanner(PlannerBackend):
         return self._attached_collision_object(aco, operation=CollisionObject.REMOVE)
 
     def _attached_collision_object(self, attached_collision_object, operation=CollisionObject.ADD):
+        if not hasattr(self, 'attached_collision_object_topic') or not self.attached_collision_object_topic:
+            self.init_planner()
+
         attached_collision_object.object.operation = operation
         self.attached_collision_object_topic.publish(attached_collision_object.msg)
