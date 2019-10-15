@@ -32,6 +32,7 @@ matrix:
       env: TRAVIS_PYTHON_VERSION=3.7
 
 install:
+  - python -m ensurepip
   - pip install cython --install-option="--no-cython-compile"
   - pip install --no-cache-dir -r requirements-dev.txt
 
