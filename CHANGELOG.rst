@@ -12,13 +12,25 @@ Unreleased
 
 **Changed**
 
+* Changed example for loading PosConCM (includes parity argument, differs from PosCon3D)
+* Changed format ``compas_fab.sensors.baumer.PosConCM.set_flex_mount()``
+* Changed tasks.py to run ``invoke test``
+* Fixed Python 2 vs Python 3 incompatibilities
+
+
 **Added**
+
+* Added ``compas_fab.sensors.baumer.PosCon3D.reset()``
+* Added ``compas_fab.sensors.baumer.PosConCM.reset()``
+
 
 **Removed**
 
+* Removed ``compas_fab.sensors.baumer.PosConCM.get_live_monitor_data()``
+
 **Fixed**
 
-- Fixed missing planner initialization when used without context manager.
+* Fixed missing planner initialization when used without context manager.
 
 0.6.0
 ----------
