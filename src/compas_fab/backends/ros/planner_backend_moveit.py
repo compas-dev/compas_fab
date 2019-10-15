@@ -151,7 +151,7 @@ class MoveItPlanner(PlannerBackend):
     def plan_cartesian_motion_async(self, callback, errback, frames, base_link,
                                     ee_link, group, joint_names, joint_types,
                                     start_configuration, max_step, jump_threshold,
-                                    avoid_collisions, path_constraints, 
+                                    avoid_collisions, path_constraints,
                                     attached_collision_meshes):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
         header = Header(frame_id=base_link)
@@ -179,6 +179,7 @@ class MoveItPlanner(PlannerBackend):
             trajectory = JointTrajectory()
             trajectory.source_message = response
             trajectory.fraction = response.fraction
+            trajectory.joint_names = response.solution.joint_trajectory.joint_names
             trajectory.points = convert_trajectory_points(response.solution.joint_trajectory.points, joint_types)
             trajectory.start_configuration = Configuration(response.start_state.joint_state.position, start_configuration.types)
 
@@ -260,6 +261,7 @@ class MoveItPlanner(PlannerBackend):
             trajectory = JointTrajectory()
             trajectory.source_message = response
             trajectory.fraction = 1.
+            trajectory.joint_names = response.trajectory.joint_trajectory.joint_names
             trajectory.points = convert_trajectory_points(response.trajectory.joint_trajectory.points, joint_types)
             trajectory.start_configuration = Configuration(response.trajectory_start.joint_state.position, start_configuration.types)
             trajectory.planning_time = response.planning_time

@@ -10,8 +10,8 @@ from compas_fab.backends.ros.exceptions import RosError
 from compas_fab.backends.ros.messages import FollowJointTrajectoryGoal
 from compas_fab.backends.ros.messages import FollowJointTrajectoryResult
 from compas_fab.backends.ros.messages import Header
-from compas_fab.backends.ros.messages import JointTrajectory
-from compas_fab.backends.ros.messages import JointTrajectoryPoint
+from compas_fab.backends.ros.messages import JointTrajectory as RosMsgJointTrajectory
+from compas_fab.backends.ros.messages import JointTrajectoryPoint as RosMsgJointTrajectoryPoint
 from compas_fab.backends.ros.messages import Time
 from compas_fab.backends.ros.planner_backend_moveit import MoveItPlanner
 from compas_fab.backends.tasks import CancellableTask
@@ -80,7 +80,6 @@ class RosClient(Ros):
         # Dynamically mixin the planner plugin into this class
         planner_backend_type = PLANNER_BACKENDS[planner_backend]
         self.__class__ = type('RosClient_' + planner_backend_type.__name__, (planner_backend_type, RosClient), {})
-
 
     def __enter__(self):
         self.run()
@@ -227,7 +226,7 @@ class RosClient(Ros):
     def get_configuration(self):
         pass
 
-    def follow_configurations(self, callback, joint_names, configurations, timesteps, timeout=None):
+    def follow_configurations(self, callback, joint_names, configurations, timesteps, timeout=60000):
 
         if len(configurations) != len(timesteps):
             raise ValueError("%d configurations must have %d timesteps, but %d given." % (
@@ -239,21 +238,44 @@ class RosClient(Ros):
         points = []
         num_joints = len(configurations[0].values)
         for config, time in zip(configurations, timesteps):
-            pt = JointTrajectoryPoint(positions=config.values, velocities=[
+            pt = RosMsgJointTrajectoryPoint(positions=config.values, velocities=[
                                       0]*num_joints, time_from_start=Time(secs=(time)))
             points.append(pt)
 
-        joint_trajectory = JointTrajectory(
+        joint_trajectory = RosMsgJointTrajectory(
             Header(), joint_names, points)  # specify header necessary?
-        return self.follow_joint_trajectory(callback, joint_trajectory, timeout)
+        return self.follow_joint_trajectory(joint_trajectory=joint_trajectory, callback=callback, timeout=timeout)
+
+    def _convert_to_ros_trajectory(self, joint_trajectory):
+        """Converts a ``compas_fab.robots.JointTrajectory`` into a ROS Msg joint trajectory."""
+
+        # For backwards-compatibility, accept ROS Msg directly as well and simply do not modify
+        if isinstance(joint_trajectory, RosMsgJointTrajectory):
+            return joint_trajectory
+
+        trajectory = RosMsgJointTrajectory()
+        trajectory.joint_names = joint_trajectory.joint_names
+
+        for point in joint_trajectory.points:
+            ros_point = RosMsgJointTrajectoryPoint(
+                positions=point.positions,
+                velocities=point.velocities,
+                accelerations=point.accelerations,
+                effort=point.effort,
+                time_from_start=Time(
+                    point.time_from_start.secs, point.time_from_start.nsecs),
+            )
+            trajectory.points.append(ros_point)
+
+        return trajectory
 
     def follow_joint_trajectory(self, joint_trajectory, action_name='/joint_trajectory_action', callback=None, errback=None, feedback_callback=None, timeout=60000):
         """Follow the joint trajectory as computed by MoveIt planner.
 
         Parameters
         ----------
-        joint_trajectory : JointTrajectory
-            Joint trajectory message as computed by MoveIt planner
+        joint_trajectory : :class:`compas_fab.robots.JointTrajectory`
+            Instance of joint trajectory. Note: for backwards compatibility, this supports a ROS Msg being passed as well.
         action_name : string
             ROS action name, defaults to ``/joint_trajectory_action`` but some drivers need ``/follow_joint_trajectory``.
         callback : callable
@@ -273,8 +295,8 @@ class RosClient(Ros):
             An instance of a cancellable tasks.
         """
 
-        trajectory_goal = FollowJointTrajectoryGoal(
-            trajectory=joint_trajectory)
+        joint_trajectory = self._convert_to_ros_trajectory(joint_trajectory)
+        trajectory_goal = FollowJointTrajectoryGoal(trajectory=joint_trajectory)
 
         def handle_result(msg, client):
             result = FollowJointTrajectoryResult.from_msg(msg)
@@ -302,4 +324,3 @@ class RosClient(Ros):
         goal.send(timeout=timeout)
 
         return CancellableRosAction(goal)
-

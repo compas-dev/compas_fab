@@ -4,20 +4,17 @@ from .std_msgs import ROSmsg
 from .std_msgs import Header
 from .std_msgs import Time
 
-from .geometry_msgs import Transform
-from .geometry_msgs import Twist
-
 
 class JointTrajectoryPoint(ROSmsg):
     """http://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectoryPoint.html
     """
 
     def __init__(self, positions=None, velocities=None, accelerations=None, effort=None, time_from_start=None):
-        self.positions = positions if positions else []
-        self.velocities = velocities if velocities else []
-        self.accelerations = accelerations if accelerations else []
-        self.effort = effort if effort else []
-        self.time_from_start = time_from_start if time_from_start else Time()
+        self.positions = positions or []
+        self.velocities = velocities or []
+        self.accelerations = accelerations or []
+        self.effort = effort or []
+        self.time_from_start = time_from_start or Time()
         # TODO: check if we need to enter zeros to all
 
     @classmethod
@@ -40,9 +37,9 @@ class JointTrajectory(ROSmsg):
     """
 
     def __init__(self, header=None, joint_names=None, points=None):
-        self.header = header if header else Header()
-        self.joint_names = joint_names if joint_names else []
-        self.points = points if points else []
+        self.header = header or Header()
+        self.joint_names = joint_names or []
+        self.points = points or []
 
     @classmethod
     def from_msg(cls, msg):
@@ -57,10 +54,10 @@ class MultiDOFJointTrajectoryPoint(ROSmsg):
     """
 
     def __init__(self, transforms=None, velocities=None, accelerations=None, time_from_start=None):
-        self.transforms = transforms if transforms else []  # geometry_msgs/Transform[]
-        self.velocities = velocities if velocities else []  # geometry_msgs/Twist[]
-        self.accelerations = accelerations if accelerations else []  # geometry_msgs/Twist[]
-        self.time_from_start = time_from_start if time_from_start else Time()
+        self.transforms = transforms or []        # geometry_msgs/Transform[]
+        self.velocities = velocities or []        # geometry_msgs/Twist[]
+        self.accelerations = accelerations or []  # geometry_msgs/Twist[]
+        self.time_from_start = time_from_start or Time()
 
 
 class MultiDOFJointTrajectory(ROSmsg):
@@ -68,9 +65,9 @@ class MultiDOFJointTrajectory(ROSmsg):
     """
 
     def __init__(self, header=None, joint_names=None, points=None):
-        self.header = header if header else Header()
-        self.joint_names = joint_names if joint_names else []
-        self.points = points if points else []
+        self.header = header or Header()
+        self.joint_names = joint_names or []
+        self.points = points or []
 
     @classmethod
     def from_msg(cls, msg):
