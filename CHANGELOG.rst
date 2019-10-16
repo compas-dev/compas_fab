@@ -28,6 +28,10 @@ Unreleased
 
 * Removed ``compas_fab.sensors.baumer.PosConCM.get_live_monitor_data()``
 
+**Fixed**
+
+* Fixed missing planner initialization when used without context manager.
+
 0.6.0
 ----------
 
