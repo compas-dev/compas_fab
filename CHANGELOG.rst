@@ -16,13 +16,16 @@ Unreleased
 * Changed example for loading PosConCM (includes parity argument, differs from PosCon3D)
 * Changed format ``compas_fab.sensors.baumer.PosConCM.set_flex_mount()``
 * Changed tasks.py to run ``invoke test``
+* Renamed ``compas_fab.backends.CancellableTask`` to ``compas_fab.backends.CancellableFutureResult``
 * ROS client: changed joint trajectory follower (``follow_joint_trajectory``) to support generic ``JointTrajectory`` arguments.
+* ROS client: changed return type of trajectory execution methods to ``CancellableFutureResult``
 
 **Added**
 
 * Added ``compas_fab.sensors.baumer.PosCon3D.reset()``
 * Added ``compas_fab.sensors.baumer.PosConCM.reset()``
 * ROS client: added support for MoveIt! execution action via `client.execute_joint_trajectory`.
+* Added ``compas_fab.backends.FutureResult`` class to deal with long-running async tasks
 
 **Removed**
 
