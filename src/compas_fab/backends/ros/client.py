@@ -7,11 +7,15 @@ from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
 from compas_fab.backends.ros.exceptions import RosError
+from compas_fab.backends.ros.messages import ExecuteTrajectoryFeedback
+from compas_fab.backends.ros.messages import ExecuteTrajectoryGoal
+from compas_fab.backends.ros.messages import ExecuteTrajectoryResult
 from compas_fab.backends.ros.messages import FollowJointTrajectoryGoal
 from compas_fab.backends.ros.messages import FollowJointTrajectoryResult
 from compas_fab.backends.ros.messages import Header
 from compas_fab.backends.ros.messages import JointTrajectory as RosMsgJointTrajectory
 from compas_fab.backends.ros.messages import JointTrajectoryPoint as RosMsgJointTrajectoryPoint
+from compas_fab.backends.ros.messages import RobotTrajectory
 from compas_fab.backends.ros.messages import Time
 from compas_fab.backends.ros.planner_backend_moveit import MoveItPlanner
 from compas_fab.backends.tasks import CancellableTask
@@ -320,6 +324,67 @@ class RosClient(Ros):
         if errback:
             goal.on('timeout', lambda: handle_failure(
                 RosError("Action Goal timeout", -1)))
+
+        goal.send(timeout=timeout)
+
+        return CancellableRosAction(goal)
+
+    def execute_joint_trajectory(self, joint_trajectory, action_name='/execute_trajectory', callback=None, errback=None, feedback_callback=None, timeout=60000):
+        """Execute a joint trajectory via the MoveIt infrastructure.
+
+        Note
+        ----
+        This method does not support Multi-DOF Joint Trajectories.
+
+        Parameters
+        ----------
+        joint_trajectory : :class:`compas_fab.robots.JointTrajectory`
+            Instance of joint trajectory.
+        callback : callable
+            Function to be invoked when the goal is completed, requires
+            one positional parameter ``result``.
+        action_name : string
+            ROS action name, defaults to ``/execute_trajectory``.
+        errback : callable
+            Function to be invoked in case of error or timeout, requires
+            one position parameter ``exception``.
+        feedback_callback : callable
+            Function to be invoked during execution to provide feedback.
+        timeout : int
+            Timeout for goal completion in milliseconds.
+
+        Returns
+        -------
+        :class:`CancellableTask`
+            An instance of a cancellable tasks.
+        """
+
+        joint_trajectory = self._convert_to_ros_trajectory(joint_trajectory)
+        trajectory = RobotTrajectory(joint_trajectory=joint_trajectory)
+        trajectory_goal = ExecuteTrajectoryGoal(trajectory=trajectory)
+
+        def handle_result(msg):
+            result = ExecuteTrajectoryResult.from_msg(msg)
+            callback(result)
+
+        def handle_feedback(msg):
+            feedback = ExecuteTrajectoryFeedback.from_msg(msg)
+            feedback_callback(feedback)
+
+        def handle_failure(error):
+            errback(error)
+
+        action_client = ActionClient(self, action_name, 'moveit_msgs/ExecuteTrajectoryAction')
+        goal = Goal(action_client, Message(trajectory_goal.msg))
+
+        if callback:
+            goal.on('result', handle_result)
+
+        if feedback_callback:
+            goal.on('feedback', handle_feedback)
+
+        if errback:
+            goal.on('timeout', lambda: handle_failure(RosError("Action Goal timeout", -1)))
 
         goal.send(timeout=timeout)
 

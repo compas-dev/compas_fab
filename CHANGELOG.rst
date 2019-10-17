@@ -22,6 +22,7 @@ Unreleased
 
 * Added ``compas_fab.sensors.baumer.PosCon3D.reset()``
 * Added ``compas_fab.sensors.baumer.PosConCM.reset()``
+* ROS client: added support for MoveIt! execution action via `client.execute_joint_trajectory`.
 
 **Removed**
 
