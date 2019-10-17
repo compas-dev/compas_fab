@@ -30,6 +30,7 @@ Unreleased
 **Removed**
 
 * Removed ``compas_fab.sensors.baumer.PosConCM.get_live_monitor_data()``
+* Removed non-implemented methods from ``compas_fab.robots.Robot``: ``send_frame``, ``send_configuration``, ``send_trajectory``
 
 0.6.0
 ----------

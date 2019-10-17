@@ -1176,21 +1176,6 @@ class Robot(object):
 
         return trajectory
 
-    def send_frame(self):
-        # (check service name with ros)
-        self.ensure_client()
-        raise NotImplementedError
-
-    def send_configuration(self):
-        # (check service name with ros)
-        self.ensure_client()
-        raise NotImplementedError
-
-    def send_trajectory(self):
-        # (check service name with ros)
-        self.ensure_client()
-        raise NotImplementedError
-
     def transformed_frames(self, configuration, group=None):
         """Returns the robot's transformed frames."""
         joint_names = self.get_configurable_joint_names(group)
