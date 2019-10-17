@@ -93,13 +93,18 @@ class MoveItPlanner(PlannerBackend):
                                             GetPlanningSceneResponse)
 
     def init_planner(self):
-        self.collision_object_topic = Topic(self, '/collision_object',
-                                            'moveit_msgs/CollisionObject', queue_size=None)
+        self.collision_object_topic = Topic(
+            self,
+            '/collision_object',
+            'moveit_msgs/CollisionObject',
+            queue_size=None)
         self.collision_object_topic.advertise()
 
         self.attached_collision_object_topic = Topic(
-            self, '/attached_collision_object',
-            'moveit_msgs/AttachedCollisionObject', queue_size=None)
+            self,
+            '/attached_collision_object',
+            'moveit_msgs/AttachedCollisionObject',
+            queue_size=None)
         self.attached_collision_object_topic.advertise()
 
     def dispose_planner(self):
@@ -133,7 +138,10 @@ class MoveItPlanner(PlannerBackend):
                                        avoid_collisions=avoid_collisions,
                                        attempts=attempts)
 
-        self.GET_POSITION_IK(self, (ik_request, ), callback, errback)
+        def convert_to_positions(response):
+            callback(response.solution.joint_state.position)
+
+        self.GET_POSITION_IK(self, (ik_request, ), convert_to_positions, errback)
 
     def forward_kinematics_async(self, callback, errback, joint_positions, base_link,
                                  group, joint_names, ee_link):
@@ -145,8 +153,11 @@ class MoveItPlanner(PlannerBackend):
         robot_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
 
+        def convert_to_frame(response):
+            callback(response.pose_stamped[0].pose.frame)
+
         self.GET_POSITION_FK(self, (header, fk_link_names,
-                                    robot_state), callback, errback)
+                                    robot_state), convert_to_frame, errback)
 
     def plan_cartesian_motion_async(self, callback, errback, frames, base_link,
                                     ee_link, group, joint_names, joint_types,
