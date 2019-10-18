@@ -9,7 +9,6 @@ matrix:
       before_install:
         - choco install python2 vcredist2008
         - choco install --ignore-dependencies vcpython27
-        - pip install pypiwin32
       env:
         - PATH=/c/Python27:/c/Python27/Scripts:$PATH
         - TRAVIS_PYTHON_VERSION=2.7
@@ -17,8 +16,7 @@ matrix:
       os: windows
       language: shell
       before_install:
-        - choco install python
-        - pip install pypiwin32
+        - choco install python3 --version=3.7.4
       env:
         - PATH=/c/Python37:/c/Python37/Scripts:$PATH
         - TRAVIS_PYTHON_VERSION=3.7

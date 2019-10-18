@@ -833,12 +833,10 @@ class Robot(object):
         frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
         frame_RCF.point /= self.scale_factor  # must be in meters
 
-        response = self.client.inverse_kinematics(frame_RCF, base_link,
+        joint_positions = self.client.inverse_kinematics(frame_RCF, base_link,
                                                   group, joint_names, joint_positions,
                                                   avoid_collisions, constraints, attempts,
                                                   attached_collision_meshes)
-
-        joint_positions = response.solution.joint_state.position
         joint_positions = self._scale_joint_values(joint_positions, self.scale_factor)
         # full configuration # TODO group config?
         configuration = Configuration(joint_positions, self.get_configurable_joint_types())
@@ -900,8 +898,7 @@ class Robot(object):
 
         if not backend:
             if self.client:
-                response = self.client.forward_kinematics(full_joint_positions, base_link_name, group, full_joint_names, link_name)
-                frame_RCF = response.pose_stamped[0].pose.frame
+                frame_RCF = self.client.forward_kinematics(full_joint_positions, base_link_name, group, full_joint_names, link_name)
                 frame_RCF.point *= self.scale_factor
             else:
                 frame_WCF = self.model.forward_kinematics(group_joint_state, link_name)
@@ -1178,21 +1175,6 @@ class Robot(object):
         trajectory.start_configuration.scale(self.scale_factor)
 
         return trajectory
-
-    def send_frame(self):
-        # (check service name with ros)
-        self.ensure_client()
-        raise NotImplementedError
-
-    def send_configuration(self):
-        # (check service name with ros)
-        self.ensure_client()
-        raise NotImplementedError
-
-    def send_trajectory(self):
-        # (check service name with ros)
-        self.ensure_client()
-        raise NotImplementedError
 
     def transformed_frames(self, configuration, group=None):
         """Returns the robot's transformed frames."""

@@ -140,8 +140,10 @@ class JointTrajectory(Trajectory):
 
     Attributes
     ----------
-    points: :obj:`list` of :class:`JointTrajectoryPoint`
+    trajectory_points: :obj:`list` of :class:`JointTrajectoryPoint`
         List of points composing the trajectory.
+    joint_names: :obj:`list` of :obj:`str`
+        List of joint names of the trajectory.
     start_configuration: :class:`Configuration`
         Start configuration for the trajectory.
     fraction: float
@@ -149,9 +151,10 @@ class JointTrajectory(Trajectory):
         e.g. ``1`` means the full trajectory was found.
     """
 
-    def __init__(self, trajectory_points=[], start_configuration=None, fraction=None):
+    def __init__(self, trajectory_points=[], joint_names=[], start_configuration=None, fraction=None):
         super(Trajectory, self).__init__()
         self.points = trajectory_points
+        self.joint_names = joint_names
         self.start_configuration = start_configuration
         self.fraction = fraction
 
@@ -181,15 +184,18 @@ class JointTrajectory(Trajectory):
     @property
     def data(self):
         """:obj:`dict` : The data representing the trajectory."""
-        return {
-            'points': [p.to_data() for p in self.points],
-            'start_configuration': self.start_configuration.to_data(),
-            'fraction': self.fraction,
-        }
+        data_obj = {}
+        data_obj['points'] = [p.to_data() for p in self.points]
+        data_obj['joint_names'] = self.joint_names or []
+        data_obj['start_configuration'] = self.start_configuration.to_data()
+        data_obj['fraction'] = self.fraction
+
+        return data_obj
 
     @data.setter
     def data(self, data):
         self.points = list(map(JointTrajectoryPoint.from_data, data.get('points') or []))
+        self.joint_names = data.get('joint_names', [])
         self.start_configuration = Configuration.from_data(data.get('start_configuration'))
         self.fraction = data.get('fraction')
 
