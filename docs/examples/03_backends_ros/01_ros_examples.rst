@@ -23,10 +23,8 @@ see the output ``Connected: True`` if everything is working properly:
 .. code-block:: python
 
     from compas_fab.backends import RosClient
-    client = RosClient()
-    client.run()
-    print('Connected: %s' % client.is_connected)
-    client.terminate()
+    with RosClient() as client:
+        print('Connected:', client.is_connected)
 
 *Yay! Our first connection to ROS!*
 

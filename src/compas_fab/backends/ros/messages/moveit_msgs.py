@@ -139,27 +139,6 @@ class RobotState(ROSmsg):
 
 class PositionIKRequest(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionIKRequest.html
-
-    Examples
-    --------
-    >>> base_link = 'base_link'
-    >>> planning_group = 'manipulator'
-    >>> pose = Pose([420, -25, 459], [1, 0, 0], [0, 1, 0])
-    >>> joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint',
-                       'elbow_joint', 'wrist_1_joint', 'wrist_2_joint',
-                       'wrist_3_joint']
-    >>> joint_positions = [3.39, -1.47, -2.05, 0.38, -4.96, -6.28]
-    >>> header = Header(frame_id='base_link')
-    >>> pose_stamped = PoseStamped(header, pose)
-    >>> joint_state = JointState(name=joint_names, position=joint_positions,
-                                 header=header)
-    >>> multi_dof_joint_state = MultiDOFJointState(header=header,
-                                                   joint_names=joint_names)
-    >>> start_state = RobotState(joint_state, multi_dof_joint_state)
-    >>> ik_request = PositionIKRequest(group_name=planning_group,
-                                       robot_state=start_state,
-                                       pose_stamped=pose_stamped,
-                                       avoid_collisions=True)
     """
 
     def __init__(self, group_name="robot", robot_state=None, constraints=None,

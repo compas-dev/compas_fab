@@ -80,9 +80,8 @@ class RosClient(Ros):
     --------
 
     >>> from compas_fab.backends import RosClient
-    >>> client = RosClient()
-    >>> client.run()
-    >>> print('Connected: %s' % client.is_connected)
+    >>> with RosClient() as client:
+    ...     print('Connected: %s' % client.is_connected)
     Connected: True
 
     Note

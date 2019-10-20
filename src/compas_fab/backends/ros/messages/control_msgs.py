@@ -18,7 +18,7 @@ class JointTolerance(ROSmsg):
 
 
 class FollowJointTrajectoryGoal(ROSmsg):
-    """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryGoal.html
+    """http://docs.ros.org/api/control_msgs/html/action/FollowJointTrajectory.html
     """
 
     def __init__(self, trajectory=None, path_tolerance=None,
