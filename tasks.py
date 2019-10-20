@@ -190,14 +190,21 @@ def deploy_docs(ctx):
     with chdir(target_doc_folder):
         ctx.run('git add . && git commit -m doc-deployer && git push')
 
+
 @task(help={
-      'checks': 'True to run all checks before testing, otherwise False.'})
-def test(ctx, checks=False):
+      'checks': 'True to run all checks before testing, otherwise False.',
+      'doctest': 'True to run doctest modules, otherwise False.',
+      })
+def test(ctx, checks=False, doctest=True):
     """Run all tests."""
     if checks:
         check(ctx)
 
-    ctx.run('pytest --doctest-modules')
+    if doctest:
+        ctx.run('pytest --doctest-modules')
+    else:
+        ctx.run('pytest')
+
 
 @task(help={
       'release_type': 'Type of release follows semver rules. Must be one of: major, minor, patch.'})
