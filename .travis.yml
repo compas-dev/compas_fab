@@ -23,8 +23,19 @@ matrix:
     - name: "Python 3.7: Xenial Linux"
       python: 3.7
       dist: xenial
-      env: TRAVIS_PYTHON_VERSION=3.7
+      # Pytest doctests are only enabled for Linux
+      # because they are integration tests and need ROS running on Docker
+      env:
+        - TRAVIS_PYTHON_VERSION=3.7
+        - PYTEST_ADDOPTS=--doctest-modules
       services: docker
+      before_install:
+        - docker run -p 19997:19997 --name vrep_rfl -d gramaziokohler/vrep-rfl
+        - docker-compose -f "docs/backends/files/ur5-demo/docker-compose.yml" up -d --build
+        - docker ps -a
+      after_script:
+        - docker-compose -f "docs/backends/files/ur5-demo/docker-compose.yml" down
+        - docker rm -f vrep_rfl
     - name: "Python 3.7: macOS"
       os: osx
       osx_image: xcode10.2

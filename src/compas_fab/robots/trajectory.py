@@ -187,7 +187,7 @@ class JointTrajectory(Trajectory):
         data_obj = {}
         data_obj['points'] = [p.to_data() for p in self.points]
         data_obj['joint_names'] = self.joint_names or []
-        data_obj['start_configuration'] = self.start_configuration.to_data()
+        data_obj['start_configuration'] = self.start_configuration.to_data() if self.start_configuration else None
         data_obj['fraction'] = self.fraction
 
         return data_obj
@@ -196,7 +196,8 @@ class JointTrajectory(Trajectory):
     def data(self, data):
         self.points = list(map(JointTrajectoryPoint.from_data, data.get('points') or []))
         self.joint_names = data.get('joint_names', [])
-        self.start_configuration = Configuration.from_data(data.get('start_configuration'))
+        if data.get('start_configuration'):
+            self.start_configuration = Configuration.from_data(data.get('start_configuration'))
         self.fraction = data.get('fraction')
 
     @property
@@ -207,22 +208,3 @@ class JointTrajectory(Trajectory):
             return 0.
 
         return self.points[-1].time_from_start.seconds
-
-
-if __name__ == '__main__':
-    p1 = JointTrajectoryPoint([1.571, 0, 0, 0.262, 0, 0], [0] * 6, [3.] * 6)
-    p1.time_from_start = Duration(2, 1293)
-
-    p2 = JointTrajectoryPoint([0.571, 0, 0, 0.262, 0, 0], [0] * 6, [3.] * 6)
-    p2.time_from_start = Duration(6, 0)
-
-    trj = JointTrajectory([p1, p2])
-    print(trj)
-    # p.accelerations = [2,3,4,3,5,1]
-    # p.time_from_start = [Duration(1, 23)]
-    # print(p1.to_data())
-    # print(JointTrajectoryPoint.from_data(p1.to_data()))
-
-    print(trj.points)
-    print(trj.to_data())
-    print(JointTrajectory.from_data(trj.to_data()).to_data())

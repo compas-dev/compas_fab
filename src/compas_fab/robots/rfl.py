@@ -52,7 +52,7 @@ def Robot(name, client=None):
     --------
 
     >>> from compas_fab.robots import rfl
-    >>> robot = rfl.get_robot('A')
+    >>> robot = rfl.Robot('A')
     >>> robot.name
     'A'
     """
