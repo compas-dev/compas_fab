@@ -140,7 +140,7 @@ class JointTrajectory(Trajectory):
 
     Attributes
     ----------
-    trajectory_points: :obj:`list` of :class:`JointTrajectoryPoint`
+    points: :obj:`list` of :class:`JointTrajectoryPoint`
         List of points composing the trajectory.
     joint_names: :obj:`list` of :obj:`str`
         List of joint names of the trajectory.
