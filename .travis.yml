@@ -28,6 +28,7 @@ matrix:
       env:
         - TRAVIS_PYTHON_VERSION=3.7
         - PYTEST_ADDOPTS=--doctest-modules
+        - TRAVIS_GENERATE_DOCS=true
       services: docker
       before_install:
         - docker run -p 19997:19997 --name vrep_rfl -d gramaziokohler/vrep-rfl
@@ -53,4 +54,6 @@ script:
   - python -c "import compas_fab.robots"
   - python -c "import compas_fab.utilities"
   - pytest
-  - invoke docs
+  - if [[ "$TRAVIS_GENERATE_DOCS" == "true" ]]; then
+      invoke docs;
+    fi
