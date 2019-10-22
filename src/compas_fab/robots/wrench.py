@@ -13,23 +13,27 @@ if not compas.is_ironpython():
 else:
     stats = None
 
+# TODO: move to some constants file? g is also defined in scipy.constants
+# standard acceleration of gravity [m/s**2]
+g = 9.80665
+
 
 __all__ = ['Wrench']
 
 
 class Wrench():
-    """
-    A wrench is defined by a vector describing the 3 components of force, and
-    another vector describing the 3 components of torque.
+    """A wrench represents force in free space, separated into its linear (force) and angular (torque) parts.
+    represents both translational and rotational acceleration
+    
     Optional values for initialization are the rigid body inertia.
 
     Attributes
     ----------
-    force : vector
-        [Fx,Fy,Fz] force vector in Newtons
-    torque : vector
-        [Tx,Ty,Tz] moments vector in Newton-meters
-    inertia : inertia object
+    force : :class:`Vector`
+        [Fx, Fy, Fz] force vector in Newtons
+    torque : :class:`Vector`
+        [Tx, Ty, Tz] moments vector in Newton-meters
+    inertia : :class:`Inertia`, optional
 
     Examples
     --------
@@ -39,8 +43,6 @@ class Wrench():
     """
 
     def __init__(self, force, torque, inertia=None):
-        self._force = None
-        self._torque = None
         self.force = force
         self.torque = torque
         self.inertia = inertia
@@ -298,30 +300,34 @@ class Wrench():
     # transformations
     # ==========================================================================
 
-    def transform(self, matrix):
-        """Transforms a wrench given a transformation matrix.
+    def transform(self, transformation):
+        """Transforms a `Wrench` with the transformation.
 
         Parameters
         ----------
-        matrix : list of list
-            The transformation matrix.
+        transformation : :class:`Transformation`
+            The transformation to transform the `Wrench`.
+        
+        Returns
+        -------
+        None
 
         Examples
         --------
-        >>> t = [[1,0,0,0], [0,-1,0,0], [0,0,-1,0], [0,0,0,1]]
+        >>> R = Rotation.from_axis_and_angle([1, 0, 0], math.pi)
         >>> w = Wrench([1, 2, 3], [0.1, 0.2, 0.3])
-        >>> w.transform(t)
+        >>> w.transform(R)
         """
-        self.force.transform(matrix)
-        self.torque.transform(matrix)
+        self.force.transform(transformation)
+        self.torque.transform(transformation)
 
-    def transformed(self, matrix):
-        """Returns a transformed copy of the wrench.
+    def transformed(self, transformation):
+        """Returns a transformed copy of the `Wrench`.
 
         Parameters
         ----------
-        matrix : list of list
-            The transformation matrix.
+        transformation : :class:`Transformation`
+            The transformation to transform the `Wrench`.
 
         Returns
         -------
@@ -330,17 +336,16 @@ class Wrench():
 
         Examples
         --------
-        >>> t = [[1,0,0,0], [0,-1,0,0], [0,0,-1,0], [0,0,0,1]]
+        >>> R = Rotation.from_axis_and_angle([1, 0, 0], math.pi)
         >>> w1 = Wrench([1, 2, 3], [0.1, 0.2, 0.3])
-        >>> w2 = w1.transformed(t)
+        >>> w2 = w1.transformed(R)
         """
         wrench = self.copy()
-        wrench.transform(matrix)
+        wrench.transform(transformation)
         return wrench
 
     def gravity_compensated(self, frame):
-        """
-        Removes the force and torque in effect of gravity from the wrench.
+        """Removes the force and torque in effect of gravity from the wrench.
 
         Parameters
         ----------
@@ -356,7 +361,7 @@ class Wrench():
         --------
         >>> from compas.geometry import Frame
         >>> from inertia import Inertia
-        >>> i = Inertia(10, [0,0,1])
+        >>> i = Inertia(10, [0,0,1]
         >>> f = Frame([0,0,0], [1,0,0], [0,1,0])
         >>> w = Wrench([0,0,-98], [0,0,0], inertia=i)
         >>> w.gravity_compensated(f)
