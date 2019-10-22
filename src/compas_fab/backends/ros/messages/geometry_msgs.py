@@ -9,7 +9,7 @@ from .std_msgs import ROSmsg
 
 
 class Point(ROSmsg):
-    """http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Point.html
+    """http://docs.ros.org/api/geometry_msgs/html/msg/Point.html
     """
 
     def __init__(self, x, y, z):
@@ -24,7 +24,7 @@ class Point(ROSmsg):
 
 
 class Quaternion(ROSmsg):
-    """http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Quaternion.html
+    """http://docs.ros.org/api/geometry_msgs/html/msg/Quaternion.html
     """
 
     def __init__(self, x=0., y=0., z=0., w=1.):
@@ -40,7 +40,7 @@ class Quaternion(ROSmsg):
 
 
 class Pose(ROSmsg):
-    """http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Pose.html
+    """http://docs.ros.org/api/geometry_msgs/html/msg/Pose.html
     """
 
     def __init__(self, position=None, orientation=None):
@@ -67,7 +67,7 @@ class Pose(ROSmsg):
 
 
 class PoseStamped(ROSmsg):
-    """http://docs.ros.org/melodic/api/geometry_msgs/html/msg/PoseStamped.html
+    """http://docs.ros.org/api/geometry_msgs/html/msg/PoseStamped.html
     """
 
     def __init__(self, header=None, pose=None):
@@ -144,7 +144,7 @@ class Wrench(ROSmsg):
 
 
 class WrenchStamped(ROSmsg):
-    """http://docs.ros.org/jade/api/geometry_msgs/html/msg/WrenchStamped.html
+    """http://docs.ros.org/api/geometry_msgs/html/msg/WrenchStamped.html
 
     A wrench with reference coordinate frame and timestamp.
     """
