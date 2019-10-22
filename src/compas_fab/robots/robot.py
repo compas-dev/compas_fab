@@ -490,7 +490,7 @@ class Robot(object):
         all_joint_names = self.get_configurable_joint_names()
         if len(all_joint_names) != len(full_configuration.values):
             raise ValueError("Please pass a full configuration with %d values" % len(all_joint_names))
-        elif len(all_joint_names) != len(group_configuration.values):  # group config == full config
+        elif len(all_joint_names) == len(group_configuration.values):  # group config == full config
             return group_configuration
         else:
             group_joint_names = self.get_configurable_joint_names(group)
