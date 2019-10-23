@@ -4,8 +4,8 @@ from compas.geometry import Frame
 
 import compas_fab.robots
 
-from compas_fab.backends.ros.messages import Header
-from compas_fab.backends.ros.messages import ROSmsg
+from .std_msgs import Header
+from .std_msgs import ROSmsg
 
 
 class Point(ROSmsg):
