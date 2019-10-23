@@ -17,7 +17,8 @@ If you use COMPAS FAB in a project, please use the following citation:
             Helmreich, M. and
             Gandia, A. and
             Ma, Z. and
-            Ariza, I.
+            Ariza, I. and
+            Pacher, M.
             },
         howpublished={https://github.com/compas-dev/compas\_fab/},
         note={Gramazio Kohler Research, ETH Z\"{u}rich},
