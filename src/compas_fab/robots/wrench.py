@@ -284,6 +284,9 @@ class Wrench():
             if math.fabs(a - b) > tol:
                 return False
         return True
+    
+    def __ne__(self, other, tol=1e-05):
+        return not self.__eq__(other, tol))
 
     # ==========================================================================
     # transformations
