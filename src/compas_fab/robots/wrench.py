@@ -388,11 +388,3 @@ class Wrench():
 
         return Wrench(self.force - force_gravity, self.torque - torque_gravity)
 
-
-# ==============================================================================
-# Main
-# ==============================================================================
-if __name__ == "__main__":
-    from compas.geometry import Rotation
-    import doctest
-    doctest.testmod(globs=globals())
