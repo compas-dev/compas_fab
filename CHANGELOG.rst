@@ -12,7 +12,9 @@ Unreleased
 
 **Added**
 
-* ..
+* Added ``compas_fab.robots.wrench``: a Wrench class representing force in free space, separated into its linear (force) and angular (torque) parts.
+* Added ``compas_fab.robots.inertia``: a Inertia class representing spatial distribution of mass in a rigid body
+* Added ``Wrench(ROSmsg)`` and ``Inertia(ROSmsg)`` in ``compas_fab.backends.ros.messages.geometry_msgs``
 
 **Changed**
 
