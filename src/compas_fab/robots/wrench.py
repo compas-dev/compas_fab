@@ -16,6 +16,7 @@ else:
 # TODO: move to some constants file? g is also defined in scipy.constants
 # standard acceleration of gravity [m/s**2]
 g = 9.80665
+gravity_vector = Vector(0, 0, -g)
 
 
 __all__ = ['Wrench']
@@ -23,7 +24,6 @@ __all__ = ['Wrench']
 
 class Wrench():
     """A wrench represents force in free space, separated into its linear (force) and angular (torque) parts.
-    represents both translational and rotational acceleration
 
     Attributes
     ----------
@@ -37,6 +37,7 @@ class Wrench():
     >>> from compas.geometry import Vector
     >>> w = Wrench([1, 2, 3], [0.1, 0.2, 0.3])
     >>> w = Wrench(Vector(1, 2, 3), Vector(0.1, 0.2, 0.3))
+
     """
 
     def __init__(self, force, torque):
@@ -58,7 +59,7 @@ class Wrench():
 
         Returns
         -------
-        Wrench
+        :class:`Wrench`
             The constructed wrench.
 
         Examples
@@ -80,7 +81,7 @@ class Wrench():
 
         Returns
         -------
-        Wrench
+        :class:`Wrench`
             The constructed wrench.
 
         Examples
@@ -93,17 +94,15 @@ class Wrench():
         return cls(force, torque)
 
     @classmethod
-    def by_samples(cls, wrenches, proportiontocut=0.1):
+    def by_samples(cls, wrenches, proportion_to_cut=0.1):
         """
         Construct the wrench by sampled data, allowing to filter.
 
         Parameters
         ----------
-        forces : :obj:`list` of :obj:`list` of :obj:`float`
-            List of forces.
-        torques : :obj:`list` of :obj:`list` of :obj:`float`
-            List of torques.
-        proportiontocut : :obj:`float`
+        wrenches : list of :class:`Wrench`
+            List of wrenches.
+        proportion_to_cut : :obj:`float`
             Fraction to cut off of both tails of the distribution
 
         Returns
@@ -113,10 +112,10 @@ class Wrench():
 
         Examples
         --------
-        >>> w1 = Wrench([1,1,1], [.1,.1,.1])
-        >>> w2 = Wrench([2,2,2], [.2,.2,.2])
-        >>> w3 = Wrench([3,3,3], [.3,.3,.3])
-        >>> w = Wrench.by_samples([w1,w2,w3])
+        >>> w1 = Wrench([1, 1, 1], [.1,.1,.1])
+        >>> w2 = Wrench([2, 2, 2], [.2,.2,.2])
+        >>> w3 = Wrench([3, 3, 3], [.3,.3,.3])
+        >>> w = Wrench.by_samples([w1, w2, w3])
         >>> print(w)
         Wrench(Vector(2.000, 2.000, 2.000), Vector(0.200, 0.200, 0.200))
         """
@@ -125,8 +124,8 @@ class Wrench():
 
         forces = [w.force for w in wrenches]
         torques = [w.torque for w in wrenches]
-        force = stats.trim_mean(forces, proportiontocut, axis=0).tolist()
-        torque = stats.trim_mean(torques, proportiontocut, axis=0).tolist()
+        force = stats.trim_mean(forces, proportion_to_cut, axis=0).tolist()
+        torque = stats.trim_mean(torques, proportion_to_cut, axis=0).tolist()
         return cls(force, torque)
 
     # ==========================================================================
@@ -297,7 +296,7 @@ class Wrench():
         ----------
         transformation : :class:`Transformation`
             The transformation to transform the `Wrench`.
-        
+
         Returns
         -------
         None
@@ -334,13 +333,17 @@ class Wrench():
         wrench.transform(transformation)
         return wrench
 
-    def gravity_compensated(self, frame, inertia):
+    def gravity_compensated(self, ft_sensor_frame, mass, center_of_mass):
         """Removes the force and torque in effect of gravity from the wrench.
 
         Parameters
         ----------
-        frame : :class:`compas.geometry.Frame`
-            A frame.
+        ft_sensor_frame : :class:`compas.geometry.Frame`
+            The coordinate frame of the force torque sensor.
+        mass: float
+            The mass of the object in kg.
+        center_of_mass : :class:`Point`
+            The center of mass of the object in meters.
 
         Returns
         -------
@@ -349,40 +352,44 @@ class Wrench():
 
         Examples
         --------
-        >>> from compas.geometry import Frame
-        >>> from inertia import Inertia
-        >>> i = Inertia(10, [0,0,1]
-        >>> f = Frame([0,0,0], [1,0,0], [0,1,0])
-        >>> w = Wrench([0,0,-98], [0,0,0])
-        >>> w.gravity_compensated(f, i)
-        Wrench(Vector(0.000, 0.000, 0.000), Vector(0.000, 0.000, 0.000), Mass(10), CoM(Vector(0.000, 0.000, 1.000)), Tensor(None), Gravity magnitude(9.8))
-        >>> i = Inertia(10, [1,1,1])
-        >>> f = Frame([0,0,0], [1,0,0], [0,1,0])
-        >>> w = Wrench([0,0,-98], [-98,98,0])
-        >>> w.gravity_compensated(f, i)
-        Wrench(Vector(0.000, 0.000, 0.000), Vector(0.000, 0.000, 0.000), Mass(10), CoM(Vector(1.000, 1.000, 1.000)), Tensor(None), Gravity magnitude(9.8))
+        >>> mass, com = 10, [0, 0, 1]
+        >>> f = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+        >>> w = Wrench([0, 0, -98], [0, 0, 0])
+        >>> w.gravity_compensated(f, mass, com)
+        Wrench(Vector(0.000, 0.000, 0.066), Vector(0.000, 0.000, 0.000))
+
+        >>> mass, com = 10, [1, 1, 1]
+        >>> f = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+        >>> w = Wrench([0, 0, -98], [-98, 98, 0])
+        >>> w.gravity_compensated(f, mass, com)
+        Wrench(Vector(0.000, 0.000, 0.066), Vector(-88.193, 88.193, 0.000))
+
+        Notes
+        -----
+        For more info, see [1]_.
+
+        References
+        ----------
+        .. [1] Vougioukas S., *Bias Estimation and Gravity Compensation For
+            Force-Torque Sensors*,
+            Available at: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.552.109.
         """
         # transform gravity vector to FT Sensor coordinate system (FTSCS)
-        FTSCS_transformation = Transformation.from_frame_to_frame(frame, Frame.worldXY())
-        gravity_vector_FTSCS = inertia.gravity_vector_WCS.transformed(FTSCS_transformation)
+        gravity_vector_FTSCS = ft_sensor_frame.to_local_coords(gravity_vector)
 
-        # F gravity compensation
-        # F = gravity * mass
-        F_gravity = gravity_vector_FTSCS * inertia.mass
+        # F gravity compensation, F = gravity * mass
+        force_gravity = gravity_vector_FTSCS * mass
 
-        # T gravity compensation
-        # T = (lever_arm * mass) X gravity_vector_FTSCS
-        T_gravity = Vector(*cross_vectors((inertia.center_of_mass * inertia.mass), gravity_vector_FTSCS))
+        # torque gravity compensation, T = (lever_arm * mass) X gravity_vector_FTSCS
+        torque_gravity = Vector(*cross_vectors((center_of_mass * mass), gravity_vector_FTSCS))
 
-        force = self.force - F_gravity
-        torque = self.torque - T_gravity
-        return Wrench(force, torque)
+        return Wrench(self.force - force_gravity, self.torque - torque_gravity)
 
 
 # ==============================================================================
 # Main
 # ==============================================================================
 if __name__ == "__main__":
-
+    from compas.geometry import Rotation
     import doctest
-    doctest.testmod()
+    doctest.testmod(globs=globals())
