@@ -1,25 +1,66 @@
-from compas.geometry import Vector
+from compas.geometry import Point
 
 
 class Inertia():
-    """
-    A Rigid Body Inertia object is defined by...
-    http://docs.ros.org/kinetic/api/geometry_msgs/html/msg/Inertia.html
+    """The moments of inertia represent the spatial distribution of mass in a rigid body.
 
-    Parameters
+    It depends on the mass, size, and shape of a rigid body with units of
+    [mass * m**2]. The moments of inertia can be expressed as the components of
+    a symmetric positive-definite 3x3 matrix, with 3 diagonal elements, and 3
+    unique off-diagonal elements. Each inertia matrix is defined relative to a
+    coordinate frame or set of axes.
+
+    Attributes
     ----------
-    mass: float [Kg]
-    center_of_mass : list of 3 float [meters]
-    inertia_tensor : 3x3 rotation matrix [kg-m**2]
-    gravity_magniture : float [m/s**2]
+    inertia_tensor : list of float
+        A symmetric positive-definite 3x3 matrix:
+        | ixx ixy ixz |
+        | ixy iyy iyz |
+        | ixz iyz izz |
+        with [ixx, iyy, izz] as the principal moments of inertia and
+        [ixy, ixz, iyz] as the products of inertia.
+    mass: float
+        The mass of the object in kg.
+    center_of_mass : :class:`Point`
+        The center of mass of the object in meters.
+
+    Examples
+    --------
+    >>> inertia = Inertia([[0] * 3] * 3, 1., Point(0.1, 3.1, 4.4))
+    >>> inertia
+    Inertia([[0, 0, 0], [0, 0, 0], [0, 0, 0]], 1.0, Point(0.100, 3.100, 4.400))
+    >>> inertia.principal_moments
+    [0, 0, 0]
+
+    Notes
+    -----
+    Assuming uniform mass density, inertial data can be obtained using the
+    free software MeshLab, refering to this great tutorial:
+    http://gazebosim.org/tutorials?tut=inertia
     """
 
-    def __init__(self, mass, center_of_mass, inertia_tensor=None, gravity_magniture=9.8):
-        self.mass = mass
-        self.center_of_mass = Vector(*center_of_mass)
+    def __init__(self, inertia_tensor, mass, center_of_mass):
         self.inertia_tensor = inertia_tensor
-        self.gravity_magniture = gravity_magniture
-        self.gravity_vector_WCS = Vector(0.0, 0.0, -self.gravity_magniture)
+        self.mass = mass
+        self.center_of_mass = Point(*center_of_mass)
+
+    @property
+    def principal_moments(self):
+        """Returns the diagonal elements of the inertia tensor [ixx, iyy, izz]
+        """
+        I = self.inertia_tensor
+        return [I[0][0], I[1][1], I[2][2]]
 
     def __repr__(self):
-        return "Mass({0}), CoM({1}), Tensor({2}), Gravity magnitude({3})".format(self.mass, self.center_of_mass, self.inertia_tensor, self.gravity_magniture)
+        return "Inertia({0}, {1}, {2})".format(self.inertia_tensor, self.mass, self.center_of_mass)
+
+    @staticmethod
+    def calculate_inertia_tensor(cls, mesh):
+        """Returns the inertia tensor.
+        """
+        raise NotImplementedError
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(globs=globals())
