@@ -37,3 +37,4 @@ Authors
 * Augusto Gandia <gandia@arch.ethz.ch> `@augustogandia <https://github.com/augustogandia>`_
 * Zhao Ma <ma@arch.ethz.ch> `@xarthurx <https://github.com/xarthurx>`_
 * Inés Ariza <ariza@arch.ethz.ch> `@inesariza <https://github.com/inesariza>`_
+* Matteo Pacher <pacher@arch.ethz.ch> `@matteo-pacher <https://github.com/matteo-pacher>`_
