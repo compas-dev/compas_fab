@@ -4,8 +4,8 @@ from compas.geometry import Frame
 
 import compas_fab.robots
 
-from .std_msgs import Header
-from .std_msgs import ROSmsg
+from compas_fab.backends.ros.messages import Header
+from compas_fab.backends.ros.messages import ROSmsg
 
 
 class Point(ROSmsg):
@@ -158,3 +158,53 @@ class WrenchStamped(ROSmsg):
         header = Header.from_msg(msg['header'])
         wrench = Wrench.from_msg(msg['wrench'])
         return cls(header, wrench)
+
+
+class Inertia(ROSmsg):
+    """http://docs.ros.org/api/geometry_msgs/html/msg/Inertia.html
+
+    Examples
+    --------
+    >>> inertia = compas_fab.robots.Inertia([[0] * 3] * 3, 1., [0.1, 3.1, 4.4])
+    >>> ros_inertia = Inertia.from_inertia(inertia)
+    >>> ros_inertia.msg
+    {'m': 1.0, 'com': {'x': 0.1, 'y': 3.1, 'z': 4.4}, 'ixx': 0.0, 'ixy': 0.0, 'ixz': 0.0, 'iyy': 0.0, 'iyz': 0.0, 'izz': 0.0}
+    >>> ros_inertia.inertia
+    Inertia([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], 1.0, Point(0.100, 3.100, 4.400))
+    """
+
+    def __init__(self, m=0.0, com=None, ixx=0., ixy=0., ixz=0., iyy=0., iyz=0., izz=0.):
+        self.m = float(m)  # Mass [kg]
+        self.com = com or Vector3()  # Center of mass [m]
+        self.ixx = float(ixx)
+        self.ixy = float(ixy)
+        self.ixz = float(ixz)
+        self.iyy = float(iyy)
+        self.iyz = float(iyz)
+        self.izz = float(izz)
+
+    @classmethod
+    def from_msg(cls, msg):
+        com = Vector3.from_msg(msg['com'])
+        return cls(msg['m'], com, msg['ixx'], msg['ixy'], msg['ixz'], msg['iyy'], msg['iyz'], msg['izz'])
+
+    @classmethod
+    def from_inertia(cls, inertia):
+        m = inertia.mass
+        com = Vector3(*list(inertia.center_of_mass))
+        ixx, ixy, ixz = inertia.inertia_tensor[0]
+        ixy, iyy, iyz = inertia.inertia_tensor[1]
+        izz = inertia.inertia_tensor[2][2]
+        return cls(m, com, ixx, ixy, ixz, iyy, iyz, izz)
+
+    @property
+    def inertia(self):
+        inertia_tensor = [[self.ixx, self.ixy, self.ixz],
+                          [self.ixy, self.iyy, self.iyz],
+                          [self.ixz, self.iyz, self.izz]]
+        return compas_fab.robots.Inertia(inertia_tensor, self.m, [self.com.x, self.com.y, self.com.z])
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

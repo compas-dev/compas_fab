@@ -79,5 +79,6 @@ from .semantics import *
 from .time_ import *
 from .trajectory import *
 from .wrench import *
+from .inertia import *
 
 __all__ = [name for name in dir() if not name.startswith('_')]
