@@ -118,6 +118,15 @@ class Wrench(ROSmsg):
     """http://docs.ros.org/api/geometry_msgs/html/msg/Wrench.html
 
     This represents force in free space, separated into its linear and angular parts.
+
+    Examples
+    --------
+    >>> wrench = compas_fab.robots.Wrench([0, 0, -98], [0, 0, 0])
+    >>> ros_wrench = Wrench.from_wrench(wrench)
+    >>> ros_wrench.msg
+    {'force': {'x': 0.0, 'y': 0.0, 'z': -98.0}, 'torque': {'x': 0.0, 'y': 0.0, 'z': 0.0}}
+    >>> ros_wrench.wrench
+    Wrench(Vector(0.000, 0.000, -98.000), Vector(0.000, 0.000, 0.000))
     """
 
     def __init__(self, force=None, torque=None):
