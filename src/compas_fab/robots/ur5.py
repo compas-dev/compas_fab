@@ -64,8 +64,3 @@ def Robot(client=None, load_geometry=False):
         robot.client = client
 
     return robot
-
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()

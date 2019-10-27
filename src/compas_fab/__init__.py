@@ -16,7 +16,7 @@ environments.
     compas_fab.backends
     compas_fab.robots
     compas_fab.utilities
-
+    compas_fab.sensors
     compas_fab.blender
     compas_fab.ghpython
     compas_fab.rhino

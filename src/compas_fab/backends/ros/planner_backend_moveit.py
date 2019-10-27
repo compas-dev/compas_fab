@@ -93,18 +93,25 @@ class MoveItPlanner(PlannerBackend):
                                             GetPlanningSceneResponse)
 
     def init_planner(self):
-        self.collision_object_topic = Topic(self, '/collision_object',
-                                            'moveit_msgs/CollisionObject', queue_size=None)
+        self.collision_object_topic = Topic(
+            self,
+            '/collision_object',
+            'moveit_msgs/CollisionObject',
+            queue_size=None)
         self.collision_object_topic.advertise()
 
         self.attached_collision_object_topic = Topic(
-            self, '/attached_collision_object',
-            'moveit_msgs/AttachedCollisionObject', queue_size=None)
+            self,
+            '/attached_collision_object',
+            'moveit_msgs/AttachedCollisionObject',
+            queue_size=None)
         self.attached_collision_object_topic.advertise()
 
     def dispose_planner(self):
-        self.collision_object_topic.unadvertise()
-        self.attached_collision_object_topic.unadvertise()
+        if hasattr(self, 'collision_object_topic') and self.collision_object_topic:
+            self.collision_object_topic.unadvertise()
+        if hasattr(self, 'attached_collision_object_topic') and self.attached_collision_object_topic:
+            self.attached_collision_object_topic.unadvertise()
 
     # ==========================================================================
     # planning services
@@ -133,7 +140,10 @@ class MoveItPlanner(PlannerBackend):
                                        avoid_collisions=avoid_collisions,
                                        attempts=attempts)
 
-        self.GET_POSITION_IK(self, (ik_request, ), callback, errback)
+        def convert_to_positions(response):
+            callback(response.solution.joint_state.position)
+
+        self.GET_POSITION_IK(self, (ik_request, ), convert_to_positions, errback)
 
     def forward_kinematics_async(self, callback, errback, joint_positions, base_link,
                                  group, joint_names, ee_link):
@@ -145,13 +155,16 @@ class MoveItPlanner(PlannerBackend):
         robot_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
 
+        def convert_to_frame(response):
+            callback(response.pose_stamped[0].pose.frame)
+
         self.GET_POSITION_FK(self, (header, fk_link_names,
-                                    robot_state), callback, errback)
+                                    robot_state), convert_to_frame, errback)
 
     def plan_cartesian_motion_async(self, callback, errback, frames, base_link,
                                     ee_link, group, joint_names, joint_types,
                                     start_configuration, max_step, jump_threshold,
-                                    avoid_collisions, path_constraints, 
+                                    avoid_collisions, path_constraints,
                                     attached_collision_meshes):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
         header = Header(frame_id=base_link)
@@ -179,6 +192,7 @@ class MoveItPlanner(PlannerBackend):
             trajectory = JointTrajectory()
             trajectory.source_message = response
             trajectory.fraction = response.fraction
+            trajectory.joint_names = response.solution.joint_trajectory.joint_names
             trajectory.points = convert_trajectory_points(response.solution.joint_trajectory.points, joint_types)
             trajectory.start_configuration = Configuration(response.start_state.joint_state.position, start_configuration.types)
 
@@ -260,6 +274,7 @@ class MoveItPlanner(PlannerBackend):
             trajectory = JointTrajectory()
             trajectory.source_message = response
             trajectory.fraction = 1.
+            trajectory.joint_names = response.trajectory.joint_trajectory.joint_names
             trajectory.points = convert_trajectory_points(response.trajectory.joint_trajectory.points, joint_types)
             trajectory.start_configuration = Configuration(response.trajectory_start.joint_state.position, start_configuration.types)
             trajectory.planning_time = response.planning_time
@@ -299,6 +314,9 @@ class MoveItPlanner(PlannerBackend):
         self._collision_object(co, CollisionObject.APPEND)
 
     def _collision_object(self, collision_object, operation=CollisionObject.ADD):
+        if not hasattr(self, 'collision_object_topic') or not self.collision_object_topic:
+            self.init_planner()
+
         collision_object.operation = operation
         self.collision_object_topic.publish(collision_object.msg)
 
@@ -315,5 +333,8 @@ class MoveItPlanner(PlannerBackend):
         return self._attached_collision_object(aco, operation=CollisionObject.REMOVE)
 
     def _attached_collision_object(self, attached_collision_object, operation=CollisionObject.ADD):
+        if not hasattr(self, 'attached_collision_object_topic') or not self.attached_collision_object_topic:
+            self.init_planner()
+
         attached_collision_object.object.operation = operation
         self.attached_collision_object_topic.publish(attached_collision_object.msg)

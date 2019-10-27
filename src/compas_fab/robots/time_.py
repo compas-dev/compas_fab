@@ -28,6 +28,15 @@ class Duration(object):
     def __repr__(self):
         return self.__str__()
 
+    def __eq__(self, other):
+        if isinstance(other, Duration):
+            return self.seconds == other.seconds
+
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     @property
     def seconds(self):
         """Returns the duration as floating-point seconds.

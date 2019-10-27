@@ -7,6 +7,9 @@ compas_fab.sensors
 
 Package containing a common interface to integrate sensors of various vendors.
 
+Main classes
+------------
+
 .. autosummary::
     :toctree: generated/
     :nosignatures:
@@ -14,7 +17,7 @@ Package containing a common interface to integrate sensors of various vendors.
     SerialSensor
 
 Baumer sensors
-==============
+--------------
 
 .. currentmodule:: compas_fab.sensors.baumer
 
@@ -25,7 +28,11 @@ Baumer sensors
     :nosignatures:
 
     PosCon3D
+    PosConCM
 
 """
 
 from .base import *
+from .baumer import *
+
+__all__ = [name for name in dir() if not name.startswith('_')]

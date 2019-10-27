@@ -54,17 +54,16 @@ class VrepClient(object):
 
         >>> from compas_fab.backends import VrepClient
         >>> with VrepClient() as client:
-        ...     print ('Connected: %s' % client.is_connected
-        ...
+        ...     print ('Connected: %s' % client.is_connected)
         Connected: True
 
     Note:
         For more examples, check out the :ref:`V-REP examples page <examples_vrep>`.
     """
     SUPPORTED_PLANNERS = ('bitrrt', 'bkpiece1', 'est', 'kpiece1',
-                            'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst',
-                            'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar',
-                            'sbl', 'stride', 'trrt')
+                           'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst',
+                           'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar',
+                           'sbl', 'stride', 'trrt')
 
     def __init__(self, host='127.0.0.1', port=19997, scale=DEFAULT_SCALE, lua_script='RFL', debug=False):
         super(VrepClient, self).__init__()
@@ -150,8 +149,8 @@ class VrepClient(object):
             >>> from compas_fab.backends import VrepClient
             >>> with VrepClient() as client:
             ...     matrices = client.get_object_matrices([0])
-            ...     print([int(i) for i in matrices[0]])
-            [0, 0, 0, 19, 0, 0, 0, 10, 0, 0, 0, 6]
+            ...     print([int(i) for i in matrices[0]])   # doctest: +SKIP
+            [0, 0, 0, 19, 0, 0, 0, 10, 0, 0, 0, 6]         # doctest: +SKIP
 
         .. note::
             The resulting dictionary is keyed by object handle.
@@ -226,7 +225,7 @@ class VrepClient(object):
             >>> with VrepClient() as client:
             ...     config = Configuration.from_prismatic_and_revolute_values([7.600, -4.500, -5.500],
             ...                                                               to_radians([90, 0, 0, 0, 0, -90]))
-            ...     client.set_robot_config(Robot.basic('A', index=0), config)
+            ...     client.set_robot_config(rfl.Robot('A'), config)
             ...
         """
         assert_robot(robot)
@@ -250,7 +249,7 @@ class VrepClient(object):
 
             >>> from compas_fab.robots import *
             >>> with VrepClient() as client:
-            ...     config = client.get_robot_config(Robot.basic('A', index=0))
+            ...     config = client.get_robot_config(rfl.Robot('A'))
 
         Returns:
             An instance of :class:`.Configuration`.
@@ -272,7 +271,7 @@ class VrepClient(object):
 
             >>> from compas_fab.robots import *
             >>> with VrepClient() as client:
-            ...     frame = client.forward_kinematics(Robot.basic('A', index=0))
+            ...     frame = client.forward_kinematics(rfl.Robot('A'))
 
         Returns:
             An instance of :class:`Frame`.
@@ -280,8 +279,8 @@ class VrepClient(object):
         assert_robot(robot)
 
         _res, _, pose, _, _ = self.run_child_script('getIkTipPose',
-                                                      [robot.model.attr['index']],
-                                                      [], [])
+                                                     [robot.model.attr['index']],
+                                                     [], [])
         return vrep_pose_to_frame(pose, self.scale)
 
     def inverse_kinematics(self, robot, goal_frame, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):

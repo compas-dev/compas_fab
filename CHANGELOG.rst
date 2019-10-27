@@ -7,15 +7,34 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-Unreleased
+0.7.0
 ----------
 
 **Changed**
 
+* Fixed Python 2 vs Python 3 incompatibilities in ``compas_fab.sensors`` module
+* Changed example for loading PosConCM (includes parity argument, differs from PosCon3D)
+* Changed format ``compas_fab.sensors.baumer.PosConCM.set_flex_mount()``
+* Changed tasks.py to run ``invoke test``
+* Renamed ``compas_fab.backends.CancellableTask`` to ``compas_fab.backends.CancellableFutureResult``
+* ROS client: changed joint trajectory follower (``follow_joint_trajectory``) to support generic ``JointTrajectory`` arguments.
+* ROS client: changed return type of trajectory execution methods to ``CancellableFutureResult``
+
 **Added**
+
+* Added ``compas_fab.sensors.baumer.PosCon3D.reset()``
+* Added ``compas_fab.sensors.baumer.PosConCM.reset()``
+* ROS client: added support for MoveIt! execution action via ``client.execute_joint_trajectory``.
+* Added ``compas_fab.backends.FutureResult`` class to deal with long-running async tasks
 
 **Removed**
 
+* Removed ``compas_fab.sensors.baumer.PosConCM.get_live_monitor_data()``
+* Removed non-implemented methods from ``compas_fab.robots.Robot``: ``send_frame``, ``send_configuration``, ``send_trajectory``
+
+**Fixed**
+
+* Fixed missing planner initialization when used without context manager.
 
 0.6.0
 ----------

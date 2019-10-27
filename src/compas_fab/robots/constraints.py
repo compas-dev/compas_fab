@@ -46,6 +46,8 @@ class BoundingVolume(object):
         >>> from compas_fab.robots import BoundingVolume
         >>> box = Box(Frame.worldXY(), 1., 1., 1.)
         >>> bv = BoundingVolume.from_box(box)
+        >>> bv.type
+        1
         """
         return cls(cls.BOX, box)
 
@@ -63,6 +65,8 @@ class BoundingVolume(object):
         >>> from compas_fab.robots import BoundingVolume
         >>> sphere = Sphere((1., 1., 1.), 5.)
         >>> bv = BoundingVolume.from_sphere(sphere)
+        >>> bv.type
+        2
         """
         return cls(cls.SPHERE, sphere)
 
@@ -81,6 +85,8 @@ class BoundingVolume(object):
         >>> from compas_fab.robots import BoundingVolume
         >>> mesh = Mesh.from_obj(compas.get('faces.obj'))
         >>> bv = BoundingVolume.from_mesh(Mesh)
+        >>> bv.type
+        3
         """
         return cls(cls.MESH, mesh)
 
@@ -312,10 +318,3 @@ class PositionConstraint(Constraint):
     def copy(self):
         cls = type(self)
         return cls(self.link_name, self.bounding_volume.copy(), self.weight)
-
-
-if __name__ == "__main__":
-
-    import doctest
-    doctest.testmod()
-    # print([name for name in dir() if not name.startswith('_')])

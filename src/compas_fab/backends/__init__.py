@@ -26,14 +26,15 @@ ROS
     RosClient
     RosFileServerLoader
 
-Tasks
------
+Long-running tasks
+------------------
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
-    CancellableTask
+    FutureResult
+    CancellableFutureResult
 
 Exceptions
 ----------

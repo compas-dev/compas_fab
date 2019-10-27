@@ -1,21 +1,21 @@
 from __future__ import absolute_import
 
-from compas_fab.backends.ros.messages.std_msgs import ROSmsg
-from compas_fab.backends.ros.messages.std_msgs import Header
 from compas_fab.backends.ros.messages.geometry_msgs import Point
 from compas_fab.backends.ros.messages.geometry_msgs import Pose
 from compas_fab.backends.ros.messages.geometry_msgs import PoseStamped
-from compas_fab.backends.ros.messages.geometry_msgs import Vector3
 from compas_fab.backends.ros.messages.geometry_msgs import Quaternion
-from compas_fab.backends.ros.messages.shape_msgs import SolidPrimitive
-from compas_fab.backends.ros.messages.shape_msgs import Plane
-from compas_fab.backends.ros.messages.shape_msgs import Mesh
-from compas_fab.backends.ros.messages.sensor_msgs import JointState
-from compas_fab.backends.ros.messages.sensor_msgs import MultiDOFJointState
-from compas_fab.backends.ros.messages.trajectory_msgs import JointTrajectory
-from compas_fab.backends.ros.messages.trajectory_msgs import MultiDOFJointTrajectory
+from compas_fab.backends.ros.messages.geometry_msgs import Vector3
 from compas_fab.backends.ros.messages.object_recognition_msgs import ObjectType
 from compas_fab.backends.ros.messages.octomap_msgs import OctomapWithPose
+from compas_fab.backends.ros.messages.sensor_msgs import JointState
+from compas_fab.backends.ros.messages.sensor_msgs import MultiDOFJointState
+from compas_fab.backends.ros.messages.shape_msgs import Mesh
+from compas_fab.backends.ros.messages.shape_msgs import Plane
+from compas_fab.backends.ros.messages.shape_msgs import SolidPrimitive
+from compas_fab.backends.ros.messages.std_msgs import Header
+from compas_fab.backends.ros.messages.std_msgs import ROSmsg
+from compas_fab.backends.ros.messages.trajectory_msgs import JointTrajectory
+from compas_fab.backends.ros.messages.trajectory_msgs import MultiDOFJointTrajectory
 
 
 class CollisionObject(ROSmsg):
@@ -139,27 +139,6 @@ class RobotState(ROSmsg):
 
 class PositionIKRequest(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionIKRequest.html
-
-    Examples
-    --------
-    >>> base_link = 'base_link'
-    >>> planning_group = 'manipulator'
-    >>> pose = Pose([420, -25, 459], [1, 0, 0], [0, 1, 0])
-    >>> joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint',
-                       'elbow_joint', 'wrist_1_joint', 'wrist_2_joint',
-                       'wrist_3_joint']
-    >>> joint_positions = [3.39, -1.47, -2.05, 0.38, -4.96, -6.28]
-    >>> header = Header(frame_id='base_link')
-    >>> pose_stamped = PoseStamped(header, pose)
-    >>> joint_state = JointState(name=joint_names, position=joint_positions,
-                                 header=header)
-    >>> multi_dof_joint_state = MultiDOFJointState(header=header,
-                                                   joint_names=joint_names)
-    >>> start_state = RobotState(joint_state, multi_dof_joint_state)
-    >>> ik_request = PositionIKRequest(group_name=planning_group,
-                                       robot_state=start_state,
-                                       pose_stamped=pose_stamped,
-                                       avoid_collisions=True)
     """
 
     def __init__(self, group_name="robot", robot_state=None, constraints=None,
@@ -255,23 +234,25 @@ class PlannerParams(ROSmsg):
     """
 
     def __init__(self, keys=None, values=None, descriptions=None):
-        self.keys = keys if keys else [] # parameter names (same size as values)
-        self.values = values if values else [] # parameter values (same size as keys)
-        self.descriptions = descriptions if descriptions else [] # parameter description (can be empty)
+        self.keys = keys or []                  # parameter names (same size as values)
+        self.values = values or []              # parameter values (same size as keys)
+        self.descriptions = descriptions or []  # parameter description (can be empty)
+
 
 class WorkspaceParameters(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/WorkspaceParameters.html
     """
-    def __init__(self, header=Header(), min_corner=Vector3(-1000,-1000,-1000), max_corner=Vector3(1000,1000,1000)):
+    def __init__(self, header=Header(), min_corner=Vector3(-1000, -1000, -1000), max_corner=Vector3(1000, 1000, 1000)):
         self.header = header
         self.min_corner = min_corner
         self.max_corner = max_corner
+
 
 class TrajectoryConstraints(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/TrajectoryConstraints.html
     """
     def __init__(self, constraints=None):
-        self.constraints = constraints if constraints else [] #Constraints[]
+        self.constraints = constraints or []  # Constraints[]
 
 
 class JointConstraint(ROSmsg):
@@ -291,21 +272,23 @@ class JointConstraint(ROSmsg):
         c = joint_constraint
         return cls(c.joint_name, c.value, c.tolerance, c.tolerance, c.weight)
 
+
 class VisibilityConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/VisibilityConstraint.html
     """
     def __init__(self):
         raise NotImplementedError
 
+
 class BoundingVolume(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/BoundingVolume.html
     """
     def __init__(self, primitives=None, primitive_poses=None, meshes=None,
                  mesh_poses=None):
-        self.primitives = primitives if primitives else [] #shape_msgs/SolidPrimitive[]
-        self.primitive_poses = primitive_poses if primitive_poses else [] #geometry_msgs/Pose[]
-        self.meshes = meshes if meshes else [] #shape_msgs/Mesh[]
-        self.mesh_poses = mesh_poses if mesh_poses else [] #geometry_msgs/Pose[]
+        self.primitives = primitives or []            # shape_msgs/SolidPrimitive[]
+        self.primitive_poses = primitive_poses or []  # geometry_msgs/Pose[]
+        self.meshes = meshes or []                    # shape_msgs/Mesh[]
+        self.mesh_poses = mesh_poses or []            # geometry_msgs/Pose[]
 
     @classmethod
     def from_box(cls, box):
@@ -360,16 +343,17 @@ class BoundingVolume(ROSmsg):
         else:
             raise NotImplementedError
 
+
 class PositionConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionConstraint.html
     """
     def __init__(self, header=None, link_name=None, target_point_offset=None,
                  constraint_region=None, weight=None):
-        self.header = header if header else Header()
-        self.link_name = link_name if link_name else ""
-        self.target_point_offset = target_point_offset if target_point_offset else Vector3(0.,0.,0.) # geometry_msgs/Vector3
-        self.constraint_region = constraint_region if constraint_region else BoundingVolume() # moveit_msgs/BoundingVolume
-        self.weight = float(weight) if weight else 1.
+        self.header = header or Header()
+        self.link_name = link_name or ""
+        self.target_point_offset = target_point_offset or Vector3(0., 0., 0.)  # geometry_msgs/Vector3
+        self.constraint_region = constraint_region or BoundingVolume()         # moveit_msgs/BoundingVolume
+        self.weight = float(weight) or 1.
 
     @classmethod
     def from_position_constraint(cls, header, position_constraint):
@@ -377,6 +361,7 @@ class PositionConstraint(ROSmsg):
         """
         constraint_region = BoundingVolume.from_bounding_volume(position_constraint.bounding_volume)
         return cls(header, position_constraint.link_name, None, constraint_region, position_constraint.weight)
+
 
 class OrientationConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/OrientationConstraint.html
@@ -393,9 +378,9 @@ class OrientationConstraint(ROSmsg):
         the z-axis by an angle of 6.3 radians, whereas the z-axis can only change
         by 0.01.
         """
-        self.header = header if header else Header()
-        self.orientation = orientation or Quaternion()#geometry_msgs/Quaternion
-        self.link_name = link_name if link_name else ""
+        self.header = header or Header()
+        self.orientation = orientation or Quaternion()  # geometry_msgs/Quaternion
+        self.link_name = link_name or ""
         self.absolute_x_axis_tolerance = float(absolute_x_axis_tolerance)
         self.absolute_y_axis_tolerance = float(absolute_y_axis_tolerance)
         self.absolute_z_axis_tolerance = float(absolute_z_axis_tolerance)
@@ -449,7 +434,7 @@ class PlanningSceneComponents(ROSmsg):
         return ''
 
 
-class  AllowedCollisionMatrix(ROSmsg):
+class AllowedCollisionMatrix(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/AllowedCollisionMatrix.html
     """
     def __init__(self, entry_names=None, entry_values=None, default_entry_names=None, default_entry_values=None):
@@ -481,29 +466,16 @@ class PlanningScene(ROSmsg):
                  fixed_frame_transforms=None, allowed_collision_matrix=None,
                  link_padding=None, link_scale=None, object_colors=None, world=None,
                  is_diff=False):
-        self.name = name  # string
-        self.robot_state = robot_state or RobotState()  # moveit_msgs/RobotState
-        self.robot_model_name = robot_model_name  # string
+        self.name = name                                            # string
+        self.robot_state = robot_state or RobotState()              # moveit_msgs/RobotState
+        self.robot_model_name = robot_model_name                    # string
         self.fixed_frame_transforms = fixed_frame_transforms or []  # geometry_msgs/TransformStamped[]
         self.allowed_collision_matrix = allowed_collision_matrix or AllowedCollisionMatrix()
-        self.link_padding = link_padding or []  # moveit_msgs/LinkPadding[]
-        self.link_scale = link_scale or []  # moveit_msgs/LinkScale[]
-        self.object_colors = object_colors or []  # moveit_msgs/ObjectColor[]
-        self.world = world or PlanningSceneWorld()  # moveit_msgs/PlanningSceneWorld
-        self.is_diff = is_diff  # bool
-
-        """
-        SCENE_SETTINGS = 1
-        ROBOT_STATE=2
-        ROBOT_STATE_ATTACHED_OBJECTS=4
-        WORLD_OBJECT_NAMES=8
-        WORLD_OBJECT_GEOMETRY=16
-        OCTOMAP=32
-        TRANSFORMS=64
-        ALLOWED_COLLISION_MATRIX=128
-        LINK_PADDING_AND_SCALING=256
-        OBJECT_COLORS=512
-        """
+        self.link_padding = link_padding or []                      # moveit_msgs/LinkPadding[]
+        self.link_scale = link_scale or []                          # moveit_msgs/LinkScale[]
+        self.object_colors = object_colors or []                    # moveit_msgs/ObjectColor[]
+        self.world = world or PlanningSceneWorld()                  # moveit_msgs/PlanningSceneWorld
+        self.is_diff = is_diff                                      # bool
 
     @classmethod
     def from_msg(cls, msg):
@@ -515,3 +487,36 @@ class PlanningScene(ROSmsg):
                    msg['fixed_frame_transforms'], allowed_collision_matrix,
                    msg['link_padding'], msg['link_scale'], msg['object_colors'],
                    world, msg['is_diff'])
+
+
+class ExecuteTrajectoryGoal(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/action/ExecuteTrajectory.html
+    """
+
+    def __init__(self, trajectory=None):
+        self.trajectory = trajectory or RobotTrajectory()
+
+
+class ExecuteTrajectoryFeedback(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/action/ExecuteTrajectory.html
+    """
+
+    def __init__(self, state=None):
+        self.state = state
+
+    @classmethod
+    def from_msg(cls, msg):
+        return cls(msg['state'])
+
+
+class ExecuteTrajectoryResult(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/action/ExecuteTrajectory.html
+    """
+
+    def __init__(self, error_code=None):
+        self.error_code = error_code or MoveItErrorCodes()  # moveit_msgs/MoveItErrorCodes
+
+    @classmethod
+    def from_msg(cls, msg):
+        error_code = MoveItErrorCodes.from_msg(msg['error_code'])
+        return cls(error_code)

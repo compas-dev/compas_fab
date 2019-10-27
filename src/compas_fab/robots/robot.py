@@ -89,12 +89,24 @@ class Robot(object):
         -------
         str
             Name of the robot.
+
+        Examples
+        --------
+        >>> robot.name
+        'ur5'
         """
         return self.model.name
 
     @property
     def group_names(self):
-        """All planning groups of the robot."""
+        """All planning groups of the robot.
+
+        Examples
+        --------
+        >>> robot.group_names
+        ['manipulator', 'endeffector']
+
+        """
         self.ensure_semantics()
         return self.semantics.group_names
 
@@ -120,6 +132,11 @@ class Robot(object):
         Returns
         -------
         str
+
+        Examples
+        --------
+        >>> robot.get_end_effector_link_name()
+        'ee_link'
         """
         if not self.semantics:
             return self.model.get_end_effector_link_name()
@@ -137,6 +154,12 @@ class Robot(object):
         Returns
         -------
         :class: `compas.robots.Link`
+
+        Examples
+        --------
+        >>> link = robot.get_end_effector_link()
+        >>> link.name
+        'ee_link'
         """
         name = self.get_end_effector_link_name(group)
         return self.model.get_link_by_name(name)
@@ -167,6 +190,11 @@ class Robot(object):
         Returns
         -------
         str
+
+        Examples
+        --------
+        >>> robot.get_base_link_name()
+        'base_link'
         """
         if not self.semantics:
             return self.model.get_base_link_name()
@@ -184,6 +212,12 @@ class Robot(object):
         Returns
         -------
         :class: `compas.robots.Link`
+
+        Examples
+        --------
+        >>> link = robot.get_base_link()
+        >>> link.name
+        'base_link'
         """
         name = self.get_base_link_name(group)
         return self.model.get_link_by_name(name)
@@ -266,6 +300,11 @@ class Robot(object):
         Returns
         -------
         list of str
+
+        Examples
+        --------
+        >>> robot.get_link_names('manipulator')
+        ['base_link', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link', 'ee_link']
         """
         base_link_name = self.get_base_link_name(group)
         ee_link_name = self.get_end_effector_link_name(group)
@@ -290,6 +329,12 @@ class Robot(object):
         ----
         If semantics is set and no group is passed, it returns all configurable
         joints of all groups.
+
+        Examples
+        --------
+        >>> joints = robot.get_configurable_joints('manipulator')
+        >>> [j.name for j in joints]
+        ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
         """
         if self.semantics:
             if group:
@@ -336,6 +381,11 @@ class Robot(object):
         ----
         If semantics is set and no group is passed, it returns all configurable
         joints of all groups.
+
+        Examples
+        --------
+        >>> robot.get_configurable_joint_names('manipulator')
+        ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
         """
         configurable_joints = self.get_configurable_joints(group)
         return [j.name for j in configurable_joints]
@@ -356,6 +406,11 @@ class Robot(object):
         ----
         If semantics is set and no group is passed, it returns all configurable
         joint types of all groups.
+
+        Examples
+        --------
+        >>> robot.get_configurable_joint_types('manipulator')
+        [0, 0, 0, 0, 0, 0]
         """
         configurable_joints = self.get_configurable_joints(group)
         return [j.type for j in configurable_joints]
@@ -366,6 +421,11 @@ class Robot(object):
 
     def init_configuration(self, group=None):
         """Returns the init joint configuration.
+
+        Examples
+        --------
+        >>> robot.init_configuration('manipulator')
+        Configuration((0.000, 0.000, 0.000, 0.000, 0.000, 0.000), (0, 0, 0, 0, 0, 0))
         """
         types = [joint.type for joint in self.get_configurable_joints(group)]
         positions = [0.] * len(types)
@@ -633,7 +693,8 @@ class Robot(object):
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerances_axes = [math.radians(1)] * 3
         >>> group = robot.main_group_name
-        >>> goal_constraints = robot.orientation_constraint_from_frame(frame, tolerances_axes, group=group)
+        >>> robot.orientation_constraint_from_frame(frame, tolerances_axes, group=group)
+        OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)
 
         Notes
         -----
@@ -670,7 +731,8 @@ class Robot(object):
         --------
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
-        >>> goal_constraints = robot.position_constraint_from_frame(frame, tolerance_position)
+        >>> robot.position_constraint_from_frame(frame, tolerance_position)
+        PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)
 
         Notes
         -----
@@ -707,7 +769,8 @@ class Robot(object):
         >>> tolerance_position = 0.001
         >>> tolerances_axes = [math.radians(1)]
         >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
+        >>> robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
+        [PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0), OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)]
 
         Notes
         -----
@@ -740,7 +803,8 @@ class Robot(object):
         >>> configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
         >>> tolerances = [math.radians(5)] * 6
         >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances, group)
+        >>> robot.constraints_from_configuration(configuration, tolerances, group)
+        [JointConstraint('shoulder_pan_joint', -0.042, 0.08726646259971647, 1.0), JointConstraint('shoulder_lift_joint', 4.295, 0.08726646259971647, 1.0), JointConstraint('elbow_joint', -4.11, 0.08726646259971647, 1.0), JointConstraint('wrist_1_joint', -3.327, 0.08726646259971647, 1.0), JointConstraint('wrist_2_joint', 4.755, 0.08726646259971647, 1.0), JointConstraint('wrist_3_joint', 0.0, 0.08726646259971647, 1.0)]
 
         Raises
         ------
@@ -818,7 +882,8 @@ class Robot(object):
         >>> frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
         >>> start_configuration = robot.init_configuration()
         >>> group = robot.main_group_name
-        >>> configuration = robot.inverse_kinematics(frame_WCF, start_configuration, group)
+        >>> robot.inverse_kinematics(frame_WCF, start_configuration, group)                 # doctest: +SKIP
+        Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
         self.ensure_client()
         if not group:
@@ -833,12 +898,10 @@ class Robot(object):
         frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
         frame_RCF.point /= self.scale_factor  # must be in meters
 
-        response = self.client.inverse_kinematics(frame_RCF, base_link,
-                                                  group, joint_names, joint_positions,
-                                                  avoid_collisions, constraints, attempts,
-                                                  attached_collision_meshes)
-
-        joint_positions = response.solution.joint_state.position
+        joint_positions = self.client.inverse_kinematics(frame_RCF, base_link,
+                                                         group, joint_names, joint_positions,
+                                                         avoid_collisions, constraints, attempts,
+                                                         attached_collision_meshes)
         joint_positions = self._scale_joint_values(joint_positions, self.scale_factor)
         # full configuration # TODO group config?
         configuration = Configuration(joint_positions, self.get_configurable_joint_types())
@@ -877,6 +940,8 @@ class Robot(object):
         >>> frame_RCF_c == frame_RCF_m
         True
         >>> frame_WCF = robot.represent_frame_in_WCF(frame_RCF_m, group)
+        >>> frame_WCF
+        Frame(Point(0.300, 0.100, 0.500), Vector(1.000, -0.000, -0.000), Vector(0.000, 1.000, -0.000))
 
         """
         if not group:
@@ -900,8 +965,7 @@ class Robot(object):
 
         if not backend:
             if self.client:
-                response = self.client.forward_kinematics(full_joint_positions, base_link_name, group, full_joint_names, link_name)
-                frame_RCF = response.pose_stamped[0].pose.frame
+                frame_RCF = self.client.forward_kinematics(full_joint_positions, base_link_name, group, full_joint_names, link_name)
                 frame_RCF.point *= self.scale_factor
             else:
                 frame_WCF = self.model.forward_kinematics(group_joint_state, link_name)
@@ -934,6 +998,8 @@ class Robot(object):
         >>> configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
         >>> group = robot.main_group_name
         >>> frame_WCF = robot.forward_kinematics(configuration, group)
+        >>> frame_WCF
+        Frame(Point(0.300, 0.100, 0.500), Vector(1.000, -0.000, -0.000), Vector(0.000, 1.000, -0.000))
         """
         if link_name is None:
             link_name = self.get_end_effector_link_name(group)
@@ -983,12 +1049,14 @@ class Robot(object):
                       Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])]
         >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
         >>> group = robot.main_group_name
-        >>> response = robot.plan_cartesian_motion(frames,\
-                                                   start_configuration,\
-                                                   max_step=0.01,\
-                                                   jump_threshold=1.57,\
-                                                   avoid_collisions=True,\
-                                                   group=group)
+        >>> trajectory = robot.plan_cartesian_motion(frames,\
+                                                     start_configuration,\
+                                                     max_step=0.01,\
+                                                     jump_threshold=1.57,\
+                                                     avoid_collisions=True,\
+                                                     group=group)
+        >>> type(trajectory)
+        <class 'compas_fab.robots.trajectory.JointTrajectory'>
         """
         self.ensure_client()
         if not group:
@@ -1091,18 +1159,22 @@ class Robot(object):
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
         >>> tolerances_axes = [math.radians(1)] * 3
-        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
+        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.])
         >>> group = robot.main_group_name
         >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
-        >>> response = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
-
-        >>> # Example with joint constraints
-        >>> configuration = Configuration.from_revolute_values([0.257, 4.945, -4.423, -3.609, 6.030, 1.526])
+        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
+        >>> trajectory.fraction
+        1.0
+        >>> # Example with joint constraints (to the UP configuration)
+        >>> configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0])
         >>> tolerances = [math.radians(5)] * 6
         >>> group = robot.main_group_name
         >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances, group)
-        >>> response = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
-
+        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
+        >>> trajectory.fraction
+        1.0
+        >>> type(trajectory)
+        <class 'compas_fab.robots.trajectory.JointTrajectory'>
         """
 
         # TODO: for the motion plan request a list of possible goal constraints
@@ -1178,21 +1250,6 @@ class Robot(object):
         trajectory.start_configuration.scale(self.scale_factor)
 
         return trajectory
-
-    def send_frame(self):
-        # (check service name with ros)
-        self.ensure_client()
-        raise NotImplementedError
-
-    def send_configuration(self):
-        # (check service name with ros)
-        self.ensure_client()
-        raise NotImplementedError
-
-    def send_trajectory(self):
-        # (check service name with ros)
-        self.ensure_client()
-        raise NotImplementedError
 
     def transformed_frames(self, configuration, group=None):
         """Returns the robot's transformed frames."""
@@ -1296,20 +1353,3 @@ class Robot(object):
             print(info)
         print("The robot's links are:")
         print([l.name for l in self.model.links])
-
-
-if __name__ == "__main__":
-    import doctest
-    import math
-    from compas.datastructures import Mesh
-    from compas.datastructures import mesh_transformed
-    from compas.geometry import Scale
-    from compas_fab.robots.ur5 import Robot as UR5Robot
-    from compas_fab.backends import RosClient
-
-    client = RosClient()
-    client.run()
-    robot = UR5Robot(client)
-    doctest.testmod(globs=globals())
-    client.close()
-    client.terminate()

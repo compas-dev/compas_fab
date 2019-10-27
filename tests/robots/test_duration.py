@@ -28,3 +28,11 @@ def test_to_data():
 
     assert data['secs'] == 2
     assert data['nsecs'] == 5e+8
+
+
+def test_equality():
+    assert Duration(10, 25) == Duration(10, 25)
+
+
+def test_inequality():
+    assert Duration(10, 25) != Duration(10, 21)
