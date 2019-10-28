@@ -19,6 +19,8 @@ Main classes
     RobotSemantics
     Configuration
     Duration
+    Wrench
+    Inertia
 
 Path planning
 -------------
