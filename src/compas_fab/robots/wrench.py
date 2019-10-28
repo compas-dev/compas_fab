@@ -286,7 +286,7 @@ class Wrench():
         return True
     
     def __ne__(self, other, tol=1e-05):
-        return not self.__eq__(other, tol))
+        return not self.__eq__(other, tol)
 
     # ==========================================================================
     # transformations
