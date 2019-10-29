@@ -45,6 +45,7 @@ matrix:
 install:
   - pip install cython --install-option="--no-cython-compile"
   - pip install --no-cache-dir -r requirements-dev.txt
+  - pip install ikfast_pybind # for testing backends.pybullet.ik_intefaces ikfast interface modules
 
 script:
   - python -c "import compas_fab"
