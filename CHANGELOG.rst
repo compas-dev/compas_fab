@@ -16,6 +16,8 @@ Unreleased
 
 **Changed**
 
+* Updated to COMPAS 0.10
+
 **Removed**
 
 **Fixed**
