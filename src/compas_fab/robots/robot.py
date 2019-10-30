@@ -270,7 +270,7 @@ class Robot(object):
         --------
         """
 
-        base_link = self.get_base_link_name(group)
+        base_link = self.get_base_link(group)
         # the group's original base_frame
         base_frame = self.get_base_frame(group)
 
@@ -282,7 +282,11 @@ class Robot(object):
         # That's why we have to do the workaround with the Transformation.
 
         joint_state = dict(zip(joint_names, joint_positions))
-        base_frame_WCF = self.model.forward_kinematics(joint_state, link_name=base_link)
+
+        if not base_link.parent_joint:
+            base_frame_WCF = Frame.worldXY()
+        else:
+            base_frame_WCF = self.model.forward_kinematics(joint_state, link_name=base_link.name)
         base_frame_RCF = self.represent_frame_in_RCF(base_frame_WCF, group)
 
         base_frame_RCF.point *= self.scale_factor
