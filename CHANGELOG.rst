@@ -20,6 +20,8 @@ Unreleased
 
 **Fixed**
 
+* Use WorldXY's origin as default for robots that are have no parent join on their base
+
 **Deprecated**
 
 0.7.0
