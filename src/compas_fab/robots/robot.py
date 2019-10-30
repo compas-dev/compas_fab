@@ -287,7 +287,7 @@ class Robot(object):
             base_frame_WCF = Frame.worldXY()
         else:
             base_frame_WCF = self.model.forward_kinematics(joint_state, link_name=base_link.name)
-        base_frame_RCF = self.represent_frame_in_RCF(base_frame_WCF, group)
+        base_frame_RCF = self.to_local_coords(base_frame_WCF, group)
 
         base_frame_RCF.point *= self.scale_factor
         T = Transformation.from_frame(base_frame)
@@ -561,7 +561,7 @@ class Robot(object):
 
         """
         base_frame = self.get_base_frame(group)
-        return Transformation.from_frame_to_frame(Frame.worldXY(), base_frame)
+        return Transformation.change_basis(base_frame, Frame.worldXY())
 
     def _get_current_transformation_WCF_RCF(self, full_configuration, group):
         """Returns the group's current WCF to RCF transformation, if the robot is in full_configuration.
@@ -602,7 +602,7 @@ class Robot(object):
 
         """
         base_frame = self.get_base_frame(group)
-        return Transformation.from_frame_to_frame(base_frame, Frame.worldXY())
+        return Transformation.change_basis(Frame.worldXY(), base_frame)
 
     def set_RCF(self, robot_coordinate_frame, group=None):
         """Moves the origin frame of the robot to the robot_coordinate_frame.
@@ -615,7 +615,7 @@ class Robot(object):
         """
         return self.get_base_frame(group)
 
-    def represent_frame_in_RCF(self, frame_WCF, group=None):
+    def to_local_coords(self, frame_WCF, group=None):
         """Represents a frame from the world coordinate system (WCF) in the robot's coordinate system (RCF).
 
         Parameters
@@ -631,12 +631,14 @@ class Robot(object):
         Examples
         --------
         >>> frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
-        >>> frame_RCF = robot.represent_frame_in_RCF(frame_WCF)
+        >>> frame_RCF = robot.to_local_coords(frame_WCF)
+        >>> frame_RCF
+        Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
         """
         frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
         return frame_RCF
 
-    def represent_frame_in_WCF(self, frame_RCF, group=None):
+    def to_world_coords(self, frame_RCF, group=None):
         """Represents a frame from the robot's coordinate system (RCF) in the world coordinate system (WCF).
 
         Parameters
@@ -652,7 +654,9 @@ class Robot(object):
         Examples
         --------
         >>> frame_RCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
-        >>> frame_WCF = robot.represent_frame_in_WCF(frame_RCF)
+        >>> frame_WCF = robot.to_world_coords(frame_RCF)
+        >>> frame_WCF
+        Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
         """
         frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
         return frame_WCF
@@ -899,7 +903,7 @@ class Robot(object):
             start_configuration)
 
         # represent in RCF
-        frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
+        frame_RCF = self.to_local_coords(frame_WCF, group)
         frame_RCF.point /= self.scale_factor  # must be in meters
 
         joint_positions = self.client.inverse_kinematics(frame_RCF, base_link,
@@ -943,7 +947,7 @@ class Robot(object):
         >>> frame_RCF_m = robot.forward_kinematics(configuration, group, backend='model')
         >>> frame_RCF_c == frame_RCF_m
         True
-        >>> frame_WCF = robot.represent_frame_in_WCF(frame_RCF_m, group)
+        >>> frame_WCF = robot.to_world_coords(frame_RCF_m, group)
         >>> frame_WCF
         Frame(Point(0.300, 0.100, 0.500), Vector(1.000, -0.000, -0.000), Vector(0.000, 1.000, -0.000))
 
@@ -973,10 +977,10 @@ class Robot(object):
                 frame_RCF.point *= self.scale_factor
             else:
                 frame_WCF = self.model.forward_kinematics(group_joint_state, link_name)
-                frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
+                frame_RCF = self.to_local_coords(frame_WCF, group)
         elif backend == 'model':
             frame_WCF = self.model.forward_kinematics(group_joint_state, link_name)
-            frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
+            frame_RCF = self.to_local_coords(frame_WCF, group)
         else:
             # pass to backend, kdl, ikfast,...
             raise NotImplementedError
@@ -1068,7 +1072,7 @@ class Robot(object):
         frames_RCF = []
         for frame_WCF in frames_WCF:
             # represent in RCF
-            frame_RCF = self.represent_frame_in_RCF(frame_WCF, group)
+            frame_RCF = self.to_local_coords(frame_WCF, group)
             frame_RCF.point /= self.scale_factor
             frames_RCF.append(frame_RCF)
         base_link = self.get_base_link_name(group)
