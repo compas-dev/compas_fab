@@ -38,6 +38,29 @@ services:
       - file_server
       - file_server.launch
 
+  panda-tf-panda_link0:
+    image: gramaziokohler/ros-panda-planner:19.04
+    container_name: panda-tf-panda_link0
+    environment:
+      - ROS_HOSTNAME=panda-tf-panda_link0
+      - ROS_MASTER_URI=http://ros-master:11311
+    depends_on:
+      - ros-master
+    command:
+      - rosrun
+      - tf
+      - static_transform_publisher
+      - '0'
+      - '0'
+      - '0'
+      - '0'
+      - '0'
+      - '0'
+      - '1'
+      - world
+      - panda_link0
+      - '100'
+
   panda-demo:
     image: gramaziokohler/ros-panda-planner:19.04
     container_name: panda-demo
