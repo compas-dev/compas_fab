@@ -89,14 +89,34 @@ class BaseRobotArtist(object):
             link = self.robot.root
 
         for item in itertools.chain(link.visual, link.collision):
-            if item.geometry.geo:
+            # NOTE: Currently, shapes assign their meshes to an
+            # attribute called `geometry`, but this will change soon to `meshes`.
+            # This code handles the situation in a forward-compatible
+            # manner. Eventually, this can be simplified to use only `meshes` attr
+            if hasattr(item.geometry.shape, 'meshes'):
+                meshes = item.geometry.shape.meshes
+            else:
+                meshes = item.geometry.shape.geometry
+
+            if meshes:
+                # Coerce meshes into an iteratable (a tuple if not natively iterable)
+                if not hasattr(meshes, '__iter__'):
+                    meshes = (meshes,)
+
                 color = None
                 if hasattr(item, 'get_color'):
                     color = item.get_color()
-                # create native geometry
-                item.native_geometry = self.draw_geometry(item.geometry.geo, color)
-                # transform native geometry based on saved init transform
-                self.transform(item.native_geometry, item.init_transformation)
+
+                native_geometry = []
+                for mesh in meshes:
+                    # create native geometry
+                    native_mesh = self.draw_geometry(mesh, color)
+                    # transform native geometry based on saved init transform
+                    self.transform(native_mesh, item.init_transformation)
+                    # append to list
+                    native_geometry.append(native_mesh)
+
+                item.native_geometry = native_geometry
                 item.current_transformation = Transformation()
 
         for child_joint in link.joints:
@@ -128,7 +148,8 @@ class BaseRobotArtist(object):
             # Some links have only collision geometry, not visual. These meshes
             # have not been loaded.
             if item.native_geometry:
-                self.transform(item.native_geometry, transformation)
+                for geometry in item.native_geometry:
+                    self.transform(geometry, transformation)
 
         for child_joint in link.joints:
             # Recursive call
@@ -152,7 +173,8 @@ class BaseRobotArtist(object):
         None
         """
         relative_transformation = transformation * item.current_transformation.inverse()
-        self.transform(item.native_geometry, relative_transformation)
+        for native_geometry in item.native_geometry:
+            self.transform(native_geometry, relative_transformation)
         item.current_transformation = transformation
 
     def update(self, configuration, names, visual=True, collision=True):
@@ -190,11 +212,14 @@ class BaseRobotArtist(object):
         """Draws all visual geometry of the robot."""
         for link in self.robot.iter_links():
             for item in link.visual:
-                yield item.native_geometry
+                if item.native_geometry:
+                    for native_geometry in item.native_geometry:
+                        yield native_geometry
 
     def draw_collision(self):
         """Draws all collision geometry of the robot."""
         for link in self.robot.iter_links():
             for item in link.collision:
                 if item.native_geometry:
-                    yield item.native_geometry
+                    for native_geometry in item.native_geometry:
+                        yield native_geometry
