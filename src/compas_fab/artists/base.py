@@ -4,7 +4,6 @@ from __future__ import print_function
 
 import itertools
 
-from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas.geometry import Scale
 
