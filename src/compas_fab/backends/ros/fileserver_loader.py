@@ -240,7 +240,10 @@ def _dae_mesh_importer(filename):
             M = [float(i) for i in matrix_node.text.split()]
 
             # If it's the identity matrix, then ignore, we don't need to transform it
-            if M != [1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1.]:
+            if M != [1., 0., 0., 0.,
+                     0., 1., 0., 0.,
+                     0., 0., 1., 0.,
+                     0., 0., 0., 1.]:
                 M = M[0:4], M[4:8], M[8:12], M[12:16]
                 transform = Transformation.from_matrix(M)
 
