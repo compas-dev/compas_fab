@@ -9,8 +9,9 @@ import tempfile
 
 import roslibpy
 from compas.datastructures import Mesh
-from compas.datastructures import meshes_join
+from compas.datastructures import mesh_transform
 from compas.files import XML
+from compas.geometry import Transformation
 from compas.robots.resources.basic import _get_file_format
 from compas.robots.resources.basic import _mesh_import
 from compas.utilities import await_callback
@@ -184,7 +185,7 @@ class RosFileServerLoader(object):
 
         Returns
         -------
-        :class:`Mesh`
+        :class:`Mesh` or list of :class:`Mesh`
             Instance of a mesh.
         """
         use_local_file = False
@@ -224,13 +225,25 @@ class RosFileServerLoader(object):
 
 
 def _dae_mesh_importer(filename):
-    """This is a very simple implementation of a DAE/Collada parser.
-    It merges all solids of the DAE file into one mesh, because
-    several other parts of the framework don't support multi-meshes per file."""
+    """This is a very simple implementation of a DAE/Collada parser."""
     dae = XML.from_file(filename)
     meshes = []
+    visual_scenes = dae.root.find('library_visual_scenes')
 
-    for mesh_xml in dae.root.findall('.//mesh'):
+    for geometry in dae.root.findall('.//geometry'):
+        mesh_xml = geometry.find('mesh')
+        mesh_id = geometry.attrib['id']
+        matrix_node = visual_scenes.find('visual_scene/node/instance_geometry[@url="#{}"]/../matrix'.format(mesh_id))
+        transform = None
+
+        if matrix_node is not None:
+            M = [float(i) for i in matrix_node.text.split()]
+
+            # If it's the identity matrix, then ignore, we don't need to transform it
+            if M != [1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1.]:
+                M = M[0:4], M[4:8], M[8:12], M[12:16]
+                transform = Transformation.from_matrix(M)
+
         for triangle_set in mesh_xml.findall('triangles'):
             triangle_set_data = triangle_set.find('p').text.split()
 
@@ -240,27 +253,20 @@ def _dae_mesh_importer(filename):
             positions = mesh_xml.find('source[@id="{}"]/float_array'.format(vertices_link.attrib['source'][1:]))
             positions = positions.text.split()
 
-            vertices = list(map(float, positions[i:i + 3]) for i in range(0, len(positions), 3))
+            vertices = [[float(p) for p in positions[i:i + 3]] for i in range(0, len(positions), 3)]
 
             # Parse faces
-            faces = list(map(int, triangle_set_data[::2]))  # Ignore normals (ever second item is normal index)
-            faces = list(faces[i:i + 3] for i in range(0, len(faces), 3))
+            faces = [int(f) for f in triangle_set_data[::2]]  # Ignore normals (ever second item is normal index)
+            faces = [faces[i:i + 3] for i in range(0, len(faces), 3)]
 
             mesh = Mesh.from_vertices_and_faces(vertices, faces)
 
+            if transform:
+                mesh_transform(mesh, transform)
+
             meshes.append(mesh)
 
-    combined_mesh = meshes_join(meshes)
-
-    # from compas.datastructures import mesh_transform
-    # from compas.geometry import Frame
-    # from compas.geometry import Transformation
-
-    # former DAE files have yaxis and zaxis swapped
-    # frame = Frame([0, 0, 0], [1, 0, 0], [0, 0, 1])
-    # T = Transformation.from_frame(frame)
-    # mesh_transform(combined_mesh, T)
-    return combined_mesh
+    return meshes
 
 
 def _fileserver_mesh_import(url, filename):
