@@ -1298,7 +1298,7 @@ if robot and configuration:
         frames = draw_pipes(pipes, cap=1)
 
     ee_frame_RCF = robot.forward_kinematics(configuration, backend='model')
-    ee_frame = robot.represent_frame_in_WCF(ee_frame_RCF)
+    ee_frame = robot.to_world_coords(ee_frame_RCF)
     ee_plane = draw_frame(ee_frame)
 
     print("End-effector frame:")
@@ -5236,7 +5236,7 @@ if robot:
 
 if sc.sticky[response_key]:
     frame_RCF = sc.sticky[response_key]
-    frame_WCF = robot.represent_frame_in_WCF(frame_RCF, group)
+    frame_WCF = robot.to_world_coords(frame_RCF, group)
 
 print frame_WCF</item>
                     <item name="Description" type_name="gh_string" type_code="10">GhPython provides a Python script component</item>

@@ -226,7 +226,14 @@ class OrientationConstraint(Constraint):
     def transform(self, transformation):
         R = Rotation.from_quaternion(self.quaternion)
         R = transformation * R
-        self.quaternion = R.rotation.quaternion
+
+        # Due to a bug on COMPAS 0.10.0
+        # (Fixed on https://github.com/compas-dev/compas/pull/378 but not released atm)
+        # we work around the retrival of the rotation component of R and instead decompose and get it
+        _, _, r, _, _ = R.decomposed()
+        self.quaternion = r.quaternion
+        # After that bug fix is released, the previous two lines should be changed to:
+        # self.quaternion = R.rotation.quaternion
 
     def __repr__(self):
         return "OrientationConstraint('{0}', {1}, {2}, {3})".format(self.link_name, self.quaternion, self.tolerances, self.weight)
