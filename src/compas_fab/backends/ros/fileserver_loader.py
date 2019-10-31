@@ -6,6 +6,7 @@ import binascii
 import logging
 import os
 import tempfile
+from collections import OrderedDict
 
 import roslibpy
 from compas.datastructures import Mesh
@@ -15,6 +16,7 @@ from compas.geometry import Transformation
 from compas.robots.resources.basic import _get_file_format
 from compas.robots.resources.basic import _mesh_import
 from compas.utilities import await_callback
+from compas.utilities import geometric_key
 
 LOGGER = logging.getLogger('compas_fab.backends.ros')
 
@@ -62,14 +64,17 @@ class RosFileServerLoader(object):
     local_cache_directory : str, optional
         Directory name to store the cached files. Only used if
         ``local_cache`` is ``True``. Defaults to ``~/robot_description``.
+    precision : float
+        Defines precision for importing/loading meshes. Defaults to ``compas.PRECISION``.
     """
 
-    def __init__(self, ros=None, local_cache=False, local_cache_directory=None):
+    def __init__(self, ros=None, local_cache=False, local_cache_directory=None, precision=None):
         self.robot_name = None
         self.schema_prefix = 'package://'
         self.ros = ros
         self.local_cache_directory = None
         self.local_cache_enabled = local_cache
+        self.precision = precision
 
         if self.local_cache_enabled:
             self.local_cache_directory = local_cache_directory or os.path.join(
@@ -218,13 +223,13 @@ class RosFileServerLoader(object):
             # Nothing to do here, the file will be read by the mesh importer
             LOGGER.debug('Loading mesh file %s from local cache dir', local_filename)
 
-        return _fileserver_mesh_import(url, local_filename)
+        return _fileserver_mesh_import(url, local_filename, self.precision)
 
     def _local_mesh_filename(self, url):
         return os.path.abspath(os.path.join(self._robot_resource_path, url[len('package://'):]))
 
 
-def _dae_mesh_importer(filename):
+def _dae_mesh_importer(filename, precision):
     """This is a very simple implementation of a DAE/Collada parser."""
     dae = XML.from_file(filename)
     meshes = []
@@ -247,40 +252,56 @@ def _dae_mesh_importer(filename):
                 M = M[0:4], M[4:8], M[8:12], M[12:16]
                 transform = Transformation.from_matrix(M)
 
-        for triangle_set in mesh_xml.findall('triangles'):
-            triangle_set_data = triangle_set.find('p').text.split()
+        triangle_set = mesh_xml.find('triangles')
+        triangle_set_data = triangle_set.find('p').text.split()
 
-            # Parse vertices
-            vertices_input = triangle_set.find('input[@semantic="VERTEX"]')
-            vertices_link = mesh_xml.find('vertices[@id="{}"]/input'.format(vertices_input.attrib['source'][1:]))
-            positions = mesh_xml.find('source[@id="{}"]/float_array'.format(vertices_link.attrib['source'][1:]))
-            positions = positions.text.split()
+        # Parse vertices
+        vertices_input = triangle_set.find('input[@semantic="VERTEX"]')
+        vertices_link = mesh_xml.find('vertices[@id="{}"]/input'.format(vertices_input.attrib['source'][1:]))
+        positions = mesh_xml.find('source[@id="{}"]/float_array'.format(vertices_link.attrib['source'][1:]))
+        positions = positions.text.split()
 
-            vertices = [[float(p) for p in positions[i:i + 3]] for i in range(0, len(positions), 3)]
+        vertices = [[float(p) for p in positions[i:i + 3]] for i in range(0, len(positions), 3)]
 
-            # Parse faces
-            faces = [int(f) for f in triangle_set_data[::2]]  # Ignore normals (ever second item is normal index)
-            faces = [faces[i:i + 3] for i in range(0, len(faces), 3)]
+        # Parse faces
+        faces = [int(f) for f in triangle_set_data[::2]]  # Ignore normals (ever second item is normal index)
+        faces = [faces[i:i + 3] for i in range(0, len(faces), 3)]
 
-            mesh = Mesh.from_vertices_and_faces(vertices, faces)
+        # Rebuild vertices and faces using the same logic that other importers
+        # use remapping everything based on a selected precision
+        index_key = OrderedDict()
+        vertex = OrderedDict()
 
-            if transform:
-                mesh_transform(mesh, transform)
+        for i, xyz in enumerate(vertices):
+            key = geometric_key(xyz, precision)
+            index_key[i] = key
+            vertex[key] = xyz
 
-            meshes.append(mesh)
+        key_index = {key: index for index, key in enumerate(vertex)}
+        index_index = {index: key_index[key] for index, key in iter(index_key.items())}
+        vertices = [xyz for xyz in iter(vertex.values())]
+        faces = [[index_index[index] for index in face] for face in faces]
+
+        mesh = Mesh.from_vertices_and_faces(vertices, faces)
+
+        if transform:
+            mesh_transform(mesh, transform)
+
+        meshes.append(mesh)
 
     return meshes
 
 
-def _fileserver_mesh_import(url, filename):
+def _fileserver_mesh_import(url, filename, precision=None):
     """Internal function that adds primitive support for DAE files
     to the _mesh_import function of compas.robots."""
     file_extension = _get_file_format(url)
 
     if file_extension == 'dae':
         # Magic!
-        return _dae_mesh_importer(filename)
+        return _dae_mesh_importer(filename, precision)
     else:
+        # TODO: This _mesh_import should also add support for precision
         return _mesh_import(url, filename)
 
 
