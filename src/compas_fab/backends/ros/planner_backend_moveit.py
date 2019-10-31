@@ -141,7 +141,7 @@ class MoveItPlanner(PlannerBackend):
                                        attempts=attempts)
 
         def convert_to_positions(response):
-            callback(response.solution.joint_state.position)
+            callback((response.solution.joint_state.position, response.solution.joint_state.name))
 
         self.GET_POSITION_IK(self, (ik_request, ), convert_to_positions, errback)
 

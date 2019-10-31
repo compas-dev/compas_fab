@@ -514,16 +514,12 @@ class Robot(object):
                 "Please pass a configuration with %d values or specify group" % len(names))
         return configuration.values[names.index(joint_name)]
 
-    def _scale_joint_values(self, values, scale_factor, group=None):
+    def _scale_joint_values(self, values, names, scale_factor, group=None):
         """Scales the scaleable joint values with scale_factor.
         """
-        joints = self.get_configurable_joints(group)
-        if len(joints) != len(values):
-            raise ValueError("Expected %d values for group %s, but received only %d." % (
-                len(joints), group, len(values)))
-
         values_scaled = []
-        for v, j in zip(values, joints):
+        for v, name in zip(values, names):
+            j = self.get_joint_by_name(name)
             if j.is_scalable():
                 v *= scale_factor
             values_scaled.append(v)
@@ -540,7 +536,7 @@ class Robot(object):
             joint_positions = start_configuration.values
         # scale the prismatic joints
         joint_positions = self._scale_joint_values(
-            joint_positions, 1. / self.scale_factor)
+            joint_positions, joint_names, 1. / self.scale_factor)
         return joint_positions
 
     # ==========================================================================
@@ -906,14 +902,22 @@ class Robot(object):
         frame_RCF = self.to_local_coords(frame_WCF, group)
         frame_RCF.point /= self.scale_factor  # must be in meters
 
-        joint_positions = self.client.inverse_kinematics(frame_RCF, base_link,
-                                                         group, joint_names, joint_positions,
-                                                         avoid_collisions, constraints, attempts,
-                                                         attached_collision_meshes)
-        joint_positions = self._scale_joint_values(joint_positions, self.scale_factor)
-        # full configuration # TODO group config?
-        configuration = Configuration(joint_positions, self.get_configurable_joint_types())
+        # The returned joint names might be more than the requested ones if there are passive joints present
+        joint_positions, joint_names = self.client.inverse_kinematics(frame_RCF, base_link,
+                                                                      group, joint_names, joint_positions,
+                                                                      avoid_collisions, constraints, attempts,
+                                                                      attached_collision_meshes)
+        joint_types = [self.get_joint_by_name(n).type for n in joint_names]
 
+        joint_positions = self._scale_joint_values(joint_positions, joint_names, self.scale_factor)
+
+        # build configuration including passive joints
+        configuration = Configuration(joint_positions, joint_types)
+
+        # return only group configuration
+        # NOTE: it might actually make more sense to return
+        # the configuration instance without extracting the group's config
+        # because we lose the passive joint info
         return self.get_group_configuration(group, configuration)
 
     def forward_kinematics(self, configuration, group=None, backend=None, link_name=None):

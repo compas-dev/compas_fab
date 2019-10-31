@@ -17,6 +17,7 @@ Unreleased
 **Changed**
 
 * Updated to COMPAS 0.10
+* Add support for passive joints on IK
 
 **Removed**
 
