@@ -264,7 +264,7 @@ def _dae_mesh_importer(filename, precision):
         vertices = [[float(p) for p in positions[i:i + 3]] for i in range(0, len(positions), 3)]
 
         # Parse faces
-        faces = [int(f) for f in triangle_set_data[::2]]  # Ignore normals (ever second item is normal index)
+        faces = [int(f) for f in triangle_set_data[::2]]  # Ignore normals (every second item is normal index)
         faces = [faces[i:i + 3] for i in range(0, len(faces), 3)]
 
         # Rebuild vertices and faces using the same logic that other importers
