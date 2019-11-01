@@ -10,24 +10,16 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 Unreleased
 ----------
 
-**Added**
-
-* ..
-
 **Changed**
 
 * Updated to COMPAS 0.10
 * Add better support for passive joints on IK, Cartesian and Kinematic planning
-
-**Removed**
 
 **Fixed**
 
 * Use WorldXY's origin as default for robots that are have no parent join on their base
 * Fixed parsing of semantics (SRDF) containing nested groups
 * Fixed DAE support on ROS File loader
-
-**Deprecated**
 
 0.7.0
 ----------
