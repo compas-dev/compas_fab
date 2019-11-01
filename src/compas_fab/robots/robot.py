@@ -355,6 +355,20 @@ class Robot(object):
         else:
             return self.model.get_configurable_joints()
 
+    def get_joint_types_by_names(self, names):
+        """Returns a list of joint types for a list of joint names.
+
+        Parameters
+        ----------
+        name: list of str
+            The names of the joints.
+
+        Returns
+        -------
+        list of str
+        """
+        return [self.get_joint_by_name(n).type for n in names]
+
     def get_joint_by_name(self, name):
         """Returns the joint in the robot model matching its name.
 
@@ -492,12 +506,16 @@ class Robot(object):
             A full configuration: with values for all configurable joints.
         """
         all_joint_names = self.get_configurable_joint_names()
+
         if len(all_joint_names) != len(full_configuration.values):
             raise ValueError("Please pass a full configuration with %d values" % len(all_joint_names))
         elif len(all_joint_names) == len(group_configuration.values):  # group config == full config
             return group_configuration
         else:
             group_joint_names = self.get_configurable_joint_names(group)
+            if len(group_joint_names) != len(group_configuration.values):
+                raise ValueError('Please pass a group configuration with {} values'.format(len(group_joint_names)))
+
             configuration = full_configuration.copy()
             for i, name in enumerate(all_joint_names):
                 if name in group_joint_names:
@@ -514,16 +532,12 @@ class Robot(object):
                 "Please pass a configuration with %d values or specify group" % len(names))
         return configuration.values[names.index(joint_name)]
 
-    def _scale_joint_values(self, values, scale_factor, group=None):
+    def _scale_joint_values(self, values, names, scale_factor, group=None):
         """Scales the scaleable joint values with scale_factor.
         """
-        joints = self.get_configurable_joints(group)
-        if len(joints) != len(values):
-            raise ValueError("Expected %d values for group %s, but received only %d." % (
-                len(joints), group, len(values)))
-
         values_scaled = []
-        for v, j in zip(values, joints):
+        for v, name in zip(values, names):
+            j = self.get_joint_by_name(name)
             if j.is_scalable():
                 v *= scale_factor
             values_scaled.append(v)
@@ -540,7 +554,7 @@ class Robot(object):
             joint_positions = start_configuration.values
         # scale the prismatic joints
         joint_positions = self._scale_joint_values(
-            joint_positions, 1. / self.scale_factor)
+            joint_positions, joint_names, 1. / self.scale_factor)
         return joint_positions
 
     # ==========================================================================
@@ -906,14 +920,22 @@ class Robot(object):
         frame_RCF = self.to_local_coords(frame_WCF, group)
         frame_RCF.point /= self.scale_factor  # must be in meters
 
-        joint_positions = self.client.inverse_kinematics(frame_RCF, base_link,
-                                                         group, joint_names, joint_positions,
-                                                         avoid_collisions, constraints, attempts,
-                                                         attached_collision_meshes)
-        joint_positions = self._scale_joint_values(joint_positions, self.scale_factor)
-        # full configuration # TODO group config?
-        configuration = Configuration(joint_positions, self.get_configurable_joint_types())
+        # The returned joint names might be more than the requested ones if there are passive joints present
+        joint_positions, joint_names = self.client.inverse_kinematics(frame_RCF, base_link,
+                                                                      group, joint_names, joint_positions,
+                                                                      avoid_collisions, constraints, attempts,
+                                                                      attached_collision_meshes)
+        joint_types = [self.get_joint_by_name(n).type for n in joint_names]
 
+        joint_positions = self._scale_joint_values(joint_positions, joint_names, self.scale_factor)
+
+        # build configuration including passive joints
+        configuration = Configuration(joint_positions, joint_types)
+
+        # return only group configuration
+        # NOTE: it might actually make more sense to return
+        # the configuration instance without extracting the group's config
+        # because we lose the passive joint info
         return self.get_group_configuration(group, configuration)
 
     def forward_kinematics(self, configuration, group=None, backend=None, link_name=None):
@@ -1075,14 +1097,9 @@ class Robot(object):
             frame_RCF = self.to_local_coords(frame_WCF, group)
             frame_RCF.point /= self.scale_factor
             frames_RCF.append(frame_RCF)
-        base_link = self.get_base_link_name(group)
 
-        joint_names = self.get_configurable_joint_names()
-        joint_types = self.get_configurable_joint_types(group)
         start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
         start_configuration.scale(1. / self.scale_factor)
-
-        ee_link = self.get_end_effector_link_name(group)
         max_step_scaled = max_step / self.scale_factor
 
         T = self.transformation_WCF_RCF(group)
@@ -1101,13 +1118,17 @@ class Robot(object):
         else:
             path_constraints_RCF_scaled = None
 
-        trajectory = self.client.plan_cartesian_motion(frames_RCF, base_link,
-                                                       ee_link, group, joint_names,
-                                                       joint_types, start_configuration,
-                                                       max_step_scaled, jump_threshold,
-                                                       avoid_collisions,
-                                                       path_constraints_RCF_scaled,
-                                                       attached_collision_meshes)
+        trajectory = self.client.plan_cartesian_motion(
+            robot=self,
+            frames=frames_RCF,
+            start_configuration=start_configuration,
+            group=group,
+            max_step=max_step_scaled,
+            jump_threshold=jump_threshold,
+            avoid_collisions=avoid_collisions,
+            path_constraints=path_constraints_RCF_scaled,
+            attached_collision_meshes=attached_collision_meshes)
+
         # Scale everything back to robot's scale
         for pt in trajectory.points:
             pt.scale(self.scale_factor)
@@ -1196,8 +1217,12 @@ class Robot(object):
         if not group:
             group = self.main_group_name  # ensure semantics
 
+        start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
+
         # Transform goal constraints to RCF and scale
-        T = self._get_current_transformation_WCF_RCF(start_configuration, group)
+        full_configuration = self.merge_group_with_full_configuration(start_configuration, self.init_configuration(), group)
+
+        T = self._get_current_transformation_WCF_RCF(full_configuration, group)
         goal_constraints_RCF_scaled = []
         for c in goal_constraints:
             cp = c.copy()
@@ -1226,30 +1251,22 @@ class Robot(object):
         else:
             path_constraints_RCF_scaled = None
 
-        joint_names = self.get_configurable_joint_names()
-        joint_types = self.get_configurable_joint_types(group)
-        start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
         start_configuration.scale(1. / self.scale_factor)
 
-        kwargs = {}
-        kwargs['goal_constraints'] = goal_constraints_RCF_scaled
-        kwargs['base_link'] = self.get_base_link_name(group)
-        kwargs['ee_link'] = self.get_end_effector_link_name(group)
-        kwargs['group'] = group
-        kwargs['joint_names'] = joint_names
-        kwargs['joint_types'] = joint_types
-        kwargs['start_configuration'] = start_configuration
-        kwargs['path_constraints'] = path_constraints_RCF_scaled
-        kwargs['trajectory_constraints'] = None
-        kwargs['planner_id'] = planner_id
-        kwargs['num_planning_attempts'] = num_planning_attempts
-        kwargs['allowed_planning_time'] = allowed_planning_time
-        kwargs['max_velocity_scaling_factor'] = max_velocity_scaling_factor
-        kwargs['max_acceleration_scaling_factor'] = max_acceleration_scaling_factor
-        kwargs['attached_collision_meshes'] = attached_collision_meshes
-        kwargs['workspace_parameters'] = None
-
-        trajectory = self.client.plan_motion(**kwargs)
+        trajectory = self.client.plan_motion(
+            robot=self,
+            goal_constraints=goal_constraints_RCF_scaled,
+            start_configuration=start_configuration,
+            group=group,
+            path_constraints=path_constraints_RCF_scaled,
+            trajectory_constraints=None,
+            planner_id=planner_id,
+            num_planning_attempts=num_planning_attempts,
+            allowed_planning_time=allowed_planning_time,
+            max_velocity_scaling_factor=max_velocity_scaling_factor,
+            max_acceleration_scaling_factor=max_acceleration_scaling_factor,
+            attached_collision_meshes=attached_collision_meshes,
+            workspace_parameters=None)
 
         # Scale everything back to robot's scale
         for pt in trajectory.points:
