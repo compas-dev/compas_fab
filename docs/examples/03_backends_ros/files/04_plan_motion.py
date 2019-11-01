@@ -27,3 +27,16 @@ with RosClient() as client:
 
     print("Computed kinematic path with %d configurations." % len(trajectory.points))
     print("Executing this path at full speed would take approx. %.3f seconds." % trajectory.time_from_start)
+    # print('Executing')
+
+    # robot.client.follow_joint_trajectory(
+    #     trajectory, callback=done_handler, errback=errhandler, feedback_callback=handler)
+
+    # wait = robot.client.execute_joint_trajectory(trajectory)
+
+    # print('Waiting...')
+    # r = wait.result()
+    # print('Done waiting...')
+
+    # import time
+    # time.sleep(1)

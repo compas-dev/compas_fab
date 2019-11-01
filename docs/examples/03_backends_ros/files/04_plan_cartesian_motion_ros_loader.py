@@ -23,7 +23,7 @@ with RosClient() as client:
     frames.append(Frame((0.2925, 0.3949, 0.5066), (0, 1, 0), (0, 0, 1)))
     frames.append(Frame((0.5103, 0.2827, 0.4074), (0, 1, 0), (0, 0, 1)))
 
-    start_configuration = Configuration((0.667, -0.298, 0.336, -2.333, -1.787, 2.123, 0.571), (0, 0, 0, 0, 0, 0, 0))
+    start_configuration = Configuration.from_revolute_values((0.667, -0.298, 0.336, -2.333, -1.787, 2.123, 0.571))
 
     trajectory = robot.plan_cartesian_motion(frames,
                                              start_configuration,

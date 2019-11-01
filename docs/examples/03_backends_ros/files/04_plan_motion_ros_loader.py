@@ -24,8 +24,8 @@ with RosClient() as client:
     tolerance_position = 0.001
     tolerance_axes = [math.radians(1)] * 3
 
-    start_configuration = Configuration(
-        (0.667, -0.298, 0.336, -2.333, -1.787, 2.123, 0.571), (0, 0, 0, 0, 0, 0, 0))
+    start_configuration = Configuration.from_revolute_values(
+        (0.667, -0.298, 0.336, -2.333, -1.787, 2.123, 0.571))
 
     # create goal constraints from frame
     goal_constraints = robot.constraints_from_frame(frame,
