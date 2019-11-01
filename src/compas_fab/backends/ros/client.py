@@ -140,19 +140,16 @@ class RosClient(Ros):
 
         return await_callback(self.forward_kinematics_async, **kwargs)
 
-    def plan_cartesian_motion(self, frames, base_link,
-                              ee_link, group, joint_names, joint_types,
-                              start_configuration, max_step, jump_threshold,
+    def plan_cartesian_motion(self,
+                              robot, frames, start_configuration,
+                              group, max_step, jump_threshold,
                               avoid_collisions, path_constraints,
                               attached_collision_meshes):
         kwargs = {}
+        kwargs['robot'] = robot
         kwargs['frames'] = frames
-        kwargs['base_link'] = base_link
-        kwargs['ee_link'] = ee_link
-        kwargs['group'] = group
-        kwargs['joint_names'] = joint_names
-        kwargs['joint_types'] = joint_types
         kwargs['start_configuration'] = start_configuration
+        kwargs['group'] = group
         kwargs['max_step'] = max_step
         kwargs['jump_threshold'] = jump_threshold
         kwargs['avoid_collisions'] = avoid_collisions

@@ -161,18 +161,23 @@ class MoveItPlanner(PlannerBackend):
         self.GET_POSITION_FK(self, (header, fk_link_names,
                                     robot_state), convert_to_frame, errback)
 
-    def plan_cartesian_motion_async(self, callback, errback, frames, base_link,
-                                    ee_link, group, joint_names, joint_types,
-                                    start_configuration, max_step, jump_threshold,
+    def plan_cartesian_motion_async(self, callback, errback,
+                                    robot, frames, start_configuration,
+                                    group, max_step, jump_threshold,
                                     avoid_collisions, path_constraints,
                                     attached_collision_meshes):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
+        base_link = robot.get_base_link_name(group)
+        ee_link = robot.get_end_effector_link_name(group)
+
+        joint_names = robot.get_configurable_joint_names(group)
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
-        joint_state = JointState(
-            header=header, name=joint_names, position=start_configuration.values)
-        start_state = RobotState(
-            joint_state, MultiDOFJointState(header=header))
+        joint_state = JointState(header=header,
+                                 name=joint_names,
+                                 position=start_configuration.values)
+        start_state = RobotState(joint_state, MultiDOFJointState(header=header))
+
         if attached_collision_meshes:
             for acm in attached_collision_meshes:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
@@ -189,14 +194,23 @@ class MoveItPlanner(PlannerBackend):
                        path_constraints=path_constraints)
 
         def convert_to_trajectory(response):
+            try:
             trajectory = JointTrajectory()
             trajectory.source_message = response
             trajectory.fraction = response.fraction
             trajectory.joint_names = response.solution.joint_trajectory.joint_names
+
+                joint_types = robot.get_joint_types_by_names(trajectory.joint_names)
             trajectory.points = convert_trajectory_points(response.solution.joint_trajectory.points, joint_types)
-            trajectory.start_configuration = Configuration(response.start_state.joint_state.position, start_configuration.types)
+
+                start_state_types = robot.get_joint_types_by_names(response.start_state.joint_state.name)
+                trajectory.start_configuration = Configuration(
+                    response.start_state.joint_state.position, start_state_types)
 
             callback(trajectory)
+
+            except Exception as e:
+                errback(e)
 
         self.GET_CARTESIAN_PATH(self, request, convert_to_trajectory, errback)
 

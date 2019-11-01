@@ -1097,14 +1097,9 @@ class Robot(object):
             frame_RCF = self.to_local_coords(frame_WCF, group)
             frame_RCF.point /= self.scale_factor
             frames_RCF.append(frame_RCF)
-        base_link = self.get_base_link_name(group)
 
-        joint_names = self.get_configurable_joint_names()
-        joint_types = self.get_configurable_joint_types(group)
         start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
         start_configuration.scale(1. / self.scale_factor)
-
-        ee_link = self.get_end_effector_link_name(group)
         max_step_scaled = max_step / self.scale_factor
 
         T = self.transformation_WCF_RCF(group)
@@ -1123,13 +1118,17 @@ class Robot(object):
         else:
             path_constraints_RCF_scaled = None
 
-        trajectory = self.client.plan_cartesian_motion(frames_RCF, base_link,
-                                                       ee_link, group, joint_names,
-                                                       joint_types, start_configuration,
-                                                       max_step_scaled, jump_threshold,
-                                                       avoid_collisions,
-                                                       path_constraints_RCF_scaled,
-                                                       attached_collision_meshes)
+        trajectory = self.client.plan_cartesian_motion(
+            robot=self,
+            frames=frames_RCF,
+            start_configuration=start_configuration,
+            group=group,
+            max_step=max_step_scaled,
+            jump_threshold=jump_threshold,
+            avoid_collisions=avoid_collisions,
+            path_constraints=path_constraints_RCF_scaled,
+            attached_collision_meshes=attached_collision_meshes)
+
         # Scale everything back to robot's scale
         for pt in trajectory.points:
             pt.scale(self.scale_factor)
