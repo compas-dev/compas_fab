@@ -17,7 +17,7 @@ with RosClient() as client:
     semantics = RobotSemantics.from_srdf_string(srdf, model)
 
     robot = Robot(model, semantics=semantics, client=client)
-    group = 'panda_arm'
+    group = robot.main_group_name
 
     frames = []
     frames.append(Frame((0.2925, 0.3949, 0.5066), (0, 1, 0), (0, 0, 1)))

@@ -1217,8 +1217,12 @@ class Robot(object):
         if not group:
             group = self.main_group_name  # ensure semantics
 
+        start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
+
         # Transform goal constraints to RCF and scale
-        T = self._get_current_transformation_WCF_RCF(start_configuration, group)
+        full_configuration = self.merge_group_with_full_configuration(start_configuration, self.init_configuration(), group)
+
+        T = self._get_current_transformation_WCF_RCF(full_configuration, group)
         goal_constraints_RCF_scaled = []
         for c in goal_constraints:
             cp = c.copy()
@@ -1247,30 +1251,22 @@ class Robot(object):
         else:
             path_constraints_RCF_scaled = None
 
-        joint_names = self.get_configurable_joint_names()
-        joint_types = self.get_configurable_joint_types(group)
-        start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
         start_configuration.scale(1. / self.scale_factor)
 
-        kwargs = {}
-        kwargs['goal_constraints'] = goal_constraints_RCF_scaled
-        kwargs['base_link'] = self.get_base_link_name(group)
-        kwargs['ee_link'] = self.get_end_effector_link_name(group)
-        kwargs['group'] = group
-        kwargs['joint_names'] = joint_names
-        kwargs['joint_types'] = joint_types
-        kwargs['start_configuration'] = start_configuration
-        kwargs['path_constraints'] = path_constraints_RCF_scaled
-        kwargs['trajectory_constraints'] = None
-        kwargs['planner_id'] = planner_id
-        kwargs['num_planning_attempts'] = num_planning_attempts
-        kwargs['allowed_planning_time'] = allowed_planning_time
-        kwargs['max_velocity_scaling_factor'] = max_velocity_scaling_factor
-        kwargs['max_acceleration_scaling_factor'] = max_acceleration_scaling_factor
-        kwargs['attached_collision_meshes'] = attached_collision_meshes
-        kwargs['workspace_parameters'] = None
-
-        trajectory = self.client.plan_motion(**kwargs)
+        trajectory = self.client.plan_motion(
+            robot=self,
+            goal_constraints=goal_constraints_RCF_scaled,
+            start_configuration=start_configuration,
+            group=group,
+            path_constraints=path_constraints_RCF_scaled,
+            trajectory_constraints=None,
+            planner_id=planner_id,
+            num_planning_attempts=num_planning_attempts,
+            allowed_planning_time=allowed_planning_time,
+            max_velocity_scaling_factor=max_velocity_scaling_factor,
+            max_acceleration_scaling_factor=max_acceleration_scaling_factor,
+            attached_collision_meshes=attached_collision_meshes,
+            workspace_parameters=None)
 
         # Scale everything back to robot's scale
         for pt in trajectory.points:

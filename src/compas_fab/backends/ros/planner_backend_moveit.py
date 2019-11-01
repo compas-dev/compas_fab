@@ -215,10 +215,9 @@ class MoveItPlanner(PlannerBackend):
 
         self.GET_CARTESIAN_PATH(self, request, convert_to_trajectory, errback)
 
-    def plan_motion_async(self, callback, errback, goal_constraints, base_link,
-                          ee_link, group, joint_names, joint_types,
-                          start_configuration, path_constraints=None,
-                          trajectory_constraints=None,
+    def plan_motion_async(self, callback, errback,
+                          robot, goal_constraints, start_configuration, group,
+                          path_constraints=None, trajectory_constraints=None,
                           planner_id='', num_planning_attempts=8,
                           allowed_planning_time=2.,
                           max_velocity_scaling_factor=1.,
@@ -229,6 +228,8 @@ class MoveItPlanner(PlannerBackend):
 
         # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
         # TODO: if list of frames (goals) => receive multiple solutions?
+        base_link = robot.get_base_link_name(group)
+        joint_names = robot.get_configurable_joint_names(group)
 
         header = Header(frame_id=base_link)
         joint_state = JointState(
@@ -290,9 +291,15 @@ class MoveItPlanner(PlannerBackend):
             trajectory.source_message = response
             trajectory.fraction = 1.
             trajectory.joint_names = response.trajectory.joint_trajectory.joint_names
-            trajectory.points = convert_trajectory_points(response.trajectory.joint_trajectory.points, joint_types)
-            trajectory.start_configuration = Configuration(response.trajectory_start.joint_state.position, start_configuration.types)
             trajectory.planning_time = response.planning_time
+
+            joint_types = robot.get_joint_types_by_names(trajectory.joint_names)
+            trajectory.points = convert_trajectory_points(
+                response.trajectory.joint_trajectory.points, joint_types)
+
+            start_state = response.trajectory_start.joint_state
+            start_state_types = robot.get_joint_types_by_names(start_state.name)
+            trajectory.start_configuration = Configuration(start_state.position, start_state_types)
 
             callback(trajectory)
 

@@ -17,7 +17,7 @@ Unreleased
 **Changed**
 
 * Updated to COMPAS 0.10
-* Add support for passive joints on IK
+* Add better support for passive joints on IK, Cartesian and Kinematic planning
 
 **Removed**
 
