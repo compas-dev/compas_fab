@@ -195,19 +195,20 @@ class MoveItPlanner(PlannerBackend):
 
         def convert_to_trajectory(response):
             try:
-            trajectory = JointTrajectory()
-            trajectory.source_message = response
-            trajectory.fraction = response.fraction
-            trajectory.joint_names = response.solution.joint_trajectory.joint_names
+                trajectory = JointTrajectory()
+                trajectory.source_message = response
+                trajectory.fraction = response.fraction
+                trajectory.joint_names = response.solution.joint_trajectory.joint_names
 
                 joint_types = robot.get_joint_types_by_names(trajectory.joint_names)
-            trajectory.points = convert_trajectory_points(response.solution.joint_trajectory.points, joint_types)
+                trajectory.points = convert_trajectory_points(
+                    response.solution.joint_trajectory.points, joint_types)
 
-                start_state_types = robot.get_joint_types_by_names(response.start_state.joint_state.name)
-                trajectory.start_configuration = Configuration(
-                    response.start_state.joint_state.position, start_state_types)
+                start_state = response.start_state.joint_state
+                start_state_types = robot.get_joint_types_by_names(start_state.name)
+                trajectory.start_configuration = Configuration(start_state.position, start_state_types)
 
-            callback(trajectory)
+                callback(trajectory)
 
             except Exception as e:
                 errback(e)
