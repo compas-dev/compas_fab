@@ -355,6 +355,20 @@ class Robot(object):
         else:
             return self.model.get_configurable_joints()
 
+    def get_joint_types_by_names(self, names):
+        """Returns a list of joint types for a list of joint names.
+
+        Parameters
+        ----------
+        name: list of str
+            The names of the joints.
+
+        Returns
+        -------
+        list of str
+        """
+        return [self.get_joint_by_name(n).type for n in names]
+
     def get_joint_by_name(self, name):
         """Returns the joint in the robot model matching its name.
 
