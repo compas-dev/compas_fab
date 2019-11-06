@@ -23,6 +23,20 @@ Unreleased
 
 **Deprecated**
 
+0.8.0
+----------
+
+**Changed**
+
+* Updated to COMPAS 0.10
+* Add better support for passive joints on IK, Cartesian and Kinematic planning
+
+**Fixed**
+
+* Use WorldXY's origin as default for robots that are have no parent join on their base
+* Fixed parsing of semantics (SRDF) containing nested groups
+* Fixed DAE support on ROS File loader
+
 0.7.0
 ----------
 
