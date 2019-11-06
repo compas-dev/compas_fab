@@ -12,7 +12,7 @@ Unreleased
 
 **Added**
 
-* ..
+* Added ``load_robot`` method to ROS client to simplify loading robots from running ROS setup.
 
 **Changed**
 
