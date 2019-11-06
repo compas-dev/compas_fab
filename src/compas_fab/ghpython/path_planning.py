@@ -7,17 +7,14 @@ from timeit import default_timer as timer
 
 import compas
 from compas.datastructures import Mesh
-from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_ghpython.geometry import xform_from_transformation
 from compas_rhino.helpers import mesh_from_guid
 
-from compas_fab.backends.vrep.coordinator import SimulationCoordinator
 from compas_fab.robots import Configuration
 
 try:
     import clr
-    import ghpythonlib.components as ghcomp
     import rhinoscriptsyntax as rs
     from Rhino.Geometry import Transform
     from Rhino.Geometry import Mesh as RhinoMesh
@@ -188,81 +185,6 @@ class PathVisualizer(object):
         return {'mesh': mesh_at_origin,
                 'parent_handle': parent_handle,
                 'relative_transform': relative_transform}
-
-
-class PathPlanner(object):
-    """Provides a simple/compact API to call the path planner from Grasshopper."""
-
-    @classmethod
-    def find_path(cls, host='127.0.0.1', port=19997, mode='local', **kwargs):
-        """Finds a path for the specified scene description. There is a large number
-        of parameters that can be passed as `kwargs`. It can run in two modes: *remote* or
-        *local*. In remote mode, the `host` and `port` parameters correspond to a
-        simulation coordinator, and in local mode, `host` and `port` correspond to
-        a V-REP instance.
-
-        Args:
-            host (:obj:`str`): IP address of the service (simulation coordinator in `remote`, V-REP in `local` mode)
-            port (:obj:`int`): Port of the service.
-            mode (:obj:`str`): Execution mode, either ``local`` or ``remote``.
-            kwargs: Keyword arguments.
-
-        Returns:
-            list: list of configurations representing a path.
-        """
-        parser = InputParameterParser()
-        options = {'robots': []}
-        active_robot = None
-
-        if 'robots' in kwargs:
-            for i, settings in enumerate(kwargs['robots']):
-                if 'robot' not in settings:
-                    raise KeyError("'robot' not found at kwargs['robots'][%d]" % i)
-
-                robot = {'robot': settings['robot']}
-
-                if 'start' in settings:
-                    start = parser.get_config_or_pose(settings['start'])
-                    if start:
-                        robot['start'] = start.to_data()
-
-                if 'goal' in settings:
-                    if not active_robot:
-                        active_robot = robot
-                        goal = parser.get_config_or_pose(settings['goal'])
-                        if goal:
-                            robot['goal'] = goal.to_data()
-                    else:
-                        raise ValueError('Multi-move is not (yet) supported. Only one goal can be specified.')
-
-                if 'building_member' in settings:
-                    robot['building_member'] = mesh_from_guid(Mesh, settings['building_member']).to_data()
-
-                if 'metric_values' in settings:
-                    robot['metric_values'] = map(float, settings['metric_values'].split(','))
-
-                if 'joint_limits' in settings:
-                    robot['joint_limits'] = settings['joint_limits']
-
-                options['robots'].append(robot)
-
-        if 'collision_meshes' in kwargs:
-            mesh_guids = parser.compact_list(kwargs['collision_meshes'])
-            options['collision_meshes'] = [mesh_from_guid(Mesh, m).to_data() for m in mesh_guids]
-
-        options['debug'] = kwargs.get('debug')
-        options['trials'] = kwargs.get('trials')
-        options['shallow_state_search'] = kwargs.get('shallow_state_search')
-        options['optimize_path_length'] = kwargs.get('optimize_path_length')
-        options['planner_id'] = kwargs.get('planner_id')
-        options['resolution'] = kwargs.get('resolution')
-
-        if mode == 'remote':
-            LOG.debug('Running remote path planner executor. Host=%s:%d', host, port)
-            return SimulationCoordinator.remote_executor(options, host, port)
-        else:
-            LOG.debug('Running local path planner executor. Host=%s:%d', host, port)
-            return SimulationCoordinator.local_executor(options, host, port)
 
 
 class InputParameterParser(object):
