@@ -4,18 +4,21 @@ from .std_msgs import ROSmsg
 from .std_msgs import Header
 from .std_msgs import Time
 
+
 class GoalID(ROSmsg):
     """http://docs.ros.org/api/actionlib_msgs/html/msg/GoalID.html
     """
+
     def __init__(self, stamp=Time(), id=""):
         self.stamp = stamp
         self.id = id
-    
+
     @classmethod
     def from_msg(cls, msg):
         stamp = Time.from_msg(msg['stamp'])
         id = msg['id']
         return cls(stamp, id)
+
 
 class GoalStatus(ROSmsg):
     """http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
@@ -36,7 +39,7 @@ class GoalStatus(ROSmsg):
         self.goal_id = goal_id
         self.status = status
         self.text = text
-    
+
     @classmethod
     def from_msg(cls, msg):
         goal_id = GoalID.from_msg(msg['goal_id'])
@@ -52,12 +55,15 @@ class GoalStatus(ROSmsg):
                 return k
         return ''
 
+
 class GoalStatusArray(ROSmsg):
     """http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatusArray.html
     """
+
     def __init__(self, header=Header(), status_list=[]):
         self.header = header
         self.status_list = status_list
+
 
 """
 rostopic info /follow_joint_trajectory/cancel

@@ -4,7 +4,6 @@ from __future__ import print_function
 
 from .std_msgs import ROSmsg
 from .std_msgs import Header
-from .std_msgs import Time
 
 from .geometry_msgs import Pose
 
