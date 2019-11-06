@@ -4220,11 +4220,7 @@ if sc.sticky[response_key]:
 from scriptcontext import sticky as st
 
 import compas
-from compas.robots import RobotModel
 from compas_fab.backends import RosClient
-from compas_fab.backends import RosFileServerLoader
-from compas_fab.robots import Robot
-from compas_fab.robots import RobotSemantics
 from compas_fab.ghpython import RobotArtist
 
 compas.PRECISION = '12f'
@@ -4237,21 +4233,11 @@ if robot_key not in st:
     st[robot_key] = None
 
 if load:
-    with RosClient() as ros:
-        # Load URDF from ROS with local cache enabled
-        local_directory = os.path.join(os.path.expanduser('~'), 'robot_description')
-        loader = RosFileServerLoader(ros, local_cache=True, local_cache_directory=local_directory)
-        loader.robot_name = 'panda-0001'
-    
-        urdf = loader.load_urdf()
-        srdf = loader.load_srdf()
+    local_directory = os.path.join(os.path.expanduser('~'), 'robot_description', 'panda')
 
-        # Create robot model from URDF and load geometry
-        model = RobotModel.from_urdf_string(urdf)
-        model.load_geometry(loader)
-        robot = Robot(model)
+    with RosClient() as ros:
+        robot = ros.load_robot(load_geometry=True, local_cache_directory=local_directory)
         robot.artist = RobotArtist(robot.model)
-        robot.semantics = RobotSemantics.from_srdf_string(srdf, model)
 
         st[robot_key] = robot
 

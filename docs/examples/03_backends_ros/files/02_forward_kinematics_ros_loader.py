@@ -1,21 +1,8 @@
-from compas.robots import RobotModel
-
 from compas_fab.backends import RosClient
-from compas_fab.backends import RosFileServerLoader
 from compas_fab.robots import Configuration
-from compas_fab.robots import Robot
-from compas_fab.robots import RobotSemantics
 
 with RosClient() as client:
-    loader = RosFileServerLoader(client)
-
-    urdf = loader.load_urdf()
-    srdf = loader.load_srdf()
-
-    model = RobotModel.from_urdf_string(urdf)
-    semantics = RobotSemantics.from_srdf_string(srdf, model)
-
-    robot = Robot(model, semantics=semantics, client=client)
+    robot = client.load_robot()
 
     configuration = Configuration.from_prismatic_and_revolute_values([0.], [-2.238, -1.153, -2.174, 0.185, 0.667, 0.])
 
