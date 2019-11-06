@@ -6,7 +6,6 @@ import time
 
 import compas
 from compas.utilities import rgb_to_rgb
-import compas_rhino
 
 from compas_fab.artists import BaseRobotArtist
 
@@ -29,7 +28,7 @@ class RobotArtist(BaseRobotArtist):
     """Visualizer for robots inside a Rhino environment."""
 
     # TODO: Add layer (e.g. __init__(self, robot, layer=None))
-    def __init__(self, robot): #, layer=None):
+    def __init__(self, robot):
         super(RobotArtist, self).__init__(robot)
 
     def transform(self, native_mesh, transformation):
@@ -89,16 +88,6 @@ class RobotArtist(BaseRobotArtist):
         rs.EnableRedraw(True)
         rs.Redraw()
 
-    # def clear_layer(self):
-    #     """Clear the main layer of the artist."""
-    #     if self.layer:
-    #         compas_rhino.clear_layer(self.layer)
-    #     else:
-    #         compas_rhino.clear_current_layer()
-
-    # def clear(self):
-    #     """Clear the robot."""
-    #     self.clear_robot()
 
 # TODO: Move to compas_rhino.geometry
 def xform_from_transformation(transformation):

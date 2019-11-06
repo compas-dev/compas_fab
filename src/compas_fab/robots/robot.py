@@ -792,7 +792,8 @@ class Robot(object):
         >>> tolerances_axes = [math.radians(1)]
         >>> group = robot.main_group_name
         >>> robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
-        [PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0), OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)]
+        [PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0), \
+        OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)]
 
         Notes
         -----
@@ -826,7 +827,12 @@ class Robot(object):
         >>> tolerances = [math.radians(5)] * 6
         >>> group = robot.main_group_name
         >>> robot.constraints_from_configuration(configuration, tolerances, group)
-        [JointConstraint('shoulder_pan_joint', -0.042, 0.08726646259971647, 1.0), JointConstraint('shoulder_lift_joint', 4.295, 0.08726646259971647, 1.0), JointConstraint('elbow_joint', -4.11, 0.08726646259971647, 1.0), JointConstraint('wrist_1_joint', -3.327, 0.08726646259971647, 1.0), JointConstraint('wrist_2_joint', 4.755, 0.08726646259971647, 1.0), JointConstraint('wrist_3_joint', 0.0, 0.08726646259971647, 1.0)]
+        [JointConstraint('shoulder_pan_joint', -0.042, 0.08726646259971647, 1.0), \
+        JointConstraint('shoulder_lift_joint', 4.295, 0.08726646259971647, 1.0), \
+        JointConstraint('elbow_joint', -4.11, 0.08726646259971647, 1.0), \
+        JointConstraint('wrist_1_joint', -3.327, 0.08726646259971647, 1.0), \
+        JointConstraint('wrist_2_joint', 4.755, 0.08726646259971647, 1.0), \
+        JointConstraint('wrist_3_joint', 0.0, 0.08726646259971647, 1.0)]
 
         Raises
         ------
