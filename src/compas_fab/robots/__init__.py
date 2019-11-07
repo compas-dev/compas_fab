@@ -19,6 +19,8 @@ Main classes
     RobotSemantics
     Configuration
     Duration
+    Wrench
+    Inertia
 
 Path planning
 -------------
@@ -78,5 +80,7 @@ from .robot import *                  # noqa: F401,F403
 from .semantics import *              # noqa: F401,F403
 from .time_ import *                  # noqa: F401,F403
 from .trajectory import *             # noqa: F401,F403
+from .wrench import *                 # noqa: F401,F403
+from .inertia import *                # noqa: F401,F403
 
 __all__ = [name for name in dir() if not name.startswith('_')]

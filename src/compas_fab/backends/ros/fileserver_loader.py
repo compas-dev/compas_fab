@@ -15,10 +15,10 @@ from compas.files import XML
 from compas.geometry import Transformation
 from compas.robots.resources.basic import _get_file_format
 from compas.robots.resources.basic import _mesh_import
-from compas.utilities import await_callback
 from compas.utilities import geometric_key
 
 LOGGER = logging.getLogger('compas_fab.backends.ros')
+TIMEOUT = 10
 
 __all__ = [
     'RosFileServerLoader',
@@ -119,7 +119,7 @@ class RosFileServerLoader(object):
                 return _read_file(filename)
 
         param = roslibpy.Param(self.ros, parameter_name)
-        urdf = await_callback(param.get)
+        urdf = param.get(timeout=TIMEOUT)
 
         self.robot_name = self._read_robot_name(urdf)
 
@@ -151,7 +151,7 @@ class RosFileServerLoader(object):
                 return _read_file(filename)
 
         param = roslibpy.Param(self.ros, parameter_name)
-        srdf = await_callback(param.get)
+        srdf = param.get(timeout=TIMEOUT)
 
         if self.local_cache_enabled:
             _write_file(self._srdf_filename, srdf)
@@ -205,7 +205,7 @@ class RosFileServerLoader(object):
         if not use_local_file:
             service = roslibpy.Service(self.ros, '/file_server/get_file', 'file_server/GetBinaryFile')
             request = roslibpy.ServiceRequest(dict(name=url))
-            response = await_callback(service.call, 'callback', 'errback', request)
+            response = service.call(request, timeout=TIMEOUT)
 
             file_content = binascii.a2b_base64(response.data['value'])
 
