@@ -28,4 +28,4 @@ in Grasshopper.
 from .artists import RobotArtist
 from .path_planning import *          # noqa: F401,F403
 
-__all__ = ['RobotArtist', 'PathVisualizer']
+__all__ = ['RobotArtist']
