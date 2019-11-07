@@ -27,7 +27,7 @@ def list_files_in_directory(directory, fullpath=False, extensions=[]):
         item_fullpath = os.path.join(directory, item)
         if os.path.isfile(item_fullpath):
             if len(extensions):
-                found = reduce(lambda x, y: x or y, [item.endswith(ext) for ext in extensions])
+                found = any([item.endswith(ext) for ext in extensions])
                 if not found:
                     continue
             if fullpath:
