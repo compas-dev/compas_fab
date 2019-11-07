@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from .std_msgs import ROSmsg
 from .std_msgs import Header
-from .std_msgs import Time
+
 
 class JointState(ROSmsg):
     """http://docs.ros.org/kinetic/api/sensor_msgs/html/msg/JointState.html
@@ -19,11 +19,11 @@ class JointState(ROSmsg):
     @classmethod
     def from_name_and_position(cls, name, position):
         return cls(Header(), name, position, [], [])
-    
+
     @classmethod
     def from_configuration(cls):
         pass
-    
+
     @property
     def configuration(self):
         pass

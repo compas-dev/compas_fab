@@ -56,7 +56,8 @@ class Pose(ROSmsg):
     @property
     def frame(self):
         point = [self.position.x, self.position.y, self.position.z]
-        quaternion = [self.orientation.w, self.orientation.x, self.orientation.y, self.orientation.z]
+        quaternion = [self.orientation.w, self.orientation.x,
+                      self.orientation.y, self.orientation.z]
         return Frame.from_quaternion(quaternion, point=point)
 
     @classmethod

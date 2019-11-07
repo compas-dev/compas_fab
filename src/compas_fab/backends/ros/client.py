@@ -169,7 +169,6 @@ class RosClient(Ros):
 
         return Robot(model, semantics=semantics, client=self)
 
-
     def inverse_kinematics(self, frame, base_link, group,
                            joint_names, joint_positions, avoid_collisions=True,
                            constraints=None, attempts=8,

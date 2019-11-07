@@ -3,8 +3,6 @@ from __future__ import print_function
 import math
 
 import compas
-from compas.geometry import Frame
-from compas.geometry import Transformation
 from compas.geometry import Vector
 from compas.geometry import cross_vectors
 
@@ -284,7 +282,7 @@ class Wrench():
             if math.fabs(a - b) > tol:
                 return False
         return True
-    
+
     def __ne__(self, other, tol=1e-05):
         return not self.__eq__(other, tol)
 
@@ -387,4 +385,3 @@ class Wrench():
         torque_gravity = Vector(*cross_vectors((center_of_mass * mass), gravity_vector_FTSCS))
 
         return Wrench(self.force - force_gravity, self.torque - torque_gravity)
-

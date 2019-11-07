@@ -10,6 +10,7 @@ __all__ = [
     'read_data_from_pickle'
 ]
 
+
 def read_csv_to_dictionary(csvfile, delimiter=';'):
     """Reads a csv file and returns a dictionary with the respective keys
     specified in the first row of the csv file.
@@ -20,7 +21,7 @@ def read_csv_to_dictionary(csvfile, delimiter=';'):
         for i, rows in enumerate(reader):
             data.append(rows)
         infile.close()
-    data = zip(*data) # transpose data
+    data = zip(*data)  # transpose data
     data_dict = {}
     for l in data:
         key = l[0]
@@ -35,6 +36,7 @@ def write_data_to_json(data, file):
     with open(file, 'w') as f:
         json.dump(data, f)
 
+
 def read_data_from_json(file):
     """Read data from json file.
     """
@@ -42,11 +44,13 @@ def read_data_from_json(file):
         data = json.load(f)
     return data
 
+
 def write_data_to_pickle(data, file):
     """Write data to pickle file.
     """
     with open(file, 'wb') as f:
         pickle.dump(data, f)
+
 
 def read_data_from_pickle(file):
     """Read data from pickle file.

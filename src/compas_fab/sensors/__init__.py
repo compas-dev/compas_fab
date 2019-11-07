@@ -32,7 +32,7 @@ Baumer sensors
 
 """
 
-from .base import *
-from .baumer import *
+from .base import *         # noqa: F401,F403
+from .baumer import *       # noqa: F401,F403
 
 __all__ = [name for name in dir() if not name.startswith('_')]

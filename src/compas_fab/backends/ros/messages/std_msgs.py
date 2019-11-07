@@ -30,7 +30,7 @@ class ROSmsg(object):
 
     def __str__(self):
         return str(self.msg)
-    
+
     def __repr__(self):
         return self.__str__
 
@@ -54,6 +54,7 @@ class Header(ROSmsg):
         self.seq = seq
         self.stamp = stamp
         self.frame_id = frame_id
+
 
 class String(ROSmsg):
     """http://docs.ros.org/api/std_msgs/html/msg/String.html

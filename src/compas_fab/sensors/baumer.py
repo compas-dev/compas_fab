@@ -47,7 +47,8 @@ class PosCon3D(SerialSensor):
     FRAME_HEAD = '{%s,%s,%s'
     FRAME_TAIL = '%s%s}'
     BROADCAST_ADDRESS = 0
-    MEASUREMENT_TYPES = ('Edge L rise', 'Edge L fall', 'Edge R rise', 'Edge R fall', 'Width', 'Center width', 'Gap', 'Center gap')
+    MEASUREMENT_TYPES = ('Edge L rise', 'Edge L fall', 'Edge R rise',
+                         'Edge R fall', 'Width', 'Center width', 'Gap', 'Center gap')
     QUALITY = {
         0: 'Valid',
         1: 'Low signal',
@@ -368,12 +369,12 @@ class PosConCM(SerialSensor):
     FRAME_TAIL = '%s%s\r\n'
     BROADCAST_ADDRESS = 0
     MEASUREMENT_TYPES = {
-        'Diameter' : 28,
-        'X_center' : 29,
-        'Z_center' : 30,
-        'X_left'   : 31,
-        'X_right'  : 32,
-        'Z_top'    : 33}
+        'Diameter': 28,
+        'X_center': 29,
+        'Z_center': 30,
+        'X_left': 31,
+        'X_right': 32,
+        'Z_top': 33}
     QUALITY = {
         0: 'Valid',
         1: 'Low signal',
@@ -436,7 +437,8 @@ class PosConCM(SerialSensor):
 
         Note
         ----
-        See `RS-485 Protocol Structure <https://www.baumer.com/ae/en/product-overview/2d-3d-sensors/profile-sensors-/measurement-of-round-objects/oxc7-x0250-ii1250-ti/p/medias/__secure__/en_BA_RS485_Protocol_Structure.pdf?mediaPK=8799860686878>`_ for more info.
+        See `RS-485 Protocol Structure <https://www.baumer.com/ae/en/product-overview/2d-3d-sensors/profile-sensors-/measurement-of-round-objects/\
+        oxc7-x0250-ii1250-ti/p/medias/__secure__/en_BA_RS485_Protocol_Structure.pdf?mediaPK=8799860686878>`_ for more info.
         """
         return '****'
 
@@ -450,7 +452,8 @@ class PosConCM(SerialSensor):
 
         if result_type == 'E':
             error_index = frame_head.split(';')
-            raise ProtocolError('Application error, Result=%s' % frame_head + 'Error type: ' + str(self.ERROR_CODES[str(error_index[1])]))
+            raise ProtocolError('Application error, Result=%s' % frame_head +
+                                'Error type: ' + str(self.ERROR_CODES[str(error_index[1])]))
 
         if result_type == 'B':
             raise ProtocolError('Sensor is busy, Result=%s' % frame_head)
