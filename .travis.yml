@@ -53,8 +53,8 @@ script:
   - python -c "from compas_fab.backends.vrep.remote_api import vrep"
   - python -c "import compas_fab.robots"
   - python -c "import compas_fab.utilities"
-  - invoke test --no-doctest
   - invoke lint
+  - invoke test --no-doctest
   - if [[ "$TRAVIS_GENERATE_DOCS" == "true" ]]; then
       invoke docs;
     fi
