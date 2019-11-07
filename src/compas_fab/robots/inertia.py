@@ -48,8 +48,8 @@ class Inertia():
     def principal_moments(self):
         """Returns the diagonal elements of the inertia tensor [ixx, iyy, izz]
         """
-        I = self.inertia_tensor
-        return [I[0][0], I[1][1], I[2][2]]
+        inertia_tensor = self.inertia_tensor
+        return [inertia_tensor[0][0], inertia_tensor[1][1], inertia_tensor[2][2]]
 
     def __repr__(self):
         return "Inertia({0}, {1}, {2})".format(self.inertia_tensor, self.mass, self.center_of_mass)
@@ -59,4 +59,3 @@ class Inertia():
         """Returns the inertia tensor.
         """
         raise NotImplementedError
-

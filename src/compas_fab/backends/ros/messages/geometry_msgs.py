@@ -97,7 +97,6 @@ class Vector3(ROSmsg):
         return cls(x, y, z)
 
 
-
 class Transform(ROSmsg):
     """http://docs.ros.org/api/geometry_msgs/html/msg/Transform.html
     """
