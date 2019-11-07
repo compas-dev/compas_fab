@@ -13,6 +13,8 @@ Unreleased
 **Added**
 
 * Added ``load_robot`` method to ROS client to simplify loading robots from running ROS setup.
+* Added ``compas_fab.robots.Wrench``: a Wrench class representing force in free space, separated into its linear (force) and angular (torque) parts.
+* Added ``compas_fab.robots.Inertia``: a Inertia class representing spatial distribution of mass in a rigid body
 
 **Changed**
 
