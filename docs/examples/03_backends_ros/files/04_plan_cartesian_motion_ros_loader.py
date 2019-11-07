@@ -1,22 +1,9 @@
 from compas.geometry import Frame
-from compas.robots import RobotModel
-
 from compas_fab.backends import RosClient
-from compas_fab.backends import RosFileServerLoader
 from compas_fab.robots import Configuration
-from compas_fab.robots import Robot
-from compas_fab.robots import RobotSemantics
 
 with RosClient() as client:
-    loader = RosFileServerLoader(client)
-
-    urdf = loader.load_urdf()
-    srdf = loader.load_srdf()
-
-    model = RobotModel.from_urdf_string(urdf)
-    semantics = RobotSemantics.from_srdf_string(srdf, model)
-
-    robot = Robot(model, semantics=semantics, client=client)
+    robot = client.load_robot()
     group = robot.main_group_name
 
     frames = []
