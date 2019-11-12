@@ -52,7 +52,7 @@ and type the following which will install it on both Rhino 5.0 and 6.0:
     On Windows, you might need to run the *command prompt* as administrator
     before running the install command.
 
-Open Rhino, start the Python script editor, type ``import compas`` and
+Open Rhino, start the Python script editor, type ``import compas_fab`` and
 run it to verify that your installation is working.
 
 Working in Blender
