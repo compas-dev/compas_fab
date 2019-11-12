@@ -20,12 +20,6 @@ Unreleased
 
 * Updated to COMPAS 0.11
 
-**Removed**
-
-**Fixed**
-
-**Deprecated**
-
 0.8.0
 ----------
 
