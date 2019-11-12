@@ -76,6 +76,10 @@ We recommend installing the following VS Code extensions:
   *Official extension to add support for Python programming, including
   debugging, auto-complete, formatting, etc.*
 
+* `Docker <https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker>`_
+
+  *Add support for ``Dockerfile`` and ``docker-compose.yml`` files to VS Code.*
+
 * `EditorConfig <https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig>`_
 
   *Add support for ``.editorconfig`` files to VS Code.*
