@@ -18,6 +18,8 @@ Unreleased
 
 **Changed**
 
+* Updated to COMPAS 0.11
+
 **Removed**
 
 **Fixed**
