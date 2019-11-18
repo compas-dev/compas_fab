@@ -265,6 +265,10 @@ class PlanningScene(object):
             The planning group to which we want to attach the mesh to. Defaults
             to the robot's main planning group.
 
+        Returns
+        -------
+        None
+
         Examples
         --------
         >>> scene = PlanningScene(robot)
