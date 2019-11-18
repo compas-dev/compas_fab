@@ -767,7 +767,7 @@ class Robot(object):
 
         Returns
         -------
-        None
+        :class:`AttachedCollisionMesh`
 
         Examples
         --------
@@ -781,6 +781,7 @@ class Robot(object):
         cm = CollisionMesh(mesh, 'end_effector')
         self.end_effector = AttachedCollisionMesh(cm, ee_link_name, touch_links)
         self.end_effector_frame = Frame(frame[0], frame[1], frame[2])
+        return self.end_effector
 
     # ==========================================================================
     # checks
@@ -1234,7 +1235,7 @@ class Robot(object):
                 path_constraints_RCF_scaled.append(cp)
         else:
             path_constraints_RCF_scaled = None
-        
+    
         if self.end_effector:
             attached_collision_meshes = attached_collision_meshes or []
             attached_collision_meshes.append(self.end_effector)
