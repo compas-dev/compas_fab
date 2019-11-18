@@ -703,7 +703,7 @@ class Robot(object):
         --------
         >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
-        >>> robot.set_end_effector(mesh, frame)
+        >>> acm = robot.set_end_effector(mesh, frame)
         >>> frame_tcf = Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))
         >>> robot.to_t0cf(frame_tcf)
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
@@ -736,7 +736,7 @@ class Robot(object):
         --------
         >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
-        >>> robot.set_end_effector(mesh, frame)
+        >>> acm = robot.set_end_effector(mesh, frame)
         >>> frame_t0cf = Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))
         >>> robot.to_tcf(frame_t0cf)
         Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))
@@ -773,7 +773,7 @@ class Robot(object):
         --------
         >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
-        >>> robot.set_end_effector(mesh, frame)
+        >>> acm = robot.set_end_effector(mesh, frame)
         """
         group = group or self.main_group_name
         ee_link_name = self.get_end_effector_link_name(group)

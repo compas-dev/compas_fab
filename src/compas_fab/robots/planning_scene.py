@@ -286,7 +286,7 @@ class PlanningScene(object):
 
         >>> # check if it's really gone
         >>> planning_scene = robot.client.get_planning_scene()
-        >>> objects = [c.object.id for c in planning_scene.robot_state.attached_collision_objects]
+        >>> objects = [c.object['id'] for c in planning_scene.robot_state.attached_collision_objects]
         >>> 'tip' in objects
         False
         """
