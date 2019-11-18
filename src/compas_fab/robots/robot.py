@@ -17,6 +17,9 @@ from compas_fab.robots.constraints import JointConstraint
 from compas_fab.robots.constraints import OrientationConstraint
 from compas_fab.robots.constraints import PositionConstraint
 
+from compas_fab.robots.planning_scene import CollisionMesh
+from compas_fab.robots.planning_scene import AttachedCollisionMesh
+
 LOGGER = logging.getLogger('compas_fab.robots.robot')
 
 __all__ = [
@@ -52,6 +55,8 @@ class Robot(object):
         self.artist = artist  # setter and getter (because of scale)
         self.semantics = semantics
         self.client = client  # setter and getter ?
+        self.end_effector = None
+        self.end_effector_frame = None
 
     @property
     def artist(self):
@@ -674,6 +679,107 @@ class Robot(object):
         """
         frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
         return frame_WCF
+
+    def to_t0cf(self, frame_tcf):
+        """Converts a frame at the robot's tool tip (tcf frame) to a frame at the robot's flange (tool0 frame) using the set end-effector.
+
+        Parameters
+        ----------
+        frame_t0cf : :class:`Frame`
+            A frame (in WCF) at the robot's tool tip (tcf).
+
+        Returns
+        -------
+        :class:`Frame`
+            A frame (in WCF) at the robot's flange (tool0).
+
+        Raises
+        ------
+        Exception
+            If the end effector is not set.
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> robot.set_end_effector(mesh, frame)
+        >>> frame_tcf = Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))
+        >>> robot.to_t0cf(frame_tcf)
+        Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
+        """
+        if not self.end_effector_frame:
+            raise Exception("Please set an endeffector")
+        Te = Transformation.from_frame_to_frame(self.end_effector_frame, Frame.worldXY())
+        Tc = Transformation.from_frame(frame_tcf)
+        return Frame.from_transformation(Tc * Te)
+
+    def to_tcf(self, frame_t0cf):
+        """Converts a frame at the robot's flange (tool0 frame) to a frame at the robot's tool tip (tcf frame) using the set end-effector.
+
+        Parameters
+        ----------
+        frame_t0cf : :class:`Frame`
+            A frame (in WCF) at the robot's flange (tool0).
+
+        Returns
+        -------
+        :class:`Frame`
+            A frame (in WCF) at the robot's tool tip (tcf).
+
+        Raises
+        ------
+        Exception
+            If the end effector is not set.
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> robot.set_end_effector(mesh, frame)
+        >>> frame_t0cf = Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))
+        >>> robot.to_tcf(frame_t0cf)
+        Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))
+        """
+        # TODO: or, rather than raising exception: do we simply read the end-effector from the urdf
+        if not self.end_effector_frame:
+            raise Exception("Please set an endeffector")
+        Te = Transformation.from_frame_to_frame(Frame.worldXY(), self.end_effector_frame)
+        Tc = Transformation.from_frame(frame_t0cf)
+        return Frame.from_transformation(Tc * Te)
+
+    def set_end_effector(self, mesh, frame, group=None, touch_links=None):
+        """Set's the robots end-effector that is not defined through URDF.
+
+        Parameters
+        ----------
+        mesh : :class:`compas.datastructures.Mesh`
+            The geometry of the end-effector. Must be placed and oriented such
+            that the Frame.worldXY() corresponds to the robot's tool0-frame.
+        frame : :class:`compas.geometry.Frame`
+            The frame of the end-effector.
+        group : str
+            The planning group to attach this end-effector to. Defaults to the
+            main planning group.
+        touch_links : list of str
+            A list of link names the end-effector is allowed to touch. Defaults
+            to the end-effector link.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> robot.set_end_effector(mesh, frame)
+        """
+        group = group or self.main_group_name
+        ee_link_name = self.get_end_effector_link_name(group)
+        touch_links = touch_links or [ee_link_name]
+        cm = CollisionMesh(mesh, 'end_effector')
+        self.end_effector = AttachedCollisionMesh(cm, ee_link_name, touch_links)
+        self.end_effector_frame = Frame(frame[0], frame[1], frame[2])
 
     # ==========================================================================
     # checks
