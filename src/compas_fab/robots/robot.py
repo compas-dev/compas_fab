@@ -1235,7 +1235,7 @@ class Robot(object):
                 path_constraints_RCF_scaled.append(cp)
         else:
             path_constraints_RCF_scaled = None
-    
+
         if self.end_effector:
             attached_collision_meshes = attached_collision_meshes or []
             attached_collision_meshes.append(self.end_effector)
