@@ -7,6 +7,18 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+Unreleased
+----------
+
+**Added**
+
+* Added `set_end_effector`, `to_tcf` and `to_t0cf` to `Robot`
+
+**Changed**
+
+* Changed `inverse_kinematics`, `plan_cartesian_motion` and `plan_motion` to use the `end_effector` as `AttachedCollisionMesh` if set
+
+
 0.9.0
 ----------
 
