@@ -10,6 +10,7 @@ from compas.geometry import Sphere
 from compas.geometry import Transformation
 from compas.robots import Joint
 from compas.robots import RobotModel
+from compas.datastructures import mesh_transformed
 
 from compas_fab.robots.configuration import Configuration
 from compas_fab.robots.constraints import Constraint
@@ -1032,6 +1033,10 @@ class Robot(object):
         frame_RCF = self.to_local_coords(frame_WCF, group)
         frame_RCF.point /= self.scale_factor  # must be in meters
 
+        if self.end_effector:
+            attached_collision_meshes = attached_collision_meshes or []
+            attached_collision_meshes.append(self.end_effector)
+
         # The returned joint names might be more than the requested ones if there are passive joints present
         joint_positions, joint_names = self.client.inverse_kinematics(frame_RCF, base_link,
                                                                       group, joint_names, joint_positions,
@@ -1229,6 +1234,10 @@ class Robot(object):
                 path_constraints_RCF_scaled.append(cp)
         else:
             path_constraints_RCF_scaled = None
+        
+        if self.end_effector:
+            attached_collision_meshes = attached_collision_meshes or []
+            attached_collision_meshes.append(self.end_effector)
 
         trajectory = self.client.plan_cartesian_motion(
             robot=self,
@@ -1365,6 +1374,10 @@ class Robot(object):
 
         start_configuration.scale(1. / self.scale_factor)
 
+        if self.end_effector:
+            attached_collision_meshes = attached_collision_meshes or []
+            attached_collision_meshes.append(self.end_effector)
+
         trajectory = self.client.plan_motion(
             robot=self,
             goal_constraints=goal_constraints_RCF_scaled,
@@ -1438,6 +1451,19 @@ class Robot(object):
         """Draws the visual geometry of the robot in the respective CAD environment.
         """
         return self.draw_visual()
+
+    def draw_end_effector(self, tool0_frame):
+        """Draws the end-effector if set.
+
+        Parameters
+        ----------
+        tool0_frame : :class:`Frame`
+            The frame at the robot's flange (tool0).
+        """
+        if self.end_effector:
+            T = Transformation.from_frame_to_frame(self.end_effector.collision_mesh.frame, tool0_frame)
+            ee_mesh = mesh_transformed(self.end_effector.collision_mesh.mesh, T)
+            return self.artist.draw_geometry(ee_mesh)
 
     def scale(self, factor):
         """Scales the robot geometry by factor (absolute).
