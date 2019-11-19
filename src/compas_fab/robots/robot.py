@@ -682,7 +682,7 @@ class Robot(object):
         return frame_WCF
 
     def to_tool0_frame(self, frame_tcf):
-        """Converts a frame at the robot's tool tip (tcf frame) to a frame at the robot's flange (tool0 frame) using the set end-effector.
+        """Converts a frame at the robot's tool tip (tcf frame) to a frame at the robot's flange (tool0 frame) using the attached tool.
 
         Parameters
         ----------
@@ -703,19 +703,51 @@ class Robot(object):
         --------
         >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
-        >>> acm = robot.set_end_effector(mesh, frame)
+        >>> robot.attach_tool(Tool(mesh, frame))
         >>> frame_tcf = Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))
         >>> robot.to_tool0_frame(frame_tcf)
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
         """
         if not self.attached_tool:
-            raise Exception("Please set an endeffector")
+            raise Exception("Please attach a tool first.")
         Te = Transformation.from_frame_to_frame(self.attached_tool.frame, Frame.worldXY())
         Tc = Transformation.from_frame(frame_tcf)
         return Frame.from_transformation(Tc * Te)
+    
+    def to_tool0_frames(self, frames_tcf):
+        """Converts a list of frames at the robot's tool tip (tcf frame) to frames at the robot's flange (tool0 frame) using the attached tool.
+
+        Parameters
+        ----------
+        frames_tcf : list of :class:`Frame`
+            Frames (in WCF) at the robot's tool tip (tcf).
+
+        Returns
+        -------
+        list of :class:`Frame`
+            Frames (in WCF) at the robot's flange (tool0).
+
+        Raises
+        ------
+        Exception
+            If the attached tool is not set.
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> robot.attach_tool(Tool(mesh, frame))
+        >>> frames_tcf = [Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))]
+        >>> robot.to_tool0_frames(frames_tcf)
+        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
+        """
+        if not self.attached_tool:
+            raise Exception("Please attach a tool first.")
+        Te = Transformation.from_frame_to_frame(self.attached_tool.frame, Frame.worldXY())
+        return [Frame.from_transformation(Transformation.from_frame(f) * Te) for f in frames_tcf]
 
     def to_tool_frame(self, frame_t0cf):
-        """Converts a frame at the robot's flange (tool0 frame) to a frame at the robot's tool tip (tcf frame) using the set end-effector.
+        """Converts a frame at the robot's flange (tool0 frame) to a frame at the robot's tool tip (tcf frame) using the attached tool.
 
         Parameters
         ----------
@@ -736,20 +768,51 @@ class Robot(object):
         --------
         >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
-        >>> acm = robot.set_end_effector(mesh, frame)
+        >>> robot.attach_tool(Tool(mesh, frame))
         >>> frame_t0cf = Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))
         >>> robot.to_tool_frame(frame_t0cf)
         Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))
         """
-        # TODO: or, rather than raising exception: do we simply read the end-effector from the urdf
         if not self.attached_tool:
-            raise Exception("Please set an attached tool.")
+            raise Exception("Please attach a tool first.")
         Te = Transformation.from_frame_to_frame(Frame.worldXY(), self.attached_tool.frame)
         Tc = Transformation.from_frame(frame_t0cf)
         return Frame.from_transformation(Tc * Te)
+    
+    def to_tool_frames(self, frames_t0cf):
+        """Converts frames at the robot's flange (tool0 frame) to frames at the robot's tool tip (tcf frame) using the attached tool.
+
+        Parameters
+        ----------
+        frames_t0cf : list of :class:`Frame`
+            Frames (in WCF) at the robot's flange (tool0).
+
+        Returns
+        -------
+        list of :class:`Frame`
+            Frames (in WCF) at the robot's tool tip (tcf).
+
+        Raises
+        ------
+        Exception
+            If the end effector is not set.
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> robot.attach_tool(Tool(mesh, frame))
+        >>> frames_t0cf = [Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))]
+        >>> robot.to_tool_frames(frames_t0cf)
+        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
+        """
+        if not self.attached_tool:
+            raise Exception("Please attach a tool first.")
+        Te = Transformation.from_frame_to_frame(Frame.worldXY(), self.attached_tool.frame)
+        return [Frame.from_transformation(Transformation.from_frame(f) * Te) for f in frames_t0cf]
 
     def attach_tool(self, tool, group=None, touch_links=None):
-        """Set's the robots end-effector that is not defined through URDF.
+        """Attach a tool to the robot independently of the model definition.
 
         Parameters
         ----------
