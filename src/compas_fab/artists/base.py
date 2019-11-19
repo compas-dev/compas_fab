@@ -86,7 +86,11 @@ class BaseRobotArtist(object):
         tool.native_geometry = [native_geometry]
         tool.current_transformation = Transformation()
         self.attached_tool = tool
-
+    
+    def detach_tool(self):
+        """Detach the tool.
+        """
+        self.attached_tool = None
 
     def draw_attached_tool(self):
         """Draws the attached tool.
