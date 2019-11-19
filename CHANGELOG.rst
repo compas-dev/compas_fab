@@ -15,6 +15,8 @@ Unreleased
 * Added ``attach_tool``, ``detach_tool``, ``draw_attached_tool``, ``from_tool0_to_attached_tool`` and ``from_attached_tool_to_tool0`` to ``Robot``
 * Added ``attach_tool`` and ``detach_tool`` to ``Artist``
 * Added ``add_attached_tool`` and ``remove_attached_tool`` to ``PlanningScene``
+* Added redraw/clear layer support to `RobotArtist` for Rhino
+* Added material/color support for DAE files on ROS file loader
 
 **Changed**
 
@@ -25,6 +27,7 @@ Unreleased
 **Fixed**
 
 * Fixed mutable init parameters of ``Configuration``, ``JointTrajectoryPoint``, ``JointTrajectory`` and ``Robot.basic``.
+* Fixed interface of `RobotArtist` for Blender
 
 **Deprecated**
 

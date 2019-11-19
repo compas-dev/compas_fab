@@ -24,10 +24,7 @@ class RobotArtist(BaseRobotArtist):
         T = xform_from_transformation(transformation)
         native_mesh.Transform(T)
 
-    def draw_geometry(self, geometry, color=None):
+    def draw_geometry(self, geometry, name=None, color=None):
         if color:
             color = rgb_to_rgb(color[0], color[1], color[2])
         return mesh_draw(geometry, color=color)
-
-    # def set_color(self, color_rgba):
-    #     r, g, b, a = color_rgba

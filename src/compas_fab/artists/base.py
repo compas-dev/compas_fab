@@ -51,7 +51,7 @@ class BaseRobotArtist(object):
         """
         raise NotImplementedError
 
-    def draw_geometry(self, geometry, color=None):
+    def draw_geometry(self, geometry, name=None, color=None):
         """Draw a **COMPAS** geometry in the respective CAD environment.
 
         Note
@@ -62,6 +62,8 @@ class BaseRobotArtist(object):
         ----------
         geometry : :class:`compas.datastructures.Mesh` or :class:`compas.geometry.Shape`
             Instance of a **COMPAS** mesh or **COMPAS** shape
+        name : str, optional
+            The name of the mesh to draw.
 
         Returns
         -------
@@ -78,10 +80,13 @@ class BaseRobotArtist(object):
         tool : :class:`compas_fab.robots.Tool`
             The tool that should be attached to the robot's flange.
         """
+        name = '{}.visual.attached_tool'.format(self.robot.name)
+        native_geometry = self.draw_geometry(tool.visual, name=name)  # TODO: only visual, collsion would be great
+
         link = self.robot.get_link_by_name(tool.attached_collision_mesh.link_name)
         ee_frame = link.parent_joint.origin.copy()
+
         T = Transformation.from_frame_to_frame(Frame.worldXY(), ee_frame)
-        native_geometry = self.draw_geometry(tool.visual)  # TODO: only visual, collsion would be great
         self.transform(native_geometry, T)
         tool.native_geometry = [native_geometry]
         tool.current_transformation = Transformation()
@@ -126,14 +131,15 @@ class BaseRobotArtist(object):
                 if not hasattr(meshes, '__iter__'):
                     meshes = (meshes,)
 
-                color = None
-                if hasattr(item, 'get_color'):
-                    color = item.get_color()
+                is_visual = hasattr(item, 'get_color')
+                color = item.get_color() if is_visual else None
 
                 native_geometry = []
-                for mesh in meshes:
+                for i, mesh in enumerate(meshes):
                     # create native geometry
-                    native_mesh = self.draw_geometry(mesh, color)
+                    mesh_type = 'visual' if is_visual else 'collision'
+                    mesh_name = '{}.{}.{}.{}'.format(self.robot.name, mesh_type, link.name, i)
+                    native_mesh = self.draw_geometry(mesh, name=mesh_name, color=color)
                     # transform native geometry based on saved init transform
                     self.transform(native_mesh, item.init_transformation)
                     # append to list

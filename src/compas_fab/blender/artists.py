@@ -19,12 +19,13 @@ __all__ = [
 class RobotArtist(BaseRobotArtist):
     """Visualizer for robots inside a Blender environment."""
 
-    def __init__(self, robot):
+    def __init__(self, robot, layer=None):
         super(RobotArtist, self).__init__(robot)
+        self.layer = layer
 
     def transform(self, native_mesh, transformation):
         native_mesh.matrix_world *= mathutils.Matrix(transformation.matrix)
 
-    def draw_mesh(self, compas_mesh, color=None):
-        v, f = compas_mesh.to_vertices_and_faces()
-        return draw_mesh(v, f, color=color)
+    def draw_geometry(self, geometry, name=None, color=None):
+        v, f = geometry.to_vertices_and_faces()
+        return draw_mesh(v, f, name=name, color=color, layer=self.layer)

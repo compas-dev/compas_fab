@@ -234,6 +234,8 @@ def _dae_mesh_importer(filename, precision):
     dae = XML.from_file(filename)
     meshes = []
     visual_scenes = dae.root.find('library_visual_scenes')
+    materials = dae.root.find('library_materials')
+    effects = dae.root.find('library_effects')
 
     for geometry in dae.root.findall('.//geometry'):
         mesh_xml = geometry.find('mesh')
@@ -254,6 +256,26 @@ def _dae_mesh_importer(filename, precision):
 
         triangle_set = mesh_xml.find('triangles')
         triangle_set_data = triangle_set.find('p').text.split()
+
+        # Try to retrieve mesh colors
+        mesh_colors = {}
+
+        if materials is not None and effects is not None:
+            try:
+                instance_effect = None
+                material_id = triangle_set.attrib.get('material')
+
+                if material_id is not None:
+                    instance_effect = materials.find('material[@id="{}"]/instance_effect'.format(material_id))
+
+                if instance_effect is not None:
+                    instance_effect_id = instance_effect.attrib['url'][1:]
+                    colors = effects.findall('effect[@id="{}"]/profile_COMMON/technique/phong/*/color'.format(instance_effect_id))
+                    for color_node in colors:
+                        rgba = [float(i) for i in color_node.text.split()]
+                        mesh_colors['mesh_color.{}'.format(color_node.attrib['sid'])] = rgba
+            except Exception:
+                LOGGER.exception('Exception while loading materials, all materials of mesh file %s will be ignored ', filename)
 
         # Parse vertices
         vertices_input = triangle_set.find('input[@semantic="VERTEX"]')
@@ -283,6 +305,9 @@ def _dae_mesh_importer(filename, precision):
         faces = [[index_index[index] for index in face] for face in faces]
 
         mesh = Mesh.from_vertices_and_faces(vertices, faces)
+
+        if mesh_colors:
+            mesh.attributes.update(mesh_colors)
 
         if transform:
             mesh_transform(mesh, transform)
