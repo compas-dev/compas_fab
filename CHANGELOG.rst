@@ -12,11 +12,13 @@ Unreleased
 
 **Added**
 
-* Added ``set_end_effector``, ``to_tcf`` and ``to_t0cf`` to ``Robot``
+* Added ``attach_tool``, ``detach_tool``, ``draw_attached_tool``, ``to_tool_frame(s)`` and ``to_tool0_frame(s)`` to ``Robot``
+* Added ``attach_tool``, ``detach_tool``, ``draw_attached_tool`` to ``Artist``
+* Added ``add_attached_tool`` and ``remove_attached_tool`` to ``PlanningScene``
 
 **Changed**
 
-* Changed `inverse_kinematics`, `plan_cartesian_motion` and `plan_motion` to use the `end_effector` as `AttachedCollisionMesh` if set
+* Changed `inverse_kinematics`, `plan_cartesian_motion` and `plan_motion` to use the attached_tool's `AttachedCollisionMesh` if set
 
 **Removed**
 
