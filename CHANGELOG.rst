@@ -18,7 +18,7 @@ Unreleased
 
 **Changed**
 
-* Changed `inverse_kinematics`, `plan_cartesian_motion` and `plan_motion` to use the attached_tool's `AttachedCollisionMesh` if set
+* Changed ``inverse_kinematics``, ``plan_cartesian_motion`` and ``plan_motion`` to use the attached_tool's ``AttachedCollisionMesh`` if set
 
 **Removed**
 
