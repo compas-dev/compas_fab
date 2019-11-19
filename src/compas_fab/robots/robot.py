@@ -68,6 +68,8 @@ class Robot(object):
     def artist(self, artist):
         self._artist = artist
         self.scale(self._scale_factor)
+        if self.attached_tool:
+            self.artist.attach_tool(self.attached_tool)
 
     @classmethod
     def basic(cls, name, joints=[], links=[], materials=[], **kwargs):
@@ -841,10 +843,15 @@ class Robot(object):
         touch_links = touch_links or [ee_link_name]
         tool.attached_collision_mesh = AttachedCollisionMesh(tool.collision_mesh, ee_link_name, touch_links)
         self.attached_tool = tool
+        if self.artist:
+            self.update(self.init_configuration(group), group=group, visual=True, collision=True) # TODO: this is not so ideal! should be called from within artist
+            self.artist.attach_tool(tool)
     
     def detach_tool(self):
-        """Detaches the set tool."""
+        """Detaches the attached tool."""
         self.attached_tool = None
+        if self.artist:
+            self.artist.detach_tool()
 
     # ==========================================================================
     # checks
@@ -1516,18 +1523,11 @@ class Robot(object):
         """
         return self.draw_visual()
 
-    def draw_end_effector(self, tool0_frame):
-        """Draws the end-effector if set.
-
-        Parameters
-        ----------
-        tool0_frame : :class:`Frame`
-            The frame at the robot's flange (tool0).
+    def draw_attached_tool(self):
+        """Draws the attached tool if set.
         """
-        if self.attached_tool:
-            T = Transformation.from_frame_to_frame(self.attached_tool.frame, tool0_frame)
-            ee_mesh = mesh_transformed(self.attached_tool.mesh, T)
-            return self.artist.draw_geometry(ee_mesh)
+        if self.artist and self.attached_tool:
+            return self.artist.draw_attached_tool()
 
     def scale(self, factor):
         """Scales the robot geometry by factor (absolute).
