@@ -18,7 +18,6 @@ from compas_fab.robots.constraints import OrientationConstraint
 from compas_fab.robots.constraints import PositionConstraint
 
 from compas_fab.robots.planning_scene import AttachedCollisionMesh
-from compas_fab.robots.tool import Tool
 
 LOGGER = logging.getLogger('compas_fab.robots.robot')
 

@@ -11,6 +11,7 @@ from compas.geometry import Rotation
 import compas_fab
 from compas_fab.backends import RosClient
 from compas_fab.robots.ur5 import Robot
+from compas_fab.robots.tool import Tool
 
 
 @pytest.fixture(autouse=True)
@@ -23,6 +24,7 @@ def add_imports(doctest_namespace):
     doctest_namespace["Scale"] = Scale
     doctest_namespace["compas_fab"] = compas_fab
     doctest_namespace["Rotation"] = Rotation
+    doctest_namespace["Rotation"] = Tool
 
 
 @pytest.fixture(scope="session", autouse=True)
