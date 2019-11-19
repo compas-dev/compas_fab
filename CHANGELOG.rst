@@ -12,7 +12,7 @@ Unreleased
 
 **Added**
 
-* Added `set_end_effector`, `to_tcf` and `to_t0cf` to `Robot`
+* Added ``set_end_effector``, ``to_tcf`` and ``to_t0cf`` to ``Robot``
 
 **Changed**
 
