@@ -681,12 +681,12 @@ class Robot(object):
         frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
         return frame_WCF
 
-    def to_t0cf(self, frame_tcf):
+    def to_tool0_frame(self, frame_tcf):
         """Converts a frame at the robot's tool tip (tcf frame) to a frame at the robot's flange (tool0 frame) using the set end-effector.
 
         Parameters
         ----------
-        frame_t0cf : :class:`Frame`
+        frame_tcf : :class:`Frame`
             A frame (in WCF) at the robot's tool tip (tcf).
 
         Returns
@@ -705,7 +705,7 @@ class Robot(object):
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> acm = robot.set_end_effector(mesh, frame)
         >>> frame_tcf = Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))
-        >>> robot.to_t0cf(frame_tcf)
+        >>> robot.to_tool0_frame(frame_tcf)
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
         """
         if not self.end_effector_frame:
@@ -714,7 +714,7 @@ class Robot(object):
         Tc = Transformation.from_frame(frame_tcf)
         return Frame.from_transformation(Tc * Te)
 
-    def to_tcf(self, frame_t0cf):
+    def to_tool_frame(self, frame_t0cf):
         """Converts a frame at the robot's flange (tool0 frame) to a frame at the robot's tool tip (tcf frame) using the set end-effector.
 
         Parameters
@@ -738,7 +738,7 @@ class Robot(object):
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> acm = robot.set_end_effector(mesh, frame)
         >>> frame_t0cf = Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))
-        >>> robot.to_tcf(frame_t0cf)
+        >>> robot.to_tool_frame(frame_t0cf)
         Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))
         """
         # TODO: or, rather than raising exception: do we simply read the end-effector from the urdf
