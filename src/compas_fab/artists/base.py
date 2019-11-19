@@ -81,7 +81,7 @@ class BaseRobotArtist(object):
         link = self.robot.get_link_by_name(tool.attached_collision_mesh.link_name)
         ee_frame = link.parent_joint.origin.copy()
         T = Transformation.from_frame_to_frame(Frame.worldXY(), ee_frame)
-        native_geometry = self.draw_geometry(tool.visual)
+        native_geometry = self.draw_geometry(tool.visual) # TODO: only visual, collsion would be great
         self.transform(native_geometry, T)
         tool.native_geometry = [native_geometry]
         tool.current_transformation = Transformation()
@@ -91,16 +91,6 @@ class BaseRobotArtist(object):
         """Detach the tool.
         """
         self.attached_tool = None
-
-    def draw_attached_tool(self):
-        """Draws the attached tool.
-        
-        Returns
-        -------
-        object
-            CAD-specific geometry
-        """
-        return self.attached_tool.native_geometry
 
     def create(self, link=None):
         """Recursive function that triggers the drawing of the robot geometry.
@@ -251,6 +241,9 @@ class BaseRobotArtist(object):
                 if item.native_geometry:
                     for native_geometry in item.native_geometry:
                         yield native_geometry
+        if self.attached_tool:
+            for native_geometry in self.attached_tool.native_geometry:
+                yield native_geometry
 
     def draw_collision(self):
         """Draws all collision geometry of the robot."""
@@ -259,3 +252,6 @@ class BaseRobotArtist(object):
                 if item.native_geometry:
                     for native_geometry in item.native_geometry:
                         yield native_geometry
+        if self.attached_tool:
+            for native_geometry in self.attached_tool.native_geometry:
+                yield native_geometry
