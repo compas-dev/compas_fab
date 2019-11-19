@@ -10,7 +10,6 @@ from compas.geometry import Sphere
 from compas.geometry import Transformation
 from compas.robots import Joint
 from compas.robots import RobotModel
-from compas.datastructures import mesh_transformed
 
 from compas_fab.robots.configuration import Configuration
 from compas_fab.robots.constraints import Constraint
