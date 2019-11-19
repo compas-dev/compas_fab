@@ -6,6 +6,7 @@ import itertools
 
 from compas.geometry import Transformation
 from compas.geometry import Scale
+from compas.geometry import Frame
 
 __all__ = [
     'BaseRobotArtist'
@@ -36,6 +37,7 @@ class BaseRobotArtist(object):
         self.robot = robot
         self.create()
         self.scale_factor = 1.
+        self.attached_tool = None
 
     def transform(self, geometry, transformation):
         """Transforms a CAD-specific geometry using a **COMPAS** transformation.
@@ -67,6 +69,28 @@ class BaseRobotArtist(object):
             CAD-specific geometry
         """
         raise NotImplementedError
+
+    def attach_tool(self, tool):
+        """Attach a tool to the robot artist.
+
+        Parameters
+        ----------
+        tool : :class:`compas_fab.robots.Tool`
+            The tool that should be attached to the robot's flange.
+        """
+        link = self.robot.get_link_by_name(tool.attached_collision_mesh.link_name)
+        ee_frame = link.parent_joint.origin.copy()
+        T = Transformation.from_frame_to_frame(Frame.worldXY(), ee_frame)
+        native_geometry = self.draw_geometry(tool.visual)  # TODO: only visual, collsion would be great
+        self.transform(native_geometry, T)
+        tool.native_geometry = [native_geometry]
+        tool.current_transformation = Transformation()
+        self.attached_tool = tool
+
+    def detach_tool(self):
+        """Detach the tool.
+        """
+        self.attached_tool = None
 
     def create(self, link=None):
         """Recursive function that triggers the drawing of the robot geometry.
@@ -207,6 +231,9 @@ class BaseRobotArtist(object):
                     if item.native_geometry:
                         self._apply_transformation_on_transformed_link(item, transformations[j.name])
 
+        if self.attached_tool:
+            self._apply_transformation_on_transformed_link(self.attached_tool, transformations[names[-1]])
+
     def draw_visual(self):
         """Draws all visual geometry of the robot."""
         for link in self.robot.iter_links():
@@ -214,6 +241,9 @@ class BaseRobotArtist(object):
                 if item.native_geometry:
                     for native_geometry in item.native_geometry:
                         yield native_geometry
+        if self.attached_tool:
+            for native_geometry in self.attached_tool.native_geometry:
+                yield native_geometry
 
     def draw_collision(self):
         """Draws all collision geometry of the robot."""
@@ -222,3 +252,6 @@ class BaseRobotArtist(object):
                 if item.native_geometry:
                     for native_geometry in item.native_geometry:
                         yield native_geometry
+        if self.attached_tool:
+            for native_geometry in self.attached_tool.native_geometry:
+                yield native_geometry

@@ -79,6 +79,7 @@ from .units import *                  # noqa: F401,F403
 from .robot import *                  # noqa: F401,F403
 from .semantics import *              # noqa: F401,F403
 from .time_ import *                  # noqa: F401,F403
+from .tool import *                   # noqa: F401,F403
 from .trajectory import *             # noqa: F401,F403
 from .wrench import *                 # noqa: F401,F403
 from .inertia import *                # noqa: F401,F403
