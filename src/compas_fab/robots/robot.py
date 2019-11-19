@@ -54,10 +54,10 @@ class Robot(object):
     def __init__(self, model, artist=None, semantics=None, client=None):
         self._scale_factor = 1.
         self.model = model
+        self.attached_tool = None
         self.artist = artist  # setter and getter (because of scale)
         self.semantics = semantics
         self.client = client  # setter and getter ?
-        self.attached_tool = None
 
     @property
     def artist(self):
@@ -709,6 +709,7 @@ class Robot(object):
         >>> frame_tcf = Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))
         >>> robot.to_tool0_frame(frame_tcf)
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
+        >>> robot.detach_tool()
         """
         if not self.attached_tool:
             raise Exception("Please attach a tool first.")
@@ -1105,8 +1106,10 @@ class Robot(object):
         frame_RCF.point /= self.scale_factor  # must be in meters
 
         if self.attached_tool:
-            attached_collision_meshes = attached_collision_meshes or []
-            attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            if attached_collision_meshes:
+                attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            else:
+                attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
         # The returned joint names might be more than the requested ones if there are passive joints present
         joint_positions, joint_names = self.client.inverse_kinematics(frame_RCF, base_link,
@@ -1307,8 +1310,10 @@ class Robot(object):
             path_constraints_RCF_scaled = None
 
         if self.attached_tool:
-            attached_collision_meshes = attached_collision_meshes or []
-            attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            if attached_collision_meshes:
+                attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            else:
+                attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
         trajectory = self.client.plan_cartesian_motion(
             robot=self,
@@ -1383,6 +1388,7 @@ class Robot(object):
         >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.])
         >>> group = robot.main_group_name
         >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
+        >>> robot.attached_tool = None
         >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
         >>> trajectory.fraction
         1.0
@@ -1446,8 +1452,10 @@ class Robot(object):
         start_configuration.scale(1. / self.scale_factor)
 
         if self.attached_tool:
-            attached_collision_meshes = attached_collision_meshes or []
-            attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            if attached_collision_meshes:
+                attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            else:
+                attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
         trajectory = self.client.plan_motion(
             robot=self,
