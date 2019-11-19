@@ -17,6 +17,8 @@ from compas_fab.robots.constraints import JointConstraint
 from compas_fab.robots.constraints import OrientationConstraint
 from compas_fab.robots.constraints import PositionConstraint
 
+from compas_fab.robots.planning_scene import AttachedCollisionMesh
+
 LOGGER = logging.getLogger('compas_fab.robots.robot')
 
 __all__ = [
@@ -49,6 +51,7 @@ class Robot(object):
     def __init__(self, model, artist=None, semantics=None, client=None):
         self._scale_factor = 1.
         self.model = model
+        self.attached_tool = None
         self.artist = artist  # setter and getter (because of scale)
         self.semantics = semantics
         self.client = client  # setter and getter ?
@@ -62,6 +65,8 @@ class Robot(object):
     def artist(self, artist):
         self._artist = artist
         self.scale(self._scale_factor)
+        if self.attached_tool:
+            self.artist.attach_tool(self.attached_tool)
 
     @classmethod
     def basic(cls, name, joints=[], links=[], materials=[], **kwargs):
@@ -675,6 +680,177 @@ class Robot(object):
         frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
         return frame_WCF
 
+    def to_tool0_frame(self, frame_tcf):
+        """Converts a frame at the robot's tool tip (tcf frame) to a frame at the robot's flange (tool0 frame) using the attached tool.
+
+        Parameters
+        ----------
+        frame_tcf : :class:`Frame`
+            A frame (in WCF) at the robot's tool tip (tcf).
+
+        Returns
+        -------
+        :class:`Frame`
+            A frame (in WCF) at the robot's flange (tool0).
+
+        Raises
+        ------
+        Exception
+            If the end effector is not set.
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> robot.attach_tool(Tool(mesh, frame))
+        >>> frame_tcf = Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))
+        >>> robot.to_tool0_frame(frame_tcf)
+        Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
+        >>> robot.detach_tool()
+        """
+        if not self.attached_tool:
+            raise Exception("Please attach a tool first.")
+        Te = Transformation.from_frame_to_frame(self.attached_tool.frame, Frame.worldXY())
+        Tc = Transformation.from_frame(frame_tcf)
+        return Frame.from_transformation(Tc * Te)
+
+    def to_tool0_frames(self, frames_tcf):
+        """Converts a list of frames at the robot's tool tip (tcf frame) to frames at the robot's flange (tool0 frame) using the attached tool.
+
+        Parameters
+        ----------
+        frames_tcf : list of :class:`Frame`
+            Frames (in WCF) at the robot's tool tip (tcf).
+
+        Returns
+        -------
+        list of :class:`Frame`
+            Frames (in WCF) at the robot's flange (tool0).
+
+        Raises
+        ------
+        Exception
+            If the attached tool is not set.
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> robot.attach_tool(Tool(mesh, frame))
+        >>> frames_tcf = [Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))]
+        >>> robot.to_tool0_frames(frames_tcf)
+        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
+        """
+        if not self.attached_tool:
+            raise Exception("Please attach a tool first.")
+        Te = Transformation.from_frame_to_frame(self.attached_tool.frame, Frame.worldXY())
+        return [Frame.from_transformation(Transformation.from_frame(f) * Te) for f in frames_tcf]
+
+    def to_tool_frame(self, frame_t0cf):
+        """Converts a frame at the robot's flange (tool0 frame) to a frame at the robot's tool tip (tcf frame) using the attached tool.
+
+        Parameters
+        ----------
+        frame_t0cf : :class:`Frame`
+            A frame (in WCF) at the robot's flange (tool0).
+
+        Returns
+        -------
+        :class:`Frame`
+            A frame (in WCF) at the robot's tool tip (tcf).
+
+        Raises
+        ------
+        Exception
+            If the end effector is not set.
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> robot.attach_tool(Tool(mesh, frame))
+        >>> frame_t0cf = Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))
+        >>> robot.to_tool_frame(frame_t0cf)
+        Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))
+        """
+        if not self.attached_tool:
+            raise Exception("Please attach a tool first.")
+        Te = Transformation.from_frame_to_frame(Frame.worldXY(), self.attached_tool.frame)
+        Tc = Transformation.from_frame(frame_t0cf)
+        return Frame.from_transformation(Tc * Te)
+
+    def to_tool_frames(self, frames_t0cf):
+        """Converts frames at the robot's flange (tool0 frame) to frames at the robot's tool tip (tcf frame) using the attached tool.
+
+        Parameters
+        ----------
+        frames_t0cf : list of :class:`Frame`
+            Frames (in WCF) at the robot's flange (tool0).
+
+        Returns
+        -------
+        list of :class:`Frame`
+            Frames (in WCF) at the robot's tool tip (tcf).
+
+        Raises
+        ------
+        Exception
+            If the end effector is not set.
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> robot.attach_tool(Tool(mesh, frame))
+        >>> frames_t0cf = [Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))]
+        >>> robot.to_tool_frames(frames_t0cf)
+        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
+        """
+        if not self.attached_tool:
+            raise Exception("Please attach a tool first.")
+        Te = Transformation.from_frame_to_frame(Frame.worldXY(), self.attached_tool.frame)
+        return [Frame.from_transformation(Transformation.from_frame(f) * Te) for f in frames_t0cf]
+
+    def attach_tool(self, tool, group=None, touch_links=None):
+        """Attach a tool to the robot independently of the model definition.
+
+        Parameters
+        ----------
+        tool : :class:`compas_fab.robots.Tool`
+            The tool that should be attached to the robot's flange.
+        group : str
+            The planning group to attach this tool to. Defaults to the main
+            planning group.
+        touch_links : list of str
+            A list of link names the end-effector is allowed to touch. Defaults
+            to the end-effector link.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> tool = Tool(mesh, frame)
+        >>> robot.attach_tool(tool)
+        """
+        group = group or self.main_group_name
+        ee_link_name = self.get_end_effector_link_name(group)
+        touch_links = touch_links or [ee_link_name]
+        tool.attached_collision_mesh = AttachedCollisionMesh(tool.collision_mesh, ee_link_name, touch_links)
+        self.attached_tool = tool
+        if self.artist:
+            self.update(self.init_configuration(group), group=group, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
+            self.artist.attach_tool(tool)
+
+    def detach_tool(self):
+        """Detaches the attached tool."""
+        self.attached_tool = None
+        if self.artist:
+            self.artist.detach_tool()
+
     # ==========================================================================
     # checks
     # ==========================================================================
@@ -926,6 +1102,12 @@ class Robot(object):
         frame_RCF = self.to_local_coords(frame_WCF, group)
         frame_RCF.point /= self.scale_factor  # must be in meters
 
+        if self.attached_tool:
+            if attached_collision_meshes:
+                attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            else:
+                attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
+
         # The returned joint names might be more than the requested ones if there are passive joints present
         joint_positions, joint_names = self.client.inverse_kinematics(frame_RCF, base_link,
                                                                       group, joint_names, joint_positions,
@@ -1124,6 +1306,12 @@ class Robot(object):
         else:
             path_constraints_RCF_scaled = None
 
+        if self.attached_tool:
+            if attached_collision_meshes:
+                attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            else:
+                attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
+
         trajectory = self.client.plan_cartesian_motion(
             robot=self,
             frames=frames_RCF,
@@ -1197,6 +1385,7 @@ class Robot(object):
         >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.])
         >>> group = robot.main_group_name
         >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
+        >>> robot.attached_tool = None
         >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
         >>> trajectory.fraction
         1.0
@@ -1258,6 +1447,12 @@ class Robot(object):
             path_constraints_RCF_scaled = None
 
         start_configuration.scale(1. / self.scale_factor)
+
+        if self.attached_tool:
+            if attached_collision_meshes:
+                attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            else:
+                attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
         trajectory = self.client.plan_motion(
             robot=self,
@@ -1333,6 +1528,12 @@ class Robot(object):
         """
         return self.draw_visual()
 
+    def draw_attached_tool(self):
+        """Draws the attached tool if set.
+        """
+        if self.artist and self.attached_tool:
+            return self.artist.draw_attached_tool()
+
     def scale(self, factor):
         """Scales the robot geometry by factor (absolute).
 
@@ -1372,6 +1573,10 @@ class Robot(object):
             configurable_joints = self.get_configurable_joints()
         print("The end-effector's name is '%s'." %
               self.get_end_effector_link_name())
+        if self.attached_tool:
+            print("The robot has a tool at the %s link attached." % self.attached_tool.attached_collision_mesh.link_name)
+        else:
+            print("The robot has NO tool attached.")
         print("The base link's name is '%s'" % self.get_base_link_name())
         print("The base_frame is:", self.get_base_frame())
         print("The robot's joints are:")

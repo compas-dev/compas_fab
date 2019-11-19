@@ -7,15 +7,18 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-
 Unreleased
 ----------
 
 **Added**
 
-* ..
+* Added ``attach_tool``, ``detach_tool``, ``draw_attached_tool``, ``to_tool_frame(s)`` and ``to_tool0_frame(s)`` to ``Robot``
+* Added ``attach_tool`` and ``detach_tool`` to ``Artist``
+* Added ``add_attached_tool`` and ``remove_attached_tool`` to ``PlanningScene``
 
 **Changed**
+
+* Changed ``inverse_kinematics``, ``plan_cartesian_motion`` and ``plan_motion`` to use the attached_tool's ``AttachedCollisionMesh`` if set
 
 **Removed**
 
