@@ -17,7 +17,7 @@ Unreleased
 **Changed**
 
 * Changed `inverse_kinematics`, `plan_cartesian_motion` and `plan_motion` to use the `end_effector` as `AttachedCollisionMesh` if set
-
+* Fixed mutable init parameters of ``Configuration``, ``JointTrajectoryPoint``, ``JointTrajectory`` and ``Robot.basic``.
 
 0.9.0
 ----------

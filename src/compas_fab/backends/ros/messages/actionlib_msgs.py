@@ -60,9 +60,9 @@ class GoalStatusArray(ROSmsg):
     """http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatusArray.html
     """
 
-    def __init__(self, header=Header(), status_list=[]):
-        self.header = header
-        self.status_list = status_list
+    def __init__(self, header=None, status_list=None):
+        self.header = header or Header()
+        self.status_list = status_list or []
 
 
 """

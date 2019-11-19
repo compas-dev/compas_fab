@@ -39,13 +39,14 @@ class Configuration(object):
 
     """
 
-    def __init__(self, values=[], types=[]):
-        if len(values) != len(types):
-            raise ValueError("%d values must have %d types, but %d given." % (
-                len(values), len(values), len(types)))
-        self.values = list(values)
-        self.types = list(types)
+    def __init__(self, values=None, types=None):
         self._precision = '3f'
+        self.values = list(values or [])
+        self.types = list(types or [])
+
+        if len(self.values) != len(self.types):
+            raise ValueError("%d values must have %d types, but %d given." % (
+                len(self.values), len(self.values), len(self.types)))
 
     def __str__(self):
         vs = '%.' + self._precision
