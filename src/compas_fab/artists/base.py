@@ -6,6 +6,7 @@ import itertools
 
 from compas.geometry import Transformation
 from compas.geometry import Scale
+from compas.geometry import Frame
 
 __all__ = [
     'BaseRobotArtist'
@@ -36,6 +37,7 @@ class BaseRobotArtist(object):
         self.robot = robot
         self.create()
         self.scale_factor = 1.
+        self.attached_tool = None
 
     def transform(self, geometry, transformation):
         """Transforms a CAD-specific geometry using a **COMPAS** transformation.
@@ -67,6 +69,34 @@ class BaseRobotArtist(object):
             CAD-specific geometry
         """
         raise NotImplementedError
+
+    def attach_tool(self, tool):
+        """Attach a tool to the robot artist.
+
+        Parameters
+        ----------
+        tool : :class:`compas_fab.robots.Tool`
+            The tool that should be attached to the robot's flange.
+        """
+        link = self.robot.get_link_by_name(tool.attached_collision_mesh.link_name)
+        ee_frame = link.parent_joint.origin.copy()
+        T = Transformation.from_frame_to_frame(Frame.worldXY(), ee_frame)
+        native_geometry = self.draw_geometry(tool.visual)
+        self.transform(native_geometry, T)
+        tool.native_geometry = [native_geometry]
+        tool.current_transformation = Transformation()
+        self.attached_tool = tool
+
+
+    def draw_attached_tool(self):
+        """Draws the attached tool.
+        
+        Returns
+        -------
+        object
+            CAD-specific geometry
+        """
+        return self.attached_tool.native_geometry
 
     def create(self, link=None):
         """Recursive function that triggers the drawing of the robot geometry.
@@ -206,6 +236,9 @@ class BaseRobotArtist(object):
                     # some links have only collision geometry, not visual. These meshes have not been loaded.
                     if item.native_geometry:
                         self._apply_transformation_on_transformed_link(item, transformations[j.name])
+        
+        if self.attached_tool:
+            self._apply_transformation_on_transformed_link(self.attached_tool, transformations[names[-1]])
 
     def draw_visual(self):
         """Draws all visual geometry of the robot."""
