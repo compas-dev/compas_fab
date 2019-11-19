@@ -300,7 +300,7 @@ class PlanningScene(object):
         touch_links = [ee_link_name]
         acm = AttachedCollisionMesh(collision_mesh, ee_link_name, touch_links)
         self.add_attached_collision_mesh(acm)
-    
+
     def add_attached_tool(self):
         """Adds the robot's attached tool to the planning scene if set.
         """
@@ -310,8 +310,7 @@ class PlanningScene(object):
 
     def remove_attached_tool(self):
         """Removes the robot's attached tool from the planning scene.
-        """ 
+        """
         self.ensure_client()
         if self.robot.attached_tool:
             self.remove_attached_collision_mesh(self.robot.attached_tool.name)
-

@@ -9,6 +9,7 @@ from compas.datastructures import Mesh
 
 from compas_fab.robots.planning_scene import CollisionMesh
 
+
 class Tool(object):
     """Represents a tool to be attached to the robot's flange.
 

@@ -17,7 +17,6 @@ from compas_fab.robots.constraints import JointConstraint
 from compas_fab.robots.constraints import OrientationConstraint
 from compas_fab.robots.constraints import PositionConstraint
 
-from compas_fab.robots.planning_scene import CollisionMesh
 from compas_fab.robots.planning_scene import AttachedCollisionMesh
 from compas_fab.robots.tool import Tool
 
@@ -715,7 +714,7 @@ class Robot(object):
         Te = Transformation.from_frame_to_frame(self.attached_tool.frame, Frame.worldXY())
         Tc = Transformation.from_frame(frame_tcf)
         return Frame.from_transformation(Tc * Te)
-    
+
     def to_tool0_frames(self, frames_tcf):
         """Converts a list of frames at the robot's tool tip (tcf frame) to frames at the robot's flange (tool0 frame) using the attached tool.
 
@@ -780,7 +779,7 @@ class Robot(object):
         Te = Transformation.from_frame_to_frame(Frame.worldXY(), self.attached_tool.frame)
         Tc = Transformation.from_frame(frame_t0cf)
         return Frame.from_transformation(Tc * Te)
-    
+
     def to_tool_frames(self, frames_t0cf):
         """Converts frames at the robot's flange (tool0 frame) to frames at the robot's tool tip (tcf frame) using the attached tool.
 
@@ -844,9 +843,9 @@ class Robot(object):
         tool.attached_collision_mesh = AttachedCollisionMesh(tool.collision_mesh, ee_link_name, touch_links)
         self.attached_tool = tool
         if self.artist:
-            self.update(self.init_configuration(group), group=group, visual=True, collision=True) # TODO: this is not so ideal! should be called from within artist
+            self.update(self.init_configuration(group), group=group, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
             self.artist.attach_tool(tool)
-    
+
     def detach_tool(self):
         """Detaches the attached tool."""
         self.attached_tool = None

@@ -81,12 +81,12 @@ class BaseRobotArtist(object):
         link = self.robot.get_link_by_name(tool.attached_collision_mesh.link_name)
         ee_frame = link.parent_joint.origin.copy()
         T = Transformation.from_frame_to_frame(Frame.worldXY(), ee_frame)
-        native_geometry = self.draw_geometry(tool.visual) # TODO: only visual, collsion would be great
+        native_geometry = self.draw_geometry(tool.visual)  # TODO: only visual, collsion would be great
         self.transform(native_geometry, T)
         tool.native_geometry = [native_geometry]
         tool.current_transformation = Transformation()
         self.attached_tool = tool
-    
+
     def detach_tool(self):
         """Detach the tool.
         """
@@ -230,7 +230,7 @@ class BaseRobotArtist(object):
                     # some links have only collision geometry, not visual. These meshes have not been loaded.
                     if item.native_geometry:
                         self._apply_transformation_on_transformed_link(item, transformations[j.name])
-        
+
         if self.attached_tool:
             self._apply_transformation_on_transformed_link(self.attached_tool, transformations[names[-1]])
 
