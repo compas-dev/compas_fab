@@ -18,6 +18,11 @@ Unreleased
 
 * Changed `inverse_kinematics`, `plan_cartesian_motion` and `plan_motion` to use the `end_effector` as `AttachedCollisionMesh` if set
 
+**Removed**
+
+**Fixed**
+
+**Deprecated**
 
 0.9.0
 ----------
