@@ -12,12 +12,19 @@ Unreleased
 
 **Added**
 
-* Added `set_end_effector`, `to_tcf` and `to_t0cf` to `Robot`
+* Added ``set_end_effector``, ``to_tcf`` and ``to_t0cf`` to ``Robot``
 
 **Changed**
 
 * Changed `inverse_kinematics`, `plan_cartesian_motion` and `plan_motion` to use the `end_effector` as `AttachedCollisionMesh` if set
+
+**Removed**
+
+**Fixed**
+
 * Fixed mutable init parameters of ``Configuration``, ``JointTrajectoryPoint``, ``JointTrajectory`` and ``Robot.basic``.
+
+**Deprecated**
 
 0.9.0
 ----------
