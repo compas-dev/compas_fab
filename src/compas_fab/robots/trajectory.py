@@ -37,11 +37,11 @@ class JointTrajectoryPoint(Configuration):
         Duration of trajectory point counting from the start.
     """
 
-    def __init__(self, values=[], types=[], velocities=[], accelerations=[], effort=[], time_from_start=None):
+    def __init__(self, values=None, types=None, velocities=None, accelerations=None, effort=None, time_from_start=None):
         super(JointTrajectoryPoint, self).__init__(values, types)
-        self.velocities = velocities or len(values) * [0.]
-        self.accelerations = accelerations or len(values) * [0.]
-        self.effort = effort or len(values) * [0.]
+        self.velocities = velocities or len(self.values) * [0.]
+        self.accelerations = accelerations or len(self.values) * [0.]
+        self.effort = effort or len(self.values) * [0.]
         self.time_from_start = time_from_start or Duration(0, 0)
 
     def __str__(self):
@@ -151,10 +151,10 @@ class JointTrajectory(Trajectory):
         e.g. ``1`` means the full trajectory was found.
     """
 
-    def __init__(self, trajectory_points=[], joint_names=[], start_configuration=None, fraction=None):
+    def __init__(self, trajectory_points=None, joint_names=None, start_configuration=None, fraction=None):
         super(Trajectory, self).__init__()
-        self.points = trajectory_points
-        self.joint_names = joint_names
+        self.points = trajectory_points or []
+        self.joint_names = joint_names or []
         self.start_configuration = start_configuration
         self.fraction = fraction
 

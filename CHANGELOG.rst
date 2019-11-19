@@ -24,6 +24,8 @@ Unreleased
 
 **Fixed**
 
+* Fixed mutable init parameters of ``Configuration``, ``JointTrajectoryPoint``, ``JointTrajectory`` and ``Robot.basic``.
+
 **Deprecated**
 
 0.9.0

@@ -242,10 +242,10 @@ class PlannerParams(ROSmsg):
 class WorkspaceParameters(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/WorkspaceParameters.html
     """
-    def __init__(self, header=Header(), min_corner=Vector3(-1000, -1000, -1000), max_corner=Vector3(1000, 1000, 1000)):
-        self.header = header
-        self.min_corner = min_corner
-        self.max_corner = max_corner
+    def __init__(self, header=None, min_corner=None, max_corner=None):
+        self.header = header or Header()
+        self.min_corner = min_corner or Vector3(-1000, -1000, -1000)
+        self.max_corner = max_corner or Vector3(1000, 1000, 1000)
 
 
 class TrajectoryConstraints(ROSmsg):

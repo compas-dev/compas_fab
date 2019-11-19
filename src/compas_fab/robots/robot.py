@@ -69,7 +69,7 @@ class Robot(object):
             self.artist.attach_tool(self.attached_tool)
 
     @classmethod
-    def basic(cls, name, joints=[], links=[], materials=[], **kwargs):
+    def basic(cls, name, joints=None, links=None, materials=None, **kwargs):
         """Convenience method to create the most basic instance of a robot, based only on a name.
 
         Parameters
@@ -82,8 +82,8 @@ class Robot(object):
         :class:`Robot`
             Newly created instance of a robot.
         """
-        model = RobotModel(name, joints=joints, links=links,
-                           materials=materials, **kwargs)
+        model = RobotModel(name, joints=joints or [], links=links or [],
+                           materials=materials or [], **kwargs)
         return cls(model, None)
 
     @property
