@@ -1568,6 +1568,10 @@ class Robot(object):
             configurable_joints = self.get_configurable_joints()
         print("The end-effector's name is '%s'." %
               self.get_end_effector_link_name())
+        if self.attached_tool:
+            print("The robot has a tool at the %s link attached." % self.attached_tool.attached_collision_mesh.link_name)
+        else:
+            print("The robot has NO tool attached.")
         print("The base link's name is '%s'" % self.get_base_link_name())
         print("The base_frame is:", self.get_base_frame())
         print("The robot's joints are:")
