@@ -748,7 +748,7 @@ class Robot(object):
         Tc = Transformation.from_frame(frame_t0cf)
         return Frame.from_transformation(Tc * Te)
 
-    def set_attached_tool(self, tool, group=None, touch_links=None):
+    def attach_tool(self, tool, group=None, touch_links=None):
         """Set's the robots end-effector that is not defined through URDF.
 
         Parameters
@@ -771,13 +771,17 @@ class Robot(object):
         >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> tool = Tool(mesh, frame)
-        >>> robot.set_attached_tool(tool)
+        >>> robot.attach_tool(tool)
         """
         group = group or self.main_group_name
         ee_link_name = self.get_end_effector_link_name(group)
         touch_links = touch_links or [ee_link_name]
         tool.attached_collision_mesh = AttachedCollisionMesh(tool.collision_mesh, ee_link_name, touch_links)
         self.attached_tool = tool
+    
+    def detach_tool(self):
+        """Detaches the set tool."""
+        self.attached_tool = None
 
     # ==========================================================================
     # checks
