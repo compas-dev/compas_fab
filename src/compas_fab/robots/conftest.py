@@ -1,5 +1,6 @@
 import math
 import time
+import os
 
 import pytest
 from compas.datastructures import Mesh
@@ -14,6 +15,7 @@ from compas_fab.robots.ur5 import Robot
 
 @pytest.fixture(autouse=True)
 def add_imports(doctest_namespace):
+    doctest_namespace["os"] = os
     doctest_namespace["math"] = math
     doctest_namespace["time"] = time
     doctest_namespace["Mesh"] = Mesh
