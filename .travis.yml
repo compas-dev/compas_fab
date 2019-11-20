@@ -39,22 +39,26 @@ matrix:
         - docker rm -f vrep_rfl
     - name: "Python 3.7: macOS"
       os: osx
-      osx_image: xcode10.2
+      osx_image: xcode11.2
       language: shell
       env: TRAVIS_PYTHON_VERSION=3.7
 
 install:
-  - pip install cython --install-option="--no-cython-compile"
-  - pip install --no-cache-dir -r requirements-dev.txt
+  - pip3 install cython --install-option="--no-cython-compile"
+  - pip3 install --no-cache-dir -r requirements-dev.txt
 
 script:
-  - python -c "import compas_fab"
-  - python -c "import compas_fab.backends"
-  - python -c "from compas_fab.backends.vrep.remote_api import vrep"
-  - python -c "import compas_fab.robots"
-  - python -c "import compas_fab.utilities"
-  - invoke lint
-  - invoke test --no-doctest
+  # The following syntax with || is taken directly from Travis CI documentation:
+  # https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
+  # 'python' points to Python 2.7 on macOS but points to Python 3.8 on Linux and Windows
+  # 'python3' is a 'command not found' error on Windows but 'py' works on Windows only
+  - python3 -c "import compas_fab" || python -c "import compas_fab"
+  - python3 -c "import compas_fab.backends" || python -c "import compas_fab.backends"
+  - python3 -c "from compas_fab.backends.vrep.remote_api import vrep" || python -c "from compas_fab.backends.vrep.remote_api import vrep"
+  - python3 -c "import compas_fab.robots" || python -c "import compas_fab.robots"
+  - python3 -c "import compas_fab.utilities" || python -c "import compas_fab.utilities"
+  - python3 -m invoke lint || python -m invoke lint
+  - python3 -m invoke test --no-doctest || python -m invoke test --no-doctest
   - if [[ "$TRAVIS_GENERATE_DOCS" == "true" ]]; then
-      invoke docs;
+      python3 -m invoke docs || python -m invoke docs;
     fi

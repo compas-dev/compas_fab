@@ -38,7 +38,6 @@ class RobotArtist(BaseRobotArtist):
             color = [r, g, b]
         else:
             color = [1., 1., 1.]
-        print('color', color)
 
         if self.layer:
             collection = bpy.data.collections.new(self.layer)
