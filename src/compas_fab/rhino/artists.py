@@ -168,14 +168,6 @@ class RobotArtist(BaseRobotArtist):
         name = mesh.UserDictionary['MeshName'] if 'MeshName' in mesh.UserDictionary else None
 
         obj = sc.doc.Objects.Find(guid)
-        if not obj:
-            print('mesh failed to be added:')
-            print('name/mesh', name, mesh)
-            import clr
-            import System
-            reasons = clr.Reference[System.String]()
-            print('is valid', mesh.IsValidWithLog(reasons))
-            print('reasons', reasons.Value)
 
         if obj:
             attr = obj.Attributes
