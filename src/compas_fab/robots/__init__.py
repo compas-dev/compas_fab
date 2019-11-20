@@ -18,6 +18,7 @@ Main classes
     Robot
     RobotSemantics
     Configuration
+    Tool
     Duration
     Wrench
     Inertia
