@@ -82,11 +82,15 @@ class RobotArtist(BaseRobotArtist):
 
         for v in vertices:
             mesh.Vertices.Add(*v)
-        for face in faces:
+        for face in new_faces:
             mesh.Faces.AddFace(*face)
 
         mesh.Normals.ComputeNormals()
         mesh.Compact()
+
+        # Try to fix invalid meshes
+        if not mesh.IsValid:
+            mesh.FillHoles()
 
         return mesh
 
@@ -164,6 +168,14 @@ class RobotArtist(BaseRobotArtist):
         name = mesh.UserDictionary['MeshName'] if 'MeshName' in mesh.UserDictionary else None
 
         obj = sc.doc.Objects.Find(guid)
+        if not obj:
+            print('mesh failed to be added:')
+            print('name/mesh', name, mesh)
+            import clr
+            import System
+            reasons = clr.Reference[System.String]()
+            print('is valid', mesh.IsValidWithLog(reasons))
+            print('reasons', reasons.Value)
 
         if obj:
             attr = obj.Attributes

@@ -27,4 +27,11 @@ class RobotArtist(BaseRobotArtist):
     def draw_geometry(self, geometry, name=None, color=None):
         if color:
             color = rgb_to_rgb(color[0], color[1], color[2])
-        return mesh_draw(geometry, color=color)
+
+        mesh = mesh_draw(geometry, color=color)
+
+        # Try to fix invalid meshes
+        if not mesh.IsValid:
+            mesh.FillHoles()
+
+        return mesh

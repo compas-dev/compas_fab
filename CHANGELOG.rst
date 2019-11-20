@@ -28,6 +28,7 @@ Unreleased
 
 * Fixed mutable init parameters of ``Configuration``, ``JointTrajectoryPoint``, ``JointTrajectory`` and ``Robot.basic``.
 * Fixed interface of `RobotArtist` for Blender
+* Fixed DAE parsing of meshes with multiple triangle sets
 
 **Deprecated**
 

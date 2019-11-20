@@ -254,65 +254,65 @@ def _dae_mesh_importer(filename, precision):
                 M = M[0:4], M[4:8], M[8:12], M[12:16]
                 transform = Transformation.from_matrix(M)
 
-        triangle_set = mesh_xml.find('triangles')
-        triangle_set_data = triangle_set.find('p').text.split()
+        for triangle_set in mesh_xml.findall('triangles'):
+            triangle_set_data = triangle_set.find('p').text.split()
 
-        # Try to retrieve mesh colors
-        mesh_colors = {}
+            # Try to retrieve mesh colors
+            mesh_colors = {}
 
-        if materials is not None and effects is not None:
-            try:
-                instance_effect = None
-                material_id = triangle_set.attrib.get('material')
+            if materials is not None and effects is not None:
+                try:
+                    instance_effect = None
+                    material_id = triangle_set.attrib.get('material')
 
-                if material_id is not None:
-                    instance_effect = materials.find('material[@id="{}"]/instance_effect'.format(material_id))
+                    if material_id is not None:
+                        instance_effect = materials.find('material[@id="{}"]/instance_effect'.format(material_id))
 
-                if instance_effect is not None:
-                    instance_effect_id = instance_effect.attrib['url'][1:]
-                    colors = effects.findall('effect[@id="{}"]/profile_COMMON/technique/phong/*/color'.format(instance_effect_id))
-                    for color_node in colors:
-                        rgba = [float(i) for i in color_node.text.split()]
-                        mesh_colors['mesh_color.{}'.format(color_node.attrib['sid'])] = rgba
-            except Exception:
-                LOGGER.exception('Exception while loading materials, all materials of mesh file %s will be ignored ', filename)
+                    if instance_effect is not None:
+                        instance_effect_id = instance_effect.attrib['url'][1:]
+                        colors = effects.findall('effect[@id="{}"]/profile_COMMON/technique/phong/*/color'.format(instance_effect_id))
+                        for color_node in colors:
+                            rgba = [float(i) for i in color_node.text.split()]
+                            mesh_colors['mesh_color.{}'.format(color_node.attrib['sid'])] = rgba
+                except Exception:
+                    LOGGER.exception('Exception while loading materials, all materials of mesh file %s will be ignored ', filename)
 
-        # Parse vertices
-        vertices_input = triangle_set.find('input[@semantic="VERTEX"]')
-        vertices_link = mesh_xml.find('vertices[@id="{}"]/input'.format(vertices_input.attrib['source'][1:]))
-        positions = mesh_xml.find('source[@id="{}"]/float_array'.format(vertices_link.attrib['source'][1:]))
-        positions = positions.text.split()
+            # Parse vertices
+            vertices_input = triangle_set.find('input[@semantic="VERTEX"]')
+            vertices_link = mesh_xml.find('vertices[@id="{}"]/input'.format(vertices_input.attrib['source'][1:]))
+            positions = mesh_xml.find('source[@id="{}"]/float_array'.format(vertices_link.attrib['source'][1:]))
+            positions = positions.text.split()
 
-        vertices = [[float(p) for p in positions[i:i + 3]] for i in range(0, len(positions), 3)]
+            vertices = [[float(p) for p in positions[i:i + 3]] for i in range(0, len(positions), 3)]
 
-        # Parse faces
-        faces = [int(f) for f in triangle_set_data[::2]]  # Ignore normals (every second item is normal index)
-        faces = [faces[i:i + 3] for i in range(0, len(faces), 3)]
+            # Parse faces
+            faces = [int(f) for f in triangle_set_data[::2]]  # Ignore normals (every second item is normal index)
+            faces = [faces[i:i + 3] for i in range(0, len(faces), 3)]
 
-        # Rebuild vertices and faces using the same logic that other importers
-        # use remapping everything based on a selected precision
-        index_key = OrderedDict()
-        vertex = OrderedDict()
+            # Rebuild vertices and faces using the same logic that other importers
+            # use remapping everything based on a selected precision
+            index_key = OrderedDict()
+            vertex = OrderedDict()
 
-        for i, xyz in enumerate(vertices):
-            key = geometric_key(xyz, precision)
-            index_key[i] = key
-            vertex[key] = xyz
+            for i, xyz in enumerate(vertices):
+                key = geometric_key(xyz, precision)
+                index_key[i] = key
+                vertex[key] = xyz
 
-        key_index = {key: index for index, key in enumerate(vertex)}
-        index_index = {index: key_index[key] for index, key in iter(index_key.items())}
-        vertices = [xyz for xyz in iter(vertex.values())]
-        faces = [[index_index[index] for index in face] for face in faces]
+            key_index = {key: index for index, key in enumerate(vertex)}
+            index_index = {index: key_index[key] for index, key in iter(index_key.items())}
+            vertices = [xyz for xyz in iter(vertex.values())]
+            faces = [[index_index[index] for index in face] for face in faces]
 
-        mesh = Mesh.from_vertices_and_faces(vertices, faces)
+            mesh = Mesh.from_vertices_and_faces(vertices, faces)
 
-        if mesh_colors:
-            mesh.attributes.update(mesh_colors)
+            if mesh_colors:
+                mesh.attributes.update(mesh_colors)
 
-        if transform:
-            mesh_transform(mesh, transform)
+            if transform:
+                mesh_transform(mesh, transform)
 
-        meshes.append(mesh)
+            meshes.append(mesh)
 
     return meshes
 
