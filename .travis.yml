@@ -44,8 +44,8 @@ matrix:
       env: TRAVIS_PYTHON_VERSION=3.7
 
 install:
-  - pip3 install cython --install-option="--no-cython-compile"
-  - pip3 install --no-cache-dir -r requirements-dev.txt
+  - pip3 install cython --install-option="--no-cython-compile" || pip install cython --install-option="--no-cython-compile"
+  - pip3 install --no-cache-dir -r requirements-dev.txt || pip install --no-cache-dir -r requirements-dev.txt
 
 script:
   # The following syntax with || is taken directly from Travis CI documentation:
@@ -57,7 +57,9 @@ script:
   - python3 -c "from compas_fab.backends.vrep.remote_api import vrep" || python -c "from compas_fab.backends.vrep.remote_api import vrep"
   - python3 -c "import compas_fab.robots" || python -c "import compas_fab.robots"
   - python3 -c "import compas_fab.utilities" || python -c "import compas_fab.utilities"
-  - python3 -m invoke lint || python -m invoke lint
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "3.7" ]]; then
+      python3 -m invoke lint || python -m invoke lint;
+    fi
   - python3 -m invoke test --no-doctest || python -m invoke test --no-doctest
   - if [[ "$TRAVIS_GENERATE_DOCS" == "true" ]]; then
       python3 -m invoke docs || python -m invoke docs;
