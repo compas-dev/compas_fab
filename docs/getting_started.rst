@@ -52,7 +52,7 @@ and type the following which will install it on both Rhino 5.0 and 6.0:
     On Windows, you might need to run the *command prompt* as administrator
     before running the install command.
 
-Open Rhino, start the Python script editor, type ``import compas`` and
+Open Rhino, start the Python script editor, type ``import compas_fab`` and
 run it to verify that your installation is working.
 
 Working in Blender
@@ -75,6 +75,10 @@ We recommend installing the following VS Code extensions:
 
   *Official extension to add support for Python programming, including
   debugging, auto-complete, formatting, etc.*
+
+* `Docker <https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker>`_
+
+  *Add support for ``Dockerfile`` and ``docker-compose.yml`` files to VS Code.*
 
 * `EditorConfig <https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig>`_
 

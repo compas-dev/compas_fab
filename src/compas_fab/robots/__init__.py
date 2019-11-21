@@ -18,7 +18,10 @@ Main classes
     Robot
     RobotSemantics
     Configuration
+    Tool
     Duration
+    Wrench
+    Inertia
 
 Path planning
 -------------
@@ -69,14 +72,17 @@ The following functions help with converting units from one system to the other.
 
 """
 
-from .configuration import *
-from .constraints import *
-from .path_plan import *
-from .planning_scene import *
-from .units import *
-from .robot import *
-from .semantics import *
-from .time_ import *
-from .trajectory import *
+from .configuration import *          # noqa: F401,F403
+from .constraints import *            # noqa: F401,F403
+from .path_plan import *              # noqa: F401,F403
+from .planning_scene import *         # noqa: F401,F403
+from .units import *                  # noqa: F401,F403
+from .robot import *                  # noqa: F401,F403
+from .semantics import *              # noqa: F401,F403
+from .time_ import *                  # noqa: F401,F403
+from .tool import *                   # noqa: F401,F403
+from .trajectory import *             # noqa: F401,F403
+from .wrench import *                 # noqa: F401,F403
+from .inertia import *                # noqa: F401,F403
 
 __all__ = [name for name in dir() if not name.startswith('_')]

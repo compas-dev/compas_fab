@@ -153,16 +153,22 @@ def docs(ctx, doctest=False, rebuild=False, check_links=False):
 
 
 @task()
+def lint(ctx):
+    """Check the consistency of coding style."""
+    log.write('Running flake8 python linter...')
+    ctx.run('flake8 src')
+
+
+@task()
 def check(ctx):
     """Check the consistency of documentation, coding style and a few other things."""
+    lint(ctx)
+
     log.write('Checking MANIFEST.in...')
     ctx.run('check-manifest --ignore-bad-ideas=remoteApi.so')
 
     log.write('Checking ReStructuredText formatting...')
     ctx.run('python setup.py check --strict --metadata --restructuredtext')
-
-    # log.write('Running flake8 python linter...')
-    # ctx.run('flake8 src setup.py')
 
     # log.write('Checking python imports...')
     # ctx.run('isort --check-only --diff --recursive src tests setup.py')
@@ -192,14 +198,10 @@ def deploy_docs(ctx):
 
 
 @task(help={
-      'checks': 'True to run all checks before testing, otherwise False.',
       'doctest': 'True to run doctest modules, otherwise False.',
       })
-def test(ctx, checks=False, doctest=True):
+def test(ctx, doctest=True):
     """Run all tests."""
-    if checks:
-        check(ctx)
-
     if doctest:
         ctx.run('pytest --doctest-modules')
     else:

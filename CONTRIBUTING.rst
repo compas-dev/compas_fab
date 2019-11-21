@@ -29,9 +29,15 @@ We love pull requests from everyone! Here's a quick guide to improve the code:
 
     invoke test
 
-7. Add yourself to ``AUTHORS.rst``.
-8. Commit your changes and push your branch to GitHub.
-9. Create a `pull request <https://help.github.com/articles/about-pull-requests/>`_ through the GitHub website.
+7. Check there are no linter errors:
+
+::
+
+    invoke lint
+
+8. Add yourself to ``AUTHORS.rst``.
+9. Commit your changes and push your branch to GitHub.
+10. Create a `pull request <https://help.github.com/articles/about-pull-requests/>`_ through the GitHub website.
 
 
 During development, use `pyinvoke <http://docs.pyinvoke.org/>`_ tasks on the
@@ -40,6 +46,7 @@ command prompt to ease recurring operations:
 * ``invoke clean``: Clean all generated artifacts.
 * ``invoke check``: Run various code and documentation style checks.
 * ``invoke docs``: Generate documentation.
+* ``invoke lint``: Run code linter for coding style checks.
 * ``invoke test``: Run all tests and checks in one swift command.
 * ``invoke``: Show available tasks.
 

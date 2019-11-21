@@ -77,8 +77,8 @@ class Mesh(ROSmsg):
     """http://docs.ros.org/kinetic/api/shape_msgs/html/msg/Mesh.html
     """
     def __init__(self, triangles=None, vertices=None):
-        self.triangles = triangles if triangles else [] # shape_msgs/MeshTriangle[]
-        self.vertices = vertices if vertices else [] # geometry_msgs/Point[]
+        self.triangles = triangles or []  # shape_msgs/MeshTriangle[]
+        self.vertices = vertices or []  # geometry_msgs/Point[]
 
     @classmethod
     def from_mesh(cls, compas_mesh):
@@ -110,7 +110,7 @@ class MeshTriangle(ROSmsg):
     def __init__(self, vertex_indices=None):
         if len(vertex_indices) != 3:
             raise ValueError("Please specify 3 indices for face, %d given." % len(vertex_indices))
-        self.vertex_indices = vertex_indices if vertex_indices else [] # uint32[3]
+        self.vertex_indices = vertex_indices or []  # uint32[3]
 
     @classmethod
     def from_msg(cls, msg):

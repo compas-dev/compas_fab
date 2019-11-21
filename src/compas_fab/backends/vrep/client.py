@@ -1,18 +1,15 @@
 from __future__ import print_function
 
 import logging
-import math
 import socket
 from timeit import default_timer as timer
 
-from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import matrix_from_frame
 
 from compas_fab.backends.exceptions import BackendError
 from compas_fab.backends.vrep.remote_api import vrep
 from compas_fab.robots import Configuration
-from compas_fab.robots import Robot
 
 DEFAULT_SCALE = 1.
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
@@ -61,9 +58,9 @@ class VrepClient(object):
         For more examples, check out the :ref:`V-REP examples page <examples_vrep>`.
     """
     SUPPORTED_PLANNERS = ('bitrrt', 'bkpiece1', 'est', 'kpiece1',
-                           'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst',
-                           'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar',
-                           'sbl', 'stride', 'trrt')
+                          'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst',
+                          'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar',
+                          'sbl', 'stride', 'trrt')
 
     def __init__(self, host='127.0.0.1', port=19997, scale=DEFAULT_SCALE, lua_script='RFL', debug=False):
         super(VrepClient, self).__init__()
@@ -176,7 +173,7 @@ class VrepClient(object):
         effectively removes one degree of freedom (DOF).
 
         Args:
-            robot (:class:`Robot`): Robot instance.
+            robot (:class:`compas_fab.robots.Robot`): Robot instance.
             metric_values (:obj:`list` of :obj:`float`): List containing one value
                 per configurable joint. Each value ranges from 0 to 1.
         """
@@ -192,7 +189,7 @@ class VrepClient(object):
         """Moves the robot to a given pose, specified as a frame.
 
         Args:
-            robot (:class:`Robot`): Robot instance to move.
+            robot (:class:`compas_fab.robots.Robot`): Robot instance to move.
             frame (:class:`Frame`): Target or goal frame.
 
         Returns:
@@ -215,7 +212,7 @@ class VrepClient(object):
         """Moves the robot to the specified configuration.
 
         Args:
-            robot (:class:`Robot`): Robot instance to move.
+            robot (:class:`compas_fab.robots.Robot`): Robot instance to move.
             config (:class:`Configuration` instance): Describes the position of the
                 robot as an instance of :class:`Configuration`.
 
@@ -243,7 +240,7 @@ class VrepClient(object):
         """Gets the current configuration of the specified robot.
 
         Args:
-            robot (:class:`Robot`): Robot instance.
+            robot (:class:`compas_fab.robots.Robot`): Robot instance.
 
         Examples:
 
@@ -265,7 +262,7 @@ class VrepClient(object):
         """Calculates forward kinematics to get the current end-effector pose.
 
         Args:
-            robot (:class:`Robot`): Robot instance.
+            robot (:class:`compas_fab.robots.Robot`): Robot instance.
 
         Examples:
 
@@ -279,15 +276,15 @@ class VrepClient(object):
         assert_robot(robot)
 
         _res, _, pose, _, _ = self.run_child_script('getIkTipPose',
-                                                     [robot.model.attr['index']],
-                                                     [], [])
+                                                    [robot.model.attr['index']],
+                                                    [], [])
         return vrep_pose_to_frame(pose, self.scale)
 
     def inverse_kinematics(self, robot, goal_frame, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
         """Calculates inverse kinematics to find valid robot configurations for the specified goal frame.
 
         Args:
-            robot (:class:`Robot`): Robot instance.
+            robot (:class:`compas_fab.robots.Robot`): Robot instance.
             goal_frame (:class:`Frame`): Target or goal frame.
             metric_values (:obj:`list` of :obj:`float`): List containing one value
                 per configurable joint. Each value ranges from 0 to 1,
@@ -357,7 +354,7 @@ class VrepClient(object):
         """Picks up a building member and attaches it to the robot.
 
         Args:
-            robot (:class:`Robot`): Robot instance to use for pick up.
+            robot (:class:`compas_fab.robots.Robot`): Robot instance to use for pick up.
             building_member_mesh (:class:`compas.datastructures.Mesh`): Mesh
                 of the building member that will be attached to the robot.
             pickup_pose (:class:`Frame`): Pickup frame.
@@ -455,7 +452,7 @@ class VrepClient(object):
         specific goal configuration.
 
         Args:
-            robot (:class:`Robot`): Robot instance to move.
+            robot (:class:`compas_fab.robots.Robot`): Robot instance to move.
             goal_configs (:obj:`list` of :class:`Configuration`): List of target or goal configurations.
             metric_values (:obj:`list` of :obj:`float`): List containing one value
                 per configurable joint. Each value ranges from 0 to 1,
@@ -493,7 +490,7 @@ class VrepClient(object):
         """Find a path plan to move the selected robot from its current position to the `goal_frame`.
 
         Args:
-            robot (:class:`Robot`): Robot instance to move.
+            robot (:class:`compas_fab.robots.Robot`): Robot instance to move.
             goal_frame (:class:`Frame`): Target or goal frame.
             metric_values (:obj:`list` of :obj:`float`): List containing one value
                 per configurable joint. Each value ranges from 0 to 1,
@@ -529,7 +526,7 @@ class VrepClient(object):
         """Adds a building member to the 3D scene and attaches it to the robot.
 
         Args:
-            robot (:class:`Robot`): Robot instance to attach the building member to.
+            robot (:class:`compas_fab.robots.Robot`): Robot instance to attach the building member to.
             building_member_mesh (:class:`compas.datastructures.Mesh`): Mesh
                 of the building member that will be attached to the robot.
 

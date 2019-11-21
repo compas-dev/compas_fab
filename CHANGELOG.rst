@@ -7,6 +7,58 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+0.10.0
+----------
+
+**Added**
+
+* Added ``attach_tool``, ``detach_tool``, ``draw_attached_tool``, ``from_tool0_to_attached_tool`` and ``from_attached_tool_to_tool0`` to ``Robot``
+* Added ``attach_tool`` and ``detach_tool`` to ``Artist``
+* Added ``add_attached_tool`` and ``remove_attached_tool`` to ``PlanningScene``
+* Added redraw/clear layer support to `RobotArtist` for Rhino
+* Added material/color support for DAE files on ROS file loader
+
+**Changed**
+
+* Changed ``inverse_kinematics``, ``plan_cartesian_motion`` and ``plan_motion`` to use the attached_tool's ``AttachedCollisionMesh`` if set
+
+**Removed**
+
+**Fixed**
+
+* Fixed mutable init parameters of ``Configuration``, ``JointTrajectoryPoint``, ``JointTrajectory`` and ``Robot.basic``.
+* Fixed interface of `RobotArtist` for Blender
+* Fixed DAE parsing of meshes with multiple triangle sets
+
+**Deprecated**
+
+0.9.0
+----------
+
+**Added**
+
+* Added ``load_robot`` method to ROS client to simplify loading robots from running ROS setup.
+* Added ``compas_fab.robots.Wrench``: a Wrench class representing force in free space, separated into its linear (force) and angular (torque) parts.
+* Added ``compas_fab.robots.Inertia``: a Inertia class representing spatial distribution of mass in a rigid body
+
+**Changed**
+
+* Updated to COMPAS 0.11
+
+0.8.0
+----------
+
+**Changed**
+
+* Updated to COMPAS 0.10
+* Add better support for passive joints on IK, Cartesian and Kinematic planning
+
+**Fixed**
+
+* Use WorldXY's origin as default for robots that are have no parent join on their base
+* Fixed parsing of semantics (SRDF) containing nested groups
+* Fixed DAE support on ROS File loader
+
 0.7.0
 ----------
 

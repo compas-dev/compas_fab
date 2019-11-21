@@ -45,21 +45,21 @@ class RobotSemantics(object):
 
     def __get_group_link_names(self, group):
         link_names = []
-        for link in group.iter('link'):
+        for link in group.findall('link'):
             name = link.attrib['name']
             if name not in link_names:
                 link_names.append(name)
-        for chain in group.iter('chain'):
+        for chain in group.findall('chain'):
             for link in self.urdf_robot.iter_link_chain(chain.attrib['base_link'], chain.attrib['tip_link']):
                 if link.name not in link_names:
                     link_names.append(link.name)
-        for joint in group.iter('joint'):
+        for joint in group.findall('joint'):
             joint = self.urdf_robot.get_joint_by_name(joint.attrib['name'])
             if joint:
                 name = joint.parent.link
                 if name not in link_names:
                     link_names.append(name)
-        for subgroup in group.iter('group'):
+        for subgroup in group.findall('group'):
             if subgroup.attrib['name'] != group.attrib['name']:
                 subgroup_link_names = self.__get_group_link_names(subgroup)
                 for name in subgroup_link_names:
@@ -69,19 +69,19 @@ class RobotSemantics(object):
 
     def __get_group_joint_names(self, group):
         joint_names = []
-        for link in group.iter('link'):
+        for link in group.findall('link'):
             link = self.urdf_robot.get_link_by_name(link.attrib['name'])
             for joint in link.joints:
                 if joint.name not in joint_names:
                     joint_names.append(joint.name)
-        for chain in group.iter('chain'):
+        for chain in group.findall('chain'):
             for joint in self.urdf_robot.iter_joint_chain(chain.attrib['base_link'], chain.attrib['tip_link']):
                 if joint.name not in joint_names:
                     joint_names.append(joint.name)
-        for joint in group.iter('joint'):
+        for joint in group.findall('joint'):
             if joint.attrib['name'] not in joint_names:
                 joint_names.append(joint.attrib['name'])
-        for subgroup in group.iter('group'):
+        for subgroup in group.findall('group'):
             if subgroup.attrib['name'] != group.attrib['name']:
                 subgroup_joint_names = self.__get_group_joint_names(subgroup)
                 for name in subgroup_joint_names:
@@ -95,7 +95,7 @@ class RobotSemantics(object):
         glenth = []
 
         group_dict = {}
-        for group in self.root.iter('group'):
+        for group in self.root.findall('group'):
             name = group.attrib['name']
             group_dict[name] = {}
             link_names = self.__get_group_link_names(group)
@@ -111,13 +111,13 @@ class RobotSemantics(object):
         self.main_group_name = gnames[idx]
 
     def __get_group_names(self):
-        return [group.attrib['name'] for group in self.root.iter('group')]
+        return [group.attrib['name'] for group in self.root.findall('group')]
 
     def __get_passive_joints(self):
         return [pjoint.attrib['name'] for pjoint in self.root.iter('passive_joint')]
 
     def __get_end_effectors(self):
-        return [ee.attrib['parent_link'] for ee in self.root.iter('end_effector')]
+        return [ee.attrib['parent_link'] for ee in self.root.findall('end_effector')]
 
     def __get_disabled_collisions(self):
         # throwing away the 'reason' attribute, not important for applications
@@ -150,23 +150,3 @@ class RobotSemantics(object):
 
     def get_disabled_collisions(self):
         return self.disabled_collisions
-
-
-if __name__ == "__main__":
-
-    import compas_fab
-    from compas.robots import RobotModel
-
-    urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
-    srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
-
-    model = RobotModel.from_urdf_file(urdf_filename)
-    semantics = RobotSemantics.from_srdf_file(srdf_filename, model)
-
-    print(model.name)
-    print("group_names:", semantics.group_names)
-    print("main_group_name:", semantics.main_group_name)
-    print("base_link_name:", semantics.get_base_link_name())
-    print("ee_link_name:", semantics.get_end_effector_link_name())
-    print("configurable_joints:", semantics.get_configurable_joint_names())
-    print()
