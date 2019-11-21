@@ -23,7 +23,6 @@ import compas
 from .body import *
 from .pose import *
 from .robot import *
-from .ik_interfaces import *
 
 # if not compas.IPY:
 #     from .grasp_utils import *

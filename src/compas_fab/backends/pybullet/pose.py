@@ -54,6 +54,21 @@ def Frame_from_pb_pose(pose):
     -------
     frame : compas Frame
     """
-    frame = Frame.from_euler_angles(euler_from_quat(pose[1]))
-    frame.point = pose[0]
+    frame = Frame.from_euler_angles(euler_from_quat(pose[1]), point=pose[0])
     return frame
+
+def Frame_from_pos_rot(pos, rot):
+    """ convert (point, rotation matrix) to compas.Frame
+
+    Parameters
+    ----------
+    pos : list of float
+        [x, y, z]
+    rot : list of lists
+        row-major 3x3 rotation matrix (same format as the outcome of np.array().tolist())
+
+    Returns
+    -------
+    frame : compas Frame
+    """
+    return Frame.from_euler_angles(quat_from_matrix(rot), point=pos)
