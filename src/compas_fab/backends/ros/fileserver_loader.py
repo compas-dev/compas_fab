@@ -230,14 +230,17 @@ class RosFileServerLoader(object):
 
 
 def _dae_mesh_importer(filename, precision):
-    """This is a very simple implementation of a DAE/Collada parser."""
+    """This is a very simple implementation of a DAE/Collada parser.
+
+    Collada specification: https://www.khronos.org/files/collada_spec_1_5.pdf
+    """
     dae = XML.from_file(filename)
     meshes = []
     visual_scenes = dae.root.find('library_visual_scenes')
     materials = dae.root.find('library_materials')
     effects = dae.root.find('library_effects')
 
-    for geometry in dae.root.findall('.//geometry'):
+    for geometry in dae.root.findall('library_geometries/geometry'):
         mesh_xml = geometry.find('mesh')
         mesh_id = geometry.attrib['id']
         matrix_node = visual_scenes.find('visual_scene/node/instance_geometry[@url="#{}"]/../matrix'.format(mesh_id))
@@ -254,8 +257,19 @@ def _dae_mesh_importer(filename, precision):
                 M = M[0:4], M[4:8], M[8:12], M[12:16]
                 transform = Transformation.from_matrix(M)
 
-        for triangle_set in mesh_xml.findall('triangles'):
-            triangle_set_data = triangle_set.find('p').text.split()
+        # primitive elements can be any combination of:
+        # lines, linestrips, polygons, polylist, triangles, trifans, tristrips
+        # The current implementation only supports triangles and polylist of triangular meshes
+        primitive_element_sets = []
+        primitive_element_sets.extend(mesh_xml.findall('triangles'))
+        primitive_element_sets.extend(mesh_xml.findall('polylist'))
+
+        if len(primitive_element_sets) == 0:
+            raise Exception('No primitive elements found (currently only triangles and polylist are supported)')
+
+        for primitive_element_set in primitive_element_sets:
+            primitive_tag = primitive_element_set.tag
+            primitive_set_data = primitive_element_set.find('p').text.split()
 
             # Try to retrieve mesh colors
             mesh_colors = {}
@@ -263,7 +277,8 @@ def _dae_mesh_importer(filename, precision):
             if materials is not None and effects is not None:
                 try:
                     instance_effect = None
-                    material_id = triangle_set.attrib.get('material')
+                    material_id = primitive_element_set.attrib.get('material')
+                    primitive_count = int(primitive_element_set.attrib['count'])
 
                     if material_id is not None:
                         instance_effect = materials.find('material[@id="{}"]/instance_effect'.format(material_id))
@@ -278,16 +293,37 @@ def _dae_mesh_importer(filename, precision):
                     LOGGER.exception('Exception while loading materials, all materials of mesh file %s will be ignored ', filename)
 
             # Parse vertices
-            vertices_input = triangle_set.find('input[@semantic="VERTEX"]')
-            vertices_link = mesh_xml.find('vertices[@id="{}"]/input'.format(vertices_input.attrib['source'][1:]))
+            all_offsets = sorted([int(i.attrib['offset']) for i in primitive_element_set.findall('input[@offset]')])
+            if not all_offsets:
+                raise Exception('Primitive element node does not contain offset information! Primitive tag={}'.format(primitive_tag))
+
+            vertices_input = primitive_element_set.find('input[@semantic="VERTEX"]')
+            vertices_id = vertices_input.attrib['source'][1:]
+            vertices_link = mesh_xml.find('vertices[@id="{}"]/input'.format(vertices_id))
             positions = mesh_xml.find('source[@id="{}"]/float_array'.format(vertices_link.attrib['source'][1:]))
             positions = positions.text.split()
 
             vertices = [[float(p) for p in positions[i:i + 3]] for i in range(0, len(positions), 3)]
 
             # Parse faces
-            faces = [int(f) for f in triangle_set_data[::2]]  # Ignore normals (every second item is normal index)
-            faces = [faces[i:i + 3] for i in range(0, len(faces), 3)]
+            # Every nth element is a vertex key, we ignore the rest based on the offsets defined
+            # Usually, every second item is the normal, but there can be other items offset in there (vertex tangents, etc)
+            skip_step = 1 + all_offsets[-1]
+
+            if primitive_tag == 'triangles':
+                vcount = [3] * primitive_count
+            elif primitive_tag == 'polylist':
+                vcount = [int(v) for v in primitive_element_set.find('vcount').text.split()]
+
+            if len(vcount) != primitive_count:
+                raise Exception('Primitive count does not match vertex per face count, vertex input id={}'.format(vertices_id))
+
+            fkeys = [int(f) for f in primitive_set_data[::skip_step]]
+            faces = []
+            for i in range(primitive_count):
+                a = i * vcount[i]
+                b = a + vcount[i]
+                faces.append(fkeys[a:b])
 
             # Rebuild vertices and faces using the same logic that other importers
             # use remapping everything based on a selected precision

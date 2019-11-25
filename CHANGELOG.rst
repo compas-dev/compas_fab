@@ -21,6 +21,8 @@ Unreleased
 
 **Fixed**
 
+* Fix DAE parser to handle ``polylist`` meshes
+
 **Deprecated**
 
 0.10.0
