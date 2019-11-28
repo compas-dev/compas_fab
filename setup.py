@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 requirements = [
     # Until COMPAS reaches 1.0, we pin major.minor and allow patch version updates
     'compas>=0.11,<0.12',
-    'roslibpy>=0.7',
+    'roslibpy>=0.7.1',
     'pyserial',
 ]
 keywords_list = ['robotic fabrication', 'digital fabrication', 'architecture', 'robotics', 'ros']
