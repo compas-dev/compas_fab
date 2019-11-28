@@ -11,19 +11,10 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 Unreleased
 ----------
 
-**Added**
-
-* ..
-
-**Changed**
-
-**Removed**
-
 **Fixed**
 
 * Fix DAE parser to handle ``polylist`` meshes
-
-**Deprecated**
+* Bumped ``roslibpy`` dependency to ``0.7.1`` to fix blocking service call issue on Mac OS
 
 0.10.0
 ----------
