@@ -1,7 +1,7 @@
 version: '2'
 services:
   ros-master:
-    image: gramaziokohler/ros-base:19.04
+    image: gramaziokohler/ros-base:19.11
     container_name: ros-master
     ports:
       - "11311:11311"
@@ -9,7 +9,7 @@ services:
       - roscore
 
   ros-bridge:
-    image: gramaziokohler/ros-abb-planner:19.04
+    image: gramaziokohler/ros-abb-planner:19.11
     container_name: ros-bridge
     environment:
       - "ROS_HOSTNAME=ros-bridge"
@@ -25,7 +25,7 @@ services:
       - rosbridge_websocket.launch
 
   ros-fileserver:
-    image: gramaziokohler/ros-abb-planner:19.04
+    image: gramaziokohler/ros-abb-planner:19.11
     container_name: ros-fileserver
     environment:
       - ROS_HOSTNAME=ros-fileserver
@@ -39,7 +39,7 @@ services:
       - file_server.launch
 
   abb-demo:
-    image: gramaziokohler/ros-abb-planner:19.04
+    image: gramaziokohler/ros-abb-planner:19.11
     container_name: abb-demo
     environment:
       - ROS_HOSTNAME=abb-demo

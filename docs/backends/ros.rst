@@ -203,6 +203,30 @@ them into a new ``docker-compose.yml`` file.
      - ✅
      - ✅
      - :download:`Link <files/ur10-demo/docker-compose.yml>`
+   * - UR3 e-series Demo
+     - ✅
+     - ✅
+     - MoveIt!
+     - ``ur_modern_driver``
+     - ✅
+     - ✅
+     - :download:`Link <files/ur3e-demo/docker-compose.yml>`
+   * - UR5 e-series Demo
+     - ✅
+     - ✅
+     - MoveIt!
+     - ``ur_modern_driver``
+     - ✅
+     - ✅
+     - :download:`Link <files/ur5e-demo/docker-compose.yml>`
+   * - UR10 e-series Demo
+     - ✅
+     - ✅
+     - MoveIt!
+     - ``ur_modern_driver``
+     - ✅
+     - ✅
+     - :download:`Link <files/ur10e-demo/docker-compose.yml>`
 
 For access to the web UI, start your browser and go to:
 
