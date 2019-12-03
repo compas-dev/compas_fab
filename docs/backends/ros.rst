@@ -98,6 +98,22 @@ them into a new ``docker-compose.yml`` file.
      - ✅
      - ✅
      - :download:`Link <files/abb-irb1600-demo/docker-compose.yml>`
+   * - Kuka IIWA7 Demo
+     - ✅
+     - ✅
+     - MoveIt!
+     - ❌
+     - ✅
+     - ✅
+     - :download:`Link <files/kuka-iiwa7-demo/docker-compose.yml>`
+   * - Kuka IIWA14 Demo
+     - ✅
+     - ✅
+     - MoveIt!
+     - ❌
+     - ✅
+     - ✅
+     - :download:`Link <files/kuka-iiwa14-demo/docker-compose.yml>`
    * - UR3 Planner
      - ✅
      - ✅
