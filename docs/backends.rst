@@ -59,35 +59,6 @@ running containers:
 * `Kitematic for Windows`_
 * `Kitematic for Mac`_
 
-
-Running GUI apps
-================
-
-When using Docker or WSL to run backends, there is no visible graphical
-user interface (GUI). Although not entirely supported in either platform,
-it is possible to visualize the GUI anyway.
-
-First install an ``X11`` server:
-
-* `XMing For Windows <https://sourceforge.net/projects/xming/>`_
-* `XQuartz For Mac <https://www.xquartz.org/>`_ (see here for `more details <https://medium.com/@mreichelt/how-to-show-x11-windows-within-docker-on-mac-50759f4b65cb>`_).
-
-Configure ``X11`` security:
-
-* On Windows, add your IP address to the file
-  ``%ProgramFiles(x86)%\XMing\X0.hosts``. It needs to be opened
-  as administrator.
-* On Mac, run ``xhost +local:root``. Remember to disable later with
-  ``xhost -local:root``.
-
-Finally, set the ``DISPLAY`` variable -either inside Docker or WSL- to point to
-your ``X11`` server, e.g.:
-
-::
-
-    export DISPLAY=192.168.0.42:0.0
-
-
 Next steps
 ==========
 

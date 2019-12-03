@@ -14,65 +14,8 @@ robot behavior across a wide variety of robotic platforms.
 Running a ROS system usually involves multiple nodes (i.e. computers, real or
 virtual), interconnected through a master controller.
 
-There are at least 3 different ways to run ROS: using Linux, using WSL on
-Windows, and using Docker.
-
-
-ROS on Linux
-============
-
-The usual but most involved way to install ROS is on a Linux machine,
-either virtual or real. The machine should have an IP address reachable
-from your computer.
-
-Follow the `ROS installation instructions`_ for all the details, or
-alternatively, use the following commands as a brief outline of the steps
-required to install ROS on **Ubuntu 16.04**:
-
-::
-
-    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-    sudo apt-get update
-    sudo apt-get install ros-kinetic-desktop-full ros-kinetic-rosbridge-server ros-kinetic-tf2-web-republisher python-rosinstall python-rosinstall-generator python-wstool
-
-    sudo rosdep init && rosdep update
-    echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
-    source ~/.bashrc
-
-    mkdir -p ~/catkin_ws/src
-    cd ~/catkin_ws/
-    catkin_make
-
-    echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
-    source ~/.bashrc
-
-Once ROS is installed, you can start a minimally functional ROS system,
-containing a ROS master and the `ROS Bridge`_ with the following command::
-
-    roslaunch rosbridge_server rosbridge_websocket.launch
-
-
-ROS on WSL
-==========
-
-For Windows 10 users, an alternative is to install the
-`Windows Subsystem for Linux`_ (WSL). WSL allows to run Linux within
-Windows without the need for an additional virtual machine.
-
-To install WSL, open PowerShell as administrator and run:
-
-::
-
-    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
-
-Open the Microsoft Store and install ``Ubuntu 16.04`` Linux distribution.
-Once the installation is completed, run ``bash`` and follow the instructions
-above to install ROS on Linux.
-
-.. seealso::
-
-    For additional details, see `Microsoft WSL documentation`_.
+There are at least 3 different ways to run ROS: using Docker, using Linux, and
+using WSL on Windows.
 
 
 ROS on Docker
@@ -233,6 +176,67 @@ For access to the web UI, start your browser and go to:
 ::
 
     http://localhost:8080/vnc.html?resize=scale&autoconnect=true
+
+
+ROS on Linux
+============
+
+The usual but most involved way to install ROS is on a Linux machine,
+either virtual or real. The machine should have an IP address reachable
+from your computer.
+
+Follow the `ROS installation instructions`_ for all the details, or
+alternatively, use the following commands as a brief outline of the steps
+required to install ROS on **Ubuntu 16.04**:
+
+::
+
+    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+    sudo apt-get update
+    sudo apt-get install ros-kinetic-desktop-full ros-kinetic-rosbridge-server ros-kinetic-tf2-web-republisher python-rosinstall python-rosinstall-generator python-wstool
+
+    sudo rosdep init && rosdep update
+    echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+    source ~/.bashrc
+
+    mkdir -p ~/catkin_ws/src
+    cd ~/catkin_ws/
+    catkin_make
+
+    echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+    source ~/.bashrc
+
+Once ROS is installed, you can start a minimally functional ROS system,
+containing a ROS master and the `ROS Bridge`_ with the following command::
+
+    roslaunch rosbridge_server rosbridge_websocket.launch
+
+
+ROS on WSL
+==========
+
+For Windows 10 users, an alternative is to install the
+`Windows Subsystem for Linux`_ (WSL). WSL allows to run Linux within
+Windows without the need for an additional virtual machine.
+
+To install WSL, open PowerShell as administrator and run:
+
+::
+
+    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+
+Open the Microsoft Store and install ``Ubuntu 16.04`` Linux distribution.
+Once the installation is completed, run ``bash`` and follow the instructions
+above to install ROS on Linux.
+
+After installation, it is possible to access the graphic user interface.
+Check :ref:`the following page <backends_gui>` for more details.
+
+.. seealso::
+
+    For additional details, see `Microsoft WSL documentation`_.
+
 
 
 .. _ROS installation instructions: http://wiki.ros.org/ROS/Installation
