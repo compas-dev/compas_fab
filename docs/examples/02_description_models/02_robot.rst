@@ -47,12 +47,8 @@ instance. The following code exemplifies how to do that.
 
     For more details about ROS, go to the :ref:`ROS Examples <ros_examples>`.
 
-The ROS File Server loader (:class:`compas_fab.backends.RosFileServerLoader`)
-allows to cache the results locally for faster reloads, or to be loaded using
-the local package loader.
-
-To enable this behavior, set the corresponding parameters on constructor and
-assign a ``robot_name`` to enable locating the URDF:
+Additionally, the ROS loader allows to cache the results locally for faster reloads,
+to enable this behavior, pass an argument with the folder where the cache should be stored:
 
 .. literalinclude :: files/02_robot_from_ros_with_cache.py
    :language: python
@@ -72,9 +68,9 @@ networks, etc), and **COMPAS FAB** adds a ``RobotArtist`` to them.
 Robot artists allow visualizing robot models easily and efficiently.
 
 The following example illustrates how to load an entire robot model from
-an open source repository and render it in Rhino:
+ROS and render it in Rhino:
 
-.. literalinclude :: files/02_robot_artist_rhino.py
+.. literalinclude :: files/02_robot_artist_rhino_from_ros.py
    :language: python
 
 .. raw:: html
@@ -83,9 +79,10 @@ an open source repository and render it in Rhino:
     <div class="card-body">
     <div class="card-title">Downloads</div>
 
-* :download:`Robot artist (Rhino) (.PY) <files/02_robot_artist_rhino.py>`
-* :download:`Robot artist (Blender) (.PY) <files/02_robot_artist_blender.py>`
-* :download:`Robot artist (Grasshopper) (.GHX) <files/02_robot_artist_grasshopper.ghx>`
+* :download:`Robot artist from ROS (Rhino) (.PY) <files/02_robot_artist_rhino_from_ros.py>`
+* :download:`Robot artist from Github (Rhino) (.PY) <files/02_robot_artist_rhino.py>`
+* :download:`Robot artist from Github (Blender) (.PY) <files/02_robot_artist_blender.py>`
+* :download:`Robot artist from Github (Grasshopper) (.GHX) <files/02_robot_artist_grasshopper.ghx>`
 
 .. raw:: html
 

@@ -89,9 +89,20 @@ the corresponding icon in the **Activity Bar** on the left side of VS Code
 and search the extension name in the search box. Once found, select it and
 click ``Install``.
 
-By default, VS Code will use ``Pylint`` to verify your code. To select a
-different linter: open the ``Command Palette`` (``Ctrl+Shift+P``) and
-select the ``Python: Select Linter`` command.
+We recommend tweaking some of the default VS Code settings:
+
+* Python Linter:
+
+  Select ``flake8`` as your default python linter: open the ``Command Palette``
+  (``Ctrl+Shift+P``), type ``Python: Select Linter``, select it and select
+  ``flake8`` from the list.
+
+* *[Windows Only]* Default Shell:
+
+  Change the default shell from ``PowerShell`` to ``Command Prompt``: open the
+  ``Command Palette`` (``Ctrl+Shift+P``), type ``Select Default Shell``,
+  select it and from the options, select ``Command Prompt``.
+  Kill all opened terminals for it to take effect.
 
 Run scripts
 -----------
