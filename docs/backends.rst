@@ -48,6 +48,10 @@ Download and install `Docker Community Edition`_:
 
     If you're a Windows user, you will need at least Windows 10 Pro.
 
+    After installation, make sure Docker runs in Linux containers mode: right-click
+    the docker icon on the tray bar; if there is an option to ``Switch to Linux containers``,
+    **select it** and wait for Docker to switch before moving forward.
+
 Working with containers
 -----------------------
 
