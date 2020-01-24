@@ -290,13 +290,13 @@ class RosClient(Ros):
             header=None,
             name=configuration[0],
             position=configuration[1])
-        #print("JointState =", js)
+        # print("JointState =", js)
         rs = RobotState(
             joint_state=js,
             multi_dof_joint_state=None,
             attached_collision_objects=None,
             is_diff=True)
-        #print("RobotState =", rs)
+        # print("RobotState =", rs)
 
         planning_scene = PlanningScene(
             name='robots_state_at_start',

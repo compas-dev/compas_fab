@@ -208,16 +208,18 @@ class MoveItPlanner(PlannerBackend):
         full_start_configuration = Configuration(values_ordered, types_ordered)
         """
         full_start_configuration = start_configuration
-        if len(full_start_configuration) != len(robot.get_configurable_joint_names()):
+        if len(full_start_configuration.values) != len(robot.get_configurable_joint_names()):
             raise ValueError("Start configuration length must be equal to 'robot.get_configurable_joint_names(robot.main_group_name)'")
-        print("full_start_configuration =", full_start_configuration)
+        # print("full_start_configuration =\n", full_start_configuration)
 
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
         joint_state = JointState(header=header,
-                                 name=joint_names,
+                                 name=full_start_configuration.joint_names,
                                  position=full_start_configuration.values)
+        # print("joint_state =\n", joint_state)
         start_state = RobotState(joint_state, MultiDOFJointState(header=header))
+        # print("start_state =\n", start_state)
 
         if attached_collision_meshes:
             for acm in attached_collision_meshes:

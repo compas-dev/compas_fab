@@ -355,7 +355,7 @@ class PlanningScene(object):
             object_colors=None,
             world=PlanningSceneWorld(),
             is_diff=True)
-        #print("planning_scene =", planning_scene)
+        # print("planning_scene =", planning_scene)
 
         response = self.client.apply_planning_scene(planning_scene)
         print("response =", response)

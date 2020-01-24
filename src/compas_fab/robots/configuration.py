@@ -54,7 +54,7 @@ class Configuration(object):
 
     def __str__(self):
         vs = '%.' + self._precision
-        return "Configuration(%s, %s)" % ('(' + ", ".join([vs] * len(self.values)) % tuple(self.values) + ')', tuple(self.types))
+        return "Configuration(%s, %s, %s)" % ('(' + ", ".join([vs] * len(self.values)) % tuple(self.values) + ')', tuple(self.types), tuple(self.joint_names))
 
     def __repr__(self):
         return self.__str__()
@@ -133,13 +133,15 @@ class Configuration(object):
         """
         return {
             'values': self.values,
-            'types': self.types
+            'types': self.types,
+            'joint_names': self.joint_names
         }
 
     @data.setter
     def data(self, data):
         self.values = data.get('values') or []
         self.types = data.get('types') or []
+        self.joint_names = data.get('joint_names') or []
 
     @property
     def prismatic_values(self):
@@ -155,7 +157,7 @@ class Configuration(object):
 
     def copy(self):
         cls = type(self)
-        return cls(self.values[:], self.types[:])
+        return cls(self.values[:], self.types[:], self.joint_names[:])
 
     def scale(self, scale_factor):
         """Scales the joint positions of the current configuration.
