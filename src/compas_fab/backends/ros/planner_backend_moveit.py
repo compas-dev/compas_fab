@@ -192,50 +192,16 @@ class MoveItPlanner(PlannerBackend):
         base_link = robot.get_base_link_name(group)
         ee_link = robot.get_end_effector_link_name(group)
 
-        """
-        if robot.name == "rfl":
-            joint_names = ['bridge1_joint_EA_X',
-                           'robot11_joint_EA_Y', 'robot11_joint_EA_Z',
-                           'robot11_joint_1', 'robot11_joint_2', 'robot11_joint_3', 'robot11_joint_4', 'robot11_joint_5', 'robot11_joint_6',
-                           'robot12_joint_EA_Y', 'robot12_joint_EA_Z',
-                           'robot12_joint_1', 'robot12_joint_2', 'robot12_joint_3', 'robot12_joint_4', 'robot12_joint_5', 'robot12_joint_6',
-                           'bridge2_joint_EA_X',
-                           'robot21_joint_EA_Y', 'robot21_joint_EA_Z',
-                           'robot21_joint_1', 'robot21_joint_2', 'robot21_joint_3', 'robot21_joint_4', 'robot21_joint_5', 'robot21_joint_6',
-                           'robot22_joint_EA_Y', 'robot22_joint_EA_Z',
-                           'robot22_joint_1', 'robot22_joint_2', 'robot22_joint_3', 'robot22_joint_4', 'robot22_joint_5', 'robot22_joint_6']
-        else:
-            raise NotImplementedError("TODO: handle joint_names matching dynamically!")
-
-        values_ordered = []
-        types_ordered = []
-        start_config_names = start_configuration.joint_names
-        print("start_config_names =\n", start_config_names)
-
-        for n in joint_names:
-            print(n, type(n), len(n))
-
-        for jn in joint_names:
-            print("name =\n", jn)
-            idx = start_config_names.index(str(jn))
-            values_ordered.append(start_configuration.values[idx])
-            types_ordered.append(start_configuration.types[idx])
-            #print(idx, start_configuration.values[idx], start_configuration.types[idx])
-        full_start_configuration = Configuration(values_ordered, types_ordered)
-        """
-        full_start_configuration = start_configuration
-        if len(full_start_configuration.values) != len(robot.get_configurable_joint_names()):
+        # start full configuration
+        if len(start_configuration.values) != len(robot.get_configurable_joint_names()):
             raise ValueError("Start configuration length must be equal to 'robot.get_configurable_joint_names(robot.main_group_name)'")
-        # print("full_start_configuration =\n", full_start_configuration)
 
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
         joint_state = JointState(header=header,
-                                 name=full_start_configuration.joint_names,
-                                 position=full_start_configuration.values)
-        # print("joint_state =\n", joint_state)
+                                 name=start_configuration.joint_names,
+                                 position=start_configuration.values)
         start_state = RobotState(joint_state, MultiDOFJointState(header=header))
-        # print("start_state =\n", start_state)
 
         if attached_collision_meshes:
             for acm in attached_collision_meshes:
