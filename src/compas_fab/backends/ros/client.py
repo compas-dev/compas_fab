@@ -271,6 +271,55 @@ class RosClient(Ros):
     def get_planning_scene_async(self, *args, **kwargs):
         raise NotImplementedError('No planner plugin assigned')
 
+    def apply_planning_scene(self, planning_scene):
+        kwargs = {}
+        kwargs['planning_scene'] = planning_scene
+        kwargs['errback_name'] = 'errback'
+
+        return await_callback(self.apply_planning_scene_async, **kwargs)
+
+    def set_scene_configuration(self, configuration, robot):
+
+        from compas_fab.backends.ros.messages import PlanningScene
+        from compas_fab.backends.ros.messages import PlanningSceneWorld
+        from compas_fab.backends.ros.messages import RobotState
+        from compas_fab.backends.ros.messages import JointState
+
+        # scene robot states
+        js = JointState(
+            header=None,
+            name=configuration[0],
+            position=configuration[1])
+        #print("JointState =", js)
+        rs = RobotState(
+            joint_state=js,
+            multi_dof_joint_state=None,
+            attached_collision_objects=None,
+            is_diff=True)
+        #print("RobotState =", rs)
+
+        planning_scene = PlanningScene(
+            name='robots_state_at_start',
+            robot_state=rs,
+            robot_model_name=robot.name,
+            fixed_frame_transforms=None,
+            allowed_collision_matrix=None,
+            link_padding=None,
+            link_scale=robot._scale_factor,
+            object_colors=None,
+            world=PlanningSceneWorld(),
+            is_diff=True)
+
+        kwargs = {}
+        kwargs['errback'] = 'errback'
+        kwargs['planning_scene'] = [planning_scene]
+
+        # apply_planning_scene_async(self, callback, errback, planning_scene):
+        return await_callback(self.apply_planning_scene_async, **kwargs)
+
+    def apply_planning_scene_async(self, callback, errback, planning_scene):
+        raise NotImplementedError('No planner plugin assigned')
+
     def add_collision_mesh(self, collision_mesh):
         raise NotImplementedError('No planner backend assigned')
 
@@ -306,7 +355,7 @@ class RosClient(Ros):
         num_joints = len(configurations[0].values)
         for config, time in zip(configurations, timesteps):
             pt = RosMsgJointTrajectoryPoint(positions=config.values, velocities=[
-                                      0]*num_joints, time_from_start=Time(secs=(time)))
+                0] * num_joints, time_from_start=Time(secs=(time)))
             points.append(pt)
 
         joint_trajectory = RosMsgJointTrajectory(

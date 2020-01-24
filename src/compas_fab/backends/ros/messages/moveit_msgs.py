@@ -242,6 +242,7 @@ class PlannerParams(ROSmsg):
 class WorkspaceParameters(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/WorkspaceParameters.html
     """
+
     def __init__(self, header=None, min_corner=None, max_corner=None):
         self.header = header or Header()
         self.min_corner = min_corner or Vector3(-1000, -1000, -1000)
@@ -251,6 +252,7 @@ class WorkspaceParameters(ROSmsg):
 class TrajectoryConstraints(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/TrajectoryConstraints.html
     """
+
     def __init__(self, constraints=None):
         self.constraints = constraints or []  # Constraints[]
 
@@ -258,6 +260,7 @@ class TrajectoryConstraints(ROSmsg):
 class JointConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/JointConstraint.html
     """
+
     def __init__(self, joint_name="", position=0, tolerance_above=0, tolerance_below=0, weight=1.):
         self.joint_name = joint_name
         self.position = float(position)
@@ -276,6 +279,7 @@ class JointConstraint(ROSmsg):
 class VisibilityConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/VisibilityConstraint.html
     """
+
     def __init__(self):
         raise NotImplementedError
 
@@ -283,6 +287,7 @@ class VisibilityConstraint(ROSmsg):
 class BoundingVolume(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/BoundingVolume.html
     """
+
     def __init__(self, primitives=None, primitive_poses=None, meshes=None,
                  mesh_poses=None):
         self.primitives = primitives or []            # shape_msgs/SolidPrimitive[]
@@ -347,6 +352,7 @@ class BoundingVolume(ROSmsg):
 class PositionConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionConstraint.html
     """
+
     def __init__(self, header=None, link_name=None, target_point_offset=None,
                  constraint_region=None, weight=None):
         self.header = header or Header()
@@ -366,6 +372,7 @@ class PositionConstraint(ROSmsg):
 class OrientationConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/OrientationConstraint.html
     """
+
     def __init__(self, header=None, orientation=None, link_name=None,
                  absolute_x_axis_tolerance=0.0, absolute_y_axis_tolerance=0.0,
                  absolute_z_axis_tolerance=0.0, weight=1):
@@ -437,6 +444,7 @@ class PlanningSceneComponents(ROSmsg):
 class AllowedCollisionMatrix(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/AllowedCollisionMatrix.html
     """
+
     def __init__(self, entry_names=None, entry_values=None, default_entry_names=None, default_entry_values=None):
         self.entry_names = entry_names or []  # string[]
         self.entry_values = entry_values or []  # moveit_msgs/AllowedCollisionEntry[]
@@ -447,6 +455,7 @@ class AllowedCollisionMatrix(ROSmsg):
 class PlanningSceneWorld(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningSceneWorld.html
     """
+
     def __init__(self, collision_objects=None, octomap=None):
         self.collision_objects = collision_objects or []  # collision objects # CollisionObject[]
         self.octomap = octomap or OctomapWithPose()  # octomap_msgs/OctomapWithPose
@@ -462,6 +471,7 @@ class PlanningSceneWorld(ROSmsg):
 class PlanningScene(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningScene.html
     """
+
     def __init__(self, name='', robot_state=None, robot_model_name='',
                  fixed_frame_transforms=None, allowed_collision_matrix=None,
                  link_padding=None, link_scale=None, object_colors=None, world=None,
@@ -487,6 +497,15 @@ class PlanningScene(ROSmsg):
                    msg['fixed_frame_transforms'], allowed_collision_matrix,
                    msg['link_padding'], msg['link_scale'], msg['object_colors'],
                    world, msg['is_diff'])
+
+
+class ApplyPlanningScene(ROSmsg):
+    """http://docs.ros.org/api/moveit_msgs/html/srv/ApplyPlanningScene.html
+    """
+
+    def __init__(self, scene=None, success=False):
+        self.scene = scene          # moveit_msgs/PlanningScene
+        self.success = success      # bool
 
 
 class ExecuteTrajectoryGoal(ROSmsg):

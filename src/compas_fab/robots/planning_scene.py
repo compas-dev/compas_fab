@@ -140,7 +140,7 @@ class PlanningScene(object):
         collision_mesh.root_name = self.robot.root_name
 
         if scale:
-            S = Scale([1./self.robot.scale_factor] * 3)
+            S = Scale([1. / self.robot.scale_factor] * 3)
             collision_mesh.scale(S)
 
         self.client.add_collision_mesh(collision_mesh)
@@ -194,7 +194,7 @@ class PlanningScene(object):
         collision_mesh.root_name = self.robot.root_name
 
         if scale:
-            S = Scale([1./self.robot.scale_factor] * 3)
+            S = Scale([1. / self.robot.scale_factor] * 3)
             collision_mesh.scale(S)
 
         self.robot.client.append_collision_mesh(collision_mesh)
@@ -226,7 +226,7 @@ class PlanningScene(object):
         self.ensure_client()
 
         if scale:
-            S = Scale([1./self.robot.scale_factor] * 3)
+            S = Scale([1. / self.robot.scale_factor] * 3)
             attached_collision_mesh.collision_mesh.scale(S)
 
         self.client.add_attached_collision_mesh(attached_collision_mesh)
@@ -293,7 +293,7 @@ class PlanningScene(object):
         self.ensure_client()
 
         if scale:
-            S = Scale([1./self.robot.scale_factor] * 3)
+            S = Scale([1. / self.robot.scale_factor] * 3)
             collision_mesh.scale(S)
 
         ee_link_name = self.robot.get_end_effector_link_name(group)
@@ -314,3 +314,48 @@ class PlanningScene(object):
         self.ensure_client()
         if self.robot.attached_tool:
             self.remove_attached_collision_mesh(self.robot.attached_tool.name)
+
+    # TODO:
+    # def clear_planning_scene(self):
+    # def reset_planning_scene(self, robot_full_configuration):
+    # make function to fully reset the planning scene
+
+    def apply_planning_scene(self, robot_full_configuration):
+        """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html
+        """
+        self.ensure_client()
+
+        # needed?
+        from compas_fab.backends.ros.messages import PlanningScene
+        from compas_fab.backends.ros.messages import PlanningSceneWorld
+        from compas_fab.backends.ros.messages import RobotState
+        from compas_fab.backends.ros.messages import JointState
+
+        # scene robot states
+        js = JointState(
+            header=None,
+            name=self.get_configurable_joint_names(),
+            position=robot_full_configuration.values)
+        print("JointState =", js)
+        rs = RobotState(
+            joint_state=js,
+            multi_dof_joint_state=None,
+            attached_collision_objects=None,
+            is_diff=True)
+        print("RobotState =", rs)
+
+        planning_scene = PlanningScene(
+            name='robots_state_at_start',
+            robot_state=rs,
+            robot_model_name=self.name,
+            fixed_frame_transforms=None,
+            allowed_collision_matrix=None,
+            link_padding=None,
+            link_scale=self._scale_factor,
+            object_colors=None,
+            world=PlanningSceneWorld(),
+            is_diff=True)
+        #print("planning_scene =", planning_scene)
+
+        response = self.client.apply_planning_scene(planning_scene)
+        print("response =", response)

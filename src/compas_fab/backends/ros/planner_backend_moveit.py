@@ -8,6 +8,7 @@ from __future__ import print_function
 from roslibpy import Topic
 
 from compas_fab.backends.ros.exceptions import RosError
+from compas_fab.backends.ros.messages import ApplyPlanningSceneResponse
 from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import CollisionObject
 from compas_fab.backends.ros.messages import Constraints
@@ -27,6 +28,7 @@ from compas_fab.backends.ros.messages import MotionPlanResponse
 from compas_fab.backends.ros.messages import MoveItErrorCodes
 from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import OrientationConstraint
+from compas_fab.backends.ros.messages import PlanningScene
 from compas_fab.backends.ros.messages import PlanningSceneComponents
 from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.messages import PoseStamped
@@ -91,6 +93,10 @@ class MoveItPlanner(PlannerBackend):
                                             'GetPlanningScene',
                                             GetPlanningSceneRequest,
                                             GetPlanningSceneResponse)
+    APPLY_PLANNING_SCENE = ServiceDescription('/apply_planning_scene',
+                                              'ApplyPlanningScene',
+                                              PlanningScene,
+                                              ApplyPlanningSceneResponse)
 
     def init_planner(self):
         self.collision_object_topic = Topic(
@@ -170,12 +176,47 @@ class MoveItPlanner(PlannerBackend):
         base_link = robot.get_base_link_name(group)
         ee_link = robot.get_end_effector_link_name(group)
 
-        joint_names = robot.get_configurable_joint_names(group)
+        """
+        if robot.name == "rfl":
+            joint_names = ['bridge1_joint_EA_X',
+                           'robot11_joint_EA_Y', 'robot11_joint_EA_Z',
+                           'robot11_joint_1', 'robot11_joint_2', 'robot11_joint_3', 'robot11_joint_4', 'robot11_joint_5', 'robot11_joint_6',
+                           'robot12_joint_EA_Y', 'robot12_joint_EA_Z',
+                           'robot12_joint_1', 'robot12_joint_2', 'robot12_joint_3', 'robot12_joint_4', 'robot12_joint_5', 'robot12_joint_6',
+                           'bridge2_joint_EA_X',
+                           'robot21_joint_EA_Y', 'robot21_joint_EA_Z',
+                           'robot21_joint_1', 'robot21_joint_2', 'robot21_joint_3', 'robot21_joint_4', 'robot21_joint_5', 'robot21_joint_6',
+                           'robot22_joint_EA_Y', 'robot22_joint_EA_Z',
+                           'robot22_joint_1', 'robot22_joint_2', 'robot22_joint_3', 'robot22_joint_4', 'robot22_joint_5', 'robot22_joint_6']
+        else:
+            raise NotImplementedError("TODO: handle joint_names matching dynamically!")
+
+        values_ordered = []
+        types_ordered = []
+        start_config_names = start_configuration.joint_names
+        print("start_config_names =\n", start_config_names)
+
+        for n in joint_names:
+            print(n, type(n), len(n))
+
+        for jn in joint_names:
+            print("name =\n", jn)
+            idx = start_config_names.index(str(jn))
+            values_ordered.append(start_configuration.values[idx])
+            types_ordered.append(start_configuration.types[idx])
+            #print(idx, start_configuration.values[idx], start_configuration.types[idx])
+        full_start_configuration = Configuration(values_ordered, types_ordered)
+        """
+        full_start_configuration = start_configuration
+        if len(full_start_configuration) != len(robot.get_configurable_joint_names()):
+            raise ValueError("Start configuration length must be equal to 'robot.get_configurable_joint_names(robot.main_group_name)'")
+        print("full_start_configuration =", full_start_configuration)
+
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
         joint_state = JointState(header=header,
                                  name=joint_names,
-                                 position=start_configuration.values)
+                                 position=full_start_configuration.values)
         start_state = RobotState(joint_state, MultiDOFJointState(header=header))
 
         if attached_collision_meshes:
@@ -360,3 +401,30 @@ class MoveItPlanner(PlannerBackend):
 
         attached_collision_object.object.operation = operation
         self.attached_collision_object_topic.publish(attached_collision_object.msg)
+
+    # ==========================================================================
+    # planning scene
+    # ==========================================================================
+
+    def apply_planning_scene_async(self, callback, errback, planning_scene):
+        """Asynchronous handler of MoveIt IK service."""
+
+        print("def apply_planning_scene_async(self, callback, errback, planning_scene)")
+        print("callback =\n", callback)
+        print("errback =\n", errback)
+        print("planning_scene =\n", planning_scene[0])
+        print("type(planning_scene) =", type(planning_scene[0]))
+
+        from compas_fab.backends.ros.messages import ApplyPlanningScene
+        planning_scene_request = ApplyPlanningScene(planning_scene[0])
+        print("planning_scene_request =\n", planning_scene_request)
+
+        # TODO: Move message conversion stuff here
+
+        def handle_result(response):
+            if response.success:
+                callback()
+            else:
+                errback(Exception("Could not apply planning scene changes"))
+
+        self.APPLY_PLANNING_SCENE(self, planning_scene_request, handle_result, errback)

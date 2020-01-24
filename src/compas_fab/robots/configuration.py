@@ -19,6 +19,9 @@ class Configuration(object):
         Joint values expressed in radians or meters, depending on the respective type.
     types : list of :class:`compas.robots.Joint.TYPE`
         Joint types, e.g. a list of `compas.robots.Joint.REVOLUTE` for revolute joints.
+    joint_names : optional
+        :obj:`list` of :obj:`str`
+        Joint names list.
 
     Examples
     --------
@@ -39,10 +42,11 @@ class Configuration(object):
 
     """
 
-    def __init__(self, values=None, types=None):
+    def __init__(self, values=None, types=None, joint_names=None):
         self._precision = '3f'
         self.values = list(values or [])
         self.types = list(types or [])
+        self.joint_names = list(joint_names or [])
 
         if len(self.values) != len(self.types):
             raise ValueError("%d values must have %d types, but %d given." % (
