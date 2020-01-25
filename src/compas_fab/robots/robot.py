@@ -64,23 +64,37 @@ class Robot(object):
     @artist.setter
     def artist(self, artist):
         self._artist = artist
-        self.scale(self._scale_factor)
-        if self.attached_tool:
-            self.artist.attach_tool(self.attached_tool)
+        if len(self.model.joints) > 0 and len(self.model.links) > 0:
+            self.scale(self._scale_factor)
+            if self.attached_tool:
+                self.artist.attach_tool(self.attached_tool)
 
     @classmethod
     def basic(cls, name, joints=None, links=None, materials=None, **kwargs):
-        """Convenience method to create the most basic instance of a robot, based only on a name.
+        """Convenience method to create the most basic instance of a robot,
+           based only on a name.
 
         Parameters
         ----------
         name : str
             Name of the robot
+        joints : :class:`compas.robots.Joint`, optional
+        links : :class:`compas.robots.Link`, optional
+        materials : `compas.robots.Material`, optional
+        **kwargs
+            Keyword arguments passed to :class:`compas.robots.RobotModel`
+            accessible from `cls.model.attr`
 
         Returns
         -------
         :class:`Robot`
             Newly created instance of a robot.
+
+        Examples
+        --------
+        >>> robot = Robot.basic('A robot')
+        >>> robot.name
+        'A robot'
         """
         model = RobotModel(name, joints=joints or [], links=links or [],
                            materials=materials or [], **kwargs)
