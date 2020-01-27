@@ -133,6 +133,22 @@ class MoveItPlanner(PlannerBackend):
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
                 start_state.attached_collision_objects.append(aco)
 
+        # constraints
+        ik_constraints = Constraints()
+        for c in constraints:
+            if c.type == c.JOINT:
+                ik_constraints.joint_constraints.append(
+                    JointConstraint.from_joint_constraint(c))
+            elif c.type == c.POSITION:
+                ik_constraints.position_constraints.append(
+                    PositionConstraint.from_position_constraint(header, c))
+            elif c.type == c.ORIENTATION:
+                ik_constraints.orientation_constraints.append(
+                    OrientationConstraint.from_orientation_constraint(header, c))
+            else:
+                raise NotImplementedError
+        constraints = ik_constraints
+
         ik_request = PositionIKRequest(group_name=group,
                                        robot_state=start_state,
                                        constraints=constraints,
@@ -170,11 +186,15 @@ class MoveItPlanner(PlannerBackend):
         base_link = robot.get_base_link_name(group)
         ee_link = robot.get_end_effector_link_name(group)
 
-        joint_names = robot.get_configurable_joint_names(group)
+        # NOTE: start_configuration has to be a full robot configuration.
+        #       This also allows to set the configuration of the other planning groups while sending the planning request.
+        if len(start_configuration.values) != len(robot.get_configurable_joint_names()):
+            raise ValueError("Start configuration length must be equal to 'robot.get_configurable_joint_names(robot.main_group_name)'")
+
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
         joint_state = JointState(header=header,
-                                 name=joint_names,
+                                 name=start_configuration.joint_names,
                                  position=start_configuration.values)
         start_state = RobotState(joint_state, MultiDOFJointState(header=header))
 
@@ -206,7 +226,7 @@ class MoveItPlanner(PlannerBackend):
 
                 start_state = response.start_state.joint_state
                 start_state_types = robot.get_joint_types_by_names(start_state.name)
-                trajectory.start_configuration = Configuration(start_state.position, start_state_types)
+                trajectory.start_configuration = Configuration(start_state.position, start_state_types, start_state.name)
 
                 callback(trajectory)
 
@@ -229,11 +249,14 @@ class MoveItPlanner(PlannerBackend):
         # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
         # TODO: if list of frames (goals) => receive multiple solutions?
         base_link = robot.get_base_link_name(group)
-        joint_names = robot.get_configurable_joint_names(group)
 
+        # NOTE: start_configuration has to be a full robot configuration.
+        #       This also allows to set the configuration of the other planning groups while sending the planning request.
         header = Header(frame_id=base_link)
         joint_state = JointState(
-            header=header, name=joint_names, position=start_configuration.values)
+            header=header,
+            name=start_configuration.joint_names,
+            position=start_configuration.values)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
         if attached_collision_meshes:
@@ -299,7 +322,7 @@ class MoveItPlanner(PlannerBackend):
 
             start_state = response.trajectory_start.joint_state
             start_state_types = robot.get_joint_types_by_names(start_state.name)
-            trajectory.start_configuration = Configuration(start_state.position, start_state_types)
+            trajectory.start_configuration = Configuration(start_state.position, start_state_types, start_state.name)
 
             callback(trajectory)
 
