@@ -775,7 +775,8 @@ class Robot(object):
         tool.attached_collision_mesh = AttachedCollisionMesh(tool.collision_mesh, ee_link_name, touch_links)
         self.attached_tool = tool
         if self.artist:
-            self.update(self.init_configuration(group), group=group, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
+            #self.update(self.init_configuration(group), group=group, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
+            self.update(self.init_configuration(), group=group, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
             self.artist.attach_tool(tool)
 
     def detach_tool(self):
@@ -1171,7 +1172,7 @@ class Robot(object):
         frames_WCF: list of :class:`compas.geometry.Frame`
             The frames through which the path is defined.
         start_configuration: :class:`Configuration`, optional
-            The robot's configuration at the starting position. Defaults to the
+            The robot's full configuration at the starting position. Defaults to the
             zero configuration.
         max_step: float
             The approximate distance between the calculated points. (Defined in
@@ -1281,7 +1282,7 @@ class Robot(object):
             or defining a volume in space, to which a specific robot link (e.g.
             the end-effector) is required to move to.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
-            The robot's configuration at the starting position. Defaults to the
+            The robot's full configuration at the starting position. Defaults to the
             all-zero configuration.
         group: str, optional
             The name of the group to plan for. Defaults to the robot's main
@@ -1426,7 +1427,7 @@ class Robot(object):
     # drawing
     # ==========================================================================
 
-    def update(self, configuration, group=None, visual=True, collision=True):
+    def update(self, configuration, joint_names=None, group=None, visual=True, collision=True):
         """Updates the robot's geometry.
 
         Parameters
@@ -1443,8 +1444,12 @@ class Robot(object):
             ``True`` if the collision geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
         """
-        names = self.get_configurable_joint_names(group)
-        self.artist.update(configuration, names, visual, collision)
+        if joint_names:
+            self.artist.update(configuration, joint_names, visual, collision)
+        else:
+            names = self.get_configurable_joint_names(group)
+            self.artist.update(configuration, names, visual, collision)
+
 
     def draw_visual(self):
         """Draws the visual geometry of the robot in the respective CAD environment.

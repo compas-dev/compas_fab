@@ -254,11 +254,12 @@ class MoveItPlanner(PlannerBackend):
         # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
         # TODO: if list of frames (goals) => receive multiple solutions?
         base_link = robot.get_base_link_name(group)
-        joint_names = robot.get_configurable_joint_names(group)
 
         header = Header(frame_id=base_link)
         joint_state = JointState(
-            header=header, name=joint_names, position=start_configuration.values)
+            header=header,
+            name=start_configuration.joint_names,
+            position=start_configuration.values)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
         if attached_collision_meshes:
@@ -324,7 +325,7 @@ class MoveItPlanner(PlannerBackend):
 
             start_state = response.trajectory_start.joint_state
             start_state_types = robot.get_joint_types_by_names(start_state.name)
-            trajectory.start_configuration = Configuration(start_state.position, start_state_types)
+            trajectory.start_configuration = Configuration(start_state.position, start_state_types, start_state.name)
 
             callback(trajectory)
 
