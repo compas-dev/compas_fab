@@ -132,6 +132,22 @@ class MoveItPlanner(PlannerBackend):
             for acm in attached_collision_meshes:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
                 start_state.attached_collision_objects.append(aco)
+        
+        # constraints
+        ik_constraints = Constraints()
+        for c in constraints:
+            if c.type == c.JOINT:
+                ik_constraints.joint_constraints.append(
+                    JointConstraint.from_joint_constraint(c))
+            elif c.type == c.POSITION:
+                ik_constraints.position_constraints.append(
+                    PositionConstraint.from_position_constraint(header, c))
+            elif c.type == c.ORIENTATION:
+                ik_constraints.orientation_constraints.append(
+                    OrientationConstraint.from_orientation_constraint(header, c))
+            else:
+                raise NotImplementedError
+        constraints = ik_constraints
 
         ik_request = PositionIKRequest(group_name=group,
                                        robot_state=start_state,
