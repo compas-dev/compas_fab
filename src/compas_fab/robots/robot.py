@@ -510,6 +510,18 @@ class Robot(object):
         :class:`compas_fab.robots.Configuration`
             A full configuration: with values for all configurable joints.
         """
+
+
+        # using group_configuration.joint_names and full_configuration.joint_names to merge
+        if len(group_configuration.joint_names) != 0 and len(full_configuration.joint_names) != 0:
+            configuration = full_configuration.copy()
+            print("merging configurations using joint names")
+            for group__joint_name, group__value in zip(group_configuration.joint_names, group_configuration.values):
+                for idx, n in enumerate(full_configuration.joint_names):
+                    if group__joint_name == n:
+                        configuration.values[idx] = group__value
+                return configuration
+
         all_joint_names = self.get_configurable_joint_names()
 
         if len(all_joint_names) != len(full_configuration.values):
@@ -1450,7 +1462,8 @@ class Robot(object):
         if joint_names:
             self.artist.update(configuration, joint_names, visual, collision)
         else:
-            names = self.get_configurable_joint_names(group)
+            #names = self.get_configurable_joint_names(group)
+            names = self.get_configurable_joint_names()
             self.artist.update(configuration, names, visual, collision)
 
     def draw_visual(self):
