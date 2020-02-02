@@ -1,13 +1,15 @@
-
 import os
-
-import pytest
+import math
 
 import compas
-from compas.geometry import Frame, Point, Vector
+import pytest
+from compas.geometry import Frame
+from compas.geometry import Point
+from compas.geometry import Vector
 from compas.robots import RobotModel
 
 from compas_fab.artists import BaseRobotArtist
+from compas_fab.robots import Configuration
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotSemantics
 from compas_fab.robots.ur5 import Robot as Ur5Robot
@@ -51,6 +53,15 @@ def ur5_joints(ur5_robot_instance):
 def ur5_links(ur5_robot_instance):
     return ur5_robot_instance.model.links
 
+@pytest.fixture
+def ur5_configuration():
+    return Configuration.from_revolute_values([math.pi/2, 0., 0., math.pi/4, 0., 0.])
+
+@pytest.fixture
+def panda_configuration():
+    return Configuration.from_revolute_values([math.pi/4, math.pi/3., 0., math.pi/4, 0., 0., math.pi/2, 0.])
+
+
 
 def test_basic_name_only():
     robot = Robot.basic('testbot')
@@ -78,9 +89,14 @@ def test_basic_attr():
     assert robot.model.attr['location'] == "rfl"
 
 
+def test_name(panda_robot_instance):
+    robot = panda_robot_instance
+    assert robot.name == 'panda'
+
+
 def test_group_names(ur5_robot_instance):
     robot = ur5_robot_instance
-    assert ur5_robot_instance.group_names == ['manipulator', 'endeffector']
+    assert robot.group_names == ['manipulator', 'endeffector']
 
 
 def test_main_group_name(panda_robot_instance):
@@ -133,6 +149,7 @@ def test_get_base_link_name(ur5_robot_instance, group, remove_semantics, expecta
         robot.semantics = None
     assert robot.get_base_link_name(group=group) == expectation
 
+
 @pytest.mark.parametrize('group', [None, 'panda_arm'])
 def test_get_base_link(panda_robot_instance, group):
     robot = panda_robot_instance
@@ -147,4 +164,35 @@ def test_get_base_frame(panda_robot_instance, group, add_artist):
     if add_artist:
         robot.artist = BaseRobotArtist(robot.model)
     assert robot.get_base_frame(group=group) == Frame.worldXY()
+
+
+def test_get_base_frame_when_link_has_parent(ur5_robot_instance):
+    robot = ur5_robot_instance
+    assert robot.get_base_frame(group='endeffector')
+
+@pytest.mark.parametrize('group, expectation', [
+                                                # ('endeffector', Frame(Point(-0.191, 0.750, 0.022), Vector(-1.000, -0.000, 0.000), Vector(-0.000, 0.707, -0.707))),
+                                                ('manipulator', Frame.worldXY())])
+def test__get_current_base_frame_ur(ur5_robot_instance, ur5_configuration, group, expectation):
+    robot = ur5_robot_instance
+    assert robot._get_current_base_frame(ur5_configuration, group) == expectation
+
+
+@pytest.mark.parametrize('group, expectation', [('panda_arm', Frame.worldXY()),
+                                                # ('hand', Frame(Point(.4, .4, .536), Vector(.719, -.281, -.636), Vector(.281, -.719, .636)))
+                                               ])
+# TODO: Check if this should work with group = 'panda_arm_hand'
+def test__get_current_base_frame(panda_robot_instance, panda_configuration, group, expectation):
+    robot = panda_robot_instance
+    assert robot._get_current_base_frame(panda_configuration, group) == expectation
+
+
+@pytest.mark.parametrize('group', ['endeffector', 'manipulator', None])
+@pytest.mark.parametrize('remove_semantics', [False, True])
+def test_get_configurable_joints(ur5_robot_instance, group, remove_semantics):
+    # TODO: Test duplicate joints
+    robot = ur5_robot_instance
+    if remove_semantics:
+        robot.semantics = None
+    assert len(robot.get_configurable_joints()) == 6
 
