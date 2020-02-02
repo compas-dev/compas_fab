@@ -208,8 +208,7 @@ def test(ctx, doctest=False, coverage=False):
     if doctest:
         pytest_args.append('--doctest-modules')
     if coverage:
-        # cov-report is set to xml mostly for vscode plugin brainfit.vscode-coverage-highlighter
-        pytest_args.append('--cov=compas_fab --cov-report xml')
+        pytest_args.append('--cov=compas_fab')
 
     ctx.run(" ".join(pytest_args))
 
