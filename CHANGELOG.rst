@@ -13,15 +13,11 @@ Unreleased
 
 **Added**
 
-* ..
+* Added Python 3.8 support
 
 **Changed**
 
-**Removed**
-
-**Fixed**
-
-**Deprecated**
+* Updated to COMPAS 0.13
 
 0.10.1
 ----------
