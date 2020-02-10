@@ -40,13 +40,13 @@ def test_scale():
 
 def test_cast_to_str():
     config = Configuration([pi/2, 3., 0.1], [Joint.REVOLUTE, Joint.PRISMATIC, Joint.PLANAR])
-    assert str(config) == 'Configuration((1.571, 3.000, 0.100), (0, 2, 5))'
+    assert str(config) == 'Configuration((1.571, 3.000, 0.100), (0, 2, 5), ())'
 
 
 def test_from_data():
     config = Configuration.from_data(dict(values=[8.312, 1.5],
                                           types=[Joint.PRISMATIC, Joint.REVOLUTE]))
-    assert str(config) == 'Configuration((8.312, 1.500), (2, 0))'
+    assert str(config) == 'Configuration((8.312, 1.500), (2, 0), ())'
 
 
 def test_to_data():
