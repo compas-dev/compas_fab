@@ -19,9 +19,8 @@ class Configuration(object):
         Joint values expressed in radians or meters, depending on the respective type.
     types : list of :class:`compas.robots.Joint.TYPE`
         Joint types, e.g. a list of `compas.robots.Joint.REVOLUTE` for revolute joints.
-    joint_names : optional
-        :obj:`list` of :obj:`str`
-        Joint names list.
+    joint_names : :obj:`list` of :obj:`str`, optional
+        Joint names list
 
     Examples
     --------

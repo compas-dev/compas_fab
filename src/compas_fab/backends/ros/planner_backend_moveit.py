@@ -175,10 +175,15 @@ class MoveItPlanner(PlannerBackend):
         if len(start_configuration.values) != len(robot.get_configurable_joint_names()):
             raise ValueError("Start configuration length must be equal to 'robot.get_configurable_joint_names(robot.main_group_name)'")
 
+        if len(start_configuration.joint_names):
+            start_configuration_joint_names = start_configuration.joint_names
+        else:
+            start_configuration_joint_names = robot.get_configurable_joint_names()
+
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
         joint_state = JointState(header=header,
-                                 name=start_configuration.joint_names,
+                                 name=start_configuration_joint_names,
                                  position=start_configuration.values)
         start_state = RobotState(joint_state, MultiDOFJointState(header=header))
 
@@ -236,10 +241,15 @@ class MoveItPlanner(PlannerBackend):
 
         # NOTE: start_configuration has to be a full robot configuration.
         #       This also allows to set the configuration of the other planning groups while sending the planning request.
+        if len(start_configuration.joint_names):
+            start_configuration_joint_names = start_configuration.joint_names
+        else:
+            start_configuration_joint_names = robot.get_configurable_joint_names()
+
         header = Header(frame_id=base_link)
         joint_state = JointState(
             header=header,
-            name=start_configuration.joint_names,
+            name=start_configuration_joint_names,
             position=start_configuration.values)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
