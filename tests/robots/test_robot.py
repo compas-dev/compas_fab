@@ -2,7 +2,6 @@
 import os
 
 import pytest
-
 from compas.robots import RobotModel
 
 from compas_fab.robots import Robot
@@ -43,7 +42,6 @@ def ur5_links():
 
 def test_basic_name_only():
     robot = Robot.basic('testbot')
-    print('hi')
     assert robot.artist is None
 
 

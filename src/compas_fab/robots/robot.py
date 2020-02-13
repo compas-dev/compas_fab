@@ -80,10 +80,10 @@ class Robot(object):
             Name of the robot
         joints : :class:`compas.robots.Joint`, optional
         links : :class:`compas.robots.Link`, optional
-        materials : `compas.robots.Material`, optional
+        materials : :class:`compas.robots.Material`, optional
         **kwargs
             Keyword arguments passed to :class:`compas.robots.RobotModel`
-            accessible from `cls.model.attr`
+            accessible from :attr:`Robot.model.attr`
 
         Returns
         -------
