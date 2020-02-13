@@ -83,7 +83,8 @@ class Robot(object):
         materials : :class:`compas.robots.Material`, optional
         **kwargs
             Keyword arguments passed to :class:`compas.robots.RobotModel`
-            accessible from :attr:`Robot.model.attr`
+            and stored as :attr:`compas.robots.RobotModel.attr`.
+            Accessible from :attr:`Robot.model.attr`.
 
         Returns
         -------
