@@ -61,7 +61,7 @@ script:
   - if [[ "$TRAVIS_PYTHON_VERSION" == "3.7" ]]; then
       python3 -m invoke lint || python -m invoke lint;
     fi
-  - python3 -m invoke test --no-doctest || python -m invoke test --no-doctest
+  - python3 -m invoke test || python -m invoke test
   - if [[ "$TRAVIS_GENERATE_DOCS" == "true" ]]; then
       python3 -m invoke docs || python -m invoke docs;
     fi

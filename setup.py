@@ -11,8 +11,8 @@ from setuptools import find_packages, setup
 
 requirements = [
     # Until COMPAS reaches 1.0, we pin major.minor and allow patch version updates
-    'compas>=0.11,<0.12',
-    'roslibpy>=0.7',
+    'compas>=0.11,<0.14',
+    'roslibpy>=0.7.1',
     'pyserial',
 ]
 keywords_list = ['robotic fabrication', 'digital fabrication', 'architecture', 'robotics', 'ros']
@@ -63,6 +63,8 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: IronPython',
         'Topic :: Scientific/Engineering',

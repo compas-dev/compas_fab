@@ -7,6 +7,41 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+
+Unreleased
+----------
+
+**Added**
+
+* ..
+
+**Changed**
+
+**Removed**
+
+**Fixed**
+
+**Deprecated**
+
+0.10.2
+----------
+
+**Added**
+
+* Added Python 3.8 support
+
+**Changed**
+
+* Updated to COMPAS 0.13
+
+0.10.1
+----------
+
+**Fixed**
+
+* Fix DAE parser to handle ``polylist`` meshes
+* Bumped ``roslibpy`` dependency to ``0.7.1`` to fix blocking service call issue on Mac OS
+
 0.10.0
 ----------
 
@@ -22,15 +57,11 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 * Changed ``inverse_kinematics``, ``plan_cartesian_motion`` and ``plan_motion`` to use the attached_tool's ``AttachedCollisionMesh`` if set
 
-**Removed**
-
 **Fixed**
 
 * Fixed mutable init parameters of ``Configuration``, ``JointTrajectoryPoint``, ``JointTrajectory`` and ``Robot.basic``.
 * Fixed interface of `RobotArtist` for Blender
 * Fixed DAE parsing of meshes with multiple triangle sets
-
-**Deprecated**
 
 0.9.0
 ----------

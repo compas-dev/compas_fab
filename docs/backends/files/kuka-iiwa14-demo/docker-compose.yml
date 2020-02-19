@@ -9,7 +9,7 @@ services:
       - roscore
 
   ros-bridge:
-    image: gramaziokohler/ros-panda-planner:19.11
+    image: gramaziokohler/ros-kuka-iiwa-planner:19.11
     container_name: ros-bridge
     environment:
       - "ROS_HOSTNAME=ros-bridge"
@@ -25,7 +25,7 @@ services:
       - rosbridge_websocket.launch
 
   ros-fileserver:
-    image: gramaziokohler/ros-panda-planner:19.11
+    image: gramaziokohler/ros-kuka-iiwa-planner:19.11
     container_name: ros-fileserver
     environment:
       - ROS_HOSTNAME=ros-fileserver
@@ -38,34 +38,11 @@ services:
       - file_server
       - file_server.launch
 
-  panda-tf-panda_link0:
-    image: gramaziokohler/ros-panda-planner:19.11
-    container_name: panda-tf-panda_link0
+  iiwa-demo:
+    image: gramaziokohler/ros-kuka-iiwa-planner:19.11
+    container_name: iiwa-demo
     environment:
-      - ROS_HOSTNAME=panda-tf-panda_link0
-      - ROS_MASTER_URI=http://ros-master:11311
-    depends_on:
-      - ros-master
-    command:
-      - rosrun
-      - tf
-      - static_transform_publisher
-      - '0'
-      - '0'
-      - '0'
-      - '0'
-      - '0'
-      - '0'
-      - '1'
-      - world
-      - panda_link0
-      - '100'
-
-  panda-demo:
-    image: gramaziokohler/ros-panda-planner:19.11
-    container_name: panda-demo
-    environment:
-      - ROS_HOSTNAME=panda-demo
+      - ROS_HOSTNAME=iiwa-demo
       - ROS_MASTER_URI=http://ros-master:11311
       - DISPLAY=gui:0.0
     depends_on:
@@ -74,8 +51,8 @@ services:
     command:
       - roslaunch
       - --wait
-      - panda_moveit_config
-      - demo.launch
+      - /demo-iiwa.launch
+      - model:=iiwa14
 
   gui:
     image: gramaziokohler/novnc:latest
