@@ -1,9 +1,9 @@
 """util functions for converting pybullet pose to compas Frame/Transformation
 """
 
-from compas.geometry import Frame, Transformation
-from pybullet_planning import Pose
-from pybullet_planning import quat_from_euler, quat_from_matrix, euler_from_quat
+from compas.geometry import Frame
+from pybullet_planning import quat_from_matrix, euler_from_quat
+
 
 def pb_pose_from_Frame(frame):
     """ convert compas.Frame to (point, quat).
@@ -55,6 +55,7 @@ def Frame_from_pb_pose(pose):
     """
     frame = Frame.from_euler_angles(euler_from_quat(pose[1]), point=pose[0])
     return frame
+
 
 def Frame_from_pos_rot(pos, rot):
     """ convert (point, rotation matrix) to compas.Frame

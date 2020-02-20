@@ -7,7 +7,6 @@ from pybullet_planning import inverse_kinematics
 from compas.geometry import Frame
 from compas_fab.backends.pybullet.map_pose import pb_pose_from_Frame
 
-DEFAULT_SCALE = 1.
 
 class PybulletClient(object):
     """Interface to use pybullet as backend via the **pybullet_plannning**.
@@ -61,7 +60,6 @@ class PybulletClient(object):
         """
         return is_connected()
 
-
     # ==========================================================================
     # robot loading
     # ==========================================================================
@@ -106,11 +104,14 @@ class PybulletClient(object):
                            joint_names, joint_positions, avoid_collisions=True,
                            constraints=None, attempts=200,
                            attached_collision_meshes=None, pb_robot=None, ee_link=None):
+        """will return kinematic_conf = None if no solution is found (including no solution is found in the given number of
+        iterations or solutions is out of limits). In this case, _scale_joint_values will raise:
+            TypeError: zip argument #1 must support iteration
+
+        """
         # TODO: base_link transformation
         assert pb_robot is not None, 'pybullet robot must be given!'
-        # TODO: check joint limit, pass in custom_limits
-        # https://github.com/yijiangh/pybullet_planning/blob/dev/src/pybullet_planning/interfaces/kinematics/ik_utils.py#L39
-
+        # TODO: initial configuration
         pb_ee_link = link_from_name(pb_robot, ee_link)
-        kinematic_conf = inverse_kinematics(pb_robot, pb_ee_link, pb_pose_from_Frame(joint_positions), attempts=200)
-        return kinematic_conf
+        kinematic_conf = inverse_kinematics(pb_robot, pb_ee_link, pb_pose_from_Frame(frame), max_iterations=attempts)
+        return kinematic_conf, joint_names

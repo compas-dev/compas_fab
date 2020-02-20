@@ -1,6 +1,15 @@
+import os
+import sys
+if sys.version_info[0] < 3:
+    from backports import tempfile
+else:
+    import tempfile
+
+from pybullet_planning import create_obj, is_connected, set_pose, add_body_name
 
 from compas.geometry import Frame
-from pybullet_planning import create_obj, is_connected, set_pose, add_body_name
+from compas_fab.backends.pybullet.map_pose import pb_pose_from_Frame
+
 
 def convert_mesh_to_pybullet_body(mesh, frame=Frame.worldXY(), name=None, scale=1.0):
     """ convert compas mesh and its frame to a pybullet body
@@ -16,13 +25,6 @@ def convert_mesh_to_pybullet_body(mesh, frame=Frame.worldXY(), name=None, scale=
     -------
     pybullet body
     """
-    import os, sys
-    if sys.version_info[0] < 3:
-        from backports import tempfile
-    else:
-        import tempfile
-    from compas_fab.backends.pybullet.map_pose import pb_pose_from_Frame
-
     assert is_connected(), 'pybullet env not initiated'
     with tempfile.TemporaryDirectory() as temp_dir:
         tmp_obj_path = os.path.join(temp_dir, 'compas_mesh_temp.obj')

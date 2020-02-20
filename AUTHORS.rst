@@ -39,3 +39,4 @@ Authors
 * Zhao Ma <ma@arch.ethz.ch> `@xarthurx <https://github.com/xarthurx>`_
 * Inés Ariza <ariza@arch.ethz.ch> `@inesariza <https://github.com/inesariza>`_
 * Matteo Pacher <pacher@arch.ethz.ch> `@matteo-pacher <https://github.com/matteo-pacher>`_
+* Yijiang Huang <yijiangh@mit.edu> `@yijiangh <https://github.com/yijiangh>`_
