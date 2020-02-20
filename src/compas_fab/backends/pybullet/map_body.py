@@ -21,7 +21,7 @@ def convert_mesh_to_pybullet_body(mesh, frame=Frame.worldXY(), name=None, scale=
         from backports import tempfile
     else:
         import tempfile
-    from compas_fab.backends.pybullet.pose import pb_pose_from_Frame
+    from compas_fab.backends.pybullet.map_pose import pb_pose_from_Frame
 
     assert is_connected(), 'pybullet env not initiated'
     with tempfile.TemporaryDirectory() as temp_dir:

@@ -112,3 +112,6 @@ docs/reference/generated/
 
 temp/**
 !temp/.gitkeep
+
+# YJ's local
+*.ai

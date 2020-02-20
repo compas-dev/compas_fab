@@ -981,7 +981,7 @@ class Robot(object):
     def inverse_kinematics(self, frame_WCF, start_configuration=None,
                            group=None, avoid_collisions=True,
                            constraints=None, attempts=8,
-                           attached_collision_meshes=None):
+                           attached_collision_meshes=None, **kwargs):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
@@ -1045,7 +1045,7 @@ class Robot(object):
         joint_positions, joint_names = self.client.inverse_kinematics(frame_RCF, base_link,
                                                                       group, joint_names, joint_positions,
                                                                       avoid_collisions, constraints, attempts,
-                                                                      attached_collision_meshes)
+                                                                      attached_collision_meshes, **kwargs)
         joint_types = [self.get_joint_by_name(n).type for n in joint_names]
 
         joint_positions = self._scale_joint_values(joint_positions, joint_names, self.scale_factor)
@@ -1059,7 +1059,7 @@ class Robot(object):
         # because we lose the passive joint info
         return self.get_group_configuration(group, configuration)
 
-    def forward_kinematics(self, configuration, group=None, backend=None, link_name=None):
+    def forward_kinematics(self, configuration, group=None, backend=None, link_name=None, **kwargs):
         """Calculate the robot's forward kinematic.
 
         Parameters
@@ -1116,7 +1116,7 @@ class Robot(object):
 
         if not backend:
             if self.client:
-                frame_RCF = self.client.forward_kinematics(full_joint_positions, base_link_name, group, full_joint_names, link_name)
+                frame_RCF = self.client.forward_kinematics(full_joint_positions, base_link_name, group, full_joint_names, link_name, **kwargs)
                 frame_RCF.point *= self.scale_factor
             else:
                 frame_WCF = self.model.forward_kinematics(group_joint_state, link_name)

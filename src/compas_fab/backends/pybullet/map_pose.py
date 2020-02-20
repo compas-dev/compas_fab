@@ -20,8 +20,7 @@ def pb_pose_from_Frame(frame):
               quat:  [roll, pitch, yaw]
     """
     point = [frame.point.x, frame.point.y, frame.point.z]
-    euler = frame.euler_angles()
-    return (point, quat_from_euler(euler))
+    return (point, frame.quaternion.wxyz)
 
 
 def pb_pose_from_Transformation(tf):

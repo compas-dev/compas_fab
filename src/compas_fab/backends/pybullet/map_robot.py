@@ -33,7 +33,7 @@ def attach_end_effector_geometry(ee_meshes, robot, ee_link_name, scale=1.0):
         a list of pybullet object for the ee_meshes
     """
     from compas.geometry import Frame
-    from compas_fab.backends.pybullet.body import convert_mesh_to_pybullet_body
+    from compas_fab.backends.pybullet.map_body import convert_mesh_to_pybullet_body
 
     pyb_ee_link = link_from_name(robot, ee_link_name)
     ee_link_pose = get_link_pose(robot, pyb_ee_link)
@@ -64,7 +64,7 @@ def get_TCP_pose(robot, ee_link_name, ee_link_from_TCP_tf=None, return_pb_pose=F
     TCP_frame : compas Frame or (point, quat)
         in the world coordinate
     """
-    from compas_fab.backends.pybullet import pb_pose_from_Transformation, Frame_from_pb_pose
+    from compas_fab.backends.pybullet.map_pose import pb_pose_from_Transformation, Frame_from_pb_pose
 
     pyb_ee_link = link_from_name(robot, ee_link_name)
     world_from_ee_link = get_link_pose(robot, pyb_ee_link)
