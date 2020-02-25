@@ -448,7 +448,7 @@ class Robot(object):
         Examples
         --------
         >>> robot.init_configuration('manipulator')
-        Configuration((0.000, 0.000, 0.000, 0.000, 0.000, 0.000), (0, 0, 0, 0, 0, 0), ())
+        Configuration((0.000, 0.000, 0.000, 0.000, 0.000, 0.000), (0, 0, 0, 0, 0, 0))
         """
         types = [joint.type for joint in self.get_configurable_joints(group)]
         positions = [0.] * len(types)
