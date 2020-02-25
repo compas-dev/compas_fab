@@ -170,6 +170,10 @@ class Configuration(object):
         ----------
         scale_factor : float
             Scale factor
+        
+        Returns
+        -------
+        None
         """
         values_scaled = []
 
@@ -179,3 +183,21 @@ class Configuration(object):
             values_scaled.append(value)
 
         self.values = values_scaled
+
+    def scaled(self, scale_factor):
+        """Returns a scaled copy of the joint positions of this configuration.
+
+        Only scalable joints are scaled, i.e. planar and prismatic joints.
+
+        Parameters
+        ----------
+        scale_factor : float
+            Scale factor
+        
+        Returns
+        -------
+        None
+        """
+        config = self.copy()
+        config.scale(scale_factor)
+        return config
