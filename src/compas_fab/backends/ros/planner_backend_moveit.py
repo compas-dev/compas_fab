@@ -173,7 +173,7 @@ class MoveItPlanner(PlannerBackend):
         if len(start_configuration.joint_names):
             start_configuration_joint_names = start_configuration.joint_names
         else:
-            start_configuration_joint_names = self.get_configurable_joint_names()
+            start_configuration_joint_names = robot.get_configurable_joint_names()
 
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
@@ -237,7 +237,7 @@ class MoveItPlanner(PlannerBackend):
         if len(start_configuration.joint_names):
             start_configuration_joint_names = start_configuration.joint_names
         else:
-            start_configuration_joint_names = self.get_configurable_joint_names()
+            start_configuration_joint_names = robot.get_configurable_joint_names()
 
         header = Header(frame_id=base_link)
         joint_state = JointState(
