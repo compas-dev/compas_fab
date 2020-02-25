@@ -1181,10 +1181,9 @@ class Robot(object):
         frames_WCF: list of :class:`compas.geometry.Frame`
             The frames through which the path is defined.
         start_configuration: :class:`Configuration`, optional
-            The robot's full configuration at the starting position. Defaults to the
-            zero configuration.
-            start_configuration has to be a full robot configuration. This also allows
-            to set the configuration of the other planning groups while sending the planning request.
+            The robot's full configuration, i.e. values for all configurable
+            joints of the entire robot cell, at the starting position. Defaults
+            to the all-zero configuration.
         max_step: float
             The approximate distance between the calculated points. (Defined in
             the robot's units)
@@ -1230,9 +1229,17 @@ class Robot(object):
             frame_RCF = self.to_local_coords(frame_WCF, group)
             frame_RCF.point /= self.scale_factor
             frames_RCF.append(frame_RCF)
+        
+        # NOTE: start_configuration has to be a full robot configuration, such
+        # that all configurable joints of all planning groups are defined for planning.
+        all_configurable_joint_names = self.get_configurable_joint_names()
+        if start_configuration:
+            if len(start_configuration.values) != len(all_configurable_joint_names):
+                raise ValueError("The start configuration must contain values for all of the robot's configurable joints, namely {} in total".format(len(all_configurable_joint_names)))
+        else:  
+            start_configuration = self.init_configuration()
+        start_configuration = start_configuration.scaled(1. / self.scale_factor)
 
-        start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
-        start_configuration.scale(1. / self.scale_factor)
         max_step_scaled = max_step / self.scale_factor
 
         T = self.transformation_WCF_RCF(group)
@@ -1293,10 +1300,9 @@ class Robot(object):
             or defining a volume in space, to which a specific robot link (e.g.
             the end-effector) is required to move to.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
-            The robot's full configuration at the starting position. Defaults to the
-            all-zero configuration.
-            start_configuration has to be a full robot configuration. This also allows
-            to set the configuration of the other planning groups while sending the planning request.
+            The robot's full configuration, i.e. values for all configurable
+            joints of the entire robot cell, at the starting position. Defaults
+            to the all-zero configuration.
         group: str, optional
             The name of the group to plan for. Defaults to the robot's main
             planning group.
@@ -1359,12 +1365,17 @@ class Robot(object):
         if not group:
             group = self.main_group_name  # ensure semantics
 
-        start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
+        # NOTE: start_configuration has to be a full robot configuration, such
+        # that all configurable joints of all planning groups are defined for planning.
+        all_configurable_joint_names = self.get_configurable_joint_names()
+        if start_configuration:
+            if len(start_configuration.values) != len(all_configurable_joint_names):
+                raise ValueError("The start configuration must contain values for all of the robot's configurable joints, namely {} in total".format(len(all_configurable_joint_names)))
+        else:  
+            start_configuration = self.init_configuration()
+        start_configuration = start_configuration.scaled(1. / self.scale_factor)
 
-        # Transform goal constraints to RCF and scale
-        full_configuration = self.merge_group_with_full_configuration(start_configuration, self.init_configuration(), group)
-
-        T = self._get_current_transformation_WCF_RCF(full_configuration, group)
+        T = self._get_current_transformation_WCF_RCF(start_configuration, group)
         goal_constraints_RCF_scaled = []
         for c in goal_constraints:
             cp = c.copy()
@@ -1392,8 +1403,6 @@ class Robot(object):
                 path_constraints_RCF_scaled.append(cp)
         else:
             path_constraints_RCF_scaled = None
-
-        start_configuration.scale(1. / self.scale_factor)
 
         if self.attached_tool:
             if attached_collision_meshes:
