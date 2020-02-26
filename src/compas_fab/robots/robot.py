@@ -280,13 +280,13 @@ class Robot(object):
         base_frame = self.get_base_frame(group)
 
         joint_names = self.get_configurable_joint_names()
-        joint_positions = self._get_scaled_joint_positions_from_start_configuration(full_configuration)
+        full_configuration_scaled = self._check_and_scale_full_configuration(full_configuration)
 
         # ideally we would call this with the planning group that includes all
         # configurable joints, but we cannot be sure that this group exists.
         # That's why we have to do the workaround with the Transformation.
 
-        joint_state = dict(zip(joint_names, joint_positions))
+        joint_state = dict(zip(joint_names, full_configuration_scaled.values))
 
         if not base_link.parent_joint:
             base_frame_WCF = Frame.worldXY()
@@ -558,19 +558,18 @@ class Robot(object):
             values_scaled.append(v)
         return values_scaled
 
-    def _get_scaled_joint_positions_from_start_configuration(self, start_configuration=None):
+    def _check_and_scale_full_configuration(self, full_configuration=None):
         """Checks the start configuration and returns joint_positions.
         """
         joint_names = self.get_configurable_joint_names()  # full configuration
-        joint_positions = [0] * len(joint_names)
-        if start_configuration:
-            if len(joint_names) != len(start_configuration.values):
-                raise ValueError("Please pass a configuration with %d values" % len(joint_names))
-            joint_positions = start_configuration.values
+        if full_configuration:
+            if len(joint_names) != len(full_configuration.values):
+                raise ValueError("Please pass a configuration with %d values, since all of the robot cell's configurable joints have to be set.".format(len(joint_names)))
+        else:
+            full_configuration = self.init_configuration().values
         # scale the prismatic joints
-        joint_positions = self._scale_joint_values(
-            joint_positions, joint_names, 1. / self.scale_factor)
-        return joint_positions
+        joint_positions = self._scale_joint_values(full_configuration.values, joint_names, 1. / self.scale_factor)
+        return Configuration(joint_positions, full_configuration.types[:])
 
     # ==========================================================================
     # transformations, coordinate frames
@@ -1038,8 +1037,7 @@ class Robot(object):
         base_link = self.get_base_link_name(group)
         joint_names = self.get_configurable_joint_names()
 
-        joint_positions = self._get_scaled_joint_positions_from_start_configuration(
-            start_configuration)
+        start_configuration_scaled = self._check_and_scale_full_configuration(start_configuration)
 
         # represent in RCF
         frame_RCF = self.to_local_coords(frame_WCF, group)
@@ -1053,7 +1051,7 @@ class Robot(object):
 
         # The returned joint names might be more than the requested ones if there are passive joints present
         joint_positions, joint_names = self.client.inverse_kinematics(frame_RCF, base_link,
-                                                                      group, joint_names, joint_positions,
+                                                                      group, joint_names, start_configuration_scaled.values,
                                                                       avoid_collisions, constraints, attempts,
                                                                       attached_collision_meshes)
         joint_types = [self.get_joint_by_name(n).type for n in joint_names]
@@ -1116,7 +1114,7 @@ class Robot(object):
                 raise ValueError("Link name %s does not exist in planning group" % link_name)
 
         full_configuration = self.merge_group_with_full_configuration(configuration, self.init_configuration(), group)
-        full_joint_positions = self._get_scaled_joint_positions_from_start_configuration(full_configuration)
+        full_configuration_scaled = self._check_and_scale_full_configuration(full_configuration)
         full_joint_names = self.get_configurable_joint_names()
         base_link_name = self.get_base_link_name(group)
 
@@ -1126,7 +1124,7 @@ class Robot(object):
 
         if not backend:
             if self.client:
-                frame_RCF = self.client.forward_kinematics(full_joint_positions, base_link_name, group, full_joint_names, link_name)
+                frame_RCF = self.client.forward_kinematics(full_configuration_scaled.values, base_link_name, group, full_joint_names, link_name)
                 frame_RCF.point *= self.scale_factor
             else:
                 frame_WCF = self.model.forward_kinematics(group_joint_state, link_name)
