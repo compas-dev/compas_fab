@@ -82,10 +82,13 @@ class RobotSemantics(object):
                 joint_names.append(joint.attrib['name'])
         for subgroup in group.findall('group'):
             if subgroup.attrib['name'] != group.attrib['name']:
-                subgroup_joint_names = self.__get_group_joint_names(subgroup)
-                for name in subgroup_joint_names:
-                    if name not in joint_names:
-                        joint_names.append(name)
+                # find group element at top level
+                for top_group in self.root.findall('group'):
+                    if top_group.attrib['name'] == subgroup.attrib['name']:
+                        subgroup_joint_names = self.__get_group_joint_names(top_group)
+                        for name in subgroup_joint_names:
+                            if name not in joint_names:
+                                joint_names.append(name)
         return joint_names
 
     def __source_attributes(self):
@@ -127,6 +130,16 @@ class RobotSemantics(object):
         if not group:
             group = self.main_group_name
         return self._group_dict[group]["links"][0]
+
+    def get_all_configurable_joints(self):
+        joints = []
+        for group in self.group_names:
+            for name in self._group_dict[group]["joints"]:
+                joint = self.urdf_robot.get_joint_by_name(name)
+                if joint:
+                    if joint.is_configurable() and name not in self.passive_joints:
+                        joints.append(joint)
+        return joints
 
     def get_configurable_joints(self, group=None):
         if not group:
