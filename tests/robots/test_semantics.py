@@ -23,16 +23,16 @@ def test_panda_srdf_file(panda_srdf, panda_urdf):
     model = RobotModel.from_urdf_file(panda_urdf)
     semantics = RobotSemantics.from_srdf_file(panda_srdf, model)
     assert semantics.group_names == ['panda_arm', 'hand', 'panda_arm_hand']
-    assert semantics.main_group_name == 'panda_arm'
-    assert semantics.get_base_link_name() == 'panda_link0'
-    assert semantics.get_end_effector_link_name() == 'panda_link8'
-    assert semantics.get_configurable_joint_names() == ['panda_joint1',
-                                                        'panda_joint2',
-                                                        'panda_joint3',
-                                                        'panda_joint4',
-                                                        'panda_joint5',
-                                                        'panda_joint6',
-                                                        'panda_joint7']
+    assert semantics.main_group_name == 'panda_arm_hand'
+    assert semantics.get_base_link_name('panda_arm') == 'panda_link0'
+    assert semantics.get_end_effector_link_name('panda_arm') == 'panda_link8'
+    assert semantics.get_configurable_joint_names('panda_arm') == ['panda_joint1',
+                                                                   'panda_joint2',
+                                                                   'panda_joint3',
+                                                                   'panda_joint4',
+                                                                   'panda_joint5',
+                                                                   'panda_joint6',
+                                                                   'panda_joint7']
 
 
 def test_ur5_semantics():

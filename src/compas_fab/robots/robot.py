@@ -440,7 +440,8 @@ class Robot(object):
         Examples
         --------
         >>> robot.init_configuration('manipulator')
-        Configuration((0.000, 0.000, 0.000, 0.000, 0.000, 0.000), (0, 0, 0, 0, 0, 0))
+        Configuration((0.000, 0.000, 0.000, 0.000, 0.000, 0.000), (0, 0, 0, 0, 0, 0), \
+            ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))
         """
         types = [joint.type for joint in self.get_configurable_joints(group)]
         positions = [0.] * len(types)
@@ -1126,7 +1127,6 @@ class Robot(object):
                 frame_RCF = self.to_local_coords(frame_WCF, group)
         elif backend == 'model':
             frame_WCF = self.model.forward_kinematics(full_joint_state, link_name)
-            print("wcf", frame_WCF)
             frame_RCF = self.to_local_coords(frame_WCF, group)
         else:
             # pass to backend, kdl, ikfast,...
