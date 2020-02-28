@@ -170,6 +170,7 @@ class MoveItPlanner(PlannerBackend):
         base_link = robot.get_base_link_name(group)
         ee_link = robot.get_end_effector_link_name(group)
 
+        # joint_names in the configuration are set in the robot
         if len(start_configuration.joint_names):
             start_configuration_joint_names = start_configuration.joint_names
         else:
@@ -234,6 +235,7 @@ class MoveItPlanner(PlannerBackend):
         # TODO: if list of frames (goals) => receive multiple solutions?
         base_link = robot.get_base_link_name(group)
 
+        # joint_names in the configuration are set in the robot
         if len(start_configuration.joint_names):
             start_configuration_joint_names = start_configuration.joint_names
         else:
