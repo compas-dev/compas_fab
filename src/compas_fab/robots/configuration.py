@@ -170,7 +170,7 @@ class Configuration(object):
         ----------
         scale_factor : float
             Scale factor
-        
+
         Returns
         -------
         None
@@ -193,7 +193,7 @@ class Configuration(object):
         ----------
         scale_factor : float
             Scale factor
-        
+
         Returns
         -------
         None

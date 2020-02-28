@@ -498,12 +498,12 @@ class Robot(object):
         Returns
         -------
         :class:`compas_fab.robots.Configuration`
-            A full configuration: with values for all configurable joints.  
+            A full configuration: with values for all configurable joints.
         """
         if not len(group_configuration.joint_names):
             group_configuration.joint_names = self.get_configurable_joint_names(group)
-        
-        full_configuration = self._check_full_configuration(full_configuration) # adds joint_names to full_configuration and makes copy
+
+        full_configuration = self._check_full_configuration(full_configuration)  # adds joint_names to full_configuration and makes copy
 
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         group_joint_state = dict(zip(group_configuration.joint_names, group_configuration.values))
@@ -526,7 +526,7 @@ class Robot(object):
 
     def _check_full_configuration(self, full_configuration=None):
         """Either creates a full configuration or checks if the passed full configuration is valid.
-        
+
         Parameters
         ----------
         full_configuration : :class:`compas_fab.robots.Configuration`, optional
@@ -1041,7 +1041,7 @@ class Robot(object):
         if full_joint_state:
             # necessary to sort?
             joint_types = self.get_joint_types_by_names(joint_names)
-            # build configuration including passive joints, but no sorting 
+            # build configuration including passive joints, but no sorting
             configuration = Configuration(joint_positions, joint_types, joint_names)
         else:
             # sort values for group configuration
@@ -1049,7 +1049,7 @@ class Robot(object):
             group_joint_names = self.get_configurable_joint_names(group)
             values = [joint_state[name] for name in group_joint_names]
             configuration = Configuration(values, self.get_configurable_joint_types(group), group_joint_names)
-        
+
         configuration.scale(self.scale_factor)
 
         # NOTE: it might actually make more sense to return
@@ -1104,7 +1104,7 @@ class Robot(object):
             # check
             if link_name not in self.get_link_names(group):
                 raise ValueError("Link name %s does not exist in planning group" % link_name)
-        
+
         zero_configuration = self.init_configuration()
         if len(full_configuration.values) != len(zero_configuration.values):
             full_configuration = self.merge_group_with_full_configuration(full_configuration, zero_configuration, group)
@@ -1117,7 +1117,7 @@ class Robot(object):
         if not backend:
             if self.client:
                 frame_RCF = self.client.forward_kinematics(full_configuration_scaled.values,
-                                                           base_link_name, group, 
+                                                           base_link_name, group,
                                                            full_configuration_scaled.joint_names,
                                                            link_name)
                 frame_RCF.point *= self.scale_factor
@@ -1224,7 +1224,7 @@ class Robot(object):
             frame_RCF = self.to_local_coords(frame_WCF, group)
             frame_RCF.point /= self.scale_factor
             frames_RCF.append(frame_RCF)
-        
+
         # NOTE: start_configuration has to be a full robot configuration, such
         # that all configurable joints of the whole robot cell are defined for planning.
         start_configuration = self._check_full_configuration(start_configuration)
