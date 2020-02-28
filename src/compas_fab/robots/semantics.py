@@ -136,12 +136,14 @@ class RobotSemantics(object):
 
     def get_all_configurable_joints(self):
         joints = []
+        names = []
         for group in self.group_names:
             for name in self._group_dict[group]["joints"]:
                 joint = self.urdf_robot.get_joint_by_name(name)
                 if joint:
-                    if joint.is_configurable() and name not in self.passive_joints:
+                    if joint.is_configurable() and name not in (self.passive_joints + names):
                         joints.append(joint)
+                        names.append(name)
         return joints
 
     def get_configurable_joints(self, group=None):
