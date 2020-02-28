@@ -524,17 +524,6 @@ class Robot(object):
                 "Please pass a configuration with %d values or specify group" % len(names))
         return configuration.values[names.index(joint_name)]
 
-    def _scale_joint_values(self, values, names, scale_factor, group=None):
-        """Scales the scaleable joint values with scale_factor.
-        """
-        values_scaled = []
-        for v, name in zip(values, names):
-            j = self.get_joint_by_name(name)
-            if j.is_scalable():
-                v *= scale_factor
-            values_scaled.append(v)
-        return values_scaled
-
     def _check_full_configuration(self, full_configuration=None):
         """Either creates a full configuration or checks if the passed full configuration is valid.
         
@@ -1048,8 +1037,6 @@ class Robot(object):
                                                                       group, start_configuration_scaled.joint_names, start_configuration_scaled.values,
                                                                       avoid_collisions, constraints, attempts,
                                                                       attached_collision_meshes)
-
-        #joint_positions = self._scale_joint_values(joint_positions, joint_names, self.scale_factor)
 
         if full_joint_state:
             # necessary to sort?
