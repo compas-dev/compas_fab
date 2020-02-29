@@ -170,16 +170,13 @@ class MoveItPlanner(PlannerBackend):
         base_link = robot.get_base_link_name(group)
         ee_link = robot.get_end_effector_link_name(group)
 
-        # joint_names in the configuration are set in the robot
-        if len(start_configuration.joint_names):
-            start_configuration_joint_names = start_configuration.joint_names
-        else:
-            start_configuration_joint_names = robot.get_configurable_joint_names()
+        # if start_configuration == full_configuration is checked in the robot.
+        # start_configuration.joint_names are also set in the robot
 
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
         joint_state = JointState(header=header,
-                                 name=start_configuration_joint_names,
+                                 name=start_configuration.joint_names,
                                  position=start_configuration.values)
         start_state = RobotState(joint_state, MultiDOFJointState(header=header))
 
@@ -235,16 +232,13 @@ class MoveItPlanner(PlannerBackend):
         # TODO: if list of frames (goals) => receive multiple solutions?
         base_link = robot.get_base_link_name(group)
 
-        # joint_names in the configuration are set in the robot
-        if len(start_configuration.joint_names):
-            start_configuration_joint_names = start_configuration.joint_names
-        else:
-            start_configuration_joint_names = robot.get_configurable_joint_names()
+        # if start_configuration == full_configuration is checked in the robot.
+        # start_configuration.joint_names are also set in the robot
 
         header = Header(frame_id=base_link)
         joint_state = JointState(
             header=header,
-            name=start_configuration_joint_names,
+            name=start_configuration.joint_names,
             position=start_configuration.values)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
