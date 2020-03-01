@@ -1194,7 +1194,7 @@ class Robot(object):
             violates these constraints. Defaults to None.
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
-        
+
         Returns
         -------
         :class:`compas_fab.robots.JointTrajectory`
@@ -1317,7 +1317,7 @@ class Robot(object):
             Defaults to 1.
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
-        
+
         Returns
         -------
         :class:`compas_fab.robots.JointTrajectory`
