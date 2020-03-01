@@ -1,4 +1,4 @@
-"""Calculates a cartesian motion path (linear in tool space).
+"""Visualizes a robot.
     Inputs:
         robot: The robot
         group: str
