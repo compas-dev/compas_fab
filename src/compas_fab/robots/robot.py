@@ -443,9 +443,10 @@ class Robot(object):
         Configuration((0.000, 0.000, 0.000, 0.000, 0.000, 0.000), (0, 0, 0, 0, 0, 0), \
             ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))
         """
-        types = [joint.type for joint in self.get_configurable_joints(group)]
-        positions = [0.] * len(types)
-        return Configuration(positions, types, self.get_configurable_joint_names(group))
+        joint_names = self.get_configurable_joint_names(group)
+        joint_types = self.get_joint_types_by_names(joint_names)
+        positions = [0.] * len(joint_types)
+        return Configuration(positions, joint_types, joint_names)
 
     def random_configuration(self, group=None):
         """Returns a random configuration.
@@ -454,13 +455,14 @@ class Robot(object):
         """
         configurable_joints = self.get_configurable_joints(group)
         values = []
-        types = [j.type for j in configurable_joints]
         for joint in configurable_joints:
             if joint.limit:
                 values.append(joint.limit.lower + (joint.limit.upper - joint.limit.lower) * random.random())
             else:
                 values.append(0)
-        return Configuration(values, types, self.get_configurable_joint_names(group))
+        joint_names = self.get_configurable_joint_names(group)
+        joint_types = self.get_joint_types_by_names(joint_names)
+        return Configuration(values, joint_types, joint_names)
 
     def get_group_configuration(self, group, full_configuration):
         """Returns the group's configuration.
@@ -545,7 +547,7 @@ class Robot(object):
             if not len(configuration.joint_names):
                 configuration.joint_names = joint_names
         else:
-            configuration = self.init_configuration() # with joint_names
+            configuration = self.init_configuration()  # with joint_names
 
         return configuration
 
@@ -1037,11 +1039,9 @@ class Robot(object):
                                                                       group, start_configuration_scaled.joint_names, start_configuration_scaled.values,
                                                                       avoid_collisions, constraints, attempts,
                                                                       attached_collision_meshes)
-
         if full_joint_state:
-            # necessary to sort?
-            joint_types = self.get_joint_types_by_names(joint_names)
             # build configuration including passive joints, but no sorting
+            joint_types = self.get_joint_types_by_names(joint_names)
             configuration = Configuration(joint_positions, joint_types, joint_names)
         else:
             # sort values for group configuration
@@ -1050,12 +1050,7 @@ class Robot(object):
             values = [joint_state[name] for name in group_joint_names]
             configuration = Configuration(values, self.get_configurable_joint_types(group), group_joint_names)
 
-        configuration.scale(self.scale_factor)
-
-        # NOTE: it might actually make more sense to return
-        # the configuration instance without extracting the group's config
-        # because we loose the passive joint info
-        return configuration
+        return configuration.scaled(self.scale_factor)
 
     def forward_kinematics(self, full_configuration, group=None, backend=None, link_name=None):
         """Calculate the robot's forward kinematic.
@@ -1065,7 +1060,7 @@ class Robot(object):
         full_configuration : :class:`compas_fab.robots.Configuration`
             The full configuration to calculate the forward kinematic for. If no
             full configuration is passed, the zero-joint state for the other
-            joints is assumed.
+            configurable joints is assumed.
         group : str, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.

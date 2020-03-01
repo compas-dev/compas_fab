@@ -185,7 +185,7 @@ class Configuration(object):
         self.values = values_scaled
 
     def scaled(self, scale_factor):
-        """Returns a scaled copy of the joint positions of this configuration.
+        """Returns a scaled copy of this configuration.
 
         Only scalable joints are scaled, i.e. planar and prismatic joints.
 
