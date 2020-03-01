@@ -18,6 +18,7 @@ Unreleased
 **Changed**
 
 * start full configuration for planning service calls: this allows to set the configuration of the other planning groups while sending the planning request.
+* Changed semantics to read subgroups
 
 **Removed**
 

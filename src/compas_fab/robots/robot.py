@@ -477,8 +477,7 @@ class Robot(object):
         :class:`compas_fab.robots.Configuration`
             The configuration of the group.
         """
-        if not len(full_configuration.joint_names):
-            full_configuration.joint_names = self.get_configurable_joint_names()
+        full_configuration = self._check_full_configuration(full_configuration)  # adds joint_names to full_configuration and makes copy
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         group_joint_names = self.get_configurable_joint_names(group)
         values = [full_joint_state[name] for name in group_joint_names]
@@ -546,8 +545,7 @@ class Robot(object):
             if not len(configuration.joint_names):
                 configuration.joint_names = joint_names
         else:
-            configuration = self.init_configuration()
-            configuration.joint_names = joint_names
+            configuration = self.init_configuration() # with joint_names
 
         return configuration
 
@@ -616,6 +614,7 @@ class Robot(object):
         """Moves the origin frame of the robot to the robot_coordinate_frame.
         """
         # TODO: must be applied to the model, so that base_frame is RCF
+        # Problem: check if conversion wcf/rcf still works with backend
         raise NotImplementedError
 
     def get_RCF(self, group=None):
