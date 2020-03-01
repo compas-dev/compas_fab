@@ -213,8 +213,6 @@ class BaseRobotArtist(object):
         ----------
         configuration : :class:`compas_fab.robots.Configuration`
             Instance of the configuration (joint state) to move to.
-        names : list of string
-            The names of the configurable joints to update.
         visual : bool, optional
             ``True`` if the visual geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
