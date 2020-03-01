@@ -541,7 +541,8 @@ class Robot(object):
         """
         joint_names = self.get_configurable_joint_names()  # full configuration
         if full_configuration:
-            if len(joint_names) != len(full_configuration.values):
+            # full_configuration might have passive joints specified as well, we allow this.
+            if len(joint_names) > len(full_configuration.values):
                 raise ValueError("Please pass a configuration with {} values, for all configurable joints of the robot cell.".format(len(joint_names)))
             configuration = full_configuration.copy()
             if not len(configuration.joint_names):
@@ -1193,6 +1194,11 @@ class Robot(object):
             violates these constraints. Defaults to None.
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
+        
+        Returns
+        -------
+        :class:`compas_fab.robots.JointTrajectory`
+            The calculated trajectory.
 
         Examples
         --------
@@ -1311,7 +1317,11 @@ class Robot(object):
             Defaults to 1.
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
-
+        
+        Returns
+        -------
+        :class:`compas_fab.robots.JointTrajectory`
+            The calculated trajectory.
 
         Examples
         --------
