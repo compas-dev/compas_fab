@@ -13,14 +13,24 @@ Unreleased
 
 **Added**
 
-* ..
+* Added optional `joint_names` to `Configuration`
+* Added `Configuration.scaled`
+* Added ``Robot._check_full_configuration``
+* Added kwarg `full_joint_state` to ``Robot.inverse_kinematics``
+* Added `joint_names` to ``Configuration`` if available
+* Added ``Semantics.get_all_configurable_joints``
 
 **Changed**
 
-* start full configuration for planning service calls: this allows to set the configuration of the other planning groups while sending the planning request.
-* Changed semantics to read subgroups
+* Construct `full_configuration` with `values`, `types`, `joint_names` in ``Robot`` rather than in ``MoveItPlanner``
+* ``MoveItPlanner`` returns start_configuration with set joint_names
+* Changed ``Semantics.__get_group_joint_names`` and ``Semantics.__get_group_link_names`` to read subgroups
+* Removed parameter `names` from ``RobotArtist.update``
+* Updated Grasshopper examples
 
 **Removed**
+* ``Robot._scale_joint_values``
+* ``Robot._get_scaled_joint_positions_from_start_configuration``
 
 **Fixed**
 
