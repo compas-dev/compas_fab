@@ -21,6 +21,9 @@ Unreleased
 
 **Fixed**
 
+* Convert constraints on inverse kinematics and cartesian planner to ROS messages
+* Fix support for trajectory constraints on kinematic planner
+
 **Deprecated**
 
 0.10.2
