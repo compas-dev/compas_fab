@@ -528,6 +528,25 @@ class Robot(object):
                     configuration.values[i] = group_configuration.values[gi]
             return configuration
 
+    def get_group_names_from_link_name(self, link_name):
+        """Returns the group_names to which the link_name belongs to.
+
+        Parameters
+        ----------
+        link_name : str
+            The name of a link
+
+        Returns
+        -------
+        list of str
+           A list of group names.
+        """
+        group_names = []
+        for group in self.group_names:
+            if link_name in self.get_link_names(group):
+                group_names.append(group)
+        return group_names
+
     def get_position_by_joint_name(self, configuration, joint_name, group=None):
         """Returns the value of the joint_name in the passed configuration.
         """
