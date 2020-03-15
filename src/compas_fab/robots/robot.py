@@ -245,8 +245,6 @@ class Robot(object):
             base_frame = link.parent_joint.origin.copy()
         else:
             base_frame = Frame.worldXY()
-        if not self.artist:
-            base_frame.point *= self._scale_factor
         return base_frame
 
     def _get_current_base_frame(self, full_configuration, group):
