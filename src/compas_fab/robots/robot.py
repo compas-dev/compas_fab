@@ -434,7 +434,7 @@ class Robot(object):
         :class:`compas_fab.robots.Configuration`
             The configuration of the group.
         """
-        full_configuration = self._check_full_configuration(full_configuration)  # adds joint_names to full_configuration and makes copy
+        full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)  # adds joint_names to full_configuration and makes copy
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         group_joint_names = self.get_configurable_joint_names(group)
         values = [full_joint_state[name] for name in group_joint_names]
@@ -460,7 +460,7 @@ class Robot(object):
         if not len(group_configuration.joint_names):
             group_configuration.joint_names = self.get_configurable_joint_names(group)
 
-        full_configuration = self._check_full_configuration(full_configuration)  # adds joint_names to full_configuration and makes copy
+        full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)  # adds joint_names to full_configuration and makes copy
 
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         group_joint_state = dict(zip(group_configuration.joint_names, group_configuration.values))
@@ -481,7 +481,7 @@ class Robot(object):
                 "Please pass a configuration with %d values or specify group" % len(names))
         return configuration.values[names.index(joint_name)]
 
-    def _check_full_configuration(self, full_configuration=None):
+    def _check_full_configuration_and_scale(self, full_configuration=None):
         """Either creates a full configuration or checks if the passed full configuration is valid.
 
         Parameters
@@ -491,12 +491,12 @@ class Robot(object):
 
         Returns
         -------
-        :class:`compas_fab.robots.Configuration`
-            The full configuration
+        (:class:`compas_fab.robots.Configuration`, :class:`compas_fab.robots.Configuration`)
+            The full configuration and the scaled full configuration
         """
         joint_names = self.get_configurable_joint_names()  # full configuration
         if not full_configuration:
-            return self.zero_configuration()  # with joint_names
+            configuration = self.zero_configuration()  # with joint_names
         else:
             # full_configuration might have passive joints specified as well, we allow this.
             if len(joint_names) > len(full_configuration.values):
@@ -504,7 +504,7 @@ class Robot(object):
             configuration = full_configuration.copy()
             if not len(configuration.joint_names):
                 configuration.joint_names = joint_names
-            return configuration
+        return configuration, configuration.scaled(1. / self.scale_factor)
 
     # ==========================================================================
     # transformations, coordinate frames
@@ -950,8 +950,7 @@ class Robot(object):
         if not group:
             group = self.main_group_name  # ensure semantics
 
-        start_configuration = self._check_full_configuration(start_configuration)
-        start_configuration_scaled = start_configuration.scaled(1. / self.scale_factor)
+        start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
 
         frame_WCF_scaled = frame_WCF.copy()
         frame_WCF_scaled.point /= self.scale_factor  # must be in meters
@@ -1024,11 +1023,8 @@ class Robot(object):
             if link_name not in self.get_link_names(group):
                 raise ValueError("Link name %s does not exist in planning group" % link_name)
 
-        zero_configuration = self.zero_configuration()
-        if len(full_configuration.values) != len(zero_configuration.values):
-            full_configuration = self.merge_group_with_full_configuration(full_configuration, zero_configuration, group)
-        full_configuration = self._check_full_configuration(full_configuration)
-        full_configuration_scaled = full_configuration.scaled(1. / self.scale_factor)
+        full_configuration = self.merge_group_with_full_configuration(full_configuration, self.zero_configuration(), group)
+        full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)
 
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
 
@@ -1111,8 +1107,7 @@ class Robot(object):
 
         # NOTE: start_configuration has to be a full robot configuration, such
         # that all configurable joints of the whole robot are defined for planning.
-        start_configuration = self._check_full_configuration(start_configuration)
-        start_configuration_scaled = start_configuration.scaled(1. / self.scale_factor)
+        start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
 
         max_step_scaled = max_step / self.scale_factor
 
@@ -1243,7 +1238,7 @@ class Robot(object):
 
         # NOTE: start_configuration has to be a full robot configuration, such
         # that all configurable joints of the whole robot are defined for planning.
-        start_configuration = self._check_full_configuration(start_configuration)
+        start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
 
         goal_constraints_WCF_scaled = []
         for c in goal_constraints:
@@ -1276,8 +1271,6 @@ class Robot(object):
                 attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
             else:
                 attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
-
-        start_configuration_scaled = start_configuration.scaled(1. / self.scale_factor)
 
         trajectory = self.client.plan_motion(
             robot=self,
