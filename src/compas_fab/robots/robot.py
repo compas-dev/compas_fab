@@ -178,7 +178,7 @@ class Robot(object):
             The name of the group. Defaults to `None`.
         full_configuration : :class:`Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
-            joints of the entire robot cell. Defaults to the all-zero configuration.
+            joints of the entire robot. Defaults to the all-zero configuration.
 
         Returns
         -------
@@ -241,7 +241,7 @@ class Robot(object):
             The name of the group. Defaults to `None`.
         full_configuration : :class:`Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
-            joints of the entire robot cell. Defaults to the all-zero configuration.
+            joints of the entire robot. Defaults to the all-zero configuration.
 
         Returns
         -------
@@ -487,7 +487,7 @@ class Robot(object):
         Parameters
         ----------
         full_configuration : :class:`compas_fab.robots.Configuration`, optional
-            The full configuration of the whole robot cell, including values for all configurable joints.
+            The full configuration of the whole robot, including values for all configurable joints.
 
         Returns
         -------
@@ -498,7 +498,7 @@ class Robot(object):
         if full_configuration:
             # full_configuration might have passive joints specified as well, we allow this.
             if len(joint_names) > len(full_configuration.values):
-                raise ValueError("Please pass a configuration with {} values, for all configurable joints of the robot cell.".format(len(joint_names)))
+                raise ValueError("Please pass a configuration with {} values, for all configurable joints of the robot.".format(len(joint_names)))
             configuration = full_configuration.copy()
             if not len(configuration.joint_names):
                 configuration.joint_names = joint_names
@@ -1063,8 +1063,8 @@ class Robot(object):
             The frames through which the path is defined.
         start_configuration: :class:`Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
-            joints of the entire robot cell, at the starting position. Defaults
-            to the all-zero configuration.
+            joints of the entire robot, at the starting position. Defaults to
+            the all-zero configuration.
         max_step: float
             The approximate distance between the calculated points. (Defined in
             the robot's units)
@@ -1111,7 +1111,7 @@ class Robot(object):
             group = self.main_group_name  # ensure semantics
 
         # NOTE: start_configuration has to be a full robot configuration, such
-        # that all configurable joints of the whole robot cell are defined for planning.
+        # that all configurable joints of the whole robot are defined for planning.
         start_configuration = self._check_full_configuration(start_configuration)
         start_configuration_scaled = start_configuration.scaled(1. / self.scale_factor)
 
@@ -1174,8 +1174,8 @@ class Robot(object):
             the end-effector) is required to move to.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
-            joints of the entire robot cell, at the starting position. Defaults
-            to the all-zero configuration.
+            joints of the entire robot, at the starting position. Defaults to
+            the all-zero configuration.
         group: str, optional
             The name of the group to plan for. Defaults to the robot's main
             planning group.
@@ -1243,7 +1243,7 @@ class Robot(object):
             group = self.main_group_name  # ensure semantics
 
         # NOTE: start_configuration has to be a full robot configuration, such
-        # that all configurable joints of the whole robot cell are defined for planning.
+        # that all configurable joints of the whole robot are defined for planning.
         start_configuration = self._check_full_configuration(start_configuration)
 
         goal_constraints_WCF_scaled = []
