@@ -184,7 +184,7 @@ class Robot(object):
         -------
         :class: `compas.geometry.Frame`
         """
-        if full_configuration == None:
+        if full_configuration is None:
             full_configuration = self.init_configuration()
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         return self.model.forward_kinematics(full_joint_state, link_name=self.get_end_effector_link_name(group))
@@ -247,7 +247,7 @@ class Robot(object):
         -------
         :class: `compas.geometry.Frame`
         """
-        if full_configuration == None:
+        if full_configuration is None:
             full_configuration = self.init_configuration()
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         return self.model.forward_kinematics(full_joint_state, link_name=self.get_base_link_name(group))
@@ -1047,7 +1047,7 @@ class Robot(object):
         else:
             # pass to backend, kdl, ikfast,...
             raise NotImplementedError
-        
+
         return frame_WCF
 
     def forward_kinematics_robot_model(self, configuration, group=None, link_name=None):
