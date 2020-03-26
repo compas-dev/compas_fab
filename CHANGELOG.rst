@@ -13,11 +13,9 @@ Unreleased
 
 **Added**
 
-* Added optional `joint_names` to `Configuration`
-* Added `Configuration.scaled`
-* Added ``Robot._check_full_configuration``
-* Added kwarg `full_joint_state` to ``Robot.inverse_kinematics``
-* Added `joint_names` to ``Configuration`` if available
+* Added optional ``joint_names`` to `Configuration`
+* Added ``Configuration.scaled``
+* Added ``full_joint_state`` to ``Robot.inverse_kinematics``
 * Added ``Semantics.get_all_configurable_joints``
 
 **Changed**
