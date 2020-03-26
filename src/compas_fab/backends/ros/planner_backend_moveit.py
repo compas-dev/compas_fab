@@ -118,14 +118,14 @@ class MoveItPlanner(PlannerBackend):
     # ==========================================================================
 
     def inverse_kinematics_async(self, callback, errback, frame, base_link, group,
-                                 joint_names, joint_positions, avoid_collisions=True,
+                                 start_configuration, avoid_collisions=True,
                                  constraints=None, attempts=8, attached_collision_meshes=None):
         """Asynchronous handler of MoveIt IK service."""
         header = Header(frame_id=base_link)
         pose = Pose.from_frame(frame)
         pose_stamped = PoseStamped(header, pose)
         joint_state = JointState(
-            name=joint_names, position=joint_positions, header=header)
+            name=start_configuration.joint_names, position=start_configuration.values, header=header)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
         if attached_collision_meshes:

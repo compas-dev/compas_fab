@@ -963,7 +963,7 @@ class Robot(object):
 
         # The returned joint names might be more than the requested ones if there are passive joints present
         joint_positions, joint_names = self.client.inverse_kinematics(frame_WCF_scaled, self.model.root.name,
-                                                                      group, start_configuration_scaled.joint_names, start_configuration_scaled.values,
+                                                                      group, start_configuration_scaled,
                                                                       avoid_collisions, constraints, attempts,
                                                                       attached_collision_meshes)
         if full_joint_state:

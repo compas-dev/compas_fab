@@ -170,15 +170,14 @@ class RosClient(Ros):
         return Robot(model, semantics=semantics, client=self)
 
     def inverse_kinematics(self, frame, base_link, group,
-                           joint_names, joint_positions, avoid_collisions=True,
+                           start_configuration, avoid_collisions=True,
                            constraints=None, attempts=8,
                            attached_collision_meshes=None):
         kwargs = {}
         kwargs['frame'] = frame
         kwargs['base_link'] = base_link
         kwargs['group'] = group
-        kwargs['joint_names'] = joint_names
-        kwargs['joint_positions'] = joint_positions
+        kwargs['start_configuration'] = start_configuration
         kwargs['avoid_collisions'] = avoid_collisions
         kwargs['constraints'] = constraints
         kwargs['attempts'] = attempts
