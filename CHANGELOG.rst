@@ -25,6 +25,8 @@ Unreleased
 * Removed parameter ``names`` from ``RobotArtist.update``
 * Updated Grasshopper examples
 * ``Robot``: ``forward_kinematics`` returns now ``frame_WCF``
+* ``MoveItPlanner``: ``forward_kinematics`` takes now instance of ``Configuration`` and ``robot``
+* ``MoveItPlanner``: ``inverse_kinematics`` takes now instance of ``Configuration`` and ``robot``
 
 **Removed**
 
