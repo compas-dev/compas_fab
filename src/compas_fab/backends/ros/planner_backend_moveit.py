@@ -117,10 +117,11 @@ class MoveItPlanner(PlannerBackend):
     # planning services
     # ==========================================================================
 
-    def inverse_kinematics_async(self, callback, errback, frame, base_link, group,
+    def inverse_kinematics_async(self, callback, errback, robot, frame, group,
                                  start_configuration, avoid_collisions=True,
                                  constraints=None, attempts=8, attached_collision_meshes=None):
         """Asynchronous handler of MoveIt IK service."""
+        base_link = robot.model.root.name
         header = Header(frame_id=base_link)
         pose = Pose.from_frame(frame)
         pose_stamped = PoseStamped(header, pose)
@@ -145,9 +146,10 @@ class MoveItPlanner(PlannerBackend):
 
         self.GET_POSITION_IK(self, (ik_request, ), convert_to_positions, errback)
 
-    def forward_kinematics_async(self, callback, errback, configuration, base_link,
+    def forward_kinematics_async(self, callback, errback, robot, configuration,
                                  group, ee_link):
         """Asynchronous handler of MoveIt FK service."""
+        base_link = robot.model.root.name
         header = Header(frame_id=base_link)
         fk_link_names = [ee_link]
         joint_state = JointState(

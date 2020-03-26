@@ -962,7 +962,8 @@ class Robot(object):
                 attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
         # The returned joint names might be more than the requested ones if there are passive joints present
-        joint_positions, joint_names = self.client.inverse_kinematics(frame_WCF_scaled, self.model.root.name,
+        joint_positions, joint_names = self.client.inverse_kinematics(self,
+                                                                      frame_WCF_scaled,
                                                                       group, start_configuration_scaled,
                                                                       avoid_collisions, constraints, attempts,
                                                                       attached_collision_meshes)
@@ -1030,8 +1031,9 @@ class Robot(object):
 
         if not backend:
             if self.client:
-                frame_WCF = self.client.forward_kinematics(full_configuration_scaled,
-                                                           self.model.root.name, group,
+                frame_WCF = self.client.forward_kinematics(self,
+                                                           full_configuration_scaled,
+                                                           group,
                                                            link_name)
                 frame_WCF.point *= self.scale_factor
             else:

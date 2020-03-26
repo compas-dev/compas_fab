@@ -169,13 +169,13 @@ class RosClient(Ros):
 
         return Robot(model, semantics=semantics, client=self)
 
-    def inverse_kinematics(self, frame, base_link, group,
+    def inverse_kinematics(self, robot, frame, group,
                            start_configuration, avoid_collisions=True,
                            constraints=None, attempts=8,
                            attached_collision_meshes=None):
         kwargs = {}
+        kwargs['robot'] = robot
         kwargs['frame'] = frame
-        kwargs['base_link'] = base_link
         kwargs['group'] = group
         kwargs['start_configuration'] = start_configuration
         kwargs['avoid_collisions'] = avoid_collisions
@@ -186,10 +186,10 @@ class RosClient(Ros):
 
         return await_callback(self.inverse_kinematics_async, **kwargs)
 
-    def forward_kinematics(self, configuration, base_link, group, ee_link):
+    def forward_kinematics(self, robot, configuration, group, ee_link):
         kwargs = {}
+        kwargs['robot'] = robot
         kwargs['configuration'] = configuration
-        kwargs['base_link'] = base_link
         kwargs['group'] = group
         kwargs['ee_link'] = ee_link
 
