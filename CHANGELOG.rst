@@ -13,7 +13,7 @@ Unreleased
 
 **Added**
 
-* Added optional ``joint_names`` to `Configuration`
+* Added optional ``joint_names`` to ``Configuration``
 * Added ``Configuration.scaled``
 * Added ``full_joint_state`` to ``Robot.inverse_kinematics``
 * Added ``Semantics.get_all_configurable_joints``
@@ -24,6 +24,7 @@ Unreleased
 * ``MoveItPlanner`` returns ``start_configuration`` with set ``joint_names``
 * Removed parameter ``names`` from ``RobotArtist.update``
 * Updated Grasshopper examples
+* ``Robot.forward_kinematics`` returns now a frame in world coords
 
 **Removed**
 
