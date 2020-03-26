@@ -26,8 +26,6 @@ Unreleased
 * Updated Grasshopper examples
 
 **Removed**
-* ``Robot._scale_joint_values``
-* ``Robot._get_scaled_joint_positions_from_start_configuration``
 
 **Fixed**
 
