@@ -14,9 +14,6 @@
             The frame in the world coordinate frame (WCF).
 """
 from __future__ import print_function
-import logging
-
-LOGGER = logging.getLogger('roslibpy')
 
 if robot and robot.client and full_configuration:
     if robot.client.is_connected:

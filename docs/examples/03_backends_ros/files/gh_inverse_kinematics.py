@@ -16,11 +16,9 @@
         full_configuration: The full configuration
 """
 from __future__ import print_function
-import logging
 
 from compas.geometry import Frame
 
-LOGGER = logging.getLogger('roslibpy')
 
 frame = Frame(plane.Origin, plane.XAxis, plane.YAxis)
 
