@@ -1050,36 +1050,6 @@ class Robot(object):
 
         return frame_WCF
 
-    def forward_kinematics_robot_model(self, configuration, group=None, link_name=None):
-        """Calculate the robot's forward kinematic with the robot model.
-
-        Parameters
-        ----------
-        configuration : :class:`compas_fab.robots.Configuration`
-            The configuration to calculate the forward kinematic for.
-        group : str, optional
-            The planning group used for the calculation. Defaults to the robot's
-            main planning group.
-        link_name : str
-            The name of the link to calculate the forward kinematics for.
-            Defaults to the group's end effector link.
-
-        Examples
-        --------
-        >>> configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
-        >>> group = robot.main_group_name
-        >>> frame_WCF = robot.forward_kinematics(configuration, group)
-        >>> frame_WCF
-        Frame(Point(0.300, 0.100, 0.500), Vector(1.000, -0.000, -0.000), Vector(0.000, 1.000, -0.000))
-        """
-        print("Robot.forward_kinematics_robot_model(config) is deprecated: please use Robot.forward_kinematics(config, backend='model') instead")
-        if link_name is None:
-            link_name = self.get_end_effector_link_name(group)
-
-        joint_names = self.get_configurable_joint_names(group)
-        joint_state = dict(zip(joint_names, configuration.values))
-        return self.model.forward_kinematics(joint_state, link_name)
-
     def plan_cartesian_motion(self, frames_WCF, start_configuration=None,
                               max_step=0.01, jump_threshold=1.57,
                               avoid_collisions=True, group=None,
