@@ -39,7 +39,7 @@ if robot and full_configuration:
         frames = robot.transformed_frames(full_configuration)
 
     if show_base_frame:
-        base_frame_WCF = robot._get_current_base_frame(full_configuration, group)
+        base_frame_WCF = robot.get_base_frame(group, full_configuration)
 
     if show_end_effector_frame:
         ee_frame_RCF = robot.forward_kinematics(full_configuration, group=group, backend='model')
