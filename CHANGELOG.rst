@@ -20,10 +20,9 @@ Unreleased
 
 **Changed**
 
-* Construct `full_configuration` with `values`, `types`, `joint_names` in ``Robot`` rather than in ``MoveItPlanner``
-* ``MoveItPlanner`` returns start_configuration with set joint_names
-* Changed ``Semantics.__get_group_joint_names`` and ``Semantics.__get_group_link_names`` to read subgroups
-* Removed parameter `names` from ``RobotArtist.update``
+* Construct ``full_configuration`` with ``values``, ``types``, ``joint_names`` in ``Robot`` rather than in ``MoveItPlanner``
+* ``MoveItPlanner`` returns ``start_configuration`` with set ``joint_names``
+* Removed parameter ``names`` from ``RobotArtist.update``
 * Updated Grasshopper examples
 
 **Removed**
