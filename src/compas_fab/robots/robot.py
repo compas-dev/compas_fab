@@ -227,7 +227,7 @@ class Robot(object):
         name = self.get_base_link_name(group)
         return self.model.get_link_by_name(name)
 
-    def get_base_frame(self, group=None):
+    def get_base_frame(self, group=None, full_configuration=None):
         """Returns the frame of the base link, which is the robot's origin frame.
 
         Parameters
@@ -239,13 +239,10 @@ class Robot(object):
         -------
         :class: `compas.geometry.Frame`
         """
-        # TODO: check this
-        link = self.get_base_link(group)
-        if link.parent_joint:
-            base_frame = link.parent_joint.origin.copy()
-        else:
-            base_frame = Frame.worldXY()
-        return base_frame
+        if full_configuration == None:
+            full_configuration = self.init_configuration()
+        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
+        return self.model.forward_kinematics(full_joint_state, link_name=self.get_base_link_name(group))
 
     def get_link_names(self, group=None):
         """Returns the names of the links in the chain.
