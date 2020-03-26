@@ -1018,14 +1018,12 @@ class Robot(object):
         self.ensure_client()
         if not group:
             group = self.main_group_name  # ensure semantics
-        base_link = self.get_base_link_name(group)
 
         start_configuration = self._check_full_configuration(start_configuration)
         start_configuration_scaled = start_configuration.scaled(1. / self.scale_factor)
 
-        # represent in RCF
-        frame_RCF = self.to_local_coords(frame_WCF, group)
-        frame_RCF.point /= self.scale_factor  # must be in meters
+        frame_WCF_scaled = frame_WCF.copy()
+        frame_WCF_scaled.point /= self.scale_factor  # must be in meters
 
         if self.attached_tool:
             if attached_collision_meshes:
@@ -1034,7 +1032,7 @@ class Robot(object):
                 attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
         # The returned joint names might be more than the requested ones if there are passive joints present
-        joint_positions, joint_names = self.client.inverse_kinematics(frame_RCF, base_link,
+        joint_positions, joint_names = self.client.inverse_kinematics(frame_WCF_scaled, self.model.root.name,
                                                                       group, start_configuration_scaled.joint_names, start_configuration_scaled.values,
                                                                       avoid_collisions, constraints, attempts,
                                                                       attached_collision_meshes)
@@ -1074,20 +1072,16 @@ class Robot(object):
         Returns
         -------
         :class:`Frame`
-            The frame in the robot's coordinate system (RCF).
+            The frame in the world's coordinate system (WCF).
 
         Examples
         --------
         >>> configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
         >>> group = robot.main_group_name
-        >>> frame_RCF_c = robot.forward_kinematics(configuration, group)
-        >>> frame_RCF_m = robot.forward_kinematics(configuration, group, backend='model')
-        >>> frame_RCF_c == frame_RCF_m
+        >>> frame_WCF_c = robot.forward_kinematics(configuration, group)
+        >>> frame_WCF_m = robot.forward_kinematics(configuration, group, backend='model')
+        >>> frame_WCF_c == frame_WCF_m
         True
-        >>> frame_WCF = robot.to_world_coords(frame_RCF_m, group)
-        >>> frame_WCF
-        Frame(Point(0.300, 0.100, 0.500), Vector(1.000, -0.000, -0.000), Vector(0.000, 1.000, -0.000))
-
         """
         if not group:
             group = self.main_group_name
@@ -1104,28 +1098,25 @@ class Robot(object):
             full_configuration = self.merge_group_with_full_configuration(full_configuration, zero_configuration, group)
         full_configuration = self._check_full_configuration(full_configuration)
         full_configuration_scaled = full_configuration.scaled(1. / self.scale_factor)
-        base_link_name = self.get_base_link_name(group)
 
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
 
         if not backend:
             if self.client:
-                frame_RCF = self.client.forward_kinematics(full_configuration_scaled.values,
-                                                           base_link_name, group,
+                frame_WCF = self.client.forward_kinematics(full_configuration_scaled.values,
+                                                           self.model.root.name, group,
                                                            full_configuration_scaled.joint_names,
                                                            link_name)
-                frame_RCF.point *= self.scale_factor
+                frame_WCF.point *= self.scale_factor
             else:
                 frame_WCF = self.model.forward_kinematics(full_joint_state, link_name)
-                frame_RCF = self.to_local_coords(frame_WCF, group)
         elif backend == 'model':
             frame_WCF = self.model.forward_kinematics(full_joint_state, link_name)
-            frame_RCF = self.to_local_coords(frame_WCF, group)
         else:
             # pass to backend, kdl, ikfast,...
             raise NotImplementedError
-
-        return frame_RCF
+        
+        return frame_WCF
 
     def forward_kinematics_robot_model(self, configuration, group=None, link_name=None):
         """Calculate the robot's forward kinematic with the robot model.
@@ -1216,12 +1207,6 @@ class Robot(object):
         self.ensure_client()
         if not group:
             group = self.main_group_name  # ensure semantics
-        frames_RCF = []
-        for frame_WCF in frames_WCF:
-            # represent in RCF
-            frame_RCF = self.to_local_coords(frame_WCF, group)
-            frame_RCF.point /= self.scale_factor
-            frames_RCF.append(frame_RCF)
 
         # NOTE: start_configuration has to be a full robot configuration, such
         # that all configurable joints of the whole robot cell are defined for planning.
@@ -1230,21 +1215,19 @@ class Robot(object):
 
         max_step_scaled = max_step / self.scale_factor
 
-        T = self.transformation_WCF_RCF(group)
         if path_constraints:
-            path_constraints_RCF_scaled = []
+            path_constraints_WCF_scaled = []
             for c in path_constraints:
                 cp = c.copy()
-                cp.transform(T)
                 if c.type == Constraint.JOINT:
                     joint = self.get_joint_by_name(c.joint_name)
                     if joint.is_scalable():
                         cp.scale(self.scale_factor)
                 else:
                     cp.scale(self.scale_factor)
-                path_constraints_RCF_scaled.append(cp)
+                path_constraints_WCF_scaled.append(cp)
         else:
-            path_constraints_RCF_scaled = None
+            path_constraints_WCF_scaled = None
 
         if self.attached_tool:
             if attached_collision_meshes:
@@ -1254,13 +1237,13 @@ class Robot(object):
 
         trajectory = self.client.plan_cartesian_motion(
             robot=self,
-            frames=frames_RCF,
+            frames=frames_WCF,
             start_configuration=start_configuration_scaled,
             group=group,
             max_step=max_step_scaled,
             jump_threshold=jump_threshold,
             avoid_collisions=avoid_collisions,
-            path_constraints=path_constraints_RCF_scaled,
+            path_constraints=path_constraints_WCF_scaled,
             attached_collision_meshes=attached_collision_meshes)
 
         # Scale everything back to robot's scale
@@ -1361,34 +1344,31 @@ class Robot(object):
         # that all configurable joints of the whole robot cell are defined for planning.
         start_configuration = self._check_full_configuration(start_configuration)
 
-        T = self._get_current_transformation_WCF_RCF(start_configuration, group)
-        goal_constraints_RCF_scaled = []
+        goal_constraints_WCF_scaled = []
         for c in goal_constraints:
             cp = c.copy()
-            cp.transform(T)
             if c.type == Constraint.JOINT:
                 joint = self.get_joint_by_name(c.joint_name)
                 if joint.is_scalable():
                     cp.scale(self.scale_factor)
             else:
                 cp.scale(self.scale_factor)
-            goal_constraints_RCF_scaled.append(cp)
+            goal_constraints_WCF_scaled.append(cp)
 
         # Transform path constraints to RCF and scale
         if path_constraints:
-            path_constraints_RCF_scaled = []
+            path_constraints_WCF_scaled = []
             for c in path_constraints:
                 cp = c.copy()
-                cp.transform(T)
                 if c.type == Constraint.JOINT:
                     joint = self.get_joint_by_name(c.joint_name)
                     if joint.is_scalable():
                         cp.scale(self.scale_factor)
                 else:
                     cp.scale(self.scale_factor)
-                path_constraints_RCF_scaled.append(cp)
+                path_constraints_WCF_scaled.append(cp)
         else:
-            path_constraints_RCF_scaled = None
+            path_constraints_WCF_scaled = None
 
         if self.attached_tool:
             if attached_collision_meshes:
@@ -1400,10 +1380,10 @@ class Robot(object):
 
         trajectory = self.client.plan_motion(
             robot=self,
-            goal_constraints=goal_constraints_RCF_scaled,
+            goal_constraints=goal_constraints_WCF_scaled,
             start_configuration=start_configuration_scaled,
             group=group,
-            path_constraints=path_constraints_RCF_scaled,
+            path_constraints=path_constraints_WCF_scaled,
             trajectory_constraints=None,
             planner_id=planner_id,
             num_planning_attempts=num_planning_attempts,
