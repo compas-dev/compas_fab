@@ -185,7 +185,7 @@ class Robot(object):
         :class: `compas.geometry.Frame`
         """
         if full_configuration is None:
-            full_configuration = self.init_configuration()
+            full_configuration = self.zero_configuration()
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         return self.model.forward_kinematics(full_joint_state, link_name=self.get_end_effector_link_name(group))
 
@@ -248,7 +248,7 @@ class Robot(object):
         :class: `compas.geometry.Frame`
         """
         if full_configuration is None:
-            full_configuration = self.init_configuration()
+            full_configuration = self.zero_configuration()
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         return self.model.forward_kinematics(full_joint_state, link_name=self.get_base_link_name(group))
 
@@ -389,12 +389,12 @@ class Robot(object):
     # configurations
     # ==========================================================================
 
-    def init_configuration(self, group=None):
+    def zero_configuration(self, group=None):
         """Returns the init joint configuration.
 
         Examples
         --------
-        >>> robot.init_configuration('manipulator')
+        >>> robot.zero_configuration('manipulator')
         Configuration((0.000, 0.000, 0.000, 0.000, 0.000, 0.000), (0, 0, 0, 0, 0, 0), \
             ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))
         """
@@ -503,7 +503,7 @@ class Robot(object):
             if not len(configuration.joint_names):
                 configuration.joint_names = joint_names
         else:
-            configuration = self.init_configuration()  # with joint_names
+            configuration = self.zero_configuration()  # with joint_names
 
         return configuration
 
@@ -696,7 +696,7 @@ class Robot(object):
         tool.attached_collision_mesh = AttachedCollisionMesh(tool.collision_mesh, ee_link_name, touch_links)
         self.attached_tool = tool
         if self.artist:
-            self.update(self.init_configuration(), group=group, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
+            self.update(self.zero_configuration(), group=group, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
             self.artist.attach_tool(tool)
 
     def detach_tool(self):
@@ -942,7 +942,7 @@ class Robot(object):
         Examples
         --------
         >>> frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
-        >>> start_configuration = robot.init_configuration()
+        >>> start_configuration = robot.zero_configuration()
         >>> group = robot.main_group_name
         >>> robot.inverse_kinematics(frame_WCF, start_configuration, group)                 # doctest: +SKIP
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
@@ -1025,7 +1025,7 @@ class Robot(object):
             if link_name not in self.get_link_names(group):
                 raise ValueError("Link name %s does not exist in planning group" % link_name)
 
-        zero_configuration = self.init_configuration()
+        zero_configuration = self.zero_configuration()
         if len(full_configuration.values) != len(zero_configuration.values):
             full_configuration = self.merge_group_with_full_configuration(full_configuration, zero_configuration, group)
         full_configuration = self._check_full_configuration(full_configuration)
