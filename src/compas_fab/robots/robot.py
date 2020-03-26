@@ -247,54 +247,6 @@ class Robot(object):
             base_frame = Frame.worldXY()
         return base_frame
 
-    def _get_current_base_frame(self, full_configuration, group):
-        """Returns the group's current base frame, if the robot is in full_configuration.
-
-        The base_frame of a planning group can change if a parent joint was
-        transformed. This function performs a forward kinematic request with the
-        full configuration to retrieve the (possibly) transformed base_frame of
-        planning group. This function is only used in plan_motion since other
-        services, such as ik or plan_cartesian_motion, do not use the
-        transformed base_frame as the group's local coordinate system.
-
-        Parameters
-        ----------
-        full_configuration : :class:`compas_fab.robots.Configuration`
-            The (full) configuration from which the group's base frame is
-            calculated.
-        group : str
-            The planning group for which we want to get the transformed base frame.
-
-        Returns
-        -------
-        :class:`compas.geometry.Frame`
-
-        Examples
-        --------
-        """
-
-        base_link = self.get_base_link(group)
-        # the group's original base_frame
-        base_frame = self.get_base_frame(group)
-
-        joint_names = self.get_configurable_joint_names()
-        full_configuration = self._check_full_configuration(full_configuration)
-
-        # ideally we would call this with the planning group that includes all
-        # configurable joints, but we cannot be sure that this group exists.
-        # That's why we have to do the workaround with the Transformation.
-
-        joint_state = dict(zip(joint_names, full_configuration.values))
-
-        if not base_link.parent_joint:
-            base_frame_WCF = Frame.worldXY()
-        else:
-            base_frame_WCF = self.model.forward_kinematics(joint_state, link_name=base_link.name)
-        base_frame_RCF = self.to_local_coords(base_frame_WCF, group)
-
-        T = Transformation.from_frame(base_frame)
-        return base_frame_RCF.transformed(T)
-
     def get_link_names(self, group=None):
         """Returns the names of the links in the chain.
 
@@ -569,31 +521,6 @@ class Robot(object):
         """
         base_frame = self.get_base_frame(group)
         return Transformation.change_basis(base_frame, Frame.worldXY())
-
-    def _get_current_transformation_WCF_RCF(self, full_configuration, group):
-        """Returns the group's current WCF to RCF transformation, if the robot is in full_configuration.
-
-        The base_frame of a planning group can change if a parent joint was
-        transformed. This function performs a forward kinematic request with the
-        full configuration to retrieve the (possibly) transformed base_frame of
-        planning group. This function is only used in plan_motion since other
-        services, such as ik or plan_cartesian_motion, do not use the
-        transformed base_frame as the group's local coordinate system.
-
-        Parameters
-        ----------
-        full_configuration : :class:`compas_fab.robots.Configuration`
-            The (full) configuration from which the group's base frame is
-            calculated.
-        group : str
-            The planning group for which we want to get the transformed base frame.
-
-        Returns
-        -------
-        :class:`compas.geometry.Transformation`
-        """
-        base_frame = self._get_current_base_frame(full_configuration, group)
-        return Transformation.from_frame_to_frame(base_frame, Frame.worldXY())
 
     def transformation_WCF_RCF(self, group=None):
         """Returns the transformation from the world coordinate system (WCF) to the robot's coordinate system (RCF).
