@@ -23,12 +23,10 @@
             The calculated trajectory.
 """
 from __future__ import print_function
-import logging
 import scriptcontext as sc
 
 from compas.geometry import Frame
 
-LOGGER = logging.getLogger('roslibpy')
 
 guid = str(ghenv.Component.InstanceGuid)
 response_key = "response_" + guid
