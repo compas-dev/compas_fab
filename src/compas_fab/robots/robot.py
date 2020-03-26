@@ -184,7 +184,7 @@ class Robot(object):
         -------
         :class: `compas.geometry.Frame`
         """
-        if full_configuration is None:
+        if not full_configuration:
             full_configuration = self.zero_configuration()
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         return self.model.forward_kinematics(full_joint_state, link_name=self.get_end_effector_link_name(group))
@@ -247,7 +247,7 @@ class Robot(object):
         -------
         :class: `compas.geometry.Frame`
         """
-        if full_configuration is None:
+        if not full_configuration:
             full_configuration = self.zero_configuration()
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         return self.model.forward_kinematics(full_joint_state, link_name=self.get_base_link_name(group))
@@ -495,17 +495,16 @@ class Robot(object):
             The full configuration
         """
         joint_names = self.get_configurable_joint_names()  # full configuration
-        if full_configuration:
+        if not full_configuration:
+            return self.zero_configuration()  # with joint_names
+        else:
             # full_configuration might have passive joints specified as well, we allow this.
             if len(joint_names) > len(full_configuration.values):
                 raise ValueError("Please pass a configuration with {} values, for all configurable joints of the robot.".format(len(joint_names)))
             configuration = full_configuration.copy()
             if not len(configuration.joint_names):
                 configuration.joint_names = joint_names
-        else:
-            configuration = self.zero_configuration()  # with joint_names
-
-        return configuration
+            return configuration
 
     # ==========================================================================
     # transformations, coordinate frames
