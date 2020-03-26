@@ -69,6 +69,11 @@ class RobotSemantics(object):
                                 link_names.append(name)
         return link_names
 
+    def __get_group_elem_by_name(self, group_name):
+        for group_elem in self.root.findall('group'):
+            if group_elem.attrib['name'] == group_name:
+                return group_name
+
     def __get_group_joint_names(self, group):
         joint_names = []
         for link in group.findall('link'):
@@ -86,12 +91,11 @@ class RobotSemantics(object):
         for subgroup in group.findall('group'):
             if subgroup.attrib['name'] != group.attrib['name']:
                 # find group element at top level
-                for top_group_elem in self.root.findall('group'):
-                    if top_group_elem.attrib['name'] == subgroup.attrib['name']:
-                        subgroup_joint_names = self.__get_group_joint_names(top_group_elem)
-                        for name in subgroup_joint_names:
-                            if name not in joint_names:
-                                joint_names.append(name)
+                top_group_elem = self.__get_group_elem_by_name(subgroup.attrib['name'])
+                subgroup_joint_names = self.__get_group_joint_names(top_group_elem)
+                for name in subgroup_joint_names:
+                    if name not in joint_names:
+                        joint_names.append(name)
         return joint_names
 
     def __source_attributes(self):

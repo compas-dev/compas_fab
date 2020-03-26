@@ -460,7 +460,7 @@ class Robot(object):
         if not len(group_configuration.joint_names):
             group_configuration.joint_names = self.get_configurable_joint_names(group)
 
-        full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)  # adds joint_names to full_configuration and makes copy
+        full_configuration = self._check_full_configuration_and_scale(full_configuration)[0]  # adds joint_names to full_configuration and makes copy
 
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         group_joint_state = dict(zip(group_configuration.joint_names, group_configuration.values))
