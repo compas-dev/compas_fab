@@ -169,7 +169,7 @@ class Robot(object):
         name = self.get_end_effector_link_name(group)
         return self.model.get_link_by_name(name)
 
-    def get_end_effector_frame(self, group=None):
+    def get_end_effector_frame(self, group=None, full_configuration=None):
         """Returns the end effector's frame.
 
         Parameters
@@ -181,8 +181,10 @@ class Robot(object):
         -------
         :class: `compas.geometry.Frame`
         """
-        link = self.get_end_effector_link(group)
-        return link.parent_joint.origin.copy()
+        if full_configuration == None:
+            full_configuration = self.init_configuration()
+        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
+        return self.model.forward_kinematics(full_joint_state, link_name=self.get_end_effector_link_name(group))
 
     def get_base_link_name(self, group=None):
         """Returns the name of the base link.
