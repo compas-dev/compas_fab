@@ -221,11 +221,7 @@ class BaseRobotArtist(object):
             Defaults to ``True``.
         """
         positions = configuration.values
-        # checks
-        if not len(configuration.joint_names):
-            names = self.robot.get_configurable_joint_names()
-        else:
-            names = configuration.joint_names
+        names = configuration.joint_names or self.robot.get_configurable_joint_names()
         if len(names) != len(configuration.values):
             raise ValueError("Please pass a configuration with %d joint_names." % len(positions))
         joint_state = dict(zip(names, positions))
