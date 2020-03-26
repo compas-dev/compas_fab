@@ -926,7 +926,7 @@ class Robot(object):
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
         full_joint_state : bool
-            If `True`, returns a full configuration with all joint values
+            If ``True``, returns a full configuration with all joint values
             specified, including passive ones if available.
 
         Raises
