@@ -25,7 +25,6 @@
             The calculated trajectory.
 """
 from __future__ import print_function
-import logging
 import scriptcontext as sc
 
 guid = str(ghenv.Component.InstanceGuid)
@@ -33,7 +32,6 @@ response_key = "response_" + guid
 if response_key not in sc.sticky:
     sc.sticky[response_key] = None
 
-LOGGER = logging.getLogger('roslibpy')
 
 if robot and robot.client and start_configuration and compute:
     if robot.client.is_connected:
