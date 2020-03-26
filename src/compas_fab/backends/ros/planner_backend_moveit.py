@@ -167,7 +167,7 @@ class MoveItPlanner(PlannerBackend):
                                     avoid_collisions, path_constraints,
                                     attached_collision_meshes):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
-        base_link = robot.get_base_link_name(group)
+        base_link = robot.model.root.name # use world coords
         ee_link = robot.get_end_effector_link_name(group)
 
         # if start_configuration == full_configuration is checked in the robot.
@@ -230,7 +230,7 @@ class MoveItPlanner(PlannerBackend):
 
         # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
         # TODO: if list of frames (goals) => receive multiple solutions?
-        base_link = robot.get_base_link_name(group)
+        base_link = robot.model.root.name # use world coords
 
         # if start_configuration == full_configuration is checked in the robot.
         # start_configuration.joint_names are also set in the robot
