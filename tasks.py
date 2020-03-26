@@ -199,14 +199,18 @@ def deploy_docs(ctx):
 
 @task(help={
       'doctest': 'True to run doctest modules, otherwise False.',
+      'coverage': 'True to generate coverage report using pytest-cov'
       })
-def test(ctx, doctest=True):
+def test(ctx, doctest=False, coverage=False):
     """Run all tests."""
-    if doctest:
-        ctx.run('pytest --doctest-modules')
-    else:
-        ctx.run('pytest')
 
+    pytest_args = ['pytest']
+    if doctest:
+        pytest_args.append('--doctest-modules')
+    if coverage:
+        pytest_args.append('--cov=compas_fab')
+
+    ctx.run(" ".join(pytest_args))
 
 @task(help={
       'release_type': 'Type of release follows semver rules. Must be one of: major, minor, patch.'})

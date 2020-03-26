@@ -27,12 +27,28 @@ Unreleased
 * ``Robot``: ``forward_kinematics`` returns now ``frame_WCF``
 * ``MoveItPlanner``: ``forward_kinematics`` takes now instance of ``Configuration`` and ``robot``
 * ``MoveItPlanner``: ``inverse_kinematics`` takes now instance of ``Configuration`` and ``robot``
+* Property :class:`compas_fab.robots.Robot.artist` does not try to scale robot
+  geometry if links and/or joints are not defined.
 
 **Removed**
 
 **Fixed**
 
+* Convert constraints on inverse kinematics and cartesian planner to ROS messages
+* Fix support for trajectory constraints on kinematic planner
+
 **Deprecated**
+
+0.10.2
+----------
+
+**Added**
+
+* Added Python 3.8 support
+
+**Changed**
+
+* Updated to COMPAS 0.13
 
 0.10.1
 ----------
