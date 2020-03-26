@@ -434,7 +434,7 @@ class Robot(object):
         :class:`compas_fab.robots.Configuration`
             The configuration of the group.
         """
-        full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)  # adds joint_names to full_configuration and makes copy
+        full_configuration = self._check_full_configuration_and_scale(full_configuration)[0]  # adds joint_names to full_configuration and makes copy
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         group_joint_names = self.get_configurable_joint_names(group)
         values = [full_joint_state[name] for name in group_joint_names]
