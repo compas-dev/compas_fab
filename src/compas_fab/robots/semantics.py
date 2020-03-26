@@ -72,7 +72,7 @@ class RobotSemantics(object):
     def __get_group_elem_by_name(self, group_name):
         for group_elem in self.root.findall('group'):
             if group_elem.attrib['name'] == group_name:
-                return group_name
+                return group_elem
 
     def __get_group_joint_names(self, group):
         joint_names = []
