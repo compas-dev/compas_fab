@@ -24,7 +24,7 @@ Unreleased
 * ``MoveItPlanner`` returns ``start_configuration`` with set ``joint_names``
 * Removed parameter ``names`` from ``RobotArtist.update``
 * Updated Grasshopper examples
-* ``Robot.forward_kinematics`` returns now a frame in world coords
+* ``Robot``: ``forward_kinematics`` returns now ``frame_WCF``
 
 **Removed**
 

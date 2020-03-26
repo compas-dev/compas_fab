@@ -186,12 +186,11 @@ class RosClient(Ros):
 
         return await_callback(self.inverse_kinematics_async, **kwargs)
 
-    def forward_kinematics(self, joint_positions, base_link, group, joint_names, ee_link):
+    def forward_kinematics(self, configuration, base_link, group, ee_link):
         kwargs = {}
-        kwargs['joint_positions'] = joint_positions
+        kwargs['configuration'] = configuration
         kwargs['base_link'] = base_link
         kwargs['group'] = group
-        kwargs['joint_names'] = joint_names
         kwargs['ee_link'] = ee_link
 
         kwargs['errback_name'] = 'errback'

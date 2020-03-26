@@ -145,13 +145,13 @@ class MoveItPlanner(PlannerBackend):
 
         self.GET_POSITION_IK(self, (ik_request, ), convert_to_positions, errback)
 
-    def forward_kinematics_async(self, callback, errback, joint_positions, base_link,
-                                 group, joint_names, ee_link):
+    def forward_kinematics_async(self, callback, errback, configuration, base_link,
+                                 group, ee_link):
         """Asynchronous handler of MoveIt FK service."""
         header = Header(frame_id=base_link)
         fk_link_names = [ee_link]
         joint_state = JointState(
-            name=joint_names, position=joint_positions, header=header)
+            name=configuration.joint_names, position=configuration.values, header=header)
         robot_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
 
