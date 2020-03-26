@@ -176,6 +176,9 @@ class Robot(object):
         ----------
         group : str
             The name of the group. Defaults to `None`.
+        full_configuration : :class:`Configuration`, optional
+            The robot's full configuration, i.e. values for all configurable
+            joints of the entire robot cell. Defaults to the all-zero configuration.
 
         Returns
         -------
@@ -236,6 +239,9 @@ class Robot(object):
         ----------
         group : str
             The name of the group. Defaults to `None`.
+        full_configuration : :class:`Configuration`, optional
+            The robot's full configuration, i.e. values for all configurable
+            joints of the entire robot cell. Defaults to the all-zero configuration.
 
         Returns
         -------
