@@ -42,6 +42,5 @@ if robot and full_configuration:
         base_frame_WCF = robot.get_base_frame(group, full_configuration)
 
     if show_end_effector_frame:
-        ee_frame_RCF = robot.forward_kinematics(full_configuration, group=group, backend='model')
-        ee_frame_WCF = robot.to_world_coords(ee_frame_RCF, group=group)
+        ee_frame_WCF = robot.get_end_effector_frame(group, full_configuration)
         print("End-effector", ee_frame_WCF)
