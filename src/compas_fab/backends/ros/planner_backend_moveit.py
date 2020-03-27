@@ -33,6 +33,7 @@ from compas_fab.backends.ros.messages import PoseStamped
 from compas_fab.backends.ros.messages import PositionConstraint
 from compas_fab.backends.ros.messages import PositionIKRequest
 from compas_fab.backends.ros.messages import RobotState
+from compas_fab.backends.ros.messages import TrajectoryConstraints
 from compas_fab.backends.ros.planner_backend import PlannerBackend
 from compas_fab.backends.ros.planner_backend import ServiceDescription
 from compas_fab.robots import Configuration
@@ -113,6 +114,27 @@ class MoveItPlanner(PlannerBackend):
         if hasattr(self, 'attached_collision_object_topic') and self.attached_collision_object_topic:
             self.attached_collision_object_topic.unadvertise()
 
+    def _convert_constraints_to_rosmsg(self, constraints, header):
+        """Convert COMPAS FAB constraints into ROS Messages."""
+        if not constraints:
+            return None
+
+        ros_constraints = Constraints()
+        for c in constraints:
+            if c.type == c.JOINT:
+                ros_constraints.joint_constraints.append(
+                    JointConstraint.from_joint_constraint(c))
+            elif c.type == c.POSITION:
+                ros_constraints.position_constraints.append(
+                    PositionConstraint.from_position_constraint(header, c))
+            elif c.type == c.ORIENTATION:
+                ros_constraints.orientation_constraints.append(
+                    OrientationConstraint.from_orientation_constraint(header, c))
+            else:
+                raise NotImplementedError
+
+        return ros_constraints
+
     # ==========================================================================
     # planning services
     # ==========================================================================
@@ -133,6 +155,8 @@ class MoveItPlanner(PlannerBackend):
             for acm in attached_collision_meshes:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
                 start_state.attached_collision_objects.append(aco)
+
+        constraints = self._convert_constraints_to_rosmsg(constraints, header)
 
         ik_request = PositionIKRequest(group_name=group,
                                        robot_state=start_state,
@@ -183,6 +207,8 @@ class MoveItPlanner(PlannerBackend):
             for acm in attached_collision_meshes:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
                 start_state.attached_collision_objects.append(aco)
+
+        path_constraints = self._convert_constraints_to_rosmsg(path_constraints, header)
 
         request = dict(header=header,
                        start_state=start_state,
@@ -243,38 +269,12 @@ class MoveItPlanner(PlannerBackend):
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
                 start_state.attached_collision_objects.append(aco)
 
-        # goal constraints
-        constraints = Constraints()
-        for c in goal_constraints:
-            if c.type == c.JOINT:
-                constraints.joint_constraints.append(
-                    JointConstraint.from_joint_constraint(c))
-            elif c.type == c.POSITION:
-                constraints.position_constraints.append(
-                    PositionConstraint.from_position_constraint(header, c))
-            elif c.type == c.ORIENTATION:
-                constraints.orientation_constraints.append(
-                    OrientationConstraint.from_orientation_constraint(header, c))
-            else:
-                raise NotImplementedError
-        goal_constraints = [constraints]
+        # convert constraints
+        goal_constraints = [self._convert_constraints_to_rosmsg(goal_constraints, header)]
+        path_constraints = self._convert_constraints_to_rosmsg(path_constraints, header)
 
-        # path constraints
-        if path_constraints:
-            constraints = Constraints()
-            for c in path_constraints:
-                if c.type == c.JOINT:
-                    constraints.joint_constraints.append(
-                        JointConstraint.from_joint_constraint(c))
-                elif c.type == c.POSITION:
-                    constraints.position_constraints.append(
-                        PositionConstraint.from_position_constraint(header, c))
-                elif c.type == c.ORIENTATION:
-                    constraints.orientation_constraints.append(
-                        OrientationConstraint.from_orientation_constraint(header, c))
-                else:
-                    raise NotImplementedError
-            path_constraints = constraints
+        if trajectory_constraints is not None:
+            trajectory_constraints = TrajectoryConstraints(constraints=self._convert_constraints_to_rosmsg(path_constraints, header))
 
         request = dict(start_state=start_state,
                        goal_constraints=goal_constraints,

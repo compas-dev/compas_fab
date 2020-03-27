@@ -64,23 +64,38 @@ class Robot(object):
     @artist.setter
     def artist(self, artist):
         self._artist = artist
-        self.scale(self._scale_factor)
-        if self.attached_tool:
-            self.artist.attach_tool(self.attached_tool)
+        if len(self.model.joints) > 0 and len(self.model.links) > 0:
+            self.scale(self._scale_factor)
+            if self.attached_tool:
+                self.artist.attach_tool(self.attached_tool)
 
     @classmethod
     def basic(cls, name, joints=None, links=None, materials=None, **kwargs):
-        """Convenience method to create the most basic instance of a robot, based only on a name.
+        """Convenience method to create the most basic instance of a robot,
+           based only on a name.
 
         Parameters
         ----------
         name : str
             Name of the robot
+        joints : :class:`compas.robots.Joint`, optional
+        links : :class:`compas.robots.Link`, optional
+        materials : :class:`compas.robots.Material`, optional
+        **kwargs
+            Keyword arguments passed to :class:`compas.robots.RobotModel`
+            and stored as :attr:`compas.robots.RobotModel.attr`.
+            Accessible from :attr:`Robot.model.attr`.
 
         Returns
         -------
         :class:`Robot`
             Newly created instance of a robot.
+
+        Examples
+        --------
+        >>> robot = Robot.basic('A robot')
+        >>> robot.name
+        'A robot'
         """
         model = RobotModel(name, joints=joints or [], links=links or [],
                            materials=materials or [], **kwargs)
@@ -471,6 +486,25 @@ class Robot(object):
 
         full_configuration.values = [full_joint_state[name] for name in full_configuration.joint_names]
         return full_configuration
+
+    def get_group_names_from_link_name(self, link_name):
+        """Returns the group_names to which the link_name belongs to.
+
+        Parameters
+        ----------
+        link_name : str
+            The name of a link
+
+        Returns
+        -------
+        list of str
+           A list of group names.
+        """
+        group_names = []
+        for group in self.group_names:
+            if link_name in self.get_link_names(group):
+                group_names.append(group)
+        return group_names
 
     def get_position_by_joint_name(self, configuration, joint_name, group=None):
         """Returns the value of the joint_name in the passed configuration.
