@@ -1146,6 +1146,10 @@ class Robot(object):
 
         max_step_scaled = max_step / self.scale_factor
 
+        frames_WCF_scaled = []
+        for frame in frames_WCF:
+            frames_WCF_scaled.append(Frame(frame.point * 1/self.scale_factor, frame.xaxis, frame.yaxis))
+
         if path_constraints:
             path_constraints_WCF_scaled = []
             for c in path_constraints:
@@ -1168,7 +1172,7 @@ class Robot(object):
 
         trajectory = self.client.plan_cartesian_motion(
             robot=self,
-            frames=frames_WCF,
+            frames=frames_WCF_scaled,
             start_configuration=start_configuration_scaled,
             group=group,
             max_step=max_step_scaled,
