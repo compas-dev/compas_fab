@@ -19,6 +19,8 @@ Unreleased
 
 * Property :class:`compas_fab.robots.Robot.artist` does not try to scale robot
   geometry if links and/or joints are not defined.
+* In :class:`compas_fab.constraints.JointConstraint`, added tolerance_above and
+  tolerance_below for allowing asymmetrical constraints
 
 **Removed**
 
