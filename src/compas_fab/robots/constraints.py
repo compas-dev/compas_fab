@@ -157,7 +157,6 @@ class JointConstraint(Constraint):
     tolerance_above: float
     tolerance_below: float
         The bound to be achieved is [value - tolerance_below, position + tolerance_above].
-        JointConstraint tolerances values must be positive.
     weight: float, optional
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to 1.
@@ -173,8 +172,8 @@ class JointConstraint(Constraint):
         super(JointConstraint, self).__init__(self.JOINT, weight)
         self.joint_name = joint_name
         self.value = value
-        self.tolerance_above = tolerance_above
-        self.tolerance_below = tolerance_below
+        self.tolerance_above = abs(tolerance_above)
+        self.tolerance_below = abs(tolerance_below)
 
     def scale(self, scale_factor):
         self.value /= scale_factor
