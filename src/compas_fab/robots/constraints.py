@@ -155,8 +155,10 @@ class JointConstraint(Constraint):
     value: float
         The targeted value for that joint.
     tolerance_above: float
+        Tolerance above the targeted joint value, in radians. Defaults to 0.
     tolerance_below: float
-        The bound to be achieved is [value - tolerance_below, position + tolerance_above].
+        Tolerance below the targeted joint value, in radians. Defaults to 0.
+        The bound to be achieved is [value - tolerance_below, value + tolerance_above].
     weight: float, optional
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to 1.
