@@ -1370,9 +1370,10 @@ class Robot(object):
         1.0
         >>> # Example with joint constraints (to the UP configuration)
         >>> configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0])
-        >>> tolerances = [math.radians(5)] * 6
+        >>> tolerances_above = [math.radians(5)] * len(configuration.values)
+        >>> tolerances_below = [math.radians(5)] * len(configuration.values)
         >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances, group)
+        >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances_above, tolerances_below, group)
         >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
         >>> trajectory.fraction
         1.0
