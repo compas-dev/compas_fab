@@ -977,12 +977,12 @@ class Robot(object):
         >>> tolerances_below = [math.radians(1)] * 6
         >>> group = robot.main_group_name
         >>> robot.constraints_from_configuration(configuration, tolerances_above, tolerances_below, group)
-        [JointConstraint('shoulder_pan_joint', -0.042, 0.0174532925199, 0.0174532925199, 1.0), \
-        JointConstraint('shoulder_lift_joint', 4.295, 0.0174532925199, 0.0174532925199, 1.0), \
-        JointConstraint('elbow_joint', -4.11, 0.0174532925199, 0.0174532925199, 1.0), \
-        JointConstraint('wrist_1_joint', -3.327, 0.0174532925199, 0.0174532925199, 1.0), \
-        JointConstraint('wrist_2_joint', 4.755, 0.0174532925199, 0.0174532925199, 1.0), \
-        JointConstraint('wrist_3_joint', 0.0, 0.0174532925199, 0.0174532925199, 1.0)]
+        [JointConstraint('shoulder_pan_joint', -0.042, 0.017453292519943295, 0.017453292519943295, 1.0), \
+        JointConstraint('shoulder_lift_joint', 4.295, 0.017453292519943295, 0.017453292519943295, 1.0), \
+        JointConstraint('elbow_joint', -4.11, 0.017453292519943295, 0.017453292519943295, 1.0), \
+        JointConstraint('wrist_1_joint', -3.327, 0.017453292519943295, 0.017453292519943295, 1.0), \
+        JointConstraint('wrist_2_joint', 4.755, 0.017453292519943295, 0.017453292519943295, 1.0), \
+        JointConstraint('wrist_3_joint', 0.0, 0.017453292519943295, 0.017453292519943295, 1.0)]
 
         Raises
         ------
