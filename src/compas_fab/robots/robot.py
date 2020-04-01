@@ -949,17 +949,23 @@ class Robot(object):
         oc = self.orientation_constraint_from_frame(frame_WCF, tolerances_axes, group)
         return [pc, oc]
 
-    def constraints_from_configuration(self, configuration, tolerances, group=None):
+    def constraints_from_configuration(self, configuration, tolerances_above, tolerances_below, group=None):
         """Returns joint constraints on all joints of the configuration.
 
         Parameters
         ----------
         configuration: :class:`compas_fab.robots.Configuration`
             The target configuration.
-        tolerances: list of float
-            The tolerances (as +/-) on each of the joints defining the bound in radian
-            to be achieved. If only one value is passed it will be used to create
-            bounds for all joint constraints.
+        tolerances_above: list of float
+            The tolerances above the targeted configuration's joint value on each
+            of the joints, defining the upper bound in radian to be achieved.
+            If only one value is passed, it will be used to create upper bounds
+            for all joint constraints.
+        tolerances_below: list of float
+            The tolerances below the targeted configuration's joint value on each
+            of the joints, defining the upper bound in radian to be achieved.
+            If only one value is passed, it will be used to create lower bounds
+            for all joint constraints.
         group: str, optional
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
@@ -967,15 +973,16 @@ class Robot(object):
         Examples
         --------
         >>> configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
-        >>> tolerances = [math.radians(5)] * 6
+        >>> tolerances_above = [math.radians(1)] * 6
+        >>> tolerances_below = [math.radians(1)] * 6
         >>> group = robot.main_group_name
-        >>> robot.constraints_from_configuration(configuration, tolerances, group)
-        [JointConstraint('shoulder_pan_joint', -0.042, 0.08726646259971647, 1.0), \
-        JointConstraint('shoulder_lift_joint', 4.295, 0.08726646259971647, 1.0), \
-        JointConstraint('elbow_joint', -4.11, 0.08726646259971647, 1.0), \
-        JointConstraint('wrist_1_joint', -3.327, 0.08726646259971647, 1.0), \
-        JointConstraint('wrist_2_joint', 4.755, 0.08726646259971647, 1.0), \
-        JointConstraint('wrist_3_joint', 0.0, 0.08726646259971647, 1.0)]
+        >>> robot.constraints_from_configuration(configuration, tolerances_above, tolerances_below, group)
+        [JointConstraint('shoulder_pan_joint', -0.042, 0.0174532925199, 0.0174532925199, 1.0), \
+        JointConstraint('shoulder_lift_joint', 4.295, 0.0174532925199, 0.0174532925199, 1.0), \
+        JointConstraint('elbow_joint', -4.11, 0.0174532925199, 0.0174532925199, 1.0), \
+        JointConstraint('wrist_1_joint', -3.327, 0.0174532925199, 0.0174532925199, 1.0), \
+        JointConstraint('wrist_2_joint', 4.755, 0.0174532925199, 0.0174532925199, 1.0), \
+        JointConstraint('wrist_3_joint', 0.0, 0.0174532925199, 0.0174532925199, 1.0)]
 
         Raises
         ------
@@ -997,15 +1004,20 @@ class Robot(object):
         if len(joint_names) != len(configuration.values):
             raise ValueError("The passed configuration has %d values, the group %s needs however: %d" % (
                 len(configuration.values), group, len(joint_names)))
-        if len(tolerances) == 1:
-            tolerances = tolerances * len(joint_names)
-        elif len(tolerances) != len(configuration.values):
-            raise ValueError("The passed configuration has %d values, the tolerances however: %d" % (
-                len(configuration.values), len(tolerances)))
+        if len(tolerances_above) == 1:
+            tolerances_above = tolerances_above * len(joint_names)
+        elif len(tolerances_above) != len(configuration.values):
+            raise ValueError("The passed configuration has %d values, the tolerances_above however: %d" % (
+                len(configuration.values), len(tolerances_above)))
+        if len(tolerances_below) == 1:
+            tolerances_below = tolerances_below * len(joint_names)
+        elif len(tolerances_below) != len(configuration.values):
+            raise ValueError("The passed configuration has %d values, the tolerances_below however: %d" % (
+                len(configuration.values), len(tolerances_below)))
 
         constraints = []
-        for name, value, tolerance in zip(joint_names, configuration.values, tolerances):
-            constraints.append(JointConstraint(name, value, tolerance))
+        for name, value, tolerance_above, tolerance_below in zip(joint_names, configuration.values, tolerances_above, tolerances_below):
+            constraints.append(JointConstraint(name, value, tolerance_above, tolerance_below))
         return constraints
 
     # ==========================================================================
