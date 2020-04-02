@@ -403,8 +403,35 @@ class Robot(object):
         configurable_joints = self.get_configurable_joints(group)
         return [j.type for j in configurable_joints]
 
-    def get_links_distance(self, link_name_1, link_name_2, group=None):
-        return None
+    def get_links_distance(self, configuration, link_name_1, link_name_2, group=None):
+        """Calculate the distance between two robot's links.
+
+        Parameters
+        ----------
+        configuration : :class:`compas_fab.robots.Configuration`
+            The configuration of the robot to calculate the distance for.
+        link_name_1 : str
+            The name of the link to calculate the distance from.
+        link_name_2 : str
+            The name of the link to calculate the distance to.
+        group : str, optional
+            The planning group used for the calculation. Defaults to the robot's
+            main planning group.
+
+        Returns
+        -------
+        float
+            The distance between the links.
+        """
+        point_link_1 = robot.forward_kinematics(configuration,
+                                                group,
+                                                link_name=link_name_1).point
+        point_link_2 = robot.forward_kinematics(configuration,
+                                                group,
+                                                link_name=link_name_2).point
+
+        distance = point_link_1.distance_to_point(point_link_2)
+        return distance
 
     # ==========================================================================
     # configurations
@@ -853,7 +880,7 @@ class Robot(object):
             #       I find it misleading. Is that the intended result of scaling a Sphere?
             _S = Scale([1.0 / self.scale_factor] * 3)
             sphere.transform(_S)
-            sphere.radius = sphere.radius/self.scale_factor
+            sphere.radius = sphere.radius / self.scale_factor
 
         bv = BoundingVolume.from_sphere(sphere)
         return [PositionConstraint(link_name, bv, weight=1.)]
@@ -1295,7 +1322,7 @@ class Robot(object):
 
         frames_WCF_scaled = []
         for frame in frames_WCF:
-            frames_WCF_scaled.append(Frame(frame.point * 1. / self.scale_factor, frame.xaxis, frame.yaxis))
+            frames_WCF_scaled.append(Frame(frame.point * 1 / self.scale_factor, frame.xaxis, frame.yaxis))
 
         if path_constraints:
             path_constraints_WCF_scaled = []
