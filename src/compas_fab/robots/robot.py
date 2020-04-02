@@ -4,6 +4,8 @@ from __future__ import print_function
 
 import logging
 import random
+from datetime import datetime
+from datetime import timedelta
 
 from compas.geometry import Frame
 from compas.geometry import Scale
@@ -13,11 +15,11 @@ from compas.robots import Joint
 from compas.robots import RobotModel
 
 from compas_fab.robots.configuration import Configuration
+from compas_fab.robots.constraints import BoundingVolume
 from compas_fab.robots.constraints import Constraint
 from compas_fab.robots.constraints import JointConstraint
 from compas_fab.robots.constraints import OrientationConstraint
 from compas_fab.robots.constraints import PositionConstraint
-
 from compas_fab.robots.planning_scene import AttachedCollisionMesh
 
 LOGGER = logging.getLogger('compas_fab.robots.robot')
@@ -400,7 +402,7 @@ class Robot(object):
         """
         configurable_joints = self.get_configurable_joints(group)
         return [j.type for j in configurable_joints]
-    
+
     def get_links_distance(self, link_name_1, link_name_2, group=None):
         return None
 
@@ -834,7 +836,7 @@ class Robot(object):
         ee_link = self.get_end_effector_link_name(group)
         sphere = Sphere(frame_WCF.point, tolerance_position)
         return PositionConstraint.from_sphere(ee_link, sphere)
-    
+
     def position_constraint_from_max_reach(self, target_point, link_name, max_reach, group=None):
         """
         Returns a position constraint for link_name with a sphere around the target point.
@@ -1050,9 +1052,114 @@ class Robot(object):
             configuration = Configuration(values, self.get_configurable_joint_types(group), group_joint_names)
 
         return configuration.scaled(self.scale_factor)
-    
-    def iter_inverse_kinematics(self):
-        pass
+
+    def iter_inverse_kinematics(self,
+                                frame_WCF,
+                                start_configuration=None,
+                                group=None,
+                                avoid_collisions=True,
+                                constraints=None,
+                                attempts=10,
+                                attached_collision_meshes=None,
+                                full_joint_state=True,
+                                n_configurations=10,
+                                max_reach=10.0,
+                                shoulder_link_name=None,
+                                timeout_seconds=1.0):
+        """Calculate a given number of robot's inverse kinematic for a given frame.
+        Usefull to search for a list of configurations, with given constraints.
+        NOTE: max_reach value has to be lower than the maximum distance from the
+              shoulder_link to the tool0_link in order to force variation in the
+              IK solver.
+
+        Parameters
+        ----------
+        frame: :class:`compas.geometry.Frame`
+            The frame to calculate the inverse for.
+        start_configuration: :class:`compas_fab.robots.Configuration`, optional
+            If passed, the inverse will be calculated such that the calculated
+            joint positions differ the least from the start_configuration.
+            Defaults to the init configuration.
+        group: str, optional
+            The planning group used for calculation. Defaults to the robot's
+            main planning group.
+        avoid_collisions: bool, optional
+            Whether or not to avoid collisions. Defaults to True.
+        constraints: list of :class:`compas_fab.robots.Constraint`, optional
+            A set of constraints that the request must obey. Defaults to None.
+            If None, position_constraint_from_max_reach will be the only coconstraint.
+        attempts: int, optional
+            The maximum number of inverse kinematic attempts. Defaults to 8.
+        attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
+            Defaults to None.
+        full_joint_state : bool
+            If ``True``, returns a full configuration with all joint values
+            specified, including passive ones if available.
+        n_configurations : int, optional
+            Targeted number of desired configurations.
+        max_reach : float, optional
+            Maximum distance from the shoulder_link to the tool0_link of the selected group.
+            The max_reach value has to be lower than the maximum distance from the
+            shoulder_link to the tool0_link in order to force variation in the IK solver,
+            otherwise all returned configuations will be idential!
+            # TODO: for MoveIt IK solver, look at using seachPositionIK() instead of getPositionIK()?
+            #       Expose seachPositionIK() service?
+        shoulder_link_name : str, optional
+            Name of the robot's shoulder link, or other robot link name, that will be constrained
+            within the max_reach distance from the tool0_link.
+        timeout_seconds : float, optional
+            Timeout expressed in seconds
+
+        Raises
+        ------
+        compas_fab.backends.exceptions.BackendError
+            If no configuration can be found.
+
+        Returns
+        -------
+        list :class:`compas_fab.robots.Configuration`
+            The planning group's list of configurations within max_reach
+
+        Examples
+        --------
+        # TODO
+        """
+
+        if not group:
+            group = self.main_group_name
+        if shoulder_link_name is None:
+            raise NotImplementedError
+            # TODO: implement auto identification of the shoulder's link name for the current group, or main group
+
+        reach_constraints = self.position_constraint_from_max_reach(frame_WCF.point, shoulder_link_name, max_reach, group)
+        if constraints is None:
+            constraints = reach_constraints
+        else:
+            constraints.extend(reach_constraints)
+
+        result_configurations = []
+        wait_until = datetime.now() + timedelta(seconds=timeout_seconds)
+        break_loop = False
+        while not break_loop:
+            # NOTE: how can I catch "Error code: -31; NO_IK_SOLUTION" error without interrupting the loop?
+            try:
+                configuration = self.inverse_kinematics(frame_WCF,
+                                                        start_configuration=start_configuration,
+                                                        group=group,
+                                                        avoid_collisions=avoid_collisions,
+                                                        constraints=constraints,
+                                                        attempts=attempts,
+                                                        attached_collision_meshes=attached_collision_meshes,
+                                                        full_joint_state=full_joint_state)
+                result_configurations.append(configuration)
+            except BaseException:
+                # print("Error code: -31; NO_IK_SOLUTION")
+                pass
+
+            if (wait_until < datetime.now()) or (len(result_configurations) == n_configurations):
+                break_loop = True
+
+        return result_configurations
 
     def forward_kinematics(self, configuration, group=None, backend=None, link_name=None):
         """Calculate the robot's forward kinematic.
