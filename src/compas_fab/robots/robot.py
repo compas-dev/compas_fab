@@ -6,6 +6,7 @@ import logging
 import random
 
 from compas.geometry import Frame
+from compas.geometry import Scale
 from compas.geometry import Sphere
 from compas.geometry import Transformation
 from compas.robots import Joint
@@ -399,6 +400,9 @@ class Robot(object):
         """
         configurable_joints = self.get_configurable_joints(group)
         return [j.type for j in configurable_joints]
+    
+    def get_links_distance(self, link_name_1, link_name_2, group=None):
+        return None
 
     # ==========================================================================
     # configurations
@@ -830,6 +834,27 @@ class Robot(object):
         ee_link = self.get_end_effector_link_name(group)
         sphere = Sphere(frame_WCF.point, tolerance_position)
         return PositionConstraint.from_sphere(ee_link, sphere)
+    
+    def position_constraint_from_max_reach(self, target_point, link_name, max_reach, group=None):
+        """
+        Returns a position constraint for link_name with a sphere around the target point.
+        max_reach: the maximum span the arm can reach (radius of the reaching sphere).
+        """
+        if not group:
+            group = self.main_group_name
+
+        sphere = Sphere(target_point, max_reach)
+
+        if self.scale_factor != 1.0:
+            # NOTE: tried using BoundingVolume.scale(robot.scale_factor), but it only scales the target_point.
+            # NOTE: also the compas geometry transformation scale applies only to the center point of the sphere, not to the radius.
+            #       I find it misleading. Is that the intended result of scaling a Sphere?
+            _S = Scale([1.0 / self.scale_factor] * 3)
+            sphere.transform(_S)
+            sphere.radius = sphere.radius/self.scale_factor
+
+        bv = BoundingVolume.from_sphere(sphere)
+        return [PositionConstraint(link_name, bv, weight=1.)]
 
     def constraints_from_frame(self, frame_WCF, tolerance_position, tolerances_axes, group=None):
         """Returns a position and orientation constraint on the group's end-effector link.
@@ -1013,6 +1038,9 @@ class Robot(object):
             configuration = Configuration(values, self.get_configurable_joint_types(group), group_joint_names)
 
         return configuration.scaled(self.scale_factor)
+    
+    def iter_inverse_kinematics(self):
+        pass
 
     def forward_kinematics(self, full_configuration, group=None, backend=None, link_name=None):
         """Calculate the robot's forward kinematic.
