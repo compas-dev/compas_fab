@@ -17,6 +17,9 @@ Unreleased
 * Added ``Configuration.scaled``
 * Added ``full_joint_state`` to ``Robot.inverse_kinematics``
 * Added ``Semantics.get_all_configurable_joints``
+* Added ``position_constraint_from_max_reach`` to constrain a specific link within a maximum distance of a point
+* Added ``iter_inverse_kinematics`` to search for a list of configurations, with given constraints
+* Added ``get_links_distance`` to calculate the distance between two robot's links
 
 **Changed**
 
