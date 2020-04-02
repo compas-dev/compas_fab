@@ -423,12 +423,12 @@ class Robot(object):
         float
             The distance between the links.
         """
-        point_link_1 = robot.forward_kinematics(configuration,
-                                                group,
-                                                link_name=link_name_1).point
-        point_link_2 = robot.forward_kinematics(configuration,
-                                                group,
-                                                link_name=link_name_2).point
+        point_link_1 = self.forward_kinematics(configuration,
+                                               group,
+                                               link_name=link_name_1).point
+        point_link_2 = self.forward_kinematics(configuration,
+                                               group,
+                                               link_name=link_name_2).point
 
         distance = point_link_1.distance_to_point(point_link_2)
         return distance
