@@ -29,6 +29,10 @@ Unreleased
 * ``MoveItPlanner``: ``inverse_kinematics`` takes now instance of ``Configuration`` and ``robot``
 * Property :class:`compas_fab.robots.Robot.artist` does not try to scale robot
   geometry if links and/or joints are not defined.
+* In :class:``compas_fab.robots.constraints.JointConstraint``, added ``tolerance_above`` and
+  ``tolerance_below`` for allowing asymmetrical constraints.
+* In :class:``compas_fab.robots.Robot``, changed the ``constraints_from_configuration``
+  function with ``tolerances_above`` and ``tolerances_below``.
 
 **Removed**
 

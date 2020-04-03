@@ -869,17 +869,23 @@ class Robot(object):
         oc = self.orientation_constraint_from_frame(frame_WCF, tolerances_axes, group)
         return [pc, oc]
 
-    def constraints_from_configuration(self, configuration, tolerances, group=None):
+    def constraints_from_configuration(self, configuration, tolerances_above, tolerances_below, group=None):
         """Returns joint constraints on all joints of the configuration.
 
         Parameters
         ----------
         configuration: :class:`compas_fab.robots.Configuration`
             The target configuration.
-        tolerances: list of float
-            The tolerances (as +/-) on each of the joints defining the bound in radian
-            to be achieved. If only one value is passed it will be used to create
-            bounds for all joint constraints.
+        tolerances_above: list of float
+            The tolerances above the targeted configuration's joint value on each
+            of the joints, defining the upper bound in radian to be achieved.
+            If only one value is passed, it will be used to create upper bounds
+            for all joint constraints.
+        tolerances_below: list of float
+            The tolerances below the targeted configuration's joint value on each
+            of the joints, defining the upper bound in radian to be achieved.
+            If only one value is passed, it will be used to create lower bounds
+            for all joint constraints.
         group: str, optional
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
@@ -887,15 +893,16 @@ class Robot(object):
         Examples
         --------
         >>> configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
-        >>> tolerances = [math.radians(5)] * 6
+        >>> tolerances_above = [math.radians(1)] * 6
+        >>> tolerances_below = [math.radians(1)] * 6
         >>> group = robot.main_group_name
-        >>> robot.constraints_from_configuration(configuration, tolerances, group)
-        [JointConstraint('shoulder_pan_joint', -0.042, 0.08726646259971647, 1.0), \
-        JointConstraint('shoulder_lift_joint', 4.295, 0.08726646259971647, 1.0), \
-        JointConstraint('elbow_joint', -4.11, 0.08726646259971647, 1.0), \
-        JointConstraint('wrist_1_joint', -3.327, 0.08726646259971647, 1.0), \
-        JointConstraint('wrist_2_joint', 4.755, 0.08726646259971647, 1.0), \
-        JointConstraint('wrist_3_joint', 0.0, 0.08726646259971647, 1.0)]
+        >>> robot.constraints_from_configuration(configuration, tolerances_above, tolerances_below, group)
+        [JointConstraint('shoulder_pan_joint', -0.042, 0.017453292519943295, 0.017453292519943295, 1.0), \
+        JointConstraint('shoulder_lift_joint', 4.295, 0.017453292519943295, 0.017453292519943295, 1.0), \
+        JointConstraint('elbow_joint', -4.11, 0.017453292519943295, 0.017453292519943295, 1.0), \
+        JointConstraint('wrist_1_joint', -3.327, 0.017453292519943295, 0.017453292519943295, 1.0), \
+        JointConstraint('wrist_2_joint', 4.755, 0.017453292519943295, 0.017453292519943295, 1.0), \
+        JointConstraint('wrist_3_joint', 0.0, 0.017453292519943295, 0.017453292519943295, 1.0)]
 
         Raises
         ------
@@ -917,15 +924,20 @@ class Robot(object):
         if len(joint_names) != len(configuration.values):
             raise ValueError("The passed configuration has %d values, the group %s needs however: %d" % (
                 len(configuration.values), group, len(joint_names)))
-        if len(tolerances) == 1:
-            tolerances = tolerances * len(joint_names)
-        elif len(tolerances) != len(configuration.values):
-            raise ValueError("The passed configuration has %d values, the tolerances however: %d" % (
-                len(configuration.values), len(tolerances)))
+        if len(tolerances_above) == 1:
+            tolerances_above = tolerances_above * len(joint_names)
+        elif len(tolerances_above) != len(configuration.values):
+            raise ValueError("The passed configuration has %d values, the tolerances_above however: %d" % (
+                len(configuration.values), len(tolerances_above)))
+        if len(tolerances_below) == 1:
+            tolerances_below = tolerances_below * len(joint_names)
+        elif len(tolerances_below) != len(configuration.values):
+            raise ValueError("The passed configuration has %d values, the tolerances_below however: %d" % (
+                len(configuration.values), len(tolerances_below)))
 
         constraints = []
-        for name, value, tolerance in zip(joint_names, configuration.values, tolerances):
-            constraints.append(JointConstraint(name, value, tolerance))
+        for name, value, tolerance_above, tolerance_below in zip(joint_names, configuration.values, tolerances_above, tolerances_below):
+            constraints.append(JointConstraint(name, value, tolerance_above, tolerance_below))
         return constraints
 
     # ==========================================================================
@@ -936,7 +948,7 @@ class Robot(object):
                            group=None, avoid_collisions=True,
                            constraints=None, attempts=8,
                            attached_collision_meshes=None,
-                           full_joint_state=False):
+                           return_full_configuration=False):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
@@ -958,7 +970,7 @@ class Robot(object):
             The maximum number of inverse kinematic attempts. Defaults to 8.
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
-        full_joint_state : bool
+        return_full_configuration : bool
             If ``True``, returns a full configuration with all joint values
             specified, including passive ones if available.
 
@@ -1001,7 +1013,7 @@ class Robot(object):
                                                                       group, start_configuration_scaled,
                                                                       avoid_collisions, constraints, attempts,
                                                                       attached_collision_meshes)
-        if full_joint_state:
+        if return_full_configuration:
             # build configuration including passive joints, but no sorting
             joint_types = self.get_joint_types_by_names(joint_names)
             configuration = Configuration(joint_positions, joint_types, joint_names)
@@ -1014,7 +1026,7 @@ class Robot(object):
 
         return configuration.scaled(self.scale_factor)
 
-    def forward_kinematics(self, full_configuration, group=None, backend=None, link_name=None):
+    def forward_kinematics(self, configuration, group=None, backend=None, link_name=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
@@ -1058,7 +1070,7 @@ class Robot(object):
             if link_name not in self.get_link_names(group):
                 raise ValueError("Link name %s does not exist in planning group" % link_name)
 
-        full_configuration = self.merge_group_with_full_configuration(full_configuration, self.zero_configuration(), group)
+        full_configuration = self.merge_group_with_full_configuration(configuration, self.zero_configuration(), group)
         full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)
 
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
@@ -1148,7 +1160,7 @@ class Robot(object):
 
         frames_WCF_scaled = []
         for frame in frames_WCF:
-            frames_WCF_scaled.append(Frame(frame.point * 1/self.scale_factor, frame.xaxis, frame.yaxis))
+            frames_WCF_scaled.append(Frame(frame.point * 1. / self.scale_factor, frame.xaxis, frame.yaxis))
 
         if path_constraints:
             path_constraints_WCF_scaled = []
@@ -1157,9 +1169,9 @@ class Robot(object):
                 if c.type == Constraint.JOINT:
                     joint = self.get_joint_by_name(c.joint_name)
                     if joint.is_scalable():
-                        cp.scale(self.scale_factor)
+                        cp.scale(1. / self.scale_factor)
                 else:
-                    cp.scale(self.scale_factor)
+                    cp.scale(1. / self.scale_factor)
                 path_constraints_WCF_scaled.append(cp)
         else:
             path_constraints_WCF_scaled = None
@@ -1254,9 +1266,10 @@ class Robot(object):
         1.0
         >>> # Example with joint constraints (to the UP configuration)
         >>> configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0])
-        >>> tolerances = [math.radians(5)] * 6
+        >>> tolerances_above = [math.radians(5)] * len(configuration.values)
+        >>> tolerances_below = [math.radians(5)] * len(configuration.values)
         >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances, group)
+        >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances_above, tolerances_below, group)
         >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
         >>> trajectory.fraction
         1.0
@@ -1285,9 +1298,9 @@ class Robot(object):
             if c.type == Constraint.JOINT:
                 joint = self.get_joint_by_name(c.joint_name)
                 if joint.is_scalable():
-                    cp.scale(self.scale_factor)
+                    cp.scale(1. / self.scale_factor)
             else:
-                cp.scale(self.scale_factor)
+                cp.scale(1. / self.scale_factor)
             goal_constraints_WCF_scaled.append(cp)
 
         # Transform path constraints to RCF and scale
@@ -1298,9 +1311,9 @@ class Robot(object):
                 if c.type == Constraint.JOINT:
                     joint = self.get_joint_by_name(c.joint_name)
                     if joint.is_scalable():
-                        cp.scale(self.scale_factor)
+                        cp.scale(1. / self.scale_factor)
                 else:
-                    cp.scale(self.scale_factor)
+                    cp.scale(1. / self.scale_factor)
                 path_constraints_WCF_scaled.append(cp)
         else:
             path_constraints_WCF_scaled = None
