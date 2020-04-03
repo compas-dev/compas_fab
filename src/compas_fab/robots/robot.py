@@ -1322,7 +1322,7 @@ class Robot(object):
 
         frames_WCF_scaled = []
         for frame in frames_WCF:
-            frames_WCF_scaled.append(Frame(frame.point * 1 / self.scale_factor, frame.xaxis, frame.yaxis))
+            frames_WCF_scaled.append(Frame(frame.point * 1. / self.scale_factor, frame.xaxis, frame.yaxis))
 
         if path_constraints:
             path_constraints_WCF_scaled = []
