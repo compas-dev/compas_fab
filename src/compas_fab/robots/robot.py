@@ -1070,7 +1070,7 @@ class Robot(object):
             if link_name not in self.get_link_names(group):
                 raise ValueError("Link name %s does not exist in planning group" % link_name)
 
-        full_configuration = self.merge_group_with_full_configuration(full_configuration, self.zero_configuration(), group)
+        full_configuration = self.merge_group_with_full_configuration(configuration, self.zero_configuration(), group)
         full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)
 
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
