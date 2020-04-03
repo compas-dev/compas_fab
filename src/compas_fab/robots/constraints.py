@@ -91,7 +91,7 @@ class BoundingVolume(object):
         return cls(cls.MESH, mesh)
 
     def scale(self, scale_factor):
-        S = Scale([1./scale_factor] * 3)
+        S = Scale([scale_factor] * 3)
         self.transform(S)
 
     def transform(self, transformation):
@@ -140,6 +140,11 @@ class Constraint(object):
     def scale(self, scale_factor):
         pass
 
+    def scaled(self, scale_factor):
+        c = self.copy()
+        c.scale(scale_factor)
+        return c
+
     def copy(self):
         cls = type(self)
         return cls(self.type, self.weight)
@@ -174,8 +179,8 @@ class JointConstraint(Constraint):
         self.tolerance = tolerance
 
     def scale(self, scale_factor):
-        self.value /= scale_factor
-        self.tolerance /= scale_factor
+        self.value *= scale_factor
+        self.tolerance *= scale_factor
 
     def __repr__(self):
         return "JointConstraint('{0}', {1}, {2}, {3})".format(self.joint_name, self.value, self.tolerance, self.weight)

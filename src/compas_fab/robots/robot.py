@@ -1148,7 +1148,7 @@ class Robot(object):
 
         frames_WCF_scaled = []
         for frame in frames_WCF:
-            frames_WCF_scaled.append(Frame(frame.point * 1/self.scale_factor, frame.xaxis, frame.yaxis))
+            frames_WCF_scaled.append(Frame(frame.point * 1. / self.scale_factor, frame.xaxis, frame.yaxis))
 
         if path_constraints:
             path_constraints_WCF_scaled = []
@@ -1157,9 +1157,9 @@ class Robot(object):
                 if c.type == Constraint.JOINT:
                     joint = self.get_joint_by_name(c.joint_name)
                     if joint.is_scalable():
-                        cp.scale(self.scale_factor)
+                        cp.scale(1. / self.scale_factor)
                 else:
-                    cp.scale(self.scale_factor)
+                    cp.scale(1. / self.scale_factor)
                 path_constraints_WCF_scaled.append(cp)
         else:
             path_constraints_WCF_scaled = None
@@ -1285,9 +1285,9 @@ class Robot(object):
             if c.type == Constraint.JOINT:
                 joint = self.get_joint_by_name(c.joint_name)
                 if joint.is_scalable():
-                    cp.scale(self.scale_factor)
+                    cp.scale(1. / self.scale_factor)
             else:
-                cp.scale(self.scale_factor)
+                cp.scale(1. / self.scale_factor)
             goal_constraints_WCF_scaled.append(cp)
 
         # Transform path constraints to RCF and scale
@@ -1298,9 +1298,9 @@ class Robot(object):
                 if c.type == Constraint.JOINT:
                     joint = self.get_joint_by_name(c.joint_name)
                     if joint.is_scalable():
-                        cp.scale(self.scale_factor)
+                        cp.scale(1. / self.scale_factor)
                 else:
-                    cp.scale(self.scale_factor)
+                    cp.scale(1. / self.scale_factor)
                 path_constraints_WCF_scaled.append(cp)
         else:
             path_constraints_WCF_scaled = None
