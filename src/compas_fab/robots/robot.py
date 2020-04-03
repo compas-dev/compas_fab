@@ -184,20 +184,25 @@ class Robot(object):
         name = self.get_end_effector_link_name(group)
         return self.model.get_link_by_name(name)
 
-    def get_end_effector_frame(self, group=None):
+    def get_end_effector_frame(self, group=None, full_configuration=None):
         """Returns the end effector's frame.
 
         Parameters
         ----------
         group : str
             The name of the group. Defaults to `None`.
+        full_configuration : :class:`Configuration`, optional
+            The robot's full configuration, i.e. values for all configurable
+            joints of the entire robot. Defaults to the all-zero configuration.
 
         Returns
         -------
         :class: `compas.geometry.Frame`
         """
-        link = self.get_end_effector_link(group)
-        return link.parent_joint.origin.copy()
+        if not full_configuration:
+            full_configuration = self.zero_configuration()
+        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
+        return self.model.forward_kinematics(full_joint_state, link_name=self.get_end_effector_link_name(group))
 
     def get_base_link_name(self, group=None):
         """Returns the name of the base link.
@@ -242,76 +247,25 @@ class Robot(object):
         name = self.get_base_link_name(group)
         return self.model.get_link_by_name(name)
 
-    def get_base_frame(self, group=None):
+    def get_base_frame(self, group=None, full_configuration=None):
         """Returns the frame of the base link, which is the robot's origin frame.
 
         Parameters
         ----------
         group : str
             The name of the group. Defaults to `None`.
+        full_configuration : :class:`Configuration`, optional
+            The robot's full configuration, i.e. values for all configurable
+            joints of the entire robot. Defaults to the all-zero configuration.
 
         Returns
         -------
         :class: `compas.geometry.Frame`
         """
-        # TODO: check this
-        link = self.get_base_link(group)
-        if link.parent_joint:
-            base_frame = link.parent_joint.origin.copy()
-        else:
-            base_frame = Frame.worldXY()
-        if not self.artist:
-            base_frame.point *= self._scale_factor
-        return base_frame
-
-    def _get_current_base_frame(self, full_configuration, group):
-        """Returns the group's current base frame, if the robot is in full_configuration.
-
-        The base_frame of a planning group can change if a parent joint was
-        transformed. This function performs a forward kinematic request with the
-        full configuration to retrieve the (possibly) transformed base_frame of
-        planning group. This function is only used in plan_motion since other
-        services, such as ik or plan_cartesian_motion, do not use the
-        transformed base_frame as the group's local coordinate system.
-
-        Parameters
-        ----------
-        full_configuration : :class:`compas_fab.robots.Configuration`
-            The (full) configuration from which the group's base frame is
-            calculated.
-        group : str
-            The planning group for which we want to get the transformed base frame.
-
-        Returns
-        -------
-        :class:`compas.geometry.Frame`
-
-        Examples
-        --------
-        """
-
-        base_link = self.get_base_link(group)
-        # the group's original base_frame
-        base_frame = self.get_base_frame(group)
-
-        joint_names = self.get_configurable_joint_names()
-        joint_positions = self._get_scaled_joint_positions_from_start_configuration(full_configuration)
-
-        # ideally we would call this with the planning group that includes all
-        # configurable joints, but we cannot be sure that this group exists.
-        # That's why we have to do the workaround with the Transformation.
-
-        joint_state = dict(zip(joint_names, joint_positions))
-
-        if not base_link.parent_joint:
-            base_frame_WCF = Frame.worldXY()
-        else:
-            base_frame_WCF = self.model.forward_kinematics(joint_state, link_name=base_link.name)
-        base_frame_RCF = self.to_local_coords(base_frame_WCF, group)
-
-        base_frame_RCF.point *= self.scale_factor
-        T = Transformation.from_frame(base_frame)
-        return base_frame_RCF.transformed(T)
+        if not full_configuration:
+            full_configuration = self.zero_configuration()
+        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
+        return self.model.forward_kinematics(full_joint_state, link_name=self.get_base_link_name(group))
 
     def get_link_names(self, group=None):
         """Returns the names of the links in the chain.
@@ -364,14 +318,7 @@ class Robot(object):
             if group:
                 return self.semantics.get_configurable_joints(group)
             else:
-                joints = []
-                for group in self.group_names:
-                    joints_in_group = self.semantics.get_configurable_joints(
-                        group)
-                    for joint in joints_in_group:
-                        if joint not in joints:  # Check to not add double joints
-                            joints.append(joint)
-                return joints
+                return self.semantics.get_all_configurable_joints()
         else:
             return self.model.get_configurable_joints()
 
@@ -457,17 +404,19 @@ class Robot(object):
     # configurations
     # ==========================================================================
 
-    def init_configuration(self, group=None):
+    def zero_configuration(self, group=None):
         """Returns the init joint configuration.
 
         Examples
         --------
-        >>> robot.init_configuration('manipulator')
-        Configuration((0.000, 0.000, 0.000, 0.000, 0.000, 0.000), (0, 0, 0, 0, 0, 0))
+        >>> robot.zero_configuration('manipulator')
+        Configuration((0.000, 0.000, 0.000, 0.000, 0.000, 0.000), (0, 0, 0, 0, 0, 0), \
+            ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))
         """
-        types = [joint.type for joint in self.get_configurable_joints(group)]
-        positions = [0.] * len(types)
-        return Configuration(positions, types)
+        joint_names = self.get_configurable_joint_names(group)
+        joint_types = self.get_joint_types_by_names(joint_names)
+        positions = [0.] * len(joint_types)
+        return Configuration(positions, joint_types, joint_names)
 
     def random_configuration(self, group=None):
         """Returns a random configuration.
@@ -476,13 +425,14 @@ class Robot(object):
         """
         configurable_joints = self.get_configurable_joints(group)
         values = []
-        types = [j.type for j in configurable_joints]
         for joint in configurable_joints:
             if joint.limit:
                 values.append(joint.limit.lower + (joint.limit.upper - joint.limit.lower) * random.random())
             else:
                 values.append(0)
-        return Configuration(values, types)
+        joint_names = self.get_configurable_joint_names(group)
+        joint_types = self.get_joint_types_by_names(joint_names)
+        return Configuration(values, joint_types, joint_names)
 
     def get_group_configuration(self, group, full_configuration):
         """Returns the group's configuration.
@@ -499,14 +449,11 @@ class Robot(object):
         :class:`compas_fab.robots.Configuration`
             The configuration of the group.
         """
-        values = []
-        types = []
+        full_configuration = self._check_full_configuration_and_scale(full_configuration)[0]  # adds joint_names to full_configuration and makes copy
+        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         group_joint_names = self.get_configurable_joint_names(group)
-        for i, name in enumerate(self.get_configurable_joint_names()):
-            if name in group_joint_names:
-                types.append(full_configuration.types[i])
-                values.append(full_configuration.values[i])
-        return Configuration(values, types)
+        values = [full_joint_state[name] for name in group_joint_names]
+        return Configuration(values, self.get_configurable_joint_types(group), group_joint_names)
 
     def merge_group_with_full_configuration(self, group_configuration, full_configuration, group):
         """Returns a robot's full configuration by merging a group's configuration with a full configuration.
@@ -525,23 +472,20 @@ class Robot(object):
         :class:`compas_fab.robots.Configuration`
             A full configuration: with values for all configurable joints.
         """
-        all_joint_names = self.get_configurable_joint_names()
+        if not len(group_configuration.joint_names):
+            group_configuration.joint_names = self.get_configurable_joint_names(group)
 
-        if len(all_joint_names) != len(full_configuration.values):
-            raise ValueError("Please pass a full configuration with %d values" % len(all_joint_names))
-        elif len(all_joint_names) == len(group_configuration.values):  # group config == full config
-            return group_configuration
-        else:
-            group_joint_names = self.get_configurable_joint_names(group)
-            if len(group_joint_names) != len(group_configuration.values):
-                raise ValueError('Please pass a group configuration with {} values'.format(len(group_joint_names)))
+        full_configuration = self._check_full_configuration_and_scale(full_configuration)[0]  # adds joint_names to full_configuration and makes copy
 
-            configuration = full_configuration.copy()
-            for i, name in enumerate(all_joint_names):
-                if name in group_joint_names:
-                    gi = group_joint_names.index(name)
-                    configuration.values[i] = group_configuration.values[gi]
-            return configuration
+        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
+        group_joint_state = dict(zip(group_configuration.joint_names, group_configuration.values))
+
+        # overwrite full_joint_state with values of group_joint_state
+        for name in group_joint_state:
+            full_joint_state[name] = group_joint_state[name]
+
+        full_configuration.values = [full_joint_state[name] for name in full_configuration.joint_names]
+        return full_configuration
 
     def get_group_names_from_link_name(self, link_name):
         """Returns the group_names to which the link_name belongs to.
@@ -571,30 +515,30 @@ class Robot(object):
                 "Please pass a configuration with %d values or specify group" % len(names))
         return configuration.values[names.index(joint_name)]
 
-    def _scale_joint_values(self, values, names, scale_factor, group=None):
-        """Scales the scaleable joint values with scale_factor.
-        """
-        values_scaled = []
-        for v, name in zip(values, names):
-            j = self.get_joint_by_name(name)
-            if j.is_scalable():
-                v *= scale_factor
-            values_scaled.append(v)
-        return values_scaled
+    def _check_full_configuration_and_scale(self, full_configuration=None):
+        """Either creates a full configuration or checks if the passed full configuration is valid.
 
-    def _get_scaled_joint_positions_from_start_configuration(self, start_configuration=None):
-        """Checks the start configuration and returns joint_positions.
+        Parameters
+        ----------
+        full_configuration : :class:`compas_fab.robots.Configuration`, optional
+            The full configuration of the whole robot, including values for all configurable joints.
+
+        Returns
+        -------
+        (:class:`compas_fab.robots.Configuration`, :class:`compas_fab.robots.Configuration`)
+            The full configuration and the scaled full configuration
         """
         joint_names = self.get_configurable_joint_names()  # full configuration
-        joint_positions = [0] * len(joint_names)
-        if start_configuration:
-            if len(joint_names) != len(start_configuration.values):
-                raise ValueError("Please pass a configuration with %d values" % len(joint_names))
-            joint_positions = start_configuration.values
-        # scale the prismatic joints
-        joint_positions = self._scale_joint_values(
-            joint_positions, joint_names, 1. / self.scale_factor)
-        return joint_positions
+        if not full_configuration:
+            configuration = self.zero_configuration()  # with joint_names
+        else:
+            # full_configuration might have passive joints specified as well, we allow this.
+            if len(joint_names) > len(full_configuration.values):
+                raise ValueError("Please pass a configuration with {} values, for all configurable joints of the robot.".format(len(joint_names)))
+            configuration = full_configuration.copy()
+            if not len(configuration.joint_names):
+                configuration.joint_names = joint_names
+        return configuration, configuration.scaled(1. / self.scale_factor)
 
     # ==========================================================================
     # transformations, coordinate frames
@@ -616,31 +560,6 @@ class Robot(object):
         base_frame = self.get_base_frame(group)
         return Transformation.change_basis(base_frame, Frame.worldXY())
 
-    def _get_current_transformation_WCF_RCF(self, full_configuration, group):
-        """Returns the group's current WCF to RCF transformation, if the robot is in full_configuration.
-
-        The base_frame of a planning group can change if a parent joint was
-        transformed. This function performs a forward kinematic request with the
-        full configuration to retrieve the (possibly) transformed base_frame of
-        planning group. This function is only used in plan_motion since other
-        services, such as ik or plan_cartesian_motion, do not use the
-        transformed base_frame as the group's local coordinate system.
-
-        Parameters
-        ----------
-        full_configuration : :class:`compas_fab.robots.Configuration`
-            The (full) configuration from which the group's base frame is
-            calculated.
-        group : str
-            The planning group for which we want to get the transformed base frame.
-
-        Returns
-        -------
-        :class:`compas.geometry.Transformation`
-        """
-        base_frame = self._get_current_base_frame(full_configuration, group)
-        return Transformation.from_frame_to_frame(base_frame, Frame.worldXY())
-
     def transformation_WCF_RCF(self, group=None):
         """Returns the transformation from the world coordinate system (WCF) to the robot's coordinate system (RCF).
 
@@ -661,6 +580,7 @@ class Robot(object):
         """Moves the origin frame of the robot to the robot_coordinate_frame.
         """
         # TODO: must be applied to the model, so that base_frame is RCF
+        # Problem: check if conversion wcf/rcf still works with backend
         raise NotImplementedError
 
     def get_RCF(self, group=None):
@@ -809,7 +729,7 @@ class Robot(object):
         tool.attached_collision_mesh = AttachedCollisionMesh(tool.collision_mesh, ee_link_name, touch_links)
         self.attached_tool = tool
         if self.artist:
-            self.update(self.init_configuration(group), group=group, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
+            self.update(self.zero_configuration(), group=group, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
             self.artist.attach_tool(tool)
 
     def detach_tool(self):
@@ -1027,7 +947,8 @@ class Robot(object):
     def inverse_kinematics(self, frame_WCF, start_configuration=None,
                            group=None, avoid_collisions=True,
                            constraints=None, attempts=8,
-                           attached_collision_meshes=None):
+                           attached_collision_meshes=None,
+                           return_full_configuration=False):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
@@ -1049,6 +970,9 @@ class Robot(object):
             The maximum number of inverse kinematic attempts. Defaults to 8.
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
+        return_full_configuration : bool
+            If ``True``, returns a full configuration with all joint values
+            specified, including passive ones if available.
 
         Raises
         ------
@@ -1063,7 +987,7 @@ class Robot(object):
         Examples
         --------
         >>> frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
-        >>> start_configuration = robot.init_configuration()
+        >>> start_configuration = robot.zero_configuration()
         >>> group = robot.main_group_name
         >>> robot.inverse_kinematics(frame_WCF, start_configuration, group)                 # doctest: +SKIP
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
@@ -1071,15 +995,11 @@ class Robot(object):
         self.ensure_client()
         if not group:
             group = self.main_group_name  # ensure semantics
-        base_link = self.get_base_link_name(group)
-        joint_names = self.get_configurable_joint_names()
 
-        joint_positions = self._get_scaled_joint_positions_from_start_configuration(
-            start_configuration)
+        start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
 
-        # represent in RCF
-        frame_RCF = self.to_local_coords(frame_WCF, group)
-        frame_RCF.point /= self.scale_factor  # must be in meters
+        frame_WCF_scaled = frame_WCF.copy()
+        frame_WCF_scaled.point /= self.scale_factor  # must be in meters
 
         if self.attached_tool:
             if attached_collision_meshes:
@@ -1088,30 +1008,33 @@ class Robot(object):
                 attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
         # The returned joint names might be more than the requested ones if there are passive joints present
-        joint_positions, joint_names = self.client.inverse_kinematics(frame_RCF, base_link,
-                                                                      group, joint_names, joint_positions,
+        joint_positions, joint_names = self.client.inverse_kinematics(self,
+                                                                      frame_WCF_scaled,
+                                                                      group, start_configuration_scaled,
                                                                       avoid_collisions, constraints, attempts,
                                                                       attached_collision_meshes)
-        joint_types = [self.get_joint_by_name(n).type for n in joint_names]
+        if return_full_configuration:
+            # build configuration including passive joints, but no sorting
+            joint_types = self.get_joint_types_by_names(joint_names)
+            configuration = Configuration(joint_positions, joint_types, joint_names)
+        else:
+            # sort values for group configuration
+            joint_state = dict(zip(joint_names, joint_positions))
+            group_joint_names = self.get_configurable_joint_names(group)
+            values = [joint_state[name] for name in group_joint_names]
+            configuration = Configuration(values, self.get_configurable_joint_types(group), group_joint_names)
 
-        joint_positions = self._scale_joint_values(joint_positions, joint_names, self.scale_factor)
-
-        # build configuration including passive joints
-        configuration = Configuration(joint_positions, joint_types)
-
-        # return only group configuration
-        # NOTE: it might actually make more sense to return
-        # the configuration instance without extracting the group's config
-        # because we lose the passive joint info
-        return self.get_group_configuration(group, configuration)
+        return configuration.scaled(self.scale_factor)
 
     def forward_kinematics(self, configuration, group=None, backend=None, link_name=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
         ----------
-        configuration : :class:`compas_fab.robots.Configuration`
-            The configuration to calculate the forward kinematic for.
+        full_configuration : :class:`compas_fab.robots.Configuration`
+            The full configuration to calculate the forward kinematic for. If no
+            full configuration is passed, the zero-joint state for the other
+            configurable joints is assumed.
         group : str, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
@@ -1126,20 +1049,16 @@ class Robot(object):
         Returns
         -------
         :class:`Frame`
-            The frame in the robot's coordinate system (RCF).
+            The frame in the world's coordinate system (WCF).
 
         Examples
         --------
         >>> configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
         >>> group = robot.main_group_name
-        >>> frame_RCF_c = robot.forward_kinematics(configuration, group)
-        >>> frame_RCF_m = robot.forward_kinematics(configuration, group, backend='model')
-        >>> frame_RCF_c == frame_RCF_m
+        >>> frame_WCF_c = robot.forward_kinematics(configuration, group)
+        >>> frame_WCF_m = robot.forward_kinematics(configuration, group, backend='model')
+        >>> frame_WCF_c == frame_WCF_m
         True
-        >>> frame_WCF = robot.to_world_coords(frame_RCF_m, group)
-        >>> frame_WCF
-        Frame(Point(0.300, 0.100, 0.500), Vector(1.000, -0.000, -0.000), Vector(0.000, 1.000, -0.000))
-
         """
         if not group:
             group = self.main_group_name
@@ -1151,59 +1070,27 @@ class Robot(object):
             if link_name not in self.get_link_names(group):
                 raise ValueError("Link name %s does not exist in planning group" % link_name)
 
-        full_configuration = self.merge_group_with_full_configuration(configuration, self.init_configuration(), group)
-        full_joint_positions = self._get_scaled_joint_positions_from_start_configuration(full_configuration)
-        full_joint_names = self.get_configurable_joint_names()
-        base_link_name = self.get_base_link_name(group)
+        full_configuration = self.merge_group_with_full_configuration(configuration, self.zero_configuration(), group)
+        full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)
 
-        group_configuration = self.get_group_configuration(group, full_configuration)
-        group_joint_names = self.get_configurable_joint_names(group)
-        group_joint_state = dict(zip(group_joint_names, group_configuration.values))  # assuming configuration is group configuration
+        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
 
         if not backend:
             if self.client:
-                frame_RCF = self.client.forward_kinematics(full_joint_positions, base_link_name, group, full_joint_names, link_name)
-                frame_RCF.point *= self.scale_factor
+                frame_WCF = self.client.forward_kinematics(self,
+                                                           full_configuration_scaled,
+                                                           group,
+                                                           link_name)
+                frame_WCF.point *= self.scale_factor
             else:
-                frame_WCF = self.model.forward_kinematics(group_joint_state, link_name)
-                frame_RCF = self.to_local_coords(frame_WCF, group)
+                frame_WCF = self.model.forward_kinematics(full_joint_state, link_name)
         elif backend == 'model':
-            frame_WCF = self.model.forward_kinematics(group_joint_state, link_name)
-            frame_RCF = self.to_local_coords(frame_WCF, group)
+            frame_WCF = self.model.forward_kinematics(full_joint_state, link_name)
         else:
             # pass to backend, kdl, ikfast,...
             raise NotImplementedError
 
-        return frame_RCF
-
-    def forward_kinematics_robot_model(self, configuration, group=None, link_name=None):
-        """Calculate the robot's forward kinematic with the robot model.
-
-        Parameters
-        ----------
-        configuration : :class:`compas_fab.robots.Configuration`
-            The configuration to calculate the forward kinematic for.
-        group : str, optional
-            The planning group used for the calculation. Defaults to the robot's
-            main planning group.
-        link_name : str
-            The name of the link to calculate the forward kinematics for.
-            Defaults to the group's end effector link.
-
-        Examples
-        --------
-        >>> configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
-        >>> group = robot.main_group_name
-        >>> frame_WCF = robot.forward_kinematics(configuration, group)
-        >>> frame_WCF
-        Frame(Point(0.300, 0.100, 0.500), Vector(1.000, -0.000, -0.000), Vector(0.000, 1.000, -0.000))
-        """
-        if link_name is None:
-            link_name = self.get_end_effector_link_name(group)
-
-        joint_names = self.get_configurable_joint_names(group)
-        joint_state = dict(zip(joint_names, configuration.values))
-        return self.model.forward_kinematics(joint_state, link_name)
+        return frame_WCF
 
     def plan_cartesian_motion(self, frames_WCF, start_configuration=None,
                               max_step=0.01, jump_threshold=1.57,
@@ -1217,8 +1104,9 @@ class Robot(object):
         frames_WCF: list of :class:`compas.geometry.Frame`
             The frames through which the path is defined.
         start_configuration: :class:`Configuration`, optional
-            The robot's configuration at the starting position. Defaults to the
-            zero configuration.
+            The robot's full configuration, i.e. values for all configurable
+            joints of the entire robot, at the starting position. Defaults to
+            the all-zero configuration.
         max_step: float
             The approximate distance between the calculated points. (Defined in
             the robot's units)
@@ -1240,6 +1128,11 @@ class Robot(object):
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
 
+        Returns
+        -------
+        :class:`compas_fab.robots.JointTrajectory`
+            The calculated trajectory.
+
         Examples
         --------
         >>> frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\
@@ -1258,32 +1151,30 @@ class Robot(object):
         self.ensure_client()
         if not group:
             group = self.main_group_name  # ensure semantics
-        frames_RCF = []
-        for frame_WCF in frames_WCF:
-            # represent in RCF
-            frame_RCF = self.to_local_coords(frame_WCF, group)
-            frame_RCF.point /= self.scale_factor
-            frames_RCF.append(frame_RCF)
 
-        start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
-        start_configuration.scale(1. / self.scale_factor)
+        # NOTE: start_configuration has to be a full robot configuration, such
+        # that all configurable joints of the whole robot are defined for planning.
+        start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
+
         max_step_scaled = max_step / self.scale_factor
 
-        T = self.transformation_WCF_RCF(group)
+        frames_WCF_scaled = []
+        for frame in frames_WCF:
+            frames_WCF_scaled.append(Frame(frame.point * 1. / self.scale_factor, frame.xaxis, frame.yaxis))
+
         if path_constraints:
-            path_constraints_RCF_scaled = []
+            path_constraints_WCF_scaled = []
             for c in path_constraints:
                 cp = c.copy()
-                cp.transform(T)
                 if c.type == Constraint.JOINT:
                     joint = self.get_joint_by_name(c.joint_name)
                     if joint.is_scalable():
-                        cp.scale(self.scale_factor)
+                        cp.scale(1. / self.scale_factor)
                 else:
-                    cp.scale(self.scale_factor)
-                path_constraints_RCF_scaled.append(cp)
+                    cp.scale(1. / self.scale_factor)
+                path_constraints_WCF_scaled.append(cp)
         else:
-            path_constraints_RCF_scaled = None
+            path_constraints_WCF_scaled = None
 
         if self.attached_tool:
             if attached_collision_meshes:
@@ -1293,13 +1184,13 @@ class Robot(object):
 
         trajectory = self.client.plan_cartesian_motion(
             robot=self,
-            frames=frames_RCF,
-            start_configuration=start_configuration,
+            frames=frames_WCF_scaled,
+            start_configuration=start_configuration_scaled,
             group=group,
             max_step=max_step_scaled,
             jump_threshold=jump_threshold,
             avoid_collisions=avoid_collisions,
-            path_constraints=path_constraints_RCF_scaled,
+            path_constraints=path_constraints_WCF_scaled,
             attached_collision_meshes=attached_collision_meshes)
 
         # Scale everything back to robot's scale
@@ -1327,8 +1218,9 @@ class Robot(object):
             or defining a volume in space, to which a specific robot link (e.g.
             the end-effector) is required to move to.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
-            The robot's configuration at the starting position. Defaults to the
-            all-zero configuration.
+            The robot's full configuration, i.e. values for all configurable
+            joints of the entire robot, at the starting position. Defaults to
+            the all-zero configuration.
         group: str, optional
             The name of the group to plan for. Defaults to the robot's main
             planning group.
@@ -1354,6 +1246,10 @@ class Robot(object):
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
 
+        Returns
+        -------
+        :class:`compas_fab.robots.JointTrajectory`
+            The calculated trajectory.
 
         Examples
         --------
@@ -1392,41 +1288,35 @@ class Robot(object):
         if not group:
             group = self.main_group_name  # ensure semantics
 
-        start_configuration = start_configuration.copy() if start_configuration else self.init_configuration()
+        # NOTE: start_configuration has to be a full robot configuration, such
+        # that all configurable joints of the whole robot are defined for planning.
+        start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
 
-        # Transform goal constraints to RCF and scale
-        full_configuration = self.merge_group_with_full_configuration(start_configuration, self.init_configuration(), group)
-
-        T = self._get_current_transformation_WCF_RCF(full_configuration, group)
-        goal_constraints_RCF_scaled = []
+        goal_constraints_WCF_scaled = []
         for c in goal_constraints:
             cp = c.copy()
-            cp.transform(T)
             if c.type == Constraint.JOINT:
                 joint = self.get_joint_by_name(c.joint_name)
                 if joint.is_scalable():
-                    cp.scale(self.scale_factor)
+                    cp.scale(1. / self.scale_factor)
             else:
-                cp.scale(self.scale_factor)
-            goal_constraints_RCF_scaled.append(cp)
+                cp.scale(1. / self.scale_factor)
+            goal_constraints_WCF_scaled.append(cp)
 
         # Transform path constraints to RCF and scale
         if path_constraints:
-            path_constraints_RCF_scaled = []
+            path_constraints_WCF_scaled = []
             for c in path_constraints:
                 cp = c.copy()
-                cp.transform(T)
                 if c.type == Constraint.JOINT:
                     joint = self.get_joint_by_name(c.joint_name)
                     if joint.is_scalable():
-                        cp.scale(self.scale_factor)
+                        cp.scale(1. / self.scale_factor)
                 else:
-                    cp.scale(self.scale_factor)
-                path_constraints_RCF_scaled.append(cp)
+                    cp.scale(1. / self.scale_factor)
+                path_constraints_WCF_scaled.append(cp)
         else:
-            path_constraints_RCF_scaled = None
-
-        start_configuration.scale(1. / self.scale_factor)
+            path_constraints_WCF_scaled = None
 
         if self.attached_tool:
             if attached_collision_meshes:
@@ -1436,10 +1326,10 @@ class Robot(object):
 
         trajectory = self.client.plan_motion(
             robot=self,
-            goal_constraints=goal_constraints_RCF_scaled,
-            start_configuration=start_configuration,
+            goal_constraints=goal_constraints_WCF_scaled,
+            start_configuration=start_configuration_scaled,
             group=group,
-            path_constraints=path_constraints_RCF_scaled,
+            path_constraints=path_constraints_WCF_scaled,
             trajectory_constraints=None,
             planner_id=planner_id,
             num_planning_attempts=num_planning_attempts,
@@ -1459,14 +1349,16 @@ class Robot(object):
 
     def transformed_frames(self, configuration, group=None):
         """Returns the robot's transformed frames."""
-        joint_names = self.get_configurable_joint_names(group)
-        joint_state = dict(zip(joint_names, configuration.values))
+        if not len(configuration.joint_names):
+            configuration.joint_names = self.get_configurable_joint_names(group)
+        joint_state = dict(zip(configuration.joint_names, configuration.values))
         return self.model.transformed_frames(joint_state)
 
     def transformed_axes(self, configuration, group=None):
         """Returns the robot's transformed axes."""
-        joint_names = self.get_configurable_joint_names(group)
-        joint_state = dict(zip(joint_names, configuration.values))
+        if not len(configuration.joint_names):
+            configuration.joint_names = self.get_configurable_joint_names(group)
+        joint_state = dict(zip(configuration.joint_names, configuration.values))
         return self.model.transformed_axes(joint_state)
 
     # ==========================================================================
@@ -1490,8 +1382,9 @@ class Robot(object):
             ``True`` if the collision geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
         """
-        names = self.get_configurable_joint_names(group)
-        self.artist.update(configuration, names, visual, collision)
+        if not len(configuration.joint_names):
+            configuration.joint_names = self.get_configurable_joint_names(group)
+        self.artist.update(configuration, visual, collision)
 
     def draw_visual(self):
         """Draws the visual geometry of the robot in the respective CAD environment.

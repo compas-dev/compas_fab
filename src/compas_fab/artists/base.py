@@ -206,15 +206,13 @@ class BaseRobotArtist(object):
             self.transform(native_geometry, relative_transformation)
         item.current_transformation = transformation
 
-    def update(self, configuration, names, visual=True, collision=True):
+    def update(self, configuration, visual=True, collision=True):
         """Triggers the update of the robot geometry.
 
         Parameters
         ----------
         configuration : :class:`compas_fab.robots.Configuration`
             Instance of the configuration (joint state) to move to.
-        names : list of string
-            The names of the configurable joints to update.
         visual : bool, optional
             ``True`` if the visual geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
@@ -223,8 +221,9 @@ class BaseRobotArtist(object):
             Defaults to ``True``.
         """
         positions = configuration.values
-        if len(names) != len(positions):
-            raise ValueError("len(names): %d is not len(positions) %d" % (len(names), len(positions)))
+        names = configuration.joint_names or self.robot.get_configurable_joint_names()
+        if len(names) != len(configuration.values):
+            raise ValueError("Please pass a configuration with %d joint_names." % len(positions))
         joint_state = dict(zip(names, positions))
         transformations = self.robot.compute_transformations(joint_state)
         for j in self.robot.iter_joints():

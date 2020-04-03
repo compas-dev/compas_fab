@@ -19,6 +19,8 @@ class Configuration(object):
         Joint values expressed in radians or meters, depending on the respective type.
     types : list of :class:`compas.robots.Joint.TYPE`
         Joint types, e.g. a list of `compas.robots.Joint.REVOLUTE` for revolute joints.
+    joint_names : :obj:`list` of :obj:`str`, optional
+        Joint names list
 
     Examples
     --------
@@ -39,18 +41,22 @@ class Configuration(object):
 
     """
 
-    def __init__(self, values=None, types=None):
+    def __init__(self, values=None, types=None, joint_names=None):
         self._precision = '3f'
         self.values = list(values or [])
         self.types = list(types or [])
+        self.joint_names = list(joint_names or [])
 
         if len(self.values) != len(self.types):
             raise ValueError("%d values must have %d types, but %d given." % (
                 len(self.values), len(self.values), len(self.types)))
 
     def __str__(self):
-        vs = '%.' + self._precision
-        return "Configuration(%s, %s)" % ('(' + ", ".join([vs] * len(self.values)) % tuple(self.values) + ')', tuple(self.types))
+        v_str = ('(' + ", ".join(['%.' + self._precision] * len(self.values)) + ')') % tuple(self.values)
+        if len(self.joint_names):
+            return "Configuration({}, {}, {})".format(v_str, tuple(self.types), tuple(self.joint_names))
+        else:
+            return "Configuration({}, {})".format(v_str, tuple(self.types))
 
     def __repr__(self):
         return self.__str__()
@@ -129,13 +135,15 @@ class Configuration(object):
         """
         return {
             'values': self.values,
-            'types': self.types
+            'types': self.types,
+            'joint_names': self.joint_names
         }
 
     @data.setter
     def data(self, data):
         self.values = data.get('values') or []
         self.types = data.get('types') or []
+        self.joint_names = data.get('joint_names') or []
 
     @property
     def prismatic_values(self):
@@ -151,7 +159,7 @@ class Configuration(object):
 
     def copy(self):
         cls = type(self)
-        return cls(self.values[:], self.types[:])
+        return cls(self.values[:], self.types[:], self.joint_names[:])
 
     def scale(self, scale_factor):
         """Scales the joint positions of the current configuration.
@@ -162,6 +170,10 @@ class Configuration(object):
         ----------
         scale_factor : float
             Scale factor
+
+        Returns
+        -------
+        None
         """
         values_scaled = []
 
@@ -171,3 +183,21 @@ class Configuration(object):
             values_scaled.append(value)
 
         self.values = values_scaled
+
+    def scaled(self, scale_factor):
+        """Returns a scaled copy of this configuration.
+
+        Only scalable joints are scaled, i.e. planar and prismatic joints.
+
+        Parameters
+        ----------
+        scale_factor : float
+            Scale factor
+
+        Returns
+        -------
+        None
+        """
+        config = self.copy()
+        config.scale(scale_factor)
+        return config

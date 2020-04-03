@@ -60,11 +60,19 @@ class RobotSemantics(object):
                     link_names.append(name)
         for subgroup in group.findall('group'):
             if subgroup.attrib['name'] != group.attrib['name']:
-                subgroup_link_names = self.__get_group_link_names(subgroup)
-                for name in subgroup_link_names:
-                    if name not in link_names:
-                        link_names.append(name)
+                # find group element at top level
+                for top_group_elem in self.root.findall('group'):
+                    if top_group_elem.attrib['name'] == subgroup.attrib['name']:
+                        subgroup_link_names = self.__get_group_link_names(top_group_elem)
+                        for name in subgroup_link_names:
+                            if name not in link_names:
+                                link_names.append(name)
         return link_names
+
+    def __get_group_elem_by_name(self, group_name):
+        for group_elem in self.root.findall('group'):
+            if group_elem.attrib['name'] == group_name:
+                return group_elem
 
     def __get_group_joint_names(self, group):
         joint_names = []
@@ -82,7 +90,9 @@ class RobotSemantics(object):
                 joint_names.append(joint.attrib['name'])
         for subgroup in group.findall('group'):
             if subgroup.attrib['name'] != group.attrib['name']:
-                subgroup_joint_names = self.__get_group_joint_names(subgroup)
+                # find group element at top level
+                top_group_elem = self.__get_group_elem_by_name(subgroup.attrib['name'])
+                subgroup_joint_names = self.__get_group_joint_names(top_group_elem)
                 for name in subgroup_joint_names:
                     if name not in joint_names:
                         joint_names.append(name)
@@ -127,6 +137,13 @@ class RobotSemantics(object):
         if not group:
             group = self.main_group_name
         return self._group_dict[group]["links"][0]
+
+    def get_all_configurable_joints(self):
+        joints = []
+        for joint in self.urdf_robot.get_configurable_joints():
+            if joint.name not in self.passive_joints:
+                joints.append(joint)
+        return joints
 
     def get_configurable_joints(self, group=None):
         if not group:

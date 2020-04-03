@@ -13,10 +13,20 @@ Unreleased
 
 **Added**
 
-* ..
+* Added optional ``joint_names`` to ``Configuration``
+* Added ``Configuration.scaled``
+* Added ``full_joint_state`` to ``Robot.inverse_kinematics``
+* Added ``Semantics.get_all_configurable_joints``
 
 **Changed**
 
+* Construct ``full_configuration`` with ``values``, ``types``, ``joint_names`` in ``Robot`` rather than in ``MoveItPlanner``
+* ``MoveItPlanner`` returns ``start_configuration`` with set ``joint_names``
+* Removed parameter ``names`` from ``RobotArtist.update``
+* Updated Grasshopper examples
+* ``Robot``: ``forward_kinematics`` returns now ``frame_WCF``
+* ``MoveItPlanner``: ``forward_kinematics`` takes now instance of ``Configuration`` and ``robot``
+* ``MoveItPlanner``: ``inverse_kinematics`` takes now instance of ``Configuration`` and ``robot``
 * Property :class:`compas_fab.robots.Robot.artist` does not try to scale robot
   geometry if links and/or joints are not defined.
 * In :class:``compas_fab.robots.constraints.JointConstraint``, added ``tolerance_above`` and
