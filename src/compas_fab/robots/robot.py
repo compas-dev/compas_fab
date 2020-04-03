@@ -936,7 +936,7 @@ class Robot(object):
                            group=None, avoid_collisions=True,
                            constraints=None, attempts=8,
                            attached_collision_meshes=None,
-                           full_joint_state=False):
+                           return_full_configuration=False):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
@@ -958,7 +958,7 @@ class Robot(object):
             The maximum number of inverse kinematic attempts. Defaults to 8.
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
-        full_joint_state : bool
+        return_full_configuration : bool
             If ``True``, returns a full configuration with all joint values
             specified, including passive ones if available.
 
@@ -1001,7 +1001,7 @@ class Robot(object):
                                                                       group, start_configuration_scaled,
                                                                       avoid_collisions, constraints, attempts,
                                                                       attached_collision_meshes)
-        if full_joint_state:
+        if return_full_configuration:
             # build configuration including passive joints, but no sorting
             joint_types = self.get_joint_types_by_names(joint_names)
             configuration = Configuration(joint_positions, joint_types, joint_names)

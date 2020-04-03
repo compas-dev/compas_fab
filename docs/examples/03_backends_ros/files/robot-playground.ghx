@@ -14175,7 +14175,7 @@ if robot and robot.client:
                                                       start_configuration,
                                                       group=group,
                                                       avoid_collisions=avoid_collisions,
-                                                      full_joint_state=True)
+                                                      return_full_configuration=True)
         group_configuration = robot.get_group_configuration(group, full_configuration)
         print(group_configuration)
     else:
