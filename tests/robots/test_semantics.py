@@ -33,6 +33,17 @@ def test_panda_srdf_file(panda_srdf, panda_urdf):
                                                                    'panda_joint5',
                                                                    'panda_joint6',
                                                                    'panda_joint7']
+    all_configurable_joint_names = [j.name for j in semantics.get_all_configurable_joints()]
+    assert all_configurable_joint_names == ['panda_joint1',
+                                            'panda_joint2',
+                                            'panda_joint3',
+                                            'panda_joint4',
+                                            'panda_joint5',
+                                            'panda_joint6',
+                                            'panda_joint7',
+                                            'panda_finger_joint1']
+    configurable_joints = semantics.get_configurable_joints('panda_arm_hand')
+    assert [j.type for j in configurable_joints] == [0, 0, 0, 0, 0, 0, 0, 2]
 
 
 def test_ur5_semantics():
