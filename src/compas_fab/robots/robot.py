@@ -1014,7 +1014,7 @@ class Robot(object):
 
         return configuration.scaled(self.scale_factor)
 
-    def forward_kinematics(self, full_configuration, group=None, backend=None, link_name=None):
+    def forward_kinematics(self, configuration, group=None, backend=None, link_name=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
