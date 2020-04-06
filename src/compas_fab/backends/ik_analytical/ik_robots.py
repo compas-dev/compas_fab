@@ -74,6 +74,8 @@ def ik_abb_irb4600_40_255(frame_rcf, joints=None):
         A1[i] = -1 * A1[i]
         A2[i] = A2[i] + math.pi / 2
         A3[i] = A3[i] - math.pi / 2
+        A4[i] = -1 * A4[i]
+        A6[i] = -1 * A6[i] + math.pi/2
 
     configurations = joint_angles_to_configurations(A1, A2, A3, A4, A5, A6)
 
