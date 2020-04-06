@@ -20,7 +20,7 @@ def forward_kinematics_spherical_wrist(p1, p2, p3, p4, joint_values):
     p4 : Point
     joint_values : list of float
         List of 6 joint values in radians.
-    
+
     Returns
     -------
     :class:`compas.geometry.Frame`
@@ -194,8 +194,8 @@ def inverse_kinematics_spherical_wrist(p1, p2, p3, p4, target_frame):
                 endx, endy, endz = axis6_frame.to_local_coords(end_frame.to_world_coords(Point(1, 0, 0)))
                 axis6_angle = math.atan2(endy, endx)
                 axis6_angles.append(axis6_angle)
-    
-    #for joint_values in zip(axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles):
+
+    # for joint_values in zip(axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles):
     #    print(forward_kinematics_spherical_wrist(p1, p2, p3, p4, joint_values))
 
     return axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles
