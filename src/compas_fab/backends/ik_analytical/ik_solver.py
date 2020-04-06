@@ -7,6 +7,15 @@ from compas_fab.backends.ik_analytical import fit_within_bounds, get_smaller_ang
 from compas_fab.backends.ik_analytical import inverse_kinematics_spherical_wrist
 from compas_fab.backends.ik_analytical import forward_kinematics_spherical_wrist
 
+def convert_frame_wcf_to_frame_tool0_rcf(frame_wcf, base_transformation=None, tool_transformation=None):
+    T = Transformation.from_frame(frame_wcf)
+    if base_transformation:
+        T = base_transformation * T
+    if tool_transformation:
+        T = T * tool_transformation
+    return Frame.from_transformation(T)
+    #return Frame.from_transformation(self.base_transformation * Transformation.from_frame(frame_wcf) * self.tool_transformation)
+
 
 class InverseKinematicsSolver(object):
     """Create a custom InverseKinematicsSolver for a robot.
@@ -25,14 +34,7 @@ class InverseKinematicsSolver(object):
     def update_base_transformation(self, base_frame):
         self.base_transformation = Transformation.from_frame(base_frame).inverse()
         
-    def convert_frame_wcf_to_frame_tool0_rcf(self, frame_wcf):
-        T = Transformation.from_frame(frame_wcf)
-        if self.base_transformation:
-            T = self.base_transformation * T
-        if self.tool_transformation:
-            T = T * self.tool_transformation
-        return Frame.from_transformation(T)
-        #return Frame.from_transformation(self.base_transformation * Transformation.from_frame(frame_wcf) * self.tool_transformation)
+    
     
     def convert_frames_wcf_to_frames_tool0_rcf(self, frames_wcf):
         return [self.convert_frame_wcf_to_frame_tool0_rcf(frame_wcf) for frame_wcf in frames_wcf]
@@ -55,39 +57,43 @@ class InverseKinematicsSolver(object):
                 configurations[i] = None
         return configurations
 
-    def inverse_kinematics(self, frame_WCF, start_configuration=None,
-                           group=None, avoid_collisions=True,
+    def get_inverse_kinematics_function(self, robot, client):
+    
+        def inverse_kinematics(client, robot, frame_WCF, group,
+                           start_configuration, avoid_collisions=True,
                            constraints=None, attempts=8,
-                           attached_collision_meshes=None,
-                           return_full_configuration=False):
+                           attached_collision_meshes=None):
 
-        if start_configuration:
-            print("self.robot", self.robot)
-            print("self", self)
-            base_frame = self.robot.get_base_frame(group=self.group, full_configuration=start_configuration)
-            self.update_base_transformation(base_frame)
+            if start_configuration:
+                print("Robot", robot)
+                print("client", client)
+                print("start_configuration", start_configuration)
+                base_frame = robot.get_base_frame(group, full_configuration=start_configuration)
+                base_transformation = Transformation.from_frame(base_frame).inverse()
 
-        frame_tool0_RCF = self.convert_frame_wcf_to_frame_tool0_rcf(frame_WCF)
+            #frame_tool0_RCF = self.convert_frame_wcf_to_frame_tool0_rcf(frame_WCF)
+            frame_tool0_RCF = convert_frame_wcf_to_frame_tool0_rcf(frame_WCF, base_transformation, self.tool_transformation)
 
-        # call the ik function
-        configurations = self.function(frame_tool0_RCF)
-        # fit configurations within joint bounds (sets those to `None` that are not working)
-        configurations = self.try_to_fit_configurations_between_bounds(configurations)
-        # check collisions for all configurations (sets those to `None` that are not working)
-        if self.robot.client:
-            configurations = self.robot.client.check_configurations_for_collision(configurations)
+            # call the ik function
+            configurations = self.function(frame_tool0_RCF)
+            # fit configurations within joint bounds (sets those to `None` that are not working)
+            configurations = self.try_to_fit_configurations_between_bounds(configurations)
+            # check collisions for all configurations (sets those to `None` that are not working)
+            if self.robot.client:
+                configurations = robot.client.check_configurations_for_collision(configurations)
 
-        cull_not_working = False
-        get_closest_to_start = False
+            cull_not_working = False
+            get_closest_to_start = False
 
-        if cull_not_working:
-            configurations = [c for c in configurations if c != None]
+            if cull_not_working:
+                configurations = [c for c in configurations if c != None]
 
-        if get_closest_to_start:
-            # sort by diff
-            return configurations[0]
-        
-        return configurations
+            if get_closest_to_start:
+                # sort by diff
+                return configurations[0]
+            
+            return configurations
+        return inverse_kinematics
 
 
 def reduce_to_configurations_between_bounds(configurations, joints):
