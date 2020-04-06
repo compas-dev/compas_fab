@@ -3,18 +3,8 @@ from compas.geometry import Point
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_fab.robots import Configuration
-from compas_fab.backends.ik_analytical import fit_within_bounds, get_smaller_angle
+from compas_fab.backends.ik_analytical import fit_within_bounds
 from compas_fab.backends.ik_analytical import inverse_kinematics_spherical_wrist
-from compas_fab.backends.ik_analytical import forward_kinematics_spherical_wrist
-
-def convert_frame_wcf_to_frame_tool0_rcf(frame_wcf, base_transformation=None, tool_transformation=None):
-    T = Transformation.from_frame(frame_wcf)
-    if base_transformation:
-        T = base_transformation * T
-    if tool_transformation:
-        T = T * tool_transformation
-    return Frame.from_transformation(T)
-    #return Frame.from_transformation(self.base_transformation * Transformation.from_frame(frame_wcf) * self.tool_transformation)
 
 
 class InverseKinematicsSolver(object):
@@ -24,20 +14,25 @@ class InverseKinematicsSolver(object):
     def __init__(self, robot, group, function, base_frame=None, tool_frame=None):
 
         self.robot = robot
-        self.group = group 
+        self.group = group
         self.joints = robot.get_configurable_joints(group=group)
+        self.joint_names = robot.get_configurable_joint_names(group=group)
         self.function = function
 
         self.base_transformation = Transformation.from_frame(base_frame).inverse() if base_frame else None
         self.tool_transformation = Transformation.from_frame(tool_frame).inverse() if tool_frame else None
-    
+
     def update_base_transformation(self, base_frame):
         self.base_transformation = Transformation.from_frame(base_frame).inverse()
-        
-    
-    
-    def convert_frames_wcf_to_frames_tool0_rcf(self, frames_wcf):
-        return [self.convert_frame_wcf_to_frame_tool0_rcf(frame_wcf) for frame_wcf in frames_wcf]
+
+    def convert_frame_wcf_to_frame_tool0_rcf(self, frame_wcf, base_transformation=None, tool_transformation=None):
+        T = Transformation.from_frame(frame_wcf)
+        if base_transformation:
+            T = base_transformation * T
+        if tool_transformation:
+            T = T * tool_transformation
+        return Frame.from_transformation(T)
+        # return Frame.from_transformation(self.base_transformation * Transformation.from_frame(frame_wcf) * self.tool_transformation)
 
     def try_to_fit_configurations_between_bounds(self, configurations):
         """
@@ -52,79 +47,72 @@ class InverseKinematicsSolver(object):
                 a4 = fit_within_bounds(a4, j4.limit.lower, j4.limit.upper)
                 a5 = fit_within_bounds(a5, j5.limit.lower, j5.limit.upper)
                 a6 = fit_within_bounds(a6, j6.limit.lower, j6.limit.upper)
-                configurations[i] = Configuration.from_revolute_values([a1, a2, a3, a4, a5, a6])
+                configurations[i].values = [a1, a2, a3, a4, a5, a6]
             except AssertionError:
                 configurations[i] = None
         return configurations
 
-    def get_inverse_kinematics_function(self, robot, client):
-    
-        def inverse_kinematics(client, robot, frame_WCF, group,
-                           start_configuration, avoid_collisions=True,
-                           constraints=None, attempts=8,
-                           attached_collision_meshes=None):
+    def add_joint_names_to_configurations(self, configurations):
+        """
+        """
+        for i, c in enumerate(configurations):
+            configurations[i].joint_names = self.joint_names[:]
+
+    def inverse_kinematics_function(self):
+        """
+        """
+
+        def inverse_kinematics(frame_WCF, start_configuration=None, group=None,
+                               avoid_collisions=True, constraints=None,
+                               attempts=8, attached_collision_meshes=None,
+                               return_full_configuration=False,
+                               cull_not_working=False,
+                               return_closest_to_start=False):
 
             if start_configuration:
-                print("Robot", robot)
-                print("client", client)
-                print("start_configuration", start_configuration)
-                base_frame = robot.get_base_frame(group, full_configuration=start_configuration)
-                base_transformation = Transformation.from_frame(base_frame).inverse()
+                base_frame = self.robot.get_base_frame(self.group, full_configuration=start_configuration)
+                self.update_base_transformation(base_frame)
+                # in_collision = self.robot.client.configuration_in_collision(start_configuration)
+                # if in_collision:
+                #    raise ValueError("Start configuration already in collision")
 
-            #frame_tool0_RCF = self.convert_frame_wcf_to_frame_tool0_rcf(frame_WCF)
-            frame_tool0_RCF = convert_frame_wcf_to_frame_tool0_rcf(frame_WCF, base_transformation, self.tool_transformation)
+            # frame_tool0_RCF = self.convert_frame_wcf_to_frame_tool0_rcf(frame_WCF)
+            frame_tool0_RCF = Frame.from_transformation(self.base_transformation * Transformation.from_frame(frame_WCF) * self.tool_transformation)
 
             # call the ik function
             configurations = self.function(frame_tool0_RCF)
+
+            # The ik solution for 6 axes industrial robots returns by default 8
+            # configurations, which are sorted. That means, the if you call ik
+            # on 2 frames that are close to each other, and compare the 8
+            # configurations of the first one with the 8 of the second one at
+            # their respective indices, then these configurations are 'close' to
+            # each other. That is why for certain use cases, e.g. custom cartesian
+            # path planning it makes sense to keep the sorting and set the ones
+            # that are out of joint limits or in collison to `None`.
+
+            # add joint names to configurations
+            self.add_joint_names_to_configurations(configurations)
             # fit configurations within joint bounds (sets those to `None` that are not working)
-            configurations = self.try_to_fit_configurations_between_bounds(configurations)
+            self.try_to_fit_configurations_between_bounds(configurations)
             # check collisions for all configurations (sets those to `None` that are not working)
             if self.robot.client:
-                configurations = robot.client.check_configurations_for_collision(configurations)
-
-            cull_not_working = False
-            get_closest_to_start = False
+                self.robot.client.check_configurations_for_collision(configurations)
 
             if cull_not_working:
-                configurations = [c for c in configurations if c != None]
+                configurations = [c for c in configurations if c is not None]
 
-            if get_closest_to_start:
+            if return_closest_to_start:
                 # sort by diff
                 return configurations[0]
-            
+
             return configurations
         return inverse_kinematics
 
 
-def reduce_to_configurations_between_bounds(configurations, joints):
-    j1, j2, j3, j4, j5, j6 = joints
-    configurations_within_bounds = []
-    for c in configurations:
-        a1, a2, a3, a4, a5, a6 = c.values
-        try:
-            a1 = fit_within_bounds(a1, j1.limit.lower, j1.limit.upper)
-            a2 = fit_within_bounds(a2, j2.limit.lower, j2.limit.upper)
-            a3 = fit_within_bounds(a3, j3.limit.lower, j3.limit.upper)
-            a4 = fit_within_bounds(a4, j4.limit.lower, j4.limit.upper)
-            a5 = fit_within_bounds(a5, j5.limit.lower, j5.limit.upper)
-            a6 = fit_within_bounds(a6, j6.limit.lower, j6.limit.upper)
-            configurations_within_bounds.append(Configuration.from_revolute_values([a1, a2, a3, a4, a5, a6]))
-        except AssertionError:
-            configurations_within_bounds.append([])
-    return configurations_within_bounds
-
-def calculate_small_angles(A1, A2, A3, A4, A5, A6):
-    for i in range(8):
-        A1[i] = get_smaller_angle(A1[i])
-        A2[i] = get_smaller_angle(A2[i])
-        A3[i] = get_smaller_angle(A3[i])
-        A4[i] = get_smaller_angle(A4[i])
-        A5[i] = get_smaller_angle(A5[i])
-        A6[i] = get_smaller_angle(A5[i])
-    return A1, A2, A3, A4, A5, A6
-
 def joint_angles_to_configurations(A1, A2, A3, A4, A5, A6):
     return [Configuration.from_revolute_values([a1, a2, a3, a4, a5, a6]) for a1, a2, a3, a4, a5, a6 in zip(A1, A2, A3, A4, A5, A6)]
+
 
 def ik_staubli_txl60(frame_rcf):
 
@@ -143,7 +131,8 @@ def ik_staubli_txl60(frame_rcf):
 
     return joint_angles_to_configurations(A1, A2, A3, A4, A5, A6)
 
-def ik_abb_irb4600_40_255(frame_rcf, joints=None):
+
+def ik_abb_irb4600_40_255(frame_rcf):
 
     p1 = Point(0.175, 0.000, 0.495)
     p2 = Point(0.175, 0.000, 1.590)
@@ -161,13 +150,12 @@ def ik_abb_irb4600_40_255(frame_rcf, joints=None):
 
     return joint_angles_to_configurations(A1, A2, A3, A4, A5, A6)
 
+
 if __name__ == "__main__":
 
     frame_rcf = Frame((0.600, 0.700, 1.000), (-1., 0., 0.), (0., 1., 0.))
-    joints = []
-    configurations = ik_abb_irb4600_40_255(frame_rcf, joints)
+    configurations = ik_abb_irb4600_40_255(frame_rcf)
 
     print("")
     frame_rcf = Frame((0.200, 0.200, 0.200), (-1., 0., 0.), (0., 1., 0.))
-    configurations = ik_staubli_txl60(frame_rcf, joints=None)
-    
+    configurations = ik_staubli_txl60(frame_rcf)
