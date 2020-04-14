@@ -14,8 +14,8 @@ class BoundingVolume(object):
 
     Attributes
     ----------
-    volume_type : :class:`int`
-        The type of the bounding volume.
+    volume_type : :attr:`BoundingVolume.BOX`, :attr:`BoundingVolume.SPHERE` or :attr:`BoundingVolume.MESH`
+        The type of bounding volume.
     volume : :class:`compas.datastructures.Mesh` or :class:`compas.geometry.Primitive`
         The volume can be either a :class:`compas.geometry.Box`, a
         :class:`compas.geometry.Sphere`, or a
@@ -152,8 +152,8 @@ class Constraint(object):
 
     Attributes
     ----------
-    constraint_type : :class:`int`
-        Constraint type, see :data:`possible_types`.
+    constraint_type : :attr:`Constraint.JOINT`, :attr:`Constraint.POSITION` or :attr:`Constraint.ORIENTATION`
+        Constraint type.
     weight : :class:`float`, optional
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to ``1``.
