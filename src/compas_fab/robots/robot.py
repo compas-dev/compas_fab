@@ -85,7 +85,7 @@ class Robot(object):
             Material description of the robot.
         kwargs : :class:`dict`
             Keyword arguments passed to the :class:`compas.robots.RobotModel`
-            ``attr`` :obj:`dict`. Accessible from ``Robot.model.attr``.
+            `attr` :obj:`dict`. Accessible from `Robot.model.attr`.
 
         Returns
         -------
@@ -487,8 +487,8 @@ class Robot(object):
         Raises
         ------
         :exc:`ValueError`
-            If the ``full_configuration`` does not specify positions for all
-            configurable joints, or if the ``group_configuration`` does not
+            If the `full_configuration` does not specify positions for all
+            configurable joints, or if the `group_configuration` does not
             specify positions for all configurable joints of the given group.
         """
         if not len(group_configuration.joint_names):
@@ -507,7 +507,7 @@ class Robot(object):
         return full_configuration
 
     def get_group_names_from_link_name(self, link_name):
-        """Get the names of the groups ``link_name`` belongs to.
+        """Get the names of the groups `link_name` belongs to.
 
         Parameters
         ----------
@@ -545,8 +545,8 @@ class Robot(object):
         Raises
         ------
         :exc:`ValueError`
-            If the number of joints in the ``configuration`` parameter does not
-            match the configurable joints of the given ``group``.
+            If the number of joints in the `configuration` parameter does not
+            match the configurable joints of the given `group`.
         """
         names = self.get_configurable_joint_names(group)
         if len(names) != len(configuration.values):
@@ -1170,9 +1170,9 @@ class Robot(object):
         Raises
         ------
         :exc:`ValueError`
-            If ``link_name`` doesn't match any of the :class:`Robot` instance's links.
+            If `link_name` doesn't match any of the :class:`Robot` instance's links.
         :exc:`NotImplementedError`
-            If forward kinematic method for given ``backend`` is not implemented.
+            If forward kinematic method for given `backend` is not implemented.
 
         Examples
         --------
@@ -1349,7 +1349,7 @@ class Robot(object):
             planning group.
         path_constraints : :class:`list` of :class:`Constraint`, optional
             Optional constraints that can be imposed along the solution path.
-            Note that path calculation won't work if the ``start_configuration``
+            Note that path calculation won't work if the `start_configuration`
             violates these constraints. Defaults to ``None``.
         planner_id : :class:`str`
             The name of the algorithm used for path planning. Defaults to ``'RRT'``.
