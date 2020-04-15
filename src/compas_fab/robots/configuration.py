@@ -16,11 +16,13 @@ class Configuration(object):
 
     Parameters
     ----------
-    values : :obj:`list` of :obj:`float`
-        Joint values expressed in radians or meters, depending on the respective type.
-    types : list of :data:`compas.robots.Joint.SUPPORTED_TYPES`
-        Joint types, e.g. a list of `compas.robots.Joint.REVOLUTE` for revolute joints.
-    joint_names : :obj:`list` of :obj:`str`, optional
+    values : :class:`list` of :class:`float`
+        Joint values expressed in radians or meters, depending on the respective
+        type.
+    types : :class:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+        Joint types, e.g. a list of :attr:`compas.robots.Joint.REVOLUTE` for
+        revolute joints.
+    joint_names : :obj:`list` of :class:`str`, optional
         List of joint names.
 
     Attributes
