@@ -383,7 +383,7 @@ class Robot(object):
 
         Returns
         -------
-        :class:`list` of :data:`compas.robots.Joint.SUPPORTED_TYPES`
+        :class:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
 
         Note
         ----
