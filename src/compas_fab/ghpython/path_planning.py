@@ -9,7 +9,7 @@ import compas
 from compas.datastructures import Mesh
 from compas.geometry import Transformation
 from compas_ghpython.geometry import xform_from_transformation
-from compas_rhino.helpers import mesh_from_guid
+from compas_rhino.geometry import RhinoMesh
 
 from compas_fab.robots import Configuration
 
@@ -167,7 +167,7 @@ class PathVisualizer(object):
     def _get_building_member_info(self, gripping_config):
         start = timer() if self.debug else None
         self.simulator.set_robot_config(self.robot, gripping_config)
-        mesh = mesh_from_guid(Mesh, self.building_member)
+        mesh = RhinoMesh.from_geometry(self.building_member).to_compas()
         handle = self.simulator.add_building_member(self.robot, mesh)
         matrix = self.simulator.get_object_matrices([handle])[handle]
 
