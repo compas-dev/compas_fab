@@ -57,3 +57,8 @@ def test_to_data():
 
     assert data['values'] == [8.312, 1.5, 0., 0., 0., 1., 0.8]
     assert data['types'] == [Joint.PRISMATIC] + [Joint.REVOLUTE] * 6
+
+def test_difference():
+    c1 = Configuration.from_revolute_values([1, 2, 3], joint_names=['1', '2', '3'])
+    c2 = Configuration.from_revolute_values([1, 2], joint_names=['1', '2'])
+    
