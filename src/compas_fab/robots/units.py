@@ -1,3 +1,4 @@
+"""Unit conversions on lists, useful for defining joint values."""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -11,32 +12,32 @@ __all__ = [
 
 
 def to_radians(degrees):
-    """Converts a list of floats representing degrees to a list of radians.
+    """Convert a list of floats representing degrees to a list of radians.
 
     Parameters
     ----------
-    degrees : list of :obj:`float`
-        List of degrees.
+    degrees : :class:`list` of :class:`float`
+        List of angle values in degrees.
 
     Returns
     -------
-    list of :obj:`float`
-        List of radians.
+    :class:`list` of :class:`float`
+        List of angle values in radians.
     """
     return [math.radians(d) for d in degrees]
 
 
 def to_degrees(radians):
-    """Converts a list of floats representing radians to a list of degrees.
+    """Convert a list of floats representing radians to a list of degrees.
 
     Parameters
     ----------
-    radians : list of :obj:`float`
-        List of radians.
+    radians : :class:`list` of :obj:`float`
+        List of angle values in radians.
 
     Returns
     -------
-    list of :obj:`float`
+    :class:`list` of :obj:`float`
         List of degress.
     """
     return [math.degrees(r) for r in radians]
