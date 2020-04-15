@@ -6,7 +6,7 @@ from compas_fab.backends.ik_solver import fit_within_bounds
 class InverseKinematicsSolver(object):
     """Create a custom InverseKinematicsSolver for a robot.
     """
-
+    # TODO create with class `Tool`, not tool frame!! 
     def __init__(self, robot, group, function, base_frame=None, tool_frame=None):
 
         self.robot = robot
@@ -20,6 +20,9 @@ class InverseKinematicsSolver(object):
 
     def update_base_transformation(self, base_frame):
         self.base_transformation = Transformation.from_frame(base_frame).inverse()
+    
+    def convert_frame_wcf_to_tool0_wcf(self, frame_wcf):
+        return Frame.from_transformation(Transformation.from_frame(frame_wcf) * self.tool_transformation)
 
     def convert_frame_wcf_to_frame_tool0_rcf(self, frame_wcf, base_transformation=None, tool_transformation=None):
         T = Transformation.from_frame(frame_wcf)
@@ -62,8 +65,9 @@ class InverseKinematicsSolver(object):
                                avoid_collisions=True, constraints=None,
                                attempts=8, attached_collision_meshes=None,
                                return_full_configuration=False,
-                               cull_not_working=False,
-                               return_closest_to_start=False):
+                               cull=False,
+                               return_closest_to_start=False,
+                               return_idxs=None):
 
             if start_configuration:
                 base_frame = self.robot.get_base_frame(self.group, full_configuration=start_configuration)
@@ -87,20 +91,28 @@ class InverseKinematicsSolver(object):
             # path planning it makes sense to keep the sorting and set the ones
             # that are out of joint limits or in collison to `None`.
 
+            if return_idxs:
+                configurations = [configurations[i] for i in return_idxs]
+
             # add joint names to configurations
             self.add_joint_names_to_configurations(configurations)
+            
             # fit configurations within joint bounds (sets those to `None` that are not working)
             self.try_to_fit_configurations_between_bounds(configurations)
             # check collisions for all configurations (sets those to `None` that are not working)
             if self.robot.client:
                 self.robot.client.check_configurations_for_collision(configurations)
+            
+            if return_closest_to_start:
+                diffs = [c.max_difference(start_configuration) for c in configurations if c is not None]
+                if len(diffs):
+                    idx = diffs.index(min(diffs))
+                    return configurations[idx] # only one
+                return None
 
-            if cull_not_working:
+            if cull:
                 configurations = [c for c in configurations if c is not None]
 
-            if return_closest_to_start:
-                # sort by diff
-                return configurations[0]
-
+            
             return configurations
         return inverse_kinematics
