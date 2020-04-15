@@ -2,6 +2,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import math
+
 from compas.robots import Joint
 
 __all__ = [
@@ -62,7 +64,7 @@ class Configuration(object):
         return self.__str__()
 
     @classmethod
-    def from_revolute_values(cls, values):
+    def from_revolute_values(cls, values, joint_names=None):
         """Construct a configuration from revolute joint values in radians.
 
         Parameters
@@ -70,16 +72,20 @@ class Configuration(object):
         values : :obj:`list` of :obj:`float`
             Joint values expressed in radians.
 
+        joint_names : :obj:`list` of :obj:`str`, optional
+            List of joint names.
+
         Returns
         -------
         :class:`Configuration`
              An instance of :class:`Configuration` instance.
         """
         values = list(values)
-        return cls.from_data({'values': values, 'types': [Joint.REVOLUTE] * len(values)})
+        joint_names = list(joint_names or [])
+        return cls.from_data({'values': values, 'types': [Joint.REVOLUTE] * len(values), 'joint_names': joint_names})
 
     @classmethod
-    def from_prismatic_and_revolute_values(cls, prismatic_values, revolute_values):
+    def from_prismatic_and_revolute_values(cls, prismatic_values, revolute_values, joint_names=None):
         """Construct a configuration from prismatic and revolute joint values.
 
         Parameters
@@ -88,6 +94,8 @@ class Configuration(object):
             Positions on the external axis system in meters.
         revolute_values : :obj:`list` of :obj:`float`
             Joint values expressed in radians.
+        joint_names : :obj:`list` of :obj:`str`, optional
+            List of joint names.
 
         Returns
         -------
@@ -97,10 +105,11 @@ class Configuration(object):
         # Force iterables into lists
         prismatic_values = list(prismatic_values)
         revolute_values = list(revolute_values)
+        joint_names = list(joint_names or [])
         values = prismatic_values + revolute_values
         types = [Joint.PRISMATIC] * \
             len(prismatic_values) + [Joint.REVOLUTE] * len(revolute_values)
-        return cls.from_data({'values': values, 'types': types})
+        return cls.from_data({'values': values, 'types': types, 'joint_names': joint_names})
 
     @classmethod
     def from_data(cls, data):
@@ -201,3 +210,47 @@ class Configuration(object):
         config = self.copy()
         config.scale(scale_factor)
         return config
+
+    def differences(self, other):
+        if len(self.joint_names) and len(other.joint_names):
+            d1 = dict(zip(self.joint_names, self.values))
+            d2 = dict(zip(other.joint_names, other.values))
+            types = dict(zip(self.joint_names, self.types))
+            for k, v in d1.items():
+                if k in d2:
+                    diff = abs(v - d2[k])
+                    if types[k] == Joint.REVOLUTE:
+                        while diff > abs(diff - 2*math.pi):
+                            diff = abs(diff - 2*math.pi)
+                    yield diff
+        else:
+            if len(self.values) != len(other.values):
+                raise ValueError("Can't compare configurations with different lengths")
+            for i, (v1, v2) in enumerate(zip(self.values, other.values)):
+                diff = abs(v1 - v2)
+                if self.types[i] == Joint.REVOLUTE:
+                    while diff > abs(diff - 2*math.pi):
+                        diff = abs(diff - 2*math.pi)
+                yield diff
+
+    def max_difference(self, other):
+        """
+        """
+        return max(self.differences(other))
+
+    def close_to(self, other, tol=1e-3):
+        """
+        """
+        for diff in self.differences(other):
+            if diff > tol:
+                return False
+        return True
+
+
+if __name__ == "__main__":
+    c1 = Configuration.from_revolute_values([1, 2, 3], joint_names=['1', '2', '3'])
+    c2 = Configuration.from_revolute_values([1, 2], joint_names=['1', '2'])
+    print(c1.close_to(c2))
+    c1 = Configuration.from_revolute_values([1.0001, 2.0002 - 2 * math.pi, 3.0009], joint_names=['1', '2', '3'])
+    c2 = Configuration.from_revolute_values([1, 2], joint_names=['1', '2'])
+    print(c1.max_difference(c2))
