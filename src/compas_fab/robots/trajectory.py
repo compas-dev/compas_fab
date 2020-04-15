@@ -48,7 +48,7 @@ class JointTrajectoryPoint(Configuration):
         self.time_from_start = time_from_start or Duration(0, 0)
 
     def __str__(self):
-        """Return a nicely printable representation of :class:`JointTrajectoryPoint`."""
+        """Return a human-readable string representation of the instance."""
         vs = '%.' + self._precision
         return 'JointTrajectoryPoint(({}), {}, ({}), ({}), ({}), {})'.format(
             ', '.join(vs % i for i in self.values),
