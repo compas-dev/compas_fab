@@ -20,14 +20,16 @@ class CollisionMesh(object):
     ----------
     mesh : :class:`compas.datastructures.Mesh`
         The collision mesh. Ideally it is as coarse as possible.
-    id : str
-        The id of the mesh, used to identify it for later operations (remove,
-        append, etc.)
+    id : :class:`str`
+        The id of the mesh, used to identify it for later operations
+        (:meth:`~PlanningScene.add_collision_mesh`,
+        :meth:`~PlanningScene.remove_collision_mesh`,
+        :meth:`~PlanningScene.append_collision_mesh` etc.)
     frame : :class:`compas.geometry.Frame`, optional
         The frame of the mesh. Defaults to the world XY frame.
-    root_name : str
-        The name of the root link the collision mesh with be placed in. Defaults
-        to 'world'.
+    root_name : :class:`str`
+        The name of the root link the collision mesh will be placed in. Defaults
+        to `'world'`.
 
     Examples
     --------
@@ -48,25 +50,27 @@ class CollisionMesh(object):
 
         Parameters
         ----------
-        transformation : compas.geometry.Scale
+        transformation : :class:`compas.geometry.Scale`
+            Scaling transformation to apply to collision mesh.
         """
         mesh_transform(self.mesh, transformation)
 
 
 class AttachedCollisionMesh(object):
-    """Represents a collision mesh that is attached to a robot's link.
+    """Represents a collision mesh that is attached to a :class:`Robot`'s :class:`~compas.robots.Link`.
 
     Attributes
     ----------
     collision_mesh : :class:`compas_fab.robots.CollisionMesh`
         The collision mesh we want to attach.
-    link_name : str
-        The name of the link the collision mesh will be attached to.
-    touch_links : list of str
+    link_name : :class:`str`
+        The name of the :class:`~compas.robots.Link` the collision mesh will be
+        attached to.
+    touch_links : :class:`list` of :class:`str`
         The list of link names the collision mesh is allowed to touch. Defaults
-        to the link_name it is attached to.
-    weight : float
-        The weight of the attached object. Defaults to 1.
+        to the link it is attached to.
+    weight : :class:`float`
+        The weight of the attached object. Defaults to ``1.0``.
 
     Examples
     --------
@@ -90,11 +94,8 @@ class PlanningScene(object):
 
     Attributes
     ----------
-    robot : :class:`compas_fab.robots.Robot`
+    robot : :class:`Robot`
         A reference to the robot in the planning scene.
-
-    Examples
-    --------
     """
 
     def __init__(self, robot):
@@ -102,31 +103,41 @@ class PlanningScene(object):
 
     @property
     def client(self):
-        """The backend client."""
+        """:class:`compas_fab.backend.RosClient` or :class:`compas_fab.backend.VrepClient` : The backend client."""
         return self.robot.client
 
     def ensure_client(self):
+        """Ensure that the planning scene's robot has a defined client.
+
+        Raises
+        ------
+        :exc:`Exception`
+            If no client is set for planning scene's robot.
+        """
         if not self.client:
             raise Exception(
                 'This method is only callable once a client is assigned')
 
     def add_collision_mesh(self, collision_mesh, scale=False):
-        """Adds a collision mesh to the planning scene.
-
-        If the object with the same name previously existed, it is replaced.
+        """Add a collision mesh to the planning scene.
 
         Parameters
         ----------
-        collision_mesh : :class:`compas_fab.robots.CollisionMesh`
+        collision_mesh : :class:`CollisionMesh`
             The collision mesh we want to add.
-        scale : bool, optional
-            If `True`, the mesh will be scaled according to the robot's scale
+        scale : :class:`bool`, optional
+            If ``True``, the mesh will be scaled according to the robot's scale
             factor.
 
         Returns
         -------
-        None
+        ``None``
 
+        Note
+        ----
+        A :class:`CollisionMesh` with the same `id` as an existing
+        :class:`CollisionMesh` in the :class:`PlanningScene` will
+        replace the existing collision object.
 
         Examples
         --------
@@ -146,16 +157,16 @@ class PlanningScene(object):
         self.client.add_collision_mesh(collision_mesh)
 
     def remove_collision_mesh(self, id):
-        """Removes a collision object from the planning scene.
+        """Remove a collision object from the planning scene.
 
         Parameters
         ----------
-        id : str
-            The identifier of the collision object.
+        id : :class:`str`
+            The `id` of the :class:`CollisionMesh` instance to remove.
 
         Returns
         -------
-        None
+        ``None``
 
         Examples
         --------
@@ -166,21 +177,24 @@ class PlanningScene(object):
         self.robot.client.remove_collision_mesh(id)
 
     def append_collision_mesh(self, collision_mesh, scale=False):
-        """Appends a collision mesh that already exists in the planning scene.
-
-        If the does not exist, it is added.
+        """Append a collision mesh to the planning scene.
 
         Parameters
         ----------
-        collision_mesh : :class:`compas_fab.robots.CollisionMesh`
-            The collision mesh we want to append.
-        scale : bool, optional
-            If `True`, the mesh will be scaled according to the robot's scale
+        collision_mesh : :class:`CollisionMesh`
+            The collision mesh we want to append to the :class:`PlanningScene`.
+        scale : :class:`bool`, optional
+            If ``True``, the mesh will be scaled according to the robot's scale
             factor.
 
         Returns
         -------
-        None
+        ``None``
+
+        Note
+        ----
+        If there is already a :class:`CollisionMesh` instance with the same `id`
+        in the :class:`PlanningScene`, it will not be replaced.
 
         Examples
         --------
@@ -200,18 +214,20 @@ class PlanningScene(object):
         self.robot.client.append_collision_mesh(collision_mesh)
 
     def add_attached_collision_mesh(self, attached_collision_mesh, scale=False):
-        """Adds an attached collision object to the planning scene.
+        """Add an attached collision object to the planning scene.
 
         Parameters
         ----------
-        attached_collision_mesh : :class:`compas_fab.robots.AttachedCollisionMesh`
-        scale : bool, optional
-            If `True`, the mesh will be scaled according to the robot's scale
-            factor.
+        attached_collision_mesh : :class:`AttachedCollisionMesh`
+            The :class:`AttachedCollisionMesh` (a :class:`CollisionMesh`
+            attached to a :class:`Robot`'s :class:`~compas.robots.Link`) that
+            we want to add to the :class:`PlanningScene`.
+        scale : :class:`bool`, optional
+            If ``True``, the mesh will be scaled using the robot's scale factor.
 
         Returns
         -------
-        None
+        ``None``
 
         Examples
         --------
@@ -232,16 +248,18 @@ class PlanningScene(object):
         self.client.add_attached_collision_mesh(attached_collision_mesh)
 
     def remove_attached_collision_mesh(self, id):
-        """Removes an attached collision object from the planning scene.
+        """Remove an attached collision object from the planning scene.
 
         Parameters
         ----------
-        id : str
-            The identifier of the object.
+        id : :class:`str`
+            The `id` of the :class:`CollisionMesh` in the
+            :class:`AttachedCollisionMesh` to remove from the
+            :class:`PlanningScene`.
 
         Returns
         -------
-        None
+        ``None``
 
         Examples
         --------
@@ -256,18 +274,18 @@ class PlanningScene(object):
 
         Parameters
         ----------
-        collision_mesh: :class:`compas_fab.robots.CollisionMesh`
-            The collision mesh.
-        scale : bool, optional
-            If `True`, the mesh will be scaled according to the robot's scale
+        collision_mesh: :class:`CollisionMesh`
+            The collision mesh to attach to robot's end effector.
+        scale : :class:`bool`, optional
+            If ``True``, the mesh will be scaled using the robot's scale
             factor.
-        group : str
-            The planning group to which we want to attach the mesh to. Defaults
-            to the robot's main planning group.
+        group : :class:`str`
+            The planning group with the end effector we want to attach the mesh
+            to. Defaults to the robot's main planning group.
 
         Returns
         -------
-        None
+        ``None``
 
         Examples
         --------
@@ -302,15 +320,13 @@ class PlanningScene(object):
         self.add_attached_collision_mesh(acm)
 
     def add_attached_tool(self):
-        """Adds the robot's attached tool to the planning scene if set.
-        """
+        """Add the robot's attached tool to the planning scene if tool is set."""
         self.ensure_client()
         if self.robot.attached_tool:
             self.add_attached_collision_mesh(self.robot.attached_tool.attached_collision_mesh)
 
     def remove_attached_tool(self):
-        """Removes the robot's attached tool from the planning scene.
-        """
+        """Remove the robot's attached tool from the planning scene."""
         self.ensure_client()
         if self.robot.attached_tool:
             self.remove_attached_collision_mesh(self.robot.attached_tool.name)
