@@ -986,15 +986,16 @@ class Robot(object):
         configuration: :class:`Configuration`
             The target configuration.
         tolerances_above: :class:`list` of :class:`float`
-            The tolerances above the targeted configuration's joint value on each
-            of the joints, defining the upper bound in radian to be achieved.
-            If only one value is passed, it will be used to create upper bounds
-            for all joint constraints.
+            The tolerances above the targeted configuration's joint value on
+            each of the joints, defining the upper bound in radians to be
+            achieved. If only one value is passed, it will be used to create
+            upper bounds for all joint constraints.
+
         tolerances_below: :class:`list` of :class:`float`
-            The tolerances below the targeted configuration's joint value on each
-            of the joints, defining the upper bound in radian to be achieved.
-            If only one value is passed, it will be used to create lower bounds
-            for all joint constraints.
+            The tolerances below the targeted configuration's joint value on
+            each of the joints, defining the upper bound in radians to be
+            achieved. If only one value is passed, it will be used to create
+            lower bounds for all joint constraints.
         group: :class:`str`, optional
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
