@@ -45,6 +45,8 @@ matrix:
 
 install:
   - pip3 install cython --install-option="--no-cython-compile" || pip install cython --install-option="--no-cython-compile"
+    # workaround until this issue is fixed: https://github.com/compas-dev/compas/issues/510
+  - if test $TRAVIS_PYTHON_VERSION -eq '2.7'; then pip install llvmlite==0.31.0 numba==0.47.0; fi
   - pip3 install --no-cache-dir -r requirements-dev.txt || pip install --no-cache-dir -r requirements-dev.txt
 
 script:
