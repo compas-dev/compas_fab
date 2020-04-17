@@ -35,7 +35,7 @@ class Robot(object):
     upon the model described in the class :class:`compas.robots.RobotModel` of
     the **COMPAS** framework.
 
-    Attributes
+    Parameters
     ----------
     model : :class:`compas.robots.RobotModel`
         The robot model, usually created from an URDF structure.
@@ -793,7 +793,7 @@ class Robot(object):
             self.artist.attach_tool(tool)
 
     def detach_tool(self):
-        """Detaches the attached tool.
+        """Detach the attached tool.
 
         See Also
         --------
@@ -1080,7 +1080,7 @@ class Robot(object):
         constraints : :class:`list` of :class:`Constraint`, optional
             A set of constraints that the request must obey. Defaults to ``None``.
         attempts : :class:`int`, optional
-            The maximum number of inverse kinematic attempts. Defaults to 8.
+            The maximum number of inverse kinematic attempts. Defaults to ``8``.
         attached_collision_meshes : :class:`list` of :class:`AttachedCollisionMesh`, optional
             Defaults to ``None``.
         return_full_configuration : :class:`bool`
@@ -1238,7 +1238,7 @@ class Robot(object):
             points. If the distance is found to be above this threshold, the
             path computation fails. It must be specified in relation to max_step.
             If this theshhold is 0, 'jumps' might occur, resulting in an invalid
-            cartesian path. Defaults to pi / 2.
+            cartesian path. Defaults to :math:`\\pi / 2`.
         avoid_collisions : :class:`bool`, optional
             Whether or not to avoid collisions. Defaults to ``True``.
         group : :class:`str`, optional
@@ -1358,14 +1358,14 @@ class Robot(object):
             However, for algorithms that use randomization in their execution
             (like ``'RRT'``), it is likely that different planner executions will
             produce different solutions. Setting this parameter to a value above
-            1 will run many additional motion plans, and will report the
-            shortest solution as the final result. Defaults to 1.
+            ``1`` will run many additional motion plans, and will report the
+            shortest solution as the final result. Defaults to ``1``.
         allowed_planning_time : :class:`float`
-            The number of seconds allowed to perform the planning. Defaults to 2.
+            The number of seconds allowed to perform the planning. Defaults to ``2``.
         max_velocity_scaling_factor : :class:`float`
-            Defaults to 1.
+            Defaults to ``1``.
         max_acceleration_scaling_factor : :class:`float`
-            Defaults to 1.
+            Defaults to ``1``.
         attached_collision_meshes : :class:`list` of :class:`AttachedCollisionMesh`
             Defaults to ``None``.
 
@@ -1539,24 +1539,24 @@ class Robot(object):
         self.artist.update(configuration, visual, collision)
 
     def draw_visual(self):
-        """Draws the visual geometry of the robot in the defined :attr:`.artist`'s CAD environment."""
+        """Draw the robot's visual geometry using the defined :attr:`Robot.artist`."""
         return self.artist.draw_visual()
 
     def draw_collision(self):
-        """Draws the collision geometry of the robot in the defined :attr:`.artist`'s CAD environment."""
+        """Draw the robot's collision geometry using the defined :attr:`Robot.artist`."""
         return self.artist.draw_collision()
 
     def draw(self):
-        """Draws the visual geometry of the robot in the defined :attr:`.artist`'s CAD environment."""
+        """Alias of :meth:`draw_visual`."""
         return self.draw_visual()
 
     def draw_attached_tool(self):
-        """Draws the attached tool in the defined :attr:`artist`'s CAD environment."""
+        """Draw the attached tool using the defined :attr:`Robot.artist`."""
         if self.artist and self.attached_tool:
             return self.artist.draw_attached_tool()
 
     def scale(self, factor):
-        """Scales the robot geometry by factor (absolute).
+        """Scale the robot geometry by a factor (absolute).
 
         Parameters
         ----------
