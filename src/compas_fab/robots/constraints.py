@@ -12,10 +12,10 @@ __all__ = ['BoundingVolume', 'Constraint', 'JointConstraint',
 class BoundingVolume(object):
     """A container for describing a bounding volume.
 
-    Attributes
+    Parameters
     ----------
-    volume_type : :attr:`BoundingVolume.BOX`, :attr:`BoundingVolume.SPHERE` or :attr:`BoundingVolume.MESH`
-        The type of bounding volume.
+    volume_type
+        The type of bounding volume, one of :attr:`BoundingVolume.VOLUME_TYPES`.
     volume : :class:`compas.datastructures.Mesh` or :class:`compas.geometry.Primitive`
         The volume can be either a :class:`compas.geometry.Box`, a
         :class:`compas.geometry.Sphere`, or a
@@ -29,10 +29,12 @@ class BoundingVolume(object):
     #: Mesh volume type
     MESH = 3
 
+    #: List of supported volume types
+    VOLUME_TYPES = (BOX, SPHERE, MESH)
+
     def __init__(self, volume_type, volume):
-        if volume_type not in [self.BOX, self.SPHERE, self.MESH]:
-            raise ValueError("Type must be %d, %d or %d"
-                             % (self.BOX, self.SPHERE, self.MESH))
+        if volume_type not in self.VOLUME_TYPES:
+            raise ValueError("Type must be %d, %d or %d" % (self.VOLUME_TYPES))
         self.type = volume_type
         self.volume = volume
 
@@ -150,13 +152,14 @@ class BoundingVolume(object):
 class Constraint(object):
     """Base class for robot constraints.
 
-    Attributes
+    Parameters
     ----------
-    constraint_type : :attr:`Constraint.JOINT`, :attr:`Constraint.POSITION` or :attr:`Constraint.ORIENTATION`
-        Constraint type.
+    constraint_type
+        Constraint type, one of :attr:`Constraint.CONSTRAINT_TYPES`.
     weight : :class:`float`, optional
         A weighting factor for this constraint. Denotes relative importance to
-        other constraints. Closer to zero means less important. Defaults to ``1``.
+        other constraints. Closer to zero means less important. Defaults to
+        ``1``.
     """
 
     #: Joint constraint type.
@@ -167,11 +170,11 @@ class Constraint(object):
     ORIENTATION = 3
 
     #:  List of possible constraint types.
-    possible_types = (JOINT, POSITION, ORIENTATION)
+    CONSTRAINT_TYPES = (JOINT, POSITION, ORIENTATION)
 
     def __init__(self, constraint_type, weight=1.):
-        if constraint_type not in self.possible_types:
-            raise ValueError("Type must be %d, %d or %d" % self.possible_types)
+        if constraint_type not in self.CONSTRAINT_TYPES:
+            raise ValueError("Type must be %d, %d or %d" % self.CONSTRAINT_TYPES)
         self.type = constraint_type
         self.weight = weight
 
@@ -209,21 +212,20 @@ class Constraint(object):
 class JointConstraint(Constraint):
     """Constrains the value of a joint to be within a certain bound.
 
-    Attributes
+    Parameters
     ----------
     joint_name : :class:`str`
         The name of the joint this contraint refers to.
     value : :class:`float`
         The targeted value for that joint.
     tolerance_above : :class:`float`
-        Tolerance above the targeted joint value, in radians. Defaults to 0.
+        Tolerance above the targeted joint value, in radians. Defaults to ``0``.
     tolerance_below : :class:`float`
-        Tolerance below the targeted joint value, in radians. Defaults to 0.
-        The bound to be achieved is
-        ``[value - tolerance_below, value + tolerance_above]``.
+        Tolerance below the targeted joint value, in radians. Defaults to ``0``.
     weight : :class:`float`, optional
         A weighting factor for this constraint. Denotes relative importance to
-        other constraints. Closer to zero means less important. Defaults to ``1``.
+        other constraints. Closer to zero means less important. Defaults to
+        ``1``.
 
     Examples
     --------
@@ -268,7 +270,7 @@ class JointConstraint(Constraint):
 class OrientationConstraint(Constraint):
     r"""Constrains a link to be within a certain orientation.
 
-    Attributes
+    Parameters
     ----------
     link_name : :class:`str`
         The name of the link this contraint refers to.
@@ -278,20 +280,21 @@ class OrientationConstraint(Constraint):
     tolerances : :class:`list` of :class:`float`, optional
         Error tolerances t\ :sub:`i` for each of the frame's axes. If only one
         value is passed it will be used for all 3 axes. The respective bound to
-        be achieved is ``[ai - ti, ai + ti]``. Defaults to
+        be achieved is :math:`(a_{i} - t_{i}, a_{i} + t_{i})`. Defaults to
         ``[0.01, 0.01, 0.01]``.
     weight : :class:`float`, optional
         A weighting factor for this constraint. Denotes relative importance to
-        other constraints. Closer to zero means less important. Defaults to 1.
+        other constraints. Closer to zero means less important. Defaults to
+        ``1``.
 
     Notes
     -----
     The rotation tolerance for an axis is defined by the other vector component
     values for rotation around corresponding axis.
 
-    If you specify the tolerance vector with [0.01, 0.01, 6.3], it means that
-    the frame's x-axis and y-axis are allowed to rotate about the z-axis by an
-    angle of 6.3 radians, whereas the z-axis can only change 0.01.
+    If you specify the tolerance vector with ``[0.01, 0.01, 6.3]``, it means
+    that the frame's x-axis and y-axis are allowed to rotate about the z-axis
+    by an angle of 6.3 radians, whereas the z-axis can only change 0.01.
 
     Examples
     --------
@@ -337,7 +340,7 @@ class OrientationConstraint(Constraint):
 class PositionConstraint(Constraint):
     """Constrains a link to be within a certain bounding volume.
 
-    Attributes
+    Parameters
     ----------
     link_name : :class:`str`
         The name of the link this contraint refers to.
