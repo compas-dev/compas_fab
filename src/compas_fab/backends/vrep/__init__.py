@@ -16,10 +16,9 @@ Package with functionality to run simulations using the robotic simulation tool
 
 """
 
-from .client import VrepError
+from .helpers import VrepError
 from .client import VrepClient
 
 __all__ = [
-    'VrepError',
     'VrepClient'
 ]
