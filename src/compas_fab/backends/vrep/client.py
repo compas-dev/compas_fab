@@ -6,7 +6,12 @@ from compas.geometry import Frame
 
 from compas_fab.backends.client import ClientInterface
 from compas_fab.backends.vrep import VrepError
-from compas_fab.backends.vrep.helpers import config_from_vrep, config_to_vrep, floats_to_vrep, floats_from_vrep, assert_robot, resolve_host
+from compas_fab.backends.vrep.helpers import assert_robot
+from compas_fab.backends.vrep.helpers import config_from_vrep
+from compas_fab.backends.vrep.helpers import config_to_vrep
+from compas_fab.backends.vrep.helpers import floats_from_vrep
+from compas_fab.backends.vrep.helpers import floats_to_vrep
+from compas_fab.backends.vrep.helpers import resolve_host
 from compas_fab.backends.vrep.planner_backend_vrep import VrepPlanner
 from compas_fab.backends.vrep.remote_api import vrep
 from compas_fab.robots import Configuration
@@ -399,4 +404,3 @@ class VrepClient(ClientInterface):
                                            CHILD_SCRIPT_TYPE, function_name,
                                            in_ints, in_floats, in_strings,
                                            bytearray(), DEFAULT_OP_MODE)
-

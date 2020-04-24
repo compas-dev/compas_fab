@@ -4,9 +4,15 @@ from __future__ import print_function
 
 from compas.utilities import await_callback
 
-from compas_fab.backends.ros.messages import GetPositionFKRequest, GetPositionFKResponse, Header, JointState, RobotState, MultiDOFJointState
-from compas_fab.backends.ros.planner_backend import ServiceDescription
+
 from compas_fab.backends.ros.backend_features.helpers import validate_response
+from compas_fab.backends.ros.messages import GetPositionFKRequest
+from compas_fab.backends.ros.messages import GetPositionFKResponse
+from compas_fab.backends.ros.messages import Header
+from compas_fab.backends.ros.messages import JointState
+from compas_fab.backends.ros.messages import MultiDOFJointState
+from compas_fab.backends.ros.messages import RobotState
+from compas_fab.backends.ros.planner_backend import ServiceDescription
 
 
 class MoveItForwardKinematics(object):

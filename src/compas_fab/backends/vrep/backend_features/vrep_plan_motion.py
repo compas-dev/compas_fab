@@ -4,7 +4,12 @@ from __future__ import print_function
 
 from timeit import default_timer as timer
 
-from compas_fab.backends.vrep.helpers import assert_robot, config_to_vrep, frame_to_vrep_pose, floats_to_vrep, config_from_vrep, VrepError
+from compas_fab.backends.vrep.helpers import assert_robot
+from compas_fab.backends.vrep.helpers import config_from_vrep
+from compas_fab.backends.vrep.helpers import config_to_vrep
+from compas_fab.backends.vrep.helpers import floats_to_vrep
+from compas_fab.backends.vrep.helpers import frame_to_vrep_pose
+from compas_fab.backends.vrep.helpers import VrepError
 
 
 class VrepPlanMotion(object):
@@ -161,11 +166,11 @@ class VrepPlanMotion(object):
                       planner_id, trials, shallow_state_search, optimize_path_length)
 
         res, _, path, _, _ = self.client.run_child_script('searchRobotPath',
-                                                   [robot.model.attr['index'],
-                                                    trials,
-                                                    (int)(resolution * 1000),
-                                                    1 if optimize_path_length else 0],
-                                                   states, string_param_list)
+                                                          [robot.model.attr['index'],
+                                                           trials,
+                                                           (int)(resolution * 1000),
+                                                           1 if optimize_path_length else 0],
+                                                          states, string_param_list)
         if log:
             log.debug('Execution time: search_robot_path=%.2f', timer() - start)
 

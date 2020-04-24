@@ -3,8 +3,13 @@ from __future__ import division
 from __future__ import print_function
 
 from compas_fab.backends.ros.exceptions import RosError
-from compas_fab.backends.ros.messages import MoveItErrorCodes, Constraints, JointConstraint, PositionConstraint, OrientationConstraint
-from compas_fab.robots import Duration, JointTrajectoryPoint
+from compas_fab.backends.ros.messages import Constraints
+from compas_fab.backends.ros.messages import JointConstraint
+from compas_fab.backends.ros.messages import MoveItErrorCodes
+from compas_fab.backends.ros.messages import PositionConstraint
+from compas_fab.backends.ros.messages import OrientationConstraint
+from compas_fab.robots import Duration
+from compas_fab.robots import JointTrajectoryPoint
 
 
 def validate_response(response):
@@ -14,7 +19,7 @@ def validate_response(response):
                        int(response.error_code))
 
 
-def _convert_constraints_to_rosmsg(constraints, header):
+def convert_constraints_to_rosmsg(constraints, header):
     """Convert COMPAS FAB constraints into ROS Messages."""
     if not constraints:
         return None

@@ -1,6 +1,7 @@
 import socket
 
-from compas.geometry import Frame, matrix_from_frame
+from compas.geometry import Frame
+from compas.geometry import matrix_from_frame
 
 from compas_fab.backends import BackendError
 
@@ -64,6 +65,7 @@ def assert_robot(robot):
 # NETWORKING HELPERS
 # A couple of simple networking helpers for host name resolution
 # --------------------------------------------------------------------------
+
 
 def is_ipv4_address(addr):
     try:

@@ -3,9 +3,11 @@ from __future__ import division
 from __future__ import print_function
 
 
-from contextlib import contextmanager, ExitStack
+from contextlib import contextmanager
+from contextlib import ExitStack
 
-from compas_fab.backends import RosClient, VrepClient
+from compas_fab.backends import RosClient
+from compas_fab.backends import VrepClient
 
 
 __all__ = [
@@ -66,4 +68,3 @@ class ClientManager(MultiResourceManager):
         }
         super(ClientManager, self).__enter__()
         return self
-

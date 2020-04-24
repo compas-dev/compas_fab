@@ -4,10 +4,20 @@ from __future__ import print_function
 
 from compas.utilities import await_callback
 
-from compas_fab.backends.ros.messages import Header, JointState, RobotState, MultiDOFJointState, AttachedCollisionObject, TrajectoryConstraints, MotionPlanResponse, MotionPlanRequest
-from compas_fab.backends.ros.backend_features.helpers import _convert_constraints_to_rosmsg, convert_trajectory_points, validate_response
+from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
+from compas_fab.backends.ros.backend_features.helpers import convert_trajectory_points
+from compas_fab.backends.ros.backend_features.helpers import validate_response
+from compas_fab.backends.ros.messages import AttachedCollisionObject
+from compas_fab.backends.ros.messages import Header
+from compas_fab.backends.ros.messages import JointState
+from compas_fab.backends.ros.messages import MotionPlanResponse
+from compas_fab.backends.ros.messages import MotionPlanRequest
+from compas_fab.backends.ros.messages import MultiDOFJointState
+from compas_fab.backends.ros.messages import RobotState
+from compas_fab.backends.ros.messages import TrajectoryConstraints
 from compas_fab.backends.ros.planner_backend import ServiceDescription
-from compas_fab.robots import JointTrajectory, Configuration
+from compas_fab.robots import JointTrajectory
+from compas_fab.robots import Configuration
 
 
 class MoveItPlanMotion(object):
@@ -28,14 +38,14 @@ class MoveItPlanMotion(object):
                  max_acceleration_scaling_factor=1.,
                  attached_collision_meshes=None,
                  workspace_parameters=None):
-        return self.plan_motion( robot, goal_constraints, start_configuration, group,
-                                 path_constraints, trajectory_constraints,
-                                 planner_id, num_planning_attempts,
-                                 allowed_planning_time,
-                                 max_velocity_scaling_factor,
-                                 max_acceleration_scaling_factor,
-                                 attached_collision_meshes,
-                                 workspace_parameters)
+        return self.plan_motion(robot, goal_constraints, start_configuration, group,
+                                path_constraints, trajectory_constraints,
+                                planner_id, num_planning_attempts,
+                                allowed_planning_time,
+                                max_velocity_scaling_factor,
+                                max_acceleration_scaling_factor,
+                                attached_collision_meshes,
+                                workspace_parameters)
 
     def plan_motion(self, robot, goal_constraints, start_configuration, group,
                     path_constraints=None, trajectory_constraints=None,
@@ -92,11 +102,11 @@ class MoveItPlanMotion(object):
                 start_state.attached_collision_objects.append(aco)
 
         # convert constraints
-        goal_constraints = [_convert_constraints_to_rosmsg(goal_constraints, header)]
-        path_constraints = _convert_constraints_to_rosmsg(path_constraints, header)
+        goal_constraints = [convert_constraints_to_rosmsg(goal_constraints, header)]
+        path_constraints = convert_constraints_to_rosmsg(path_constraints, header)
 
         if trajectory_constraints is not None:
-            trajectory_constraints = TrajectoryConstraints(constraints=_convert_constraints_to_rosmsg(path_constraints, header))
+            trajectory_constraints = TrajectoryConstraints(constraints=convert_constraints_to_rosmsg(path_constraints, header))
 
         request = dict(start_state=start_state,
                        goal_constraints=goal_constraints,

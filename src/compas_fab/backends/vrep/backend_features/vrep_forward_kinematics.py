@@ -2,7 +2,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas_fab.backends.vrep.helpers import vrep_pose_to_frame, assert_robot
+from compas_fab.backends.vrep.helpers import assert_robot
+from compas_fab.backends.vrep.helpers import vrep_pose_to_frame
 
 
 class VrepForwardKinematics(object):
@@ -29,7 +30,5 @@ class VrepForwardKinematics(object):
         """
         assert_robot(robot)
 
-        _res, _, pose, _, _ = self.client.run_child_script('getIkTipPose',
-                                                    [robot.model.attr['index']],
-                                                    [], [])
+        _res, _, pose, _, _ = self.client.run_child_script('getIkTipPose', [robot.model.attr['index']], [], [])
         return vrep_pose_to_frame(pose, self.client.scale)

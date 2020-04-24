@@ -4,9 +4,18 @@ from __future__ import print_function
 
 from compas.utilities import await_callback
 
-from compas_fab.backends.ros.messages import Header, Pose, PoseStamped, JointState, RobotState, MultiDOFJointState, AttachedCollisionObject, PositionIKRequest, GetPositionIKRequest, \
-    GetPositionIKResponse
-from compas_fab.backends.ros.backend_features.helpers import validate_response, _convert_constraints_to_rosmsg
+from compas_fab.backends.ros.backend_features.helpers import validate_response
+from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
+from compas_fab.backends.ros.messages import AttachedCollisionObject
+from compas_fab.backends.ros.messages import GetPositionIKRequest
+from compas_fab.backends.ros.messages import GetPositionIKResponse
+from compas_fab.backends.ros.messages import Header
+from compas_fab.backends.ros.messages import JointState
+from compas_fab.backends.ros.messages import MultiDOFJointState
+from compas_fab.backends.ros.messages import Pose
+from compas_fab.backends.ros.messages import PoseStamped
+from compas_fab.backends.ros.messages import PositionIKRequest
+from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.planner_backend import ServiceDescription
 
 
@@ -65,7 +74,7 @@ class MoveItInverseKinematics(object):
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
                 start_state.attached_collision_objects.append(aco)
 
-        constraints = _convert_constraints_to_rosmsg(constraints, header)
+        constraints = convert_constraints_to_rosmsg(constraints, header)
 
         ik_request = PositionIKRequest(group_name=group,
                                        robot_state=start_state,

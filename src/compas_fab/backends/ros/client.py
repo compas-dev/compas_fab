@@ -9,11 +9,6 @@ from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
 from compas_fab.backends.client import ClientInterface
-from compas_fab.backends.ros.backend_features.move_it_forward_kinematics import MoveItForwardKinematics
-from compas_fab.backends.ros.backend_features.move_it_inverse_kinematics import MoveItInverseKinematics
-from compas_fab.backends.ros.backend_features.move_it_plan_cartesian_motion import MoveItPlanCartesianMotion
-from compas_fab.backends.ros.backend_features.move_it_plan_motion import MoveItPlanMotion
-from compas_fab.backends.ros.backend_features.move_it_planning_scene import MoveItPlanningScene
 from compas_fab.backends.ros.exceptions import RosError
 from compas_fab.backends.ros.fileserver_loader import RosFileServerLoader
 from compas_fab.backends.ros.messages import ExecuteTrajectoryFeedback

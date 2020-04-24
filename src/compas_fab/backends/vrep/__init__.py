@@ -20,5 +20,6 @@ from .helpers import VrepError
 from .client import VrepClient
 
 __all__ = [
-    'VrepClient'
+    'VrepClient',
+    'VrepError',
 ]
