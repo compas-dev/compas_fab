@@ -9,6 +9,7 @@ from compas_fab.backends.vrep.helpers import vrep_pose_to_frame
 class VrepForwardKinematics(object):
     def __init__(self, client):
         self.client = client
+        thing = VrepClient
 
     def __call__(self, robot):
         return self.forward_kinematics(robot)
@@ -22,6 +23,7 @@ class VrepForwardKinematics(object):
         Examples:
 
             >>> from compas_fab.robots import *
+            >>> from compas_fab.backends import VrepClient
             >>> with VrepClient() as client:
             ...     frame = client.forward_kinematics(rfl.Robot('A'))
 

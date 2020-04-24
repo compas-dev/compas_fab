@@ -20,7 +20,7 @@ class MoveItPlanningScene(object):
         self.ros_client = ros_client
 
     def __call__(self, *args, **kwargs):
-        return
+        return self.get_planning_scene()
 
     def get_planning_scene(self):
         kwargs = {}
