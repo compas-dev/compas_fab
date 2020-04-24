@@ -1031,7 +1031,7 @@ class Robot(object):
 
         Parameters
         ----------
-        full_configuration : :class:`compas_fab.robots.Configuration`
+        configuration : :class:`compas_fab.robots.Configuration`
             The full configuration to calculate the forward kinematic for. If no
             full configuration is passed, the zero-joint state for the other
             configurable joints is assumed.
@@ -1114,7 +1114,7 @@ class Robot(object):
             The maximum allowed distance of joint positions between consecutive
             points. If the distance is found to be above this threshold, the
             path computation fails. It must be specified in relation to max_step.
-            If this theshhold is 0, 'jumps' might occur, resulting in an invalid
+            If this threshold is 0, 'jumps' might occur, resulting in an invalid
             cartesian path. Defaults to pi/2.
         avoid_collisions: bool, optional
             Whether or not to avoid collisions. Defaults to True.

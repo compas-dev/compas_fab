@@ -2,8 +2,6 @@ from __future__ import print_function
 
 import logging
 
-from compas.geometry import Frame
-
 from compas_fab.backends.client import ClientInterface
 from compas_fab.backends.vrep import VrepError
 from compas_fab.backends.vrep.helpers import assert_robot
@@ -14,7 +12,6 @@ from compas_fab.backends.vrep.helpers import floats_to_vrep
 from compas_fab.backends.vrep.helpers import resolve_host
 from compas_fab.backends.vrep.planner_backend_vrep import VrepPlanner
 from compas_fab.backends.vrep.remote_api import vrep
-from compas_fab.robots import Configuration
 
 DEFAULT_SCALE = 1.
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
