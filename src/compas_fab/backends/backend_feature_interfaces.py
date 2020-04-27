@@ -20,11 +20,11 @@ class ForwardKinematics(object):
 class InverseKinematics(object):
     __metaclass__ = ABCMeta
 
-    def __call__(self, frame_WCF, start_configuration=None, group=None, options={}):
-        return self.inverse_kinematics(frame_WCF, start_configuration, group, options)
+    def __call__(self, robot, frame_WCF, start_configuration=None, group=None, options={}):
+        return self.inverse_kinematics(robot, frame_WCF, start_configuration, group, options)
 
     @abstractmethod
-    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options={}):
+    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options={}):
         pass
 
 

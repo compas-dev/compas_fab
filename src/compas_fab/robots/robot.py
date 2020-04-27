@@ -944,11 +944,23 @@ class Robot(object):
     # services
     # ==========================================================================
 
-    def inverse_kinematics(self, frame_WCF, start_configuration=None,
-                           group=None, avoid_collisions=True,
-                           constraints=None, attempts=8,
-                           attached_collision_meshes=None,
-                           return_full_configuration=False):
+    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options={}):
+        avoid_collisions = options.get('avoid_collisions', True)
+        constraints = options.get('constraints')
+        attempts = options.get('attempts', 8)
+        attached_collision_meshes = options.get('attached_collision_meshes')
+        return_full_configuration = options.get('return_full_configuration', False)
+        return self.inverse_kinematics_deprecated(frame_WCF, start_configuration,
+                                                  group, avoid_collisions,
+                                                  constraints, attempts,
+                                                  attached_collision_meshes,
+                                                  return_full_configuration)
+
+    def inverse_kinematics_deprecated(self, frame_WCF, start_configuration=None,
+                                      group=None, avoid_collisions=True,
+                                      constraints=None, attempts=8,
+                                      attached_collision_meshes=None,
+                                      return_full_configuration=False):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
@@ -1008,11 +1020,16 @@ class Robot(object):
                 attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
         # The returned joint names might be more than the requested ones if there are passive joints present
+        options = {
+            'avoid_collisions': avoid_collisions,
+            'constraints': constraints,
+            'attempts': attempts,
+            'attached_collision_meshes': attached_collision_meshes,
+        }
         joint_positions, joint_names = self.client.inverse_kinematics(self,
-                                                                      frame_WCF_scaled,
-                                                                      group, start_configuration_scaled,
-                                                                      avoid_collisions, constraints, attempts,
-                                                                      attached_collision_meshes)
+                                                                      frame_WCF_scaled, start_configuration_scaled,
+                                                                      group,
+                                                                      options)
         if return_full_configuration:
             # build configuration including passive joints, but no sorting
             joint_types = self.get_joint_types_by_names(joint_names)

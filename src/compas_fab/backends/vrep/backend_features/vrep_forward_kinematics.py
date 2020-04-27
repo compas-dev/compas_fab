@@ -24,7 +24,7 @@ class VrepForwardKinematics(ForwardKinematics):
             >>> from compas_fab.robots import *
             >>> from compas_fab.backends import VrepClient
             >>> with VrepClient() as client:
-            ...     frame = client.forward_kinematics(0)
+            ...     frame = client.forward_kinematics(None, None, 0)
 
         Returns:
             An instance of :class:`Frame`.

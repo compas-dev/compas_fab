@@ -4,6 +4,7 @@ from __future__ import print_function
 
 from compas.utilities import await_callback
 
+from compas_fab.backends.backend_feature_interfaces import InverseKinematics
 from compas_fab.backends.ros.backend_features.helpers import validate_response
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
 from compas_fab.backends.ros.messages import AttachedCollisionObject
@@ -19,7 +20,7 @@ from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.planner_backend import ServiceDescription
 
 
-class MoveItInverseKinematics(object):
+class MoveItInverseKinematics(InverseKinematics):
     GET_POSITION_IK = ServiceDescription('/compute_ik',
                                          'GetPositionIK',
                                          GetPositionIKRequest,
@@ -29,20 +30,20 @@ class MoveItInverseKinematics(object):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def __call__(self, robot, frame, group,
-                 start_configuration, avoid_collisions=True,
-                 constraints=None, attempts=8,
-                 attached_collision_meshes=None):
+    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options={}):  # !!! GHX !!!
+        avoid_collisions = options.get('avoid_collisions', True)
+        constraints = options.get('constraints')
+        attempts = options.get('attempts', 8)
+        attached_collision_meshes = options.get('attached_collision_meshes')
+        return self.inverse_kinematics_deprecated(robot, frame_WCF, group,
+                                                  start_configuration, avoid_collisions,
+                                                  constraints, attempts,
+                                                  attached_collision_meshes)
 
-        return self.inverse_kinematics(robot, frame, group,
-                                       start_configuration, avoid_collisions,
-                                       constraints, attempts,
-                                       attached_collision_meshes)
-
-    def inverse_kinematics(self, robot, frame, group,
-                           start_configuration, avoid_collisions=True,
-                           constraints=None, attempts=8,
-                           attached_collision_meshes=None):
+    def inverse_kinematics_deprecated(self, robot, frame, group,
+                                      start_configuration, avoid_collisions=True,
+                                      constraints=None, attempts=8,
+                                      attached_collision_meshes=None):
         kwargs = {}
         kwargs['robot'] = robot
         kwargs['frame'] = frame

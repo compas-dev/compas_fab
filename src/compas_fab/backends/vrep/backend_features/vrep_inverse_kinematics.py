@@ -2,19 +2,25 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas_fab.backends.backend_feature_interfaces import InverseKinematics
 from compas_fab.backends.vrep.helpers import assert_robot
 from compas_fab.backends.vrep.helpers import config_from_vrep
 from compas_fab.backends.vrep.helpers import frame_to_vrep_pose
 
 
-class VrepInverseKinematics(object):
+class VrepInverseKinematics(InverseKinematics):
     def __init__(self, client):
         self.client = client
 
-    def __call__(self, robot, goal_frame, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
-        return self.inverse_kinematics(robot, goal_frame, metric_values, gantry_joint_limits, arm_joint_limits, max_trials, max_results)
+    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options={}):
+        metric_values = options.get('metric_values')
+        gantry_joint_limits = options.get('gantry_joint_limits')
+        arm_joint_limits = options.get('arm_joint_limits')
+        max_trials = options.get('max_trials')
+        max_results = options.get('max_results', 1)
+        return self.inverse_kinematics_deprecated(robot, frame_WCF, metric_values, gantry_joint_limits, arm_joint_limits, max_trials, max_results)
 
-    def inverse_kinematics(self, robot, goal_frame, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
+    def inverse_kinematics_deprecated(self, robot, goal_frame, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
         """Calculates inverse kinematics to find valid robot configurations for the specified goal frame.
 
         Args:
