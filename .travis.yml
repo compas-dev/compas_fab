@@ -32,6 +32,15 @@ jobs:
         - choco install python --version=3.8.0
         - pip3 install --user --upgrade pip
         - pip3 install cython --install-option="--no-cython-compile"
+      # Workaround because the released COMPAS 0.15.5 does not install cleanly on python 3.8 on Windows
+      # All of this [install] section should be removed after a new of COMPAS fixes 3.8 installability
+      # (main issue being matplotlib limited to a version not available on win 3.8)
+      install:
+        - pip3 install ezdxf imageio matplotlib networkx numba numpy pillow planarity scipy sympy trimesh
+        - pip3 install attr sphinx_compas_theme sphinx> invoke bump2version check-manifest flake8 autopep8 pylint pytest pytest-cov isort
+        - pip3 install --no-deps compas
+        - pip3 install roslibpy pyserial
+        - pip3 install --no-deps -e .
       env:
         - PATH=/c/Python38:/c/Python38/Scripts:$PATH
         - TRAVIS_PYTHON_IMPLEMENTATION="cpython"
