@@ -67,9 +67,11 @@ forward kinematics:
         robot_b = rfl.Robot('B')
         client.set_robot_config(robot_a, config_robot_a)
         client.set_robot_config(robot_b, config_robot_b)
+        group_a = robot_a.model.attr['index']
+        group_b = robot_b.model.attr['index']
 
-        frame_a = client.forward_kinematics(robot_a)
-        frame_b = client.forward_kinematics(robot_b)
+        frame_a = client.forward_kinematics(None, None, group=group_a)
+        frame_b = client.forward_kinematics(None, None, group=group_b)
         print('End effector poses: ', str(frame_a), str(frame_b))
 
 Inverse Kinematics

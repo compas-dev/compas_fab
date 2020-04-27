@@ -1026,7 +1026,12 @@ class Robot(object):
 
         return configuration.scaled(self.scale_factor)
 
-    def forward_kinematics(self, configuration, group=None, backend=None, link_name=None):
+    def forward_kinematics(self, configuration, group=None, options={}):
+        backend = options.get('backend')
+        link_name = options.get('link_name')
+        return self.forward_kinematics_deprecated(configuration, group, backend, link_name)
+
+    def forward_kinematics_deprecated(self, configuration, group=None, backend=None, link_name=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
@@ -1056,7 +1061,8 @@ class Robot(object):
         >>> configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
         >>> group = robot.main_group_name
         >>> frame_WCF_c = robot.forward_kinematics(configuration, group)
-        >>> frame_WCF_m = robot.forward_kinematics(configuration, group, backend='model')
+        >>> options = {'backend': 'model'}
+        >>> frame_WCF_m = robot.forward_kinematics(configuration, group, options)
         >>> frame_WCF_c == frame_WCF_m
         True
         """
@@ -1077,10 +1083,11 @@ class Robot(object):
 
         if not backend:
             if self.client:
+                options = {'link_name': link_name}
                 frame_WCF = self.client.forward_kinematics(self,
                                                            full_configuration_scaled,
                                                            group,
-                                                           link_name)
+                                                           options)
                 frame_WCF.point *= self.scale_factor
             else:
                 frame_WCF = self.model.forward_kinematics(full_joint_state, link_name)

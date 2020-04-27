@@ -4,7 +4,7 @@ from __future__ import print_function
 
 from compas.utilities import await_callback
 
-
+from compas_fab.backends.backend_feature_interfaces import ForwardKinematics
 from compas_fab.backends.ros.backend_features.helpers import validate_response
 from compas_fab.backends.ros.messages import GetPositionFKRequest
 from compas_fab.backends.ros.messages import GetPositionFKResponse
@@ -15,7 +15,7 @@ from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.planner_backend import ServiceDescription
 
 
-class MoveItForwardKinematics(object):
+class MoveItForwardKinematics(ForwardKinematics):
     GET_POSITION_FK = ServiceDescription('/compute_fk',
                                          'GetPositionFK',
                                          GetPositionFKRequest,
@@ -25,10 +25,11 @@ class MoveItForwardKinematics(object):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def __call__(self, robot, configuration, group, ee_link):
-        return self.forward_kinematics(robot, configuration, group, ee_link)
+    def forward_kinematics(self, robot, configuration, group=None, options={}):  # !!! must find all calls to this and adapt  GHX!!!
+        link_name = options.get('link_name')
+        return self.forward_kinematics_deprecated(robot, configuration, group, link_name)
 
-    def forward_kinematics(self, robot, configuration, group, ee_link):
+    def forward_kinematics_deprecated(self, robot, configuration, group, ee_link):
         kwargs = {}
         kwargs['robot'] = robot
         kwargs['configuration'] = configuration
