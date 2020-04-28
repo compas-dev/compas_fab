@@ -20,14 +20,14 @@ class CollisionMesh(object):
     ----------
     mesh : :class:`compas.datastructures.Mesh`
         The collision mesh. Ideally it is as coarse as possible.
-    id : :class:`str`
+    id : :obj:`str`
         The id of the mesh, used to identify it for later operations
         (:meth:`~PlanningScene.add_collision_mesh`,
         :meth:`~PlanningScene.remove_collision_mesh`,
         :meth:`~PlanningScene.append_collision_mesh` etc.)
     frame : :class:`compas.geometry.Frame`, optional
         The frame of the mesh. Defaults to the world XY frame.
-    root_name : :class:`str`
+    root_name : :obj:`str`
         The name of the root link the collision mesh will be placed in. Defaults
         to `'world'`.
 
@@ -63,13 +63,13 @@ class AttachedCollisionMesh(object):
     ----------
     collision_mesh : :class:`compas_fab.robots.CollisionMesh`
         The collision mesh we want to attach.
-    link_name : :class:`str`
+    link_name : :obj:`str`
         The name of the :class:`~compas.robots.Link` the collision mesh will be
         attached to.
-    touch_links : :class:`list` of :class:`str`
+    touch_links : :obj:`list` of :obj:`str`
         The list of link names the collision mesh is allowed to touch. Defaults
         to the link it is attached to.
-    weight : :class:`float`
+    weight : :obj:`float`
         The weight of the attached object. Defaults to ``1.0``.
 
     Examples
@@ -125,7 +125,7 @@ class PlanningScene(object):
         ----------
         collision_mesh : :class:`CollisionMesh`
             The collision mesh we want to add.
-        scale : :class:`bool`, optional
+        scale : :obj:`bool`, optional
             If ``True``, the mesh will be scaled according to the robot's scale
             factor.
 
@@ -161,7 +161,7 @@ class PlanningScene(object):
 
         Parameters
         ----------
-        id : :class:`str`
+        id : :obj:`str`
             The `id` of the :class:`CollisionMesh` instance to remove.
 
         Returns
@@ -183,7 +183,7 @@ class PlanningScene(object):
         ----------
         collision_mesh : :class:`CollisionMesh`
             The collision mesh we want to append to the :class:`PlanningScene`.
-        scale : :class:`bool`, optional
+        scale : :obj:`bool`, optional
             If ``True``, the mesh will be scaled according to the robot's scale
             factor.
 
@@ -222,7 +222,7 @@ class PlanningScene(object):
             The :class:`AttachedCollisionMesh` (a :class:`CollisionMesh`
             attached to a :class:`Robot`'s :class:`~compas.robots.Link`) that
             we want to add to the :class:`PlanningScene`.
-        scale : :class:`bool`, optional
+        scale : :obj:`bool`, optional
             If ``True``, the mesh will be scaled using the robot's scale factor.
 
         Returns
@@ -252,7 +252,7 @@ class PlanningScene(object):
 
         Parameters
         ----------
-        id : :class:`str`
+        id : :obj:`str`
             The `id` of the :class:`CollisionMesh` in the
             :class:`AttachedCollisionMesh` to remove from the
             :class:`PlanningScene`.
@@ -276,10 +276,10 @@ class PlanningScene(object):
         ----------
         collision_mesh: :class:`CollisionMesh`
             The collision mesh to attach to robot's end effector.
-        scale : :class:`bool`, optional
+        scale : :obj:`bool`, optional
             If ``True``, the mesh will be scaled using the robot's scale
             factor.
-        group : :class:`str`
+        group : :obj:`str`
             The planning group with the end effector we want to attach the mesh
             to. Defaults to the robot's main planning group.
 
