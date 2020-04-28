@@ -75,15 +75,15 @@ class Robot(object):
 
         Parameters
         ----------
-        name : :class:`str`
+        name : :obj:`str`
             Name of the robot
-        joints : :class:`list` of :class:`compas.robots.Joint`, optional
+        joints : :obj:`list` of :class:`compas.robots.Joint`, optional
             Robot's joints.
-        links : :class:`list` of :class:`compas.robots.Link`, optional
+        links : :obj:`list` of :class:`compas.robots.Link`, optional
             Robot's links
-        materials : :class:`list` of :class:`compas.robots.Material`, optional
+        materials : :obj:`list` of :class:`compas.robots.Material`, optional
             Material description of the robot.
-        kwargs : :class:`dict`
+        kwargs : :obj:`dict`
             Keyword arguments passed to the :class:`compas.robots.RobotModel`
             `attr` :obj:`dict`. Accessible from `Robot.model.attr`.
 
@@ -104,7 +104,7 @@ class Robot(object):
 
     @property
     def name(self):
-        """:class:`str`: Name of the robot, as defined by its model.
+        """:obj:`str`: Name of the robot, as defined by its model.
 
         Examples
         --------
@@ -115,7 +115,7 @@ class Robot(object):
 
     @property
     def group_names(self):
-        """:class:`list` of :class:`str`: All planning groups of the robot.
+        """:obj:`list` of :obj:`str`: All planning groups of the robot.
 
         Examples
         --------
@@ -128,13 +128,13 @@ class Robot(object):
 
     @property
     def main_group_name(self):
-        """:class:`str`: Robot's main planning group."""
+        """:obj:`str`: Robot's main planning group."""
         self.ensure_semantics()
         return self.semantics.main_group_name
 
     @property
     def root_name(self):
-        """:class:`str`: Robot's root name."""
+        """:obj:`str`: Robot's root name."""
         return self.model.root.name
 
     def get_end_effector_link_name(self, group=None):
@@ -142,12 +142,12 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the group. Defaults to the main planning group.
 
         Returns
         -------
-        :class:`str`
+        :obj:`str`
 
         Examples
         --------
@@ -164,7 +164,7 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -185,7 +185,7 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
         full_configuration : :class:`Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
@@ -205,12 +205,12 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :class:`str`
+        :obj:`str`
 
         Examples
         --------
@@ -227,7 +227,7 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -248,7 +248,7 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
         full_configuration : :class:`Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
@@ -268,12 +268,12 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :class:`list` of :class:`str`
+        :obj:`list` of :obj:`str`
 
         Examples
         --------
@@ -292,12 +292,12 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :class:`list` of :class:`compas.robots.Joint`
+        :obj:`list` of :class:`compas.robots.Joint`
 
         Note
         ----
@@ -323,12 +323,12 @@ class Robot(object):
 
         Parameters
         ----------
-        name : :class:`list` of :class:`str`
+        name : :obj:`list` of :obj:`str`
             The names of the joints.
 
         Returns
         -------
-        :class:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+        :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
             List of joint types.
         """
         return [self.get_joint_by_name(n).type for n in names]
@@ -338,7 +338,7 @@ class Robot(object):
 
         Parameters
         ----------
-        name : :class:`str`
+        name : :obj:`str`
             The name of the joint.
 
         Returns
@@ -352,12 +352,12 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :class:`list` of :class:`str`
+        :obj:`list` of :obj:`str`
 
         Note
         ----
@@ -378,12 +378,12 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :class:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+        :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
 
         Note
         ----
@@ -421,12 +421,12 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :class:`list` of :class:`float`
+        :obj:`list` of :obj:`float`
 
         Note
         ----
@@ -448,7 +448,7 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`
+        group : :obj:`str`
             The name of the planning group.
         full_configuration : :class:`Configuration`
             The configuration for all configurable joints of the robot.
@@ -476,7 +476,7 @@ class Robot(object):
             The configuration for one of the robot's planning groups.
         full_configuration : :class:`Configuration`
             The configuration for all configurable joints of the robot.
-        group : :class:`str`
+        group : :obj:`str`
             The name of the planning group.
 
         Returns
@@ -511,12 +511,12 @@ class Robot(object):
 
         Parameters
         ----------
-        link_name : :class:`str`
+        link_name : :obj:`str`
             The name of a link
 
         Returns
         -------
-        :class:`list` of :class:`str`
+        :obj:`list` of :obj:`str`
            A list of group names.
         """
         group_names = []
@@ -532,14 +532,14 @@ class Robot(object):
         ----------
         configuration : :class:`Configuration`
             The configuration of the configurable joints.
-        joint_name : :class:`str`
+        joint_name : :obj:`str`
             Name of joint.
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :class:`float`
+        :obj:`float`
             Joint position for the given joint.
 
         Raises
@@ -587,7 +587,7 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -603,7 +603,7 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -631,7 +631,7 @@ class Robot(object):
 
         Parameters
         ----------
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -648,7 +648,7 @@ class Robot(object):
         ----------
         frame_WCF : :class:`compas.geometry.Frame`
             A frame in the world coordinate frame.
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -673,7 +673,7 @@ class Robot(object):
         ----------
         frame_RCF : :class:`compas.geometry.Frame`
             A frame in the robot's coordinate frame.
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -696,12 +696,12 @@ class Robot(object):
 
         Parameters
         ----------
-        frames_tcf : :class:`list` of :class:`compas.geometry.Frame`
+        frames_tcf : :obj:`list` of :class:`compas.geometry.Frame`
             Frames (in WCF) at the robot's tool tip (tcf).
 
         Returns
         -------
-        :class:`list` of :class:`compas.geometry.Frame`
+        :obj:`list` of :class:`compas.geometry.Frame`
             Frames (in WCF) at the robot's flange (tool0).
 
         Raises
@@ -728,12 +728,12 @@ class Robot(object):
 
         Parameters
         ----------
-        frames_t0cf : :class:`list` of :class:`compas.geometry.Frame`
+        frames_t0cf : :obj:`list` of :class:`compas.geometry.Frame`
             Frames (in WCF) at the robot's flange (tool0).
 
         Returns
         -------
-        :class:`list` of :class:`compas.geometry.Frame`
+        :obj:`list` of :class:`compas.geometry.Frame`
             Frames (in WCF) at the robot's tool tip (tcf).
 
         Raises
@@ -762,9 +762,9 @@ class Robot(object):
         ----------
         tool : :class:`Tool`
             The tool that should be attached to the robot's flange.
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The planning group to attach this tool to. Defaults to the main planning group.
-        touch_links : :class:`list` of :class:`str`
+        touch_links : :obj:`list` of :obj:`str`
             A list of link names the end-effector is allowed to touch. Defaults
             to the end-effector link.
 
@@ -842,10 +842,10 @@ class Robot(object):
         ----------
         frame_WCF: :class:`compas.geometry.Frame`
             The frame from which we create the orientation constraint.
-        tolerances_axes: :class:`list` of :class:`float`
+        tolerances_axes: :obj:`list` of :obj:`float`
             Error tolerances t\ :sub:`i` for each of the frame's axes in
             radians. If only one value is passed it will be uses for all 3 axes.
-        group: :class:`str`, optional
+        group: :obj:`str`, optional
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
 
@@ -891,10 +891,10 @@ class Robot(object):
         ----------
         frame_WCF : :class:`compas.geometry.Frame`
             The frame from which we create position and orientation constraints.
-        tolerance_position : :class:`float`
+        tolerance_position : :obj:`float`
             The allowed tolerance to the frame's position (defined in the
             robot's units).
-        group: :class:`str`, optional
+        group: :obj:`str`, optional
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
 
@@ -935,19 +935,19 @@ class Robot(object):
         ----------
         frame_WCF: :class:`compas.geometry.Frame`
             The frame from which we create position and orientation constraints.
-        tolerance_position: :class:`float`
+        tolerance_position: :obj:`float`
             The allowed tolerance to the frame's position (defined in the
             robot's units).
-        tolerances_axes: :class:`list` of :class:`float`
+        tolerances_axes: :obj:`list` of :obj:`float`
             Error tolerances t\ :sub:`i` for each of the frame's axes in
             radians. If only one value is passed it will be uses for all 3 axes.
-        group: :class:`str`, optional
+        group: :obj:`str`, optional
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
 
         Returns
         -------
-        :class:`list` of :class:`Constraint`
+        :obj:`list` of :class:`Constraint`
 
         See Also
         --------
@@ -985,24 +985,24 @@ class Robot(object):
         ----------
         configuration: :class:`Configuration`
             The target configuration.
-        tolerances_above: :class:`list` of :class:`float`
+        tolerances_above: :obj:`list` of :obj:`float`
             The tolerances above the targeted configuration's joint value on
             each of the joints, defining the upper bound in radians to be
             achieved. If only one value is passed, it will be used to create
             upper bounds for all joint constraints.
 
-        tolerances_below: :class:`list` of :class:`float`
+        tolerances_below: :obj:`list` of :obj:`float`
             The tolerances below the targeted configuration's joint value on
             each of the joints, defining the upper bound in radians to be
             achieved. If only one value is passed, it will be used to create
             lower bounds for all joint constraints.
-        group: :class:`str`, optional
+        group: :obj:`str`, optional
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
 
         Returns
         -------
-        :class:`list` of :class:`JointConstraint`
+        :obj:`list` of :class:`JointConstraint`
 
         Raises
         ------
@@ -1073,18 +1073,18 @@ class Robot(object):
             If passed, the inverse will be calculated such that the calculated
             joint positions differ the least from the start_configuration.
             Defaults to the initial configuration.
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
-        avoid_collisions : :class:`bool`, optional
+        avoid_collisions : :obj:`bool`, optional
             Whether or not to avoid collisions. Defaults to ``True``.
-        constraints : :class:`list` of :class:`Constraint`, optional
+        constraints : :obj:`list` of :class:`Constraint`, optional
             A set of constraints that the request must obey. Defaults to ``None``.
-        attempts : :class:`int`, optional
+        attempts : :obj:`int`, optional
             The maximum number of inverse kinematic attempts. Defaults to ``8``.
-        attached_collision_meshes : :class:`list` of :class:`AttachedCollisionMesh`, optional
+        attached_collision_meshes : :obj:`list` of :class:`AttachedCollisionMesh`, optional
             Defaults to ``None``.
-        return_full_configuration : :class:`bool`
+        return_full_configuration : :obj:`bool`
             If ``True``, returns a full configuration with all joint values
             specified, including passive ones if available.
 
@@ -1149,17 +1149,17 @@ class Robot(object):
             The full configuration to calculate the forward kinematic for. If no
             full configuration is passed, the zero-joint state for the other
             configurable joints is assumed.
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
-        backend : ``None`` or :class:`str`
+        backend : ``None`` or :obj:`str`
             * If ``None``, calculates forward kinematic with the client if it exists or
               with the robot model.
             * If ``'model'``, use the robot model to calculate forward kinematic.
 
             Anything else is open for implementation, possibly ``'kdl'`` or
             ``'ikfast'``.
-        link_name : :class:`str`, optional
+        link_name : :obj:`str`, optional
             The name of the link to calculate the forward kinematics for.
             Defaults to the group's end effector link.
 
@@ -1225,31 +1225,31 @@ class Robot(object):
 
         Parameters
         ----------
-        frames_WCF : :class:`list` of :class:`compas.geometry.Frame`
+        frames_WCF : :obj:`list` of :class:`compas.geometry.Frame`
             The frames through which the path is defined.
         start_configuration : :class:`Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the starting position. Defaults to
             the all-zero configuration.
-        max_step : :class:`float`, optional
+        max_step : :obj:`float`, optional
             The approximate distance between the calculated points. (Defined in
             the robot's units)
-        jump_threshold : :class:`float`, optional
+        jump_threshold : :obj:`float`, optional
             The maximum allowed distance of joint positions between consecutive
             points. If the distance is found to be above this threshold, the
             path computation fails. It must be specified in relation to max_step.
             If this theshhold is 0, 'jumps' might occur, resulting in an invalid
             cartesian path. Defaults to :math:`\\pi / 2`.
-        avoid_collisions : :class:`bool`, optional
+        avoid_collisions : :obj:`bool`, optional
             Whether or not to avoid collisions. Defaults to ``True``.
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
-        path_constraints : :class:`list` of :class:`Constraint`, optional
+        path_constraints : :obj:`list` of :class:`Constraint`, optional
             Optional constraints that can be imposed along the solution path.
             Note that path calculation won't work if the start_configuration
             violates these constraints. Defaults to ``None``.
-        attached_collision_meshes : :class:`list` of :class:`AttachedCollisionMesh`, optional
+        attached_collision_meshes : :obj:`list` of :class:`AttachedCollisionMesh`, optional
             Defaults to ``None``.
 
         Returns
@@ -1335,7 +1335,7 @@ class Robot(object):
 
         Parameters
         ----------
-        goal_constraints : :class:`list` of :class:`Constraint`
+        goal_constraints : :obj:`list` of :class:`Constraint`
             The goal to be achieved, defined in a set of constraints.
             Constraints can be very specific, for example defining value domains
             for each joint, such that the goal configuration is included,
@@ -1345,29 +1345,29 @@ class Robot(object):
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the starting position. Defaults to
             the all-zero configuration.
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the group to plan for. Defaults to the robot's main
             planning group.
-        path_constraints : :class:`list` of :class:`Constraint`, optional
+        path_constraints : :obj:`list` of :class:`Constraint`, optional
             Optional constraints that can be imposed along the solution path.
             Note that path calculation won't work if the `start_configuration`
             violates these constraints. Defaults to ``None``.
-        planner_id : :class:`str`
+        planner_id : :obj:`str`
             The name of the algorithm used for path planning. Defaults to ``'RRT'``.
-        num_planning_attempts : :class:`int`, optional
+        num_planning_attempts : :obj:`int`, optional
             Normally, if one motion plan is needed, one motion plan is computed.
             However, for algorithms that use randomization in their execution
             (like ``'RRT'``), it is likely that different planner executions will
             produce different solutions. Setting this parameter to a value above
             ``1`` will run many additional motion plans, and will report the
             shortest solution as the final result. Defaults to ``1``.
-        allowed_planning_time : :class:`float`
+        allowed_planning_time : :obj:`float`
             The number of seconds allowed to perform the planning. Defaults to ``2``.
-        max_velocity_scaling_factor : :class:`float`
+        max_velocity_scaling_factor : :obj:`float`
             Defaults to ``1``.
-        max_acceleration_scaling_factor : :class:`float`
+        max_acceleration_scaling_factor : :obj:`float`
             Defaults to ``1``.
-        attached_collision_meshes : :class:`list` of :class:`AttachedCollisionMesh`
+        attached_collision_meshes : :obj:`list` of :class:`AttachedCollisionMesh`
             Defaults to ``None``.
 
         Returns
@@ -1477,13 +1477,13 @@ class Robot(object):
         ----------
         configuration : :class:`Configuration`
             Configuration to compute transformed frames for.
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
 
         Returns
         -------
-        :class:`list` of :class:`compas.geometry.Frame`
+        :obj:`list` of :class:`compas.geometry.Frame`
         """
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
@@ -1499,13 +1499,13 @@ class Robot(object):
         ----------
         configuration : :class:`Configuration`
             Configuration to compute transformed axes for.
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
 
         Returns
         -------
-        :class:`list` of :class:`compas.geometry.Vector`
+        :obj:`list` of :class:`compas.geometry.Vector`
         """
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
@@ -1525,13 +1525,13 @@ class Robot(object):
         ----------
         configuration : :class:`Configuration`
             Instance of the configuration (joint state) to move to.
-        group : :class:`str`, optional
+        group : :obj:`str`, optional
             The name of the group to plan for. Defaults to the robot's main
             planning group.
-        visual : :class:`bool`, optional
+        visual : :obj:`bool`, optional
             ``True`` if the visual geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
-        collision : :class:`bool`, optional
+        collision : :obj:`bool`, optional
             ``True`` if the collision geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
         """
@@ -1561,7 +1561,7 @@ class Robot(object):
 
         Parameters
         ----------
-        factor : :class:`float`
+        factor : :obj:`float`
             The factor to scale the robot with.
 
         Returns
@@ -1576,7 +1576,7 @@ class Robot(object):
 
     @property
     def scale_factor(self):
-        """:class:`float`: Robot's scale factor."""
+        """:obj:`float`: Robot's scale factor."""
         if self.artist:
             return self.artist.scale_factor
         else:
