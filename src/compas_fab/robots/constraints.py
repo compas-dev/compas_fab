@@ -54,7 +54,7 @@ class BoundingVolume(object):
 
     def __init__(self, volume_type, volume):
         if volume_type not in self.VOLUME_TYPES:
-            raise ValueError("Type must be %d, %d or %d" % (self.VOLUME_TYPES))
+            raise ValueError("Type must be one of {}".format(self.VOLUME_TYPES))
         self.type = volume_type
         self.volume = volume
 
