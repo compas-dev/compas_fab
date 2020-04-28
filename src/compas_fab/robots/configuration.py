@@ -16,13 +16,13 @@ class Configuration(object):
 
     Parameters
     ----------
-    values : :class:`list` of :class:`float`
+    values : :obj:`list` of :obj:`float`
         Joint values expressed in radians or meters, depending on the respective
         type.
-    types : :class:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+    types : :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
         Joint types, e.g. a list of :attr:`compas.robots.Joint.REVOLUTE` for
         revolute joints.
-    joint_names : :obj:`list` of :class:`str`, optional
+    joint_names : :obj:`list` of :obj:`str`, optional
         List of joint names.
 
     Attributes
@@ -139,7 +139,7 @@ class Configuration(object):
 
         Returns
         -------
-        :class:`dict`
+        :obj:`dict`
             The data representing the configuration.
         """
         return self.data
@@ -196,7 +196,7 @@ class Configuration(object):
 
         Parameters
         ----------
-        scale_factor : :class:`float`
+        scale_factor : :obj:`float`
             Scale factor.
 
         Returns
@@ -219,7 +219,7 @@ class Configuration(object):
 
         Parameters
         ----------
-        scale_factor : :class:`float`
+        scale_factor : :obj:`float`
             Scale factor
 
         Returns
