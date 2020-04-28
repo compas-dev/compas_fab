@@ -33,7 +33,7 @@ class Configuration(object):
     types : :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
         Joint types, e.g. a list of :attr:`compas.robots.Joint.REVOLUTE` for
         revolute joints.
-    joint_names : :obj:`list` of :obj:`str`, optional
+    joint_names : :obj:`list` of :obj:`str`
         List of joint names.
     data : :obj:`dict`
         The data representing the configuration.
