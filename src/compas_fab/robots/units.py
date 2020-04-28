@@ -16,12 +16,12 @@ def to_radians(degrees):
 
     Parameters
     ----------
-    degrees : :class:`list` of :class:`float`
+    degrees : :obj:`list` of :obj:`float`
         List of angle values in degrees.
 
     Returns
     -------
-    :class:`list` of :class:`float`
+    :obj:`list` of :obj:`float`
         List of angle values in radians.
     """
     return [math.radians(d) for d in degrees]
@@ -32,12 +32,12 @@ def to_degrees(radians):
 
     Parameters
     ----------
-    radians : :class:`list` of :obj:`float`
+    radians : :obj:`list` of :obj:`float`
         List of angle values in radians.
 
     Returns
     -------
-    :class:`list` of :obj:`float`
+    :obj:`list` of :obj:`float`
         List of degress.
     """
     return [math.degrees(r) for r in radians]
