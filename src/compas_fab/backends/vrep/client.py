@@ -153,7 +153,7 @@ class VrepClient(ClientInterface):
         """
         return self.run_child_script('getRobotVisibleShapeHandles', [], [], [])[1]
 
-    def set_robot_metric(self, robot, metric_values):
+    def set_robot_metric(self, group, metric_values):
         """Assigns a metric defining relations between axis values of a robot.
 
         It takes a list containing one value per configurable joint. Each value
@@ -166,12 +166,10 @@ class VrepClient(ClientInterface):
             metric_values (:obj:`list` of :obj:`float`): List containing one value
                 per configurable joint. Each value ranges from 0 to 1.
         """
-        assert_robot(robot)
-
         vrep.simxCallScriptFunction(self.client_id,
                                     self.lua_script,
                                     CHILD_SCRIPT_TYPE, 'setTheMetric',
-                                    [robot.model.attr['index']], metric_values, [],
+                                    [group], metric_values, [],
                                     bytearray(), DEFAULT_OP_MODE)
 
     def set_robot_pose(self, robot, frame):
@@ -221,7 +219,7 @@ class VrepClient(ClientInterface):
 
         values = config_to_vrep(config, self.scale)
 
-        self.set_robot_metric(robot, [0.0] * len(config.values))
+        self.set_robot_metric(robot.model.attr['index'], [0.0] * len(config.values))
         self.run_child_script('moveRobotFK',
                               [], values, ['robot' + robot.name])
 
@@ -247,7 +245,7 @@ class VrepClient(ClientInterface):
                                                       [], [])
         return config_from_vrep(config, self.scale)
 
-    def find_raw_robot_states(self, robot, goal_vrep_pose, gantry_joint_limits, arm_joint_limits, max_trials=None, max_results=1):
+    def find_raw_robot_states(self, group, goal_vrep_pose, gantry_joint_limits, arm_joint_limits, max_trials=None, max_results=1):
         i = 0
         final_states = []
         retry_until_success = True if not max_trials else False
@@ -261,7 +259,7 @@ class VrepClient(ClientInterface):
                 string_param_list.append(','.join(map(str, joint_limits)))
 
             res, _, states, _, _ = self.run_child_script('searchRobotStates',
-                                                         [robot.model.attr['index'],
+                                                         [group,
                                                           max_trials or 1,
                                                           max_results],
                                                          goal_vrep_pose, string_param_list)

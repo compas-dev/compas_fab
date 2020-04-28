@@ -134,7 +134,7 @@ class VrepPlanMotion(object):
             log.debug('Execution time: add_meshes=%.2f', timer() - first_start)
 
         start = timer() if log else None
-        self.client.set_robot_metric(robot, metric_values)
+        self.client.set_robot_metric(robot.model.attr['index'], metric_values)
         if log:
             log.debug('Execution time: set_robot_metric=%.2f', timer() - start)
 
@@ -149,7 +149,7 @@ class VrepPlanMotion(object):
             start = timer() if log else None
             max_trials = None if shallow_state_search else 80
             max_results = 1 if shallow_state_search else 80
-            states = self.client.find_raw_robot_states(robot, frame_to_vrep_pose(goal['target'], self.client.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
+            states = self.client.find_raw_robot_states(robot.model.attr['index'], frame_to_vrep_pose(goal['target'], self.client.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
             if log:
                 log.debug('Execution time: search_robot_states=%.2f', timer() - start)
 

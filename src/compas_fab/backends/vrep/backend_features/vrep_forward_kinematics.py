@@ -17,7 +17,7 @@ class VrepForwardKinematics(ForwardKinematics):
         """Calculates forward kinematics to get the current end-effector pose.
 
         Args:
-            group (int): Integer referencing the desired robot group.
+            group (:obj:`int`): Integer referencing the desired robot group.
 
         Examples:
 

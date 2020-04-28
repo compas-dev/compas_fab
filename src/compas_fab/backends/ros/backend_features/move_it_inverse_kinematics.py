@@ -30,22 +30,23 @@ class MoveItInverseKinematics(InverseKinematics):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options={}):  # !!! GHX !!!
+    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options={}):  # !!! GHX !!!
         avoid_collisions = options.get('avoid_collisions', True)
         constraints = options.get('constraints')
         attempts = options.get('attempts', 8)
         attached_collision_meshes = options.get('attached_collision_meshes')
-        return self.inverse_kinematics_deprecated(robot, frame_WCF, group,
+        base_link = options['base_link']
+        return self.inverse_kinematics_deprecated(base_link, frame_WCF, group,
                                                   start_configuration, avoid_collisions,
                                                   constraints, attempts,
                                                   attached_collision_meshes)
 
-    def inverse_kinematics_deprecated(self, robot, frame, group,
+    def inverse_kinematics_deprecated(self, base_link, frame, group,
                                       start_configuration, avoid_collisions=True,
                                       constraints=None, attempts=8,
                                       attached_collision_meshes=None):
         kwargs = {}
-        kwargs['robot'] = robot
+        kwargs['base_link'] = base_link
         kwargs['frame'] = frame
         kwargs['group'] = group
         kwargs['start_configuration'] = start_configuration
@@ -58,11 +59,10 @@ class MoveItInverseKinematics(InverseKinematics):
 
         return await_callback(self.inverse_kinematics_async, **kwargs)
 
-    def inverse_kinematics_async(self, callback, errback, robot, frame, group,
+    def inverse_kinematics_async(self, callback, errback, base_link, frame, group,
                                  start_configuration, avoid_collisions=True,
                                  constraints=None, attempts=8, attached_collision_meshes=None):
         """Asynchronous handler of MoveIt IK service."""
-        base_link = robot.model.root.name
         header = Header(frame_id=base_link)
         pose = Pose.from_frame(frame)
         pose_stamped = PoseStamped(header, pose)

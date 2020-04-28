@@ -1025,9 +1025,9 @@ class Robot(object):
             'constraints': constraints,
             'attempts': attempts,
             'attached_collision_meshes': attached_collision_meshes,
+            'base_link': self.model.root.name,
         }
-        joint_positions, joint_names = self.client.inverse_kinematics(self,
-                                                                      frame_WCF_scaled, start_configuration_scaled,
+        joint_positions, joint_names = self.client.inverse_kinematics(frame_WCF_scaled, start_configuration_scaled,
                                                                       group,
                                                                       options)
         if return_full_configuration:
