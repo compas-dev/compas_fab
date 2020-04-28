@@ -20,13 +20,33 @@ class BoundingVolume(object):
         The volume can be either a :class:`compas.geometry.Box`, a
         :class:`compas.geometry.Sphere`, or a
         :class:`compas.datastructures.Mesh`.
+
+    Attributes
+    ----------
+    volume_type
+        The type of bounding volume, one of :attr:`BoundingVolume.VOLUME_TYPES`.
+    volume : :class:`compas.datastructures.Mesh` or :class:`compas.geometry.Primitive`
+        The volume can be either a :class:`compas.geometry.Box`, a
+        :class:`compas.geometry.Sphere`, or a
+        :class:`compas.datastructures.Mesh`.
+
+    Class attributes
+    ----------------
+    BOX
+        Box bounding volume type.
+    SPHERE
+        Sphere bounding volume type.
+    MESH
+        Mesh bounding volume type.
+    VOLUME_TYPES
+        List of supported bounding volume types.
     """
 
-    #: Box volume type
+    #: Box bounding volume type
     BOX = 1
-    #: Sphere volume type
+    #: Sphere bounding volume type
     SPHERE = 2
-    #: Mesh volume type
+    #: Mesh bounding volume type
     MESH = 3
 
     #: List of supported volume types
@@ -160,6 +180,26 @@ class Constraint(object):
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to
         ``1``.
+
+    Attributes
+    ----------
+    constraint_type
+        Constraint type, one of :attr:`Constraint.CONSTRAINT_TYPES`.
+    weight : :obj:`float`, optional
+        A weighting factor for this constraint. Denotes relative importance to
+        other constraints. Closer to zero means less important. Defaults to
+        ``1``.
+
+    Class Attributes
+    ----------------
+    JOINT
+        Joint constraint type.
+    POSITION
+        Positional constraint type.
+    ORIENTATION
+        Orientational constraint type.
+    CONSTRAINT_TYPES
+        List of possible constraint types.
     """
 
     #: Joint constraint type.
@@ -227,6 +267,21 @@ class JointConstraint(Constraint):
         other constraints. Closer to zero means less important. Defaults to
         ``1``.
 
+    Attributes
+    ----------
+    joint_name : :obj:`str`
+        The name of the joint this contraint refers to.
+    value : :obj:`float`
+        The targeted value for that joint.
+    tolerance_above : :obj:`float`
+        Tolerance above the targeted joint value, in radians. Defaults to ``0``.
+    tolerance_below : :obj:`float`
+        Tolerance below the targeted joint value, in radians. Defaults to ``0``.
+    weight : :obj:`float`, optional
+        A weighting factor for this constraint. Denotes relative importance to
+        other constraints. Closer to zero means less important. Defaults to
+        ``1``.
+
     Examples
     --------
     >>> from compas_fab.robots import JointConstraint
@@ -271,6 +326,23 @@ class OrientationConstraint(Constraint):
     r"""Constrains a link to be within a certain orientation.
 
     Parameters
+    ----------
+    link_name : :obj:`str`
+        The name of the link this contraint refers to.
+    quaternion : :obj:`list` of :obj:`float`
+        The desired orientation of the link specified by a quaternion in the
+        order of ``[w, x, y, z]``.
+    tolerances : :obj:`list` of :obj:`float`, optional
+        Error tolerances t\ :sub:`i` for each of the frame's axes. If only one
+        value is passed it will be used for all 3 axes. The respective bound to
+        be achieved is :math:`(a_{i} - t_{i}, a_{i} + t_{i})`. Defaults to
+        ``[0.01, 0.01, 0.01]``.
+    weight : :obj:`float`, optional
+        A weighting factor for this constraint. Denotes relative importance to
+        other constraints. Closer to zero means less important. Defaults to
+        ``1``.
+
+    Attributes
     ----------
     link_name : :obj:`str`
         The name of the link this contraint refers to.
@@ -348,7 +420,19 @@ class PositionConstraint(Constraint):
         The volume this constraint refers to.
     weight : :obj:`float`, optional
         A weighting factor for this constraint. Denotes relative importance to
-        other constraints. Closer to zero means less important. Defaults to ``1``.
+        other constraints. Closer to zero means less important. Defaults to
+        ``1``.
+
+    Attributes
+    ----------
+    link_name : :obj:`str`
+        The name of the link this contraint refers to.
+    bounding_volume : :class:`BoundingVolume`
+        The volume this constraint refers to.
+    weight : :obj:`float`, optional
+        A weighting factor for this constraint. Denotes relative importance to
+        other constraints. Closer to zero means less important. Defaults to
+        ``1``.
 
     Examples
     --------
