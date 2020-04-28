@@ -24,6 +24,23 @@ class JointTrajectoryPoint(Configuration):
 
     Parameters
     ----------
+    values : :obj:`list` of :obj:`float`, optional
+        Joint values expressed in radians or meters, depending on the respective
+        type.
+    types : :obj:`list` of :attr:`compas.robots.Joint.TYPE`, optional
+        Joint types, e.g. a :obj:`list` of
+        :attr:`compas.robots.Joint.REVOLUTE` for revolute joints.
+    velocities : :obj:`list` of :obj:`float`, optional
+        Velocity of each joint.
+    accelerations : :obj:`list` of :obj:`float`, optional
+        Acceleration of each joint.
+    effort : :obj:`list` of :obj:`float`, optional
+        Effort of each joint.
+    time_from_start : :class:`Duration`, optional
+        Duration of trajectory point counting from the start.
+
+    Parameters
+    ----------
     values : :obj:`list` of :obj:`float`
         Joint values expressed in radians or meters, depending on the respective
         type.
@@ -38,6 +55,13 @@ class JointTrajectoryPoint(Configuration):
         Effort of each joint.
     time_from_start : :class:`Duration`
         Duration of trajectory point counting from the start.
+    positions : :obj:`list` of :obj:`float`
+        Alias of `values`.
+    data : obj:`dict`
+        The data representing the trajectory point. By assigning a data
+        dictionary to this property, the current data of the configuration will
+        be replaced by the data in the :obj:`dict`. The data getter and setter
+        should always be used in combination with each other.
     """
 
     def __init__(self, values=None, types=None, velocities=None, accelerations=None, effort=None, time_from_start=None):
@@ -132,6 +156,11 @@ class JointTrajectoryPoint(Configuration):
 class Trajectory(object):
     """Base trajectory class.
 
+    Parameters
+    ----------
+    planning_time : :obj:`float`
+        Amount of time it took to complete the motion plan
+
     Attributes
     ----------
     planning_time : :obj:`float`
@@ -154,8 +183,22 @@ class JointTrajectory(Trajectory):
     start_configuration : :class:`Configuration`
         Start configuration for the trajectory.
     fraction : :obj:`float`
-        Indicates the percentage of requested trajectory that was calcuted,
+        Indicates the percentage of requested trajectory that was calculated,
         e.g. ``1`` means the full trajectory was found.
+
+    Attributes
+    ----------
+    points : :obj:`list` of :class:`JointTrajectoryPoint`
+        List of points composing the trajectory.
+    joint_names : :obj:`list` of :obj:`str`
+        List of joint names of the trajectory.
+    start_configuration : :class:`Configuration`
+        Start configuration for the trajectory.
+    fraction : :obj:`float`
+        Indicates the percentage of requested trajectory that was calculated,
+        e.g. ``1`` means the full trajectory was found.
+    data : :obj:`dict`
+        The data representing the trajectory.
     """
 
     def __init__(self, trajectory_points=None, joint_names=None, start_configuration=None, fraction=None):
