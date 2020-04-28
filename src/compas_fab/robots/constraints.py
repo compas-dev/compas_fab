@@ -185,10 +185,9 @@ class Constraint(object):
     ----------
     constraint_type
         Constraint type, one of :attr:`Constraint.CONSTRAINT_TYPES`.
-    weight : :obj:`float`, optional
+    weight : :obj:`float`
         A weighting factor for this constraint. Denotes relative importance to
-        other constraints. Closer to zero means less important. Defaults to
-        ``1``.
+        other constraints. Closer to zero means less important.
 
     Class Attributes
     ----------------
@@ -274,13 +273,12 @@ class JointConstraint(Constraint):
     value : :obj:`float`
         The targeted value for that joint.
     tolerance_above : :obj:`float`
-        Tolerance above the targeted joint value, in radians. Defaults to ``0``.
+        Tolerance above the targeted joint value, in radians.
     tolerance_below : :obj:`float`
-        Tolerance below the targeted joint value, in radians. Defaults to ``0``.
-    weight : :obj:`float`, optional
+        Tolerance below the targeted joint value, in radians.
+    weight : :obj:`float`
         A weighting factor for this constraint. Denotes relative importance to
-        other constraints. Closer to zero means less important. Defaults to
-        ``1``.
+        other constraints. Closer to zero means less important.
 
     Examples
     --------
@@ -349,15 +347,13 @@ class OrientationConstraint(Constraint):
     quaternion : :obj:`list` of :obj:`float`
         The desired orientation of the link specified by a quaternion in the
         order of ``[w, x, y, z]``.
-    tolerances : :obj:`list` of :obj:`float`, optional
+    tolerances : :obj:`list` of :obj:`float`
         Error tolerances t\ :sub:`i` for each of the frame's axes. If only one
         value is passed it will be used for all 3 axes. The respective bound to
-        be achieved is :math:`(a_{i} - t_{i}, a_{i} + t_{i})`. Defaults to
-        ``[0.01, 0.01, 0.01]``.
-    weight : :obj:`float`, optional
+        be achieved is :math:`(a_{i} - t_{i}, a_{i} + t_{i})`.
+    weight : :obj:`float`
         A weighting factor for this constraint. Denotes relative importance to
-        other constraints. Closer to zero means less important. Defaults to
-        ``1``.
+        other constraints. Closer to zero means less important.
 
     Notes
     -----
@@ -429,10 +425,9 @@ class PositionConstraint(Constraint):
         The name of the link this contraint refers to.
     bounding_volume : :class:`BoundingVolume`
         The volume this constraint refers to.
-    weight : :obj:`float`, optional
+    weight : :obj:`float`
         A weighting factor for this constraint. Denotes relative importance to
-        other constraints. Closer to zero means less important. Defaults to
-        ``1``.
+        other constraints. Closer to zero means less important.
 
     Examples
     --------
