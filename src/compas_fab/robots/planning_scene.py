@@ -77,7 +77,7 @@ class AttachedCollisionMesh(object):
     Parameters
     ----------
     collision_mesh : :class:`compas_fab.robots.CollisionMesh`
-        The collision mesh we want to attach.
+        The collision mesh to be attached to the robot model.
     link_name : :obj:`str`
         The name of the :class:`~compas.robots.Link` the collision mesh will be
         attached to.
