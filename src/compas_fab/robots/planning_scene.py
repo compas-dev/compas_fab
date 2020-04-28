@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas.datastructures import mesh_transform
 from compas.geometry import Frame
 from compas.geometry import Scale
 
@@ -60,15 +59,16 @@ class CollisionMesh(object):
         self.frame = frame or Frame.worldXY()
         self.root_name = root_name or 'world'
 
-    def scale(self, transformation):
-        """Scales the collision mesh.
+    def scale(self, scale_factor):
+        """Scales the collision mesh uniformly.
 
         Parameters
         ----------
-        transformation : :class:`compas.geometry.Scale`
-            Scaling transformation to apply to collision mesh.
+        scale_factor : :obj:`float`
+            Scale factor.
         """
-        mesh_transform(self.mesh, transformation)
+        S = Scale([scale_factor] * 3)
+        self.mesh.transform(S)
 
 
 class AttachedCollisionMesh(object):
@@ -183,8 +183,8 @@ class PlanningScene(object):
         collision_mesh.root_name = self.robot.root_name
 
         if scale:
-            S = Scale([1./self.robot.scale_factor] * 3)
-            collision_mesh.scale(S)
+            scale_factor = 1. / self.robot.scale_factor
+            collision_mesh.scale(scale_factor)
 
         self.client.add_collision_mesh(collision_mesh)
 
@@ -240,8 +240,8 @@ class PlanningScene(object):
         collision_mesh.root_name = self.robot.root_name
 
         if scale:
-            S = Scale([1./self.robot.scale_factor] * 3)
-            collision_mesh.scale(S)
+            scale_factor = 1. / self.robot.scale_factor
+            collision_mesh.scale(scale_factor)
 
         self.robot.client.append_collision_mesh(collision_mesh)
 
@@ -274,8 +274,8 @@ class PlanningScene(object):
         self.ensure_client()
 
         if scale:
-            S = Scale([1./self.robot.scale_factor] * 3)
-            attached_collision_mesh.collision_mesh.scale(S)
+            scale_factor = 1. / self.robot.scale_factor
+            attached_collision_mesh.collision_mesh.scale(scale_factor)
 
         self.client.add_attached_collision_mesh(attached_collision_mesh)
 
@@ -343,8 +343,8 @@ class PlanningScene(object):
         self.ensure_client()
 
         if scale:
-            S = Scale([1./self.robot.scale_factor] * 3)
-            collision_mesh.scale(S)
+            scale_factor = 1. / self.robot.scale_factor
+            collision_mesh.scale(scale_factor)
 
         ee_link_name = self.robot.get_end_effector_link_name(group)
         touch_links = [ee_link_name]
