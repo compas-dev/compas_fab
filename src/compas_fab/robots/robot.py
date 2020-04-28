@@ -1100,9 +1100,11 @@ class Robot(object):
 
         if not backend:
             if self.client:
-                options = {'link_name': link_name}
-                frame_WCF = self.client.forward_kinematics(self,
-                                                           full_configuration_scaled,
+                options = {
+                    'link_name': link_name,
+                    'base_link': self.model.root.name,
+                }
+                frame_WCF = self.client.forward_kinematics(full_configuration_scaled,
                                                            group,
                                                            options)
                 frame_WCF.point *= self.scale_factor

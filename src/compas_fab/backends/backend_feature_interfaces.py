@@ -9,11 +9,11 @@ from abc import abstractmethod
 class ForwardKinematics(object):
     __metaclass__ = ABCMeta
 
-    def __call__(self, robot, configuration, group=None, options={}):
-        return self.forward_kinematics(robot, configuration, group, options)
+    def __call__(self, configuration, group=None, options={}):
+        return self.forward_kinematics(configuration, group, options)
 
     @abstractmethod
-    def forward_kinematics(self, robot, configuration, group=None, options={}):
+    def forward_kinematics(self, configuration, group=None, options={}):
         pass
 
 

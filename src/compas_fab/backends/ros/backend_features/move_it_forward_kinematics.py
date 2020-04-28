@@ -25,13 +25,14 @@ class MoveItForwardKinematics(ForwardKinematics):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def forward_kinematics(self, robot, configuration, group=None, options={}):  # !!! must find all calls to this and adapt  GHX!!!
+    def forward_kinematics(self, configuration, group=None, options={}):  # !!! must find all calls to this and adapt  GHX!!!
+        base_link = options['base_link']
         link_name = options.get('link_name')
-        return self.forward_kinematics_deprecated(robot, configuration, group, link_name)
+        return self.forward_kinematics_deprecated(base_link, configuration, group, link_name)
 
-    def forward_kinematics_deprecated(self, robot, configuration, group, ee_link):
+    def forward_kinematics_deprecated(self, base_link, configuration, group, ee_link):
         kwargs = {}
-        kwargs['robot'] = robot
+        kwargs['base_link'] = base_link
         kwargs['configuration'] = configuration
         kwargs['group'] = group
         kwargs['ee_link'] = ee_link
@@ -40,10 +41,9 @@ class MoveItForwardKinematics(ForwardKinematics):
 
         return await_callback(self.forward_kinematics_async, **kwargs)
 
-    def forward_kinematics_async(self, callback, errback, robot, configuration,
+    def forward_kinematics_async(self, callback, errback, base_link, configuration,
                                  group, ee_link):
         """Asynchronous handler of MoveIt FK service."""
-        base_link = robot.model.root.name
         header = Header(frame_id=base_link)
         fk_link_names = [ee_link]
         joint_state = JointState(
