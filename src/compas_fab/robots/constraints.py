@@ -117,7 +117,7 @@ class BoundingVolume(object):
 
         Parameters
         ----------
-        scale_factor : :class:`float`
+        scale_factor : :obj:`float`
             Scale factor to use in scaling operation.
         """
         S = Scale([scale_factor] * 3)
@@ -156,7 +156,7 @@ class Constraint(object):
     ----------
     constraint_type
         Constraint type, one of :attr:`Constraint.CONSTRAINT_TYPES`.
-    weight : :class:`float`, optional
+    weight : :obj:`float`, optional
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to
         ``1``.
@@ -191,7 +191,7 @@ class Constraint(object):
 
         Parameters
         ----------
-        scale_factor : :class:`float`
+        scale_factor : :obj:`float`
             Scale factor used to scale the :class:`Constraint`.
         """
         c = self.copy()
@@ -214,15 +214,15 @@ class JointConstraint(Constraint):
 
     Parameters
     ----------
-    joint_name : :class:`str`
+    joint_name : :obj:`str`
         The name of the joint this contraint refers to.
-    value : :class:`float`
+    value : :obj:`float`
         The targeted value for that joint.
-    tolerance_above : :class:`float`
+    tolerance_above : :obj:`float`
         Tolerance above the targeted joint value, in radians. Defaults to ``0``.
-    tolerance_below : :class:`float`
+    tolerance_below : :obj:`float`
         Tolerance below the targeted joint value, in radians. Defaults to ``0``.
-    weight : :class:`float`, optional
+    weight : :obj:`float`, optional
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to
         ``1``.
@@ -245,7 +245,7 @@ class JointConstraint(Constraint):
 
         Parameters
         ----------
-        scale_factor : :class:`float`
+        scale_factor : :obj:`float`
             Factor used to multiply the joint value and tolerance bounds with.
         """
         self.value *= scale_factor
@@ -272,17 +272,17 @@ class OrientationConstraint(Constraint):
 
     Parameters
     ----------
-    link_name : :class:`str`
+    link_name : :obj:`str`
         The name of the link this contraint refers to.
-    quaternion : :class:`list` of :class:`float`
+    quaternion : :obj:`list` of :obj:`float`
         The desired orientation of the link specified by a quaternion in the
         order of ``[w, x, y, z]``.
-    tolerances : :class:`list` of :class:`float`, optional
+    tolerances : :obj:`list` of :obj:`float`, optional
         Error tolerances t\ :sub:`i` for each of the frame's axes. If only one
         value is passed it will be used for all 3 axes. The respective bound to
         be achieved is :math:`(a_{i} - t_{i}, a_{i} + t_{i})`. Defaults to
         ``[0.01, 0.01, 0.01]``.
-    weight : :class:`float`, optional
+    weight : :obj:`float`, optional
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to
         ``1``.
@@ -342,11 +342,11 @@ class PositionConstraint(Constraint):
 
     Parameters
     ----------
-    link_name : :class:`str`
+    link_name : :obj:`str`
         The name of the link this contraint refers to.
     bounding_volume : :class:`BoundingVolume`
         The volume this constraint refers to.
-    weight : :class:`float`, optional
+    weight : :obj:`float`, optional
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to ``1``.
 
@@ -371,11 +371,11 @@ class PositionConstraint(Constraint):
 
         Parameters
         ----------
-        link_name: :class:`str`
+        link_name: :obj:`str`
             The name of the link this contraint refers to.
         box : :class:`compas.geometry.Box`
             Box defining the bounding volume this constraint refers to.
-        weight : :class:`float`, optional
+        weight : :obj:`float`, optional
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to ``1``.
 
@@ -399,11 +399,11 @@ class PositionConstraint(Constraint):
 
         Parameters
         ----------
-        link_name : :class:`str`
+        link_name : :obj:`str`
             The name of the link this contraint refers to.
         sphere : :class:`compas.geometry.Sphere`
             Sphere defining the bounding volume this constraint refers to.
-        weight : :class:`weight`
+        weight : :obj:`float`
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to ``1``.
 
@@ -427,11 +427,11 @@ class PositionConstraint(Constraint):
 
         Parameters
         ----------
-        link_name : :class:`str`
+        link_name : :obj:`str`
             The name of the link this contraint refers to.
         mesh : :class:`compas.datastructures.Mesh`
             Mesh defining the bounding volume this constraint refers to.
-        weight : :class:`weight`
+        weight : :obj:`float`
             A weighting factor for this constraint. Denotes relative importance
             to other constraints. Closer to zero means less important. Defaults
             to ``1``.
@@ -451,11 +451,11 @@ class PositionConstraint(Constraint):
         return cls(link_name, bounding_volume, weight)
 
     def scale(self, scale_factor):
-        """Scale the :class:`bounding_volume` uniformely.
+        """Scale the :attr:`bounding_volume` uniformely.
 
         Parameters
         ----------
-        scale_factor : :class:`float`
+        scale_factor : :obj:`float`
             Factor to scale constraining :attr:`bounding_volume`.
         """
         self.bounding_volume.scale(scale_factor)
