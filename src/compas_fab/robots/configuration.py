@@ -12,7 +12,7 @@ __all__ = [
 class Configuration(object):
     """Represents the configuration of a robot based on the state of its joints.
 
-    This concept is also refered to as `Joint State`.
+    This concept is also refered to as \"Joint State\".
 
     Parameters
     ----------
@@ -27,9 +27,20 @@ class Configuration(object):
 
     Attributes
     ----------
-    data
-    prismatic_values
-    revolute_values
+    values : :obj:`list` of :obj:`float`
+        Joint values expressed in radians or meters, depending on the respective
+        type.
+    types : :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+        Joint types, e.g. a list of :attr:`compas.robots.Joint.REVOLUTE` for
+        revolute joints.
+    joint_names : :obj:`list` of :obj:`str`, optional
+        List of joint names.
+    data : :obj:`dict`
+        The data representing the configuration.
+    prismatic_values : :obj:`list` of :obj:`float`
+        Prismatic joint values in meters.
+    revolute_values : :obj:`list` of :obj:`float`
+        Revolute joint values in radians.
 
     Examples
     --------
@@ -61,7 +72,7 @@ class Configuration(object):
                 len(self.values), len(self.values), len(self.types)))
 
     def __str__(self):
-        """Nicely printable representation of :class:`Configuration`."""
+        """Return a human-readable string representation of the instance."""
         v_str = ('(' + ", ".join(['%.' + self._precision] * len(self.values)) + ')') % tuple(self.values)
         if len(self.joint_names):
             return "Configuration({}, {}, {})".format(v_str, tuple(self.types), tuple(self.joint_names))
