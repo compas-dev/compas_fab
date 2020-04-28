@@ -33,6 +33,8 @@ Unreleased
   ``tolerance_below`` for allowing asymmetrical constraints.
 * In :class:``compas_fab.robots.Robot``, changed the ``constraints_from_configuration``
   function with ``tolerances_above`` and ``tolerances_below``.
+* :meth:`compas_fab.robots.CollisionMesh.scale` now takes a scale factor
+  instead of a :class:`compas.geometry.Scale` instance as an argument.
 
 **Removed**
 
