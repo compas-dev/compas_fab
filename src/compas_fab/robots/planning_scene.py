@@ -16,6 +16,21 @@ __all__ = [
 class CollisionMesh(object):
     """Represents a collision mesh.
 
+    Parameters
+    ----------
+    mesh : :class:`compas.datastructures.Mesh`
+        The collision mesh. Ideally it is as coarse as possible.
+    id : :obj:`str`
+        The id of the mesh, used to identify it for later operations
+        (:meth:`~PlanningScene.add_collision_mesh`,
+        :meth:`~PlanningScene.remove_collision_mesh`,
+        :meth:`~PlanningScene.append_collision_mesh` etc.)
+    frame : :class:`compas.geometry.Frame`, optional
+        The frame of the mesh. Defaults to :meth:`~compas.geometry.Frame.worldXY().
+    root_name : :obj:`str`
+        The name of the root link the collision mesh will be placed in. Defaults
+        to `'world'`.
+
     Attributes
     ----------
     mesh : :class:`compas.datastructures.Mesh`
@@ -26,7 +41,7 @@ class CollisionMesh(object):
         :meth:`~PlanningScene.remove_collision_mesh`,
         :meth:`~PlanningScene.append_collision_mesh` etc.)
     frame : :class:`compas.geometry.Frame`, optional
-        The frame of the mesh. Defaults to the world XY frame.
+        The frame of the mesh. Defaults to :meth:`~compas.geometry.Frame.worldXY().
     root_name : :obj:`str`
         The name of the root link the collision mesh will be placed in. Defaults
         to `'world'`.
@@ -58,6 +73,19 @@ class CollisionMesh(object):
 
 class AttachedCollisionMesh(object):
     """Represents a collision mesh that is attached to a :class:`Robot`'s :class:`~compas.robots.Link`.
+
+    Parameters
+    ----------
+    collision_mesh : :class:`compas_fab.robots.CollisionMesh`
+        The collision mesh we want to attach.
+    link_name : :obj:`str`
+        The name of the :class:`~compas.robots.Link` the collision mesh will be
+        attached to.
+    touch_links : :obj:`list` of :obj:`str`
+        The list of link names the collision mesh is allowed to touch. Defaults
+        to the link it is attached to.
+    weight : :obj:`float`
+        The weight of the attached object. Defaults to ``1.0``.
 
     Attributes
     ----------
@@ -92,10 +120,17 @@ class AttachedCollisionMesh(object):
 class PlanningScene(object):
     """Represents the planning scene.
 
+    Parameters
+    ----------
+    robot : :class:`Robot`
+        A reference to the robot in the planning scene.
+
     Attributes
     ----------
     robot : :class:`Robot`
         A reference to the robot in the planning scene.
+    client : :class:`compas_fab.backend.RosClient` or :class:`compas_fab.backend.VrepClient`
+        A reference to the robot's backend client.
     """
 
     def __init__(self, robot):
@@ -121,6 +156,9 @@ class PlanningScene(object):
     def add_collision_mesh(self, collision_mesh, scale=False):
         """Add a collision mesh to the planning scene.
 
+        If there is already a :class:`CollisionMesh` in the
+        :class:`PlanningScene` with the same `id` it will be replaced.
+
         Parameters
         ----------
         collision_mesh : :class:`CollisionMesh`
@@ -132,12 +170,6 @@ class PlanningScene(object):
         Returns
         -------
         ``None``
-
-        Note
-        ----
-        A :class:`CollisionMesh` with the same `id` as an existing
-        :class:`CollisionMesh` in the :class:`PlanningScene` will
-        replace the existing collision object.
 
         Examples
         --------
@@ -179,6 +211,11 @@ class PlanningScene(object):
     def append_collision_mesh(self, collision_mesh, scale=False):
         """Append a collision mesh to the planning scene.
 
+        Adds or appends :class:`CollisionMesh` to :class:`PlanningScene` using
+        `id`. This means that if there's already a :class:`CollisionMesh` in the
+        planning scene it will be merged with the :class:`CollisionMesh` given
+        as an argument to the method.
+
         Parameters
         ----------
         collision_mesh : :class:`CollisionMesh`
@@ -190,11 +227,6 @@ class PlanningScene(object):
         Returns
         -------
         ``None``
-
-        Note
-        ----
-        If there is already a :class:`CollisionMesh` instance with the same `id`
-        in the :class:`PlanningScene`, it will not be replaced.
 
         Examples
         --------
