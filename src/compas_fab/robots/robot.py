@@ -46,6 +46,30 @@ class Robot(object):
     client : optional
         The backend client to use for communication,
         e.g. :class:`compas_fab.backends.RosClient`. Defaults to ``None``.
+
+    Attributes
+    ----------
+    model : :class:`compas.robots.RobotModel`
+        The robot model, usually created from an URDF structure.
+    artist : :class:`compas_fab.artists.BaseRobotArtist`
+        Instance of the artist used to visualize the robot.
+    semantics : :class:`RobotSemantics`
+        The semantic model of the robot.
+    client
+        The backend client to use for communication,
+        e.g. :class:`compas_fab.backends.RosClient`.
+    artist : class:`compas_fab.artists.BaseRobotArtist`
+        Artist used to visualize robot.
+    name : :obj:`str`
+        Name of the robot, as defined by its model.
+    group_names : :obj:`list` of :obj:`str`
+        All planning groups of the robot.
+    main_group_name : :obj:`str`
+        Robot's main planning group.
+    root_name : :obj:`str`
+        Robot's root name.
+    scale_factor : :obj:`float`:
+        Robot's scale factor.
     """
 
     def __init__(self, model, artist=None, semantics=None, client=None):
