@@ -39,7 +39,7 @@ class JointTrajectoryPoint(Configuration):
     time_from_start : :class:`Duration`, optional
         Duration of trajectory point counting from the start.
 
-    Parameters
+    Attributes
     ----------
     values : :obj:`list` of :obj:`float`
         Joint values expressed in radians or meters, depending on the respective
@@ -153,13 +153,8 @@ class JointTrajectoryPoint(Configuration):
 class Trajectory(object):
     """Base trajectory class.
 
-    Parameters
-    ----------
-    planning_time : :obj:`float`
-        Amount of time it took to complete the motion plan
-
-    Attributes
-    ----------
+    Attribute
+    ---------
     planning_time : :obj:`float`
         Amount of time it took to complete the motion plan
     """
@@ -173,13 +168,13 @@ class JointTrajectory(Trajectory):
 
     Parameters
     ----------
-    points : :obj:`list` of :class:`JointTrajectoryPoint`
+    trajectory_points : :obj:`list` of :class:`JointTrajectoryPoint`, optional
         List of points composing the trajectory.
-    joint_names : :obj:`list` of :obj:`str`
+    joint_names : :obj:`list` of :obj:`str`, optional
         List of joint names of the trajectory.
-    start_configuration : :class:`Configuration`
+    start_configuration : :class:`Configuration`, optional
         Start configuration for the trajectory.
-    fraction : :obj:`float`
+    fraction : :obj:`float`, optional
         Indicates the percentage of requested trajectory that was calculated,
         e.g. ``1`` means the full trajectory was found.
 
