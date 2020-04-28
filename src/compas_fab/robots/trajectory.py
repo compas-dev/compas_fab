@@ -58,10 +58,7 @@ class JointTrajectoryPoint(Configuration):
     positions : :obj:`list` of :obj:`float`
         Alias of `values`.
     data : obj:`dict`
-        The data representing the trajectory point. By assigning a data
-        dictionary to this property, the current data of the configuration will
-        be replaced by the data in the :obj:`dict`. The data getter and setter
-        should always be used in combination with each other.
+        The data representing the trajectory point.
     """
 
     def __init__(self, values=None, types=None, velocities=None, accelerations=None, effort=None, time_from_start=None):
