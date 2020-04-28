@@ -211,10 +211,14 @@ class PlanningScene(object):
     def append_collision_mesh(self, collision_mesh, scale=False):
         """Append a collision mesh to the planning scene.
 
-        Adds or appends :class:`CollisionMesh` to :class:`PlanningScene` using
-        `id`. This means that if there's already a :class:`CollisionMesh` in the
-        planning scene it will be merged with the :class:`CollisionMesh` given
-        as an argument to the method.
+        Appends a :class:`CollisionMesh` to the :class:`PlanningScene` using
+        ``id`` as an identifier of a group or cluster of collision meshes. If the group
+        does not exist, it will be created implicitly; if it does exist, the meshes will be
+        appended to it instead.
+        
+        Grouping meshes under a common identifier allows to remove them all
+        in one operation, using the :meth:`~PlanningScene.remove_collision_mesh` with 
+        the group identifier.
 
         Parameters
         ----------
