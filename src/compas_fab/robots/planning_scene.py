@@ -81,11 +81,11 @@ class AttachedCollisionMesh(object):
     link_name : :obj:`str`
         The name of the :class:`~compas.robots.Link` the collision mesh will be
         attached to.
-    touch_links : :obj:`list` of :obj:`str`
+    touch_links : :obj:`list` of :obj:`str`, optional
         The list of link names the collision mesh is allowed to touch. Defaults
         to the link it is attached to.
-    weight : :obj:`float`
-        The weight of the attached object. Defaults to ``1.0``.
+    weight : :obj:`float`, optional
+        The weight of the attached object in kg. Defaults to ``1.0``.
 
     Attributes
     ----------
@@ -98,7 +98,7 @@ class AttachedCollisionMesh(object):
         The list of link names the collision mesh is allowed to touch. Defaults
         to the link it is attached to.
     weight : :obj:`float`
-        The weight of the attached object. Defaults to ``1.0``.
+        The weight of the attached object in kg.
 
     Examples
     --------
@@ -129,7 +129,7 @@ class PlanningScene(object):
     ----------
     robot : :class:`Robot`
         A reference to the robot in the planning scene.
-    client : :class:`compas_fab.backend.RosClient` or :class:`compas_fab.backend.VrepClient`
+    client
         A reference to the robot's backend client.
     """
 
@@ -212,12 +212,12 @@ class PlanningScene(object):
         """Append a collision mesh to the planning scene.
 
         Appends a :class:`CollisionMesh` to the :class:`PlanningScene` using
-        ``id`` as an identifier of a group or cluster of collision meshes. If the group
+        `id` as an identifier of a group or cluster of collision meshes. If the group
         does not exist, it will be created implicitly; if it does exist, the meshes will be
         appended to it instead.
-        
+
         Grouping meshes under a common identifier allows to remove them all
-        in one operation, using the :meth:`~PlanningScene.remove_collision_mesh` with 
+        in one operation, using the :meth:`~PlanningScene.remove_collision_mesh` with
         the group identifier.
 
         Parameters
