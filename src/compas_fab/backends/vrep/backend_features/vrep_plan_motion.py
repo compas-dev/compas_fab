@@ -4,7 +4,7 @@ from __future__ import print_function
 
 from timeit import default_timer as timer
 
-from compas_fab.backends.vrep.helpers import assert_robot
+from compas_fab.backends.backend_feature_interfaces import PlanMotion
 from compas_fab.backends.vrep.helpers import config_from_vrep
 from compas_fab.backends.vrep.helpers import config_to_vrep
 from compas_fab.backends.vrep.helpers import floats_to_vrep
@@ -12,7 +12,7 @@ from compas_fab.backends.vrep.helpers import frame_to_vrep_pose
 from compas_fab.backends.vrep.helpers import VrepError
 
 
-class VrepPlanMotion(object):
+class VrepPlanMotion(PlanMotion):
     SUPPORTED_PLANNERS = ('bitrrt', 'bkpiece1', 'est', 'kpiece1',
                           'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst',
                           'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar',
@@ -21,24 +21,37 @@ class VrepPlanMotion(object):
     def __init__(self, client):
         self.client = client
 
-    def __call__(self, robot, goal_frame, metric_values=None, collision_meshes=None,
-                 planner_id='rrtconnect', trials=1, resolution=0.02,
-                 gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False,
-                 log=None):
-        return self.plan_motion(robot, goal_frame, metric_values, collision_meshes,
-                                planner_id, trials, resolution,
-                                gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length,
-                                log)
+    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):
+        num_joints = options.get('num_joints')
+        metric_values = options.get('metric_values')
+        collision_meshes = options.get('collision_meshes')
+        planner_id = options.get('planner_id', 'rrtconnect')
+        trials = options.get('trials', 1)
+        resolution = options.get('resolution', 0.02)
+        gantry_joint_limits = options.get('gantry_joint_limits')
+        arm_joint_limits = options.get('arm_joint_limits')
+        shallow_state_search = options.get('shallow_state_search', True)
+        optimize_path_length = options.get('optimize_path_length', False)
+        log = options.get('log')
+        return self.plan_motion_deprecated(group, goal_constraints, num_joints,
+                                           metric_values, collision_meshes,
+                                           planner_id, trials, resolution,
+                                           gantry_joint_limits, arm_joint_limits,
+                                           shallow_state_search, optimize_path_length,
+                                           log)
 
-    def plan_motion(self, robot, goal_frame, metric_values=None, collision_meshes=None,
-                    planner_id='rrtconnect', trials=1, resolution=0.02,
-                    gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False,
-                    log=None):
+    def plan_motion_deprecated(self, group, goal_frame, num_joints,
+                               metric_values=None, collision_meshes=None,
+                               planner_id='rrtconnect', trials=1, resolution=0.02,
+                               gantry_joint_limits=None, arm_joint_limits=None,
+                               shallow_state_search=True, optimize_path_length=False,
+                               log=None):
         """Find a path plan to move the selected robot from its current position to the `goal_frame`.
 
         Args:
-            robot (:class:`compas_fab.robots.Robot`): Robot instance to move.
+            group (:obj:`int`): Integer referencing the desired robot group.
             goal_frame (:class:`Frame`): Target or goal frame.
+            num_joints (:obj:`int`): Number of configurable joints
             metric_values (:obj:`list` of :obj:`float`): List containing one value
                 per configurable joint. Each value ranges from 0 to 1,
                 where 1 indicates the axis/joint is blocked and cannot
@@ -65,15 +78,16 @@ class VrepPlanMotion(object):
             list: List of :class:`Configuration` objects representing the
             collision-free path to the ``goal_frame``.
         """
-        assert_robot(robot)
-        return self._find_path_plan(robot, {'target_type': 'pose', 'target': goal_frame},
-                                    metric_values, collision_meshes, planner_id, trials, resolution,
+        return self._find_path_plan(group, {'target_type': 'pose', 'target': goal_frame},
+                                    num_joints, metric_values, collision_meshes, planner_id, trials, resolution,
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length,
                                     log)
 
-    def plan_motion_to_config(self, robot, goal_configs, metric_values=None, collision_meshes=None,
+    def plan_motion_to_config(self, group, goal_configs, num_joints,
+                              metric_values=None, collision_meshes=None,
                               planner_id='rrtconnect', trials=1, resolution=0.02,
-                              gantry_joint_limits=None, arm_joint_limits=None, shallow_state_search=True, optimize_path_length=False,
+                              gantry_joint_limits=None, arm_joint_limits=None,
+                              shallow_state_search=True, optimize_path_length=False,
                               log=None):
         """Find a path plan to move the selected robot from its current position to one of the `goal_configs`.
 
@@ -109,20 +123,17 @@ class VrepPlanMotion(object):
             list: List of :class:`Configuration` objects representing the
             collision-free path to the ``goal_configs``.
         """
-        assert_robot(robot)
-        return self._find_path_plan(robot, {'target_type': 'config', 'target': goal_configs},
-                                    metric_values, collision_meshes, planner_id, trials, resolution,
+        return self._find_path_plan(group, {'target_type': 'config', 'target': goal_configs},
+                                    num_joints, metric_values, collision_meshes, planner_id, trials, resolution,
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length,
                                     log)
 
-    def _find_path_plan(self, robot, goal, metric_values, collision_meshes,
+    def _find_path_plan(self, group, goal, num_joints, metric_values, collision_meshes,
                         planner_id, trials, resolution,
                         gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length,
                         log):
-
-        joints = len(robot.get_configurable_joints())
         if not metric_values:
-            metric_values = [0.1] * joints
+            metric_values = [0.1] * num_joints
 
         if planner_id not in self.SUPPORTED_PLANNERS:
             raise ValueError('Unsupported planner_id. Must be one of: ' + str(self.SUPPORTED_PLANNERS))
@@ -134,7 +145,7 @@ class VrepPlanMotion(object):
             log.debug('Execution time: add_meshes=%.2f', timer() - first_start)
 
         start = timer() if log else None
-        self.client.set_robot_metric(robot.model.attr['index'], metric_values)
+        self.client.set_robot_metric(group, metric_values)
         if log:
             log.debug('Execution time: set_robot_metric=%.2f', timer() - start)
 
@@ -149,7 +160,7 @@ class VrepPlanMotion(object):
             start = timer() if log else None
             max_trials = None if shallow_state_search else 80
             max_results = 1 if shallow_state_search else 80
-            states = self.client.find_raw_robot_states(robot.model.attr['index'], frame_to_vrep_pose(goal['target'], self.client.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
+            states = self.client.find_raw_robot_states(group, frame_to_vrep_pose(goal['target'], self.client.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
             if log:
                 log.debug('Execution time: search_robot_states=%.2f', timer() - start)
 
@@ -166,7 +177,7 @@ class VrepPlanMotion(object):
                       planner_id, trials, shallow_state_search, optimize_path_length)
 
         res, _, path, _, _ = self.client.run_child_script('searchRobotPath',
-                                                          [robot.model.attr['index'],
+                                                          [group,
                                                            trials,
                                                            (int)(resolution * 1000),
                                                            1 if optimize_path_length else 0],
@@ -180,5 +191,5 @@ class VrepPlanMotion(object):
         if log:
             log.debug('Execution time: total=%.2f', timer() - first_start)
 
-        return [config_from_vrep(path[i:i + joints], self.client.scale)
-                for i in range(0, len(path), joints)]
+        return [config_from_vrep(path[i:i + num_joints], self.client.scale)
+                for i in range(0, len(path), num_joints)]

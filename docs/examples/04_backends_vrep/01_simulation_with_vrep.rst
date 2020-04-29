@@ -93,7 +93,8 @@ that there is at least one valid configuration to reach the goal pose.
 
     with VrepClient() as client:
         robot = rfl.Robot('B')
-        configs = client.inverse_kinematics(robot, goal_pose)
+        group = robot.model.attr['index']
+        configs = client.inverse_kinematics(goal_pose, group=group)
         print('Found valid configuration: ', str(configs[-1]))
 
 Basic path planning example
@@ -119,7 +120,8 @@ Here is an example of such a request:
     with VrepClient() as client:
         robot = rfl.Robot('B')
         client.set_robot_config(robot, start_config)
-        path = client.plan_motion(robot, goal_pose)
+        group = robot.model.attr['index']
+        path = client.plan_motion(goal_pose, group=group)
         print('Found path of %d steps' % len(path))
 
 

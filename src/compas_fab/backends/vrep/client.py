@@ -186,7 +186,11 @@ class VrepClient(ClientInterface):
 
         # First check if the start state is reachable
         joints = len(robot.get_configurable_joints())
-        config = self.inverse_kinematics(robot, frame, [0.] * joints)[-1]
+        options = {
+            'num_joints': joints,
+            'metric_values': [0.] * joints,
+        }
+        config = self.inverse_kinematics(frame, group=robot.model.attr['index'], options=options)[-1]
 
         if not config:
             raise ValueError('Cannot find a valid config for the given pose')

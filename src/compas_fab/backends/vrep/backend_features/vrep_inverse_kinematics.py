@@ -3,7 +3,6 @@ from __future__ import division
 from __future__ import print_function
 
 from compas_fab.backends.backend_feature_interfaces import InverseKinematics
-from compas_fab.backends.vrep.helpers import assert_robot
 from compas_fab.backends.vrep.helpers import config_from_vrep
 from compas_fab.backends.vrep.helpers import frame_to_vrep_pose
 
@@ -18,15 +17,16 @@ class VrepInverseKinematics(InverseKinematics):
         arm_joint_limits = options.get('arm_joint_limits')
         max_trials = options.get('max_trials')
         max_results = options.get('max_results', 1)
-        configurable_joints = options['configurable_joints']
-        return self.inverse_kinematics_deprecated(group, frame_WCF, configurable_joints, metric_values, gantry_joint_limits, arm_joint_limits, max_trials, max_results)
+        num_joints = options['num_joints']
+        return self.inverse_kinematics_deprecated(group, frame_WCF, num_joints, metric_values, gantry_joint_limits, arm_joint_limits, max_trials, max_results)
 
-    def inverse_kinematics_deprecated(self, group, goal_frame, joints, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
+    def inverse_kinematics_deprecated(self, group, goal_frame, num_joints, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
         """Calculates inverse kinematics to find valid robot configurations for the specified goal frame.
 
         Args:
             group (:obj:`int`): Integer referencing the desired robot group.
             goal_frame (:class:`Frame`): Target or goal frame.
+            num_joints (:obj:`int`): Number of configurable joints
             metric_values (:obj:`list` of :obj:`float`): List containing one value
                 per configurable joint. Each value ranges from 0 to 1,
                 where 1 indicates the axis/joint is blocked and cannot
@@ -45,7 +45,6 @@ class VrepInverseKinematics(InverseKinematics):
         """
 
         # joints = len(robot.get_configurable_joints())
-        num_joints = len(joints)
         if not metric_values:
             metric_values = [0.1] * num_joints
 

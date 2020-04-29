@@ -35,7 +35,7 @@ class PlanMotion(object):
         return self.plan_motion(goal_constraints, start_configuration, group, options)
 
     @abstractmethod
-    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):  # !!!
+    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):
         pass
 
 

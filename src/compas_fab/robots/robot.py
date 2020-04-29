@@ -1227,12 +1227,27 @@ class Robot(object):
 
         return trajectory
 
-    def plan_motion(self, goal_constraints, start_configuration=None,
-                    group=None, path_constraints=None, planner_id='RRT',
-                    num_planning_attempts=1, allowed_planning_time=2.,
-                    max_velocity_scaling_factor=1.,
-                    max_acceleration_scaling_factor=1.,
-                    attached_collision_meshes=None):
+    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):
+        path_constraints = options.get('path_constraints')
+        planner_id = options.get('planner_id', 'RRT')
+        num_planning_attempts = options.get('num_planning_attempts', 1)
+        allowed_planning_time = options.get('allowed_planning_time', 2.)
+        max_velocity_scaling_factor = options.get('max_velocity_scling_factor', 1.)
+        max_acceleration_scaling_factor = options.get('max_acceleration_scaling_factor', 1.)
+        attached_collision_meshes = options.get('attached_collision_meshes')
+        return self.plan_motion_deprecated(goal_constraints, start_configuration,
+                                           group, path_constraints, planner_id,
+                                           num_planning_attempts, allowed_planning_time,
+                                           max_velocity_scaling_factor,
+                                           max_acceleration_scaling_factor,
+                                           attached_collision_meshes)
+
+    def plan_motion_deprecated(self, goal_constraints, start_configuration=None,
+                               group=None, path_constraints=None, planner_id='RRT',
+                               num_planning_attempts=1, allowed_planning_time=2.,
+                               max_velocity_scaling_factor=1.,
+                               max_acceleration_scaling_factor=1.,
+                               attached_collision_meshes=None):
         """Calculates a motion path.
 
         Parameters
@@ -1287,7 +1302,7 @@ class Robot(object):
         >>> group = robot.main_group_name
         >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
         >>> robot.attached_tool = None
-        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
+        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRT'})
         >>> trajectory.fraction
         1.0
         >>> # Example with joint constraints (to the UP configuration)
@@ -1296,7 +1311,7 @@ class Robot(object):
         >>> tolerances_below = [math.radians(5)] * len(configuration.values)
         >>> group = robot.main_group_name
         >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances_above, tolerances_below, group)
-        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, planner_id='RRT')
+        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRT'})
         >>> trajectory.fraction
         1.0
         >>> type(trajectory)
@@ -1350,20 +1365,25 @@ class Robot(object):
             else:
                 attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
+        options = {
+            'base_link': self.model.root.name,
+            'joint_names': self.get_configurable_joint_names(),
+            'joint_types': self.get_configurable_joint_types(),
+            'path_constraints': path_constraints_WCF_scaled,
+            'planner_id': planner_id,
+            'num_planning_attempts': num_planning_attempts,
+            'allowed_planning_time': allowed_planning_time,
+            'max_velocity_scaling_factor': max_velocity_scaling_factor,
+            'max_acceleration_scaling_factor': max_acceleration_scaling_factor,
+            'attached_collision_meshes': attached_collision_meshes,
+        }
+
         trajectory = self.client.plan_motion(
-            robot=self,
             goal_constraints=goal_constraints_WCF_scaled,
             start_configuration=start_configuration_scaled,
             group=group,
-            path_constraints=path_constraints_WCF_scaled,
-            trajectory_constraints=None,
-            planner_id=planner_id,
-            num_planning_attempts=num_planning_attempts,
-            allowed_planning_time=allowed_planning_time,
-            max_velocity_scaling_factor=max_velocity_scaling_factor,
-            max_acceleration_scaling_factor=max_acceleration_scaling_factor,
-            attached_collision_meshes=attached_collision_meshes,
-            workspace_parameters=None)
+            options=options,
+        )
 
         # Scale everything back to robot's scale
         for pt in trajectory.points:
