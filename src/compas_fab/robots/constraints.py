@@ -357,20 +357,20 @@ class VisibilityConstraint(Constraint):
 
     Attributes
     ----------
-    target_frame: Frame
+    target_frame: :class:`compas.geometry.Frame`
         The frame of the disc; as the robot moves, the frame of the disc may change as well
         this can be in the frame of a particular robot link, for example
-    target_frame_reference_link: string, optional
-        The name of the link that the target_frame is associated with.
-        Defaults to base link, thus world coordinates
     target_radius: float
         The radius of the disc that should be maintained visible
-    sensor_frame: Frame
+    sensor_frame: :class:`compas.geometry.Frame`
         The frame in which visibility is to be maintained.
         Frame id defaults to robot base link.
         It is assumed the sensor can look directly at the target, in any direction.
         This assumption is usually not true, but additional PositionConstraints
         can resolve this issue.
+    target_frame_reference_link: string, optional
+        The name of the link that the target_frame is associated with.
+        Defaults to base link, thus world coordinates
     sensor_frame_reference_link: string, optional
         The name of the link that the sensor_frame is associated with.
         Defaults to base link, thus world coordinates
