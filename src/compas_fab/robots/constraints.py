@@ -360,30 +360,26 @@ class VisibilityConstraint(Constraint):
     target_frame: Frame
         The frame of the disc; as the robot moves, the frame of the disc may change as well
         this can be in the frame of a particular robot link, for example
-
-    target_frame_reference_link: string
+    target_frame_reference_link: string, optional
         The name of the link that the target_frame is associated with.
-
+        Defaults to base link, thus world coordinates
     target_radius: float
         The radius of the disc that should be maintained visible
-
     sensor_frame: Frame
         The frame in which visibility is to be maintained.
         Frame id defaults to robot base link.
         It is assumed the sensor can look directly at the target, in any direction.
         This assumption is usually not true, but additional PositionConstraints
         can resolve this issue.
-
-    sensor_frame_reference_link: string
+    sensor_frame_reference_link: string, optional
         The name of the link that the sensor_frame is associated with.
-
+        Defaults to base link, thus world coordinates
     cone_sides: int, optional
         From the sensor origin towards the target, the disc forms a visibility cone.
         This cone is approximated using many sides. For example, when using 4 sides,
         that in fact makes the visibility region be a pyramid.
         This value should always be 3 or more.
         Defaults to 3
-
     max_view_angle: float, optional
         Even though the disc is maintained visible, the visibility cone can be very small
         because of the orientation of the disc with respect to the sensor. It is possible
@@ -396,34 +392,29 @@ class VisibilityConstraint(Constraint):
         is the maximum view angle to be maintained. This should be a value in the open interval
         (0, Pi/2). If 0 is set, the view angle is NOT enforced.
         Defaults to 0.0
-
     max_range_angle: float, optional
         This angle is used similarly to max_view_angle but limits the maximum angle
         between the sensor origin direction vector and the axis that connects the
         sensor origin to the target frame origin. The value is again in the range (0, Pi/2)
         and is NOT enforced if set to 0.
         Defaults to 0.0
-
-    uint8 SENSOR_X=2
-    uint8 SENSOR_Y=1
-    uint8 SENSOR_Z=0
-    uint8 sensor_view_direction
-    # uint8[0, 255]
-    ### FRAME??
-    # The axis that is assumed to indicate the direction of view for the sensor
-    # X = 2, Y = 1, Z = 0
-
+    sensor_view_direction: int, optional
+        The axis that is assumed to indicate the direction of view for the sensor
+        X axis = 2, Y axis = 1, Z axis = 0
+        Defaults to 0
     weight: float, optional
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to 1.
 
     Examples
     --------
+    TODO
     """
 
     def __init__(self, target_frame, target_radius, sensor_frame,
                  target_frame_reference_link=None, sensor_frame_reference_link=None,
-                 cone_sides=3, max_view_angle=0.0, max_range_angle=0.0, weight=1.0):
+                 cone_sides=3, max_view_angle=0.0, max_range_angle=0.0,
+                 sensor_view_direction=0, weight=1.0):
         super(VisibilityConstraint, self).__init__(self.VISIBILITY, weight)
         self.target_frame = target_frame
         self.target_radius = target_radius
@@ -433,6 +424,7 @@ class VisibilityConstraint(Constraint):
         self.cone_sides = cone_sides
         self.max_view_angle = max_view_angle
         self.max_range_angle = max_range_angle
+        self.sensor_view_direction = sensor_view_direction
         self.weight = weight
 
     def scale(self, scale_factor):
@@ -441,12 +433,15 @@ class VisibilityConstraint(Constraint):
         self.sensor_frame = Frame(self.sensor_frame.point * scale_factor, self.sensor_frame.xaxis, self.sensor_frame.yaxis)
 
     def __repr__(self):
-        return "VisibilityConstraint({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8})".format(self.target_frame, self.target_radius, self.sensor_frame,
-                                                                                          self.target_frame_reference_link, self.sensor_frame_reference_link,
-                                                                                          self.cone_sides, self.max_view_angle, self.max_range_angle, self.weight)
+        return "VisibilityConstraint({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})".format(
+            self.target_frame, self.target_radius, self.sensor_frame,
+            self.target_frame_reference_link, self.sensor_frame_reference_link,
+            self.cone_sides, self.max_view_angle, self.max_range_angle,
+            self.sensor_view_direction, self.weight)
 
     def copy(self):
         cls = type(self)
         return cls(self.target_frame, self.target_radius, self.sensor_frame,
                    self.target_frame_reference_link, self.sensor_frame_reference_link,
-                   self.cone_sides, self.max_view_angle, self.max_range_angle, self.weight)
+                   self.cone_sides, self.max_view_angle, self.max_range_angle,
+                   self.sensor_view_direction, self.weight)

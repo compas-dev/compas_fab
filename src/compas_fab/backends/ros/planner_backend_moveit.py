@@ -133,7 +133,7 @@ class MoveItPlanner(PlannerBackend):
                     OrientationConstraint.from_orientation_constraint(header, c))
             elif c.type == c.VISIBILITY:
                 ros_constraints.visibility_constraints.append(
-                    VisibilityConstraint.from_visibility_constraint(c))
+                    VisibilityConstraint.from_visibility_constraint(c, header.frame_id))
             else:
                 raise NotImplementedError
 
@@ -161,7 +161,6 @@ class MoveItPlanner(PlannerBackend):
                 start_state.attached_collision_objects.append(aco)
 
         constraints = self._convert_constraints_to_rosmsg(constraints, header)
-        print("inverse_kinematics_async constraints\n", constraints)
 
         ik_request = PositionIKRequest(group_name=group,
                                        robot_state=start_state,

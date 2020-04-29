@@ -283,28 +283,33 @@ class VisibilityConstraint(ROSmsg):
     def __init__(self, target_radius=None, target_pose=None, cone_sides=None,
                  sensor_pose=None, max_view_angle=0.0, max_range_angle=0.0,
                  SENSOR_X=None, SENSOR_Y=None, SENSOR_Z=None,
-                 sensor_view_direction=None, weight=1.):
+                 sensor_view_direction=2, weight=1.):
         self.target_radius = float(target_radius)
         self.target_pose = target_pose
         self.cone_sides = cone_sides if cone_sides >= 3 else 3
         self.sensor_pose = sensor_pose
         self.max_view_angle = float(max_view_angle)
         self.max_range_angle = float(max_range_angle)
-        self.SENSOR_X = SENSOR_X                              # int() ?
-        self.SENSOR_Y = SENSOR_Y                              # int() ?
-        self.SENSOR_Z = SENSOR_Z                              # int() ?
-        self.sensor_view_direction = sensor_view_direction    # int() ?
+        self.sensor_view_direction = int(sensor_view_direction)
         self.weight = float(weight) or 1.
 
     @classmethod
-    def from_visibility_constraint(cls, visibility_constraint):
+    def from_visibility_constraint(cls, visibility_constraint, base_link):
         """Creates a `VisibilityConstraint` from a :class:`compas_fab.robots.VisibilityConstraint`.
         """
-        target_pose_header = Header(frame_id=visibility_constraint.target_frame_reference_link)
+        if visibility_constraint.target_frame_reference_link is not None:
+            target_pose_frame_id = visibility_constraint.target_frame_reference_link
+        else:
+            target_pose_frame_id = base_link
+        target_pose_header = Header(frame_id=target_pose_frame_id)
         target_pose = Pose.from_frame(visibility_constraint.target_frame)
         target_pose_stamped = PoseStamped(target_pose_header, target_pose)
 
-        sensor_pose_header = Header(frame_id=visibility_constraint.sensor_frame_reference_link)
+        if visibility_constraint.sensor_frame_reference_link is not None:
+            sensor_pose_frame_id = visibility_constraint.sensor_frame_reference_link
+        else:
+            sensor_pose_frame_id = base_link
+        sensor_pose_header = Header(frame_id=sensor_pose_frame_id)
         sensor_pose = Pose.from_frame(visibility_constraint.sensor_frame)
         sensor_pose_stamped = PoseStamped(sensor_pose_header, sensor_pose)
 
@@ -315,13 +320,8 @@ class VisibilityConstraint(ROSmsg):
         kwargs['sensor_pose'] = sensor_pose_stamped
         kwargs['max_view_angle'] = visibility_constraint.max_view_angle
         kwargs['max_range_angle'] = visibility_constraint.max_range_angle
-        kwargs['SENSOR_X'] = 0               # visibility_constraint.sensor_x
-        kwargs['SENSOR_Y'] = 0               # visibility_constraint.sensor_y
-        kwargs['SENSOR_Z'] = 0               # visibility_constraint.sensor_z
-        kwargs['sensor_view_direction'] = 0  # visibility_constraint.sensor_view_direction
+        kwargs['sensor_view_direction'] = visibility_constraint.sensor_view_direction
         kwargs['weight'] = visibility_constraint.weight
-
-        print("from_visibility_constraint kwargs\n", kwargs)
 
         return cls(**kwargs)
 
