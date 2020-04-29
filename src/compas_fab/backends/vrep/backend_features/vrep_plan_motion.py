@@ -51,7 +51,7 @@ class VrepPlanMotion(PlanMotion):
         Args:
             group (:obj:`int`): Integer referencing the desired robot group.
             goal_frame (:class:`Frame`): Target or goal frame.
-            num_joints (:obj:`int`): Number of configurable joints
+            num_joints (:obj:`int`): Number of configurable joints.
             metric_values (:obj:`list` of :obj:`float`): List containing one value
                 per configurable joint. Each value ranges from 0 to 1,
                 where 1 indicates the axis/joint is blocked and cannot
@@ -83,20 +83,40 @@ class VrepPlanMotion(PlanMotion):
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length,
                                     log)
 
-    def plan_motion_to_config(self, group, goal_configs, num_joints,
-                              metric_values=None, collision_meshes=None,
-                              planner_id='rrtconnect', trials=1, resolution=0.02,
-                              gantry_joint_limits=None, arm_joint_limits=None,
-                              shallow_state_search=True, optimize_path_length=False,
-                              log=None):
+    def plan_motion_to_config(self, goal_configs, start_configuration=None, group=None, options={}):
+        num_joints = options.get('num_joints')
+        metric_values = options.get('metric_values')
+        collision_meshes = options.get('collision_meshes')
+        planner_id = options.get('planner_id', 'rrtconnect')
+        trials = options.get('trials', 1)
+        resolution = options.get('resolution', 0.02)
+        gantry_joint_limits = options.get('gantry_joint_limits')
+        arm_joint_limits = options.get('arm_joint_limits')
+        shallow_state_search = options.get('shallow_state_search', True)
+        optimize_path_length = options.get('optimize_path_length', False)
+        log = options.get('log')
+        return self.plan_motion_to_config_deprecated(group, goal_configs, num_joints,
+                                           metric_values, collision_meshes,
+                                           planner_id, trials, resolution,
+                                           gantry_joint_limits, arm_joint_limits,
+                                           shallow_state_search, optimize_path_length,
+                                           log)
+
+    def plan_motion_to_config_deprecated(self, group, goal_configs, num_joints,
+                                         metric_values=None, collision_meshes=None,
+                                         planner_id='rrtconnect', trials=1, resolution=0.02,
+                                         gantry_joint_limits=None, arm_joint_limits=None,
+                                         shallow_state_search=True, optimize_path_length=False,
+                                         log=None):
         """Find a path plan to move the selected robot from its current position to one of the `goal_configs`.
 
         This function is useful when it is required to get a path plan that ends in one
         specific goal configuration.
 
         Args:
-            robot (:class:`compas_fab.robots.Robot`): Robot instance to move.
+            group (:obj:`int`): Integer referencing the desired robot group.
             goal_configs (:obj:`list` of :class:`Configuration`): List of target or goal configurations.
+            num_joints (:obj:`int`): Number of configurable joints.
             metric_values (:obj:`list` of :obj:`float`): List containing one value
                 per configurable joint. Each value ranges from 0 to 1,
                 where 1 indicates the axis/joint is blocked and cannot
