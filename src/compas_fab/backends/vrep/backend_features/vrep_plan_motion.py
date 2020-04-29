@@ -96,11 +96,11 @@ class VrepPlanMotion(PlanMotion):
         optimize_path_length = options.get('optimize_path_length', False)
         log = options.get('log')
         return self.plan_motion_to_config_deprecated(group, goal_configs, num_joints,
-                                           metric_values, collision_meshes,
-                                           planner_id, trials, resolution,
-                                           gantry_joint_limits, arm_joint_limits,
-                                           shallow_state_search, optimize_path_length,
-                                           log)
+                                                     metric_values, collision_meshes,
+                                                     planner_id, trials, resolution,
+                                                     gantry_joint_limits, arm_joint_limits,
+                                                     shallow_state_search, optimize_path_length,
+                                                     log)
 
     def plan_motion_to_config_deprecated(self, group, goal_configs, num_joints,
                                          metric_values=None, collision_meshes=None,

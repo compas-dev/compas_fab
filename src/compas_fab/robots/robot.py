@@ -1118,11 +1118,23 @@ class Robot(object):
 
         return frame_WCF
 
-    def plan_cartesian_motion(self, frames_WCF, start_configuration=None,
-                              max_step=0.01, jump_threshold=1.57,
-                              avoid_collisions=True, group=None,
-                              path_constraints=None,
-                              attached_collision_meshes=None):
+    def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options={}):
+        max_step = options.get('max_step', 0.01)
+        jump_threshold = options.get('jump_threshold', 1.57)
+        avoid_collisions = options.get('avoid_collisions', True)
+        path_constraints = options.get('path_constraints')
+        attached_collisions_meshes = options.get('attached_collision_meshes')
+        return self.plan_cartesian_motion_deprecated(frames_WCF, start_configuration,
+                                                     max_step, jump_threshold,
+                                                     avoid_collisions, group,
+                                                     path_constraints,
+                                                     attached_collisions_meshes)
+
+    def plan_cartesian_motion_deprecated(self, frames_WCF, start_configuration=None,
+                                         max_step=0.01, jump_threshold=1.57,
+                                         avoid_collisions=True, group=None,
+                                         path_constraints=None,
+                                         attached_collision_meshes=None):
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
@@ -1165,12 +1177,13 @@ class Robot(object):
                       Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])]
         >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
         >>> group = robot.main_group_name
+        >>> options = {'max_step': 0.01,\
+                       'jump_threshold': 1.57,\
+                       'avoid_collisions': True}
         >>> trajectory = robot.plan_cartesian_motion(frames,\
                                                      start_configuration,\
-                                                     max_step=0.01,\
-                                                     jump_threshold=1.57,\
-                                                     avoid_collisions=True,\
-                                                     group=group)
+                                                     group=group,\
+                                                     options=options)
         >>> type(trajectory)
         <class 'compas_fab.robots.trajectory.JointTrajectory'>
         """
@@ -1208,16 +1221,23 @@ class Robot(object):
             else:
                 attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
+        options = {
+            'base_link': self.model.root.name,
+            'ee_link': self.get_end_effector_link_name(),
+            'joint_names': self.get_configurable_joint_names(),
+            'joint_types': self.get_configurable_joint_types(),
+            'max_step': max_step_scaled,
+            'jump_threshold': jump_threshold,
+            'avoid_collisions': avoid_collisions,
+            'path_constraints': path_constraints,
+            'attached_collision_meshes': attached_collision_meshes,
+        }
+
         trajectory = self.client.plan_cartesian_motion(
-            robot=self,
-            frames=frames_WCF_scaled,
+            frames_WCF=frames_WCF_scaled,
             start_configuration=start_configuration_scaled,
             group=group,
-            max_step=max_step_scaled,
-            jump_threshold=jump_threshold,
-            avoid_collisions=avoid_collisions,
-            path_constraints=path_constraints_WCF_scaled,
-            attached_collision_meshes=attached_collision_meshes)
+            options=options)
 
         # Scale everything back to robot's scale
         for pt in trajectory.points:

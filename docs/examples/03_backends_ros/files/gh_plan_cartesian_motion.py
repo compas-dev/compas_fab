@@ -37,12 +37,15 @@ frames = [Frame(plane.Origin, plane.XAxis, plane.YAxis) for plane in planes]
 
 if robot and robot.client and start_configuration and compute:
     if robot.client.is_connected:
+        options = {
+            'max_step': float(max_step),
+            'avoid_collisions': bool(avoid_collisions),
+            'attached_collision_meshes': list(attached_colllision_meshes),
+        }
         sc.sticky[response_key] = robot.plan_cartesian_motion(frames,
                                                               start_configuration=start_configuration,
                                                               group=group,
-                                                              max_step=float(max_step),
-                                                              avoid_collisions=bool(avoid_collisions),
-                                                              attached_collision_meshes=list(attached_collision_meshes))
+                                                              options=options)
     else:
         print("Robot client is not connected")
 

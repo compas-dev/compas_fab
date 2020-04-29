@@ -4,6 +4,7 @@ from __future__ import print_function
 
 from compas.utilities import await_callback
 
+from compas_fab.backends.backend_feature_interfaces import PlanCartesianMotion
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
 from compas_fab.backends.ros.backend_features.helpers import convert_trajectory_points
 from compas_fab.backends.ros.backend_features.helpers import validate_response
@@ -20,7 +21,7 @@ from compas_fab.robots import Configuration
 from compas_fab.robots import JointTrajectory
 
 
-class MoveItPlanCartesianMotion(object):
+class MoveItPlanCartesianMotion(PlanCartesianMotion):
     GET_CARTESIAN_PATH = ServiceDescription('/compute_cartesian_path',
                                             'GetCartesianPath',
                                             GetCartesianPathRequest,
@@ -30,22 +31,33 @@ class MoveItPlanCartesianMotion(object):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def __call__(self, robot, frames, start_configuration,
-                 group, max_step, jump_threshold,
-                 avoid_collisions, path_constraints,
-                 attached_collision_meshes):
-        return self.plan_cartesian_motion(robot, frames, start_configuration,
-                                          group, max_step, jump_threshold,
-                                          avoid_collisions, path_constraints,
-                                          attached_collision_meshes)
+    def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options={}):
+        base_link = options.get('base_link')
+        ee_link = options.get('ee_link')
+        joint_names = options.get('joint_names')
+        joint_types = options.get('joint_types')
+        max_step = options.get('max_step')
+        jump_threshold = options.get('jump_threshold')
+        avoid_collisions = options.get('avoid_collisions')
+        path_constraints = options.get('path_constraints')
+        attached_collision_meshes = options.get('attached_collision_meshes')
+        return self.plan_cartesian_motion_deprecated(base_link, ee_link, joint_names, joint_types,
+                                                     frames_WCF, start_configuration,
+                                                     group, max_step, jump_threshold,
+                                                     avoid_collisions, path_constraints,
+                                                     attached_collision_meshes)
 
-    def plan_cartesian_motion(self,
-                              robot, frames, start_configuration,
-                              group, max_step, jump_threshold,
-                              avoid_collisions, path_constraints,
-                              attached_collision_meshes):
+    def plan_cartesian_motion_deprecated(self,
+                                         base_link, ee_link, joint_names, joint_types,
+                                         frames, start_configuration,
+                                         group, max_step, jump_threshold,
+                                         avoid_collisions, path_constraints,
+                                         attached_collision_meshes):
         kwargs = {}
-        kwargs['robot'] = robot
+        kwargs['base_link'] = base_link
+        kwargs['ee_link'] = ee_link
+        kwargs['joint_names'] = joint_names
+        kwargs['joint_types'] = joint_types
         kwargs['frames'] = frames
         kwargs['start_configuration'] = start_configuration
         kwargs['group'] = group
@@ -60,13 +72,13 @@ class MoveItPlanCartesianMotion(object):
         return await_callback(self.plan_cartesian_motion_async, **kwargs)
 
     def plan_cartesian_motion_async(self, callback, errback,
-                                    robot, frames, start_configuration,
+                                    base_link, ee_link,  joint_names, joint_types,
+                                    frames, start_configuration,
                                     group, max_step, jump_threshold,
                                     avoid_collisions, path_constraints,
                                     attached_collision_meshes):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
-        base_link = robot.model.root.name  # use world coords
-        ee_link = robot.get_end_effector_link_name(group)
+        joint_type_by_name = dict(zip(joint_names, joint_types))  # should this go somewhere else? does it already exist somewhere else?
 
         header = Header(frame_id=base_link)
         waypoints = [Pose.from_frame(frame) for frame in frames]
@@ -99,12 +111,12 @@ class MoveItPlanCartesianMotion(object):
                 trajectory.fraction = response.fraction
                 trajectory.joint_names = response.solution.joint_trajectory.joint_names
 
-                joint_types = robot.get_joint_types_by_names(trajectory.joint_names)
+                joint_types = [joint_type_by_name[name] for name in trajectory.joint_names]
                 trajectory.points = convert_trajectory_points(
                     response.solution.joint_trajectory.points, joint_types)
 
                 start_state = response.start_state.joint_state
-                start_state_types = robot.get_joint_types_by_names(start_state.name)
+                start_state_types = [joint_type_by_name[name] for name in start_state.name]
                 trajectory.start_configuration = Configuration(start_state.position, start_state_types, start_state.name)
 
                 callback(trajectory)
