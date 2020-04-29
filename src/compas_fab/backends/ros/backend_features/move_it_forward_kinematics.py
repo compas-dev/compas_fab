@@ -25,10 +25,10 @@ class MoveItForwardKinematics(ForwardKinematics):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def forward_kinematics(self, configuration, group=None, options={}):  # !!! must find all calls to this and adapt  GHX!!!
+    def forward_kinematics(self, configuration, group=None, options={}):  # !!! GHX!!!
         base_link = options['base_link']
-        link_name = options.get('link_name')
-        return self.forward_kinematics_deprecated(base_link, configuration, group, link_name)
+        ee_link = options.get('ee_link')
+        return self.forward_kinematics_deprecated(base_link, configuration, group, ee_link)
 
     def forward_kinematics_deprecated(self, base_link, configuration, group, ee_link):
         kwargs = {}

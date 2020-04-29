@@ -4,13 +4,14 @@ from __future__ import print_function
 
 from compas.utilities import await_callback
 
+from compas_fab.backends.backend_feature_interfaces import GetPlanningScene
 from compas_fab.backends.ros.messages import GetPlanningSceneRequest
 from compas_fab.backends.ros.messages import GetPlanningSceneResponse
 from compas_fab.backends.ros.messages import PlanningSceneComponents
 from compas_fab.backends.ros.planner_backend import ServiceDescription
 
 
-class MoveItPlanningScene(object):
+class MoveItPlanningScene(GetPlanningScene):
     GET_PLANNING_SCENE = ServiceDescription('/get_planning_scene',
                                             'GetPlanningScene',
                                             GetPlanningSceneRequest,
@@ -18,9 +19,6 @@ class MoveItPlanningScene(object):
 
     def __init__(self, ros_client):
         self.ros_client = ros_client
-
-    def __call__(self, *args, **kwargs):
-        return self.get_planning_scene()
 
     def get_planning_scene(self):
         kwargs = {}

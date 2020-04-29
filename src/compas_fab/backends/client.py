@@ -75,9 +75,6 @@ class PlannerInterface(object):
     def dispose_planner(self):
         pass
 
-    def validate_response(self, response):
-        pass
-
     # ==========================================================================
     # planning services
     # ==========================================================================

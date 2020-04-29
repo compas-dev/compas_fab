@@ -1045,10 +1045,10 @@ class Robot(object):
 
     def forward_kinematics(self, configuration, group=None, options={}):
         backend = options.get('backend')
-        link_name = options.get('link_name')
-        return self.forward_kinematics_deprecated(configuration, group, backend, link_name)
+        ee_link = options.get('ee_link')
+        return self.forward_kinematics_deprecated(configuration, group, backend, ee_link)
 
-    def forward_kinematics_deprecated(self, configuration, group=None, backend=None, link_name=None):
+    def forward_kinematics_deprecated(self, configuration, group=None, backend=None, ee_link=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
@@ -1064,7 +1064,7 @@ class Robot(object):
             If `None` calculates fk with the client if it exists or with the robot model.
             If 'model' use the robot model to calculate fk. Anything else is open
             for implementation, possibly 'kdl', 'ikfast'
-        link_name : str, optional
+        ee_link : str, optional
             The name of the link to calculate the forward kinematics for.
             Defaults to the group's end effector link.
 
@@ -1086,12 +1086,12 @@ class Robot(object):
         if not group:
             group = self.main_group_name
 
-        if link_name is None:
-            link_name = self.get_end_effector_link_name(group)
+        if ee_link is None:
+            ee_link = self.get_end_effector_link_name(group)
         else:
             # check
-            if link_name not in self.get_link_names(group):
-                raise ValueError("Link name %s does not exist in planning group" % link_name)
+            if ee_link not in self.get_link_names(group):
+                raise ValueError("Link name %s does not exist in planning group" % ee_link)
 
         full_configuration = self.merge_group_with_full_configuration(configuration, self.zero_configuration(), group)
         full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)
@@ -1101,7 +1101,7 @@ class Robot(object):
         if not backend:
             if self.client:
                 options = {
-                    'link_name': link_name,
+                    'ee_link': ee_link,
                     'base_link': self.model.root.name,
                 }
                 frame_WCF = self.client.forward_kinematics(full_configuration_scaled,
@@ -1109,9 +1109,9 @@ class Robot(object):
                                                            options)
                 frame_WCF.point *= self.scale_factor
             else:
-                frame_WCF = self.model.forward_kinematics(full_joint_state, link_name)
+                frame_WCF = self.model.forward_kinematics(full_joint_state, ee_link)
         elif backend == 'model':
-            frame_WCF = self.model.forward_kinematics(full_joint_state, link_name)
+            frame_WCF = self.model.forward_kinematics(full_joint_state, ee_link)
         else:
             # pass to backend, kdl, ikfast,...
             raise NotImplementedError
