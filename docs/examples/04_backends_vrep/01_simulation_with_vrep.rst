@@ -92,6 +92,8 @@ that there is at least one valid configuration to reach the goal pose.
     with VrepClient() as client:
         robot = rfl.Robot('B')
         configs = client.inverse_kinematics(robot, goal_pose)
+
+        assert len(configs) > 0, 'No IK solution found'
         print('Found valid configuration: ', str(configs[-1]))
 
 Basic path planning example

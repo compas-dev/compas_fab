@@ -169,9 +169,10 @@ def deploy_docs(ctx):
 @task(help={
       'checks': 'True to run all checks before testing, otherwise False.',
       'doctest': 'True to run doctest modules, otherwise False.',
-      'coverage': 'True to generate coverage report using pytest-cov'
+      'codeblock': 'True to run codeblocks present in the documentation, otherwise False',
+      'coverage': 'True to generate coverage report using pytest-cov',
       })
-def test(ctx, checks=False, doctest=False, coverage=False):
+def test(ctx, checks=False, doctest=False, codeblock=False, coverage=False):
     """Run all tests."""
     if checks:
         check(ctx)
@@ -184,6 +185,10 @@ def test(ctx, checks=False, doctest=False, coverage=False):
             pytest_args.append('--cov=compas_fab')
 
         ctx.run(" ".join(pytest_args))
+
+        # Using --doctest-modules together with docs as the testpaths goes bananas
+        if codeblock:
+            ctx.run('pytest docs')
 
 
 @task

@@ -9,7 +9,7 @@ jobs:
       env:
         - TRAVIS_RUN_LINTER=true
         - TRAVIS_GENERATE_DOCS=true
-        - PYTEST_ADDOPTS=--doctest-modules
+        - TRAVIS_TEST_OPTS=--doctest --codeblock
         - TRAVIS_PYTHON_IMPLEMENTATION="cpython"
       services: docker
       before_script:
@@ -72,12 +72,7 @@ script:
 - if [[ "$TRAVIS_RUN_LINTER" == "true" ]]; then
     invoke lint;
   fi
-- invoke test
-#   - python3 -c "import compas_fab" || python -c "import compas_fab"
-#   - python3 -c "import compas_fab.backends" || python -c "import compas_fab.backends"
-#   - python3 -c "from compas_fab.backends.vrep.remote_api import vrep" || python -c "from compas_fab.backends.vrep.remote_api import vrep"
-#   - python3 -c "import compas_fab.robots" || python -c "import compas_fab.robots"
-#   - python3 -c "import compas_fab.utilities" || python -c "import compas_fab.utilities"
+- invoke test $TRAVIS_TEST_OPTS
 
 after_success:
 - if [[ "$TRAVIS_GENERATE_DOCS" == "true" ]]; then
