@@ -31,7 +31,7 @@ if robot and robot.client:
         full_configuration = robot.inverse_kinematics(frame,
                                                       start_configuration,
                                                       group=group,
-                                                      options)
+                                                      options=options)
         group_configuration = robot.get_group_configuration(group, full_configuration)
         print(group_configuration)
     else:
