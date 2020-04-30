@@ -8,8 +8,8 @@ jobs:
       python: 3.8           # this works for Linux but is ignored on macOS or Windows
       env:
         - TRAVIS_RUN_LINTER=true
+        - TRAVIS_RUN_INTEGRATION_TESTS=true
         - TRAVIS_GENERATE_DOCS=true
-        - TRAVIS_TEST_OPTS=--doctest --codeblock
         - TRAVIS_PYTHON_IMPLEMENTATION="cpython"
       services: docker
       before_script:
@@ -72,7 +72,11 @@ script:
 - if [[ "$TRAVIS_RUN_LINTER" == "true" ]]; then
     invoke lint;
   fi
-- invoke test $TRAVIS_TEST_OPTS
+- if [[ "$TRAVIS_RUN_INTEGRATION_TESTS" == "true" ]]; then
+    invoke test --doctest --codeblock;
+  else
+    invoke test;
+  fi;
 
 after_success:
 - if [[ "$TRAVIS_GENERATE_DOCS" == "true" ]]; then
