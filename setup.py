@@ -11,7 +11,7 @@ from setuptools import find_packages, setup
 
 requirements = [
     # Until COMPAS reaches 1.0, we pin major.minor and allow patch version updates
-    'compas>=0.15,<0.16',
+    'compas>=0.15.6,<0.16',
     'roslibpy>=0.7.1',
     'pyserial',
 ]
