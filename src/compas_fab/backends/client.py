@@ -65,7 +65,79 @@ class ClientInterface(object):
 #         raise NotImplementedError('Assigned control does not have this feature.')
 
 
-class PlannerInterface(object):
+# class CollisionObjectListener(object):
+#     def __init__(self, client):
+#         self.client = client
+#
+#     def has_topic(self):
+#         return hasattr(self.client, 'collision_object_topic') and self.client.collision_object_topic
+#
+#     def initialize(self):
+#         if self.has_topic():
+#             return
+#         self.client.collision_object_topic = Topic(
+#             self.client,
+#             '/collision_object',
+#             'moveit_msgs/CollisionObject',
+#             queue_size=None)
+#         self.client.collision_object_topic.advertise()
+#
+#     def dispose(self):
+#         if self.has_topic():
+#             self.client.collision_object_topic.unadvertise()
+#
+#     def collision_object(self, collision_object, operation=CollisionObject.ADD):
+#         if not self.has_topic():
+#             self.initialize()
+#         collision_object.operation = operation
+#         self.client.collision_object_topic(collision_object.msg)
+#
+#
+# class AttachedCollisionObjectManager(object):
+#     def __init__(self, client):
+#         self.client = client
+#
+#     def has_topic(self):
+#         return hasattr(self.client, 'attached_collision_object_topic') and self.client.attached_collision_object_topic
+#
+#     def initialize(self):
+#         if self.has_topic():
+#             return
+#
+#         self.client.attached_collision_object_topic = Topic(
+#             self.client,
+#             '/attached_collision_object',
+#             'moveit_msgs/AttachedCollisionObject',
+#             queue_size=None)
+#         self.client.attached_collision_object_topic.advertise()
+#
+#     def dispose(self):
+#         if self.has_topic():
+#             self.client.attached_collision_object_topic.unadvertise()
+#
+#     def attached_collision_object(self, attached_collision_object, operation=CollitionObject.ADD):
+#         if not self.has_topic():
+#             self.initialize()
+#         attached_collision_object.object.operation = operation
+#         self.client.attached_collision_object_topic.publish(attached_collision_object.msg)
+#
+#
+# class Subject(object):
+#     def __init__(self):
+#         self._listeners = []
+#
+#     def attach(self, listener):
+#         self._listeners.append(listener)
+#
+#     def detach(self, listener):
+#         self._listeners.remove(listener)
+#
+#     def notify(self, msg):
+#         for listener in self._listeners:
+#             listener.update(self, msg)
+
+
+class PlannerInterface(object):  # inherit from Subject?
     def __init__(self, client):
         self.client = client
 
