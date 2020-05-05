@@ -32,51 +32,22 @@ class MoveItPlanMotion(PlanMotion):
         self.ros_client = ros_client
 
     def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):  # !!! ghx and others
-        base_link = options.get('base_link')
-        joint_names = options.get('joint_names')
-        joint_types = options.get('joint_types')
-        path_constraints = options.get('path_constraints')
-        trajectory_constraints = options.get('trajectory_constraints')
-        planner_id = options.get('planner_id')
-        num_planning_attempts = options.get('num_planning_attempts', 8)
-        allowed_planning_time = options.get('allowed_planning_time', 2.)
-        max_velocity_scaling_factor = options.get('max_velocity_scaling_factor', 1.)
-        max_acceleration_scaling_factor = options.get('max_acceleration_scaling_factor', 1.)
-        attached_collision_meshes = options.get('attached_collision_meshes')
-        workspace_parameters = options.get('workspace_parameters')
-        return self.plan_motion_deprecated(base_link, joint_names, joint_types, goal_constraints, start_configuration, group,
-                                           path_constraints, trajectory_constraints,
-                                           planner_id, num_planning_attempts,
-                                           allowed_planning_time,
-                                           max_velocity_scaling_factor,
-                                           max_acceleration_scaling_factor,
-                                           attached_collision_meshes,
-                                           workspace_parameters)
-
-    def plan_motion_deprecated(self, base_link, joint_names, joint_types, goal_constraints, start_configuration, group,
-                               path_constraints=None, trajectory_constraints=None,
-                               planner_id='', num_planning_attempts=8,
-                               allowed_planning_time=2.,
-                               max_velocity_scaling_factor=1.,
-                               max_acceleration_scaling_factor=1.,
-                               attached_collision_meshes=None,
-                               workspace_parameters=None):
         kwargs = {}
-        kwargs['base_link'] = base_link
-        kwargs['joint_names'] = joint_names
-        kwargs['joint_types'] = joint_types
+        kwargs['base_link'] = options['base_link']
+        kwargs['joint_names'] = options['joint_names']
+        kwargs['joint_types'] = options['joint_types']
         kwargs['goal_constraints'] = goal_constraints
         kwargs['start_configuration'] = start_configuration
         kwargs['group'] = group
-        kwargs['path_constraints'] = path_constraints
-        kwargs['trajectory_constraints'] = trajectory_constraints
-        kwargs['planner_id'] = planner_id
-        kwargs['num_planning_attempts'] = num_planning_attempts
-        kwargs['allowed_planning_time'] = allowed_planning_time
-        kwargs['max_velocity_scaling_factor'] = max_velocity_scaling_factor
-        kwargs['max_acceleration_scaling_factor'] = max_acceleration_scaling_factor
-        kwargs['attached_collision_meshes'] = attached_collision_meshes
-        kwargs['workspace_parameters'] = workspace_parameters
+        kwargs['path_constraints'] = options.get('path_constraints')
+        kwargs['trajectory_constraints'] = options.get('trajectory_constraints')
+        kwargs['planner_id'] = options.get('planner_id', '')
+        kwargs['num_planning_attempts'] = options.get('num_planning_attempts', 8)
+        kwargs['allowed_planning_time'] = options.get('allowed_planning_time', 2.)
+        kwargs['max_velocity_scaling_factor'] = options.get('max_velocity_scaling_factor', 1.)
+        kwargs['max_acceleration_scaling_factor'] = options.get('max_acceleration_scaling_factor', 1.)
+        kwargs['attached_collision_meshes'] = options.get('attached_collision_meshes')
+        kwargs['workspace_parameters'] = options.get('workspace_parameters')
 
         kwargs['errback_name'] = 'errback'
 

@@ -11,9 +11,6 @@ class VrepForwardKinematics(ForwardKinematics):
         self.client = client
 
     def forward_kinematics(self, configuration, group=None, options={}):  # !!! must find all calls to this and adapt !!!
-        return self.forward_kinematics_deprecated(group)
-
-    def forward_kinematics_deprecated(self, group):
         """Calculates forward kinematics to get the current end-effector pose.
 
         Args:

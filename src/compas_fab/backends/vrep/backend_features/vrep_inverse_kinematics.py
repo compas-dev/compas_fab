@@ -12,20 +12,11 @@ class VrepInverseKinematics(InverseKinematics):
         self.client = client
 
     def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options={}):
-        metric_values = options.get('metric_values')
-        gantry_joint_limits = options.get('gantry_joint_limits')
-        arm_joint_limits = options.get('arm_joint_limits')
-        max_trials = options.get('max_trials')
-        max_results = options.get('max_results', 1)
-        num_joints = options['num_joints']
-        return self.inverse_kinematics_deprecated(group, frame_WCF, num_joints, metric_values, gantry_joint_limits, arm_joint_limits, max_trials, max_results)
-
-    def inverse_kinematics_deprecated(self, group, goal_frame, num_joints, metric_values=None, gantry_joint_limits=None, arm_joint_limits=None, max_trials=None, max_results=1):
         """Calculates inverse kinematics to find valid robot configurations for the specified goal frame.
 
         Args:
             group (:obj:`int`): Integer referencing the desired robot group.
-            goal_frame (:class:`Frame`): Target or goal frame.
+            frame_WCF (:class:`Frame`): Target or goal frame.
             num_joints (:obj:`int`): Number of configurable joints
             metric_values (:obj:`list` of :obj:`float`): List containing one value
                 per configurable joint. Each value ranges from 0 to 1,
@@ -43,14 +34,19 @@ class VrepInverseKinematics(InverseKinematics):
             list: List of :class:`Configuration` objects representing
             the collision-free configuration for the ``goal_frame``.
         """
+        num_joints = options['num_joints']
+        metric_values = options.get('metric_values')
+        gantry_joint_limits = options.get('gantry_joint_limits')
+        arm_joint_limits = options.get('arm_joint_limits')
+        max_trials = options.get('max_trials')
+        max_results = options.get('max_results', 1)
 
-        # joints = len(robot.get_configurable_joints())
         if not metric_values:
             metric_values = [0.1] * num_joints
 
         self.client.set_robot_metric(group, metric_values)
 
-        states = self.client.find_raw_robot_states(group, frame_to_vrep_pose(goal_frame, self.client.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
+        states = self.client.find_raw_robot_states(group, frame_to_vrep_pose(frame_WCF, self.client.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
 
         return [config_from_vrep(states[i:i + num_joints], self.client.scale)
                 for i in range(0, len(states), num_joints)]

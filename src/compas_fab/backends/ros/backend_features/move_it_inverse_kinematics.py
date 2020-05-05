@@ -31,29 +31,16 @@ class MoveItInverseKinematics(InverseKinematics):
         self.ros_client = ros_client
 
     def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options={}):  # !!! GHX !!!
-        avoid_collisions = options.get('avoid_collisions', True)
-        constraints = options.get('constraints')
-        attempts = options.get('attempts', 8)
-        attached_collision_meshes = options.get('attached_collision_meshes')
-        base_link = options['base_link']
-        return self.inverse_kinematics_deprecated(base_link, frame_WCF, group,
-                                                  start_configuration, avoid_collisions,
-                                                  constraints, attempts,
-                                                  attached_collision_meshes)
-
-    def inverse_kinematics_deprecated(self, base_link, frame, group,
-                                      start_configuration, avoid_collisions=True,
-                                      constraints=None, attempts=8,
-                                      attached_collision_meshes=None):
         kwargs = {}
-        kwargs['base_link'] = base_link
-        kwargs['frame'] = frame
+        kwargs['base_link'] = options['base_link']
+        kwargs['frame'] = frame_WCF
         kwargs['group'] = group
         kwargs['start_configuration'] = start_configuration
-        kwargs['avoid_collisions'] = avoid_collisions
-        kwargs['constraints'] = constraints
-        kwargs['attempts'] = attempts
+        kwargs['avoid_collisions'] = options.get('avoid_collisions', True)
+        kwargs['constraints'] = options.get('constraints')
+        kwargs['attempts'] = options.get('attempts', 8)
         # why is attached_collision_meshes unused?
+        # kwargs['attached_collision_meshes'] = options.get('attached_collision_meshes')
 
         kwargs['errback_name'] = 'errback'
 

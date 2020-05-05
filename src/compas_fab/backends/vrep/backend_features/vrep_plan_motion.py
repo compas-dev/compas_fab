@@ -22,35 +22,11 @@ class VrepPlanMotion(PlanMotion):
         self.client = client
 
     def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):
-        num_joints = options.get('num_joints')
-        metric_values = options.get('metric_values')
-        collision_meshes = options.get('collision_meshes')
-        planner_id = options.get('planner_id', 'rrtconnect')
-        trials = options.get('trials', 1)
-        resolution = options.get('resolution', 0.02)
-        gantry_joint_limits = options.get('gantry_joint_limits')
-        arm_joint_limits = options.get('arm_joint_limits')
-        shallow_state_search = options.get('shallow_state_search', True)
-        optimize_path_length = options.get('optimize_path_length', False)
-        log = options.get('log')
-        return self.plan_motion_deprecated(group, goal_constraints, num_joints,
-                                           metric_values, collision_meshes,
-                                           planner_id, trials, resolution,
-                                           gantry_joint_limits, arm_joint_limits,
-                                           shallow_state_search, optimize_path_length,
-                                           log)
-
-    def plan_motion_deprecated(self, group, goal_frame, num_joints,
-                               metric_values=None, collision_meshes=None,
-                               planner_id='rrtconnect', trials=1, resolution=0.02,
-                               gantry_joint_limits=None, arm_joint_limits=None,
-                               shallow_state_search=True, optimize_path_length=False,
-                               log=None):
         """Find a path plan to move the selected robot from its current position to the `goal_frame`.
 
         Args:
             group (:obj:`int`): Integer referencing the desired robot group.
-            goal_frame (:class:`Frame`): Target or goal frame.
+            goal_constraints (:class:`Frame`): Target or goal frame.
             num_joints (:obj:`int`): Number of configurable joints.
             metric_values (:obj:`list` of :obj:`float`): List containing one value
                 per configurable joint. Each value ranges from 0 to 1,
@@ -78,13 +54,7 @@ class VrepPlanMotion(PlanMotion):
             list: List of :class:`Configuration` objects representing the
             collision-free path to the ``goal_frame``.
         """
-        return self._find_path_plan(group, {'target_type': 'pose', 'target': goal_frame},
-                                    num_joints, metric_values, collision_meshes, planner_id, trials, resolution,
-                                    gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length,
-                                    log)
-
-    def plan_motion_to_config(self, goal_configs, start_configuration=None, group=None, options={}):
-        num_joints = options.get('num_joints')
+        num_joints = options['num_joints']
         metric_values = options.get('metric_values')
         collision_meshes = options.get('collision_meshes')
         planner_id = options.get('planner_id', 'rrtconnect')
@@ -95,19 +65,12 @@ class VrepPlanMotion(PlanMotion):
         shallow_state_search = options.get('shallow_state_search', True)
         optimize_path_length = options.get('optimize_path_length', False)
         log = options.get('log')
-        return self.plan_motion_to_config_deprecated(group, goal_configs, num_joints,
-                                                     metric_values, collision_meshes,
-                                                     planner_id, trials, resolution,
-                                                     gantry_joint_limits, arm_joint_limits,
-                                                     shallow_state_search, optimize_path_length,
-                                                     log)
+        return self._find_path_plan(group, {'target_type': 'pose', 'target': goal_constraints},
+                                    num_joints, metric_values, collision_meshes, planner_id, trials, resolution,
+                                    gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length,
+                                    log)
 
-    def plan_motion_to_config_deprecated(self, group, goal_configs, num_joints,
-                                         metric_values=None, collision_meshes=None,
-                                         planner_id='rrtconnect', trials=1, resolution=0.02,
-                                         gantry_joint_limits=None, arm_joint_limits=None,
-                                         shallow_state_search=True, optimize_path_length=False,
-                                         log=None):
+    def plan_motion_to_config(self, goal_configs, start_configuration=None, group=None, options={}):
         """Find a path plan to move the selected robot from its current position to one of the `goal_configs`.
 
         This function is useful when it is required to get a path plan that ends in one
@@ -143,6 +106,17 @@ class VrepPlanMotion(PlanMotion):
             list: List of :class:`Configuration` objects representing the
             collision-free path to the ``goal_configs``.
         """
+        num_joints = options['num_joints']
+        metric_values = options.get('metric_values')
+        collision_meshes = options.get('collision_meshes')
+        planner_id = options.get('planner_id', 'rrtconnect')
+        trials = options.get('trials', 1)
+        resolution = options.get('resolution', 0.02)
+        gantry_joint_limits = options.get('gantry_joint_limits')
+        arm_joint_limits = options.get('arm_joint_limits')
+        shallow_state_search = options.get('shallow_state_search', True)
+        optimize_path_length = options.get('optimize_path_length', False)
+        log = options.get('log')
         return self._find_path_plan(group, {'target_type': 'config', 'target': goal_configs},
                                     num_joints, metric_values, collision_meshes, planner_id, trials, resolution,
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length,

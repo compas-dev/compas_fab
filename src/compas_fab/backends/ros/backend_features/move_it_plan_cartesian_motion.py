@@ -32,40 +32,19 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         self.ros_client = ros_client
 
     def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options={}):
-        base_link = options.get('base_link')
-        ee_link = options.get('ee_link')
-        joint_names = options.get('joint_names')
-        joint_types = options.get('joint_types')
-        max_step = options.get('max_step')
-        jump_threshold = options.get('jump_threshold')
-        avoid_collisions = options.get('avoid_collisions')
-        path_constraints = options.get('path_constraints')
-        attached_collision_meshes = options.get('attached_collision_meshes')
-        return self.plan_cartesian_motion_deprecated(base_link, ee_link, joint_names, joint_types,
-                                                     frames_WCF, start_configuration,
-                                                     group, max_step, jump_threshold,
-                                                     avoid_collisions, path_constraints,
-                                                     attached_collision_meshes)
-
-    def plan_cartesian_motion_deprecated(self,
-                                         base_link, ee_link, joint_names, joint_types,
-                                         frames, start_configuration,
-                                         group, max_step, jump_threshold,
-                                         avoid_collisions, path_constraints,
-                                         attached_collision_meshes):
         kwargs = {}
-        kwargs['base_link'] = base_link
-        kwargs['ee_link'] = ee_link
-        kwargs['joint_names'] = joint_names
-        kwargs['joint_types'] = joint_types
-        kwargs['frames'] = frames
+        kwargs['base_link'] = options['base_link']
+        kwargs['ee_link'] = options['ee_link']
+        kwargs['joint_names'] = options['joint_names']
+        kwargs['joint_types'] = options['joint_types']
+        kwargs['frames'] = frames_WCF
         kwargs['start_configuration'] = start_configuration
         kwargs['group'] = group
-        kwargs['max_step'] = max_step
-        kwargs['jump_threshold'] = jump_threshold
-        kwargs['avoid_collisions'] = avoid_collisions
-        kwargs['path_constraints'] = path_constraints
-        kwargs['attached_collision_meshes'] = attached_collision_meshes
+        kwargs['max_step'] = options.get('max_step', 0.01)
+        kwargs['jump_threshold'] = options.get('jump_threshold', 1.57)
+        kwargs['avoid_collisions'] = options.get('avoid_collisions', True)
+        kwargs['path_constraints'] = options.get('path_constraints')
+        kwargs['attached_collision_meshes'] = options.get('attached_collision_meshes')
 
         kwargs['errback_name'] = 'errback'
 
