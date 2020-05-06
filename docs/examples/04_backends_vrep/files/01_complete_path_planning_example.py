@@ -40,3 +40,5 @@ with VrepClient(debug=True) as client:
                               })
 
     print('Found path of %d steps' % len(path))
+
+    assert len(path) > 0, 'Path should not be empty'

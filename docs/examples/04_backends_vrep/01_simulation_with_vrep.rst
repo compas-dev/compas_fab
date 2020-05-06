@@ -95,6 +95,8 @@ that there is at least one valid configuration to reach the goal pose.
         robot = rfl.Robot('B')
         group = robot.model.attr['index']
         configs = client.inverse_kinematics(goal_pose, group=group)
+
+        assert len(configs) > 0, 'No IK solution found'
         print('Found valid configuration: ', str(configs[-1]))
 
 Basic path planning example
