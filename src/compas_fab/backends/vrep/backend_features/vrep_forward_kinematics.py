@@ -5,8 +5,14 @@ from __future__ import print_function
 from compas_fab.backends.backend_feature_interfaces import ForwardKinematics
 from compas_fab.backends.vrep.helpers import vrep_pose_to_frame
 
+__all__ = [
+    'VrepForwardKinematics',
+]
+
 
 class VrepForwardKinematics(ForwardKinematics):
+    """Calculates forward kinematics to get the current end-effector pose.
+    """
     def __init__(self, client):
         self.client = client
 
@@ -14,7 +20,9 @@ class VrepForwardKinematics(ForwardKinematics):
         """Calculates forward kinematics to get the current end-effector pose.
 
         Args:
+            configuration (:obj:`None`): Unused parameter.
             group (:obj:`int`): Integer referencing the desired robot group.
+            options (:obj:`dict`): Unused parameter.
 
         Examples:
 

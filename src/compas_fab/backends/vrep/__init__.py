@@ -13,13 +13,22 @@ Package with functionality to run simulations using the robotic simulation tool
 
     VrepClient
     VrepError
+    VrepForwardKinematics
+    VrepInverseKinematics
+    VrepPlanMotion
 
 """
 
 from .helpers import VrepError
 from .client import VrepClient
+from .backend_features import VrepInverseKinematics
+from .backend_features import VrepForwardKinematics
+from .backend_features import VrepPlanMotion
 
 __all__ = [
     'VrepClient',
     'VrepError',
+    'VrepForwardKinematics',
+    'VrepInverseKinematics',
+    'VrepPlanMotion',
 ]

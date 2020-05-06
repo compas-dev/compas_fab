@@ -945,27 +945,11 @@ class Robot(object):
     # ==========================================================================
 
     def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options={}):
-        avoid_collisions = options.get('avoid_collisions', True)
-        constraints = options.get('constraints')
-        attempts = options.get('attempts', 8)
-        attached_collision_meshes = options.get('attached_collision_meshes')
-        return_full_configuration = options.get('return_full_configuration', False)
-        return self.inverse_kinematics_deprecated(frame_WCF, start_configuration,
-                                                  group, avoid_collisions,
-                                                  constraints, attempts,
-                                                  attached_collision_meshes,
-                                                  return_full_configuration)
-
-    def inverse_kinematics_deprecated(self, frame_WCF, start_configuration=None,
-                                      group=None, avoid_collisions=True,
-                                      constraints=None, attempts=8,
-                                      attached_collision_meshes=None,
-                                      return_full_configuration=False):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
         ----------
-        frame: :class:`compas.geometry.Frame`
+        frame_WCF: :class:`compas.geometry.Frame`
             The frame to calculate the inverse for.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
             If passed, the inverse will be calculated such that the calculated
@@ -974,17 +958,20 @@ class Robot(object):
         group: str, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
-        avoid_collisions: bool, optional
-            Whether or not to avoid collisions. Defaults to True.
-        constraints: list of :class:`compas_fab.robots.Constraint`, optional
-            A set of constraints that the request must obey. Defaults to None.
-        attempts: int, optional
-            The maximum number of inverse kinematic attempts. Defaults to 8.
-        attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
-            Defaults to None.
-        return_full_configuration : bool
-            If ``True``, returns a full configuration with all joint values
-            specified, including passive ones if available.
+        options: dict, optional
+            Dictionary containing the following key-value pairs:
+
+            - avoid_collisions :: bool, optional
+                Whether or not to avoid collisions. Defaults to `True`.
+            - constraints :: list of :class:`compas_fab.robots.Constraint`, optional
+                A set of constraints that the request must obey. Defaults to `None`.
+            - attempts :: int, optional
+                The maximum number of inverse kinematic attempts. Defaults to `8`.
+            - attached_collision_meshes :: list of :class:`compas_fab.robots.AttachedCollisionMesh`
+                Defaults to `None`.
+            - return_full_configuration :: bool
+                If ``True``, returns a full configuration with all joint values
+                specified, including passive ones if available.
 
         Raises
         ------
@@ -1004,6 +991,22 @@ class Robot(object):
         >>> robot.inverse_kinematics(frame_WCF, start_configuration, group)                 # doctest: +SKIP
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
+        avoid_collisions = options.get('avoid_collisions', True)
+        constraints = options.get('constraints')
+        attempts = options.get('attempts', 8)
+        attached_collision_meshes = options.get('attached_collision_meshes')
+        return_full_configuration = options.get('return_full_configuration', False)
+        return self.inverse_kinematics_deprecated(frame_WCF, start_configuration,
+                                                  group, avoid_collisions,
+                                                  constraints, attempts,
+                                                  attached_collision_meshes,
+                                                  return_full_configuration)
+
+    def inverse_kinematics_deprecated(self, frame_WCF, start_configuration=None,
+                                      group=None, avoid_collisions=True,
+                                      constraints=None, attempts=8,
+                                      attached_collision_meshes=None,
+                                      return_full_configuration=False):
         self.ensure_client()
         if not group:
             group = self.main_group_name  # ensure semantics
@@ -1044,11 +1047,6 @@ class Robot(object):
         return configuration.scaled(self.scale_factor)
 
     def forward_kinematics(self, configuration, group=None, options={}):
-        backend = options.get('backend')
-        ee_link = options.get('ee_link')
-        return self.forward_kinematics_deprecated(configuration, group, backend, ee_link)
-
-    def forward_kinematics_deprecated(self, configuration, group=None, backend=None, ee_link=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
@@ -1060,13 +1058,16 @@ class Robot(object):
         group : str, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
-        backend : None or str
-            If `None` calculates fk with the client if it exists or with the robot model.
-            If 'model' use the robot model to calculate fk. Anything else is open
-            for implementation, possibly 'kdl', 'ikfast'
-        ee_link : str, optional
-            The name of the link to calculate the forward kinematics for.
-            Defaults to the group's end effector link.
+        options : dict, optional
+            Dictionary containing the following key-value pairs:
+
+            - backend :: None or str
+                If `None` calculates fk with the client if it exists or with the robot model.
+                If 'model' use the robot model to calculate fk. Anything else is open
+                for implementation, possibly 'kdl', 'ikfast'
+            - ee_link :: str, optional
+                The name of the link to calculate the forward kinematics for.
+                Defaults to the group's end effector link.
 
         Returns
         -------
@@ -1083,6 +1084,11 @@ class Robot(object):
         >>> frame_WCF_c == frame_WCF_m
         True
         """
+        backend = options.get('backend')
+        ee_link = options.get('ee_link')
+        return self.forward_kinematics_deprecated(configuration, group, backend, ee_link)
+
+    def forward_kinematics_deprecated(self, configuration, group=None, backend=None, ee_link=None):
         if not group:
             group = self.main_group_name
 
@@ -1119,22 +1125,6 @@ class Robot(object):
         return frame_WCF
 
     def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options={}):
-        max_step = options.get('max_step', 0.01)
-        jump_threshold = options.get('jump_threshold', 1.57)
-        avoid_collisions = options.get('avoid_collisions', True)
-        path_constraints = options.get('path_constraints')
-        attached_collisions_meshes = options.get('attached_collision_meshes')
-        return self.plan_cartesian_motion_deprecated(frames_WCF, start_configuration,
-                                                     max_step, jump_threshold,
-                                                     avoid_collisions, group,
-                                                     path_constraints,
-                                                     attached_collisions_meshes)
-
-    def plan_cartesian_motion_deprecated(self, frames_WCF, start_configuration=None,
-                                         max_step=0.01, jump_threshold=1.57,
-                                         avoid_collisions=True, group=None,
-                                         path_constraints=None,
-                                         attached_collision_meshes=None):
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
@@ -1145,26 +1135,28 @@ class Robot(object):
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the starting position. Defaults to
             the all-zero configuration.
-        max_step: float
-            The approximate distance between the calculated points. (Defined in
-            the robot's units)
-        jump_threshold: float
-            The maximum allowed distance of joint positions between consecutive
-            points. If the distance is found to be above this threshold, the
-            path computation fails. It must be specified in relation to max_step.
-            If this threshold is 0, 'jumps' might occur, resulting in an invalid
-            cartesian path. Defaults to pi/2.
-        avoid_collisions: bool, optional
-            Whether or not to avoid collisions. Defaults to True.
         group: str, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
-        path_constraints: list of :class:`compas_fab.robots.Constraint`, optional
-            Optional constraints that can be imposed along the solution path.
-            Note that path calculation won't work if the start_configuration
-            violates these constraints. Defaults to None.
-        attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
-            Defaults to None.
+        options: dict, optional
+            Dictionary containing the following key-value pairs:
+            - max_step :: float, optional
+                The approximate distance between the calculated points. (Defined in
+                the robot's units.) Defaults to `0.01`.
+            - jump_threshold :: float, optional
+                The maximum allowed distance of joint positions between consecutive
+                points. If the distance is found to be above this threshold, the
+                path computation fails. It must be specified in relation to max_step.
+                If this threshold is 0, 'jumps' might occur, resulting in an invalid
+                cartesian path. Defaults to pi/2.
+            - avoid_collisions :: bool, optional
+                Whether or not to avoid collisions. Defaults to `True`.
+            - path_constraints :: list of :class:`compas_fab.robots.Constraint`, optional
+                Optional constraints that can be imposed along the solution path.
+                Note that path calculation won't work if the start_configuration
+                violates these constraints. Defaults to `None`.
+            - attached_collision_meshes :: list of :class:`compas_fab.robots.AttachedCollisionMesh`
+                Defaults to `None`.
 
         Returns
         -------
@@ -1187,6 +1179,22 @@ class Robot(object):
         >>> type(trajectory)
         <class 'compas_fab.robots.trajectory.JointTrajectory'>
         """
+        max_step = options.get('max_step', 0.01)
+        jump_threshold = options.get('jump_threshold', 1.57)
+        avoid_collisions = options.get('avoid_collisions', True)
+        path_constraints = options.get('path_constraints')
+        attached_collisions_meshes = options.get('attached_collision_meshes')
+        return self.plan_cartesian_motion_deprecated(frames_WCF, start_configuration,
+                                                     max_step, jump_threshold,
+                                                     avoid_collisions, group,
+                                                     path_constraints,
+                                                     attached_collisions_meshes)
+
+    def plan_cartesian_motion_deprecated(self, frames_WCF, start_configuration=None,
+                                         max_step=0.01, jump_threshold=1.57,
+                                         avoid_collisions=True, group=None,
+                                         path_constraints=None,
+                                         attached_collision_meshes=None):
         self.ensure_client()
         if not group:
             group = self.main_group_name  # ensure semantics
@@ -1248,26 +1256,6 @@ class Robot(object):
         return trajectory
 
     def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):
-        path_constraints = options.get('path_constraints')
-        planner_id = options.get('planner_id', 'RRT')
-        num_planning_attempts = options.get('num_planning_attempts', 1)
-        allowed_planning_time = options.get('allowed_planning_time', 2.)
-        max_velocity_scaling_factor = options.get('max_velocity_scling_factor', 1.)
-        max_acceleration_scaling_factor = options.get('max_acceleration_scaling_factor', 1.)
-        attached_collision_meshes = options.get('attached_collision_meshes')
-        return self.plan_motion_deprecated(goal_constraints, start_configuration,
-                                           group, path_constraints, planner_id,
-                                           num_planning_attempts, allowed_planning_time,
-                                           max_velocity_scaling_factor,
-                                           max_acceleration_scaling_factor,
-                                           attached_collision_meshes)
-
-    def plan_motion_deprecated(self, goal_constraints, start_configuration=None,
-                               group=None, path_constraints=None, planner_id='RRT',
-                               num_planning_attempts=1, allowed_planning_time=2.,
-                               max_velocity_scaling_factor=1.,
-                               max_acceleration_scaling_factor=1.,
-                               attached_collision_meshes=None):
         """Calculates a motion path.
 
         Parameters
@@ -1285,27 +1273,30 @@ class Robot(object):
         group: str, optional
             The name of the group to plan for. Defaults to the robot's main
             planning group.
-        path_constraints: list of :class:`compas_fab.robots.Constraint`, optional
-            Optional constraints that can be imposed along the solution path.
-            Note that path calculation won't work if the start_configuration
-            violates these constraints. Defaults to None.
-        planner_id: str
-            The name of the algorithm used for path planning. Defaults to 'RRT'.
-        num_planning_attempts: int, optional
-            Normally, if one motion plan is needed, one motion plan is computed.
-            However, for algorithms that use randomization in their execution
-            (like 'RRT'), it is likely that different planner executions will
-            produce different solutions. Setting this parameter to a value above
-            1 will run many additional motion plans, and will report the
-            shortest solution as the final result. Defaults to 1.
-        allowed_planning_time: float
-            The number of seconds allowed to perform the planning. Defaults to 2.
-        max_velocity_scaling_factor: float
-            Defaults to 1.
-        max_acceleration_scaling_factor: float
-            Defaults to 1.
-        attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
-            Defaults to None.
+        options : dict, optional
+            Dictionary containing the following key-value pairs:
+
+            - path_constraints :: list of :class:`compas_fab.robots.Constraint`, optional
+                Optional constraints that can be imposed along the solution path.
+                Note that path calculation won't work if the start_configuration
+                violates these constraints. Defaults to `None`.
+            - planner_id :: str
+                The name of the algorithm used for path planning. Defaults to 'RRT'.
+            - num_planning_attempts :: int, optional
+                Normally, if one motion plan is needed, one motion plan is computed.
+                However, for algorithms that use randomization in their execution
+                (like 'RRT'), it is likely that different planner executions will
+                produce different solutions. Setting this parameter to a value above
+                1 will run many additional motion plans, and will report the
+                shortest solution as the final result. Defaults to `1`.
+            - allowed_planning_time :: float
+                The number of seconds allowed to perform the planning. Defaults to `2`.
+            - max_velocity_scaling_factor :: float
+                Defaults to `1`.
+            - max_acceleration_scaling_factor :: float
+                Defaults to `1`.
+            - attached_collision_meshes :: list of :class:`compas_fab.robots.AttachedCollisionMesh`
+                Defaults to `None`.
 
         Returns
         -------
@@ -1337,6 +1328,26 @@ class Robot(object):
         >>> type(trajectory)
         <class 'compas_fab.robots.trajectory.JointTrajectory'>
         """
+        path_constraints = options.get('path_constraints')
+        planner_id = options.get('planner_id', 'RRT')
+        num_planning_attempts = options.get('num_planning_attempts', 1)
+        allowed_planning_time = options.get('allowed_planning_time', 2.)
+        max_velocity_scaling_factor = options.get('max_velocity_scling_factor', 1.)
+        max_acceleration_scaling_factor = options.get('max_acceleration_scaling_factor', 1.)
+        attached_collision_meshes = options.get('attached_collision_meshes')
+        return self.plan_motion_deprecated(goal_constraints, start_configuration,
+                                           group, path_constraints, planner_id,
+                                           num_planning_attempts, allowed_planning_time,
+                                           max_velocity_scaling_factor,
+                                           max_acceleration_scaling_factor,
+                                           attached_collision_meshes)
+
+    def plan_motion_deprecated(self, goal_constraints, start_configuration=None,
+                               group=None, path_constraints=None, planner_id='RRT',
+                               num_planning_attempts=1, allowed_planning_time=2.,
+                               max_velocity_scaling_factor=1.,
+                               max_acceleration_scaling_factor=1.,
+                               attached_collision_meshes=None):
 
         # TODO: for the motion plan request a list of possible goal constraints
         # can be passed, from which the planner will try to find a path that

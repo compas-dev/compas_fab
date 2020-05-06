@@ -15,6 +15,9 @@ V-REP
     :nosignatures:
 
     VrepClient
+    VrepForwardKinematics
+    VrepInverseKinematics
+    VrepPlanMotion
 
 ROS
 ---
@@ -56,5 +59,7 @@ from .ros.client import *               # noqa: F401,F403
 from .ros.exceptions import *           # noqa: F401,F403
 from .ros.fileserver_loader import *    # noqa: F401,F403
 from .vrep.client import *              # noqa: F401,F403
+from .vrep.backend_features import *    # noqa: F401,F403
+from .vrep.helpers import *             # noqa: F401,F403
 
 __all__ = [name for name in dir() if not name.startswith('_')]
