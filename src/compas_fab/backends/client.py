@@ -72,12 +72,6 @@ class PlannerInterface(EventEmitterMixin):
         super(PlannerInterface, self).__init__()
         self.client = client
 
-    def init_planner(self):
-        pass
-
-    def dispose_planner(self):
-        pass
-
     # ==========================================================================
     # planning services
     # ==========================================================================
