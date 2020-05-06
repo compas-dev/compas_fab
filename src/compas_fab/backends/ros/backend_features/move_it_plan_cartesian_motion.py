@@ -20,6 +20,10 @@ from compas_fab.backends.ros.planner_backend import ServiceDescription
 from compas_fab.robots import Configuration
 from compas_fab.robots import JointTrajectory
 
+__all__ = [
+    'MoveItPlanCartesianMotion',
+]
+
 
 class MoveItPlanCartesianMotion(PlanCartesianMotion):
     GET_CARTESIAN_PATH = ServiceDescription('/compute_cartesian_path',

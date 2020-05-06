@@ -20,6 +20,10 @@ from compas_fab.backends.ros.planner_backend import ServiceDescription
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import Configuration
 
+__all__ = [
+    'MoveItPlanMotion'
+]
+
 
 class MoveItPlanMotion(PlanMotion):
     GET_MOTION_PLAN = ServiceDescription('/plan_kinematic_path',

@@ -14,6 +14,10 @@ from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.planner_backend import ServiceDescription
 
+__all__ = [
+    'MoveItForwardKinematics',
+]
+
 
 class MoveItForwardKinematics(ForwardKinematics):
     GET_POSITION_FK = ServiceDescription('/compute_fk',

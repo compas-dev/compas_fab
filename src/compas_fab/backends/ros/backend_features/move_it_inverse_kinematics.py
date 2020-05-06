@@ -19,6 +19,10 @@ from compas_fab.backends.ros.messages import PositionIKRequest
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.planner_backend import ServiceDescription
 
+__all__ = [
+    'MoveItInverseKinematics',
+]
+
 
 class MoveItInverseKinematics(InverseKinematics):
     GET_POSITION_IK = ServiceDescription('/compute_ik',

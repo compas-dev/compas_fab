@@ -24,5 +24,6 @@ from .exceptions import *                 # noqa: F401,F403
 from .fileserver_loader import *          # noqa: F401,F403
 from .direct_ur_action_client import *    # noqa: F401,F403
 from .messages import *                   # noqa: F401,F403
+from .backend_features import *           # noqa: F401,F403
 
 __all__ = [name for name in dir() if not name.startswith('_')]

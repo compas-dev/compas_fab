@@ -10,6 +10,10 @@ from compas_fab.backends.ros.messages import GetPlanningSceneResponse
 from compas_fab.backends.ros.messages import PlanningSceneComponents
 from compas_fab.backends.ros.planner_backend import ServiceDescription
 
+__all__ = [
+    'MoveItPlanningScene',
+]
+
 
 class MoveItPlanningScene(GetPlanningScene):
     GET_PLANNING_SCENE = ServiceDescription('/get_planning_scene',

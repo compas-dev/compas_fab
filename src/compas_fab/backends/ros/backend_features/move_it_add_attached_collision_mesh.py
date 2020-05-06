@@ -6,6 +6,10 @@ from compas_fab.backends.backend_feature_interfaces import AddAttachedCollisionM
 from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import CollisionObject
 
+__all__ = [
+    'MoveItAddAttachedCollisionMesh',
+]
+
 
 class MoveItAddAttachedCollisionMesh(AddAttachedCollisionMesh):
     def __init__(self, ros_client):

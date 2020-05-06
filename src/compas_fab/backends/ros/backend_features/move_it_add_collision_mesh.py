@@ -5,6 +5,10 @@ from __future__ import print_function
 from compas_fab.backends.backend_feature_interfaces import AddCollisionMesh
 from compas_fab.backends.ros.messages import CollisionObject
 
+__all__ = [
+    'MoveItAddCollisionMesh',
+]
+
 
 class MoveItAddCollisionMesh(AddCollisionMesh):
     def __init__(self, ros_client):
