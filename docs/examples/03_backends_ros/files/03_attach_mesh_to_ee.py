@@ -13,7 +13,7 @@ with RosClient() as client:
     robot = Robot(client)
     scene = PlanningScene(robot)
 
-    # create collison object
+    # create collision object
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
     cm = CollisionMesh(mesh, 'tip')
 

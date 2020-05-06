@@ -291,7 +291,7 @@ class VrepClient(ClientInterface):
             robot (:class:`compas_fab.robots.Robot`): Robot instance to use for pick up.
             building_member_mesh (:class:`compas.datastructures.Mesh`): Mesh
                 of the building member that will be attached to the robot.
-            pickup_pose (:class:`Frame`): Pickup frame.
+            pickup_frame (:class:`Frame`): Pickup frame.
             metric_values (:obj:`list` of :obj:`float`): List containing one value
                 per configurable joint. Each value ranges from 0 to 1,
                 where 1 indicates the axis/joint is blocked and cannot

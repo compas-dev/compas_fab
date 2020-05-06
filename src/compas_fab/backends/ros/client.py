@@ -105,13 +105,10 @@ class RosClient(Ros, ClientInterface):
         self.run()
         self.connect()
 
-        # Planners usually need to initialize/advertise topics and/or services
-        self.planner.init_planner()
-
         return self
 
     def __exit__(self, *args):
-        self.planner.dispose_planner()
+        self.planner.emit('dispose')
 
         self.close()
 
