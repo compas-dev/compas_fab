@@ -36,3 +36,5 @@ with VrepClient(debug=True) as client:
                               shallow_state_search=fast_search)
 
     print('Found path of %d steps' % len(path))
+
+    assert len(path) > 0, 'Path should not be empty'

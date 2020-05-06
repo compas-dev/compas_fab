@@ -57,42 +57,6 @@ def confirm(question):
         print('Focus, kid! It is either (y)es or (n)o', file=sys.stderr)
 
 
-# The IronPython install code is based on gh_python_remote
-# https://github.com/Digital-Structures/ghpythonremote
-# MIT License
-# Copyright (c) 2017 Pierre Cuvilliers, Caitlin Mueller, Massachusetts Institute of Technology
-def get_ironpython_path(rhino_version):
-    appdata_path = os.getenv('APPDATA', '')
-    ironpython_settings_path = os.path.join(appdata_path, 'McNeel', 'Rhinoceros', rhino_version, 'Plug-ins',
-                                            'IronPython (814d908a-e25c-493d-97e9-ee3861957f49)', 'settings')
-
-    if not os.path.isdir(ironpython_settings_path):
-        return None
-
-    return ironpython_settings_path
-
-
-def replaceText(node, newText):
-    if node.firstChild.nodeType != node.TEXT_NODE:
-        raise Exception("Node does not contain text")
-
-    node.firstChild.replaceWholeText(newText)
-
-
-def updateSearchPaths(settings_file, python_source_path):
-    with codecs.open(settings_file, 'r', encoding="ascii", errors="ignore") as file_handle:
-        doc = parse(file_handle)
-
-    for entry in doc.getElementsByTagName('entry'):
-        if entry.getAttribute('key') == 'SearchPaths':
-            current_paths = entry.firstChild.data
-            if python_source_path not in current_paths:
-                replaceText(entry, current_paths + ';' + python_source_path)
-
-    with codecs.open(settings_file, 'w', encoding='utf-8') as file_handle:
-        doc.writexml(file_handle)
-
-
 @task(default=True)
 def help(ctx):
     """Lists available tasks and usage."""
@@ -141,15 +105,18 @@ def clean(ctx, docs=True, bytecode=True, builds=True):
       'check_links': 'True to check all web links in docs for validity, otherwise False.'})
 def docs(ctx, doctest=False, rebuild=False, check_links=False):
     """Builds package's HTML documentation."""
+
     if rebuild:
         clean(ctx)
 
-    if doctest:
-        ctx.run('sphinx-build -b doctest docs dist/docs')
+    with chdir(BASE_FOLDER):
+        if doctest:
+            ctx.run('sphinx-build -b doctest docs dist/docs')
 
-    ctx.run('sphinx-build -b html docs dist/docs')
-    if check_links:
-        ctx.run('sphinx-build -b linkcheck docs dist/docs')
+        ctx.run('sphinx-build -b html docs dist/docs')
+
+        if check_links:
+            ctx.run('sphinx-build -b linkcheck docs dist/docs')
 
 
 @task()
@@ -162,16 +129,18 @@ def lint(ctx):
 @task()
 def check(ctx):
     """Check the consistency of documentation, coding style and a few other things."""
-    lint(ctx)
 
-    log.write('Checking MANIFEST.in...')
-    ctx.run('check-manifest --ignore-bad-ideas=remoteApi.so')
+    with chdir(BASE_FOLDER):
+        lint(ctx)
 
-    log.write('Checking ReStructuredText formatting...')
-    ctx.run('python setup.py check --strict --metadata --restructuredtext')
+        log.write('Checking MANIFEST.in...')
+        ctx.run('check-manifest --ignore-bad-ideas=remoteApi.so')
 
-    # log.write('Checking python imports...')
-    # ctx.run('isort --check-only --diff --recursive src tests setup.py')
+        log.write('Checking ReStructuredText formatting...')
+        ctx.run('python setup.py check --strict --metadata --restructuredtext')
+
+        # log.write('Checking python imports...')
+        # ctx.run('isort --check-only --diff --recursive src tests setup.py')
 
 
 @task()
@@ -198,19 +167,52 @@ def deploy_docs(ctx):
 
 
 @task(help={
+      'checks': 'True to run all checks before testing, otherwise False.',
       'doctest': 'True to run doctest modules, otherwise False.',
-      'coverage': 'True to generate coverage report using pytest-cov'
+      'codeblock': 'True to run codeblocks present in the documentation, otherwise False',
+      'coverage': 'True to generate coverage report using pytest-cov',
       })
-def test(ctx, doctest=False, coverage=False):
+def test(ctx, checks=False, doctest=False, codeblock=False, coverage=False):
     """Run all tests."""
+    if checks:
+        check(ctx)
 
-    pytest_args = ['pytest']
-    if doctest:
-        pytest_args.append('--doctest-modules')
-    if coverage:
-        pytest_args.append('--cov=compas_fab')
+    with chdir(BASE_FOLDER):
+        pytest_args = ['pytest']
+        if doctest:
+            pytest_args.append('--doctest-modules')
+        if coverage:
+            pytest_args.append('--cov=compas_fab')
 
-    ctx.run(" ".join(pytest_args))
+        ctx.run(" ".join(pytest_args))
+
+        # Using --doctest-modules together with docs as the testpaths goes bananas
+        if codeblock:
+            ctx.run('pytest docs')
+
+
+@task
+def prepare_changelog(ctx):
+    """Prepare changelog for next release."""
+    UNRELEASED_CHANGELOG_TEMPLATE = '\nUnreleased\n----------\n\n**Added**\n\n**Changed**\n\n**Removed**\n'
+
+    with chdir(BASE_FOLDER):
+        # Preparing changelog for next release
+        with open('CHANGELOG.rst', 'r+') as changelog:
+            content = changelog.read()
+            start_index = content.index('----------')
+            start_index = content.rindex('\n', 0, start_index - 1)
+            last_version = content[start_index:start_index + 11].strip()
+
+            if last_version == 'Unreleased':
+                log.write('Already up-to-date')
+                return
+
+            changelog.seek(0)
+            changelog.write(content[0:start_index] + UNRELEASED_CHANGELOG_TEMPLATE + content[start_index:])
+
+        ctx.run('git add CHANGELOG.md && git commit -m "Prepare changelog for next release"')
+
 
 @task(help={
       'release_type': 'Type of release follows semver rules. Must be one of: major, minor, patch.'})
