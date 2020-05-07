@@ -37,53 +37,54 @@ class MoveItPlanMotion(PlanMotion):
         self.ros_client = ros_client
 
     def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):  # !!! ghx and others
-        """Finds a path plan to move the selected robot from its current position within the `goal_constraints`.
+        """Calculates a motion path.
 
-        Args:
-            goal_constraints: list of :class:`compas_fab.robots.Constraint`
-                The goal to be achieved, defined in a set of constraints.
-                Constraints can be very specific, for example defining value domains
-                for each joint, such that the goal configuration is included,
-                or defining a volume in space, to which a specific robot link (e.g.
-                the end-effector) is required to move to.
-            start_configuration: :class:`compas_fab.robots.Configuration`, optional
-                The robot's full configuration, i.e. values for all configurable
-                joints of the entire robot, at the starting position. Defaults to
-                the all-zero configuration.
-            group: str, optional
-                The name of the group to plan for. Defaults to the robot's main
-                planning group.
-            options : dict, optional
-                Dictionary containing the following key-value pairs:
+        Parameters
+        ----------
+        goal_constraints: list of :class:`compas_fab.robots.Constraint`
+            The goal to be achieved, defined in a set of constraints.
+            Constraints can be very specific, for example defining value domains
+            for each joint, such that the goal configuration is included,
+            or defining a volume in space, to which a specific robot link (e.g.
+            the end-effector) is required to move to.
+        start_configuration: :class:`compas_fab.robots.Configuration`, optional
+            The robot's full configuration, i.e. values for all configurable
+            joints of the entire robot, at the starting position. Defaults to
+            the all-zero configuration.
+        group: str, optional
+            The name of the group to plan for. Defaults to the robot's main
+            planning group.
+        options : dict, optional
+            Dictionary containing the following key-value pairs:
 
-                - base_link (:obj:`str`) :: Name of the base link.
-                - joint_names (:obj:`list` of :obj:`str`) :: List containing joint names.
-                - joint_types (:obj:`list` of :obj:`str`) :: List containing joint types.
-                - path_constraints :: list of :class:`compas_fab.robots.Constraint`, optional
-                    Optional constraints that can be imposed along the solution path.
-                    Note that path calculation won't work if the start_configuration
-                    violates these constraints. Defaults to `None`.
-                - planner_id :: str
-                    The name of the algorithm used for path planning. Defaults to 'RRT'.
-                - num_planning_attempts :: int, optional
-                    Normally, if one motion plan is needed, one motion plan is computed.
-                    However, for algorithms that use randomization in their execution
-                    (like 'RRT'), it is likely that different planner executions will
-                    produce different solutions. Setting this parameter to a value above
-                    1 will run many additional motion plans, and will report the
-                    shortest solution as the final result. Defaults to `1`.
-                - allowed_planning_time :: float
-                    The number of seconds allowed to perform the planning. Defaults to `2`.
-                - max_velocity_scaling_factor :: float
-                    Defaults to `1`.
-                - max_acceleration_scaling_factor :: float
-                    Defaults to `1`.
-                - attached_collision_meshes :: list of :class:`compas_fab.robots.AttachedCollisionMesh`
-                    Defaults to `None`.
+             - base_link (:obj:`str`) :: Name of the base link.
+            - joint_names (:obj:`list` of :obj:`str`) :: List containing joint names.
+            - joint_types (:obj:`list` of :obj:`str`) :: List containing joint types.
+            - path_constraints :: list of :class:`compas_fab.robots.Constraint`, optional
+                Optional constraints that can be imposed along the solution path.
+                Note that path calculation won't work if the start_configuration
+                violates these constraints. Defaults to `None`.
+            - planner_id :: str
+                The name of the algorithm used for path planning. Defaults to 'RRT'.
+            - num_planning_attempts :: int, optional
+                Normally, if one motion plan is needed, one motion plan is computed.
+                However, for algorithms that use randomization in their execution
+                (like 'RRT'), it is likely that different planner executions will
+                produce different solutions. Setting this parameter to a value above
+                1 will run many additional motion plans, and will report the
+                shortest solution as the final result. Defaults to `1`.
+            - allowed_planning_time :: float
+                The number of seconds allowed to perform the planning. Defaults to `2`.
+            - max_velocity_scaling_factor :: float
+                Defaults to `1`.
+            - max_acceleration_scaling_factor :: float
+                Defaults to `1`.
+            - attached_collision_meshes :: list of :class:`compas_fab.robots.AttachedCollisionMesh`
+                Defaults to `None`.
 
-
-        Returns:
-            :class:`compas_fab.robots.JointTrajectory`
+        Returns
+        -------
+        :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
         """
         kwargs = {}

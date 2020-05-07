@@ -37,7 +37,7 @@ class VrepInverseKinematics(InverseKinematics):
                     arm joints. Use this if you want to restrict the working area in which to search for states.
                 - max_trials (:obj:`int`) :: Number of trials to run. Set to ``None``
                     to retry infinitely.
-                - max_results (:obj:`int`) …: Maximum number of result states to return.
+                - max_results (:obj:`int`) :: Maximum number of result states to return.
 
         Returns:
             list: List of :class:`Configuration` objects representing
