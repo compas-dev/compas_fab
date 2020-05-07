@@ -35,6 +35,45 @@ class MoveItInverseKinematics(InverseKinematics):
         self.ros_client = ros_client
 
     def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options={}):  # !!! GHX !!!
+        """Calculate the robot's inverse kinematic for a given frame.
+
+        Parameters
+        ----------
+        frame_WCF: :class:`compas.geometry.Frame`
+            The frame to calculate the inverse for.
+        start_configuration: :class:`compas_fab.robots.Configuration`, optional
+            If passed, the inverse will be calculated such that the calculated
+            joint positions differ the least from the start_configuration.
+            Defaults to the init configuration.
+        group: str, optional
+            The planning group used for calculation. Defaults to the robot's
+            main planning group.
+        options: dict, optional
+            Dictionary containing the following key-value pairs:
+
+            - base_link (:obj:`str`) :: Name of the base link.
+            - avoid_collisions :: bool, optional
+                Whether or not to avoid collisions. Defaults to `True`.
+            - constraints :: list of :class:`compas_fab.robots.Constraint`, optional
+                A set of constraints that the request must obey. Defaults to `None`.
+            - attempts :: int, optional
+                The maximum number of inverse kinematic attempts. Defaults to `8`.
+            - attached_collision_meshes :: list of :class:`compas_fab.robots.AttachedCollisionMesh`
+                Defaults to `None`.
+            - return_full_configuration :: bool
+                If ``True``, returns a full configuration with all joint values
+                specified, including passive ones if available.
+
+        Raises
+        ------
+        compas_fab.backends.exceptions.BackendError
+            If no configuration can be found.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Configuration`
+            The planning group's configuration.
+        """
         kwargs = {}
         kwargs['base_link'] = options['base_link']
         kwargs['frame'] = frame_WCF

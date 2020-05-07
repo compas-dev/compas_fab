@@ -1140,6 +1140,7 @@ class Robot(object):
             main planning group.
         options: dict, optional
             Dictionary containing the following key-value pairs:
+
             - max_step :: float, optional
                 The approximate distance between the calculated points. (Defined in
                 the robot's units.) Defaults to `0.01`.

@@ -26,6 +26,7 @@ __all__ = [
 
 
 class MoveItPlanCartesianMotion(PlanCartesianMotion):
+    """Callable to calculate a cartesian motion path (linear in tool space)."""
     GET_CARTESIAN_PATH = ServiceDescription('/compute_cartesian_path',
                                             'GetCartesianPath',
                                             GetCartesianPathRequest,
@@ -36,6 +37,49 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         self.ros_client = ros_client
 
     def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options={}):
+        """Calculates a cartesian motion path (linear in tool space).
+
+        Parameters
+        ----------
+        frames_WCF: list of :class:`compas.geometry.Frame`
+            The frames through which the path is defined.
+        start_configuration: :class:`Configuration`, optional
+            The robot's full configuration, i.e. values for all configurable
+            joints of the entire robot, at the starting position. Defaults to
+            the all-zero configuration.
+        group: str, optional
+            The planning group used for calculation. Defaults to the robot's
+            main planning group.
+        options: dict, optional
+            Dictionary containing the following key-value pairs:
+
+            - base_link (:obj:`str`) :: Name of the base link.
+            - ee_link (:obj:`str`) :: Name of the end effector link.
+            - joint_names (:obj:`list` of :obj:`str`) :: List containing joint names.
+            - joint_types (:obj:`list` of :obj:`str`) :: List containing joint types.
+            - max_step :: float, optional
+                The approximate distance between the calculated points. (Defined in
+                the robot's units.) Defaults to `0.01`.
+            - jump_threshold :: float, optional
+                The maximum allowed distance of joint positions between consecutive
+                points. If the distance is found to be above this threshold, the
+                path computation fails. It must be specified in relation to max_step.
+                If this threshold is 0, 'jumps' might occur, resulting in an invalid
+                cartesian path. Defaults to pi/2.
+            - avoid_collisions :: bool, optional
+                Whether or not to avoid collisions. Defaults to `True`.
+            - path_constraints :: list of :class:`compas_fab.robots.Constraint`, optional
+                Optional constraints that can be imposed along the solution path.
+                Note that path calculation won't work if the start_configuration
+                violates these constraints. Defaults to `None`.
+            - attached_collision_meshes :: list of :class:`compas_fab.robots.AttachedCollisionMesh`
+                Defaults to `None`.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.JointTrajectory`
+            The calculated trajectory.
+        """
         kwargs = {}
         kwargs['base_link'] = options['base_link']
         kwargs['ee_link'] = options['ee_link']

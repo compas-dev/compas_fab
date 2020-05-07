@@ -20,6 +20,7 @@ __all__ = [
 
 
 class MoveItForwardKinematics(ForwardKinematics):
+    """Callable to calculate the robot's forward kinematic."""
     GET_POSITION_FK = ServiceDescription('/compute_fk',
                                          'GetPositionFK',
                                          GetPositionFKRequest,
@@ -30,6 +31,33 @@ class MoveItForwardKinematics(ForwardKinematics):
         self.ros_client = ros_client
 
     def forward_kinematics(self, configuration, group=None, options={}):  # !!! GHX!!!
+        """Calculate the robot's forward kinematic.
+
+        Parameters
+        ----------
+        configuration : :class:`compas_fab.robots.Configuration`
+            The full configuration to calculate the forward kinematic for. If no
+            full configuration is passed, the zero-joint state for the other
+            configurable joints is assumed.
+        group : str, optional
+            The planning group used for the calculation. Defaults to the robot's
+            main planning group.
+        options : dict, optional
+            Dictionary containing the following key-value pairs:
+
+            - backend :: None or str
+                If `None` calculates fk with the client if it exists or with the robot model.
+                If 'model' use the robot model to calculate fk. Anything else is open
+                for implementation, possibly 'kdl', 'ikfast'
+            - ee_link :: str, optional
+                The name of the link to calculate the forward kinematics for.
+                Defaults to the group's end effector link.
+
+        Returns
+        -------
+        :class:`Frame`
+            The frame in the world's coordinate system (WCF).
+        """
         kwargs = {}
         kwargs['base_link'] = options['base_link']
         kwargs['configuration'] = configuration

@@ -12,7 +12,7 @@ __all__ = [
 
 
 class VrepInverseKinematics(InverseKinematics):
-    """Calculates inverse kinematics to find valid robot configurations for the specified goal frame.
+    """Callable to calculate inverse kinematics to find valid robot configurations for the specified goal frame.
     """
     def __init__(self, client):
         self.client = client

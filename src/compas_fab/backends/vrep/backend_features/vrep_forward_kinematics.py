@@ -11,7 +11,7 @@ __all__ = [
 
 
 class VrepForwardKinematics(ForwardKinematics):
-    """Calculates forward kinematics to get the current end-effector pose.
+    """Callable to calculate forward kinematics to get the current end-effector pose.
     """
     def __init__(self, client):
         self.client = client

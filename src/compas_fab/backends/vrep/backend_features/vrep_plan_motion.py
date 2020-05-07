@@ -17,7 +17,7 @@ __all__ = [
 
 
 class VrepPlanMotion(PlanMotion):
-    """Finds a path plan to move the selected robot from its current position to the `goal_frame`.
+    """Callable to find a path plan to move the selected robot from its current position to the `goal_constraints`.
     """
     SUPPORTED_PLANNERS = ('bitrrt', 'bkpiece1', 'est', 'kpiece1',
                           'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst',
@@ -28,12 +28,12 @@ class VrepPlanMotion(PlanMotion):
         self.client = client
 
     def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):
-        """Finds a path plan to move the selected robot from its current position to the `goal_frame`.
+        """Finds a path plan to move the selected robot from its current position to the `goal_constraints`.
 
         Args:
             goal_constraints (:class:`Frame`): Target or goal frame.
-            group (:obj:`int`): Integer referencing the desired robot group.
             start_configuration (:obj:`None`): Unused parameter.
+            group (:obj:`int`): Integer referencing the desired robot group.
             options (:obj:`dict`): Dictionary containing the following key-values pairs:
 
                 - num_joints (:obj:`int`) :: Number of configurable joints.
