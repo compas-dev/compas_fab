@@ -211,7 +211,7 @@ def prepare_changelog(ctx):
             changelog.seek(0)
             changelog.write(content[0:start_index] + UNRELEASED_CHANGELOG_TEMPLATE + content[start_index:])
 
-        ctx.run('git add CHANGELOG.md && git commit -m "Prepare changelog for next release"')
+        ctx.run('git add CHANGELOG.rst && git commit -m "Prepare changelog for next release"')
 
 
 @task(help={
