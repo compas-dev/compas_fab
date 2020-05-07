@@ -15,6 +15,10 @@ Unreleased
 
 **Changed**
 
+**Fixed**
+
+**Deprecated**
+
 **Removed**
 
 0.11.0
