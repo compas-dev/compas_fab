@@ -37,14 +37,10 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 * :meth:`compas_fab.robots.CollisionMesh.scale` now takes a scale factor
   instead of a :class:`compas.geometry.Scale` instance as an argument.
 
-**Removed**
-
 **Fixed**
 
 * Convert constraints on inverse kinematics and cartesian planner to ROS messages
 * Fix support for trajectory constraints on kinematic planner
-
-**Deprecated**
 
 0.10.2
 ----------
