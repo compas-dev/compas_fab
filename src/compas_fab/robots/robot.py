@@ -1177,9 +1177,9 @@ class Robot(object):
                                                         constraints=constraints,
                                                         attempts=attempts,
                                                         attached_collision_meshes=attached_collision_meshes,
-                                                        full_joint_state=full_joint_state)
+                                                        return_full_configuration=full_joint_state)
                 result_configurations.append(configuration)
-            except BaseException:
+            except:
                 # print("Error code: -31; NO_IK_SOLUTION")
                 pass
 
