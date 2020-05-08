@@ -26,7 +26,7 @@ class VrepInverseKinematics(InverseKinematics):
             group (:obj:`int`): Integer referencing the desired robot group.
             options (:obj:`dict`): Dictionary containing the following key-value pairs:
 
-                - num_joints (:obj:`int`) :: Number of configurable joints
+                - num_joints (:obj:`int`) :: Number of configurable joints.
                 - metric_values (:obj:`list` of :obj:`float`) :: List containing one value
                     per configurable joint. Each value ranges from 0 to 1,
                     where 1 indicates the axis/joint is blocked and cannot

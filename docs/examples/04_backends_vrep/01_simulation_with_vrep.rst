@@ -70,8 +70,8 @@ forward kinematics:
         group_a = robot_a.model.attr['index']
         group_b = robot_b.model.attr['index']
 
-        frame_a = client.forward_kinematics(None, None, group=group_a)
-        frame_b = client.forward_kinematics(None, None, group=group_b)
+        frame_a = client.forward_kinematics(None, group=group_a)
+        frame_b = client.forward_kinematics(None, group=group_b)
         print('End effector poses: ', str(frame_a), str(frame_b))
 
 Inverse Kinematics
@@ -94,7 +94,10 @@ that there is at least one valid configuration to reach the goal pose.
     with VrepClient() as client:
         robot = rfl.Robot('B')
         group = robot.model.attr['index']
-        configs = client.inverse_kinematics(goal_pose, group=group)
+        options = {
+            'num_joints': len(robot.get_configurable_joints()),
+        }
+        configs = client.inverse_kinematics(goal_pose, group=group, options=options)
 
         assert len(configs) > 0, 'No IK solution found'
         print('Found valid configuration: ', str(configs[-1]))
@@ -123,7 +126,10 @@ Here is an example of such a request:
         robot = rfl.Robot('B')
         client.set_robot_config(robot, start_config)
         group = robot.model.attr['index']
-        path = client.plan_motion(goal_pose, group=group)
+        options = {
+            'num_joints': len(robot.get_configurable_joints()),
+        }
+        path = client.plan_motion(goal_pose, group=group, options=options)
         print('Found path of %d steps' % len(path))
 
 
