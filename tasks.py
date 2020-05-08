@@ -194,7 +194,7 @@ def test(ctx, checks=False, doctest=False, codeblock=False, coverage=False):
 @task
 def prepare_changelog(ctx):
     """Prepare changelog for next release."""
-    UNRELEASED_CHANGELOG_TEMPLATE = '\nUnreleased\n----------\n\n**Added**\n\n**Changed**\n\n**Removed**\n'
+    UNRELEASED_CHANGELOG_TEMPLATE = '\nUnreleased\n----------\n\n**Added**\n\n**Changed**\n\n**Fixed**\n\n**Deprecated**\n\n**Removed**\n'
 
     with chdir(BASE_FOLDER):
         # Preparing changelog for next release
@@ -211,7 +211,7 @@ def prepare_changelog(ctx):
             changelog.seek(0)
             changelog.write(content[0:start_index] + UNRELEASED_CHANGELOG_TEMPLATE + content[start_index:])
 
-        ctx.run('git add CHANGELOG.md && git commit -m "Prepare changelog for next release"')
+        ctx.run('git add CHANGELOG.rst && git commit -m "Prepare changelog for next release"')
 
 
 @task(help={
