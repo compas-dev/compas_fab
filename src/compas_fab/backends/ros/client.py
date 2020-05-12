@@ -147,7 +147,7 @@ class RosClient(Ros, ClientInterface):
             use_local_cache = True
             path_parts = local_cache_directory.strip(os.path.sep).split(os.path.sep)
             path_parts, robot_name = path_parts[:-1], path_parts[-1]
-            local_cache_directory = os.path.sep.join(path_parts)
+            local_cache_directory = os.path.sep.join([os.sep] + path_parts)
 
         loader = RosFileServerLoader(self, use_local_cache, local_cache_directory, precision)
 
