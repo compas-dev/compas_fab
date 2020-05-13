@@ -15,7 +15,7 @@ class MoveItRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def remove_attached_collision_mesh(self, id):
+    def remove_attached_collision_mesh(self, id, options={}):
         """Add an attached collision mesh from the robot."""
         aco = AttachedCollisionObject()
         aco.object.id = id

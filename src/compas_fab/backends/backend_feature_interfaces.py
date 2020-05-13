@@ -53,44 +53,44 @@ class PlanCartesianMotion(object):
 class GetPlanningScene(object):
     __metaclass__ = ABCMeta
 
-    def __call__(self):
-        return self.get_planning_scene()
+    def __call__(self, options={}):
+        return self.get_planning_scene(options)
 
     @abstractmethod
-    def get_planning_scene(self):
+    def get_planning_scene(self, options={}):
         pass
 
 
 class AddCollisionMesh(object):
     __metaclass__ = ABCMeta
 
-    def __call__(self, collision_mesh):
-        return self.add_collision_mesh(collision_mesh)
+    def __call__(self, collision_mesh, options={}):
+        return self.add_collision_mesh(collision_mesh, options)
 
     @abstractmethod
-    def add_collision_mesh(self, collision_mesh):
+    def add_collision_mesh(self, collision_mesh, options={}):
         pass
 
 
 class RemoveCollisionMesh(object):
     __metaclass__ = ABCMeta
 
-    def __call__(self, id):
-        return self.remove_collision_mesh(id)
+    def __call__(self, id, options={}):
+        return self.remove_collision_mesh(id, options)
 
     @abstractmethod
-    def remove_collision_mesh(self, id):
+    def remove_collision_mesh(self, id, options={}):
         pass
 
 
 class AppendCollisionMesh(object):
     __metaclass__ = ABCMeta
 
-    def __call__(self, collision_mesh):
-        return self.append_collision_mesh(collision_mesh)
+    def __call__(self, collision_mesh, options={}):
+        return self.append_collision_mesh(collision_mesh, options)
 
     @abstractmethod
-    def append_collision_mesh(self, collision_mesh):
+    def append_collision_mesh(self, collision_mesh, options={}):
         pass
 
 
@@ -108,9 +108,9 @@ class AddAttachedCollisionMesh(object):
 class RemoveAttachedCollisionMesh(object):
     __metaclass__ = ABCMeta
 
-    def __call__(self, id):
-        return self.remove_attached_collision_mesh(id)
+    def __call__(self, id, options={}):
+        return self.remove_attached_collision_mesh(id, options)
 
     @abstractmethod
-    def remove_attached_collision_mesh(self, id):
+    def remove_attached_collision_mesh(self, id, options={}):
         pass
