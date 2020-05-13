@@ -61,6 +61,47 @@ class CancellableRosActionResult(CancellableFutureResult):
         return True
 
 
+class LocalCacheInfo(object):
+    def __init__(self, use_local_cache, robot_name=None, local_cache_directory=None):
+        self.use_local_cache = use_local_cache
+        self.robot_name = robot_name
+        self.local_cache_directory = local_cache_directory
+
+    @classmethod
+    def from_local_cache_directory(cls, local_cache_directory):
+        """Construct local caching options based on the local cache directory.
+
+        Based on the specified local cache directory, determine whether
+        caching should be used at all, what the robot name is, and what the
+        real caching directory to use is (which differs from the local cache
+        directory specified to this function).
+
+        Examples
+        --------
+        >>> info = LocalCacheInfo.from_local_cache_directory(None)
+        >>> info.use_local_cache
+        False
+
+
+        >>> local_directory = os.path.join(os.path.expanduser('~'), 'robot_description', 'robocop')
+        >>> info = LocalCacheInfo.from_local_cache_directory(local_directory)
+        >>> info.use_local_cache
+        True
+        >>> info.robot_name
+        'robocop'
+        """
+        if local_cache_directory is None:
+            return LocalCacheInfo(use_local_cache=False)
+
+        path_parts = local_cache_directory.strip(os.path.sep).split(os.path.sep)
+        path_parts, robot_name = path_parts[:-1], path_parts[-1]
+        local_cache_directory = os.path.sep.join(path_parts)
+
+        return LocalCacheInfo(use_local_cache=True,
+                              robot_name=robot_name,
+                              local_cache_directory=local_cache_directory)
+
+
 class RosClient(Ros, ClientInterface):
     """Interface to use ROS as backend via the **rosbridge**.
 
@@ -141,13 +182,11 @@ class RosClient(Ros, ClientInterface):
         ur5
         """
         robot_name = None
-        use_local_cache = False
 
-        if local_cache_directory is not None:
-            use_local_cache = True
-            path_parts = local_cache_directory.strip(os.path.sep).split(os.path.sep)
-            path_parts, robot_name = path_parts[:-1], path_parts[-1]
-            local_cache_directory = os.path.sep.join([os.sep] + path_parts)
+        cache_info = LocalCacheInfo.from_local_cache_directory(local_cache_directory)
+        use_local_cache = cache_info.use_local_cache
+        robot_name = cache_info.robot_name
+        robot_name = cache_info.local_cache_directory
 
         loader = RosFileServerLoader(self, use_local_cache, local_cache_directory, precision)
 
