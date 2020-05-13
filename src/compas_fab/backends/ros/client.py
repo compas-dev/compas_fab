@@ -93,7 +93,7 @@ class LocalCacheInfo(object):
         if local_cache_directory is None:
             return LocalCacheInfo(use_local_cache=False)
 
-        path_parts = os.path.abspath(local_cache_directory).strip(os.path.sep).split(os.path.sep)
+        path_parts = local_cache_directory.rstrip(os.path.sep).split(os.path.sep)
         path_parts, robot_name = path_parts[:-1], path_parts[-1]
         local_cache_directory = os.path.sep.join(path_parts)
 
