@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas_fab.backends.vrep.helpers import assert_robot
 from compas_fab.backends.vrep.helpers import DEFAULT_OP_MODE
 from compas_fab.backends.vrep.helpers import VrepError
 from compas_fab.backends.backend_feature_interfaces import AddAttachedCollisionMesh
@@ -61,3 +62,29 @@ class VrepAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         vrep.simxSetObjectParent(self.client.client_id, handle, parent_handle, True, DEFAULT_OP_MODE)
 
         return handle
+
+    def pick_building_member(self, robot, building_member_mesh, pickup_frame, metric_values=None):
+        """Picks up a building member and attaches it to the robot.
+
+        Args:
+            robot (:class:`compas_fab.robots.Robot`): Robot instance to use for pick up.
+            building_member_mesh (:class:`compas.datastructures.Mesh`): Mesh
+                of the building member that will be attached to the robot.
+            pickup_frame (:class:`Frame`): Pickup frame.
+            metric_values (:obj:`list` of :obj:`float`): List containing one value
+                per configurable joint. Each value ranges from 0 to 1,
+                where 1 indicates the axis/joint is blocked and cannot
+                move during inverse kinematic solving.
+
+        Returns:
+            int: Object handle (identifier) assigned to the building member.
+        """
+        assert_robot(robot)
+
+        joints = len(robot.get_configurable_joints())
+        if not metric_values:
+            metric_values = [0.1] * joints
+
+        self.client.set_robot_pose(robot, pickup_frame)
+
+        return self.add_attached_collision_mesh(building_member_mesh, options={'robot_name': robot.name})

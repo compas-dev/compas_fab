@@ -24,7 +24,7 @@ fast_search     = True
 
 with VrepClient(debug=True) as client:
     robot = rfl.Robot('A', client=client)
-    client.pick_building_member(robot, building_member, start_pose)
+    client.planner.pick_building_member(robot, building_member, start_pose)
     group = robot.model.attr['index']
 
     path = client.plan_motion(goal_pose,

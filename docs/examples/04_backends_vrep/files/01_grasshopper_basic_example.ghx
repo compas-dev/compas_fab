@@ -149,7 +149,7 @@ if trigger:
 
     with VrepClient() as client:
         robot = rfl.Robot(selected_robot)
-        client.pick_building_member(robot, building_member_mesh, start_pose)
+        client.planner.pick_building_member(robot, building_member_mesh, start_pose)
         pickup_config = client.get_robot_config(robot)
 
         path = client.plan_motion(goal_pose, group=robot.model.attr['index'])

@@ -17,3 +17,4 @@ class VrepPlanner(PlannerInterface):
         self.plan_motion = VrepPlanMotion(self.client)
         self.plan_motion_to_config = VrepPlanMotion(self.client).plan_motion_to_config
         self.add_attached_collision_mesh = VrepAddAttachedCollisionMesh(self.client)
+        self.pick_building_member = VrepAddAttachedCollisionMesh(self.client).pick_building_member
