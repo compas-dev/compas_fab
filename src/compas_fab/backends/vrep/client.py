@@ -284,33 +284,6 @@ class VrepClient(ClientInterface):
 
         return final_states
 
-    def remove_meshes(self, mesh_handles):
-        """Removes meshes from the 3D scene.
-
-        This is functionally identical to ``remove_objects``, but it's here for
-        symmetry reasons.
-
-        Args:
-            mesh_handles (:obj:`list` of :obj:`int`): Object handles to remove.
-        """
-        self.remove_objects(mesh_handles)
-
-    def remove_objects(self, object_handles):
-        """Removes objects from the 3D scene.
-
-        Args:
-            object_handles (:obj:`list` of :obj:`int`): Object handles to remove.
-
-        .. note::
-            Please note there's no need to clean up objects manually after the simulation
-            has completed, as those will be reset automatically anyway. This method is
-            only useful if you need to remove objects *during* a simulation.
-        """
-        for handle in object_handles:
-            vrep.simxRemoveObject(self.client_id, handle, DEFAULT_OP_MODE)
-
-        self._added_handles = filter(lambda x: x not in object_handles, self._added_handles)
-
     def run_child_script(self, function_name, in_ints, in_floats, in_strings):
         return vrep.simxCallScriptFunction(self.client_id,
                                            self.lua_script,

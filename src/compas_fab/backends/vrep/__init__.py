@@ -18,6 +18,7 @@ Package with functionality to run simulations using the robotic simulation tool
     VrepPlanMotion
     VrepAddAttachedCollisionMesh
     VrepAddCollisionMesh
+    VrepRemoveCollisionMesh
 
 """
 
@@ -28,6 +29,7 @@ from .backend_features import VrepForwardKinematics
 from .backend_features import VrepPlanMotion
 from .backend_features import VrepAddAttachedCollisionMesh
 from .backend_features import VrepAddCollisionMesh
+from .backend_features import VrepRemoveCollisionMesh
 
 __all__ = [
     'VrepClient',
@@ -37,4 +39,5 @@ __all__ = [
     'VrepPlanMotion',
     'VrepAddAttachedCollisionMesh',
     'VrepAddCollisionMesh',
+    'VrepRemoveCollisionMesh',
 ]
