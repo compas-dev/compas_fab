@@ -97,11 +97,11 @@ class AppendCollisionMesh(object):
 class AddAttachedCollisionMesh(object):
     __metaclass__ = ABCMeta
 
-    def __call__(self, attached_collision_mesh):
-        return self.add_attached_collision_mesh(attached_collision_mesh)
+    def __call__(self, attached_collision_mesh, options={}):
+        return self.add_attached_collision_mesh(attached_collision_mesh, options)
 
     @abstractmethod
-    def add_attached_collision_mesh(self, attached_collision_mesh):
+    def add_attached_collision_mesh(self, attached_collision_mesh, options={}):
         pass
 
 

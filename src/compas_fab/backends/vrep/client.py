@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import logging
 
+from compas_fab.backends.vrep.helpers import DEFAULT_OP_MODE
 from compas_fab.backends.client import ClientInterface
 from compas_fab.backends.vrep import VrepError
 from compas_fab.backends.vrep.helpers import assert_robot
@@ -14,7 +15,6 @@ from compas_fab.backends.vrep.planner_backend_vrep import VrepPlanner
 from compas_fab.backends.vrep.remote_api import vrep
 
 DEFAULT_SCALE = 1.
-DEFAULT_OP_MODE = vrep.simx_opmode_blocking
 CHILD_SCRIPT_TYPE = vrep.sim_scripttype_childscript
 LOG = logging.getLogger('compas_fab.backends.vrep.client')
 
@@ -308,35 +308,7 @@ class VrepClient(ClientInterface):
 
         self.set_robot_pose(robot, pickup_frame)
 
-        return self.add_building_member(robot, building_member_mesh)
-
-    def add_building_member(self, robot, building_member_mesh):
-        """Adds a building member to the 3D scene and attaches it to the robot.
-
-        Args:
-            robot (:class:`compas_fab.robots.Robot`): Robot instance to attach the building member to.
-            building_member_mesh (:class:`compas.datastructures.Mesh`): Mesh
-                of the building member that will be attached to the robot.
-
-        Returns:
-            int: Object handle (identifier) assigned to the building member.
-
-        .. note::
-            All meshes are automatically removed from the scene when the simulation ends.
-        """
-        assert_robot(robot)
-
-        handles = self.add_meshes([building_member_mesh])
-
-        if len(handles) != 1:
-            raise VrepError('Expected one handle, but multiple found=' + str(handles), -1)
-
-        handle = handles[0]
-
-        parent_handle = self.get_object_handle('customGripper' + robot.name + '_connection')
-        vrep.simxSetObjectParent(self.client_id, handle, parent_handle, True, DEFAULT_OP_MODE)
-
-        return handle
+        return self.add_attached_collision_mesh(building_member_mesh, options={'robot_name': robot.name})
 
     def add_meshes(self, meshes):
         """Adds meshes to the 3D scene.

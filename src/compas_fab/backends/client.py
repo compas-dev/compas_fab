@@ -27,20 +27,20 @@ class ClientInterface(object):
     def get_planning_scene(self, *args, **kwargs):
         return self.planner.get_planning_scene(*args, **kwargs)
 
-    def add_collision_mesh(self, collision_mesh):
-        return self.planner.add_collision_mesh(collision_mesh)
+    def add_collision_mesh(self, *args, **kwargs):
+        return self.planner.add_collision_mesh(*args, **kwargs)
 
-    def remove_collision_mesh(self, id):
-        return self.planner.remove_collision_mesh(id)
+    def remove_collision_mesh(self, *args, **kwargs):
+        return self.planner.remove_collision_mesh(*args, **kwargs)
 
-    def append_collision_mesh(self, collision_mesh):
-        return self.planner.append_collision_mesh(collision_mesh)
+    def append_collision_mesh(self, *args, **kwargs):
+        return self.planner.append_collision_mesh(*args, **kwargs)
 
-    def add_attached_collision_mesh(self, attached_collision_mesh):
-        return self.planner.add_attached_collision_mesh(attached_collision_mesh)
+    def add_attached_collision_mesh(self, *args, **kwargs):
+        return self.planner.add_attached_collision_mesh(*args, **kwargs)
 
-    def remove_attached_collision_mesh(self, id):
-        return self.planner.remove_attached_collision_mesh(id)
+    def remove_attached_collision_mesh(self, *args, **kwargs):
+        return self.planner.remove_attached_collision_mesh(*args, **kwargs)
 
 #     # ==========================================================================
 #     # executing
@@ -95,17 +95,17 @@ class PlannerInterface(EventEmitterMixin):
     def get_planning_scene(self, *args, **kwargs):
         raise Exception('Assigned planner does not have this feature.')
 
-    def add_collision_mesh(self, collision_mesh):
+    def add_collision_mesh(self, *args, **kwargs):
         raise Exception('Assigned planner does not have this feature.')
 
-    def remove_collision_mesh(self, id):
+    def remove_collision_mesh(self, *args, **kwargs):
         raise Exception('Assigned planner does not have this feature.')
 
-    def append_collision_mesh(self, collision_mesh):
+    def append_collision_mesh(self, *args, **kwargs):
         raise Exception('Assigned planner does not have this feature.')
 
-    def add_attached_collision_mesh(self, attached_collision_mesh):
+    def add_attached_collision_mesh(self, *args, **kwargs):
         raise Exception('Assigned planner does not have this feature.')
 
-    def remove_attached_collision_mesh(self, id):
+    def remove_attached_collision_mesh(self, *args, **kwargs):
         raise Exception('Assigned planner does not have this feature.')

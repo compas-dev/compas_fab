@@ -73,7 +73,7 @@ def _to_xform(m):
 
 # TODO: This module needs to be heavily refactored
 # Currently only compatible with V-REP client and most helper functions
-# are not superceeded by compas features
+# are not superseded by compas features
 class PathVisualizer(object):
     """Handles the generation of meshes to visualize a full path plan
     in Rhino/Grasshopper.
@@ -167,7 +167,7 @@ class PathVisualizer(object):
         start = timer() if self.debug else None
         self.simulator.set_robot_config(self.robot, gripping_config)
         mesh = RhinoMesh.from_guid(self.building_member).to_compas()
-        handle = self.simulator.add_building_member(self.robot, mesh)
+        handle = self.simulator.add_attached_collision_mesh(mesh, options={'robot_name': self.robot.name})
         matrix = self.simulator.get_object_matrices([handle])[handle]
 
         parent_handle = self.simulator.get_object_handle('customGripper' + self.robot.name)
