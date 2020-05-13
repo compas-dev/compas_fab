@@ -36,7 +36,7 @@ class MoveItPlanMotion(PlanMotion):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):  # !!! ghx and others
+    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):
         """Calculates a motion path.
 
         Parameters

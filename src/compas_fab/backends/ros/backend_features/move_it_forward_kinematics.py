@@ -30,7 +30,7 @@ class MoveItForwardKinematics(ForwardKinematics):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def forward_kinematics(self, configuration, group=None, options={}):  # !!! GHX!!!
+    def forward_kinematics(self, configuration, group=None, options={}):
         """Calculate the robot's forward kinematic.
 
         Parameters

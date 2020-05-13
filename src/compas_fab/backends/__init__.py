@@ -18,6 +18,9 @@ V-REP
     VrepForwardKinematics
     VrepInverseKinematics
     VrepPlanMotion
+    VrepAddAttachedCollisionMesh
+    VrepAddCollisionMesh
+    VrepRemoveCollisionMesh
 
 ROS
 ---

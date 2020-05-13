@@ -34,7 +34,7 @@ class MoveItInverseKinematics(InverseKinematics):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options={}):  # !!! GHX !!!
+    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options={}):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
