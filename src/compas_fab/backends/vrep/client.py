@@ -284,38 +284,6 @@ class VrepClient(ClientInterface):
 
         return final_states
 
-    def add_meshes(self, meshes):
-        """Adds meshes to the 3D scene.
-
-        Args:
-            meshes (:obj:`list` of :class:`compas.datastructures.Mesh`): List
-                of meshes to add to the current simulation scene.
-
-        Returns:
-            list: List of object handles (identifiers) assigned to the meshes.
-
-        .. note::
-            All meshes are automatically removed from the scene when the simulation ends.
-        """
-        mesh_handles = []
-
-        for mesh in meshes:
-            if not mesh.is_trimesh():
-                raise ValueError('The V-REP client only supports tri-meshes')
-
-            vertices, faces = mesh.to_vertices_and_faces()
-            vrep_packing = (floats_to_vrep([item for sublist in vertices for item in sublist], self.scale) +
-                            [item for sublist in faces for item in sublist])
-            params = [[len(vertices) * 3, len(faces) * 4], vrep_packing]
-            handles = self.run_child_script('buildMesh',
-                                            params[0],
-                                            params[1],
-                                            [])[1]
-            mesh_handles.extend(handles)
-            self._added_handles.extend(handles)
-
-        return mesh_handles
-
     def remove_meshes(self, mesh_handles):
         """Removes meshes from the 3D scene.
 
