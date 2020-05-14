@@ -27,7 +27,7 @@ def add_imports(doctest_namespace):
     doctest_namespace["Tool"] = Tool
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(autouse=True)
 def connect_to_ros(doctest_namespace):
     client = RosClient()
     client.run()
