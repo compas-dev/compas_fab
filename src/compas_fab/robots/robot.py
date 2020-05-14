@@ -544,7 +544,7 @@ class Robot(object):
     # transformations, coordinate frames
     # ==========================================================================
 
-    def transformation_RCF_WCF(self, group=None):
+    def transformation_RCF_WCF(self, group=None, full_configuration=None):
         """Returns the transformation from the robot's coordinate system (RCF) to the world coordinate system (WCF).
 
         Parameters
@@ -557,10 +557,10 @@ class Robot(object):
         :class:`compas.geometry.Transformation`
 
         """
-        base_frame = self.get_base_frame(group)
+        base_frame = self.get_base_frame(group, full_configuration)
         return Transformation.change_basis(base_frame, Frame.worldXY())
 
-    def transformation_WCF_RCF(self, group=None):
+    def transformation_WCF_RCF(self, group=None, full_configuration=None):
         """Returns the transformation from the world coordinate system (WCF) to the robot's coordinate system (RCF).
 
         Parameters
@@ -573,7 +573,7 @@ class Robot(object):
         :class:`compas.geometry.Transformation`
 
         """
-        base_frame = self.get_base_frame(group)
+        base_frame = self.get_base_frame(group, full_configuration)
         return Transformation.change_basis(Frame.worldXY(), base_frame)
 
     def set_RCF(self, robot_coordinate_frame, group=None):
@@ -588,7 +588,7 @@ class Robot(object):
         """
         return self.get_base_frame(group)
 
-    def to_local_coords(self, frame_WCF, group=None):
+    def to_local_coords(self, frame_WCF, group=None, full_configuration=None):
         """Represents a frame from the world coordinate system (WCF) in the robot's coordinate system (RCF).
 
         Parameters
@@ -608,10 +608,10 @@ class Robot(object):
         >>> frame_RCF
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
         """
-        frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
+        frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group, full_configuration))
         return frame_RCF
 
-    def to_world_coords(self, frame_RCF, group=None):
+    def to_world_coords(self, frame_RCF, group=None, full_configuration=None):
         """Represents a frame from the robot's coordinate system (RCF) in the world coordinate system (WCF).
 
         Parameters
@@ -631,7 +631,7 @@ class Robot(object):
         >>> frame_WCF
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
         """
-        frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
+        frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group, full_configuration))
         return frame_WCF
 
     def from_attached_tool_to_tool0(self, frames_tcf):
@@ -1006,6 +1006,8 @@ class Robot(object):
                 attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
             else:
                 attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
+        
+        print(">>", constraints)
 
         # The returned joint names might be more than the requested ones if there are passive joints present
         joint_positions, joint_names = self.client.inverse_kinematics(self,
