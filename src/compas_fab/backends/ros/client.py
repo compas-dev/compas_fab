@@ -186,7 +186,7 @@ class RosClient(Ros, ClientInterface):
         cache_info = LocalCacheInfo.from_local_cache_directory(local_cache_directory)
         use_local_cache = cache_info.use_local_cache
         robot_name = cache_info.robot_name
-        robot_name = cache_info.local_cache_directory
+        local_cache_directory = cache_info.local_cache_directory
 
         loader = RosFileServerLoader(self, use_local_cache, local_cache_directory, precision)
 
