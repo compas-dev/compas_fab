@@ -27,7 +27,7 @@ def add_imports(doctest_namespace):
     doctest_namespace["Tool"] = Tool
 
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope='class', autouse=True)
 def connect_to_ros(request, doctest_namespace):
     if request.module.__name__ in ('compas_fab.robots.robot', 'compas_fab.robots.planning_scene'):
         client = RosClient()
