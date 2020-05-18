@@ -51,7 +51,7 @@ class VrepAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         .. note::
             All meshes are automatically removed from the scene when the simulation ends.
         """
-        handles = self.client.add_meshes([building_member_mesh])
+        handles = self.client.add_collision_mesh([building_member_mesh])
 
         if len(handles) != 1:
             raise VrepError('Expected one handle, but multiple found=' + str(handles), -1)
