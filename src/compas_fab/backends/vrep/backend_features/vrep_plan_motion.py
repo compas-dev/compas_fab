@@ -146,9 +146,9 @@ class VrepPlanMotion(PlanMotion):
 
         first_start = timer() if log else None
         if collision_meshes:
-            self.client.add_meshes(collision_meshes)
+            self.client.add_collision_mesh(collision_meshes)
         if log:
-            log.debug('Execution time: add_meshes=%.2f', timer() - first_start)
+            log.debug('Execution time: add_collision_mesh=%.2f', timer() - first_start)
 
         start = timer() if log else None
         self.client.set_robot_metric(group, metric_values)
