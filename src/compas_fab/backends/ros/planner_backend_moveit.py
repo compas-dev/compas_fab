@@ -38,6 +38,7 @@ class MoveItPlanner(PlannerInterface):
         self.add_attached_collision_mesh = MoveItAddAttachedCollisionMesh(self.client)
         self.remove_attached_collision_mesh = MoveItRemoveAttachedCollisionMesh(self.client)
 
+        self.on('initialize', self.init_planner)
         self.on('collision_object', self.advertise_collision_object)
         self.on('collision_object', self._collision_object)
         self.on('attached_collision_object', self.advertise_attached_collision_object)
@@ -66,6 +67,10 @@ class MoveItPlanner(PlannerInterface):
                 'moveit_msgs/AttachedCollisionObject',
                 queue_size=None)
             self.client.attached_collision_object_topic.advertise()
+
+    def init_planner(self, *args, **kwargs):
+        self.advertise_collision_object()
+        self.advertise_attached_collision_object()
 
     def dispose_planner(self, *args, **kwargs):
         if self.has_topic('collision_object_topic'):
