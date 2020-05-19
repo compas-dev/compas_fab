@@ -57,7 +57,7 @@ class MoveItPlanMotion(PlanMotion):
         options : dict, optional
             Dictionary containing the following key-value pairs:
 
-             - base_link (:obj:`str`) :: Name of the base link.
+            - base_link (:obj:`str`) :: Name of the base link.
             - joint_names (:obj:`list` of :obj:`str`) :: List containing joint names.
             - joint_types (:obj:`list` of :obj:`str`) :: List containing joint types.
             - path_constraints :: list of :class:`compas_fab.robots.Constraint`, optional

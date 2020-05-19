@@ -1333,7 +1333,7 @@ class Robot(object):
         planner_id = options.get('planner_id', 'RRT')
         num_planning_attempts = options.get('num_planning_attempts', 1)
         allowed_planning_time = options.get('allowed_planning_time', 2.)
-        max_velocity_scaling_factor = options.get('max_velocity_scling_factor', 1.)
+        max_velocity_scaling_factor = options.get('max_velocity_scaling_factor', 1.)
         max_acceleration_scaling_factor = options.get('max_acceleration_scaling_factor', 1.)
         attached_collision_meshes = options.get('attached_collision_meshes')
         return self.plan_motion_deprecated(goal_constraints, start_configuration,
@@ -1398,7 +1398,7 @@ class Robot(object):
                 attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
         options = {
-            'base_link': self.model.root.name,
+            'base_link': self.model.root.name,  # use world coordinates
             'joint_names': self.get_configurable_joint_names(),
             'joint_types': self.get_configurable_joint_types(),
             'path_constraints': path_constraints_WCF_scaled,
@@ -1539,4 +1539,4 @@ class Robot(object):
                     joint.limit.upper, joint.limit.lower)
             print(info)
         print("The robot's links are:")
-        print([l.name for l in self.model.links])
+        print([link.name for link in self.model.links])
