@@ -23,5 +23,8 @@ with RosClient() as client:
 
         scene.append_collision_mesh(cm)
 
+    time.sleep(1)
+    scene.remove_collision_mesh('brick')
+
     # sleep a bit before terminating the client
     time.sleep(1)
