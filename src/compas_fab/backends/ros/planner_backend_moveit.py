@@ -84,7 +84,7 @@ class MoveItPlanner(PlannerInterface):
 
     def _collision_object(self, *args, **kwargs):
         collision_object = kwargs.get('collision_object')
-        operation = kwargs.get('operations', CollisionObject.ADD)
+        operation = kwargs.get('operation', CollisionObject.ADD)
         collision_object.operation = operation
         self.client.collision_object_topic.publish(collision_object.msg)
 
