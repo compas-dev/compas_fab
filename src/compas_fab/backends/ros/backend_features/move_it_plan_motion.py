@@ -140,8 +140,7 @@ class MoveItPlanMotion(PlanMotion):
         path_constraints = convert_constraints_to_rosmsg(path_constraints, header)
 
         if trajectory_constraints is not None:
-            trajectory_constraints = TrajectoryConstraints(constraints=convert_constraints_to_rosmsg(path_constraints, header))
-            # !!! is this supposed to be trajectory_constraints rather than path_constraints?
+            trajectory_constraints = TrajectoryConstraints(constraints=convert_constraints_to_rosmsg(trajectory_constraints, header))
 
         request = dict(start_state=start_state,
                        goal_constraints=goal_constraints,
