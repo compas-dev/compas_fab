@@ -16,7 +16,7 @@ The first step is just connect to the simulator and verify the connection
 is working.
 
 Copy and paste the following example into any Python environment
-(a standalong script, a CAD environment, etc) and run it, you should
+(a standalone script, a CAD environment, etc) and run it, you should
 see the output ``Connected: True`` if everything is working properly:
 
 .. code-block:: python
