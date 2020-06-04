@@ -13,6 +13,7 @@ requirements = [
     # Until COMPAS reaches 1.0, we pin major.minor and allow patch version updates
     'compas>=0.16.1,<0.17',
     'roslibpy>=0.7.1',
+    'pybullet',
     'pyserial',
 ]
 keywords_list = ['robotic fabrication', 'digital fabrication', 'architecture', 'robotics', 'ros']

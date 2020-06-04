@@ -27,6 +27,7 @@ class RobotSemantics(object):
         self.group_names = self.__get_group_names()
         self.passive_joints = self.__get_passive_joints()
         self.end_effectors = self.__get_end_effectors()
+        self.disabled_collisions = self.__get_disabled_collisions()
         self._group_dict = {}
         self.main_group = None
         self.urdf_robot = urdf_robot
@@ -127,6 +128,11 @@ class RobotSemantics(object):
 
     def __get_end_effectors(self):
         return [ee.attrib['parent_link'] for ee in self.root.findall('end_effector')]
+
+    def __get_disabled_collisions(self):
+        return {
+            {dc.attrib['link1'], dc.attrib['link2']} for dc in self.root.iter('disable_collisions')
+        }
 
     def get_end_effector_link_name(self, group=None):
         if not group:
