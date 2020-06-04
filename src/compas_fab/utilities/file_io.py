@@ -14,11 +14,22 @@ __all__ = [
 def read_csv_to_dictionary(csvfile, delimiter=';'):
     """Reads a csv file and returns a dictionary with the respective keys
     specified in the first row of the csv file.
+
+    Parameters
+    ----------
+    csvfile : str
+        The path to csv file.
+    delimiter : str, optional
+        The character used to separate the values. Default `;`
+
+    Returns
+    -------
+    dict
     """
     data = []
     with open(csvfile, mode='r') as infile:
         reader = csv.reader(infile, delimiter=delimiter)
-        for i, rows in enumerate(reader):
+        for _i, rows in enumerate(reader):
             data.append(rows)
         infile.close()
     data = zip(*data)  # transpose data
@@ -32,6 +43,13 @@ def read_csv_to_dictionary(csvfile, delimiter=';'):
 
 def write_data_to_json(data, file):
     """Write data to json file.
+
+    Parameters
+    ----------
+    data : dict, list, tuple, str, unicode, int, long, float, boolean, None
+        The data to write to json file. Data must be JSON serialisable.
+    file : str
+        TThe path where to save the data.
     """
     with open(file, 'w') as f:
         json.dump(data, f)
@@ -39,6 +57,16 @@ def write_data_to_json(data, file):
 
 def read_data_from_json(file):
     """Read data from json file.
+
+    Parameters
+    ----------
+    file : str
+        The path to the json file.
+
+    Returns
+    -------
+    object
+        An object containing the deserialised data from the json file.
     """
     with open(file) as f:
         data = json.load(f)
@@ -47,6 +75,13 @@ def read_data_from_json(file):
 
 def write_data_to_pickle(data, file):
     """Write data to pickle file.
+
+    Parameters
+    ----------
+    data : object
+        The data to write to a pickle file.
+    file : str
+        The path where to save the data.
     """
     with open(file, 'wb') as f:
         pickle.dump(data, f)
@@ -54,6 +89,16 @@ def write_data_to_pickle(data, file):
 
 def read_data_from_pickle(file):
     """Read data from pickle file.
+
+    Parameters
+    ----------
+    file : str
+        The path to the pickle file.
+
+    Returns
+    -------
+    object
+        An object containing the reconstituted object hierarchy.
     """
     with open(file, 'rb') as f:
         data = pickle.load(f)
