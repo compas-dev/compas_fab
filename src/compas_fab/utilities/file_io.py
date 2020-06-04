@@ -20,7 +20,7 @@ def read_csv_to_dictionary(csvfile, delimiter=';'):
     csvfile : str
         The path to csv file.
     delimiter : str, optional
-        The character used to separate the values. Default `;`
+        The character used to separate the values. Default ``;``
 
     Returns
     -------
@@ -29,7 +29,7 @@ def read_csv_to_dictionary(csvfile, delimiter=';'):
     data = []
     with open(csvfile, mode='r') as infile:
         reader = csv.reader(infile, delimiter=delimiter)
-        for _i, rows in enumerate(reader):
+        for rows in reader:
             data.append(rows)
         infile.close()
     data = zip(*data)  # transpose data
@@ -49,7 +49,7 @@ def write_data_to_json(data, file):
     data : dict, list, tuple, str, unicode, int, long, float, boolean, None
         The data to write to json file. Data must be JSON serialisable.
     file : str
-        TThe path where to save the data.
+        The path where to save the data.
     """
     with open(file, 'w') as f:
         json.dump(data, f)
