@@ -1471,4 +1471,4 @@ class Robot(object):
                     joint.limit.upper, joint.limit.lower)
             print(info)
         print("The robot's links are:")
-        print([l.name for l in self.model.links])
+        print([link.name for link in self.model.links])

@@ -34,9 +34,9 @@ def read_csv_to_dictionary(csvfile, delimiter=';'):
         infile.close()
     data = zip(*data)  # transpose data
     data_dict = {}
-    for l in data:
-        key = l[0]
-        values = list(l[1:])
+    for col in data:
+        key = col[0]
+        values = list(col[1:])
         data_dict.update({key: values})
     return data_dict
 
