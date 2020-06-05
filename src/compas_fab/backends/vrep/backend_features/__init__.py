@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from .vrep_add_attached_collision_mesh import VrepAddAttachedCollisionMesh
 from .vrep_add_collision_mesh import VrepAddCollisionMesh
 from .vrep_forward_kinematics import VrepForwardKinematics

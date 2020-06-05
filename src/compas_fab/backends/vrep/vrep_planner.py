@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas_fab.backends.client import PlannerInterface
+from compas_fab.backends.client_interface import PlannerInterface
 from compas_fab.backends.vrep.backend_features.vrep_add_attached_collision_mesh import VrepAddAttachedCollisionMesh
 from compas_fab.backends.vrep.backend_features.vrep_add_collision_mesh import VrepAddCollisionMesh
 from compas_fab.backends.vrep.backend_features.vrep_forward_kinematics import VrepForwardKinematics

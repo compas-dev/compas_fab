@@ -66,6 +66,7 @@ Exceptions
 
 """
 
+from .client_manager import *           # noqa: F401,F403
 from .exceptions import *               # noqa: F401,F403
 from .tasks import *                    # noqa: F401,F403
 from .ros.backend_features import *     # noqa: F401,F403

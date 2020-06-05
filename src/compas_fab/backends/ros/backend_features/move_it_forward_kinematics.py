@@ -12,7 +12,7 @@ from compas_fab.backends.ros.messages import Header
 from compas_fab.backends.ros.messages import JointState
 from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import RobotState
-from compas_fab.backends.ros.planner_backend import ServiceDescription
+from compas_fab.backends.ros.service_description import ServiceDescription
 
 __all__ = [
     'MoveItForwardKinematics',

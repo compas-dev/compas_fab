@@ -6,8 +6,8 @@ from __future__ import print_function
 from contextlib import contextmanager
 from contextlib import ExitStack
 
-from compas_fab.backends import RosClient
-from compas_fab.backends import VrepClient
+from compas_fab.backends.ros import RosClient
+from compas_fab.backends.vrep import VrepClient
 
 
 __all__ = [

@@ -8,7 +8,7 @@ from compas_fab.backends.backend_feature_interfaces import GetPlanningScene
 from compas_fab.backends.ros.messages import GetPlanningSceneRequest
 from compas_fab.backends.ros.messages import GetPlanningSceneResponse
 from compas_fab.backends.ros.messages import PlanningSceneComponents
-from compas_fab.backends.ros.planner_backend import ServiceDescription
+from compas_fab.backends.ros.service_description import ServiceDescription
 
 __all__ = [
     'MoveItPlanningScene',

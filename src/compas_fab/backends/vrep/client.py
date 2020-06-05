@@ -3,7 +3,7 @@ from __future__ import print_function
 import logging
 
 from compas_fab.backends.vrep.helpers import DEFAULT_OP_MODE
-from compas_fab.backends.client import ClientInterface
+from compas_fab.backends.client_interface import ClientInterface
 from compas_fab.backends.vrep import VrepError
 from compas_fab.backends.vrep.helpers import assert_robot
 from compas_fab.backends.vrep.helpers import config_from_vrep
@@ -11,7 +11,7 @@ from compas_fab.backends.vrep.helpers import config_to_vrep
 from compas_fab.backends.vrep.helpers import floats_from_vrep
 from compas_fab.backends.vrep.helpers import floats_to_vrep
 from compas_fab.backends.vrep.helpers import resolve_host
-from compas_fab.backends.vrep.planner_backend_vrep import VrepPlanner
+from compas_fab.backends.vrep.vrep_planner import VrepPlanner
 from compas_fab.backends.vrep.remote_api import vrep
 
 DEFAULT_SCALE = 1.

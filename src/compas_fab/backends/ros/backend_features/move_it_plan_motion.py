@@ -16,7 +16,7 @@ from compas_fab.backends.ros.messages import MotionPlanRequest
 from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import TrajectoryConstraints
-from compas_fab.backends.ros.planner_backend import ServiceDescription
+from compas_fab.backends.ros.service_description import ServiceDescription
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import Configuration
 

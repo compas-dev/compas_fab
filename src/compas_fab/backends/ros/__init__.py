@@ -14,6 +14,16 @@ Package with functionality to interact with `ROS <http://ros.org/>`_.
     RosFileServerLoader
     RosError
     RosValidationError
+    MoveItAddAttachedCollisionMesh
+    MoveItAddCollisionMesh
+    MoveItAppendCollisionMesh
+    MoveItForwardKinematics
+    MoveItInverseKinematics
+    MoveItPlanCartesianMotion
+    MoveItPlanMotion
+    MoveItPlanningScene
+    MoveItRemoveAttachedCollisionMesh
+    MoveItRemoveCollisionMesh
 
 """
 

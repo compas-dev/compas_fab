@@ -17,7 +17,7 @@ from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.messages import PoseStamped
 from compas_fab.backends.ros.messages import PositionIKRequest
 from compas_fab.backends.ros.messages import RobotState
-from compas_fab.backends.ros.planner_backend import ServiceDescription
+from compas_fab.backends.ros.service_description import ServiceDescription
 
 __all__ = [
     'MoveItInverseKinematics',
@@ -82,8 +82,7 @@ class MoveItInverseKinematics(InverseKinematics):
         kwargs['avoid_collisions'] = options.get('avoid_collisions', True)
         kwargs['constraints'] = options.get('constraints')
         kwargs['attempts'] = options.get('attempts', 8)
-        # why is attached_collision_meshes unused?
-        # kwargs['attached_collision_meshes'] = options.get('attached_collision_meshes')
+        kwargs['attached_collision_meshes'] = options.get('attached_collision_meshes')
 
         kwargs['errback_name'] = 'errback'
 

@@ -8,7 +8,7 @@ from roslibpy import Ros
 from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
-from compas_fab.backends.client import ClientInterface
+from compas_fab.backends.client_interface import ClientInterface
 from compas_fab.backends.ros.exceptions import RosError
 from compas_fab.backends.ros.fileserver_loader import RosFileServerLoader
 from compas_fab.backends.ros.messages import ExecuteTrajectoryFeedback
@@ -23,7 +23,7 @@ from compas_fab.backends.ros.messages import JointTrajectoryPoint as RosMsgJoint
 from compas_fab.backends.ros.messages import MoveItErrorCodes
 from compas_fab.backends.ros.messages import RobotTrajectory
 from compas_fab.backends.ros.messages import Time
-from compas_fab.backends.ros.planner_backend_moveit import MoveItPlanner
+from compas_fab.backends.ros.move_it_planner import MoveItPlanner
 from compas_fab.backends.tasks import CancellableFutureResult
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotSemantics

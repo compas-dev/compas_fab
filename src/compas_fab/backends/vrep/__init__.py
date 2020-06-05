@@ -21,6 +21,7 @@ Package with functionality to run simulations using the robotic simulation tool
     VrepRemoveCollisionMesh
 
 """
+from __future__ import absolute_import
 
 from .helpers import VrepError
 from .client import VrepClient
