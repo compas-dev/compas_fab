@@ -16,7 +16,7 @@ The first step is just connect to the simulator and verify the connection
 is working.
 
 Copy and paste the following example into any Python environment
-(a standalong script, a CAD environment, etc) and run it, you should
+(a standalone script, a CAD environment, etc) and run it, you should
 see the output ``Connected: True`` if everything is working properly:
 
 .. code-block:: python
@@ -40,8 +40,8 @@ referenced by the identifiers: ``A``, ``B``, ``C`` and ``D``.
     :figclass: figure
     :class: figure-img img-fluid
 
-When planning on a multi-robotic setup, it's important to make sure all robots
-on the setup of them are positioned correctly and not colliding with each other
+When planning on a multi-robotic cell, it's important to make sure all robots
+on the cell are positioned correctly and not colliding with each other
 at start, otherwise path planning will fail.
 
 The state of a robot is specified as an instance of
