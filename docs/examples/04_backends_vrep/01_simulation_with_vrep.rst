@@ -40,8 +40,8 @@ referenced by the identifiers: ``A``, ``B``, ``C`` and ``D``.
     :figclass: figure
     :class: figure-img img-fluid
 
-When planning on a multi-robotic setup, it's important to make sure all robots
-on the setup of them are positioned correctly and not colliding with each other
+When planning on a multi-robotic cell, it's important to make sure all robots
+on the cell are positioned correctly and not colliding with each other
 at start, otherwise path planning will fail.
 
 The state of a robot is specified as an instance of
