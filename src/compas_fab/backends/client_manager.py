@@ -3,8 +3,13 @@ from __future__ import division
 from __future__ import print_function
 
 
-from contextlib import contextmanager
-from contextlib import ExitStack
+import compas
+if compas.is_ironpython():
+    from contextlib2 import contextmanager
+    from contextlib2 import ExitStack
+else:
+    from contextlib import contextmanager
+    from contextlib import ExitStack
 
 from compas_fab.backends.ros import RosClient
 from compas_fab.backends.vrep import VrepClient
