@@ -253,7 +253,7 @@ class MoveItPlanner(PlannerBackend):
                           workspace_parameters=None):
         """Asynchronous handler of MoveIt motion planner service."""
 
-        # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
+        # https://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
         # TODO: if list of frames (goals) => receive multiple solutions?
         base_link = robot.model.root.name  # use world coords
 

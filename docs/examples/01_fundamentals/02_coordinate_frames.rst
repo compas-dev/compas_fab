@@ -121,6 +121,5 @@ before sending it as a target pose to the robot.
 Links
 =====
 
-* `ROS REP-105: Coordinate Frames for Mobile Platforms <http://www.ros.org/reps/rep-0105.html#id15>`_
+* `ROS REP-105: Coordinate Frames for Mobile Platforms <https://www.ros.org/reps/rep-0105.html#id15>`_
 * `ABB: What is a coordinate system? <http://developercenter.robotstudio.com/blobproxy/devcenter/RobotStudio/html/4eac08e9-c42c-446f-bbd4-228e523dd2d5.htm>`_
-

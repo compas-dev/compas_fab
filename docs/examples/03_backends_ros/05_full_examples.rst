@@ -4,7 +4,7 @@ Full examples
 
 .. note::
 
-    The following examples use the `ROS <http://www.ros.org/>`_ backend
+    The following examples use the `ROS <https://www.ros.org/>`_ backend
     and the MoveI! planner with the Franka Emika Panda robots.
     Before running them, please make sure you have the :ref:`ROS backend <ros_backend>`
     correctly configured and the :ref:`Panda Demo <ros_bundles_list>` started.
@@ -57,4 +57,3 @@ a single document, as a reference of how these features could be integrated:
 
     </div>
     </div>
-

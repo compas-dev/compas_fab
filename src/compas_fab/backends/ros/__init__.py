@@ -5,7 +5,7 @@ compas_fab.backends.ros
 
 .. module:: compas_fab.backends.ros
 
-Package with functionality to interact with `ROS <http://ros.org/>`_.
+Package with functionality to interact with `ROS <https://ros.org/>`_.
 
 .. autosummary::
     :toctree: generated/

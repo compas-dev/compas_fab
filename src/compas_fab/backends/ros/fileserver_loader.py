@@ -213,7 +213,7 @@ class RosFileServerLoader(object):
             # namespaces are handled differently between the CLI and CPython
             # XML parsers, so, we just get rid of it for DAE files
             if file_extension == 'dae':
-                file_content = file_content.replace(b'xmlns="http://www.collada.org/2005/11/COLLADASchema"', b'')
+                file_content = file_content.replace(b'xmlns="https://www.collada.org/2005/11/COLLADASchema"', b'')
 
             # compas.files does not support file-like objects so we need to
             # save the file to disk always. If local caching is enabled,

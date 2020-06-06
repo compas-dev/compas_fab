@@ -5,7 +5,7 @@ from .std_msgs import Header
 
 
 class JointState(ROSmsg):
-    """http://docs.ros.org/kinetic/api/sensor_msgs/html/msg/JointState.html
+    """https://docs.ros.org/kinetic/api/sensor_msgs/html/msg/JointState.html
     """
 
     def __init__(self, header=None, name=None, position=None, velocity=None,
@@ -39,7 +39,7 @@ class JointState(ROSmsg):
 
 
 class MultiDOFJointState(ROSmsg):
-    """http://docs.ros.org/kinetic/api/sensor_msgs/html/msg/MultiDOFJointState.html
+    """https://docs.ros.org/kinetic/api/sensor_msgs/html/msg/MultiDOFJointState.html
     """
 
     def __init__(self, header=None, joint_names=None, transforms=None, twist=None,

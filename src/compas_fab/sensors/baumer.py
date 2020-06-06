@@ -9,7 +9,7 @@ __all__ = ['PosCon3D', 'PosConCM']
 
 class PosCon3D(SerialSensor):
     """Provides an interface for the `Baumer PosCon3D edge measurement sensor
-    <http://www.baumer.com/us-en/products/distance-measurement/light-section-sensors/poscon-3d-edge-measurement/>`_.
+    <https://www.baumer.com/us/en/product-overview/object-detection/edge-measurement/c/38276>`_.
 
     The sensor has different interfaces to retrieve its data. This
     class provides access to the serial interface (RS-485). This
@@ -329,7 +329,7 @@ class PosCon3D(SerialSensor):
 
 class PosConCM(SerialSensor):
     """Provides an interface for the `Baumer PosConCM round objects measurement sensor
-    <http://www.baumer.com/us-en/products/distance-measurement/light-section-sensors/poscon-cm-measurement-of-round-objects/>`_.
+    <https://www.baumer.com/us/en/product-overview/smart-vision/profile-sensors-/measurement-of-round-objects/c/14115>`_.
 
     The sensor has different interfaces to retrieve its data. This
     class provides access to the serial interface (RS-485).
@@ -437,8 +437,7 @@ class PosConCM(SerialSensor):
 
         Note
         ----
-        See `RS-485 Protocol Structure <https://www.baumer.com/ae/en/product-overview/2d-3d-sensors/profile-sensors-/measurement-of-round-objects/\
-        oxc7-x0250-ii1250-ti/p/medias/__secure__/en_BA_RS485_Protocol_Structure.pdf?mediaPK=8799860686878>`_ for more info.
+        See `RS-485 Protocol Structure <https://www.baumer.com/medias/__secure__/en_BA_RS485_Protocol_Structure.pdf?mediaPK=8799860686878>`_ for more info.
         """
         return '****'
 

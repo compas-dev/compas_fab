@@ -8,7 +8,7 @@ from compas.datastructures import mesh_quads_to_triangles
 
 
 class SolidPrimitive(ROSmsg):
-    """http://docs.ros.org/kinetic/api/shape_msgs/html/msg/SolidPrimitive.html
+    """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/SolidPrimitive.html
     """
     BOX = 1
     SPHERE = 2
@@ -74,7 +74,7 @@ class SolidPrimitive(ROSmsg):
 
 
 class Mesh(ROSmsg):
-    """http://docs.ros.org/kinetic/api/shape_msgs/html/msg/Mesh.html
+    """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/Mesh.html
     """
     def __init__(self, triangles=None, vertices=None):
         self.triangles = triangles or []  # shape_msgs/MeshTriangle[]
@@ -105,7 +105,7 @@ class Mesh(ROSmsg):
 
 
 class MeshTriangle(ROSmsg):
-    """http://docs.ros.org/api/shape_msgs/html/msg/MeshTriangle.html
+    """https://docs.ros.org/api/shape_msgs/html/msg/MeshTriangle.html
     """
     def __init__(self, vertex_indices=None):
         if len(vertex_indices) != 3:
@@ -119,7 +119,7 @@ class MeshTriangle(ROSmsg):
 
 
 class Plane(ROSmsg):
-    """http://docs.ros.org/kinetic/api/shape_msgs/html/msg/Plane.html
+    """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/Plane.html
     """
 
     def __init__(self, coef):

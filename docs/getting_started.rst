@@ -7,7 +7,7 @@ Getting started
 Installation
 ============
 
-The recommended way to install **COMPAS FAB** is to use `Anaconda/conda <https://conda.io/docs/>`_:
+The recommended way to install **COMPAS FAB** is to use `Anaconda/conda <https://docs.conda.io/>`_:
 
 ::
 
@@ -24,7 +24,7 @@ But it can also be installed using ``pip``:
 .. note::
 
     On Windows, you may need to install
-    `Microsoft Visual C++ 14.0 <https://www.scivision.co/python-windows-visual-c++-14-required/>`_.
+    `Microsoft Visual C++ 14.0 <https://www.scivision.co/python-windows-visual-c-14-required/>`_.
 
 
 Once the installation is completed, you can verify your setup.
@@ -131,6 +131,5 @@ Next Steps
 * :ref:`Working with backends <backends>`
 * :ref:`COMPAS FAB Examples <examples>`
 * :ref:`COMPAS FAB API Reference <reference>`
-* `COMPAS Examples <https://compas-dev.github.io/main/examples.html>`_
-* `COMPAS Tutorials <https://compas-dev.github.io/main/tutorials.html>`_
+* `COMPAS Tutorials <https://compas-dev.github.io/main/tutorial.html>`_
 * `COMPAS API Reference <https://compas-dev.github.io/main/api.html>`_

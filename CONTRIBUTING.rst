@@ -37,7 +37,7 @@ We love pull requests from everyone! Here's a quick guide to improve the code:
 
 8. Add yourself to ``AUTHORS.rst``.
 9. Commit your changes and push your branch to GitHub.
-10. Create a `pull request <https://help.github.com/articles/about-pull-requests/>`_ through the GitHub website.
+10. Create a `pull request <https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests>`_ through the GitHub website.
 
 
 During development, use `pyinvoke <http://docs.pyinvoke.org/>`_ tasks on the
@@ -57,8 +57,8 @@ Documentation improvements
 We could always use more documentation, whether as part of the
 introduction/examples/usage documentation or API documentation in docstrings.
 
-Documentation is written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_
-and use `Sphinx <http://sphinx-doc.org/index.html>`_ to generate the HTML output.
+Documentation is written in `reStructuredText <https://docutils.sourceforge.io/rst.html>`_
+and use `Sphinx <https://www.sphinx-doc.org/>`_ to generate the HTML output.
 
 Once you made the documentation changes locally, run the documentation generation::
 

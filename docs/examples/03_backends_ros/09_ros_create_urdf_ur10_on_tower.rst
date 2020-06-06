@@ -91,7 +91,7 @@ Paste the following into the file:
 .. code-block:: xml
 
     <?xml version="1.0" encoding="utf-8"?>
-        <robot xmlns:xacro="http://ros.org/wiki/xacro">
+        <robot xmlns:xacro="https://ros.org/wiki/xacro">
             <xacro:macro name="tower" params="prefix">
                 <link name="${prefix}tower">
                     <visual>
@@ -200,7 +200,7 @@ Paste the following:
 .. code-block:: xml
 
     <?xml version="1.0"?>
-        <robot name="ur10_tower" xmlns:xacro="http://ros.org/wiki/xacro">
+        <robot name="ur10_tower" xmlns:xacro="https://ros.org/wiki/xacro">
             <!-- tower -->
             <xacro:include filename="tower.xacro"/>
             <!-- ur10 -->
@@ -362,11 +362,8 @@ And later create a MoveIt! package from it.
 Further links
 =============
 
-* `Building a visual robot model with URDF from scratch <http://wiki.ros.org/urdf/Tutorials/Building%20a%20Visual%20Robot%20Model%20with%20URDF%20from%20Scratch>`_
-* `Adding Physical and Collision Properties to a URDF Model <http://wiki.ros.org/urdf/Tutorials/Adding%20Physical%20and%20Collision%20Properties%20to%20a%20URDF%20Model>`_
-* `Create your own URDF file <http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file>`_
-* `Create a URDF for an Industrial Robot <http://wiki.ros.org/Industrial/Tutorials/Create%20a%20URDF%20for%20an%20Industrial%20Robot>`_
-* `Working with ROS-Industrial Robot Support Packages <http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages>`_
-
-
-
+* `Building a visual robot model with URDF from scratch <https://wiki.ros.org/urdf/Tutorials/Building%20a%20Visual%20Robot%20Model%20with%20URDF%20from%20Scratch>`_
+* `Adding Physical and Collision Properties to a URDF Model <https://wiki.ros.org/urdf/Tutorials/Adding%20Physical%20and%20Collision%20Properties%20to%20a%20URDF%20Model>`_
+* `Create your own URDF file <https://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file>`_
+* `Create a URDF for an Industrial Robot <https://wiki.ros.org/Industrial/Tutorials/Create%20a%20URDF%20for%20an%20Industrial%20Robot>`_
+* `Working with ROS-Industrial Robot Support Packages <https://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages>`_

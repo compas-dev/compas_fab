@@ -42,8 +42,10 @@ extlinks = {
 
 # intersphinx options
 intersphinx_mapping = {'python': ('https://docs.python.org/', None),
-                       'compas': ('http://compas-dev.github.io/main/', None),
-                       'roslibpy': ('http://roslibpy.readthedocs.org/en/latest/', None)}
+                       'compas': ('https://compas-dev.github.io/main/', None),
+                       'roslibpy': ('https://roslibpy.readthedocs.io/en/latest/', None)}
+
+linkcheck_ignore = [r'http://localhost:\d+/']
 
 # autodoc options
 autodoc_default_options = {
