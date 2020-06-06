@@ -38,6 +38,7 @@ class ROSmsg(object):
 class Time(ROSmsg):
     """http://docs.ros.org/kinetic/api/std_msgs/html/msg/Time.html
     """
+
     def __init__(self, secs=0., nsecs=0.):
         self.secs = secs
         self.nsecs = nsecs
@@ -59,5 +60,6 @@ class Header(ROSmsg):
 class String(ROSmsg):
     """http://docs.ros.org/api/std_msgs/html/msg/String.html
     """
+
     def __init__(self, data=''):
         self.data = data
