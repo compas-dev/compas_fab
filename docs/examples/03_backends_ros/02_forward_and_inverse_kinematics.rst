@@ -11,7 +11,7 @@ Forward and inverse kinematics
     The following examples use the `ROS <https://www.ros.org/>`_ backend
     and the MoveI! planner for UR5 robots. Before running them, please
     make sure you have the :ref:`ROS backend <ros_backend>` correctly
-    configured and the :ref:`UR5 Planner <ros_bundles_list>` started.
+    configured and the :ref:`UR5 Demo <ros_bundles_list>` started.
 
 Forward kinematics
 ==================
