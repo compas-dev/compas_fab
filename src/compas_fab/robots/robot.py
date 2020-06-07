@@ -427,7 +427,10 @@ class Robot(object):
     # ==========================================================================
 
     def zero_configuration(self, group=None):
-        """Get the all-zero joint configuration.
+        """Get the all-zero (initial) joint configuration.
+
+        If zero is out of joint limits ``(upper, lower)`` then
+        ``(upper + lower) / 2`` is used as joint value.
 
         Examples
         --------
@@ -435,10 +438,17 @@ class Robot(object):
         Configuration((0.000, 0.000, 0.000, 0.000, 0.000, 0.000), (0, 0, 0, 0, 0, 0), \
             ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))
         """
-        joint_names = self.get_configurable_joint_names(group)
-        joint_types = self.get_joint_types_by_names(joint_names)
-        positions = [0.] * len(joint_types)
-        return Configuration(positions, joint_types, joint_names)
+        values = []
+        joint_names = []
+        joint_types = []
+        for joint in self.get_configurable_joints(group):
+            if joint.limit and not (0 <= joint.limit.upper and 0 >= joint.limit.lower):
+                values.append((joint.limit.upper + joint.limit.lower)/2.)
+            else:
+                values.append(0)
+            joint_names.append(joint.name)
+            joint_types.append(joint.type)
+        return Configuration(values, joint_types, joint_names)
 
     def random_configuration(self, group=None):
         """Get a random configuration.
@@ -1633,4 +1643,4 @@ class Robot(object):
                     joint.limit.upper, joint.limit.lower)
             print(info)
         print("The robot's links are:")
-        print([l.name for l in self.model.links])
+        print([link.name for link in self.model.links])
