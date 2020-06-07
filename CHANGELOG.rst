@@ -13,6 +13,19 @@ Unreleased
 
 **Added**
 
+**Changed**
+
+**Fixed**
+
+**Deprecated**
+
+**Removed**
+
+0.11.0
+----------
+
+**Added**
+
 * Added optional ``joint_names`` to ``Configuration``
 * Added ``Configuration.scaled``
 * Added ``full_joint_state`` to ``Robot.inverse_kinematics``
@@ -20,6 +33,7 @@ Unreleased
 
 **Changed**
 
+* Updated to ``COMPAS 0.15``
 * Construct ``full_configuration`` with ``values``, ``types``, ``joint_names`` in ``Robot`` rather than in ``MoveItPlanner``
 * ``MoveItPlanner`` returns ``start_configuration`` with set ``joint_names``
 * Removed parameter ``names`` from ``RobotArtist.update``
@@ -33,15 +47,13 @@ Unreleased
   ``tolerance_below`` for allowing asymmetrical constraints.
 * In :class:``compas_fab.robots.Robot``, changed the ``constraints_from_configuration``
   function with ``tolerances_above`` and ``tolerances_below``.
-
-**Removed**
+* :meth:`compas_fab.robots.CollisionMesh.scale` now takes a scale factor
+  instead of a :class:`compas.geometry.Scale` instance as an argument.
 
 **Fixed**
 
 * Convert constraints on inverse kinematics and cartesian planner to ROS messages
 * Fix support for trajectory constraints on kinematic planner
-
-**Deprecated**
 
 0.10.2
 ----------
@@ -52,7 +64,7 @@ Unreleased
 
 **Changed**
 
-* Updated to COMPAS 0.13
+* Updated to ``COMPAS 0.13``
 
 0.10.1
 ----------
@@ -94,14 +106,14 @@ Unreleased
 
 **Changed**
 
-* Updated to COMPAS 0.11
+* Updated to ``COMPAS 0.11``
 
 0.8.0
 ----------
 
 **Changed**
 
-* Updated to COMPAS 0.10
+* Updated to ``COMPAS 0.10``
 * Add better support for passive joints on IK, Cartesian and Kinematic planning
 
 **Fixed**
@@ -219,7 +231,7 @@ Unreleased
 
 **Changed**
 
-* Updated to COMPAS 0.4.10
+* Updated to ``COMPAS 0.4.10``
 
 0.3.0
 ----------
@@ -233,7 +245,7 @@ Unreleased
 **Changed**
 
 * Renamed ``UrdfImporter`` to ``RosFileServerLoader``
-* Updated to COMPAS 0.4.8
+* Updated to ``COMPAS 0.4.8``
 
 0.2.1
 ----------
@@ -249,7 +261,7 @@ Unreleased
 
 * First open source release!
 * V-REP and ROS clients
-* Updated to COMPAS 0.3.2
+* Updated to ``COMPAS 0.3.2``
 
 0.1.0
 -----

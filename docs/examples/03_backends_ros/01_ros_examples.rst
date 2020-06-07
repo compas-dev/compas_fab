@@ -17,7 +17,7 @@ First step
 The first step is to connect to ROS to verify that the system is working.
 
 Copy and paste the following example into any Python environment
-(a standalong script, a CAD environment, etc) and run it, you should
+(a standalone script, a CAD environment, etc) and run it, you should
 see the output ``Connected: True`` if everything is working properly:
 
 .. code-block:: python
@@ -95,7 +95,7 @@ Open a command prompt and start the talker:
 
 ::
 
-    python 01_ros_hello_world_listener.py
+    python 01_ros_hello_world_talker.py
 
 
 Now open a second command prompt and start the listener:
