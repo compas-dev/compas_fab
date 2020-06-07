@@ -51,7 +51,7 @@ class RobotArtist(BaseRobotArtist):
             color = geometry.attributes['mesh_color.diffuse']
 
         key_index = geometry.key_index()
-        vertices = geometry.get_vertices_attributes('xyz')
+        vertices = geometry.vertices_attributes('xyz')
         faces = [[key_index[key] for key in geometry.face_vertices(fkey)] for fkey in geometry.faces()]
         new_faces = []
         for face in faces:
