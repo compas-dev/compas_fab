@@ -598,7 +598,7 @@ class Robot(object):
         """
         return self.get_base_frame(group)
 
-    def to_local_coords(self, frame_WCF, group=None):
+    def to_local_coordinates(self, frame_WCF, group=None):
         """Represents a frame from the world coordinate system (WCF) in the robot's coordinate system (RCF).
 
         Parameters
@@ -614,14 +614,14 @@ class Robot(object):
         Examples
         --------
         >>> frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
-        >>> frame_RCF = robot.to_local_coords(frame_WCF)
+        >>> frame_RCF = robot.to_local_coordinates(frame_WCF)
         >>> frame_RCF
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
         """
         frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
         return frame_RCF
 
-    def to_world_coords(self, frame_RCF, group=None):
+    def to_world_coordinates(self, frame_RCF, group=None):
         """Represents a frame from the robot's coordinate system (RCF) in the world coordinate system (WCF).
 
         Parameters
@@ -637,7 +637,7 @@ class Robot(object):
         Examples
         --------
         >>> frame_RCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
-        >>> frame_WCF = robot.to_world_coords(frame_RCF)
+        >>> frame_WCF = robot.to_world_coordinates(frame_RCF)
         >>> frame_WCF
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
         """
