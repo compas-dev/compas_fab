@@ -171,7 +171,7 @@ class BaseRobotArtist(object):
         self.robot.scale(factor)  # scale the model
 
         relative_factor = factor / self.scale_factor  # relative scaling factor
-        transformation = Scale.from_factor([relative_factor] * 3)
+        transformation = Scale.from_factors([relative_factor] * 3)
         self.scale_link(self.robot.root, transformation)
         self.scale_factor = factor
 
