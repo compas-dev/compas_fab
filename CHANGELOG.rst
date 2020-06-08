@@ -35,9 +35,6 @@ Unreleased
   function with ``tolerances_above`` and ``tolerances_below``.
 * :meth:`compas_fab.robots.CollisionMesh.scale` now takes a scale factor
   instead of a :class:`compas.geometry.Scale` instance as an argument.
-* :meth:`compas_fab.robots.CollisionMesh.scale` now uses constructor
-  :meth:`compas.geometry.Scale.from_factors` to create transformation. This is to
-  adapt to a breaking change introduced in compas 0.16.
 
 **Removed**
 
