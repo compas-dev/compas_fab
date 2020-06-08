@@ -15,6 +15,10 @@ Unreleased
 
 **Changed**
 
+* Updated to ``COMPAS 0.16.1``
+* Renamed ``compas_fab.robots.Robot.to_local_coords`` to ``compas_fab.robots.Robot.to_local_coordinates``
+* Renamed ``compas_fab.robots.Robot.to_world_coords`` to ``compas_fab.robots.Robot.to_world_coordinates``
+
 **Fixed**
 
 **Deprecated**
