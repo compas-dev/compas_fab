@@ -121,7 +121,7 @@ class RosClient(Ros, ClientInterface):
         ``True`` to indicate it should use a secure web socket, otherwise ``False``.
     planner_backend: str
         Name of the planner backend plugin to use. The plugin must be a sub-class of
-        :class:`PlannerBackend`. Defaults to :class:`moveit`.
+        :class:`PlannerInterface`. Defaults to :class:`MoveItPLanner`.
 
     Examples
     --------
