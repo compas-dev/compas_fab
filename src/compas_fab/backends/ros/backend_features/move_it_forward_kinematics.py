@@ -4,7 +4,7 @@ from __future__ import print_function
 
 from compas.utilities import await_callback
 
-from compas_fab.backends.backend_feature_interfaces import ForwardKinematics
+from compas_fab.backends.interfaces import ForwardKinematics
 from compas_fab.backends.ros.backend_features.helpers import validate_response
 from compas_fab.backends.ros.messages import GetPositionFKRequest
 from compas_fab.backends.ros.messages import GetPositionFKResponse

@@ -4,7 +4,7 @@ from __future__ import print_function
 
 from compas.utilities import await_callback
 
-from compas_fab.backends.backend_feature_interfaces import PlanMotion
+from compas_fab.backends.interfaces import PlanMotion
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
 from compas_fab.backends.ros.backend_features.helpers import convert_trajectory_points
 from compas_fab.backends.ros.backend_features.helpers import validate_response

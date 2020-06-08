@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas_fab.backends.backend_feature_interfaces import ForwardKinematics
+from compas_fab.backends.interfaces import ForwardKinematics
 from compas_fab.backends.vrep.helpers import vrep_pose_to_frame
 
 __all__ = [

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas_fab.backends.backend_feature_interfaces import InverseKinematics
+from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.vrep.helpers import config_from_vrep
 from compas_fab.backends.vrep.helpers import frame_to_vrep_pose
 

@@ -3,7 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 from compas_fab.backends.vrep.helpers import floats_to_vrep
-from compas_fab.backends.backend_feature_interfaces import AddCollisionMesh
+from compas_fab.backends.interfaces import AddCollisionMesh
 
 
 __all__ = [

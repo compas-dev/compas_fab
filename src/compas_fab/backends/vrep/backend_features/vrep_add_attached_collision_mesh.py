@@ -5,7 +5,7 @@ from __future__ import print_function
 from compas_fab.backends.vrep.helpers import assert_robot
 from compas_fab.backends.vrep.helpers import DEFAULT_OP_MODE
 from compas_fab.backends.vrep.helpers import VrepError
-from compas_fab.backends.backend_feature_interfaces import AddAttachedCollisionMesh
+from compas_fab.backends.interfaces import AddAttachedCollisionMesh
 from compas_fab.backends.vrep.remote_api import vrep
 
 __all__ = [
