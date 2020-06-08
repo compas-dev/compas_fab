@@ -4,9 +4,11 @@ from __future__ import print_function
 
 import itertools
 
-from compas.geometry import Transformation
-from compas.geometry import Scale
+from compas.datastructures import Mesh
 from compas.geometry import Frame
+from compas.geometry import Scale
+from compas.geometry import Shape
+from compas.geometry import Transformation
 
 __all__ = [
     'BaseRobotArtist'
@@ -60,8 +62,8 @@ class BaseRobotArtist(object):
 
         Parameters
         ----------
-        geometry : :class:`compas.datastructures.Mesh` or :class:`compas.geometry.Shape`
-            Instance of a **COMPAS** mesh or **COMPAS** shape
+        geometry : :class:`Mesh`
+            Instance of a **COMPAS** mesh
         name : str, optional
             The name of the mesh to draw.
 
@@ -81,7 +83,7 @@ class BaseRobotArtist(object):
             The tool that should be attached to the robot's flange.
         """
         name = '{}.visual.attached_tool'.format(self.robot.name)
-        native_geometry = self.draw_geometry(tool.visual, name=name)  # TODO: only visual, collsion would be great
+        native_geometry = self.draw_geometry(tool.visual, name=name)  # TODO: only visual, collision would be great
 
         link = self.robot.get_link_by_name(tool.attached_collision_mesh.link_name)
         ee_frame = link.parent_joint.origin.copy()
@@ -125,6 +127,9 @@ class BaseRobotArtist(object):
                 meshes = item.geometry.shape.meshes
             else:
                 meshes = item.geometry.shape.geometry
+
+            if isinstance(meshes, Shape):
+                meshes = [Mesh.from_shape(meshes)]
 
             if meshes:
                 # Coerce meshes into an iteratable (a tuple if not natively iterable)
