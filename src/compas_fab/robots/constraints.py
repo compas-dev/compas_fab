@@ -91,7 +91,7 @@ class BoundingVolume(object):
         return cls(cls.MESH, mesh)
 
     def scale(self, scale_factor):
-        S = Scale([scale_factor] * 3)
+        S = Scale.from_factor([scale_factor] * 3)
         self.transform(S)
 
     def transform(self, transformation):
