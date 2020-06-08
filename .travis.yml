@@ -1,66 +1,84 @@
-# Base language is Python, but that does not work on macOs & Windows builds
-language: python
+# Based on https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
+language: python            # this works for Linux but is an error on macOS or Windows
 
-matrix:
+jobs:
   include:
-    - name: "Python 2.7: Windows"
-      os: windows
-      language: shell
-      before_install:
-        - choco install python2 vcredist2008
-        - choco install --ignore-dependencies vcpython27
+    # Latest python releases on all 3 OSes
+    - name: "Python 3.8 on Xenial Linux"
+      python: 3.8           # this works for Linux but is ignored on macOS or Windows
       env:
-        - PATH=/c/Python27:/c/Python27/Scripts:$PATH
-        - TRAVIS_PYTHON_VERSION=2.7
-    - name: "Python 3.7: Windows"
-      os: windows
-      language: shell
-      before_install:
-        - choco install python3 --version=3.7.4
-      env:
-        - PATH=/c/Python37:/c/Python37/Scripts:$PATH
-        - TRAVIS_PYTHON_VERSION=3.7
-    - name: "Python 3.7: Xenial Linux"
-      python: 3.7
-      dist: xenial
-      # Pytest doctests are only enabled for Linux
-      # because they are integration tests and need ROS running on Docker
-      env:
-        - TRAVIS_PYTHON_VERSION=3.7
-        - PYTEST_ADDOPTS=--doctest-modules
+        - TRAVIS_RUN_LINTER=true
+        - TRAVIS_RUN_INTEGRATION_TESTS=true
         - TRAVIS_GENERATE_DOCS=true
+        - TRAVIS_PYTHON_IMPLEMENTATION="cpython"
       services: docker
-      before_install:
+      before_script:
         - docker run -p 19997:19997 --name vrep_rfl -d gramaziokohler/vrep-rfl
         - docker-compose -f "docs/backends/files/ur5-demo/docker-compose.yml" up -d --build
         - docker ps -a
       after_script:
         - docker-compose -f "docs/backends/files/ur5-demo/docker-compose.yml" down
         - docker rm -f vrep_rfl
-    - name: "Python 3.7: macOS"
+    - name: "Python 3.7 on macOS"
       os: osx
-      osx_image: xcode11.2
+      osx_image: xcode11.2  # Python 3.7.4 running on macOS 10.14.4
+      language: shell       # 'language: python' is an error on Travis CI macOS
+      env:
+        - TRAVIS_PYTHON_IMPLEMENTATION="cpython"
+    - name: "Python 3.8 on Windows"
+      os: windows           # Windows 10.0.17134 N/A Build 17134
+      language: shell       # 'language: python' is an error on Travis CI Windows
+      before_install:
+        - choco install python --version=3.8.0
+        - pip3 install --user --upgrade pip
+        - pip3 install cython --install-option="--no-cython-compile"
+      env:
+        - PATH=/c/Python38:/c/Python38/Scripts:$PATH
+        - TRAVIS_PYTHON_IMPLEMENTATION="cpython"
+    # Older Python releases
+    - name: "Python 3.6 on Xenial Linux"
+      python: 3.6
+      env:
+        - TRAVIS_PYTHON_IMPLEMENTATION="cpython"
+    # IronPython monstrosity
+    - name: "IronPython 2.7: Windows"
+      os: windows
       language: shell
-      env: TRAVIS_PYTHON_VERSION=3.7
+      before_install:
+        - choco install ironpython --version=2.7.8.1
+        - ipy -X:Frames -m ensurepip
+        - ipy -X:Frames -m pip install --no-deps compas roslibpy
+        - ipy -X:Frames -m pip install ironpython-pytest
+      script:
+        - ipy tests/ipy_test_runner.py
+      env:
+        - TRAVIS_PYTHON_IMPLEMENTATION="ironpython"
+        - IRONPYTHONPATH=$TRAVIS_BUILD_DIR/src
+
+
+# all three OSes agree about 'pip3'
+before_install:
+- if [[ "$TRAVIS_PYTHON_IMPLEMENTATION" == "cpython" ]]; then
+    pip3 install --upgrade pip;
+    pip3 install cython --install-option="--no-cython-compile";
+  fi
 
 install:
-  - pip3 install cython --install-option="--no-cython-compile" || pip install cython --install-option="--no-cython-compile"
-  - pip3 install --no-cache-dir -r requirements-dev.txt || pip install --no-cache-dir -r requirements-dev.txt
+- if [[ "$TRAVIS_PYTHON_IMPLEMENTATION" == "cpython" ]]; then
+    pip3 install --no-cache-dir -r requirements-dev.txt;
+  fi
 
 script:
-  # The following syntax with || is taken directly from Travis CI documentation:
-  # https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
-  # 'python' points to Python 2.7 on macOS but points to Python 3.8 on Linux and Windows
-  # 'python3' is a 'command not found' error on Windows but 'py' works on Windows only
-  - python3 -c "import compas_fab" || python -c "import compas_fab"
-  - python3 -c "import compas_fab.backends" || python -c "import compas_fab.backends"
-  - python3 -c "from compas_fab.backends.vrep.remote_api import vrep" || python -c "from compas_fab.backends.vrep.remote_api import vrep"
-  - python3 -c "import compas_fab.robots" || python -c "import compas_fab.robots"
-  - python3 -c "import compas_fab.utilities" || python -c "import compas_fab.utilities"
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "3.7" ]]; then
-      python3 -m invoke lint || python -m invoke lint;
-    fi
-  - python3 -m invoke test || python -m invoke test
-  - if [[ "$TRAVIS_GENERATE_DOCS" == "true" ]]; then
-      python3 -m invoke docs || python -m invoke docs;
-    fi
+- if [[ "$TRAVIS_RUN_LINTER" == "true" ]]; then
+    invoke lint;
+  fi
+- if [[ "$TRAVIS_RUN_INTEGRATION_TESTS" == "true" ]]; then
+    invoke test --doctest --codeblock;
+  else
+    invoke test;
+  fi;
+
+after_success:
+- if [[ "$TRAVIS_GENERATE_DOCS" == "true" ]]; then
+    invoke docs;
+  fi

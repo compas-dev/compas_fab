@@ -53,14 +53,15 @@ def ur5_joints(ur5_robot_instance):
 def ur5_links(ur5_robot_instance):
     return ur5_robot_instance.model.links
 
+
 @pytest.fixture
 def ur5_configuration():
     return Configuration.from_revolute_values([math.pi/2, 0., 0., math.pi/4, 0., 0.])
 
+
 @pytest.fixture
 def panda_configuration():
     return Configuration.from_revolute_values([math.pi/4, math.pi/3., 0., math.pi/4, 0., 0., math.pi/2, 0.])
-
 
 
 def test_basic_name_only():
@@ -170,9 +171,10 @@ def test_get_base_frame_when_link_has_parent(ur5_robot_instance):
     robot = ur5_robot_instance
     assert robot.get_base_frame(group='endeffector')
 
+
 @pytest.mark.parametrize('group, expectation', [
-                                                # ('endeffector', Frame(Point(-0.191, 0.750, 0.022), Vector(-1.000, -0.000, 0.000), Vector(-0.000, 0.707, -0.707))),
-                                                ('manipulator', Frame.worldXY())])
+    # ('endeffector', Frame(Point(-0.191, 0.750, 0.022), Vector(-1.000, -0.000, 0.000), Vector(-0.000, 0.707, -0.707))),
+    ('manipulator', Frame.worldXY())])
 def test__get_current_base_frame_ur(ur5_robot_instance, ur5_configuration, group, expectation):
     robot = ur5_robot_instance
     assert robot._get_current_base_frame(ur5_configuration, group) == expectation
@@ -180,7 +182,7 @@ def test__get_current_base_frame_ur(ur5_robot_instance, ur5_configuration, group
 
 @pytest.mark.parametrize('group, expectation', [('panda_arm', Frame.worldXY()),
                                                 # ('hand', Frame(Point(.4, .4, .536), Vector(.719, -.281, -.636), Vector(.281, -.719, .636)))
-                                               ])
+                                                ])
 # TODO: Check if this should work with group = 'panda_arm_hand'
 def test__get_current_base_frame(panda_robot_instance, panda_configuration, group, expectation):
     robot = panda_robot_instance
@@ -195,4 +197,3 @@ def test_get_configurable_joints(ur5_robot_instance, group, remove_semantics):
     if remove_semantics:
         robot.semantics = None
     assert len(robot.get_configurable_joints()) == 6
-

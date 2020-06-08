@@ -270,7 +270,7 @@ class JointConstraint(ROSmsg):
         """Creates a `JointConstraint` from a :class:`compas_fab.robots.JointConstraint`.
         """
         c = joint_constraint
-        return cls(c.joint_name, c.value, c.tolerance, c.tolerance, c.weight)
+        return cls(c.joint_name, c.value, c.tolerance_above, c.tolerance_below, c.weight)
 
 
 class VisibilityConstraint(ROSmsg):

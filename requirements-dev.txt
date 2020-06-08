@@ -1,3 +1,4 @@
+attrs>=19.3.0
 sphinx_compas_theme>=0.4
 sphinx>=1.6
 invoke>=0.14
@@ -8,6 +9,7 @@ autopep8
 pylint
 pytest
 pytest-cov
+sybil
 isort
 twine
 -e .

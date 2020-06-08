@@ -91,7 +91,7 @@ class BoundingVolume(object):
         return cls(cls.MESH, mesh)
 
     def scale(self, scale_factor):
-        S = Scale([1./scale_factor] * 3)
+        S = Scale([scale_factor] * 3)
         self.transform(S)
 
     def transform(self, transformation):
@@ -140,6 +140,11 @@ class Constraint(object):
     def scale(self, scale_factor):
         pass
 
+    def scaled(self, scale_factor):
+        c = self.copy()
+        c.scale(scale_factor)
+        return c
+
     def copy(self):
         cls = type(self)
         return cls(self.type, self.weight)
@@ -154,8 +159,11 @@ class JointConstraint(Constraint):
         The name of the joint this contraint refers to.
     value: float
         The targeted value for that joint.
-    tolerance: float
-        The bound to be achieved is [value - tolerance, value + tolerance]
+    tolerance_above: float
+        Tolerance above the targeted joint value, in radians. Defaults to 0.
+    tolerance_below: float
+        Tolerance below the targeted joint value, in radians. Defaults to 0.
+        The bound to be achieved is [value - tolerance_below, value + tolerance_above].
     weight: float, optional
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to 1.
@@ -163,26 +171,28 @@ class JointConstraint(Constraint):
     Examples
     --------
     >>> from compas_fab.robots import JointConstraint
-    >>> jc = JointConstraint("joint_0", 1.4, 0.1)
+    >>> jc = JointConstraint("joint_0", 1.4, 0.1, 0.1, 1.0)
 
     """
 
-    def __init__(self, joint_name, value, tolerance=0., weight=1.):
+    def __init__(self, joint_name, value, tolerance_above=0., tolerance_below=0., weight=1.):
         super(JointConstraint, self).__init__(self.JOINT, weight)
         self.joint_name = joint_name
         self.value = value
-        self.tolerance = tolerance
+        self.tolerance_above = abs(tolerance_above)
+        self.tolerance_below = abs(tolerance_below)
 
     def scale(self, scale_factor):
-        self.value /= scale_factor
-        self.tolerance /= scale_factor
+        self.value *= scale_factor
+        self.tolerance_above *= scale_factor
+        self.tolerance_below *= scale_factor
 
     def __repr__(self):
-        return "JointConstraint('{0}', {1}, {2}, {3})".format(self.joint_name, self.value, self.tolerance, self.weight)
+        return "JointConstraint('{0}', {1}, {2}, {3}, {4})".format(self.joint_name, self.value, self.tolerance_above, self.tolerance_below, self.weight)
 
     def copy(self):
         cls = type(self)
-        return cls(self.joint_name, self.value, self.tolerance, self.weight)
+        return cls(self.joint_name, self.value, self.tolerance_above, self.tolerance_below, self.weight)
 
 
 class OrientationConstraint(Constraint):
@@ -227,13 +237,7 @@ class OrientationConstraint(Constraint):
         R = Rotation.from_quaternion(self.quaternion)
         R = transformation * R
 
-        # Due to a bug on COMPAS 0.10.0
-        # (Fixed on https://github.com/compas-dev/compas/pull/378 but not released atm)
-        # we work around the retrival of the rotation component of R and instead decompose and get it
-        _, _, r, _, _ = R.decomposed()
-        self.quaternion = r.quaternion
-        # After that bug fix is released, the previous two lines should be changed to:
-        # self.quaternion = R.rotation.quaternion
+        self.quaternion = R.rotation.quaternion
 
     def __repr__(self):
         return "OrientationConstraint('{0}', {1}, {2}, {3})".format(self.link_name, self.quaternion, self.tolerances, self.weight)
