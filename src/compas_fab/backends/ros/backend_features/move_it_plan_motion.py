@@ -125,7 +125,7 @@ class MoveItPlanMotion(PlanMotion):
         trajectory_constraints = options.get('trajectory_constraints')
 
         if trajectory_constraints is not None:
-            trajectory_constraints = TrajectoryConstraints(constraints=convert_constraints_to_rosmsg( options['trajectory_constraints'], header))
+            trajectory_constraints = TrajectoryConstraints(constraints=convert_constraints_to_rosmsg(options['trajectory_constraints'], header))
 
         request = dict(start_state=start_state,
                        goal_constraints=goal_constraints,
