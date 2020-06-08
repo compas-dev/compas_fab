@@ -60,7 +60,7 @@ introduction/examples/usage documentation or API documentation in docstrings.
 Documentation is written in `reStructuredText <https://docutils.sourceforge.io/rst.html>`_
 and use `Sphinx <https://www.sphinx-doc.org/>`_ to generate the HTML output.
 
-The project uses Numpy style docstrings, see 
+The project uses Numpy style docstrings, see
 `Sphinx extension Napoleon's documentation <https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html>`_
 for examples.
 

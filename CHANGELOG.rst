@@ -43,9 +43,9 @@ Unreleased
 * ``MoveItPlanner``: ``inverse_kinematics`` takes now instance of ``Configuration`` and ``robot``
 * Property :class:`compas_fab.robots.Robot.artist` does not try to scale robot
   geometry if links and/or joints are not defined.
-* In :class:``compas_fab.robots.constraints.JointConstraint``, added ``tolerance_above`` and
+* In :class:`compas_fab.robots.constraints.JointConstraint`, added ``tolerance_above`` and
   ``tolerance_below`` for allowing asymmetrical constraints.
-* In :class:``compas_fab.robots.Robot``, changed the ``constraints_from_configuration``
+* In :class:`compas_fab.robots.Robot`, changed the ``constraints_from_configuration``
   function with ``tolerances_above`` and ``tolerances_below``.
 * :meth:`compas_fab.robots.CollisionMesh.scale` now takes a scale factor
   instead of a :class:`compas.geometry.Scale` instance as an argument.
@@ -82,7 +82,7 @@ Unreleased
 * Added ``attach_tool``, ``detach_tool``, ``draw_attached_tool``, ``from_tool0_to_attached_tool`` and ``from_attached_tool_to_tool0`` to ``Robot``
 * Added ``attach_tool`` and ``detach_tool`` to ``Artist``
 * Added ``add_attached_tool`` and ``remove_attached_tool`` to ``PlanningScene``
-* Added redraw/clear layer support to `RobotArtist` for Rhino
+* Added redraw/clear layer support to :class:`~compas_fab.rhino.RobotArtist` for Rhino
 * Added material/color support for DAE files on ROS file loader
 
 **Changed**
@@ -92,7 +92,7 @@ Unreleased
 **Fixed**
 
 * Fixed mutable init parameters of ``Configuration``, ``JointTrajectoryPoint``, ``JointTrajectory`` and ``Robot.basic``.
-* Fixed interface of `RobotArtist` for Blender
+* Fixed interface of :class:`~compas_fab.blender.RobotArtist` for Blender
 * Fixed DAE parsing of meshes with multiple triangle sets
 
 0.9.0
@@ -220,7 +220,7 @@ Unreleased
 
 **Deprecated**
 
-* The aliases for ``Frame`` and ``Transformation`` will be removed, in the future, import directly from `compas` core.
+* The aliases for ``Frame`` and ``Transformation`` will be removed, in the future, import directly from ``compas`` core.
 
 0.4.0
 ----------
