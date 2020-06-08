@@ -34,7 +34,7 @@ class MoveItInverseKinematics(InverseKinematics):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options={}):
+    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
@@ -74,6 +74,8 @@ class MoveItInverseKinematics(InverseKinematics):
         :class:`compas_fab.robots.Configuration`
             The planning group's configuration.
         """
+        if options is None:
+            options = {}
         kwargs = {}
         kwargs['base_link'] = options['base_link']
         kwargs['frame'] = frame_WCF

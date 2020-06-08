@@ -15,7 +15,7 @@ class VrepAddCollisionMesh(AddCollisionMesh):
     def __init__(self, client):
         self.client = client
 
-    def add_collision_mesh(self, collision_mesh, options={}):
+    def add_collision_mesh(self, collision_mesh, options=None):
         """Adds meshes to the 3D scene.
 
         Args:

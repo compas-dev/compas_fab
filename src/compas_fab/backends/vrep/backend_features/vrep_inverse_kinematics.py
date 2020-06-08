@@ -17,7 +17,7 @@ class VrepInverseKinematics(InverseKinematics):
     def __init__(self, client):
         self.client = client
 
-    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options={}):
+    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculates inverse kinematics to find valid robot configurations for the specified goal frame.
 
         Args:
@@ -43,6 +43,8 @@ class VrepInverseKinematics(InverseKinematics):
             list: List of :class:`Configuration` objects representing
             the collision-free configuration for the ``goal_frame``.
         """
+        if options is None:
+            options = {}
         num_joints = options['num_joints']
         metric_values = options.get('metric_values')
         gantry_joint_limits = options.get('gantry_joint_limits')

@@ -16,7 +16,7 @@ class VrepForwardKinematics(ForwardKinematics):
     def __init__(self, client):
         self.client = client
 
-    def forward_kinematics(self, configuration, group=None, options={}):
+    def forward_kinematics(self, configuration, group=None, options=None):
         """Calculates forward kinematics to get the current end-effector pose.
 
         Args:

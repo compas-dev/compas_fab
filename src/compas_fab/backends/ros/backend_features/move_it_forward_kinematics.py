@@ -30,7 +30,7 @@ class MoveItForwardKinematics(ForwardKinematics):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def forward_kinematics(self, configuration, group=None, options={}):
+    def forward_kinematics(self, configuration, group=None, options=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
@@ -58,6 +58,8 @@ class MoveItForwardKinematics(ForwardKinematics):
         :class:`Frame`
             The frame in the world's coordinate system (WCF).
         """
+        if options is None:
+            options = {}
         kwargs = {}
         kwargs['base_link'] = options['base_link']
         kwargs['configuration'] = configuration

@@ -36,7 +36,7 @@ class MoveItPlanMotion(PlanMotion):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):
+    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options=None):
         """Calculates a motion path.
 
         Parameters
@@ -87,6 +87,8 @@ class MoveItPlanMotion(PlanMotion):
         :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
         """
+        if options is None:
+            options = {}
         kwargs = {}
         kwargs['base_link'] = options['base_link']
         kwargs['joint_names'] = options['joint_names']

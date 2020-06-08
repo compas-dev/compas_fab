@@ -944,7 +944,7 @@ class Robot(object):
     # services
     # ==========================================================================
 
-    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options={}):
+    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
@@ -991,6 +991,8 @@ class Robot(object):
         >>> robot.inverse_kinematics(frame_WCF, start_configuration, group)                 # doctest: +SKIP
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
+        if options is None:
+            options = {}
         avoid_collisions = options.get('avoid_collisions', True)
         constraints = options.get('constraints')
         attempts = options.get('attempts', 8)
@@ -1046,7 +1048,7 @@ class Robot(object):
 
         return configuration.scaled(self.scale_factor)
 
-    def forward_kinematics(self, configuration, group=None, options={}):
+    def forward_kinematics(self, configuration, group=None, options=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
@@ -1084,6 +1086,8 @@ class Robot(object):
         >>> frame_WCF_c == frame_WCF_m
         True
         """
+        if options is None:
+            options = {}
         backend = options.get('backend')
         ee_link = options.get('ee_link')
         return self.forward_kinematics_deprecated(configuration, group, backend, ee_link)
@@ -1124,7 +1128,7 @@ class Robot(object):
 
         return frame_WCF
 
-    def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options={}):
+    def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
@@ -1180,6 +1184,8 @@ class Robot(object):
         >>> type(trajectory)
         <class 'compas_fab.robots.trajectory.JointTrajectory'>
         """
+        if options is None:
+            options = {}
         max_step = options.get('max_step', 0.01)
         jump_threshold = options.get('jump_threshold', 1.57)
         avoid_collisions = options.get('avoid_collisions', True)
@@ -1256,7 +1262,7 @@ class Robot(object):
 
         return trajectory
 
-    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):
+    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options=None):
         """Calculates a motion path.
 
         Parameters
@@ -1329,6 +1335,8 @@ class Robot(object):
         >>> type(trajectory)
         <class 'compas_fab.robots.trajectory.JointTrajectory'>
         """
+        if options is None:
+            options = {}
         path_constraints = options.get('path_constraints')
         planner_id = options.get('planner_id', 'RRT')
         num_planning_attempts = options.get('num_planning_attempts', 1)

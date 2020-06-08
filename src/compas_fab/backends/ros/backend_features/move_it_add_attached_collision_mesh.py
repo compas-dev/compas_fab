@@ -15,7 +15,7 @@ class MoveItAddAttachedCollisionMesh(AddAttachedCollisionMesh):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def add_attached_collision_mesh(self, attached_collision_mesh, options={}):
+    def add_attached_collision_mesh(self, attached_collision_mesh, options=None):
         """Add a collision mesh attached to the robot."""
         aco = AttachedCollisionObject.from_attached_collision_mesh(
             attached_collision_mesh)

@@ -27,7 +27,7 @@ class VrepPlanMotion(PlanMotion):
     def __init__(self, client):
         self.client = client
 
-    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options={}):
+    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options=None):
         """Finds a path plan to move the selected robot from its current position to the `goal_constraints`.
 
         Args:
@@ -63,6 +63,8 @@ class VrepPlanMotion(PlanMotion):
             list: List of :class:`Configuration` objects representing the
             collision-free path to the ``goal_frame``.
         """
+        if options is None:
+            options = {}
         num_joints = options['num_joints']
         metric_values = options.get('metric_values')
         collision_meshes = options.get('collision_meshes')
@@ -79,7 +81,7 @@ class VrepPlanMotion(PlanMotion):
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length,
                                     log)
 
-    def plan_motion_to_config(self, goal_configs, start_configuration=None, group=None, options={}):
+    def plan_motion_to_config(self, goal_configs, start_configuration=None, group=None, options=None):
         """Find a path plan to move the selected robot from its current position to one of the `goal_configs`.
 
         This function is useful when it is required to get a path plan that ends in one
@@ -118,6 +120,8 @@ class VrepPlanMotion(PlanMotion):
             list: List of :class:`Configuration` objects representing the
             collision-free path to the ``goal_configs``.
         """
+        if options is None:
+            options = {}
         num_joints = options['num_joints']
         metric_values = options.get('metric_values')
         collision_meshes = options.get('collision_meshes')

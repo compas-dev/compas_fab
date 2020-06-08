@@ -36,7 +36,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options={}):
+    def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
@@ -80,6 +80,8 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
         """
+        if options is None:
+            options = {}
         kwargs = {}
         kwargs['base_link'] = options['base_link']
         kwargs['ee_link'] = options['ee_link']

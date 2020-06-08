@@ -24,7 +24,7 @@ class MoveItPlanningScene(GetPlanningScene):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def get_planning_scene(self, options={}):
+    def get_planning_scene(self, options=None):
         kwargs = {}
         kwargs['errback_name'] = 'errback'
 

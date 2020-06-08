@@ -17,7 +17,7 @@ class VrepAddAttachedCollisionMesh(AddAttachedCollisionMesh):
     def __init__(self, client):
         self.client = client
 
-    def add_attached_collision_mesh(self, attached_collision_mesh, options={}):
+    def add_attached_collision_mesh(self, attached_collision_mesh, options=None):
         """Adds a building member to the 3D scene and attaches it to the robot.
 
         Args:
@@ -34,6 +34,8 @@ class VrepAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         .. note::
             All meshes are automatically removed from the scene when the simulation ends.
         """
+        if options is None:
+            options = {}
         robot_name = options['robot_name']
         return self.add_building_member(robot_name, attached_collision_mesh)
 

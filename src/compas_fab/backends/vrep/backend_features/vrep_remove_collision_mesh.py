@@ -16,7 +16,7 @@ class VrepRemoveCollisionMesh(RemoveCollisionMesh):
     def __init__(self, client):
         self.client = client
 
-    def remove_collision_mesh(self, id, options={}):
+    def remove_collision_mesh(self, id, options=None):
         """Removes objects from the 3D scene.
 
         Args:
