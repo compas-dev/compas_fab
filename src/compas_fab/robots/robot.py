@@ -568,7 +568,7 @@ class Robot(object):
 
         """
         base_frame = self.get_base_frame(group)
-        return Transformation.from_change_basis(base_frame, Frame.worldXY())
+        return Transformation.from_change_of_basis(base_frame, Frame.worldXY())
 
     def transformation_WCF_RCF(self, group=None):
         """Returns the transformation from the world coordinate system (WCF) to the robot's coordinate system (RCF).
@@ -584,7 +584,7 @@ class Robot(object):
 
         """
         base_frame = self.get_base_frame(group)
-        return Transformation.from_change_basis(Frame.worldXY(), base_frame)
+        return Transformation.from_change_of_basis(Frame.worldXY(), base_frame)
 
     def set_RCF(self, robot_coordinate_frame, group=None):
         """Moves the origin frame of the robot to the robot_coordinate_frame.
