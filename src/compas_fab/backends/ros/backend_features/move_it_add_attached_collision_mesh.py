@@ -19,4 +19,4 @@ class MoveItAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         """Add a collision mesh attached to the robot."""
         aco = AttachedCollisionObject.from_attached_collision_mesh(
             attached_collision_mesh)
-        self.ros_client.planner.emit('attached_collision_object', attached_collision_object=aco, operation=CollisionObject.ADD)
+        self.ros_client.planner.publish_attached_collision_object(attached_collision_object=aco, operation=CollisionObject.ADD)

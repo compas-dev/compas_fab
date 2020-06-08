@@ -2,8 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from roslibpy.event_emitter import EventEmitterMixin
-
 
 class ClientInterface(object):
     def __init__(self):
@@ -69,7 +67,7 @@ class ClientInterface(object):
 #         raise NotImplementedError('Assigned control does not have this feature.')
 
 
-class PlannerInterface(EventEmitterMixin):
+class PlannerInterface(object):
     def __init__(self, client):
         super(PlannerInterface, self).__init__()
         self.client = client

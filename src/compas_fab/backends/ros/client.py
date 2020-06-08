@@ -145,13 +145,12 @@ class RosClient(Ros, ClientInterface):
     def __enter__(self):
         self.run()
         self.connect()
-        self.planner.emit('initialize')
 
         return self
 
     def __exit__(self, *args):
-        self.planner.emit('dispose')
-
+        self.planner.dispose_planner()
+        # self.closing() ?
         self.close()
 
     def load_robot(self, load_geometry=False, urdf_param_name='/robot_description', srdf_param_name='/robot_description_semantic', precision=None, local_cache_directory=None):

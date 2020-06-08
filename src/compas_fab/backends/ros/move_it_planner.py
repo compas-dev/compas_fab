@@ -38,58 +38,50 @@ class MoveItPlanner(PlannerInterface):
         self.add_attached_collision_mesh = MoveItAddAttachedCollisionMesh(self.client)
         self.remove_attached_collision_mesh = MoveItRemoveAttachedCollisionMesh(self.client)
 
-        self.on('initialize', self.init_planner)
-        self.on('collision_object', self.advertise_collision_object)
-        self.on('collision_object', self._collision_object)
-        self.on('attached_collision_object', self.advertise_attached_collision_object)
-        self.on('attached_collision_object', self._attached_collision_object)
-        self.on('dispose', self.dispose_planner)
+        self.collision_object_topic = None
+        self.attached_collision_object_topic = None
 
-    def has_topic(self, topic):
-        if hasattr(self.client, topic) and getattr(self.client, topic):
-            return True
-        return False
-
-    def advertise_collision_object(self, *args, **kwargs):
-        if not self.has_topic('collision_object_topic'):
-            self.client.collision_object_topic = Topic(
-                self.client,
-                '/collision_object',
-                'moveit_msgs/CollisionObject',
-                queue_size=None)
-            self.client.collision_object_topic.advertise()
-
-    def advertise_attached_collision_object(self, *args, **kwargs):
-        if not self.has_topic('attached_collision_object_topic'):
-            self.client.attached_collision_object_topic = Topic(
-                self.client,
-                '/attached_collision_object',
-                'moveit_msgs/AttachedCollisionObject',
-                queue_size=None)
-            self.client.attached_collision_object_topic.advertise()
+        self.client.on_ready(self.init_planner)
+        # self.client.on_closing(self.dispose_planner)
 
     def init_planner(self, *args, **kwargs):
         self.advertise_collision_object()
         self.advertise_attached_collision_object()
 
+    def advertise_collision_object(self):
+        if self.collision_object_topic is None:
+            self.collision_object_topic = Topic(
+                self.client,
+                '/collision_object',
+                'moveit_msgs/CollisionObject',
+                queue_size=None)
+            self.collision_object_topic.advertise()
+
+    def advertise_attached_collision_object(self):
+        if self.attached_collision_object_topic is None:
+            self.attached_collision_object_topic = Topic(
+                self.client,
+                '/attached_collision_object',
+                'moveit_msgs/AttachedCollisionObject',
+                queue_size=None)
+            self.attached_collision_object_topic.advertise()
+
     def dispose_planner(self, *args, **kwargs):
-        if self.has_topic('collision_object_topic'):
-            self.client.collision_object_topic.unadvertise()
-        if self.has_topic('attached_collision_object_topic'):
-            self.client.attached_collision_object_topic.unadvertise()
+        if self.collision_object_topic is not None:
+            self.collision_object_topic.unadvertise()
+        if self.attached_collision_object_topic is not None:
+            self.attached_collision_object_topic.unadvertise()
 
     # ==========================================================================
     # collision objects
     # ==========================================================================
 
-    def _collision_object(self, *args, **kwargs):
-        collision_object = kwargs.get('collision_object')
-        operation = kwargs.get('operation', CollisionObject.ADD)
+    def publish_collision_object(self, collision_object, operation=CollisionObject.ADD):
+        self.advertise_collision_object()
         collision_object.operation = operation
-        self.client.collision_object_topic.publish(collision_object.msg)
+        self.collision_object_topic.publish(collision_object.msg)
 
-    def _attached_collision_object(self, *args, **kwargs):
-        attached_collision_object = kwargs.get('attached_collision_object')
-        operation = kwargs.get('operation', CollisionObject.ADD)
+    def publish_attached_collision_object(self, attached_collision_object, operation=CollisionObject.ADD):
+        self.advertise_attached_collision_object()
         attached_collision_object.object.operation = operation
-        self.client.attached_collision_object_topic.publish(attached_collision_object.msg)
+        self.attached_collision_object_topic.publish(attached_collision_object.msg)

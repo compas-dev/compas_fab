@@ -17,4 +17,4 @@ class MoveItAppendCollisionMesh(AppendCollisionMesh):
     def append_collision_mesh(self, collision_mesh, options=None):
         """Append a collision mesh to the planning scene."""
         co = CollisionObject.from_collision_mesh(collision_mesh)
-        self.ros_client.planner.emit('collision_object', collision_object=co, operation=CollisionObject.APPEND)
+        self.ros_client.planner.publish_collision_object(collision_object=co, operation=CollisionObject.APPEND)
