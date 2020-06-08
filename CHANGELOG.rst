@@ -30,6 +30,8 @@ Unreleased
 * Added ``Configuration.scaled``
 * Added ``full_joint_state`` to ``Robot.inverse_kinematics``
 * Added ``Semantics.get_all_configurable_joints``
+* Added :class:``compas_fab.robots.constraints.VisibilityConstraint``
+* Added :class:``compas_fab.backends.ros.messages.VisibilityConstraint``
 
 **Changed**
 

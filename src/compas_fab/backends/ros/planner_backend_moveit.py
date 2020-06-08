@@ -34,6 +34,7 @@ from compas_fab.backends.ros.messages import PositionConstraint
 from compas_fab.backends.ros.messages import PositionIKRequest
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import TrajectoryConstraints
+from compas_fab.backends.ros.messages import VisibilityConstraint
 from compas_fab.backends.ros.planner_backend import PlannerBackend
 from compas_fab.backends.ros.planner_backend import ServiceDescription
 from compas_fab.robots import Configuration
@@ -130,6 +131,9 @@ class MoveItPlanner(PlannerBackend):
             elif c.type == c.ORIENTATION:
                 ros_constraints.orientation_constraints.append(
                     OrientationConstraint.from_orientation_constraint(header, c))
+            elif c.type == c.VISIBILITY:
+                ros_constraints.visibility_constraints.append(
+                    VisibilityConstraint.from_visibility_constraint(c, header.frame_id))
             else:
                 raise NotImplementedError
 

@@ -242,6 +242,7 @@ class PlannerParams(ROSmsg):
 class WorkspaceParameters(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/WorkspaceParameters.html
     """
+
     def __init__(self, header=None, min_corner=None, max_corner=None):
         self.header = header or Header()
         self.min_corner = min_corner or Vector3(-1000, -1000, -1000)
@@ -251,6 +252,7 @@ class WorkspaceParameters(ROSmsg):
 class TrajectoryConstraints(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/TrajectoryConstraints.html
     """
+
     def __init__(self, constraints=None):
         self.constraints = constraints or []  # Constraints[]
 
@@ -258,6 +260,7 @@ class TrajectoryConstraints(ROSmsg):
 class JointConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/JointConstraint.html
     """
+
     def __init__(self, joint_name="", position=0, tolerance_above=0, tolerance_below=0, weight=1.):
         self.joint_name = joint_name
         self.position = float(position)
@@ -276,13 +279,57 @@ class JointConstraint(ROSmsg):
 class VisibilityConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/VisibilityConstraint.html
     """
-    def __init__(self):
-        raise NotImplementedError
+
+    def __init__(self, target_radius=None, target_pose=None, cone_sides=None,
+                 sensor_pose=None, max_view_angle=0.0, max_range_angle=0.0,
+                 SENSOR_X=None, SENSOR_Y=None, SENSOR_Z=None,
+                 sensor_view_direction=2, weight=1.):
+        self.target_radius = float(target_radius)
+        self.target_pose = target_pose
+        self.cone_sides = cone_sides if cone_sides >= 3 else 3
+        self.sensor_pose = sensor_pose
+        self.max_view_angle = float(max_view_angle)
+        self.max_range_angle = float(max_range_angle)
+        self.sensor_view_direction = int(sensor_view_direction)
+        self.weight = float(weight) or 1.
+
+    @classmethod
+    def from_visibility_constraint(cls, visibility_constraint, base_link):
+        """Creates a `VisibilityConstraint` from a :class:`compas_fab.robots.VisibilityConstraint`.
+        """
+        if visibility_constraint.target_frame_reference_link is not None:
+            target_pose_frame_id = visibility_constraint.target_frame_reference_link
+        else:
+            target_pose_frame_id = base_link
+        target_pose_header = Header(frame_id=target_pose_frame_id)
+        target_pose = Pose.from_frame(visibility_constraint.target_frame)
+        target_pose_stamped = PoseStamped(target_pose_header, target_pose)
+
+        if visibility_constraint.sensor_frame_reference_link is not None:
+            sensor_pose_frame_id = visibility_constraint.sensor_frame_reference_link
+        else:
+            sensor_pose_frame_id = base_link
+        sensor_pose_header = Header(frame_id=sensor_pose_frame_id)
+        sensor_pose = Pose.from_frame(visibility_constraint.sensor_frame)
+        sensor_pose_stamped = PoseStamped(sensor_pose_header, sensor_pose)
+
+        kwargs = {}
+        kwargs['target_radius'] = visibility_constraint.target_radius
+        kwargs['target_pose'] = target_pose_stamped
+        kwargs['cone_sides'] = visibility_constraint.cone_sides if visibility_constraint.cone_sides >= 3 else 3
+        kwargs['sensor_pose'] = sensor_pose_stamped
+        kwargs['max_view_angle'] = visibility_constraint.max_view_angle
+        kwargs['max_range_angle'] = visibility_constraint.max_range_angle
+        kwargs['sensor_view_direction'] = visibility_constraint.sensor_view_direction
+        kwargs['weight'] = visibility_constraint.weight
+
+        return cls(**kwargs)
 
 
 class BoundingVolume(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/BoundingVolume.html
     """
+
     def __init__(self, primitives=None, primitive_poses=None, meshes=None,
                  mesh_poses=None):
         self.primitives = primitives or []            # shape_msgs/SolidPrimitive[]
@@ -347,6 +394,7 @@ class BoundingVolume(ROSmsg):
 class PositionConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionConstraint.html
     """
+
     def __init__(self, header=None, link_name=None, target_point_offset=None,
                  constraint_region=None, weight=None):
         self.header = header or Header()
@@ -366,6 +414,7 @@ class PositionConstraint(ROSmsg):
 class OrientationConstraint(ROSmsg):
     """http://docs.ros.org/kinetic/api/moveit_msgs/html/msg/OrientationConstraint.html
     """
+
     def __init__(self, header=None, orientation=None, link_name=None,
                  absolute_x_axis_tolerance=0.0, absolute_y_axis_tolerance=0.0,
                  absolute_z_axis_tolerance=0.0, weight=1):
@@ -437,6 +486,7 @@ class PlanningSceneComponents(ROSmsg):
 class AllowedCollisionMatrix(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/AllowedCollisionMatrix.html
     """
+
     def __init__(self, entry_names=None, entry_values=None, default_entry_names=None, default_entry_values=None):
         self.entry_names = entry_names or []  # string[]
         self.entry_values = entry_values or []  # moveit_msgs/AllowedCollisionEntry[]
@@ -447,6 +497,7 @@ class AllowedCollisionMatrix(ROSmsg):
 class PlanningSceneWorld(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningSceneWorld.html
     """
+
     def __init__(self, collision_objects=None, octomap=None):
         self.collision_objects = collision_objects or []  # collision objects # CollisionObject[]
         self.octomap = octomap or OctomapWithPose()  # octomap_msgs/OctomapWithPose
@@ -462,6 +513,7 @@ class PlanningSceneWorld(ROSmsg):
 class PlanningScene(ROSmsg):
     """http://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningScene.html
     """
+
     def __init__(self, name='', robot_state=None, robot_model_name='',
                  fixed_frame_transforms=None, allowed_collision_matrix=None,
                  link_padding=None, link_scale=None, object_colors=None, world=None,
