@@ -16,4 +16,4 @@ class MoveItAddCollisionMesh(AddCollisionMesh):
 
     def add_collision_mesh(self, collision_mesh, options=None):
         co = CollisionObject.from_collision_mesh(collision_mesh)
-        self.ros_client.planner.emit('collision_object', collision_object=co, operation=CollisionObject.ADD)
+        self.ros_client.planner.publish_collision_object(collision_object=co, operation=CollisionObject.ADD)

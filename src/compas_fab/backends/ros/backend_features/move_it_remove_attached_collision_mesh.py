@@ -19,4 +19,4 @@ class MoveItRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
         """Add an attached collision mesh from the robot."""
         aco = AttachedCollisionObject()
         aco.object.id = id
-        self.ros_client.planner.emit('attached_collision_object', attached_collision_object=aco, operation=CollisionObject.REMOVE)
+        self.ros_client.planner.publish_attached_collision_object(attached_collision_object=aco, operation=CollisionObject.REMOVE)

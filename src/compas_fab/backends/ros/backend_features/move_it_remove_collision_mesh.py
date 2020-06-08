@@ -18,4 +18,4 @@ class MoveItRemoveCollisionMesh(RemoveCollisionMesh):
         """Remove a collision mesh from the planning scene."""
         co = CollisionObject()
         co.id = id
-        self.ros_client.planner.emit('collision_object', collision_object=co, operation=CollisionObject.REMOVE)
+        self.ros_client.planner.publish_collision_object(collision_object=co, operation=CollisionObject.REMOVE)
