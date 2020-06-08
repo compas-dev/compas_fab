@@ -8,6 +8,9 @@ from compas_fab.backends.vrep.remote_api import vrep
 
 from compas_fab.robots import Configuration
 
+__all__ = [
+    'VrepError',
+]
 
 DEFAULT_OP_MODE = vrep.simx_opmode_blocking
 
