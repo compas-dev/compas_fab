@@ -50,7 +50,7 @@ class CollisionMesh(object):
         scale_factor : :obj:`float`
             Scale factor.
         """
-        S = Scale([scale_factor] * 3)
+        S = Scale.from_factors([scale_factor] * 3)
         self.mesh.transform(S)
 
 
