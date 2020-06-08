@@ -87,74 +87,57 @@ class MoveItPlanMotion(PlanMotion):
         :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
         """
-        if options is None:
-            options = {}
         kwargs = {}
-        kwargs['base_link'] = options['base_link']
-        kwargs['joint_names'] = options['joint_names']
-        kwargs['joint_types'] = options['joint_types']
         kwargs['goal_constraints'] = goal_constraints
         kwargs['start_configuration'] = start_configuration
         kwargs['group'] = group
-        kwargs['path_constraints'] = options.get('path_constraints')
-        kwargs['trajectory_constraints'] = options.get('trajectory_constraints')
-        kwargs['planner_id'] = options.get('planner_id', '')
-        kwargs['num_planning_attempts'] = options.get('num_planning_attempts', 8)
-        kwargs['allowed_planning_time'] = options.get('allowed_planning_time', 2.)
-        kwargs['max_velocity_scaling_factor'] = options.get('max_velocity_scaling_factor', 1.)
-        kwargs['max_acceleration_scaling_factor'] = options.get('max_acceleration_scaling_factor', 1.)
-        kwargs['attached_collision_meshes'] = options.get('attached_collision_meshes')
-        kwargs['workspace_parameters'] = options.get('workspace_parameters')
+        kwargs['options'] = options or {}
 
         kwargs['errback_name'] = 'errback'
 
         return await_callback(self.plan_motion_async, **kwargs)
 
     def plan_motion_async(self, callback, errback,
-                          base_link, joint_names, joint_types, goal_constraints, start_configuration, group,
-                          path_constraints=None, trajectory_constraints=None,
-                          planner_id='', num_planning_attempts=8,
-                          allowed_planning_time=2.,
-                          max_velocity_scaling_factor=1.,
-                          max_acceleration_scaling_factor=1.,
-                          attached_collision_meshes=None,
-                          workspace_parameters=None):
+                          goal_constraints, start_configuration=None, group=None, options=None):
         """Asynchronous handler of MoveIt motion planner service."""
 
         # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
         # TODO: if list of frames (goals) => receive multiple solutions?
+        joint_names = options['joint_names']
+        joint_types = options['joint_types']
         joint_type_by_name = dict(zip(joint_names, joint_types))  # !!! should this go somewhere else? does it already exist somewhere else?
 
-        header = Header(frame_id=base_link)
+        header = Header(frame_id=options['base_link'])
         joint_state = JointState(
             header=header,
             name=start_configuration.joint_names,
             position=start_configuration.values)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
-        if attached_collision_meshes:
-            for acm in attached_collision_meshes:
+        if options.get('attached_collision_meshes'):
+            for acm in options['attached_collision_meshes']:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
                 start_state.attached_collision_objects.append(aco)
 
         # convert constraints
         goal_constraints = [convert_constraints_to_rosmsg(goal_constraints, header)]
-        path_constraints = convert_constraints_to_rosmsg(path_constraints, header)
+        path_constraints = convert_constraints_to_rosmsg(options.get('path_constraints'), header)
+        trajectory_constraints = options.get('trajectory_constraints')
 
         if trajectory_constraints is not None:
-            trajectory_constraints = TrajectoryConstraints(constraints=convert_constraints_to_rosmsg(trajectory_constraints, header))
+            trajectory_constraints = TrajectoryConstraints(constraints=convert_constraints_to_rosmsg( options['trajectory_constraints'], header))
 
         request = dict(start_state=start_state,
                        goal_constraints=goal_constraints,
                        path_constraints=path_constraints,
                        trajectory_constraints=trajectory_constraints,
-                       planner_id=planner_id,
+                       planner_id=options.get('planner_id', ''),
                        group_name=group,
-                       num_planning_attempts=num_planning_attempts,
-                       allowed_planning_time=allowed_planning_time,
-                       max_velocity_scaling_factor=max_velocity_scaling_factor,
-                       max_acceleration_scaling_factor=max_velocity_scaling_factor)
-        # workspace_parameters=workspace_parameters
+                       num_planning_attempts=options.get('num_planning_attempts', 8),
+                       allowed_planning_time=options.get('allowed_planning_time', 2.),
+                       max_velocity_scaling_factor=options.get('max_velocity_scaling_factor', 1.),
+                       max_acceleration_scaling_factor=options.get('max_acceleration_scaling_factor', 1.))
+        # workspace_parameters=options.get('workspace_parameters')
 
         def convert_to_trajectory(response):
             trajectory = JointTrajectory()

@@ -80,57 +80,45 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
         """
-        if options is None:
-            options = {}
         kwargs = {}
-        kwargs['base_link'] = options['base_link']
-        kwargs['ee_link'] = options['ee_link']
-        kwargs['joint_names'] = options['joint_names']
-        kwargs['joint_types'] = options['joint_types']
-        kwargs['frames'] = frames_WCF
+        kwargs['options'] = options or {}
+        kwargs['frames_WCF'] = frames_WCF
         kwargs['start_configuration'] = start_configuration
         kwargs['group'] = group
-        kwargs['max_step'] = options.get('max_step', 0.01)
-        kwargs['jump_threshold'] = options.get('jump_threshold', 1.57)
-        kwargs['avoid_collisions'] = options.get('avoid_collisions', True)
-        kwargs['path_constraints'] = options.get('path_constraints')
-        kwargs['attached_collision_meshes'] = options.get('attached_collision_meshes')
 
         kwargs['errback_name'] = 'errback'
 
         return await_callback(self.plan_cartesian_motion_async, **kwargs)
 
     def plan_cartesian_motion_async(self, callback, errback,
-                                    base_link, ee_link,  joint_names, joint_types,
-                                    frames, start_configuration,
-                                    group, max_step, jump_threshold,
-                                    avoid_collisions, path_constraints,
-                                    attached_collision_meshes):
+                                    frames_WCF, start_configuration=None, group=None, options=None):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
+        joint_names = options['joint_names']
+        joint_types = options['joint_types']
         joint_type_by_name = dict(zip(joint_names, joint_types))  # should this go somewhere else? does it already exist somewhere else?
 
-        header = Header(frame_id=base_link)
-        waypoints = [Pose.from_frame(frame) for frame in frames]
+        header = Header(frame_id=options['base_link'])
+        waypoints = [Pose.from_frame(frame) for frame in frames_WCF]
         joint_state = JointState(header=header,
                                  name=start_configuration.joint_names,
                                  position=start_configuration.values)
         start_state = RobotState(joint_state, MultiDOFJointState(header=header))
 
-        if attached_collision_meshes:
-            for acm in attached_collision_meshes:
+        if options.get('attached_collision_meshes'):
+            for acm in options['attached_collision_meshes']:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
                 start_state.attached_collision_objects.append(aco)
 
-        path_constraints = convert_constraints_to_rosmsg(path_constraints, header)
+        path_constraints = convert_constraints_to_rosmsg(options.get('path_constraints'), header)
 
         request = dict(header=header,
                        start_state=start_state,
                        group_name=group,
-                       link_name=ee_link,
+                       link_name=options['ee_link'],
                        waypoints=waypoints,
-                       max_step=float(max_step),
-                       jump_threshold=float(jump_threshold),
-                       avoid_collisions=bool(avoid_collisions),
+                       max_step=float(options.get('max_step', 0.01)),
+                       jump_threshold=float(options.get('jump_threshold', 1.57)),
+                       avoid_collisions=bool(options.get('avoid_collisions', True)),
                        path_constraints=path_constraints)
 
         def convert_to_trajectory(response):

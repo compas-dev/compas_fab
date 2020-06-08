@@ -58,22 +58,21 @@ class MoveItForwardKinematics(ForwardKinematics):
         :class:`Frame`
             The frame in the world's coordinate system (WCF).
         """
-        if options is None:
-            options = {}
         kwargs = {}
-        kwargs['base_link'] = options['base_link']
         kwargs['configuration'] = configuration
         kwargs['group'] = group
-        kwargs['ee_link'] = options['ee_link']
+        kwargs['options'] = options or {}
 
         kwargs['errback_name'] = 'errback'
 
         return await_callback(self.forward_kinematics_async, **kwargs)
 
-    def forward_kinematics_async(self, callback, errback, base_link, configuration,
-                                 group, ee_link):
+    def forward_kinematics_async(self, callback, errback,
+                                 configuration, group, options):
         """Asynchronous handler of MoveIt FK service."""
+        base_link = options['base_link']
         header = Header(frame_id=base_link)
+        ee_link = options['ee_link']
         fk_link_names = [ee_link]
         joint_state = JointState(
             name=configuration.joint_names, position=configuration.values, header=header)
