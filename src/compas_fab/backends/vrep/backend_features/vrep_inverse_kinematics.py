@@ -26,18 +26,18 @@ class VrepInverseKinematics(InverseKinematics):
             group (:obj:`int`): Integer referencing the desired robot group.
             options (:obj:`dict`): Dictionary containing the following key-value pairs:
 
-                - num_joints (:obj:`int`) : Number of configurable joints.
-                - metric_values (:obj:`list` of :obj:`float`) : List containing one value
-                    per configurable joint. Each value ranges from 0 to 1,
-                    where 1 indicates the axis/joint is blocked and cannot
-                    move during inverse kinematic solving.
-                - gantry_joint_limits (:obj:`list` of :obj:`float`) : List of 6 floats defining the upper/lower limits of
-                    gantry joints. Use this if you want to restrict the area in which to search for states.
-                - arm_joint_limits (:obj:`list` of :obj:`float`) : List of 12 floats defining the upper/lower limits of
-                    arm joints. Use this if you want to restrict the working area in which to search for states.
-                - max_trials (:obj:`int`) : Number of trials to run. Set to ``None``
-                    to retry infinitely.
-                - max_results (:obj:`int`) : Maximum number of result states to return.
+                - ``"num_joints"``: (:obj:`int`) Number of configurable joints.
+                - ``"metric_values"``: (:obj:`list` of :obj:`float`) List containing one value
+                  per configurable joint. Each value ranges from 0 to 1,
+                  where 1 indicates the axis/joint is blocked and cannot
+                  move during inverse kinematic solving.
+                - ``"gantry_joint_limits"``; (:obj:`list` of :obj:`float`) List of 6 floats defining the upper/lower limits of
+                  gantry joints. Use this if you want to restrict the area in which to search for states.
+                - ``"arm_joint_limits"``: (:obj:`list` of :obj:`float`) List of 12 floats defining the upper/lower limits of
+                  arm joints. Use this if you want to restrict the working area in which to search for states.
+                - ``"max_trials"``: (:obj:`int`) Number of trials to run. Set to ``None``
+                  to retry infinitely.
+                - ``"max_results"``: (:obj:`int`) Maximum number of result states to return.
 
         Returns:
             list: List of :class:`Configuration` objects representing

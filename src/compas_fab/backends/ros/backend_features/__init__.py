@@ -1,27 +1,3 @@
-"""
-********************************************************************************
-compas_fab.backends.ros.backend_features
-********************************************************************************
-
-.. module:: compas_fab.backends.ros.backend_features
-
-
-
-.. autosummary::
-    :toctree: generated/
-
-    MoveItAddAttachedCollisionMesh
-    MoveItAddCollisionMesh
-    MoveItAppendCollisionMesh
-    MoveItForwardKinematics
-    MoveItInverseKinematics
-    MoveItPlanCartesianMotion
-    MoveItPlanMotion
-    MoveItPlanningScene
-    MoveItRemoveAttachedCollisionMesh
-    MoveItRemoveCollisionMesh
-
-"""
 from __future__ import absolute_import
 
 from compas_fab.backends.ros.backend_features.move_it_add_collision_mesh import MoveItAddCollisionMesh

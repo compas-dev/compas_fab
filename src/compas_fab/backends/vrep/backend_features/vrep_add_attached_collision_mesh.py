@@ -25,7 +25,7 @@ class VrepAddAttachedCollisionMesh(AddAttachedCollisionMesh):
                 of the building member that will be attached to the robot.
             options (:obj:`dict`): Dictionary containing the following key-value pairs:
 
-                - robot_name (:obj:`str`): Name of robot instance to attach the building member to.
+                - ``"robot_name'``: (:obj:`str`) Name of robot instance to attach the building member to.
 
 
         Returns:

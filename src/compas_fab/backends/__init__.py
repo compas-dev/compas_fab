@@ -15,6 +15,7 @@ V-REP
     :nosignatures:
 
     VrepClient
+    VrepPlanner
 
 ROS
 ---
@@ -25,6 +26,7 @@ ROS
 
     RosClient
     RosFileServerLoader
+    MoveItPlanner
 
 Long-running tasks
 ------------------
@@ -55,7 +57,9 @@ from .tasks import *                    # noqa: F401,F403
 from .ros.client import *               # noqa: F401,F403
 from .ros.exceptions import *           # noqa: F401,F403
 from .ros.fileserver_loader import *    # noqa: F401,F403
+from .ros.planner import *              # noqa: F401,F403
 from .vrep.client import *              # noqa: F401,F403
 from .vrep.helpers import *             # noqa: F401,F403
+from .vrep.planner import *             # noqa: F401,F403
 
 __all__ = [name for name in dir() if not name.startswith('_')]

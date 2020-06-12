@@ -7,7 +7,8 @@ from __future__ import print_function
 
 from roslibpy import Topic
 
-from compas_fab.backends.client_interface import PlannerInterface, forward_docstring
+from compas_fab.backends.client_interface import forward_docstring
+from compas_fab.backends.client_interface import PlannerInterface
 from compas_fab.backends.ros.backend_features.move_it_add_attached_collision_mesh import MoveItAddAttachedCollisionMesh
 from compas_fab.backends.ros.backend_features.move_it_add_collision_mesh import MoveItAddCollisionMesh
 from compas_fab.backends.ros.backend_features.move_it_append_collision_mesh import MoveItAppendCollisionMesh

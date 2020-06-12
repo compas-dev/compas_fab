@@ -23,7 +23,7 @@ from compas_fab.backends.ros.messages import JointTrajectoryPoint as RosMsgJoint
 from compas_fab.backends.ros.messages import MoveItErrorCodes
 from compas_fab.backends.ros.messages import RobotTrajectory
 from compas_fab.backends.ros.messages import Time
-from compas_fab.backends.ros.move_it_planner import MoveItPlanner
+from compas_fab.backends.ros.planner import MoveItPlanner
 from compas_fab.backends.tasks import CancellableFutureResult
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotSemantics

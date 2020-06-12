@@ -36,28 +36,28 @@ class VrepPlanMotion(PlanMotion):
             group (:obj:`int`): Integer referencing the desired robot group.
             options (:obj:`dict`): Dictionary containing the following key-values pairs:
 
-                - num_joints (:obj:`int`) :: Number of configurable joints.
-                - metric_values (:obj:`list` of :obj:`float`) :: List containing one value
-                    per configurable joint. Each value ranges from 0 to 1,
-                    where 1 indicates the axis/joint is blocked and cannot
-                    move during inverse kinematic solving.
-                - collision_meshes (:obj:`list` of :class:`compas.datastructures.Mesh`) :: Collision meshes
-                    to be taken into account when calculating the motion plan.
-                    Defaults to ``None``.
-                - planner_id (:obj:`str`) :: Name of the planner to use. Defaults to ``rrtconnect``.
-                - trials (:obj:`int`) :: Number of search trials to run. Defaults to ``1``.
-                - resolution (:obj:`float`) :: Validity checking resolution. This value
-                    is specified as a fraction of the space's extent.
-                    Defaults to ``0.02``.
-                - gantry_joint_limits (:obj:`list` of `float`) :: List of 6 floats defining the upper/lower limits of
-                    gantry joints. Use this if you want to restrict the working area of the path planner.
-                - arm_joint_limits (:obj:`list` of `float`) :: List of 12 floats defining the upper/lower limits of
-                    arm joints. Use this if you want to restrict the working area of the path planner.
-                - shallow_state_search (:obj:`bool`) :: True to search only a minimum of
-                    valid states before searching a path, False to search states intensively.
-                - optimize_path_length (:obj:`bool`) :: True to search the path with minimal total length among all `trials`,
-                    False to return the first valid path found. It only affects the output if `trials > 1`.
-                - log (:class:`Logger`) :: Logger object to aid debugging. Default to ``None``.
+                - ``"num_joints"``: (:obj:`int`) Number of configurable joints.
+                - ``"metric_values"``: (:obj:`list` of :obj:`float`) List containing one value
+                  per configurable joint. Each value ranges from 0 to 1,
+                  where 1 indicates the axis/joint is blocked and cannot
+                  move during inverse kinematic solving.
+                - ``"collision_meshes"``: (:obj:`list` of :class:`compas.datastructures.Mesh`) Collision meshes
+                  to be taken into account when calculating the motion plan.
+                  Defaults to ``None``.
+                - ``"planner_id"``: (:obj:`str`) Name of the planner to use. Defaults to ``rrtconnect``.
+                - ``"trials"``: (:obj:`int`) Number of search trials to run. Defaults to ``1``.
+                - ``"resolution"``: (:obj:`float`) Validity checking resolution. This value
+                  is specified as a fraction of the space's extent.
+                  Defaults to ``0.02``.
+                - ``"gantry_joint_limits"``: (:obj:`list` of `float`) List of 6 floats defining the upper/lower limits of
+                  gantry joints. Use this if you want to restrict the working area of the path planner.
+                - ``"arm_joint_limits"``: (:obj:`list` of `float`) List of 12 floats defining the upper/lower limits of
+                  arm joints. Use this if you want to restrict the working area of the path planner.
+                - ``"shallow_state_search"``: (:obj:`bool`) True to search only a minimum of
+                  valid states before searching a path, False to search states intensively.
+                - ``"optimize_path_length"``: (:obj:`bool`) True to search the path with minimal total length among all `trials`,
+                  False to return the first valid path found. It only affects the output if `trials > 1`.
+                - ``"log"``: (:class:`Logger`) Logger object to aid debugging. Default to ``None``.
 
         Returns:
             list: List of :class:`Configuration` objects representing the
@@ -93,28 +93,28 @@ class VrepPlanMotion(PlanMotion):
             start_configuration (:obj:`None`): Unused parameter.
             options (:obj:`dict`): Dictionary containing the following key-values pairs:
 
-                - num_joints (:obj:`int`) : Number of configurable joints.
-                - metric_values (:obj:`list` of :obj:`float`) : List containing one value
-                    per configurable joint. Each value ranges from 0 to 1,
-                    where 1 indicates the axis/joint is blocked and cannot
-                    move during inverse kinematic solving.
-                - collision_meshes (:obj:`list` of :class:`compas.datastructures.Mesh`) : Collision meshes
-                    to be taken into account when calculating the motion plan.
-                    Defaults to ``None``.
-                - planner_id (:obj:`str`) : Name of the planner to use. Defaults to ``rrtconnect``.
-                - trials (:obj:`int`) : Number of search trials to run. Defaults to ``1``.
-                - resolution (:obj:`float`) : Validity checking resolution. This value
-                    is specified as a fraction of the space's extent.
-                    Defaults to ``0.02``.
-                - gantry_joint_limits (:obj:`list` of `float`) : List of 6 floats defining the upper/lower limits of
-                    gantry joints. Use this if you want to restrict the working area of the path planner.
-                - arm_joint_limits (:obj:`list` of `float`) : List of 12 floats defining the upper/lower limits of
-                    arm joints. Use this if you want to restrict the working area of the path planner.
-                - shallow_state_search (:obj:`bool`) : True to search only a minimum of
-                    valid states before searching a path, False to search states intensively.
-                - optimize_path_length (:obj:`bool`) : True to search the path with minimal total length among all `trials`,
-                    False to return the first valid path found. It only affects the output if `trials > 1`.
-                - log (:class:`Logger`) : Logger object to aid debugging. Default to ``None``.
+                - ``"num_joints"``: (:obj:`int`) Number of configurable joints.
+                - ``"metric_values"``: (:obj:`list` of :obj:`float`) List containing one value
+                  per configurable joint. Each value ranges from 0 to 1,
+                  where 1 indicates the axis/joint is blocked and cannot
+                  move during inverse kinematic solving.
+                - ``"collision_meshes"``: (:obj:`list` of :class:`compas.datastructures.Mesh`) Collision meshes
+                  to be taken into account when calculating the motion plan.
+                  Defaults to ``None``.
+                - ``"planner_id"``: (:obj:`str`) Name of the planner to use. Defaults to ``rrtconnect``.
+                - ``"trials"``: (:obj:`int`) Number of search trials to run. Defaults to ``1``.
+                - ``"resolution"``: (:obj:`float`) Validity checking resolution. This value
+                  is specified as a fraction of the space's extent.
+                  Defaults to ``0.02``.
+                - ``"gantry_joint_limits"``: (:obj:`list` of `float`) List of 6 floats defining the upper/lower limits of
+                  gantry joints. Use this if you want to restrict the working area of the path planner.
+                - ``"arm_joint_limits"``: (:obj:`list` of `float`) List of 12 floats defining the upper/lower limits of
+                  arm joints. Use this if you want to restrict the working area of the path planner.
+                - ``"shallow_state_search"``: (:obj:`bool`) True to search only a minimum of
+                  valid states before searching a path, False to search states intensively.
+                - ``"optimize_path_length"``: (:obj:`bool`) True to search the path with minimal total length among all `trials`,
+                  False to return the first valid path found. It only affects the output if `trials > 1`.
+                - ``"log"``: (:class:`Logger`) Logger object to aid debugging. Default to ``None``.
 
         Returns:
             list: List of :class:`Configuration` objects representing the
