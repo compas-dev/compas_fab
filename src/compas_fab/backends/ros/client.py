@@ -181,6 +181,7 @@ class RosClient(Ros):
         kwargs['avoid_collisions'] = avoid_collisions
         kwargs['constraints'] = constraints
         kwargs['attempts'] = attempts
+        kwargs['attached_collision_meshes'] = attached_collision_meshes
 
         kwargs['errback_name'] = 'errback'
 
