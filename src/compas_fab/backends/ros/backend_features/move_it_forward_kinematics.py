@@ -45,11 +45,11 @@ class MoveItForwardKinematics(ForwardKinematics):
         options : dict, optional
             Dictionary containing the following key-value pairs:
 
-            - backend :: None or str
+            - backend (:obj:`str`) :
                 If `None` calculates fk with the client if it exists or with the robot model.
                 If 'model' use the robot model to calculate fk. Anything else is open
                 for implementation, possibly 'kdl', 'ikfast'
-            - ee_link :: str, optional
+            - ee_link (:obj:`str`, optional) :
                 The name of the link to calculate the forward kinematics for.
                 Defaults to the group's end effector link.
 

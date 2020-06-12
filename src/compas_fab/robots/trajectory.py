@@ -147,7 +147,7 @@ class JointTrajectory(Trajectory):
     start_configuration: :class:`Configuration`
         Start configuration for the trajectory.
     fraction: float
-        Indicates the percentage of requested trajectory that was calcuted,
+        Indicates the percentage of requested trajectory that was calculated,
         e.g. ``1`` means the full trajectory was found.
     """
 

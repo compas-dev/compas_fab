@@ -20,7 +20,7 @@ class VrepRemoveCollisionMesh(RemoveCollisionMesh):
         """Removes objects from the 3D scene.
 
         Args:
-            id (:obj:`list` of :obj:`int`): Object handles to remove.
+            id (:obj:`list` of :obj:`int`) : Object handles to remove.
 
         .. note::
             Please note there's no need to clean up objects manually after the simulation

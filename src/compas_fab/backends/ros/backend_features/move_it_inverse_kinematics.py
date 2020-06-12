@@ -51,16 +51,16 @@ class MoveItInverseKinematics(InverseKinematics):
         options: dict, optional
             Dictionary containing the following key-value pairs:
 
-            - base_link (:obj:`str`) :: Name of the base link.
-            - avoid_collisions :: bool, optional
+            - base_link (:obj:`str`) : Name of the base link.
+            - avoid_collisions (:obj:`bool`, optional) :
                 Whether or not to avoid collisions. Defaults to `True`.
-            - constraints :: list of :class:`compas_fab.robots.Constraint`, optional
+            - constraints (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional) :
                 A set of constraints that the request must obey. Defaults to `None`.
-            - attempts :: int, optional
+            - attempts (:obj:`int`, optional) :
                 The maximum number of inverse kinematic attempts. Defaults to `8`.
-            - attached_collision_meshes :: list of :class:`compas_fab.robots.AttachedCollisionMesh`
+            - attached_collision_meshes (:obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`, optional) :
                 Defaults to `None`.
-            - return_full_configuration :: bool
+            - return_full_configuration (:obj:`bool`, optional) :
                 If ``True``, returns a full configuration with all joint values
                 specified, including passive ones if available.
 

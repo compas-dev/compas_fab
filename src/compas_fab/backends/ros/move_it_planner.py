@@ -7,7 +7,7 @@ from __future__ import print_function
 
 from roslibpy import Topic
 
-from compas_fab.backends.client_interface import PlannerInterface
+from compas_fab.backends.client_interface import PlannerInterface, forward_docstring
 from compas_fab.backends.ros.backend_features.move_it_add_attached_collision_mesh import MoveItAddAttachedCollisionMesh
 from compas_fab.backends.ros.backend_features.move_it_add_collision_mesh import MoveItAddCollisionMesh
 from compas_fab.backends.ros.backend_features.move_it_append_collision_mesh import MoveItAppendCollisionMesh
@@ -27,22 +27,51 @@ class MoveItPlanner(PlannerInterface):
 
     def __init__(self, client):
         super(MoveItPlanner, self).__init__(client)
-        self.inverse_kinematics = MoveItInverseKinematics(self.client)
-        self.forward_kinematics = MoveItForwardKinematics(self.client)
-        self.plan_cartesian_motion = MoveItPlanCartesianMotion(self.client)
-        self.plan_motion = MoveItPlanMotion(self.client)
-        self.get_planning_scene = MoveItPlanningScene(self.client)
-        self.add_collision_mesh = MoveItAddCollisionMesh(self.client)
-        self.remove_collision_mesh = MoveItRemoveCollisionMesh(self.client)
-        self.append_collision_mesh = MoveItAppendCollisionMesh(self.client)
-        self.add_attached_collision_mesh = MoveItAddAttachedCollisionMesh(self.client)
-        self.remove_attached_collision_mesh = MoveItRemoveAttachedCollisionMesh(self.client)
-
         self.collision_object_topic = None
         self.attached_collision_object_topic = None
 
         self.client.on_ready(self.init_planner)
         # self.client.on_closing(self.dispose_planner)
+
+    @forward_docstring(MoveItForwardKinematics)
+    def forward_kinematics(self, *args, **kwargs):
+        return MoveItForwardKinematics(self.client)(*args, **kwargs)
+
+    @forward_docstring(MoveItInverseKinematics)
+    def inverse_kinematics(self, *args, **kwargs):
+        return MoveItInverseKinematics(self.client)(*args, **kwargs)
+
+    @forward_docstring(MoveItPlanCartesianMotion)
+    def plan_cartesian_motion(self, *args, **kwargs):
+        return MoveItPlanCartesianMotion(self.client)(*args, **kwargs)
+
+    @forward_docstring(MoveItPlanMotion)
+    def plan_motion(self, *args, **kwargs):
+        return MoveItPlanMotion(self.client)(*args, **kwargs)
+
+    @forward_docstring(MoveItPlanningScene)
+    def get_planning_scene(self, *args, **kwargs):
+        return MoveItPlanningScene(self.client)(*args, **kwargs)
+
+    @forward_docstring(MoveItAddCollisionMesh)
+    def add_collision_mesh(self, *args, **kwargs):
+        return MoveItAddCollisionMesh(self.client)(*args, **kwargs)
+
+    @forward_docstring(MoveItRemoveCollisionMesh)
+    def remove_collision_mesh(self, *args, **kwargs):
+        return MoveItRemoveCollisionMesh(self.client)(*args, **kwargs)
+
+    @forward_docstring(MoveItAppendCollisionMesh)
+    def append_collision_mesh(self, *args, **kwargs):
+        return MoveItAppendCollisionMesh(self.client)(*args, **kwargs)
+
+    @forward_docstring(MoveItAddAttachedCollisionMesh)
+    def add_attached_collision_mesh(self, *args, **kwargs):
+        return MoveItAddAttachedCollisionMesh(self.client)(*args, **kwargs)
+
+    @forward_docstring(MoveItRemoveAttachedCollisionMesh)
+    def remove_attached_collision_mesh(self, *args, **kwargs):
+        return MoveItRemoveAttachedCollisionMesh(self.client)(*args, **kwargs)
 
     def init_planner(self, *args, **kwargs):
         self.advertise_collision_object()

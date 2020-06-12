@@ -327,7 +327,7 @@ class Robot(object):
 
         Parameters
         ----------
-        name: list of str
+        names: list of str
             The names of the joints.
 
         Returns

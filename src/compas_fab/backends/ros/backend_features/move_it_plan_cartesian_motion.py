@@ -53,26 +53,26 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         options: dict, optional
             Dictionary containing the following key-value pairs:
 
-            - base_link (:obj:`str`) :: Name of the base link.
-            - ee_link (:obj:`str`) :: Name of the end effector link.
-            - joint_names (:obj:`list` of :obj:`str`) :: List containing joint names.
-            - joint_types (:obj:`list` of :obj:`str`) :: List containing joint types.
-            - max_step :: float, optional
+            - base_link (:obj:`str`) : Name of the base link.
+            - ee_link (:obj:`str`) : Name of the end effector link.
+            - joint_names (:obj:`list` of :obj:`str`) : List containing joint names.
+            - joint_types (:obj:`list` of :obj:`str`) : List containing joint types.
+            - max_step (:obj:`float`, optional) :
                 The approximate distance between the calculated points. (Defined in
                 the robot's units.) Defaults to `0.01`.
-            - jump_threshold :: float, optional
+            - jump_threshold (:obj:`float`, optional) :
                 The maximum allowed distance of joint positions between consecutive
                 points. If the distance is found to be above this threshold, the
                 path computation fails. It must be specified in relation to max_step.
                 If this threshold is 0, 'jumps' might occur, resulting in an invalid
                 cartesian path. Defaults to pi/2.
-            - avoid_collisions :: bool, optional
+            - avoid_collisions (:obj:`bool`, optional) :
                 Whether or not to avoid collisions. Defaults to `True`.
-            - path_constraints :: list of :class:`compas_fab.robots.Constraint`, optional
+            - path_constraints (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional) :
                 Optional constraints that can be imposed along the solution path.
                 Note that path calculation won't work if the start_configuration
                 violates these constraints. Defaults to `None`.
-            - attached_collision_meshes :: list of :class:`compas_fab.robots.AttachedCollisionMesh`
+            - attached_collision_meshes (:obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`) :
                 Defaults to `None`.
 
         Returns

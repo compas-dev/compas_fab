@@ -3,21 +3,39 @@ from __future__ import division
 from __future__ import print_function
 
 
+def forward_docstring(backend_feature):
+    def dec(obj):
+        obj.__doc__ = backend_feature.__dict__[obj.__name__].__doc__
+        return obj
+    return dec
+
+
 class ClientInterface(object):
+    """Interface for all backend clients.  Forwards all planning services and
+    planning scene management to the Planner.
+    """
     def __init__(self):
         self.planner = PlannerInterface(self)
         # self.control = ControlInterface()
 
+    # ==========================================================================
+    # planning services
+    # ==========================================================================
+
     def inverse_kinematics(self, *args, **kwargs):
+        """Forwards call to appropriate method in the planner."""
         return self.planner.inverse_kinematics(*args, **kwargs)
 
     def forward_kinematics(self, *args, **kwargs):
+        """Forwards call to appropriate method in the planner."""
         return self.planner.forward_kinematics(*args, **kwargs)
 
     def plan_cartesian_motion(self, *args, **kwargs):
+        """Forwards call to appropriate method in the planner."""
         return self.planner.plan_cartesian_motion(*args, **kwargs)
 
     def plan_motion(self, *args, **kwargs):
+        """Forwards call to appropriate method in the planner."""
         return self.planner.plan_motion(*args, **kwargs)
 
     # ==========================================================================
@@ -25,21 +43,27 @@ class ClientInterface(object):
     # ==========================================================================
 
     def get_planning_scene(self, *args, **kwargs):
+        """Forwards call to appropriate method in the planner."""
         return self.planner.get_planning_scene(*args, **kwargs)
 
     def add_collision_mesh(self, *args, **kwargs):
+        """Forwards call to appropriate method in the planner."""
         return self.planner.add_collision_mesh(*args, **kwargs)
 
     def remove_collision_mesh(self, *args, **kwargs):
+        """Forwards call to appropriate method in the planner."""
         return self.planner.remove_collision_mesh(*args, **kwargs)
 
     def append_collision_mesh(self, *args, **kwargs):
+        """Forwards call to appropriate method in the planner."""
         return self.planner.append_collision_mesh(*args, **kwargs)
 
     def add_attached_collision_mesh(self, *args, **kwargs):
+        """Forwards call to appropriate method in the planner."""
         return self.planner.add_attached_collision_mesh(*args, **kwargs)
 
     def remove_attached_collision_mesh(self, *args, **kwargs):
+        """Forwards call to appropriate method in the planner."""
         return self.planner.remove_attached_collision_mesh(*args, **kwargs)
 
 #     # ==========================================================================
@@ -68,6 +92,10 @@ class ClientInterface(object):
 
 
 class PlannerInterface(object):
+    """Interface for all Planners associated with a backend client.  Provides default
+    behavior for all planning services and planning scene management methods.  To be
+    use in conjunction with backend feature interfaces.
+    """
     def __init__(self, client):
         super(PlannerInterface, self).__init__()
         self.client = client
@@ -77,15 +105,27 @@ class PlannerInterface(object):
     # ==========================================================================
 
     def inverse_kinematics(self, *args, **kwargs):
+        """Default method for planner.  May be overridden in a
+        specific Planner's implementation.
+        """
         raise Exception('Assigned planner does not have this feature.')
 
     def forward_kinematics(self, *args, **kwargs):
+        """Default method for planner.  May be overridden in a
+        specific Planner's implementation.
+        """
         raise Exception('Assigned planner does not have this feature.')
 
     def plan_motion(self, *args, **kwargs):
+        """Default method for planner.  May be overridden in a
+        specific Planner's implementation.
+        """
         raise Exception('Assigned planner does not have this feature.')
 
     def plan_cartesian_motion(self, *args, **kwargs):
+        """Default method for planner.  May be overridden in a
+        specific Planner's implementation.
+        """
         raise Exception('Assigned planner does not have this feature.')
 
     # ==========================================================================
@@ -93,19 +133,37 @@ class PlannerInterface(object):
     # ==========================================================================
 
     def get_planning_scene(self, *args, **kwargs):
+        """Default method for planner.  May be overridden in a
+        specific Planner's implementation.
+        """
         raise Exception('Assigned planner does not have this feature.')
 
     def add_collision_mesh(self, *args, **kwargs):
+        """Default method for planner.  May be overridden in a
+        specific Planner's implementation.
+        """
         raise Exception('Assigned planner does not have this feature.')
 
     def remove_collision_mesh(self, *args, **kwargs):
+        """Default method for planner.  May be overridden in a
+        specific Planner's implementation.
+        """
         raise Exception('Assigned planner does not have this feature.')
 
     def append_collision_mesh(self, *args, **kwargs):
+        """Default method for planner.  May be overridden in a
+        specific Planner's implementation.
+        """
         raise Exception('Assigned planner does not have this feature.')
 
     def add_attached_collision_mesh(self, *args, **kwargs):
+        """Default method for planner.  May be overridden in a
+        specific Planner's implementation.
+        """
         raise Exception('Assigned planner does not have this feature.')
 
     def remove_attached_collision_mesh(self, *args, **kwargs):
+        """Default method for planner.  May be overridden in a
+        specific Planner's implementation.
+        """
         raise Exception('Assigned planner does not have this feature.')

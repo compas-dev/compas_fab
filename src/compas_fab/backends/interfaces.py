@@ -7,6 +7,13 @@ from abc import abstractmethod
 
 
 class ForwardKinematics(object):
+    """Interface for a Planner's forward kinematics feature.  Any implementation of
+    ``ForwardKinematics`` must define the method ``forward_kinematics``.  The
+    ``__call__`` magic method allows an instance of an implementation of
+    ``ForwardKinematics`` to be treated as its ``forward_kinematics`` method.  See
+    <https://docs.python.org/3/reference/datamodel.html#object.__call__ >and
+    <https://en.wikipedia.org/wiki/Function_object#In_Python.>
+    """
     __metaclass__ = ABCMeta
 
     def __call__(self, configuration, group=None, options=None):
