@@ -12,6 +12,8 @@ __all__ = [
 
 
 class VrepAddCollisionMesh(AddCollisionMesh):
+    """Callable to add a mesh to the 3D scene.
+    """
     def __init__(self, client):
         self.client = client
 
@@ -21,6 +23,7 @@ class VrepAddCollisionMesh(AddCollisionMesh):
         Args:
             collision_mesh (:obj:`list` of :class:`compas.datastructures.Mesh`): List
                 of meshes to add to the current simulation scene.
+            options (:obj:`dict`): Unused parameter.
 
         Returns:
             list: List of object handles (identifiers) assigned to the meshes.

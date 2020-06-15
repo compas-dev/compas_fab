@@ -40,15 +40,11 @@ class MoveItForwardKinematics(ForwardKinematics):
             full configuration is passed, the zero-joint state for the other
             configurable joints is assumed.
         group : str, optional
-            The planning group used for the calculation. Defaults to the robot's
-            main planning group.
+            Unused parameter.
         options : dict, optional
             Dictionary containing the following key-value pairs:
 
-            - ``"backend"``: (:obj:`str`) If `None` calculates fk with the client if
-              it exists or with the robot model. If 'model' use the robot model to
-              calculate fk. Anything else is open for implementation,
-              possibly 'kdl', 'ikfast'.
+            - ``"base_link"``: (:obj:`str`) The name of the base link.
             - ``"ee_link"``: (:obj:`str`, optional) The name of the link to
               calculate the forward kinematics for. Defaults to the group's end
               effector link.
@@ -60,7 +56,6 @@ class MoveItForwardKinematics(ForwardKinematics):
         """
         kwargs = {}
         kwargs['configuration'] = configuration
-        kwargs['group'] = group
         kwargs['options'] = options or {}
 
         kwargs['errback_name'] = 'errback'
@@ -68,7 +63,7 @@ class MoveItForwardKinematics(ForwardKinematics):
         return await_callback(self.forward_kinematics_async, **kwargs)
 
     def forward_kinematics_async(self, callback, errback,
-                                 configuration, group, options):
+                                 configuration, options):
         """Asynchronous handler of MoveIt FK service."""
         base_link = options['base_link']
         header = Header(frame_id=base_link)

@@ -14,6 +14,8 @@ __all__ = [
 
 
 class VrepAddAttachedCollisionMesh(AddAttachedCollisionMesh):
+    """Callable to add a building member to the 3D scene and attach it to the robot.
+    """
     def __init__(self, client):
         self.client = client
 

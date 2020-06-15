@@ -16,6 +16,7 @@ __all__ = [
 
 
 class MoveItPlanningScene(GetPlanningScene):
+    """Callable to retrieve the planning scene."""
     GET_PLANNING_SCENE = ServiceDescription('/get_planning_scene',
                                             'GetPlanningScene',
                                             GetPlanningSceneRequest,
@@ -25,6 +26,17 @@ class MoveItPlanningScene(GetPlanningScene):
         self.ros_client = ros_client
 
     def get_planning_scene(self, options=None):
+        """Retrieve the planning scene.
+
+        Parameters
+        ----------
+        options : dict, optional
+            Unused parameter.
+
+        Returns
+        -------
+        :class:`compas_fab.backends.ros.messages.moveit_msgs.PlanningScene`
+        """
         kwargs = {}
         kwargs['errback_name'] = 'errback'
 

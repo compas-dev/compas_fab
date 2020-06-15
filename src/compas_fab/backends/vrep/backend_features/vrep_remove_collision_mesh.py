@@ -13,6 +13,8 @@ __all__ = [
 
 
 class VrepRemoveCollisionMesh(RemoveCollisionMesh):
+    """Callable to remove collision meshes from the 3D scene.
+    """
     def __init__(self, client):
         self.client = client
 

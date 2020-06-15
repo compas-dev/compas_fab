@@ -4,7 +4,9 @@
 A Note on Backend Client Architecture
 *******************************************************************************
 
-Any new backend client should inherit from ``ClientInterface`` and
+To maintain consistency from one backend client to another and to promote
+modularity, we make use of several interfaces.  Any new backend client
+should inherit from ``ClientInterface`` and
 make use of the ``PlannerInterface``.  Methods for connecting,
 disconnecting, and generally managing the client state are a part
 of the client, while any methods for planning, scene management or
@@ -17,8 +19,8 @@ The ``PlannerInterface`` serves as a template for any client-specific
 planner, providing default behavior for each of the
 methods listed within.  When a developer wishes to override any
 of these defaults, they should make use of the appropriate backend
-feature interface from backends/interfaces.py.  The file
-interfaces.py consists of a collection of classes, any
+feature interface from ``backends/interfaces.py``.  The file
+``interfaces.py`` consists of a collection of classes, any
 implementation of which is callable through its ``__call__`` magic
 method.  For example:
 
@@ -45,15 +47,19 @@ can be instantiated and called in the following manner:
     # or equivalently:
     ik_result = calculate_example_ik.inverse_kinematics(frame)
 
+
 These backend feature interfaces exist in part to enforce a common
 signature across all implementations of, say,
-``inverse_kinematics`` for greater end-user ease, as well as to
-allow mixing and matching of the backend features of various clients
-to suit the performance and overhead requirements of the end-user.  To
-illustrate this last point, consider the following example, where the
-backend of ``ClientA`` is very efficient at computing inverse kinematics
-and has no feature to plan motion, while the backend of ``ClientB`` is
-slow to compute inverse kinematics but can plan motion:
+``inverse_kinematics`` for greater end-user ease.  Please adhere to the
+types listed for the arguments and return values listed in the documentation
+for the backend features as much as possible.
+
+These interfaces as exist to allow mixing and matching of the backend
+features of various clients to suit the performance and overhead
+requirements of the end-user.  To illustrate this last point, consider the
+following example, where the backend of ``ClientA`` is very efficient at
+computing inverse kinematics and has no feature to plan motion, while the
+backend of ``ClientB`` is slow to compute inverse kinematics but can plan motion:
 
 .. code-block:: python
 
@@ -68,10 +74,10 @@ of ``ClientA``, while the motion planning is calculated by the backend of
 ``ClientBPlanMotion`` inherit from ``InverseKinematics`` and
 ``PlanMotion``, resp.)
 
-Contents
-========
+Interfaces
+==========
 
 .. toctree::
     :maxdepth: 2
 
-    backend_features
+    interfaces

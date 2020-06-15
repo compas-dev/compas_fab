@@ -2,6 +2,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+__all__ = [
+    'ClientInterface',
+    'PlannerInterface',
+]
+
 
 def forward_docstring(backend_feature):
     def dec(obj):
@@ -12,7 +17,7 @@ def forward_docstring(backend_feature):
 
 class ClientInterface(object):
     """Interface for all backend clients.  Forwards all planning services and
-    planning scene management to the Planner.
+    planning scene management to the planner.
     """
     def __init__(self):
         self.planner = PlannerInterface(self)
@@ -92,7 +97,7 @@ class ClientInterface(object):
 
 
 class PlannerInterface(object):
-    """Interface for all Planners associated with a backend client.  Provides default
+    """Interface for all planners associated with a backend client.  Provides default
     behavior for all planning services and planning scene management methods.  To be
     use in conjunction with backend feature interfaces.
     """
@@ -105,26 +110,42 @@ class PlannerInterface(object):
     # ==========================================================================
 
     def inverse_kinematics(self, *args, **kwargs):
-        """Default method for planner.  May be overridden in a
-        specific Planner's implementation.
+        """Default method for planner.
+
+        Raises
+        ------
+        Exception
+            Planner does not have this feature.
         """
         raise Exception('Assigned planner does not have this feature.')
 
     def forward_kinematics(self, *args, **kwargs):
-        """Default method for planner.  May be overridden in a
-        specific Planner's implementation.
+        """Default method for planner.
+
+        Raises
+        ------
+        Exception
+            Planner does not have this feature.
         """
         raise Exception('Assigned planner does not have this feature.')
 
     def plan_motion(self, *args, **kwargs):
-        """Default method for planner.  May be overridden in a
-        specific Planner's implementation.
+        """Default method for planner.
+
+        Raises
+        ------
+        Exception
+            Planner does not have this feature.
         """
         raise Exception('Assigned planner does not have this feature.')
 
     def plan_cartesian_motion(self, *args, **kwargs):
-        """Default method for planner.  May be overridden in a
-        specific Planner's implementation.
+        """Default method for planner.
+
+        Raises
+        ------
+        Exception
+            Planner does not have this feature.
         """
         raise Exception('Assigned planner does not have this feature.')
 
@@ -133,37 +154,61 @@ class PlannerInterface(object):
     # ==========================================================================
 
     def get_planning_scene(self, *args, **kwargs):
-        """Default method for planner.  May be overridden in a
-        specific Planner's implementation.
+        """Default method for planner.
+
+        Raises
+        ------
+        Exception
+            Planner does not have this feature.
         """
         raise Exception('Assigned planner does not have this feature.')
 
     def add_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.  May be overridden in a
-        specific Planner's implementation.
+        """Default method for planner.
+
+        Raises
+        ------
+        Exception
+            Planner does not have this feature.
         """
         raise Exception('Assigned planner does not have this feature.')
 
     def remove_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.  May be overridden in a
-        specific Planner's implementation.
+        """Default method for planner.
+
+        Raises
+        ------
+        Exception
+            Planner does not have this feature.
         """
         raise Exception('Assigned planner does not have this feature.')
 
     def append_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.  May be overridden in a
-        specific Planner's implementation.
+        """Default method for planner.
+
+        Raises
+        ------
+        Exception
+            Planner does not have this feature.
         """
         raise Exception('Assigned planner does not have this feature.')
 
     def add_attached_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.  May be overridden in a
-        specific Planner's implementation.
+        """Default method for planner.
+
+        Raises
+        ------
+        Exception
+            Planner does not have this feature.
         """
         raise Exception('Assigned planner does not have this feature.')
 
     def remove_attached_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.  May be overridden in a
-        specific Planner's implementation.
+        """Default method for planner.
+
+        Raises
+        ------
+        Exception
+            Planner does not have this feature.
         """
         raise Exception('Assigned planner does not have this feature.')

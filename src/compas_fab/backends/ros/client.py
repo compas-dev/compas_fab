@@ -8,7 +8,7 @@ from roslibpy import Ros
 from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
-from compas_fab.backends.client_interface import ClientInterface
+from compas_fab.backends.interfaces.client import ClientInterface
 from compas_fab.backends.ros.exceptions import RosError
 from compas_fab.backends.ros.fileserver_loader import RosFileServerLoader
 from compas_fab.backends.ros.messages import ExecuteTrajectoryFeedback
@@ -121,7 +121,8 @@ class RosClient(Ros, ClientInterface):
         ``True`` to indicate it should use a secure web socket, otherwise ``False``.
     planner_backend: str
         Name of the planner backend plugin to use. The plugin must be a sub-class of
-        :class:`PlannerInterface`. Defaults to :class:`MoveItPLanner`.
+        :class:`compas_fab.backends.PlannerInterface`. Defaults to ``"moveit"``,
+        making use of :class:`compas_fab.backends.MoveItPlanner`.
 
     Examples
     --------

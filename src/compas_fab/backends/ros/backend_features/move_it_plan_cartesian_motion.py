@@ -58,21 +58,21 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
             - ``"joint_names"``: (:obj:`list` of :obj:`str`) List containing joint names.
             - ``"joint_types"``: (:obj:`list` of :obj:`str`) List containing joint types.
             - ``"max_step"``: (:obj:`float`, optional) The approximate distance between the
-              calculated points. (Defined in the robot's units.) Defaults to `0.01`.
+              calculated points. (Defined in the robot's units.) Defaults to ``0.01``.
             - ``"jump_threshold"``: (:obj:`float`, optional)
               The maximum allowed distance of joint positions between consecutive
               points. If the distance is found to be above this threshold, the
               path computation fails. It must be specified in relation to max_step.
-              If this threshold is 0, 'jumps' might occur, resulting in an invalid
-              cartesian path. Defaults to pi/2.
+              If this threshold is ``0``, 'jumps' might occur, resulting in an invalid
+              cartesian path. Defaults to :math:`\\pi / 2`.
             - ``"avoid_collisions"``: (:obj:`bool`, optional)
-              Whether or not to avoid collisions. Defaults to `True`.
+              Whether or not to avoid collisions. Defaults to ``True``.
             - ``"path_constraints"``: (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional)
               Optional constraints that can be imposed along the solution path.
               Note that path calculation won't work if the start_configuration
-              violates these constraints. Defaults to `None`.
+              violates these constraints. Defaults to ``None``.
             - ``"attached_collision_meshes"``: (:obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`)
-              Defaults to `None`.
+              Defaults to ``None``.
 
         Returns
         -------
@@ -94,7 +94,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
         joint_names = options['joint_names']
         joint_types = options['joint_types']
-        joint_type_by_name = dict(zip(joint_names, joint_types))  # should this go somewhere else? does it already exist somewhere else?
+        joint_type_by_name = dict(zip(joint_names, joint_types))
 
         header = Header(frame_id=options['base_link'])
         waypoints = [Pose.from_frame(frame) for frame in frames_WCF]

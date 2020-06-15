@@ -60,9 +60,6 @@ class MoveItInverseKinematics(InverseKinematics):
               Defaults to `8`.
             - ``"attached_collision_meshes"``: (:obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`, optional)
               Defaults to `None`.
-            - ``"return_full_configuration"``: (:obj:`bool`, optional) If ``True``,
-              returns a full configuration with all joint values
-              specified, including passive ones if available.
 
         Raises
         ------

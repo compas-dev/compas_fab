@@ -63,24 +63,24 @@ class MoveItPlanMotion(PlanMotion):
             - ``"path_constraints"``: (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional)
               Optional constraints that can be imposed along the solution path.
               Note that path calculation won't work if the start_configuration
-              violates these constraints. Defaults to `None`.
+              violates these constraints. Defaults to ``None``.
             - ``"planner_id"``: (:obj:`str`)
-              The name of the algorithm used for path planning. Defaults to 'RRT'.
+              The name of the algorithm used for path planning. Defaults to ``"RRT"``.
             - ``"num_planning_attempts"``: (:obj:`int`, optional)
               Normally, if one motion plan is needed, one motion plan is computed.
               However, for algorithms that use randomization in their execution
               (like 'RRT'), it is likely that different planner executions will
               produce different solutions. Setting this parameter to a value above
-              1 will run many additional motion plans, and will report the
-              shortest solution as the final result. Defaults to `1`.
+              ``1`` will run many additional motion plans, and will report the
+              shortest solution as the final result. Defaults to ``1``.
             - ``'allowed_planning_time'``: (:obj:`float`)
-              The number of seconds allowed to perform the planning. Defaults to `2`.
+              The number of seconds allowed to perform the planning. Defaults to ``2``.
             - ``"max_velocity_scaling_factor"``: (:obj:`float`)
-              Defaults to `1`.
+              Defaults to ``1``.
             - ``"max_acceleration_scaling_factor"``: (:obj:`float`)
-              Defaults to `1`.
+              Defaults to ``1``.
             - ``"attached_collision_meshes"``: (:obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`)
-              Defaults to `None`.
+              Defaults to ``None``.
 
         Returns
         -------

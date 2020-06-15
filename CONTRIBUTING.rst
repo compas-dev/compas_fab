@@ -92,4 +92,6 @@ The best way to send feedback is to file an issue on
 A Note on Architecture for Backend Clients
 ------------------------------------------
 
-:ref:`Note on Architecture <architecture>`
+To maintain consistency from one backend client to another and to promote modularity,
+we make use of several interfaces.  Please reference :ref:`Note on Architecture <architecture>`
+for more details on how to add or amend a backend client.
