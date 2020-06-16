@@ -31,7 +31,7 @@ jobs:
       before_install:
         - choco install curl
         - mkdir /certs
-        - https://curl.haxx.se/ca/cacert.pem --output /certs/cacert.pem
+        - curl https://curl.haxx.se/ca/cacert.pem --output /certs/cacert.pem
         - choco install python --version=3.8.0
         - pip3 install --user --upgrade pip
         - pip3 install cython --install-option="--no-cython-compile"
