@@ -13,9 +13,18 @@ Unreleased
 
 **Added**
 
+* Added ``ClientInterface``, ``PlannerInterface`` and various backend feature interfaces
+* Added implementations of these interfaces for ROS and V-REP
+
 **Changed**
 
+* Backend clients have been restructured according to the new interfaces
+* The signatures of all kinematics, motion planning and planning scene management methods have been homogenized across backend clients and within ``Robot``
+* All examples have been updated to reflect these changes
+
 **Fixed**
+
+* Attached collision meshes are included in inverse kinematics calculations in ROS
 
 **Deprecated**
 
