@@ -10,6 +10,8 @@ import compas
 from compas._os import system
 import pybullet
 
+from compas_fab.backends.interfaces.client import ClientInterface
+
 from .const import BASE_LINK_ID
 from .const import BodyInfo
 from .const import GREY
@@ -20,11 +22,10 @@ from .const import RED
 from .const import STATIC_MASS
 from .const import ZERO_FRAME
 from .hide_output import HideOutput
-from .planner_backend_pybullet import PyBulletPlanner
+from .planner import PyBulletPlanner
 from .utils import LOG
 from .conversions import frame_from_pose
 from .conversions import pose_from_frame
-from ..client import ClientInterface
 
 
 __all__ = [
