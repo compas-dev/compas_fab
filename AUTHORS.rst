@@ -23,7 +23,9 @@ If you use COMPAS FAB in a project, please use the following citation:
             },
         howpublished={https://github.com/compas-dev/compas\_fab/},
         note={Gramazio Kohler Research, ETH Z\"{u}rich},
-        year={2018}
+        year={2018},
+        doi={10.5281/zenodo.3469478},
+        url={https://doi.org/10.5281/zenodo.3469478},
     }
 
 Authors

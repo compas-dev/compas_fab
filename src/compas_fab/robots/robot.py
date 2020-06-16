@@ -405,7 +405,10 @@ class Robot(object):
     # ==========================================================================
 
     def zero_configuration(self, group=None):
-        """Returns the init joint configuration.
+        """Returns the zero joint configuration.
+
+        If zero is out of joint limits (upper, lower), (upper + lower)/2 is used
+        as joint value.
 
         Examples
         --------
@@ -413,10 +416,17 @@ class Robot(object):
         Configuration((0.000, 0.000, 0.000, 0.000, 0.000, 0.000), (0, 0, 0, 0, 0, 0), \
             ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))
         """
-        joint_names = self.get_configurable_joint_names(group)
-        joint_types = self.get_joint_types_by_names(joint_names)
-        positions = [0.] * len(joint_types)
-        return Configuration(positions, joint_types, joint_names)
+        values = []
+        joint_names = []
+        joint_types = []
+        for joint in self.get_configurable_joints(group):
+            if joint.limit and not (0 <= joint.limit.upper and 0 >= joint.limit.lower):
+                values.append((joint.limit.upper + joint.limit.lower)/2.)
+            else:
+                values.append(0)
+            joint_names.append(joint.name)
+            joint_types.append(joint.type)
+        return Configuration(values, joint_types, joint_names)
 
     def random_configuration(self, group=None):
         """Returns a random configuration.
@@ -558,7 +568,7 @@ class Robot(object):
 
         """
         base_frame = self.get_base_frame(group)
-        return Transformation.change_basis(base_frame, Frame.worldXY())
+        return Transformation.from_change_of_basis(base_frame, Frame.worldXY())
 
     def transformation_WCF_RCF(self, group=None):
         """Returns the transformation from the world coordinate system (WCF) to the robot's coordinate system (RCF).
@@ -574,7 +584,7 @@ class Robot(object):
 
         """
         base_frame = self.get_base_frame(group)
-        return Transformation.change_basis(Frame.worldXY(), base_frame)
+        return Transformation.from_change_of_basis(Frame.worldXY(), base_frame)
 
     def set_RCF(self, robot_coordinate_frame, group=None):
         """Moves the origin frame of the robot to the robot_coordinate_frame.
@@ -588,7 +598,7 @@ class Robot(object):
         """
         return self.get_base_frame(group)
 
-    def to_local_coords(self, frame_WCF, group=None):
+    def to_local_coordinates(self, frame_WCF, group=None):
         """Represents a frame from the world coordinate system (WCF) in the robot's coordinate system (RCF).
 
         Parameters
@@ -604,14 +614,14 @@ class Robot(object):
         Examples
         --------
         >>> frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
-        >>> frame_RCF = robot.to_local_coords(frame_WCF)
+        >>> frame_RCF = robot.to_local_coordinates(frame_WCF)
         >>> frame_RCF
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
         """
         frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
         return frame_RCF
 
-    def to_world_coords(self, frame_RCF, group=None):
+    def to_world_coordinates(self, frame_RCF, group=None):
         """Represents a frame from the robot's coordinate system (RCF) in the world coordinate system (WCF).
 
         Parameters
@@ -627,7 +637,7 @@ class Robot(object):
         Examples
         --------
         >>> frame_RCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
-        >>> frame_WCF = robot.to_world_coords(frame_RCF)
+        >>> frame_WCF = robot.to_world_coordinates(frame_RCF)
         >>> frame_WCF
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
         """

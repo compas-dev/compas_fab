@@ -58,11 +58,9 @@ We could always use more documentation, whether as part of the
 introduction/examples/usage documentation or API documentation in docstrings.
 
 Documentation is written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_
-and use `Sphinx <http://sphinx-doc.org/index.html>`_ to generate the HTML output.
-
-The project uses Numpy style docstrings, see
-`Sphinx extension Napoleon's documentation <https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html>`_
-for examples.
+and use `Sphinx <http://sphinx-doc.org/index.html>`_ with
+`numpy-style docstrings <https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html>`_
+to generate the HTML output.
 
 Once you made the documentation changes locally, run the documentation generation::
 

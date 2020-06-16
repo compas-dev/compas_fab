@@ -112,15 +112,14 @@ before sending it as a target pose to the robot.
     frame_WCF = Frame(point, xaxis, yaxis)
     print("frame in WCF", frame_WCF)
 
-    frame_RCF = robot.to_local_coords(frame_WCF)
+    frame_RCF = robot.to_local_coordinates(frame_WCF)
     print("frame in RCF", frame_RCF)
 
-    frame_WCF = robot.to_world_coords(frame_RCF)
+    frame_WCF = robot.to_world_coordinates(frame_RCF)
     print("frame in WCF", frame_WCF)
 
 Links
 =====
 
 * `ROS REP-105: Coordinate Frames for Mobile Platforms <http://www.ros.org/reps/rep-0105.html#id15>`_
-* `ABB: What is a coordinate system? <http://developercenter.robotstudio.com/blobproxy/devcenter/RobotStudio/html/4eac08e9-c42c-446f-bbd4-228e523dd2d5.htm>`_
 
