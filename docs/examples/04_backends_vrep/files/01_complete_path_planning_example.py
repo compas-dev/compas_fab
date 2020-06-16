@@ -24,16 +24,20 @@ fast_search     = True
 
 with VrepClient(debug=True) as client:
     robot = rfl.Robot('A', client=client)
-    client.pick_building_member(robot, building_member, start_pose)
+    client.planner.pick_building_member(robot, building_member, start_pose)
+    group = robot.model.attr['index']
 
-    path = client.plan_motion(robot,
-                              goal_pose,
-                              metric_values=metric,
-                              collision_meshes=structure,
-                              planner_id=planner_id,
-                              trials=max_trials,
-                              resolution=resolution,
-                              shallow_state_search=fast_search)
+    path = client.plan_motion(goal_pose,
+                              group=group,
+                              options={
+                                  'num_joints': len(robot.get_configurable_joints()),
+                                  'metric_values': metric,
+                                  'collision_meshes': structure,
+                                  'planner_id': planner_id,
+                                  'trials': max_trials,
+                                  'resolution': resolution,
+                                  'shallow_state_search': fast_search,
+                              })
 
     print('Found path of %d steps' % len(path))
 

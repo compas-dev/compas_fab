@@ -18,7 +18,8 @@ If you use COMPAS FAB in a project, please use the following citation:
             Gandia, A. and
             Ma, Z. and
             Ariza, I. and
-            Pacher, M.
+            Pacher, M. and
+            Lytle, B.
             },
         howpublished={https://github.com/compas-dev/compas\_fab/},
         note={Gramazio Kohler Research, ETH Z\"{u}rich},
@@ -41,3 +42,4 @@ Authors
 * Zhao Ma <ma@arch.ethz.ch> `@xarthurx <https://github.com/xarthurx>`_
 * Inés Ariza <ariza@arch.ethz.ch> `@inesariza <https://github.com/inesariza>`_
 * Matteo Pacher <pacher@arch.ethz.ch> `@matteo-pacher <https://github.com/matteo-pacher>`_
+* Beverly Lytle <lytle@arch.ethz.ch> `@beverlylytle <https://github.com/beverlylytle>`_
