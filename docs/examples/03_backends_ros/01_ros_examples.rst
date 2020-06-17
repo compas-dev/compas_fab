@@ -104,7 +104,7 @@ Now open a second command prompt and start the listener:
 
     python 01_ros_hello_world_listener.py
 
-You should see the listener printing everytime it hears the other node talking.
+You should see the listener printing every time it hears the other node talking.
 
 .. note::
 

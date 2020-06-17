@@ -136,7 +136,7 @@ Paste the following into the file:
 Explanation
 -----------
 
-The end-effector consists of one fixed joint (that will be attacted to the tool0
+The end-effector consists of one fixed joint (that will be attached to the tool0
 of the robot), one link with geometry (the tool geometry), one fixed joint (the
 tcp joint, defining the TCP frame) and the tcp link without geometry.
 

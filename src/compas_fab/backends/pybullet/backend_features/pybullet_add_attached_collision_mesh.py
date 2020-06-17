@@ -28,12 +28,14 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         attached_collision_mesh : :class:`compas_fab.robots.AttachedCollisionMesh`
             Object containing the collision mesh to be attached.
         options : dict, optional
-            Unused parameter.
+            !!!
 
         Returns
         -------
         ``None``
         """
+        if options is None:
+            options = {}
         mesh = attached_collision_mesh.collision_mesh.mesh
         name = attached_collision_mesh.collision_mesh.id
 

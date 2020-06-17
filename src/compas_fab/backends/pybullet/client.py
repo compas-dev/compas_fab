@@ -71,7 +71,7 @@ class PyBulletBase(object):
 
 
 class PyBulletClient(PyBulletBase, ClientInterface):
-    """Interface to use pybullet as backend via the **pybullet_plannning**.
+    """Interface to use pybullet as backend.
 
     :class:`.PybulletClient` is a context manager type, so it's best
     used in combination with the ``with`` statement to ensure
@@ -80,18 +80,17 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     Parameters
     ----------
     use_gui : :obj:`bool`
-        Enable pybullet GUI. Defaults to True.
+        Enable pybullet GUI. Defaults to ``True``.
+    verbose : :obj:`bool`
+        Use verbose logging. Defaults to ``False``.
 
     Examples
     --------
     >>> from compas_fab.backends import PyBulletClient
-    >>> with PyBulletClient() as client:
+    >>> with PyBulletClient(use_gui=False) as client:
     ...     print('Connected: %s' % client.is_connected)
     Connected: 1
 
-    Note
-    ----
-    For more examples, check out the :ref:`ROS examples page <ros_examples>`.
     """
 
     def __init__(self, use_gui=True, verbose=False):
@@ -140,7 +139,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        urdf_filename : str
+        urdf_filename : :obj:`str`
             absolute file path to the urdf file. The mesh file can be linked by either
             `package::` or relative path.
         """
@@ -204,12 +203,21 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             for link2_name in names:
                 link2 = self.link_id_by_name[link2_name]
                 pts = pybullet.getClosestPoints(bodyA=self.robot_uid, bodyB=self.robot_uid, distance=0, linkIndexA=link1, linkIndexB=link2, physicsClientId=self.client_id)
-                if len(pts):
+                if pts:
                     LOG.warning("Collision between '{}' and '{}'".format(link1_name, link2_name))
                     return True, (link1_name, link2_name)
 
         # attached collision objects
-        # TODO
+        # !!! is this right?
+        for name, constraint_info in self.attached_collision_objects.items():
+            pts = pybullet.getClosestPoints(bodyA=self.robot_uid, bodyB=constraint_info.body_id, distance=0, physicsClientId=self.client_id)
+            if pts:
+                LOG.warning("Collision between 'robot' and '{}'".format(name))
+            for collision_object_name, body_ids in self.collision_objects.items():
+                for body_id in body_ids:
+                    pts = pybullet.getClosestPoints(bodyA=body_id, bodyB=constraint_info.body_id, distance=0, physicsClientId=self.client_id)
+                    if pts:
+                        LOG.warning("Collision between '{}' and '{}'".format(name, collision_object_name))
 
         return False, ()
 
