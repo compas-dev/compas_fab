@@ -73,7 +73,7 @@ class PyBulletBase(object):
 class PyBulletClient(PyBulletBase, ClientInterface):
     """Interface to use pybullet as backend.
 
-    :class:`.PybulletClient` is a context manager type, so it's best
+    :class:`compasfab.backends.PyBulletClient` is a context manager type, so it's best
     used in combination with the ``with`` statement to ensure
     resource deallocation.
 

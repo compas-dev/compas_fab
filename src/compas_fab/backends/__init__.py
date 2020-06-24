@@ -29,18 +29,14 @@ ROS
     MoveItPlanner
 
 PyBullet
----
+--------
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
     PyBulletClient
-    PyBulletAddAttachedCollisionMesh
-    PyBulletAddCollisionMesh
-    PyBulletAppendCollisionMesh
-    PyBulletRemoveAttachedCollisionMesh
-    PyBulletRemoveCollisionMesh
+    PyBulletPlanner
 
 Long-running tasks
 ------------------
@@ -79,7 +75,7 @@ from .vrep.helpers import *             # noqa: F401,F403
 from .vrep.planner import *             # noqa: F401,F403
 
 if not compas.is_ironpython():
-    from .pybullet.backend_features import *  # noqa: F401,F403
+    from .pybullet.planner import *           # noqa: F401,F403
     from .pybullet.client import *            # noqa: F401,F403
 
 __all__ = [name for name in dir() if not name.startswith('_')]

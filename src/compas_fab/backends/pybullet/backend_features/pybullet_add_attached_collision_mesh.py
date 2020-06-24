@@ -28,7 +28,10 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         attached_collision_mesh : :class:`compas_fab.robots.AttachedCollisionMesh`
             Object containing the collision mesh to be attached.
         options : dict, optional
-            !!!
+            Dictionary containing the following key-value pairs:
+
+            - ``"max_force"``: (:obj:`float`) The maximum force that
+              the constraint can apply.
 
         Returns
         -------

@@ -45,6 +45,7 @@ LOG = get_logger(__name__)
 @contextmanager
 def redirect_stdout(to=os.devnull, enabled=True):
     """Context manager to capture and redirect console output.
+    https://stackoverflow.com/a/17954769
     Parameters
     ----------
     to : Location to redirect output to.  Defaults to ``os.devnull``.
@@ -57,13 +58,14 @@ def redirect_stdout(to=os.devnull, enabled=True):
     ...     print("from Python")                                         # doctest: +SKIP
     ...     os.system("echo non-Python applications are also supported") # doctest: +SKIP
     """
-    # Pytest interferes with file descriptor capture.
-    # Try-except clause exists to disable capture during tests.
     def _redirect_stdout(to_):
         sys.stdout.close()  # + implicit flush()
         os.dup2(to_.fileno(), fd)
         sys.stdout = os.fdopen(fd, 'w')
 
+    # Pytest interferes with file descriptor capture.
+    # The try-except clause exists to disable capture during tests,
+    # and in Python versions where this is not supported.
     try:
         fd = sys.stdout.fileno()
     except UnsupportedOperation:
