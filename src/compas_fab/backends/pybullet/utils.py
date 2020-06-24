@@ -44,13 +44,19 @@ LOG = get_logger(__name__)
 
 @contextmanager
 def redirect_stdout(to=os.devnull, enabled=True):
-    '''
-    import os
+    """Context manager to capture and redirect console output.
+    Parameters
+    ----------
+    to : Location to redirect output to.  Defaults to ``os.devnull``.
+    enabled : (:obj:`bool`) Flag to enable or disable redirection.
 
-    with stdout_redirected(to=filename):
-        print("from Python")
-        os.system("echo non-Python applications are also supported")
-    '''
+    Examples
+    --------
+    >>> import os                                                        # doctest: +SKIP
+    >>> with redirect_stdout(to='filename'):                             # doctest: +SKIP
+    ...     print("from Python")                                         # doctest: +SKIP
+    ...     os.system("echo non-Python applications are also supported") # doctest: +SKIP
+    """
     # Pytest interferes with file descriptor capture.
     # Try-except clause exists to disable capture during tests.
     def _redirect_stdout(to_):
