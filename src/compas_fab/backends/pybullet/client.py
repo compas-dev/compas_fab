@@ -77,6 +77,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     used in combination with the ``with`` statement to ensure
     resource deallocation.
 
+    Thanks to Yijiang Huang and his work in `pybullet_planning
+    <https://github.com/yijiangh/pybullet_planning>`_ for much inspiration.
+
     Parameters
     ----------
     use_gui : :obj:`bool`
