@@ -8,11 +8,53 @@ import sys
 from contextlib import contextmanager
 from io import UnsupportedOperation
 
-
+import compas_fab.backends
 __all__ = [
     'LOG',
     'redirect_stdout',
 ]
+
+
+@contextmanager
+def redirect_stdout(to=os.devnull, enabled=True):
+    """Context manager to capture and redirect console output.
+    https://stackoverflow.com/a/17954769
+    Parameters
+    ----------
+    to : Location to redirect output to.  Defaults to ``os.devnull``.
+    enabled : (:obj:`bool`) Flag to enable or disable redirection.
+
+    Examples
+    --------
+    >>> import os                                                        # doctest: +SKIP
+    >>> with redirect_stdout(to='filename'):                             # doctest: +SKIP
+    ...     print("from Python")                                         # doctest: +SKIP
+    ...     os.system("echo non-Python applications are also supported") # doctest: +SKIP
+    """
+    def _redirect_stdout(to_):
+        sys.stdout.close()  # + implicit flush()
+        os.dup2(to_.fileno(), fd)
+        sys.stdout = os.fdopen(fd, 'w')
+
+    # Pytest interferes with file descriptor capture.
+    # The try-except clause exists to disable capture during tests,
+    # and in Python versions where this is not supported.
+    # try:
+    #     fd = sys.stdout.fileno()
+    # except UnsupportedOperation:
+    #     enabled = False
+
+    if not enabled or compas_fab.backends._called_from_test:
+        yield
+    else:
+        fd = sys.stdout.fileno()
+        with os.fdopen(os.dup(fd), 'w') as old_stdout:
+            with open(to, 'w') as file:
+                _redirect_stdout(to_=file)
+            try:
+                yield
+            finally:
+                _redirect_stdout(to_=old_stdout)  # restore stdout. buffering and flags such as CLOEXEC may be different
 
 
 def get_logger(name):
@@ -42,42 +84,3 @@ def get_logger(name):
 LOG = get_logger(__name__)
 
 
-@contextmanager
-def redirect_stdout(to=os.devnull, enabled=True):
-    """Context manager to capture and redirect console output.
-    https://stackoverflow.com/a/17954769
-    Parameters
-    ----------
-    to : Location to redirect output to.  Defaults to ``os.devnull``.
-    enabled : (:obj:`bool`) Flag to enable or disable redirection.
-
-    Examples
-    --------
-    >>> import os                                                        # doctest: +SKIP
-    >>> with redirect_stdout(to='filename'):                             # doctest: +SKIP
-    ...     print("from Python")                                         # doctest: +SKIP
-    ...     os.system("echo non-Python applications are also supported") # doctest: +SKIP
-    """
-    def _redirect_stdout(to_):
-        sys.stdout.close()  # + implicit flush()
-        os.dup2(to_.fileno(), fd)
-        sys.stdout = os.fdopen(fd, 'w')
-
-    # Pytest interferes with file descriptor capture.
-    # The try-except clause exists to disable capture during tests,
-    # and in Python versions where this is not supported.
-    try:
-        fd = sys.stdout.fileno()
-    except UnsupportedOperation:
-        enabled = False
-
-    if not enabled:
-        yield
-    else:
-        with os.fdopen(os.dup(fd), 'w') as old_stdout:
-            with open(to, 'w') as file:
-                _redirect_stdout(to_=file)
-            try:
-                yield
-            finally:
-                _redirect_stdout(to_=old_stdout)  # restore stdout. buffering and flags such as CLOEXEC may be different
