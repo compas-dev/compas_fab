@@ -53,7 +53,8 @@ class PyBulletBase(object):
             if height is not None:
                 options += '--height={}'.format(height)
             self.client_id = pybullet.connect(method, options=options)
-        assert 0 <= self.client_id
+        if 0 > self.client_id:
+            raise Exception('Error in establishing connection with PyBullet.')
         if use_gui:
             pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_GUI, False, physicsClientId=self.client_id)
             pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_TINY_RENDERER, False, physicsClientId=self.client_id)
@@ -200,7 +201,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         for name, body_ids in self.collision_objects.items():
             for body_id in body_ids:
                 pts = pybullet.getClosestPoints(bodyA=self.robot_uid, bodyB=body_id, distance=0, physicsClientId=self.client_id)
-                if len(pts):
+                if pts:
                     LOG.warning("Collision between 'robot' and '{}'".format(name))
                     return True, ("robot", name)
 
@@ -298,7 +299,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def set_joint_positions(self, joints, values, body_id=None):
         body_id = self.body_id_or_default(body_id)
-        assert len(joints) == len(values)
+        if len(joints) != len(values):
+            raise Exception('Joints and values must have the same length.')
         for joint, value in zip(joints, values):
             self.set_joint_position(joint, value, body_id)
 
