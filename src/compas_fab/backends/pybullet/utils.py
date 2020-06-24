@@ -6,7 +6,6 @@ import logging
 import os
 import sys
 from contextlib import contextmanager
-from io import UnsupportedOperation
 
 import compas_fab.backends
 __all__ = [
@@ -37,13 +36,6 @@ def redirect_stdout(to=os.devnull, enabled=True):
         sys.stdout = os.fdopen(fd, 'w')
 
     # Pytest interferes with file descriptor capture.
-    # The try-except clause exists to disable capture during tests,
-    # and in Python versions where this is not supported.
-    # try:
-    #     fd = sys.stdout.fileno()
-    # except UnsupportedOperation:
-    #     enabled = False
-
     if not enabled or compas_fab.backends._called_from_test:
         yield
     else:
