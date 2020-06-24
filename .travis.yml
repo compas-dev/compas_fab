@@ -34,6 +34,7 @@ jobs:
         - curl https://curl.haxx.se/ca/cacert.pem --output /certs/cacert.pem
         - choco install python --version=3.8.0
         - pip3 install --user --upgrade pip
+        - pip3 install wheel
         - pip3 install cython --install-option="--no-cython-compile"
       env:
         - SSL_CERT_FILE=/certs/cacert.pem
