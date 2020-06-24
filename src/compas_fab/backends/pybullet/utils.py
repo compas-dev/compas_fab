@@ -74,5 +74,3 @@ def get_logger(name):
 
 
 LOG = get_logger(__name__)
-
-
