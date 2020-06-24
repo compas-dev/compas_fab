@@ -131,7 +131,8 @@ class RobotSemantics(object):
 
     def __get_disabled_collisions(self):
         return {
-            {dc.attrib['link1'], dc.attrib['link2']} for dc in self.root.iter('disable_collisions')
+            frozenset([dc.attrib['link1'], dc.attrib['link2']])
+            for dc in self.root.iter('disable_collisions')
         }
 
     def get_end_effector_link_name(self, group=None):

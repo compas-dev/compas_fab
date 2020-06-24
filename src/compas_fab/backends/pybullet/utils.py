@@ -3,9 +3,15 @@ from __future__ import division
 from __future__ import print_function
 
 import logging
+import os
+import sys
+from contextlib import contextmanager
+from io import UnsupportedOperation
+
 
 __all__ = [
     'LOG',
+    'redirect_stdout',
 ]
 
 
@@ -34,3 +40,36 @@ def get_logger(name):
 
 
 LOG = get_logger(__name__)
+
+
+@contextmanager
+def redirect_stdout(to=os.devnull, enabled=True):
+    '''
+    import os
+
+    with stdout_redirected(to=filename):
+        print("from Python")
+        os.system("echo non-Python applications are also supported")
+    '''
+    # Pytest interferes with file descriptor capture.
+    # Try-except clause exists to disable capture during tests.
+    def _redirect_stdout(to_):
+        sys.stdout.close()  # + implicit flush()
+        os.dup2(to_.fileno(), fd)
+        sys.stdout = os.fdopen(fd, 'w')
+
+    try:
+        fd = sys.stdout.fileno()
+    except UnsupportedOperation:
+        enabled = False
+
+    if not enabled:
+        yield
+    else:
+        with os.fdopen(os.dup(fd), 'w') as old_stdout:
+            with open(to, 'w') as file:
+                _redirect_stdout(to_=file)
+            try:
+                yield
+            finally:
+                _redirect_stdout(to_=old_stdout)  # restore stdout. buffering and flags such as CLOEXEC may be different

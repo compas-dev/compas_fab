@@ -21,9 +21,9 @@ from .const import NULL_ID
 from .const import RED
 from .const import STATIC_MASS
 from .const import ZERO_FRAME
-from .hide_output import HideOutput
 from .planner import PyBulletPlanner
 from .utils import LOG
+from .utils import redirect_stdout
 from .conversions import frame_from_pose
 from .conversions import pose_from_frame
 
@@ -44,7 +44,7 @@ class PyBulletBase(object):
             use_gui = False
             print('No display detected!')
         method = pybullet.GUI if use_gui else pybullet.DIRECT
-        with HideOutput():
+        with redirect_stdout():
             options = ''
             if color is not None:
                 options += '--background_color_red={} --background_color_green={} --background_color_blue={}'.format(*color)
@@ -63,7 +63,7 @@ class PyBulletBase(object):
             pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SHADOWS, shadows, physicsClientId=self.client_id)
 
     def disconnect(self):
-        with HideOutput():
+        with redirect_stdout():
             return pybullet.disconnect(physicsClientId=self.client_id)
 
     def check_connection(self):
@@ -89,7 +89,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     >>> from compas_fab.backends import PyBulletClient
     >>> with PyBulletClient(use_gui=False) as client:
     ...     print('Connected: %s' % client.is_connected)
-    Connected: 1
+    Connected: True
 
     """
 
@@ -132,7 +132,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         bool
             `True` if connected, `False` otherwise.
         """
-        return self.check_connection()
+        return self.check_connection() == 1
+
+    def step_simulation(self):
+        pybullet.stepSimulation(physicsClientId=self.client_id)
 
     def load_robot_from_urdf(self, urdf_filename):
         """Create a pybullet robot using the input urdf file.
@@ -144,7 +147,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             `package::` or relative path.
         """
         # TODO: fuse end effector and robot link tree into one
-        with HideOutput(not self.verbose):
+        with redirect_stdout(enabled=not self.verbose):
             self.robot_uid = pybullet.loadURDF(urdf_filename, useFixedBase=True, physicsClientId=self.client_id)
         self.create_name_id_maps()
 
