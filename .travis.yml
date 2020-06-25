@@ -31,7 +31,6 @@ jobs:
       before_install:
         - choco install curl
         - mkdir /certs
-        - curl https://curl.haxx.se/ca/cacert.pem --output /certs/cacert.pem
         - choco install miniconda3 --params="'/AddToPath:0 /RegisterPython:0'"
         - conda create -n fab python=3.8
         - conda activate fab
@@ -39,7 +38,6 @@ jobs:
         - python -c "import pybullet"
         - python -m pip install cython --install-option="--no-cython-compile"
       env:
-        - SSL_CERT_FILE=/certs/cacert.pem
         - PATH=$PATH:/c/tools/miniconda3:/c/tools/miniconda3/Scripts
         - TRAVIS_PYTHON_IMPLEMENTATION="cpython"
     # Older Python releases
