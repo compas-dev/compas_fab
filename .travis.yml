@@ -32,15 +32,14 @@ jobs:
         - choco install curl
         - mkdir /certs
         - curl https://curl.haxx.se/ca/cacert.pem --output /certs/cacert.pem
-        - choco install python --version=3.8.0
-        - python -m pip install --user --upgrade pip
-        - python -m pip install wheel
+        - choco install miniconda3 --params="'/AddToPath:0 /RegisterPython:0 /D:/c/Miniconda'"
+        - conda create -n fab python=3.8
+        - conda activate fab
         - python -m pip install --user pybullet~=2.8
         - python -c "import pybullet"
         - python -m pip install cython --install-option="--no-cython-compile"
       env:
         - SSL_CERT_FILE=/certs/cacert.pem
-        - PATH=/c/Python38:/c/Python38/Scripts:$PATH
         - TRAVIS_PYTHON_IMPLEMENTATION="cpython"
     # Older Python releases
     - name: "Python 3.6 on Xenial Linux"
