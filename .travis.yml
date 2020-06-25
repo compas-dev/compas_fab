@@ -32,7 +32,7 @@ jobs:
         - choco install curl
         - mkdir /certs
         - curl https://curl.haxx.se/ca/cacert.pem --output /certs/cacert.pem
-        - choco install miniconda3 --params="'/AddToPath:0 /RegisterPython:0 /D:/c/Miniconda'"
+        - choco install miniconda3 --params="'/AddToPath:1 /RegisterPython:0 /D:/c/Miniconda'"
         - conda create -n fab python=3.8
         - conda activate fab
         - python -m pip install --user pybullet~=2.8
