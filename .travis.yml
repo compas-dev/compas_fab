@@ -31,7 +31,7 @@ jobs:
       before_install:
         - choco install openssl.light
         - choco install miniconda3 --params="'/AddToPath:0 /RegisterPython:0'"
-        - conda create -n fab python=3.8
+        - conda create -n fab python=3.8 --yes
         - conda activate fab
         - python -m pip install --user pybullet~=2.8
         - python -c "import pybullet"
