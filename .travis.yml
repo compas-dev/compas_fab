@@ -29,15 +29,15 @@ jobs:
       os: windows           # Windows 10.0.17134 N/A Build 17134
       language: shell       # 'language: python' is an error on Travis CI Windows
       before_install:
-        - wget https://raw.githubusercontent.com/trichter/conda4travis/no-choco/conda4travis.sh -O conda4travis.sh
-        - source conda4travis.sh
-        #- choco install openssl.light
-        #- choco install miniconda3 --params="'/AddToPath:0 /RegisterPython:0'"
-        #- source /c/tools/miniconda3/Scripts/activate
+        - choco install openssl.light
+        - choco install miniconda3 --params="'/AddToPath:0 /RegisterPython:0'"
+        - source /c/tools/miniconda3/Scripts/activate
         - conda config --add channels conda-forge
         - conda create -n fab "compas>=0.16,<0.17" "roslibpy>=0.7.1" pyserial python=3.8 --yes
         - conda activate fab
         - python -m pip install --user pybullet~=2.8
+        - conda info -a
+        - conda list
         - python -v -c "import pybullet"
       env:
         - TRAVIS_PYTHON_IMPLEMENTATION="cpython"
