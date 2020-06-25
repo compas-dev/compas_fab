@@ -39,6 +39,8 @@ jobs:
         - conda info -a
         - conda list
         - python -m pip list -v
+        - cp /c/tools/miniconda3/envs/fab/lib/site-packages/pybullet*.pyd .
+        - ls
         - python -v -c "import pybullet"
       env:
         - TRAVIS_PYTHON_IMPLEMENTATION="cpython"
