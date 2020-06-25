@@ -36,6 +36,7 @@ jobs:
         - conda create -n fab "compas>=0.16,<0.17" "roslibpy>=0.7.1" pyserial python=3.8 --yes
         - conda activate fab
         - python -m pip install --user pybullet~=2.8
+        - python -c "import numpy"
         - python -v -c "import pybullet"
       env:
         - TRAVIS_PYTHON_IMPLEMENTATION="cpython"
