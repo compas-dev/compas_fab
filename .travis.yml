@@ -35,7 +35,8 @@ jobs:
         - choco install python --version=3.8.0
         - python -m pip install --user --upgrade pip
         - python -m pip install wheel
-        - python -m pip install --user pybullet~=2.8 
+        - python -m pip install --user pybullet~=2.8
+        - python -c "import pybullet"
         - python -m pip install cython --install-option="--no-cython-compile"
       env:
         - SSL_CERT_FILE=/certs/cacert.pem
