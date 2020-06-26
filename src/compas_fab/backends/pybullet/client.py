@@ -10,6 +10,7 @@ import compas
 from compas._os import system
 import pybullet
 
+import compas_fab
 from compas_fab.backends.interfaces.client import ClientInterface
 
 from .const import BASE_LINK_ID
@@ -100,7 +101,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def __init__(self, use_gui=True, verbose=False):
         super(PyBulletClient, self).__init__()
         self.planner = PyBulletPlanner(self)
-        self.use_gui = use_gui
+        self.use_gui = use_gui and not compas_fab.backends._called_from_test
         self.verbose = verbose
         self._robot = None
         self.robot_uid = None
