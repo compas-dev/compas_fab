@@ -402,7 +402,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return collision_args
 
     @staticmethod
-    def get_geometry_args(self, path, scale=1.):
+    def get_geometry_args(path, scale=1.):
         return {
             'shapeType': pybullet.GEOM_MESH,
             'fileName': path,
