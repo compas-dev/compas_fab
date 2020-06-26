@@ -181,7 +181,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def configuration_in_collision(self, configuration):
         joint_ids = tuple(self.joint_id_by_name[name] for name in configuration.joint_names)
         self.set_joint_positions(joint_ids, configuration.values, self.robot_uid)
-        collision, names = self.collision_check()
+        collision, _names = self.collision_check()
         return collision
 
     def remove_configurations_in_collision(self, configurations):
