@@ -35,38 +35,60 @@ __all__ = [
 
 
 class PyBulletBase(object):
-    def __init__(self):
+    def __init__(self, use_gui):
         self.client_id = None
+        self.use_gui = use_gui and not compas_fab.backends._called_from_test
 
-    def connect(self, use_gui=True, shadows=True, color=None, width=None, height=None):
+    def connect(self, shadows=True, color=None, width=None, height=None):
         # Shared Memory: execute the physics simulation and rendering in a separate process
         # https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/examples/vrminitaur.py#L7
-        if use_gui and system != 'darwin' and not compas.is_windows() and ('DISPLAY' not in os.environ):
-            use_gui = False
-            print('No display detected!')
-        method = pybullet.GUI if use_gui else pybullet.DIRECT
+        self.detect_display()
+        method = pybullet.GUI if self.use_gui else pybullet.DIRECT
+        options = self.compose_options(color, width, height)
         with redirect_stdout():
-            options = ''
-            if color is not None:
-                options += '--background_color_red={} --background_color_green={} --background_color_blue={}'.format(*color)
-            if width is not None:
-                options += '--width={}'.format(width)
-            if height is not None:
-                options += '--height={}'.format(height)
             self.client_id = pybullet.connect(method, options=options)
         if 0 > self.client_id:
             raise Exception('Error in establishing connection with PyBullet.')
-        if use_gui:
-            pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_GUI, False, physicsClientId=self.client_id)
-            pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_TINY_RENDERER, False, physicsClientId=self.client_id)
-            pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_RGB_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
-            pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_DEPTH_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
-            pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, False, physicsClientId=self.client_id)
-            pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SHADOWS, shadows, physicsClientId=self.client_id)
+        if self.use_gui:
+            self.configure_debug_visualizer(shadows)
+
+    def detect_display(self):
+        if self.use_gui and system != 'darwin' and not compas.is_windows() and ('DISPLAY' not in os.environ):
+            self.use_gui = False
+            print('No display detected! Continuing without GUI.')
+
+    def compose_options(self, color, width, height):
+        options = ''
+        if color is not None:
+            options += '--background_color_red={} --background_color_green={} --background_color_blue={}'.format(*color)
+        if width is not None:
+            options += '--width={}'.format(width)
+        if height is not None:
+            options += '--height={}'.format(height)
+        return options
+
+    def configure_debug_visualizer(self, shadows):
+        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_GUI, False, physicsClientId=self.client_id)
+        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_TINY_RENDERER, False, physicsClientId=self.client_id)
+        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_RGB_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
+        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_DEPTH_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
+        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, False, physicsClientId=self.client_id)
+        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SHADOWS, shadows, physicsClientId=self.client_id)
 
     def disconnect(self):
         with redirect_stdout():
             return pybullet.disconnect(physicsClientId=self.client_id)
+
+    @property
+    def is_connected(self):
+        """Indicates whether the client has an active connection.
+
+        Returns
+        -------
+        :obj:`bool`
+            ``True`` if connected, ``False`` otherwise.
+        """
+        return self.check_connection() == 1
 
     def check_connection(self):
         return pybullet.getConnectionInfo(physicsClientId=self.client_id)['isConnected']
@@ -97,11 +119,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     Connected: True
 
     """
-
     def __init__(self, use_gui=True, verbose=False):
-        super(PyBulletClient, self).__init__()
+        super(PyBulletClient, self).__init__(use_gui)
         self.planner = PyBulletPlanner(self)
-        self.use_gui = use_gui and not compas_fab.backends._called_from_test
         self.verbose = verbose
         self._robot = None
         self.robot_uid = None
@@ -112,7 +132,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.link_id_by_name = {}
 
     def __enter__(self):
-        self.connect(use_gui=self.use_gui)
+        self.connect()
         return self
 
     def __exit__(self, *args):
@@ -128,17 +148,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.load_robot_from_urdf(robot.model.urdf_filename)
         self.create_collision_map(robot)
 
-    @property
-    def is_connected(self):
-        """Indicates whether the client has an active connection.
-
-        Returns
-        -------
-        bool
-            `True` if connected, `False` otherwise.
-        """
-        return self.check_connection() == 1
-
     def step_simulation(self):
         pybullet.stepSimulation(physicsClientId=self.client_id)
 
@@ -148,8 +157,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         Parameters
         ----------
         urdf_filename : :obj:`str`
-            absolute file path to the urdf file. The mesh file can be linked by either
-            `package::` or relative path.
+            Absolute file path to the urdf file. The mesh file can be linked by either
+            `"package::"` or relative path.
         """
         # TODO: fuse end effector and robot link tree into one
         with redirect_stdout(enabled=not self.verbose):
@@ -167,8 +176,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             self.joint_id_by_name[joint_name] = joint_id
 
     def create_collision_map(self, disabled_collisions=None):
-        """
-        """
         link_names = self.robot.get_link_names_with_collision_geometry()
         disabled_collisions = disabled_collisions or set()
         if self.robot.semantics:
@@ -196,8 +203,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                 configurations[i] = None
 
     def collision_check(self):
-        """
-        """
         # collision objects
         for name, body_ids in self.collision_objects.items():
             for body_id in body_ids:
@@ -210,7 +215,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             link1 = self.link_id_by_name[link1_name]
             for link2_name in names:
                 link2 = self.link_id_by_name[link2_name]
-                pts = pybullet.getClosestPoints(bodyA=self.robot_uid, bodyB=self.robot_uid, distance=0, linkIndexA=link1, linkIndexB=link2, physicsClientId=self.client_id)
+                pts = pybullet.getClosestPoints(bodyA=self.robot_uid, bodyB=self.robot_uid, distance=0,
+                                                linkIndexA=link1, linkIndexB=link2, physicsClientId=self.client_id)
                 if pts:
                     LOG.warning("Collision between '{}' and '{}'".format(link1_name, link2_name))
                     return True, (link1_name, link2_name)
@@ -306,19 +312,19 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             self.set_joint_position(joint, value, body_id)
 
     # =======================================
-    def convert_mesh_to_body(self, mesh, frame, name=None):
+    def convert_mesh_to_body(self, mesh, frame, _name=None):
         """Convert compas mesh and its frame to a pybullet body
 
         Parameters
         ----------
-        mesh : compas Mesh
-        frame : compas Frame
-        name : str
-            Optional, name of the mesh for tagging in pybullet's GUI
+        mesh : `compas.datastructures.Mesh`
+        frame : :class:`compas.geometry.Frame`
+        _name : :obj:`str`, optional
+            Name of the mesh for tagging in pybullet's GUI
 
         Returns
         -------
-        pybullet body id
+        :obj:`int`
         """
         temp_dir = tempfile.mkdtemp()
         tmp_obj_path = os.path.join(temp_dir, 'temp.obj')
@@ -328,7 +334,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         # !!! The following lines are apparently for visual debugging purposes
         # To be deleted or rewritten later.
         # if name:
-        #     add_body_name(pyb_body, name)
+        #     pybullet_planning.add_body_name(pyb_body, name)
         os.remove(tmp_obj_path)
         os.rmdir(temp_dir)
         return pyb_body_id

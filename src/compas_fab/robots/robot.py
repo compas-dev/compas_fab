@@ -292,7 +292,7 @@ class Robot(object):
         return link_names
 
     def get_link_names_with_collision_geometry(self):
-        return [link.name for link in self.model.iter_links() if len(link.collision)]
+        return [link.name for link in self.model.iter_links() if link.collision]
 
     def get_configurable_joints(self, group=None):
         """Returns the configurable joints.
