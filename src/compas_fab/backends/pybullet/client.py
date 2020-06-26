@@ -61,7 +61,7 @@ class PyBulletBase(object):
             print('No display detected! Continuing without GUI.')
 
     @staticmethod
-    def compose_options(self, color, width, height):
+    def compose_options(color, width, height):
         options = ''
         if color is not None:
             options += '--background_color_red={} --background_color_green={} --background_color_blue={}'.format(*color)
