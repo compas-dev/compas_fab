@@ -9,6 +9,7 @@ from itertools import combinations
 import compas
 from compas._os import system
 import pybullet
+from compas.robots import RobotModel
 
 import compas_fab
 from compas_fab.backends.interfaces.client import ClientInterface
@@ -32,6 +33,8 @@ from .conversions import pose_from_frame
 __all__ = [
     'PyBulletClient',
 ]
+
+from ...robots import Robot
 
 
 class PyBulletBase(object):
@@ -57,6 +60,7 @@ class PyBulletBase(object):
             self.use_gui = False
             print('No display detected! Continuing without GUI.')
 
+    @staticmethod
     def compose_options(self, color, width, height):
         options = ''
         if color is not None:
@@ -145,8 +149,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     @robot.setter
     def robot(self, robot):
         self._robot = robot
+        self._robot.client = self
         self.load_robot_from_urdf(robot.model.urdf_filename)
-        self.create_collision_map(robot)
+        self.create_collision_map()
 
     def step_simulation(self):
         pybullet.stepSimulation(physicsClientId=self.client_id)
@@ -161,6 +166,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             `"package::"` or relative path.
         """
         # TODO: fuse end effector and robot link tree into one
+        robot_model = RobotModel.from_urdf_file(urdf_filename)
+        self._robot = Robot(robot_model)
+        self._robot.client = self
+        self.create_collision_map()
         with redirect_stdout(enabled=not self.verbose):
             self.robot_uid = pybullet.loadURDF(urdf_filename, useFixedBase=True, physicsClientId=self.client_id)
         self.create_name_id_maps()
@@ -385,11 +394,12 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         }
         collision_args.update(geometry_args)
         if 'length' in collision_args:
-            # TODO: pybullet bug visual => length, collision => height
+            # pybullet bug visual => length, collision => height
             collision_args['height'] = collision_args['length']
             del collision_args['length']
         return collision_args
 
+    @staticmethod
     def get_geometry_args(self, path, scale=1.):
         return {
             'shapeType': pybullet.GEOM_MESH,
