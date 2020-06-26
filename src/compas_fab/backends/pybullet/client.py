@@ -255,11 +255,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             return self.robot_uid
         return body_id
 
-    def set_base_frame(self, frame, body_id=None):
-        body_id = self.body_id_or_default(body_id)
-        point, quaternion = pose_from_frame(frame)
-        pybullet.resetBasePositionAndOrientation(body_id, point, quaternion, physicsClientId=self.client_id)
-
     def get_base_frame(self, body_id=None):
         body_id = self.body_id_or_default(body_id)
         pose = pybullet.getBasePositionAndOrientation(body_id, physicsClientId=self.client_id)
@@ -308,6 +303,13 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return frame_from_pose(pose)
 
     # =======================================
+    def set_base_frame(self, frame, body_id=None):
+        # !!! This could lead to a discrepancy between the self._robot and what's going on in pybullet.
+        # !!! RCF would not match
+        body_id = self.body_id_or_default(body_id)
+        point, quaternion = pose_from_frame(frame)
+        pybullet.resetBasePositionAndOrientation(body_id, point, quaternion, physicsClientId=self.client_id)
+
     def set_joint_position(self, joint_id, value, body_id=None):
         body_id = self.body_id_or_default(body_id)
         pybullet.resetJointState(body_id, joint_id, value, targetVelocity=0, physicsClientId=self.client_id)
