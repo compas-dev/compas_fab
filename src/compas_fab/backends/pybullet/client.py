@@ -11,8 +11,8 @@ from compas._os import system
 import pybullet
 from compas.robots import RobotModel
 
-import compas_fab
 from compas_fab.backends.interfaces.client import ClientInterface
+from compas_fab.robots import Robot
 
 from .const import BASE_LINK_ID
 from .const import BodyInfo
@@ -34,13 +34,11 @@ __all__ = [
     'PyBulletClient',
 ]
 
-from ...robots import Robot
-
 
 class PyBulletBase(object):
     def __init__(self, use_gui):
         self.client_id = None
-        self.use_gui = use_gui #and not compas_fab.backends._called_from_test
+        self.use_gui = use_gui
 
     def connect(self, shadows=True, color=None, width=None, height=None):
         # Shared Memory: execute the physics simulation and rendering in a separate process
