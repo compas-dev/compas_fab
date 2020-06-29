@@ -31,8 +31,6 @@ Our first example loads the UR5 robot from a URDF and then adds, then removes, a
 floor as a collision mesh.  The calls to ``sleep`` are only necessary to prevent the
 gui from closing this example too quickly.
 
-.. skip: next
-
 .. literalinclude :: files/01_add_collision_mesh.py
    :language: python
 
@@ -52,8 +50,6 @@ gui from closing this example too quickly.
 Adding and removing a collision mesh attached to the end effector link of the
 robot is similar.  Again, the calls to ``sleep`` and ``step_simulation`` exist only
 to make the GUI rendering smoother.
-
-.. skip: next
 
 .. literalinclude :: files/02_add_attached_collision_mesh.py
    :language: python
