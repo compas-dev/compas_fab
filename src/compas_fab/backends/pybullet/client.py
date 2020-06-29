@@ -40,7 +40,7 @@ from ...robots import Robot
 class PyBulletBase(object):
     def __init__(self, use_gui):
         self.client_id = None
-        self.use_gui = use_gui and not compas_fab.backends._called_from_test
+        self.use_gui = use_gui #and not compas_fab.backends._called_from_test
 
     def connect(self, shadows=True, color=None, width=None, height=None):
         # Shared Memory: execute the physics simulation and rendering in a separate process
