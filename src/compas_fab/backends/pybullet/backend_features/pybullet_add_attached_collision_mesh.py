@@ -2,12 +2,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import pybullet
-
 from compas_fab.backends.interfaces import AddAttachedCollisionMesh
 from compas_fab.backends.pybullet.const import BASE_LINK_ID, ConstraintInfo
 from compas_fab.backends.pybullet.const import ZERO_FRAME
 from compas_fab.backends.pybullet.conversions import pose_from_frame
+from compas_fab.utilities import LazyLoader
+
+pybullet = LazyLoader('pybullet', globals(), 'pybullet')
 
 
 __all__ = [

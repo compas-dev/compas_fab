@@ -2,10 +2,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import pybullet
-
 from compas_fab.backends.interfaces import RemoveAttachedCollisionMesh
 from compas_fab.backends.pybullet.utils import LOG
+from compas_fab.utilities import LazyLoader
+
+pybullet = LazyLoader('pybullet', globals(), 'pybullet')
 
 
 __all__ = [

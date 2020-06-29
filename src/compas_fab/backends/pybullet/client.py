@@ -8,11 +8,11 @@ from itertools import combinations
 
 import compas
 from compas._os import system
-import pybullet
 from compas.robots import RobotModel
 
 from compas_fab.backends.interfaces.client import ClientInterface
 from compas_fab.robots import Robot
+from compas_fab.utilities import LazyLoader
 
 from .const import BASE_LINK_ID
 from .const import BodyInfo
@@ -28,6 +28,8 @@ from .utils import LOG
 from .utils import redirect_stdout
 from .conversions import frame_from_pose
 from .conversions import pose_from_frame
+
+pybullet = LazyLoader('pybullet', globals(), 'pybullet')
 
 
 __all__ = [

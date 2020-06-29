@@ -39,11 +39,13 @@ Other functions
 
     sign
     argsort
+    LazyLoader
 
 """
 
 from .file_io import *        # noqa: F401,F403
 from .filesystem import *     # noqa: F401,F403
+from .lazy_loader import *    # noqa: F401,F403
 from .numbers import *        # noqa: F401,F403
 from .utilities import *      # noqa: F401,F403
 
