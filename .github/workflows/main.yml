@@ -10,7 +10,7 @@ on:
 
 jobs:
   basic-builds:
-    runs-on: $${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         name: [
@@ -22,7 +22,7 @@ jobs:
           - name: "windows-py38"
             os: windows-latest
             python-version: 3.8
-          - name: "macos-py38"
+          - name: "macos-py37"
             os: macos-latest
             python-version: 3.7
           - name: "ubuntu-py36"
@@ -49,6 +49,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
       - name: Set up docker containers
         run: |
           docker run -p 19997:19997 --name vrep_rfl -d gramaziokohler/vrep-rfl
@@ -72,7 +76,7 @@ jobs:
           docker-compose -f "docs/backends/files/ur5-demo/docker-compose.yml" down
           docker rm -f vrep_rfl
       - name: Generate docs
-        if: $${{ success() }}
+        if: ${{ success() }}
         run: |
           invoke docs
   ironpython-build:
