@@ -83,7 +83,7 @@ jobs:
     name: windows-ironpython
     runs-on: windows-latest
     env:
-     IRONPYTHONPATH: $GITHUB_WORKSPACE/src
+     IRONPYTHONPATH: ${{ env.GITHUB_WORKSPACE }}/src
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
