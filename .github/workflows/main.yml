@@ -83,7 +83,7 @@ jobs:
     name: windows-ironpython
     runs-on: windows-latest
     env:
-     IRONPYTHONPATH: %GITHUB_WORKSPACE%/src
+     IRONPYTHONPATH: $GITHUB_WORKSPACE/src
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
@@ -92,6 +92,8 @@ jobs:
           ipy -X:Frames -m ensurepip
           ipy -X:Frames -m pip install --no-deps compas roslibpy
           ipy -X:Frames -m pip install ironpython-pytest
+      - name: Dump GitHub workspace
+        run: echo "$GITHUB_WORKSPACE"
       - name: Run tests
         run: |
           ipy tests/ipy_test_runner.py
