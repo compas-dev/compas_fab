@@ -34,7 +34,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
         # :class:`Frame`
         #     The frame in the world's coordinate system (WCF).
         # """
-        pass
+        raise NotImplementedError
         # """
         # """
         # ee_link_name = options['ee_link_name']

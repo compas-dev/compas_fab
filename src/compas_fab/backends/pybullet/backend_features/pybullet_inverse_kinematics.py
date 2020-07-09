@@ -46,7 +46,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # :class:`compas_fab.robots.Configuration`
         #     The planning group's configuration.
         # """
-        pass
+        raise NotImplementedError
         # """
         # """
         # options = options or {}
