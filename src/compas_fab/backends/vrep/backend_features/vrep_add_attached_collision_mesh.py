@@ -36,8 +36,7 @@ class VrepAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         .. note::
             All meshes are automatically removed from the scene when the simulation ends.
         """
-        if options is None:
-            options = {}
+        options = options or {}
         robot_name = options['robot_name']
         return self.add_building_member(robot_name, attached_collision_mesh)
 

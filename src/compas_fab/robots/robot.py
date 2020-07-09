@@ -1004,8 +1004,7 @@ class Robot(object):
         >>> robot.inverse_kinematics(frame_WCF, start_configuration, group)                 # doctest: +SKIP
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
-        if options is None:
-            options = {}
+        options = options or {}
         avoid_collisions = options.get('avoid_collisions', True)
         constraints = options.get('constraints')
         attempts = options.get('attempts', 8)
@@ -1099,8 +1098,7 @@ class Robot(object):
         >>> frame_WCF_c == frame_WCF_m
         True
         """
-        if options is None:
-            options = {}
+        options = options or {}
         backend = options.get('backend')
         ee_link = options.get('ee_link')
         return self.forward_kinematics_deprecated(configuration, group, backend, ee_link)
@@ -1197,8 +1195,7 @@ class Robot(object):
         >>> type(trajectory)
         <class 'compas_fab.robots.trajectory.JointTrajectory'>
         """
-        if options is None:
-            options = {}
+        options = options or {}
         max_step = options.get('max_step', 0.01)
         jump_threshold = options.get('jump_threshold', 1.57)
         avoid_collisions = options.get('avoid_collisions', True)
@@ -1348,8 +1345,7 @@ class Robot(object):
         >>> type(trajectory)
         <class 'compas_fab.robots.trajectory.JointTrajectory'>
         """
-        if options is None:
-            options = {}
+        options = options or {}
         path_constraints = options.get('path_constraints')
         planner_id = options.get('planner_id', 'RRT')
         num_planning_attempts = options.get('num_planning_attempts', 1)

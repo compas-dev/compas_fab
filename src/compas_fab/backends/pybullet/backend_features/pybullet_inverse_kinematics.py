@@ -49,8 +49,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         pass
         # """
         # """
-        # if options is None:
-        #     options = {}
+        # options = options or {}
         # self.ensure_robot()
         # ee_link_name = options.get('ee_link_name')
         # pb_ee_link = self.client.link_from_name(self.client.robot_uid, ee_link_name)

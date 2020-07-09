@@ -39,8 +39,7 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         -------
         ``None``
         """
-        if options is None:
-            options = {}
+        options = options or {}
         mesh = attached_collision_mesh.collision_mesh.mesh
         name = attached_collision_mesh.collision_mesh.id
 

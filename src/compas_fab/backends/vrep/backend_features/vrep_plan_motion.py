@@ -63,8 +63,7 @@ class VrepPlanMotion(PlanMotion):
             list: List of :class:`Configuration` objects representing the
             collision-free path to the ``goal_constraint``.
         """
-        if options is None:
-            options = {}
+        options = options or {}
         num_joints = options['num_joints']
         metric_values = options.get('metric_values')
         collision_meshes = options.get('collision_meshes')
@@ -120,8 +119,7 @@ class VrepPlanMotion(PlanMotion):
             list: List of :class:`Configuration` objects representing the
             collision-free path to the ``goal_configs``.
         """
-        if options is None:
-            options = {}
+        options = options or {}
         num_joints = options['num_joints']
         metric_values = options.get('metric_values')
         collision_meshes = options.get('collision_meshes')

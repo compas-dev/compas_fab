@@ -43,8 +43,7 @@ class VrepInverseKinematics(InverseKinematics):
             list: List of :class:`Configuration` objects representing
             the collision-free configuration for the ``goal_frame``.
         """
-        if options is None:
-            options = {}
+        options = options or {}
         num_joints = options['num_joints']
         metric_values = options.get('metric_values')
         gantry_joint_limits = options.get('gantry_joint_limits')
