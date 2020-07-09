@@ -12,10 +12,10 @@ from compas.geometry import Frame
 from compas.robots import RobotModel
 
 from compas_fab.backends.interfaces.client import ClientInterface
+from . import const as const
 from compas_fab.robots import Robot
 from compas_fab.utilities import LazyLoader
 
-import compas_fab.backends.pybullet.const as const
 from .planner import PyBulletPlanner
 from .utils import LOG
 from .utils import redirect_stdout
@@ -43,7 +43,7 @@ class PyBulletBase(object):
         options = self.compose_options(color, width, height)
         with redirect_stdout():
             self.client_id = pybullet.connect(method, options=options)
-        if 0 > self.client_id:
+        if self.client_id < 0:
             raise Exception('Error in establishing connection with PyBullet.')
         if self.use_gui:
             self.configure_debug_visualizer(shadows)
@@ -85,10 +85,9 @@ class PyBulletBase(object):
         :obj:`bool`
             ``True`` if connected, ``False`` otherwise.
         """
-        return self.check_connection() == 1
-
-    def check_connection(self):
-        return pybullet.getConnectionInfo(physicsClientId=self.client_id)['isConnected']
+        if self.client_id is None:
+            return False
+        return pybullet.getConnectionInfo(physicsClientId=self.client_id)['isConnected'] == 1
 
 
 class PyBulletClient(PyBulletBase, ClientInterface):
