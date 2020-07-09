@@ -15,14 +15,7 @@ from compas_fab.backends.interfaces.client import ClientInterface
 from compas_fab.robots import Robot
 from compas_fab.utilities import LazyLoader
 
-from .const import BASE_LINK_ID
-from .const import BodyInfo
-from .const import GREY
-from .const import JointInfo
-from .const import LinkState
-from .const import NULL_ID
-from .const import RED
-from .const import STATIC_MASS
+import compas_fab.backends.pybullet.const as const
 from .planner import PyBulletPlanner
 from .utils import LOG
 from .utils import redirect_stdout
@@ -265,15 +258,15 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def _get_link_state(self, link_id, body_id=None):
         body_id = self._body_id_or_default(body_id)
-        return LinkState(*pybullet.getLinkState(body_id, link_id, physicsClientId=self.client_id))
+        return const.LinkState(*pybullet.getLinkState(body_id, link_id, physicsClientId=self.client_id))
 
     def _get_body_info(self, body_id=None):
         body_id = self._body_id_or_default(body_id)
-        return BodyInfo(*pybullet.getBodyInfo(body_id, physicsClientId=self.client_id))
+        return const.BodyInfo(*pybullet.getBodyInfo(body_id, physicsClientId=self.client_id))
 
     def _get_joint_info(self, joint_id, body_id=None):
         body_id = self._body_id_or_default(body_id)
-        return JointInfo(*pybullet.getJointInfo(body_id, joint_id, physicsClientId=self.client_id))
+        return const.JointInfo(*pybullet.getJointInfo(body_id, joint_id, physicsClientId=self.client_id))
 
     def _get_num_joints(self, body_id=None):
         body_id = self._body_id_or_default(body_id)
@@ -289,13 +282,13 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def _get_link_name(self, link_id, body_id=None):
         body_id = self._body_id_or_default(body_id)
-        if link_id == BASE_LINK_ID:
+        if link_id == const.BASE_LINK_ID:
             return self._get_base_name(body_id)
         return self._get_joint_info(link_id, body_id).linkName.decode('UTF-8')
 
     def _get_link_frame(self, link_id, body_id=None):
         body_id = self._body_id_or_default(body_id)
-        if link_id == BASE_LINK_ID:
+        if link_id == const.BASE_LINK_ID:
             return self._get_base_frame(body_id)
         link_state = self._get_link_state(link_id, body_id)
         pose = (link_state.worldLinkFramePosition, link_state.worldLinkFrameOrientation)
@@ -349,11 +342,11 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             os.rmdir(temp_dir)
         return pyb_body_id
 
-    def body_from_obj(self, path, scale=1., mass=STATIC_MASS, collision=True, color=GREY):
+    def body_from_obj(self, path, scale=1., mass=const.STATIC_MASS, collision=True, color=const.GREY):
         geometry_args = self.get_geometry_args(path, scale=scale)
 
         collision_args = self.get_collision_args(geometry_args)
-        collision_id = self.create_collision_shape(collision_args) if collision else NULL_ID
+        collision_id = self.create_collision_shape(collision_args) if collision else const.NULL_ID
 
         visual_args = self.get_visual_args(geometry_args, color=color)
         visual_id = self.create_visual_shape(visual_args)
@@ -361,7 +354,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         body_id = self.create_body(collision_id, visual_id, mass=mass)
         return body_id
 
-    def create_body(self, collision_id=NULL_ID, visual_id=NULL_ID, mass=STATIC_MASS):
+    def create_body(self, collision_id=const.NULL_ID, visual_id=const.NULL_ID, mass=const.STATIC_MASS):
         return pybullet.createMultiBody(baseMass=mass, baseCollisionShapeIndex=collision_id,
                                         baseVisualShapeIndex=visual_id, physicsClientId=self.client_id)
 
@@ -370,10 +363,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def create_visual_shape(self, visual_args):
         if visual_args.get('rgbaColor') is None:
-            return NULL_ID
+            return const.NULL_ID
         return pybullet.createVisualShape(**visual_args)
 
-    def get_visual_args(self, geometry_args, frame=Frame.worldXY(), color=RED, specular=None):
+    def get_visual_args(self, geometry_args, frame=Frame.worldXY(), color=const.RED, specular=None):
         point, quaternion = pose_from_frame(frame)
         visual_args = {
             'rgbaColor': color,
