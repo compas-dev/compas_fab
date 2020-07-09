@@ -8,6 +8,7 @@ from itertools import combinations
 
 import compas
 from compas._os import system
+from compas.geometry import Frame
 from compas.robots import RobotModel
 
 from compas_fab.backends.interfaces.client import ClientInterface
@@ -22,7 +23,6 @@ from .const import LinkState
 from .const import NULL_ID
 from .const import RED
 from .const import STATIC_MASS
-from .const import ZERO_FRAME
 from .planner import PyBulletPlanner
 from .utils import LOG
 from .utils import redirect_stdout
@@ -373,7 +373,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             return NULL_ID
         return pybullet.createVisualShape(**visual_args)
 
-    def get_visual_args(self, geometry_args, frame=ZERO_FRAME, color=RED, specular=None):
+    def get_visual_args(self, geometry_args, frame=Frame.worldXY(), color=RED, specular=None):
         point, quaternion = pose_from_frame(frame)
         visual_args = {
             'rgbaColor': color,
@@ -386,7 +386,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             visual_args['specularColor'] = specular
         return visual_args
 
-    def get_collision_args(self, geometry_args, frame=ZERO_FRAME):
+    def get_collision_args(self, geometry_args, frame=Frame.worldXY()):
         point, quaternion = pose_from_frame(frame)
         collision_args = {
             'collisionFramePosition': point,

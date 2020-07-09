@@ -2,10 +2,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas.geometry import Frame
 from compas_fab.backends.interfaces import AddAttachedCollisionMesh
 from compas_fab.backends.pybullet.const import BASE_LINK_ID
 from compas_fab.backends.pybullet.const import ConstraintInfo
-from compas_fab.backends.pybullet.const import ZERO_FRAME
 from compas_fab.backends.pybullet.conversions import pose_from_frame
 from compas_fab.utilities import LazyLoader
 
@@ -61,11 +61,11 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         )
 
         constraint_id = pybullet.createConstraint(self.client.robot_uid, robot_tool0_link_id, body_id, body_link_id,
-                                                  pybullet.JOINT_FIXED, jointAxis=ZERO_FRAME.point,
+                                                  pybullet.JOINT_FIXED, jointAxis=Frame.worldXY().point,
                                                   parentFramePosition=grasp_point,
-                                                  childFramePosition=ZERO_FRAME.point,
+                                                  childFramePosition=Frame.worldXY().point,
                                                   parentFrameOrientation=grasp_quaternion,
-                                                  childFrameOrientation=ZERO_FRAME.quaternion,
+                                                  childFrameOrientation=Frame.worldXY().quaternion,
                                                   physicsClientId=self.client.client_id)
         if options.get('max_force') is not None:
             pybullet.changeConstraint(constraint_id, maxForce=options['max_force'], physicsClientId=self.client.client_id)
