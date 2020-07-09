@@ -68,7 +68,7 @@ jobs:
       - name: Run linter
         run: |
           invoke lint
-      - name: Run integration test
+      - name: Run integration tests
         run: |
           invoke test --doctest --codeblock
       - name: Tear down docker containers
