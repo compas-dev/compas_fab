@@ -165,7 +165,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             Absolute file path to the urdf file. The mesh file can be linked by either
             `"package::"` or relative path.
         """
-        # TODO: fuse end effector and robot link tree into one
         robot_model = RobotModel.from_urdf_file(urdf_filename)
         self._robot = Robot(robot_model)
         self._robot.client = self
@@ -177,11 +176,11 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def create_name_id_maps(self):
         self.joint_id_by_name = {}
         self.link_id_by_name = {}
-        joint_ids = self.get_joint_ids(self.robot_uid)
+        joint_ids = self._get_joint_ids(self.robot_uid)
         for joint_id in joint_ids:
-            link_name = self.get_link_name(joint_id, self.robot_uid)
+            link_name = self._get_link_name(joint_id, self.robot_uid)
             self.link_id_by_name[link_name] = joint_id
-            joint_name = self.get_joint_name(joint_id, self.robot_uid)
+            joint_name = self._get_joint_name(joint_id, self.robot_uid)
             self.joint_id_by_name[joint_name] = joint_id
 
     def create_collision_map(self, disabled_collisions=None):
@@ -197,7 +196,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def configuration_in_collision(self, configuration):
         joint_ids = tuple(self.joint_id_by_name[name] for name in configuration.joint_names)
-        self.set_joint_positions(joint_ids, configuration.values, self.robot_uid)
+        self._set_joint_positions(joint_ids, configuration.values, self.robot_uid)
         collision, _names = self.collision_check()
         return collision
 
@@ -249,78 +248,76 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         if self.robot_uid is None:
             raise Exception('This method is only callable once a robot is loaded')
 
-    def body_id_or_default(self, body_id):
+    def _body_id_or_default(self, body_id):
         if body_id is None:
             self.ensure_robot()
             return self.robot_uid
         return body_id
 
-    def get_base_frame(self, body_id=None):
-        body_id = self.body_id_or_default(body_id)
+    def _get_base_frame(self, body_id=None):
+        body_id = self._body_id_or_default(body_id)
         pose = pybullet.getBasePositionAndOrientation(body_id, physicsClientId=self.client_id)
         return frame_from_pose(pose)
 
-    def get_base_name(self, body_id=None):
-        body_id = self.body_id_or_default(body_id)
-        return self.get_body_info(body_id).base_name.decode(encoding='UTF-8')
+    def _get_base_name(self, body_id=None):
+        body_id = self._body_id_or_default(body_id)
+        return self._get_body_info(body_id).base_name.decode(encoding='UTF-8')
 
-    def get_link_state(self, link_id, body_id=None):
-        body_id = self.body_id_or_default(body_id)
+    def _get_link_state(self, link_id, body_id=None):
+        body_id = self._body_id_or_default(body_id)
         return LinkState(*pybullet.getLinkState(body_id, link_id, physicsClientId=self.client_id))
 
-    def get_body_info(self, body_id=None):
-        body_id = self.body_id_or_default(body_id)
+    def _get_body_info(self, body_id=None):
+        body_id = self._body_id_or_default(body_id)
         return BodyInfo(*pybullet.getBodyInfo(body_id, physicsClientId=self.client_id))
 
-    def get_joint_info(self, joint_id, body_id=None):
-        body_id = self.body_id_or_default(body_id)
+    def _get_joint_info(self, joint_id, body_id=None):
+        body_id = self._body_id_or_default(body_id)
         return JointInfo(*pybullet.getJointInfo(body_id, joint_id, physicsClientId=self.client_id))
 
-    def get_num_joints(self, body_id=None):
-        body_id = self.body_id_or_default(body_id)
+    def _get_num_joints(self, body_id=None):
+        body_id = self._body_id_or_default(body_id)
         return pybullet.getNumJoints(body_id, physicsClientId=self.client_id)
 
-    def get_joint_ids(self, body_id=None):
-        body_id = self.body_id_or_default(body_id)
-        return list(range(self.get_num_joints(body_id)))
+    def _get_joint_ids(self, body_id=None):
+        body_id = self._body_id_or_default(body_id)
+        return list(range(self._get_num_joints(body_id)))
 
-    def get_joint_name(self, joint_id, body_id=None):
-        body_id = self.body_id_or_default(body_id)
-        return self.get_joint_info(joint_id, body_id).jointName
+    def _get_joint_name(self, joint_id, body_id=None):
+        body_id = self._body_id_or_default(body_id)
+        return self._get_joint_info(joint_id, body_id).jointName
 
-    def get_link_name(self, link_id, body_id=None):
-        body_id = self.body_id_or_default(body_id)
+    def _get_link_name(self, link_id, body_id=None):
+        body_id = self._body_id_or_default(body_id)
         if link_id == BASE_LINK_ID:
-            return self.get_base_name(body_id)
-        return self.get_joint_info(link_id, body_id).linkName.decode('UTF-8')
+            return self._get_base_name(body_id)
+        return self._get_joint_info(link_id, body_id).linkName.decode('UTF-8')
 
-    def get_link_frame(self, link_id, body_id=None):
-        body_id = self.body_id_or_default(body_id)
+    def _get_link_frame(self, link_id, body_id=None):
+        body_id = self._body_id_or_default(body_id)
         if link_id == BASE_LINK_ID:
-            return self.get_base_frame(body_id)
-        link_state = self.get_link_state(link_id, body_id)
+            return self._get_base_frame(body_id)
+        link_state = self._get_link_state(link_id, body_id)
         pose = (link_state.worldLinkFramePosition, link_state.worldLinkFrameOrientation)
         return frame_from_pose(pose)
 
     # =======================================
-    def set_base_frame(self, frame, body_id=None):
-        # !!! This could lead to a discrepancy between the self._robot and what's going on in pybullet.
-        # !!! RCF would not match
-        body_id = self.body_id_or_default(body_id)
+    def _set_base_frame(self, frame, body_id=None):
+        body_id = self._body_id_or_default(body_id)
         point, quaternion = pose_from_frame(frame)
         pybullet.resetBasePositionAndOrientation(body_id, point, quaternion, physicsClientId=self.client_id)
 
-    def set_joint_position(self, joint_id, value, body_id=None):
-        body_id = self.body_id_or_default(body_id)
+    def _set_joint_position(self, joint_id, value, body_id=None):
+        body_id = self._body_id_or_default(body_id)
         pybullet.resetJointState(body_id, joint_id, value, targetVelocity=0, physicsClientId=self.client_id)
         # self.create_collision_map() ???
 
-    def set_joint_positions(self, joints, values, body_id=None):
-        body_id = self.body_id_or_default(body_id)
+    def _set_joint_positions(self, joints, values, body_id=None):
+        body_id = self._body_id_or_default(body_id)
         if len(joints) != len(values):
             raise Exception('Joints and values must have the same length.')
         for joint, value in zip(joints, values):
-            self.set_joint_position(joint, value, body_id)
+            self._set_joint_position(joint, value, body_id)
 
     # =======================================
     def convert_mesh_to_body(self, mesh, frame, _name=None):
@@ -339,15 +336,17 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """
         temp_dir = tempfile.mkdtemp()
         tmp_obj_path = os.path.join(temp_dir, 'temp.obj')
-        mesh.to_obj(tmp_obj_path)
-        pyb_body_id = self.body_from_obj(tmp_obj_path)
-        self.set_base_frame(frame, pyb_body_id)
-        # !!! The following lines are apparently for visual debugging purposes
-        # To be deleted or rewritten later.
-        # if name:
-        #     pybullet_planning.add_body_name(pyb_body, name)
-        os.remove(tmp_obj_path)
-        os.rmdir(temp_dir)
+        try:
+            mesh.to_obj(tmp_obj_path)
+            pyb_body_id = self.body_from_obj(tmp_obj_path)
+            self._set_base_frame(frame, pyb_body_id)
+            # !!! The following lines are apparently for visual debugging purposes
+            # To be deleted or rewritten later.
+            # if name:
+            #     pybullet_planning.add_body_name(pyb_body, name)
+        finally:
+            os.remove(tmp_obj_path)
+            os.rmdir(temp_dir)
         return pyb_body_id
 
     def body_from_obj(self, path, scale=1., mass=STATIC_MASS, collision=True, color=GREY):

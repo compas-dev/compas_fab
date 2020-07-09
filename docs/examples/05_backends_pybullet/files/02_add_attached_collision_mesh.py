@@ -1,9 +1,11 @@
 import time
 
-from compas.datastructures import Mesh
 import compas_fab
 from compas_fab.backends.pybullet import PyBulletClient
-from compas_fab.robots import CollisionMesh, AttachedCollisionMesh
+from compas_fab.robots import AttachedCollisionMesh
+from compas_fab.robots import CollisionMesh
+
+from compas.datastructures import Mesh
 
 with PyBulletClient() as client:
     urdf_filepath = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')

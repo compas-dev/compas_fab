@@ -3,7 +3,8 @@ from __future__ import division
 from __future__ import print_function
 
 from compas_fab.backends.interfaces import AddAttachedCollisionMesh
-from compas_fab.backends.pybullet.const import BASE_LINK_ID, ConstraintInfo
+from compas_fab.backends.pybullet.const import BASE_LINK_ID
+from compas_fab.backends.pybullet.const import ConstraintInfo
 from compas_fab.backends.pybullet.const import ZERO_FRAME
 from compas_fab.backends.pybullet.conversions import pose_from_frame
 from compas_fab.utilities import LazyLoader
@@ -44,8 +45,8 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         name = attached_collision_mesh.collision_mesh.id
 
         robot_tool0_link_id = self.client.link_id_by_name[attached_collision_mesh.link_name]
-        robot_tool0_frame = self.client.get_link_frame(robot_tool0_link_id, self.client.robot_uid)
-        robot_tool0_link_state = self.client.get_link_state(robot_tool0_link_id, self.client.robot_uid)
+        robot_tool0_frame = self.client._get_link_frame(robot_tool0_link_id, self.client.robot_uid)
+        robot_tool0_link_state = self.client._get_link_state(robot_tool0_link_id, self.client.robot_uid)
         inverted_tool0_com_point, inverted_tool0_com_frame = pybullet.invertTransform(
             robot_tool0_link_state.linkWorldPosition,
             robot_tool0_link_state.linkWorldOrientation
