@@ -33,9 +33,10 @@ class PyBulletRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
         -------
         ``None``
         """
-        if id in self.client.attached_collision_objects:
-            for constraint_info in self.client.attached_collision_objects[id]:
-                pybullet.removeConstraint(constraint_info.constraint_id, physicsClientId=self.client.client_id)
-                pybullet.removeBody(constraint_info.body_id, physicsClientId=self.client.client_id)
-        else:
+        if id not in self.client.attached_collision_objects:
             LOG.warning("Attached collision object with name '{}' does not exist in scene.".format(id))
+            return
+
+        for constraint_info in self.client.attached_collision_objects[id]:
+            pybullet.removeConstraint(constraint_info.constraint_id, physicsClientId=self.client.client_id)
+            pybullet.removeBody(constraint_info.body_id, physicsClientId=self.client.client_id)

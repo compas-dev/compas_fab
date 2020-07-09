@@ -70,8 +70,9 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         if options.get('max_force') is not None:
             pybullet.changeConstraint(constraint_id, maxForce=options['max_force'], physicsClientId=self.client.client_id)
 
-        # if name in self.client.attached_collision_objects:
-        #     self.client.remove_attached_collision_mesh(name)  # mimic ROS' behaviour: collision object with same name is replaced
+        # mimic ROS' behavior: collision object with same name is replaced
+        if name in self.client.attached_collision_objects:
+            self.client.remove_attached_collision_mesh(name)
 
         constraint_info = ConstraintInfo(constraint_id, body_id)
         self.client.attached_collision_objects[name] = [constraint_info]

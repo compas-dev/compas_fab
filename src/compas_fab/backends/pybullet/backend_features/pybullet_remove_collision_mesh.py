@@ -33,8 +33,9 @@ class PyBulletRemoveCollisionMesh(RemoveCollisionMesh):
         -------
         ``None``
         """
-        if id in self.client.collision_objects:
-            for body_id in self.client.collision_objects[id]:
-                pybullet.removeBody(body_id)
-        else:
+        if id not in self.client.collision_objects:
             LOG.warning("Collision object with name '{}' does not exist in scene.".format(id))
+            return
+
+        for body_id in self.client.collision_objects[id]:
+            pybullet.removeBody(body_id)

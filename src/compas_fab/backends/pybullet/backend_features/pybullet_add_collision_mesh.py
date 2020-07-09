@@ -31,7 +31,10 @@ class PyBulletAddCollisionMesh(AddCollisionMesh):
         mesh = collision_mesh.mesh
         name = collision_mesh.id
         frame = collision_mesh.frame
+
+        # mimic ROS' behavior: collision object with same name is replaced
         if name in self.client.collision_objects:
-            self.client.remove_collision_mesh(name)  # mimic ROS' behaviour: collision object with same name is replaced
+            self.client.remove_collision_mesh(name)
+
         body_id = self.client.convert_mesh_to_body(mesh, frame, name)
         self.client.collision_objects[name] = [body_id]
