@@ -23,3 +23,5 @@ JointInfo = namedtuple('JointInfo', ['jointIndex', 'jointName', 'jointType',
 LinkState = namedtuple('LinkState', ['linkWorldPosition', 'linkWorldOrientation',
                                      'localInertialFramePosition', 'localInertialFrameOrientation',
                                      'worldLinkFramePosition', 'worldLinkFrameOrientation'])
+
+DetectedCollision = namedtuple('DetectedCollision', ['in_collision', 'names'])

@@ -12,7 +12,7 @@ from compas.geometry import Frame
 from compas.robots import RobotModel
 
 from compas_fab.backends.interfaces.client import ClientInterface
-from . import const as const
+from . import const as const, DetectedCollision
 from compas_fab.robots import Robot
 from compas_fab.utilities import LazyLoader
 
@@ -186,43 +186,34 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                 continue
             self.collision_map.setdefault(link1, []).append(link2)
 
-    def configuration_in_collision(self, configuration):
-        joint_ids = tuple(self.joint_id_by_name[name] for name in configuration.joint_names)
-        self._set_joint_positions(joint_ids, configuration.values, self.robot_uid)
-        collision, _names = self.collision_check()
-        return collision
-
     def remove_configurations_in_collision(self, configurations):
         """Used for a custom inverse kinematics function.
         """
         for i, configuration in enumerate(configurations):
             if not configuration:  # if an ik solution was already removed
                 continue
-            in_collision = self.configuration_in_collision(configuration)
-            if in_collision:
+            detected_collision = self.check_collisions(configuration)
+            if detected_collision.in_collision:
                 configurations[i] = None
 
-    def collision_check(self):
-        # collision objects
-        for name, body_ids in self.collision_objects.items():
-            for body_id in body_ids:
-                pts = pybullet.getClosestPoints(bodyA=self.robot_uid, bodyB=body_id, distance=0, physicsClientId=self.client_id)
-                if pts:
-                    LOG.warning("Collision between 'robot' and '{}'".format(name))
-                    return True, ("robot", name)
+    def check_collisions(self, configuration=None):
+        self.ensure_robot()
+        if configuration:
+            joint_ids = tuple(self.joint_id_by_name[name] for name in configuration.joint_names)
+            self._set_joint_positions(joint_ids, configuration.values, self.robot_uid)
+        detected_collision = self._check_robot_self_collision()
+        if detected_collision.in_collision:
+            return detected_collision
+        detected_collision = self._check_collision_with_objects()
+        if detected_collision.in_collision:
+            return detected_collision
+        detected_collision = self._check_collision_with_attached_objects()
+        if detected_collision.in_collision:
+            return detected_collision
 
-        for link1_name, names in self.collision_map.items():
-            link1 = self.link_id_by_name[link1_name]
-            for link2_name in names:
-                link2 = self.link_id_by_name[link2_name]
-                pts = pybullet.getClosestPoints(bodyA=self.robot_uid, bodyB=self.robot_uid, distance=0,
-                                                linkIndexA=link1, linkIndexB=link2, physicsClientId=self.client_id)
-                if pts:
-                    LOG.warning("Collision between '{}' and '{}'".format(link1_name, link2_name))
-                    return True, (link1_name, link2_name)
+        return DetectedCollision(False, (None, None))
 
-        # attached collision objects
-        # !!! is this right?
+    def _check_collision_with_attached_objects(self):
         for name, constraint_info in self.attached_collision_objects.items():
             pts = pybullet.getClosestPoints(bodyA=self.robot_uid, bodyB=constraint_info.body_id, distance=0, physicsClientId=self.client_id)
             if pts:
@@ -232,8 +223,40 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                     pts = pybullet.getClosestPoints(bodyA=body_id, bodyB=constraint_info.body_id, distance=0, physicsClientId=self.client_id)
                     if pts:
                         LOG.warning("Collision between '{}' and '{}'".format(name, collision_object_name))
+                        return DetectedCollision(True, (name, collision_object_name))
+        return DetectedCollision(False, (None, None))
 
-        return False, ()
+    def _check_collision_with_objects(self):
+        for name, body_ids in self.collision_objects.items():
+            for body_id in body_ids:
+                pts = pybullet.getClosestPoints(bodyA=self.robot_uid, bodyB=body_id, distance=0, physicsClientId=self.client_id)
+                if pts:
+                    LOG.warning("Collision between 'robot' and '{}'".format(name))
+                    return DetectedCollision(True, ("robot", name))
+        return DetectedCollision(False, (None, None))
+
+    def _check_robot_self_collision(self):
+        for link1_name, names in self.collision_map.items():
+            link1 = self.link_id_by_name[link1_name]
+            for link2_name in names:
+                link2 = self.link_id_by_name[link2_name]
+                pts = pybullet.getClosestPoints(bodyA=self.robot_uid, bodyB=self.robot_uid, distance=0,
+                                                linkIndexA=link1, linkIndexB=link2, physicsClientId=self.client_id)
+                if pts:
+                    LOG.warning("Collision between '{}' and '{}'".format(link1_name, link2_name))
+                    return DetectedCollision(True, (link1_name, link2_name))
+        return DetectedCollision(False, (None, None))
+
+    def check_collision_objects_for_collision(self):
+        names = self.collision_objects.keys()
+        for name1, name2 in combinations(names, 2):
+            for body1_id in self.collision_objects[name1]:
+                for body2_id in self.collision_objects[name2]:
+                    pts = pybullet.getClosestPoints(bodyA=body1_id, bodyB=body2_id, distance=0, physicsClientId=self.client_id)
+                    if len(pts):
+                        LOG.warning("Collision between '{}' and '{}'".format(name1, name2))
+                        return DetectedCollision(True, (name1, name2))
+        return DetectedCollision(False, (None, None))
 
     def ensure_robot(self):
         """Checks if the robot is loaded."""
