@@ -37,25 +37,42 @@ class PyBulletBase(object):
         self.use_gui = use_gui
 
     def connect(self, shadows=True, color=None, width=None, height=None):
+        """Connect from the PyBullet server.
+
+        Parameters
+        ----------
+        shadows : :obj:`bool`
+            Display shadows in the GUI. Defaults to ``True``.
+        color : :obj:`tuple` of :obj:`float`
+            Set the background color of the GUI. Defaults to ``None``.
+        width : :obj:`int`
+            Set the width in pixels of the GUI. Defaults to ``None``.
+        height : :obj:`int`
+            Set the height in pixels of GUI. Defaults to ``None``.
+
+        Returns
+        -------
+        ``None``
+        """
         # Shared Memory: execute the physics simulation and rendering in a separate process
         # https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/examples/vrminitaur.py#L7
-        self.detect_display()
+        self._detect_display()
         method = pybullet.GUI if self.use_gui else pybullet.DIRECT
-        options = self.compose_options(color, width, height)
+        options = self._compose_options(color, width, height)
         with redirect_stdout():
             self.client_id = pybullet.connect(method, options=options)
         if self.client_id < 0:
             raise Exception('Error in establishing connection with PyBullet.')
         if self.use_gui:
-            self.configure_debug_visualizer(shadows)
+            self._configure_debug_visualizer(shadows)
 
-    def detect_display(self):
+    def _detect_display(self):
         if self.use_gui and system != 'darwin' and not compas.is_windows() and ('DISPLAY' not in os.environ):
             self.use_gui = False
             print('No display detected! Continuing without GUI.')
 
     @staticmethod
-    def compose_options(color, width, height):
+    def _compose_options(color, width, height):
         options = ''
         if color is not None:
             options += '--background_color_red={} --background_color_green={} --background_color_blue={}'.format(*color)
@@ -65,7 +82,7 @@ class PyBulletBase(object):
             options += '--height={}'.format(height)
         return options
 
-    def configure_debug_visualizer(self, shadows):
+    def _configure_debug_visualizer(self, shadows):
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_GUI, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_TINY_RENDERER, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_RGB_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
@@ -74,6 +91,7 @@ class PyBulletBase(object):
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SHADOWS, shadows, physicsClientId=self.client_id)
 
     def disconnect(self):
+        """Disconnect from the PyBullet server."""
         with redirect_stdout():
             return pybullet.disconnect(physicsClientId=self.client_id)
 
