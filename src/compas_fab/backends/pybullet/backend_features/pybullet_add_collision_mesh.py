@@ -26,8 +26,8 @@ class PyBulletAddCollisionMesh(AddCollisionMesh):
         options : dict
             Dictionary containing the following key-value pairs:
 
-            - ``"mass"``: (:obj:`float`) The mass of the mesh.  If `0` is given,
-              (the default), the object added is static.
+            - ``"mass"``: (:obj:`float`) The mass of the object, in kg.
+              If `0` is given, (the default), the object added is static.
 
         Returns
         -------

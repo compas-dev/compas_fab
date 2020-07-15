@@ -34,7 +34,7 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
 
             - ``"max_force"``: (:obj:`float`) The maximum force that
               the constraint can apply. Optional.
-            - ``"mass"``: (:obj:`float`) The mass of the mesh.
+            - ``"mass"``: (:obj:`float`) The mass of the object, in kg.
 
         Returns
         -------

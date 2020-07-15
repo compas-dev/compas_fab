@@ -376,7 +376,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         _name : :obj:`str`, optional
             Name of the mesh for tagging in pybullet's GUI
         mass : :obj:`float`, optional
-            Mass of the body to be created.  If `0` mass is given (the default),
+            Mass of the body to be created, in kg.  If `0` mass is given (the default),
             the object is static.
 
         Returns
