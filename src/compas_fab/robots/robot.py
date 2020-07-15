@@ -292,6 +292,17 @@ class Robot(object):
         return link_names
 
     def get_link_names_with_collision_geometry(self):
+        """Returns the names of the links with collision geometry.
+
+        Returns
+        -------
+        list of str
+
+        Examples
+        --------
+        >>> robot.get_link_names_with_collision_geometry()
+        ['base_link', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link', 'ee_link']
+        """
         return [link.name for link in self.model.iter_links() if link.collision]
 
     def get_configurable_joints(self, group=None):
