@@ -7,7 +7,6 @@ import tempfile
 from itertools import combinations
 
 import compas
-import compas_fab.backends.pybullet.exceptions
 from compas._os import system
 from compas.geometry import Frame
 from compas.robots import RobotModel
