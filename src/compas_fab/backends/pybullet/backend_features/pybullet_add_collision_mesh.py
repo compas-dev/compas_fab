@@ -33,6 +33,7 @@ class PyBulletAddCollisionMesh(AddCollisionMesh):
         -------
         ``None``
         """
+        options = options or {}
         mesh = collision_mesh.mesh
         name = collision_mesh.id
         frame = collision_mesh.frame
