@@ -8,6 +8,8 @@ __all__ = [
     'PyBulletAddCollisionMesh',
 ]
 
+from compas_fab.backends.pybullet.const import STATIC_MASS
+
 
 class PyBulletAddCollisionMesh(AddCollisionMesh):
     """Callable to add a collision mesh to the planning scene."""
@@ -21,8 +23,11 @@ class PyBulletAddCollisionMesh(AddCollisionMesh):
         ----------
         collision_mesh : :class:`compas_fab.robots.CollisionMesh`
             Object containing the collision mesh to be added.
-        options : dict, optional
-            Unused parameter.
+        options : dict
+            Dictionary containing the following key-value pairs:
+
+            - ``"mass"``: (:obj:`float`) The mass of the mesh.  If `0` is given,
+              (the default), the object added is static.
 
         Returns
         -------
@@ -31,10 +36,11 @@ class PyBulletAddCollisionMesh(AddCollisionMesh):
         mesh = collision_mesh.mesh
         name = collision_mesh.id
         frame = collision_mesh.frame
+        mass = options.get('mass', STATIC_MASS)
 
         # mimic ROS' behavior: collision object with same name is replaced
         if name in self.client.collision_objects:
             self.client.remove_collision_mesh(name)
 
-        body_id = self.client.convert_mesh_to_body(mesh, frame, name)
+        body_id = self.client.convert_mesh_to_body(mesh, frame, name, mass)
         self.client.collision_objects[name] = [body_id]

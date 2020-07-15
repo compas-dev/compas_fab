@@ -29,11 +29,12 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         ----------
         attached_collision_mesh : :class:`compas_fab.robots.AttachedCollisionMesh`
             Object containing the collision mesh to be attached.
-        options : dict, optional
+        options : dict
             Dictionary containing the following key-value pairs:
 
             - ``"max_force"``: (:obj:`float`) The maximum force that
-              the constraint can apply.
+              the constraint can apply. Optional.
+            - ``"mass"``: (:obj:`float`) The mass of the mesh.
 
         Returns
         -------
@@ -51,7 +52,7 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
             robot_tool0_link_state.linkWorldOrientation
         )
 
-        body_id = self.client.convert_mesh_to_body(mesh, robot_tool0_frame)
+        body_id = self.client.convert_mesh_to_body(mesh, robot_tool0_frame, mass=options['mass'])
         body_link_id = BASE_LINK_ID
         body_point, body_quaternion = pose_from_frame(robot_tool0_frame)
 
@@ -65,7 +66,7 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
                                                   parentFramePosition=grasp_point,
                                                   childFramePosition=Frame.worldXY().point,
                                                   parentFrameOrientation=grasp_quaternion,
-                                                  childFrameOrientation=Frame.worldXY().quaternion,
+                                                  childFrameOrientation=Frame.worldXY().quaternion.xyzw,
                                                   physicsClientId=self.client.client_id)
         if options.get('max_force') is not None:
             pybullet.changeConstraint(constraint_id, maxForce=options['max_force'], physicsClientId=self.client.client_id)

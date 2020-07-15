@@ -14,7 +14,7 @@ with PyBulletClient() as client:
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
     cm = CollisionMesh(mesh, 'tip')
     acm = AttachedCollisionMesh(cm, 'ee_link')
-    client.add_attached_collision_mesh(acm)
+    client.add_attached_collision_mesh(acm, {'mass': 1})
 
     time.sleep(1)
     client.step_simulation()

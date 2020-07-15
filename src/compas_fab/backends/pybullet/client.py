@@ -7,20 +7,22 @@ import tempfile
 from itertools import combinations
 
 import compas
+import compas_fab.backends.pybullet.exceptions
 from compas._os import system
 from compas.geometry import Frame
 from compas.robots import RobotModel
 
 from compas_fab.backends.interfaces.client import ClientInterface
-from . import const as const, DetectedCollision
+from . import const as const
 from compas_fab.robots import Robot
 from compas_fab.utilities import LazyLoader
 
+from .conversions import frame_from_pose
+from .conversions import pose_from_frame
+from .exceptions import DetectedCollisionError
 from .planner import PyBulletPlanner
 from .utils import LOG
 from .utils import redirect_stdout
-from .conversions import frame_from_pose
-from .conversions import pose_from_frame
 
 pybullet = LazyLoader('pybullet', globals(), 'pybullet')
 
@@ -123,7 +125,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.robot_uid = None
         self.collision_objects = {}
         self.attached_collision_objects = {}
-        self.collision_map = {}
+        self.disabled_collisions = set()  # !!! use setCollisionFilterPair in setter?
         self.joint_id_by_name = {}
         self.link_id_by_name = {}
 
@@ -143,9 +145,20 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self._robot = robot
         self._robot.client = self
         self.load_robot_from_urdf(robot.model.urdf_filename)
-        self.create_collision_map()
+        self.disabled_collisions.update(self.robot.semantics.disabled_collisions)
+
+    def ensure_robot(self):
+        """Checks if the robot is loaded."""
+        if self.robot_uid is None:
+            raise Exception('This method is only callable once a robot is loaded')
 
     def step_simulation(self):
+        """By default, the physics server will not step the simulation,
+        unless you explicitly send a ``step_simulation``command.  This
+        method will perform all the actions in a single forward dynamics
+        simulation step such as collision detection, constraint solving
+        and integration. The timestep is 1/240 second.
+        """
         pybullet.stepSimulation(physicsClientId=self.client_id)
 
     def load_robot_from_urdf(self, urdf_filename):
@@ -160,9 +173,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         robot_model = RobotModel.from_urdf_file(urdf_filename)
         self._robot = Robot(robot_model)
         self._robot.client = self
-        self.create_collision_map()
         with redirect_stdout(enabled=not self.verbose):
-            self.robot_uid = pybullet.loadURDF(urdf_filename, useFixedBase=True, physicsClientId=self.client_id)
+            self.robot_uid = pybullet.loadURDF(urdf_filename, useFixedBase=True,
+                                               physicsClientId=self.client_id, flags=pybullet.URDF_USE_SELF_COLLISION)
         self.create_name_id_maps()
 
     def create_name_id_maps(self):
@@ -175,94 +188,113 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             joint_name = self._get_joint_name(joint_id, self.robot_uid)
             self.joint_id_by_name[joint_name] = joint_id
 
-    def create_collision_map(self, disabled_collisions=None):
-        link_names = self.robot.get_link_names_with_collision_geometry()
-        disabled_collisions = disabled_collisions or set()
-        if self.robot.semantics:
-            disabled_collisions.update(self.robot.semantics.disabled_collisions)
-        self.collision_map = {}
-        for link1, link2 in combinations(link_names, 2):
-            if {link1, link2} in disabled_collisions:
-                continue
-            self.collision_map.setdefault(link1, []).append(link2)
-
     def remove_configurations_in_collision(self, configurations):
-        """Used for a custom inverse kinematics function.
+        """Removes from a list of configurations those which are in collision.
+        Used for a custom inverse kinematics function.
+
+        Parameters
+        ----------
+        configurations : :obj:`list` of :class:`compas_fab.robots.Configuration`
+            List of configurations to be checked for collisions.
+
+        Returns
+        -------
+        :obj:`list` of :class:`compas_fab.robots.Configuration`
+            The same list of configurations with those in collision replaced with ``None``.
         """
         for i, configuration in enumerate(configurations):
             if not configuration:  # if an ik solution was already removed
                 continue
-            detected_collision = self.check_collisions(configuration)
-            if detected_collision.in_collision:
+            try:
+                self.check_collisions(configuration)
+            except DetectedCollisionError:
                 configurations[i] = None
 
+    # =======================================
     def check_collisions(self, configuration=None):
+        """Checks whether the current or given configuration is in collision.
+
+        Parameters
+        ----------
+        configuration : :class:`compas_fab.robots.Configuration`
+            Configuration to be checked for collision.  If ``None`` is given, the current
+            configuration will be checked.  Defaults to ``None``.
+
+        Raises
+        -------
+        :class:`compas_fab.backends.pybullet.DetectedCollision`
+        """
         self.ensure_robot()
         if configuration:
             joint_ids = tuple(self.joint_id_by_name[name] for name in configuration.joint_names)
             self._set_joint_positions(joint_ids, configuration.values, self.robot_uid)
-        detected_collision = self._check_robot_self_collision()
-        if detected_collision.in_collision:
-            return detected_collision
-        detected_collision = self._check_collision_with_objects()
-        if detected_collision.in_collision:
-            return detected_collision
-        detected_collision = self._check_collision_with_attached_objects()
-        if detected_collision.in_collision:
-            return detected_collision
+        self.check_collision_with_objects()
+        self.check_robot_self_collision()
 
-        return DetectedCollision(False, (None, None))
+    def check_collision_with_objects(self):
+        """Checks whether the robot and its attached collision objects with its current
+        configuration is is colliding with any collision objects.
 
-    def _check_collision_with_attached_objects(self):
-        for name, constraint_info in self.attached_collision_objects.items():
-            pts = pybullet.getClosestPoints(bodyA=self.robot_uid, bodyB=constraint_info.body_id, distance=0, physicsClientId=self.client_id)
-            if pts:
-                LOG.warning("Collision between 'robot' and '{}'".format(name))
-            for collision_object_name, body_ids in self.collision_objects.items():
-                for body_id in body_ids:
-                    pts = pybullet.getClosestPoints(bodyA=body_id, bodyB=constraint_info.body_id, distance=0, physicsClientId=self.client_id)
-                    if pts:
-                        LOG.warning("Collision between '{}' and '{}'".format(name, collision_object_name))
-                        return DetectedCollision(True, (name, collision_object_name))
-        return DetectedCollision(False, (None, None))
-
-    def _check_collision_with_objects(self):
+        Raises
+        -------
+        :class:`compas_fab.backends.pybullet.DetectedCollision`
+        """
         for name, body_ids in self.collision_objects.items():
             for body_id in body_ids:
-                pts = pybullet.getClosestPoints(bodyA=self.robot_uid, bodyB=body_id, distance=0, physicsClientId=self.client_id)
-                if pts:
-                    LOG.warning("Collision between 'robot' and '{}'".format(name))
-                    return DetectedCollision(True, ("robot", name))
-        return DetectedCollision(False, (None, None))
+                self._check_collision(self.robot_uid, 'robot', body_id, name)
 
-    def _check_robot_self_collision(self):
-        for link1_name, names in self.collision_map.items():
-            link1 = self.link_id_by_name[link1_name]
-            for link2_name in names:
-                link2 = self.link_id_by_name[link2_name]
-                pts = pybullet.getClosestPoints(bodyA=self.robot_uid, bodyB=self.robot_uid, distance=0,
-                                                linkIndexA=link1, linkIndexB=link2, physicsClientId=self.client_id)
-                if pts:
-                    LOG.warning("Collision between '{}' and '{}'".format(link1_name, link2_name))
-                    return DetectedCollision(True, (link1_name, link2_name))
-        return DetectedCollision(False, (None, None))
+    def check_robot_self_collision(self):
+        """Checks whether the robot and its attached collision objects with its current
+        configuration is colliding with itself.
+
+        Raises
+        -------
+        :class:`compas_fab.backends.pybullet.DetectedCollision`
+        """
+        link_names = self.robot.get_link_names_with_collision_geometry()
+        # check for collisions between robot links
+        for link_1_name, link_2_name in combinations(link_names, 2):
+            if {link_1_name, link_2_name} in self.disabled_collisions:
+                continue
+            link_1_id = self.link_id_by_name[link_1_name]
+            link_2_id = self.link_id_by_name[link_2_name]
+            self._check_collision(self.robot_uid, link_1_name, self.robot_uid, link_2_name, link_1_id, link_2_id)
+        # check for collisions between robot links and attached collision objects
+        for link_name in link_names:
+            link_id = self.link_id_by_name[link_name]
+            for name, constraint_info_list in self.attached_collision_objects.items():
+                for constraint_info in constraint_info_list:
+                    self._check_collision(self.robot_uid, link_name, constraint_info.body_id, name, link_id)
 
     def check_collision_objects_for_collision(self):
+        """Checks whether any of the collision objects are colliding.
+
+        Raises
+        -------
+        :class:`compas_fab.backends.pybullet.DetectedCollision`
+        """
         names = self.collision_objects.keys()
-        for name1, name2 in combinations(names, 2):
-            for body1_id in self.collision_objects[name1]:
-                for body2_id in self.collision_objects[name2]:
-                    pts = pybullet.getClosestPoints(bodyA=body1_id, bodyB=body2_id, distance=0, physicsClientId=self.client_id)
-                    if len(pts):
-                        LOG.warning("Collision between '{}' and '{}'".format(name1, name2))
-                        return DetectedCollision(True, (name1, name2))
-        return DetectedCollision(False, (None, None))
+        for name_1, name_2 in combinations(names, 2):
+            for body_1_id in self.collision_objects[name_1]:
+                for body_2_id in self.collision_objects[name_2]:
+                    self._check_collision(body_1_id, name_1, body_2_id, name_2)
 
-    def ensure_robot(self):
-        """Checks if the robot is loaded."""
-        if self.robot_uid is None:
-            raise Exception('This method is only callable once a robot is loaded')
+    def _check_collision(self, body_1_id, body_1_name, body_2_id, body_2_name, link_index_1=None, link_index_2=None):
+        kwargs = {
+            'bodyA': body_1_id,
+            'bodyB': body_2_id,
+            'distance': 0,
+            'physicsClientId': self.client_id,
+            'linkIndexA': link_index_1,
+            'linkIndexB': link_index_2,
+        }
+        kwargs = {key: value for key, value in kwargs.items() if value is not None}
+        pts = pybullet.getClosestPoints(**kwargs)
+        if pts:
+            LOG.warning("Collision between '{}' and '{}'".format(body_1_name, body_2_name))
+            raise DetectedCollisionError(body_1_name, body_2_name)
 
+    # =======================================
     def _body_id_or_default(self, body_id):
         if body_id is None:
             self.ensure_robot()
@@ -300,7 +332,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def _get_joint_name(self, joint_id, body_id=None):
         body_id = self._body_id_or_default(body_id)
-        return self._get_joint_info(joint_id, body_id).jointName
+        return self._get_joint_info(joint_id, body_id).jointName.decode('UTF-8')
 
     def _get_link_name(self, link_id, body_id=None):
         body_id = self._body_id_or_default(body_id)
@@ -325,7 +357,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def _set_joint_position(self, joint_id, value, body_id=None):
         body_id = self._body_id_or_default(body_id)
         pybullet.resetJointState(body_id, joint_id, value, targetVelocity=0, physicsClientId=self.client_id)
-        # self.create_collision_map() ???
 
     def _set_joint_positions(self, joints, values, body_id=None):
         body_id = self._body_id_or_default(body_id)
@@ -335,7 +366,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             self._set_joint_position(joint, value, body_id)
 
     # =======================================
-    def convert_mesh_to_body(self, mesh, frame, _name=None):
+    def convert_mesh_to_body(self, mesh, frame, _name=None, mass=const.STATIC_MASS):
         """Convert compas mesh and its frame to a pybullet body
 
         Parameters
@@ -344,6 +375,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         frame : :class:`compas.geometry.Frame`
         _name : :obj:`str`, optional
             Name of the mesh for tagging in pybullet's GUI
+        mass : :obj:`float`, optional
+            Mass of the body to be created.  If `0` mass is given (the default),
+            the object is static.
 
         Returns
         -------
@@ -353,9 +387,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         tmp_obj_path = os.path.join(temp_dir, 'temp.obj')
         try:
             mesh.to_obj(tmp_obj_path)
-            pyb_body_id = self.body_from_obj(tmp_obj_path)
+            pyb_body_id = self.body_from_obj(tmp_obj_path, mass=mass)
             self._set_base_frame(frame, pyb_body_id)
-            # !!! The following lines are apparently for visual debugging purposes
+            # !!! The following lines are for visual debugging purposes
             # To be deleted or rewritten later.
             # if name:
             #     pybullet_planning.add_body_name(pyb_body, name)
@@ -365,30 +399,32 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return pyb_body_id
 
     def body_from_obj(self, path, scale=1., mass=const.STATIC_MASS, collision=True, color=const.GREY):
-        geometry_args = self.get_geometry_args(path, scale=scale)
+        geometry_args = self._get_geometry_args(path, scale=scale)
 
-        collision_args = self.get_collision_args(geometry_args)
-        collision_id = self.create_collision_shape(collision_args) if collision else const.NULL_ID
+        collision_args = self._get_collision_args(geometry_args)
+        collision_id = self._create_collision_shape(collision_args) if collision else const.NULL_ID
 
-        visual_args = self.get_visual_args(geometry_args, color=color)
-        visual_id = self.create_visual_shape(visual_args)
+        visual_args = self._get_visual_args(geometry_args, color=color)
+        visual_id = self._create_visual_shape(visual_args)
 
-        body_id = self.create_body(collision_id, visual_id, mass=mass)
+        body_id = self._create_body(collision_id, visual_id, mass=mass)
         return body_id
 
-    def create_body(self, collision_id=const.NULL_ID, visual_id=const.NULL_ID, mass=const.STATIC_MASS):
+    def _create_body(self, collision_id=const.NULL_ID, visual_id=const.NULL_ID, mass=const.STATIC_MASS):
         return pybullet.createMultiBody(baseMass=mass, baseCollisionShapeIndex=collision_id,
                                         baseVisualShapeIndex=visual_id, physicsClientId=self.client_id)
 
-    def create_collision_shape(self, collision_args):
+    @staticmethod
+    def _create_collision_shape(collision_args):
         return pybullet.createCollisionShape(**collision_args)
 
-    def create_visual_shape(self, visual_args):
+    @staticmethod
+    def _create_visual_shape(visual_args):
         if visual_args.get('rgbaColor') is None:
             return const.NULL_ID
         return pybullet.createVisualShape(**visual_args)
 
-    def get_visual_args(self, geometry_args, frame=Frame.worldXY(), color=const.RED, specular=None):
+    def _get_visual_args(self, geometry_args, frame=Frame.worldXY(), color=const.RED, specular=None):
         point, quaternion = pose_from_frame(frame)
         visual_args = {
             'rgbaColor': color,
@@ -401,7 +437,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             visual_args['specularColor'] = specular
         return visual_args
 
-    def get_collision_args(self, geometry_args, frame=Frame.worldXY()):
+    def _get_collision_args(self, geometry_args, frame=Frame.worldXY()):
         point, quaternion = pose_from_frame(frame)
         collision_args = {
             'collisionFramePosition': point,
@@ -416,7 +452,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return collision_args
 
     @staticmethod
-    def get_geometry_args(path, scale=1.):
+    def _get_geometry_args(path, scale=1.):
         return {
             'shapeType': pybullet.GEOM_MESH,
             'fileName': path,
