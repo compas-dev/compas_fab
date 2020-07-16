@@ -32,7 +32,7 @@ class MoveItPlanner(PlannerInterface):
         self.attached_collision_object_topic = None
 
         self.client.on_ready(self.init_planner)
-        # self.client.on_closing(self.dispose_planner)
+        self.client.on('closing', self.dispose_planner)
 
     @forward_docstring(MoveItForwardKinematics)
     def forward_kinematics(self, *args, **kwargs):
