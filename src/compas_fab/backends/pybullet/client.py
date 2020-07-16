@@ -121,7 +121,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     Parameters
     ----------
     connection_type : :obj:`str`
-        Sets the connection type. Defaults to ``gui``.
+        Sets the connection type. Defaults to ``'gui'``.
     verbose : :obj:`bool`
         Use verbose logging. Defaults to ``False``.
 
@@ -199,6 +199,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            Robot whose configurations may be in collision.
         configurations : :obj:`list` of :class:`compas_fab.robots.Configuration`
             List of configurations to be checked for collisions.
 
@@ -221,6 +223,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            Robot whose configuration may be in collision.
         configuration : :class:`compas_fab.robots.Configuration`
             Configuration to be checked for collision.  If ``None`` is given, the current
             configuration will be checked.  Defaults to ``None``.
@@ -239,6 +243,11 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """Checks whether the robot and its attached collision objects with its current
         configuration is is colliding with any collision objects.
 
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`
+            Robot whose configuration may be in collision.
+
         Raises
         -------
         :class:`compas_fab.backends.pybullet.DetectedCollision`
@@ -250,6 +259,11 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def check_robot_self_collision(self, robot):
         """Checks whether the robot and its attached collision objects with its current
         configuration is colliding with itself.
+
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`
+            Robot whose configuration may be in collision.
 
         Raises
         -------
@@ -384,6 +398,26 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return pyb_body_id
 
     def body_from_obj(self, path, scale=1., mass=const.STATIC_MASS, collision=True, color=const.GREY):
+        """Create a PyBullet body from an OBJ file.
+
+        Parameters
+        ----------
+        path : :obj:`str`
+            Path to the OBJ file.
+        scale : :obj:`float`, optional
+            Factor by which to scale the mesh. Defaults to ``1.``
+        mass : :obj:`float`, optional
+            Mass of the body to be created, in kg.  If `0` mass is given (the default),
+            the object is static.
+        collision : :obj:`bool`
+            When ``True``, body will be included in collision checking calculations. Defaults to ``True``.
+        color : :obj:`tuple` of :obj:`float`
+            RGBa color components of the body.
+
+        Returns
+        -------
+        :obj:`int`
+        """
         geometry_args = self._get_geometry_args(path, scale=scale)
 
         collision_args = self._get_collision_args(geometry_args)
