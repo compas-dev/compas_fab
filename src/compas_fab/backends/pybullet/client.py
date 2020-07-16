@@ -15,7 +15,7 @@ from compas_fab.backends.interfaces.client import ClientInterface
 from compas_fab.robots import Robot
 from compas_fab.utilities import LazyLoader
 
-from . import const as const
+from . import const
 from .conversions import frame_from_pose
 from .conversions import pose_from_frame
 from .exceptions import DetectedCollisionError
