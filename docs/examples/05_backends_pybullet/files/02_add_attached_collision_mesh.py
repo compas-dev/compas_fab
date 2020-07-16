@@ -9,12 +9,12 @@ from compas.datastructures import Mesh
 
 with PyBulletClient() as client:
     urdf_filepath = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
-    client.load_robot_from_urdf(urdf_filepath)
+    robot = client.load_robot(urdf_filepath)
 
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
     cm = CollisionMesh(mesh, 'tip')
     acm = AttachedCollisionMesh(cm, 'ee_link')
-    client.add_attached_collision_mesh(acm, {'mass': 1})
+    client.add_attached_collision_mesh(acm, {'mass': 1, 'robot': robot})
 
     time.sleep(1)
     client.step_simulation()

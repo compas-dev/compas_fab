@@ -137,13 +137,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         super(PyBulletClient, self).__init__(connection_type)
         self.planner = PyBulletPlanner(self)
         self.verbose = verbose
-        self._robot = None
-        self.robot_uid = None
         self.collision_objects = {}
         self.attached_collision_objects = {}
         self.disabled_collisions = set()
-        self.joint_id_by_name = {}
-        self.link_id_by_name = {}
 
     def __enter__(self):
         self.connect()
@@ -151,22 +147,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def __exit__(self, *args):
         self.disconnect()
-
-    @property
-    def robot(self):
-        return self._robot
-
-    @robot.setter
-    def robot(self, robot):
-        self._robot = robot
-        self._robot.client = self
-        self.load_robot_from_urdf(robot.model.urdf_filename)
-        self.disabled_collisions.update(self.robot.semantics.disabled_collisions)
-
-    def ensure_robot(self):
-        """Checks if the robot is loaded."""
-        if self.robot_uid is None:
-            raise Exception('This method is only callable once a robot is loaded')
 
     def step_simulation(self):
         """By default, the physics server will not step the simulation,
@@ -177,34 +157,43 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """
         pybullet.stepSimulation(physicsClientId=self.client_id)
 
-    def load_robot_from_urdf(self, urdf_filename):
+    def load_robot(self, urdf_file):
         """Create a pybullet robot using the input urdf file.
 
         Parameters
         ----------
-        urdf_filename : :obj:`str`
-            Absolute file path to the urdf file. The mesh file can be linked by either
+        urdf_file : :obj:`str` or file object
+            Absolute file path to the urdf file name or file object. The mesh file can be linked by either
             `"package::"` or relative path.
         """
-        robot_model = RobotModel.from_urdf_file(urdf_filename)
-        self._robot = Robot(robot_model)
-        self._robot.client = self
+        robot_model = RobotModel.from_urdf_file(urdf_file)
+        robot = Robot(robot_model)
+        robot.client = self
         with redirect_stdout(enabled=not self.verbose):
-            self.robot_uid = pybullet.loadURDF(urdf_filename, useFixedBase=True,
-                                               physicsClientId=self.client_id, flags=pybullet.URDF_USE_SELF_COLLISION)
-        self.create_name_id_maps()
+            robot.pybullet_uid = pybullet.loadURDF(urdf_file, useFixedBase=True,
+                                                   physicsClientId=self.client_id,
+                                                   flags=pybullet.URDF_USE_SELF_COLLISION)
+        self._add_ids_to_robot_joints(robot)
+        self._add_ids_to_robot_links(robot)
+        return robot
 
-    def create_name_id_maps(self):
-        self.joint_id_by_name = {}
-        self.link_id_by_name = {}
-        joint_ids = self._get_joint_ids(self.robot_uid)
+    def _add_ids_to_robot_joints(self, robot):
+        joint_ids = self._get_joint_ids(robot.pybullet_uid)
         for joint_id in joint_ids:
-            link_name = self._get_link_name(joint_id, self.robot_uid)
-            self.link_id_by_name[link_name] = joint_id
-            joint_name = self._get_joint_name(joint_id, self.robot_uid)
-            self.joint_id_by_name[joint_name] = joint_id
+            joint_name = self._get_joint_name(joint_id, robot.pybullet_uid)
+            joint = robot.model.get_joint_by_name(joint_name)
+            pybullet_attr = {'id': joint_id}
+            joint.attr.setdefault('pybullet', {}).update(pybullet_attr)
 
-    def remove_configurations_in_collision(self, configurations):
+    def _add_ids_to_robot_links(self, robot):
+        joint_ids = self._get_joint_ids(robot.pybullet_uid)
+        for link_id in joint_ids:
+            link_name = self._get_link_name(link_id, robot.pybullet_uid)
+            link = robot.model.get_link_by_name(link_name)
+            pybullet_attr = {'id': link_id}
+            link.attr.setdefault('pybullet', {}).update(pybullet_attr)
+
+    def remove_configurations_in_collision(self, robot, configurations):
         """Removes from a list of configurations those which are in collision.
         Used for a custom inverse kinematics function.
 
@@ -222,12 +211,12 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             if not configuration:  # if an ik solution was already removed
                 continue
             try:
-                self.check_collisions(configuration)
+                self.check_collisions(robot, configuration)
             except DetectedCollisionError:
                 configurations[i] = None
 
     # =======================================
-    def check_collisions(self, configuration=None):
+    def check_collisions(self, robot, configuration=None):
         """Checks whether the current or given configuration is in collision.
 
         Parameters
@@ -240,14 +229,13 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         -------
         :class:`compas_fab.backends.pybullet.DetectedCollision`
         """
-        self.ensure_robot()
         if configuration:
-            joint_ids = tuple(self.joint_id_by_name[name] for name in configuration.joint_names)
-            self._set_joint_positions(joint_ids, configuration.values, self.robot_uid)
-        self.check_collision_with_objects()
-        self.check_robot_self_collision()
+            joint_ids = tuple(robot.model.get_joint_by_name[name].attr['pybullet']['id'] for name in configuration.joint_names)
+            self._set_joint_positions(joint_ids, configuration.values, robot.pybullet_uid)
+        self.check_collision_with_objects(robot)
+        self.check_robot_self_collision(robot)
 
-    def check_collision_with_objects(self):
+    def check_collision_with_objects(self, robot):
         """Checks whether the robot and its attached collision objects with its current
         configuration is is colliding with any collision objects.
 
@@ -257,9 +245,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """
         for name, body_ids in self.collision_objects.items():
             for body_id in body_ids:
-                self._check_collision(self.robot_uid, 'robot', body_id, name)
+                self._check_collision(robot.pybullet_uid, 'robot', body_id, name)
 
-    def check_robot_self_collision(self):
+    def check_robot_self_collision(self, robot):
         """Checks whether the robot and its attached collision objects with its current
         configuration is colliding with itself.
 
@@ -267,20 +255,20 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         -------
         :class:`compas_fab.backends.pybullet.DetectedCollision`
         """
-        link_names = self.robot.get_link_names_with_collision_geometry()
+        link_names = robot.get_link_names_with_collision_geometry()
         # check for collisions between robot links
         for link_1_name, link_2_name in combinations(link_names, 2):
             if {link_1_name, link_2_name} in self.disabled_collisions:
                 continue
-            link_1_id = self.link_id_by_name[link_1_name]
-            link_2_id = self.link_id_by_name[link_2_name]
-            self._check_collision(self.robot_uid, link_1_name, self.robot_uid, link_2_name, link_1_id, link_2_id)
+            link_1_id = robot.model.get_link_by_name[link_1_name].attr['pybullet']['id']
+            link_2_id = robot.model.get_link_by_name[link_2_name].attr['pybullet']['id']
+            self._check_collision(robot.pybullet_uid, link_1_name, robot.pybullet_uid, link_2_name, link_1_id, link_2_id)
         # check for collisions between robot links and attached collision objects
         for link_name in link_names:
-            link_id = self.link_id_by_name[link_name]
+            link_id = robot.model.get_link_by_name[link_name].attr['pybullet']['id']
             for name, constraint_info_list in self.attached_collision_objects.items():
                 for constraint_info in constraint_info_list:
-                    self._check_collision(self.robot_uid, link_name, constraint_info.body_id, name, link_id)
+                    self._check_collision(robot.pybullet_uid, link_name, constraint_info.body_id, name, link_id)
 
     def check_collision_objects_for_collision(self):
         """Checks whether any of the collision objects are colliding.
@@ -310,54 +298,38 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             LOG.warning("Collision between '{}' and '{}'".format(body_1_name, body_2_name))
             raise DetectedCollisionError(body_1_name, body_2_name)
 
-    # =======================================
-    def _body_id_or_default(self, body_id):
-        if body_id is None:
-            self.ensure_robot()
-            return self.robot_uid
-        return body_id
-
-    def _get_base_frame(self, body_id=None):
-        body_id = self._body_id_or_default(body_id)
+    # ======================================
+    def _get_base_frame(self, body_id):
         pose = pybullet.getBasePositionAndOrientation(body_id, physicsClientId=self.client_id)
         return frame_from_pose(pose)
 
-    def _get_base_name(self, body_id=None):
-        body_id = self._body_id_or_default(body_id)
+    def _get_base_name(self, body_id):
         return self._get_body_info(body_id).base_name.decode(encoding='UTF-8')
 
-    def _get_link_state(self, link_id, body_id=None):
-        body_id = self._body_id_or_default(body_id)
+    def _get_link_state(self, link_id, body_id):
         return const.LinkState(*pybullet.getLinkState(body_id, link_id, physicsClientId=self.client_id))
 
-    def _get_body_info(self, body_id=None):
-        body_id = self._body_id_or_default(body_id)
+    def _get_body_info(self, body_id):
         return const.BodyInfo(*pybullet.getBodyInfo(body_id, physicsClientId=self.client_id))
 
-    def _get_joint_info(self, joint_id, body_id=None):
-        body_id = self._body_id_or_default(body_id)
+    def _get_joint_info(self, joint_id, body_id):
         return const.JointInfo(*pybullet.getJointInfo(body_id, joint_id, physicsClientId=self.client_id))
 
-    def _get_num_joints(self, body_id=None):
-        body_id = self._body_id_or_default(body_id)
+    def _get_num_joints(self, body_id):
         return pybullet.getNumJoints(body_id, physicsClientId=self.client_id)
 
-    def _get_joint_ids(self, body_id=None):
-        body_id = self._body_id_or_default(body_id)
+    def _get_joint_ids(self, body_id):
         return list(range(self._get_num_joints(body_id)))
 
-    def _get_joint_name(self, joint_id, body_id=None):
-        body_id = self._body_id_or_default(body_id)
+    def _get_joint_name(self, joint_id, body_id):
         return self._get_joint_info(joint_id, body_id).jointName.decode('UTF-8')
 
-    def _get_link_name(self, link_id, body_id=None):
-        body_id = self._body_id_or_default(body_id)
+    def _get_link_name(self, link_id, body_id):
         if link_id == const.BASE_LINK_ID:
             return self._get_base_name(body_id)
         return self._get_joint_info(link_id, body_id).linkName.decode('UTF-8')
 
-    def _get_link_frame(self, link_id, body_id=None):
-        body_id = self._body_id_or_default(body_id)
+    def _get_link_frame(self, link_id, body_id):
         if link_id == const.BASE_LINK_ID:
             return self._get_base_frame(body_id)
         link_state = self._get_link_state(link_id, body_id)
@@ -365,17 +337,14 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return frame_from_pose(pose)
 
     # =======================================
-    def _set_base_frame(self, frame, body_id=None):
-        body_id = self._body_id_or_default(body_id)
+    def _set_base_frame(self, frame, body_id):
         point, quaternion = pose_from_frame(frame)
         pybullet.resetBasePositionAndOrientation(body_id, point, quaternion, physicsClientId=self.client_id)
 
-    def _set_joint_position(self, joint_id, value, body_id=None):
-        body_id = self._body_id_or_default(body_id)
+    def _set_joint_position(self, joint_id, value, body_id):
         pybullet.resetJointState(body_id, joint_id, value, targetVelocity=0, physicsClientId=self.client_id)
 
-    def _set_joint_positions(self, joints, values, body_id=None):
-        body_id = self._body_id_or_default(body_id)
+    def _set_joint_positions(self, joints, values, body_id):
         if len(joints) != len(values):
             raise Exception('Joints and values must have the same length.')
         for joint, value in zip(joints, values):

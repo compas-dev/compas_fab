@@ -28,7 +28,7 @@ GREY = (0.5, 0.5, 0.5, 1)
 RED = (1, 0, 0, 1)
 
 BodyInfo = namedtuple('BodyInfo', ['base_name', 'body_name'])
-ConstraintInfo = namedtuple('ConstraintInfo', ['constraint_id', 'body_id'])
+ConstraintInfo = namedtuple('ConstraintInfo', ['constraint_id', 'body_id', 'robot_uid'])
 JointInfo = namedtuple('JointInfo', ['jointIndex', 'jointName', 'jointType',
                                      'qIndex', 'uIndex', 'flags',
                                      'jointDamping', 'jointFriction', 'jointLowerLimit', 'jointUpperLimit',

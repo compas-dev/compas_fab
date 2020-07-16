@@ -35,18 +35,21 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
             - ``"max_force"``: (:obj:`float`) The maximum force that
               the constraint can apply. Optional.
             - ``"mass"``: (:obj:`float`) The mass of the object, in kg.
+            - ``"robot"``: (:class:`compas_fab.robots.Robot``) Robot instance
+              to which the object should be attached.
 
         Returns
         -------
         ``None``
         """
         options = options or {}
+        robot = options['robot']
         mesh = attached_collision_mesh.collision_mesh.mesh
         name = attached_collision_mesh.collision_mesh.id
 
-        robot_tool0_link_id = self.client.link_id_by_name[attached_collision_mesh.link_name]
-        robot_tool0_frame = self.client._get_link_frame(robot_tool0_link_id, self.client.robot_uid)
-        robot_tool0_link_state = self.client._get_link_state(robot_tool0_link_id, self.client.robot_uid)
+        robot_tool0_link_id = robot.model.get_link_by_name(attached_collision_mesh.link_name).attr['pybullet']['id']
+        robot_tool0_frame = self.client._get_link_frame(robot_tool0_link_id, robot.pybullet_uid)
+        robot_tool0_link_state = self.client._get_link_state(robot_tool0_link_id, robot.pybullet_uid)
         inverted_tool0_com_point, inverted_tool0_com_frame = pybullet.invertTransform(
             robot_tool0_link_state.linkWorldPosition,
             robot_tool0_link_state.linkWorldOrientation
@@ -61,7 +64,7 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
             body_point, body_quaternion
         )
 
-        constraint_id = pybullet.createConstraint(self.client.robot_uid, robot_tool0_link_id, body_id, body_link_id,
+        constraint_id = pybullet.createConstraint(robot.pybullet_uid, robot_tool0_link_id, body_id, body_link_id,
                                                   pybullet.JOINT_FIXED, jointAxis=Frame.worldXY().point,
                                                   parentFramePosition=grasp_point,
                                                   childFramePosition=Frame.worldXY().point,
@@ -75,5 +78,5 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         if name in self.client.attached_collision_objects:
             self.client.remove_attached_collision_mesh(name)
 
-        constraint_info = ConstraintInfo(constraint_id, body_id)
+        constraint_info = ConstraintInfo(constraint_id, body_id, robot.pybullet_uid)
         self.client.attached_collision_objects[name] = [constraint_info]

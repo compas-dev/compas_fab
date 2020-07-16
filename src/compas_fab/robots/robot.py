@@ -52,9 +52,10 @@ class Robot(object):
         self._scale_factor = 1.
         self.model = model
         self.attached_tool = None
-        self.artist = artist  # setter and getter (because of scale)
+        self.artist = artist
         self.semantics = semantics
-        self.client = client  # setter and getter ?
+        self.client = client
+        self.pybullet_uid = None
 
     @property
     def artist(self):

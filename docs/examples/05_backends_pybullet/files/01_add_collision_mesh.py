@@ -7,7 +7,7 @@ from compas_fab.robots import CollisionMesh
 
 with PyBulletClient() as client:
     urdf_filepath = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
-    client.load_robot_from_urdf(urdf_filepath)
+    robot = client.load_robot(urdf_filepath)
 
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/floor.stl'))
     cm = CollisionMesh(mesh, 'floor')
