@@ -12,10 +12,10 @@ from compas.geometry import Frame
 from compas.robots import RobotModel
 
 from compas_fab.backends.interfaces.client import ClientInterface
-from . import const as const
 from compas_fab.robots import Robot
 from compas_fab.utilities import LazyLoader
 
+from . import const as const
 from .conversions import frame_from_pose
 from .conversions import pose_from_frame
 from .exceptions import DetectedCollisionError
@@ -32,9 +32,9 @@ __all__ = [
 
 
 class PyBulletBase(object):
-    def __init__(self, use_gui):
+    def __init__(self, connection_type):
         self.client_id = None
-        self.use_gui = use_gui
+        self.connection_type = connection_type
 
     def connect(self, shadows=True, color=None, width=None, height=None):
         """Connect from the PyBullet server.
@@ -57,18 +57,17 @@ class PyBulletBase(object):
         # Shared Memory: execute the physics simulation and rendering in a separate process
         # https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/examples/vrminitaur.py#L7
         self._detect_display()
-        method = pybullet.GUI if self.use_gui else pybullet.DIRECT
         options = self._compose_options(color, width, height)
         with redirect_stdout():
-            self.client_id = pybullet.connect(method, options=options)
+            self.client_id = pybullet.connect(const.CONNECTION_TYPE[self.connection_type], options=options)
         if self.client_id < 0:
             raise Exception('Error in establishing connection with PyBullet.')
-        if self.use_gui:
+        if self.connection_type == 'gui':
             self._configure_debug_visualizer(shadows)
 
     def _detect_display(self):
-        if self.use_gui and system != 'darwin' and not compas.is_windows() and ('DISPLAY' not in os.environ):
-            self.use_gui = False
+        if self.connection_type == 'gui' and system != 'darwin' and not compas.is_windows() and ('DISPLAY' not in os.environ):
+            self.connection_type = 'direct'
             print('No display detected! Continuing without GUI.')
 
     @staticmethod
@@ -121,28 +120,28 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     Parameters
     ----------
-    use_gui : :obj:`bool`
-        Enable pybullet GUI. Defaults to ``True``.
+    connection_type : :obj:`str`
+        Sets the connection type. Defaults to ``gui``.
     verbose : :obj:`bool`
         Use verbose logging. Defaults to ``False``.
 
     Examples
     --------
     >>> from compas_fab.backends import PyBulletClient
-    >>> with PyBulletClient(use_gui=False) as client:
+    >>> with PyBulletClient(connection_type='direct') as client:
     ...     print('Connected: %s' % client.is_connected)
     Connected: True
 
     """
-    def __init__(self, use_gui=True, verbose=False):
-        super(PyBulletClient, self).__init__(use_gui)
+    def __init__(self, connection_type='gui', verbose=False):
+        super(PyBulletClient, self).__init__(connection_type)
         self.planner = PyBulletPlanner(self)
         self.verbose = verbose
         self._robot = None
         self.robot_uid = None
         self.collision_objects = {}
         self.attached_collision_objects = {}
-        self.disabled_collisions = set()  # !!! use setCollisionFilterPair in setter?
+        self.disabled_collisions = set()
         self.joint_id_by_name = {}
         self.link_id_by_name = {}
 

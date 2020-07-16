@@ -7,7 +7,7 @@ import os
 import sys
 from contextlib import contextmanager
 
-import compas_fab.backends
+
 __all__ = [
     'LOG',
     'redirect_stdout',

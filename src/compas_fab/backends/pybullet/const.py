@@ -4,6 +4,20 @@ from __future__ import print_function
 
 from collections import namedtuple
 
+from compas_fab.utilities import LazyLoader
+
+pybullet = LazyLoader('pybullet', globals(), 'pybullet')
+
+CONNECTION_TYPE = {
+    'direct': pybullet.DIRECT,
+    'gui': pybullet.GUI,
+    'shared_memory': pybullet.SHARED_MEMORY,
+    'udp': pybullet.UDP,
+    'tcp': pybullet.TCP,
+    'gui_server': pybullet.GUI_SERVER,
+    'shared_memory_server': pybullet.SHARED_MEMORY_SERVER,
+    'shared_memory_gui': pybullet.SHARED_MEMORY_GUI,
+}
 
 BASE_LINK_ID = -1
 NULL_ID = -1

@@ -15,7 +15,7 @@ you see the output ``Connected: True``, then everything is working properly.
 .. code-block:: python
 
     from compas_fab.backends import PyBulletClient
-    with PyBulletClient(use_gui=False) as client:
+    with PyBulletClient(connection_type='direct') as client:
         print('Connected:', client.is_connected)
 
 .. note::
