@@ -36,7 +36,10 @@ def redirect_stdout(to=os.devnull, enabled=True):
         sys.stdout = os.fdopen(fd, 'w')
 
     # Pytest interferes with file descriptor capture.
-    if not enabled or compas_fab.backends._called_from_test:
+    called_from_test = 'pytest' in sys.modules
+    enabled = False if called_from_test else enabled
+
+    if not enabled:
         yield
     else:
         fd = sys.stdout.fileno()
