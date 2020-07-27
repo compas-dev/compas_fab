@@ -131,6 +131,5 @@ Next Steps
 * :ref:`Working with backends <backends>`
 * :ref:`COMPAS FAB Examples <examples>`
 * :ref:`COMPAS FAB API Reference <reference>`
-* `COMPAS Examples <https://compas-dev.github.io/main/examples.html>`_
-* `COMPAS Tutorials <https://compas-dev.github.io/main/tutorials.html>`_
+* `COMPAS Tutorials <https://compas-dev.github.io/main/tutorial.html>`_
 * `COMPAS API Reference <https://compas-dev.github.io/main/api.html>`_
