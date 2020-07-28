@@ -1,4 +1,4 @@
-name: integrated
+name: integration
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: ubuntu-py38-integrated
+    name: ubuntu-py38-integration
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
