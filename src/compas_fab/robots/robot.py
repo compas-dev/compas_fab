@@ -52,9 +52,10 @@ class Robot(object):
         self._scale_factor = 1.
         self.model = model
         self.attached_tool = None
-        self.artist = artist  # setter and getter (because of scale)
+        self.artist = artist
         self.semantics = semantics
-        self.client = client  # setter and getter ?
+        self.client = client
+        self.pybullet_uid = None
 
     @property
     def artist(self):
@@ -290,6 +291,20 @@ class Robot(object):
         for link in self.model.iter_link_chain(base_link_name, ee_link_name):
             link_names.append(link.name)
         return link_names
+
+    def get_link_names_with_collision_geometry(self):
+        """Returns the names of the links with collision geometry.
+
+        Returns
+        -------
+        list of str
+
+        Examples
+        --------
+        >>> robot.get_link_names_with_collision_geometry()
+        ['base_link', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link', 'ee_link']
+        """
+        return [link.name for link in self.model.iter_links() if link.collision]
 
     def get_configurable_joints(self, group=None):
         """Returns the configurable joints.
@@ -1001,8 +1016,7 @@ class Robot(object):
         >>> robot.inverse_kinematics(frame_WCF, start_configuration, group)                 # doctest: +SKIP
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
-        if options is None:
-            options = {}
+        options = options or {}
         avoid_collisions = options.get('avoid_collisions', True)
         constraints = options.get('constraints')
         attempts = options.get('attempts', 8)
@@ -1096,8 +1110,7 @@ class Robot(object):
         >>> frame_WCF_c == frame_WCF_m
         True
         """
-        if options is None:
-            options = {}
+        options = options or {}
         backend = options.get('backend')
         ee_link = options.get('ee_link')
         return self.forward_kinematics_deprecated(configuration, group, backend, ee_link)
@@ -1194,8 +1207,7 @@ class Robot(object):
         >>> type(trajectory)
         <class 'compas_fab.robots.trajectory.JointTrajectory'>
         """
-        if options is None:
-            options = {}
+        options = options or {}
         max_step = options.get('max_step', 0.01)
         jump_threshold = options.get('jump_threshold', 1.57)
         avoid_collisions = options.get('avoid_collisions', True)
@@ -1345,8 +1357,7 @@ class Robot(object):
         >>> type(trajectory)
         <class 'compas_fab.robots.trajectory.JointTrajectory'>
         """
-        if options is None:
-            options = {}
+        options = options or {}
         path_constraints = options.get('path_constraints')
         planner_id = options.get('planner_id', 'RRT')
         num_planning_attempts = options.get('num_planning_attempts', 1)

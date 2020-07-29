@@ -25,6 +25,7 @@ __all__ = [
 
 
 class MoveItInverseKinematics(InverseKinematics):
+    """Callable to calculate the robot's inverse kinematics for a given frame."""
     GET_POSITION_IK = ServiceDescription('/compute_ik',
                                          'GetPositionIK',
                                          GetPositionIKRequest,

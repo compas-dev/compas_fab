@@ -24,13 +24,29 @@ class RobotSemantics(object):
 
     def __init__(self, root, urdf_robot):
         self.root = root
-        self.group_names = self.__get_group_names()
-        self.passive_joints = self.__get_passive_joints()
-        self.end_effectors = self.__get_end_effectors()
         self._group_dict = {}
         self.main_group = None
         self.urdf_robot = urdf_robot
         self.__source_attributes()
+
+    @property
+    def group_names(self):
+        return [group.attrib['name'] for group in self.root.findall('group')]
+
+    @property
+    def passive_joints(self):
+        return [pjoint.attrib['name'] for pjoint in self.root.iter('passive_joint')]
+
+    @property
+    def end_effectors(self):
+        return [ee.attrib['parent_link'] for ee in self.root.findall('end_effector')]
+
+    @property
+    def disabled_collisions(self):
+        return {
+            frozenset([dc.attrib['link1'], dc.attrib['link2']])
+            for dc in self.root.iter('disable_collisions')
+        }
 
     @classmethod
     def from_srdf_file(cls, file, urdf_robot):
@@ -118,15 +134,6 @@ class RobotSemantics(object):
 
         self._group_dict = group_dict
         self.main_group_name = gnames[idx]
-
-    def __get_group_names(self):
-        return [group.attrib['name'] for group in self.root.findall('group')]
-
-    def __get_passive_joints(self):
-        return [pjoint.attrib['name'] for pjoint in self.root.iter('passive_joint')]
-
-    def __get_end_effectors(self):
-        return [ee.attrib['parent_link'] for ee in self.root.findall('end_effector')]
 
     def get_end_effector_link_name(self, group=None):
         if not group:
