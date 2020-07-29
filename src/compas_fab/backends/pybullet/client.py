@@ -201,8 +201,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             pybullet_attr = {'id': link_id}
             link.attr.setdefault('pybullet', {}).update(pybullet_attr)
 
-    def remove_configurations_in_collision(self, robot, configurations):
-        """Removes from a list of configurations those which are in collision.
+    def filter_configurations_in_collision(self, robot, configurations):
+        """Filters from a list of configurations those which are in collision.
         Used for a custom inverse kinematics function.
 
         Parameters

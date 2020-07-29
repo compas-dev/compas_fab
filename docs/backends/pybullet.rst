@@ -10,7 +10,7 @@ PyBullet
 source collision detection and rigid dynamics library written in C++.  PyBullet
 was written with the intention of being a "fast and easy to use Python module for
 robotics simulation and machine learning."  It also provides bindings for rendering
-and visualization, and support for virtual reality headsets including.  While PyBullet
+and visualization, and support for virtual reality headsets.  While PyBullet
 is based on a client-server architecture, there is no need to spin up any Docker
 containers to run the server.  This, along with its speed, may make PyBullet a
 preferable backend for COMPAS_FAB.  However, it, alone, does not provide motion
