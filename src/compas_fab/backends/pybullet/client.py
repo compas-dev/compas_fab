@@ -19,7 +19,7 @@ from compas_fab.utilities import LazyLoader
 from . import const
 from .conversions import frame_from_pose
 from .conversions import pose_from_frame
-from .exceptions import DetectedCollisionError
+from .exceptions import CollisionError
 from .planner import PyBulletPlanner
 from .utils import LOG
 from .utils import redirect_stdout
@@ -201,6 +201,18 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             pybullet_attr = {'id': link_id}
             link.attr.setdefault('pybullet', {}).update(pybullet_attr)
 
+    def _get_joint_id_by_name(self, name, robot):
+        return robot.model.get_joint_by_name(name).attr['pybullet']['id']
+
+    def _get_joint_ids_by_name(self, names, robot):
+        return tuple(self._get_joint_id_by_name(name, robot) for name in names)
+
+    def _get_link_id_by_name(self, name, robot):
+        return robot.model.get_link_by_name(name).attr['pybullet']['id']
+
+    def _get_link_ids_by_name(self, names, robot):
+        return tuple(self._get_link_id_by_name(name, robot) for name in names)
+
     def filter_configurations_in_collision(self, robot, configurations):
         """Filters from a list of configurations those which are in collision.
         Used for a custom inverse kinematics function.
@@ -222,7 +234,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                 continue
             try:
                 self.check_collisions(robot, configuration)
-            except DetectedCollisionError:
+            except CollisionError:
                 configurations[i] = None
 
     # =======================================
@@ -234,7 +246,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         robot : :class:`compas_fab.robots.Robot`
             Robot whose configuration may be in collision.
         configuration : :class:`compas_fab.robots.Configuration`
-            Configuration to be checked for collision.  If ``None`` is given, the current
+            Configuration to be checked for collisions.  If ``None`` is given, the current
             configuration will be checked.  Defaults to ``None``.
 
         Raises
@@ -242,7 +254,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         :class:`compas_fab.backends.pybullet.DetectedCollision`
         """
         if configuration:
-            joint_ids = tuple(robot.model.get_joint_by_name[name].attr['pybullet']['id'] for name in configuration.joint_names)
+            joint_ids = self._get_joint_ids_by_name(configuration.joint_names, robot)
             self._set_joint_positions(joint_ids, configuration.values, robot.pybullet_uid)
         self.check_collision_with_objects(robot)
         self.check_robot_self_collision(robot)
@@ -282,12 +294,12 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         for link_1_name, link_2_name in combinations(link_names, 2):
             if {link_1_name, link_2_name} in self.disabled_collisions:
                 continue
-            link_1_id = robot.model.get_link_by_name[link_1_name].attr['pybullet']['id']
-            link_2_id = robot.model.get_link_by_name[link_2_name].attr['pybullet']['id']
+            link_1_id = self._get_link_id_by_name(link_1_name, robot)
+            link_2_id = self._get_link_id_by_name(link_2_name, robot)
             self._check_collision(robot.pybullet_uid, link_1_name, robot.pybullet_uid, link_2_name, link_1_id, link_2_id)
         # check for collisions between robot links and attached collision objects
         for link_name in link_names:
-            link_id = robot.model.get_link_by_name[link_name].attr['pybullet']['id']
+            link_id = self._get_link_id_by_name(link_name, robot)
             for name, constraint_info_list in self.attached_collision_objects.items():
                 for constraint_info in constraint_info_list:
                     self._check_collision(robot.pybullet_uid, link_name, constraint_info.body_id, name, link_id)
@@ -297,7 +309,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Raises
         -------
-        :class:`compas_fab.backends.pybullet.DetectedCollision`
+        :class:`compas_fab.backends.pybullet.CollisionError`
         """
         names = self.collision_objects.keys()
         for name_1, name_2 in combinations(names, 2):
@@ -318,7 +330,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         pts = pybullet.getClosestPoints(**kwargs)
         if pts:
             LOG.warning("Collision between '{}' and '{}'".format(body_1_name, body_2_name))
-            raise DetectedCollisionError(body_1_name, body_2_name)
+            raise CollisionError(body_1_name, body_2_name)
 
     # ======================================
     def _get_base_frame(self, body_id):
@@ -329,7 +341,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return self._get_body_info(body_id).base_name.decode(encoding='UTF-8')
 
     def _get_link_state(self, link_id, body_id):
-        return const.LinkState(*pybullet.getLinkState(body_id, link_id, physicsClientId=self.client_id))
+        return const.LinkState(*pybullet.getLinkState(body_id, link_id, computeForwardKinematics=True, physicsClientId=self.client_id))
 
     def _get_body_info(self, body_id):
         return const.BodyInfo(*pybullet.getBodyInfo(body_id, physicsClientId=self.client_id))
@@ -366,11 +378,31 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def _set_joint_position(self, joint_id, value, body_id):
         pybullet.resetJointState(body_id, joint_id, value, targetVelocity=0, physicsClientId=self.client_id)
 
-    def _set_joint_positions(self, joints, values, body_id):
-        if len(joints) != len(values):
+    def _set_joint_positions(self, joint_ids, values, body_id):
+        if len(joint_ids) != len(values):
             raise Exception('Joints and values must have the same length.')
-        for joint, value in zip(joints, values):
-            self._set_joint_position(joint, value, body_id)
+        for joint_id, value in zip(joint_ids, values):
+            self._set_joint_position(joint_id, value, body_id)
+
+    def set_robot_configuration(self, robot, configuration, group):
+        """Sets the robot's pose to the given configuration. Should be followed by
+        `step_simulation` for visualization purposes.
+
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`  The robot to be configured.
+        configuration : :class:`compas_fab.robots.Configuration`  If a full configuration is not given,
+            the values from :meth:`compas_fab.robots.Robot.zero_configuration` will be used for the
+            missing ones.  Joint names are expected to be supplied in the configuration.
+        group : :obj:`str`, optional
+            The planning group used for calculation. Defaults to the robot's
+            main planning group.
+        """
+        default_config = robot.zero_configuration()
+        full_configuration = robot.merge_group_with_full_configuration(configuration, default_config, group)
+        joint_ids = self._get_joint_ids_by_name(full_configuration.joint_names, robot)
+        self._set_joint_positions(joint_ids, full_configuration.values, robot.pybullet_uid)
+        return full_configuration
 
     # =======================================
     def convert_mesh_to_body(self, mesh, frame, _name=None, concavity=False, mass=const.STATIC_MASS):
@@ -378,7 +410,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        mesh : `compas.datastructures.Mesh`
+        mesh : :class:`compas.datastructures.Mesh`
         frame : :class:`compas.geometry.Frame`
         _name : :obj:`str`, optional
             Name of the mesh for tagging in PyBullet's GUI

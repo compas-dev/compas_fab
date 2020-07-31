@@ -51,7 +51,7 @@ Adding and removing a collision mesh attached to the end effector link of the
 robot is similar.  Again, the calls to ``sleep`` and ``step_simulation`` exist only
 to make the GUI rendering smoother.
 
-.. literalinclude :: files/02_add_attached_collision_mesh.py
+.. literalinclude :: files/01_add_attached_collision_mesh.py
    :language: python
 
 .. raw:: html
@@ -60,7 +60,7 @@ to make the GUI rendering smoother.
     <div class="card-body">
     <div class="card-title">Downloads</div>
 
-* :download:`Add Attached Collision Mesh (.PY) <files/02_add_attached_collision_mesh.py>`
+* :download:`Add Attached Collision Mesh (.PY) <files/01_add_attached_collision_mesh.py>`
 
 .. raw:: html
 

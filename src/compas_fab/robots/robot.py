@@ -1116,35 +1116,41 @@ class Robot(object):
         return self.forward_kinematics_deprecated(configuration, group, backend, ee_link)
 
     def forward_kinematics_deprecated(self, configuration, group=None, backend=None, ee_link=None):
-        if not group:
-            group = self.main_group_name
+        group = group or self.main_group_name
 
-        if ee_link is None:
-            ee_link = self.get_end_effector_link_name(group)
-        else:
-            # check
-            if ee_link not in self.get_link_names(group):
-                raise ValueError("Link name %s does not exist in planning group" % ee_link)
+        ee_link = ee_link or self.get_end_effector_link_name(group)
+        if ee_link not in self.get_link_names(group):
+            raise ValueError("Link name %s does not exist in planning group" % ee_link)
 
         full_configuration = self.merge_group_with_full_configuration(configuration, self.zero_configuration(), group)
         full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)
 
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
 
-        if not backend:
-            if self.client:
+        if not self.client:
+            backend = backend or 'model'
+
+        if backend == 'model':
+            frame_WCF = self.model.forward_kinematics(full_joint_state, ee_link)
+        elif self.client:
+            from compas_fab.backends.pybullet import PyBulletClient
+            from compas_fab.backends.ros import RosClient
+
+            if isinstance(self.client, RosClient):
                 options = {
                     'ee_link': ee_link,
                     'base_link': self.model.root.name,
                 }
-                frame_WCF = self.client.forward_kinematics(full_configuration_scaled,
-                                                           group,
-                                                           options)
-                frame_WCF.point *= self.scale_factor
+            elif isinstance(self.client, PyBulletClient):
+                options = {
+                    'robot': self,
+                }
             else:
-                frame_WCF = self.model.forward_kinematics(full_joint_state, ee_link)
-        elif backend == 'model':
-            frame_WCF = self.model.forward_kinematics(full_joint_state, ee_link)
+                options = {}
+            frame_WCF = self.client.forward_kinematics(full_configuration_scaled,
+                                                       group,
+                                                       options)
+            frame_WCF.point *= self.scale_factor
         else:
             # pass to backend, kdl, ikfast,...
             raise NotImplementedError
