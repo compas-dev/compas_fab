@@ -42,7 +42,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         options: dict, optional
             Dictionary containing the following key-value pairs:
 
-            -``"robot"``: (:class:`compas_fab.robots.Robot) Robot for which to compute
+            - ``"robot"``: (:class:`compas_fab.robots.Robot`) Robot for which to compute
               the inverse kinematics.
             - ``"link_name"``: (:obj:`str`, optional ) Name of the link for which
               to compute the inverse kinematics.  Defaults to the given robot's end
@@ -57,11 +57,11 @@ class PyBulletInverseKinematics(InverseKinematics):
         Returns
         -------
         :class:`compas_fab.robots.Configuration`
-            The planning group's configuration.
+            The robot's full configuration.
 
         Raises
         ------
-        :class:`compas_fab.backends.pybullet.InverseKinematicsError`
+        :class:`compas_fab.backends.InverseKinematicsError`
         """
         robot = options['robot']
         link_name = options.get('link_name') or robot.get_end_effector_link_name(group)

@@ -14,6 +14,7 @@ from compas_fab.backends.pybullet.backend_features.pybullet_remove_collision_mes
 
 
 class PyBulletPlanner(PlannerInterface):
+    """Implement the planner backend interface for PyBullet."""
     def __init__(self, client):
         super(PyBulletPlanner, self).__init__(client)
 

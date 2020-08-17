@@ -151,7 +151,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def step_simulation(self):
         """By default, the physics server will not step the simulation,
-        unless you explicitly send a ``step_simulation``command.  This
+        unless you explicitly send a ``step_simulation`` command.  This
         method will perform all the actions in a single forward dynamics
         simulation step such as collision detection, constraint solving
         and integration. The timestep is 1/240 second.
@@ -309,7 +309,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Raises
         -------
-        :class:`compas_fab.backends.pybullet.CollisionError`
+        :class:`compas_fab.backends.CollisionError`
         """
         names = self.collision_objects.keys()
         for name_1, name_2 in combinations(names, 2):
@@ -384,7 +384,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         for joint_id, value in zip(joint_ids, values):
             self._set_joint_position(joint_id, value, body_id)
 
-    def set_robot_configuration(self, robot, configuration, group):
+    def set_robot_configuration(self, robot, configuration, group=None):
         """Sets the robot's pose to the given configuration. Should be followed by
         `step_simulation` for visualization purposes.
 

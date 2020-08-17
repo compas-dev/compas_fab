@@ -1,5 +1,4 @@
 import compas_fab
-
 from compas_fab.backends import PyBulletClient
 from compas_fab.robots import Configuration
 

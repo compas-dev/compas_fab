@@ -30,7 +30,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
             - ``"link"``: (:obj:`str`, optional) The name of the link to
               calculate the forward kinematics for. Defaults to the end effector.
             - ``"check_collision"``: (:obj:`str`, optional) When ``True``,
-              :meth:`compas.pybullet.PyBulletClient.check_collisions` will be called.
+              :meth:`compas_fab.backends.PyBulletClient.check_collisions` will be called.
               Defaults to ``False``.
 
         Returns
@@ -39,11 +39,6 @@ class PyBulletForwardKinematics(ForwardKinematics):
             The frame in the world's coordinate system (WCF).
         """
         robot = options['robot']
-        # Joint names, but not link names, are recoverable from the pybullet server.
-        # My intention is that a user doesn't have to care about pybullet's internal id system,
-        # except for maybe the robot's uid.  I would put just the robot uid in the options
-        # (rather than the full robot)
-        # if it were possible to recover the links, but it's not.
         link_name = options.get('link') or robot.get_end_effector_link_name(group)
         link_id = self.client._get_link_id_by_name(link_name, robot)
         self.client.set_robot_configuration(robot, configuration, group)

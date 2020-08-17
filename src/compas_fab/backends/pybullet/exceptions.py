@@ -12,7 +12,7 @@ class PyBulletError(BackendError):
 
 
 class CollisionError(PyBulletError):
-    """Exception raised when two objects have been found to be in collision."""
+    """Exception raised when two objects have been found to be in collision in PyBullet."""
     def __init__(self, name1, name2):
         message = "Collision between '{}' and '{}'".format(name1, name2)
         super(CollisionError, self).__init__(message)
@@ -21,7 +21,7 @@ class CollisionError(PyBulletError):
 
 
 class InverseKinematicsError(PyBulletError):
-    """Exception raised when no IK solution can be found."""
+    """Exception raised when no IK solution can be found in PyBullet."""
     def __init__(self):
         message = "No inverse kinematics solution found."
         super(InverseKinematicsError, self).__init__(message)
