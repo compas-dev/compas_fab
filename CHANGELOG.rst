@@ -15,7 +15,7 @@ Unreleased
 
 * Added ``ClientInterface``, ``PlannerInterface`` and various backend feature interfaces
 * Added implementations of these interfaces for ROS and V-REP
-* Added client for PyBullet
+* Added client for PyBullet with forward and inverse kinematics
 
 **Changed**
 
