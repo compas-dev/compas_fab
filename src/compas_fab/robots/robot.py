@@ -1260,7 +1260,7 @@ class Robot(object):
 
         options = {
             'base_link': self.model.root.name,
-            'ee_link': self.get_end_effector_link_name(),
+            'ee_link': self.get_end_effector_link_name(group),
             'joint_names': self.get_configurable_joint_names(),
             'joint_types': self.get_configurable_joint_types(),
             'max_step': max_step_scaled,
