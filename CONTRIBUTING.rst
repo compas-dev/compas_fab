@@ -58,7 +58,7 @@ We could always use more documentation, whether as part of the
 introduction/examples/usage documentation or API documentation in docstrings.
 
 Documentation is written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_
-and use `Sphinx <http://sphinx-doc.org/index.html>`_ with 
+and use `Sphinx <http://sphinx-doc.org/index.html>`_ with
 `numpy-style docstrings <https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_numpy.html>`_
 to generate the HTML output.
 
@@ -86,3 +86,10 @@ The best way to send feedback is to file an issue on
 
 * Explain in detail how it would work.
 * Keep the scope as narrow as possible, to make it easier to implement.
+
+A Note on Architecture for Backend Clients
+------------------------------------------
+
+To maintain consistency from one backend client to another and to promote modularity,
+we make use of several interfaces.  Please reference :ref:`Note on Architecture <architecture>`
+for more details on how to add or amend a backend client.
