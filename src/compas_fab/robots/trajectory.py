@@ -1,3 +1,4 @@
+"""Classes used to define robot trajectories."""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -21,12 +22,31 @@ class JointTrajectoryPoint(Configuration):
     Trajectory points are defined either as *values + velocities and
     accelerations*, or as *values + efforts*.
 
+    Parameters
+    ----------
+    values : :obj:`list` of :obj:`float`, optional
+        Joint values expressed in radians or meters, depending on the respective
+        type.
+    types : :obj:`list` of :attr:`compas.robots.Joint.TYPE`, optional
+        Joint types, e.g. a :obj:`list` of
+        :attr:`compas.robots.Joint.REVOLUTE` for revolute joints.
+    velocities : :obj:`list` of :obj:`float`, optional
+        Velocity of each joint.
+    accelerations : :obj:`list` of :obj:`float`, optional
+        Acceleration of each joint.
+    effort : :obj:`list` of :obj:`float`, optional
+        Effort of each joint.
+    time_from_start : :class:`Duration`, optional
+        Duration of trajectory point counting from the start.
+
     Attributes
     ----------
     values : :obj:`list` of :obj:`float`
-        Joint values expressed in radians or meters, depending on the respective type.
-    types : :obj:`list` of :class:`compas.robots.Joint.TYPE`
-        Joint types, e.g. a list of :class:`compas.robots.Joint.REVOLUTE` for revolute joints.
+        Joint values expressed in radians or meters, depending on the respective
+        type.
+    types : :obj:`list` of :attr:`compas.robots.Joint.TYPE`
+        Joint types, e.g. a :obj:`list` of
+        :attr:`compas.robots.Joint.REVOLUTE` for revolute joints.
     velocities : :obj:`list` of :obj:`float`
         Velocity of each joint.
     accelerations : :obj:`list` of :obj:`float`
@@ -35,6 +55,10 @@ class JointTrajectoryPoint(Configuration):
         Effort of each joint.
     time_from_start : :class:`Duration`
         Duration of trajectory point counting from the start.
+    positions : :obj:`list` of :obj:`float`
+        Alias of `values`.
+    data : obj:`dict`
+        The data representing the trajectory point.
     """
 
     def __init__(self, values=None, types=None, velocities=None, accelerations=None, effort=None, time_from_start=None):
@@ -45,6 +69,7 @@ class JointTrajectoryPoint(Configuration):
         self.time_from_start = time_from_start or Duration(0, 0)
 
     def __str__(self):
+        """Return a human-readable string representation of the instance."""
         vs = '%.' + self._precision
         return 'JointTrajectoryPoint(({}), {}, ({}), ({}), ({}), {})'.format(
             ', '.join(vs % i for i in self.values),
@@ -57,11 +82,12 @@ class JointTrajectoryPoint(Configuration):
 
     @property
     def positions(self):
-        """Alias of ``values``."""
+        """:obj:`list` of :obj:`float` : Alias of `values`."""
         return self.values
 
     @property
     def velocities(self):
+        """:obj:`list` of :obj:`float` : Velocity of each joint."""
         return self._velocities
 
     @velocities.setter
@@ -74,6 +100,7 @@ class JointTrajectoryPoint(Configuration):
 
     @property
     def accelerations(self):
+        """:obj:`list` of :obj:`float` : Acceleration of each joint."""
         return self._accelerations
 
     @accelerations.setter
@@ -86,6 +113,7 @@ class JointTrajectoryPoint(Configuration):
 
     @property
     def effort(self):
+        """:obj:`list` of :obj:`float` : Effort of each joint."""
         return self._effort
 
     @effort.setter
@@ -101,7 +129,7 @@ class JointTrajectoryPoint(Configuration):
         """:obj:`dict` : The data representing the trajectory point.
 
         By assigning a data dictionary to this property, the current data of the
-        configuration will be replaced by the data in the dict. The data getter
+        configuration will be replaced by the data in the :obj:`dict`. The data getter
         and setter should always be used in combination with each other.
         """
         data_obj = super(JointTrajectoryPoint, self).data
@@ -125,9 +153,9 @@ class JointTrajectoryPoint(Configuration):
 class Trajectory(object):
     """Base trajectory class.
 
-    Attributes
-    ----------
-    planning_time: :obj:`float`
+    Attribute
+    ---------
+    planning_time : :obj:`float`
         Amount of time it took to complete the motion plan
     """
 
@@ -138,17 +166,31 @@ class Trajectory(object):
 class JointTrajectory(Trajectory):
     """Describes a joint trajectory as a list of trajectory points.
 
-    Attributes
+    Parameters
     ----------
-    points: :obj:`list` of :class:`JointTrajectoryPoint`
+    trajectory_points : :obj:`list` of :class:`JointTrajectoryPoint`, optional
         List of points composing the trajectory.
-    joint_names: :obj:`list` of :obj:`str`
+    joint_names : :obj:`list` of :obj:`str`, optional
         List of joint names of the trajectory.
-    start_configuration: :class:`Configuration`
+    start_configuration : :class:`Configuration`, optional
         Start configuration for the trajectory.
-    fraction: float
+    fraction : :obj:`float`, optional
         Indicates the percentage of requested trajectory that was calculated,
         e.g. ``1`` means the full trajectory was found.
+
+    Attributes
+    ----------
+    points : :obj:`list` of :class:`JointTrajectoryPoint`
+        List of points composing the trajectory.
+    joint_names : :obj:`list` of :obj:`str`
+        List of joint names of the trajectory.
+    start_configuration : :class:`Configuration`
+        Start configuration for the trajectory.
+    fraction : :obj:`float`
+        Indicates the percentage of requested trajectory that was calculated,
+        e.g. ``1`` means the full trajectory was found.
+    data : :obj:`dict`
+        The data representing the trajectory.
     """
 
     def __init__(self, trajectory_points=None, joint_names=None, start_configuration=None, fraction=None):
@@ -177,8 +219,14 @@ class JointTrajectory(Trajectory):
         return trajectory
 
     def to_data(self):
-        """Return the data dictionary that represents the trajectory, and from
-        which it can be reconstructed."""
+        """Get the data dictionary that represents the trajectory.
+
+        This can be used to reconstruct the :class:`Trajectory` instance.
+
+        Returns
+        -------
+        :obj:`dict`
+        """
         return self.data
 
     @property
@@ -202,8 +250,7 @@ class JointTrajectory(Trajectory):
 
     @property
     def time_from_start(self):
-        """Effectively, time from start for the last point in the trajectory.
-        """
+        """:obj:`float` : Effectively, time from start for the last point in the trajectory."""
         if not self.points:
             return 0.
 
