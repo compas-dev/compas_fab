@@ -14,53 +14,8 @@ from roslibpy import ServiceRequest
 from compas_fab.backends.ros.exceptions import RosValidationError
 
 __all__ = [
-    'PlannerBackend',
     'ServiceDescription'
 ]
-
-
-class PlannerBackend(object):
-    """Base class for ROS planner backends."""
-    def validate_response(self, response):
-        pass
-
-    # ==========================================================================
-    # planning services
-    # ==========================================================================
-
-    def inverse_kinematics_async(self, *args, **kwargs):
-        pass
-
-    def forward_kinematics_async(self, *args, **kwargs):
-        pass
-
-    def plan_motion_async(self, *args, **kwargs):
-        pass
-
-    def plan_cartesian_motion_async(self, *args, **kwargs):
-        pass
-
-    # ==========================================================================
-    # collision objects and planning scene
-    # ==========================================================================
-
-    def get_planning_scene_async(self, *args, **kwargs):
-        pass
-
-    def add_collision_mesh(self, collision_mesh):
-        pass
-
-    def remove_collision_mesh(self, id):
-        pass
-
-    def append_collision_mesh(self, collision_mesh):
-        pass
-
-    def add_attached_collision_mesh(self, attached_collision_mesh):
-        pass
-
-    def remove_attached_collision_mesh(self, id):
-        pass
 
 
 class ServiceDescription(object):

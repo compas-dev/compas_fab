@@ -140,7 +140,7 @@ class BoundingVolume(object):
         scale_factor : :obj:`float`
             Scale factor to use in scaling operation.
         """
-        S = Scale([scale_factor] * 3)
+        S = Scale.from_factors([scale_factor] * 3)
         self.transform(S)
 
     def transform(self, transformation):

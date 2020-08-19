@@ -11,11 +11,14 @@ with RosClient() as client:
     frames.append(Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]))
     frames.append(Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0]))
     start_configuration = Configuration.from_revolute_values([-0.042, 0.033, -2.174, 5.282, -1.528, 0.000])
+    options = {
+        'max_step': 0.01,
+        'avoid_collisions': True,
+    }
 
     trajectory = robot.plan_cartesian_motion(frames,
                                              start_configuration,
-                                             max_step=0.01,
-                                             avoid_collisions=True)
+                                             options=options)
 
     print("Computed cartesian path with %d configurations, " % len(trajectory.points))
     print("following %d%% of requested trajectory." % (trajectory.fraction * 100))

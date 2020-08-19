@@ -76,6 +76,7 @@ class SolidPrimitive(ROSmsg):
 class Mesh(ROSmsg):
     """http://docs.ros.org/kinetic/api/shape_msgs/html/msg/Mesh.html
     """
+
     def __init__(self, triangles=None, vertices=None):
         self.triangles = triangles or []  # shape_msgs/MeshTriangle[]
         self.vertices = vertices or []  # geometry_msgs/Point[]
@@ -107,6 +108,7 @@ class Mesh(ROSmsg):
 class MeshTriangle(ROSmsg):
     """http://docs.ros.org/api/shape_msgs/html/msg/MeshTriangle.html
     """
+
     def __init__(self, vertex_indices=None):
         if len(vertex_indices) != 3:
             raise ValueError("Please specify 3 indices for face, %d given." % len(vertex_indices))

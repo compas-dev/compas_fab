@@ -4,9 +4,13 @@ COMPAS FAB: Robotic Fabrication for COMPAS
 
 .. start-badges
 
-.. image:: https://travis-ci.com/compas-dev/compas_fab.svg?branch=master
-    :target: https://travis-ci.com/compas-dev/compas_fab
-    :alt: Travis-CI Build Status
+.. image:: https://github.com/compas-dev/compas_fab/workflows/build/badge.svg
+    :target: https://github.com/compas-dev/compas_fab/actions
+    :alt: Github Actions Build Status
+
+.. image:: https://github.com/compas-dev/compas_fab/workflows/integration/badge.svg
+    :target: https://github.com/compas-dev/compas_fab/actions
+    :alt: Github Actions Integration Status
 
 .. image:: https://img.shields.io/github/license/compas-dev/compas_fab.svg
     :target: https://pypi.python.org/pypi/compas_fab

@@ -7,7 +7,7 @@ check-manifest>=0.36
 flake8
 autopep8
 pylint
-pytest
+pytest>=4.6
 pytest-cov
 sybil
 isort
