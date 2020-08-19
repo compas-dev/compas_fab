@@ -1024,7 +1024,7 @@ class Robot(object):
         >>> group = robot.main_group_name
         >>> robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
         [PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0), \
-        OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)]
+            OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)]
         """
         pc = self.position_constraint_from_frame(frame_WCF, tolerance_position, group)
         oc = self.orientation_constraint_from_frame(frame_WCF, tolerances_axes, group)
