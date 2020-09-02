@@ -73,8 +73,8 @@ class InverseKinematics(object):
 
         Returns
         -------
-        :class:`compas_fab.robots.Configuration`
-            The planning group's configuration.
+        tuple of joint positions and joint names
+            A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
         """
         pass
 

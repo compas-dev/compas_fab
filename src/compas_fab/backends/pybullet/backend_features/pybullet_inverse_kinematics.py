@@ -56,8 +56,8 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         Returns
         -------
-        :class:`compas_fab.robots.Configuration`
-            The robot's full configuration.
+        tuple of joint positions and joint names
+            A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
 
         Raises
         ------
@@ -71,7 +71,6 @@ class PyBulletInverseKinematics(InverseKinematics):
         joints = robot.get_configurable_joints()
         joints.sort(key=lambda j: j.attr['pybullet']['id'])
         joint_names = [joint.name for joint in joints]
-        joint_types = [joint.type for joint in joints]
 
         if start_configuration:
             start_configuration = self.client.set_robot_configuration(robot, start_configuration, group)
@@ -123,9 +122,11 @@ class PyBulletInverseKinematics(InverseKinematics):
                     point,
                     orientation,
                 )
+
         if not joint_positions:
             raise InverseKinematicsError()
-        return Configuration(joint_positions, joint_types, joint_names)
+
+        return joint_positions, joint_names
 
     def _get_rest_poses(self, joint_names, configuration):
         name_value_map = {configuration.joint_names[i]: configuration.values[i] for i in range(len(configuration.joint_names))}
