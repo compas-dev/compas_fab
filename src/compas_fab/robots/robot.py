@@ -969,7 +969,7 @@ class Robot(object):
     # services
     # ==========================================================================
 
-    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options=None):
+    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, return_full_configuration=False, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
@@ -983,20 +983,20 @@ class Robot(object):
         group: str, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
+        return_full_configuration : bool, optional
+            If ``True``, returns a full configuration with all joint values
+            specified, including passive ones if available. Defaults to ``False``.
         options: dict, optional
             Dictionary containing the following key-value pairs:
 
             - avoid_collisions :: bool, optional
-                Whether or not to avoid collisions. Defaults to `True`.
+                Whether or not to avoid collisions. Defaults to ``True``.
             - constraints :: list of :class:`compas_fab.robots.Constraint`, optional
-                A set of constraints that the request must obey. Defaults to `None`.
+                A set of constraints that the request must obey. Defaults to ``None``.
             - attempts :: int, optional
-                The maximum number of inverse kinematic attempts. Defaults to `8`.
+                The maximum number of inverse kinematic attempts. Defaults to ``8``.
             - attached_collision_meshes :: list of :class:`compas_fab.robots.AttachedCollisionMesh`
-                Defaults to `None`.
-            - return_full_configuration :: bool
-                If ``True``, returns a full configuration with all joint values
-                specified, including passive ones if available.
+                Defaults to ``None``.
 
         Raises
         ------
@@ -1017,22 +1017,8 @@ class Robot(object):
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
         options = options or {}
-        avoid_collisions = options.get('avoid_collisions', True)
-        constraints = options.get('constraints')
-        attempts = options.get('attempts', 8)
         attached_collision_meshes = options.get('attached_collision_meshes')
-        return_full_configuration = options.get('return_full_configuration', False)
-        return self.inverse_kinematics_deprecated(frame_WCF, start_configuration,
-                                                  group, avoid_collisions,
-                                                  constraints, attempts,
-                                                  attached_collision_meshes,
-                                                  return_full_configuration)
 
-    def inverse_kinematics_deprecated(self, frame_WCF, start_configuration=None,
-                                      group=None, avoid_collisions=True,
-                                      constraints=None, attempts=8,
-                                      attached_collision_meshes=None,
-                                      return_full_configuration=False):
         self.ensure_client()
         if not group:
             group = self.main_group_name  # ensure semantics
@@ -1048,15 +1034,15 @@ class Robot(object):
             else:
                 attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
+        options['attached_collision_meshes'] = attached_collision_meshes
+
         # The returned joint names might be more than the requested ones if there are passive joints present
-        options = {
-            'avoid_collisions': avoid_collisions,
-            'constraints': constraints,
-            'attempts': attempts,
-            'attached_collision_meshes': attached_collision_meshes,
-            'base_link': self.model.root.name,
-        }
-        joint_positions, joint_names = self.client.inverse_kinematics(frame_WCF_scaled, start_configuration_scaled,
+        if 'base_link' not in options:
+            options['base_link'] = self.model.root.name
+
+        joint_positions, joint_names = self.client.inverse_kinematics(self,
+                                                                      frame_WCF_scaled,
+                                                                      start_configuration_scaled,
                                                                       group,
                                                                       options)
         if return_full_configuration:

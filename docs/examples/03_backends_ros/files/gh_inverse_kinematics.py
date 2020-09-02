@@ -26,11 +26,11 @@ if robot and robot.client:
     if robot.client.is_connected:
         options = {
             'avoid_collisions': avoid_collisions,
-            'return_full_configuration': True,
         }
         full_configuration = robot.inverse_kinematics(frame,
                                                       start_configuration,
                                                       group=group,
+                                                      return_full_configuration=True,
                                                       options=options)
         group_configuration = robot.get_group_configuration(group, full_configuration)
         print(group_configuration)
