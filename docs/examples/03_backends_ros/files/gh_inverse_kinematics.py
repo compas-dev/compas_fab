@@ -8,7 +8,7 @@
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
             If passed, the inverse will be calculated such that the calculated
             joint positions differ the least from the start_configuration.
-            Defaults to the init configuration.
+            Defaults to the zero configuration.
         avoid_collisions: bool, optional
             Whether or not to avoid collisions. Defaults to True.
     Output:

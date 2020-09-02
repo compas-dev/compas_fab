@@ -45,7 +45,7 @@ class MoveItInverseKinematics(InverseKinematics):
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
             If passed, the inverse will be calculated such that the calculated
             joint positions differ the least from the start_configuration.
-            Defaults to the init configuration.
+            Defaults to the zero configuration.
         group: str, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.

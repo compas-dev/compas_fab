@@ -5,7 +5,7 @@ Forward and inverse kinematics
 Forward kinematics
 ==================
 
-As with ROS, the forward kinematics function calculates the pose of the robot's
+The forward kinematics function calculates the pose of the robot's
 end-effector from joint states. This means the state of each joint in the
 articulated body of a robot needs to be defined.
 

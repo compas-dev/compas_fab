@@ -12941,9 +12941,9 @@ if client and client.is_connected and load:
     # Create robot model from URDF and load geometry
     model = RobotModel.from_urdf_string(urdf)
     model.load_geometry(loader)
-    
+
     semantics = RobotSemantics.from_srdf_string(srdf, model)
-    
+
     robot = Robot(model, semantics=semantics)
     robot.artist = RobotArtist(robot.model)
     robot.scale(scale_factor)
@@ -14154,7 +14154,7 @@ pln = rg.Plane(pt, -rg.Vector3d.ZAxis)</item>
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
             If passed, the inverse will be calculated such that the calculated
             joint positions differ the least from the start_configuration.
-            Defaults to the init configuration.
+            Defaults to the zero configuration.
         avoid_collisions: bool, optional
             Whether or not to avoid collisions. Defaults to True.
     Output:
@@ -14175,9 +14175,9 @@ if robot and robot.client:
         full_configuration = robot.inverse_kinematics(frame,
                                                       start_configuration,
                                                       group=group,
+                                                      return_full_configuration=True,
                                                       options={
                                                         'avoid_collisions':avoid_collisions,
-                                                        'return_full_configuration':True,
                                                       })
         group_configuration = robot.get_group_configuration(group, full_configuration)
         print(group_configuration)
@@ -14338,7 +14338,7 @@ main planning group.</item>
                             <item name="Description" type_name="gh_string" type_code="10">:class:`compas_fab.robots.Configuration`, optional
 If passed, the inverse will be calculated such that the calculated
 joint positions differ the least from the start_configuration.
-Defaults to the init configuration.</item>
+Defaults to the zero configuration.</item>
                             <item name="InstanceGuid" type_name="gh_guid" type_code="9">44aea0fa-c976-4a30-8d7c-15c1cacc5162</item>
                             <item name="Name" type_name="gh_string" type_code="10">start_configuration</item>
                             <item name="NickName" type_name="gh_string" type_code="10">start_configuration</item>
