@@ -35,11 +35,13 @@ class MoveItInverseKinematics(InverseKinematics):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options=None):
+    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which inverse kinematics is being calculated.
         frame_WCF: :class:`compas.geometry.Frame`
             The frame to calculate the inverse for.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional

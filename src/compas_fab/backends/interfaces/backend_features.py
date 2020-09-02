@@ -16,15 +16,17 @@ class ForwardKinematics(object):
     """
     __metaclass__ = ABCMeta
 
-    def __call__(self, configuration, group=None, options=None):
-        return self.forward_kinematics(configuration, group, options)
+    def __call__(self, robot, configuration, group=None, options=None):
+        return self.forward_kinematics(robot, configuration, group, options)
 
     @abstractmethod
-    def forward_kinematics(self, configuration, group=None, options=None):
+    def forward_kinematics(self, robot, configuration, group=None, options=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which forward kinematics is being calculated.
         configuration : :class:`compas_fab.robots.Configuration`
             The full configuration to calculate the forward kinematic for. If no
             full configuration is passed, the zero-joint state for the other
@@ -53,15 +55,17 @@ class InverseKinematics(object):
     """
     __metaclass__ = ABCMeta
 
-    def __call__(self, frame_WCF, start_configuration=None, group=None, options=None):
-        return self.inverse_kinematics(frame_WCF, start_configuration, group, options)
+    def __call__(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
+        return self.inverse_kinematics(robot, frame_WCF, start_configuration, group, options)
 
     @abstractmethod
-    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options=None):
+    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which inverse kinematics is being calculated.
         frame_WCF: :class:`compas.geometry.Frame`
             The frame to calculate the inverse for.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
@@ -89,15 +93,17 @@ class PlanMotion(object):
     """
     __metaclass__ = ABCMeta
 
-    def __call__(self, goal_constraints, start_configuration=None, group=None, options=None):
-        return self.plan_motion(goal_constraints, start_configuration, group, options)
+    def __call__(self, robot, goal_constraints, start_configuration=None, group=None, options=None):
+        return self.plan_motion(robot, goal_constraints, start_configuration, group, options)
 
     @abstractmethod
-    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options=None):
+    def plan_motion(self, robot, goal_constraints, start_configuration=None, group=None, options=None):
         """Calculates a motion path.
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which the motion path is being calculated.
         goal_constraints: list of :class:`compas_fab.robots.Constraint`
             The goal to be achieved, defined in a set of constraints.
             Constraints can be very specific, for example defining value domains
@@ -131,15 +137,17 @@ class PlanCartesianMotion(object):
     """
     __metaclass__ = ABCMeta
 
-    def __call__(self, frames_WCF, start_configuration=None, group=None, options=None):
-        return self.plan_cartesian_motion(frames_WCF, start_configuration, group, options)
+    def __call__(self, robot, frames_WCF, start_configuration=None, group=None, options=None):
+        return self.plan_cartesian_motion(robot, frames_WCF, start_configuration, group, options)
 
     @abstractmethod
-    def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options=None):
+    def plan_cartesian_motion(self, robot, frames_WCF, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which the cartesian motion path is being calculated.
         frames_WCF: list of :class:`compas.geometry.Frame`
             The frames through which the path is defined.
         start_configuration: :class:`Configuration`, optional

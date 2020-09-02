@@ -27,7 +27,8 @@ with VrepClient(debug=True) as client:
     client.planner.pick_building_member(robot, building_member, start_pose)
     group = robot.model.attr['index']
 
-    path = client.plan_motion(goal_pose,
+    path = client.plan_motion(robot,
+                              goal_pose,
                               group=group,
                               options={
                                   'num_joints': len(robot.get_configurable_joints()),

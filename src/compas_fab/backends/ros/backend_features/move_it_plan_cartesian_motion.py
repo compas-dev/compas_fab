@@ -36,11 +36,13 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options=None):
+    def plan_cartesian_motion(self, robot, frames_WCF, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which the cartesian motion plan is being calculated.
         frames_WCF: list of :class:`compas.geometry.Frame`
             The frames through which the path is defined.
         start_configuration: :class:`Configuration`, optional

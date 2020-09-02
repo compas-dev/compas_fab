@@ -1118,21 +1118,12 @@ class Robot(object):
         if backend == 'model':
             frame_WCF = self.model.forward_kinematics(full_joint_state, ee_link)
         elif self.client:
-            from compas_fab.backends.pybullet import PyBulletClient
-            from compas_fab.backends.ros import RosClient
-
-            if isinstance(self.client, RosClient):
-                options = {
-                    'ee_link': ee_link,
-                    'base_link': self.model.root.name,
-                }
-            elif isinstance(self.client, PyBulletClient):
-                options = {
-                    'robot': self,
-                }
-            else:
-                options = {}
-            frame_WCF = self.client.forward_kinematics(full_configuration_scaled,
+            options = {
+                'ee_link': ee_link,
+                'base_link': self.model.root.name,
+            }
+            frame_WCF = self.client.forward_kinematics(self,
+                                                       full_configuration_scaled,
                                                        group,
                                                        options)
             frame_WCF.point *= self.scale_factor
@@ -1262,6 +1253,7 @@ class Robot(object):
         }
 
         trajectory = self.client.plan_cartesian_motion(
+            robot=self,
             frames_WCF=frames_WCF_scaled,
             start_configuration=start_configuration_scaled,
             group=group,
@@ -1431,6 +1423,7 @@ class Robot(object):
         }
 
         trajectory = self.client.plan_motion(
+            robot=self,
             goal_constraints=goal_constraints_WCF_scaled,
             start_configuration=start_configuration_scaled,
             group=group,

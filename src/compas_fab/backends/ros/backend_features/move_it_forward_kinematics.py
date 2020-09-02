@@ -30,11 +30,13 @@ class MoveItForwardKinematics(ForwardKinematics):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def forward_kinematics(self, configuration, group=None, options=None):
+    def forward_kinematics(self, robot, configuration, group=None, options=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which inverse kinematics is being calculated.
         configuration : :class:`compas_fab.robots.Configuration`
             The full configuration to calculate the forward kinematic for. If no
             full configuration is passed, the zero-joint state for the other

@@ -7,9 +7,8 @@ with PyBulletClient() as client:
     robot = client.load_robot(urdf_filename)
 
     configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.])
-    options = {'robot': robot}
 
-    frame_WCF = client.forward_kinematics(configuration, options=options)
+    frame_WCF = robot.forward_kinematics(configuration)
 
     print("Frame in the world coordinate system")
     print(frame_WCF)

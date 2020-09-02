@@ -10,11 +10,13 @@ class PyBulletForwardKinematics(ForwardKinematics):
     def __init__(self, client):
         self.client = client
 
-    def forward_kinematics(self, configuration, group=None, options=None):
+    def forward_kinematics(self, robot, configuration, group=None, options=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which inverse kinematics is being calculated.
         configuration : :class:`compas_fab.robots.Configuration`
             The full configuration to calculate the forward kinematic for. If no
             full configuration is passed, the zero-joint state for the other
@@ -25,8 +27,6 @@ class PyBulletForwardKinematics(ForwardKinematics):
         options : dict, optional
             Dictionary containing the following key-value pairs:
 
-            - ``"robot"``: (:class:`compas_fab.robots.Robot`) The robot whose
-              kinematics are to be calculated.
             - ``"link"``: (:obj:`str`, optional) The name of the link to
               calculate the forward kinematics for. Defaults to the end effector.
             - ``"check_collision"``: (:obj:`str`, optional) When ``True``,
@@ -38,7 +38,6 @@ class PyBulletForwardKinematics(ForwardKinematics):
         :class:`Frame`
             The frame in the world's coordinate system (WCF).
         """
-        robot = options['robot']
         link_name = options.get('link') or robot.get_end_effector_link_name(group)
         link_id = self.client._get_link_id_by_name(link_name, robot)
         self.client.set_robot_configuration(robot, configuration, group)

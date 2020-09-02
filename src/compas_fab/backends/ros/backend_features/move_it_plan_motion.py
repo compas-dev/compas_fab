@@ -36,11 +36,13 @@ class MoveItPlanMotion(PlanMotion):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options=None):
+    def plan_motion(self, robot, goal_constraints, start_configuration=None, group=None, options=None):
         """Calculates a motion path.
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which the motion plan is being calculated.
         goal_constraints: list of :class:`compas_fab.robots.Constraint`
             The goal to be achieved, defined in a set of constraints.
             Constraints can be very specific, for example defining value domains

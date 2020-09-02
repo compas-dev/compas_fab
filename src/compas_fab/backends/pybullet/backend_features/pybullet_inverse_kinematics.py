@@ -9,7 +9,6 @@ from compas.robots import Joint
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.pybullet.conversions import pose_from_frame
 from compas_fab.backends.pybullet.exceptions import InverseKinematicsError
-from compas_fab.robots import Configuration
 from compas_fab.utilities import LazyLoader
 
 pybullet = LazyLoader('pybullet', globals(), 'pybullet')
@@ -25,11 +24,13 @@ class PyBulletInverseKinematics(InverseKinematics):
     def __init__(self, client):
         self.client = client
 
-    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options=None):
+    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which inverse kinematics is being calculated.
         frame_WCF: :class:`compas.geometry.Frame`
             The frame to calculate the inverse for.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
@@ -42,8 +43,6 @@ class PyBulletInverseKinematics(InverseKinematics):
         options: dict, optional
             Dictionary containing the following key-value pairs:
 
-            - ``"robot"``: (:class:`compas_fab.robots.Robot`) Robot for which to compute
-              the inverse kinematics.
             - ``"link_name"``: (:obj:`str`, optional ) Name of the link for which
               to compute the inverse kinematics.  Defaults to the given robot's end
               effector.
@@ -63,7 +62,6 @@ class PyBulletInverseKinematics(InverseKinematics):
         ------
         :class:`compas_fab.backends.InverseKinematicsError`
         """
-        robot = options['robot']
         link_name = options.get('link_name') or robot.get_end_effector_link_name(group)
         link_id = self.client._get_link_id_by_name(link_name, robot)
         point, orientation = pose_from_frame(frame_WCF)

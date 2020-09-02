@@ -27,10 +27,11 @@ class VrepPlanMotion(PlanMotion):
     def __init__(self, client):
         self.client = client
 
-    def plan_motion(self, goal_constraints, start_configuration=None, group=None, options=None):
+    def plan_motion(self, robot, goal_constraints, start_configuration=None, group=None, options=None):
         """Finds a path plan to move the selected robot from its current position to the `goal_constraints`.
 
         Args:
+            robot (:class:`compas_fab.robots.Robot`): The robot instance for which the motion plan is being calculated.
             goal_constraints (:class:`Frame`): Target or goal frame.
             start_configuration (:obj:`None`): Unused parameter.
             group (:obj:`int`): Integer referencing the desired robot group.
