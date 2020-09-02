@@ -1020,8 +1020,7 @@ class Robot(object):
         attached_collision_meshes = options.get('attached_collision_meshes')
 
         self.ensure_client()
-        if not group:
-            group = self.main_group_name  # ensure semantics
+        group = self.main_group_name if self.semantics and not group else None
 
         start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
 
@@ -1102,7 +1101,7 @@ class Robot(object):
         return self.forward_kinematics_deprecated(configuration, group, backend, ee_link)
 
     def forward_kinematics_deprecated(self, configuration, group=None, backend=None, ee_link=None):
-        group = group or self.main_group_name
+        group = self.main_group_name if self.semantics and not group else None
 
         ee_link = ee_link or self.get_end_effector_link_name(group)
         if ee_link not in self.get_link_names(group):
