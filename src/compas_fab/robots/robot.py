@@ -1068,21 +1068,21 @@ class Robot(object):
 
         Parameters
         ----------
-        configuration : :class:`compas_fab.robots.Configuration`
+        configuration: :class:`compas_fab.robots.Configuration`
             The full configuration to calculate the forward kinematic for. If no
             full configuration is passed, the zero-joint state for the other
             configurable joints is assumed.
-        group : str, optional
+        group: str, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
-        options : dict, optional
+        options: dict, optional
             Dictionary containing the following key-value pairs:
 
-            - ``"solver"`` : ``None`` or :obj:`str`
-                If ``None`` calculates FK with the client if it exists or with the robot model.
-                If ``'model'`` use the robot model to calculate FK.
-                Other values depend on specific backend implementation, some backends might
-                allow selecting different FK solvers dynamically.
+            - ``"solver"``: (:obj:`str`, optional) If ``None`` calculates FK
+              with the client if it exists or with the robot model.
+              If ``'model'`` use the robot model to calculate FK.
+              Other values depend on specific backend implementation, some backends might
+              allow selecting different FK solvers dynamically.
             - ``"link"``: (:obj:`str`, optional) The name of the link to
               calculate the forward kinematics for. Defaults to the group's end
               effector link.

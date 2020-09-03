@@ -16,4 +16,4 @@ containers to run the server.  This, along with its speed, may make PyBullet a
 preferable backend for COMPAS_FAB.  However, it, alone, does not provide motion
 planning functionality.  PyBullet is also not compatible with IronPython. Hence to use
 it with Rhinoceros and Grasshopper it must be invoked through :ref:``compas.rpc``
-(see `COMPAS RPC <https://compas-dev.github.io/main/api/compas.rpc.html>`_).
+(see `COMPAS RPC <https://compas.dev/compas/api/compas.rpc.html>`_).

@@ -42,7 +42,7 @@ extlinks = {
 
 # intersphinx options
 intersphinx_mapping = {'python': ('https://docs.python.org/', None),
-                       'compas': ('http://compas-dev.github.io/main/', None),
+                       'compas': ('http://compas.dev/compas/', None),
                        'roslibpy': ('http://roslibpy.readthedocs.org/en/latest/', None)}
 
 # autodoc options

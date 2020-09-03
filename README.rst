@@ -36,7 +36,7 @@ COMPAS FAB: Robotic Fabrication for COMPAS
 planning and execution of robotic fabrication processes. It provides interfaces
 to existing software libraries and tools available in the field of robotics
 (e.g. OMPL, ROS) and makes them accessible from within the parametric design
-environment. The package builds upon `COMPAS <https://compas-dev.github.io/>`_,
+environment. The package builds upon `COMPAS <https://compas.dev/>`_,
 an open-source Python-based framework for collaboration and research in
 architecture, engineering and digital fabrication.
 
@@ -87,8 +87,8 @@ First Steps
 * `Documentation <https://gramaziokohler.github.io/compas_fab/>`_
 * `COMPAS FAB Examples <https://gramaziokohler.github.io/compas_fab/latest/examples.html>`_
 * `COMPAS FAB API Reference <https://gramaziokohler.github.io/compas_fab/latest/reference.html>`_
-* `COMPAS Examples <https://compas-dev.github.io/main/examples.html>`_
-* `COMPAS API Reference <https://compas-dev.github.io/main/api.html>`_
+* `COMPAS Tutorials <https://compas.dev/compas/tutorial.html>`_
+* `COMPAS API Reference <https://compas.dev/compas/api.html>`_
 
 
 Questions and feedback
