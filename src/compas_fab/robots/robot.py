@@ -39,7 +39,7 @@ class Robot(object):
     ----------
     model : :class:`compas.robots.RobotModel`
         The robot model, usually created from an URDF structure.
-    artist : :class:`BaseRobotArtist`, optional
+    artist : :class:`compas_fab.artists.BaseRobotArtist`, optional
         Instance of the artist used to visualize the robot. Defaults to ``None``.
     semantics : :class:`compas_fab.robots.RobotSemantics`, optional
         The semantic model of the robot. Defaults to ``None``.

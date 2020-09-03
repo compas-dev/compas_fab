@@ -37,5 +37,6 @@ container with the following commands on the command prompt::
 Next Steps
 ==========
 
+* :ref:`Tutorial: COMPAS Robots <compas:robots>`
 * :ref:`Examples: V-REP Backend <examples_vrep>`
 * :ref:`COMPAS FAB API Reference <reference>`

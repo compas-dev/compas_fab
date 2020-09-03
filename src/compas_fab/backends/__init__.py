@@ -62,6 +62,13 @@ Exceptions
     RosValidationError
     VrepError
 
+
+Interfaces
+----------
+
+For details about integrating new backends, check
+the :ref:`architecture` documentation.
+
 """
 
 import compas
