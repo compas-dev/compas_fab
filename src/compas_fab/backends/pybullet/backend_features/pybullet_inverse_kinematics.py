@@ -55,7 +55,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         Returns
         -------
-        tuple of joint positions and joint names
+        :obj:`tuple` of :obj:`list`
             A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
 
         Raises
