@@ -31,7 +31,6 @@ with VrepClient(debug=True) as client:
                               goal_pose,
                               group=group,
                               options={
-                                  'num_joints': len(robot.get_configurable_joints()),
                                   'metric_values': metric,
                                   'collision_meshes': structure,
                                   'planner_id': planner_id,

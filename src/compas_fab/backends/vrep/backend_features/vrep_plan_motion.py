@@ -37,7 +37,6 @@ class VrepPlanMotion(PlanMotion):
             group (:obj:`int`): Integer referencing the desired robot group.
             options (:obj:`dict`): Dictionary containing the following key-values pairs:
 
-                - ``"num_joints"``: (:obj:`int`) Number of configurable joints.
                 - ``"metric_values"``: (:obj:`list` of :obj:`float`) List containing one value
                   per configurable joint. Each value ranges from 0 to 1,
                   where 1 indicates the axis/joint is blocked and cannot
@@ -65,7 +64,7 @@ class VrepPlanMotion(PlanMotion):
             collision-free path to the ``goal_constraint``.
         """
         options = options or {}
-        num_joints = options['num_joints']
+        num_joints = len(robot.get_configurable_joints())
         metric_values = options.get('metric_values')
         collision_meshes = options.get('collision_meshes')
         planner_id = options.get('planner_id', 'rrtconnect')
@@ -76,24 +75,25 @@ class VrepPlanMotion(PlanMotion):
         shallow_state_search = options.get('shallow_state_search', True)
         optimize_path_length = options.get('optimize_path_length', False)
         log = options.get('log')
+
         return self._find_path_plan(group, {'target_type': 'pose', 'target': goal_constraints},
                                     num_joints, metric_values, collision_meshes, planner_id, trials, resolution,
                                     gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length,
                                     log)
 
-    def plan_motion_to_config(self, goal_configs, start_configuration=None, group=None, options=None):
+    def plan_motion_to_config(self, robot, goal_configs, start_configuration=None, group=None, options=None):
         """Find a path plan to move the selected robot from its current position to one of the `goal_configs`.
 
         This function is useful when it is required to get a path plan that ends in one
         specific goal configuration.
 
         Args:
+            robot (:class:`compas_fab.robots.Robot`): The robot instance for which the motion plan is being calculated.
             goal_configs (:obj:`list` of :class:`Configuration`): List of target or goal configurations.
             group (:obj:`int`): Integer referencing the desired robot group.
             start_configuration (:obj:`None`): Unused parameter.
             options (:obj:`dict`): Dictionary containing the following key-values pairs:
 
-                - ``"num_joints"``: (:obj:`int`) Number of configurable joints.
                 - ``"metric_values"``: (:obj:`list` of :obj:`float`) List containing one value
                   per configurable joint. Each value ranges from 0 to 1,
                   where 1 indicates the axis/joint is blocked and cannot
@@ -121,7 +121,7 @@ class VrepPlanMotion(PlanMotion):
             collision-free path to the ``goal_configs``.
         """
         options = options or {}
-        num_joints = options['num_joints']
+        num_joints = len(robot.get_configurable_joints())
         metric_values = options.get('metric_values')
         collision_meshes = options.get('collision_meshes')
         planner_id = options.get('planner_id', 'rrtconnect')

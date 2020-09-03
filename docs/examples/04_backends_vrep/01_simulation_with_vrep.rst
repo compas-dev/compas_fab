@@ -102,8 +102,8 @@ that there is at least one valid configuration to reach the goal pose.
         assert len(configs) > 0, 'No IK solution found'
         print('Found valid configuration: ', str(configs[-1]))
 
-Basic path planning example
----------------------------
+Path planning
+=============
 
 Calculating a path plan requires several parameters to be configured in order
 to start the process. In its minimal expression, a path planning request must
@@ -124,16 +124,12 @@ Here is an example of such a request:
 
     with VrepClient() as client:
         robot = rfl.Robot('B')
-        client.set_robot_config(robot, start_config)
         group = robot.model.attr['index']
-        options = {
-            'num_joints': len(robot.get_configurable_joints()),
-        }
-        path = client.plan_motion(robot, goal_pose, group=group, options=options)
+        client.set_robot_config(robot, start_config)
+        path = client.plan_motion(robot, goal_pose, group=group)
         print('Found path of %d steps' % len(path))
 
-
-Or Copy & Paste the following code into a Python file:
+A more elaborate request takes several additional parameters to control the planning process:
 
 .. literalinclude :: files/01_complete_path_planning_example.py
    :language: python
