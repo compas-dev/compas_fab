@@ -23,14 +23,20 @@ Unreleased
 * Renamed ``compas_fab.robots.Robot.to_local_coords`` to ``compas_fab.robots.Robot.to_local_coordinates``
 * Renamed ``compas_fab.robots.Robot.to_world_coords`` to ``compas_fab.robots.Robot.to_world_coordinates``
 * Backend clients have been restructured according to the new interfaces
+* Parameter ``backend`` of forward kinematics has been renamed to ``solver``
 * The signatures of all kinematics, motion planning and planning scene management methods have been homogenized across backend clients and within ``Robot``
 * All examples have been updated to reflect these changes
+
 
 **Fixed**
 
 * Attached collision meshes are included in inverse kinematics calculations in ROS
 
 **Deprecated**
+
+* The methods ``forward_kinematics``, ``inverse_kinematics``, ``plan_cartesian_motion`` and ``plan_motion``
+  of ``Robot`` class have been refactored, but a backwards-compatible deprecated version with the old
+  signatures still exists suffixed by ``_deprecated``, e.g. ``forward_kinematics_deprecated``.
 
 **Removed**
 
