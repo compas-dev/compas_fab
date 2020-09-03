@@ -30,7 +30,8 @@ method.  For example:
     from compas_fab.backends.interfaces import InverseKinematics
 
     class ExampleInverseKinematics(InverseKinematics):
-        def inverse_kinematics(self, frame_WCF,
+        def inverse_kinematics(self, robot,
+                               frame_WCF,
                                start_configuration=None,
                                group=None,
                                options=None):
@@ -43,9 +44,9 @@ can be instantiated and called in the following manner:
 
     calculate_example_ik = ExampleInverseKinematics()
     frame = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
-    ik_result = calculate_example_ik(frame)
+    ik_result = calculate_example_ik(robot, frame)
     # or equivalently:
-    ik_result = calculate_example_ik.inverse_kinematics(frame)
+    ik_result = calculate_example_ik.inverse_kinematics(robot, frame)
 
 
 These backend feature interfaces exist in part to enforce a common
