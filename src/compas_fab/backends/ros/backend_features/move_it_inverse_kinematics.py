@@ -55,10 +55,12 @@ class MoveItInverseKinematics(InverseKinematics):
             Dictionary containing the following key-value pairs:
 
             - ``"base_link"``: (:obj:`str`) Name of the base link.
+              Defaults to the model's root link.
             - ``"avoid_collisions"``: (:obj:`bool`, optional) Whether or not to avoid collisions.
               Defaults to `True`.
             - ``"constraints"``: (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional)
-              A set of constraints that the request must obey. Defaults to `None`.
+              A set of constraints that the request must obey.
+              Defaults to `None`.
             - ``"attempts"``: (:obj:`int`, optional) The maximum number of inverse kinematic attempts.
               Defaults to `8`.
             - ``"attached_collision_meshes"``: (:obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`, optional)
@@ -80,6 +82,9 @@ class MoveItInverseKinematics(InverseKinematics):
         kwargs['group'] = group
         kwargs['start_configuration'] = start_configuration
 
+        # Use base_link or fallback to model's root link
+        options['base_link'] = options.get('base_link', robot.model.root.name)
+
         kwargs['errback_name'] = 'errback'
 
         return await_callback(self.inverse_kinematics_async, **kwargs)
@@ -89,12 +94,13 @@ class MoveItInverseKinematics(InverseKinematics):
         """Asynchronous handler of MoveIt IK service."""
         base_link = options['base_link']
         header = Header(frame_id=base_link)
-        pose = Pose.from_frame(frame_WCF)
-        pose_stamped = PoseStamped(header, pose)
+        pose_stamped = PoseStamped(header, Pose.from_frame(frame_WCF))
+
         joint_state = JointState(
             name=start_configuration.joint_names, position=start_configuration.values, header=header)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
+
         if options.get('attached_collision_meshes'):
             for acm in options['attached_collision_meshes']:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)

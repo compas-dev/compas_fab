@@ -1036,9 +1036,6 @@ class Robot(object):
         options['attached_collision_meshes'] = attached_collision_meshes
 
         # The returned joint names might be more than the requested ones if there are passive joints present
-        if 'base_link' not in options:
-            options['base_link'] = self.model.root.name
-
         joint_positions, joint_names = self.client.inverse_kinematics(self,
                                                                       frame_WCF_scaled,
                                                                       start_configuration_scaled,
