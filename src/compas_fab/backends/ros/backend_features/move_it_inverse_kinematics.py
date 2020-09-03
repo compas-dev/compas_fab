@@ -76,8 +76,9 @@ class MoveItInverseKinematics(InverseKinematics):
         :obj:`tuple` of :obj:`list`
             A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
         """
+        options = options or {}
         kwargs = {}
-        kwargs['options'] = options or {}
+        kwargs['options'] = options
         kwargs['frame_WCF'] = frame_WCF
         kwargs['group'] = group
         kwargs['start_configuration'] = start_configuration
