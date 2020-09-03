@@ -152,7 +152,7 @@ if trigger:
         client.planner.pick_building_member(robot, building_member_mesh, start_pose)
         pickup_config = client.get_robot_config(robot)
 
-        path = client.plan_motion(goal_pose, group=robot.model.attr['index'])
+        path = client.plan_motion(robot, goal_pose, group=robot.model.attr['index'])
         if len(path) &gt; 0:
             path.insert(0, pickup_config)
             print('Found path of %d steps' % len(path))
