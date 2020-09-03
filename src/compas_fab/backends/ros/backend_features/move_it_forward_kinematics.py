@@ -64,6 +64,7 @@ class MoveItForwardKinematics(ForwardKinematics):
         kwargs = {}
         kwargs['configuration'] = configuration
         kwargs['options'] = options
+        kwargs['errback_name'] = 'errback'
 
         # Use base_link or fallback to model's root link
         options['base_link'] = options.get('base_link', robot.model.root.name)
@@ -72,8 +73,6 @@ class MoveItForwardKinematics(ForwardKinematics):
         options['link'] = options.get('link', options.get('ee_link')) or robot.get_end_effector_link_name(group)
         if options['link'] not in robot.get_link_names(group):
             raise ValueError('Link name {} does not exist in planning group'.format(options['link']))
-
-        kwargs['errback_name'] = 'errback'
 
         return await_callback(self.forward_kinematics_async, **kwargs)
 

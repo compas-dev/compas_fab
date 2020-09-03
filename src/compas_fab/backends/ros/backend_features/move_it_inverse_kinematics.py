@@ -82,11 +82,10 @@ class MoveItInverseKinematics(InverseKinematics):
         kwargs['frame_WCF'] = frame_WCF
         kwargs['group'] = group
         kwargs['start_configuration'] = start_configuration
+        kwargs['errback_name'] = 'errback'
 
         # Use base_link or fallback to model's root link
         options['base_link'] = options.get('base_link', robot.model.root.name)
-
-        kwargs['errback_name'] = 'errback'
 
         return await_callback(self.inverse_kinematics_async, **kwargs)
 

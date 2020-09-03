@@ -60,14 +60,13 @@ class MoveItPlanMotion(PlanMotion):
             Dictionary containing the following key-value pairs:
 
             - ``"base_link"``: (:obj:`str`) Name of the base link.
-            - ``"joint_names"``: (:obj:`list` of :obj:`str`) List containing joint names.
-            - ``"joint_types"``: (:obj:`list` of :obj:`str`) List containing joint types.
             - ``"path_constraints"``: (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional)
               Optional constraints that can be imposed along the solution path.
               Note that path calculation won't work if the start_configuration
               violates these constraints. Defaults to ``None``.
             - ``"planner_id"``: (:obj:`str`)
-              The name of the algorithm used for path planning. Defaults to ``"RRT"``.
+              The name of the algorithm used for path planning.
+              Defaults to ``'RRTConnectkConfigDefault'``.
             - ``"num_planning_attempts"``: (:obj:`int`, optional)
               Normally, if one motion plan is needed, one motion plan is computed.
               However, for algorithms that use randomization in their execution
@@ -89,13 +88,18 @@ class MoveItPlanMotion(PlanMotion):
         :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
         """
+        options = options or {}
         kwargs = {}
         kwargs['goal_constraints'] = goal_constraints
         kwargs['start_configuration'] = start_configuration
         kwargs['group'] = group
-        kwargs['options'] = options or {}
-
+        kwargs['options'] = options
         kwargs['errback_name'] = 'errback'
+
+        # Use base_link or fallback to model's root link
+        options['base_link'] = options.get('base_link', robot.model.root.name)
+        options['joint_names'] = robot.get_configurable_joint_names()
+        options['joint_types'] = robot.get_configurable_joint_types()
 
         return await_callback(self.plan_motion_async, **kwargs)
 
@@ -133,9 +137,9 @@ class MoveItPlanMotion(PlanMotion):
                        goal_constraints=goal_constraints,
                        path_constraints=path_constraints,
                        trajectory_constraints=trajectory_constraints,
-                       planner_id=options.get('planner_id', ''),
+                       planner_id=options.get('planner_id', 'RRTConnectkConfigDefault'),
                        group_name=group,
-                       num_planning_attempts=options.get('num_planning_attempts', 8),
+                       num_planning_attempts=options.get('num_planning_attempts', 1),
                        allowed_planning_time=options.get('allowed_planning_time', 2.),
                        max_velocity_scaling_factor=options.get('max_velocity_scaling_factor', 1.),
                        max_acceleration_scaling_factor=options.get('max_acceleration_scaling_factor', 1.))

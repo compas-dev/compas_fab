@@ -1304,25 +1304,13 @@ class Robot(object):
             - path_constraints :: list of :class:`compas_fab.robots.Constraint`, optional
                 Optional constraints that can be imposed along the solution path.
                 Note that path calculation won't work if the start_configuration
-                violates these constraints. Defaults to `None`.
-            - planner_id :: str
-                The name of the algorithm used for path planning.
-                Defaults to 'RRTConnectkConfigDefault'.
-            - num_planning_attempts :: int, optional
-                Normally, if one motion plan is needed, one motion plan is computed.
-                However, for algorithms that use randomization in their execution
-                (like 'RRT'), it is likely that different planner executions will
-                produce different solutions. Setting this parameter to a value above
-                1 will run many additional motion plans, and will report the
-                shortest solution as the final result. Defaults to `1`.
-            - allowed_planning_time :: float
-                The number of seconds allowed to perform the planning. Defaults to `2`.
-            - max_velocity_scaling_factor :: float
-                Defaults to `1`.
-            - max_acceleration_scaling_factor :: float
-                Defaults to `1`.
+                violates these constraints. Defaults to ``None``.
             - attached_collision_meshes :: list of :class:`compas_fab.robots.AttachedCollisionMesh`
-                Defaults to `None`.
+                Defaults to ``None``.
+
+            There are additional options that are specific to the backend in use.
+            Check the API reference of the motion planner backend implementation
+            for more details.
 
         Returns
         -------
@@ -1356,25 +1344,7 @@ class Robot(object):
         """
         options = options or {}
         path_constraints = options.get('path_constraints')
-        planner_id = options.get('planner_id', 'RRTConnectkConfigDefault')
-        num_planning_attempts = options.get('num_planning_attempts', 1)
-        allowed_planning_time = options.get('allowed_planning_time', 2.)
-        max_velocity_scaling_factor = options.get('max_velocity_scaling_factor', 1.)
-        max_acceleration_scaling_factor = options.get('max_acceleration_scaling_factor', 1.)
         attached_collision_meshes = options.get('attached_collision_meshes')
-        return self.plan_motion_deprecated(goal_constraints, start_configuration,
-                                           group, path_constraints, planner_id,
-                                           num_planning_attempts, allowed_planning_time,
-                                           max_velocity_scaling_factor,
-                                           max_acceleration_scaling_factor,
-                                           attached_collision_meshes)
-
-    def plan_motion_deprecated(self, goal_constraints, start_configuration=None,
-                               group=None, path_constraints=None, planner_id='RRTConnectkConfigDefault',
-                               num_planning_attempts=1, allowed_planning_time=2.,
-                               max_velocity_scaling_factor=1.,
-                               max_acceleration_scaling_factor=1.,
-                               attached_collision_meshes=None):
 
         # TODO: for the motion plan request a list of possible goal constraints
         # can be passed, from which the planner will try to find a path that
@@ -1385,7 +1355,7 @@ class Robot(object):
 
         self.ensure_client()
         if not group:
-            group = self.main_group_name  # ensure semantics
+            group = self.main_group_name
 
         # NOTE: start_configuration has to be a full robot configuration, such
         # that all configurable joints of the whole robot are defined for planning.
@@ -1423,18 +1393,8 @@ class Robot(object):
             else:
                 attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
-        options = {
-            'base_link': self.model.root.name,  # use world coordinates
-            'joint_names': self.get_configurable_joint_names(),
-            'joint_types': self.get_configurable_joint_types(),
-            'path_constraints': path_constraints_WCF_scaled,
-            'planner_id': planner_id,
-            'num_planning_attempts': num_planning_attempts,
-            'allowed_planning_time': allowed_planning_time,
-            'max_velocity_scaling_factor': max_velocity_scaling_factor,
-            'max_acceleration_scaling_factor': max_acceleration_scaling_factor,
-            'attached_collision_meshes': attached_collision_meshes,
-        }
+        options['path_constraints'] = path_constraints_WCF_scaled
+        options['attached_collision_meshes'] = attached_collision_meshes
 
         trajectory = self.client.plan_motion(
             robot=self,
@@ -1451,6 +1411,25 @@ class Robot(object):
         trajectory.start_configuration.scale(self.scale_factor)
 
         return trajectory
+
+    def plan_motion_deprecated(self, goal_constraints, start_configuration=None,
+                               group=None, path_constraints=None, planner_id='RRTConnectkConfigDefault',
+                               num_planning_attempts=1, allowed_planning_time=2.,
+                               max_velocity_scaling_factor=1.,
+                               max_acceleration_scaling_factor=1.,
+                               attached_collision_meshes=None):
+        return self.plan_motion(goal_constraints,
+                                start_configuration,
+                                group,
+                                options=dict(
+                                    path_constraints=path_constraints,
+                                    planner_id=planner_id,
+                                    num_planning_attempts=num_planning_attempts,
+                                    allowed_planning_time=allowed_planning_time,
+                                    max_velocity_scaling_factor=max_velocity_scaling_factor,
+                                    max_acceleration_scaling_factor=max_acceleration_scaling_factor,
+                                    attached_collision_meshes=attached_collision_meshes,
+                                ))
 
     def transformed_frames(self, configuration, group=None):
         """Returns the robot's transformed frames."""
