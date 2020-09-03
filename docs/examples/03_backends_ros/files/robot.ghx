@@ -3676,7 +3676,7 @@ LOGGER = logging.getLogger('roslibpy')
 
 if robot and robot.client and full_configuration:
     if robot.client.is_connected:
-        frame_WCF = robot.forward_kinematics(full_configuration, group, {'backend': 'model'})
+        frame_WCF = robot.forward_kinematics(full_configuration, group, {'solver': 'model'})
     else:
         print("Robot is not connected")
 </item>
@@ -14541,7 +14541,7 @@ frames = []
 if robot:
     for c in full_configurations:
         if c:
-            frame_WCF = robot.forward_kinematics(c, group, {'backend': 'model'})
+            frame_WCF = robot.forward_kinematics(c, group, {'solver': 'model'})
             frames.append(frame_WCF)
 
     P = [rg.Point3d(*list(frame.point)) for frame in frames]</item>
@@ -15452,7 +15452,7 @@ frames = []
 if robot:
     for c in full_configurations:
         if c:
-            frame_WCF = robot.forward_kinematics(c, group, {'backend': 'model'})
+            frame_WCF = robot.forward_kinematics(c, group, {'solver': 'model'})
             frames.append(frame_WCF)
 
     P = [rg.Point3d(*list(frame.point)) for frame in frames]</item>
@@ -15999,7 +15999,7 @@ if robot and full_configuration:
         base_frame_WCF = robot.get_base_frame(group, full_configuration)
 
     if show_end_effector_frame:
-        ee_frame_WCF = robot.forward_kinematics(full_configuration, group=group, options={'backend': 'model'})
+        ee_frame_WCF = robot.forward_kinematics(full_configuration, group=group, options={'solver': 'model'})
         print("End-effector", ee_frame_WCF)
 </item>
                     <item name="Description" type_name="gh_string" type_code="10">Calculates a cartesian motion path (linear in tool space).</item>

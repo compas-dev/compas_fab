@@ -46,19 +46,32 @@ class MoveItForwardKinematics(ForwardKinematics):
         options : dict, optional
             Dictionary containing the following key-value pairs:
 
-            - ``"base_link"``: (:obj:`str`) The name of the base link.
-            - ``"ee_link"``: (:obj:`str`, optional) The name of the link to
+            - ``"base_link"``: (:obj:`str`) Name of the base link.
+              Defaults to the model's root link.
+            - ``"link"``: (:obj:`str`, optional) The name of the link to
               calculate the forward kinematics for. Defaults to the group's end
               effector link.
+              Backwards compatibility note: if there's no ``link`` option, the
+              planner will try also ``ee_link`` as fallback before defaulting
+              to the end effector's link.
 
         Returns
         -------
         :class:`Frame`
             The frame in the world's coordinate system (WCF).
         """
+        options = options or {}
         kwargs = {}
         kwargs['configuration'] = configuration
-        kwargs['options'] = options or {}
+        kwargs['options'] = options
+
+        # Use base_link or fallback to model's root link
+        options['base_link'] = options.get('base_link', robot.model.root.name)
+
+        # Use selected link or default to group's end effector
+        options['link'] = options.get('link', options.get('ee_link')) or robot.get_end_effector_link_name(group)
+        if options['link'] not in robot.get_link_names(group):
+            raise ValueError('Link name {} does not exist in planning group'.format(options['link']))
 
         kwargs['errback_name'] = 'errback'
 
@@ -68,9 +81,9 @@ class MoveItForwardKinematics(ForwardKinematics):
                                  configuration, options):
         """Asynchronous handler of MoveIt FK service."""
         base_link = options['base_link']
+        fk_link_names = [options['link']]
+
         header = Header(frame_id=base_link)
-        ee_link = options['ee_link']
-        fk_link_names = [ee_link]
         joint_state = JointState(
             name=configuration.joint_names, position=configuration.values, header=header)
         robot_state = RobotState(

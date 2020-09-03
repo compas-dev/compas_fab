@@ -17,7 +17,7 @@ from __future__ import print_function
 
 if robot and robot.client and full_configuration:
     if robot.client.is_connected:
-        frame_WCF = robot.forward_kinematics(full_configuration, group, options={'backend': 'model'})
+        frame_WCF = robot.forward_kinematics(full_configuration, group, options={'solver': 'model'})
         print(frame_WCF)
     else:
         print("Robot is not connected")

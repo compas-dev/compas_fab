@@ -3674,7 +3674,7 @@ LOGGER = logging.getLogger('roslibpy')
 
 if robot and robot.client and full_configuration:
     if robot.client.is_connected:
-        frame_WCF = robot.forward_kinematics(full_configuration, group, options={'backend':'model'})
+        frame_WCF = robot.forward_kinematics(full_configuration, group, options={'solver':'model'})
         print(frame_WCF)
     else:
         print("Robot is not connected")
@@ -14539,7 +14539,7 @@ frames = []
 if robot:
     for c in full_configurations:
         if c:
-            frame_WCF = robot.forward_kinematics(c, group, options={'backend':'model'})
+            frame_WCF = robot.forward_kinematics(c, group, options={'solver':'model'})
             frames.append(frame_WCF)
 
     P = [rg.Point3d(*list(frame.point)) for frame in frames]</item>
@@ -15450,7 +15450,7 @@ frames = []
 if robot:
     for c in full_configurations:
         if c:
-            frame_WCF = robot.forward_kinematics(c, group, options={'backend':'model'})
+            frame_WCF = robot.forward_kinematics(c, group, options={'solver':'model'})
             frames.append(frame_WCF)
 
     P = [rg.Point3d(*list(frame.point)) for frame in frames]</item>

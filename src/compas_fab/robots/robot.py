@@ -987,16 +987,9 @@ class Robot(object):
             If ``True``, returns a full configuration with all joint values
             specified, including passive ones if available. Defaults to ``False``.
         options: dict, optional
-            Dictionary containing the following key-value pairs:
-
-            - avoid_collisions :: bool, optional
-                Whether or not to avoid collisions. Defaults to ``True``.
-            - constraints :: list of :class:`compas_fab.robots.Constraint`, optional
-                A set of constraints that the request must obey. Defaults to ``None``.
-            - attempts :: int, optional
-                The maximum number of inverse kinematic attempts. Defaults to ``8``.
-            - attached_collision_meshes :: list of :class:`compas_fab.robots.AttachedCollisionMesh`
-                Defaults to ``None``.
+            Dictionary containing the key-value pairs of additional options.
+            The valid options are specific to the backend in use.
+            Check the API reference of the IK backend implementation for more details.
 
         Raises
         ------
@@ -1069,13 +1062,20 @@ class Robot(object):
         options : dict, optional
             Dictionary containing the following key-value pairs:
 
-            - backend :: None or str
-                If `None` calculates fk with the client if it exists or with the robot model.
-                If 'model' use the robot model to calculate fk. Anything else is open
-                for implementation, possibly 'kdl', 'ikfast'
-            - ee_link :: str, optional
-                The name of the link to calculate the forward kinematics for.
-                Defaults to the group's end effector link.
+            - ``"solver"`` : ``None`` or :obj:`str`
+                If ``None`` calculates FK with the client if it exists or with the robot model.
+                If ``'model'`` use the robot model to calculate FK.
+                Other values depend on specific backend implementation, some backends might
+                allow selecting different FK solvers dynamically.
+            - ``"link"``: (:obj:`str`, optional) The name of the link to
+              calculate the forward kinematics for. Defaults to the group's end
+              effector link.
+              Backwards compatibility note: if there's no ``link`` option, the
+              planner will try also ``ee_link`` as fallback before defaulting
+              to the end effector's link.
+
+            There are additional options that are specific to the backend in use.
+            Check the API reference of the FK backend implementation for more details.
 
         Returns
         -------
@@ -1087,48 +1087,48 @@ class Robot(object):
         >>> configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
         >>> group = robot.main_group_name
         >>> frame_WCF_c = robot.forward_kinematics(configuration, group)
-        >>> options = {'backend': 'model'}
+        >>> options = {'solver': 'model'}
         >>> frame_WCF_m = robot.forward_kinematics(configuration, group, options)
         >>> frame_WCF_c == frame_WCF_m
         True
         """
         options = options or {}
-        backend = options.get('backend')
-        ee_link = options.get('ee_link')
-        return self.forward_kinematics_deprecated(configuration, group, backend, ee_link)
+        solver = options.get('solver')
 
-    def forward_kinematics_deprecated(self, configuration, group=None, backend=None, ee_link=None):
         group = self.main_group_name if self.semantics and not group else None
-
-        ee_link = ee_link or self.get_end_effector_link_name(group)
-        if ee_link not in self.get_link_names(group):
-            raise ValueError("Link name %s does not exist in planning group" % ee_link)
 
         full_configuration = self.merge_group_with_full_configuration(configuration, self.zero_configuration(), group)
         full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)
 
         full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
 
+        # If there's no client, we default to `model` solver if there is no other assigned.
         if not self.client:
-            backend = backend or 'model'
+            solver = solver or 'model'
 
-        if backend == 'model':
-            frame_WCF = self.model.forward_kinematics(full_joint_state, ee_link)
-        elif self.client:
-            options = {
-                'ee_link': ee_link,
-                'base_link': self.model.root.name,
-            }
+        # Solve with the model
+        if solver == 'model':
+            link = options.get('link', options.get('ee_link'))
+            link = link or self.get_end_effector_link_name(group)
+            if link not in self.get_link_names(group):
+                raise ValueError('Link name {} does not exist in planning group'.format(link))
+
+            frame_WCF = self.model.forward_kinematics(full_joint_state, link)
+
+        # Otherwise, pass everything down to the client
+        else:
+            self.ensure_client()
             frame_WCF = self.client.forward_kinematics(self,
                                                        full_configuration_scaled,
                                                        group,
                                                        options)
-            frame_WCF.point *= self.scale_factor
-        else:
-            # pass to backend, kdl, ikfast,...
-            raise NotImplementedError
 
+        # Scale and return
+        frame_WCF.point *= self.scale_factor
         return frame_WCF
+
+    def forward_kinematics_deprecated(self, configuration, group=None, backend=None, ee_link=None):
+        return self.forward_kinematics(configuration, group, options=dict(solver=backend, link=ee_link))
 
     def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
