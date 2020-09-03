@@ -15,7 +15,8 @@
             or defining a volume in space, to which a specific robot link (e.g.
             the end-effector) is required to move to.
         planner_id: str
-            The name of the algorithm used for path planning. Defaults to 'RRT'.
+            The name of the algorithm used for path planning.
+            Defaults to ``'RRTConnectkConfigDefault'``.
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
         compute: bool

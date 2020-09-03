@@ -1290,7 +1290,8 @@ class Robot(object):
                 Note that path calculation won't work if the start_configuration
                 violates these constraints. Defaults to `None`.
             - planner_id :: str
-                The name of the algorithm used for path planning. Defaults to 'RRT'.
+                The name of the algorithm used for path planning.
+                Defaults to 'RRTConnectkConfigDefault'.
             - num_planning_attempts :: int, optional
                 Normally, if one motion plan is needed, one motion plan is computed.
                 However, for algorithms that use randomization in their execution
@@ -1322,7 +1323,7 @@ class Robot(object):
         >>> group = robot.main_group_name
         >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
         >>> robot.attached_tool = None
-        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRT'})
+        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnectkConfigDefault'})
         >>> trajectory.fraction
         1.0
         >>> # Example with joint constraints (to the UP configuration)
@@ -1331,7 +1332,7 @@ class Robot(object):
         >>> tolerances_below = [math.radians(5)] * len(configuration.values)
         >>> group = robot.main_group_name
         >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances_above, tolerances_below, group)
-        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRT'})
+        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnectkConfigDefault'})
         >>> trajectory.fraction
         1.0
         >>> type(trajectory)
@@ -1339,7 +1340,7 @@ class Robot(object):
         """
         options = options or {}
         path_constraints = options.get('path_constraints')
-        planner_id = options.get('planner_id', 'RRT')
+        planner_id = options.get('planner_id', 'RRTConnectkConfigDefault')
         num_planning_attempts = options.get('num_planning_attempts', 1)
         allowed_planning_time = options.get('allowed_planning_time', 2.)
         max_velocity_scaling_factor = options.get('max_velocity_scaling_factor', 1.)
@@ -1353,7 +1354,7 @@ class Robot(object):
                                            attached_collision_meshes)
 
     def plan_motion_deprecated(self, goal_constraints, start_configuration=None,
-                               group=None, path_constraints=None, planner_id='RRT',
+                               group=None, path_constraints=None, planner_id='RRTConnectkConfigDefault',
                                num_planning_attempts=1, allowed_planning_time=2.,
                                max_velocity_scaling_factor=1.,
                                max_acceleration_scaling_factor=1.,

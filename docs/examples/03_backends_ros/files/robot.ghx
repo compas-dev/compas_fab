@@ -5890,7 +5890,7 @@ if robot:
             or defining a volume in space, to which a specific robot link (e.g.
             the end-effector) is required to move to.
         planner_id: str
-            The name of the algorithm used for path planning. Defaults to 'RRT'.
+            The name of the algorithm used for path planning. Defaults to 'RRTConnectkConfigDefault'.
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
         compute: bool
@@ -6117,7 +6117,7 @@ the end-effector) is required to move to.</item>
                           <items count="11">
                             <item name="AllowTreeAccess" type_name="gh_bool" type_code="1">true</item>
                             <item name="Description" type_name="gh_string" type_code="10">str
-The name of the algorithm used for path planning. Defaults to 'RRT'.</item>
+The name of the algorithm used for path planning. Defaults to 'RRTConnectkConfigDefault'.</item>
                             <item name="InstanceGuid" type_name="gh_guid" type_code="9">ee0b1568-b152-48bd-aee6-f67089f6ecae</item>
                             <item name="Name" type_name="gh_string" type_code="10">planner_id</item>
                             <item name="NickName" type_name="gh_string" type_code="10">planner_id</item>
