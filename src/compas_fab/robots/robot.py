@@ -1047,6 +1047,22 @@ class Robot(object):
 
         return configuration.scaled(self.scale_factor)
 
+    def inverse_kinematics_deprecated(self, frame_WCF, start_configuration=None,
+                                      group=None, avoid_collisions=True,
+                                      constraints=None, attempts=8,
+                                      attached_collision_meshes=None,
+                                      return_full_configuration=False):
+        return self.inverse_kinematics(frame_WCF,
+                                       start_configuration,
+                                       group,
+                                       return_full_configuration,
+                                       options=dict(
+                                           avoid_collisions=avoid_collisions,
+                                           constraints=constraints,
+                                           attempts=attempts,
+                                           attached_collision_meshes=attached_collision_meshes,
+                                       ))
+
     def forward_kinematics(self, configuration, group=None, options=None):
         """Calculate the robot's forward kinematic.
 
