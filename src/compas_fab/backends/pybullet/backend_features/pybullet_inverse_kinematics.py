@@ -87,7 +87,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
             if options.get('semi-constrained'):
                 joint_positions = pybullet.calculateInverseKinematics(
-                    robot.pybullet_uid,
+                    robot.attributes['pybullet_uid'],
                     link_id,
                     point,
                     lowerLimits=lower_limits,
@@ -97,7 +97,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 )
             else:
                 joint_positions = pybullet.calculateInverseKinematics(
-                    robot.pybullet_uid,
+                    robot.attributes['pybullet_uid'],
                     link_id,
                     point,
                     orientation,
@@ -109,13 +109,13 @@ class PyBulletInverseKinematics(InverseKinematics):
         else:
             if options.get('semi-constrained'):
                 joint_positions = pybullet.calculateInverseKinematics(
-                    robot.pybullet_uid,
+                    robot.attributes['pybullet_uid'],
                     link_id,
                     point,
                 )
             else:
                 joint_positions = pybullet.calculateInverseKinematics(
-                    robot.pybullet_uid,
+                    robot.attributes['pybullet_uid'],
                     link_id,
                     point,
                     orientation,

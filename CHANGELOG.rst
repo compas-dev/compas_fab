@@ -13,9 +13,10 @@ Unreleased
 
 **Added**
 
+* **PyBullet integration**: added support for PyBullet client and forward/inverse kinematic solver
 * Added ``ClientInterface``, ``PlannerInterface`` and various backend feature interfaces
 * Added implementations of these interfaces for ROS and V-REP
-* Added client for PyBullet with forward and inverse kinematics
+* Added ``attributes`` dictionary to ``Robot`` class 
 
 **Changed**
 

@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import logging
 import random
 
 from compas.geometry import Frame
@@ -16,10 +15,7 @@ from compas_fab.robots.constraints import Constraint
 from compas_fab.robots.constraints import JointConstraint
 from compas_fab.robots.constraints import OrientationConstraint
 from compas_fab.robots.constraints import PositionConstraint
-
 from compas_fab.robots.planning_scene import AttachedCollisionMesh
-
-LOGGER = logging.getLogger('compas_fab.robots.robot')
 
 __all__ = [
     'Robot',
@@ -39,13 +35,17 @@ class Robot(object):
     ----------
     model : :class:`compas.robots.RobotModel`
         The robot model, usually created from an URDF structure.
-    artist : :class:`compas_fab.artists.BaseRobotArtist`, optional
+    artist : :class:`compas_fab.artists.BaseRobotArtist`
         Instance of the artist used to visualize the robot. Defaults to ``None``.
-    semantics : :class:`compas_fab.robots.RobotSemantics`, optional
+    semantics : :class:`compas_fab.robots.RobotSemantics`
         The semantic model of the robot. Defaults to ``None``.
-    client : optional
+    client : :class:`compas_fab.backends.interfaces.ClientInterface`
         The backend client to use for communication,
         e.g. :class:`compas_fab.backends.RosClient`
+    attributes : dict
+        Named attributes related to the robot instance.
+    attached_tool : :class:`compas_fab.robots.Tool`
+        Instance of the tool attached to the robot, if any.
     """
 
     def __init__(self, model, artist=None, semantics=None, client=None):
@@ -55,7 +55,7 @@ class Robot(object):
         self.artist = artist
         self.semantics = semantics
         self.client = client
-        self.pybullet_uid = None
+        self.attributes = {}
 
     @property
     def artist(self):

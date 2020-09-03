@@ -41,7 +41,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
         link_name = options.get('link') or robot.get_end_effector_link_name(group)
         link_id = self.client._get_link_id_by_name(link_name, robot)
         self.client.set_robot_configuration(robot, configuration, group)
-        frame = self.client._get_link_frame(link_id, robot.pybullet_uid)
+        frame = self.client._get_link_frame(link_id, robot.attributes['pybullet_uid'])
         if options.get('check_collision'):
             self.client.collision_check()
         return frame
