@@ -1163,23 +1163,19 @@ class Robot(object):
         options: dict, optional
             Dictionary containing the following key-value pairs:
 
-            - max_step :: float, optional
-                The approximate distance between the calculated points. (Defined in
-                the robot's units.) Defaults to `0.01`.
-            - jump_threshold :: float, optional
-                The maximum allowed distance of joint positions between consecutive
-                points. If the distance is found to be above this threshold, the
-                path computation fails. It must be specified in relation to max_step.
-                If this threshold is 0, 'jumps' might occur, resulting in an invalid
-                cartesian path. Defaults to pi/2.
-            - avoid_collisions :: bool, optional
-                Whether or not to avoid collisions. Defaults to `True`.
+            - max_step :: :obj:`float`, optional
+                The approximate distance between the
+                calculated points. (Defined in the robot's units.) Defaults to ``0.01``.
             - path_constraints :: list of :class:`compas_fab.robots.Constraint`, optional
                 Optional constraints that can be imposed along the solution path.
                 Note that path calculation won't work if the start_configuration
-                violates these constraints. Defaults to `None`.
+                violates these constraints. Defaults to ``None``.
             - attached_collision_meshes :: list of :class:`compas_fab.robots.AttachedCollisionMesh`
-                Defaults to `None`.
+                Defaults to ``None``.
+
+            There are additional options that are specific to the backend in use.
+            Check the API reference of the cartesian motion planner backend implementation
+            for more details.
 
         Returns
         -------
@@ -1203,22 +1199,10 @@ class Robot(object):
         <class 'compas_fab.robots.trajectory.JointTrajectory'>
         """
         options = options or {}
-        max_step = options.get('max_step', 0.01)
-        jump_threshold = options.get('jump_threshold', 1.57)
-        avoid_collisions = options.get('avoid_collisions', True)
+        max_step = options.get('max_step')
         path_constraints = options.get('path_constraints')
-        attached_collisions_meshes = options.get('attached_collision_meshes')
-        return self.plan_cartesian_motion_deprecated(frames_WCF, start_configuration,
-                                                     max_step, jump_threshold,
-                                                     avoid_collisions, group,
-                                                     path_constraints,
-                                                     attached_collisions_meshes)
+        attached_collision_meshes = options.get('attached_collision_meshes')
 
-    def plan_cartesian_motion_deprecated(self, frames_WCF, start_configuration=None,
-                                         max_step=0.01, jump_threshold=1.57,
-                                         avoid_collisions=True, group=None,
-                                         path_constraints=None,
-                                         attached_collision_meshes=None):
         self.ensure_client()
         if not group:
             group = self.main_group_name  # ensure semantics
@@ -1226,8 +1210,6 @@ class Robot(object):
         # NOTE: start_configuration has to be a full robot configuration, such
         # that all configurable joints of the whole robot are defined for planning.
         start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
-
-        max_step_scaled = max_step / self.scale_factor
 
         frames_WCF_scaled = []
         for frame in frames_WCF:
@@ -1253,17 +1235,10 @@ class Robot(object):
             else:
                 attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
 
-        options = {
-            'base_link': self.model.root.name,
-            'ee_link': self.get_end_effector_link_name(),
-            'joint_names': self.get_configurable_joint_names(),
-            'joint_types': self.get_configurable_joint_types(),
-            'max_step': max_step_scaled,
-            'jump_threshold': jump_threshold,
-            'avoid_collisions': avoid_collisions,
-            'path_constraints': path_constraints,
-            'attached_collision_meshes': attached_collision_meshes,
-        }
+        options['path_constraints'] = path_constraints
+        options['attached_collision_meshes'] = attached_collision_meshes
+        if max_step:
+            options['max_step'] = max_step / self.scale_factor
 
         trajectory = self.client.plan_cartesian_motion(
             robot=self,
@@ -1279,6 +1254,22 @@ class Robot(object):
         trajectory.start_configuration.scale(self.scale_factor)
 
         return trajectory
+
+    def plan_cartesian_motion_deprecated(self, frames_WCF, start_configuration=None,
+                                         max_step=0.01, jump_threshold=1.57,
+                                         avoid_collisions=True, group=None,
+                                         path_constraints=None,
+                                         attached_collision_meshes=None):
+        return self.plan_cartesian_motion(frames_WCF,
+                                          start_configuration=start_configuration,
+                                          group=group,
+                                          options=dict(
+                                              max_step=max_step,
+                                              jump_threshold=jump_threshold,
+                                              avoid_collisions=avoid_collisions,
+                                              path_constraints=path_constraints,
+                                              attached_collision_meshes=attached_collision_meshes,
+                                          ))
 
     def plan_motion(self, goal_constraints, start_configuration=None, group=None, options=None):
         """Calculates a motion path.
