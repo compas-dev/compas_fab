@@ -1,7 +1,7 @@
 .. _architecture:
 
 *******************************************************************************
-A Note on Backend Client Architecture
+Backend Client Architecture
 *******************************************************************************
 
 To maintain consistency from one backend client to another and to promote
