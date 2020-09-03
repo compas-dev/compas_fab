@@ -1013,7 +1013,7 @@ class Robot(object):
         attached_collision_meshes = options.get('attached_collision_meshes')
 
         self.ensure_client()
-        group = self.main_group_name if self.semantics and not group else None
+        group = group or self.main_group_name if self.semantics else None
 
         start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
 
@@ -1111,7 +1111,7 @@ class Robot(object):
         options = options or {}
         solver = options.get('solver')
 
-        group = self.main_group_name if self.semantics and not group else None
+        group = group or self.main_group_name if self.semantics else None
 
         full_configuration = self.merge_group_with_full_configuration(configuration, self.zero_configuration(), group)
         full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)
