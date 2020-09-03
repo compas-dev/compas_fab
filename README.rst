@@ -48,7 +48,7 @@ Main features
 * Planning tools: kinematic solvers, path planning, etc.
 * Execution tools: feedback loops, robot control, etc.
 
-**COMPAS FAB** runs on Python 2.x, 3.x and IronPython 2.7.
+**COMPAS FAB** runs on Python 3.x and IronPython 2.7.
 
 
 Getting Started
