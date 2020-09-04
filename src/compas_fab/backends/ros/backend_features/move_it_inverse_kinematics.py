@@ -2,11 +2,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas.geometry import Sphere
 from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import InverseKinematics
-from compas_fab.backends.ros.backend_features.helpers import validate_response
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
+from compas_fab.backends.ros.backend_features.helpers import validate_response
 from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import GetPositionIKRequest
 from compas_fab.backends.ros.messages import GetPositionIKResponse
@@ -18,6 +19,7 @@ from compas_fab.backends.ros.messages import PoseStamped
 from compas_fab.backends.ros.messages import PositionIKRequest
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
+from compas_fab.robots.constraints import PositionConstraint
 
 __all__ = [
     'MoveItInverseKinematics',
@@ -111,3 +113,27 @@ class MoveItInverseKinematics(InverseKinematics):
             callback((response.solution.joint_state.position, response.solution.joint_state.name))
 
         self.GET_POSITION_IK(self.ros_client, (ik_request, ), convert_to_positions, errback)
+
+    def iter_inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, n_configurations=10, max_reach=None, link_name=None, options=None):
+
+        if not group:
+            group = self.main_group_name
+
+        # reach constraint
+        if max_reach and link_name:
+            assert(link_name in self.get_link_names(group=group))
+            sphere = Sphere(frame_WCF.point, max_reach)
+            reach_constraints = [PositionConstraint.from_sphere(link_name, sphere)]
+        else:
+            print("No max_reach or link_name!")
+
+        if options.get('constraints') == [] or options.get('constraints') is None:
+            options['constraints'] = reach_constraints
+        else:
+            options['constraints'].extend(reach_constraints)
+
+        for n in n_configurations:
+            yield self.inverse_kinematics(frame_WCF,
+                                          start_configuration=start_configuration,
+                                          group=group,
+                                          options=options)
