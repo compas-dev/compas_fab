@@ -57,7 +57,7 @@ class MoveItInverseKinematics(InverseKinematics):
             - ``"base_link"``: (:obj:`str`) Name of the base link.
               Defaults to the model's root link.
             - ``"avoid_collisions"``: (:obj:`bool`, optional) Whether or not to avoid collisions.
-              Defaults to `True`.
+              Defaults to ``True``.
             - ``"constraints"``: (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional)
               A set of constraints that the request must obey.
               Defaults to `None`.
