@@ -7,7 +7,7 @@ API Reference
 This reference manual details functions, modules, and objects included in COMPAS FAB,
 describing what they are and what they do.
 
-For learning how to use COMPAS FAB, see the :ref:`examples <examples>` and
+To learn how to use COMPAS FAB, see the :ref:`examples <examples>` and
 how to :ref:`work with backends <backends>`.
 
 Modules
