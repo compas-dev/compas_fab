@@ -1010,7 +1010,7 @@ class Robot(object):
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
         options = options or {}
-        attached_collision_meshes = options.get('attached_collision_meshes')
+        attached_collision_meshes = options.get('attached_collision_meshes', [])
 
         self.ensure_client()
         group = group or self.main_group_name if self.semantics else None
