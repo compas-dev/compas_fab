@@ -60,7 +60,7 @@ class MoveItInverseKinematics(InverseKinematics):
               Defaults to ``True``.
             - ``"constraints"``: (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional)
               A set of constraints that the request must obey.
-              Defaults to `None`.
+              Defaults to ``None``.
             - ``"attempts"``: (:obj:`int`, optional) The maximum number of inverse kinematic attempts.
               Defaults to `8`.
             - ``"attached_collision_meshes"``: (:obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`, optional)
