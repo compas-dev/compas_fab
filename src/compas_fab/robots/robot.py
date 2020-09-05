@@ -1021,10 +1021,7 @@ class Robot(object):
         frame_WCF_scaled.point /= self.scale_factor  # must be in meters
 
         if self.attached_tool:
-            if attached_collision_meshes:
-                attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
-            else:
-                attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
+            attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
 
         options['attached_collision_meshes'] = attached_collision_meshes
 
@@ -1201,7 +1198,7 @@ class Robot(object):
         options = options or {}
         max_step = options.get('max_step')
         path_constraints = options.get('path_constraints')
-        attached_collision_meshes = options.get('attached_collision_meshes')
+        attached_collision_meshes = options.get('attached_collision_meshes', [])
 
         self.ensure_client()
         if not group:
@@ -1230,13 +1227,10 @@ class Robot(object):
             path_constraints_WCF_scaled = None
 
         if self.attached_tool:
-            if attached_collision_meshes:
-                attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
-            else:
-                attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
+            attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
 
-        options['path_constraints'] = path_constraints
         options['attached_collision_meshes'] = attached_collision_meshes
+        options['path_constraints'] = path_constraints
         if max_step:
             options['max_step'] = max_step / self.scale_factor
 
@@ -1335,7 +1329,7 @@ class Robot(object):
         """
         options = options or {}
         path_constraints = options.get('path_constraints')
-        attached_collision_meshes = options.get('attached_collision_meshes')
+        attached_collision_meshes = options.get('attached_collision_meshes', [])
 
         # TODO: for the motion plan request a list of possible goal constraints
         # can be passed, from which the planner will try to find a path that
@@ -1379,13 +1373,10 @@ class Robot(object):
             path_constraints_WCF_scaled = None
 
         if self.attached_tool:
-            if attached_collision_meshes:
-                attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
-            else:
-                attached_collision_meshes = [self.attached_tool.attached_collision_mesh]
+            attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
 
-        options['path_constraints'] = path_constraints_WCF_scaled
         options['attached_collision_meshes'] = attached_collision_meshes
+        options['path_constraints'] = path_constraints_WCF_scaled
 
         trajectory = self.client.plan_motion(
             robot=self,
