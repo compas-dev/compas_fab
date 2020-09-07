@@ -11,6 +11,9 @@ Package with functionality to interact with `PyBullet <http://pybullet.org/>`_.
     :toctree: generated/
 
     PyBulletClient
+    PyBulletError
+    CollisionError
+    InverseKinematicsError
     PyBulletPlanner
 
 """
