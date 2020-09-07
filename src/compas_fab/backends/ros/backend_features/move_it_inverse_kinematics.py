@@ -114,29 +114,27 @@ class MoveItInverseKinematics(InverseKinematics):
 
         self.GET_POSITION_IK(self.ros_client, (ik_request, ), convert_to_positions, errback)
 
-    def iter_inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, n_configurations=10, max_reach=None, link_name=None, options=None):
+    def iter_inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, max_reach=None, link_name=None, options=None):
 
         if not group:
             group = self.main_group_name
 
         # reach constraint
         if max_reach and link_name:
+            # forcing diverse IK solution by constraining the link_name within a sphere
             assert(link_name in self.get_link_names(group=group))
             sphere = Sphere(frame_WCF.point, max_reach)
             reach_constraints = [PositionConstraint.from_sphere(link_name, sphere)]
         else:
-            print("No max_reach or link_name!")
+            # forcing diverse IK solution by randomizing the start configuration
+            start_configuration = self.random_configuration(group=group)
 
         if options.get('constraints') == [] or options.get('constraints') is None:
             options['constraints'] = reach_constraints
         else:
             options['constraints'].extend(reach_constraints)
 
-        for n in n_configurations:
-            if max_reach is None:
-                start_configuration = self.random_configuration(group=group)
-            
-            yield self.inverse_kinematics(frame_WCF,
-                                          start_configuration=start_configuration,
-                                          group=group,
-                                          options=options)
+        yield self.inverse_kinematics(frame_WCF,
+                                      start_configuration=start_configuration,
+                                      group=group,
+                                      options=options)
