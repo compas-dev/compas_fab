@@ -44,3 +44,14 @@ jobs:
         if: ${{ success() }}
         run: |
           invoke docs
+          mkdir -p deploy/compas_fab/edge && mv -T dist/docs deploy/compas_fab/edge/
+      - name: Deploy docs
+        if: success()
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          repo: gramaziokohler/gramaziokohler.github.io
+          target_branch: master
+          build_dir: deploy
+          keep_history: true
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
