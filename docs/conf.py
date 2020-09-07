@@ -68,6 +68,15 @@ html_theme_options = {
     "package_title": project,
     "package_version": release,
     "package_repo": 'https://github.com/compas-dev/compas_fab',
+    "package_docs": 'https://gramaziokohler.github.io/compas_fab',
+    "package_old_versions": [
+        ("latest", 'https://gramaziokohler.github.io/compas_fab/latest',),
+        ("stable", 'https://gramaziokohler.github.io/compas_fab/stable'),
+        ("v0.11.0", 'https://gramaziokohler.github.io/compas_fab/0.11.0'),
+        ("v0.10.1", 'https://gramaziokohler.github.io/compas_fab/0.10.1'),
+        ("v0.10.0", 'https://gramaziokohler.github.io/compas_fab/0.10.0'),
+        ("v0.1.0", 'https://gramaziokohler.github.io/compas_fab/0.1.0'),
+    ]
 }
 
 html_split_index = False
