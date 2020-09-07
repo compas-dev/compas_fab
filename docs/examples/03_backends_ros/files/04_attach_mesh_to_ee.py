@@ -6,12 +6,11 @@ import compas_fab
 from compas_fab.backends import RosClient
 from compas_fab.robots import CollisionMesh
 from compas_fab.robots import PlanningScene
-from compas_fab.robots.ur5 import Robot
 
 with RosClient() as client:
-
-    robot = Robot(client)
+    robot = client.load_robot()
     scene = PlanningScene(robot)
+    assert robot.name == 'ur5'
 
     # create collision object
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))

@@ -63,6 +63,13 @@ running containers:
 * `Kitematic for Windows`_
 * `Kitematic for Mac`_
 
+Developing new backends
+=======================
+
+If you are interested in developing/integrating backends to the framework, check
+the :ref:`backend architecture document <architecture>` and the
+:ref:`contributors_guide`.
+
 Next steps
 ==========
 

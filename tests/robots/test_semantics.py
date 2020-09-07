@@ -59,3 +59,22 @@ def test_ur5_semantics():
                                                         'wrist_1_joint',
                                                         'wrist_2_joint',
                                                         'wrist_3_joint']
+
+
+def test_disabled_collisions(panda_srdf, panda_urdf):
+    model = RobotModel.from_urdf_file(panda_urdf)
+    semantics = RobotSemantics.from_srdf_file(panda_srdf, model)
+    assert ('panda_hand', 'panda_link6') in semantics.disabled_collisions
+    assert ('panda_hand', 'panda_leftfinger') in semantics.disabled_collisions
+
+
+def test_end_effectors(panda_srdf, panda_urdf):
+    model = RobotModel.from_urdf_file(panda_urdf)
+    semantics = RobotSemantics.from_srdf_file(panda_srdf, model)
+    assert ['panda_link8'] == semantics.end_effectors
+
+
+def test_passive_joints(panda_srdf, panda_urdf):
+    model = RobotModel.from_urdf_file(panda_urdf)
+    semantics = RobotSemantics.from_srdf_file(panda_srdf, model)
+    assert ['panda_finger_joint2'] == semantics.passive_joints

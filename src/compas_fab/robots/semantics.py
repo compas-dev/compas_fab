@@ -22,132 +22,66 @@ class RobotSemantics(object):
 
     """
 
-    def __init__(self, root, urdf_robot):
-        self.root = root
-        self._group_dict = {}
-        self.main_group = None
-        self.urdf_robot = urdf_robot
-        self.__source_attributes()
+    def __init__(self, robot_model,
+                 groups=None, main_group_name=None, passive_joints=None,
+                 end_effectors=None, disabled_collisions=None):
+        self.robot_model = robot_model
+
+        self.groups = groups or {}
+        self.main_group_name = main_group_name
+        self.passive_joints = passive_joints or []
+        self.end_effectors = end_effectors or []
+        self.disabled_collisions = disabled_collisions or set()
 
     @property
     def group_names(self):
-        return [group.attrib['name'] for group in self.root.findall('group')]
-
-    @property
-    def passive_joints(self):
-        return [pjoint.attrib['name'] for pjoint in self.root.iter('passive_joint')]
-
-    @property
-    def end_effectors(self):
-        return [ee.attrib['parent_link'] for ee in self.root.findall('end_effector')]
-
-    @property
-    def disabled_collisions(self):
-        return {
-            frozenset([dc.attrib['link1'], dc.attrib['link2']])
-            for dc in self.root.iter('disable_collisions')
-        }
+        return list(self.groups.keys())
 
     @classmethod
-    def from_srdf_file(cls, file, urdf_robot):
+    def from_srdf_file(cls, file, robot_model):
+        """Create an instance of semantics based on an SRDF file path or file-like object."""
         xml = XML.from_file(file)
-        return cls(xml.root, urdf_robot)
+        return cls.from_xml(xml, robot_model)
 
     @classmethod
-    def from_srdf_string(cls, text, urdf_robot):
+    def from_srdf_string(cls, text, robot_model):
+        """Create an instance of semantics based on an SRDF string."""
         xml = XML.from_string(text)
-        return cls(xml.root, urdf_robot)
+        return cls.from_xml(xml, robot_model)
 
-    def __get_group_link_names(self, group):
-        link_names = []
-        for link in group.findall('link'):
-            name = link.attrib['name']
-            if name not in link_names:
-                link_names.append(name)
-        for chain in group.findall('chain'):
-            for link in self.urdf_robot.iter_link_chain(chain.attrib['base_link'], chain.attrib['tip_link']):
-                if link.name not in link_names:
-                    link_names.append(link.name)
-        for joint in group.findall('joint'):
-            joint = self.urdf_robot.get_joint_by_name(joint.attrib['name'])
-            if joint:
-                name = joint.parent.link
-                if name not in link_names:
-                    link_names.append(name)
-        for subgroup in group.findall('group'):
-            if subgroup.attrib['name'] != group.attrib['name']:
-                # find group element at top level
-                for top_group_elem in self.root.findall('group'):
-                    if top_group_elem.attrib['name'] == subgroup.attrib['name']:
-                        subgroup_link_names = self.__get_group_link_names(top_group_elem)
-                        for name in subgroup_link_names:
-                            if name not in link_names:
-                                link_names.append(name)
-        return link_names
+    @classmethod
+    def from_xml(cls, xml, robot_model):
+        """Create an instance of semantics based on an XML object."""
+        groups = _get_groups(xml.root, robot_model)
+        passive_joints = _get_passive_joints(xml.root)
+        end_effectors = _get_end_effectors(xml.root)
+        disabled_collisions = _get_disabled_collisions(xml.root)
 
-    def __get_group_elem_by_name(self, group_name):
-        for group_elem in self.root.findall('group'):
-            if group_elem.attrib['name'] == group_name:
-                return group_elem
+        groups_by_links_len = sorted(groups.items(), key=lambda group: len(group[1]['links']))
+        main_group_name = groups_by_links_len[-1][0]
 
-    def __get_group_joint_names(self, group):
-        joint_names = []
-        for link in group.findall('link'):
-            link = self.urdf_robot.get_link_by_name(link.attrib['name'])
-            for joint in link.joints:
-                if joint.name not in joint_names:
-                    joint_names.append(joint.name)
-        for chain in group.findall('chain'):
-            for joint in self.urdf_robot.iter_joint_chain(chain.attrib['base_link'], chain.attrib['tip_link']):
-                if joint.name not in joint_names:
-                    joint_names.append(joint.name)
-        for joint in group.findall('joint'):
-            if joint.attrib['name'] not in joint_names:
-                joint_names.append(joint.attrib['name'])
-        for subgroup in group.findall('group'):
-            if subgroup.attrib['name'] != group.attrib['name']:
-                # find group element at top level
-                top_group_elem = self.__get_group_elem_by_name(subgroup.attrib['name'])
-                subgroup_joint_names = self.__get_group_joint_names(top_group_elem)
-                for name in subgroup_joint_names:
-                    if name not in joint_names:
-                        joint_names.append(name)
-        return joint_names
-
-    def __source_attributes(self):
-
-        gnames = []
-        glenth = []
-
-        group_dict = {}
-        for group in self.root.findall('group'):
-            name = group.attrib['name']
-            group_dict[name] = {}
-            link_names = self.__get_group_link_names(group)
-            joint_names = self.__get_group_joint_names(group)
-            group_dict[name]["links"] = link_names
-            group_dict[name]["joints"] = joint_names
-            gnames.append(name)
-            glenth.append(len(link_names))
-
-        idx = glenth.index(max(glenth))
-
-        self._group_dict = group_dict
-        self.main_group_name = gnames[idx]
+        return cls(
+            robot_model,
+            groups=groups,
+            main_group_name=main_group_name,
+            passive_joints=passive_joints,
+            end_effectors=end_effectors,
+            disabled_collisions=disabled_collisions,
+        )
 
     def get_end_effector_link_name(self, group=None):
         if not group:
             group = self.main_group_name
-        return self._group_dict[group]["links"][-1]
+        return self.groups[group]["links"][-1]
 
     def get_base_link_name(self, group=None):
         if not group:
             group = self.main_group_name
-        return self._group_dict[group]["links"][0]
+        return self.groups[group]["links"][0]
 
     def get_all_configurable_joints(self):
         joints = []
-        for joint in self.urdf_robot.get_configurable_joints():
+        for joint in self.robot_model.get_configurable_joints():
             if joint.name not in self.passive_joints:
                 joints.append(joint)
         return joints
@@ -156,8 +90,8 @@ class RobotSemantics(object):
         if not group:
             group = self.main_group_name
         joints = []
-        for name in self._group_dict[group]["joints"]:
-            joint = self.urdf_robot.get_joint_by_name(name)
+        for name in self.groups[group]["joints"]:
+            joint = self.robot_model.get_joint_by_name(name)
             if joint:
                 if joint.is_configurable() and name not in self.passive_joints:
                     joints.append(joint)
@@ -165,3 +99,97 @@ class RobotSemantics(object):
 
     def get_configurable_joint_names(self, group=None):
         return [joint.name for joint in self.get_configurable_joints(group)]
+
+
+# XML parsing methods
+def _get_groups(root, robot_model):
+    groups = {}
+
+    for group in root.findall('group'):
+        name = group.attrib['name']
+        groups[name] = dict(
+            links=_get_group_link_names(group, root, robot_model),
+            joints=_get_group_joint_names(group, root, robot_model),
+        )
+
+    return groups
+
+
+def _get_group_link_names(group, root, robot_model):
+    link_names = []
+    for link in group.findall('link'):
+        name = link.attrib['name']
+        if name not in link_names:
+            link_names.append(name)
+
+    for chain in group.findall('chain'):
+        for link in robot_model.iter_link_chain(chain.attrib['base_link'], chain.attrib['tip_link']):
+            if link.name not in link_names:
+                link_names.append(link.name)
+
+    for joint in group.findall('joint'):
+        joint = robot_model.get_joint_by_name(joint.attrib['name'])
+        if joint:
+            name = joint.parent.link
+            if name not in link_names:
+                link_names.append(name)
+
+    for subgroup in group.findall('group'):
+        if subgroup.attrib['name'] != group.attrib['name']:
+            # find group element at top level
+            for top_group_elem in root.findall('group'):
+                if top_group_elem.attrib['name'] == subgroup.attrib['name']:
+                    subgroup_link_names = _get_group_link_names(top_group_elem, root, robot_model)
+                    for name in subgroup_link_names:
+                        if name not in link_names:
+                            link_names.append(name)
+    return link_names
+
+
+def _get_group_joint_names(group, root, robot_model):
+    joint_names = []
+    for link in group.findall('link'):
+        link = robot_model.get_link_by_name(link.attrib['name'])
+        for joint in link.joints:
+            if joint.name not in joint_names:
+                joint_names.append(joint.name)
+
+    for chain in group.findall('chain'):
+        for joint in robot_model.iter_joint_chain(chain.attrib['base_link'], chain.attrib['tip_link']):
+            if joint.name not in joint_names:
+                joint_names.append(joint.name)
+
+    for joint in group.findall('joint'):
+        if joint.attrib['name'] not in joint_names:
+            joint_names.append(joint.attrib['name'])
+
+    for subgroup in group.findall('group'):
+        if subgroup.attrib['name'] != group.attrib['name']:
+            # find group element at top level
+            top_group_elem = _get_group_elem_by_name(subgroup.attrib['name'], root)
+            subgroup_joint_names = _get_group_joint_names(top_group_elem, root, robot_model)
+            for name in subgroup_joint_names:
+                if name not in joint_names:
+                    joint_names.append(name)
+    return joint_names
+
+
+def _get_group_elem_by_name(group_name, root):
+    for group_elem in root.findall('group'):
+        if group_elem.attrib['name'] == group_name:
+            return group_elem
+
+
+def _get_passive_joints(root):
+    return [joint.attrib['name'] for joint in root.iter('passive_joint')]
+
+
+def _get_end_effectors(root):
+    return [ee.attrib['parent_link'] for ee in root.findall('end_effector')]
+
+
+def _get_disabled_collisions(root):
+    return {
+        tuple([dc.attrib['link1'], dc.attrib['link2']])
+        for dc in root.iter('disable_collisions')
+    }

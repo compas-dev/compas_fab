@@ -35,17 +35,19 @@ class MoveItInverseKinematics(InverseKinematics):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options=None):
+    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which inverse kinematics is being calculated.
         frame_WCF: :class:`compas.geometry.Frame`
             The frame to calculate the inverse for.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
             If passed, the inverse will be calculated such that the calculated
             joint positions differ the least from the start_configuration.
-            Defaults to the init configuration.
+            Defaults to the zero configuration.
         group: str, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
@@ -53,14 +55,16 @@ class MoveItInverseKinematics(InverseKinematics):
             Dictionary containing the following key-value pairs:
 
             - ``"base_link"``: (:obj:`str`) Name of the base link.
+              Defaults to the model's root link.
             - ``"avoid_collisions"``: (:obj:`bool`, optional) Whether or not to avoid collisions.
-              Defaults to `True`.
+              Defaults to ``True``.
             - ``"constraints"``: (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional)
-              A set of constraints that the request must obey. Defaults to `None`.
+              A set of constraints that the request must obey.
+              Defaults to ``None``.
             - ``"attempts"``: (:obj:`int`, optional) The maximum number of inverse kinematic attempts.
-              Defaults to `8`.
+              Defaults to ``8``.
             - ``"attached_collision_meshes"``: (:obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`, optional)
-              Defaults to `None`.
+              Defaults to ``None``.
 
         Raises
         ------
@@ -69,16 +73,19 @@ class MoveItInverseKinematics(InverseKinematics):
 
         Returns
         -------
-        :class:`compas_fab.robots.Configuration`
-            The planning group's configuration.
+        :obj:`tuple` of :obj:`list`
+            A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
         """
+        options = options or {}
         kwargs = {}
-        kwargs['options'] = options or {}
+        kwargs['options'] = options
         kwargs['frame_WCF'] = frame_WCF
         kwargs['group'] = group
         kwargs['start_configuration'] = start_configuration
-
         kwargs['errback_name'] = 'errback'
+
+        # Use base_link or fallback to model's root link
+        options['base_link'] = options.get('base_link', robot.model.root.name)
 
         return await_callback(self.inverse_kinematics_async, **kwargs)
 
@@ -87,12 +94,13 @@ class MoveItInverseKinematics(InverseKinematics):
         """Asynchronous handler of MoveIt IK service."""
         base_link = options['base_link']
         header = Header(frame_id=base_link)
-        pose = Pose.from_frame(frame_WCF)
-        pose_stamped = PoseStamped(header, pose)
+        pose_stamped = PoseStamped(header, Pose.from_frame(frame_WCF))
+
         joint_state = JointState(
             name=start_configuration.joint_names, position=start_configuration.values, header=header)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
+
         if options.get('attached_collision_meshes'):
             for acm in options['attached_collision_meshes']:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)

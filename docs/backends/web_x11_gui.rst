@@ -1,7 +1,7 @@
 .. _backends_gui:
 
 ********************************************************************************
-Backends with graphical user interface
+Access backend GUI
 ********************************************************************************
 
 .. highlight:: bash
@@ -32,6 +32,15 @@ This feature is possible thanks to `NoVNC <https://novnc.com/>`_.
 Visualization forwarding display
 ================================
 
+.. note::
+
+    🐉 HERE BE DRAGONS!
+
+    Be aware that the following can be time-consuming and frustrating to configure.
+    We recommend using the web browser visualization in the general case, and only
+    use X11 forwarding if you know what you are getting yourself into.
+
+
 This option allows to forward a display directly to your operating system. It is
 especially useful when used in combination with WSL.
 
@@ -56,15 +65,3 @@ replacing ``YOUR_IP_ADDRESS`` with your current IP:
 ::
 
     export DISPLAY=YOUR_IP_ADDRESS:0.0
-
-Next steps
-==========
-
-Check documentation for your backend of choice:
-
-.. toctree::
-    :maxdepth: 2
-    :titlesonly:
-    :glob:
-
-    backends/*
