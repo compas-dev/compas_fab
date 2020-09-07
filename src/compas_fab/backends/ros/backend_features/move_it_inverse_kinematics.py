@@ -133,6 +133,9 @@ class MoveItInverseKinematics(InverseKinematics):
             options['constraints'].extend(reach_constraints)
 
         for n in n_configurations:
+            if max_reach is None:
+                start_configuration = self.random_configuration(group=group)
+            
             yield self.inverse_kinematics(frame_WCF,
                                           start_configuration=start_configuration,
                                           group=group,
