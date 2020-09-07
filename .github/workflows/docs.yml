@@ -30,6 +30,7 @@ jobs:
         run: |
           invoke docs
           BRANCH_OR_TAG=${GITHUB_REF##*/}
+          echo "Detected branch/tag: $BRANCH_OR_TAG"
           if [ $BRANCH_OR_TAG = "master" ]; then
             BRANCH_OR_TAG="latest"
           fi;
