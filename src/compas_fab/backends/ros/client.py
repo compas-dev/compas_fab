@@ -145,7 +145,6 @@ class RosClient(Ros, ClientInterface):
 
     def __enter__(self):
         self.run()
-        self.connect()
 
         return self
 
