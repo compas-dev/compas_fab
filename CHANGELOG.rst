@@ -13,6 +13,39 @@ Unreleased
 
 **Added**
 
+* **PyBullet integration**: added support for PyBullet client and forward/inverse kinematic solver
+* Added ``ClientInterface``, ``PlannerInterface`` and various backend feature interfaces
+* Added implementations of these interfaces for ROS and V-REP
+* Added ``attributes`` dictionary to ``Robot`` class 
+
+**Changed**
+
+* Updated to ``COMPAS 0.16.1``
+* Renamed ``compas_fab.robots.Robot.to_local_coords`` to ``compas_fab.robots.Robot.to_local_coordinates``
+* Renamed ``compas_fab.robots.Robot.to_world_coords`` to ``compas_fab.robots.Robot.to_world_coordinates``
+* Backend clients have been restructured according to the new interfaces
+* Parameter ``backend`` of forward kinematics has been renamed to ``solver``
+* The signatures of all kinematics, motion planning and planning scene management methods have been homogenized across backend clients and within ``Robot``
+* All examples have been updated to reflect these changes
+
+
+**Fixed**
+
+* Attached collision meshes are included in inverse kinematics calculations in ROS
+
+**Deprecated**
+
+* The methods ``forward_kinematics``, ``inverse_kinematics``, ``plan_cartesian_motion`` and ``plan_motion``
+  of ``Robot`` class have been refactored, but a backwards-compatible deprecated version with the old
+  signatures still exists suffixed by ``_deprecated``, e.g. ``forward_kinematics_deprecated``.
+
+**Removed**
+
+0.11.0
+----------
+
+**Added**
+
 * Added optional ``joint_names`` to ``Configuration``
 * Added ``Configuration.scaled``
 * Added ``full_joint_state`` to ``Robot.inverse_kinematics``
@@ -20,6 +53,7 @@ Unreleased
 
 **Changed**
 
+* Updated to ``COMPAS 0.15``
 * Construct ``full_configuration`` with ``values``, ``types``, ``joint_names`` in ``Robot`` rather than in ``MoveItPlanner``
 * ``MoveItPlanner`` returns ``start_configuration`` with set ``joint_names``
 * Removed parameter ``names`` from ``RobotArtist.update``
@@ -29,19 +63,17 @@ Unreleased
 * ``MoveItPlanner``: ``inverse_kinematics`` takes now instance of ``Configuration`` and ``robot``
 * Property :class:`compas_fab.robots.Robot.artist` does not try to scale robot
   geometry if links and/or joints are not defined.
-* In :class:``compas_fab.robots.constraints.JointConstraint``, added ``tolerance_above`` and
+* In :class:`compas_fab.robots.constraints.JointConstraint`, added ``tolerance_above`` and
   ``tolerance_below`` for allowing asymmetrical constraints.
-* In :class:``compas_fab.robots.Robot``, changed the ``constraints_from_configuration``
+* In :class:`compas_fab.robots.Robot`, changed the ``constraints_from_configuration``
   function with ``tolerances_above`` and ``tolerances_below``.
-
-**Removed**
+* :meth:`compas_fab.robots.CollisionMesh.scale` now takes a scale factor
+  instead of a :class:`compas.geometry.Scale` instance as an argument.
 
 **Fixed**
 
 * Convert constraints on inverse kinematics and cartesian planner to ROS messages
 * Fix support for trajectory constraints on kinematic planner
-
-**Deprecated**
 
 0.10.2
 ----------
@@ -52,7 +84,7 @@ Unreleased
 
 **Changed**
 
-* Updated to COMPAS 0.13
+* Updated to ``COMPAS 0.13``
 
 0.10.1
 ----------
@@ -70,7 +102,7 @@ Unreleased
 * Added ``attach_tool``, ``detach_tool``, ``draw_attached_tool``, ``from_tool0_to_attached_tool`` and ``from_attached_tool_to_tool0`` to ``Robot``
 * Added ``attach_tool`` and ``detach_tool`` to ``Artist``
 * Added ``add_attached_tool`` and ``remove_attached_tool`` to ``PlanningScene``
-* Added redraw/clear layer support to `RobotArtist` for Rhino
+* Added redraw/clear layer support to :class:`~compas_fab.rhino.RobotArtist` for Rhino
 * Added material/color support for DAE files on ROS file loader
 
 **Changed**
@@ -80,7 +112,7 @@ Unreleased
 **Fixed**
 
 * Fixed mutable init parameters of ``Configuration``, ``JointTrajectoryPoint``, ``JointTrajectory`` and ``Robot.basic``.
-* Fixed interface of `RobotArtist` for Blender
+* Fixed interface of :class:`~compas_fab.blender.RobotArtist` for Blender
 * Fixed DAE parsing of meshes with multiple triangle sets
 
 0.9.0
@@ -94,14 +126,14 @@ Unreleased
 
 **Changed**
 
-* Updated to COMPAS 0.11
+* Updated to ``COMPAS 0.11``
 
 0.8.0
 ----------
 
 **Changed**
 
-* Updated to COMPAS 0.10
+* Updated to ``COMPAS 0.10``
 * Add better support for passive joints on IK, Cartesian and Kinematic planning
 
 **Fixed**
@@ -208,7 +240,7 @@ Unreleased
 
 **Deprecated**
 
-* The aliases for ``Frame`` and ``Transformation`` will be removed, in the future, import directly from `compas` core.
+* The aliases for ``Frame`` and ``Transformation`` will be removed, in the future, import directly from ``compas`` core.
 
 0.4.0
 ----------
@@ -219,7 +251,7 @@ Unreleased
 
 **Changed**
 
-* Updated to COMPAS 0.4.10
+* Updated to ``COMPAS 0.4.10``
 
 0.3.0
 ----------
@@ -233,7 +265,7 @@ Unreleased
 **Changed**
 
 * Renamed ``UrdfImporter`` to ``RosFileServerLoader``
-* Updated to COMPAS 0.4.8
+* Updated to ``COMPAS 0.4.8``
 
 0.2.1
 ----------
@@ -249,7 +281,7 @@ Unreleased
 
 * First open source release!
 * V-REP and ROS clients
-* Updated to COMPAS 0.3.2
+* Updated to ``COMPAS 0.3.2``
 
 0.1.0
 -----

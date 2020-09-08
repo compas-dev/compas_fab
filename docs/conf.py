@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 import os
 import sphinx_compas_theme
 
+from sphinx.ext.napoleon.docstring import NumpyDocstring
+
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
@@ -27,7 +29,7 @@ project = 'COMPAS FAB'
 year = '2018'
 author = 'Gramazio Kohler Research'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '0.10.2'
+version = release = '0.11.0'
 
 pygments_style = 'sphinx'
 show_authors = True
@@ -40,13 +42,12 @@ extlinks = {
 
 # intersphinx options
 intersphinx_mapping = {'python': ('https://docs.python.org/', None),
-                       'compas': ('http://compas-dev.github.io/main/', None),
-                       'roslibpy': ('http://roslibpy.readthedocs.org/en/latest/', None)}
+                       'compas': ('https://compas.dev/compas/', None),
+                       'roslibpy': ('https://roslibpy.readthedocs.io/en/latest/', None)}
 
 # autodoc options
 autodoc_default_options = {
     'member-order': 'bysource',
-    'special-members': '__init__',
     'exclude-members': '__weakref__',
     'undoc-members': True,
     'private-members': True,
@@ -58,6 +59,14 @@ autodoc_member_order = 'alphabetical'
 # autosummary options
 autosummary_generate = True
 
+# collect doc versions
+package_docs_root = 'https://gramaziokohler.github.io/compas_fab/'
+
+with open(os.path.join(os.path.dirname(__file__), 'doc_versions.txt'), 'r') as f:
+    version_names = [version.strip() for version in f.readlines()]
+    package_docs_versions = [(version, '{}{}'.format(package_docs_root, version))
+                             for version in version_names if version]
+
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 html_theme = 'compaspkg'
@@ -67,6 +76,8 @@ html_theme_options = {
     "package_title": project,
     "package_version": release,
     "package_repo": 'https://github.com/compas-dev/compas_fab',
+    "package_docs": package_docs_root,
+    "package_old_versions": package_docs_versions
 }
 
 html_split_index = False
@@ -93,3 +104,38 @@ napoleon_use_ivar = False
 napoleon_use_param = False
 napoleon_use_rtype = False
 
+# Parse Attributes and Class Attributes on Class docs same as parameters.
+# first, we define new methods for any new sections and add them to the class
+
+
+def parse_keys_section(self, section):
+    return self._format_fields('Keys', self._consume_fields())
+
+
+NumpyDocstring._parse_keys_section = parse_keys_section
+
+
+def parse_attributes_section(self, section):
+    return self._format_fields('Attributes', self._consume_fields())
+
+
+NumpyDocstring._parse_attributes_section = parse_attributes_section
+
+
+def parse_class_attributes_section(self, section):
+    return self._format_fields('Class Attributes', self._consume_fields())
+
+
+NumpyDocstring._parse_class_attributes_section = parse_class_attributes_section
+
+
+# we now patch the parse method to guarantee that the the above methods are
+# assigned to the _section dict
+def patched_parse(self):
+    self._sections['keys'] = self._parse_keys_section
+    self._sections['class attributes'] = self._parse_class_attributes_section
+    self._unpatched_parse()
+
+
+NumpyDocstring._unpatched_parse = NumpyDocstring._parse
+NumpyDocstring._parse = patched_parse

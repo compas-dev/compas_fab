@@ -3,12 +3,12 @@ from __future__ import print_function
 import os
 
 from compas.robots import RobotModel
-from compas.utilities import await_callback
 from roslibpy import Message
 from roslibpy import Ros
 from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
 
+from compas_fab.backends.interfaces.client import ClientInterface
 from compas_fab.backends.ros.exceptions import RosError
 from compas_fab.backends.ros.fileserver_loader import RosFileServerLoader
 from compas_fab.backends.ros.messages import ExecuteTrajectoryFeedback
@@ -23,7 +23,7 @@ from compas_fab.backends.ros.messages import JointTrajectoryPoint as RosMsgJoint
 from compas_fab.backends.ros.messages import MoveItErrorCodes
 from compas_fab.backends.ros.messages import RobotTrajectory
 from compas_fab.backends.ros.messages import Time
-from compas_fab.backends.ros.planner_backend_moveit import MoveItPlanner
+from compas_fab.backends.ros.planner import MoveItPlanner
 from compas_fab.backends.tasks import CancellableFutureResult
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotSemantics
@@ -61,7 +61,48 @@ class CancellableRosActionResult(CancellableFutureResult):
         return True
 
 
-class RosClient(Ros):
+class LocalCacheInfo(object):
+    def __init__(self, use_local_cache, robot_name=None, local_cache_directory=None):
+        self.use_local_cache = use_local_cache
+        self.robot_name = robot_name
+        self.local_cache_directory = local_cache_directory
+
+    @classmethod
+    def from_local_cache_directory(cls, local_cache_directory):
+        """Construct local caching options based on the local cache directory.
+
+        Based on the specified local cache directory, determine whether
+        caching should be used at all, what the robot name is, and what the
+        real caching directory to use is (which differs from the local cache
+        directory specified to this function).
+
+        Examples
+        --------
+        >>> info = LocalCacheInfo.from_local_cache_directory(None)
+        >>> info.use_local_cache
+        False
+
+
+        >>> local_directory = os.path.join(os.path.expanduser('~'), 'robot_description', 'robocop')
+        >>> info = LocalCacheInfo.from_local_cache_directory(local_directory)
+        >>> info.use_local_cache
+        True
+        >>> info.robot_name
+        'robocop'
+        """
+        if local_cache_directory is None:
+            return LocalCacheInfo(use_local_cache=False)
+
+        path_parts = local_cache_directory.rstrip(os.path.sep).split(os.path.sep)
+        path_parts, robot_name = path_parts[:-1], path_parts[-1]
+        local_cache_directory = os.path.sep.join(path_parts)
+
+        return LocalCacheInfo(use_local_cache=True,
+                              robot_name=robot_name,
+                              local_cache_directory=local_cache_directory)
+
+
+class RosClient(Ros, ClientInterface):
     """Interface to use ROS as backend via the **rosbridge**.
 
     The connection is managed by ``roslibpy``.
@@ -80,7 +121,8 @@ class RosClient(Ros):
         ``True`` to indicate it should use a secure web socket, otherwise ``False``.
     planner_backend: str
         Name of the planner backend plugin to use. The plugin must be a sub-class of
-        :class:`PlannerBackend`. Defaults to :class:`moveit`.
+        :class:`compas_fab.backends.PlannerInterface`. Defaults to ``"moveit"``,
+        making use of :class:`compas_fab.backends.MoveItPlanner`.
 
     Examples
     --------
@@ -98,22 +140,16 @@ class RosClient(Ros):
     def __init__(self, host='localhost', port=9090, is_secure=False, planner_backend='moveit'):
         super(RosClient, self).__init__(host, port, is_secure)
 
-        # Dynamically mixin the planner plugin into this class
         planner_backend_type = PLANNER_BACKENDS[planner_backend]
-        self.__class__ = type('RosClient_' + planner_backend_type.__name__, (planner_backend_type, RosClient), {})
+        self.planner = planner_backend_type(self)
 
     def __enter__(self):
         self.run()
         self.connect()
 
-        # Planners usually need to initialize/advertise topics and/or services
-        self.init_planner()
-
         return self
 
     def __exit__(self, *args):
-        self.dispose_planner()
-
         self.close()
 
     def load_robot(self, load_geometry=False, urdf_param_name='/robot_description', srdf_param_name='/robot_description_semantic', precision=None, local_cache_directory=None):
@@ -145,13 +181,11 @@ class RosClient(Ros):
         ur5
         """
         robot_name = None
-        use_local_cache = False
 
-        if local_cache_directory is not None:
-            use_local_cache = True
-            path_parts = local_cache_directory.strip(os.path.sep).split(os.path.sep)
-            path_parts, robot_name = path_parts[:-1], path_parts[-1]
-            local_cache_directory = os.path.sep.join(path_parts)
+        cache_info = LocalCacheInfo.from_local_cache_directory(local_cache_directory)
+        use_local_cache = cache_info.use_local_cache
+        robot_name = cache_info.robot_name
+        local_cache_directory = cache_info.local_cache_directory
 
         loader = RosFileServerLoader(self, use_local_cache, local_cache_directory, precision)
 
@@ -168,121 +202,6 @@ class RosClient(Ros):
             model.load_geometry(loader)
 
         return Robot(model, semantics=semantics, client=self)
-
-    def inverse_kinematics(self, robot, frame, group,
-                           start_configuration, avoid_collisions=True,
-                           constraints=None, attempts=8,
-                           attached_collision_meshes=None):
-        kwargs = {}
-        kwargs['robot'] = robot
-        kwargs['frame'] = frame
-        kwargs['group'] = group
-        kwargs['start_configuration'] = start_configuration
-        kwargs['avoid_collisions'] = avoid_collisions
-        kwargs['constraints'] = constraints
-        kwargs['attempts'] = attempts
-
-        kwargs['errback_name'] = 'errback'
-
-        return await_callback(self.inverse_kinematics_async, **kwargs)
-
-    def forward_kinematics(self, robot, configuration, group, ee_link):
-        kwargs = {}
-        kwargs['robot'] = robot
-        kwargs['configuration'] = configuration
-        kwargs['group'] = group
-        kwargs['ee_link'] = ee_link
-
-        kwargs['errback_name'] = 'errback'
-
-        return await_callback(self.forward_kinematics_async, **kwargs)
-
-    def plan_cartesian_motion(self,
-                              robot, frames, start_configuration,
-                              group, max_step, jump_threshold,
-                              avoid_collisions, path_constraints,
-                              attached_collision_meshes):
-        kwargs = {}
-        kwargs['robot'] = robot
-        kwargs['frames'] = frames
-        kwargs['start_configuration'] = start_configuration
-        kwargs['group'] = group
-        kwargs['max_step'] = max_step
-        kwargs['jump_threshold'] = jump_threshold
-        kwargs['avoid_collisions'] = avoid_collisions
-        kwargs['path_constraints'] = path_constraints
-        kwargs['attached_collision_meshes'] = attached_collision_meshes
-
-        kwargs['errback_name'] = 'errback'
-
-        return await_callback(self.plan_cartesian_motion_async, **kwargs)
-
-    def plan_motion(self, robot, goal_constraints, start_configuration, group,
-                    path_constraints=None, trajectory_constraints=None,
-                    planner_id='', num_planning_attempts=8,
-                    allowed_planning_time=2.,
-                    max_velocity_scaling_factor=1.,
-                    max_acceleration_scaling_factor=1.,
-                    attached_collision_meshes=None,
-                    workspace_parameters=None):
-        kwargs = {}
-        kwargs['robot'] = robot
-        kwargs['goal_constraints'] = goal_constraints
-        kwargs['start_configuration'] = start_configuration
-        kwargs['group'] = group
-        kwargs['path_constraints'] = path_constraints
-        kwargs['trajectory_constraints'] = trajectory_constraints
-        kwargs['planner_id'] = planner_id
-        kwargs['num_planning_attempts'] = num_planning_attempts
-        kwargs['allowed_planning_time'] = allowed_planning_time
-        kwargs['max_velocity_scaling_factor'] = max_velocity_scaling_factor
-        kwargs['max_acceleration_scaling_factor'] = max_acceleration_scaling_factor
-        kwargs['attached_collision_meshes'] = attached_collision_meshes
-        kwargs['workspace_parameters'] = workspace_parameters
-
-        kwargs['errback_name'] = 'errback'
-
-        return await_callback(self.plan_motion_async, **kwargs)
-
-    def inverse_kinematics_async(self, *args, **kwargs):
-        raise NotImplementedError('No planner backend assigned')
-
-    def forward_kinematics_async(self, *args, **kwargs):
-        raise NotImplementedError('No planner backend assigned')
-
-    def plan_motion_async(self, *args, **kwargs):
-        raise NotImplementedError('No planner backend assigned')
-
-    def plan_cartesian_motion_async(self, *args, **kwargs):
-        raise NotImplementedError('No planner backend assigned')
-
-    # ==========================================================================
-    # collision objects and planning scene
-    # ==========================================================================
-
-    def get_planning_scene(self):
-        kwargs = {}
-        kwargs['errback_name'] = 'errback'
-
-        return await_callback(self.get_planning_scene_async, **kwargs)
-
-    def get_planning_scene_async(self, *args, **kwargs):
-        raise NotImplementedError('No planner plugin assigned')
-
-    def add_collision_mesh(self, collision_mesh):
-        raise NotImplementedError('No planner backend assigned')
-
-    def remove_collision_mesh(self, id):
-        raise NotImplementedError('No planner backend assigned')
-
-    def append_collision_mesh(self, collision_mesh):
-        raise NotImplementedError('No planner backend assigned')
-
-    def add_attached_collision_mesh(self, attached_collision_mesh):
-        raise NotImplementedError('No planner backend assigned')
-
-    def remove_attached_collision_mesh(self, id):
-        raise NotImplementedError('No planner backend assigned')
 
     # ==========================================================================
     # executing

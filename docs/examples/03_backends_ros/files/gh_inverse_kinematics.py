@@ -8,7 +8,7 @@
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
             If passed, the inverse will be calculated such that the calculated
             joint positions differ the least from the start_configuration.
-            Defaults to the init configuration.
+            Defaults to the zero configuration.
         avoid_collisions: bool, optional
             Whether or not to avoid collisions. Defaults to True.
     Output:
@@ -24,11 +24,14 @@ frame = Frame(plane.Origin, plane.XAxis, plane.YAxis)
 
 if robot and robot.client:
     if robot.client.is_connected:
+        options = {
+            'avoid_collisions': avoid_collisions,
+        }
         full_configuration = robot.inverse_kinematics(frame,
                                                       start_configuration,
                                                       group=group,
-                                                      avoid_collisions=avoid_collisions,
-                                                      return_full_configuration=True)
+                                                      return_full_configuration=True,
+                                                      options=options)
         group_configuration = robot.get_group_configuration(group, full_configuration)
         print(group_configuration)
     else:

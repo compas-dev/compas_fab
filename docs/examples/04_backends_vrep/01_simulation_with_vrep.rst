@@ -16,7 +16,7 @@ The first step is just connect to the simulator and verify the connection
 is working.
 
 Copy and paste the following example into any Python environment
-(a standalong script, a CAD environment, etc) and run it, you should
+(a standalone script, a CAD environment, etc) and run it, you should
 see the output ``Connected: True`` if everything is working properly:
 
 .. code-block:: python
@@ -40,8 +40,8 @@ referenced by the identifiers: ``A``, ``B``, ``C`` and ``D``.
     :figclass: figure
     :class: figure-img img-fluid
 
-When planning on a multi-robotic setup, it's important to make sure all robots
-on the setup of them are positioned correctly and not colliding with each other
+When planning on a multi-robotic cell, it's important to make sure all robots
+on the cell are positioned correctly and not colliding with each other
 at start, otherwise path planning will fail.
 
 The state of a robot is specified as an instance of
@@ -67,9 +67,11 @@ forward kinematics:
         robot_b = rfl.Robot('B')
         client.set_robot_config(robot_a, config_robot_a)
         client.set_robot_config(robot_b, config_robot_b)
+        group_a = robot_a.model.attr['index']
+        group_b = robot_b.model.attr['index']
 
-        frame_a = client.forward_kinematics(robot_a)
-        frame_b = client.forward_kinematics(robot_b)
+        frame_a = client.forward_kinematics(robot, None, group=group_a)
+        frame_b = client.forward_kinematics(robot, None, group=group_b)
         print('End effector poses: ', str(frame_a), str(frame_b))
 
 Inverse Kinematics
@@ -91,11 +93,17 @@ that there is at least one valid configuration to reach the goal pose.
 
     with VrepClient() as client:
         robot = rfl.Robot('B')
-        configs = client.inverse_kinematics(robot, goal_pose)
+        group = robot.model.attr['index']
+        options = {
+            'num_joints': len(robot.get_configurable_joints()),
+        }
+        configs = client.inverse_kinematics(robot, goal_pose, group=group, options=options)
+
+        assert len(configs) > 0, 'No IK solution found'
         print('Found valid configuration: ', str(configs[-1]))
 
-Basic path planning example
----------------------------
+Path planning
+=============
 
 Calculating a path plan requires several parameters to be configured in order
 to start the process. In its minimal expression, a path planning request must
@@ -116,12 +124,12 @@ Here is an example of such a request:
 
     with VrepClient() as client:
         robot = rfl.Robot('B')
+        group = robot.model.attr['index']
         client.set_robot_config(robot, start_config)
-        path = client.plan_motion(robot, goal_pose)
+        path = client.plan_motion(robot, goal_pose, group=group)
         print('Found path of %d steps' % len(path))
 
-
-Or Copy & Paste the following code into a Python file:
+A more elaborate request takes several additional parameters to control the planning process:
 
 .. literalinclude :: files/01_complete_path_planning_example.py
    :language: python

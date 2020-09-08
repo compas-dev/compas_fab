@@ -13,16 +13,36 @@ __all__ = [
 
 class Configuration(object):
     """Represents the configuration of a robot based on the state of its joints.
-    This concept is also refered to as `Joint State`.
+
+    This concept is also refered to as \"Joint State\".
+
+    Parameters
+    ----------
+    values : :obj:`list` of :obj:`float`
+        Joint values expressed in radians or meters, depending on the respective
+        type.
+    types : :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+        Joint types, e.g. a list of :attr:`compas.robots.Joint.REVOLUTE` for
+        revolute joints.
+    joint_names : :obj:`list` of :obj:`str`, optional
+        List of joint names.
 
     Attributes
     ----------
     values : :obj:`list` of :obj:`float`
-        Joint values expressed in radians or meters, depending on the respective type.
-    types : list of :class:`compas.robots.Joint.TYPE`
-        Joint types, e.g. a list of `compas.robots.Joint.REVOLUTE` for revolute joints.
-    joint_names : :obj:`list` of :obj:`str`, optional
-        Joint names list
+        Joint values expressed in radians or meters, depending on the respective
+        type.
+    types : :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+        Joint types, e.g. a list of :attr:`compas.robots.Joint.REVOLUTE` for
+        revolute joints.
+    joint_names : :obj:`list` of :obj:`str`
+        List of joint names.
+    data : :obj:`dict`
+        The data representing the configuration.
+    prismatic_values : :obj:`list` of :obj:`float`
+        Prismatic joint values in meters.
+    revolute_values : :obj:`list` of :obj:`float`
+        Revolute joint values in radians.
 
     Examples
     --------
@@ -54,6 +74,7 @@ class Configuration(object):
                 len(self.values), len(self.values), len(self.types)))
 
     def __str__(self):
+        """Return a human-readable string representation of the instance."""
         v_str = ('(' + ", ".join(['%.' + self._precision] * len(self.values)) + ')') % tuple(self.values)
         if len(self.joint_names):
             return "Configuration({}, {}, {})".format(v_str, tuple(self.types), tuple(self.joint_names))
@@ -61,6 +82,7 @@ class Configuration(object):
             return "Configuration({}, {})".format(v_str, tuple(self.types))
 
     def __repr__(self):
+        """Printable representation of :class:`Configuration`."""
         return self.__str__()
 
     @classmethod
@@ -100,7 +122,7 @@ class Configuration(object):
         Returns
         -------
         :class:`Configuration`
-             An instance of :class:`Configuration` instance.
+             An instance of :class:`Configuration`.
         """
         # Force iterables into lists
         prismatic_values = list(prismatic_values)
@@ -123,24 +145,33 @@ class Configuration(object):
         Returns
         -------
         :class:`Configuration`
-             An instance of :class:`Configuration` instance.
+             An instance of :class:`Configuration`.
         """
         config = cls()
         config.data = data
         return config
 
     def to_data(self):
-        """Return the data dictionary that represents the configuration, and from
-        which it can be reconstructed."""
+        """Get the data dictionary that represents the configuration.
+
+        This data can also be used to reconstruct the :class:`Configuration`
+        instance.
+
+        Returns
+        -------
+        :obj:`dict`
+            The data representing the configuration.
+        """
         return self.data
 
     @property
     def data(self):
         """:obj:`dict` : The data representing the configuration.
 
-        By assigning a data dictionary to this property, the current data of the
-        configuration will be replaced by the data in the dict. The data getter
-        and setter should always be used in combination with each other.
+        By assigning a data dictionary to this property, the current data of
+        the configuration will be replaced by the data in the :obj:`dict`. The
+        data getter and setter should always be used in combination with each
+        other.
         """
         return {
             'values': self.values,
@@ -158,7 +189,8 @@ class Configuration(object):
     def prismatic_values(self):
         """:obj:`list` of :obj:`float` : Prismatic joint values in meters.
 
-        E.g. positions on the external axis system."""
+        E.g. positions on the external axis system.
+        """
         return [v for i, v in enumerate(self.values) if self.types[i] == Joint.PRISMATIC]
 
     @property
@@ -167,6 +199,13 @@ class Configuration(object):
         return [v for i, v in enumerate(self.values) if self.types[i] == Joint.REVOLUTE]
 
     def copy(self):
+        """Create a copy of this :class:`Configuration`.
+
+        Returns
+        -------
+        :class:`Configuration`
+            An instance of :class:`Configuration`
+        """
         cls = type(self)
         return cls(self.values[:], self.types[:], self.joint_names[:])
 
@@ -177,8 +216,8 @@ class Configuration(object):
 
         Parameters
         ----------
-        scale_factor : float
-            Scale factor
+        scale_factor : :obj:`float`
+            Scale factor.
 
         Returns
         -------
@@ -194,13 +233,13 @@ class Configuration(object):
         self.values = values_scaled
 
     def scaled(self, scale_factor):
-        """Returns a scaled copy of this configuration.
+        """Return a scaled copy of this configuration.
 
         Only scalable joints are scaled, i.e. planar and prismatic joints.
 
         Parameters
         ----------
-        scale_factor : float
+        scale_factor : :obj:`float`
             Scale factor
 
         Returns

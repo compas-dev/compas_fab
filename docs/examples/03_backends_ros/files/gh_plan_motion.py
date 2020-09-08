@@ -15,7 +15,8 @@
             or defining a volume in space, to which a specific robot link (e.g.
             the end-effector) is required to move to.
         planner_id: str
-            The name of the algorithm used for path planning. Defaults to 'RRT'.
+            The name of the algorithm used for path planning.
+            Defaults to ``'RRTConnectkConfigDefault'``.
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
         compute: bool
@@ -38,8 +39,8 @@ if robot and robot.client and start_configuration and compute:
         sc.sticky[response_key] = robot.plan_motion(goal_constraints,
                                                     start_configuration,
                                                     group,
-                                                    planner_id=str(planner_id),
-                                                    attached_collision_meshes=list(attached_collision_meshes))
+                                                    {'planner_id': str(planner_id),
+                                                     'attached_collision_meshes': list(attached_collision_meshes)})
     else:
         print("Robot client is not connected.")
 

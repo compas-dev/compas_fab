@@ -16,8 +16,7 @@ from compas_fab.robots import Configuration
 try:
     import clr
     import rhinoscriptsyntax as rs
-    from Rhino.Geometry import Transform
-    from Rhino.Geometry import Mesh as RhinoMesh
+    import Rhino.Geometry as rg
 except ImportError:
     compas.raise_if_ironpython()
 
@@ -46,7 +45,7 @@ def vrep_pose_from_plane(plane):
 
 
 def _transform_to_origin(mesh, xform):
-    inverse = clr.StrongBox[Transform]()
+    inverse = clr.StrongBox[rg.Transform]()
     if not xform.TryGetInverse(inverse):
         raise ValueError('Unable to get inverse of matrix')
 
@@ -58,7 +57,7 @@ def _transform_to_origin(mesh, xform):
 def _create_rhino_mesh(vertices, faces):
     vertices = [vertices[i:i + 3] for i in range(0, len(vertices), 3)]
     faces = [faces[i:i + 3] for i in range(0, len(faces), 3)]
-    mesh = RhinoMesh()
+    mesh = rg.Mesh()
     for a, b, c in vertices:
         mesh.Vertices.Add(a, b, c)
     for face in faces:
@@ -74,7 +73,7 @@ def _to_xform(m):
 
 # TODO: This module needs to be heavily refactored
 # Currently only compatible with V-REP client and most helper functions
-# are not superceeded by compas features
+# are not superseded by compas features
 class PathVisualizer(object):
     """Handles the generation of meshes to visualize a full path plan
     in Rhino/Grasshopper.
@@ -129,7 +128,7 @@ class PathVisualizer(object):
             parent_transform = _to_xform(mesh_matrices[info['parent_handle']])
             relative_transform = info['relative_transform']
 
-            mesh.Transform(Transform.Multiply(parent_transform, relative_transform))
+            mesh.Transform(rg.Transform.Multiply(parent_transform, relative_transform))
             meshes.append(mesh)
 
         if self.debug:
@@ -167,8 +166,8 @@ class PathVisualizer(object):
     def _get_building_member_info(self, gripping_config):
         start = timer() if self.debug else None
         self.simulator.set_robot_config(self.robot, gripping_config)
-        mesh = RhinoMesh.from_geometry(self.building_member).to_compas()
-        handle = self.simulator.add_building_member(self.robot, mesh)
+        mesh = RhinoMesh.from_guid(self.building_member).to_compas()
+        handle = self.simulator.add_attached_collision_mesh(mesh, options={'robot_name': self.robot.name})
         matrix = self.simulator.get_object_matrices([handle])[handle]
 
         parent_handle = self.simulator.get_object_handle('customGripper' + self.robot.name)
