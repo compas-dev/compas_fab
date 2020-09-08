@@ -5,6 +5,7 @@ from __future__ import print_function
 import json
 
 from compas.geometry import Frame
+from compas.geometry import Transformation
 from compas.datastructures import Mesh
 
 from compas_fab.robots.planning_scene import CollisionMesh
@@ -145,3 +146,53 @@ class Tool(object):
         """
         with open(filepath, 'w') as f:
             json.dump(self.data, f, indent=4, sort_keys=True)
+
+    def from_attached_tool_to_tool0(self, frames_tcf):
+        """Converts a list of frames at the robot's tool tip (tcf frame) to frames at the robot's flange (tool0 frame).
+
+        Parameters
+        ----------
+        frames_tcf : list of :class:`Frame`
+            Frames (in WCF) at the robot's tool tip (tcf).
+
+        Returns
+        -------
+        list of :class:`Frame`
+            Frames (in WCF) at the robot's flange (tool0).
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> tool = Tool(mesh, frame)
+        >>> frames_tcf = [Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))]
+        >>> tool.from_attached_tool_to_tool0(frames_tcf)
+        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
+        """
+        Te = Transformation.from_frame_to_frame(self.frame, Frame.worldXY())
+        return [Frame.from_transformation(Transformation.from_frame(f) * Te) for f in frames_tcf]
+
+    def from_tool0_to_attached_tool(self, frames_t0cf):
+        """Converts frames at the robot's flange (tool0 frame) to frames at the robot's tool tip (tcf frame).
+
+        Parameters
+        ----------
+        frames_t0cf : list of :class:`Frame`
+            Frames (in WCF) at the robot's flange (tool0).
+
+        Returns
+        -------
+        list of :class:`Frame`
+            Frames (in WCF) at the robot's tool tip (tcf).
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> tool = Tool(mesh, frame)
+        >>> frames_t0cf = [Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))]
+        >>> tool.from_tool0_to_attached_tool(frames_t0cf)
+        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
+        """
+        Te = Transformation.from_frame_to_frame(Frame.worldXY(), self.frame)
+        return [Frame.from_transformation(Transformation.from_frame(f) * Te) for f in frames_t0cf]
