@@ -1,8 +1,8 @@
 attrs>=19.3.0
-sphinx_compas_theme>=0.4
+sphinx_compas_theme>=0.9
 sphinx>=1.6
 invoke>=0.14
-bump2version>=0.5.11
+bump2version>=1.0
 check-manifest>=0.36
 flake8
 autopep8
