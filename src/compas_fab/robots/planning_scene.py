@@ -70,6 +70,17 @@ class CollisionMesh(object):
         S = Scale.from_factors([scale_factor] * 3)
         self.mesh.transform(S)
 
+    def scaled(self, scale_factor):
+        """Copies the collision mesh, and scales the copy uniformly.
+
+        Parameters
+        ----------
+        scale_factor : :obj:`float`
+            Scale factor.
+        """
+        self.mesh = self.mesh.copy()
+        self.scale(scale_factor)
+
 
 class AttachedCollisionMesh(object):
     """Represents a collision mesh that is attached to a :class:`Robot`'s :class:`~compas.robots.Link`.
@@ -164,8 +175,8 @@ class PlanningScene(object):
         collision_mesh : :class:`CollisionMesh`
             The collision mesh we want to add.
         scale : :obj:`bool`, optional
-            If ``True``, the mesh will be scaled according to the robot's scale
-            factor.
+            If ``True``, the mesh will be copied and scaled according to
+            the robot's scale factor.
 
         Returns
         -------
@@ -184,7 +195,7 @@ class PlanningScene(object):
 
         if scale:
             scale_factor = 1. / self.robot.scale_factor
-            collision_mesh.scale(scale_factor)
+            collision_mesh.scaled(scale_factor)
 
         self.client.add_collision_mesh(collision_mesh)
 
@@ -225,8 +236,8 @@ class PlanningScene(object):
         collision_mesh : :class:`CollisionMesh`
             The collision mesh we want to append to the :class:`PlanningScene`.
         scale : :obj:`bool`, optional
-            If ``True``, the mesh will be scaled according to the robot's scale
-            factor.
+            If ``True``, the mesh will be copied and scaled according to
+            the robot's scale factor.
 
         Returns
         -------
@@ -245,7 +256,7 @@ class PlanningScene(object):
 
         if scale:
             scale_factor = 1. / self.robot.scale_factor
-            collision_mesh.scale(scale_factor)
+            collision_mesh.scaled(scale_factor)
 
         self.robot.client.append_collision_mesh(collision_mesh)
 
@@ -259,7 +270,8 @@ class PlanningScene(object):
             attached to a :class:`Robot`'s :class:`~compas.robots.Link`) that
             we want to add to the :class:`PlanningScene`.
         scale : :obj:`bool`, optional
-            If ``True``, the mesh will be scaled using the robot's scale factor.
+            If ``True``, the mesh will be copied and scaled according to
+            the robot's scale factor.
 
         Returns
         -------
@@ -279,7 +291,7 @@ class PlanningScene(object):
 
         if scale:
             scale_factor = 1. / self.robot.scale_factor
-            attached_collision_mesh.collision_mesh.scale(scale_factor)
+            attached_collision_mesh.collision_mesh.scaled(scale_factor)
 
         self.client.add_attached_collision_mesh(attached_collision_mesh)
 
@@ -313,8 +325,8 @@ class PlanningScene(object):
         collision_mesh: :class:`CollisionMesh`
             The collision mesh to attach to robot's end effector.
         scale : :obj:`bool`, optional
-            If ``True``, the mesh will be scaled using the robot's scale
-            factor.
+            If ``True``, the mesh will be copied and scaled according to
+            the robot's scale factor.
         group : :obj:`str`
             The planning group with the end effector we want to attach the mesh
             to. Defaults to the robot's main planning group.
@@ -348,7 +360,7 @@ class PlanningScene(object):
 
         if scale:
             scale_factor = 1. / self.robot.scale_factor
-            collision_mesh.scale(scale_factor)
+            collision_mesh.scaled(scale_factor)
 
         ee_link_name = self.robot.get_end_effector_link_name(group)
         touch_links = [ee_link_name]
