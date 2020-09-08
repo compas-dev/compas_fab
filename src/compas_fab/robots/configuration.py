@@ -84,13 +84,15 @@ class Configuration(object):
         return self.__str__()
 
     @classmethod
-    def from_revolute_values(cls, values):
+    def from_revolute_values(cls, values, joint_names=None):
         """Construct a configuration from revolute joint values in radians.
 
         Parameters
         ----------
         values : :obj:`list` of :obj:`float`
             Joint values expressed in radians.
+        joint_names : :obj:`list` of :obj:`str`, optional
+            List of joint names.
 
         Returns
         -------
@@ -98,10 +100,11 @@ class Configuration(object):
              An instance of :class:`Configuration` instance.
         """
         values = list(values)
-        return cls.from_data({'values': values, 'types': [Joint.REVOLUTE] * len(values)})
+        joint_names = list(joint_names or [])
+        return cls.from_data({'values': values, 'types': [Joint.REVOLUTE] * len(values), 'joint_names': joint_names})
 
     @classmethod
-    def from_prismatic_and_revolute_values(cls, prismatic_values, revolute_values):
+    def from_prismatic_and_revolute_values(cls, prismatic_values, revolute_values, joint_names=None):
         """Construct a configuration from prismatic and revolute joint values.
 
         Parameters
@@ -110,6 +113,8 @@ class Configuration(object):
             Positions on the external axis system in meters.
         revolute_values : :obj:`list` of :obj:`float`
             Joint values expressed in radians.
+        joint_names : :obj:`list` of :obj:`str`, optional
+            List of joint names.
 
         Returns
         -------
@@ -119,10 +124,11 @@ class Configuration(object):
         # Force iterables into lists
         prismatic_values = list(prismatic_values)
         revolute_values = list(revolute_values)
+        joint_names = list(joint_names or [])
         values = prismatic_values + revolute_values
         types = [Joint.PRISMATIC] * \
             len(prismatic_values) + [Joint.REVOLUTE] * len(revolute_values)
-        return cls.from_data({'values': values, 'types': types})
+        return cls.from_data({'values': values, 'types': types, 'joint_names': joint_names})
 
     @classmethod
     def from_data(cls, data):
@@ -240,3 +246,10 @@ class Configuration(object):
         config = self.copy()
         config.scale(scale_factor)
         return config
+
+
+if __name__ == "__main__":
+    c1 = Configuration.from_revolute_values([1, 2, 3], joint_names=['1', '2', '3'])
+    c2 = Configuration.from_revolute_values([1, 2], joint_names=['1', '2'])
+    c1 = Configuration.from_revolute_values([1.0001, 2.0002 - 2 * 3.4, 3.0009], joint_names=['1', '2', '3'])
+    c2 = Configuration.from_revolute_values([1, 2], joint_names=['1', '2'])
