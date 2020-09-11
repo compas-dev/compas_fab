@@ -276,29 +276,24 @@ class Configuration(object):
         >>> list(c1.differences_generator(c2))
         [0, 0.0, -1]
         """
-        if len(self.joint_names) and len(other.joint_names):
-            d1 = dict(zip(self.joint_names, self.values))
-            d2 = dict(zip(other.joint_names, other.values))
-            types = dict(zip(self.joint_names, self.types))
-            for k, v in d1.items():
-                if k not in d2:
-                    raise ValueError("Configurations have different joint names.")
-                diff = v - d2[k]
-                if types[k] in [Joint.REVOLUTE, Joint.CONTINUOUS]:
-                    sign = -1 if diff > 0 else 1
-                    while abs(diff) > abs(diff + sign * 2 * pi):
-                        diff = diff + sign * 2 * pi
-                yield diff
+        if self.joint_names and other.joint_names:
+            if set(self.joint_names) != set(other.joint_names):
+                raise ValueError("Configurations have different joint names.")
+                
+            other_value_by_name = dict(zip(other.joint_names, other.values))
+            sorted_other_values = [other_value_by_name[name] for name in self.joint_names]
+            value_pairs = zip(self.values, sorted_other_values)
         else:
             if len(self.values) != len(other.values):
                 raise ValueError("Can't compare configurations with different lengths of values.")
-            for i, (v1, v2) in enumerate(zip(self.values, other.values)):
-                diff = v1 - v2
-                if self.types[i] in [Joint.REVOLUTE, Joint.CONTINUOUS]:
-                    sign = -1 if diff > 0 else 1
-                    while abs(diff) > abs(diff + sign * 2 * pi):
-                        diff = diff + sign * 2 * pi
-                yield diff
+            value_pairs = zip(self.values, other.values)
+            
+        for i, (v1, v2) in enumerate(value_pairs):
+            diff = v1 - v2
+            if self.types[i] in [Joint.REVOLUTE, Joint.CONTINUOUS]:
+                mod = diff % (2 * pi)
+                diff = mod if diff > 0 else mod - 2*pi
+            yield diff
 
     def max_difference(self, other):
         """Returns the maximum difference to another `Configuration`'s values.
