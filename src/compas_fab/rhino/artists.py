@@ -6,44 +6,43 @@ import time
 
 import compas
 import compas_rhino
-
-from compas_fab.artists import BaseRobotArtist
-from compas.utilities import pairwise
 from compas.geometry import centroid_polygon
+from compas.utilities import pairwise
+from compas_rhino.geometry.transformations import xtransform
 
-try:
+from compas_fab.artists import BaseRobotModelArtist
+
+if compas.RHINO:
     import Rhino.Geometry
     import scriptcontext as sc
     from System.Drawing import Color
     from Rhino.DocObjects.ObjectColorSource import ColorFromObject
     from Rhino.DocObjects.ObjectColorSource import ColorFromLayer
     from Rhino.DocObjects.ObjectMaterialSource import MaterialFromObject
-except ImportError:
-    compas.raise_if_ironpython()
 
 __all__ = [
     'RobotArtist',
+    'RobotModelArtist',
 ]
 
 
-class RobotArtist(BaseRobotArtist):
+class RobotModelArtist(BaseRobotModelArtist):
     """Visualizer for robots inside a Rhino environment.
 
     Parameters
     ----------
-    robot : compas.robots.RobotModel
+    model : :class:`compas.robots.RobotModel`
         Robot model.
     layer : str, optional
         The name of the layer that will contain the robot meshes.
     """
 
-    def __init__(self, robot, layer=None):
-        super(RobotArtist, self).__init__(robot)
+    def __init__(self, model, layer=None):
+        super(RobotModelArtist, self).__init__(model)
         self.layer = layer
 
     def transform(self, native_mesh, transformation):
-        T = xform_from_transformation(transformation)
-        native_mesh.Transform(T)
+        xtransform(native_mesh, transformation)
 
     def draw_geometry(self, geometry, name=None, color=None):
         # Imported colors take priority over a the parameter color
@@ -111,7 +110,7 @@ class RobotArtist(BaseRobotArtist):
         self.redraw()
 
     def draw_collision(self):
-        collisions = super(RobotArtist, self).draw_collision()
+        collisions = super(RobotModelArtist, self).draw_collision()
         collisions = list(collisions)
 
         self._enter_layer()
@@ -122,7 +121,7 @@ class RobotArtist(BaseRobotArtist):
         self._exit_layer()
 
     def draw_visual(self):
-        visuals = super(RobotArtist, self).draw_visual()
+        visuals = super(RobotModelArtist, self).draw_visual()
         visuals = list(visuals)
 
         self._enter_layer()
@@ -176,7 +175,7 @@ class RobotArtist(BaseRobotArtist):
                 attr.ObjectColor = Color.FromArgb(a, r, g, b)
                 attr.ColorSource = ColorFromObject
 
-                material_name = 'robotartist.{:.2f}_{:.2f}_{:.2f}_{:.2f}'.format(r, g, b, a)
+                material_name = 'robotmodelartist.{:.2f}_{:.2f}_{:.2f}_{:.2f}'.format(r, g, b, a)
                 material_index = sc.doc.Materials.Find(material_name, True)
 
                 # Material does not exist, create it
@@ -198,18 +197,5 @@ class RobotArtist(BaseRobotArtist):
             obj.CommitChanges()
 
 
-# TODO: Move to compas_rhino.geometry
-def xform_from_transformation(transformation):
-    """Creates a Rhino Transform instance from a :class:`Transformation`.
-
-    Args:
-        transformation (:class:`Transformation`): the transformation.
-
-    Returns:
-        (:class:`Rhino.Geometry.Transform`)
-    """
-    transform = Rhino.Geometry.Transform(1.0)
-    for i in range(0, 4):
-        for j in range(0, 4):
-            transform[i, j] = transformation[i, j]
-    return transform
+# deprecated alias
+RobotArtist = RobotModelArtist

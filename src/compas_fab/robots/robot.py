@@ -35,8 +35,8 @@ class Robot(object):
     ----------
     model : :class:`RobotModel`
         The robot model, usually created from an URDF structure.
-    artist : :class:`compas_fab.artists.BaseRobotArtist`
-        Instance of the artist used to visualize the robot. Defaults to ``None``.
+    artist : :class:`compas_fab.artists.BaseRobotModelArtist`
+        Instance of the artist used to visualize the robot model. Defaults to ``None``.
     semantics : :class:`compas_fab.robots.RobotSemantics`
         The semantic model of the robot. Defaults to ``None``.
     client : :class:`compas_fab.backends.interfaces.ClientInterface`
@@ -59,7 +59,7 @@ class Robot(object):
 
     @property
     def artist(self):
-        """:class:`compas_fab.artists.BaseRobotArtist`: Artist used to visualize robot."""
+        """:class:`compas_fab.artists.BaseRobotModelArtist`: Artist used to visualize robot model."""
         return self._artist
 
     @artist.setter

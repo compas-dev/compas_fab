@@ -2,7 +2,7 @@ import compas
 compas.PRECISION = '12f'
 
 from compas.robots import *
-from compas_fab.blender import RobotArtist
+from compas_fab.blender import RobotModelArtist
 
 r = 'ros-industrial/abb'
 p = 'abb_irb6600_support'
@@ -11,7 +11,7 @@ b = 'kinetic-devel'
 github = GithubPackageMeshLoader(r, p, b)
 urdf = github.load_urdf('irb6640.urdf')
 
-robot = RobotModel.from_urdf_file(urdf)
-robot.load_geometry(github)
+model = RobotModel.from_urdf_file(urdf)
+model.load_geometry(github)
 
-RobotArtist(robot).draw_visual()
+RobotModelArtist(model).draw_visual()

@@ -17,15 +17,15 @@ of the CAD environment.
     :toctree: generated/
     :nosignatures:
 
-    BaseRobotArtist
+    BaseRobotModelArtist
 
 
 """
 
 from __future__ import absolute_import
 
-from compas_fab.artists.base import BaseRobotArtist
+from compas_fab.artists.base import BaseRobotModelArtist
 
 __all__ = [
-    'BaseRobotArtist'
+    'BaseRobotModelArtist'
 ]
