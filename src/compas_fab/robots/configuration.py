@@ -248,7 +248,7 @@ class Configuration(object):
         config.scale(scale_factor)
         return config
 
-    def differences_generator(self, other):
+    def iter_differences(self, other):
         """Generator over the differences to another `Configuration`'s values.
 
         If the joint type is revolute or continuous, the smaller difference
@@ -273,13 +273,16 @@ class Configuration(object):
         --------
         >>> c1 = Configuration.from_revolute_values([1, 0, 3])
         >>> c2 = Configuration.from_revolute_values([1, 2 * pi, 4])
-        >>> list(c1.differences_generator(c2))
-        [0, 0.0, -1]
+        >>> allclose(c1.iter_differences(c2), [0.0, 0.0, -1.0])
+        True
+        >>> c1 = Configuration.from_revolute_values([1, 0, 3])
+        >>> c2 = Configuration.from_revolute_values([1, -2 * pi - 0.2, 4])
+        >>> allclose(c1.iter_differences(c2), [0.0, 0.2, -1.0])
+        True
         """
         if self.joint_names and other.joint_names:
             if set(self.joint_names) != set(other.joint_names):
                 raise ValueError("Configurations have different joint names.")
-                
             other_value_by_name = dict(zip(other.joint_names, other.values))
             sorted_other_values = [other_value_by_name[name] for name in self.joint_names]
             value_pairs = zip(self.values, sorted_other_values)
@@ -287,12 +290,14 @@ class Configuration(object):
             if len(self.values) != len(other.values):
                 raise ValueError("Can't compare configurations with different lengths of values.")
             value_pairs = zip(self.values, other.values)
-            
+
         for i, (v1, v2) in enumerate(value_pairs):
             diff = v1 - v2
             if self.types[i] in [Joint.REVOLUTE, Joint.CONTINUOUS]:
-                mod = diff % (2 * pi)
-                diff = mod if diff > 0 else mod - 2*pi
+                d1 = diff % (2 * pi)
+                d1 = d1 if diff >= 0 else d1 - 2*pi
+                d2 = d1 - 2*pi if diff >= 0 else d1 + 2*pi
+                diff = d1 if abs(d1) < abs(d2) else d2
             yield diff
 
     def max_difference(self, other):
@@ -313,9 +318,9 @@ class Configuration(object):
         >>> c1 = Configuration.from_revolute_values([1, 0, 3])
         >>> c2 = Configuration.from_revolute_values([1, 2 * pi, 4])
         >>> c1.max_difference(c2)
-        1
+        1.0
         """
-        return max([abs(v) for v in self.differences_generator(other)])
+        return max([abs(v) for v in self.iter_differences(other)])
 
     def close_to(self, other, tol=1e-3):
         """Returns ``True`` if the other `Configuration`'s values are within a certain range.
@@ -340,7 +345,7 @@ class Configuration(object):
         >>> c1.close_to(c2)
         True
         """
-        for diff in self.differences_generator(other):
+        for diff in self.iter_differences(other):
             if abs(diff) > tol:
                 return False
         return True
@@ -348,5 +353,6 @@ class Configuration(object):
 
 if __name__ == "__main__":
     import math  # noqa F401
+    from compas.geometry import allclose   # noqa F401
     import doctest
     doctest.testmod(globs=globals())
