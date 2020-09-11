@@ -16,7 +16,7 @@ Unreleased
 * **PyBullet integration**: added support for PyBullet client and forward/inverse kinematic solver
 * Added ``ClientInterface``, ``PlannerInterface`` and various backend feature interfaces
 * Added implementations of these interfaces for ROS and V-REP
-* Added ``attributes`` dictionary to ``Robot`` class 
+* Added ``attributes`` dictionary to ``Robot`` class
 
 **Changed**
 
@@ -27,6 +27,7 @@ Unreleased
 * Parameter ``backend`` of forward kinematics has been renamed to ``solver``
 * The signatures of all kinematics, motion planning and planning scene management methods have been homogenized across backend clients and within ``Robot``
 * All examples have been updated to reflect these changes
+* The installer to Rhino has been unified with COMPAS core. Now running ``python -m compas_rhino.install`` will also detect and install COMPAS FAB and its dependencies.
 
 
 **Fixed**
