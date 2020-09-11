@@ -58,6 +58,5 @@ class RobotModelArtist(BaseRobotModelArtist):
         bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
 
 
-
 # deprecated alias
 RobotArtist = RobotModelArtist
