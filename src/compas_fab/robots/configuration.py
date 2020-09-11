@@ -252,7 +252,7 @@ class Configuration(object):
         """Generator over the differences to another `Configuration`'s values.
 
         If the joint type is revolute or continuous, the smaller difference
-        (+/- 2*pi) is calculated.
+        (+/- 2*:math:`\\pi`) is calculated.
 
         Parameters
         ----------
@@ -261,7 +261,7 @@ class Configuration(object):
 
         Yields
         ------
-        float
+        :obj:`float`
             The next difference to the `Configuration`'s values.
 
         Raises
@@ -310,8 +310,8 @@ class Configuration(object):
 
         Returns
         ------
-        float
-            The maximum absolute difference
+        :obj:`float`
+            The maximum absolute difference.
 
         Examples
         --------
@@ -323,7 +323,7 @@ class Configuration(object):
         return max([abs(v) for v in self.differences_generator(other)])
 
     def close_to(self, other, tol=1e-3):
-        """Returns `True` if the other `Configuration`'s values are within a certain range.
+        """Returns ``True`` if the other `Configuration`'s values are within a certain range.
 
         Parameters
         ----------
@@ -334,8 +334,8 @@ class Configuration(object):
 
         Returns
         -------
-        bool
-            `True` if the other `Configuration`'s values are within a certain
+        :obj:`bool`
+            ``True`` if the other `Configuration`'s values are within a certain
             tolerance, `False` otherwise.
 
         Examples

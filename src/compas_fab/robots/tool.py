@@ -22,7 +22,7 @@ class Tool(object):
         The frame of the tool in tool0 frame.
     collision : :class:`compas.datastructures.Mesh`
         The collision mesh representation of the tool.
-    name : str
+    name : :obj:`str`
         The name of the `Tool`. Defaults to 'attached_tool'.
 
     Examples
@@ -60,7 +60,7 @@ class Tool(object):
 
         Returns
         -------
-        dict
+        :obj:`dict`
             The frame data.
 
         """
@@ -87,7 +87,7 @@ class Tool(object):
 
         Returns
         -------
-        Tool
+        :class:`Tool`
             The constructed `Tool`.
 
         Examples
@@ -112,7 +112,7 @@ class Tool(object):
 
         Returns
         -------
-        Tool
+        :class:`Tool`
             The tool.
 
         Examples
@@ -129,7 +129,7 @@ class Tool(object):
 
         Parameters
         ----------
-        filepath : str
+        filepath : :obj:`str`
             Path to the file.
 
         Returns
@@ -152,12 +152,12 @@ class Tool(object):
 
         Parameters
         ----------
-        frames_tcf : list of :class:`Frame`
+        frames_tcf : :obj:`list` of :class:`compas.geometry.Frame`
             Frames (in WCF) at the robot's tool tip (tcf).
 
         Returns
         -------
-        list of :class:`Frame`
+        :obj:`list` of :class:`compas.geometry.Frame`
             Frames (in WCF) at the robot's flange (tool0).
 
         Examples
@@ -177,12 +177,12 @@ class Tool(object):
 
         Parameters
         ----------
-        frames_t0cf : list of :class:`Frame`
+        frames_t0cf : :obj:`list` of :class:`compas.geometry.Frame`
             Frames (in WCF) at the robot's flange (tool0).
 
         Returns
         -------
-        list of :class:`Frame`
+        :obj:`list` of :class:`compas.geometry.Frame`
             Frames (in WCF) at the robot's tool tip (tcf).
 
         Examples
