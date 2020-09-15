@@ -196,6 +196,7 @@ class RobotModelArtist(BaseRobotModelArtist):
 
             obj.CommitChanges()
 
+
 # TODO: switch to compas_rhino.geometry.transformations.xtransform
 # as soon as this is in the release
 def xform_from_transformation(transformation):
@@ -210,6 +211,7 @@ def xform_from_transformation(transformation):
         for j in range(0, 4):
             transform[i, j] = transformation[i, j]
     return transform
+
 
 # deprecated alias
 RobotArtist = RobotModelArtist
