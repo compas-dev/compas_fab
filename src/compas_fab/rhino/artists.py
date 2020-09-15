@@ -8,7 +8,6 @@ import compas
 import compas_rhino
 from compas.geometry import centroid_polygon
 from compas.utilities import pairwise
-from compas_rhino.geometry.transformations import xtransform
 
 from compas_fab.artists import BaseRobotModelArtist
 
@@ -42,7 +41,8 @@ class RobotModelArtist(BaseRobotModelArtist):
         self.layer = layer
 
     def transform(self, native_mesh, transformation):
-        xtransform(native_mesh, transformation)
+        T = xform_from_transformation(transformation)
+        native_mesh.Transform(T)
 
     def draw_geometry(self, geometry, name=None, color=None):
         # Imported colors take priority over a the parameter color
@@ -196,6 +196,20 @@ class RobotModelArtist(BaseRobotModelArtist):
 
             obj.CommitChanges()
 
+# TODO: switch to compas_rhino.geometry.transformations.xtransform
+# as soon as this is in the release
+def xform_from_transformation(transformation):
+    """Creates a Rhino Transform instance from a :class:`Transformation`.
+    Args:
+        transformation (:class:`Transformation`): the transformation.
+    Returns:
+        (:class:`Rhino.Geometry.Transform`)
+    """
+    transform = Rhino.Geometry.Transform(1.0)
+    for i in range(0, 4):
+        for j in range(0, 4):
+            transform[i, j] = transformation[i, j]
+    return transform
 
 # deprecated alias
 RobotArtist = RobotModelArtist

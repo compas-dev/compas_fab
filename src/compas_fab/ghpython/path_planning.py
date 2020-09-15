@@ -9,7 +9,7 @@ import compas
 from compas.datastructures import Mesh
 from compas.geometry import Transformation
 from compas_rhino.geometry import RhinoMesh
-from compas_rhino.geometry.transformations import xform_from_transformation
+from compas_ghpython.geometry import xform_from_transformation
 
 from compas_fab.robots import Configuration
 
