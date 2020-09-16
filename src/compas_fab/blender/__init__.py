@@ -20,10 +20,11 @@ in Blender.
     :toctree: generated/
     :nosignatures:
 
-    RobotArtist
+    RobotModelArtist
 
 """
 
 from .artists import RobotArtist
+from .artists import RobotModelArtist
 
-__all__ = ['RobotArtist']
+__all__ = ['RobotArtist', 'RobotModelArtist']

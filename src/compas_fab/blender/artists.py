@@ -4,7 +4,7 @@ from __future__ import print_function
 
 from compas_blender import draw_mesh
 
-from compas_fab.artists import BaseRobotArtist
+from compas_fab.artists import BaseRobotModelArtist
 
 try:
     import bpy
@@ -13,16 +13,24 @@ except ImportError:
     pass
 
 __all__ = [
-    'RobotArtist',
+    'RobotModelArtist',
 ]
 
 
-class RobotArtist(BaseRobotArtist):
-    """Visualizer for robots inside a Blender environment."""
+class RobotModelArtist(BaseRobotModelArtist):
+    """Visualizer for robot models inside a Blender environment.
 
-    def __init__(self, robot, layer=None):
+    Parameters
+    ----------
+    model : :class:`compas.robots.RobotModel`
+        Robot model.
+    layer : str, optional
+        The name of the layer that will contain the robot meshes.
+    """
+
+    def __init__(self, model, layer=None):
         self.layer = layer
-        super(RobotArtist, self).__init__(robot)
+        super(RobotModelArtist, self).__init__(model)
 
     def transform(self, native_mesh, transformation):
         native_mesh.matrix_world @= mathutils.Matrix(transformation.matrix)
@@ -48,3 +56,7 @@ class RobotArtist(BaseRobotArtist):
 
     def redraw(self, timeout=None):
         bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+
+
+# deprecated alias
+RobotArtist = RobotModelArtist

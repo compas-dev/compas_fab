@@ -64,7 +64,7 @@ separated from the specific CAD interfaces, while providing a way to leverage
 native performance of the CAD environment.
 
 In the main library there are artists for various datastructures (meshes,
-networks, etc), and **COMPAS FAB** adds a ``RobotArtist`` to them.
+networks, etc), and **COMPAS FAB** adds a ``RobotModelArtist`` to them.
 Robot artists allow visualizing robot models easily and efficiently.
 
 The following example illustrates how to load an entire robot model from

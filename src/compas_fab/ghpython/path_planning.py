@@ -8,17 +8,15 @@ from timeit import default_timer as timer
 import compas
 from compas.datastructures import Mesh
 from compas.geometry import Transformation
-from compas_ghpython.geometry import xform_from_transformation
 from compas_rhino.geometry import RhinoMesh
+from compas_ghpython.geometry import xform_from_transformation
 
 from compas_fab.robots import Configuration
 
-try:
+if compas.RHINO:
     import clr
     import rhinoscriptsyntax as rs
     import Rhino.Geometry as rg
-except ImportError:
-    compas.raise_if_ironpython()
 
 __all__ = [
     'PathVisualizer',
