@@ -5,7 +5,7 @@ from __future__ import print_function
 from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import AddAttachedCollisionMesh
-from compas_fab.backends.ros.messages import ApplyPlanningSceneRequest
+from compas_fab.backends.ros.messages import ApplyPlanningSceneRequest, CollisionObject
 from compas_fab.backends.ros.messages import ApplyPlanningSceneResponse
 from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import PlanningScene
@@ -51,6 +51,7 @@ class MoveItAddAttachedCollisionMesh(AddAttachedCollisionMesh):
     def add_attached_collision_mesh_async(self, callback, errback, attached_collision_mesh):
         aco = AttachedCollisionObject.from_attached_collision_mesh(
             attached_collision_mesh)
+        aco.object.operation = CollisionObject.ADD
         world = PlanningSceneWorld(collision_objects=[aco.object])
         scene = PlanningScene(world=world, is_diff=True)
         request = dict(scene=scene)

@@ -20,5 +20,7 @@ with RosClient() as client:
     group = robot.main_group_name
     scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)
 
-    scene.remove_attached_collision_mesh('tip')
+    # sleep a bit before removing the tip
+    time.sleep(1)
 
+    scene.remove_attached_collision_mesh('tip')

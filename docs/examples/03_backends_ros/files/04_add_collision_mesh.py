@@ -16,8 +16,7 @@ with RosClient() as client:
     cm = CollisionMesh(mesh, 'floor')
     scene.add_collision_mesh(cm)
 
+    # sleep a bit before removing the floor
     time.sleep(1)
-    scene.remove_collision_mesh('floor')
 
-    # sleep a bit before terminating the client
-    time.sleep(1)
+    scene.remove_collision_mesh('floor')
