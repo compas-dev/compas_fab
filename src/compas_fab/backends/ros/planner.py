@@ -5,8 +5,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from roslibpy import Topic
-
 from compas_fab.backends.interfaces.client import forward_docstring
 from compas_fab.backends.interfaces.client import PlannerInterface
 from compas_fab.backends.ros.backend_features.move_it_add_attached_collision_mesh import MoveItAddAttachedCollisionMesh
@@ -19,7 +17,6 @@ from compas_fab.backends.ros.backend_features.move_it_plan_motion import MoveItP
 from compas_fab.backends.ros.backend_features.move_it_planning_scene import MoveItPlanningScene
 from compas_fab.backends.ros.backend_features.move_it_remove_attached_collision_mesh import MoveItRemoveAttachedCollisionMesh
 from compas_fab.backends.ros.backend_features.move_it_remove_collision_mesh import MoveItRemoveCollisionMesh
-from compas_fab.backends.ros.messages import CollisionObject
 
 
 class MoveItPlanner(PlannerInterface):
