@@ -14,8 +14,7 @@ with RosClient() as client:
 
     brick = Box.from_width_height_depth(0.11, 0.07, 0.25)
 
-    # !!! investigate why the fifth brick hangs
-    for i in range(4):
+    for i in range(5):
         mesh = Mesh.from_vertices_and_faces(brick.vertices, brick.faces)
         cm = CollisionMesh(mesh, 'brick')
         cm.frame.point.y += 0.5
