@@ -181,3 +181,19 @@ class GetPlanningSceneResponse(ROSmsg):
     @classmethod
     def from_msg(cls, msg):
         return PlanningScene.from_msg(msg['scene'])
+
+
+class ApplyPlanningSceneRequest(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html
+    """
+
+    def __init__(self, scene=None):
+        self.scene = scene or PlanningScene()
+
+
+class ApplyPlanningSceneResponse(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html
+    """
+
+    def __init__(self, success=False):
+        self.success = success
