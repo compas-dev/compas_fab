@@ -37,6 +37,7 @@ Unreleased
   the fact they depend on ``compas.robots.RobotModel``.
 * Renamed  ``compas_fab.robots.Robot.from_tool0_to_attached_tool`` to ``compas_fab.robots.Robot.from_t0cf_to_tcf``
 * Renamed  ``compas_fab.robots.Robot.from_attached_tool_to_tool0`` to ``compas_fab.robots.Robot.from_tcf_to_t0cf``
+* Changed ROS planning scene methods to be synchronous.
 
 
 **Fixed**
