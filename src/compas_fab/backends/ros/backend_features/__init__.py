@@ -4,6 +4,7 @@ from compas_fab.backends.ros.backend_features.move_it_add_collision_mesh import 
 from compas_fab.backends.ros.backend_features.move_it_append_collision_mesh import MoveItAppendCollisionMesh
 from compas_fab.backends.ros.backend_features.move_it_forward_kinematics import MoveItForwardKinematics
 from compas_fab.backends.ros.backend_features.move_it_inverse_kinematics import MoveItInverseKinematics
+from compas_fab.backends.ros.backend_features.move_it_iter_inverse_kinematics import MoveItIterInverseKinematics
 from compas_fab.backends.ros.backend_features.move_it_plan_cartesian_motion import MoveItPlanCartesianMotion
 from compas_fab.backends.ros.backend_features.move_it_plan_motion import MoveItPlanMotion
 from compas_fab.backends.ros.backend_features.move_it_planning_scene import MoveItPlanningScene
@@ -17,6 +18,7 @@ __all__ = [
     'MoveItAppendCollisionMesh',
     'MoveItForwardKinematics',
     'MoveItInverseKinematics',
+    'MoveItIterInverseKinematics',
     'MoveItPlanCartesianMotion',
     'MoveItPlanMotion',
     'MoveItPlanningScene',

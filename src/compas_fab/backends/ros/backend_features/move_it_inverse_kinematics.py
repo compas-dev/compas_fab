@@ -19,7 +19,6 @@ from compas_fab.backends.ros.messages import PoseStamped
 from compas_fab.backends.ros.messages import PositionIKRequest
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
-from compas_fab.robots.constraints import PositionConstraint
 
 __all__ = [
     'MoveItInverseKinematics',
@@ -121,28 +120,3 @@ class MoveItInverseKinematics(InverseKinematics):
             callback((response.solution.joint_state.position, response.solution.joint_state.name))
 
         self.GET_POSITION_IK(self.ros_client, (ik_request, ), convert_to_positions, errback)
-
-    def iter_inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, max_reach=None, link_name=None, options=None):
-
-        if not group:
-            group = self.main_group_name
-
-        # reach constraint
-        if max_reach and link_name:
-            # forcing diverse IK solution by constraining the link_name within a sphere
-            assert(link_name in self.get_link_names(group=group))
-            sphere = Sphere(frame_WCF.point, max_reach)
-            reach_constraints = [PositionConstraint.from_sphere(link_name, sphere)]
-        else:
-            # forcing diverse IK solution by randomizing the start configuration
-            start_configuration = self.random_configuration(group=group)
-
-        if options.get('constraints') == [] or options.get('constraints') is None:
-            options['constraints'] = reach_constraints
-        else:
-            options['constraints'].extend(reach_constraints)
-
-        yield self.inverse_kinematics(frame_WCF,
-                                      start_configuration=start_configuration,
-                                      group=group,
-                                      options=options)

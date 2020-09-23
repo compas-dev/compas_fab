@@ -27,6 +27,7 @@ Feature interfaces
 
     ForwardKinematics
     InverseKinematics
+    IterInverseKinematics
     PlanMotion
     PlanCartesianMotion
 
@@ -52,6 +53,7 @@ from .backend_features import AppendCollisionMesh
 from .backend_features import ForwardKinematics
 from .backend_features import GetPlanningScene
 from .backend_features import InverseKinematics
+from .backend_features import IterInverseKinematics
 from .backend_features import PlanCartesianMotion
 from .backend_features import PlanMotion
 from .backend_features import RemoveAttachedCollisionMesh
@@ -62,6 +64,7 @@ from .client import PlannerInterface
 __all__ = [
     'ForwardKinematics',
     'InverseKinematics',
+    'IterInverseKinematics',
     'PlanMotion',
     'PlanCartesianMotion',
     'GetPlanningScene',

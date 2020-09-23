@@ -26,6 +26,10 @@ class ClientInterface(object):
         """Forwards call to appropriate method in the planner."""
         return self.planner.inverse_kinematics(*args, **kwargs)
 
+    def iter_inverse_kinematics(self, *args, **kwargs):
+        """Forwards call to appropriate method in the planner."""
+        return self.planner.iter_inverse_kinematics(*args, **kwargs)
+
     def forward_kinematics(self, *args, **kwargs):
         """Forwards call to appropriate method in the planner."""
         return self.planner.forward_kinematics(*args, **kwargs)
@@ -105,6 +109,16 @@ class PlannerInterface(object):
     # ==========================================================================
 
     def inverse_kinematics(self, *args, **kwargs):
+        """Default method for planner.
+
+        Raises
+        ------
+        Exception
+            Planner does not have this feature.
+        """
+        raise Exception('Assigned planner does not have this feature.')
+
+    def iter_inverse_kinematics(self, *args, **kwargs):
         """Default method for planner.
 
         Raises

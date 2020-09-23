@@ -12,6 +12,7 @@ from compas_fab.backends.ros.backend_features.move_it_add_collision_mesh import 
 from compas_fab.backends.ros.backend_features.move_it_append_collision_mesh import MoveItAppendCollisionMesh
 from compas_fab.backends.ros.backend_features.move_it_forward_kinematics import MoveItForwardKinematics
 from compas_fab.backends.ros.backend_features.move_it_inverse_kinematics import MoveItInverseKinematics
+from compas_fab.backends.ros.backend_features.move_it_iter_inverse_kinematics import MoveItIterInverseKinematics
 from compas_fab.backends.ros.backend_features.move_it_plan_cartesian_motion import MoveItPlanCartesianMotion
 from compas_fab.backends.ros.backend_features.move_it_plan_motion import MoveItPlanMotion
 from compas_fab.backends.ros.backend_features.move_it_planning_scene import MoveItPlanningScene
@@ -33,6 +34,10 @@ class MoveItPlanner(PlannerInterface):
     @forward_docstring(MoveItInverseKinematics)
     def inverse_kinematics(self, *args, **kwargs):
         return MoveItInverseKinematics(self.client)(*args, **kwargs)
+
+    @forward_docstring(MoveItIterInverseKinematics)
+    def iter_inverse_kinematics(self, *args, **kwargs):
+        return MoveItIterInverseKinematics(self.client)(*args, **kwargs)
 
     @forward_docstring(MoveItPlanCartesianMotion)
     def plan_cartesian_motion(self, *args, **kwargs):

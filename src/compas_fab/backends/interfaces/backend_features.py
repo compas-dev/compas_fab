@@ -83,6 +83,44 @@ class InverseKinematics(object):
         pass
 
 
+class IterInverseKinematics(object):
+    """Interface for a Planner's iterated inverse kinematics feature.  Any implementation of
+    ``IterInverseKinematics`` must define the method ``iter_inverse_kinematics``.  The
+    ``__call__`` magic method allows an instance of an implementation of
+    ``IterInverseKinematics`` to be treated as its ``iter_inverse_kinematics`` method.  See
+    <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
+    <https://en.wikipedia.org/wiki/Function_object#In_Python>.
+    """
+    __metaclass__ = ABCMeta
+
+    def __call__(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
+        return self.iter_inverse_kinematics(robot, frame_WCF, start_configuration, group, options)
+
+    @abstractmethod
+    def iter_inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
+        """Calculate the robot's inverse kinematic for a given frame.
+
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which inverse kinematics is being calculated.
+        frame_WCF: :class:`compas.geometry.Frame`
+            The frame to calculate the inverse for.
+        start_configuration: :class:`compas_fab.robots.Configuration`, optional
+        group: str, optional
+            The planning group used for calculation.
+        options: dict, optional
+            Dictionary containing kwargs for arguments specific to
+            the client being queried.
+
+        Yields
+        -------
+        :obj:`tuple` of :obj:`list`
+            A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
+        """
+        pass
+
+
 class PlanMotion(object):
     """Interface for a Planner's plan motion feature.  Any implementation of
     ``PlanMotion`` must define the method ``plan_motion``.  The
