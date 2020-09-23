@@ -10,40 +10,38 @@ class PyBulletForwardKinematics(ForwardKinematics):
     def __init__(self, client):
         self.client = client
 
-    def forward_kinematics(self, configuration, group=None, options=None):
-        # """Calculate the robot's forward kinematic.
-        #
-        # Parameters
-        # ----------
-        # configuration : :class:`compas_fab.robots.Configuration`
-        #     The full configuration to calculate the forward kinematic for. If no
-        #     full configuration is passed, the zero-joint state for the other
-        #     configurable joints is assumed.
-        # group : str, optional
-        #     Unused parameter.
-        # options : dict, optional
-        #     Dictionary containing the following key-value pairs:
-        #
-        #     - ``"base_link"``: (:obj:`str`) The name of the base link.
-        #     - ``"ee_link"``: (:obj:`str`, optional) The name of the link to
-        #       calculate the forward kinematics for. Defaults to the group's end
-        #       effector link.
-        #
-        # Returns
-        # -------
-        # :class:`Frame`
-        #     The frame in the world's coordinate system (WCF).
-        # """
-        raise NotImplementedError
-        # """
-        # """
-        # ee_link_name = options['ee_link_name']
-        # joints = self.client.joints_from_names(self.client.robot_uid, configuration.joint_names)
-        # ee_link = self.client.link_from_name(self.client.robot_uid, ee_link_name)
-        # self.client.set_joint_positions(self.client.robot_uid, joints, configuration.values)
-        # pose = self.client.get_link_pose(self.client.robot_uid, ee_link)
-        # if options.get('check_collision'):
-        #     collision, names = self.client.client.collision_check()
-        #     if collision:
-        #         raise CollisionError(*names)
-        # return frame_from_pose(pose)
+    def forward_kinematics(self, robot, configuration, group=None, options=None):
+        """Calculate the robot's forward kinematic.
+
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which inverse kinematics is being calculated.
+        configuration : :class:`compas_fab.robots.Configuration`
+            The full configuration to calculate the forward kinematic for. If no
+            full configuration is passed, the zero-joint state for the other
+            configurable joints is assumed.
+        group : str, optional
+            The planning group used for calculation. Defaults to the robot's
+            main planning group.
+        options : dict, optional
+            Dictionary containing the following key-value pairs:
+
+            - ``"link"``: (:obj:`str`, optional) The name of the link to
+              calculate the forward kinematics for. Defaults to the end effector.
+            - ``"check_collision"``: (:obj:`str`, optional) When ``True``,
+              :meth:`compas_fab.backends.PyBulletClient.check_collisions` will be called.
+              Defaults to ``False``.
+
+        Returns
+        -------
+        :class:`Frame`
+            The frame in the world's coordinate system (WCF).
+        """
+        link_name = options.get('link') or robot.get_end_effector_link_name(group)
+        link_id = self.client._get_link_id_by_name(link_name, robot)
+        self.client.set_robot_configuration(robot, configuration, group)
+        frame = self.client._get_link_frame(link_id, robot.attributes['pybullet_uid'])
+        if options.get('check_collision'):
+            self.client.collision_check()
+        return frame

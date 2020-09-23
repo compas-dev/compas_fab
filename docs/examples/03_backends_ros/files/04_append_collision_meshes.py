@@ -6,12 +6,11 @@ from compas.geometry import Box
 from compas_fab.backends import RosClient
 from compas_fab.robots import CollisionMesh
 from compas_fab.robots import PlanningScene
-from compas_fab.robots.ur5 import Robot
 
 with RosClient() as client:
-
-    robot = Robot(client)
+    robot = client.load_robot()
     scene = PlanningScene(robot)
+    assert robot.name == 'ur5'
 
     brick = Box.from_width_height_depth(0.11, 0.07, 0.25)
 
@@ -23,8 +22,7 @@ with RosClient() as client:
 
         scene.append_collision_mesh(cm)
 
+    # sleep a bit before removing the bricks
     time.sleep(1)
-    scene.remove_collision_mesh('brick')
 
-    # sleep a bit before terminating the client
-    time.sleep(1)
+    scene.remove_collision_mesh('brick')

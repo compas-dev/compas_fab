@@ -2,7 +2,7 @@
 Forward and inverse kinematics
 *******************************************************************************
 
-.. figure:: files/02_forward_and_inverse_kinematics.jpg
+.. figure:: files/03_forward_and_inverse_kinematics.jpg
     :figclass: figure
     :class: figure-img img-fluid
 
@@ -26,14 +26,14 @@ Joint states are described in **COMPAS FAB** with the
 The simplest way to calculate forward kinematics is based on the properties defined
 by the robot model and does not require ROS to be running:
 
-.. literalinclude :: files/02_forward_kinematics.py
+.. literalinclude :: files/03_forward_kinematics_urdf.py
    :language: python
 
 Additionally, if the :class:`compas_fab.robots.Robot` is assigned a ``client``, it
 will try to use it to resolve forward kinematics. The following example shows the same
 solutions but calculated by ROS:
 
-.. literalinclude :: files/02_forward_kinematics_ros.py
+.. literalinclude :: files/03_forward_kinematics.py
    :language: python
 
 Inverse kinematics
@@ -46,5 +46,5 @@ end-effector to reach a certain target pose (**joint space** to
 
 The following code exemplifies how to calculate this:
 
-.. literalinclude :: files/02_inverse_kinematics.py
+.. literalinclude :: files/03_inverse_kinematics.py
    :language: python

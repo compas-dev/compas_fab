@@ -11,32 +11,32 @@ from compas.geometry import Shape
 from compas.geometry import Transformation
 
 __all__ = [
-    'BaseRobotArtist'
+    'BaseRobotModelArtist'
 ]
 
 
-class BaseRobotArtist(object):
-    """Provides common functionality to most robot artist implementations.
+class BaseRobotModelArtist(object):
+    """Provides common functionality to most robot model artist implementations.
 
     In **COMPAS**, the `artists` are classes that assist with the visualization of
     datastructures and models, in a way that maintains the data separated from the
     specific CAD interfaces, while providing a way to leverage native performance
     of the CAD environment.
 
-    There are two methods that implementors of this base class should provide, one
+    There are two methods that implementers of this base class should provide, one
     is concerned with the actual creation of geometry in the native format of the
     CAD environment (:meth:`draw_geometry`) and the other is one to apply a transformation
     to geometry (:meth:`transform`).
 
     Attributes
     ----------
-    robot : :class:`compas.robots.RobotModel`
+    model : :class:`compas.robots.RobotModel`
         Instance of a robot model.
     """
 
-    def __init__(self, robot):
-        super(BaseRobotArtist, self).__init__()
-        self.robot = robot
+    def __init__(self, model):
+        super(BaseRobotModelArtist, self).__init__()
+        self.model = model
         self.create()
         self.scale_factor = 1.
         self.attached_tool = None
@@ -82,10 +82,10 @@ class BaseRobotArtist(object):
         tool : :class:`compas_fab.robots.Tool`
             The tool that should be attached to the robot's flange.
         """
-        name = '{}.visual.attached_tool'.format(self.robot.name)
+        name = '{}.visual.attached_tool'.format(self.model.name)
         native_geometry = self.draw_geometry(tool.visual, name=name)  # TODO: only visual, collision would be great
 
-        link = self.robot.get_link_by_name(tool.attached_collision_mesh.link_name)
+        link = self.model.get_link_by_name(tool.attached_collision_mesh.link_name)
         ee_frame = link.parent_joint.origin.copy()
 
         T = Transformation.from_frame_to_frame(Frame.worldXY(), ee_frame)
@@ -100,7 +100,7 @@ class BaseRobotArtist(object):
         self.attached_tool = None
 
     def create(self, link=None):
-        """Recursive function that triggers the drawing of the robot geometry.
+        """Recursive function that triggers the drawing of the robot model's geometry.
 
         This method delegates the geometry drawing to the :meth:`draw_geometry`
         method. It transforms the geometry based on the saved initial
@@ -116,7 +116,7 @@ class BaseRobotArtist(object):
         None
         """
         if link is None:
-            link = self.robot.root
+            link = self.model.root
 
         for item in itertools.chain(link.visual, link.collision):
             # NOTE: Currently, shapes assign their meshes to an
@@ -132,7 +132,7 @@ class BaseRobotArtist(object):
                 meshes = [Mesh.from_shape(meshes)]
 
             if meshes:
-                # Coerce meshes into an iteratable (a tuple if not natively iterable)
+                # Coerce meshes into an iterable (a tuple if not natively iterable)
                 if not hasattr(meshes, '__iter__'):
                     meshes = (meshes,)
 
@@ -143,7 +143,7 @@ class BaseRobotArtist(object):
                 for i, mesh in enumerate(meshes):
                     # create native geometry
                     mesh_type = 'visual' if is_visual else 'collision'
-                    mesh_name = '{}.{}.{}.{}'.format(self.robot.name, mesh_type, link.name, i)
+                    mesh_name = '{}.{}.{}.{}'.format(self.model.name, mesh_type, link.name, i)
                     native_mesh = self.draw_geometry(mesh, name=mesh_name, color=color)
                     # transform native geometry based on saved init transform
                     self.transform(native_mesh, item.init_transformation)
@@ -157,7 +157,7 @@ class BaseRobotArtist(object):
             self.create(child_joint.child_link)
 
     def scale(self, factor):
-        """Scales the robot geometry by factor (absolute).
+        """Scales the robot model's geometry by factor (absolute).
 
         Parameters
         ----------
@@ -168,11 +168,11 @@ class BaseRobotArtist(object):
         -------
         None
         """
-        self.robot.scale(factor)  # scale the model
+        self.model.scale(factor)  # scale the model
 
         relative_factor = factor / self.scale_factor  # relative scaling factor
         transformation = Scale.from_factors([relative_factor] * 3)
-        self.scale_link(self.robot.root, transformation)
+        self.scale_link(self.model.root, transformation)
         self.scale_factor = factor
 
     def scale_link(self, link, transformation):
@@ -226,12 +226,12 @@ class BaseRobotArtist(object):
             Defaults to ``True``.
         """
         positions = configuration.values
-        names = configuration.joint_names or self.robot.get_configurable_joint_names()
+        names = configuration.joint_names or self.model.get_configurable_joint_names()
         if len(names) != len(configuration.values):
             raise ValueError("Please pass a configuration with %d joint_names." % len(positions))
         joint_state = dict(zip(names, positions))
-        transformations = self.robot.compute_transformations(joint_state)
-        for j in self.robot.iter_joints():
+        transformations = self.model.compute_transformations(joint_state)
+        for j in self.model.iter_joints():
             link = j.child_link
             for item in link.visual:
                 self._apply_transformation_on_transformed_link(item, transformations[j.name])
@@ -245,8 +245,8 @@ class BaseRobotArtist(object):
             self._apply_transformation_on_transformed_link(self.attached_tool, transformations[names[-1]])
 
     def draw_visual(self):
-        """Draws all visual geometry of the robot."""
-        for link in self.robot.iter_links():
+        """Draws all visual geometry of the robot model."""
+        for link in self.model.iter_links():
             for item in link.visual:
                 if item.native_geometry:
                     for native_geometry in item.native_geometry:
@@ -256,8 +256,8 @@ class BaseRobotArtist(object):
                 yield native_geometry
 
     def draw_collision(self):
-        """Draws all collision geometry of the robot."""
-        for link in self.robot.iter_links():
+        """Draws all collision geometry of the robot model."""
+        for link in self.model.iter_links():
             for item in link.collision:
                 if item.native_geometry:
                     for native_geometry in item.native_geometry:

@@ -36,11 +36,13 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options=None):
+    def plan_cartesian_motion(self, robot, frames_WCF, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
         ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which the cartesian motion plan is being calculated.
         frames_WCF: list of :class:`compas.geometry.Frame`
             The frames through which the path is defined.
         start_configuration: :class:`Configuration`, optional
@@ -54,9 +56,9 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
             Dictionary containing the following key-value pairs:
 
             - ``"base_link"``: (:obj:`str`) Name of the base link.
-            - ``"ee_link"``: (:obj:`str`) Name of the end effector link.
-            - ``"joint_names"``: (:obj:`list` of :obj:`str`) List containing joint names.
-            - ``"joint_types"``: (:obj:`list` of :obj:`str`) List containing joint types.
+            - ``"link"``: (:obj:`str`, optional) The name of the link to
+              calculate the forward kinematics for. Defaults to the group's end
+              effector link.
             - ``"max_step"``: (:obj:`float`, optional) The approximate distance between the
               calculated points. (Defined in the robot's units.) Defaults to ``0.01``.
             - ``"jump_threshold"``: (:obj:`float`, optional)
@@ -79,13 +81,22 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
         """
+        options = options or {}
         kwargs = {}
-        kwargs['options'] = options or {}
+        kwargs['options'] = options
         kwargs['frames_WCF'] = frames_WCF
         kwargs['start_configuration'] = start_configuration
         kwargs['group'] = group
 
         kwargs['errback_name'] = 'errback'
+
+        # Use base_link or fallback to model's root link
+        options['base_link'] = options.get('base_link', robot.model.root.name)
+        options['joint_names'] = robot.get_configurable_joint_names()
+        options['joint_types'] = robot.get_configurable_joint_types()
+        options['link'] = options.get('link') or robot.get_end_effector_link_name(group)
+        if options['link'] not in robot.get_link_names(group):
+            raise ValueError('Link name {} does not exist in planning group'.format(options['link']))
 
         return await_callback(self.plan_cartesian_motion_async, **kwargs)
 
@@ -113,7 +124,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         request = dict(header=header,
                        start_state=start_state,
                        group_name=group,
-                       link_name=options['ee_link'],
+                       link_name=options['link'],
                        waypoints=waypoints,
                        max_step=float(options.get('max_step', 0.01)),
                        jump_threshold=float(options.get('jump_threshold', 1.57)),
