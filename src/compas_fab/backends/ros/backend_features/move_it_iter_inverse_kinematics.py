@@ -89,4 +89,3 @@ class MoveItIterInverseKinematics(IterInverseKinematics):
                                                          options=options)
             except BackendError:
                 yield "hello"  # TODO what should happen here?
-
