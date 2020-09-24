@@ -65,22 +65,23 @@ class MoveItIterInverseKinematics(IterInverseKinematics):
 
         group = group or robot.main_group_name
 
-        if max_reach and link_name:
-            # forcing diverse IK solutions by constraining the link_name within a sphere
-            #
-            # here I just want to bring up a discussion point:  since inverse_kinematics is called, and one might
-            # expect there to be constraints already in options, does it really make sense to add these two new
-            # parameters of link_name and max_reach?  maybe it would be more general if the user would feel free
-            # to generate his own constraints, and there could be a flag in the options on whether to generate
-            # random start configurations.
-            assert(link_name in robot.get_link_names(group=group))
-            sphere = Sphere(frame_WCF.point, max_reach)
-            constraints.append(PositionConstraint.from_sphere(link_name, sphere))
-        else:
-            # forcing diverse IK solutions by randomizing the start configuration
-            start_configuration = robot.random_configuration(group=group)
-
         while True:
+
+            if max_reach and link_name:
+                # forcing diverse IK solutions by constraining the link_name within a sphere
+                #
+                # here I just want to bring up a discussion point:  since inverse_kinematics is called, and one might
+                # expect there to be constraints already in options, does it really make sense to add these two new
+                # parameters of link_name and max_reach?  maybe it would be more general if the user would feel free
+                # to generate his own constraints, and there could be a flag in the options on whether to generate
+                # random start configurations.
+                assert(link_name in robot.get_link_names(group=group))
+                sphere = Sphere(frame_WCF.point, max_reach)
+                constraints.append(PositionConstraint.from_sphere(link_name, sphere))
+            else:
+                # forcing diverse IK solutions by randomizing the start configuration
+                start_configuration = robot.random_configuration(group=group)
+
             try:
                 yield self.ros_client.inverse_kinematics(robot,
                                                          frame_WCF,
@@ -88,4 +89,4 @@ class MoveItIterInverseKinematics(IterInverseKinematics):
                                                          group=group,
                                                          options=options)
             except BackendError:
-                yield "hello"  # TODO what should happen here?
+                yield "hello"  # TODO what should happen here? continue/break/yield None?
