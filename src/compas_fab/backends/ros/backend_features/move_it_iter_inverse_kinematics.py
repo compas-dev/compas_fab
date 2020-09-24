@@ -38,14 +38,15 @@ class MoveItIterInverseKinematics(IterInverseKinematics):
             - ``"avoid_collisions"``: (:obj:`bool`, optional) Whether or not to avoid collisions.
               Defaults to ``True``.
             - ``"constraints"``: (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional)
-              A set of constraints that the request must obey.
+              A set of constraints that the request must obey.  Constraints may be leveraged
+              to yield a diversity of inverse kinematic solutions.
               Defaults to ``None``.
             - ``"attempts"``: (:obj:`int`, optional) The maximum number of inverse kinematic attempts.
               Defaults to ``8``.
             - ``"attached_collision_meshes"``: (:obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`, optional)
               Defaults to ``None``.
-            - ``"max_reach"``: (:obj:`float`, optional): TODO
-            - ``"link_name:``: (:obj:`str`, optional): TODO
+            - ``"use_random_configuration"``: (:obj:`bool`, optional): If ``True``,  a random start
+              configuration is used in the inverse kinematic calculation. Defaults to ``False``.
 
         Raises
         ------
@@ -59,27 +60,10 @@ class MoveItIterInverseKinematics(IterInverseKinematics):
         """
         # TODO an example
         options = options or {}
-        max_reach = options.get('max_reach')  # TODO default value?
-        link_name = options.get('link_name')  # TODO or default value here?
-        constraints = options.setdefault('constraints', [])
-
         group = group or robot.main_group_name
 
         while True:
-
-            if max_reach and link_name:
-                # forcing diverse IK solutions by constraining the link_name within a sphere
-                #
-                # here I just want to bring up a discussion point:  since inverse_kinematics is called, and one might
-                # expect there to be constraints already in options, does it really make sense to add these two new
-                # parameters of link_name and max_reach?  maybe it would be more general if the user would feel free
-                # to generate his own constraints, and there could be a flag in the options on whether to generate
-                # random start configurations.
-                assert(link_name in robot.get_link_names(group=group))
-                sphere = Sphere(frame_WCF.point, max_reach)
-                constraints.append(PositionConstraint.from_sphere(link_name, sphere))
-            else:
-                # forcing diverse IK solutions by randomizing the start configuration
+            if options.get('use_random_configuration'):
                 start_configuration = robot.random_configuration(group=group)
 
             try:
