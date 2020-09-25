@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas_blender import draw_mesh
 
 from compas_fab.artists import BaseRobotModelArtist
 
@@ -11,6 +10,8 @@ try:
     import mathutils
 except ImportError:
     pass
+else:
+    from compas_blender import draw_mesh
 
 __all__ = [
     'RobotModelArtist',

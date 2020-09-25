@@ -6,10 +6,7 @@ import logging
 from timeit import default_timer as timer
 
 import compas
-from compas.datastructures import Mesh
 from compas.geometry import Transformation
-from compas_rhino.geometry import RhinoMesh
-from compas_ghpython.geometry import xform_from_transformation
 
 from compas_fab.robots import Configuration
 
@@ -17,6 +14,9 @@ if compas.RHINO:
     import clr
     import rhinoscriptsyntax as rs
     import Rhino.Geometry as rg
+
+    from compas_rhino.geometry import RhinoMesh
+    from compas_rhino.geometry.transformations import xform_from_transformation
 
 __all__ = [
     'PathVisualizer',
