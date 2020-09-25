@@ -2,8 +2,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas_rhino
-import compas_rhino.uninstall
+import compas
+if compas.RHINO:
+    import compas_rhino.install
+    import compas_rhino.uninstall
 
 import compas_fab.rhino.install
 
