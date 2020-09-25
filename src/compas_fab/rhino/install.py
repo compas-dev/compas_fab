@@ -2,7 +2,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas_rhino.install
+import compas
+if compas.RHINO:
+    import compas_rhino.install
 
 __all__ = []
 

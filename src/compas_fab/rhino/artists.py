@@ -5,7 +5,6 @@ from __future__ import print_function
 import time
 
 import compas
-import compas_rhino
 from compas.geometry import centroid_polygon
 from compas.utilities import pairwise
 
@@ -18,6 +17,8 @@ if compas.RHINO:
     from Rhino.DocObjects.ObjectColorSource import ColorFromObject
     from Rhino.DocObjects.ObjectColorSource import ColorFromLayer
     from Rhino.DocObjects.ObjectMaterialSource import MaterialFromObject
+
+    import compas_rhino
 
 __all__ = [
     'RobotArtist',
