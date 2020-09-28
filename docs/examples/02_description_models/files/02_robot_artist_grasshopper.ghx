@@ -48,10 +48,10 @@
             <chunk name="Projection">
               <items count="2">
                 <item name="Target" type_name="gh_drawing_point" type_code="30">
-                  <X>-480</X>
-                  <Y>205</Y>
+                  <X>81</X>
+                  <Y>348</Y>
                 </item>
-                <item name="Zoom" type_name="gh_single" type_code="5">2</item>
+                <item name="Zoom" type_name="gh_single" type_code="5">1.03093123</item>
               </items>
             </chunk>
             <chunk name="Views">
@@ -73,8 +73,8 @@
           <chunks count="1">
             <chunk name="Library" index="0">
               <items count="6">
-                <item name="AssemblyFullName" type_name="gh_string" type_code="10">Bengesht, Version=3.3.0.0, Culture=neutral, PublicKeyToken=null</item>
-                <item name="AssemblyVersion" type_name="gh_string" type_code="10">3.3.0.0</item>
+                <item name="AssemblyFullName" type_name="gh_string" type_code="10">GhPython, Version=6.29.20239.15172, Culture=neutral, PublicKeyToken=null</item>
+                <item name="AssemblyVersion" type_name="gh_string" type_code="10">6.29.20239.15172</item>
                 <item name="Author" type_name="gh_string" type_code="10"></item>
                 <item name="Id" type_name="gh_guid" type_code="9">00000000-0000-0000-0000-000000000000</item>
                 <item name="Name" type_name="gh_string" type_code="10"></item>
@@ -137,7 +137,7 @@ import compas
 
 from compas.robots import RobotModel
 from compas.robots import GithubPackageMeshLoader
-from compas_fab.ghpython import RobotModelArtist
+from compas_ghpython.artists import RobotModelArtist
 
 # Robot meshes are usually in meters
 # Set a high percision to prevent parsing errors
@@ -169,11 +169,11 @@ robot = st[robot_key]
                     <item name="Description" type_name="gh_string" type_code="10">GhPython provides a Python script component</item>
                     <item name="EditorLocation" type_name="gh_drawing_point" type_code="30">
                       <X>72</X>
-                      <Y>73</Y>
+                      <Y>0</Y>
                     </item>
                     <item name="EditorSize" type_name="gh_drawing_size" type_code="32">
                       <W>1454</W>
-                      <H>1341</H>
+                      <H>1050</H>
                     </item>
                     <item name="HideInput" type_name="gh_bool" type_code="1">true</item>
                     <item name="HideOutput" type_name="gh_bool" type_code="1">true</item>
@@ -188,9 +188,9 @@ robot = st[robot_key]
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>174</X>
+                          <X>178</X>
                           <Y>119</Y>
-                          <W>99</W>
+                          <W>90</W>
                           <H>28</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
@@ -225,13 +225,13 @@ robot = st[robot_key]
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>176</X>
+                                  <X>180</X>
                                   <Y>121</Y>
-                                  <W>28</W>
+                                  <W>24</W>
                                   <H>24</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>191.5</X>
+                                  <X>193.5</X>
                                   <Y>133</Y>
                                 </item>
                               </items>
@@ -253,11 +253,11 @@ robot = st[robot_key]
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>234</X>
                                   <Y>121</Y>
-                                  <W>37</W>
+                                  <W>32</W>
                                   <H>24</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>252.5</X>
+                                  <X>250</X>
                                   <Y>133</Y>
                                 </item>
                               </items>
@@ -328,7 +328,7 @@ robot = st[robot_key]
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>44</X>
                           <Y>122</Y>
-                          <W>94</W>
+                          <W>90</W>
                           <H>22</H>
                         </item>
                       </items>
@@ -371,10 +371,10 @@ robot = st[robot_key]
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>145</X>
-                          <Y>-48</Y>
-                          <W>69</W>
-                          <H>30</H>
+                          <X>149</X>
+                          <Y>-47</Y>
+                          <W>65</W>
+                          <H>28</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                           <X>200</X>
@@ -407,13 +407,13 @@ robot = st[robot_key]
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>147</X>
-                                  <Y>-46</Y>
-                                  <W>38</W>
-                                  <H>26</H>
+                                  <X>151</X>
+                                  <Y>-45</Y>
+                                  <W>34</W>
+                                  <H>24</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>167.5</X>
+                                  <X>169.5</X>
                                   <Y>-33</Y>
                                 </item>
                               </items>
@@ -449,7 +449,7 @@ robot = st[robot_key]
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>23</X>
                           <Y>-44</Y>
-                          <W>101</W>
+                          <W>97</W>
                           <H>22</H>
                         </item>
                       </items>
@@ -527,9 +527,9 @@ if robot:
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>685</X>
+                          <X>690</X>
                           <Y>127</Y>
-                          <W>143</W>
+                          <W>134</W>
                           <H>144</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
@@ -571,13 +571,13 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>687</X>
+                                  <X>692</X>
                                   <Y>129</Y>
-                                  <W>34</W>
+                                  <W>29</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>705.5</X>
+                                  <X>708</X>
                                   <Y>139</Y>
                                 </item>
                               </items>
@@ -602,13 +602,13 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>687</X>
+                                  <X>692</X>
                                   <Y>149</Y>
-                                  <W>34</W>
+                                  <W>29</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>705.5</X>
+                                  <X>708</X>
                                   <Y>159</Y>
                                 </item>
                               </items>
@@ -633,13 +633,13 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>687</X>
+                                  <X>692</X>
                                   <Y>169</Y>
-                                  <W>34</W>
+                                  <W>29</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>705.5</X>
+                                  <X>708</X>
                                   <Y>179</Y>
                                 </item>
                               </items>
@@ -664,13 +664,13 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>687</X>
+                                  <X>692</X>
                                   <Y>189</Y>
-                                  <W>34</W>
+                                  <W>29</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>705.5</X>
+                                  <X>708</X>
                                   <Y>199</Y>
                                 </item>
                               </items>
@@ -695,13 +695,13 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>687</X>
+                                  <X>692</X>
                                   <Y>209</Y>
-                                  <W>34</W>
+                                  <W>29</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>705.5</X>
+                                  <X>708</X>
                                   <Y>219</Y>
                                 </item>
                               </items>
@@ -726,13 +726,13 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>687</X>
+                                  <X>692</X>
                                   <Y>229</Y>
-                                  <W>34</W>
+                                  <W>29</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>705.5</X>
+                                  <X>708</X>
                                   <Y>239</Y>
                                 </item>
                               </items>
@@ -757,13 +757,13 @@ if robot:
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>687</X>
+                                  <X>692</X>
                                   <Y>249</Y>
-                                  <W>34</W>
+                                  <W>29</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>705.5</X>
+                                  <X>708</X>
                                   <Y>259</Y>
                                 </item>
                               </items>
@@ -785,11 +785,11 @@ if robot:
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>751</X>
                                   <Y>129</Y>
-                                  <W>75</W>
+                                  <W>71</W>
                                   <H>140</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>788.5</X>
+                                  <X>786.5</X>
                                   <Y>199</Y>
                                 </item>
                               </items>
@@ -819,7 +819,7 @@ if robot:
                   </items>
                   <chunks count="2">
                     <chunk name="Attributes">
-                      <items count="3">
+                      <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>420</X>
                           <Y>138</Y>
@@ -830,7 +830,6 @@ if robot:
                           <X>420.5246</X>
                           <Y>138.3925</Y>
                         </item>
-                        <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                       </items>
                     </chunk>
                     <chunk name="Slider">
@@ -1087,19 +1086,19 @@ if robot:
                       <Y>76.55536</Y>
                     </item>
                     <item name="Cb" type_name="gh_drawing_pointf" type_code="31">
-                      <X>658.1384</X>
+                      <X>688.6081</X>
                       <Y>76.55536</Y>
                     </item>
                     <item name="Cc" type_name="gh_drawing_pointf" type_code="31">
-                      <X>658.1384</X>
-                      <Y>111.9299</Y>
+                      <X>688.6081</X>
+                      <Y>115.0329</Y>
                     </item>
                     <item name="Cd" type_name="gh_drawing_pointf" type_code="31">
                       <X>424.5905</X>
-                      <Y>111.9299</Y>
+                      <Y>115.0329</Y>
                     </item>
                     <item name="Description" type_name="gh_string" type_code="10">A quick note</item>
-                    <item name="Font" type_name="gh_string" type_code="10">Calibri</item>
+                    <item name="Font" type_name="gh_string" type_code="10">Arial</item>
                     <item name="InstanceGuid" type_name="gh_guid" type_code="9">d33a91db-afca-4e47-9440-82f794770b4d</item>
                     <item name="Italic" type_name="gh_bool" type_code="1">false</item>
                     <item name="Name" type_name="gh_string" type_code="10">Scribble</item>
@@ -1113,8 +1112,8 @@ if robot:
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>419.5905</X>
                           <Y>71.55536</Y>
-                          <W>243.5479</W>
-                          <H>45.37451</H>
+                          <W>274.0176</W>
+                          <H>48.47754</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                           <X>424.5905</X>
@@ -1161,9 +1160,9 @@ from __future__ import print_function
 
 if robot and configuration:
     configuration.joint_names = robot.get_configurable_joint_names()
-    robot.artist.update(configuration, visual=show_visual, collision=show_collision)
-
     joint_state = dict(zip(configuration.joint_names, configuration.values))
+    
+    robot.artist.update(joint_state, visual=show_visual, collision=show_collision)
 
     print(joint_state)
 
@@ -1187,12 +1186,12 @@ if robot and configuration:
 </item>
                     <item name="Description" type_name="gh_string" type_code="10">Visualizes a robot.</item>
                     <item name="EditorLocation" type_name="gh_drawing_point" type_code="30">
-                      <X>154</X>
-                      <Y>104</Y>
+                      <X>27</X>
+                      <Y>0</Y>
                     </item>
                     <item name="EditorSize" type_name="gh_drawing_size" type_code="32">
                       <W>1653</W>
-                      <H>1220</H>
+                      <H>1050</H>
                     </item>
                     <item name="Hidden" type_name="gh_bool" type_code="1">true</item>
                     <item name="HideInput" type_name="gh_bool" type_code="1">true</item>
@@ -1205,17 +1204,18 @@ if robot and configuration:
                   </items>
                   <chunks count="2">
                     <chunk name="Attributes">
-                      <items count="2">
+                      <items count="3">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>1256</X>
+                          <X>1261</X>
                           <Y>216</Y>
-                          <W>229</W>
+                          <W>221</W>
                           <H>144</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                           <X>1403</X>
                           <Y>288</Y>
                         </item>
+                        <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                       </items>
                     </chunk>
                     <chunk name="ParameterData">
@@ -1253,17 +1253,18 @@ if robot and configuration:
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>1258</X>
+                                  <X>1263</X>
                                   <Y>218</Y>
-                                  <W>130</W>
+                                  <W>125</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1324.5</X>
+                                  <X>1327</X>
                                   <Y>228</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -1285,17 +1286,18 @@ The robot's full configuration to display.</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>1258</X>
+                                  <X>1263</X>
                                   <Y>238</Y>
-                                  <W>130</W>
+                                  <W>125</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1324.5</X>
+                                  <X>1327</X>
                                   <Y>248</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -1317,17 +1319,18 @@ Whether or not to show the robot's visual meshes.</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>1258</X>
+                                  <X>1263</X>
                                   <Y>258</Y>
-                                  <W>130</W>
+                                  <W>125</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1324.5</X>
+                                  <X>1327</X>
                                   <Y>268</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -1349,17 +1352,18 @@ Whether or not to show the robot's collision meshes.</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>1258</X>
+                                  <X>1263</X>
                                   <Y>278</Y>
-                                  <W>130</W>
+                                  <W>125</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1324.5</X>
+                                  <X>1327</X>
                                   <Y>288</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -1381,17 +1385,18 @@ Whether or not to show the robot's joint frames.</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>1258</X>
+                                  <X>1263</X>
                                   <Y>298</Y>
-                                  <W>130</W>
+                                  <W>125</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1324.5</X>
+                                  <X>1327</X>
                                   <Y>308</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -1413,17 +1418,18 @@ Whether or not to show the robot's base frame.</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>1258</X>
+                                  <X>1263</X>
                                   <Y>318</Y>
-                                  <W>130</W>
+                                  <W>125</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1324.5</X>
+                                  <X>1327</X>
                                   <Y>328</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -1445,17 +1451,18 @@ Whether or not to show the robot's end-effector frame.</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>1258</X>
+                                  <X>1263</X>
                                   <Y>338</Y>
-                                  <W>130</W>
+                                  <W>125</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1324.5</X>
+                                  <X>1327</X>
                                   <Y>348</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -1471,17 +1478,18 @@ Whether or not to show the robot's end-effector frame.</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>1418</X>
                                   <Y>218</Y>
-                                  <W>65</W>
+                                  <W>62</W>
                                   <H>28</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1450.5</X>
+                                  <X>1449</X>
                                   <Y>232</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -1497,17 +1505,18 @@ Whether or not to show the robot's end-effector frame.</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>1418</X>
                                   <Y>246</Y>
-                                  <W>65</W>
+                                  <W>62</W>
                                   <H>28</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1450.5</X>
+                                  <X>1449</X>
                                   <Y>260</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -1523,17 +1532,18 @@ Whether or not to show the robot's end-effector frame.</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>1418</X>
                                   <Y>274</Y>
-                                  <W>65</W>
+                                  <W>62</W>
                                   <H>28</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1450.5</X>
+                                  <X>1449</X>
                                   <Y>288</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -1549,17 +1559,18 @@ Whether or not to show the robot's end-effector frame.</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>1418</X>
                                   <Y>302</Y>
-                                  <W>65</W>
+                                  <W>62</W>
                                   <H>28</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1450.5</X>
+                                  <X>1449</X>
                                   <Y>316</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -1575,17 +1586,18 @@ Whether or not to show the robot's end-effector frame.</item>
                           </items>
                           <chunks count="1">
                             <chunk name="Attributes">
-                              <items count="2">
+                              <items count="3">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>1418</X>
                                   <Y>330</Y>
-                                  <W>65</W>
+                                  <W>62</W>
                                   <H>28</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1450.5</X>
+                                  <X>1449</X>
                                   <Y>344</Y>
                                 </item>
+                                <item name="Selected" type_name="gh_bool" type_code="1">true</item>
                               </items>
                             </chunk>
                           </chunks>
@@ -1706,19 +1718,19 @@ Whether or not to show the robot's end-effector frame.</item>
                       <Y>80.36942</Y>
                     </item>
                     <item name="Cb" type_name="gh_drawing_pointf" type_code="31">
-                      <X>1108.377</X>
+                      <X>1137.502</X>
                       <Y>80.36942</Y>
                     </item>
                     <item name="Cc" type_name="gh_drawing_pointf" type_code="31">
-                      <X>1108.377</X>
-                      <Y>108.6971</Y>
+                      <X>1137.502</X>
+                      <Y>110.1985</Y>
                     </item>
                     <item name="Cd" type_name="gh_drawing_pointf" type_code="31">
                       <X>888.0784</X>
-                      <Y>108.6971</Y>
+                      <Y>110.1985</Y>
                     </item>
                     <item name="Description" type_name="gh_string" type_code="10">A quick note</item>
-                    <item name="Font" type_name="gh_string" type_code="10">Calibri</item>
+                    <item name="Font" type_name="gh_string" type_code="10">Arial</item>
                     <item name="InstanceGuid" type_name="gh_guid" type_code="9">49b0dacd-bcc6-48ea-9d2c-77862d12d28a</item>
                     <item name="Italic" type_name="gh_bool" type_code="1">false</item>
                     <item name="Name" type_name="gh_string" type_code="10">Scribble</item>
@@ -1732,8 +1744,8 @@ Whether or not to show the robot's end-effector frame.</item>
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>883.0784</X>
                           <Y>75.36942</Y>
-                          <W>230.2983</W>
-                          <H>38.32764</H>
+                          <W>259.4233</W>
+                          <H>39.8291</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                           <X>888.0784</X>
@@ -1833,9 +1845,9 @@ Whether or not to show the robot's end-effector frame.</item>
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>934</X>
+                          <X>938</X>
                           <Y>197</Y>
-                          <W>77</W>
+                          <W>72</W>
                           <H>84</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
@@ -1869,13 +1881,13 @@ Whether or not to show the robot's end-effector frame.</item>
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>936</X>
+                                  <X>940</X>
                                   <Y>199</Y>
-                                  <W>15</W>
+                                  <W>11</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>945</X>
+                                  <X>947</X>
                                   <Y>209</Y>
                                 </item>
                               </items>
@@ -1918,13 +1930,13 @@ Whether or not to show the robot's end-effector frame.</item>
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>936</X>
+                                  <X>940</X>
                                   <Y>219</Y>
-                                  <W>15</W>
+                                  <W>11</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>945</X>
+                                  <X>947</X>
                                   <Y>229</Y>
                                 </item>
                               </items>
@@ -1946,13 +1958,13 @@ Whether or not to show the robot's end-effector frame.</item>
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>936</X>
+                                  <X>940</X>
                                   <Y>239</Y>
-                                  <W>15</W>
+                                  <W>11</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>945</X>
+                                  <X>947</X>
                                   <Y>249</Y>
                                 </item>
                               </items>
@@ -1974,13 +1986,13 @@ Whether or not to show the robot's end-effector frame.</item>
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>936</X>
+                                  <X>940</X>
                                   <Y>259</Y>
-                                  <W>15</W>
+                                  <W>11</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>945</X>
+                                  <X>947</X>
                                   <Y>269</Y>
                                 </item>
                               </items>
@@ -2004,11 +2016,11 @@ Whether or not to show the robot's end-effector frame.</item>
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>981</X>
                                   <Y>199</Y>
-                                  <W>28</W>
+                                  <W>27</W>
                                   <H>80</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>995</X>
+                                  <X>994.5</X>
                                   <Y>239</Y>
                                 </item>
                               </items>
@@ -2065,7 +2077,7 @@ Whether or not to show the robot's end-effector frame.</item>
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>883</X>
                           <Y>169</Y>
-                          <W>226</W>
+                          <W>126</W>
                           <H>22</H>
                         </item>
                       </items>
@@ -2096,7 +2108,7 @@ Whether or not to show the robot's end-effector frame.</item>
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>1093</X>
                           <Y>249</Y>
-                          <W>127</W>
+                          <W>122</W>
                           <H>22</H>
                         </item>
                       </items>
@@ -2127,7 +2139,7 @@ Whether or not to show the robot's end-effector frame.</item>
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>1081</X>
                           <Y>273</Y>
-                          <W>139</W>
+                          <W>135</W>
                           <H>22</H>
                         </item>
                       </items>
@@ -2158,7 +2170,7 @@ Whether or not to show the robot's end-effector frame.</item>
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>1086</X>
                           <Y>299</Y>
-                          <W>133</W>
+                          <W>129</W>
                           <H>22</H>
                         </item>
                       </items>
@@ -2189,7 +2201,7 @@ Whether or not to show the robot's end-effector frame.</item>
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>1027</X>
                           <Y>345</Y>
-                          <W>193</W>
+                          <W>188</W>
                           <H>22</H>
                         </item>
                       </items>
@@ -2220,7 +2232,7 @@ Whether or not to show the robot's end-effector frame.</item>
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>1065</X>
                           <Y>321</Y>
-                          <W>155</W>
+                          <W>151</W>
                           <H>22</H>
                         </item>
                       </items>
@@ -2243,19 +2255,19 @@ Whether or not to show the robot's end-effector frame.</item>
                       <Y>63.21286</Y>
                     </item>
                     <item name="Cb" type_name="gh_drawing_pointf" type_code="31">
-                      <X>142.026</X>
+                      <X>155.5392</X>
                       <Y>63.21286</Y>
                     </item>
                     <item name="Cc" type_name="gh_drawing_pointf" type_code="31">
-                      <X>142.026</X>
-                      <Y>91.5405</Y>
+                      <X>155.5392</X>
+                      <Y>93.04196</Y>
                     </item>
                     <item name="Cd" type_name="gh_drawing_pointf" type_code="31">
                       <X>40.64706</X>
-                      <Y>91.5405</Y>
+                      <Y>93.04196</Y>
                     </item>
                     <item name="Description" type_name="gh_string" type_code="10">A quick note</item>
-                    <item name="Font" type_name="gh_string" type_code="10">Calibri</item>
+                    <item name="Font" type_name="gh_string" type_code="10">Arial</item>
                     <item name="InstanceGuid" type_name="gh_guid" type_code="9">c0ee2b14-be7e-40ae-a58a-9c0dda14bcc0</item>
                     <item name="Italic" type_name="gh_bool" type_code="1">false</item>
                     <item name="Name" type_name="gh_string" type_code="10">Scribble</item>
@@ -2269,8 +2281,8 @@ Whether or not to show the robot's end-effector frame.</item>
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                           <X>35.64706</X>
                           <Y>58.21286</Y>
-                          <W>111.3789</W>
-                          <H>38.32764</H>
+                          <W>124.8921</W>
+                          <H>39.8291</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
                           <X>40.64706</X>
@@ -2299,9 +2311,9 @@ Whether or not to show the robot's end-effector frame.</item>
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>1649</X>
+                          <X>1653</X>
                           <Y>274</Y>
-                          <W>48</W>
+                          <W>44</W>
                           <H>84</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
@@ -2324,13 +2336,13 @@ Whether or not to show the robot's end-effector frame.</item>
                         <chunk name="Attributes">
                           <items count="2">
                             <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                              <X>1651</X>
+                              <X>1655</X>
                               <Y>276</Y>
-                              <W>17</W>
+                              <W>13</W>
                               <H>20</H>
                             </item>
                             <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                              <X>1661</X>
+                              <X>1663</X>
                               <Y>286</Y>
                             </item>
                           </items>
@@ -2351,13 +2363,13 @@ Whether or not to show the robot's end-effector frame.</item>
                         <chunk name="Attributes">
                           <items count="2">
                             <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                              <X>1651</X>
+                              <X>1655</X>
                               <Y>296</Y>
-                              <W>17</W>
+                              <W>13</W>
                               <H>20</H>
                             </item>
                             <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                              <X>1661</X>
+                              <X>1663</X>
                               <Y>306</Y>
                             </item>
                           </items>
@@ -2378,13 +2390,13 @@ Whether or not to show the robot's end-effector frame.</item>
                         <chunk name="Attributes">
                           <items count="2">
                             <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                              <X>1651</X>
+                              <X>1655</X>
                               <Y>316</Y>
-                              <W>17</W>
+                              <W>13</W>
                               <H>20</H>
                             </item>
                             <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                              <X>1661</X>
+                              <X>1663</X>
                               <Y>326</Y>
                             </item>
                           </items>
@@ -2427,13 +2439,13 @@ Whether or not to show the robot's end-effector frame.</item>
                         <chunk name="Attributes">
                           <items count="2">
                             <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                              <X>1651</X>
+                              <X>1655</X>
                               <Y>336</Y>
-                              <W>17</W>
+                              <W>13</W>
                               <H>20</H>
                             </item>
                             <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                              <X>1661</X>
+                              <X>1663</X>
                               <Y>346</Y>
                             </item>
                           </items>
@@ -2519,9 +2531,9 @@ W = 3</item>
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>1525</X>
+                          <X>1528</X>
                           <Y>274</Y>
-                          <W>94</W>
+                          <W>87</W>
                           <H>84</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
@@ -2563,13 +2575,13 @@ W = 3</item>
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>1527</X>
+                                  <X>1530</X>
                                   <Y>276</Y>
-                                  <W>40</W>
+                                  <W>37</W>
                                   <H>40</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1548.5</X>
+                                  <X>1550</X>
                                   <Y>296</Y>
                                 </item>
                               </items>
@@ -2594,13 +2606,13 @@ W = 3</item>
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>1527</X>
+                                  <X>1530</X>
                                   <Y>316</Y>
-                                  <W>40</W>
+                                  <W>37</W>
                                   <H>40</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1548.5</X>
+                                  <X>1550</X>
                                   <Y>336</Y>
                                 </item>
                               </items>
@@ -2643,11 +2655,11 @@ W = 3</item>
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>1597</X>
                                   <Y>276</Y>
-                                  <W>20</W>
+                                  <W>16</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1607</X>
+                                  <X>1605</X>
                                   <Y>286</Y>
                                 </item>
                               </items>
@@ -2669,11 +2681,11 @@ W = 3</item>
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>1597</X>
                                   <Y>296</Y>
-                                  <W>20</W>
+                                  <W>16</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1607</X>
+                                  <X>1605</X>
                                   <Y>306</Y>
                                 </item>
                               </items>
@@ -2695,11 +2707,11 @@ W = 3</item>
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>1597</X>
                                   <Y>316</Y>
-                                  <W>20</W>
+                                  <W>16</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1607</X>
+                                  <X>1605</X>
                                   <Y>326</Y>
                                 </item>
                               </items>
@@ -2721,11 +2733,11 @@ W = 3</item>
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
                                   <X>1597</X>
                                   <Y>336</Y>
-                                  <W>20</W>
+                                  <W>16</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>1607</X>
+                                  <X>1605</X>
                                   <Y>346</Y>
                                 </item>
                               </items>
@@ -2790,7 +2802,7 @@ W = 3</item>
     <chunk name="Thumbnail">
       <items count="1">
         <item name="Thumbnail" type_name="gh_drawing_bitmap" type_code="37">
-          <bitmap length="15950">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</bitmap>
+          <bitmap length="6012">iVBORw0KGgoAAAANSUhEUgAAAJYAAABkCAYAAABkW8nwAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAlqADAAQAAAABAAAAZAAAAAAGd2knAAAW8klEQVR4Ae2dSXBc1ZKGU6UqlSYL2ZYtSx4kecBgm8dkxmAI6KZpeAxBO+LFWxAEEKzYdG9esCaCTW9YsSBgAx1E0wQQzEMzh00zeADbeMRCnifZkm0NJZWGUueXV6d8JZcs2aiKMvck7/ree+4Z8/wnM0+eLL0SERnRy5PnwLRyIE5tIyMeW9PK1YhXVlJSIrGI88APP08c8MDKE2OjXq0HVtQRkKfxe2DlibFRr9YDK+oIyNP4PbDyxNioV+uBFXUE5Gn8Hlh5YmzUq/XAijoC8jR+D6w8MTbq1XpgRR0BeRq/B1aeGBv1aj2woo6API3fAytPjI16tR5YUUdAnsbvgZUnxka9Wg+sqCMgT+P3wMoTY6NerQdW1BGQp/F7YOWJsVGv1gMr6gjI0/g9sPLE2KhX64EVdQTkafweWHlibNSr9cCKOgLyNH4PrDwxNurVemBFHQF5Gr8HVp4YG/VqPbCijoA8jd8DK0+MjXq1HlhRR0Cexu+BlSfGRr1a+8Nr45lw6tQpSafTwh/QgjKZjPT09Mjg4KAkEglpbGyUqqqq8cX8u+dAlgNZiXXo0CED05kzZ2T//v0Gov7+fhkaGpKjR4/Ka6+9Jj/99JO8++67cvjw4WwF/sFzIBcHshJr7dp1smLFlXL8+HHp7e2VX3/9VVKplEktJNWmTZtMUm3fvl0efPDBXHX5NM+BLAeywFqz5t8kmUzahx9//FEGBgaymZBilZWVsn79esuDavTkOXA+DmBE6d+2HfvHbfv6+kwtuoLYWoBpeHhYSktLpby8XCoqKtxnf/ccGMMB8JITWGNy+RfPgQvkgP+ryRfIMJ996hzI7gqnXsTn9ByYnAMeWJPzyOe4CA54YF0E03yRyTnggTU5j3yOi+BA1o+FE7TQFIvFzH1R6HZ9e/nnQBZYTDJkW0V9xmeVb+K4CL+Ypz8fB7LAchOMI/TkyZNSV1eX99GOBy9t4/F3IM97B/LUAOOIx+N2uSacg5mF+2cmxg1lgfXWW2/ZpM6aNUtefPFFef311wvuXecEAIATQQExGZOBzJ0GWIEi+ceBKNwdt4gc48Njc9/C+cPPbtGTliuvebrxdo+ekIw/SQnXVajnLLA2b94s1dXVdh64cOFCKSsrK1QfxrQDc2DeCy+8IDt27JBbbrlFHn/8cQO96xMqlAl65ZVXZN++fbJ69Wp54IEHsmE9YyrUF/I7SdHe3i67d++2g/abbrpJZs6cmVXHTLabpPF1TMc7fd61a5f1HR6vW7dOZs+eLddee+15qz9w4IBwXgtfrrnmmnPykk5YE1EpLS0tNo/nZCpwQhZYdLyrq0tg9ueffy6cFwK0QhPM37Jli13PP/+8tLW1yXvvvSefffaZ9a27u9uAsWTJEvniiy+M0TD0pZdekp07d8qiRYtM4t14441Wx549e4RJZBW77xym33HHHZbvo48+MnDdcMMN8sknn9iCeu655+zQfbrHDmiPHTsmH374odxzzz3y8ccfG6iIfaOfd955pxw5csTAxmaqtbXVwESUCWMkDo68LIx7773XwpjgB+bDN998Y/whWODtt9+WefPmyRVXXCFr1661eXz44Ycnlf7TOd4ssJ555hlb8SD+5ptv/sMkFgBgApAexIMRC0YM2FNPPSUvv/yySZdHHnnEgMbqveqqq+Trr7825pLOZFF+zpw5QogPC+bpp5+2skxOc3OzSUEW0TvvvCMACvAy2dT3yy+/yIkTJ6SpqWk6+Wx1MbZbb71VXn31VYtve/TRR+XTTz+1NulbTU2NAeH6668XJCsg+vLLLw2EVIAE5wKE8+fPt2fK33777fYOKFlgc+fOla1bt5qAIGDg4MGD1m59ff20j2miCrN+rAULFpgYJSPSwKmdiQrmKx2xvmrVKlt9zz77rAHmiSeekDfeeEMeeughueuuu0wCwfyVK1cK/WayABh2IaE/qEbix6677jq57bbbTPoAVMoAHiQAq/+xxx6z1X/ZZZfJmjVrZNmyZVY2X9GxAAu+0m82SPQPG3L58uUmmQi2JBYOFYkkAkSoSsphd3JdfvnlVubbb781QGITAxinKpHYAAk+NjQ02HjhEeZAIWlK0Q1hHxfSIB7HDhpRqTI23AY1xvepEiI8DGCYAQCc8T7VesiH+N+wYYOpCMD3RxJjYCzhccBDjHCABLC5AEVnZ6cBBwl15ZVXWnQukhpQEHQJTzFJKEe9EOoUgAFECOlMGvl4RqKxWGpraw1QSD6eqasQBAaywNq4caO5GFAVYWIlMHgAQIH29hPy/jeH5I4bFsryltnisMWKQOyOF7fEz8PU8O6OvBjNDDS844FxXIViQHic4Wf6BzAchfuO9OCaiIKFFz8vsCYq+2dJNx64wWD8QXfffbfMmDHDnplkDEV8Wjbpyuz/XV8q3anTcvr/XpEDmaclNVSi4IjZ6sM+wTYBYFBHR4fZCdgOAMyJc2wA4udRWQQM6lQZwgOJNaLqbHRHivRjElkBesXsHlOQ8n72zrfpIMaIJGH1O3VIn+grKop2UKXwZyJwIYXhF0Z0lCkrG9988y2zX9DpLjoURsNEQIGxW15RJTNLe+SfR/5DUrG75FR3v3TpNjeY6BKTakgip96YiL1795oxjKhnMqibyYLxABCwuUki//BwRn77ba9OZJ9Kw2EV75VOrAbzpBgiXyxWaoCOl6rUQ/LpO+lTJdqkH0hYByIkK7YZEosLlcSi+P7777NqacWKFdZnyo4n2gdYub6Nz/tnf88Ci90EW9T6+rljxgwAAIdTT0uaeuXk3v+U2Q0rpbqm2iadAkwKej+sCpFMGMm4LpzKcxOKfQFwXb3UwbeRkYzaCAdk8+YdasRfLldfvTwLPL4jqTIZDZFWIDH5ouAbHBwyg5UFQJvYJ0wuKow7bZCXPvDOnbpo//X/+W9ZuWqFtDQvVkO5Ttu72rb2lOE7iwQfERsK+IC9wlj5los8qAKuZIF19dVXKdODI5Uww5Aw7GKYCMikxTU32uSOhJjrpAUrNkxMjJNg4XQmmjrPBZZo/lKVFFUKyF5Tp65cAKzcUol6kLaACZtwKgQ48HclyktlT9su+Wlrl/R2p6R54VIzggEUYKVuwAig6ANXLmDBA9L5HnXKAgteMClhQ3Vi5ujRi+bVzOdkcZLpnA/jEsjnwOg+BZOWURcCP4jFOZtRgM3QSc1202W1suEJdJNNnU4iucykhfO6dMDd2NAYnIsuC45LcKJiZyF5UP9IWwCFuqRegOMuV4+7O2C591x3JF4YlGEe0Mdc7yxMyoQXYa66iyktO2PhAf1RHQz6UKLHHq3qOtiinuOlqtoClUmfYK5Tb0yyU2t8Y+uNpELF4ssBNOSljMvr3rkziVwffPCBqTlUPkY323UcjZTHXiQdKQzYSKNN6nTlaZt+O1Bwx/6LqcoOE3mQgPzYFy3g+E1djsL9Ig0g4c/64YcfzMfmNg4ufzHfs8Aqhk66yZk5s0adtQuUsZI1mvl2PmITgI3I5LBRmAoBkvvvv98A5dwqSCwMdgDqfrRL24ALYPEMGMKA4NmAol0cVvvv6Ml9MpCpk5rqmZIsUxDpf2wyGAIedtQr+ZGEOHSRSACXuum/S8dWRL27Yxn6yJnopUBFBSyYjWFeXT3DjP5EolQl1hzdhQU+NMd4JpIJyE6ochoV4zYJAMN9C+d1qox2qIsJxLWABHFgamlpseMQgMQJBOB7//33s1KJSR3ftoFqdLZH1LFXXqZSbrhfjnS0yeDQgJYtlbLSpJSMxCVZEZdFMxZlgRYAVTcU8UACUw19RlLRN56ffPJJAyC27qVCRQUsmMaub//+Q/LddxtUajWpFJql0iKIbg2DhMllUphULs4UWdG4RwBQWBU6IITL0Bb1cU4IASCISAJAxkXkBHVSzrlFOC5B4iBhIGwvnsmD5xt1+v26bbJKj5gqAWz1bKmaUW5A6013ybzmWhkcHlAbVVSaVUplslqqymuk53Sf9iFQsfQdrztSk/qcjZVrE2SdKMJ/igpYAAVqampUNXizAiZYuagLB6Lxd/KTxpGFO1fDlnFS6Xx3wMTfocCOcoTEQgUyuQAFaUb9SBD8WuSlHSYcgJEHENIOE8999Q2rze2CFCUP9h9Sd+nSpdI0N/grPenBPkmlu+3a2bZZju49JY31C+0cFP8edUKAH8JBm06PPQKzD0X6T1EBi0lBFfb2ptUQ71awBCoRCRR8O2uIhw1yeHv6tJ4G6MWk4DsDGE5yYQQDonAZwELaV199ZYfAfCMf9hkAYkJ55xm16P6uBRIKUFE/xj31hAl1jC8Nycl5Hc8Qam3Hju0GvubmZlsIyUSFzKyeK/UzmmVT70aTev0KRk4YwsTY+9P9sufYRqnsKVc1WiYJVa1lcXUwj97jsTJNT0hpSVzr0TNb/W866HT3KTl2+nDgBZhChcvmr7BcRQUseoRK6ezssNgp3A4NDbVZNTTRuGA8O0InUZzKIz8Tz3d3D9cBsJh8pI4DGoAiHWJ3iNQBWJADKqAij8tnH0f/ceXHA47dJpsLjrlwtFIH4OOiv+AA6aiVSolKPqs71Hc99ZLFc/8iycqEDAwp2LmG+6Qn3SmDfertzwzK8IhuLmTYjsjoDuMGpDG18Uq0De52ZZ9Ji2m+0Qs4an77T+9DAxn5ZtNXcqxxneULjzPns47h3+W/7FNRAYvJ4FqwoEED8W7RQQaRDtg3EN/CIAm/Ixl4hxywJsobTkc9udMCQMFEE8eFYd/c3GxgBQS8cyePu6yx0D/Uy7dcRDrfUaNcgBUJi4oj/gtJWaFqNqYqt0ftq0UacIlqpU0ATfs96rytmTFfykv1xKNcZ1H/NzHp7lVBxrHYcEYXgoIuo1fwrCcHms673TUnz5Rg8zGifIc40ehIHZVdqbXaFO4TGoTHruGzz5bikjVHUQELxtPxw4fb9Xxuo/qXrlRf1hIFjCbzRR8ADavZqTXu0GR+LDdBTLADHs9EjbLbIo32MdhRe0gyDuBxktIu5ZGIPFOOazxR3oF7/Lfx74DGqcmWlhaLrUpou0c0QG+zhgAd1zE2aXzYEfV7oX6Jqfr555/1vLZc2w58aRk9/uKZYzCeuTPnJSXKMFipF+OCRxyBodpLVU2Wl9VIIl5mz/o1yGgdZGFTnsJKano2LdwuW9KiKjc3VMhPIe2GlCZGy2lS7txU+gcQk8Kgamur1SHYogwZ0d1RuzFksgm7WD/Wfffdl5VYDJmzQg6dkSgtOuGAmAhWwObATF9cf9zdgSoX4CZjJTtAYuHnqd+qQtXyv/7jH1KjTt5B7UO9SmLqpj9EirJJmYjoC7vYo0ePqerTA32VVENDKmm56050SNUl92PHD8uJjnYDoDlzFXRJBfrK1Uv1/LfCJJ2UDEt/akC2bNskseXBicOYdhVDmcER6dinaljvXOBargtyFRWwYCArEHWEekom49nttps4ViCT5965Q86PxaqkvMvD3UmocBkmwfmx+I7RjduAOHPKUAeuB2wiyhE8R9Qn5bjIEybSXP3h9Kk8Y38tXrzYgBtTSUk9aZWOEM8Q9dPP8xF5OzpOaYTGTvXyd9uCTCbLZVilLYKFRVJXN1d+2XBAI0h22c4TSQwxtuTQbLnn3uskWV4m1ZW6052tMfp/OSm/db+lEivHj2u0O7OaEqJC0EA1NEArARUVsOgSzGtrO6Bx7N9qtARHOrUGGr45kIy/w9CwH8uF4lKXU5uujAMA9fFtn6o+pB3qhgnmjo2F7UNeAMZ31BBGPvUAQsrmIsB6oYSUQZVjvOO7Gg8gxkd79Gcyov22tn3aRzz5LKogahUAIb0aGnqkXW2602dOqfQasrFRZ1ol4uy6WRJXp3Rn1wk5eHK3bhDSsnXHZok14TNkIZ1Vda4fGe1T595Bk5BFrQoV+xpxcK16vZt1tYraOtW28txAJrpjEzEhMH8qE0A9gISfXjlXAmkY1oALCYhhz6TygwsmjPpt50bGCYj8+KCo29l/E2TNJgNc8tImdlyucnw7HzHm1tbfVOr26Y9Frs3ywpWhXwADgNTWlqmrpEqfkYjBAiNAk/HW1syyi3J96ZRsPbJediogE+rOYG7GkJalDvWaGM/DfC8qicXg8bIvXdqi0mqxjSHDLkV7HzBmzLCm5QUAOHeCq9A5J907UsS1T/7JCOmSCxwTlUMS8vtJnKkTEaAG8BMR/WttPagqG1dGsAiIEEFyIWEBLwGZ9fWN6kY5ru6Zk9rHuIKZYMbLVO3vt18trfnbI6raNJxJQ5figH0gLSPJc1U/wms4jW2lYU7VumfU30Gwo3RUVMCCeS6s2XVwdNPnXqf9fiEAoHH6OBlh510oOTfEhZYL50+n+3QX261JwW6RE4hAyqjNphIP8JWUtKuaT2m+HpO+LNzubvLFdBd+lTTUzzcfWd9Al3T1npKTauRLgwLLVOHZ1tgc9HYOSeqULjSto6xKbd+hIgXW2W77p4vhwO2336R24izzf1EeNYW0R1I54v3AgVq1tWZZEmAbVlsLc4CfxyXLknbNqNRTg9qFsmzpctl8elAP0YMF5ST3iP5Kq6pOpeic0YU22pZr58KXlivp70XHAYC0b98xddEcM8kaj+NYDna/fFMMqT+sScO+t6pD9pDagYF/jvNP2xUquP7lvn8yj/6g9Eqqv0c2/vyjlC4JbFcGHLajUIedv+mmQHeDQDdRdRbAHlhw6xInbERUHaqPo62hIXaQOHTTuvFJmEQKJNOwAuiEGfhnznTpgXqVgYvDbb7zw9n6OY0m4Ygfw9hvPbNN9nS+Kcn4WRMAgBqSFKw1C0bTsa/sQ8BMD6xLHFR0f9euPXo81KNgyqiDl0Pg4ATA2YPu1AHpRZRFIoHnPvi/s6E8UqisLPi1FM99aqulNMSnK9Up23dtk9i8wHdIXrCT7tE8p9WVUaoBjHq0NNQPqNTzHnJ1eWDBrUuc2ts79Wf561USYbhzmF2lBnq3AkbUD1djPrD+/j4D0KJFLXpkxk/y2nWXya6xz6I0OHD/7rvvZGHzfIklFIC6K6ytrjP3C/4uIiYg3aOblJMY0SH6pl4Qdehrqt5Drj0PLGPXpfMProywWwLwZDID5kguLZ1tA8ElUlJSZ+qNZ5ykwdQHu9qqqnI11vUgUHeCqMNUql+N/rn6tzEe1l8oLc4yo6+/18JlBvs14iLGpZ9UMsXUdKtQ2x/ppUEWEp8ZSEh2io48sBwnLpE77oRNm7apwzb43SS/Qo+p83LJEo6E4po+oEAjKqTMJBSuD2ww8gFCfGGp1Bl1ktaoLRZEaySTMbPL2tuPy7zGuaoCO6R3AM/8gLQdbJWTafWLqW+M8vGkgkmllIZ+2fuwPhtuFVOJSg+sSwRG53YT18DWrbvsCIiv2FFcOEXLyjQEWh2anLditAMwVCFqEEcotGjRYo2Q3a2q8JBFwwI6jq0OHz5iYdorVl0hM2vmyMKKJVbv30sGpbpVbTBFFMDCBsN9Yc5QxZFJKU2H+O4IiGneUIr74u/TygGOhHDGOoP6Yitnp7dhw88GGvRScIaHWsLARooRbRsAgO9BWqDDgnSibTs0CiL4pRC7QQAIEP/61/ssXOhi++bKUacHluNGnu8AC/vo9wKLbiYSF2/BIEMm6gN9/L1CxsX9e2DlGVDh6n/vpIXrKtZnk1YqsS4e+sU6siLuF0yPCo26TaMyXD/OQnHAA6tQnI5YOx5YEZvwQg3XA6tQnI5YOx5YEZvwQg3XA6tQnI5YOx5YEZvwQg3XA6tQnI5YOx5YEZvwQg3XA6tQnI5YOx5YEZvwQg3XA6tQnI5YOxbdELEx++EWgAP/D6BYPVGXhH07AAAAAElFTkSuQmCC</bitmap>
         </item>
       </items>
     </chunk>

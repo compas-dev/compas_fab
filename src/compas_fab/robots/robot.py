@@ -35,7 +35,7 @@ class Robot(object):
     ----------
     model : :class:`RobotModel`
         The robot model, usually created from an URDF structure.
-    artist : :class:`compas_fab.artists.BaseRobotModelArtist`
+    artist : :class:`compas.robot.base_artist.BaseRobotModelArtist`
         Instance of the artist used to visualize the robot model. Defaults to ``None``.
     semantics : :class:`compas_fab.robots.RobotSemantics`
         The semantic model of the robot. Defaults to ``None``.
@@ -59,7 +59,7 @@ class Robot(object):
 
     @property
     def artist(self):
-        """:class:`compas_fab.artists.BaseRobotModelArtist`: Artist used to visualize robot model."""
+        """:class:`compas.robots.base_artist.BaseRobotModelArtist`: Artist used to visualize robot model."""
         return self._artist
 
     @artist.setter
@@ -811,7 +811,9 @@ class Robot(object):
         tool.attached_collision_mesh = AttachedCollisionMesh(tool.collision_mesh, ee_link_name, touch_links)
         self.attached_tool = tool
         if self.artist:
-            self.update(self.zero_configuration(), group=group, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
+            zero_config = self.zero_configuration()
+            joint_state = dict(zip(zero_config.joint_names, zero_config.values))
+            self.update(joint_state, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
             self.artist.attach_tool(tool)
 
     def detach_tool(self):
@@ -1574,16 +1576,13 @@ class Robot(object):
     # drawing
     # ==========================================================================
 
-    def update(self, configuration, group=None, visual=True, collision=True):
+    def update(self, joint_state, visual=True, collision=True):
         """Update the robot's geometry.
 
         Parameters
         ----------
-        configuration : :class:`Configuration`
-            Instance of the configuration (joint state) to move to.
-        group : :obj:`str`, optional
-            The name of the group to plan for. Defaults to the robot's main
-            planning group.
+        joint_state : :obj:`dict`
+            A dictionary with joint names as keys and joint positions as values.
         visual : :obj:`bool`, optional
             ``True`` if the visual geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
@@ -1591,9 +1590,7 @@ class Robot(object):
             ``True`` if the collision geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
         """
-        if not len(configuration.joint_names):
-            configuration.joint_names = self.get_configurable_joint_names(group)
-        self.artist.update(configuration, visual, collision)
+        self.artist.update(joint_state, visual, collision)
 
     def draw_visual(self):
         """Draw the robot's visual geometry using the defined :attr:`Robot.artist`."""
