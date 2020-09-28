@@ -140,7 +140,7 @@ from compas.robots import GithubPackageMeshLoader
 from compas_ghpython.artists import RobotModelArtist
 
 # Robot meshes are usually in meters
-# Set a high percision to prevent parsing errors
+# Set a high precision to prevent parsing errors
 # and configure Rhino itself in meters
 compas.PRECISION = '12f'
 

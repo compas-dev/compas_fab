@@ -1,6 +1,6 @@
 import compas
 from compas_fab.backends import RosClient
-from compas_fab.rhino import RobotModelArtist
+from compas_rhino.artists import RobotModelArtist
 
 # Set high precision to import meshes defined in meters
 compas.PRECISION = '12f'
