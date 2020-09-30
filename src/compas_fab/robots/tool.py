@@ -5,9 +5,10 @@ from __future__ import print_function
 import json
 
 from compas.geometry import Frame
-from compas.geometry import Transformation
 from compas.datastructures import Mesh
+from compas.robots import ToolModel
 
+from compas_fab.robots.planning_scene import AttachedCollisionMesh
 from compas_fab.robots.planning_scene import CollisionMesh
 
 
@@ -18,12 +19,14 @@ class Tool(object):
     ----------
     visual : :class:`compas.datastructures.Mesh`
         The visual mesh of the tool.
-    frame : :class:`compas.geometry.Frame`
+    frame_in_tool0_frame : :class:`compas.geometry.Frame`
         The frame of the tool in tool0 frame.
     collision : :class:`compas.datastructures.Mesh`
         The collision mesh representation of the tool.
     name : :obj:`str`
         The name of the `Tool`. Defaults to 'attached_tool'.
+    link_name : :obj:`str`
+        The name of the `Link` to which the tool is attached.  Defaults to ``None``.
 
     Examples
     --------
@@ -34,25 +37,43 @@ class Tool(object):
     """
 
     def __init__(self, visual, frame_in_tool0_frame, collision=None,
-                 name="attached_tool"):
-        self.visual = visual
-        self.frame = frame_in_tool0_frame
-        self.collision = collision
-        self.name = name
+                 name="attached_tool", link_name=None):
+        self.tool_model = ToolModel(visual, frame_in_tool0_frame, collision, name, link_name)
+        self.attached_collision_meshes = self.get_attached_collision_meshes()
+
+    @classmethod
+    def from_tool_model(cls, tool_model):
+        tool = cls(None, None)
+        tool.tool_model = tool_model
+        tool.attached_collision_meshes = tool.get_attached_collision_meshes()
+        return tool
+
+    def get_attached_collision_meshes(self):
+        tool_attached_collision_meshes = []
+        for link in self.tool_model.iter_links():
+            for item in link.collision:
+                meshes = self.tool_model._get_item_meshes(item)
+                for mesh in meshes:
+                    collision_mesh = CollisionMesh(item, mesh)
+                    attached_collision_mesh = AttachedCollisionMesh(collision_mesh, self.link_name, [self.link_name])
+                    tool_attached_collision_meshes.append(attached_collision_mesh)
+        return tool_attached_collision_meshes
 
     @property
-    def collision(self):
-        """The collision mesh representation of the tool."""
-        return self._collision
+    def link_name(self):
+        return self.tool_model.link_name
 
-    @collision.setter
-    def collision(self, collision):
-        self._collision = collision or self.visual
+    @link_name.setter
+    def link_name(self, link_name):
+        self.tool_model.link_name = link_name
 
     @property
-    def collision_mesh(self):
-        """Returns the collision mesh of the tool."""
-        return CollisionMesh(self.collision, self.name)
+    def frame(self):
+        return self.tool_model.frame
+
+    @frame.setter
+    def frame(self, frame):
+        self.tool_model.frame = frame
 
     @property
     def data(self):
@@ -64,17 +85,13 @@ class Tool(object):
             The frame data.
 
         """
-        return {'visual': self.visual.data,
-                'frame': self.frame.data,
-                'collision': self.collision.data,
-                'name': self.name}
+        data = self.tool_model.data
+        return data
 
     @data.setter
     def data(self, data):
-        self.visual = Mesh.from_data(data['visual'])
-        self.frame = Frame.from_data(data['frame'])
-        self.collision = Mesh.from_data(data['collision']) if 'collision' in data else None
-        self.name = data['name'] if 'name' in data else 'attached_tool'
+        self.tool_model.data = data
+        self.attached_collision_meshes = self.get_attached_collision_meshes()
 
     @classmethod
     def from_data(cls, data):
@@ -97,7 +114,7 @@ class Tool(object):
         >>> data = {'visual': mesh.data, 'frame': frame.data}
         >>> tool = Tool.from_data(data)
         """
-        tool = cls(None, None)
+        tool = cls(None)
         tool.data = data
         return tool
 
@@ -147,6 +164,11 @@ class Tool(object):
         with open(filepath, 'w') as f:
             json.dump(self.data, f, indent=4, sort_keys=True)
 
+    def update_touch_links(self, touch_links=None):
+        if touch_links:
+            for acm in self.attached_collision_meshes:
+                acm.touch_links = touch_links
+
     def from_tcf_to_t0cf(self, frames_tcf):
         """Converts a list of frames at the robot's tool tip (tcf frame) to frames at the robot's flange (tool0 frame).
 
@@ -169,8 +191,7 @@ class Tool(object):
         >>> tool.from_tcf_to_t0cf(frames_tcf)
         [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
         """
-        Te = Transformation.from_frame_to_frame(self.frame, Frame.worldXY())
-        return [Frame.from_transformation(Transformation.from_frame(f) * Te) for f in frames_tcf]
+        return self.tool_model.from_tcf_to_t0cf(frames_tcf)
 
     def from_t0cf_to_tcf(self, frames_t0cf):
         """Converts frames at the robot's flange (tool0 frame) to frames at the robot's tool tip (tcf frame).
@@ -194,5 +215,4 @@ class Tool(object):
         >>> tool.from_t0cf_to_tcf(frames_t0cf)
         [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
         """
-        Te = Transformation.from_frame_to_frame(Frame.worldXY(), self.frame)
-        return [Frame.from_transformation(Transformation.from_frame(f) * Te) for f in frames_t0cf]
+        return self.tool_model.from_t0cf_to_tcf(frames_t0cf)
