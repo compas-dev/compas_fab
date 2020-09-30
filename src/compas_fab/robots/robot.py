@@ -734,7 +734,7 @@ class Robot(object):
 
         Examples
         --------
-        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> mesh = Mesh.from_stl(compas.get('cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> robot.attach_tool(Tool(mesh, frame))
         >>> frames_tcf = [Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))]
@@ -765,7 +765,7 @@ class Robot(object):
 
         Examples
         --------
-        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> mesh = Mesh.from_stl(compas.get('cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> robot.attach_tool(Tool(mesh, frame))
         >>> frames_t0cf = [Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))]
@@ -800,7 +800,7 @@ class Robot(object):
 
         Examples
         --------
-        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> mesh = Mesh.from_stl(compas.get('cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> tool = Tool(mesh, frame)
         >>> robot.attach_tool(tool)
