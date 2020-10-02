@@ -114,7 +114,7 @@ class Tool(object):
         >>> data = {'visual': mesh.data, 'frame': frame.data}
         >>> tool = Tool.from_data(data)
         """
-        tool = cls(None)
+        tool = cls(None, None)
         tool.data = data
         return tool
 

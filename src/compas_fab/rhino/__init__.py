@@ -23,8 +23,10 @@ in Rhino.
     RobotModelArtist
 
 """
+import compas
 
-from .artists import RobotArtist
-from .artists import RobotModelArtist
+if compas.RHINO:
+    from .artists import RobotArtist
+    from .artists import RobotModelArtist
 
-__all__ = ['RobotArtist', 'RobotModelArtist']
+    __all__ = ['RobotArtist', 'RobotModelArtist']

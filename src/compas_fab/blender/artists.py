@@ -12,9 +12,9 @@ else:
     from compas_blender import draw_mesh
     from compas_blender.artists import RobotModelArtist
 
-__all__ = [
-    'RobotModelArtist',
-]
+    __all__ = [
+        'RobotModelArtist',
+    ]
 
-# deprecated alias
-RobotArtist = RobotModelArtist
+    # deprecated alias
+    RobotArtist = RobotModelArtist

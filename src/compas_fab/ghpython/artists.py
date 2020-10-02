@@ -7,10 +7,10 @@ import compas
 if compas.RHINO:
     from compas_ghpython.artists import RobotModelArtist
 
-__all__ = [
-    'RobotArtist',
-    'RobotModelArtist',
-]
+    __all__ = [
+        'RobotArtist',
+        'RobotModelArtist',
+    ]
 
-# deprecated alias
-RobotArtist = RobotModelArtist
+    # deprecated alias
+    RobotArtist = RobotModelArtist
