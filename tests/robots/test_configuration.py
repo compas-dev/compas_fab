@@ -1,7 +1,8 @@
 from math import pi
 
 from compas.robots import Joint
-from compas_fab.robots import Configuration, JointTrajectoryPoint
+from compas_fab.robots import Configuration
+from compas_fab.robots import JointTrajectoryPoint
 from compas_fab.robots import to_degrees
 
 
