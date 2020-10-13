@@ -361,13 +361,13 @@ class Configuration(object):
             raise ValueError('Joint names are required for this operation.')
 
     @property
-    def joint_states(self):
+    def joint_dict(self):
         """A dictionary of joint values by joint name."""
         self.check_joint_names()
         return dict(zip(self.joint_names, self.values))
 
     @property
-    def type_states(self):
+    def type_dict(self):
         """A dictionary of joint types by joint name."""
         self.check_joint_names()
         return dict(zip(self.joint_names, self.types))
@@ -392,15 +392,15 @@ class Configuration(object):
             If the configuration or the ``other`` configuration does not specify
             joint names for all joint values.
         """
-        _joint_states = self.joint_states
-        _joint_states.update(other.joint_states)
+        _joint_dict = self.joint_dict
+        _joint_dict.update(other.joint_dict)
 
-        _type_states = self.type_states
-        _type_states.update(other.type_states)
+        _type_dict = self.type_dict
+        _type_dict.update(other.type_dict)
 
-        self.joint_names = list(_joint_states.keys())
-        self.values = [_joint_states[name] for name in self.joint_names]
-        self.types = [_type_states[name] for name in self.joint_names]
+        self.joint_names = list(_joint_dict.keys())
+        self.values = [_joint_dict[name] for name in self.joint_names]
+        self.types = [_type_dict[name] for name in self.joint_names]
 
     def merged(self, other):
         """Get a new ``Configuration`` with this configuration merged with another configuration.

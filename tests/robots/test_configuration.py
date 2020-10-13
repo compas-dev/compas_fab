@@ -64,7 +64,7 @@ def test_config_merge():
     config = Configuration(values=[1, 2, 3], types=[Joint.REVOLUTE]*3, joint_names=['a', 'b', 'c'])
     other_config = Configuration(values=[3, 2, 0], types=[Joint.REVOLUTE]*3, joint_names=['a', 'b', 'd'])
     config.merge(other_config)
-    assert config.joint_states == {'a': 3, 'b': 2, 'c': 3, 'd': 0}
+    assert config.joint_dict == {'a': 3, 'b': 2, 'c': 3, 'd': 0}
 
 
 def test_joint_trajectory_point_merge():
@@ -73,5 +73,5 @@ def test_joint_trajectory_point_merge():
     other_tjp = JointTrajectoryPoint(values=[3, 2, 0], types=[Joint.REVOLUTE]*3, velocities=[0, 5, 0])
     other_tjp.joint_names = ['a', 'b', 'd']
     tjp.merge(other_tjp)
-    assert tjp.joint_states == {'a': 3, 'b': 2, 'c': 3, 'd': 0}
-    assert tjp.velocity_states == {'a': 0, 'b': 5, 'c': 6, 'd': 0}
+    assert tjp.joint_dict == {'a': 3, 'b': 2, 'c': 3, 'd': 0}
+    assert tjp.velocity_dict == {'a': 0, 'b': 5, 'c': 6, 'd': 0}

@@ -161,19 +161,19 @@ class JointTrajectoryPoint(Configuration):
         return cls.from_data(self.data)
 
     @property
-    def velocity_states(self):
+    def velocity_dict(self):
         """A dictionary of joint velocities by joint name."""
         self.check_joint_names()
         return dict(zip(self.joint_names, self.velocities))
 
     @property
-    def acceleration_states(self):
+    def acceleration_dict(self):
         """A dictionary of joint accelerations by joint name."""
         self.check_joint_names()
         return dict(zip(self.joint_names, self.accelerations))
 
     @property
-    def effort_states(self):
+    def effort_dict(self):
         """A dictionary of joint efforts by joint name."""
         self.check_joint_names()
         return dict(zip(self.joint_names, self.effort))
@@ -198,27 +198,27 @@ class JointTrajectoryPoint(Configuration):
             If the ``JointTrajectoryPoint`` or the other ``JointTrajectoryPoint`` does not specify
             joint names for all joint values.
         """
-        _joint_states = self.joint_states
-        _joint_states.update(other.joint_states)
+        _joint_dict = self.joint_dict
+        _joint_dict.update(other.joint_dict)
 
-        _type_states = self.type_states
-        _type_states.update(other.type_states)
+        _type_dict = self.type_dict
+        _type_dict.update(other.type_dict)
 
-        _velocity_states = self.velocity_states
-        _velocity_states.update(other.velocity_states)
+        _velocity_dict = self.velocity_dict
+        _velocity_dict.update(other.velocity_dict)
 
-        _acceleration_states = self.acceleration_states
-        _acceleration_states.update(other.acceleration_states)
+        _acceleration_dict = self.acceleration_dict
+        _acceleration_dict.update(other.acceleration_dict)
 
-        _effort_states = self.effort_states
-        _effort_states.update(other.effort_states)
+        _effort_dict = self.effort_dict
+        _effort_dict.update(other.effort_dict)
 
-        self.joint_names = list(_joint_states.keys())
-        self.values = [_joint_states[name] for name in self.joint_names]
-        self.types = [_type_states[name] for name in self.joint_names]
-        self.velocities = [_velocity_states[name] for name in self.joint_names]
-        self.accelerations = [_acceleration_states[name] for name in self.joint_names]
-        self.effort = [_effort_states[name] for name in self.joint_names]
+        self.joint_names = list(_joint_dict.keys())
+        self.values = [_joint_dict[name] for name in self.joint_names]
+        self.types = [_type_dict[name] for name in self.joint_names]
+        self.velocities = [_velocity_dict[name] for name in self.joint_names]
+        self.accelerations = [_acceleration_dict[name] for name in self.joint_names]
+        self.effort = [_effort_dict[name] for name in self.joint_names]
 
     def merged(self, other):
         """Get a new ``JointTrajectoryPoint`` with this ``JointTrajectoryPoint`` merged
