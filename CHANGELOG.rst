@@ -23,6 +23,8 @@ Unreleased
 * Added ``compas_fab.robots.Configuration.iter_differences``
 * Added ``compas_fab.robots.Configuration.max_difference``
 * Added ``compas_fab.robots.Configuration.close_to``
+* Added ``compas_fab.robots.Configuration.merge``
+* Added ``compas_fab.robots.JointTrajectoryPoint.merge``
 
 **Changed**
 
