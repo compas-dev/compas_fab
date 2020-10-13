@@ -179,63 +179,70 @@ class JointTrajectoryPoint(Configuration):
         return dict(zip(self.joint_names, self.effort))
 
     def merge(self, other):
-        """Merge the `JointTrajectoryPoint` with another `JointTrajectoryPoint` in place
-        along joint names.  The other `JointTrajectoryPoint` takes precedence over this
-        `JointTrajectoryPoint` in case a joint value is present in both.
-        Caution: `joint_names` may be rearranged.
+        """Merge the ``JointTrajectoryPoint`` with another ``JointTrajectoryPoint`` in place
+        along joint names.  The other ``JointTrajectoryPoint`` takes precedence over this
+        ``JointTrajectoryPoint`` in case a joint value is present in both.
+
+        Note
+        ----
+            Caution: ``joint_names`` may be rearranged.
 
         Parameters
         ----------
         other : :class:`JointTrajectoryPoint`
-            The `JointTrajectoryPoint` to be merged.
+            The ``JointTrajectoryPoint`` to be merged.
 
         Raises
         ------
         :exc:`ValueError`
-            If the `JointTrajectoryPoint` or the other `JointTrajectoryPoint` does not specify
+            If the ``JointTrajectoryPoint`` or the other ``JointTrajectoryPoint`` does not specify
             joint names for all joint values.
         """
-        self_joint_states = self.joint_states
-        self_joint_states.update(other.joint_states)
+        _joint_states = self.joint_states
+        _joint_states.update(other.joint_states)
 
-        self_type_states = self.type_states
-        self_type_states.update(other.type_states)
+        _type_states = self.type_states
+        _type_states.update(other.type_states)
 
-        self_velocity_states = self.velocity_states
-        self_velocity_states.update(other.velocity_states)
+        _velocity_states = self.velocity_states
+        _velocity_states.update(other.velocity_states)
 
-        self_acceleration_states = self.acceleration_states
-        self_acceleration_states.update(other.acceleration_states)
+        _acceleration_states = self.acceleration_states
+        _acceleration_states.update(other.acceleration_states)
 
-        self_effort_states = self.effort_states
-        self_effort_states.update(other.effort_states)
+        _effort_states = self.effort_states
+        _effort_states.update(other.effort_states)
 
-        self.joint_names = list(self_joint_states.keys())
-        self.values = [self_joint_states[name] for name in self.joint_names]
-        self.types = [self_type_states[name] for name in self.joint_names]
-        self.velocities = [self_velocity_states[name] for name in self.joint_names]
-        self.accelerations = [self_acceleration_states[name] for name in self.joint_names]
-        self.effort = [self_effort_states[name] for name in self.joint_names]
+        self.joint_names = list(_joint_states.keys())
+        self.values = [_joint_states[name] for name in self.joint_names]
+        self.types = [_type_states[name] for name in self.joint_names]
+        self.velocities = [_velocity_states[name] for name in self.joint_names]
+        self.accelerations = [_acceleration_states[name] for name in self.joint_names]
+        self.effort = [_effort_states[name] for name in self.joint_names]
 
     def merged(self, other):
-        """Get a new `JointTrajectoryPoint` with this `JointTrajectoryPoint` merged with another `JointTrajectoryPoint`.
-        The other `JointTrajectoryPoint` takes precedence over this `JointTrajectoryPoint` in
-        case a joint value is present in both.
+        """Get a new ``JointTrajectoryPoint`` with this ``JointTrajectoryPoint`` merged
+        with another ``JointTrajectoryPoint``.  The other ``JointTrajectoryPoint``
+        takes precedence over this ``JointTrajectoryPoint`` in case a joint value is present in both.
+
+        Note
+        ----
+            Caution: ``joint_names`` may be rearranged.
 
         Parameters
         ----------
         other : :class:`JointTrajectoryPoint`
-            The `JointTrajectoryPoint` to be merged.
+            The ``JointTrajectoryPoint`` to be merged.
 
         Returns
         -------
         :class:`JointTrajectoryPoint`
-            A `JointTrajectoryPoint` with values for all included joints.
+            A ``JointTrajectoryPoint`` with values for all included joints.
 
         Raises
         ------
         :exc:`ValueError`
-            If the `JointTrajectoryPoint` or the other `JointTrajectoryPoint` does not specify
+            If the ``JointTrajectoryPoint`` or the other ``JointTrajectoryPoint`` does not specify
             joint names for all joint values.
         """
         jtp = self.copy()

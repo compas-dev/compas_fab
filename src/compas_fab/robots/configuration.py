@@ -350,6 +350,7 @@ class Configuration(object):
                 return False
         return True
 
+    @property
     def has_joint_names(self):
         """Returns ``True`` when there is a joint name for every value."""
         return len(self.values) == len(self.joint_names)
@@ -374,7 +375,11 @@ class Configuration(object):
     def merge(self, other):
         """Merge the configuration with another configuration in place along joint names.
         The other configuration takes precedence over this configuration in
-        case a joint value is present in both. Caution: `joint_names` may be rearranged.
+        case a joint value is present in both.
+
+        Note
+        ----
+            Caution: ``joint_names`` may be rearranged.
 
         Parameters
         ----------
@@ -384,23 +389,27 @@ class Configuration(object):
         Raises
         ------
         :exc:`ValueError`
-            If the configuration or the `other` configuration does not specify
+            If the configuration or the ``other`` configuration does not specify
             joint names for all joint values.
         """
-        self_joint_states = self.joint_states
-        self_joint_states.update(other.joint_states)
+        _joint_states = self.joint_states
+        _joint_states.update(other.joint_states)
 
-        self_type_states = self.type_states
-        self_type_states.update(other.type_states)
+        _type_states = self.type_states
+        _type_states.update(other.type_states)
 
-        self.joint_names = list(self_joint_states.keys())
-        self.values = [self_joint_states[name] for name in self.joint_names]
-        self.types = [self_type_states[name] for name in self.joint_names]
+        self.joint_names = list(_joint_states.keys())
+        self.values = [_joint_states[name] for name in self.joint_names]
+        self.types = [_type_states[name] for name in self.joint_names]
 
     def merged(self, other):
-        """Get a new `Configuration` with this configuration merged with another configuration.
+        """Get a new ``Configuration`` with this configuration merged with another configuration.
         The other configuration takes precedence over this configuration in
         case a joint value is present in both.
+
+        Note
+        ----
+            Caution: ``joint_names`` may be rearranged.
 
         Parameters
         ----------
@@ -415,7 +424,7 @@ class Configuration(object):
         Raises
         ------
         :exc:`ValueError`
-            If the configuration or the `other` configuration does not specify
+            If the configuration or the ``other`` configuration does not specify
             joint names for all joint values.
         """
         configuration = self.copy()
