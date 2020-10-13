@@ -57,3 +57,10 @@ def test_to_data():
 
     assert data['values'] == [8.312, 1.5, 0., 0., 0., 1., 0.8]
     assert data['types'] == [Joint.PRISMATIC] + [Joint.REVOLUTE] * 6
+
+
+def test_merge():
+    config = Configuration(values=[1, 2, 3], types=[Joint.REVOLUTE]*3, joint_names=['a', 'b', 'c'])
+    other_config = Configuration(values=[3, 2, 0], types=[Joint.REVOLUTE]*3, joint_names=['a', 'b', 'd'])
+    config.merge(other_config)
+    assert config.joint_states == {'a': 3, 'b': 2, 'c': 3, 'd': 0}

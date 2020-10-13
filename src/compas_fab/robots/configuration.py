@@ -350,6 +350,78 @@ class Configuration(object):
                 return False
         return True
 
+    def has_joint_names(self):
+        """Returns ``True`` when there is a joint name for every value."""
+        return len(self.values) == len(self.joint_names)
+
+    def check_joint_names(self):
+        """Raises an error if there is not a joint name for every value."""
+        if not self.has_joint_names:
+            raise ValueError('Joint names are required for this operation.')
+
+    @property
+    def joint_states(self):
+        """A dictionary of joint values by joint name."""
+        self.check_joint_names()
+        return dict(zip(self.joint_names, self.values))
+
+    @property
+    def type_states(self):
+        """A dictionary of joint types by joint name."""
+        self.check_joint_names()
+        return dict(zip(self.joint_names, self.types))
+
+    def merge(self, other):
+        """Merge the configuration with another configuration in place along joint names.
+        The other configuration takes precedence over this configuration in
+        case a joint value is present in both. Caution: `joint_names` may be rearranged.
+
+        Parameters
+        ----------
+        other : :class:`Configuration`
+            The configuration to be merged.
+
+        Raises
+        ------
+        :exc:`ValueError`
+            If the configuration or the `other` configuration does not specify
+            joint names for all joint values.
+        """
+        self_joint_states = self.joint_states
+        self_joint_states.update(other.joint_states)
+
+        self_type_states = self.type_states
+        self_type_states.update(other.type_states)
+
+        self.joint_names = list(self_joint_states.keys())
+        self.values = [self_joint_states[name] for name in self.joint_names]
+        self.types = [self_type_states[name] for name in self.joint_names]
+
+    def merged(self, other):
+        """Get a new `Configuration` with this configuration merged with another configuration.
+        The other configuration takes precedence over this configuration in
+        case a joint value is present in both.
+
+        Parameters
+        ----------
+        other : :class:`Configuration`
+            The configuration to be merged.
+
+        Returns
+        -------
+        :class:`Configuration`
+            A configuration with values for all included joints.
+
+        Raises
+        ------
+        :exc:`ValueError`
+            If the configuration or the `other` configuration does not specify
+            joint names for all joint values.
+        """
+        configuration = self.copy()
+        configuration.merge(other)
+        return configuration
+
 
 if __name__ == "__main__":
     import math  # noqa F401
