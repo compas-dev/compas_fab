@@ -9,7 +9,7 @@ if compas.RHINO:
     from compas_ghpython.utilities import draw_mesh
     from compas_rhino.geometry.transformations import xtransform
 
-from compas_fab.artists import BaseRobotModelArtist
+from compas_fab.artists import BaseRobotModelArtist  # noqa: E402
 
 __all__ = [
     'RobotArtist',

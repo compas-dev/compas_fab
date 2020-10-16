@@ -7,7 +7,7 @@ if compas.RHINO:
     import compas_rhino.install
     import compas_rhino.uninstall
 
-import compas_fab.rhino.install
+import compas_fab.rhino.install  # noqa: E402
 
 __all__ = []
 

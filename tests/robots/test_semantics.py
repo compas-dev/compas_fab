@@ -27,12 +27,12 @@ def test_panda_srdf_file(panda_srdf, panda_urdf):
     assert semantics.get_base_link_name('panda_arm') == 'panda_link0'
     assert semantics.get_end_effector_link_name('panda_arm') == 'panda_link8'
     assert semantics.get_configurable_joint_names('panda_arm') == ['panda_joint1',
-                                                                    'panda_joint2',
-                                                                    'panda_joint3',
-                                                                    'panda_joint4',
-                                                                    'panda_joint5',
-                                                                    'panda_joint6',
-                                                                    'panda_joint7']
+                                                                   'panda_joint2',
+                                                                   'panda_joint3',
+                                                                   'panda_joint4',
+                                                                   'panda_joint5',
+                                                                   'panda_joint6',
+                                                                   'panda_joint7']
     all_configurable_joint_names = [j.name for j in semantics.get_all_configurable_joints()]
     assert all_configurable_joint_names == ['panda_joint1',
                                             'panda_joint2',
@@ -44,6 +44,14 @@ def test_panda_srdf_file(panda_srdf, panda_urdf):
                                             'panda_finger_joint1']
     configurable_joints = semantics.get_configurable_joints('panda_arm_hand')
     assert [j.type for j in configurable_joints] == [0, 0, 0, 0, 0, 0, 0, 2]
+    set_joints = list(semantics.group_states['panda_arm']['ready'].keys())
+    assert set_joints == ['panda_joint1',
+                          'panda_joint2',
+                          'panda_joint3',
+                          'panda_joint4',
+                          'panda_joint5',
+                          'panda_joint6',
+                          'panda_joint7']
 
 
 def test_ur5_semantics():
