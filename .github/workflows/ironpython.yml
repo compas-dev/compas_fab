@@ -21,6 +21,7 @@ jobs:
           ipy -X:Frames -m pip install --no-deps compas roslibpy
           ipy -X:Frames -m pip install ironpython-pytest
       - name: Run tests
+        env:
+          IRONPYTHONPATH=./src
         run: |
-          set IRONPYTHONPATH=./src
           ipy tests/ipy_test_runner.py
