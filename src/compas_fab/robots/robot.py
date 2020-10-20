@@ -146,7 +146,7 @@ class Robot(object):
         Examples
         --------
         >>> set(robot.group_states['manipulator'].keys())
-        {'home', 'up'}
+        {'up', 'home'}
 
         """
         self.ensure_semantics()
