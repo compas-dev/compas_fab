@@ -20,12 +20,14 @@ in Grasshopper.
     :toctree: generated/
     :nosignatures:
 
-    RobotArtist
+    RobotModelArtist
 
 
 """
 
 from .artists import RobotArtist
+from .artists import RobotModelArtist
+
 from .path_planning import *          # noqa: F401,F403
 
-__all__ = ['RobotArtist']
+__all__ = ['RobotArtist', 'RobotModelArtist']

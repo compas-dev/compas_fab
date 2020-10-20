@@ -5,6 +5,7 @@ from __future__ import print_function
 import json
 
 from compas.geometry import Frame
+from compas.geometry import Transformation
 from compas.datastructures import Mesh
 
 from compas_fab.robots.planning_scene import CollisionMesh
@@ -21,7 +22,7 @@ class Tool(object):
         The frame of the tool in tool0 frame.
     collision : :class:`compas.datastructures.Mesh`
         The collision mesh representation of the tool.
-    name : str
+    name : :obj:`str`
         The name of the `Tool`. Defaults to 'attached_tool'.
 
     Examples
@@ -59,7 +60,7 @@ class Tool(object):
 
         Returns
         -------
-        dict
+        :obj:`dict`
             The frame data.
 
         """
@@ -86,7 +87,7 @@ class Tool(object):
 
         Returns
         -------
-        Tool
+        :class:`Tool`
             The constructed `Tool`.
 
         Examples
@@ -111,7 +112,7 @@ class Tool(object):
 
         Returns
         -------
-        Tool
+        :class:`Tool`
             The tool.
 
         Examples
@@ -128,7 +129,7 @@ class Tool(object):
 
         Parameters
         ----------
-        filepath : str
+        filepath : :obj:`str`
             Path to the file.
 
         Returns
@@ -145,3 +146,53 @@ class Tool(object):
         """
         with open(filepath, 'w') as f:
             json.dump(self.data, f, indent=4, sort_keys=True)
+
+    def from_tcf_to_t0cf(self, frames_tcf):
+        """Converts a list of frames at the robot's tool tip (tcf frame) to frames at the robot's flange (tool0 frame).
+
+        Parameters
+        ----------
+        frames_tcf : :obj:`list` of :class:`compas.geometry.Frame`
+            Frames (in WCF) at the robot's tool tip (tcf).
+
+        Returns
+        -------
+        :obj:`list` of :class:`compas.geometry.Frame`
+            Frames (in WCF) at the robot's flange (tool0).
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> tool = Tool(mesh, frame)
+        >>> frames_tcf = [Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))]
+        >>> tool.from_tcf_to_t0cf(frames_tcf)
+        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
+        """
+        Te = Transformation.from_frame_to_frame(self.frame, Frame.worldXY())
+        return [Frame.from_transformation(Transformation.from_frame(f) * Te) for f in frames_tcf]
+
+    def from_t0cf_to_tcf(self, frames_t0cf):
+        """Converts frames at the robot's flange (tool0 frame) to frames at the robot's tool tip (tcf frame).
+
+        Parameters
+        ----------
+        frames_t0cf : :obj:`list` of :class:`compas.geometry.Frame`
+            Frames (in WCF) at the robot's flange (tool0).
+
+        Returns
+        -------
+        :obj:`list` of :class:`compas.geometry.Frame`
+            Frames (in WCF) at the robot's tool tip (tcf).
+
+        Examples
+        --------
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+        >>> tool = Tool(mesh, frame)
+        >>> frames_t0cf = [Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))]
+        >>> tool.from_t0cf_to_tcf(frames_t0cf)
+        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
+        """
+        Te = Transformation.from_frame_to_frame(Frame.worldXY(), self.frame)
+        return [Frame.from_transformation(Transformation.from_frame(f) * Te) for f in frames_t0cf]

@@ -3238,7 +3238,7 @@ from scriptcontext import sticky as st
 
 import compas
 from compas_fab.robots.ur5 import Robot
-from compas_fab.ghpython import RobotArtist
+from compas_fab.ghpython import RobotModelArtist
 
 compas.PRECISION = '12f'
 
@@ -3251,7 +3251,7 @@ if robot_key not in st:
 
 if load:
     robot = Robot(load_geometry=True)
-    robot.artist = RobotArtist(robot.model)
+    robot.artist = RobotModelArtist(robot.model)
     st[robot_key] = robot
     robot.scale(scale_factor)
 
@@ -12922,7 +12922,7 @@ from compas_fab.backends import RosClient
 from compas_fab.backends import RosFileServerLoader
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotSemantics
-from compas_fab.ghpython import RobotArtist
+from compas_fab.ghpython import RobotModelArtist
 
 # Set high precision to import meshes defined in meters
 compas.PRECISION = '24f'
@@ -12947,7 +12947,7 @@ if client and client.is_connected and load:
     semantics = RobotSemantics.from_srdf_string(srdf, model)
 
     robot = Robot(model, semantics=semantics)
-    robot.artist = RobotArtist(robot.model)
+    robot.artist = RobotModelArtist(robot.model)
     robot.scale(scale_factor)
     st[robot_key] = robot
 

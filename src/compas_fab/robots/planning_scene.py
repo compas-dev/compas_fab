@@ -343,12 +343,7 @@ class PlanningScene(object):
         >>> group = robot.main_group_name
         >>> scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)
 
-        >>> # wait for it to be attached
-        >>> time.sleep(1)
-
-        >>> # wait for it to be removed
         >>> scene.remove_attached_collision_mesh('tip')
-        >>> time.sleep(1)
 
         >>> # check if it's really gone
         >>> planning_scene = robot.client.get_planning_scene()

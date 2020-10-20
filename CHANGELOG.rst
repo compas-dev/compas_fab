@@ -17,6 +17,15 @@ Unreleased
 * Added ``ClientInterface``, ``PlannerInterface`` and various backend feature interfaces
 * Added implementations of these interfaces for ROS and V-REP
 * Added ``attributes`` dictionary to ``Robot`` class
+* Added ``compas_fab.robots.Tool.from_t0cf_to_tcf``
+* Added ``compas_fab.robots.Tool.from_tcf_to_t0cf``
+* Added ```joint_names`` as optional parameter for all ``compas_fab.robots.Configuration`` constructors
+* Added ``compas_fab.robots.Configuration.iter_differences``
+* Added ``compas_fab.robots.Configuration.max_difference``
+* Added ``compas_fab.robots.Configuration.close_to``
+* Added ``compas_fab.robots.Configuration.merge``
+* Added ``compas_fab.robots.JointTrajectoryPoint.merge``
+* Added ``compas_fab.robots.Semantics.group_states``
 
 **Changed**
 
@@ -28,6 +37,11 @@ Unreleased
 * The signatures of all kinematics, motion planning and planning scene management methods have been homogenized across backend clients and within ``Robot``
 * All examples have been updated to reflect these changes
 * The installer to Rhino has been unified with COMPAS core. Now running ``python -m compas_rhino.install`` will also detect and install COMPAS FAB and its dependencies.
+* Renamed all ``RobotArtist`` implementations to ``RobotModelArtist`` to reflect
+  the fact they depend on ``compas.robots.RobotModel``.
+* Renamed  ``compas_fab.robots.Robot.from_tool0_to_attached_tool`` to ``compas_fab.robots.Robot.from_t0cf_to_tcf``
+* Renamed  ``compas_fab.robots.Robot.from_attached_tool_to_tool0`` to ``compas_fab.robots.Robot.from_tcf_to_t0cf``
+* Changed ROS planning scene methods to be synchronous.
 
 
 **Fixed**
@@ -39,6 +53,7 @@ Unreleased
 * The methods ``forward_kinematics``, ``inverse_kinematics``, ``plan_cartesian_motion`` and ``plan_motion``
   of ``Robot`` class have been refactored, but a backwards-compatible deprecated version with the old
   signatures still exists suffixed by ``_deprecated``, e.g. ``forward_kinematics_deprecated``.
+* ``RobotArtist`` are deprecated in favor of ``RobotModelArtist``.
 
 **Removed**
 

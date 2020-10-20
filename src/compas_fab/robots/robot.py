@@ -35,8 +35,8 @@ class Robot(object):
     ----------
     model : :class:`RobotModel`
         The robot model, usually created from an URDF structure.
-    artist : :class:`compas_fab.artists.BaseRobotArtist`
-        Instance of the artist used to visualize the robot. Defaults to ``None``.
+    artist : :class:`compas_fab.artists.BaseRobotModelArtist`
+        Instance of the artist used to visualize the robot model. Defaults to ``None``.
     semantics : :class:`compas_fab.robots.RobotSemantics`
         The semantic model of the robot. Defaults to ``None``.
     client : :class:`compas_fab.backends.interfaces.ClientInterface`
@@ -59,7 +59,7 @@ class Robot(object):
 
     @property
     def artist(self):
-        """:class:`compas_fab.artists.BaseRobotArtist`: Artist used to visualize robot."""
+        """:class:`compas_fab.artists.BaseRobotModelArtist`: Artist used to visualize robot model."""
         return self._artist
 
     @artist.setter
@@ -138,6 +138,19 @@ class Robot(object):
     def root_name(self):
         """:obj:`str`: Robot's root name."""
         return self.model.root.name
+
+    @property
+    def group_states(self):
+        """:obj:`dict` of :obj:`dict`: All group states of the robot.
+
+        Examples
+        --------
+        >>> sorted(robot.group_states['manipulator'].keys())
+        ['home', 'up']
+
+        """
+        self.ensure_semantics()
+        return self.semantics.group_states
 
     def get_end_effector_link_name(self, group=None):
         """Get the name of the robot's end effector link.
@@ -516,19 +529,12 @@ class Robot(object):
             configurable joints, or if the `group_configuration` does not
             specify positions for all configurable joints of the given group.
         """
-        if not len(group_configuration.joint_names):
+        if not group_configuration.joint_names:
             group_configuration.joint_names = self.get_configurable_joint_names(group)
 
         full_configuration = self._check_full_configuration_and_scale(full_configuration)[0]  # adds joint_names to full_configuration and makes copy
 
-        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
-        group_joint_state = dict(zip(group_configuration.joint_names, group_configuration.values))
-
-        # overwrite full_joint_state with values of group_joint_state
-        for name in group_joint_state:
-            full_joint_state[name] = group_joint_state[name]
-
-        full_configuration.values = [full_joint_state[name] for name in full_configuration.joint_names]
+        full_configuration.merge(group_configuration)
         return full_configuration
 
     def get_group_names_from_link_name(self, link_name):
@@ -589,15 +595,15 @@ class Robot(object):
         (:class:`Configuration`, :class:`Configuration`)
             The full configuration and the scaled full configuration
         """
-        joint_names = self.get_configurable_joint_names()  # full configuration
         if not full_configuration:
             configuration = self.zero_configuration()  # with joint_names
         else:
+            joint_names = self.get_configurable_joint_names()  # full configuration
             # full_configuration might have passive joints specified as well, we allow this.
             if len(joint_names) > len(full_configuration.values):
                 raise ValueError("Please pass a configuration with {} values, for all configurable joints of the robot.".format(len(joint_names)))
             configuration = full_configuration.copy()
-            if not len(configuration.joint_names):
+            if not configuration.joint_names:
                 configuration.joint_names = joint_names
         return configuration, configuration.scaled(1. / self.scale_factor)
 
@@ -714,7 +720,7 @@ class Robot(object):
         frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
         return frame_WCF
 
-    def from_attached_tool_to_tool0(self, frames_tcf):
+    def from_tcf_to_t0cf(self, frames_tcf):
         """Convert a list of frames at the robot's tool tip (tcf frame) to frames at the robot's flange (tool0 frame) using the attached tool.
 
         Parameters
@@ -738,15 +744,14 @@ class Robot(object):
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> robot.attach_tool(Tool(mesh, frame))
         >>> frames_tcf = [Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))]
-        >>> robot.from_attached_tool_to_tool0(frames_tcf)
+        >>> robot.from_tcf_to_t0cf(frames_tcf)
         [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
         """
         if not self.attached_tool:
             raise Exception("Please attach a tool first.")
-        Te = Transformation.from_frame_to_frame(self.attached_tool.frame, Frame.worldXY())
-        return [Frame.from_transformation(Transformation.from_frame(f) * Te) for f in frames_tcf]
+        return self.attached_tool.from_tcf_to_t0cf(frames_tcf)
 
-    def from_tool0_to_attached_tool(self, frames_t0cf):
+    def from_t0cf_to_tcf(self, frames_t0cf):
         """Convert frames at the robot's flange (tool0 frame) to frames at the robot's tool tip (tcf frame) using the attached tool.
 
         Parameters
@@ -770,13 +775,12 @@ class Robot(object):
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> robot.attach_tool(Tool(mesh, frame))
         >>> frames_t0cf = [Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))]
-        >>> robot.from_tool0_to_attached_tool(frames_t0cf)
+        >>> robot.from_t0cf_to_tcf(frames_t0cf)
         [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
         """
         if not self.attached_tool:
             raise Exception("Please attach a tool first.")
-        Te = Transformation.from_frame_to_frame(Frame.worldXY(), self.attached_tool.frame)
-        return [Frame.from_transformation(Transformation.from_frame(f) * Te) for f in frames_t0cf]
+        return self.attached_tool.from_t0cf_to_tcf(frames_t0cf)
 
     def attach_tool(self, tool, group=None, touch_links=None):
         """Attach a tool to the robot independently of the model definition.

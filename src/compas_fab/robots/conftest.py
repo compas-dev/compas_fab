@@ -7,6 +7,7 @@ from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Rotation
 from compas.geometry import Scale
+from compas.geometry import allclose
 
 import compas_fab
 from compas_fab.backends import RosClient
@@ -25,6 +26,7 @@ def add_imports(doctest_namespace):
     doctest_namespace["compas_fab"] = compas_fab
     doctest_namespace["Rotation"] = Rotation
     doctest_namespace["Tool"] = Tool
+    doctest_namespace["allclose"] = allclose
 
 
 @pytest.fixture(scope='function', autouse=True)
