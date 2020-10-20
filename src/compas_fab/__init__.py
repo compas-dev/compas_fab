@@ -69,4 +69,5 @@ try:
 except Exception:
     pass
 
+__all_plugins__ = ['compas_fab.rhino.install']
 __all__ = ['__author__', '__author_email__', '__copyright__', '__description__', '__license__', '__title__', '__url__', '__version__', 'get']

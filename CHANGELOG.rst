@@ -36,6 +36,7 @@ Unreleased
 * Parameter ``backend`` of forward kinematics has been renamed to ``solver``
 * The signatures of all kinematics, motion planning and planning scene management methods have been homogenized across backend clients and within ``Robot``
 * All examples have been updated to reflect these changes
+* The installer to Rhino has been unified with COMPAS core. Now running ``python -m compas_rhino.install`` will also detect and install COMPAS FAB and its dependencies.
 * Renamed all ``RobotArtist`` implementations to ``RobotModelArtist`` to reflect
   the fact they depend on ``compas.robots.RobotModel``.
 * Renamed  ``compas_fab.robots.Robot.from_tool0_to_attached_tool`` to ``compas_fab.robots.Robot.from_t0cf_to_tcf``

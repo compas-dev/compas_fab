@@ -40,12 +40,11 @@ Working in Rhino
 ================
 
 To make **COMPAS FAB** available inside Rhino, open the *command prompt*
-and type the following which will install it on both Rhino 5.0 and 6.0:
+and type the following:
 
 ::
 
-    python -m compas_fab.rhino.install -v 5.0
-    python -m compas_fab.rhino.install -v 6.0
+    python -m compas_rhino.install
 
 .. note:
 
