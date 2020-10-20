@@ -145,8 +145,8 @@ class Robot(object):
 
         Examples
         --------
-        >>> set(robot.group_states['manipulator'].keys())
-        {'up', 'home'}
+        >>> sorted(robot.group_states['manipulator'].keys())
+        ['home', 'up']
 
         """
         self.ensure_semantics()
