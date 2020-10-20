@@ -3,11 +3,12 @@ from __future__ import division
 from __future__ import print_function
 
 import compas
+import compas_fab.rhino.install
+
 if compas.RHINO:
     import compas_rhino.install
     import compas_rhino.uninstall
 
-import compas_fab.rhino.install
 
 __all__ = []
 

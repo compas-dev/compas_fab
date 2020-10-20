@@ -24,7 +24,8 @@ class RobotSemantics(object):
 
     def __init__(self, robot_model,
                  groups=None, main_group_name=None, passive_joints=None,
-                 end_effectors=None, disabled_collisions=None):
+                 end_effectors=None, disabled_collisions=None,
+                 group_states=None):
         self.robot_model = robot_model
 
         self.groups = groups or {}
@@ -32,6 +33,7 @@ class RobotSemantics(object):
         self.passive_joints = passive_joints or []
         self.end_effectors = end_effectors or []
         self.disabled_collisions = disabled_collisions or set()
+        self.group_states = group_states or {}
 
     @property
     def group_names(self):
@@ -56,6 +58,7 @@ class RobotSemantics(object):
         passive_joints = _get_passive_joints(xml.root)
         end_effectors = _get_end_effectors(xml.root)
         disabled_collisions = _get_disabled_collisions(xml.root)
+        group_states = _get_group_states(xml.root)
 
         groups_by_links_len = sorted(groups.items(), key=lambda group: len(group[1]['links']))
         main_group_name = groups_by_links_len[-1][0]
@@ -67,6 +70,7 @@ class RobotSemantics(object):
             passive_joints=passive_joints,
             end_effectors=end_effectors,
             disabled_collisions=disabled_collisions,
+            group_states=group_states,
         )
 
     def get_end_effector_link_name(self, group=None):
@@ -113,6 +117,18 @@ def _get_groups(root, robot_model):
         )
 
     return groups
+
+
+def _get_group_states(root):
+    group_states = {}
+
+    for group_state in root.findall('group_state'):
+        group_state_name = group_state.attrib['name']
+        group_name = group_state.attrib['group']
+        joint_dict = {joint.attrib['name']: joint.attrib['value'] for joint in group_state.findall('joint')}
+        group_states.setdefault(group_name, {})[group_state_name] = joint_dict
+
+    return group_states
 
 
 def _get_group_link_names(group, root, robot_model):

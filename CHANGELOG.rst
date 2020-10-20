@@ -25,6 +25,7 @@ Unreleased
 * Added ``compas_fab.robots.Configuration.close_to``
 * Added ``compas_fab.robots.Configuration.merge``
 * Added ``compas_fab.robots.JointTrajectoryPoint.merge``
+* Added ``compas_fab.robots.Semantics.group_states``
 
 **Changed**
 
