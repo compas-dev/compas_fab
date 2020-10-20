@@ -139,6 +139,19 @@ class Robot(object):
         """:obj:`str`: Robot's root name."""
         return self.model.root.name
 
+    @property
+    def group_states(self):
+        """:obj:`dict` of :obj:`dict`: All group states of the robot.
+
+        Examples
+        --------
+        >>> set(robot.group_states['manipulator'].keys())
+        {'home', 'up'}
+
+        """
+        self.ensure_semantics()
+        return self.semantics.group_states
+
     def get_end_effector_link_name(self, group=None):
         """Get the name of the robot's end effector link.
 
