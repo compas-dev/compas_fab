@@ -22,6 +22,6 @@ jobs:
           ipy -X:Frames -m pip install ironpython-pytest
       - name: Run tests
         env:
-          IRONPYTHONPATH=./src
+          IRONPYTHONPATH: ./src
         run: |
           ipy tests/ipy_test_runner.py
