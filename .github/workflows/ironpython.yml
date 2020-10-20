@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Setting IronPython path
-        run: echo "IRONPYTHONPATH=$env:$GITHUB_WORKSPACE/src" >> $GITHUB_ENV
+        run: echo "IRONPYTHONPATH=$GITHUB_WORKSPACE/src" >> $GITHUB_ENV
       - name: Install dependencies
         run: |
           echo IRONPYTHONPATH=$IRONPYTHONPATH
