@@ -14,15 +14,14 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setting IronPython path
-        run: echo "IRONPYTHONPATH=$GITHUB_WORKSPACE/src" >> $GITHUB_ENV
       - name: Install dependencies
         run: |
-          echo IRONPYTHONPATH=$IRONPYTHONPATH
           choco install ironpython --version=2.7.8.1
           ipy -X:Frames -m ensurepip
           ipy -X:Frames -m pip install --no-deps compas roslibpy
           ipy -X:Frames -m pip install ironpython-pytest
       - name: Run tests
+        env:
+          IRONPYTHONPATH: ./src
         run: |
           ipy tests/ipy_test_runner.py
