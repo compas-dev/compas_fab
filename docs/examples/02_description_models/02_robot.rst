@@ -80,6 +80,7 @@ ROS and render it in Rhino:
     <div class="card-title">Downloads</div>
 
 * :download:`Robot artist from ROS (Rhino) (.PY) <files/02_robot_artist_rhino_from_ros.py>`
+* :download:`Robot artist from ROS (Grasshopper) (.GHX) <files/02_robot_artist_grasshopper_panda.ghx>`
 * :download:`Robot artist from Github (Rhino) (.PY) <files/02_robot_artist_rhino.py>`
 * :download:`Robot artist from Github (Blender) (.PY) <files/02_robot_artist_blender.py>`
 * :download:`Robot artist from Github (Grasshopper) (.GHX) <files/02_robot_artist_grasshopper.ghx>`
