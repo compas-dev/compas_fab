@@ -25,11 +25,8 @@
 from __future__ import print_function
 
 if robot and full_configuration:
-    if not full_configuration.joint_names:
-        full_configuration.joint_names = robot.get_configurable_joint_names()
-    joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
+    robot.update(full_configuration, visual=show_visual, collision=show_collision)
 
-    robot.update(joint_state, visual=show_visual, collision=show_collision)
     print(full_configuration)
 
     if show_visual:
