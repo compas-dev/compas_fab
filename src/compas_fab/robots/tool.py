@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import json
 
-from compas.robots import ToolModel
+from compas.robots import ToolModel, Geometry
 
 from compas_fab.robots.planning_scene import AttachedCollisionMesh
 from compas_fab.robots.planning_scene import CollisionMesh
@@ -50,7 +50,7 @@ class Tool(object):
         tool_attached_collision_meshes = []
         for link in self.tool_model.iter_links():
             for item in link.collision:
-                meshes = self.tool_model._get_item_meshes(item)
+                meshes = Geometry._get_item_meshes(item)
                 for mesh in meshes:
                     collision_mesh = CollisionMesh(item, mesh)
                     attached_collision_mesh = AttachedCollisionMesh(collision_mesh, self.link_name, [self.link_name])

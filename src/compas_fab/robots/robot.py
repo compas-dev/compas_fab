@@ -837,9 +837,6 @@ class Robot(object):
         tool.update_touch_links(touch_links)
         self.attached_tool = tool
         if self.artist:
-            zero_config = self.zero_configuration()
-            joint_state = dict(zip(zero_config.joint_names, zero_config.values))
-            self.update(joint_state, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
             self.artist.attach_tool_model(tool.tool_model)
 
     def detach_tool(self):
