@@ -607,6 +607,27 @@ class Robot(object):
                 configuration.joint_names = joint_names
         return configuration, configuration.scaled(1. / self.scale_factor)
 
+    def get_configuration_from_group_state(self, group, group_state):
+        """Get a ``Configuration`` from a group's group state.
+
+        Parameters
+        ----------
+        group : :obj:`str`
+            The name of the planning group.
+        group_state : :obj:`str
+            The name of the ``group_state``.
+
+        Returns
+        -------
+        :class:`Configuration`
+            The configuration specified by the ``group_state``.
+        """
+        joint_dict = self.group_states[group][group_state]
+        group_joint_names = self.get_configurable_joint_names(group)
+        group_joint_types = self.get_configurable_joint_types(group)
+        values = [joint_dict[name] for name in group_joint_names]
+        return Configuration(values, group_joint_types, group_joint_names)
+
     # ==========================================================================
     # transformations, coordinate frames
     # ==========================================================================
