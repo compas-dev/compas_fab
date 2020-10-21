@@ -113,7 +113,7 @@ class AttachedCollisionMesh(object):
 
     Examples
     --------
-    >>> mesh = Mesh.from_stl(compas.get('cone.stl'))
+    >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
     >>> cm = CollisionMesh(mesh, 'tip')
     >>> ee_link_name = 'ee_link'
     >>> touch_links = ['wrist_3_link', 'ee_link']
@@ -280,7 +280,7 @@ class PlanningScene(object):
         Examples
         --------
         >>> scene = PlanningScene(robot)
-        >>> mesh = Mesh.from_stl(compas.get('cone.stl'))
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> cm = CollisionMesh(mesh, 'tip')
         >>> ee_link_name = 'ee_link'
         >>> touch_links = ['wrist_3_link', 'ee_link']
@@ -338,7 +338,7 @@ class PlanningScene(object):
         Examples
         --------
         >>> scene = PlanningScene(robot)
-        >>> mesh = Mesh.from_stl(compas.get('cone.stl'))
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> cm = CollisionMesh(mesh, 'tip')
         >>> group = robot.main_group_name
         >>> scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)

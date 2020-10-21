@@ -1,8 +1,8 @@
 import time
 
-import compas
 from compas.datastructures import Mesh
 
+import compas_fab
 from compas_fab.backends import RosClient
 from compas_fab.robots import CollisionMesh
 from compas_fab.robots import PlanningScene
@@ -13,7 +13,7 @@ with RosClient() as client:
     assert robot.name == 'ur5'
 
     # create collision object
-    mesh = Mesh.from_stl(compas.get('cone.stl'))
+    mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
     cm = CollisionMesh(mesh, 'tip')
 
     # attach it to the end-effector

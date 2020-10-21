@@ -4,12 +4,11 @@ from __future__ import print_function
 
 
 try:
-    import bpy
-    import mathutils
+    import bpy  # noqa: F401
+    import mathutils  # noqa: F401
 except ImportError:
     pass
 else:
-    from compas_blender import draw_mesh
     from compas_blender.artists import RobotModelArtist
 
     __all__ = [

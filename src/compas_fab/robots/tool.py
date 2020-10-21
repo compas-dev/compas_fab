@@ -4,8 +4,6 @@ from __future__ import print_function
 
 import json
 
-from compas.geometry import Frame
-from compas.datastructures import Mesh
 from compas.robots import ToolModel
 
 from compas_fab.robots.planning_scene import AttachedCollisionMesh
@@ -30,7 +28,7 @@ class Tool(object):
 
     Examples
     --------
-    >>> mesh = Mesh.from_stl(compas.get('cone.stl'))
+    >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
     >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
     >>> tool = Tool(mesh, frame)
 
@@ -109,7 +107,7 @@ class Tool(object):
 
         Examples
         --------
-        >>> mesh = Mesh.from_stl(compas.get('cone.stl'))
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> data = {'visual': mesh.data, 'frame': frame.data}
         >>> tool = Tool.from_data(data)
@@ -134,7 +132,7 @@ class Tool(object):
 
         Examples
         --------
-        >>> filepath = os.path.join(compas.DATA, "cone_tool.json")
+        >>> filepath = os.path.join(compas_fab.DATA, "planning_scene", "cone_tool.json")
         >>> tool = Tool.from_json(filepath)
         """
         with open(filepath, 'r') as f:
@@ -155,10 +153,10 @@ class Tool(object):
 
         Examples
         --------
-        >>> mesh = Mesh.from_stl(compas.get('cone.stl'))
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> tool = Tool(mesh, frame)
-        >>> filepath = os.path.join(compas.DATA, "cone_tool.json")
+        >>> filepath = os.path.join(compas_fab.DATA, "planning_scene", "cone_tool.json")
         >>> tool.to_json(filepath)
         """
         with open(filepath, 'w') as f:
@@ -184,7 +182,7 @@ class Tool(object):
 
         Examples
         --------
-        >>> mesh = Mesh.from_stl(compas.get('cone.stl'))
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> tool = Tool(mesh, frame)
         >>> frames_tcf = [Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))]
@@ -208,7 +206,7 @@ class Tool(object):
 
         Examples
         --------
-        >>> mesh = Mesh.from_stl(compas.get('cone.stl'))
+        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> tool = Tool(mesh, frame)
         >>> frames_t0cf = [Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))]

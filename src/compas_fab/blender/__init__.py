@@ -24,8 +24,8 @@ in Blender.
 
 """
 try:
-    import bpy
-    import mathutils
+    import bpy  # noqa: F401
+    import mathutils  # noqa: F401
 except ImportError:
     pass
 else:
