@@ -15,7 +15,6 @@ from compas_fab.robots.constraints import Constraint
 from compas_fab.robots.constraints import JointConstraint
 from compas_fab.robots.constraints import OrientationConstraint
 from compas_fab.robots.constraints import PositionConstraint
-from compas_fab.robots.planning_scene import AttachedCollisionMesh
 
 __all__ = [
     'Robot',
@@ -31,11 +30,11 @@ class Robot(object):
     upon the model described in the class :class:`compas.robots.RobotModel` of
     the **COMPAS** framework.
 
-    Parameters
+    Attributes
     ----------
     model : :class:`RobotModel`
         The robot model, usually created from an URDF structure.
-    artist : :class:`compas_fab.artists.BaseRobotModelArtist`
+    artist : :class:`compas.robots.base_artist.BaseRobotModelArtist`
         Instance of the artist used to visualize the robot model. Defaults to ``None``.
     semantics : :class:`compas_fab.robots.RobotSemantics`
         The semantic model of the robot. Defaults to ``None``.
@@ -59,7 +58,7 @@ class Robot(object):
 
     @property
     def artist(self):
-        """:class:`compas_fab.artists.BaseRobotModelArtist`: Artist used to visualize robot model."""
+        """:class:`compas.robots.base_artist.BaseRobotModelArtist`: Artist used to visualize robot model."""
         return self._artist
 
     @artist.setter
@@ -68,7 +67,7 @@ class Robot(object):
         if len(self.model.joints) > 0 and len(self.model.links) > 0:
             self.scale(self._scale_factor)
             if self.attached_tool:
-                self.artist.attach_tool(self.attached_tool)
+                self.artist.attach_tool_model(self.attached_tool.tool_model)
 
     @classmethod
     def basic(cls, name, joints=None, links=None, materials=None, **kwargs):
@@ -832,14 +831,13 @@ class Robot(object):
         >>> tool = Tool(mesh, frame)
         >>> robot.attach_tool(tool)
         """
-        group = group or self.main_group_name
-        ee_link_name = self.get_end_effector_link_name(group)
-        touch_links = touch_links or [ee_link_name]
-        tool.attached_collision_mesh = AttachedCollisionMesh(tool.collision_mesh, ee_link_name, touch_links)
+        if not tool.link_name:
+            group = group or self.main_group_name
+            tool.link_name = self.get_end_effector_link_name(group)
+        tool.update_touch_links(touch_links)
         self.attached_tool = tool
         if self.artist:
-            self.update(self.zero_configuration(), group=group, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
-            self.artist.attach_tool(tool)
+            self.artist.attach_tool_model(tool.tool_model)
 
     def detach_tool(self):
         """Detach the attached tool.
@@ -850,7 +848,7 @@ class Robot(object):
         """
         self.attached_tool = None
         if self.artist:
-            self.artist.detach_tool()
+            self.artist.detach_tool_model()
 
     # ==========================================================================
     # checks
@@ -1162,7 +1160,7 @@ class Robot(object):
         frame_WCF_scaled.point /= self.scale_factor  # must be in meters
 
         if self.attached_tool:
-            attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            attached_collision_meshes.extend(self.attached_tool.attached_collision_meshes)
 
         options['attached_collision_meshes'] = attached_collision_meshes
 
@@ -1375,7 +1373,7 @@ class Robot(object):
             path_constraints_WCF_scaled = None
 
         if self.attached_tool:
-            attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            attached_collision_meshes.extend(self.attached_tool.attached_collision_meshes)
 
         options['attached_collision_meshes'] = attached_collision_meshes
         options['path_constraints'] = path_constraints
@@ -1521,7 +1519,7 @@ class Robot(object):
             path_constraints_WCF_scaled = None
 
         if self.attached_tool:
-            attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            attached_collision_meshes.extend(self.attached_tool.attached_collision_meshes)
 
         options['attached_collision_meshes'] = attached_collision_meshes
         options['path_constraints'] = path_constraints_WCF_scaled
@@ -1601,7 +1599,7 @@ class Robot(object):
     # drawing
     # ==========================================================================
 
-    def update(self, configuration, group=None, visual=True, collision=True):
+    def update(self, configuration, group, visual=True, collision=True):
         """Update the robot's geometry.
 
         Parameters
@@ -1620,7 +1618,8 @@ class Robot(object):
         """
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
-        self.artist.update(configuration, visual, collision)
+        joint_state = dict(zip(configuration.joint_names, configuration.values))
+        self.artist.update(joint_state, visual, collision)
 
     def draw_visual(self):
         """Draw the robot's visual geometry using the defined :attr:`Robot.artist`."""
@@ -1634,10 +1633,11 @@ class Robot(object):
         """Alias of :meth:`draw_visual`."""
         return self.draw_visual()
 
-    def draw_attached_tool(self):
-        """Draw the attached tool using the defined :attr:`Robot.artist`."""
-        if self.artist and self.attached_tool:
-            return self.artist.draw_attached_tool()
+    # TODO: add artist.draw_attached_tool
+    # def draw_attached_tool(self):
+    #     """Draw the attached tool using the defined :attr:`Robot.artist`."""
+    #     if self.artist and self.attached_tool:
+    #         return self.artist.draw_attached_tool()
 
     def scale(self, factor):
         """Scale the robot geometry by a factor (absolute).
@@ -1678,7 +1678,7 @@ class Robot(object):
         print("The end-effector's name is '%s'." %
               self.get_end_effector_link_name())
         if self.attached_tool:
-            print("The robot has a tool at the %s link attached." % self.attached_tool.attached_collision_mesh.link_name)
+            print("The robot has a tool at the %s link attached." % self.attached_tool.link_name)
         else:
             print("The robot has NO tool attached.")
         print("The base link's name is '%s'" % self.get_base_link_name())

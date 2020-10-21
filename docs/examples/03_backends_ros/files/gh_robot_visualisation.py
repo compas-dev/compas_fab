@@ -26,6 +26,7 @@ from __future__ import print_function
 
 if robot and full_configuration:
     robot.update(full_configuration, visual=show_visual, collision=show_collision)
+
     print(full_configuration)
 
     if show_visual:

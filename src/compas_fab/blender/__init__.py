@@ -23,8 +23,13 @@ in Blender.
     RobotModelArtist
 
 """
+try:
+    import bpy  # noqa: F401
+    import mathutils  # noqa: F401
+except ImportError:
+    pass
+else:
+    from .artists import RobotArtist
+    from .artists import RobotModelArtist
 
-from .artists import RobotArtist
-from .artists import RobotModelArtist
-
-__all__ = ['RobotArtist', 'RobotModelArtist']
+    __all__ = ['RobotArtist', 'RobotModelArtist']

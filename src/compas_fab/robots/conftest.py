@@ -3,6 +3,7 @@ import os
 import time
 
 import pytest
+import compas
 from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Rotation
@@ -23,6 +24,7 @@ def add_imports(doctest_namespace):
     doctest_namespace["Mesh"] = Mesh
     doctest_namespace["Frame"] = Frame
     doctest_namespace["Scale"] = Scale
+    doctest_namespace["compas"] = compas
     doctest_namespace["compas_fab"] = compas_fab
     doctest_namespace["Rotation"] = Rotation
     doctest_namespace["Tool"] = Tool

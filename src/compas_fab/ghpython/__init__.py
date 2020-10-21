@@ -24,10 +24,12 @@ in Grasshopper.
 
 
 """
+import compas
 
-from .artists import RobotArtist
-from .artists import RobotModelArtist
+if compas.RHINO:
+    from .artists import RobotArtist
+    from .artists import RobotModelArtist
 
-from .path_planning import *          # noqa: F401,F403
+    from .path_planning import *          # noqa: F401,F403
 
-__all__ = ['RobotArtist', 'RobotModelArtist']
+    __all__ = ['RobotArtist', 'RobotModelArtist']
