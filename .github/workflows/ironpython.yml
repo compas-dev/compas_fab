@@ -14,8 +14,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setting IronPython path
-        run: echo "::set-env name=IRONPYTHONPATH::$env:GITHUB_WORKSPACE/src"
       - name: Install dependencies
         run: |
           choco install ironpython --version=2.7.8.1
@@ -23,5 +21,7 @@ jobs:
           ipy -X:Frames -m pip install --no-deps compas roslibpy
           ipy -X:Frames -m pip install ironpython-pytest
       - name: Run tests
+        env:
+          IRONPYTHONPATH: ./src
         run: |
           ipy tests/ipy_test_runner.py

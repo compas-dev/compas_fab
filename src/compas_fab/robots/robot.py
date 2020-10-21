@@ -139,6 +139,19 @@ class Robot(object):
         """:obj:`str`: Robot's root name."""
         return self.model.root.name
 
+    @property
+    def group_states(self):
+        """:obj:`dict` of :obj:`dict`: All group states of the robot.
+
+        Examples
+        --------
+        >>> sorted(robot.group_states['manipulator'].keys())
+        ['home', 'up']
+
+        """
+        self.ensure_semantics()
+        return self.semantics.group_states
+
     def get_end_effector_link_name(self, group=None):
         """Get the name of the robot's end effector link.
 
@@ -516,19 +529,12 @@ class Robot(object):
             configurable joints, or if the `group_configuration` does not
             specify positions for all configurable joints of the given group.
         """
-        if not len(group_configuration.joint_names):
+        if not group_configuration.joint_names:
             group_configuration.joint_names = self.get_configurable_joint_names(group)
 
         full_configuration = self._check_full_configuration_and_scale(full_configuration)[0]  # adds joint_names to full_configuration and makes copy
 
-        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
-        group_joint_state = dict(zip(group_configuration.joint_names, group_configuration.values))
-
-        # overwrite full_joint_state with values of group_joint_state
-        for name in group_joint_state:
-            full_joint_state[name] = group_joint_state[name]
-
-        full_configuration.values = [full_joint_state[name] for name in full_configuration.joint_names]
+        full_configuration.merge(group_configuration)
         return full_configuration
 
     def get_group_names_from_link_name(self, link_name):
@@ -589,17 +595,38 @@ class Robot(object):
         (:class:`Configuration`, :class:`Configuration`)
             The full configuration and the scaled full configuration
         """
-        joint_names = self.get_configurable_joint_names()  # full configuration
         if not full_configuration:
             configuration = self.zero_configuration()  # with joint_names
         else:
+            joint_names = self.get_configurable_joint_names()  # full configuration
             # full_configuration might have passive joints specified as well, we allow this.
             if len(joint_names) > len(full_configuration.values):
                 raise ValueError("Please pass a configuration with {} values, for all configurable joints of the robot.".format(len(joint_names)))
             configuration = full_configuration.copy()
-            if not len(configuration.joint_names):
+            if not configuration.joint_names:
                 configuration.joint_names = joint_names
         return configuration, configuration.scaled(1. / self.scale_factor)
+
+    def get_configuration_from_group_state(self, group, group_state):
+        """Get a ``Configuration`` from a group's group state.
+
+        Parameters
+        ----------
+        group : :obj:`str`
+            The name of the planning group.
+        group_state : :obj:`str
+            The name of the ``group_state``.
+
+        Returns
+        -------
+        :class:`Configuration`
+            The configuration specified by the ``group_state``.
+        """
+        joint_dict = self.group_states[group][group_state]
+        group_joint_names = self.get_configurable_joint_names(group)
+        group_joint_types = self.get_configurable_joint_types(group)
+        values = [joint_dict[name] for name in group_joint_names]
+        return Configuration(values, group_joint_types, group_joint_names)
 
     # ==========================================================================
     # transformations, coordinate frames
