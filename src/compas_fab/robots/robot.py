@@ -1599,13 +1599,16 @@ class Robot(object):
     # drawing
     # ==========================================================================
 
-    def update(self, joint_state, visual=True, collision=True):
+    def update(self, configuration, group, visual=True, collision=True):
         """Update the robot's geometry.
 
         Parameters
         ----------
-        joint_state : :obj:`dict`
-            A dictionary with joint names as keys and joint positions as values.
+        configuration : :class:`Configuration`
+            Instance of the configuration (joint state) to move to.
+        group : :obj:`str`, optional
+            The name of the group to plan for. Defaults to the robot's main
+            planning group.
         visual : :obj:`bool`, optional
             ``True`` if the visual geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
@@ -1613,6 +1616,9 @@ class Robot(object):
             ``True`` if the collision geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
         """
+        if not len(configuration.joint_names):
+            configuration.joint_names = self.get_configurable_joint_names(group)
+        joint_state = dict(zip(configuration.joint_names, configuration.values))
         self.artist.update(joint_state, visual, collision)
 
     def draw_visual(self):
