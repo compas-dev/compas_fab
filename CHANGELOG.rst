@@ -19,7 +19,7 @@ Unreleased
 * Added ``attributes`` dictionary to ``Robot`` class
 * Added ``compas_fab.robots.Tool.from_t0cf_to_tcf``
 * Added ``compas_fab.robots.Tool.from_tcf_to_t0cf``
-* Added ```joint_names`` as optional parameter for all ``compas_fab.robots.Configuration`` constructors
+* Added ``joint_names`` as optional parameter for all ``compas_fab.robots.Configuration`` constructors
 * Added ``compas_fab.robots.Configuration.iter_differences``
 * Added ``compas_fab.robots.Configuration.max_difference``
 * Added ``compas_fab.robots.Configuration.close_to``
