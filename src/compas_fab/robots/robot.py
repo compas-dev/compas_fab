@@ -1627,7 +1627,7 @@ class Robot(object):
         """Alias of :meth:`draw_visual`."""
         return self.draw_visual()
 
-    # !!! artist.draw_attached_tool???
+    # TODO: add artist.draw_attached_tool
     # def draw_attached_tool(self):
     #     """Draw the attached tool using the defined :attr:`Robot.artist`."""
     #     if self.artist and self.attached_tool:
