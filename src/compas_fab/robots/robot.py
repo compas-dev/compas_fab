@@ -1599,7 +1599,7 @@ class Robot(object):
     # drawing
     # ==========================================================================
 
-    def update(self, configuration, group, visual=True, collision=True):
+    def update(self, configuration, group=None, visual=True, collision=True):
         """Update the robot's geometry.
 
         Parameters
@@ -1616,9 +1616,12 @@ class Robot(object):
             ``True`` if the collision geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
         """
+        group = group or self.main_group_name if self.semantics else None
+
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
         joint_state = dict(zip(configuration.joint_names, configuration.values))
+
         self.artist.update(joint_state, visual, collision)
 
     def draw_visual(self):

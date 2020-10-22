@@ -25,7 +25,8 @@
 from __future__ import print_function
 
 if robot and full_configuration:
-    robot.update(full_configuration, visual=show_visual, collision=show_collision)
+    group = group or None
+    robot.update(full_configuration, group, visual=show_visual, collision=show_collision)
 
     print(full_configuration)
 
@@ -36,8 +37,8 @@ if robot and full_configuration:
         collision = robot.draw_collision()
 
     if show_frames:
-        axes = robot.transformed_axes(full_configuration)
-        frames = robot.transformed_frames(full_configuration)
+        axes = robot.transformed_axes(full_configuration, group)
+        frames = robot.transformed_frames(full_configuration, group)
 
     if show_base_frame:
         base_frame_WCF = robot.get_base_frame(group, full_configuration)

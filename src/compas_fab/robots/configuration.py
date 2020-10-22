@@ -358,7 +358,10 @@ class Configuration(object):
     def check_joint_names(self):
         """Raises an error if there is not a joint name for every value."""
         if not self.has_joint_names:
-            raise ValueError('Joint names are required for this operation.')
+            if not len(self.joint_names):
+                raise ValueError('Joint names are required for this operation.')
+            else:
+                raise ValueError('Joint names do not match the number of joint values. Joint names={}, Joint values={}'.format(len(self.values), len(self.joint_names)))
 
     @property
     def joint_dict(self):
