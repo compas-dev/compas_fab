@@ -62,11 +62,12 @@ class PyBulletInverseKinematics(InverseKinematics):
         ------
         :class:`compas_fab.backends.InverseKinematicsError`
         """
+        options = options or {}
         link_name = options.get('link_name') or robot.get_end_effector_link_name(group)
         link_id = self.client._get_link_id_by_name(link_name, robot)
         point, orientation = pose_from_frame(frame_WCF)
 
-        joints = robot.get_configurable_joints()
+        joints = robot.model.get_configurable_joints()
         joints.sort(key=lambda j: j.attr['pybullet']['id'])
         joint_names = [joint.name for joint in joints]
 
@@ -75,7 +76,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         called_from_test = 'pytest' in sys.modules
         if options.get('enforce_joint_limits', True) and not called_from_test:
-
+            
             lower_limits = [joint.limit.lower if joint.type != Joint.CONTINUOUS else 0 for joint in joints]
             upper_limits = [joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi for joint in joints]
             # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.
