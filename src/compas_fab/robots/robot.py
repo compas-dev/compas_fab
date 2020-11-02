@@ -557,6 +557,7 @@ class Robot(object):
 
     def get_position_by_joint_name(self, configuration, joint_name, group=None):
         """Get the position of named joint in given configuration.
+
         Parameters
         ----------
         configuration : :class:`Configuration`
@@ -565,10 +566,12 @@ class Robot(object):
             Name of joint.
         group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
+
         Returns
         -------
         :obj:`float`
             Joint position for the given joint.
+
         Raises
         ------
         :exc:`ValueError`
@@ -1327,6 +1330,9 @@ class Robot(object):
 
         Examples
         --------
+
+        >>> robot.client = RosClient()
+        >>> robot.client.run()
         >>> frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\
                       Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])]
         >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
@@ -1338,8 +1344,9 @@ class Robot(object):
                                                      start_configuration,\
                                                      group=group,\
                                                      options=options)
-        >>> type(trajectory)
-        <class 'compas_fab.robots.trajectory.JointTrajectory'>
+        >>> len(trajectory.points) > 1
+        True
+        >>> robot.client.close()
         """
         options = options or {}
         max_step = options.get('max_step')
@@ -1450,7 +1457,11 @@ class Robot(object):
 
         Examples
         --------
-        >>> # Example with position and orientation constraints
+
+        Using position and orientation constraints:
+
+        >>> robot.client = RosClient()
+        >>> robot.client.run()
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
         >>> tolerances_axes = [math.radians(1)] * 3
@@ -1461,7 +1472,14 @@ class Robot(object):
         >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnectkConfigDefault'})
         >>> trajectory.fraction
         1.0
-        >>> # Example with joint constraints (to the UP configuration)
+        >>> len(trajectory.points) > 1
+        True
+        >>> robot.client.close()
+
+        Using joint constraints (to the UP configuration):
+
+        >>> robot.client = RosClient()
+        >>> robot.client.run()
         >>> configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0])
         >>> tolerances_above = [math.radians(5)] * len(configuration.values)
         >>> tolerances_below = [math.radians(5)] * len(configuration.values)
@@ -1470,8 +1488,9 @@ class Robot(object):
         >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnectkConfigDefault'})
         >>> trajectory.fraction
         1.0
-        >>> type(trajectory)
-        <class 'compas_fab.robots.trajectory.JointTrajectory'>
+        >>> len(trajectory.points) > 1
+        True
+        >>> robot.client.close()
         """
         options = options or {}
         path_constraints = options.get('path_constraints')
@@ -1561,6 +1580,7 @@ class Robot(object):
 
     def transformed_frames(self, configuration, group=None):
         """Get the robot's transformed frames.
+
         Parameters
         ----------
         configuration : :class:`Configuration`
@@ -1568,9 +1588,11 @@ class Robot(object):
         group : :obj:`str`, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
+
         Returns
         -------
         :obj:`list` of :class:`compas.geometry.Frame`
+            Transformed frames.
         """
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
@@ -1579,6 +1601,7 @@ class Robot(object):
 
     def transformed_axes(self, configuration, group=None):
         """Get the robot's transformed axes.
+
         Parameters
         ----------
         configuration : :class:`Configuration`
@@ -1586,9 +1609,11 @@ class Robot(object):
         group : :obj:`str`, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
+
         Returns
         -------
         :obj:`list` of :class:`compas.geometry.Vector`
+            Transformed axes.
         """
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
