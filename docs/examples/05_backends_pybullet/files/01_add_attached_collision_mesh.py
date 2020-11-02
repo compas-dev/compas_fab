@@ -2,7 +2,7 @@ import time
 
 import compas_fab
 from compas_fab.backends.pybullet import PyBulletClient
-from compas_fab.robots import AttachedCollisionMesh
+from compas_fab.robots import AttachedCollisionMesh, Configuration
 from compas_fab.robots import CollisionMesh
 
 from compas.datastructures import Mesh
@@ -16,10 +16,15 @@ with PyBulletClient() as client:
     acm = AttachedCollisionMesh(cm, 'ee_link')
     client.add_attached_collision_mesh(acm, {'mass': 1, 'robot': robot})
 
-    time.sleep(1)
-    client.step_simulation()
-    time.sleep(1)
+    conf = Configuration.from_revolute_values([-1.0,0,0, 0,0,0])
+    client.set_robot_configuration(robot, conf)
+
+    count = 0
+    while count < 30:
+        time.sleep(.25)
+        client.step_simulation()
+        count += 1
+    input('update conf!')
 
     client.remove_attached_collision_mesh('tip')
-
-    time.sleep(1)
+    input('Removed!')
