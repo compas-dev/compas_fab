@@ -1334,8 +1334,8 @@ class Robot(object):
         >>> robot.client = RosClient()
         >>> robot.client.run()
         >>> frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\
-                      Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])]
-        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
+                      Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0])]
+        >>> start_configuration = Configuration.from_revolute_values([-0.042, 0.033, -2.174, 5.282, -1.528, 0.000])
         >>> group = robot.main_group_name
         >>> options = {'max_step': 0.01,\
                        'jump_threshold': 1.57,\
