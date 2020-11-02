@@ -226,6 +226,9 @@ def release(ctx, release_type):
     # Build project
     ctx.run('python setup.py clean --all sdist bdist_wheel')
 
+    # Prepare changelog for next release
+    prepare_changelog(ctx)
+
     # Upload to pypi
     if confirm('Everything is ready. You are about to push to git which will trigger a release to pypi.org. Are you sure? [y/N]'):
         ctx.run('git push --tags && git push')
