@@ -9,16 +9,20 @@ on:
       - master
 
 jobs:
-  build:
+  build-cpython:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         name: [
+          "ubuntu-py39",
           "windows-py38",
           "macos-py37",
           "ubuntu-py36",
         ]
         include:
+          - name: "ubuntu-py39"
+            os: ubuntu-latest
+            python-version: 3.8
           - name: "windows-py38"
             os: windows-latest
             python-version: 3.8
@@ -47,3 +51,19 @@ jobs:
       - name: Run tests
         run: |
           invoke test
+  build-ironpython:
+    name: windows-ironpython
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          choco install ironpython --version=2.7.8.1
+          ipy -X:Frames -m ensurepip
+          ipy -X:Frames -m pip install --no-deps compas roslibpy
+          ipy -X:Frames -m pip install ironpython-pytest
+      - name: Run tests
+        env:
+          IRONPYTHONPATH: ./src
+        run: |
+          ipy tests/ipy_test_runner.py

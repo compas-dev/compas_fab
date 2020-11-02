@@ -32,7 +32,8 @@ jobs:
           python -m pip install --no-cache-dir -r requirements-dev.txt
       - name: Run integration tests
         run: |
-          invoke test --doctest --codeblock
+          invoke test --doctest
+          invoke test --codeblock
       - name: Tear down docker containers
         run: |
           docker-compose -f "docs/backends/files/ur5-demo/docker-compose.yml" down

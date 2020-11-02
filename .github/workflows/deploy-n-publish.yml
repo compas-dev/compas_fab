@@ -1,4 +1,4 @@
-name: docs
+name: deploy-and-publish
 
 on:
   push:
@@ -7,6 +7,8 @@ on:
   pull_request:
     branches:
       - master
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -18,15 +20,15 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Install dependencies
+      - name: 🔗 Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install cython --install-option="--no-cython-compile"
-      - name: Install
+      - name: 💎 Install
         run: |
           python -m pip install --no-cache-dir -r requirements-dev.txt
-      - name: Generate docs
-        if: ${{ success() }}
+      - name: 📃 Generate docs
+        if: success()
         run: |
           invoke docs
 
@@ -46,7 +48,7 @@ jobs:
 
           echo "Docs will be deployed to https://gramaziokohler.github.io/compas_fab/$BRANCH_OR_TAG"
           mkdir -p deploy/compas_fab/$BRANCH_OR_TAG && mv -T dist/docs deploy/compas_fab/$BRANCH_OR_TAG/
-      - name: Deploy docs
+      - name: 🚢 Deploy docs
         if: success()
         uses: crazy-max/ghaction-github-pages@v2
         with:
@@ -56,3 +58,13 @@ jobs:
           keep_history: true
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
+      - name: 💃 Build release
+        if: success() && startsWith(github.ref, 'refs/tags')
+        run: |
+          python setup.py clean --all sdist bdist_wheel
+      - name: 📦 Publish release to PyPI
+        if: success() && startsWith(github.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+            password: ${{ secrets.pypi_password }}
+
