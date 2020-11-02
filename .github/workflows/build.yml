@@ -50,7 +50,7 @@ jobs:
           invoke lint
       - name: Run tests
         run: |
-          invoke test
+          pytest
   build-ironpython:
     name: windows-ironpython
     runs-on: windows-latest
