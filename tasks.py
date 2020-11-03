@@ -229,6 +229,9 @@ def release(ctx, release_type):
     # Prepare changelog for next release
     prepare_changelog(ctx)
 
+    # Clean up local artifacts
+    clean(ctx)
+
     # Upload to pypi
     if confirm('Everything is ready. You are about to push to git which will trigger a release to pypi.org. Are you sure? [y/N]'):
         ctx.run('git push --tags && git push')
