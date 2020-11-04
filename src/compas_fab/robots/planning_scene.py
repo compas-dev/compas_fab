@@ -366,7 +366,8 @@ class PlanningScene(object):
         """Add the robot's attached tool to the planning scene if tool is set."""
         self.ensure_client()
         if self.robot.attached_tool:
-            self.add_attached_collision_mesh(self.robot.attached_tool.attached_collision_mesh)
+            for acm in self.robot.attached_tool.attached_collision_meshes:
+                self.add_attached_collision_mesh(acm)
 
     def remove_attached_tool(self):
         """Remove the robot's attached tool from the planning scene."""
