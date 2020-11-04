@@ -49,10 +49,11 @@ class Tool(object):
     def get_attached_collision_meshes(self):
         tool_attached_collision_meshes = []
         for link in self.tool_model.iter_links():
-            for item in link.collision:
+            for i, item in enumerate(link.collision):
                 meshes = Geometry._get_item_meshes(item)
                 for mesh in meshes:
-                    collision_mesh = CollisionMesh(item, mesh)
+                    collision_mesh_name = '{}_collision_{}'.format(link.name, i)
+                    collision_mesh = CollisionMesh(mesh, collision_mesh_name)
                     attached_collision_mesh = AttachedCollisionMesh(collision_mesh, self.link_name, [self.link_name])
                     tool_attached_collision_meshes.append(attached_collision_mesh)
         return tool_attached_collision_meshes
@@ -64,6 +65,7 @@ class Tool(object):
     @link_name.setter
     def link_name(self, link_name):
         self.tool_model.link_name = link_name
+        self.attached_collision_meshes = self.get_attached_collision_meshes()  # rebuild ACMs
 
     @property
     def frame(self):
