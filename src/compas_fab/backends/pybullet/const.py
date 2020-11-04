@@ -4,8 +4,6 @@ from __future__ import print_function
 
 from collections import namedtuple
 
-from compas_fab.utilities import LazyLoader
-
 PYBULLET_GUI = 1
 PYBULLET_DIRECT = 2
 PYBULLET_SHARED_MEMORY = 3
