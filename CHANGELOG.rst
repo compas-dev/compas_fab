@@ -17,6 +17,7 @@ Unreleased
 **Fixed**
 
 * Fixed bug in ``add_attached_tool`` of ``PlanningScene``
+* Fixed frame_id generation when tool name changes
 
 **Deprecated**
 
