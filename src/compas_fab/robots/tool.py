@@ -89,7 +89,6 @@ class Tool(object):
     @data.setter
     def data(self, data):
         self.tool_model.data = data
-        self.attached_collision_meshes = self.get_attached_collision_meshes()
 
     @classmethod
     def from_data(cls, data):
