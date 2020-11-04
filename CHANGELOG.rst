@@ -14,17 +14,11 @@ Unreleased
 
 * Added ``name`` property to ``Tool`` class.
 
-**Changed**
-
 **Fixed**
 
 * Fixed bug in ``add_attached_tool`` of ``PlanningScene``
 * Fixed ``frame_id`` generation when tool name changes
 * Fixed freeze with some sync planning scene methods on Grasshopper/IronPython
-
-**Deprecated**
-
-**Removed**
 
 0.13.0
 ----------
