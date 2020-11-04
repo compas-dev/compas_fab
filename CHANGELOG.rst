@@ -12,6 +12,8 @@ Unreleased
 
 **Added**
 
+* Added ``name`` property to ``Tool`` class.
+
 **Changed**
 
 **Fixed**

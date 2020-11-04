@@ -58,6 +58,10 @@ class Tool(object):
         return acms
 
     @property
+    def name(self):
+        return self.tool_model.name
+
+    @property
     def link_name(self):
         return self.tool_model.link_name
 
