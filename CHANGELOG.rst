@@ -17,6 +17,8 @@ Unreleased
 **Fixed**
 
 * Fixed bug in ``add_attached_tool`` of ``PlanningScene``
+* Fixed ``frame_id`` generation when tool name changes
+* Fixed freeze with some sync planning scene methods on Grasshopper/IronPython
 
 **Deprecated**
 
