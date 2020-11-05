@@ -293,7 +293,9 @@ class PlanningScene(object):
             scale_factor = 1. / self.robot.scale_factor
             attached_collision_mesh.collision_mesh.scaled(scale_factor)
 
-        self.client.add_attached_collision_mesh(attached_collision_mesh)
+        options = {'robot': self.robot}
+
+        self.client.add_attached_collision_mesh(attached_collision_mesh, options)
 
     def remove_attached_collision_mesh(self, id):
         """Remove an attached collision object from the planning scene.
@@ -315,7 +317,10 @@ class PlanningScene(object):
         >>> scene.remove_attached_collision_mesh('tip')   # doctest: +SKIP
         """
         self.ensure_client()
-        self.client.remove_attached_collision_mesh(id)
+
+        options = {'robot': self.robot}
+
+        self.client.remove_attached_collision_mesh(id, options)
 
     def attach_collision_mesh_to_robot_end_effector(self, collision_mesh, scale=False, group=None):
         """Attaches a collision mesh to the robot's end-effector.

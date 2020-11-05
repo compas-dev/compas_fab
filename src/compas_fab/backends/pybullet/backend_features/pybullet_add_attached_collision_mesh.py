@@ -34,12 +34,11 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         options : dict
             Dictionary containing the following key-value pairs:
 
+            - ``"robot"``: (:class:`compas_fab.robots.Robot``) Robot instance
+              to which the object should be attached.
             - ``"max_force"``: (:obj:`float`) The maximum force that
               the constraint can apply. Optional.
             - ``"mass"``: (:obj:`float`) The mass of the object, in kg.
-            - ``"robot"``: (:class:`compas_fab.robots.Robot``) Robot instance
-              to which the object should be attached.
-            - ``"mass"``: (:obj:`float`) The mass of the attached object.
               Defaults to ``1.0``.
 
         Returns
@@ -51,9 +50,8 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
 
         robot_uid = robot.attributes['pybullet_uid']
 
-        cached_robot = ed.UrdfEditor()
-        cached_robot.initializeFromBulletBody(robot_uid, self.client.client_id)
-        # save this object somewhere for later reference
+        if not robot.attributes.get('cached_pybullet_robot'):
+            raise Exception('Robot must be cached before adding attached collision meshes.')
 
         editable_robot = ed.UrdfEditor()
         editable_robot.initializeFromBulletBody(robot_uid, self.client.client_id)
@@ -73,7 +71,7 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
             if urdfLink.link_name == attached_collision_mesh.link_name:
                 parent_link_index = index
         if parent_link_index is None:
-            raise Exception('uhoh')
+            raise Exception('Cannot find link {} in robot {}'.format(attached_collision_mesh.link_name, robot.name))
 
         new_joint = editable_robot.joinUrdf(
             editable_mesh,
@@ -96,7 +94,6 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
 
     #todo cache the robot for attached cm removal
     #todo fix remove_acm
-    #todo see how this plays with the calls to robot.attached_collision_meshes
 
 
 

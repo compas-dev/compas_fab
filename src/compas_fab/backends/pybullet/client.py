@@ -25,6 +25,7 @@ from .utils import LOG
 from .utils import redirect_stdout
 
 pybullet = LazyLoader('pybullet', globals(), 'pybullet')
+ed = LazyLoader('ed', globals(), 'pybullet_utils.urdfEditor')
 
 
 __all__ = [
@@ -182,10 +183,16 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                                              physicsClientId=self.client_id,
                                              flags=pybullet.URDF_USE_SELF_COLLISION)
             robot.attributes['pybullet_uid'] = pybullet_uid
+            self.cache_robot(robot)
 
         self._add_ids_to_robot_joints(robot)
         self._add_ids_to_robot_links(robot)
         return robot
+
+    def cache_robot(self, robot):
+        cached_robot = ed.UrdfEditor()
+        cached_robot.initializeFromBulletBody(robot.attributes['pybullet_uid'], self.client_id)
+        robot.attributes['cached_pybullet_robot'] = cached_robot
 
     def _add_ids_to_robot_joints(self, robot):
         joint_ids = self._get_joint_ids(robot.attributes['pybullet_uid'])
