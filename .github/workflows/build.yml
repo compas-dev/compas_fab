@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  build:
+  build-cpython:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -37,6 +37,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          python -m pip install wheel
           python -m pip install cython --install-option="--no-cython-compile"
       - name: Install
         run: |
@@ -46,4 +47,20 @@ jobs:
           invoke lint
       - name: Run tests
         run: |
-          invoke test
+          pytest
+  build-ironpython:
+    name: windows-ironpython
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          choco install ironpython --version=2.7.8.1
+          ipy -X:Frames -m ensurepip
+          ipy -X:Frames -m pip install --no-deps compas roslibpy
+          ipy -X:Frames -m pip install ironpython-pytest
+      - name: Run tests
+        env:
+          IRONPYTHONPATH: ./src
+        run: |
+          ipy tests/ipy_test_runner.py

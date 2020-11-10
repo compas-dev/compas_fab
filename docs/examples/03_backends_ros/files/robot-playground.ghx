@@ -3238,7 +3238,7 @@ from scriptcontext import sticky as st
 
 import compas
 from compas_fab.robots.ur5 import Robot
-from compas_fab.ghpython import RobotModelArtist
+from compas_ghpython.artists import RobotModelArtist
 
 compas.PRECISION = '12f'
 
@@ -12922,7 +12922,7 @@ from compas_fab.backends import RosClient
 from compas_fab.backends import RosFileServerLoader
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotSemantics
-from compas_fab.ghpython import RobotModelArtist
+from compas_ghpython.artists import RobotModelArtist
 
 # Set high precision to import meshes defined in meters
 compas.PRECISION = '24f'
@@ -15974,6 +15974,7 @@ from __future__ import print_function
 
 if robot and full_configuration:
     robot.update(full_configuration, visual=show_visual, collision=show_collision)
+
     print(full_configuration)
 
     if show_visual:

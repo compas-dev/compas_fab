@@ -350,6 +350,90 @@ class Configuration(object):
                 return False
         return True
 
+    @property
+    def has_joint_names(self):
+        """Returns ``True`` when there is a joint name for every value."""
+        return len(self.values) == len(self.joint_names)
+
+    def check_joint_names(self):
+        """Raises an error if there is not a joint name for every value."""
+        if not self.has_joint_names:
+            if not len(self.joint_names):
+                raise ValueError('Joint names are required for this operation.')
+            else:
+                raise ValueError('Joint names do not match the number of joint values. Joint names={}, Joint values={}'.format(len(self.values), len(self.joint_names)))
+
+    @property
+    def joint_dict(self):
+        """A dictionary of joint values by joint name."""
+        self.check_joint_names()
+        return dict(zip(self.joint_names, self.values))
+
+    @property
+    def type_dict(self):
+        """A dictionary of joint types by joint name."""
+        self.check_joint_names()
+        return dict(zip(self.joint_names, self.types))
+
+    def merge(self, other):
+        """Merge the configuration with another configuration in place along joint names.
+        The other configuration takes precedence over this configuration in
+        case a joint value is present in both.
+
+        Note
+        ----
+            Caution: ``joint_names`` may be rearranged.
+
+        Parameters
+        ----------
+        other : :class:`Configuration`
+            The configuration to be merged.
+
+        Raises
+        ------
+        :exc:`ValueError`
+            If the configuration or the ``other`` configuration does not specify
+            joint names for all joint values.
+        """
+        _joint_dict = self.joint_dict
+        _joint_dict.update(other.joint_dict)
+
+        _type_dict = self.type_dict
+        _type_dict.update(other.type_dict)
+
+        self.joint_names = list(_joint_dict.keys())
+        self.values = [_joint_dict[name] for name in self.joint_names]
+        self.types = [_type_dict[name] for name in self.joint_names]
+
+    def merged(self, other):
+        """Get a new ``Configuration`` with this configuration merged with another configuration.
+        The other configuration takes precedence over this configuration in
+        case a joint value is present in both.
+
+        Note
+        ----
+            Caution: ``joint_names`` may be rearranged.
+
+        Parameters
+        ----------
+        other : :class:`Configuration`
+            The configuration to be merged.
+
+        Returns
+        -------
+        :class:`Configuration`
+            A configuration with values for all included joints.
+
+        Raises
+        ------
+        :exc:`ValueError`
+            If the configuration or the ``other`` configuration does not specify
+            joint names for all joint values.
+        """
+        configuration = self.copy()
+        configuration.merge(other)
+        return configuration
+
 
 if __name__ == "__main__":
     import math  # noqa F401

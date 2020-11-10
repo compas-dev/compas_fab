@@ -3,6 +3,7 @@ import os
 import time
 
 import pytest
+import compas
 from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Rotation
@@ -23,15 +24,20 @@ def add_imports(doctest_namespace):
     doctest_namespace["Mesh"] = Mesh
     doctest_namespace["Frame"] = Frame
     doctest_namespace["Scale"] = Scale
+    doctest_namespace["compas"] = compas
     doctest_namespace["compas_fab"] = compas_fab
+    doctest_namespace["allclose"] = allclose
+    doctest_namespace["RosClient"] = RosClient
     doctest_namespace["Rotation"] = Rotation
     doctest_namespace["Tool"] = Tool
-    doctest_namespace["allclose"] = allclose
 
 
 @pytest.fixture(scope='function', autouse=True)
 def connect_to_ros(request, doctest_namespace):
-    if request.module.__name__ in ('compas_fab.robots.robot', 'compas_fab.robots.planning_scene'):
+    if request.module.__name__ == 'compas_fab.robots.robot':
+        doctest_namespace["robot"] = Robot()
+        yield
+    elif request.module.__name__ == 'compas_fab.robots.planning_scene':
         with RosClient() as client:
             robot = Robot(client)
 

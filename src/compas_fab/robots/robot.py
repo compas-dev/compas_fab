@@ -15,7 +15,6 @@ from compas_fab.robots.constraints import Constraint
 from compas_fab.robots.constraints import JointConstraint
 from compas_fab.robots.constraints import OrientationConstraint
 from compas_fab.robots.constraints import PositionConstraint
-from compas_fab.robots.planning_scene import AttachedCollisionMesh
 
 __all__ = [
     'Robot',
@@ -31,11 +30,11 @@ class Robot(object):
     upon the model described in the class :class:`compas.robots.RobotModel` of
     the **COMPAS** framework.
 
-    Parameters
+    Attributes
     ----------
     model : :class:`RobotModel`
         The robot model, usually created from an URDF structure.
-    artist : :class:`compas_fab.artists.BaseRobotModelArtist`
+    artist : :class:`compas.robots.base_artist.BaseRobotModelArtist`
         Instance of the artist used to visualize the robot model. Defaults to ``None``.
     semantics : :class:`compas_fab.robots.RobotSemantics`
         The semantic model of the robot. Defaults to ``None``.
@@ -59,7 +58,7 @@ class Robot(object):
 
     @property
     def artist(self):
-        """:class:`compas_fab.artists.BaseRobotModelArtist`: Artist used to visualize robot model."""
+        """:class:`compas.robots.base_artist.BaseRobotModelArtist`: Artist used to visualize robot model."""
         return self._artist
 
     @artist.setter
@@ -68,7 +67,7 @@ class Robot(object):
         if len(self.model.joints) > 0 and len(self.model.links) > 0:
             self.scale(self._scale_factor)
             if self.attached_tool:
-                self.artist.attach_tool(self.attached_tool)
+                self.artist.attach_tool_model(self.attached_tool.tool_model)
 
     @classmethod
     def basic(cls, name, joints=None, links=None, materials=None, **kwargs):
@@ -138,6 +137,19 @@ class Robot(object):
     def root_name(self):
         """:obj:`str`: Robot's root name."""
         return self.model.root.name
+
+    @property
+    def group_states(self):
+        """:obj:`dict` of :obj:`dict`: All group states of the robot.
+
+        Examples
+        --------
+        >>> sorted(robot.group_states['manipulator'].keys())
+        ['home', 'up']
+
+        """
+        self.ensure_semantics()
+        return self.semantics.group_states
 
     def get_end_effector_link_name(self, group=None):
         """Get the name of the robot's end effector link.
@@ -516,19 +528,12 @@ class Robot(object):
             configurable joints, or if the `group_configuration` does not
             specify positions for all configurable joints of the given group.
         """
-        if not len(group_configuration.joint_names):
+        if not group_configuration.joint_names:
             group_configuration.joint_names = self.get_configurable_joint_names(group)
 
         full_configuration = self._check_full_configuration_and_scale(full_configuration)[0]  # adds joint_names to full_configuration and makes copy
 
-        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
-        group_joint_state = dict(zip(group_configuration.joint_names, group_configuration.values))
-
-        # overwrite full_joint_state with values of group_joint_state
-        for name in group_joint_state:
-            full_joint_state[name] = group_joint_state[name]
-
-        full_configuration.values = [full_joint_state[name] for name in full_configuration.joint_names]
+        full_configuration.merge(group_configuration)
         return full_configuration
 
     def get_group_names_from_link_name(self, link_name):
@@ -552,6 +557,7 @@ class Robot(object):
 
     def get_position_by_joint_name(self, configuration, joint_name, group=None):
         """Get the position of named joint in given configuration.
+
         Parameters
         ----------
         configuration : :class:`Configuration`
@@ -560,10 +566,12 @@ class Robot(object):
             Name of joint.
         group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
+
         Returns
         -------
         :obj:`float`
             Joint position for the given joint.
+
         Raises
         ------
         :exc:`ValueError`
@@ -589,17 +597,38 @@ class Robot(object):
         (:class:`Configuration`, :class:`Configuration`)
             The full configuration and the scaled full configuration
         """
-        joint_names = self.get_configurable_joint_names()  # full configuration
         if not full_configuration:
             configuration = self.zero_configuration()  # with joint_names
         else:
+            joint_names = self.get_configurable_joint_names()  # full configuration
             # full_configuration might have passive joints specified as well, we allow this.
             if len(joint_names) > len(full_configuration.values):
                 raise ValueError("Please pass a configuration with {} values, for all configurable joints of the robot.".format(len(joint_names)))
             configuration = full_configuration.copy()
-            if not len(configuration.joint_names):
+            if not configuration.joint_names:
                 configuration.joint_names = joint_names
         return configuration, configuration.scaled(1. / self.scale_factor)
+
+    def get_configuration_from_group_state(self, group, group_state):
+        """Get a ``Configuration`` from a group's group state.
+
+        Parameters
+        ----------
+        group : :obj:`str`
+            The name of the planning group.
+        group_state : :obj:`str
+            The name of the ``group_state``.
+
+        Returns
+        -------
+        :class:`Configuration`
+            The configuration specified by the ``group_state``.
+        """
+        joint_dict = self.group_states[group][group_state]
+        group_joint_names = self.get_configurable_joint_names(group)
+        group_joint_types = self.get_configurable_joint_types(group)
+        values = [joint_dict[name] for name in group_joint_names]
+        return Configuration(values, group_joint_types, group_joint_names)
 
     # ==========================================================================
     # transformations, coordinate frames
@@ -805,14 +834,13 @@ class Robot(object):
         >>> tool = Tool(mesh, frame)
         >>> robot.attach_tool(tool)
         """
-        group = group or self.main_group_name
-        ee_link_name = self.get_end_effector_link_name(group)
-        touch_links = touch_links or [ee_link_name]
-        tool.attached_collision_mesh = AttachedCollisionMesh(tool.collision_mesh, ee_link_name, touch_links)
+        if not tool.link_name:
+            group = group or self.main_group_name
+            tool.link_name = self.get_end_effector_link_name(group)
+        tool.update_touch_links(touch_links)
         self.attached_tool = tool
         if self.artist:
-            self.update(self.zero_configuration(), group=group, visual=True, collision=True)  # TODO: this is not so ideal! should be called from within artist
-            self.artist.attach_tool(tool)
+            self.artist.attach_tool_model(tool.tool_model)
 
     def detach_tool(self):
         """Detach the attached tool.
@@ -823,7 +851,7 @@ class Robot(object):
         """
         self.attached_tool = None
         if self.artist:
-            self.artist.detach_tool()
+            self.artist.detach_tool_model()
 
     # ==========================================================================
     # checks
@@ -1135,7 +1163,7 @@ class Robot(object):
         frame_WCF_scaled.point /= self.scale_factor  # must be in meters
 
         if self.attached_tool:
-            attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            attached_collision_meshes.extend(self.attached_tool.attached_collision_meshes)
 
         options['attached_collision_meshes'] = attached_collision_meshes
 
@@ -1302,9 +1330,12 @@ class Robot(object):
 
         Examples
         --------
+
+        >>> robot.client = RosClient()
+        >>> robot.client.run()
         >>> frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\
-                      Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])]
-        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
+                      Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0])]
+        >>> start_configuration = Configuration.from_revolute_values([-0.042, 0.033, -2.174, 5.282, -1.528, 0.000])
         >>> group = robot.main_group_name
         >>> options = {'max_step': 0.01,\
                        'jump_threshold': 1.57,\
@@ -1313,8 +1344,9 @@ class Robot(object):
                                                      start_configuration,\
                                                      group=group,\
                                                      options=options)
-        >>> type(trajectory)
-        <class 'compas_fab.robots.trajectory.JointTrajectory'>
+        >>> len(trajectory.points) > 1
+        True
+        >>> robot.client.close()
         """
         options = options or {}
         max_step = options.get('max_step')
@@ -1348,7 +1380,7 @@ class Robot(object):
             path_constraints_WCF_scaled = None
 
         if self.attached_tool:
-            attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            attached_collision_meshes.extend(self.attached_tool.attached_collision_meshes)
 
         options['attached_collision_meshes'] = attached_collision_meshes
         options['path_constraints'] = path_constraints
@@ -1425,7 +1457,11 @@ class Robot(object):
 
         Examples
         --------
-        >>> # Example with position and orientation constraints
+
+        Using position and orientation constraints:
+
+        >>> robot.client = RosClient()
+        >>> robot.client.run()
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
         >>> tolerances_axes = [math.radians(1)] * 3
@@ -1436,7 +1472,14 @@ class Robot(object):
         >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnectkConfigDefault'})
         >>> trajectory.fraction
         1.0
-        >>> # Example with joint constraints (to the UP configuration)
+        >>> len(trajectory.points) > 1
+        True
+        >>> robot.client.close()
+
+        Using joint constraints (to the UP configuration):
+
+        >>> robot.client = RosClient()
+        >>> robot.client.run()
         >>> configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0])
         >>> tolerances_above = [math.radians(5)] * len(configuration.values)
         >>> tolerances_below = [math.radians(5)] * len(configuration.values)
@@ -1445,8 +1488,9 @@ class Robot(object):
         >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnectkConfigDefault'})
         >>> trajectory.fraction
         1.0
-        >>> type(trajectory)
-        <class 'compas_fab.robots.trajectory.JointTrajectory'>
+        >>> len(trajectory.points) > 1
+        True
+        >>> robot.client.close()
         """
         options = options or {}
         path_constraints = options.get('path_constraints')
@@ -1494,7 +1538,7 @@ class Robot(object):
             path_constraints_WCF_scaled = None
 
         if self.attached_tool:
-            attached_collision_meshes.append(self.attached_tool.attached_collision_mesh)
+            attached_collision_meshes.extend(self.attached_tool.attached_collision_meshes)
 
         options['attached_collision_meshes'] = attached_collision_meshes
         options['path_constraints'] = path_constraints_WCF_scaled
@@ -1536,6 +1580,7 @@ class Robot(object):
 
     def transformed_frames(self, configuration, group=None):
         """Get the robot's transformed frames.
+
         Parameters
         ----------
         configuration : :class:`Configuration`
@@ -1543,9 +1588,11 @@ class Robot(object):
         group : :obj:`str`, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
+
         Returns
         -------
         :obj:`list` of :class:`compas.geometry.Frame`
+            Transformed frames.
         """
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
@@ -1554,6 +1601,7 @@ class Robot(object):
 
     def transformed_axes(self, configuration, group=None):
         """Get the robot's transformed axes.
+
         Parameters
         ----------
         configuration : :class:`Configuration`
@@ -1561,9 +1609,11 @@ class Robot(object):
         group : :obj:`str`, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
+
         Returns
         -------
         :obj:`list` of :class:`compas.geometry.Vector`
+            Transformed axes.
         """
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
@@ -1591,9 +1641,13 @@ class Robot(object):
             ``True`` if the collision geometry should be also updated, otherwise ``False``.
             Defaults to ``True``.
         """
+        group = group or self.main_group_name if self.semantics else None
+
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
-        self.artist.update(configuration, visual, collision)
+        joint_state = dict(zip(configuration.joint_names, configuration.values))
+
+        self.artist.update(joint_state, visual, collision)
 
     def draw_visual(self):
         """Draw the robot's visual geometry using the defined :attr:`Robot.artist`."""
@@ -1607,10 +1661,11 @@ class Robot(object):
         """Alias of :meth:`draw_visual`."""
         return self.draw_visual()
 
-    def draw_attached_tool(self):
-        """Draw the attached tool using the defined :attr:`Robot.artist`."""
-        if self.artist and self.attached_tool:
-            return self.artist.draw_attached_tool()
+    # TODO: add artist.draw_attached_tool
+    # def draw_attached_tool(self):
+    #     """Draw the attached tool using the defined :attr:`Robot.artist`."""
+    #     if self.artist and self.attached_tool:
+    #         return self.artist.draw_attached_tool()
 
     def scale(self, factor):
         """Scale the robot geometry by a factor (absolute).
@@ -1651,7 +1706,7 @@ class Robot(object):
         print("The end-effector's name is '%s'." %
               self.get_end_effector_link_name())
         if self.attached_tool:
-            print("The robot has a tool at the %s link attached." % self.attached_tool.attached_collision_mesh.link_name)
+            print("The robot has a tool at the %s link attached." % self.attached_tool.link_name)
         else:
             print("The robot has NO tool attached.")
         print("The base link's name is '%s'" % self.get_base_link_name())

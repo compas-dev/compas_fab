@@ -29,7 +29,6 @@ Visualization and CAD integration modules:
     :maxdepth: 1
     :titlesonly:
 
-    reference/compas_fab.artists
     reference/compas_fab.blender
     reference/compas_fab.ghpython
     reference/compas_fab.rhino
