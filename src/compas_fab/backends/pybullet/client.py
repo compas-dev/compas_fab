@@ -5,6 +5,7 @@ from __future__ import print_function
 import os
 import shutil
 import tempfile
+from copy import deepcopy
 from itertools import combinations
 
 import compas
@@ -140,7 +141,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.planner = PyBulletPlanner(self)
         self.verbose = verbose
         self.collision_objects = {}
-        self.attached_collision_objects = {}
         self.disabled_collisions = set()
 
     def __enter__(self):
@@ -183,6 +183,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                                              physicsClientId=self.client_id,
                                              flags=pybullet.URDF_USE_SELF_COLLISION)
             robot.attributes['pybullet_uid'] = pybullet_uid
+            robot.attributes['attached_collision_meshes'] = {}
             self.cache_robot(robot)
 
         self._add_ids_to_robot_joints(robot)
@@ -194,21 +195,170 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         cached_robot.initializeFromBulletBody(robot.attributes['pybullet_uid'], self.client_id)
         robot.attributes['cached_pybullet_robot'] = cached_robot
 
+    def reconstruct_robot(self, robot):
+        # The following is copied from
+        # https://github.com/bulletphysics/bullet3/blob/62684840bd26fd5c4a15d5150f3502b29390b638/examples/pybullet/gym/pybullet_utils/urdfEditor.py#L310
+        # with one change noted in a comment.
+        def writeJoint(file, urdfJoint, precision=5):
+            jointTypeStr = "invalid"
+            if urdfJoint.joint_type == pybullet.JOINT_REVOLUTE:
+                if urdfJoint.joint_upper_limit < urdfJoint.joint_lower_limit:
+                    jointTypeStr = "continuous"
+                else:
+                    jointTypeStr = "revolute"
+            if urdfJoint.joint_type == pybullet.JOINT_FIXED:
+                jointTypeStr = "fixed"
+            if urdfJoint.joint_type == pybullet.JOINT_PRISMATIC:
+                jointTypeStr = "prismatic"
+            str = '\t<joint name=\"{}\" type=\"{}\">\n'.format(urdfJoint.joint_name, jointTypeStr)
+            file.write(str)
+            str = '\t\t<parent link=\"{}\"/>\n'.format(urdfJoint.parent_name)
+            file.write(str)
+            str = '\t\t<child link=\"{}\"/>\n'.format(urdfJoint.child_name)
+            file.write(str)
+
+            if urdfJoint.joint_type == pybullet.JOINT_PRISMATIC or urdfJoint.joint_type == pybullet.JOINT_REVOLUTE:
+                # Changed condition to include writing the limits for revolute joints.
+                # todo: handle limits
+                lowerLimit = -0.5
+                upperLimit = 0.5
+                str = '<limit effort="1000.0" lower="{:.{prec}f}" upper="{:.{prec}f}" velocity="0.5"/>'.format(
+                    lowerLimit, upperLimit, prec=precision)
+                file.write(str)
+
+            file.write("\t\t<dynamics damping=\"1.0\" friction=\"0.0001\"/>\n")
+            str = '\t\t<origin xyz=\"{:.{prec}f} {:.{prec}f} {:.{prec}f}\"/>\n'.format(urdfJoint.joint_origin_xyz[0],
+                                                                                       urdfJoint.joint_origin_xyz[1],
+                                                                                       urdfJoint.joint_origin_xyz[2],
+                                                                                       prec=precision)
+            str = '\t\t<origin rpy=\"{:.{prec}f} {:.{prec}f} {:.{prec}f}\" xyz=\"{:.{prec}f} {:.{prec}f} {:.{prec}f}\"/>\n'.format(
+                urdfJoint.joint_origin_rpy[0],
+                urdfJoint.joint_origin_rpy[1], urdfJoint.joint_origin_rpy[2],
+                urdfJoint.joint_origin_xyz[0],
+                urdfJoint.joint_origin_xyz[1], urdfJoint.joint_origin_xyz[2], prec=precision)
+
+            file.write(str)
+            str = '\t\t<axis xyz=\"{:.{prec}f} {:.{prec}f} {:.{prec}f}\"/>\n'.format(urdfJoint.joint_axis_xyz[0],
+                                                                                     urdfJoint.joint_axis_xyz[1],
+                                                                                     urdfJoint.joint_axis_xyz[2],
+                                                                                     prec=precision)
+            file.write(str)
+            file.write("\t</joint>\n")
+
+        def get_sorted_acm_names(dict_):
+            # surely this doesn't have to be O(n**3)
+            # what about building a dependency tree, then topologically sorting it?
+            # it may not be worth it as attached_collision_meshes is expected to be small, ie < 10 but usually 1 or 2.
+            result = []
+            queue = list(dict_.keys())
+            limit = len(dict_) ** 2
+            count = 0
+            robot_links = robot.get_link_names()
+            while queue and count < limit:
+                count += 1
+                acm_name = queue.pop(0)
+                link_name = dict_[acm_name]
+                if link_name in robot_links or link_name in result:
+                    result.append(acm_name)
+                else:
+                    queue.append(acm_name)
+
+            if queue:
+                links = [dict_[acm_name] for acm_name in queue]
+                raise Exception("Cannot find the links {}".format(links))
+
+            return result
+
+        editable_robot = deepcopy(robot.attributes['cached_pybullet_robot'])
+        editable_robot.writeJoint = writeJoint
+        attached_collision_meshes = robot.attributes['attached_collision_meshes']
+
+        acm_dict = {name: acm.link_name for name, acm in attached_collision_meshes.items()}
+        sorted_acm_names = get_sorted_acm_names(acm_dict)
+
+        for name in sorted_acm_names:
+            acm = robot.attributes['attached_collision_meshes'].get(name)
+
+            mesh = acm.collision_mesh.mesh
+            mesh_id = self.convert_mesh_to_body(mesh, Frame.worldXY(), mass=acm.attr['pybullet']['mass'])
+            acm.attr['pybullet']['id'] = mesh_id
+
+            editable_mesh = ed.UrdfEditor()
+            editable_mesh.initializeFromBulletBody(mesh_id, self.client_id)
+            pybullet.removeBody(mesh_id, physicsClientId=self.client_id)
+            if len(editable_mesh.urdfLinks) != 1:
+                raise Exception("Clearly the dev doesn't understand something fundamental.")
+            link = editable_mesh.urdfLinks[0]
+            original_name = link.link_name
+            link.link_name = name
+            editable_mesh.linkNameToIndex[link.link_name] = editable_mesh.linkNameToIndex[original_name]
+            del editable_mesh.linkNameToIndex[original_name]
+            # That the collision mesh filename gets lost in initialization seems to be a bug in PyBullet.
+            for link in editable_mesh.urdfLinks:
+                for collision, visual in zip(link.urdf_collision_shapes, link.urdf_visual_shapes):
+                    collision.geom_meshfilename = visual.geom_meshfilename
+
+            parent_link_index = None
+            for index, urdfLink in enumerate(editable_robot.urdfLinks):
+                if urdfLink.link_name == acm.link_name:
+                    parent_link_index = index
+            if parent_link_index is None:
+                raise Exception('Cannot find link {} in robot {}'.format(acm.link_name, robot.name))
+
+            frame = acm.collision_mesh.frame
+
+            jointPivotXYZInParent = list(frame.point)
+            jointPivotRPYInParent = frame.euler_angles()
+
+            new_joint = editable_robot.joinUrdf(
+                editable_mesh,
+                parentLinkIndex=parent_link_index,
+                parentPhysicsClientId=self.client_id,
+                childPhysicsClientId=self.client_id,
+                jointPivotXYZInParent=jointPivotXYZInParent,
+                jointPivotRPYInParent=jointPivotRPYInParent,
+            )
+            new_joint.joint_type = pybullet.JOINT_FIXED
+            new_joint.joint_name = 'fixed_{}_{}_joint'.format(acm.link_name, name)
+
+        robot_uid = robot.attributes['pybullet_uid']
+        # position, orientation = p.getBasePositionAndOrientation(robot_uid, physicsClientId=self.client.client_id)
+        # get joint states and then set them after createMultiBody?
+        pybullet.removeBody(robot_uid, physicsClientId=self.client_id)
+
+        tmp_dir = tempfile.mkdtemp()
+        tmp_obj_path = os.path.join(tmp_dir, 'temp.urdf')
+        try:
+            editable_robot.saveUrdf(tmp_obj_path)
+            pybullet_uid = pybullet.loadURDF(tmp_obj_path, useFixedBase=True,
+                                             physicsClientId=self.client_id,
+                                             flags=pybullet.URDF_USE_SELF_COLLISION)
+            robot.attributes['pybullet_uid'] = pybullet_uid
+
+            self._add_ids_to_robot_joints(robot)
+            self._add_ids_to_robot_links(robot)
+        finally:
+            shutil.rmtree(tmp_dir)
+
     def _add_ids_to_robot_joints(self, robot):
         joint_ids = self._get_joint_ids(robot.attributes['pybullet_uid'])
         for joint_id in joint_ids:
+            pybullet_attr = {'id': joint_id}
             joint_name = self._get_joint_name(joint_id, robot.attributes['pybullet_uid'])
             joint = robot.model.get_joint_by_name(joint_name)
-            pybullet_attr = {'id': joint_id}
-            joint.attr.setdefault('pybullet', {}).update(pybullet_attr)
+            if joint is not None:
+                joint.attr.setdefault('pybullet', {}).update(pybullet_attr)
 
     def _add_ids_to_robot_links(self, robot):
         joint_ids = self._get_joint_ids(robot.attributes['pybullet_uid'])
         for link_id in joint_ids:
+            pybullet_attr = {'id': link_id}
             link_name = self._get_link_name(link_id, robot.attributes['pybullet_uid'])
             link = robot.model.get_link_by_name(link_name)
-            pybullet_attr = {'id': link_id}
-            link.attr.setdefault('pybullet', {}).update(pybullet_attr)
+            if link is not None:
+                link.attr.setdefault('pybullet', {}).update(pybullet_attr)
+            if link_name in robot.attributes.get('attached_collision_meshes', []):
+                robot.attributes['attached_collision_meshes'][link_name].attr['pybullet'].update(pybullet_attr)
 
     def _get_joint_id_by_name(self, name, robot):
         return robot.model.get_joint_by_name(name).attr['pybullet']['id']
@@ -217,7 +367,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return tuple(self._get_joint_id_by_name(name, robot) for name in names)
 
     def _get_link_id_by_name(self, name, robot):
-        return robot.model.get_link_by_name(name).attr['pybullet']['id']
+        link = robot.model.get_link_by_name(name)
+        if link is not None:
+            return link.attr['pybullet']['id']
+        return robot.attributes['attached_collision_meshes'][name].attr['pybullet']['id']
 
     def _get_link_ids_by_name(self, names, robot):
         return tuple(self._get_link_id_by_name(name, robot) for name in names)
@@ -299,19 +452,24 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         :class:`compas_fab.backends.pybullet.DetectedCollision`
         """
         link_names = robot.get_link_names_with_collision_geometry()
+        robot_uid = robot.attributes['pybullet_uid']
         # check for collisions between robot links
         for link_1_name, link_2_name in combinations(link_names, 2):
             if {link_1_name, link_2_name} in self.disabled_collisions:
                 continue
             link_1_id = self._get_link_id_by_name(link_1_name, robot)
             link_2_id = self._get_link_id_by_name(link_2_name, robot)
-            self._check_collision(robot.attributes['pybullet_uid'], link_1_name, robot.attributes['pybullet_uid'], link_2_name, link_1_id, link_2_id)
-        # check for collisions between robot links and attached collision objects
+            self._check_collision(robot_uid, link_1_name, robot_uid, link_2_name, link_1_id, link_2_id)
+        # !!! fix this
         for link_name in link_names:
             link_id = self._get_link_id_by_name(link_name, robot)
-            for name, constraint_info_list in self.attached_collision_objects.items():
-                for constraint_info in constraint_info_list:
-                    self._check_collision(robot.attributes['pybullet_uid'], link_name, constraint_info.body_id, name, link_id)
+            for name, attached_collision_mesh in self.attached_collision_meshes.items():
+                self._check_collision(robot_uid, link_name, robot_uid, attached_collision_mesh.collision_mesh.name, link_id, attached_collision_mesh.attr['pybullet']['id'])
+        # for link_name in link_names:
+        #     link_id = self._get_link_id_by_name(link_name, robot)
+        #     for name, constraint_info_list in self.attached_collision_objects.items():
+        #         for constraint_info in constraint_info_list:
+        #             self._check_collision(robot.attributes['pybullet_uid'], link_name, constraint_info.body_id, name, link_id)
 
     def check_collision_objects_for_collision(self):
         """Checks whether any of the collision objects are colliding.

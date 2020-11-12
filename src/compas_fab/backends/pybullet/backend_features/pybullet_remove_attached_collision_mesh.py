@@ -26,17 +26,22 @@ class PyBulletRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
         ----------
         id : str
             Name of collision mesh to be removed.
-        options : dict, optional
-            Unused parameter.
+        options : dict
+            Dictionary containing the following key-value pairs:
+
+            - ``"robot"``: (:class:`compas_fab.robots.Robot``) Robot instance
+              to which the object should be attached.
 
         Returns
         -------
         ``None``
         """
-        if id not in self.client.attached_collision_objects:
+        robot = options['robot']
+        attached_collision_meshes = robot.attributes['attached_collision_meshes']
+        if id not in attached_collision_meshes:
             LOG.warning("Attached collision object with name '{}' does not exist in scene.".format(id))
             return
 
-        for constraint_info in self.client.attached_collision_objects[id]:
-            pybullet.removeConstraint(constraint_info.constraint_id, physicsClientId=self.client.client_id)
-            pybullet.removeBody(constraint_info.body_id, physicsClientId=self.client.client_id)
+        del attached_collision_meshes[id]
+
+        self.client.reconstruct_robot(robot)
