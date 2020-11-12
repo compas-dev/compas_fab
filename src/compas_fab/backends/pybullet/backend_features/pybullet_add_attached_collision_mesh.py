@@ -2,19 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
-import shutil
-import tempfile
-import time
-from copy import deepcopy
-
-from compas.geometry import Frame
 from compas_fab.backends.interfaces import AddAttachedCollisionMesh
-from compas_fab.backends.pybullet.utils import redirect_stdout
-from compas_fab.utilities import LazyLoader
-
-p = LazyLoader('p', globals(), 'pybullet')
-ed = LazyLoader('ed', globals(), 'pybullet_utils.urdfEditor')
 
 
 __all__ = [
