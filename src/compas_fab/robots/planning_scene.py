@@ -362,9 +362,11 @@ class PlanningScene(object):
         acm = AttachedCollisionMesh(collision_mesh, ee_link_name, touch_links)
         self.add_attached_collision_mesh(acm)
 
-    def add_attached_tool(self):
+    def add_attached_tool(self, tool=None):
         """Add the robot's attached tool to the planning scene if tool is set."""
         self.ensure_client()
+        if tool:
+            self.robot.attach_tool(tool)
         if self.robot.attached_tool:
             for acm in self.robot.attached_tool.attached_collision_meshes:
                 self.add_attached_collision_mesh(acm)
@@ -373,4 +375,6 @@ class PlanningScene(object):
         """Remove the robot's attached tool from the planning scene."""
         self.ensure_client()
         if self.robot.attached_tool:
-            self.remove_attached_collision_mesh(self.robot.attached_tool.name)
+            for acm in self.robot.attached_tool.attached_collision_meshes:
+                self.remove_attached_collision_mesh(acm.collision_mesh.id)
+        self.robot.detach_tool()
