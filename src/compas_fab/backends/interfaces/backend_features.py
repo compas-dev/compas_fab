@@ -2,9 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from abc import ABCMeta
-from abc import abstractmethod
-
 
 class ForwardKinematics(object):
     """Interface for a Planner's forward kinematics feature.  Any implementation of
@@ -14,12 +11,10 @@ class ForwardKinematics(object):
     <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
     <https://en.wikipedia.org/wiki/Function_object#In_Python>.
     """
-    __metaclass__ = ABCMeta
 
     def __call__(self, robot, configuration, group=None, options=None):
         return self.forward_kinematics(robot, configuration, group, options)
 
-    @abstractmethod
     def forward_kinematics(self, robot, configuration, group=None, options=None):
         """Calculate the robot's forward kinematic.
 
@@ -53,12 +48,10 @@ class InverseKinematics(object):
     <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
     <https://en.wikipedia.org/wiki/Function_object#In_Python>.
     """
-    __metaclass__ = ABCMeta
 
     def __call__(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         return self.inverse_kinematics(robot, frame_WCF, start_configuration, group, options)
 
-    @abstractmethod
     def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
@@ -91,12 +84,10 @@ class PlanMotion(object):
     <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
     <https://en.wikipedia.org/wiki/Function_object#In_Python>.
     """
-    __metaclass__ = ABCMeta
 
     def __call__(self, robot, goal_constraints, start_configuration=None, group=None, options=None):
         return self.plan_motion(robot, goal_constraints, start_configuration, group, options)
 
-    @abstractmethod
     def plan_motion(self, robot, goal_constraints, start_configuration=None, group=None, options=None):
         """Calculates a motion path.
 
@@ -135,12 +126,10 @@ class PlanCartesianMotion(object):
     <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
     <https://en.wikipedia.org/wiki/Function_object#In_Python>.
     """
-    __metaclass__ = ABCMeta
 
     def __call__(self, robot, frames_WCF, start_configuration=None, group=None, options=None):
         return self.plan_cartesian_motion(robot, frames_WCF, start_configuration, group, options)
 
-    @abstractmethod
     def plan_cartesian_motion(self, robot, frames_WCF, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
 
@@ -175,13 +164,39 @@ class GetPlanningScene(object):
     <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
     <https://en.wikipedia.org/wiki/Function_object#In_Python>.
     """
-    __metaclass__ = ABCMeta
 
     def __call__(self, options=None):
         return self.get_planning_scene(options)
 
-    @abstractmethod
     def get_planning_scene(self, options=None):
+        """Retrieve the planning scene.
+
+        Parameters
+        ----------
+        options : dict, optional
+            Dictionary containing kwargs for arguments specific to
+            the client being queried.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.planning_scene.PlanningScene`
+        """
+        pass
+
+
+class ResetPlanningScene(object):
+    """Interface for a Planner's reset planning scene feature.  Any implementation of
+    ``ResetPlanningScene`` must define the method ``reset_planning_scene``.  The
+    ``__call__`` magic method allows an instance of an implementation of
+    ``ResetPlanningScene`` to be treated as its ``reset_planning_scene`` method.  See
+    <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
+    <https://en.wikipedia.org/wiki/Function_object#In_Python>.
+    """
+
+    def __call__(self, options=None):
+        return self.reset_planning_scene(options)
+
+    def reset_planning_scene(self, options=None):
         """Retrieve the planning scene.
 
         Parameters
@@ -205,12 +220,10 @@ class AddCollisionMesh(object):
     <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
     <https://en.wikipedia.org/wiki/Function_object#In_Python>.
     """
-    __metaclass__ = ABCMeta
 
     def __call__(self, collision_mesh, options=None):
         return self.add_collision_mesh(collision_mesh, options)
 
-    @abstractmethod
     def add_collision_mesh(self, collision_mesh, options=None):
         """Add a collision mesh to the planning scene.
 
@@ -237,12 +250,10 @@ class RemoveCollisionMesh(object):
     <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
     <https://en.wikipedia.org/wiki/Function_object#In_Python>.
     """
-    __metaclass__ = ABCMeta
 
     def __call__(self, id, options=None):
         return self.remove_collision_mesh(id, options)
 
-    @abstractmethod
     def remove_collision_mesh(self, id, options=None):
         """Remove a collision mesh from the planning scene.
 
@@ -269,12 +280,10 @@ class AppendCollisionMesh(object):
     <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
     <https://en.wikipedia.org/wiki/Function_object#In_Python>.
     """
-    __metaclass__ = ABCMeta
 
     def __call__(self, collision_mesh, options=None):
         return self.append_collision_mesh(collision_mesh, options)
 
-    @abstractmethod
     def append_collision_mesh(self, collision_mesh, options=None):
         """Append a collision mesh to the planning scene.
 
@@ -301,12 +310,10 @@ class AddAttachedCollisionMesh(object):
     <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
     <https://en.wikipedia.org/wiki/Function_object#In_Python>.
     """
-    __metaclass__ = ABCMeta
 
     def __call__(self, attached_collision_mesh, options=None):
         return self.add_attached_collision_mesh(attached_collision_mesh, options)
 
-    @abstractmethod
     def add_attached_collision_mesh(self, attached_collision_mesh, options=None):
         """Add a collision mesh and attach it to the robot.
 
@@ -333,12 +340,10 @@ class RemoveAttachedCollisionMesh(object):
     <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
     <https://en.wikipedia.org/wiki/Function_object#In_Python>.
     """
-    __metaclass__ = ABCMeta
 
     def __call__(self, id, options=None):
         return self.remove_attached_collision_mesh(id, options)
 
-    @abstractmethod
     def remove_attached_collision_mesh(self, id, options=None):
         """Remove an attached collision mesh from the robot.
 

@@ -46,6 +46,10 @@ class ClientInterface(object):
         """Forwards call to appropriate method in the planner."""
         return self.planner.get_planning_scene(*args, **kwargs)
 
+    def reset_planning_scene(self, *args, **kwargs):
+        """Forwards call to appropriate method in the planner."""
+        return self.planner.reset_planning_scene(*args, **kwargs)
+
     def add_collision_mesh(self, *args, **kwargs):
         """Forwards call to appropriate method in the planner."""
         return self.planner.add_collision_mesh(*args, **kwargs)
@@ -149,6 +153,16 @@ class PlannerInterface(object):
     # ==========================================================================
 
     def get_planning_scene(self, *args, **kwargs):
+        """Default method for planner.
+
+        Raises
+        ------
+        Exception
+            Planner does not have this feature.
+        """
+        raise Exception('Assigned planner does not have this feature.')
+
+    def reset_planning_scene(self, *args, **kwargs):
         """Default method for planner.
 
         Raises
