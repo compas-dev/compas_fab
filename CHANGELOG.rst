@@ -16,6 +16,8 @@ Unreleased
 
 **Fixed**
 
+* Fixed bug in ``remove_attached_tool`` of ``PlanningScene``
+
 **Deprecated**
 
 **Removed**
