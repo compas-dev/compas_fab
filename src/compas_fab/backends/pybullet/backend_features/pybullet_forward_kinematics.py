@@ -22,8 +22,8 @@ class PyBulletForwardKinematics(ForwardKinematics):
             full configuration is passed, the zero-joint state for the other
             configurable joints is assumed.
         group : str, optional
-            The planning group used for calculation. Defaults to the robot's
-            main planning group.
+            The planning group used for determining the end effector and labeling
+            the ``configuration``. Defaults to the robot's main planning group.
         options : dict, optional
             Dictionary containing the following key-value pairs:
 

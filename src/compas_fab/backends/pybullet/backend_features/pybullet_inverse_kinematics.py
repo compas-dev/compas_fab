@@ -38,13 +38,13 @@ class PyBulletInverseKinematics(InverseKinematics):
             joint positions differ the least from the start_configuration.
             Defaults to the zero configuration.
         group: str, optional
-            The planning group used for calculation. Defaults to the robot's
-            main planning group.
+            The planning group used for determining the end effector and labeling
+            the ``start_configuration``. Defaults to the robot's main planning group.
         options: dict, optional
             Dictionary containing the following key-value pairs:
 
             - ``"link_name"``: (:obj:`str`, optional ) Name of the link for which
-              to compute the inverse kinematics.  Defaults to the given robot's end
+              to compute the inverse kinematics.  Defaults to the given group's end
               effector.
             - ``"semi-constrained"``: (:obj:`bool`, optional) When ``True``, only the
               position and not the orientation of ``frame_WCF`` will not be considered
