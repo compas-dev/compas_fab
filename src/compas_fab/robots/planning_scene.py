@@ -164,6 +164,11 @@ class PlanningScene(object):
             raise Exception(
                 'This method is only callable once a client is assigned')
 
+    def reset(self):
+        """Resets the planning scene, removing all added collision meshes."""
+        self.ensure_client()
+        self.client.reset_planning_scene()
+
     def add_collision_mesh(self, collision_mesh, scale=False):
         """Add a collision mesh to the planning scene.
 

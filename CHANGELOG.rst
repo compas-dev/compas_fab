@@ -12,6 +12,9 @@ Unreleased
 
 **Added**
 
+* Added new backend feature ``ResetPlanningScene``
+* Added ``MoveItResetPlanningScene``
+
 **Changed**
 
 **Fixed**

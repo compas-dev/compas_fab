@@ -23,4 +23,4 @@ with RosClient() as client:
     # sleep a bit before removing the tip
     time.sleep(1)
 
-    scene.remove_attached_collision_mesh('tip')
+    scene.reset()

@@ -7,6 +7,7 @@ from __future__ import print_function
 
 from compas_fab.backends.interfaces.client import forward_docstring
 from compas_fab.backends.interfaces.client import PlannerInterface
+from compas_fab.backends.ros.backend_features import MoveItResetPlanningScene
 from compas_fab.backends.ros.backend_features.move_it_add_attached_collision_mesh import MoveItAddAttachedCollisionMesh
 from compas_fab.backends.ros.backend_features.move_it_add_collision_mesh import MoveItAddCollisionMesh
 from compas_fab.backends.ros.backend_features.move_it_append_collision_mesh import MoveItAppendCollisionMesh
@@ -45,6 +46,10 @@ class MoveItPlanner(PlannerInterface):
     @forward_docstring(MoveItPlanningScene)
     def get_planning_scene(self, *args, **kwargs):
         return MoveItPlanningScene(self.client)(*args, **kwargs)
+
+    @forward_docstring(MoveItResetPlanningScene)
+    def reset_planning_scene(self, *args, **kwargs):
+        return MoveItResetPlanningScene(self.client)(*args, **kwargs)
 
     @forward_docstring(MoveItAddCollisionMesh)
     def add_collision_mesh(self, *args, **kwargs):
