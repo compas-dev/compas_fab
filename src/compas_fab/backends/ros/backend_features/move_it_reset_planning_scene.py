@@ -5,9 +5,9 @@ from __future__ import print_function
 from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import ResetPlanningScene
-from compas_fab.backends.ros.messages import ApplyPlanningSceneRequest, CollisionObject
+from compas_fab.backends.ros.messages import ApplyPlanningSceneRequest
 from compas_fab.backends.ros.messages import ApplyPlanningSceneResponse
-from compas_fab.backends.ros.messages import PlanningScene
+from compas_fab.backends.ros.messages import CollisionObject
 from compas_fab.backends.ros.service_description import ServiceDescription
 
 __all__ = [
