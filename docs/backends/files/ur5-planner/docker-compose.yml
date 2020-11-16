@@ -9,7 +9,7 @@ services:
       - roscore
 
   ros-bridge:
-    image: gramaziokohler/ros-ur-planner:19.11
+    image: gramaziokohler/ros-ur-planner:20.11
     container_name: ros-bridge
     environment:
       - "ROS_HOSTNAME=ros-bridge"
@@ -25,7 +25,7 @@ services:
       - rosbridge_websocket.launch
 
   ros-fileserver:
-    image: gramaziokohler/ros-ur-planner:19.11
+    image: gramaziokohler/ros-ur-planner:20.11
     container_name: ros-fileserver
     environment:
       - ROS_HOSTNAME=ros-fileserver
@@ -39,7 +39,7 @@ services:
       - file_server.launch
 
   ur-tf-base_link:
-    image: gramaziokohler/ros-ur-planner:19.11
+    image: gramaziokohler/ros-ur-planner:20.11
     container_name: ur-tf-base_link
     environment:
       - ROS_HOSTNAME=ur-tf-base_link
@@ -62,7 +62,7 @@ services:
       - '100'
 
   ur-description:
-    image: gramaziokohler/ros-ur-planner:19.11
+    image: gramaziokohler/ros-ur-planner:20.11
     container_name: ur-description
     environment:
       - ROS_HOSTNAME=ur-description
@@ -77,7 +77,7 @@ services:
       - load_robot_description:=true
 
   ur-planner:
-    image: gramaziokohler/ros-ur-planner:19.11
+    image: gramaziokohler/ros-ur-planner:20.11
     container_name: ur-planner
     environment:
       - ROS_HOSTNAME=ur-planner
@@ -92,7 +92,7 @@ services:
       - sim:=true
 
   ur-rviz:
-    image: gramaziokohler/ros-ur-planner:19.11
+    image: gramaziokohler/ros-ur-planner:20.11
     container_name: ur-rviz
     environment:
       - ROS_HOSTNAME=ur-rviz

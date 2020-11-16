@@ -9,7 +9,7 @@ services:
       - roscore
 
   ros-bridge:
-    image: gramaziokohler/ros-panda-planner:19.11
+    image: gramaziokohler/ros-panda-planner:20.11
     container_name: ros-bridge
     environment:
       - "ROS_HOSTNAME=ros-bridge"
@@ -25,7 +25,7 @@ services:
       - rosbridge_websocket.launch
 
   ros-fileserver:
-    image: gramaziokohler/ros-panda-planner:19.11
+    image: gramaziokohler/ros-panda-planner:20.11
     container_name: ros-fileserver
     environment:
       - ROS_HOSTNAME=ros-fileserver
@@ -39,7 +39,7 @@ services:
       - file_server.launch
 
   panda-tf-panda_link0:
-    image: gramaziokohler/ros-panda-planner:19.11
+    image: gramaziokohler/ros-panda-planner:20.11
     container_name: panda-tf-panda_link0
     environment:
       - ROS_HOSTNAME=panda-tf-panda_link0
@@ -62,7 +62,7 @@ services:
       - '100'
 
   panda-demo:
-    image: gramaziokohler/ros-panda-planner:19.11
+    image: gramaziokohler/ros-panda-planner:20.11
     container_name: panda-demo
     environment:
       - ROS_HOSTNAME=panda-demo
