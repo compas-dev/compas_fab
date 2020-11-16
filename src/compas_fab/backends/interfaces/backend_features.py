@@ -207,7 +207,7 @@ class ResetPlanningScene(object):
 
         Returns
         -------
-        :class:`compas_fab.robots.planning_scene.PlanningScene`
+        ``None``
         """
         pass
 
