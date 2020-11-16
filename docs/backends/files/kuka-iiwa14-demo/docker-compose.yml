@@ -1,7 +1,7 @@
 version: '2'
 services:
   ros-master:
-    image: gramaziokohler/ros-base:19.11
+    image: gramaziokohler/ros-base:20.11
     container_name: ros-master
     ports:
       - "11311:11311"
