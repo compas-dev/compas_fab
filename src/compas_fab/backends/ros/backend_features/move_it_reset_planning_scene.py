@@ -5,7 +5,7 @@ from __future__ import print_function
 from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import ResetPlanningScene
-from compas_fab.backends.ros.messages import ApplyPlanningSceneRequest
+from compas_fab.backends.ros.messages import ApplyPlanningSceneRequest, CollisionObject
 from compas_fab.backends.ros.messages import ApplyPlanningSceneResponse
 from compas_fab.backends.ros.messages import PlanningScene
 from compas_fab.backends.ros.service_description import ServiceDescription
@@ -44,6 +44,9 @@ class MoveItResetPlanningScene(ResetPlanningScene):
         return await_callback(self.reset_planning_scene_async, **kwargs)
 
     def reset_planning_scene_async(self, callback, errback):
-        scene = PlanningScene(is_diff=False)
+        scene = self.ros_client.get_planning_scene()
+        for collision_object in scene.world.collision_objects:
+            collision_object.operation = CollisionObject.REMOVE
+        scene.is_diff = True
         request = dict(scene=scene)
         self.APPLY_PLANNING_SCENE(self.ros_client, request, callback, errback)
