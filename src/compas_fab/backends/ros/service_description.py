@@ -8,6 +8,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import types
+
+import compas
 from roslibpy import Service
 from roslibpy import ServiceRequest
 
@@ -30,6 +33,14 @@ class ServiceDescription(object):
 
     def call(self, client, request, callback, errback):
         def inner_handler(response_msg):
+            if not compas.PY3:
+                # IronPython sometimes decides it's a good idea to use an old-style class
+                # to pass the response_msg around, so we need to make sure we turn it into
+                # a proper ServiceResponse again
+                # https://github.com/compas-dev/compas_fab/issues/235
+                is_old_style_class = isinstance(response_msg, types.InstanceType)
+                if is_old_style_class:
+                    response_msg = dict(response_msg)
             response_object = self.response_class.from_msg(response_msg)
 
             # Validate the response if there's a validator function assigned
@@ -39,14 +50,12 @@ class ServiceDescription(object):
                 except Exception as e:
                     errback(RosValidationError(e, response_object))
                     return
-
             callback(response_object)
 
         if isinstance(request, tuple):
             request_msg = self.request_class(*request)
         else:
             request_msg = self.request_class(**request)
-
         srv = Service(client, self.name, self.type)
         srv.call(ServiceRequest(request_msg.msg),
                  callback=inner_handler, errback=errback)

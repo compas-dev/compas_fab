@@ -2,10 +2,10 @@ from compas.geometry import Frame
 
 from compas_fab.backends import RosClient
 from compas_fab.robots import Configuration
-from compas_fab.robots.ur5 import Robot
 
 with RosClient() as client:
-    robot = Robot(client)
+    robot = client.load_robot()
+    assert robot.name == 'ur5'
 
     frames = []
     frames.append(Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]))

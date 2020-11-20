@@ -433,13 +433,7 @@ class PosConCM(SerialSensor):
         return self.FRAME_TAIL % (frame, self.calculate_checksum(frame))
 
     def calculate_checksum(self, command):
-        """Checks that message is complete.
-
-        Note
-        ----
-        See `RS-485 Protocol Structure <https://www.baumer.com/ae/en/product-overview/2d-3d-sensors/profile-sensors-/measurement-of-round-objects/\
-        oxc7-x0250-ii1250-ti/p/medias/__secure__/en_BA_RS485_Protocol_Structure.pdf?mediaPK=8799860686878>`_ for more info.
-        """
+        """Checks that message is complete."""
         return '****'
 
     def get_payload(self, result):

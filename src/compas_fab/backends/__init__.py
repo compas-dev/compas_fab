@@ -56,9 +56,18 @@ Exceptions
     :nosignatures:
 
     BackendError
+    CollisionError
+    InverseKinematicsError
     RosError
     RosValidationError
     VrepError
+
+
+Interfaces
+----------
+
+For details about integrating new backends, check
+the :ref:`architecture` documentation.
 
 """
 
@@ -75,7 +84,8 @@ from .vrep.helpers import *             # noqa: F401,F403
 from .vrep.planner import *             # noqa: F401,F403
 
 if not compas.is_ironpython():
-    from .pybullet.planner import *           # noqa: F401,F403
     from .pybullet.client import *            # noqa: F401,F403
+    from .pybullet.exceptions import *        # noqa: F401,F403
+    from .pybullet.planner import *           # noqa: F401,F403
 
 __all__ = [name for name in dir() if not name.startswith('_')]

@@ -149,6 +149,106 @@ class JointTrajectoryPoint(Configuration):
         self.effort = data.get('effort') or []
         self.time_from_start = Duration.from_data(data.get('time_from_start') or {})
 
+    def copy(self):
+        """Create a copy of this :class:`JointTrajectoryPoint`.
+
+        Returns
+        -------
+        :class:`JointTrajectoryPoint`
+            An instance of :class:`JointTrajectoryPoint`
+        """
+        cls = type(self)
+        return cls.from_data(self.data)
+
+    @property
+    def velocity_dict(self):
+        """A dictionary of joint velocities by joint name."""
+        self.check_joint_names()
+        return dict(zip(self.joint_names, self.velocities))
+
+    @property
+    def acceleration_dict(self):
+        """A dictionary of joint accelerations by joint name."""
+        self.check_joint_names()
+        return dict(zip(self.joint_names, self.accelerations))
+
+    @property
+    def effort_dict(self):
+        """A dictionary of joint efforts by joint name."""
+        self.check_joint_names()
+        return dict(zip(self.joint_names, self.effort))
+
+    def merge(self, other):
+        """Merge the ``JointTrajectoryPoint`` with another ``JointTrajectoryPoint`` in place
+        along joint names.  The other ``JointTrajectoryPoint`` takes precedence over this
+        ``JointTrajectoryPoint`` in case a joint value is present in both.
+
+        Note
+        ----
+            Caution: ``joint_names`` may be rearranged.
+
+        Parameters
+        ----------
+        other : :class:`JointTrajectoryPoint`
+            The ``JointTrajectoryPoint`` to be merged.
+
+        Raises
+        ------
+        :exc:`ValueError`
+            If the ``JointTrajectoryPoint`` or the other ``JointTrajectoryPoint`` does not specify
+            joint names for all joint values.
+        """
+        _joint_dict = self.joint_dict
+        _joint_dict.update(other.joint_dict)
+
+        _type_dict = self.type_dict
+        _type_dict.update(other.type_dict)
+
+        _velocity_dict = self.velocity_dict
+        _velocity_dict.update(other.velocity_dict)
+
+        _acceleration_dict = self.acceleration_dict
+        _acceleration_dict.update(other.acceleration_dict)
+
+        _effort_dict = self.effort_dict
+        _effort_dict.update(other.effort_dict)
+
+        self.joint_names = list(_joint_dict.keys())
+        self.values = [_joint_dict[name] for name in self.joint_names]
+        self.types = [_type_dict[name] for name in self.joint_names]
+        self.velocities = [_velocity_dict[name] for name in self.joint_names]
+        self.accelerations = [_acceleration_dict[name] for name in self.joint_names]
+        self.effort = [_effort_dict[name] for name in self.joint_names]
+
+    def merged(self, other):
+        """Get a new ``JointTrajectoryPoint`` with this ``JointTrajectoryPoint`` merged
+        with another ``JointTrajectoryPoint``.  The other ``JointTrajectoryPoint``
+        takes precedence over this ``JointTrajectoryPoint`` in case a joint value is present in both.
+
+        Note
+        ----
+            Caution: ``joint_names`` may be rearranged.
+
+        Parameters
+        ----------
+        other : :class:`JointTrajectoryPoint`
+            The ``JointTrajectoryPoint`` to be merged.
+
+        Returns
+        -------
+        :class:`JointTrajectoryPoint`
+            A ``JointTrajectoryPoint`` with values for all included joints.
+
+        Raises
+        ------
+        :exc:`ValueError`
+            If the ``JointTrajectoryPoint`` or the other ``JointTrajectoryPoint`` does not specify
+            joint names for all joint values.
+        """
+        jtp = self.copy()
+        jtp.merge(other)
+        return jtp
+
 
 class Trajectory(object):
     """Base trajectory class.

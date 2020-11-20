@@ -17,10 +17,11 @@ class VrepInverseKinematics(InverseKinematics):
     def __init__(self, client):
         self.client = client
 
-    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options=None):
+    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculates inverse kinematics to find valid robot configurations for the specified goal frame.
 
         Args:
+            robot (:class:`compas_fab.robots.Robot`): The robot instance for which inverse kinematics is being calculated.
             frame_WCF (:class:`Frame`): Target or goal frame.
             start_configuration (:obj:`None`): Unused parameter.
             group (:obj:`int`): Integer referencing the desired robot group.

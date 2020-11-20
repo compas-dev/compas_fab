@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from math import pi
 from compas.robots import Joint
 
 __all__ = [
@@ -84,13 +85,15 @@ class Configuration(object):
         return self.__str__()
 
     @classmethod
-    def from_revolute_values(cls, values):
+    def from_revolute_values(cls, values, joint_names=None):
         """Construct a configuration from revolute joint values in radians.
 
         Parameters
         ----------
         values : :obj:`list` of :obj:`float`
             Joint values expressed in radians.
+        joint_names : :obj:`list` of :obj:`str`, optional
+            List of joint names.
 
         Returns
         -------
@@ -98,10 +101,11 @@ class Configuration(object):
              An instance of :class:`Configuration` instance.
         """
         values = list(values)
-        return cls.from_data({'values': values, 'types': [Joint.REVOLUTE] * len(values)})
+        joint_names = list(joint_names or [])
+        return cls.from_data({'values': values, 'types': [Joint.REVOLUTE] * len(values), 'joint_names': joint_names})
 
     @classmethod
-    def from_prismatic_and_revolute_values(cls, prismatic_values, revolute_values):
+    def from_prismatic_and_revolute_values(cls, prismatic_values, revolute_values, joint_names=None):
         """Construct a configuration from prismatic and revolute joint values.
 
         Parameters
@@ -110,6 +114,8 @@ class Configuration(object):
             Positions on the external axis system in meters.
         revolute_values : :obj:`list` of :obj:`float`
             Joint values expressed in radians.
+        joint_names : :obj:`list` of :obj:`str`, optional
+            List of joint names.
 
         Returns
         -------
@@ -119,10 +125,11 @@ class Configuration(object):
         # Force iterables into lists
         prismatic_values = list(prismatic_values)
         revolute_values = list(revolute_values)
+        joint_names = list(joint_names or [])
         values = prismatic_values + revolute_values
         types = [Joint.PRISMATIC] * \
             len(prismatic_values) + [Joint.REVOLUTE] * len(revolute_values)
-        return cls.from_data({'values': values, 'types': types})
+        return cls.from_data({'values': values, 'types': types, 'joint_names': joint_names})
 
     @classmethod
     def from_data(cls, data):
@@ -240,3 +247,196 @@ class Configuration(object):
         config = self.copy()
         config.scale(scale_factor)
         return config
+
+    def iter_differences(self, other):
+        """Generator over the differences to another `Configuration`'s values.
+
+        If the joint type is revolute or continuous, the smaller difference
+        (+/- 2*:math:`\\pi`) is calculated.
+
+        Parameters
+        ----------
+        other : :class:`Configuration`
+            The configuration to compare to.
+
+        Yields
+        ------
+        :obj:`float`
+            The next difference to the `Configuration`'s values.
+
+        Raises
+        ------
+        ValueError
+            If the configurations are not comparable.
+
+        Examples
+        --------
+        >>> c1 = Configuration.from_revolute_values([1, 0, 3])
+        >>> c2 = Configuration.from_revolute_values([1, 2 * pi, 4])
+        >>> allclose(c1.iter_differences(c2), [0.0, 0.0, -1.0])
+        True
+        >>> c1 = Configuration.from_revolute_values([1, 0, 3])
+        >>> c2 = Configuration.from_revolute_values([1, -2 * pi - 0.2, 4])
+        >>> allclose(c1.iter_differences(c2), [0.0, 0.2, -1.0])
+        True
+        """
+        if self.joint_names and other.joint_names:
+            if set(self.joint_names) != set(other.joint_names):
+                raise ValueError("Configurations have different joint names.")
+            other_value_by_name = dict(zip(other.joint_names, other.values))
+            sorted_other_values = [other_value_by_name[name] for name in self.joint_names]
+            value_pairs = zip(self.values, sorted_other_values)
+        else:
+            if len(self.values) != len(other.values):
+                raise ValueError("Can't compare configurations with different lengths of values.")
+            value_pairs = zip(self.values, other.values)
+
+        for i, (v1, v2) in enumerate(value_pairs):
+            diff = v1 - v2
+            if self.types[i] in [Joint.REVOLUTE, Joint.CONTINUOUS]:
+                d1 = diff % (2 * pi)
+                d1 = d1 if diff >= 0 else d1 - 2*pi
+                d2 = d1 - 2*pi if diff >= 0 else d1 + 2*pi
+                diff = d1 if abs(d1) < abs(d2) else d2
+            yield diff
+
+    def max_difference(self, other):
+        """Returns the maximum difference to another `Configuration`'s values.
+
+        Parameters
+        ----------
+        other : :class:`Configuration`
+            The configuration to compare to.
+
+        Returns
+        ------
+        :obj:`float`
+            The maximum absolute difference.
+
+        Examples
+        --------
+        >>> c1 = Configuration.from_revolute_values([1, 0, 3])
+        >>> c2 = Configuration.from_revolute_values([1, 2 * pi, 4])
+        >>> c1.max_difference(c2)
+        1.0
+        """
+        return max([abs(v) for v in self.iter_differences(other)])
+
+    def close_to(self, other, tol=1e-3):
+        """Returns ``True`` if the other `Configuration`'s values are within a certain range.
+
+        Parameters
+        ----------
+        other : :class:`Configuration`
+            The configuration to compare to.
+        tol : float
+            The tolerance under which we consider 2 floats the same. Defaults to 1e-3.
+
+        Returns
+        -------
+        :obj:`bool`
+            ``True`` if the other `Configuration`'s values are within a certain
+            tolerance, `False` otherwise.
+
+        Examples
+        --------
+        >>> c1 = Configuration.from_revolute_values([1, 0, 3])
+        >>> c2 = Configuration.from_revolute_values([1, 2 * pi, 3])
+        >>> c1.close_to(c2)
+        True
+        """
+        for diff in self.iter_differences(other):
+            if abs(diff) > tol:
+                return False
+        return True
+
+    @property
+    def has_joint_names(self):
+        """Returns ``True`` when there is a joint name for every value."""
+        return len(self.values) == len(self.joint_names)
+
+    def check_joint_names(self):
+        """Raises an error if there is not a joint name for every value."""
+        if not self.has_joint_names:
+            if not len(self.joint_names):
+                raise ValueError('Joint names are required for this operation.')
+            else:
+                raise ValueError('Joint names do not match the number of joint values. Joint names={}, Joint values={}'.format(len(self.values), len(self.joint_names)))
+
+    @property
+    def joint_dict(self):
+        """A dictionary of joint values by joint name."""
+        self.check_joint_names()
+        return dict(zip(self.joint_names, self.values))
+
+    @property
+    def type_dict(self):
+        """A dictionary of joint types by joint name."""
+        self.check_joint_names()
+        return dict(zip(self.joint_names, self.types))
+
+    def merge(self, other):
+        """Merge the configuration with another configuration in place along joint names.
+        The other configuration takes precedence over this configuration in
+        case a joint value is present in both.
+
+        Note
+        ----
+            Caution: ``joint_names`` may be rearranged.
+
+        Parameters
+        ----------
+        other : :class:`Configuration`
+            The configuration to be merged.
+
+        Raises
+        ------
+        :exc:`ValueError`
+            If the configuration or the ``other`` configuration does not specify
+            joint names for all joint values.
+        """
+        _joint_dict = self.joint_dict
+        _joint_dict.update(other.joint_dict)
+
+        _type_dict = self.type_dict
+        _type_dict.update(other.type_dict)
+
+        self.joint_names = list(_joint_dict.keys())
+        self.values = [_joint_dict[name] for name in self.joint_names]
+        self.types = [_type_dict[name] for name in self.joint_names]
+
+    def merged(self, other):
+        """Get a new ``Configuration`` with this configuration merged with another configuration.
+        The other configuration takes precedence over this configuration in
+        case a joint value is present in both.
+
+        Note
+        ----
+            Caution: ``joint_names`` may be rearranged.
+
+        Parameters
+        ----------
+        other : :class:`Configuration`
+            The configuration to be merged.
+
+        Returns
+        -------
+        :class:`Configuration`
+            A configuration with values for all included joints.
+
+        Raises
+        ------
+        :exc:`ValueError`
+            If the configuration or the ``other`` configuration does not specify
+            joint names for all joint values.
+        """
+        configuration = self.copy()
+        configuration.merge(other)
+        return configuration
+
+
+if __name__ == "__main__":
+    import math  # noqa F401
+    from compas.geometry import allclose   # noqa F401
+    import doctest
+    doctest.testmod(globs=globals())
