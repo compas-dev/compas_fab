@@ -43,7 +43,7 @@ class CollisionMeshComponent(component):
         self.Params.Input.Add(p)
 
         p = Grasshopper.Kernel.Parameters.Param_String()
-        self.SetUpParam(p, "name", "name", "The name or identifier of the collision mesh.")
+        self.SetUpParam(p, "identifier", "identifier", "The identifier of the collision mesh.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
 
