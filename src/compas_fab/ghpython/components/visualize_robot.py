@@ -1,9 +1,10 @@
-from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 import Grasshopper
 import System
-from compas.geometry import Transformation
 from compas.geometry import Frame
+from compas.geometry import Transformation
 from compas_ghpython.artists import MeshArtist
+from ghpythonlib.componentbase import dotnetcompiledcomponent as component
+
 from compas_fab.ghpython.components.icons import default_icon
 
 
@@ -125,9 +126,6 @@ class RobotVisualize(component):
                 self.marshal.SetOutput(result[3], DA, 3, True)
                 self.marshal.SetOutput(result[4], DA, 4, True)
                 self.marshal.SetOutput(result[5], DA, 5, True)
-                self.marshal.SetOutput(result[6], DA, 6, True)
-                self.marshal.SetOutput(result[7], DA, 7, True)
-                self.marshal.SetOutput(result[8], DA, 8, True)
 
     def get_Internal_Icon_24x24(self):
         return default_icon

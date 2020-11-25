@@ -1,8 +1,9 @@
-from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 import Grasshopper
 import System
-from compas_ghpython import list_to_ghtree
 from compas_ghpython import draw_frame
+from compas_ghpython import list_to_ghtree
+from ghpythonlib.componentbase import dotnetcompiledcomponent as component
+
 from compas_fab.ghpython.components.icons import default_icon
 
 
@@ -106,7 +107,7 @@ class TrajectoryVisualize(component):
         velocities = []
         accelerations = []
 
-        if trajectory:
+        if robot and trajectory:
             group = group or robot.main_group_name
 
             for c in trajectory.points:

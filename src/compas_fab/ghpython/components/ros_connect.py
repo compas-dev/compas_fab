@@ -1,5 +1,5 @@
-import System
 import Grasshopper
+import System
 from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 from scriptcontext import sticky as st
 
@@ -45,7 +45,7 @@ class ROSConnect(component):
         self.Params.Input.Add(p)
 
         p = Grasshopper.Kernel.Parameters.Param_Boolean()
-        self.SetUpParam(p, "disconnect", "disconnect", "If `False`, disconnect from ROS. Defaults to False.")
+        self.SetUpParam(p, "disconnect", "disconnect", "If `True`, disconnect from ROS. Defaults to False.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
 

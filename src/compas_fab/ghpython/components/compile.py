@@ -1,3 +1,6 @@
+import os
+from shutil import copyfile
+
 import clr
 
 assembly_name = "COMPAS FAB"
@@ -20,8 +23,9 @@ clr.CompileModules(filename,
                    )
 
 
-from shutil import copyfile
-import os
+appdata = os.getenv('APPDATA')
+os.path.join(appdata, 'Grasshopper', 'Libraries')  # TODO: must move into compas_ghpython
+
 src = os.path.join(os.path.dirname(__file__), filename)
 dst = os.path.join(r'C:\Users\rustr\AppData\Roaming\Grasshopper\Libraries', filename)
 copyfile(src, dst)

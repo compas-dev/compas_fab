@@ -1,13 +1,11 @@
-import System
 import Grasshopper
+import System
+from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 from scriptcontext import sticky as st
-
-from compas_fab.robots import PlanningScene
 
 from compas_fab.ghpython.components import create_id
 from compas_fab.ghpython.components.icons import default_icon
-
-from ghpythonlib.componentbase import dotnetcompiledcomponent as component
+from compas_fab.robots import PlanningScene
 
 
 class PlanningSceneComponent(component):

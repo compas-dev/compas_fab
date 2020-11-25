@@ -1,8 +1,8 @@
-import System
 import Grasshopper
+import System
+from compas.geometry import Frame
 from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 
-from compas.geometry import Frame
 from compas_fab.ghpython.components.icons import default_icon
 
 

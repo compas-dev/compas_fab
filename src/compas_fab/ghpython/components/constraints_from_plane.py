@@ -1,8 +1,10 @@
-from ghpythonlib.componentbase import dotnetcompiledcomponent as component
+import math
+
 import Grasshopper
 import System
-import math
 from compas.geometry import Frame
+from ghpythonlib.componentbase import dotnetcompiledcomponent as component
+
 from compas_fab.ghpython.components.icons import default_icon
 
 

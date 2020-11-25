@@ -1,7 +1,8 @@
-from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 import Grasshopper
 import System
+from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 from scriptcontext import sticky as st
+
 from compas_fab.ghpython.components import create_id
 from compas_fab.ghpython.components.icons import default_icon
 
@@ -37,7 +38,7 @@ class PlanMotion(component):
 
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
         self.SetUpParam(p, "start_configuration", "start_configuration",
-                        "The robot’s full configuration, i.e. values for all configurable joints of the entire robot, at the starting position. Defaults to the all-zero configuration.")
+                        "The robot's full configuration, i.e. values for all configurable joints of the entire robot, at the starting position. Defaults to the all-zero configuration.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
 
