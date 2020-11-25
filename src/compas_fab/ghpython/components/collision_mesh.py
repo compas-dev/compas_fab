@@ -1,11 +1,9 @@
 import System
 import Grasshopper
-from scriptcontext import sticky as st
 
 from compas_rhino.geometry import RhinoMesh
 
 from compas_fab.robots import CollisionMesh
-from compas_fab.ghpython.components import create_id
 from compas_fab.ghpython.components.icons import default_icon
 
 from ghpythonlib.componentbase import dotnetcompiledcomponent as component
@@ -74,7 +72,7 @@ class CollisionMeshComponent(component):
 
         if result is not None:
             self.marshal.SetOutput(result, DA, 0, True)
-    
+
     def RunScript(self, scene, M, name, add, remove):
         ok = False
         if scene and M and name:
@@ -87,7 +85,3 @@ class CollisionMeshComponent(component):
                 scene.remove_collision_mesh(name)
                 ok = True
         return ok
-
-
-
-
