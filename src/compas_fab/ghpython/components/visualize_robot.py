@@ -168,4 +168,4 @@ class RobotVisualize(component):
                     mesh = acm.collision_mesh.mesh.transformed(T)
                     attached_meshes.append(MeshArtist(mesh).draw())
 
-        return (robot, visual, collision, attached_meshes, frames, ee_frame, base_frame)
+        return (visual, collision, attached_meshes, frames, base_frame, ee_frame)

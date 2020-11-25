@@ -49,13 +49,13 @@ class PlanMotion(component):
 
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
         self.SetUpParam(p, "attached_collision_meshes", "attached_collision_meshes", "A list of attached collision meshes to be included for planning.")
-        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
 
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
         self.SetUpParam(p, "path_constraints", "path_constraints",
                         "Optional constraints that can be imposed along the solution path. Note that path calculation won't work if the start_configuration violates these constraints. Defaults to None.")
-        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
+        p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
 
         p = Grasshopper.Kernel.Parameters.Param_String()
