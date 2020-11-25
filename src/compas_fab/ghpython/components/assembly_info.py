@@ -4,7 +4,6 @@ import GhPython
 assembly_name = "COMPAS FAB"
 assembly_version = "0.0.1"
 
-
 class AssemblyInfo(GhPython.Assemblies.PythonAssemblyInfo):
     def get_AssemblyName(self):
         return assembly_name
