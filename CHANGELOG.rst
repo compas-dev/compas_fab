@@ -17,6 +17,8 @@ Unreleased
 
 **Changed**
 
+* Updated to ``COMPAS 0.18``
+
 **Fixed**
 
 * Fixed bug in ``remove_attached_tool`` of ``PlanningScene``
