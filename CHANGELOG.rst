@@ -31,6 +31,7 @@ Unreleased
 **Changed**
 
 * Updated to ``COMPAS 0.18``
+* Use ``compas.IPY`` to check for IronPython
 
 **Fixed**
 
