@@ -31,7 +31,7 @@ jobs:
       - name: 📃 Generate docs
         if: success()
         run: |
-          invoke docs
+          invoke docs --check-links
 
           # Get branch/tag/latest name from git
           GITHUB_REF_REGEX="tags/v([0-9a-zA-Z\.\-]+)|(pull/[0-9]+)|heads/(.+)"

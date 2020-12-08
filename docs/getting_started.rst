@@ -58,7 +58,7 @@ Working in Blender
 ==================
 
 Once **COMPAS** itself is installed for Blender following the
-`documented procedure <https://compas.dev/compas/gettingstarted/cad/blender.html>`_,
+`documented procedure <https://compas.dev/compas/latest/gettingstarted/blender.html>`_,
 **COMPAS FAB** will automatically be available as well after installing it.
 
 
@@ -130,5 +130,5 @@ Next Steps
 * :ref:`Working with backends <backends>`
 * :ref:`COMPAS FAB Examples <examples>`
 * :ref:`COMPAS FAB API Reference <reference>`
-* `COMPAS Tutorials <https://compas.dev/compas/tutorial.html>`_
-* `COMPAS API Reference <https://compas.dev/compas/api.html>`_
+* `COMPAS Tutorials <https://compas.dev/compas/latest/tutorial.html>`_
+* `COMPAS API Reference <https://compas.dev/compas/latest/api.html>`_
