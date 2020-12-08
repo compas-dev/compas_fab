@@ -59,6 +59,9 @@ autodoc_member_order = 'alphabetical'
 # autosummary options
 autosummary_generate = True
 
+# linkcheck options
+# linkcheck_ignore = [r'http://localhost:\d+/']
+
 # collect doc versions
 package_docs_root = 'https://gramaziokohler.github.io/compas_fab/'
 
