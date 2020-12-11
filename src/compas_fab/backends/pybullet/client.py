@@ -8,7 +8,6 @@ import tempfile
 from itertools import combinations
 
 import compas
-from compas._os import system
 from compas.geometry import Frame
 from compas.robots import RobotModel
 
@@ -67,7 +66,7 @@ class PyBulletBase(object):
             self._configure_debug_visualizer(shadows)
 
     def _detect_display(self):
-        if self.connection_type == 'gui' and system != 'darwin' and not compas.is_windows() and ('DISPLAY' not in os.environ):
+        if self.connection_type == 'gui' and not compas.OSX and not compas.WINDOWS and ('DISPLAY' not in os.environ):
             self.connection_type = 'direct'
             print('No display detected! Continuing without GUI.')
 
