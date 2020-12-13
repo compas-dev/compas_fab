@@ -39,9 +39,13 @@ jobs:
           if [[ $GITHUB_REF =~ $GITHUB_REF_REGEX ]]; then
             if [[ $BASH_REMATCH = pull* ]]; then
               BRANCH_OR_TAG=pull_${BASH_REMATCH##*/}
+            elif [[ $BASH_REMATCH = tags/v* ]]; then
+              # 2nd element is tag, #v replaces prefix v
+              BRANCH_OR_TAG=${BASH_REMATCH[1]#v}
             else
               BRANCH_OR_TAG=${BASH_REMATCH##*/}
             fi;
+
             if [[ $BRANCH_OR_TAG = master ]]; then
               BRANCH_OR_TAG=latest
             fi;
