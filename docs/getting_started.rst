@@ -46,13 +46,13 @@ To update COMPAS to the latest version with ``conda``
 
 .. code-block:: bash
 
-    conda update -n research compas_fab
+    conda update compas_fab
 
 To switch to a specific version
 
 .. code-block:: bash
 
-    conda install -n research compas_fab=0.15.0
+    conda install compas_fab=0.15.0
 
 
 Update with pip
