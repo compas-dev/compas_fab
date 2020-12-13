@@ -36,6 +36,41 @@ Start Python from the command prompt and run the following:
 
 You are ready to use **COMPAS FAB**!
 
+Update
+======
+
+Update with conda
+-----------------
+
+To update COMPAS to the latest version with ``conda``
+
+.. code-block:: bash
+
+    conda update -n research compas_fab
+
+To switch to a specific version
+
+.. code-block:: bash
+
+    conda install -n research compas_fab=0.15.0
+
+
+Update with pip
+---------------
+
+If you installed COMPAS with ``pip`` the update command is the following
+
+.. code-block:: bash
+
+    pip install --upgrade compas_fab
+
+Or to switch to a specific version
+
+.. code-block:: bash
+
+    pip install compas_fab==0.15.0
+
+
 Working in Rhino
 ================
 
