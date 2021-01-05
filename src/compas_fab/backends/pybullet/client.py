@@ -9,7 +9,7 @@ from itertools import combinations
 
 import compas
 from compas.geometry import Frame
-from compas.robots import RobotModel
+from compas.robots import RobotModel, LocalPackageMeshLoader
 
 from compas_fab.backends.interfaces.client import ClientInterface
 from compas_fab.robots import Robot
@@ -160,7 +160,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """
         pybullet.stepSimulation(physicsClientId=self.client_id)
 
-    def load_robot(self, urdf_file):
+    def load_robot(self, urdf_file, resource_loaders=None):
         """Create a pybullet robot using the input urdf file.
 
         Parameters
@@ -168,6 +168,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         urdf_file : :obj:`str` or file object
             Absolute file path to the urdf file name or file object. The mesh file can be linked by either
             `"package::"` or relative path.
+        resource_loaders : :obj:`list`
+            List of :class:`compas.robots.AbstractMeshLoader` for loading geometry of the robot.  That the
+            geometry of the robot model is loaded is required before adding or removing attached collision meshes
+            to or from the scene. Defaults to the empty list.
 
         Notes
         -----
@@ -178,6 +182,12 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """
         robot_model = RobotModel.from_urdf_file(urdf_file)
         robot = Robot(robot_model, client=self)
+        resource_loaders = resource_loaders or []
+        try:
+            robot_model.load_geometry(*resource_loaders)
+            robot.attributes['geometry_loaded'] = True
+        except Exception:
+            robot.attributes['geometry_loaded'] = False
 
         with redirect_stdout(enabled=not self.verbose):
             pybullet_uid = pybullet.loadURDF(urdf_file, useFixedBase=True,
