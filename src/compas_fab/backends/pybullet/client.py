@@ -140,12 +140,15 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.collision_objects = {}
         self.attached_collision_objects = {}
         self.disabled_collisions = set()
+        self._cache_dir = None
 
     def __enter__(self):
+        self._cache_dir = tempfile.TemporaryDirectory()
         self.connect()
         return self
 
     def __exit__(self, *args):
+        self._cache_dir.cleanup()
         self.disconnect()
 
     def step_simulation(self):
@@ -426,20 +429,16 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         -------
         :obj:`int`
         """
-        tmp_dir = tempfile.mkdtemp()
-        tmp_obj_path = os.path.join(tmp_dir, 'temp.obj')
-        try:
-            mesh.to_obj(tmp_obj_path)
-            tmp_obj_path = self._handle_concavity(tmp_obj_path, tmp_dir, concavity, mass)
-            pyb_body_id = self.body_from_obj(tmp_obj_path, concavity=concavity, mass=mass)
-            self._set_base_frame(frame, pyb_body_id)
-            # The following lines are for visual debugging purposes
-            # To be deleted or rewritten later.
-            # if name:
-            #     from pybullet_planning import add_body_name
-            #     add_body_name(pyb_body, name)
-        finally:
-            shutil.rmtree(tmp_dir)
+        tmp_obj_path = os.path.join(self._cache_dir.name, 'temp.obj')
+        mesh.to_obj(tmp_obj_path)
+        tmp_obj_path = self._handle_concavity(tmp_obj_path, self._cache_dir.name, concavity, mass)
+        pyb_body_id = self.body_from_obj(tmp_obj_path, concavity=concavity, mass=mass)
+        self._set_base_frame(frame, pyb_body_id)
+        # The following lines are for visual debugging purposes
+        # To be deleted or rewritten later.
+        # if name:
+        #     from pybullet_planning import add_body_name
+        #     add_body_name(pyb_body, name)
         return pyb_body_id
 
     @staticmethod
