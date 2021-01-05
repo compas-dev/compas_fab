@@ -3,13 +3,12 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-import shutil
 import tempfile
 from itertools import combinations
 
 import compas
 from compas.geometry import Frame
-from compas.robots import RobotModel, LocalPackageMeshLoader
+from compas.robots import RobotModel
 
 from compas_fab.backends.interfaces.client import ClientInterface
 from compas_fab.robots import Robot
