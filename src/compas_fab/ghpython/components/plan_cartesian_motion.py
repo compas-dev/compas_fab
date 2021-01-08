@@ -1,9 +1,9 @@
 import Grasshopper
 import System
-from compas.geometry import Frame
 from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 from scriptcontext import sticky as st
 
+from compas.geometry import Frame
 from compas_fab.ghpython.components import create_id
 from compas_fab.ghpython.components.icons import default_icon
 
@@ -39,7 +39,7 @@ class PlanCartesianMotion(component):
 
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
         self.SetUpParam(p, "start_configuration", "start_configuration",
-                        "The robot's full configuration, i.e. values for all configurable joints of the entire robot, at the starting position. Defaults to the all-zero configuration.")
+                        "The robot's full configuration, i.e. values for all configurable joints of the entire robot, at the starting position. Defaults to the all-zero configuration.")  # noqa E501
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
 
@@ -55,7 +55,7 @@ class PlanCartesianMotion(component):
 
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
         self.SetUpParam(p, "path_constraints", "path_constraints",
-                        "Optional constraints that can be imposed along the solution path. Note that path calculation won't work if the start_configuration violates these constraints. Defaults to None.")
+                        "Optional constraints that can be imposed along the solution path. Note that path calculation won't work if the start_configuration violates these constraints. Defaults to None.")  # noqa E501
         p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
 

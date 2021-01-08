@@ -32,13 +32,13 @@ class PlanMotion(component):
         self.Params.Input.Add(p)
 
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "goal_constraints", "goal_constraints", "The goal to be achieved, defined in a set of constraints. Constraints can be very specific, for example defining value domains for each joint, such that the goal configuration is included, or defining a volume in space, to which a specific robot link (e.g. the end-effector) is required to move to.")
+        self.SetUpParam(p, "goal_constraints", "goal_constraints", "The goal to be achieved, defined in a set of constraints. Constraints can be very specific, for example defining value domains for each joint, such that the goal configuration is included, or defining a volume in space, to which a specific robot link (e.g. the end-effector) is required to move to.")  # noqa E501
         p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
 
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
         self.SetUpParam(p, "start_configuration", "start_configuration",
-                        "The robot's full configuration, i.e. values for all configurable joints of the entire robot, at the starting position. Defaults to the all-zero configuration.")
+                        "The robot's full configuration, i.e. values for all configurable joints of the entire robot, at the starting position. Defaults to the all-zero configuration.")  # noqa E501
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
 
@@ -54,7 +54,7 @@ class PlanMotion(component):
 
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
         self.SetUpParam(p, "path_constraints", "path_constraints",
-                        "Optional constraints that can be imposed along the solution path. Note that path calculation won't work if the start_configuration violates these constraints. Defaults to None.")
+                        "Optional constraints that can be imposed along the solution path. Note that path calculation won't work if the start_configuration violates these constraints. Defaults to None.")  # noqa E501
         p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
 
