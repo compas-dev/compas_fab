@@ -1,8 +1,8 @@
 import GhPython
 import System
 
-assembly_name = "COMPAS FAB"
-assembly_version = "0.15.0"
+from compas_fab.ghpython.components import assembly_name
+from compas_fab.ghpython.components import assembly_version
 
 
 class AssemblyInfo(GhPython.Assemblies.PythonAssemblyInfo):
