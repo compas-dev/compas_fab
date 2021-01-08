@@ -1,12 +1,10 @@
-import System
 import Grasshopper
+import System
+from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 
 from compas_rhino.geometry import RhinoMesh
-
-from compas_fab.robots import CollisionMesh
 from compas_fab.ghpython.components.icons import default_icon
-
-from ghpythonlib.componentbase import dotnetcompiledcomponent as component
+from compas_fab.robots import CollisionMesh
 
 
 class CollisionMeshComponent(component):

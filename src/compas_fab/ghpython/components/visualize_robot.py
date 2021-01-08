@@ -1,10 +1,10 @@
 import Grasshopper
 import System
+from ghpythonlib.componentbase import dotnetcompiledcomponent as component
+
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_ghpython.artists import MeshArtist
-from ghpythonlib.componentbase import dotnetcompiledcomponent as component
-
 from compas_fab.ghpython.components.icons import default_icon
 
 

@@ -1,9 +1,9 @@
 import Grasshopper
 import System
-from compas_ghpython import draw_frame
-from compas_ghpython import list_to_ghtree
 from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 
+from compas_ghpython import draw_frame
+from compas_ghpython import list_to_ghtree
 from compas_fab.ghpython.components.icons import default_icon
 
 
