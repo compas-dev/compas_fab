@@ -1,12 +1,13 @@
-import os
-from shutil import copyfile
-
 import clr
+
+# The below line does not work, since Grasshopper cannot be loaded from withing RhinoPython Editor.
+#from compas_fab.ghpython.components import filename
 
 assembly_name = "COMPAS FAB"
 assembly_version = "0.15.0"
-
 filename = "%s_%s.ghpy" % (assembly_name, assembly_version)
+
+
 clr.CompileModules(filename,
                    "assembly_info.py",
                    "ros_connect.py",
@@ -21,11 +22,3 @@ clr.CompileModules(filename,
                    "visualize_robot.py",
                    "visualize_trajectory.py",
                    )
-
-
-appdata = os.getenv('APPDATA')
-os.path.join(appdata, 'Grasshopper', 'Libraries')  # TODO: must move into compas_ghpython
-
-src = os.path.join(os.path.dirname(__file__), filename)
-dst = os.path.join(r'C:\Users\rustr\AppData\Roaming\Grasshopper\Libraries', filename)
-copyfile(src, dst)
