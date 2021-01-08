@@ -1,16 +1,11 @@
-import compas
 import Grasshopper
 import System
-from compas.robots import RobotModel
-from compas_ghpython.artists import RobotModelArtist
 from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 from scriptcontext import sticky as st
 
-from compas_fab.backends import RosFileServerLoader
+import compas
 from compas_fab.ghpython.components import create_id
 from compas_fab.ghpython.components.icons import default_icon
-from compas_fab.robots import Robot
-from compas_fab.robots import RobotSemantics
 
 
 class ROSRobot(component):
@@ -64,17 +59,7 @@ class ROSRobot(component):
 
         if ros_client and ros_client.is_connected and load:
             # Load URDF from ROS
-            loader = RosFileServerLoader(ros_client)
-            urdf = loader.load_urdf()
-            srdf = loader.load_srdf()
-
-            # Create robot model from URDF and load geometry
-            model = RobotModel.from_urdf_string(urdf)
-            model.load_geometry(loader)
-            semantics = RobotSemantics.from_srdf_string(srdf, model)
-            robot = Robot(model, semantics=semantics)
-            robot.artist = RobotModelArtist(robot.model)
-            st[key] = robot
+            st[key] = ros_client.load_robot(load_geometry=True)
 
         robot = st.get(key, None)
         if robot:  # client sometimes need to be restarted, without needing to reload geometry
