@@ -4,7 +4,7 @@ from shutil import copyfile
 import clr
 
 assembly_name = "COMPAS FAB"
-assembly_version = "0.0.1"
+assembly_version = "0.15.0"
 
 filename = "%s_%s.ghpy" % (assembly_name, assembly_version)
 clr.CompileModules(filename,
