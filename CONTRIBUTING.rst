@@ -96,6 +96,14 @@ To maintain consistency from one backend client to another and to promote modula
 we make use of several interfaces.  Please reference :ref:`Note on Architecture <architecture>`
 for more details on how to add or amend a backend client.
 
+A Note on GhPython Components
+-----------------------------
+
+The Grasshopper components are made with the Python GHPY compiler based on the `Tutorial by Giulio Piacentino <https://discourse.mcneel.com/t/tutorial-creating-a-grasshopper-component-with-the-python-ghpy-compiler/38552>`_.
+If you make changes to the files in ``src/compas_fab/ghpython/components``, the components library has to be manually recompiled.
+This is done by executing ``src\compas_fab\ghpython\components\compile.py`` with Rhino's PythonScript Editor.
+The resulting ghpy file is then copied automatically into the Grasshopper's library folder.
+
 Design documents
 ----------------
 
