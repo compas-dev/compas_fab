@@ -29,7 +29,7 @@ project = 'COMPAS FAB'
 year = '2018'
 author = 'Gramazio Kohler Research'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '0.13.1'
+version = release = '0.15.0'
 
 pygments_style = 'sphinx'
 show_authors = True
@@ -58,6 +58,9 @@ autodoc_member_order = 'alphabetical'
 
 # autosummary options
 autosummary_generate = True
+
+# linkcheck options
+linkcheck_ignore = [r'http://localhost:\d+/']
 
 # collect doc versions
 package_docs_root = 'https://gramaziokohler.github.io/compas_fab/'

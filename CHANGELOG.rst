@@ -12,18 +12,45 @@ Unreleased
 
 **Added**
 
+**Changed**
+
+**Fixed**
+
+**Deprecated**
+
+**Removed**
+
+0.15.0
+----------
+
+**Added**
+
+**Changed**
+
+* Updated to ``COMPAS 0.19``
+
+**Fixed**
+
+**Deprecated**
+
+**Removed**
+
+0.14.0
+----------
+
+**Added**
+
 * Added new backend feature ``ResetPlanningScene``
 * Added ``MoveItResetPlanningScene``
 
 **Changed**
 
+* Updated to ``COMPAS 0.18``
+* Use ``compas.IPY`` to check for IronPython
+
 **Fixed**
 
 * Fixed bug in ``remove_attached_tool`` of ``PlanningScene``
-
-**Deprecated**
-
-**Removed**
 
 0.13.1
 ----------

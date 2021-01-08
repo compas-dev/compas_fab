@@ -36,6 +36,41 @@ Start Python from the command prompt and run the following:
 
 You are ready to use **COMPAS FAB**!
 
+Update
+======
+
+Update with conda
+-----------------
+
+To update COMPAS to the latest version with ``conda``
+
+.. code-block:: bash
+
+    conda update compas_fab
+
+To switch to a specific version
+
+.. code-block:: bash
+
+    conda install compas_fab=0.15.0
+
+
+Update with pip
+---------------
+
+If you installed COMPAS with ``pip`` the update command is the following
+
+.. code-block:: bash
+
+    pip install --upgrade compas_fab
+
+Or to switch to a specific version
+
+.. code-block:: bash
+
+    pip install compas_fab==0.15.0
+
+
 Working in Rhino
 ================
 
@@ -58,7 +93,7 @@ Working in Blender
 ==================
 
 Once **COMPAS** itself is installed for Blender following the
-`documented procedure <https://compas.dev/compas/gettingstarted/cad/blender.html>`_,
+`documented procedure <https://compas.dev/compas/latest/gettingstarted/blender.html>`_,
 **COMPAS FAB** will automatically be available as well after installing it.
 
 
@@ -130,5 +165,5 @@ Next Steps
 * :ref:`Working with backends <backends>`
 * :ref:`COMPAS FAB Examples <examples>`
 * :ref:`COMPAS FAB API Reference <reference>`
-* `COMPAS Tutorials <https://compas.dev/compas/tutorial.html>`_
-* `COMPAS API Reference <https://compas.dev/compas/api.html>`_
+* `COMPAS Tutorials <https://compas.dev/compas/latest/tutorial.html>`_
+* `COMPAS API Reference <https://compas.dev/compas/latest/api.html>`_

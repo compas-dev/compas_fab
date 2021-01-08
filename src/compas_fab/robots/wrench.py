@@ -6,7 +6,7 @@ import compas
 from compas.geometry import Vector
 from compas.geometry import cross_vectors
 
-if not compas.is_ironpython():
+if not compas.IPY:
     from scipy import stats
 else:
     stats = None
