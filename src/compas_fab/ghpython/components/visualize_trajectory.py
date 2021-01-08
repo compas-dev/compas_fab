@@ -71,7 +71,7 @@ class TrajectoryVisualize(component):
         self.Params.Output.Add(p)
 
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "A", "A", "The accellerations along the trajectory")
+        self.SetUpParam(p, "A", "A", "The accelerations along the trajectory")
         self.Params.Output.Add(p)
 
     def SolveInstance(self, DA):
