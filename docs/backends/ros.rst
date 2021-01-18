@@ -6,7 +6,7 @@ ROS
 
 .. highlight:: bash
 
-The `Robot Operating System <http://www.ros.org>`_ (ROS) is a flexible framework
+The `Robot Operating System <https://www.ros.org>`_ (ROS) is a flexible framework
 for writing robot software. It is a collection of tools, libraries, and
 conventions that aim to simplify the task of creating complex and robust
 robot behavior across a wide variety of robotic platforms.
@@ -255,12 +255,12 @@ Check :ref:`the following page <backends_gui>` for more details.
 
 
 
-.. _ROS installation instructions: http://wiki.ros.org/ROS/Installation
+.. _ROS installation instructions: https://wiki.ros.org/ROS/Installation
 .. _Windows Subsystem for Linux: https://docs.microsoft.com/en-us/windows/wsl/about
 .. _Microsoft WSL documentation: https://docs.microsoft.com/en-us/windows/wsl/install-win10
 .. _Docker: https://www.docker.com/
 .. _Docker Hub: https://hub.docker.com/r/gramaziokohler/
-.. _ROS Bridge: http://wiki.ros.org/rosbridge_suite
+.. _ROS Bridge: https://wiki.ros.org/rosbridge_suite
 
 Next Steps
 ==========
