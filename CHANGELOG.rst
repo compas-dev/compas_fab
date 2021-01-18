@@ -14,6 +14,8 @@ Unreleased
 
 **Changed**
 
+* Updated to ``COMPAS 1.0``
+
 **Fixed**
 
 **Deprecated**
