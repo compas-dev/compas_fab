@@ -32,7 +32,7 @@ Loading model from ROS
 
 .. note::
 
-    The following example uses the `ROS <http://www.ros.org/>`_ backend
+    The following example uses the `ROS <https://www.ros.org/>`_ backend
     and loads the robot description model from it. Before running it, please
     make sure you have the :ref:`ROS backend <ros_backend>` correctly
     configured and the :ref:`Panda Demo <ros_bundles_list>` started.

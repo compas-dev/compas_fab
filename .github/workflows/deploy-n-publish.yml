@@ -31,7 +31,9 @@ jobs:
       - name: 📃 Generate docs
         if: success()
         run: |
-          invoke docs --check-links
+          # Disable link checking for the time being because ROS links are failing SSL verification
+          # invoke docs --check-links
+          invoke docs
 
           # Get branch/tag/latest name from git
           GITHUB_REF_REGEX="tags/v([0-9a-zA-Z\.\-]+)|(pull/[0-9]+)|heads/(.+)"
