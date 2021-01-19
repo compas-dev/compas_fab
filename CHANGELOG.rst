@@ -10,17 +10,9 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 Unreleased
 ----------
 
-**Added**
-
 **Changed**
 
 * Updated to ``COMPAS 1.0``
-
-**Fixed**
-
-**Deprecated**
-
-**Removed**
 
 0.15.0
 ----------
