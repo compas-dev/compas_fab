@@ -259,7 +259,7 @@ Check :ref:`the following page <backends_gui>` for more details.
 .. _Windows Subsystem for Linux: https://docs.microsoft.com/en-us/windows/wsl/about
 .. _Microsoft WSL documentation: https://docs.microsoft.com/en-us/windows/wsl/install-win10
 .. _Docker: https://www.docker.com/
-.. _Docker Hub: https://hub.docker.com/r/gramaziokohler/
+.. _Docker Hub: https://hub.docker.com/u/gramaziokohler/
 .. _ROS Bridge: https://wiki.ros.org/rosbridge_suite
 
 Next Steps

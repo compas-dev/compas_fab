@@ -91,7 +91,7 @@ Paste the following into the file:
 .. code-block:: xml
 
     <?xml version="1.0" encoding="utf-8"?>
-        <robot xmlns:xacro="http://ros.org/wiki/xacro">
+        <robot xmlns:xacro="https://ros.org/wiki/xacro">
             <xacro:macro name="tower" params="prefix">
                 <link name="${prefix}tower">
                     <visual>
@@ -200,7 +200,7 @@ Paste the following:
 .. code-block:: xml
 
     <?xml version="1.0"?>
-        <robot name="ur10_tower" xmlns:xacro="http://ros.org/wiki/xacro">
+        <robot name="ur10_tower" xmlns:xacro="https://ros.org/wiki/xacro">
             <!-- tower -->
             <xacro:include filename="tower.xacro"/>
             <!-- ur10 -->

@@ -6,7 +6,7 @@ V-REP
 
 .. highlight:: bash
 
-`V-REP <http://www.coppeliarobotics.com/>`_ is a robotic simulation tool
+`V-REP <https://www.coppeliarobotics.com/>`_ is a robotic simulation tool
 by Coppelia Robotics with an integrated development environment and various
 programmable interfaces.
 
@@ -28,11 +28,11 @@ container with the following commands on the command prompt::
 .. note::
 
     If your operating system does not support running Docker, an alternative is
-    to `download V-REP <http://www.coppeliarobotics.com/downloads.html>`_ and
+    to `download V-REP <https://www.coppeliarobotics.com/downloads>`_ and
     install it as a normal application.
 
 .. _Docker: https://www.docker.com/
-.. _Docker Hub: https://hub.docker.com/r/gramaziokohler/vrep/
+.. _Docker Hub: https://hub.docker.com/u/gramaziokohler/vrep/
 
 Next Steps
 ==========

@@ -96,7 +96,7 @@ Paste the following into the file:
 .. code-block:: xml
 
   <?xml version="1.0" encoding="utf-8"?>
-  <robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <robot xmlns:xacro="https://ros.org/wiki/xacro">
     <!-- Here we define the 2 parameters of the macro -->
     <xacro:macro name="measurement_tool" params="prefix connected_to">
       <!-- Create a fixed joint with a parameterized name. -->
@@ -156,7 +156,7 @@ Paste the following:
 .. code-block:: xml
 
   <?xml version="1.0"?>
-  <robot xmlns:xacro="http://ros.org/wiki/xacro" name="ur5_with_measurement_tool">
+  <robot xmlns:xacro="https://ros.org/wiki/xacro" name="ur5_with_measurement_tool">
 
     <!-- ur5 -->
     <xacro:include filename="$(find ur_description)/urdf/ur5.urdf.xacro" />

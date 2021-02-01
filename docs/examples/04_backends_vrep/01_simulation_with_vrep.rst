@@ -2,7 +2,7 @@
 Simulation examples with V-REP
 ********************************************************************************
 
-The following examples demonstrate the `V-REP <http://www.coppeliarobotics.com/>`_
+The following examples demonstrate the `V-REP <https://www.coppeliarobotics.com/>`_
 simulation backend. They are based on a sample scene of the Robotic Fabrication
 Lab (RFL).
 
