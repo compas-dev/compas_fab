@@ -18,6 +18,7 @@ from .std_msgs import ROSmsg
 class GetPositionIKRequest(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionIK.html
     """
+
     def __init__(self, ik_request=None):
         self.ik_request = ik_request or PositionIKRequest()
 
@@ -115,6 +116,7 @@ class SetPlannerParamsRequest(ROSmsg):
 class MotionPlanRequest(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanRequest.html
     """
+
     def __init__(self, workspace_parameters=None, start_state=None,
                  goal_constraints=None, path_constraints=None,
                  trajectory_constraints=None, planner_id='',
@@ -164,6 +166,7 @@ class MotionPlanResponse(ROSmsg):
 class GetPlanningSceneRequest(ROSmsg):
     """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html
     """
+
     def __init__(self, components=None):
         self.components = components or PlanningSceneComponents()
 
@@ -171,9 +174,26 @@ class GetPlanningSceneRequest(ROSmsg):
 class GetPlanningSceneResponse(ROSmsg):
     """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html
     """
+
     def __init__(self, scene=None):
         self.scene = scene or PlanningScene()
 
     @classmethod
     def from_msg(cls, msg):
         return PlanningScene.from_msg(msg['scene'])
+
+
+class ApplyPlanningSceneRequest(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html
+    """
+
+    def __init__(self, scene=None):
+        self.scene = scene or PlanningScene()
+
+
+class ApplyPlanningSceneResponse(ROSmsg):
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html
+    """
+
+    def __init__(self, success=False):
+        self.success = success

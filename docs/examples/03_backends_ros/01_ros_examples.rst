@@ -24,9 +24,19 @@ see the output ``Connected: True`` if everything is working properly:
 
     from compas_fab.backends import RosClient
     with RosClient() as client:
-        print('Connected:', client.is_connected)
+        print('Connected: ', client.is_connected)
 
 *Yay! Our first connection to ROS!*
+
+If you prefer to work without a context manager, the equivalent code is:
+
+.. code-block:: python
+
+   from compas_fab.backends import RosClient
+   client = RosClient()
+   client.run()
+   print('Connected: ', client.is_connected)
+   client.close()
 
 .. note::
 
@@ -104,7 +114,7 @@ Now open a second command prompt and start the listener:
 
     python 01_ros_hello_world_listener.py
 
-You should see the listener printing everytime it hears the other node talking.
+You should see the listener printing every time it hears the other node talking.
 
 .. note::
 

@@ -1,3 +1,5 @@
+.. _contributors_guide:
+
 Contributor's Guide
 ===================
 
@@ -88,3 +90,18 @@ The best way to send feedback is to file an issue on
 
 * Explain in detail how it would work.
 * Keep the scope as narrow as possible, to make it easier to implement.
+
+A Note on Architecture for Backend Clients
+------------------------------------------
+
+To maintain consistency from one backend client to another and to promote modularity,
+we make use of several interfaces.  Please reference :ref:`Note on Architecture <architecture>`
+for more details on how to add or amend a backend client.
+
+Design documents
+----------------
+
+.. toctree::
+    :maxdepth: 1
+
+    architecture

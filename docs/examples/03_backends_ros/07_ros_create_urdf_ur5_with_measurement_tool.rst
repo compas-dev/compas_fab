@@ -136,7 +136,7 @@ Paste the following into the file:
 Explanation
 -----------
 
-The end-effector consists of one fixed joint (that will be attacted to the tool0
+The end-effector consists of one fixed joint (that will be attached to the tool0
 of the robot), one link with geometry (the tool geometry), one fixed joint (the
 tcp joint, defining the TCP frame) and the tcp link without geometry.
 
@@ -296,8 +296,28 @@ For convenience, add the path to your ``.bashrc`` in order to make it available 
 Further links
 =============
 
+<<<<<<< HEAD
 * `Building a visual robot model with URDF from scratch <https://wiki.ros.org/urdf/Tutorials/Building%20a%20Visual%20Robot%20Model%20with%20URDF%20from%20Scratch>`_
 * `Adding Physical and Collision Properties to a URDF Model <https://wiki.ros.org/urdf/Tutorials/Adding%20Physical%20and%20Collision%20Properties%20to%20a%20URDF%20Model>`_
 * `Create your own URDF file <https://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file>`_
 * `Create a URDF for an Industrial Robot <https://wiki.ros.org/Industrial/Tutorials/Create%20a%20URDF%20for%20an%20Industrial%20Robot>`_
 * `Working with ROS-Industrial Robot Support Packages <https://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages>`_
+||||||| e4bfe76
+* `Building a visual robot model with URDF from scratch <http://wiki.ros.org/urdf/Tutorials/Building%20a%20Visual%20Robot%20Model%20with%20URDF%20from%20Scratch>`_
+* `Adding Physical and Collision Properties to a URDF Model <http://wiki.ros.org/urdf/Tutorials/Adding%20Physical%20and%20Collision%20Properties%20to%20a%20URDF%20Model>`_
+* `Create your own URDF file <http://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file>`_
+* `Create a URDF for an Industrial Robot <http://wiki.ros.org/Industrial/Tutorials/Create%20a%20URDF%20for%20an%20Industrial%20Robot>`_
+* `Working with ROS-Industrial Robot Support Packages <http://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages>`_
+
+
+
+=======
+* `Building a visual robot model with URDF from scratch <https://wiki.ros.org/urdf/Tutorials/Building%20a%20Visual%20Robot%20Model%20with%20URDF%20from%20Scratch>`_
+* `Adding Physical and Collision Properties to a URDF Model <https://wiki.ros.org/urdf/Tutorials/Adding%20Physical%20and%20Collision%20Properties%20to%20a%20URDF%20Model>`_
+* `Create your own URDF file <https://wiki.ros.org/urdf/Tutorials/Create%20your%20own%20urdf%20file>`_
+* `Create a URDF for an Industrial Robot <https://wiki.ros.org/Industrial/Tutorials/Create%20a%20URDF%20for%20an%20Industrial%20Robot>`_
+* `Working with ROS-Industrial Robot Support Packages <https://wiki.ros.org/Industrial/Tutorials/WorkingWithRosIndustrialRobotSupportPackages>`_
+
+
+
+>>>>>>> upstream/master

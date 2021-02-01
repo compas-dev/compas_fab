@@ -259,12 +259,21 @@ Check :ref:`the following page <backends_gui>` for more details.
 .. _Windows Subsystem for Linux: https://docs.microsoft.com/en-us/windows/wsl/about
 .. _Microsoft WSL documentation: https://docs.microsoft.com/en-us/windows/wsl/install-win10
 .. _Docker: https://www.docker.com/
+<<<<<<< HEAD
 .. _Docker Hub: https://hub.docker.com/u/gramaziokohler/
 .. _ROS Bridge: https://wiki.ros.org/rosbridge_suite
+||||||| e4bfe76
+.. _Docker Hub: https://hub.docker.com/r/gramaziokohler/
+.. _ROS Bridge: http://wiki.ros.org/rosbridge_suite
+=======
+.. _Docker Hub: https://hub.docker.com/r/gramaziokohler/
+.. _ROS Bridge: https://wiki.ros.org/rosbridge_suite
+>>>>>>> upstream/master
 
 Next Steps
 ==========
 
+* :ref:`Tutorial: COMPAS Robots <compas:robots>`
 * :ref:`Examples: Description models <examples_description_models>`
 * :ref:`Examples: ROS Backend <examples_ros>`
 * :ref:`COMPAS FAB API Reference <reference>`

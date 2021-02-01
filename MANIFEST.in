@@ -12,8 +12,10 @@ include LICENSE
 include README.rst
 
 exclude requirements-dev.txt
+exclude .deepsource.toml
 exclude .bumpversion.cfg
 exclude .editorconfig
+exclude conftest.py
 exclude tasks.py
 exclude pytest.ini
 exclude ISSUE_TEMPLATE.md

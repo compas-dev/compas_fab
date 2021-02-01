@@ -13,17 +13,17 @@ datastructures and models, in a way that maintains the data separated from the
 specific CAD interfaces, while providing a way to leverage native performance
 of the CAD environment.
 
-This package provides a robot artists implementation that is optimized to use
-in Blender.
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    RobotArtist
+This package only provides a deprecated alias to the
+:class:`~compas_blender.artists.RobotModelArtist` implemented in COMPAS.
 
 """
+try:
+    import bpy  # noqa: F401
+    import mathutils  # noqa: F401
+except ImportError:
+    pass
+else:
+    from .artists import RobotArtist
+    from .artists import RobotModelArtist
 
-from .artists import RobotArtist
-
-__all__ = ['RobotArtist']
+    __all__ = ['RobotArtist', 'RobotModelArtist']

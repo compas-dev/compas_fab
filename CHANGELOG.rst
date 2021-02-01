@@ -7,7 +7,6 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-
 Unreleased
 ----------
 
@@ -18,6 +17,115 @@ Unreleased
 **Fixed**
 
 **Deprecated**
+
+**Removed**
+
+0.16.0
+----------
+
+**Changed**
+
+* Updated to ``COMPAS 1.0``
+
+0.15.0
+----------
+
+**Added**
+
+**Changed**
+
+* Updated to ``COMPAS 0.19``
+
+**Fixed**
+
+**Deprecated**
+
+**Removed**
+
+0.14.0
+----------
+
+**Added**
+
+* Added new backend feature ``ResetPlanningScene``
+* Added ``MoveItResetPlanningScene``
+
+**Changed**
+
+* Updated to ``COMPAS 0.18``
+* Use ``compas.IPY`` to check for IronPython
+
+**Fixed**
+
+* Fixed bug in ``remove_attached_tool`` of ``PlanningScene``
+
+0.13.1
+----------
+
+**Added**
+
+* Added ``name`` property to ``Tool`` class.
+
+**Fixed**
+
+* Fixed bug in ``add_attached_tool`` of ``PlanningScene``
+* Fixed ``frame_id`` generation when tool name changes
+* Fixed freeze with some sync planning scene methods on Grasshopper/IronPython
+
+0.13.0
+----------
+
+**Changed**
+
+* Updated to ``COMPAS 0.17``
+
+0.12.0
+----------
+
+**Added**
+
+* **PyBullet integration**: added support for PyBullet client and forward/inverse kinematic solver
+* Added ``ClientInterface``, ``PlannerInterface`` and various backend feature interfaces
+* Added implementations of these interfaces for ROS and V-REP
+* Added ``attributes`` dictionary to ``Robot`` class
+* Added ``compas_fab.robots.Tool.from_t0cf_to_tcf``
+* Added ``compas_fab.robots.Tool.from_tcf_to_t0cf``
+* Added ``joint_names`` as optional parameter for all ``compas_fab.robots.Configuration`` constructors
+* Added ``compas_fab.robots.Configuration.iter_differences``
+* Added ``compas_fab.robots.Configuration.max_difference``
+* Added ``compas_fab.robots.Configuration.close_to``
+* Added ``compas_fab.robots.Configuration.merge``
+* Added ``compas_fab.robots.JointTrajectoryPoint.merge``
+* Added ``compas_fab.robots.Semantics.group_states``
+* Added ``compas_fab.robots.Robot.get_configuration_from_group_state``
+
+**Changed**
+
+* Updated to ``COMPAS 0.16.9``
+* Renamed ``compas_fab.robots.Robot.to_local_coords`` to ``compas_fab.robots.Robot.to_local_coordinates``
+* Renamed ``compas_fab.robots.Robot.to_world_coords`` to ``compas_fab.robots.Robot.to_world_coordinates``
+* Backend clients have been restructured according to the new interfaces
+* Parameter ``backend`` of forward kinematics has been renamed to ``solver``
+* The signatures of all kinematics, motion planning and planning scene management methods have been homogenized across backend clients and within ``Robot``
+* All examples have been updated to reflect these changes
+* The installer to Rhino has been unified with COMPAS core. Now running ``python -m compas_rhino.install`` will also detect and install COMPAS FAB and its dependencies.
+* Renamed all ``RobotArtist`` implementations to ``RobotModelArtist`` to reflect
+  the fact they depend on ``compas.robots.RobotModel``.
+* Renamed  ``compas_fab.robots.Robot.from_tool0_to_attached_tool`` to ``compas_fab.robots.Robot.from_t0cf_to_tcf``
+* Renamed  ``compas_fab.robots.Robot.from_attached_tool_to_tool0`` to ``compas_fab.robots.Robot.from_tcf_to_t0cf``
+* Changed ROS planning scene methods to be synchronous.
+
+
+**Fixed**
+
+* Attached collision meshes are included in inverse kinematics calculations in ROS
+
+**Deprecated**
+
+* The methods ``forward_kinematics``, ``inverse_kinematics``, ``plan_cartesian_motion`` and ``plan_motion``
+  of ``Robot`` class have been refactored, but a backwards-compatible deprecated version with the old
+  signatures still exists suffixed by ``_deprecated``, e.g. ``forward_kinematics_deprecated``.
+* ``RobotArtist`` are deprecated in favor of ``RobotModelArtist``.
 
 **Removed**
 

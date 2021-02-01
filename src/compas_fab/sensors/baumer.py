@@ -8,8 +8,15 @@ __all__ = ['PosCon3D', 'PosConCM']
 
 
 class PosCon3D(SerialSensor):
+<<<<<<< HEAD
     """Provides an interface for the `Baumer PosCon3D edge measurement sensor
     <https://www.baumer.com/us/en/product-overview/object-detection/edge-measurement/c/38276>`_.
+||||||| e4bfe76
+    """Provides an interface for the `Baumer PosCon3D edge measurement sensor
+    <http://www.baumer.com/us-en/products/distance-measurement/light-section-sensors/poscon-3d-edge-measurement/>`_.
+=======
+    """Provides an interface for the Baumer PosCon3D edge measurement sensor.
+>>>>>>> upstream/master
 
     The sensor has different interfaces to retrieve its data. This
     class provides access to the serial interface (RS-485). This
@@ -328,8 +335,15 @@ class PosCon3D(SerialSensor):
 
 
 class PosConCM(SerialSensor):
+<<<<<<< HEAD
     """Provides an interface for the `Baumer PosConCM round objects measurement sensor
     <https://www.baumer.com/us/en/product-overview/smart-vision/profile-sensors-/measurement-of-round-objects/c/14115>`_.
+||||||| e4bfe76
+    """Provides an interface for the `Baumer PosConCM round objects measurement sensor
+    <http://www.baumer.com/us-en/products/distance-measurement/light-section-sensors/poscon-cm-measurement-of-round-objects/>`_.
+=======
+    """Provides an interface for the Baumer PosConCM round objects measurement sensor.
+>>>>>>> upstream/master
 
     The sensor has different interfaces to retrieve its data. This
     class provides access to the serial interface (RS-485).
@@ -433,12 +447,24 @@ class PosConCM(SerialSensor):
         return self.FRAME_TAIL % (frame, self.calculate_checksum(frame))
 
     def calculate_checksum(self, command):
+<<<<<<< HEAD
         """Checks that message is complete.
 
         Note
         ----
         See `RS-485 Protocol Structure <https://www.baumer.com/medias/__secure__/en_BA_RS485_Protocol_Structure.pdf?mediaPK=8799860686878>`_ for more info.
         """
+||||||| e4bfe76
+        """Checks that message is complete.
+
+        Note
+        ----
+        See `RS-485 Protocol Structure <https://www.baumer.com/ae/en/product-overview/2d-3d-sensors/profile-sensors-/measurement-of-round-objects/\
+        oxc7-x0250-ii1250-ti/p/medias/__secure__/en_BA_RS485_Protocol_Structure.pdf?mediaPK=8799860686878>`_ for more info.
+        """
+=======
+        """Checks that message is complete."""
+>>>>>>> upstream/master
         return '****'
 
     def get_payload(self, result):

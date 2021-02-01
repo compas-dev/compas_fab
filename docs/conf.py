@@ -29,7 +29,7 @@ project = 'COMPAS FAB'
 year = '2018'
 author = 'Gramazio Kohler Research'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '0.11.0'
+version = release = '0.16.0'
 
 pygments_style = 'sphinx'
 show_authors = True
@@ -61,6 +61,17 @@ autodoc_member_order = 'alphabetical'
 # autosummary options
 autosummary_generate = True
 
+# linkcheck options
+linkcheck_ignore = [r'http://localhost:\d+/']
+
+# collect doc versions
+package_docs_root = 'https://gramaziokohler.github.io/compas_fab/'
+
+with open(os.path.join(os.path.dirname(__file__), 'doc_versions.txt'), 'r') as f:
+    version_names = [version.strip() for version in f.readlines()]
+    package_docs_versions = [(version, '{}{}'.format(package_docs_root, version))
+                             for version in version_names if version]
+
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 html_theme = 'compaspkg'
@@ -70,6 +81,8 @@ html_theme_options = {
     "package_title": project,
     "package_version": release,
     "package_repo": 'https://github.com/compas-dev/compas_fab',
+    "package_docs": package_docs_root,
+    "package_old_versions": package_docs_versions
 }
 
 html_split_index = False

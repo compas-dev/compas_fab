@@ -16,7 +16,7 @@ class Octomap(ROSmsg):
         self.binary = binary  # Flag to denote a binary (only free/occupied) or full occupancy octree (.bt/.ot file)
         self.id = id  # Class id of the contained octree
         self.resolution = resolution  # Resolution (in m) of the smallest octree nodes
-        self.data = data  # binary serialization of octree, use conversions.h to read and write octrees
+        self.data = data or []  # binary serialization of octree, use conversions.h to read and write octrees
 
 
 class OctomapWithPose(ROSmsg):
