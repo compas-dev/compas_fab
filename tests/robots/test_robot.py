@@ -4,8 +4,6 @@ import math
 import compas
 import pytest
 from compas.geometry import Frame
-from compas.geometry import Point
-from compas.geometry import Vector
 from compas.robots import RobotModel
 
 from compas.robots.base_artist import BaseRobotModelArtist
