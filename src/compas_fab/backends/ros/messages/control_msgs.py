@@ -10,6 +10,7 @@ from .trajectory_msgs import JointTrajectory
 class JointTolerance(ROSmsg):
     """http://docs.ros.org/api/control_msgs/html/msg/JointTolerance.html
     """
+
     def __init__(self, name="", position=0., velocity=0., acceleration=0.):
         self.name = name
         self.position = position          # in radians or meters (for a revolute or prismatic joint, respectively)
@@ -42,6 +43,7 @@ class FollowJointTrajectoryActionGoal(ROSmsg):
 class FollowJointTrajectoryFeedback(ROSmsg):
     """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryFeedback.html
     """
+
     def __init__(self, header=None, joint_names=None, desired=None, actual=None,
                  error=None):
         self.header = header or Header()
@@ -54,6 +56,7 @@ class FollowJointTrajectoryFeedback(ROSmsg):
 class FollowJointTrajectoryActionFeedback(ROSmsg):
     """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionFeedback.html
     """
+
     def __init__(self, header=None, status=None, feedback=None):
         self.header = header or Header()
         self.status = status or GoalStatus()
@@ -92,6 +95,7 @@ class FollowJointTrajectoryResult(ROSmsg):
 class FollowJointTrajectoryActionResult(ROSmsg):
     """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionResult.html
     """
+
     def __init__(self, header=None, status=None, result=None):
         self.header = header or Header()
         self.status = status or GoalStatus()

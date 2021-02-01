@@ -1,0 +1,41 @@
+name: integration
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: ubuntu-py38-integration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Set up docker containers
+        run: |
+          docker run -p 19997:19997 --name vrep_rfl -d gramaziokohler/vrep-rfl
+          docker-compose -f "docs/backends/files/ur5-demo/docker-compose.yml" up -d --build
+          docker ps -a
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install wheel
+          python -m pip install cython --install-option="--no-cython-compile"
+      - name: Install
+        run: |
+          python -m pip install --no-cache-dir -r requirements-dev.txt
+      - name: Run integration tests
+        run: |
+          pytest --doctest-modules
+          pytest docs
+      - name: Tear down docker containers
+        run: |
+          docker-compose -f "docs/backends/files/ur5-demo/docker-compose.yml" down
+          docker rm -f vrep_rfl

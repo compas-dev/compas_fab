@@ -6,7 +6,7 @@ import compas
 from compas.geometry import Vector
 from compas.geometry import cross_vectors
 
-if not compas.is_ironpython():
+if not compas.IPY:
     from scipy import stats
 else:
     stats = None
@@ -376,7 +376,7 @@ class Wrench():
             Available at: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.552.109.
         """
         # transform gravity vector to FT Sensor coordinate system (FTSCS)
-        gravity_vector_FTSCS = ft_sensor_frame.to_local_coords(gravity_vector)
+        gravity_vector_FTSCS = ft_sensor_frame.to_local_coordinates(gravity_vector)
 
         # F gravity compensation, F = gravity * mass
         force_gravity = gravity_vector_FTSCS * mass

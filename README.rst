@@ -4,9 +4,13 @@ COMPAS FAB: Robotic Fabrication for COMPAS
 
 .. start-badges
 
-.. image:: https://travis-ci.com/compas-dev/compas_fab.svg?branch=master
-    :target: https://travis-ci.com/compas-dev/compas_fab
-    :alt: Travis-CI Build Status
+.. image:: https://github.com/compas-dev/compas_fab/workflows/build/badge.svg
+    :target: https://github.com/compas-dev/compas_fab/actions
+    :alt: Github Actions Build Status
+
+.. image:: https://github.com/compas-dev/compas_fab/workflows/integration/badge.svg
+    :target: https://github.com/compas-dev/compas_fab/actions
+    :alt: Github Actions Integration Status
 
 .. image:: https://img.shields.io/github/license/compas-dev/compas_fab.svg
     :target: https://pypi.python.org/pypi/compas_fab
@@ -32,7 +36,7 @@ COMPAS FAB: Robotic Fabrication for COMPAS
 planning and execution of robotic fabrication processes. It provides interfaces
 to existing software libraries and tools available in the field of robotics
 (e.g. OMPL, ROS) and makes them accessible from within the parametric design
-environment. The package builds upon `COMPAS <https://compas-dev.github.io/>`_,
+environment. The package builds upon `COMPAS <https://compas.dev/>`_,
 an open-source Python-based framework for collaboration and research in
 architecture, engineering and digital fabrication.
 
@@ -44,7 +48,7 @@ Main features
 * Planning tools: kinematic solvers, path planning, etc.
 * Execution tools: feedback loops, robot control, etc.
 
-**COMPAS FAB** runs on Python 2.x, 3.x and IronPython 2.7.
+**COMPAS FAB** runs on Python 3.x and IronPython 2.7.
 
 
 Getting Started
@@ -83,8 +87,8 @@ First Steps
 * `Documentation <https://gramaziokohler.github.io/compas_fab/>`_
 * `COMPAS FAB Examples <https://gramaziokohler.github.io/compas_fab/latest/examples.html>`_
 * `COMPAS FAB API Reference <https://gramaziokohler.github.io/compas_fab/latest/reference.html>`_
-* `COMPAS Examples <https://compas-dev.github.io/main/examples.html>`_
-* `COMPAS API Reference <https://compas-dev.github.io/main/api.html>`_
+* `COMPAS Tutorials <https://compas.dev/compas/tutorial.html>`_
+* `COMPAS API Reference <https://compas.dev/compas/api.html>`_
 
 
 Questions and feedback

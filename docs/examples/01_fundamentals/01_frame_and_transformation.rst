@@ -33,7 +33,7 @@ coordinate system.
     # point in F (local coordinates)
     P = Point(35., 35., 35.)
     # point in global (world) coordinates
-    P_ = F.to_world_coords(P)
+    P_ = F.to_world_coordinates(P)
 
 
 Industrial robots do not have a common way of describing the pose orientation.

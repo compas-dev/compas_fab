@@ -85,6 +85,9 @@ celerybeat-schedule
 venv/
 ENV/
 
+# Pycharm project settings
+.idea/
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -106,6 +109,7 @@ ENV/
 # ------------------------------------------------------------------------------
 
 docs/reference/generated/
+docs/generated/
 
 *.3dmbak
 *.rhl
