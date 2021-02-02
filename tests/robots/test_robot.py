@@ -1,5 +1,4 @@
 import os
-import math
 
 import compas
 import pytest
@@ -8,7 +7,6 @@ from compas.robots import RobotModel
 
 from compas.robots.base_artist import BaseRobotModelArtist
 
-from compas_fab.robots import Configuration
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotSemantics
 from compas_fab.robots.ur5 import Robot as Ur5Robot
@@ -34,11 +32,6 @@ def panda_robot_instance(panda_urdf, panda_srdf):
 
 
 @pytest.fixture
-def panda_joints(panda_robot_class):
-    return panda_robot_instance.semantics.get_configurable_joints()
-
-
-@pytest.fixture
 def ur5_robot_instance():
     return Ur5Robot()
 
@@ -51,15 +44,6 @@ def ur5_joints(ur5_robot_instance):
 @pytest.fixture
 def ur5_links(ur5_robot_instance):
     return ur5_robot_instance.model.links
-
-
-@pytest.fixture
-def ur5_configuration():
-    return Configuration.from_revolute_values([math.pi/2, 0., 0., math.pi/4, 0., 0.])
-
-
-@pytest.fixture
-def panda_configuration():
 
 
 def test_basic_name_only():
