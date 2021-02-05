@@ -5,7 +5,7 @@ from scriptcontext import sticky as st
 
 from compas.geometry import Frame
 from compas_fab.ghpython.components import create_id
-from compas_fab.ghpython.components.icons import default_icon
+from compas_fab.ghpython.components.icons import plan_cartesian_motion_icon
 
 
 class PlanCartesianMotion(component):
@@ -89,7 +89,7 @@ class PlanCartesianMotion(component):
             self.marshal.SetOutput(result, DA, 0, True)
 
     def get_Internal_Icon_24x24(self):
-        return default_icon
+        return plan_cartesian_motion_icon
 
     def RunScript(self, robot, planes, start_configuration, group, attached_collision_meshes, path_constraints, max_step, compute):
 

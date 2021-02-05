@@ -4,7 +4,7 @@ from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 
 from compas_ghpython import draw_frame
 from compas_ghpython import list_to_ghtree
-from compas_fab.ghpython.components.icons import default_icon
+from compas_fab.ghpython.components.icons import trajectory_visualize_icon
 
 
 class TrajectoryVisualize(component):
@@ -94,7 +94,7 @@ class TrajectoryVisualize(component):
                 self.marshal.SetOutput(result[6], DA, 7, True)
 
     def get_Internal_Icon_24x24(self):
-        return default_icon
+        return trajectory_visualize_icon
 
     def RunScript(self, robot, group, trajectory):
         start_configuration = None

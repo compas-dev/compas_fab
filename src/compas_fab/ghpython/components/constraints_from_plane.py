@@ -5,7 +5,7 @@ import System
 from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 
 from compas.geometry import Frame
-from compas_fab.ghpython.components.icons import default_icon
+from compas_fab.ghpython.components.icons import contraints_from_plane_icon
 
 
 class ConstraintsFromPlane(component):
@@ -81,7 +81,7 @@ class ConstraintsFromPlane(component):
             self.marshal.SetOutput(result, DA, 0, True)
 
     def get_Internal_Icon_24x24(self):
-        return default_icon
+        return contraints_from_plane_icon
 
     def RunScript(self, robot, plane, group, tolerance_position, tolerance_xaxis, tolerance_yaxis, tolerance_zaxis):
         goal_constraints = None

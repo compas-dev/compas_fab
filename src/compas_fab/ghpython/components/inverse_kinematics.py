@@ -3,7 +3,7 @@ import System
 from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 
 from compas.geometry import Frame
-from compas_fab.ghpython.components.icons import default_icon
+from compas_fab.ghpython.components.icons import inverse_kinematics_icon
 
 
 class InverseKinematics(component):
@@ -63,7 +63,7 @@ class InverseKinematics(component):
             self.marshal.SetOutput(result, DA, 0, True)
 
     def get_Internal_Icon_24x24(self):
-        return default_icon
+        return inverse_kinematics_icon
 
     def RunScript(self, robot, plane, start_configuration, group):
         configuration = None

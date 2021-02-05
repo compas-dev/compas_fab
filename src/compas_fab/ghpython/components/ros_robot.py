@@ -5,7 +5,7 @@ from scriptcontext import sticky as st
 
 import compas
 from compas_fab.ghpython.components import create_id
-from compas_fab.ghpython.components.icons import default_icon
+from compas_fab.ghpython.components.icons import ros_robot_icon
 
 
 class ROSRobot(component):
@@ -51,7 +51,7 @@ class ROSRobot(component):
             self.marshal.SetOutput(result, DA, 0, True)
 
     def get_Internal_Icon_24x24(self):
-        return default_icon
+        return ros_robot_icon
 
     def RunScript(self, ros_client, load):
         compas.PRECISION = '24f'

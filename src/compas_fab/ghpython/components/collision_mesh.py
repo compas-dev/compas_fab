@@ -3,7 +3,7 @@ import System
 from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 
 from compas_rhino.geometry import RhinoMesh
-from compas_fab.ghpython.components.icons import default_icon
+from compas_fab.ghpython.components.icons import collision_mesh_icon
 from compas_fab.robots import CollisionMesh
 
 
@@ -26,7 +26,7 @@ class CollisionMeshComponent(component):
         p.Optional = True
 
     def get_Internal_Icon_24x24(self):
-        return default_icon
+        return collision_mesh_icon
 
     def RegisterInputParams(self, pManager):
 

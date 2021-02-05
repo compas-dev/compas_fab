@@ -4,7 +4,7 @@ from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 from scriptcontext import sticky as st
 
 from compas_fab.ghpython.components import create_id
-from compas_fab.ghpython.components.icons import default_icon
+from compas_fab.ghpython.components.icons import planning_scene_icon
 from compas_fab.robots import PlanningScene
 
 
@@ -27,7 +27,7 @@ class PlanningSceneComponent(component):
         p.Optional = True
 
     def get_Internal_Icon_24x24(self):
-        return default_icon
+        return planning_scene_icon
 
     def RegisterInputParams(self, pManager):
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()

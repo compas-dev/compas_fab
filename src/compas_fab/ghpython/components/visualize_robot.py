@@ -5,7 +5,7 @@ from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_ghpython.artists import MeshArtist
-from compas_fab.ghpython.components.icons import default_icon
+from compas_fab.ghpython.components.icons import robot_visualize_icon
 
 
 class RobotVisualize(component):
@@ -128,7 +128,7 @@ class RobotVisualize(component):
                 self.marshal.SetOutput(result[5], DA, 5, True)
 
     def get_Internal_Icon_24x24(self):
-        return default_icon
+        return robot_visualize_icon
 
     def RunScript(self, robot, group, configuration, attached_collision_meshes, show_visual, show_collision,
                   show_frames, show_base_frame, show_end_effector_frame, show_acm):
