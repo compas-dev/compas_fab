@@ -92,10 +92,11 @@ def test_root_name(ur5_robot_instance):
     assert robot.root_name == 'world'
 
 
-@pytest.mark.parametrize('group,expected_result', [(None, 'panda_rightfinger'), ('panda_arm_hand', 'panda_rightfinger'), ('panda_arm', 'panda_link8')])
-def test_get_end_effector_link_name(panda_robot_instance, group,  expected_result):
+def test_get_end_effector_link_name(panda_robot_instance):
     robot = panda_robot_instance
-    assert robot.get_end_effector_link_name(group=group) == expected_result
+    assert robot.get_end_effector_link_name(group=None) == 'panda_rightfinger'
+    assert robot.get_end_effector_link_name(group='panda_arm_hand') == 'panda_rightfinger'
+    assert robot.get_end_effector_link_name(group='panda_arm') == 'panda_link8'
 
 
 def test_get_end_effector_link_name_wrong_group(panda_robot_instance):
