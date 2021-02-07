@@ -111,11 +111,10 @@ def test_get_end_effector_link(ur5_robot_instance, group):
     assert isinstance(robot.get_end_effector_link(group=group), compas.robots.Link)
 
 
-@pytest.mark.parametrize('group, x_coord', [(None, .301), ('panda_arm', .359)])
-def test_get_end_effector_frame(panda_robot_instance, group, x_coord):
+def test_get_end_effector_frame(panda_robot_instance):
     robot = panda_robot_instance
-    ee_frame = robot.get_end_effector_frame(group=group)
-    assert round(ee_frame.point.x, 3) == x_coord
+    assert round(robot.get_end_effector_frame(group=None).point.x, 3) == .301
+    assert round(robot.get_end_effector_frame(group='panda_arm').point.x, 3) == .359
 
 
 @pytest.mark.parametrize('group, remove_semantics, expected_result',
