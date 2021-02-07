@@ -105,10 +105,10 @@ def test_get_end_effector_link_name_wrong_group(panda_robot_instance):
         robot.get_end_effector_link_name(group='panda_leg')
 
 
-@pytest.mark.parametrize('group', [None, 'endeffector'])
-def test_get_end_effector_link(ur5_robot_instance, group):
+def test_get_end_effector_link(ur5_robot_instance):
     robot = ur5_robot_instance
-    assert isinstance(robot.get_end_effector_link(group=group), compas.robots.Link)
+    assert isinstance(robot.get_end_effector_link(group=None), compas.robots.Link)
+    assert isinstance(robot.get_end_effector_link(group='endeffector'), compas.robots.Link)
 
 
 def test_get_end_effector_frame(panda_robot_instance):
