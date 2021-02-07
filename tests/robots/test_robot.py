@@ -1,6 +1,6 @@
 import os
+import re
 
-import compas
 import pytest
 from compas.geometry import Frame
 from compas.robots import RobotModel
@@ -29,6 +29,19 @@ def panda_robot_instance(panda_urdf, panda_srdf):
     model = RobotModel.from_urdf_file(panda_urdf)
     semantics = RobotSemantics.from_srdf_file(panda_srdf, model)
     return Robot(model, semantics=semantics)
+
+
+@pytest.fixture
+def panda_robot_instance_w_artist(panda_robot_instance):
+    robot = panda_robot_instance
+    robot.artist = BaseRobotModelArtist(robot.model)
+
+    return robot
+
+
+@pytest.fixture
+def panda_robot_instance_wo_semantics(panda_urdf):
+    return Robot(RobotModel.from_urdf_file(panda_urdf), semantics=None)
 
 
 @pytest.fixture
@@ -107,8 +120,9 @@ def test_get_end_effector_link_name_wrong_group(panda_robot_instance):
 
 def test_get_end_effector_link(ur5_robot_instance):
     robot = ur5_robot_instance
-    assert isinstance(robot.get_end_effector_link(group=None), compas.robots.Link)
-    assert isinstance(robot.get_end_effector_link(group='endeffector'), compas.robots.Link)
+
+    assert robot.get_end_effector_link(group=None).name == "ee_link"
+    assert robot.get_end_effector_link(group='endeffector').name == "ee_link"
 
 
 def test_get_end_effector_frame(panda_robot_instance):
@@ -117,44 +131,82 @@ def test_get_end_effector_frame(panda_robot_instance):
     assert round(robot.get_end_effector_frame(group='panda_arm').point.x, 3) == .359
 
 
-@pytest.mark.parametrize('group, remove_semantics, expected_result',
-                         [(None,          False, 'base_link'),
-                          (None,          True,  'base_link'),
-                          ('endeffector', False, 'ee_link'),
-                          ('endeffector', True,  'base_link')])
-def test_get_base_link_name(ur5_robot_instance, group, remove_semantics, expected_result):
+def test_get_base_link_name(ur5_robot_instance):
     robot = ur5_robot_instance
-    if remove_semantics:
-        robot.semantics = None
-    assert robot.get_base_link_name(group=group) == expected_result
+
+    assert robot.get_base_link_name(group=None) == 'base_link'
+    assert robot.get_base_link_name(group='endeffector') == 'ee_link'
 
 
-@pytest.mark.parametrize('group', [None, 'panda_arm'])
-def test_get_base_link(panda_robot_instance, group):
+def test_get_base_link_name_wo_semantics(panda_robot_instance_wo_semantics):
+    robot = panda_robot_instance_wo_semantics
+
+    assert robot.get_base_link_name(group=None) == 'panda_link0'
+    assert robot.get_base_link_name(group='endeffector') == 'panda_link0'
+
+
+def test_get_base_link(panda_robot_instance):
     robot = panda_robot_instance
-    link = robot.get_base_link(group=group)
-    assert len(link.joints) == 1
+
+    link = robot.get_base_link(group=None)
+    assert link.name == 'panda_link0'
+
+    link = robot.get_base_link(group='panda_arm')
+    assert link.name == 'panda_link0'
+
+    link = robot.get_base_link(group='hand')
+    assert link.name == 'panda_hand'
 
 
-@pytest.mark.parametrize('group', [None, 'panda_arm'])
-@pytest.mark.parametrize('add_artist', [True, False])
-def test_get_base_frame(panda_robot_instance, group, add_artist):
+def test_get_base_link_wo_semantics(panda_robot_instance_wo_semantics):
+    robot = panda_robot_instance_wo_semantics
+
+    link = robot.get_base_link(group=None)
+    assert link.name == 'panda_link0'
+
+    link = robot.get_base_link(group='panda_arm')
+    assert link.name == 'panda_link0'
+
+    link = robot.get_base_link(group='hand')
+    assert link.name == 'panda_link0'
+
+
+def test_get_base_frame(panda_robot_instance):
     robot = panda_robot_instance
-    if add_artist:
-        robot.artist = BaseRobotModelArtist(robot.model)
-    assert robot.get_base_frame(group=group) == Frame.worldXY()
+
+    assert robot.get_base_frame(group=None) == Frame.worldXY()
+    assert robot.get_base_frame(group='panda_arm') == Frame.worldXY()
+
+
+def test_get_base_frame_w_artist(panda_robot_instance_w_artist):
+    robot = panda_robot_instance_w_artist
+
+    assert robot.get_base_frame(group=None) == Frame.worldXY()
+    assert robot.get_base_frame(group='panda_arm') == Frame.worldXY()
 
 
 def test_get_base_frame_when_link_has_parent(ur5_robot_instance):
     robot = ur5_robot_instance
-    assert robot.get_base_frame(group='endeffector')
+    base_frame = robot.get_base_frame(group='endeffector')
+
+    assert [round(v, 3) for v in list(base_frame.point)] == [0.817, 0.191, -0.005]
+    assert [round(v) for v in base_frame.data['xaxis']] == [0, 1, 0]
+    assert [round(v) for v in base_frame.data['yaxis']] == [1, 0, 0]
 
 
-@ pytest.mark.parametrize('group', ['endeffector', 'manipulator', None])
-@ pytest.mark.parametrize('remove_semantics', [False, True])
-def test_get_configurable_joints(ur5_robot_instance, group, remove_semantics):
-    # TODO: Test duplicate joints
+def test_get_configurable_joints(ur5_robot_instance):
     robot = ur5_robot_instance
-    if remove_semantics:
-        robot.semantics = None
-    assert len(robot.get_configurable_joints()) == 6
+    joints = robot.get_configurable_joints()
+
+    pattern = re.compile(r'(shoulder|wrist|elbow).*_joint')
+    matches = [pattern.match(joint.name) for joint in joints]
+    assert all(matches)
+
+
+def test_get_configurable_joints_wo_semantics(panda_robot_instance_wo_semantics):
+    robot = panda_robot_instance_wo_semantics
+    joints = robot.get_configurable_joints()
+
+    pattern = re.compile(r'panda_.*joint\d')
+    matches = [pattern.match(joint.name) for joint in joints]
+    assert all(matches)
