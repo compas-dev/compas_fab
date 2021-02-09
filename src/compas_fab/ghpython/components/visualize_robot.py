@@ -140,7 +140,8 @@ class RobotVisualize(component):
         base_frame = None
         ee_frame = None
 
-        if robot and configuration:
+        if robot:
+            configuration = configuration or robot.zero_configuration()
 
             robot.update(configuration, visual=show_visual, collision=show_collision)
             frames = robot.transformed_frames(configuration, group)
