@@ -20,7 +20,7 @@ jobs:
           python-version: 3.8
       - name: Set up docker containers
         run: |
-          docker-compose -f "tests/docker-compose.yml" up -d --build
+          docker-compose -f "tests/integration_setup/docker-compose.yml" up -d --build
           docker ps -a
       - name: Install dependencies
         run: |
@@ -36,5 +36,5 @@ jobs:
           pytest docs
       - name: Tear down docker containers
         run: |
-          docker-compose -f "tests/docker-compose.yml" down
+          docker-compose -f "tests/integration_setup/docker-compose.yml" down
           docker rm -f vrep_rfl
