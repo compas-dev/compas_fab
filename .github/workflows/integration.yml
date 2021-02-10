@@ -36,5 +36,5 @@ jobs:
           pytest docs
       - name: Tear down docker containers
         run: |
-          docker-compose -f "tests/docker-compose.yml"" down
+          docker-compose -f "tests/docker-compose.yml" down
           docker rm -f vrep_rfl
