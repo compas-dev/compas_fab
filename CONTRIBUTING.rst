@@ -22,8 +22,7 @@ We love pull requests from everyone! Here's a quick guide to improve the code:
 
 ::
 
-    docker run -p 19997:19997 --name vrep_rfl -d gramaziokohler/vrep-rfl
-    docker-compose -f "docs/backends/files/ur5-demo/docker-compose.yml" up -d --build
+    docker-compose -f "tests/docker-compose.yml"" up -d --build
 
 5. Make sure all tests pass:
 
@@ -42,8 +41,7 @@ We love pull requests from everyone! Here's a quick guide to improve the code:
 
 ::
 
-    docker stop vrep_rfl
-    docker-compose -f "docs/backends/files/ur5-demo/docker-compose.yml" down
+    docker-compose -f "tests/docker-compose.yml"" down
 
 9. Check there are no linter errors:
 
