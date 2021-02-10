@@ -18,28 +18,35 @@ We love pull requests from everyone! Here's a quick guide to improve the code:
 
     pip install -r requirements-dev.txt
 
-4. Make sure all tests pass:
+4. From the `compas_fab` directory, run the docker containers:
 
 ::
 
-    invoke test
+    docker run -p 19997:19997 --name vrep_rfl -d gramaziokohler/vrep-rfl
+    docker-compose -f "docs/backends/files/ur5-demo/docker-compose.yml" up -d --build
 
-5. Start making your changes to the **master** branch (or branch off of it).
-6. Make sure all tests still pass:
+5. Make sure all tests pass:
 
 ::
 
-    invoke test
+    invoke test --doctest --codeblock
 
-7. Check there are no linter errors:
+6. Start making your changes to the **master** branch (or branch off of it).
+7. Make sure all tests still pass:
+
+::
+
+    invoke test --doctest --codeblock
+
+8. Check there are no linter errors:
 
 ::
 
     invoke lint
 
-8. Add yourself to ``AUTHORS.rst``.
-9. Commit your changes and push your branch to GitHub.
-10. Create a `pull request <https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests>`_ through the GitHub website.
+9. Add yourself to ``AUTHORS.rst``.
+10. Commit your changes and push your branch to GitHub.
+11. Create a `pull request <https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests>`_ through the GitHub website.
 
 
 During development, use `pyinvoke <http://docs.pyinvoke.org/>`_ tasks on the
