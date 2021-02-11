@@ -88,7 +88,7 @@ class ROSConnect(component):
             ros_client.close()
 
         if connect:
-            st[key] = RosClient(ip, 9090)
+            st[key] = RosClient(ip, port)
             st[key].run(5)
 
         ros_client = st.get(key, None)
