@@ -18,28 +18,40 @@ We love pull requests from everyone! Here's a quick guide to improve the code:
 
     pip install -r requirements-dev.txt
 
-4. Make sure all tests pass:
+4. From the `compas_fab` directory, run the docker containers:
 
 ::
 
-    invoke test
+    docker-compose -f "tests/integration_setup/docker-compose.yml"" up -d --build
 
-5. Start making your changes to the **master** branch (or branch off of it).
-6. Make sure all tests still pass:
+5. Make sure all tests pass:
 
 ::
 
-    invoke test
+    invoke test --doctest --codeblock
 
-7. Check there are no linter errors:
+6. Start making your changes to the **master** branch (or branch off of it).
+7. Make sure all tests still pass:
+
+::
+
+    invoke test --doctest --codeblock
+
+8. From the `compas_fab` directory, stop the docker containers:
+
+::
+
+    docker-compose -f "tests/integration_setup/docker-compose.yml"" down
+
+9. Check there are no linter errors:
 
 ::
 
     invoke lint
 
-8. Add yourself to ``AUTHORS.rst``.
-9. Commit your changes and push your branch to GitHub.
-10. Create a `pull request <https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests>`_ through the GitHub website.
+10. Add yourself to ``AUTHORS.rst``.
+11. Commit your changes and push your branch to GitHub.
+12. Create a `pull request <https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests>`_ through the GitHub website.
 
 
 During development, use `pyinvoke <http://docs.pyinvoke.org/>`_ tasks on the
