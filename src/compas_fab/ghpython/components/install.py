@@ -13,7 +13,9 @@ def _get_grasshopper_library_path():
     if compas._os.system == 'win32':
         grasshopper_library_path = os.path.join(os.getenv('APPDATA'), 'Grasshopper', 'Libraries')
     elif compas._os.system == 'darwin':
-        raise NotImplementedError
+        grasshopper_library_path = os.path.join(
+        os.getenv('HOME'), 'Library', 'Application Support', 'McNeel', 'Rhinoceros', '{}'.format(version), 
+        'Plug-ins', 'Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)', 'Libraries')
     else:
         raise Exception('Unsupported platform')
     return grasshopper_library_path
