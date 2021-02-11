@@ -6,7 +6,7 @@ from scriptcontext import sticky as st
 import compas
 from compas_fab.ghpython.components import create_id
 from compas_fab.ghpython.components.icons import ros_robot_icon
-from compas_fab.ghpython import RobotArtist
+from compas_ghpython.artists import RobotModelArtist
 
 
 class ROSRobot(component):
