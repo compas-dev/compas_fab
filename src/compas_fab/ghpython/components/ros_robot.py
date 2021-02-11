@@ -55,7 +55,7 @@ class ROSRobot(component):
         return ros_robot_icon
 
     def RunScript(self, ros_client, load):
-        compas.PRECISION = '24f'
+        compas.PRECISION = '12f'
         key = create_id(self, 'robot')
 
         if ros_client and ros_client.is_connected and load:
