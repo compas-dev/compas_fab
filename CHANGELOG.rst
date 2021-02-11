@@ -20,6 +20,13 @@ Unreleased
 
 **Removed**
 
+0.16.0
+----------
+
+**Changed**
+
+* Updated to ``COMPAS 1.0``
+
 0.15.0
 ----------
 

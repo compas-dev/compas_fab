@@ -9,7 +9,7 @@ from .geometry_msgs import Pose
 
 
 class Octomap(ROSmsg):
-    """http://docs.ros.org/kinetic/api/octomap_msgs/html/msg/Octomap.html"""
+    """https://docs.ros.org/kinetic/api/octomap_msgs/html/msg/Octomap.html"""
 
     def __init__(self, header=None, binary=False, id='', resolution=0., data=None):
         self.header = header or Header()  # Header
@@ -20,7 +20,7 @@ class Octomap(ROSmsg):
 
 
 class OctomapWithPose(ROSmsg):
-    """http://docs.ros.org/kinetic/api/octomap_msgs/html/msg/OctomapWithPose.html"""
+    """https://docs.ros.org/kinetic/api/octomap_msgs/html/msg/OctomapWithPose.html"""
 
     def __init__(self, header=None, origin=None, octomap=None):
         self.header = header or Header()  # Header

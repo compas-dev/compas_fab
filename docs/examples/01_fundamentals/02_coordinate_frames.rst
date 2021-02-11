@@ -121,5 +121,5 @@ before sending it as a target pose to the robot.
 Links
 =====
 
-* `ROS REP-105: Coordinate Frames for Mobile Platforms <http://www.ros.org/reps/rep-0105.html#id15>`_
+* `ROS REP-105: Coordinate Frames for Mobile Platforms <https://www.ros.org/reps/rep-0105.html#id15>`_
 

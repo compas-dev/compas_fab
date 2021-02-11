@@ -9,7 +9,7 @@ from .std_msgs import ROSmsg
 
 
 class Point(ROSmsg):
-    """http://docs.ros.org/api/geometry_msgs/html/msg/Point.html
+    """https://docs.ros.org/api/geometry_msgs/html/msg/Point.html
     """
 
     def __init__(self, x, y, z):
@@ -24,7 +24,7 @@ class Point(ROSmsg):
 
 
 class Quaternion(ROSmsg):
-    """http://docs.ros.org/api/geometry_msgs/html/msg/Quaternion.html
+    """https://docs.ros.org/api/geometry_msgs/html/msg/Quaternion.html
     """
 
     def __init__(self, x=0., y=0., z=0., w=1.):
@@ -40,7 +40,7 @@ class Quaternion(ROSmsg):
 
 
 class Pose(ROSmsg):
-    """http://docs.ros.org/api/geometry_msgs/html/msg/Pose.html
+    """https://docs.ros.org/api/geometry_msgs/html/msg/Pose.html
     """
 
     def __init__(self, position=None, orientation=None):
@@ -68,7 +68,7 @@ class Pose(ROSmsg):
 
 
 class PoseStamped(ROSmsg):
-    """http://docs.ros.org/api/geometry_msgs/html/msg/PoseStamped.html
+    """https://docs.ros.org/api/geometry_msgs/html/msg/PoseStamped.html
     """
 
     def __init__(self, header=None, pose=None):
@@ -83,7 +83,7 @@ class PoseStamped(ROSmsg):
 
 
 class Vector3(ROSmsg):
-    """http://docs.ros.org/api/geometry_msgs/html/msg/Vector3.html
+    """https://docs.ros.org/api/geometry_msgs/html/msg/Vector3.html
     """
 
     def __init__(self, x=0., y=0., z=0.):
@@ -98,7 +98,7 @@ class Vector3(ROSmsg):
 
 
 class Transform(ROSmsg):
-    """http://docs.ros.org/api/geometry_msgs/html/msg/Transform.html
+    """https://docs.ros.org/api/geometry_msgs/html/msg/Transform.html
     """
 
     def __init__(self, translation=None, rotation=None):
@@ -107,7 +107,7 @@ class Transform(ROSmsg):
 
 
 class Twist(ROSmsg):
-    """http://docs.ros.org/api/geometry_msgs/html/msg/Twist.html
+    """https://docs.ros.org/api/geometry_msgs/html/msg/Twist.html
     """
 
     def __init__(self, linear=None, angular=None):
@@ -116,7 +116,7 @@ class Twist(ROSmsg):
 
 
 class Wrench(ROSmsg):
-    """http://docs.ros.org/api/geometry_msgs/html/msg/Wrench.html
+    """https://docs.ros.org/api/geometry_msgs/html/msg/Wrench.html
 
     This represents force in free space, separated into its linear and angular parts.
 
@@ -154,7 +154,7 @@ class Wrench(ROSmsg):
 
 
 class WrenchStamped(ROSmsg):
-    """http://docs.ros.org/api/geometry_msgs/html/msg/WrenchStamped.html
+    """https://docs.ros.org/api/geometry_msgs/html/msg/WrenchStamped.html
 
     A wrench with reference coordinate frame and timestamp.
     """
@@ -171,7 +171,7 @@ class WrenchStamped(ROSmsg):
 
 
 class Inertia(ROSmsg):
-    """http://docs.ros.org/api/geometry_msgs/html/msg/Inertia.html
+    """https://docs.ros.org/api/geometry_msgs/html/msg/Inertia.html
 
     Examples
     --------
