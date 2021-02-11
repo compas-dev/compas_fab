@@ -1,5 +1,5 @@
-assembly_name = "COMPAS FAB"
-assembly_version = "0.15.0"
+assembly_name = 'COMPAS FAB'
+assembly_version = '0.15.0'
 filename = "%s_%s.ghpy" % (assembly_name, assembly_version)
 
 
