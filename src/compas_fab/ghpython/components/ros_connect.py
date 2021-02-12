@@ -40,12 +40,7 @@ class ROSConnect(component):
         self.Params.Input.Add(p)
 
         p = Grasshopper.Kernel.Parameters.Param_Boolean()
-        self.SetUpParam(p, "connect", "connect", "If `True`, connect to ROS. Defaults to False.")
-        p.Access = Grasshopper.Kernel.GH_ParamAccess.item
-        self.Params.Input.Add(p)
-
-        p = Grasshopper.Kernel.Parameters.Param_Boolean()
-        self.SetUpParam(p, "disconnect", "disconnect", "If `True`, disconnect from ROS. Defaults to False.")
+        self.SetUpParam(p, "connect", "connect", "If `True`, connect to ROS. If `False`, disconnect from ROS. Defaults to False.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
 
@@ -62,8 +57,7 @@ class ROSConnect(component):
         p0 = self.marshal.GetInput(DA, 0)
         p1 = self.marshal.GetInput(DA, 1)
         p2 = self.marshal.GetInput(DA, 2)
-        p3 = self.marshal.GetInput(DA, 3)
-        result = self.RunScript(p0, p1, p2, p3)
+        result = self.RunScript(p0, p1, p2)
 
         if result is not None:
             if not hasattr(result, '__getitem__'):
@@ -75,7 +69,7 @@ class ROSConnect(component):
     def get_Internal_Icon_24x24(self):
         return ros_connect_icon
 
-    def RunScript(self, ip, port, connect, disconnect):
+    def RunScript(self, ip, port, connect):
         ros_client = None
 
         ip = ip or '127.0.0.1'
@@ -84,9 +78,8 @@ class ROSConnect(component):
         key = create_id(self, 'ros_client')
         ros_client = st.get(key, None)
 
-        if ros_client and (connect or disconnect):
-            ros_client.close()
-
+        if ros_client:
+            st[key].close()
         if connect:
             st[key] = RosClient(ip, port)
             st[key].run(5)
