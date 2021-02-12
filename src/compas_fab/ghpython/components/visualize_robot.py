@@ -141,6 +141,7 @@ class RobotVisualize(component):
         ee_frame = None
 
         if robot:
+            show_visual = show_visual or True
             configuration = configuration or robot.zero_configuration()
 
             robot.update(configuration, visual=show_visual, collision=show_collision)
