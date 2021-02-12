@@ -29,7 +29,7 @@ class ROSRobot(component):
 
     def RegisterInputParams(self, pManager):
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "ros_client", "ros_client", ":class:`compas_fab.backends.RosClient` The ROS client.")
+        self.SetUpParam(p, "ros_client", "ros_client", "The ROS client.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
 

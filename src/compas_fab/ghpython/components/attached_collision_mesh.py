@@ -28,7 +28,7 @@ class AttachedCollisionMeshComponent(component):
 
     def RegisterInputParams(self, pManager):
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "scene", "scene", ":class:`compas_fab.robots.PlanningScene` The planning scene.")
+        self.SetUpParam(p, "scene", "scene", "The planning scene.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
 
