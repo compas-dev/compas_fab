@@ -4,6 +4,7 @@ from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 
 from compas.geometry import Frame
 from compas_fab.ghpython.components.icons import inverse_kinematics_icon
+from compas_fab.ghpython.components import coerce_frame
 
 
 class InverseKinematics(component):
@@ -30,7 +31,7 @@ class InverseKinematics(component):
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
 
-        p = Grasshopper.Kernel.Parameters.Param_Plane()
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
         self.SetUpParam(p, "plane", "plane", "The plane to calculate the inverse kinematic for.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
@@ -68,6 +69,6 @@ class InverseKinematics(component):
     def RunScript(self, robot, plane, start_configuration, group):
         configuration = None
         if robot and robot.client and robot.client.is_connected and plane:
-            frame = Frame(plane.Origin, plane.XAxis, plane.YAxis)
+            frame = coerce_frame(plane)
             configuration = robot.inverse_kinematics(frame, start_configuration, group)
         return configuration
