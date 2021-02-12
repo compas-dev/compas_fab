@@ -5,27 +5,28 @@ import compas
 
 from compas_fab.ghpython.components import assembly_name
 from compas_fab.ghpython.components import filename
+from compas_rhino import _check_rhino_version
 
 # TODO: function below must move into compas_ghpython
 
 
-def _get_grasshopper_library_path():
-    if compas._os.system == 'win32':
+def _get_grasshopper_library_path(version):
+    if compas.WINDOWS:
         grasshopper_library_path = os.path.join(os.getenv('APPDATA'), 'Grasshopper', 'Libraries')
-    elif compas._os.system == 'darwin':
-        grasshopper_library_path = os.path.join(
-        os.getenv('HOME'), 'Library', 'Application Support', 'McNeel', 'Rhinoceros', '{}'.format(version), 
-        'Plug-ins', 'Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)', 'Libraries')
+    elif compas.OSX:
+        grasshopper_library_path = os.path.join(os.getenv('HOME'), 'Library', 'Application Support', 'McNeel', 'Rhinoceros', '{}'.format(version),
+                                                'Plug-ins', 'Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)', 'Libraries')
     else:
         raise Exception('Unsupported platform')
     return grasshopper_library_path
 
 
-def install():
+def install(version=None):
     """Installs the Grasshopper components library.
     """
     try:
-        grasshopper_library_path = _get_grasshopper_library_path()
+        version = _check_rhino_version(version)
+        grasshopper_library_path = _get_grasshopper_library_path(version)
         # remove old libraries
         oldlibs = glob.glob("%s*.ghpy" % os.path.join(grasshopper_library_path, assembly_name))
         [os.remove(f) for f in oldlibs]
