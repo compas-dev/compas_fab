@@ -4,7 +4,7 @@ import Grasshopper
 import System
 from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 
-from compas.geometry import Frame
+from compas_fab.ghpython.components import coerce_frame
 from compas_fab.ghpython.components.icons import contraints_from_plane_icon
 
 
@@ -33,7 +33,7 @@ class ConstraintsFromPlane(component):
         self.Params.Input.Add(p)
 
         p = Grasshopper.Kernel.Parameters.Param_Plane()
-        self.SetUpParam(p, "plane", "plane", "The plane from which we create position and orientation constraints.")
+        self.SetUpParam(p, "plane", "plane", "The plane or frame from which we create position and orientation constraints.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
 
@@ -91,7 +91,7 @@ class ConstraintsFromPlane(component):
             tolerance_yaxis = tolerance_yaxis or 1.
             tolerance_zaxis = tolerance_zaxis or 1.
 
-            frame = Frame(plane.Origin, plane.XAxis, plane.YAxis)
+            frame = coerce_frame(plane)
             tolerances_axes = [math.radians(tolerance_xaxis), math.radians(tolerance_yaxis), math.radians(tolerance_zaxis)]
             goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
 

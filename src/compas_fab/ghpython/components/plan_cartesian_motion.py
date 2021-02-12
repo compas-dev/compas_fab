@@ -3,8 +3,8 @@ import System
 from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 from scriptcontext import sticky as st
 
-from compas.geometry import Frame
 from compas_fab.ghpython.components import create_id
+from compas_fab.ghpython.components import coerce_frame
 from compas_fab.ghpython.components.icons import plan_cartesian_motion_icon
 
 
@@ -33,7 +33,7 @@ class PlanCartesianMotion(component):
         self.Params.Input.Add(p)
 
         p = Grasshopper.Kernel.Parameters.Param_Plane()
-        self.SetUpParam(p, "planes", "planes", "The planes through which the path is defined.")
+        self.SetUpParam(p, "planes", "planes", "The planes or frames through which the path is defined.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
 
@@ -100,7 +100,7 @@ class PlanCartesianMotion(component):
         attached_collision_meshes = list(attached_collision_meshes) if attached_collision_meshes else None
 
         if robot and robot.client and robot.client.is_connected and start_configuration and planes and compute:
-            frames = [Frame(plane.Origin, plane.XAxis, plane.YAxis) for plane in planes]
+            frames = [coerce_frame(plane) for plane in planes]
             st[key] = robot.plan_cartesian_motion(frames,
                                                   start_configuration=start_configuration,
                                                   group=group,

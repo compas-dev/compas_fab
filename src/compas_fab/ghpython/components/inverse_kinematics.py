@@ -31,7 +31,7 @@ class InverseKinematics(component):
         self.Params.Input.Add(p)
 
         p = Grasshopper.Kernel.Parameters.Param_GenericObject()
-        self.SetUpParam(p, "plane", "plane", "The plane to calculate the inverse kinematic for.")
+        self.SetUpParam(p, "plane", "plane", "The plane or frame to calculate the inverse kinematic for.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
 
