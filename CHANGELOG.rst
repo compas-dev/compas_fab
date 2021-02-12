@@ -11,6 +11,7 @@ Unreleased
 ----------
 
 **Added**
+* Added python components library for Grasshopper
 
 **Changed**
 
