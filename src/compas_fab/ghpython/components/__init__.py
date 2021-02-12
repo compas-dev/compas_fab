@@ -8,6 +8,7 @@ filename = '{}_{}.ghpy'.format(assembly_name, assembly_version)
 def create_id(component, name):
     return '{}_{}'.format(name, component.InstanceGuid)
 
+
 def coerce_frame(plane):
     import Rhino
     from compas.geometry import Frame

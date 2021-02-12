@@ -2,7 +2,6 @@ import Grasshopper
 import System
 from ghpythonlib.componentbase import dotnetcompiledcomponent as component
 
-from compas.geometry import Frame
 from compas_fab.ghpython.components.icons import inverse_kinematics_icon
 from compas_fab.ghpython.components import coerce_frame
 

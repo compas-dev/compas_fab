@@ -5,6 +5,7 @@ from compas_fab.ghpython.components import assembly_name
 from compas_fab.ghpython.components import assembly_version
 from compas_fab.__version__ import __author_email__
 
+
 class AssemblyInfo(GhPython.Assemblies.PythonAssemblyInfo):
     def get_AssemblyName(self):
         return assembly_name
