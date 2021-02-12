@@ -32,7 +32,7 @@ class ConstraintsFromPlane(component):
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
 
-        p = Grasshopper.Kernel.Parameters.Param_Plane()
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
         self.SetUpParam(p, "plane", "plane", "The plane or frame from which we create position and orientation constraints.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)

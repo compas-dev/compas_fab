@@ -32,7 +32,7 @@ class PlanCartesianMotion(component):
         p.Access = Grasshopper.Kernel.GH_ParamAccess.item
         self.Params.Input.Add(p)
 
-        p = Grasshopper.Kernel.Parameters.Param_Plane()
+        p = Grasshopper.Kernel.Parameters.Param_GenericObject()
         self.SetUpParam(p, "planes", "planes", "The planes or frames through which the path is defined.")
         p.Access = Grasshopper.Kernel.GH_ParamAccess.list
         self.Params.Input.Add(p)
