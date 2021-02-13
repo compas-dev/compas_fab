@@ -92,7 +92,7 @@ def test_name(panda_robot_instance):
 
 def test_group_names(ur5_robot_instance):
     robot = ur5_robot_instance
-    assert robot.group_names == ['manipulator', 'endeffector']
+    assert sorted(robot.group_names) == ['endeffector', 'manipulator']
 
 
 def test_main_group_name(panda_robot_instance):
