@@ -210,6 +210,14 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self._add_ids_to_robot_links(cached_robot)
 
     def reload_from_cache(self, robot):
+        """Reloads the PyBullet server with the robot's cached model.
+
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot to be saved for use with PyBullet.
+
+        """
         current_configuration = self.get_robot_configuration(robot)
         cached_robot_model = self.get_cached_robot(robot)
         cached_robot_filepath = self.get_cached_robot_filepath(robot)
@@ -225,6 +233,20 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.step_simulation()
 
     def cache_robot(self, robot):
+        """Saves an editable copy of the robot's model and its meshes
+        for shadowing the state of the robot on the PyBullet server.
+
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot to be saved for use with PyBullet.
+
+        Raises
+        ------
+        :exc:`Exception`
+            If geometry has not been loaded.
+
+        """
         robot.ensure_geometry()
         # write meshes to cache
         address_dict = {}
@@ -257,25 +279,76 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     @staticmethod
     def ensure_cached_robot(robot):
+        """Checks if a :class:`compas_fab.robots.Robot` has been cached for use with PyBullet."""
         if not robot.attributes['pybullet']['cached_robot']:
             raise Exception(
                 'This method is only callable once the robot has been cached.')
 
     @staticmethod
     def ensure_cached_robot_geometry(robot):
+        """Checks if the geometry of a :class:`compas_fab.robots.Robot` has been cached for use with PyBullet."""
         if not robot.attributes['pybullet'].get('robot_geometry_cached'):
             raise Exception(
                 'This method is only callable once the robot with loaded geometry has been cached.')
 
     def get_cached_robot(self, robot):
+        """Returns the editable copy of the robot's model for shadowing the state
+        of the robot on the PyBullet server.
+
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot saved for use with PyBullet.
+
+        Returns
+        -------
+        :class:`compas.robots.RobotModel`
+
+        Raises
+        ------
+        :exc:`Exception`
+            If the robot has not been cached.
+
+        """
         self.ensure_cached_robot(robot)
         return robot.attributes['pybullet']['cached_robot']
 
     def get_cached_robot_filepath(self, robot):
+        """Returns the filepath of the editable copy of the robot's model for shadowing the state
+        of the robot on the PyBullet server.
+
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot saved for use with PyBullet.
+
+        Returns
+        -------
+        :obj:`str`
+
+        Raises
+        ------
+        :exc:`Exception`
+            If the robot has not been cached.
+
+        """
         self.ensure_cached_robot(robot)
         return robot.attributes['pybullet']['cached_robot_filepath']
 
     def get_uid(self, cached_robot):
+        """Returns the internal PyBullet id of the robot's model for shadowing the state
+        of the robot on the PyBullet server.
+
+        Parameters
+        ----------
+        cached_robot : :class:`compas.robots.RobotModel`
+            The robot model saved for use with PyBullet.
+
+        Returns
+        -------
+        :obj:`int`
+
+        """
         return cached_robot.attr['uid']
 
     def _add_ids_to_robot_joints(self, cached_robot):
