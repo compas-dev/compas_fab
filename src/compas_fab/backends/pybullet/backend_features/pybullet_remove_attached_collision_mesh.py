@@ -36,24 +36,12 @@ class PyBulletRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
         ``None``
         """
         robot = options['robot']
-        self.client.ensure_cached_robot(robot)
+        self.client.ensure_cached_robot_geometry(robot)
 
-        current_configuration = self.client.get_robot_configuration(robot)
-
-        cached_robot_model = robot.attributes['pybullet']['cached_robot']
-        cached_robot_filepath = robot.attributes['pybullet']['cached_robot_filepath']
+        cached_robot_model = self.client.get_cached_robot(robot)
 
         # remove link and fixed joint
         cached_robot_model.remove_link(id)
         cached_robot_model.remove_joint(id + '_fixed_joint')
 
-        robot_uid = cached_robot_model.attr['uid']
-        pybullet.removeBody(robot_uid, physicsClientId=self.client.client_id)
-
-        cached_robot_model.to_urdf_file(cached_robot_filepath, prettify=True)
-        pybullet.setPhysicsEngineParameter(enableFileCaching=0)
-        self.client._load_robot_to_pybullet(cached_robot_filepath, robot)
-        pybullet.setPhysicsEngineParameter(enableFileCaching=1)
-
-        self.client.set_robot_configuration(robot, current_configuration)
-        self.client.step_simulation()
+        self.client.reload_from_cache(robot)
