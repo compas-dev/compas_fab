@@ -18,7 +18,7 @@ Main features
 * Execution tools
 * CAD-independent
 * Robotic fabrication process modeling
-* Multiple robotic backends (e.g. `ROS: Robot Operating System <https://ros.org>`_)
+* Multiple robotic backends (e.g. `ROS: Robot Operating System <https://www.ros.org>`_)
 
 **COMPAS FAB** runs on Python 3.x and IronPython 2.7.
 

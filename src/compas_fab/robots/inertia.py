@@ -35,8 +35,7 @@ class Inertia():
     Notes
     -----
     Assuming uniform mass density, inertial data can be obtained using the
-    free software MeshLab, refering to this great tutorial:
-    http://gazebosim.org/tutorials?tut=inertia
+    free software MeshLab, refering to this great `tutorial <http://gazebosim.org/tutorials?tut=inertia>`_.
     """
 
     def __init__(self, inertia_tensor, mass, center_of_mass):

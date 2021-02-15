@@ -8,7 +8,7 @@ from .trajectory_msgs import JointTrajectory
 
 
 class JointTolerance(ROSmsg):
-    """http://docs.ros.org/api/control_msgs/html/msg/JointTolerance.html
+    """https://docs.ros.org/api/control_msgs/html/msg/JointTolerance.html
     """
 
     def __init__(self, name="", position=0., velocity=0., acceleration=0.):
@@ -19,7 +19,7 @@ class JointTolerance(ROSmsg):
 
 
 class FollowJointTrajectoryGoal(ROSmsg):
-    """http://docs.ros.org/api/control_msgs/html/action/FollowJointTrajectory.html
+    """https://docs.ros.org/api/control_msgs/html/action/FollowJointTrajectory.html
     """
 
     def __init__(self, trajectory=None, path_tolerance=None,
@@ -31,7 +31,7 @@ class FollowJointTrajectoryGoal(ROSmsg):
 
 
 class FollowJointTrajectoryActionGoal(ROSmsg):
-    """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionGoal.html
+    """https://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionGoal.html
     """
 
     def __init__(self, header=None, goal_id=None, goal=None):
@@ -41,7 +41,7 @@ class FollowJointTrajectoryActionGoal(ROSmsg):
 
 
 class FollowJointTrajectoryFeedback(ROSmsg):
-    """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryFeedback.html
+    """https://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryFeedback.html
     """
 
     def __init__(self, header=None, joint_names=None, desired=None, actual=None,
@@ -54,7 +54,7 @@ class FollowJointTrajectoryFeedback(ROSmsg):
 
 
 class FollowJointTrajectoryActionFeedback(ROSmsg):
-    """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionFeedback.html
+    """https://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionFeedback.html
     """
 
     def __init__(self, header=None, status=None, feedback=None):
@@ -64,7 +64,7 @@ class FollowJointTrajectoryActionFeedback(ROSmsg):
 
 
 class FollowJointTrajectoryResult(ROSmsg):
-    """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryResult.html
+    """https://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryResult.html
     """
 
     SUCCESSFUL = 0
@@ -93,7 +93,7 @@ class FollowJointTrajectoryResult(ROSmsg):
 
 
 class FollowJointTrajectoryActionResult(ROSmsg):
-    """http://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionResult.html
+    """https://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionResult.html
     """
 
     def __init__(self, header=None, status=None, result=None):

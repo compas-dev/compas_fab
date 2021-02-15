@@ -29,7 +29,7 @@ project = 'COMPAS FAB'
 year = '2018'
 author = 'Gramazio Kohler Research'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '0.15.0'
+version = release = '0.16.0'
 
 pygments_style = 'sphinx'
 show_authors = True
@@ -44,6 +44,8 @@ extlinks = {
 intersphinx_mapping = {'python': ('https://docs.python.org/', None),
                        'compas': ('https://compas.dev/compas/latest/', None),
                        'roslibpy': ('https://roslibpy.readthedocs.io/en/latest/', None)}
+
+linkcheck_ignore = [r'http://localhost:\d+/']
 
 # autodoc options
 autodoc_default_options = {
