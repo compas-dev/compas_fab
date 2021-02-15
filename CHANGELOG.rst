@@ -12,9 +12,16 @@ Unreleased
 
 **Added**
 
+* Added `compas_fab.robots.PyBulletClient.get_robot_configuration`
+* Added `compas_fab.robots.Robot.ensure_geometry`
+
 **Changed**
 
+* Updated to ``COMPAS 1.1``
+
 **Fixed**
+
+* Fixed bug in the PyBullet client where one could not update the configuration of a robot with an attached collision mesh
 
 **Deprecated**
 
