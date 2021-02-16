@@ -12,6 +12,8 @@ Unreleased
 
 **Added**
 
+* Added serialization methods to `compas_fab.robots.CollisionMesh` and `compas_fab.robots.AttachedCollisionMesh`
+
 **Changed**
 
 **Fixed**
