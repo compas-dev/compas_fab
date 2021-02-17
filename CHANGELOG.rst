@@ -13,10 +13,13 @@ Unreleased
 **Added**
 
 * Added serialization methods to `compas_fab.robots.CollisionMesh` and `compas_fab.robots.AttachedCollisionMesh`
+* Added `attached_collision_meshes` attribute to `compas_fab.robots.JointTrajectory`
 
 **Changed**
 
 **Fixed**
+
+* Fixed bug existing since version 0.12 where `compas_fab.backends.RosClient.add_attached_collision_mesh` added collision objects to the scene, but did not attached them to the robot
 
 **Deprecated**
 

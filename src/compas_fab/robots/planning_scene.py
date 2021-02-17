@@ -443,6 +443,11 @@ class PlanningScene(object):
         >>> group = robot.main_group_name
         >>> scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)
 
+        >>> # check if it's really there
+        >>> planning_scene = robot.client.get_planning_scene()
+        >>> objects = [c.object['id'] for c in planning_scene.robot_state.attached_collision_objects]
+        >>> 'tip' in objects
+        True
         >>> scene.remove_attached_collision_mesh('tip')
 
         >>> # check if it's really gone
