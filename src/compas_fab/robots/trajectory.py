@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots.time_ import Duration
 from compas_fab.robots.configuration import Configuration
 
@@ -277,6 +278,8 @@ class JointTrajectory(Trajectory):
     fraction : :obj:`float`, optional
         Indicates the percentage of requested trajectory that was calculated,
         e.g. ``1`` means the full trajectory was found.
+    attached_collision_meshes : :obj:`list` of :closs:`compas_fab.robots.AttachedCollisionMesh`
+        The attached collision meshes included in the calculation of this trajectory.
 
     Attributes
     ----------
@@ -289,16 +292,19 @@ class JointTrajectory(Trajectory):
     fraction : :obj:`float`
         Indicates the percentage of requested trajectory that was calculated,
         e.g. ``1`` means the full trajectory was found.
+    attached_collision_meshes : :obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`
+        The attached collision meshes included in the calculation of this trajectory.
     data : :obj:`dict`
         The data representing the trajectory.
     """
 
-    def __init__(self, trajectory_points=None, joint_names=None, start_configuration=None, fraction=None):
+    def __init__(self, trajectory_points=None, joint_names=None, start_configuration=None, fraction=None, attached_collision_meshes=None):
         super(Trajectory, self).__init__()
         self.points = trajectory_points or []
         self.joint_names = joint_names or []
         self.start_configuration = start_configuration
         self.fraction = fraction
+        self.attached_collision_meshes = attached_collision_meshes or []
 
     @classmethod
     def from_data(cls, data):
@@ -337,6 +343,7 @@ class JointTrajectory(Trajectory):
         data_obj['joint_names'] = self.joint_names or []
         data_obj['start_configuration'] = self.start_configuration.to_data() if self.start_configuration else None
         data_obj['fraction'] = self.fraction
+        data_obj['attached_collision_meshes'] = [acm.to_data() for acm in self.attached_collision_meshes]
 
         return data_obj
 
@@ -347,6 +354,7 @@ class JointTrajectory(Trajectory):
         if data.get('start_configuration'):
             self.start_configuration = Configuration.from_data(data.get('start_configuration'))
         self.fraction = data.get('fraction')
+        self.attached_collision_meshes = [AttachedCollisionMesh.from_data(acm_data) for acm_data in data.get('attached_collision_meshes')]
 
     @property
     def time_from_start(self):

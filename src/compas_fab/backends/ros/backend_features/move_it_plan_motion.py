@@ -2,6 +2,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import itertools
+
 from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import PlanMotion
@@ -119,11 +121,11 @@ class MoveItPlanMotion(PlanMotion):
             name=start_configuration.joint_names,
             position=start_configuration.values)
         start_state = RobotState(
-            joint_state, MultiDOFJointState(header=header))
-        if options.get('attached_collision_meshes'):
-            for acm in options['attached_collision_meshes']:
-                aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
-                start_state.attached_collision_objects.append(aco)
+            joint_state, MultiDOFJointState(header=header), is_diff=True)
+        attached_collision_meshes = options.get('attached_collision_meshes', [])
+        for acm in attached_collision_meshes:
+            aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
+            start_state.attached_collision_objects.append(aco)
 
         # convert constraints
         goal_constraints = [convert_constraints_to_rosmsg(goal_constraints, header)]
@@ -159,6 +161,9 @@ class MoveItPlanMotion(PlanMotion):
             start_state = response.trajectory_start.joint_state
             start_state_types = [joint_type_by_name[name] for name in start_state.name]
             trajectory.start_configuration = Configuration(start_state.position, start_state_types, start_state.name)
+            trajectory.attached_collision_meshes = list(itertools.chain(*[
+                aco.to_attached_collision_meshes()
+                for aco in response.trajectory_start.attached_collision_objects]))
 
             callback(trajectory)
 
