@@ -32,7 +32,7 @@ jobs:
           python -m pip install --no-cache-dir -r requirements-dev.txt
       - name: Run integration tests
         run: |
-          pytest --doctest-modules
+          pytest --doctest-modules --ignore-glob="**ghpython/components/**.py"
           pytest docs
       - name: Tear down docker containers
         run: |
