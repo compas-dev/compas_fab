@@ -22,7 +22,7 @@ We love pull requests from everyone! Here's a quick guide to improve the code:
 
 ::
 
-    docker-compose -f "tests/integration_setup/docker-compose.yml"" up -d --build
+    docker-compose -f "tests/integration_setup/docker-compose.yml" up -d --build
 
 5. Make sure all tests pass:
 
@@ -113,12 +113,17 @@ for more details on how to add or amend a backend client.
 A Note on GhPython Components
 -----------------------------
 
-The Grasshopper components are made with the Python GHPY compiler based on the `Tutorial by Giulio Piacentino <https://discourse.mcneel.com/t/tutorial-creating-a-grasshopper-component-with-the-python-ghpy-compiler/38552>`_.
+The Grasshopper components are made with the Python GHPY compiler based on the
+`Tutorial by Giulio Piacentino <https://discourse.mcneel.com/t/tutorial-creating-a-grasshopper-component-with-the-python-ghpy-compiler/38552>`_.
 If you make changes to the files in ``src/compas_fab/ghpython/components``, the components library has to be manually recompiled.
 This is done by executing ``src\compas_fab\ghpython\components\compile.py`` with Rhino's PythonScript Editor.
-Then you need to run
-    python -m compas_rhino.install # TODO
-which copies the resulting ghpy file into the Grasshopper's library folder.
+Make sure to open Grasshopper before compiling, so that the assemblies are loaded.
+
+Once compilation is completed, the components (``.ghpy`` file) are installed using the same command
+that installs COMPAS on Rhino::
+
+    python -m compas_rhino.install
+
 
 Design documents
 ----------------
