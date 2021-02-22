@@ -64,10 +64,12 @@ class PyBulletInverseKinematics(InverseKinematics):
         """
         options = options or {}
         link_name = options.get('link_name') or robot.get_end_effector_link_name(group)
-        link_id = self.client._get_link_id_by_name(link_name, robot)
+        cached_robot = self.client.get_cached_robot(robot)
+        body_id = self.client.get_uid(cached_robot)
+        link_id = self.client._get_link_id_by_name(link_name, cached_robot)
         point, orientation = pose_from_frame(frame_WCF)
 
-        joints = robot.model.get_configurable_joints()
+        joints = cached_robot.get_configurable_joints()
         joints.sort(key=lambda j: j.attr['pybullet']['id'])
         joint_names = [joint.name for joint in joints]
 
@@ -87,7 +89,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
             if options.get('semi-constrained'):
                 joint_positions = pybullet.calculateInverseKinematics(
-                    robot.attributes['pybullet_uid'],
+                    body_id,
                     link_id,
                     point,
                     lowerLimits=lower_limits,
@@ -97,7 +99,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 )
             else:
                 joint_positions = pybullet.calculateInverseKinematics(
-                    robot.attributes['pybullet_uid'],
+                    body_id,
                     link_id,
                     point,
                     orientation,
@@ -109,13 +111,13 @@ class PyBulletInverseKinematics(InverseKinematics):
         else:
             if options.get('semi-constrained'):
                 joint_positions = pybullet.calculateInverseKinematics(
-                    robot.attributes['pybullet_uid'],
+                    body_id,
                     link_id,
                     point,
                 )
             else:
                 joint_positions = pybullet.calculateInverseKinematics(
-                    robot.attributes['pybullet_uid'],
+                    body_id,
                     link_id,
                     point,
                     orientation,

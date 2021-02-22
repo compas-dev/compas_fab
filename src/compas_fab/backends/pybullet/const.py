@@ -39,6 +39,8 @@ JointInfo = namedtuple('JointInfo', ['jointIndex', 'jointName', 'jointType',
                                      'jointDamping', 'jointFriction', 'jointLowerLimit', 'jointUpperLimit',
                                      'jointMaxForce', 'jointMaxVelocity', 'linkName', 'jointAxis',
                                      'parentFramePos', 'parentFrameOrn', 'parentIndex'])
+JointState = namedtuple('JointState', ['jointPosition', 'jointVelocity',
+                                       'jointReactionForces', 'appliedJointMotorTorque'])
 LinkState = namedtuple('LinkState', ['linkWorldPosition', 'linkWorldOrientation',
                                      'localInertialFramePosition', 'localInertialFrameOrientation',
                                      'worldLinkFramePosition', 'worldLinkFrameOrientation'])

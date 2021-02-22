@@ -866,7 +866,7 @@ class Robot(object):
        """
         if not self.client:
             raise Exception(
-                'This method is only callable once a client is assigned')
+                'This method is only callable once a client is assigned.')
 
     def ensure_semantics(self):
         """Check if semantics is set.
@@ -877,8 +877,16 @@ class Robot(object):
         """
         if not self.semantics:
             raise Exception(
-                'This method is only callable once a semantic model is assigned')
+                'This method is only callable once a semantic model is assigned.')
 
+    def ensure_geometry(self):
+        """Check if the model's geometry has been loaded.
+        Raises
+        ------
+        :exc:`Exception`
+            If geometry has not been loaded.
+        """
+        self.model.ensure_geometry()
     # ==========================================================================
     # constraints
     # ==========================================================================

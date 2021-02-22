@@ -49,7 +49,8 @@ gui from closing this example too quickly.
 
 Adding and removing a collision mesh attached to the end effector link of the
 robot is similar.  Again, the calls to ``sleep`` and ``step_simulation`` exist only
-to make the GUI rendering smoother.
+to make the GUI rendering smoother.  Note that it is required to load the geometry
+of the robot before calling methods which add and remove attached collision meshes.
 
 .. literalinclude :: files/01_add_attached_collision_mesh.py
    :language: python
