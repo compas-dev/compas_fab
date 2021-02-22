@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import compas
 import compas.plugins
 
 
@@ -12,6 +13,10 @@ def installable_rhino_packages():
 
 @compas.plugins.plugin(category='install')
 def after_rhino_install(installed_packages):
+    # GH Components are not supported on non-Windows platforms
+    if not compas.is_windows():
+        return []
+
     if 'compas_fab' not in installed_packages:
         return []
 
@@ -21,6 +26,10 @@ def after_rhino_install(installed_packages):
 
 @compas.plugins.plugin(category='install')
 def after_rhino_uninstall(installed_packages):
+    # GH Components are not supported on non-Windows platforms
+    if not compas.is_windows():
+        return []
+
     if 'compas_fab' not in installed_packages:
         return []
 
