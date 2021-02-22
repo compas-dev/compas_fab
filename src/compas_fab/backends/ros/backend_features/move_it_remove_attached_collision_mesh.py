@@ -10,7 +10,7 @@ from compas_fab.backends.ros.messages import ApplyPlanningSceneResponse
 from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import CollisionObject
 from compas_fab.backends.ros.messages import PlanningScene
-from compas_fab.backends.ros.messages import PlanningSceneWorld
+from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
 
 __all__ = [
@@ -53,7 +53,7 @@ class MoveItRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
         aco = AttachedCollisionObject()
         aco.object.id = id
         aco.object.operation = CollisionObject.REMOVE
-        world = PlanningSceneWorld(collision_objects=[aco.object])
-        scene = PlanningScene(world=world, is_diff=True)
+        robot_state = RobotState(attached_collision_objects=[aco], is_diff=True)
+        scene = PlanningScene(robot_state=robot_state, is_diff=True)
         request = dict(scene=scene)
         self.APPLY_PLANNING_SCENE(self.ros_client, request, callback, errback)

@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Scale
 
@@ -81,6 +82,53 @@ class CollisionMesh(object):
         self.mesh = self.mesh.copy()
         self.scale(scale_factor)
 
+    def to_data(self):
+        """Get the data dictionary that represents the collision mesh.
+
+        This can be used to reconstruct the :class:`CollisionMesh` instance.
+
+        Returns
+        -------
+        :obj:`dict`
+        """
+        return self.data
+
+    @classmethod
+    def from_data(cls, data):
+        """Construct a collision mesh from its data representation.
+
+        Parameters
+        ----------
+        data : :obj:`dict`
+            The data dictionary.
+
+        Returns
+        -------
+        :class:`CollisionMesh`
+             An instance of :class:`CollisionMesh`.
+        """
+        collision_mesh = cls(None, None)
+        collision_mesh.data = data
+        return collision_mesh
+
+    @property
+    def data(self):
+        """:obj:`dict` : The data representing the collision mesh."""
+        data_obj = {}
+        data_obj['id'] = self.id
+        data_obj['mesh'] = self.mesh.to_data()
+        data_obj['frame'] = self.frame.to_data()
+        data_obj['root_name'] = self.root_name
+
+        return data_obj
+
+    @data.setter
+    def data(self, data_obj):
+        self.id = data_obj['id']
+        self.mesh = Mesh.from_data(data_obj['mesh'])
+        self.frame = Frame.from_data(data_obj['frame'])
+        self.root_name = data_obj['root_name']
+
 
 class AttachedCollisionMesh(object):
     """Represents a collision mesh that is attached to a :class:`Robot`'s :class:`~compas.robots.Link`.
@@ -126,6 +174,53 @@ class AttachedCollisionMesh(object):
         self.link_name = link_name
         self.touch_links = touch_links if touch_links else [link_name]
         self.weight = weight
+
+    def to_data(self):
+        """Get the data dictionary that represents the attached collision mesh.
+
+        This can be used to reconstruct the :class:`AttachedCollisionMesh` instance.
+
+        Returns
+        -------
+        :obj:`dict`
+        """
+        return self.data
+
+    @classmethod
+    def from_data(cls, data):
+        """Construct an attached collision mesh from its data representation.
+
+        Parameters
+        ----------
+        data : :obj:`dict`
+            The data dictionary.
+
+        Returns
+        -------
+        :class:`AttachedCollisionMesh`
+             An instance of :class:`AttachedCollisionMesh`.
+        """
+        acm = cls(None, None)
+        acm.data = data
+        return acm
+
+    @property
+    def data(self):
+        """:obj:`dict` : The data representing the attached collision mesh."""
+        data_obj = {}
+        data_obj['collision_mesh'] = self.collision_mesh.to_data()
+        data_obj['link_name'] = self.link_name
+        data_obj['touch_links'] = self.touch_links
+        data_obj['weight'] = self.weight
+
+        return data_obj
+
+    @data.setter
+    def data(self, data_obj):
+        self.collision_mesh = CollisionMesh.from_data(data_obj['collision_mesh'])
+        self.link_name = data_obj['link_name']
+        self.touch_links = data_obj['touch_links']
+        self.weight = data_obj['weight']
 
 
 class PlanningScene(object):
@@ -348,6 +443,11 @@ class PlanningScene(object):
         >>> group = robot.main_group_name
         >>> scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)
 
+        >>> # check if it's really there
+        >>> planning_scene = robot.client.get_planning_scene()
+        >>> objects = [c.object['id'] for c in planning_scene.robot_state.attached_collision_objects]
+        >>> 'tip' in objects
+        True
         >>> scene.remove_attached_collision_mesh('tip')
 
         >>> # check if it's really gone

@@ -10,12 +10,15 @@ from compas_fab.backends.ros.messages.octomap_msgs import OctomapWithPose
 from compas_fab.backends.ros.messages.sensor_msgs import JointState
 from compas_fab.backends.ros.messages.sensor_msgs import MultiDOFJointState
 from compas_fab.backends.ros.messages.shape_msgs import Mesh
+from compas_fab.backends.ros.messages.shape_msgs import MeshTriangle
 from compas_fab.backends.ros.messages.shape_msgs import Plane
 from compas_fab.backends.ros.messages.shape_msgs import SolidPrimitive
 from compas_fab.backends.ros.messages.std_msgs import Header
 from compas_fab.backends.ros.messages.std_msgs import ROSmsg
 from compas_fab.backends.ros.messages.trajectory_msgs import JointTrajectory
 from compas_fab.backends.ros.messages.trajectory_msgs import MultiDOFJointTrajectory
+from compas_fab.robots import AttachedCollisionMesh
+from compas_fab.robots import CollisionMesh
 
 
 class CollisionObject(ROSmsg):
@@ -76,6 +79,35 @@ class CollisionObject(ROSmsg):
 
         return cls(**kwargs)
 
+    def to_collision_meshes(self):
+        """Creates a list of collision meshes from a :class:`compas_fab.backends.CollisionObject`
+        """
+        collision_meshes = []
+        for mesh, pose in zip(self.meshes, self.mesh_poses):
+            pose = pose if isinstance(pose, Pose) else Pose(**pose)
+            pose.position = pose.position if isinstance(pose.position, Point) else Point(**pose.position)
+            pose.position.x = float(pose.position.x)
+            pose.position.y = float(pose.position.y)
+            pose.position.z = float(pose.position.z)
+            pose.orientation = pose.orientation if isinstance(pose.orientation, Quaternion) else Quaternion(**pose.orientation)
+            pose.orientation.x = float(pose.orientation.x)
+            pose.orientation.y = float(pose.orientation.y)
+            pose.orientation.z = float(pose.orientation.z)
+            pose.orientation.w = float(pose.orientation.w)
+            mesh = mesh if isinstance(mesh, Mesh) else Mesh(**mesh)
+            mesh.triangles = [t if isinstance(t, MeshTriangle) else MeshTriangle(**t) for t in mesh.triangles]
+            for triangle in mesh.triangles:
+                triangle.vertex_indices = [int(x) for x in triangle.vertex_indices]
+            mesh.vertices = [v if isinstance(v, Point) else Point(**v) for v in mesh.vertices]
+            for vertex in mesh.vertices:
+                vertex.x = float(vertex.x)
+                vertex.y = float(vertex.y)
+                vertex.z = float(vertex.z)
+            root_name = getattr(self.header, 'frame_id', self.header['frame_id'])
+            cm = CollisionMesh(mesh.mesh, self.id, pose.frame, root_name)
+            collision_meshes.append(cm)
+        return collision_meshes
+
 
 class AttachedCollisionObject(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html
@@ -101,6 +133,17 @@ class AttachedCollisionObject(ROSmsg):
         kwargs['weight'] = attached_collision_mesh.weight
 
         return cls(**kwargs)
+
+    def to_attached_collision_meshes(self):
+        """Creates a list of attached collision meshes from a :class:`compas_fab.backends.AttachedCollisionObject`
+        """
+        attached_collision_meshes = []
+        obj = self.object if isinstance(self.object, CollisionObject) else CollisionObject(**self.object)
+        collision_meshes = obj.to_collision_meshes()
+        for cm in collision_meshes:
+            acm = AttachedCollisionMesh(cm, self.link_name, self.touch_links, self.weight)
+            attached_collision_meshes.append(acm)
+        return attached_collision_meshes
 
 
 class Constraints(ROSmsg):
