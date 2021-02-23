@@ -54,7 +54,7 @@ try:
 
     if os.path.exists(git_head_file):
         # git head file contains one line that looks like this:
-        # ref: refs/heads/master
+        # ref: refs/heads/main
         with open(git_head_file, 'r') as git_head:
             _, ref_path = git_head.read().strip().split(' ')
             ref_path = ref_path.split('/')

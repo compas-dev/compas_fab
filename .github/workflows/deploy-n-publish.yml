@@ -3,12 +3,12 @@ name: deploy-and-publish
 on:
   push:
     branches:
-      - master
+      - main
     tags:
       - 'v*'
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -46,7 +46,7 @@ jobs:
               BRANCH_OR_TAG=${BASH_REMATCH##*/}
             fi;
 
-            if [[ $BRANCH_OR_TAG = master ]]; then
+            if [[ $BRANCH_OR_TAG = main ]]; then
               BRANCH_OR_TAG=latest
             fi;
           fi;
@@ -58,7 +58,7 @@ jobs:
         uses: crazy-max/ghaction-github-pages@v2
         with:
           repo: gramaziokohler/gramaziokohler.github.io
-          target_branch: master
+          target_branch: main
           build_dir: deploy
           keep_history: true
         env:

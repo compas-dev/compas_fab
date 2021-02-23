@@ -103,7 +103,7 @@ Contributing
 
 We love contributions!
 
-Check the `Contributor's Guide <https://github.com/compas-dev/compas_fab/blob/master/CONTRIBUTING.rst>`_
+Check the `Contributor's Guide <https://github.com/compas-dev/compas_fab/blob/main/CONTRIBUTING.rst>`_
 for more details.
 
 
@@ -131,4 +131,4 @@ Credits
 -------
 
 This package is maintained by Gramazio Kohler Research `@gramaziokohler <https://github.com/gramaziokohler>`_
-and a long list of `contributors <https://github.com/compas-dev/compas_fab/blob/master/AUTHORS.rst>`_
+and a long list of `contributors <https://github.com/compas-dev/compas_fab/blob/main/AUTHORS.rst>`_
