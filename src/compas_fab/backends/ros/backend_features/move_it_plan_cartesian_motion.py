@@ -116,10 +116,10 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
                                  position=start_configuration.values)
         start_state = RobotState(joint_state, MultiDOFJointState(header=header), is_diff=True)
 
-        attached_collision_meshes = options.get('attached_collision_meshes', [])
-        for acm in attached_collision_meshes:
-            aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
-            start_state.attached_collision_objects.append(aco)
+        if options.get('attached_collision_meshes'):
+            for acm in options['attached_collision_meshes']:
+                aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
+                start_state.attached_collision_objects.append(aco)
 
         path_constraints = convert_constraints_to_rosmsg(options.get('path_constraints'), header)
 

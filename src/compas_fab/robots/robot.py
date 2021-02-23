@@ -1160,7 +1160,7 @@ class Robot(object):
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
         options = options or {}
-        attached_collision_meshes = options.get('attached_collision_meshes', [])
+        attached_collision_meshes = options.get('attached_collision_meshes') or []
 
         self.ensure_client()
         group = group or self.main_group_name if self.semantics else None
@@ -1359,7 +1359,7 @@ class Robot(object):
         options = options or {}
         max_step = options.get('max_step')
         path_constraints = options.get('path_constraints')
-        attached_collision_meshes = options.get('attached_collision_meshes', [])
+        attached_collision_meshes = options.get('attached_collision_meshes') or []
 
         self.ensure_client()
         if not group:
@@ -1502,7 +1502,7 @@ class Robot(object):
         """
         options = options or {}
         path_constraints = options.get('path_constraints')
-        attached_collision_meshes = options.get('attached_collision_meshes', [])
+        attached_collision_meshes = options.get('attached_collision_meshes') or []
 
         # TODO: for the motion plan request a list of possible goal constraints
         # can be passed, from which the planner will try to find a path that
