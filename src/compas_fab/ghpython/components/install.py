@@ -7,7 +7,7 @@ from compas_ghpython import get_grasshopper_library_path
 from compas_rhino import _check_rhino_version
 
 from compas_fab.ghpython.components import assembly_name
-from compas_fab.ghpython.components import filename
+from compas_fab.ghpython.components import get_ghpy_filename
 
 
 def get_version_from_args():
@@ -28,8 +28,8 @@ def install():
         for f in _remove_old_components(grasshopper_library_path):
             results.append(('compas_fab', 'Uninstalled existing component: {}'.format(f), True))
 
-        src = os.path.join(os.path.dirname(__file__), filename)
-        dst = os.path.join(grasshopper_library_path, filename)
+        src = os.path.join(os.path.dirname(__file__), get_ghpy_filename())
+        dst = os.path.join(grasshopper_library_path, get_ghpy_filename())
 
         shutil.copyfile(src, dst)
 

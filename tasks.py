@@ -217,6 +217,9 @@ def release(ctx, release_type):
     if release_type not in ('patch', 'minor', 'major'):
         raise Exit('The release type parameter is invalid.\nMust be one of: major, minor, patch')
 
+    if not confirm('Have you compiled the Grasshopper components already? [y/N]'):
+        raise Exit('Please compile before release.')
+
     # Run checks
     ctx.run('invoke check test')
 
@@ -225,9 +228,6 @@ def release(ctx, release_type):
 
     # Build project
     ctx.run('python setup.py clean --all sdist bdist_wheel')
-
-    if not confirm('Please compile the Grasshopper components before continuing. Are you done? [y/N]'):
-        raise Exit('You need to manually revert the tag/commits created.')
 
     # Prepare changelog for next release
     prepare_changelog(ctx)

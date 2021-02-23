@@ -2,7 +2,11 @@ import compas_fab
 
 assembly_name = 'COMPAS FAB'
 assembly_version = compas_fab.__version__.split('-')[0]
-filename = '{}_{}.ghpy'.format(assembly_name, assembly_version)
+
+
+def get_ghpy_filename(version=None):
+    """Return the GHPY filename for the current version or a specified one."""
+    return '{}_{}.ghpy'.format(assembly_name, version or assembly_version)
 
 
 def create_id(component, name):
