@@ -76,6 +76,7 @@ class PathVisualizer(object):
     """Handles the generation of meshes to visualize a full path plan
     in Rhino/Grasshopper.
     """
+
     def __init__(self, simulator, robot, building_member=None, building_member_pickup_config=None):
         self.simulator = simulator
         self.robot = robot

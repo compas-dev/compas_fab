@@ -11,6 +11,7 @@ Unreleased
 ----------
 
 **Added**
+* Added python components library for Grasshopper
 
 * Added ``compas_fab.robots.PyBulletClient.get_robot_configuration``
 * Added ``compas_fab.robots.Robot.ensure_geometry``

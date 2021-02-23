@@ -176,7 +176,7 @@ def test(ctx, checks=False, doctest=False, codeblock=False, coverage=False):
     with chdir(BASE_FOLDER):
         pytest_args = ['pytest']
         if doctest:
-            pytest_args.append('--doctest-modules')
+            pytest_args.append('--doctest-modules --ignore-glob="**ghpython/components/**.py"')
         if coverage:
             pytest_args.append('--cov=compas_fab')
 
@@ -225,6 +225,9 @@ def release(ctx, release_type):
 
     # Build project
     ctx.run('python setup.py clean --all sdist bdist_wheel')
+
+    if not confirm('Please compile the Grasshopper components before continuing. Are you done? [y/N]'):
+        raise Exit('You need to manually revert the tag/commits created.')
 
     # Prepare changelog for next release
     prepare_changelog(ctx)
