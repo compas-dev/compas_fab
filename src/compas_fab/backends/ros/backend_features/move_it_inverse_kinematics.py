@@ -85,7 +85,7 @@ class MoveItInverseKinematics(InverseKinematics):
         kwargs['errback_name'] = 'errback'
 
         # Use base_link or fallback to model's root link
-        options['base_link'] = options.get('base_link', robot.model.root.name)
+        options['base_link'] = options.get('base_link') or robot.model.root.name
 
         return await_callback(self.inverse_kinematics_async, **kwargs)
 
@@ -112,8 +112,8 @@ class MoveItInverseKinematics(InverseKinematics):
                                        robot_state=start_state,
                                        constraints=constraints,
                                        pose_stamped=pose_stamped,
-                                       avoid_collisions=options.get('avoid_collisions', True),
-                                       attempts=options.get('attempts', 8))
+                                       avoid_collisions=options.get('avoid_collisions') or True,
+                                       attempts=options.get('attempts') or 8)
 
         def convert_to_positions(response):
             callback((response.solution.joint_state.position, response.solution.joint_state.name))

@@ -93,7 +93,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         kwargs['errback_name'] = 'errback'
 
         # Use base_link or fallback to model's root link
-        options['base_link'] = options.get('base_link', robot.model.root.name)
+        options['base_link'] = options.get('base_link') or robot.model.root.name
         options['joint_names'] = robot.get_configurable_joint_names()
         options['joint_types'] = robot.get_configurable_joint_types()
         options['link'] = options.get('link') or robot.get_end_effector_link_name(group)
@@ -128,9 +128,9 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
                        group_name=group,
                        link_name=options['link'],
                        waypoints=waypoints,
-                       max_step=float(options.get('max_step', 0.01)),
-                       jump_threshold=float(options.get('jump_threshold', 1.57)),
-                       avoid_collisions=bool(options.get('avoid_collisions', True)),
+                       max_step=float(options.get('max_step') or 0.01),
+                       jump_threshold=float(options.get('jump_threshold') or 1.57),
+                       avoid_collisions=bool(options.get('avoid_collisions') or True),
                        path_constraints=path_constraints)
 
         def convert_to_trajectory(response):

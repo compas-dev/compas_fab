@@ -50,7 +50,7 @@ class VrepInverseKinematics(InverseKinematics):
         gantry_joint_limits = options.get('gantry_joint_limits')
         arm_joint_limits = options.get('arm_joint_limits')
         max_trials = options.get('max_trials')
-        max_results = options.get('max_results', 1)
+        max_results = options.get('max_results') or 1
 
         if not metric_values:
             metric_values = [0.1] * num_joints

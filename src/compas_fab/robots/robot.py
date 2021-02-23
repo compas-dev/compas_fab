@@ -1278,7 +1278,7 @@ class Robot(object):
 
         # Solve with the model
         if solver == 'model':
-            link = options.get('link', options.get('ee_link'))
+            link = options.get('link') or options.get('ee_link')
             link = link or self.get_end_effector_link_name(group)
             if link not in self.get_link_names(group):
                 raise ValueError('Link name {} does not exist in planning group'.format(link))

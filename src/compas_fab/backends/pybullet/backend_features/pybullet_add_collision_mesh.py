@@ -37,7 +37,7 @@ class PyBulletAddCollisionMesh(AddCollisionMesh):
         mesh = collision_mesh.mesh
         name = collision_mesh.id
         frame = collision_mesh.frame
-        mass = options.get('mass', STATIC_MASS)
+        mass = options.get('mass') or STATIC_MASS
 
         # mimic ROS' behavior: collision object with same name is replaced
         if name in self.client.collision_objects:

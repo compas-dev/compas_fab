@@ -350,7 +350,7 @@ class JointTrajectory(Trajectory):
     @data.setter
     def data(self, data):
         self.points = list(map(JointTrajectoryPoint.from_data, data.get('points') or []))
-        self.joint_names = data.get('joint_names', [])
+        self.joint_names = data.get('joint_names') or []
         if data.get('start_configuration'):
             self.start_configuration = Configuration.from_data(data.get('start_configuration'))
         self.fraction = data.get('fraction')

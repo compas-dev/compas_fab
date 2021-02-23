@@ -99,7 +99,7 @@ class MoveItPlanMotion(PlanMotion):
         kwargs['errback_name'] = 'errback'
 
         # Use base_link or fallback to model's root link
-        options['base_link'] = options.get('base_link', robot.model.root.name)
+        options['base_link'] = options.get('base_link') or robot.model.root.name
         options['joint_names'] = robot.get_configurable_joint_names()
         options['joint_types'] = robot.get_configurable_joint_types()
 
@@ -140,12 +140,12 @@ class MoveItPlanMotion(PlanMotion):
                        goal_constraints=goal_constraints,
                        path_constraints=path_constraints,
                        trajectory_constraints=trajectory_constraints,
-                       planner_id=options.get('planner_id', 'RRTConnectkConfigDefault'),
+                       planner_id=options.get('planner_id') or 'RRTConnectkConfigDefault',
                        group_name=group,
-                       num_planning_attempts=options.get('num_planning_attempts', 1),
-                       allowed_planning_time=options.get('allowed_planning_time', 2.),
-                       max_velocity_scaling_factor=options.get('max_velocity_scaling_factor', 1.),
-                       max_acceleration_scaling_factor=options.get('max_acceleration_scaling_factor', 1.))
+                       num_planning_attempts=options.get('num_planning_attempts') or 1,
+                       allowed_planning_time=options.get('allowed_planning_time') or 2.,
+                       max_velocity_scaling_factor=options.get('max_velocity_scaling_factor') or 1.,
+                       max_acceleration_scaling_factor=options.get('max_acceleration_scaling_factor') or 1.)
         # workspace_parameters=options.get('workspace_parameters')
 
         def convert_to_trajectory(response):
