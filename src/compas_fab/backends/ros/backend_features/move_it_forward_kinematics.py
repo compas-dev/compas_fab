@@ -67,10 +67,10 @@ class MoveItForwardKinematics(ForwardKinematics):
         kwargs['errback_name'] = 'errback'
 
         # Use base_link or fallback to model's root link
-        options['base_link'] = options.get('base_link') or robot.model.root.name
+        options['base_link'] = options.get('base_link', robot.model.root.name)
 
         # Use selected link or default to group's end effector
-        options['link'] = options.get('link') or options.get('ee_link') or robot.get_end_effector_link_name(group)
+        options['link'] = options.get('link', options.get('ee_link')) or robot.get_end_effector_link_name(group)
         if options['link'] not in robot.get_link_names(group):
             raise ValueError('Link name {} does not exist in planning group'.format(options['link']))
 

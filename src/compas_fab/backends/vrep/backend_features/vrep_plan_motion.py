@@ -67,13 +67,13 @@ class VrepPlanMotion(PlanMotion):
         num_joints = len(robot.get_configurable_joints())
         metric_values = options.get('metric_values')
         collision_meshes = options.get('collision_meshes')
-        planner_id = options.get('planner_id') or 'rrtconnect'
-        trials = options.get('trials') or 1
-        resolution = options.get('resolution') or 0.02
+        planner_id = options.get('planner_id', 'rrtconnect')
+        trials = options.get('trials', 1)
+        resolution = options.get('resolution', 0.02)
         gantry_joint_limits = options.get('gantry_joint_limits')
         arm_joint_limits = options.get('arm_joint_limits')
-        shallow_state_search = options.get('shallow_state_search') or True
-        optimize_path_length = options.get('optimize_path_length') or False
+        shallow_state_search = options.get('shallow_state_search', True)
+        optimize_path_length = options.get('optimize_path_length', False)
         log = options.get('log')
 
         return self._find_path_plan(group, {'target_type': 'pose', 'target': goal_constraints},
@@ -124,13 +124,13 @@ class VrepPlanMotion(PlanMotion):
         num_joints = len(robot.get_configurable_joints())
         metric_values = options.get('metric_values')
         collision_meshes = options.get('collision_meshes')
-        planner_id = options.get('planner_id') or 'rrtconnect'
-        trials = options.get('trials') or 1
-        resolution = options.get('resolution') or 0.02
+        planner_id = options.get('planner_id', 'rrtconnect')
+        trials = options.get('trials', 1)
+        resolution = options.get('resolution', 0.02)
         gantry_joint_limits = options.get('gantry_joint_limits')
         arm_joint_limits = options.get('arm_joint_limits')
-        shallow_state_search = options.get('shallow_state_search') or True
-        optimize_path_length = options.get('optimize_path_length') or False
+        shallow_state_search = options.get('shallow_state_search', True)
+        optimize_path_length = options.get('optimize_path_length', False)
         log = options.get('log')
         return self._find_path_plan(group, {'target_type': 'config', 'target': goal_configs},
                                     num_joints, metric_values, collision_meshes, planner_id, trials, resolution,

@@ -77,9 +77,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             start_configuration = self.client.set_robot_configuration(robot, start_configuration, group)
 
         called_from_test = 'pytest' in sys.modules
-        enforce_joint_limits = options.get('enforce_joint_limits') or True
-
-        if enforce_joint_limits and not called_from_test:
+        if options.get('enforce_joint_limits', True) and not called_from_test:
             lower_limits = [joint.limit.lower if joint.type != Joint.CONTINUOUS else 0 for joint in joints]
             upper_limits = [joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi for joint in joints]
             # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.

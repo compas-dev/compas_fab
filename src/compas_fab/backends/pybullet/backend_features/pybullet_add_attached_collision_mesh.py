@@ -62,10 +62,10 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         robot = options['robot']
         self.client.ensure_cached_robot_geometry(robot)
 
-        mass = options.get('mass') or 1.
-        inertia = options.get('inertia') or [1., 0., 0., 1., 0., 1.]
-        inertial_origin = options.get('inertial_origin') or Frame.worldXY()
-        collision_origin = options.get('collision_origin') or Frame.worldXY()
+        mass = options.get('mass', 1.)
+        inertia = options.get('inertia', [1., 0., 0., 1., 0., 1.])
+        inertial_origin = options.get('inertial_origin', Frame.worldXY())
+        collision_origin = options.get('collision_origin', Frame.worldXY())
 
         cached_robot_model = self.client.get_cached_robot(robot)
 
