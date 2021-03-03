@@ -20,12 +20,12 @@ class JointTrajectoryPoint(Configuration):
     A trajectory point is a sub-class of :class:`Configuration` extended
     with acceleration, effort and time from start information.
 
-    Trajectory points are defined either as *values + velocities and
-    accelerations*, or as *values + efforts*.
+    Trajectory points are defined either as *joint_values + velocities and
+    accelerations*, or as *joint_values + efforts*.
 
     Parameters
     ----------
-    values : :obj:`list` of :obj:`float`, optional
+    joint_values : :obj:`list` of :obj:`float`, optional
         Joint values expressed in radians or meters, depending on the respective
         type.
     types : :obj:`list` of :attr:`compas.robots.Joint.TYPE`, optional
@@ -42,7 +42,7 @@ class JointTrajectoryPoint(Configuration):
 
     Attributes
     ----------
-    values : :obj:`list` of :obj:`float`
+    joint_values : :obj:`list` of :obj:`float`
         Joint values expressed in radians or meters, depending on the respective
         type.
     types : :obj:`list` of :attr:`compas.robots.Joint.TYPE`
@@ -57,23 +57,23 @@ class JointTrajectoryPoint(Configuration):
     time_from_start : :class:`Duration`
         Duration of trajectory point counting from the start.
     positions : :obj:`list` of :obj:`float`
-        Alias of `values`.
+        Alias of `joint_values`.
     data : obj:`dict`
         The data representing the trajectory point.
     """
 
-    def __init__(self, values=None, types=None, velocities=None, accelerations=None, effort=None, time_from_start=None):
-        super(JointTrajectoryPoint, self).__init__(values, types)
-        self.velocities = velocities or len(self.values) * [0.]
-        self.accelerations = accelerations or len(self.values) * [0.]
-        self.effort = effort or len(self.values) * [0.]
+    def __init__(self, joint_values=None, types=None, velocities=None, accelerations=None, effort=None, time_from_start=None):
+        super(JointTrajectoryPoint, self).__init__(joint_values, types)
+        self.velocities = velocities or len(self.joint_values) * [0.]
+        self.accelerations = accelerations or len(self.joint_values) * [0.]
+        self.effort = effort or len(self.joint_values) * [0.]
         self.time_from_start = time_from_start or Duration(0, 0)
 
     def __str__(self):
         """Return a human-readable string representation of the instance."""
         vs = '%.' + self._precision
         return 'JointTrajectoryPoint(({}), {}, ({}), ({}), ({}), {})'.format(
-            ', '.join(vs % i for i in self.values),
+            ', '.join(vs % i for i in self.joint_values),
             tuple(self.types),
             ', '.join(vs % i for i in self.velocities),
             ', '.join(vs % i for i in self.accelerations),
@@ -83,8 +83,8 @@ class JointTrajectoryPoint(Configuration):
 
     @property
     def positions(self):
-        """:obj:`list` of :obj:`float` : Alias of `values`."""
-        return self.values
+        """:obj:`list` of :obj:`float` : Alias of `joint_values`."""
+        return self.joint_values
 
     @property
     def velocities(self):
@@ -93,9 +93,9 @@ class JointTrajectoryPoint(Configuration):
 
     @velocities.setter
     def velocities(self, velocities):
-        if len(self.values) != len(velocities):
+        if len(self.joint_values) != len(velocities):
             raise ValueError('Must have {} velocities, but {} given.'.format(
-                len(self.values), len(velocities)))
+                len(self.joint_values), len(velocities)))
 
         self._velocities = velocities
 
@@ -106,9 +106,9 @@ class JointTrajectoryPoint(Configuration):
 
     @accelerations.setter
     def accelerations(self, accelerations):
-        if len(self.values) != len(accelerations):
+        if len(self.joint_values) != len(accelerations):
             raise ValueError('Must have {} accelerations, but {} given.'.format(
-                len(self.values), len(accelerations)))
+                len(self.joint_values), len(accelerations)))
 
         self._accelerations = accelerations
 
@@ -119,9 +119,9 @@ class JointTrajectoryPoint(Configuration):
 
     @effort.setter
     def effort(self, effort):
-        if len(self.values) != len(effort):
+        if len(self.joint_values) != len(effort):
             raise ValueError('Must have {} efforts, but {} given.'.format(
-                len(self.values), len(effort)))
+                len(self.joint_values), len(effort)))
 
         self._effort = effort
 
@@ -143,7 +143,7 @@ class JointTrajectoryPoint(Configuration):
 
     @data.setter
     def data(self, data):
-        self.values = data.get('values') or []
+        self.joint_values = data.get('joint_values') or []
         self.types = data.get('types') or []
         self.velocities = data.get('velocities') or []
         self.accelerations = data.get('accelerations') or []
@@ -215,7 +215,7 @@ class JointTrajectoryPoint(Configuration):
         _effort_dict.update(other.effort_dict)
 
         self.joint_names = list(_joint_dict.keys())
-        self.values = [_joint_dict[name] for name in self.joint_names]
+        self.joint_values = [_joint_dict[name] for name in self.joint_names]
         self.types = [_type_dict[name] for name in self.joint_names]
         self.velocities = [_velocity_dict[name] for name in self.joint_names]
         self.accelerations = [_acceleration_dict[name] for name in self.joint_names]

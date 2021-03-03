@@ -119,7 +119,7 @@ class MoveItPlanMotion(PlanMotion):
         joint_state = JointState(
             header=header,
             name=start_configuration.joint_names,
-            position=start_configuration.values)
+            position=start_configuration.joint_values)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header), is_diff=True)
 

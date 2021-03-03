@@ -45,7 +45,7 @@ def convert_trajectory_points(points, types):
     result = []
 
     for pt in points:
-        jtp = JointTrajectoryPoint(values=pt.positions,
+        jtp = JointTrajectoryPoint(joint_values=pt.positions,
                                    types=types,
                                    velocities=pt.velocities,
                                    accelerations=pt.accelerations,

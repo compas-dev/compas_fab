@@ -84,7 +84,7 @@ class MoveItForwardKinematics(ForwardKinematics):
 
         header = Header(frame_id=base_link)
         joint_state = JointState(
-            name=configuration.joint_names, position=configuration.values, header=header)
+            name=configuration.joint_names, position=configuration.joint_values, header=header)
         robot_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
 

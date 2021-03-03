@@ -425,7 +425,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         body_id = self.get_uid(cached_robot)
         if configuration:
             joint_ids = self._get_joint_ids_by_name(configuration.joint_names, cached_robot)
-            self._set_joint_positions(joint_ids, configuration.values, body_id)
+            self._set_joint_positions(joint_ids, configuration.joint_values, body_id)
         self.check_collision_with_objects(robot)
         self.check_robot_self_collision(robot)
 
@@ -579,7 +579,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         default_config = robot.zero_configuration()
         full_configuration = robot.merge_group_with_full_configuration(configuration, default_config, group)
         joint_ids = self._get_joint_ids_by_name(full_configuration.joint_names, cached_robot)
-        self._set_joint_positions(joint_ids, full_configuration.values, body_id)
+        self._set_joint_positions(joint_ids, full_configuration.joint_values, body_id)
         return full_configuration
 
     def get_robot_configuration(self, robot):
@@ -598,7 +598,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         default_config = robot.zero_configuration()
         joint_ids = self._get_joint_ids_by_name(default_config.joint_names, cached_robot)
         joint_values = self._get_joint_positions(joint_ids, body_id)
-        default_config.values = joint_values
+        default_config.joint_values = joint_values
         return default_config
 
     # =======================================

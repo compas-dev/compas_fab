@@ -219,10 +219,10 @@ class RosClient(Ros, ClientInterface):
             timeout = timesteps[-1] * 1000 * 2
 
         points = []
-        num_joints = len(configurations[0].values)
+        num_joints = len(configurations[0].joint_values)
         for config, time in zip(configurations, timesteps):
-            pt = RosMsgJointTrajectoryPoint(positions=config.values, velocities=[
-                                      0]*num_joints, time_from_start=Time(secs=(time)))
+            pt = RosMsgJointTrajectoryPoint(positions=config.joint_values, velocities=[
+                                      0] * num_joints, time_from_start=Time(secs=(time)))
             points.append(pt)
 
         joint_trajectory = RosMsgJointTrajectory(

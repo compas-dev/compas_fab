@@ -12,13 +12,13 @@ def test_revolute_ctor():
     assert config.types == [Joint.REVOLUTE] * 6
 
     config = Configuration.from_revolute_values([pi/2, 0., 0.])
-    assert to_degrees(config.values) == [90, 0, 0]
+    assert to_degrees(config.joint_values) == [90, 0, 0]
 
 
 def test_prismatic_revolute_ctor():
     config = Configuration.from_prismatic_and_revolute_values(
         [8.312], [1.5, 0., 0., 0., 1., 0.8])
-    assert config.values == [8.312, 1.5, 0., 0., 0., 1., 0.8]
+    assert config.joint_values == [8.312, 1.5, 0., 0., 0., 1., 0.8]
     assert config.types == [Joint.PRISMATIC] + [Joint.REVOLUTE] * 6
 
 
@@ -26,7 +26,7 @@ def test_ctor():
     values = [1., 3., 0.1]
     types = [Joint.REVOLUTE, Joint.PRISMATIC, Joint.PLANAR]
     config = Configuration(values, types)
-    assert config.values == values
+    assert config.joint_values == values
     assert config.types == types
 
 
@@ -36,7 +36,7 @@ def test_scale():
     config = Configuration(values, types)
     config.scale(1000.)
 
-    assert config.values == [1.5, 1000., 2000.]
+    assert config.joint_values == [1.5, 1000., 2000.]
 
 
 def test_cast_to_str():
@@ -45,7 +45,7 @@ def test_cast_to_str():
 
 
 def test_from_data():
-    config = Configuration.from_data(dict(values=[8.312, 1.5],
+    config = Configuration.from_data(dict(joint_values=[8.312, 1.5],
                                           types=[Joint.PRISMATIC, Joint.REVOLUTE]))
     assert str(config) == 'Configuration((8.312, 1.500), (2, 0))'
 
@@ -56,21 +56,21 @@ def test_to_data():
     # types=[Joint.PRISMATIC, Joint.REVOLUTE]))
     data = config.to_data()
 
-    assert data['values'] == [8.312, 1.5, 0., 0., 0., 1., 0.8]
+    assert data['joint_values'] == [8.312, 1.5, 0., 0., 0., 1., 0.8]
     assert data['types'] == [Joint.PRISMATIC] + [Joint.REVOLUTE] * 6
 
 
 def test_config_merge():
-    config = Configuration(values=[1, 2, 3], types=[Joint.REVOLUTE]*3, joint_names=['a', 'b', 'c'])
-    other_config = Configuration(values=[3, 2, 0], types=[Joint.REVOLUTE]*3, joint_names=['a', 'b', 'd'])
+    config = Configuration(joint_values=[1, 2, 3], types=[Joint.REVOLUTE]*3, joint_names=['a', 'b', 'c'])
+    other_config = Configuration(joint_values=[3, 2, 0], types=[Joint.REVOLUTE]*3, joint_names=['a', 'b', 'd'])
     config.merge(other_config)
     assert config.joint_dict == {'a': 3, 'b': 2, 'c': 3, 'd': 0}
 
 
 def test_joint_trajectory_point_merge():
-    tjp = JointTrajectoryPoint(values=[1, 2, 3], types=[Joint.REVOLUTE]*3, velocities=[4, 5, 6])
+    tjp = JointTrajectoryPoint(joint_values=[1, 2, 3], types=[Joint.REVOLUTE]*3, velocities=[4, 5, 6])
     tjp.joint_names = ['a', 'b', 'c']
-    other_tjp = JointTrajectoryPoint(values=[3, 2, 0], types=[Joint.REVOLUTE]*3, velocities=[0, 5, 0])
+    other_tjp = JointTrajectoryPoint(joint_values=[3, 2, 0], types=[Joint.REVOLUTE]*3, velocities=[0, 5, 0])
     other_tjp.joint_names = ['a', 'b', 'd']
     tjp.merge(other_tjp)
     assert tjp.joint_dict == {'a': 3, 'b': 2, 'c': 3, 'd': 0}
