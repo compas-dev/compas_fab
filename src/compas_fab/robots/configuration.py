@@ -3,7 +3,6 @@ from __future__ import division
 from __future__ import print_function
 
 from math import pi
-from collections import UserDict
 from compas.robots import Joint
 
 __all__ = [
@@ -13,6 +12,8 @@ __all__ = [
 
 class Configuration(object):
     """Represents the configuration of a robot based on the state of its joints.
+    If the names of joints are also provided, the configuration behaves as a
+    read-only dictionary of joint name-value pairs.
 
     This concept is also refered to as \"Joint State\".
 
@@ -95,6 +96,15 @@ class Configuration(object):
                 return value
         raise KeyError(item)
 
+    def __bool__(self):
+        return bool(self.joint_values)
+
+    def __len__(self):
+        return len(self.joint_names)
+
+    def __iter__(self):
+        return iter(self.joint_names)
+
     def items(self):
         return zip(self.joint_names, self.joint_values)
 
@@ -103,6 +113,13 @@ class Configuration(object):
 
     def values(self):
         return iter(self.joint_values)
+
+    def get(self, key, default=None):
+        try:
+            value = self[key]
+        except KeyError:
+            value = default
+        return value
 
     @classmethod
     def from_revolute_values(cls, values, joint_names=None):
