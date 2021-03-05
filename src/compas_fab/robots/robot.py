@@ -211,7 +211,7 @@ class Robot(object):
         """
         if not full_configuration:
             full_configuration = self.zero_configuration()
-        return self.model.forward_kinematics(full_configuration.joint_dict, link_name=self.get_end_effector_link_name(group))
+        return self.model.forward_kinematics(full_configuration, link_name=self.get_end_effector_link_name(group))
 
     def get_base_link_name(self, group=None):
         """Get the name of the robot's base link.
@@ -273,7 +273,7 @@ class Robot(object):
         """
         if not full_configuration:
             full_configuration = self.zero_configuration()
-        return self.model.forward_kinematics(full_configuration.joint_dict, link_name=self.get_base_link_name(group))
+        return self.model.forward_kinematics(full_configuration, link_name=self.get_base_link_name(group))
 
     def get_link_names(self, group=None):
         """Get the names of the links in the kinematic chain.
@@ -495,9 +495,8 @@ class Robot(object):
             The configuration of the group.
         """
         full_configuration = self._check_full_configuration_and_scale(full_configuration)[0]  # adds joint_names to full_configuration and makes copy
-        full_joint_state = full_configuration.joint_dict
         group_joint_names = self.get_configurable_joint_names(group)
-        values = [full_joint_state[name] for name in group_joint_names]
+        values = [full_configuration[name] for name in group_joint_names]
         return Configuration(values, self.get_configurable_joint_types(group), group_joint_names)
 
     def merge_group_with_full_configuration(self, group_configuration, full_configuration, group):
@@ -1279,7 +1278,7 @@ class Robot(object):
             if link not in self.get_link_names(group):
                 raise ValueError('Link name {} does not exist in planning group'.format(link))
 
-            frame_WCF = self.model.forward_kinematics(full_configuration.joint_dict, link)
+            frame_WCF = self.model.forward_kinematics(full_configuration, link)
 
         # Otherwise, pass everything down to the client
         else:
@@ -1600,7 +1599,7 @@ class Robot(object):
         """
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
-        return self.model.transformed_frames(configuration.joint_dict)
+        return self.model.transformed_frames(configuration)
 
     def transformed_axes(self, configuration, group=None):
         """Get the robot's transformed axes.
@@ -1620,7 +1619,7 @@ class Robot(object):
         """
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
-        return self.model.transformed_axes(configuration.joint_dict)
+        return self.model.transformed_axes(configuration)
 
     # ==========================================================================
     # drawing
@@ -1648,7 +1647,7 @@ class Robot(object):
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
 
-        self.artist.update(configuration.joint_dict, visual, collision)
+        self.artist.update(configuration, visual, collision)
 
     def draw_visual(self):
         """Draw the robot's visual geometry using the defined :attr:`Robot.artist`."""
