@@ -1,9 +1,26 @@
+import pytest
 from math import pi
 
 from compas.robots import Joint
 from compas_fab.robots import Configuration
 from compas_fab.robots import JointTrajectoryPoint
 from compas_fab.robots import to_degrees
+
+
+def test_bool():
+    config = Configuration(joint_values=[1, 2, 3], types=[Joint.REVOLUTE]*3, joint_names=['a', 'b', 'c'])
+    assert config
+
+    config = Configuration(joint_values=[1, 2, 3], types=[Joint.REVOLUTE]*3)
+    assert config
+
+
+def test_len():
+    config = Configuration(joint_values=[1, 2, 3], types=[Joint.REVOLUTE]*3, joint_names=['a', 'b', 'c'])
+    assert len(config) == 3
+
+    config = Configuration(joint_values=[1, 2, 3], types=[Joint.REVOLUTE]*3)
+    assert len(config) == 0
 
 
 def test_revolute_ctor():
@@ -75,3 +92,25 @@ def test_joint_trajectory_point_merged():
     new_tjp = tjp.merged(other_tjp)
     assert new_tjp.joint_dict == {'a': 3, 'b': 2, 'c': 3, 'd': 0}
     assert new_tjp.velocity_dict == {'a': 0, 'b': 5, 'c': 6, 'd': 0}
+
+
+def test_dict_behavior():
+    config = Configuration(joint_values=[1, 2, 3], types=[Joint.REVOLUTE]*3, joint_names=['a', 'b', 'c'])
+    assert list(config.items()) == [('a', 1), ('b', 2), ('c', 3)]
+    assert list(config.keys()) == ['a', 'b', 'c']
+    assert list(config.values()) == [1, 2, 3]
+    with pytest.raises(KeyError):
+        _ = config['DNE']
+    assert config['a'] == 1
+    config.joint_values[0] = 4
+    assert config['a'] == 4
+    assert config.get('a') == 4
+    assert config.get('DNE') is None
+    assert config.get('DNE', 5) == 5
+    with pytest.raises(TypeError):
+        config['a'] = 1
+    with pytest.raises(TypeError):
+        config.joint_names.append('d')
+    with pytest.raises(TypeError):
+        config.types[1:1] = range(5)
+
