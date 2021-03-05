@@ -28,7 +28,7 @@ class FixedLengthList(list):
         value_length = len(sequence)
         if slice_length != value_length:
             raise TypeError('Cannot change length of FixedLengthList')
-        super(FixedLengthList, self).__setslice__(key, value)
+        super(FixedLengthList, self).__setslice__(i, j, sequence)
 
     def append(self, item): raise TypeError('Cannot change length of FixedLengthList')
     def extend(self, other): raise TypeError('Cannot change length of FixedLengthList')
