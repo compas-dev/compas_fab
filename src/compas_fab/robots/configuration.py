@@ -22,6 +22,14 @@ class FixedLengthList(list):
             raise TypeError('Cannot change length of FixedLengthList')
         super(FixedLengthList, self).__setitem__(key, value)
 
+    def __setslice__(self, i, j, sequence):
+        # for ironpython
+        slice_length = j - i
+        value_length = len(sequence)
+        if slice_length != value_length:
+            raise TypeError('Cannot change length of FixedLengthList')
+        super(FixedLengthList, self).__setslice__(key, value)
+
     def append(self, item): raise TypeError('Cannot change length of FixedLengthList')
     def extend(self, other): raise TypeError('Cannot change length of FixedLengthList')
     def insert(self, i, item): raise TypeError('Cannot change length of FixedLengthList')
@@ -148,6 +156,10 @@ class Configuration(object):
 
     def __bool__(self):
         return bool(self.joint_values)
+
+    def __nonzero__(self):
+        # ironpython's version of __bool__
+        return self.__bool__()
 
     def __len__(self):
         return len(self.joint_names)
