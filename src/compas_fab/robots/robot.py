@@ -531,7 +531,7 @@ class Robot(object):
 
         full_configuration = self._check_full_configuration_and_scale(full_configuration)[0]  # adds joint_names to full_configuration and makes copy
 
-        full_configuration.merge(group_configuration)
+        full_configuration = full_configuration.merged(group_configuration)
         return full_configuration
 
     def get_group_names_from_link_name(self, link_name):

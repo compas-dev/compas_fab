@@ -6,6 +6,7 @@ from __future__ import print_function
 from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots.time_ import Duration
 from compas_fab.robots.configuration import Configuration
+from compas_fab.robots.configuration import FixedLengthList
 
 __all__ = [
     'JointTrajectoryPoint',
@@ -62,8 +63,8 @@ class JointTrajectoryPoint(Configuration):
         The data representing the trajectory point.
     """
 
-    def __init__(self, joint_values=None, types=None, velocities=None, accelerations=None, effort=None, time_from_start=None):
-        super(JointTrajectoryPoint, self).__init__(joint_values, types)
+    def __init__(self, joint_values=None, types=None, velocities=None, accelerations=None, effort=None, time_from_start=None, joint_names=None):
+        super(JointTrajectoryPoint, self).__init__(joint_values, types, joint_names)
         self.velocities = velocities or len(self.joint_values) * [0.]
         self.accelerations = accelerations or len(self.joint_values) * [0.]
         self.effort = effort or len(self.joint_values) * [0.]
@@ -97,7 +98,7 @@ class JointTrajectoryPoint(Configuration):
             raise ValueError('Must have {} velocities, but {} given.'.format(
                 len(self.joint_values), len(velocities)))
 
-        self._velocities = velocities
+        self._velocities = FixedLengthList(velocities)
 
     @property
     def accelerations(self):
@@ -110,7 +111,7 @@ class JointTrajectoryPoint(Configuration):
             raise ValueError('Must have {} accelerations, but {} given.'.format(
                 len(self.joint_values), len(accelerations)))
 
-        self._accelerations = accelerations
+        self._accelerations = FixedLengthList(accelerations)
 
     @property
     def effort(self):
@@ -123,7 +124,7 @@ class JointTrajectoryPoint(Configuration):
             raise ValueError('Must have {} efforts, but {} given.'.format(
                 len(self.joint_values), len(effort)))
 
-        self._effort = effort
+        self._effort = FixedLengthList(effort)
 
     @property
     def data(self):
@@ -143,11 +144,11 @@ class JointTrajectoryPoint(Configuration):
 
     @data.setter
     def data(self, data):
-        self.joint_values = data.get('joint_values') or []
-        self.types = data.get('types') or []
-        self.velocities = data.get('velocities') or []
-        self.accelerations = data.get('accelerations') or []
-        self.effort = data.get('effort') or []
+        self._joint_values = FixedLengthList(data.get('joint_values') or [])
+        self._types = FixedLengthList(data.get('types') or [])
+        self._velocities = FixedLengthList(data.get('velocities') or [])
+        self._accelerations = FixedLengthList(data.get('accelerations') or [])
+        self._effort = FixedLengthList(data.get('effort') or [])
         self.time_from_start = Duration.from_data(data.get('time_from_start') or {})
 
     def copy(self):
@@ -179,48 +180,6 @@ class JointTrajectoryPoint(Configuration):
         self.check_joint_names()
         return dict(zip(self.joint_names, self.effort))
 
-    def merge(self, other):
-        """Merge the ``JointTrajectoryPoint`` with another ``JointTrajectoryPoint`` in place
-        along joint names.  The other ``JointTrajectoryPoint`` takes precedence over this
-        ``JointTrajectoryPoint`` in case a joint value is present in both.
-
-        Note
-        ----
-            Caution: ``joint_names`` may be rearranged.
-
-        Parameters
-        ----------
-        other : :class:`JointTrajectoryPoint`
-            The ``JointTrajectoryPoint`` to be merged.
-
-        Raises
-        ------
-        :exc:`ValueError`
-            If the ``JointTrajectoryPoint`` or the other ``JointTrajectoryPoint`` does not specify
-            joint names for all joint values.
-        """
-        _joint_dict = self.joint_dict
-        _joint_dict.update(other.joint_dict)
-
-        _type_dict = self.type_dict
-        _type_dict.update(other.type_dict)
-
-        _velocity_dict = self.velocity_dict
-        _velocity_dict.update(other.velocity_dict)
-
-        _acceleration_dict = self.acceleration_dict
-        _acceleration_dict.update(other.acceleration_dict)
-
-        _effort_dict = self.effort_dict
-        _effort_dict.update(other.effort_dict)
-
-        self.joint_names = list(_joint_dict.keys())
-        self.joint_values = [_joint_dict[name] for name in self.joint_names]
-        self.types = [_type_dict[name] for name in self.joint_names]
-        self.velocities = [_velocity_dict[name] for name in self.joint_names]
-        self.accelerations = [_acceleration_dict[name] for name in self.joint_names]
-        self.effort = [_effort_dict[name] for name in self.joint_names]
-
     def merged(self, other):
         """Get a new ``JointTrajectoryPoint`` with this ``JointTrajectoryPoint`` merged
         with another ``JointTrajectoryPoint``.  The other ``JointTrajectoryPoint``
@@ -246,9 +205,29 @@ class JointTrajectoryPoint(Configuration):
             If the ``JointTrajectoryPoint`` or the other ``JointTrajectoryPoint`` does not specify
             joint names for all joint values.
         """
-        jtp = self.copy()
-        jtp.merge(other)
-        return jtp
+        _joint_dict = self.joint_dict
+        _joint_dict.update(other.joint_dict)
+
+        _type_dict = self.type_dict
+        _type_dict.update(other.type_dict)
+
+        _velocity_dict = self.velocity_dict
+        _velocity_dict.update(other.velocity_dict)
+
+        _acceleration_dict = self.acceleration_dict
+        _acceleration_dict.update(other.acceleration_dict)
+
+        _effort_dict = self.effort_dict
+        _effort_dict.update(other.effort_dict)
+
+        joint_names = list(_joint_dict.keys())
+        joint_values = [_joint_dict[name] for name in joint_names]
+        types = [_type_dict[name] for name in joint_names]
+        velocities = [_velocity_dict[name] for name in joint_names]
+        accelerations = [_acceleration_dict[name] for name in joint_names]
+        effort = [_effort_dict[name] for name in joint_names]
+
+        return JointTrajectoryPoint(joint_values, types, velocities, accelerations, effort, joint_names=joint_names)
 
 
 class Trajectory(object):

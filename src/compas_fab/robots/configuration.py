@@ -7,7 +7,27 @@ from compas.robots import Joint
 
 __all__ = [
     'Configuration',
+    'FixedLengthList',
 ]
+
+
+class FixedLengthList(list):
+    """Restriction of the standard Python list to prevent changes in length
+    while maintaining the ability to change values."""
+    def __setitem__(self, key, value):
+        # included to obstruct the all too common `l[1:1] = range(100)`-type usage
+        value_length = len(value) if hasattr(value, '__len__') else 1
+        slice_length = len(range(*key.indices(self.__len__()))) if isinstance(key, slice) else 1
+        if slice_length != value_length:
+            raise TypeError('Cannot change length of FixedLengthList')
+        super(FixedLengthList, self).__setitem__(key, value)
+
+    def append(self, item): raise TypeError('Cannot change length of FixedLengthList')
+    def extend(self, other): raise TypeError('Cannot change length of FixedLengthList')
+    def insert(self, i, item): raise TypeError('Cannot change length of FixedLengthList')
+    def remove(self, item): raise TypeError('Cannot change length of FixedLengthList')
+    def pop(self, i): raise TypeError('Cannot change length of FixedLengthList')
+    def clear(self): raise TypeError('Cannot change length of FixedLengthList')
 
 
 class Configuration(object):
@@ -65,18 +85,48 @@ class Configuration(object):
     """
 
     def __init__(self, joint_values=None, types=None, joint_names=None):
-        joint_values = list(joint_values or [])
-        types = list(types or [])
-        joint_names = list(joint_names or [])
+        joint_values = FixedLengthList(joint_values or [])
+        types = FixedLengthList(types or [])
+        joint_names = FixedLengthList(joint_names or [])
 
         if len(joint_values) != len(types):
             raise ValueError("%d joint_values must have %d types, but %d given." % (
                 len(joint_values), len(joint_values), len(types)))
 
         self._precision = '3f'
-        self.joint_values = joint_values
-        self.types = types
-        self.joint_names = joint_names
+        self._joint_values = joint_values
+        self._types = types
+        self._joint_names = joint_names
+
+    @property
+    def joint_values(self):
+        return self._joint_values
+
+    @joint_values.setter
+    def joint_values(self, values):
+        if len(self._joint_values) != len(values):
+            raise Exception('joint_values must have length {}, object of length {} given'.format(len(self._joint_values), len(values)))
+        self._joint_values = FixedLengthList(values)
+
+    @property
+    def types(self):
+        return self._types
+
+    @types.setter
+    def types(self, types):
+        if len(self._types) != len(types):
+            raise Exception('types must have length {}, object of length {} given'.format(len(self._types), len(types)))
+        self._types = FixedLengthList(types)
+
+    @property
+    def joint_names(self):
+        return self._joint_names
+
+    @joint_names.setter
+    def joint_names(self, names):
+        if names and len(self._joint_values) != len(names):
+            raise Exception('types must have length {}, object of length {} given'.format(len(self._joint_values), len(names)))
+        self._joint_names = FixedLengthList(names)
 
     def __str__(self):
         """Return a human-readable string representation of the instance."""
@@ -216,9 +266,9 @@ class Configuration(object):
 
     @data.setter
     def data(self, data):
-        self.joint_values = data.get('joint_values') or []
-        self.types = data.get('types') or []
-        self.joint_names = data.get('joint_names') or []
+        self._joint_values = FixedLengthList(data.get('joint_values') or [])
+        self._types = FixedLengthList(data.get('types') or [])
+        self._joint_names = FixedLengthList(data.get('joint_names') or [])
 
     @property
     def prismatic_values(self):
@@ -265,7 +315,7 @@ class Configuration(object):
                 value *= scale_factor
             values_scaled.append(value)
 
-        self.joint_values = values_scaled
+        self._joint_values = FixedLengthList(values_scaled)
 
     def scaled(self, scale_factor):
         """Return a scaled copy of this configuration.
@@ -467,9 +517,17 @@ class Configuration(object):
             If the configuration or the ``other`` configuration does not specify
             joint names for all joint values.
         """
-        configuration = self.copy()
-        configuration.merge(other)
-        return configuration
+        _joint_dict = self.joint_dict
+        _joint_dict.update(other.joint_dict)
+
+        _type_dict = self.type_dict
+        _type_dict.update(other.type_dict)
+
+        joint_names = list(_joint_dict.keys())
+        joint_values = [_joint_dict[name] for name in joint_names]
+        types = [_type_dict[name] for name in joint_names]
+
+        return Configuration(joint_values, types, joint_names)
 
 
 if __name__ == "__main__":
