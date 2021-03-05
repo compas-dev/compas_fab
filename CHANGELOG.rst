@@ -30,6 +30,8 @@ Unreleased
 * Added ``compas_fab.robots.Robot.ensure_geometry``
 * Added serialization methods to ``compas_fab.robots.CollisionMesh`` and ``compas_fab.robots.AttachedCollisionMesh``
 * Added ``attached_collision_meshes`` attribute to ``compas_fab.robots.JointTrajectory``
+* Added read-only dictionary behave to ``compas_fab.robots.JointTrajectoryPoint.merge``
+* Added length limitations to attributes of ``compas_fab.robots.JointTrajectoryPoint.merge``
 
 **Changed**
 
@@ -44,6 +46,8 @@ Unreleased
 **Deprecated**
 
 **Removed**
+
+* Remove ``compas_fab.robots.JointTrajectoryPoint.merge``
 
 0.16.0
 ----------
