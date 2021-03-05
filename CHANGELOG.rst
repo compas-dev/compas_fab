@@ -36,6 +36,7 @@ Unreleased
 **Changed**
 
 * Updated to ``COMPAS 1.1``
+* ``compas_fab.robots.JointTrajectoryPoint.values`` became ``compas_fab.robots.JointTrajectoryPoint.joint_values``
 
 **Fixed**
 
