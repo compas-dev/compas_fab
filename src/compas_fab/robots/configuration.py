@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 from math import pi
+from collections import UserDict
 from compas.robots import Joint
 
 __all__ = [
@@ -63,14 +64,18 @@ class Configuration(object):
     """
 
     def __init__(self, joint_values=None, types=None, joint_names=None):
-        self._precision = '3f'
-        self.joint_values = list(joint_values or [])
-        self.types = list(types or [])
-        self.joint_names = list(joint_names or [])
+        joint_values = list(joint_values or [])
+        types = list(types or [])
+        joint_names = list(joint_names or [])
 
-        if len(self.joint_values) != len(self.types):
+        if len(joint_values) != len(types):
             raise ValueError("%d joint_values must have %d types, but %d given." % (
-                len(self.joint_values), len(self.joint_values), len(self.types)))
+                len(joint_values), len(joint_values), len(types)))
+
+        self._precision = '3f'
+        self.joint_values = joint_values
+        self.types = types
+        self.joint_names = joint_names
 
     def __str__(self):
         """Return a human-readable string representation of the instance."""
