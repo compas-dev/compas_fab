@@ -30,6 +30,7 @@ Unreleased
 * Added ``compas_fab.robots.Robot.ensure_geometry``
 * Added serialization methods to ``compas_fab.robots.CollisionMesh`` and ``compas_fab.robots.AttachedCollisionMesh``
 * Added ``attached_collision_meshes`` attribute to ``compas_fab.robots.JointTrajectory``
+* Added ``compas_fab.backends.ros.PlanningSceneComponents.__ne__``
 
 **Changed**
 
