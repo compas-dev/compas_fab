@@ -16,6 +16,8 @@ Unreleased
 
 **Fixed**
 
+* Fix ``repr()`` of ``ROSmsg`` class
+
 **Deprecated**
 
 **Removed**

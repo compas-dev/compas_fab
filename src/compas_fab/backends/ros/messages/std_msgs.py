@@ -32,7 +32,11 @@ class ROSmsg(object):
         return str(self.msg)
 
     def __repr__(self):
-        return self.__str__
+        args = []
+        for key, value in self.__dict__.items():
+            args.append('{}={!r}'.format(key, value))
+
+        return '{}({})'.format(self.__class__.__name__, ', '.join(args))
 
 
 class Time(ROSmsg):
