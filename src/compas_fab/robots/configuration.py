@@ -98,7 +98,7 @@ class Configuration(object):
         joint_names = FixedLengthList(joint_names or [])
 
         if len(joint_values) != len(types):
-            raise ValueError("%d joint_values must have %d types, but %d given." % (
+            raise ValueError('{} joint_values must have {} types, but {} given.'.format(
                 len(joint_values), len(joint_values), len(types)))
 
         self._precision = '3f'
