@@ -400,7 +400,7 @@ class Configuration(object):
             yield diff
 
     def max_difference(self, other):
-        """Returns the maximum difference to another `Configuration`'s joint_values.
+        """Returns the maximum difference to another `Configuration`'s joint values.
 
         Parameters
         ----------
