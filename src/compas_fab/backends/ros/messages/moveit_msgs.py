@@ -475,6 +475,9 @@ class PlanningSceneComponents(ROSmsg):
     def __eq__(self, other):
         return self.components == other
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     @property
     def human_readable(self):
         cls = type(self)
