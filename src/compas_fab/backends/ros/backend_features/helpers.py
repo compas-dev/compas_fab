@@ -41,12 +41,12 @@ def convert_constraints_to_rosmsg(constraints, header):
     return ros_constraints
 
 
-def convert_trajectory_points(points, types):
+def convert_trajectory_points(points, joint_types):
     result = []
 
     for pt in points:
         jtp = JointTrajectoryPoint(joint_values=pt.positions,
-                                   types=types,
+                                   joint_types=joint_types,
                                    velocities=pt.velocities,
                                    accelerations=pt.accelerations,
                                    effort=pt.effort,

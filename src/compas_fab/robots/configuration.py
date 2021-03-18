@@ -11,15 +11,31 @@ __all__ = [
 ]
 
 
+def joint_names_validator(joint_names, key=None, value=None):
+    new_joint_names = joint_names.copy()
+    if key is not None and value is not None:
+        new_joint_names.__setitem__(key, value)
+    if len(new_joint_names) != len(set(new_joint_names)):
+        raise ValueError('joint_names cannot have repeated values.')
+
+
 class FixedLengthList(list):
     """Restriction of the standard Python list to prevent changes in length
     while maintaining the ability to change values."""
+    def __init__(self, *args, validator=None, **kwargs):
+        super(FixedLengthList, self).__init__(*args, **kwargs)
+        self.validator = validator
+        if self.validator:
+            self.validator(self)
+
     def __setitem__(self, key, value):
         # included to obstruct the all too common `l[1:1] = range(100)`-type usage
         value_length = len(value) if hasattr(value, '__len__') else 1
         slice_length = len(range(*key.indices(self.__len__()))) if isinstance(key, slice) else 1
         if slice_length != value_length:
             raise TypeError('Cannot change length of FixedLengthList')
+        if self.validator:
+            self.validator(self, key, value)
         super(FixedLengthList, self).__setitem__(key, value)
 
     def __setslice__(self, i, j, sequence):
@@ -28,13 +44,15 @@ class FixedLengthList(list):
         value_length = len(sequence)
         if slice_length != value_length:
             raise TypeError('Cannot change length of FixedLengthList')
+        if self.validator:
+            self.validator(self, slice(i, j), sequence)
         super(FixedLengthList, self).__setslice__(i, j, sequence)
 
     def append(self, item): raise TypeError('Cannot change length of FixedLengthList')
     def extend(self, other): raise TypeError('Cannot change length of FixedLengthList')
     def insert(self, i, item): raise TypeError('Cannot change length of FixedLengthList')
     def remove(self, item): raise TypeError('Cannot change length of FixedLengthList')
-    def pop(self, i): raise TypeError('Cannot change length of FixedLengthList')
+    def pop(self, i=-1): raise TypeError('Cannot change length of FixedLengthList')
     def clear(self): raise TypeError('Cannot change length of FixedLengthList')
 
 
@@ -50,7 +68,7 @@ class Configuration(object):
     joint_values : :obj:`list` of :obj:`float`
         Joint values expressed in radians or meters, depending on the respective
         type.
-    types : :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+    joint_types : :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
         Joint types, e.g. a list of :attr:`compas.robots.Joint.REVOLUTE` for
         revolute joints.
     joint_names : :obj:`list` of :obj:`str`, optional
@@ -61,7 +79,7 @@ class Configuration(object):
     joint_values : :obj:`list` of :obj:`float`
         Joint values expressed in radians or meters, depending on the respective
         type.
-    types : :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+    joint_types : :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
         Joint types, e.g. a list of :attr:`compas.robots.Joint.REVOLUTE` for
         revolute joints.
     joint_names : :obj:`list` of :obj:`str`
@@ -92,22 +110,34 @@ class Configuration(object):
 
     """
 
-    def __init__(self, joint_values=None, types=None, joint_names=None):
+    def __init__(self, joint_values=None, joint_types=None, joint_names=None):
         joint_values = FixedLengthList(joint_values or [])
-        types = FixedLengthList(types or [])
-        joint_names = FixedLengthList(joint_names or [])
+        joint_types = FixedLengthList(joint_types or [])
+        joint_names = FixedLengthList(joint_names or [], validator=joint_names_validator)
 
-        if len(joint_values) != len(types):
-            raise ValueError('{} joint_values must have {} types, but {} given.'.format(
-                len(joint_values), len(joint_values), len(types)))
+        if len(joint_values) != len(joint_types):
+            raise ValueError('{} joint_values must have {} joint_types, but {} given.'.format(
+                len(joint_values), len(joint_values), len(joint_types)))
+
+        if joint_names and len(joint_names) != len(joint_values):
+            raise ValueError('{} joint_values must have either 0 or {} names, but {} given'.format(
+                len(joint_values), len(joint_values), len(joint_names)
+            ))
 
         self._precision = '3f'
         self._joint_values = joint_values
-        self._types = types
+        self._joint_types = joint_types
         self._joint_names = joint_names
 
     @property
     def joint_values(self):
+        """Joint values expressed in radians or meters, depending on the respective
+        type.
+
+        Returns
+        -------
+        :obj:`list` of :obj:`float`
+        """
         return self._joint_values
 
     @joint_values.setter
@@ -117,32 +147,45 @@ class Configuration(object):
         self._joint_values = FixedLengthList(values)
 
     @property
-    def types(self):
-        return self._types
+    def joint_types(self):
+        """Joint joint_types, e.g. a list of :attr:`compas.robots.Joint.REVOLUTE` for
+        revolute joints.
 
-    @types.setter
-    def types(self, types):
-        if len(self._types) != len(types):
-            raise Exception('types must have length {}, object of length {} given'.format(len(self._types), len(types)))
-        self._types = FixedLengthList(types)
+        Returns
+        -------
+        :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+        """
+        return self._joint_types
+
+    @joint_types.setter
+    def joint_types(self, joint_types):
+        if len(self._joint_types) != len(joint_types):
+            raise Exception('joint_types must have length {}, object of length {} given'.format(len(self._joint_types), len(joint_types)))
+        self._joint_types = FixedLengthList(joint_types)
 
     @property
     def joint_names(self):
+        """"List of joint names.
+
+        Returns
+        -------
+        :obj:`list` of :obj:`str`
+        """
         return self._joint_names
 
     @joint_names.setter
     def joint_names(self, names):
         if names and len(self._joint_values) != len(names):
-            raise Exception('types must have length {}, object of length {} given'.format(len(self._joint_values), len(names)))
-        self._joint_names = FixedLengthList(names)
+            raise ValueError('joint_types must have length {}, object of length {} given'.format(len(self._joint_values), len(names)))
+        self._joint_names = FixedLengthList(names, validator=joint_names_validator)
 
     def __str__(self):
         """Return a human-readable string representation of the instance."""
         v_str = ('(' + ", ".join(['%.' + self._precision] * len(self.joint_values)) + ')') % tuple(self.joint_values)
         if len(self.joint_names):
-            return "Configuration({}, {}, {})".format(v_str, tuple(self.types), tuple(self.joint_names))
+            return "Configuration({}, {}, {})".format(v_str, tuple(self.joint_types), tuple(self.joint_names))
         else:
-            return "Configuration({}, {})".format(v_str, tuple(self.types))
+            return "Configuration({}, {})".format(v_str, tuple(self.joint_types))
 
     def __repr__(self):
         """Printable representation of :class:`Configuration`."""
@@ -154,8 +197,18 @@ class Configuration(object):
                 return value
         raise KeyError(item)
 
+    def __setitem__(self, item, value):
+        i = self.joint_names.index(item)
+        if i < 0:
+            raise KeyError(item)
+        self.joint_values[i] = value
+
     def __bool__(self):
-        return bool(self.joint_values)
+        # If __bool__ is not overwritten, then calls to bool default to the value given by __len__.
+        # Since __len__ should reflect the number of items given by iterating over the object,
+        # __len__ returns len(self.joint_names).  However, there are valid Configurations that lack
+        # joint names, and should not be falsy.
+        return True
 
     def __nonzero__(self):
         # ironpython's version of __bool__
@@ -201,7 +254,7 @@ class Configuration(object):
         """
         values = list(values)
         joint_names = list(joint_names or [])
-        return cls.from_data({'joint_values': values, 'types': [Joint.REVOLUTE] * len(values), 'joint_names': joint_names})
+        return cls.from_data({'joint_values': values, 'joint_types': [Joint.REVOLUTE] * len(values), 'joint_names': joint_names})
 
     @classmethod
     def from_prismatic_and_revolute_values(cls, prismatic_values, revolute_values, joint_names=None):
@@ -226,9 +279,9 @@ class Configuration(object):
         revolute_values = list(revolute_values)
         joint_names = list(joint_names or [])
         values = prismatic_values + revolute_values
-        types = [Joint.PRISMATIC] * \
+        joint_types = [Joint.PRISMATIC] * \
             len(prismatic_values) + [Joint.REVOLUTE] * len(revolute_values)
-        return cls.from_data({'joint_values': values, 'types': types, 'joint_names': joint_names})
+        return cls.from_data({'joint_values': values, 'joint_types': joint_types, 'joint_names': joint_names})
 
     @classmethod
     def from_data(cls, data):
@@ -272,14 +325,14 @@ class Configuration(object):
         """
         return {
             'joint_values': self.joint_values,
-            'types': self.types,
+            'joint_types': self.joint_types,
             'joint_names': self.joint_names
         }
 
     @data.setter
     def data(self, data):
         self._joint_values = FixedLengthList(data.get('joint_values') or [])
-        self._types = FixedLengthList(data.get('types') or [])
+        self._joint_types = FixedLengthList(data.get('joint_types') or [])
         self._joint_names = FixedLengthList(data.get('joint_names') or [])
 
     @property
@@ -288,12 +341,12 @@ class Configuration(object):
 
         E.g. positions on the external axis system.
         """
-        return [v for i, v in enumerate(self.joint_values) if self.types[i] == Joint.PRISMATIC]
+        return [v for i, v in enumerate(self.joint_values) if self.joint_types[i] == Joint.PRISMATIC]
 
     @property
     def revolute_values(self):
         """:obj:`list` of :obj:`float` : Revolute joint values in radians."""
-        return [v for i, v in enumerate(self.joint_values) if self.types[i] == Joint.REVOLUTE]
+        return [v for i, v in enumerate(self.joint_values) if self.joint_types[i] == Joint.REVOLUTE]
 
     def copy(self):
         """Create a copy of this :class:`Configuration`.
@@ -304,7 +357,7 @@ class Configuration(object):
             An instance of :class:`Configuration`
         """
         cls = type(self)
-        return cls(self.joint_values[:], self.types[:], self.joint_names[:])
+        return cls(self.joint_values[:], self.joint_types[:], self.joint_names[:])
 
     def scale(self, scale_factor):
         """Scales the joint positions of the current configuration.
@@ -322,7 +375,7 @@ class Configuration(object):
         """
         values_scaled = []
 
-        for value, joint_type in zip(self.joint_values, self.types):
+        for value, joint_type in zip(self.joint_values, self.joint_types):
             if joint_type in (Joint.PLANAR, Joint.PRISMATIC):
                 value *= scale_factor
             values_scaled.append(value)
@@ -392,7 +445,7 @@ class Configuration(object):
 
         for i, (v1, v2) in enumerate(value_pairs):
             diff = v1 - v2
-            if self.types[i] in [Joint.REVOLUTE, Joint.CONTINUOUS]:
+            if self.joint_types[i] in [Joint.REVOLUTE, Joint.CONTINUOUS]:
                 d1 = diff % (2 * pi)
                 d1 = d1 if diff >= 0 else d1 - 2*pi
                 d2 = d1 - 2*pi if diff >= 0 else d1 + 2*pi
@@ -472,7 +525,7 @@ class Configuration(object):
     def type_dict(self):
         """A dictionary of joint types by joint name."""
         self.check_joint_names()
-        return dict(zip(self.joint_names, self.types))
+        return dict(zip(self.joint_names, self.joint_types))
 
     def merge(self, other):
         """Merge the configuration with another configuration in place along joint names.
@@ -502,7 +555,7 @@ class Configuration(object):
 
         self.joint_names = list(_joint_dict.keys())
         self.joint_values = [_joint_dict[name] for name in self.joint_names]
-        self.types = [_type_dict[name] for name in self.joint_names]
+        self.joint_types = [_type_dict[name] for name in self.joint_names]
 
     def merged(self, other):
         """Get a new ``Configuration`` with this configuration merged with another configuration.
@@ -537,9 +590,9 @@ class Configuration(object):
 
         joint_names = list(_joint_dict.keys())
         joint_values = [_joint_dict[name] for name in joint_names]
-        types = [_type_dict[name] for name in joint_names]
+        joint_types = [_type_dict[name] for name in joint_names]
 
-        return Configuration(joint_values, types, joint_names)
+        return Configuration(joint_values, joint_types, joint_names)
 
 
 if __name__ == "__main__":

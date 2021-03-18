@@ -29,7 +29,7 @@ class JointTrajectoryPoint(Configuration):
     joint_values : :obj:`list` of :obj:`float`, optional
         Joint values expressed in radians or meters, depending on the respective
         type.
-    types : :obj:`list` of :attr:`compas.robots.Joint.TYPE`, optional
+    joint_types : :obj:`list` of :attr:`compas.robots.Joint.TYPE`, optional
         Joint types, e.g. a :obj:`list` of
         :attr:`compas.robots.Joint.REVOLUTE` for revolute joints.
     velocities : :obj:`list` of :obj:`float`, optional
@@ -46,7 +46,7 @@ class JointTrajectoryPoint(Configuration):
     joint_values : :obj:`list` of :obj:`float`
         Joint values expressed in radians or meters, depending on the respective
         type.
-    types : :obj:`list` of :attr:`compas.robots.Joint.TYPE`
+    joint_types : :obj:`list` of :attr:`compas.robots.Joint.TYPE`
         Joint types, e.g. a :obj:`list` of
         :attr:`compas.robots.Joint.REVOLUTE` for revolute joints.
     velocities : :obj:`list` of :obj:`float`
@@ -63,8 +63,8 @@ class JointTrajectoryPoint(Configuration):
         The data representing the trajectory point.
     """
 
-    def __init__(self, joint_values=None, types=None, velocities=None, accelerations=None, effort=None, time_from_start=None, joint_names=None):
-        super(JointTrajectoryPoint, self).__init__(joint_values, types, joint_names)
+    def __init__(self, joint_values=None, joint_types=None, velocities=None, accelerations=None, effort=None, time_from_start=None, joint_names=None):
+        super(JointTrajectoryPoint, self).__init__(joint_values, joint_types, joint_names)
         self.velocities = velocities or len(self.joint_values) * [0.]
         self.accelerations = accelerations or len(self.joint_values) * [0.]
         self.effort = effort or len(self.joint_values) * [0.]
@@ -75,7 +75,7 @@ class JointTrajectoryPoint(Configuration):
         vs = '%.' + self._precision
         return 'JointTrajectoryPoint(({}), {}, ({}), ({}), ({}), {})'.format(
             ', '.join(vs % i for i in self.joint_values),
-            tuple(self.types),
+            tuple(self.joint_types),
             ', '.join(vs % i for i in self.velocities),
             ', '.join(vs % i for i in self.accelerations),
             ', '.join(vs % i for i in self.effort),
@@ -145,7 +145,7 @@ class JointTrajectoryPoint(Configuration):
     @data.setter
     def data(self, data):
         self._joint_values = FixedLengthList(data.get('joint_values') or [])
-        self._types = FixedLengthList(data.get('types') or [])
+        self._joint_types = FixedLengthList(data.get('joint_types') or [])
         self._velocities = FixedLengthList(data.get('velocities') or [])
         self._accelerations = FixedLengthList(data.get('accelerations') or [])
         self._effort = FixedLengthList(data.get('effort') or [])
@@ -222,12 +222,12 @@ class JointTrajectoryPoint(Configuration):
 
         joint_names = list(_joint_dict.keys())
         joint_values = [_joint_dict[name] for name in joint_names]
-        types = [_type_dict[name] for name in joint_names]
+        joint_types = [_type_dict[name] for name in joint_names]
         velocities = [_velocity_dict[name] for name in joint_names]
         accelerations = [_acceleration_dict[name] for name in joint_names]
         effort = [_effort_dict[name] for name in joint_names]
 
-        return JointTrajectoryPoint(joint_values, types, velocities, accelerations, effort, joint_names=joint_names)
+        return JointTrajectoryPoint(joint_values, joint_types, velocities, accelerations, effort, joint_names=joint_names)
 
 
 class Trajectory(object):
