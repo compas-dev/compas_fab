@@ -59,7 +59,7 @@ class FixedLengthList(list):
 class Configuration(object):
     """Represents the configuration of a robot based on the state of its joints.
     If the names of joints are also provided, the configuration behaves as a
-    read-only dictionary of joint name-value pairs.
+    dictionary of joint name-value pairs.
 
     This concept is also refered to as \"Joint State\".
 
