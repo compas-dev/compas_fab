@@ -63,7 +63,7 @@ class MoveItInverseKinematics(InverseKinematics):
               A set of constraints that the request must obey.
               Defaults to ``None``.
             - ``"timeout"``: (:obj:`int`, optional) Maximum allowed time for inverse kinematic calculation in seconds.
-              Defaults to ``1``. This value supersedes the ``"attempts"`` argument used before ROS Noetic.
+              Defaults to ``2``. This value supersedes the ``"attempts"`` argument used before ROS Noetic.
             - ``"attached_collision_meshes"``: (:obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`, optional)
               Defaults to ``None``.
             - ``"attempts"``: (:obj:`int`, optional) The maximum number of inverse kinematic attempts.
@@ -111,7 +111,7 @@ class MoveItInverseKinematics(InverseKinematics):
 
         constraints = convert_constraints_to_rosmsg(options.get('constraints'), header)
 
-        timeout_in_secs = options.get('timeout', 1)
+        timeout_in_secs = options.get('timeout', 2)
         timeout_duration = Duration(timeout_in_secs, 0).to_data()
 
         ik_request = PositionIKRequest(group_name=group,

@@ -157,7 +157,7 @@ class RosClient(Ros, ClientInterface):
     def ros_distro(self):
         """Retrieves the ROS version to which the client is connected (eg. kinetic)"""
         if not self._ros_distro:
-            self._ros_distro = Param(self, '/rosdistro').get(timeout=3)
+            self._ros_distro = Param(self, '/rosdistro').get(timeout=1)
 
         return self._ros_distro
 
