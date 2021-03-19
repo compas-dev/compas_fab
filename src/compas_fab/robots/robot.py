@@ -211,8 +211,7 @@ class Robot(object):
         """
         if not full_configuration:
             full_configuration = self.zero_configuration()
-        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
-        return self.model.forward_kinematics(full_joint_state, link_name=self.get_end_effector_link_name(group))
+        return self.model.forward_kinematics(full_configuration, link_name=self.get_end_effector_link_name(group))
 
     def get_base_link_name(self, group=None):
         """Get the name of the robot's base link.
@@ -274,8 +273,7 @@ class Robot(object):
         """
         if not full_configuration:
             full_configuration = self.zero_configuration()
-        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
-        return self.model.forward_kinematics(full_joint_state, link_name=self.get_base_link_name(group))
+        return self.model.forward_kinematics(full_configuration, link_name=self.get_base_link_name(group))
 
     def get_link_names(self, group=None):
         """Get the names of the links in the kinematic chain.
@@ -497,9 +495,8 @@ class Robot(object):
             The configuration of the group.
         """
         full_configuration = self._check_full_configuration_and_scale(full_configuration)[0]  # adds joint_names to full_configuration and makes copy
-        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
         group_joint_names = self.get_configurable_joint_names(group)
-        values = [full_joint_state[name] for name in group_joint_names]
+        values = [full_configuration[name] for name in group_joint_names]
         return Configuration(values, self.get_configurable_joint_types(group), group_joint_names)
 
     def merge_group_with_full_configuration(self, group_configuration, full_configuration, group):
@@ -533,7 +530,7 @@ class Robot(object):
 
         full_configuration = self._check_full_configuration_and_scale(full_configuration)[0]  # adds joint_names to full_configuration and makes copy
 
-        full_configuration.merge(group_configuration)
+        full_configuration = full_configuration.merged(group_configuration)
         return full_configuration
 
     def get_group_names_from_link_name(self, link_name):
@@ -579,10 +576,10 @@ class Robot(object):
             match the configurable joints of the given `group`.
         """
         names = self.get_configurable_joint_names(group)
-        if len(names) != len(configuration.values):
+        if len(names) != len(configuration.joint_values):
             raise ValueError(
-                "Please pass a configuration with %d values or specify group" % len(names))
-        return configuration.values[names.index(joint_name)]
+                "Please pass a configuration with %d joint_values or specify group" % len(names))
+        return configuration.joint_values[names.index(joint_name)]
 
     def _check_full_configuration_and_scale(self, full_configuration=None):
         """Either create a full configuration or check if the passed full configuration is valid.
@@ -602,7 +599,7 @@ class Robot(object):
         else:
             joint_names = self.get_configurable_joint_names()  # full configuration
             # full_configuration might have passive joints specified as well, we allow this.
-            if len(joint_names) > len(full_configuration.values):
+            if len(joint_names) > len(full_configuration.joint_values):
                 raise ValueError("Please pass a configuration with {} values, for all configurable joints of the robot.".format(len(joint_names)))
             configuration = full_configuration.copy()
             if not configuration.joint_names:
@@ -1096,22 +1093,22 @@ class Robot(object):
             group = self.main_group_name
 
         joint_names = self.get_configurable_joint_names(group)
-        if len(joint_names) != len(configuration.values):
-            raise ValueError("The passed configuration has %d values, the group %s needs however: %d" % (
-                len(configuration.values), group, len(joint_names)))
+        if len(joint_names) != len(configuration.joint_values):
+            raise ValueError("The passed configuration has %d joint_values, the group %s needs however: %d" % (
+                len(configuration.joint_values), group, len(joint_names)))
         if len(tolerances_above) == 1:
             tolerances_above = tolerances_above * len(joint_names)
-        elif len(tolerances_above) != len(configuration.values):
-            raise ValueError("The passed configuration has %d values, the tolerances_above however: %d" % (
-                len(configuration.values), len(tolerances_above)))
+        elif len(tolerances_above) != len(configuration.joint_values):
+            raise ValueError("The passed configuration has %d joint_values, the tolerances_above however: %d" % (
+                len(configuration.joint_values), len(tolerances_above)))
         if len(tolerances_below) == 1:
             tolerances_below = tolerances_below * len(joint_names)
-        elif len(tolerances_below) != len(configuration.values):
-            raise ValueError("The passed configuration has %d values, the tolerances_below however: %d" % (
-                len(configuration.values), len(tolerances_below)))
+        elif len(tolerances_below) != len(configuration.joint_values):
+            raise ValueError("The passed configuration has %d joint_values, the tolerances_below however: %d" % (
+                len(configuration.joint_values), len(tolerances_below)))
 
         constraints = []
-        for name, value, tolerance_above, tolerance_below in zip(joint_names, configuration.values, tolerances_above, tolerances_below):
+        for name, value, tolerance_above, tolerance_below in zip(joint_names, configuration.joint_values, tolerances_above, tolerances_below):
             constraints.append(JointConstraint(name, value, tolerance_above, tolerance_below))
         return constraints
 
@@ -1270,8 +1267,6 @@ class Robot(object):
         full_configuration = self.merge_group_with_full_configuration(configuration, self.zero_configuration(), group)
         full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)
 
-        full_joint_state = dict(zip(full_configuration.joint_names, full_configuration.values))
-
         # If there's no client, we default to `model` solver if there is no other assigned.
         if not self.client:
             solver = solver or 'model'
@@ -1283,7 +1278,7 @@ class Robot(object):
             if link not in self.get_link_names(group):
                 raise ValueError('Link name {} does not exist in planning group'.format(link))
 
-            frame_WCF = self.model.forward_kinematics(full_joint_state, link)
+            frame_WCF = self.model.forward_kinematics(full_configuration, link)
 
         # Otherwise, pass everything down to the client
         else:
@@ -1489,8 +1484,8 @@ class Robot(object):
         >>> robot.client = RosClient()
         >>> robot.client.run()
         >>> configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0])
-        >>> tolerances_above = [math.radians(5)] * len(configuration.values)
-        >>> tolerances_below = [math.radians(5)] * len(configuration.values)
+        >>> tolerances_above = [math.radians(5)] * len(configuration.joint_values)
+        >>> tolerances_below = [math.radians(5)] * len(configuration.joint_values)
         >>> group = robot.main_group_name
         >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances_above, tolerances_below, group)
         >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnectkConfigDefault'})
@@ -1604,8 +1599,7 @@ class Robot(object):
         """
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
-        joint_state = dict(zip(configuration.joint_names, configuration.values))
-        return self.model.transformed_frames(joint_state)
+        return self.model.transformed_frames(configuration)
 
     def transformed_axes(self, configuration, group=None):
         """Get the robot's transformed axes.
@@ -1625,8 +1619,7 @@ class Robot(object):
         """
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
-        joint_state = dict(zip(configuration.joint_names, configuration.values))
-        return self.model.transformed_axes(joint_state)
+        return self.model.transformed_axes(configuration)
 
     # ==========================================================================
     # drawing
@@ -1653,9 +1646,8 @@ class Robot(object):
 
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
-        joint_state = dict(zip(configuration.joint_names, configuration.values))
 
-        self.artist.update(joint_state, visual, collision)
+        self.artist.update(configuration, visual, collision)
 
     def draw_visual(self):
         """Draw the robot's visual geometry using the defined :attr:`Robot.artist`."""

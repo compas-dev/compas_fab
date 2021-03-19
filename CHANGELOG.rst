@@ -33,10 +33,13 @@ Unreleased
 * Added serialization methods to ``compas_fab.robots.CollisionMesh`` and ``compas_fab.robots.AttachedCollisionMesh``
 * Added ``attached_collision_meshes`` attribute to ``compas_fab.robots.JointTrajectory``
 * Added ``compas_fab.backends.ros.PlanningSceneComponents.__ne__``
+* Added dictionary behavior to ``compas_fab.robots.JointTrajectoryPoint.merge``
+* Added length limitations to attributes of ``compas_fab.robots.JointTrajectoryPoint.merge``
 
 **Changed**
 
 * Updated to ``COMPAS 1.1``
+* ``Configuration`` & ``JointTrajectoryPoint``: the attributes ``values`` and ``types`` changed to ``joint_values`` and `joint_types` respectively.
 
 **Fixed**
 
@@ -47,6 +50,8 @@ Unreleased
 **Deprecated**
 
 **Removed**
+
+* Remove ``compas_fab.robots.JointTrajectoryPoint.merge``
 
 0.16.0
 ----------

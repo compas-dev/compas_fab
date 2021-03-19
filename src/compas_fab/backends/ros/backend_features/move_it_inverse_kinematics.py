@@ -97,7 +97,7 @@ class MoveItInverseKinematics(InverseKinematics):
         pose_stamped = PoseStamped(header, Pose.from_frame(frame_WCF))
 
         joint_state = JointState(
-            name=start_configuration.joint_names, position=start_configuration.values, header=header)
+            name=start_configuration.joint_names, position=start_configuration.joint_values, header=header)
         start_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
 

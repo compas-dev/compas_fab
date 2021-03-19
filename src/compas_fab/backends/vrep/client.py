@@ -223,7 +223,7 @@ class VrepClient(ClientInterface):
 
         values = config_to_vrep(config, self.scale)
 
-        self.set_robot_metric(robot.model.attr['index'], [0.0] * len(config.values))
+        self.set_robot_metric(robot.model.attr['index'], [0.0] * len(config.joint_values))
         self.run_child_script('moveRobotFK',
                               [], values, ['robot' + robot.name])
 

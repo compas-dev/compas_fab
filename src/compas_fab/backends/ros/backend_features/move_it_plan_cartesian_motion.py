@@ -113,7 +113,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         waypoints = [Pose.from_frame(frame) for frame in frames_WCF]
         joint_state = JointState(header=header,
                                  name=start_configuration.joint_names,
-                                 position=start_configuration.values)
+                                 position=start_configuration.joint_values)
         start_state = RobotState(joint_state, MultiDOFJointState(header=header), is_diff=True)
 
         if options.get('attached_collision_meshes'):
