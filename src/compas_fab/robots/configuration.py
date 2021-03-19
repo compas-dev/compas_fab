@@ -21,10 +21,19 @@ def joint_names_validator(joint_names, key=None, value=None):
 
 class FixedLengthList(list):
     """Restriction of the standard Python list to prevent changes in length
-    while maintaining the ability to change values."""
-    def __init__(self, *args, validator=None, **kwargs):
+    while maintaining the ability to change values.  An optional ``validator``
+    can be passed to the constructor which would be used to validate changes
+    to the values.
+
+    Parameters
+    ----------
+    validator : :obj:`function`
+        A boolean function with the same signature as __setiem__, ie
+        validator(fll: FixedLengthList, key: slice, value: Any) -> bool
+    """
+    def __init__(self, *args, **kwargs):
         super(FixedLengthList, self).__init__(*args, **kwargs)
-        self.validator = validator
+        self.validator = kwargs.get('validator')
         if self.validator:
             self.validator(self)
 
