@@ -12,11 +12,14 @@ Unreleased
 
 **Added**
 
+* Added support for MoveIt on ROS Noetic
+
 **Changed**
 
 **Fixed**
 
 * Fix ``repr()`` of ``ROSmsg`` class
+* Fix data type of secs and nsecs in ``Time`` ROS message
 
 **Deprecated**
 
