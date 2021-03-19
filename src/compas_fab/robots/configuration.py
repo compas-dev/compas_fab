@@ -32,7 +32,7 @@ class FixedLengthList(list):
         validator(fll: FixedLengthList, key: slice, value: Any) -> bool
     """
     def __init__(self, *args, **kwargs):
-        super(FixedLengthList, self).__init__(*args, **kwargs)
+        super(FixedLengthList, self).__init__(*args)
         self.validator = kwargs.get('validator')
         if self.validator:
             self.validator(self)
