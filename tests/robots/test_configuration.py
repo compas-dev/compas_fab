@@ -159,7 +159,7 @@ def test___setitem__():
 
 def test___setitem___with_validator():
     def validator(fixed_length_list, key=None, value=None):
-        new_fixed_length_list = fixed_length_list.copy()
+        new_fixed_length_list = list(fixed_length_list)
         if key is not None and value is not None:
             new_fixed_length_list.__setitem__(key, value)
         if len(new_fixed_length_list) != len(set(new_fixed_length_list)):
