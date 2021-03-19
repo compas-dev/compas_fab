@@ -12,7 +12,7 @@ __all__ = [
 
 
 def joint_names_validator(joint_names, key=None, value=None):
-    new_joint_names = joint_names.copy()
+    new_joint_names = list(joint_names)
     if key is not None and value is not None:
         new_joint_names.__setitem__(key, value)
     if len(new_joint_names) != len(set(new_joint_names)):
