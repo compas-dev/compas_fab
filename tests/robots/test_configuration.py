@@ -163,7 +163,7 @@ def test___setitem___with_validator():
         if key is not None and value is not None:
             new_fixed_length_list.__setitem__(key, value)
         if len(new_fixed_length_list) != len(set(new_fixed_length_list)):
-            raise ValueError('joint_names cannot have repeated values.')
+            raise ValueError('This list cannot have repeated values.')
     fll = FixedLengthList([1, 2, 3], validator=validator)
     with pytest.raises(ValueError):
         _ = FixedLengthList([1, 1, 1], validator=validator)
@@ -175,6 +175,12 @@ def test___setitem___with_validator():
     assert fll[2] == -1
     with pytest.raises(TypeError):
         fll[1:1] = range(10)
+    with pytest.raises(TypeError):
+        fll[1:] = [1]
+    with pytest.raises(TypeError):
+        fll[:] = [1, 2]
+    with pytest.raises(TypeError):
+        fll[:1] = [1, 2]
     with pytest.raises(ValueError):
         fll[1] = 1
     with pytest.raises(ValueError):

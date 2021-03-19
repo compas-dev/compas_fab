@@ -49,7 +49,8 @@ class FixedLengthList(list):
 
     def __setslice__(self, i, j, sequence):
         # for ironpython
-        slice_length = j - i
+        slice_end = min(j, self.__len__())
+        slice_length = slice_end - i
         value_length = len(sequence)
         if slice_length != value_length:
             raise TypeError('Cannot change length of FixedLengthList')
