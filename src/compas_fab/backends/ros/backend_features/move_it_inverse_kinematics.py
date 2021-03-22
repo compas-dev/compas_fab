@@ -7,6 +7,7 @@ from compas.utilities import await_callback
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
 from compas_fab.backends.ros.backend_features.helpers import validate_response
+from compas_fab.backends.ros.messages import RosDistro
 from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import GetPositionIKRequest
 from compas_fab.backends.ros.messages import GetPositionIKResponse
@@ -125,7 +126,7 @@ class MoveItInverseKinematics(InverseKinematics):
         # The field `attempts` was removed in Noetic (and higher)
         # so it needs to be removed from the message otherwise it causes a serialization error
         # https://github.com/ros-planning/moveit/pull/1288
-        if self.ros_client.ros_distro not in ('kinetic', 'melodic'):
+        if self.ros_client.ros_distro not in (RosDistro.KINETIC, RosDistro.MELODIC):
             del ik_request.attempts
 
         def convert_to_positions(response):
