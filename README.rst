@@ -30,6 +30,10 @@ COMPAS FAB: Robotic Fabrication for COMPAS
 .. image:: https://zenodo.org/badge/107952684.svg
    :target: https://zenodo.org/badge/latestdoi/107952684
 
+.. image:: https://img.shields.io/twitter/follow/compas_dev?style=social
+   :target: https://twitter.com/compas_dev
+   :alt: Twitter Follow
+
 .. end-badges
 
 **Robotic fabrication package for the COMPAS Framework** that facilitates the
