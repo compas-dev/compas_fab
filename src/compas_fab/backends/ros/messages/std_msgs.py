@@ -43,7 +43,7 @@ class Time(ROSmsg):
     """https://docs.ros.org/kinetic/api/std_msgs/html/msg/Time.html
     """
 
-    def __init__(self, secs=0., nsecs=0.):
+    def __init__(self, secs=0, nsecs=0):
         self.secs = secs
         self.nsecs = nsecs
 

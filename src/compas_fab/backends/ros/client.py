@@ -4,6 +4,7 @@ import os
 
 from compas.robots import RobotModel
 from roslibpy import Message
+from roslibpy import Param
 from roslibpy import Ros
 from roslibpy.actionlib import ActionClient
 from roslibpy.actionlib import Goal
@@ -142,6 +143,7 @@ class RosClient(Ros, ClientInterface):
 
         planner_backend_type = PLANNER_BACKENDS[planner_backend]
         self.planner = planner_backend_type(self)
+        self._ros_distro = None
 
     def __enter__(self):
         self.run()
@@ -150,6 +152,14 @@ class RosClient(Ros, ClientInterface):
 
     def __exit__(self, *args):
         self.close()
+
+    @property
+    def ros_distro(self):
+        """Retrieves the ROS version to which the client is connected (eg. kinetic)"""
+        if not self._ros_distro:
+            self._ros_distro = Param(self, '/rosdistro').get(timeout=1)
+
+        return self._ros_distro
 
     def load_robot(self, load_geometry=False, urdf_param_name='/robot_description', srdf_param_name='/robot_description_semantic', precision=None, local_cache_directory=None):
         """Load an entire robot instance -including model and semantics- directly from ROS.

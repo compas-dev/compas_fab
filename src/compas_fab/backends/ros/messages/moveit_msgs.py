@@ -185,7 +185,7 @@ class PositionIKRequest(ROSmsg):
     """
 
     def __init__(self, group_name="robot", robot_state=None, constraints=None,
-                 pose_stamped=None, timeout=1.0, attempts=8,
+                 pose_stamped=None, timeout=None, attempts=8,
                  avoid_collisions=True):
         self.group_name = group_name
         self.robot_state = robot_state if robot_state else RobotState()
