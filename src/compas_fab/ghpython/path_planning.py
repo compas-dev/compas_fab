@@ -7,8 +7,7 @@ from timeit import default_timer as timer
 
 import compas
 from compas.geometry import Transformation
-
-from compas_fab.robots import Configuration
+from compas.robots import Configuration
 
 if compas.RHINO:
     import clr

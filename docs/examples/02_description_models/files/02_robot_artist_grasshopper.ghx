@@ -502,7 +502,7 @@ robot = st[robot_key]
                 <chunk name="Container">
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">import math
-from compas_fab.robots import Configuration
+from compas.robots import Configuration
 
 if robot:
     joint_values = [a1, a2, a3, a4, a5, a6]

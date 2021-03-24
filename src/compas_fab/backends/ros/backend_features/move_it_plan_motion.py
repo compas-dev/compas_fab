@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import itertools
 
+from compas.robots import Configuration
 from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import PlanMotion
@@ -20,7 +21,6 @@ from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import TrajectoryConstraints
 from compas_fab.backends.ros.service_description import ServiceDescription
 from compas_fab.robots import JointTrajectory
-from compas_fab.robots import Configuration
 
 __all__ = [
     'MoveItPlanMotion'

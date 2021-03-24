@@ -209,6 +209,7 @@ class VrepClient(ClientInterface):
 
         Examples:
 
+            >>> from compas.robots import Configuration
             >>> from compas_fab.robots import *
             >>> with VrepClient() as client:
             ...     config = Configuration.from_prismatic_and_revolute_values([7.600, -4.500, -5.500],

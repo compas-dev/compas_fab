@@ -1,4 +1,4 @@
-from compas_fab.robots import Configuration
+from compas.robots import Configuration
 from compas_fab.robots.ur5 import Robot
 
 robot = Robot()
