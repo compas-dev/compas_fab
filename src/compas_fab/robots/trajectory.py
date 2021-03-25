@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas.robots.configuration import Configuration
+from compas.robots import Configuration
 from compas.robots.configuration import FixedLengthList
 from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots.time_ import Duration
