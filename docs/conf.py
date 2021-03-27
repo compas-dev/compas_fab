@@ -92,6 +92,7 @@ html_static_path = ['_static']
 html_last_updated_fmt = '%b %d, %Y'
 html_copy_source = False
 html_show_sourcelink = False
+html_permalinks = False
 html_add_permalinks = ''
 html_experimental_html5_writer = True
 html_compact_lists = True
