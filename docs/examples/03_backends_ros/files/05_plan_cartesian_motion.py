@@ -2,10 +2,11 @@ import time
 
 from compas.datastructures import Mesh
 from compas.geometry import Frame
+from compas.robots import Configuration
 
 import compas_fab
 from compas_fab.backends import RosClient
-from compas_fab.robots import Configuration, CollisionMesh, AttachedCollisionMesh
+from compas_fab.robots import CollisionMesh, AttachedCollisionMesh
 
 with RosClient() as client:
     robot = client.load_robot()

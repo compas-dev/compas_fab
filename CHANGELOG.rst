@@ -16,12 +16,16 @@ Unreleased
 
 **Changed**
 
+* The `Configuration` class has moved to `compas.robots`, but is still aliased within `compas_fab.robots`
+
 **Fixed**
 
 * Fix ``repr()`` of ``ROSmsg`` class
 * Fix data type of secs and nsecs in ``Time`` ROS message
 
 **Deprecated**
+
+* `compas_fab.robots.Configuration` is being deprecated in favor of `compas.robots.Configuration`
 
 **Removed**
 

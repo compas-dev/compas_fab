@@ -7,10 +7,10 @@ import random
 from compas.geometry import Frame
 from compas.geometry import Sphere
 from compas.geometry import Transformation
+from compas.robots import Configuration
 from compas.robots import Joint
 from compas.robots import RobotModel
 
-from compas_fab.robots.configuration import Configuration
 from compas_fab.robots.constraints import Constraint
 from compas_fab.robots.constraints import JointConstraint
 from compas_fab.robots.constraints import OrientationConstraint
@@ -357,7 +357,7 @@ class Robot(object):
         :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
             List of joint types.
         """
-        return [self.get_joint_by_name(n).type for n in names]
+        return self.model.get_joint_types_by_names(names)
 
     def get_joint_by_name(self, name):
         """RGet the joint in the robot model matching the given name.
@@ -462,7 +462,7 @@ class Robot(object):
 
         Returns
         -------
-        :obj:`list` of :obj:`float`
+        :class:`compas.robots.Configuration`
 
         Note
         ----
