@@ -16,6 +16,8 @@ Unreleased
 
 **Changed**
 
+* The `Configuration` class has moved to `compas.robots`, but is still aliased within `compas_fab.robots`
+
 **Fixed**
 
 * Fix ``repr()`` of ``ROSmsg`` class
