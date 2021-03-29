@@ -25,6 +25,8 @@ Unreleased
 
 **Deprecated**
 
+* `compas_fab.robots.Configuration` is being deprecated in favor of `compas.robots.Configuration`
+
 **Removed**
 
 0.17.0
