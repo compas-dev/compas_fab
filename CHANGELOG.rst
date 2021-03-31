@@ -22,6 +22,7 @@ Unreleased
 
 * Fix ``repr()`` of ``ROSmsg`` class
 * Fix data type of secs and nsecs in ``Time`` ROS message
+* Fix ``CollisionObject.to_collision_meshes``   
 
 **Deprecated**
 
