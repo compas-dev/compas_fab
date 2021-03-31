@@ -103,7 +103,7 @@ class CollisionObject(ROSmsg):
                 vertex.x = float(vertex.x)
                 vertex.y = float(vertex.y)
                 vertex.z = float(vertex.z)
-            root_name = getattr(self.header, 'frame_id', self.header['frame_id'])
+            root_name = getattr(self.header, 'frame_id', None) or self.header['frame_id']
             cm = CollisionMesh(mesh.mesh, self.id, pose.frame, root_name)
             collision_meshes.append(cm)
         return collision_meshes
