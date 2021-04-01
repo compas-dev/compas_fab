@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 from collections import OrderedDict
+from itertools import count
 
 from compas.utilities import DataEncoder
 from compas.utilities import DataDecoder
@@ -43,9 +44,7 @@ class Plan(object):
         if self.planned_actions:
             last_action_id = self._get_last_action_id()
             dependency_ids = {last_action_id}
-        action_id = self.plan_action(action, dependency_ids, namespace)
-        planned_action = self.planned_actions[action_id]
-        return action_id
+        return self.plan_action(action, dependency_ids, namespace)
 
     def remove_action_by_id(self, action_id):
         planned_action = self.planned_actions.pop(action_id)
