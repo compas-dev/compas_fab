@@ -118,6 +118,7 @@ class Plan(Datastructure):
     @planned_actions.setter
     def planned_actions(self, planned_actions):
         self._planned_actions = OrderedDict({pa.id: pa for pa in planned_actions})
+        self.check_all_dependency_ids()
 
     def plan_action(self, action, dependency_ids):
         """Adds the action to the plan with the given dependencies,
