@@ -20,9 +20,10 @@ Unreleased
 
 **Fixed**
 
-* Fix ``repr()`` of ``ROSmsg`` class
-* Fix data type of secs and nsecs in ``Time`` ROS message
-* Fix ``CollisionObject.to_collision_meshes``
+* Fixed ``repr()`` of ``ROSmsg`` class
+* Fixed data type of secs and nsecs in ``Time`` ROS message
+* Fixed ``CollisionObject.to_collision_meshes``
+* Fixed serialization of joint names for ``compas_fab.robots.JointTrajectoryPoint``
 
 **Deprecated**
 
