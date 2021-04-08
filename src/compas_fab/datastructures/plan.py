@@ -153,7 +153,7 @@ class Plan(Datastructure):
 
         Returns
         -------
-            The id of the newly planned.
+            The id of the newly planned action.
         """
         dependency_ids = set()
         if self.planned_actions:
