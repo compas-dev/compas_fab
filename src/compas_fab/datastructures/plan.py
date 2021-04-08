@@ -173,7 +173,7 @@ class Plan(Datastructure):
         Returns
         -------
         :class:`compas_fab.datastructure.Action`
-        The action of the removed :class:`compas_fab.datastructure.PlannedAction`
+            The action of the removed :class:`compas_fab.datastructure.PlannedAction`
         """
         planned_action = self.planned_actions.pop(action_id)
         for pa in self.planned_actions.values():
