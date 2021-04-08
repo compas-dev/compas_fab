@@ -41,6 +41,9 @@ class IntegerIdGenerator(Base):
             self.last_generated = next(self._generator)
             return self.last_generated
 
+    # alias for ironpython
+    next = __next__
+
     @property
     def data(self):
         return {
