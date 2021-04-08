@@ -1,5 +1,6 @@
 from .plan import (
     Action,
+    DependencyIdException,
     IntegerIdGenerator,
     Plan,
     PlannedAction
@@ -8,6 +9,7 @@ from .plan import (
 
 __all__ = [
     'Action',
+    'DependencyIdException',
     'IntegerIdGenerator',
     'Plan',
     'PlannedAction',

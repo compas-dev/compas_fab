@@ -2,22 +2,27 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import json
 import threading
 from collections import OrderedDict
 from itertools import count
 
 from compas.base import Base
+from compas.datastructures import Datastructure
+from compas.utilities import DataDecoder
+from compas.utilities import DataEncoder
 
 
 __all__ = [
     'Action',
+    'DependencyIdException',
     'IntegerIdGenerator',
     'Plan',
     'PlannedAction',
 ]
 
 
-class IntegerIdGenerator(object):
+class IntegerIdGenerator(Base):
     """Generator object yielding integers sequentially in a thread safe manner.
 
     Parameters
@@ -26,12 +31,41 @@ class IntegerIdGenerator(object):
         First value to be yielded by the generator.
     """
     def __init__(self, start_value=1):
+        super(IntegerIdGenerator, self).__init__()
+        self.last_generated = start_value - 1
         self._lock = threading.Lock()
         self._generator = count(start_value)
 
     def __next__(self):
         with self._lock:
-            yield next(self._generator)
+            self.last_generated = next(self._generator)
+            return self.last_generated
+
+    @property
+    def data(self):
+        return {
+            'start_value': self.last_generated + 1
+        }
+
+    def to_data(self):
+        return self.data
+
+    @classmethod
+    def from_data(cls, data):
+        return cls(data['start_value'])
+
+    @classmethod
+    def from_json(cls, filepath):
+        with open(filepath, 'r') as fp:
+            data = json.load(fp, cls=DataDecoder)
+        return cls.from_data(data)
+
+    def to_json(self, filepath, pretty=False):
+        with open(filepath, 'w+') as f:
+            if pretty:
+                json.dump(self.data, f, sort_keys=True, indent=4, cls=DataEncoder)
+            else:
+                json.dump(self.data, f, cls=DataEncoder)
 
 
 class DependencyIdException(Exception):
@@ -47,7 +81,7 @@ class DependencyIdException(Exception):
         return 'Found invalid dependency ids {}'.format(invalid_ids)
 
 
-class Plan(Base):
+class Plan(Datastructure):
     """Data structure for holding the information of a partially ordered plan
     (a directed acyclic graph).  The content of any event of the plan is contained
     in an :class:`compas_fab.datastructures.Action`. An event is scheduled and
@@ -66,15 +100,24 @@ class Plan(Base):
         methods.  Defaults to :class:`compas_fab.datastructures.IntegerIdGenerator`.
     """
     def __init__(self, planned_actions=None, id_generator=None):
+        super(Plan, self).__init__()
         planned_actions = planned_actions or []
-        self.planned_actions = OrderedDict({pa.id: pa for pa in planned_actions})
+        self.planned_actions = planned_actions
         if id_generator is None:
             try:
                 start_value = max(self.planned_actions.keys()) + 1 if self.planned_actions else 1
             except Exception:
-                raise Exception('Given ids not compatiable with default id_generator.')
+                raise Exception('Given ids not compatible with default id_generator.')
             id_generator = IntegerIdGenerator(start_value)
         self._id_generator = id_generator
+
+    @property
+    def planned_actions(self):
+        return self._planned_actions
+
+    @planned_actions.setter
+    def planned_actions(self, planned_actions):
+        self._planned_actions = OrderedDict({pa.id: pa for pa in planned_actions})
 
     def plan_action(self, action, dependency_ids):
         """Adds the action to the plan with the given dependencies,
@@ -225,11 +268,21 @@ class Plan(Base):
     @property
     def data(self):
         return dict(
-            planned_actions=list(self.planned_actions.values())
+            planned_actions=list(self.planned_actions.values()),
+            id_generator=self._id_generator,
         )
 
+    @data.setter
+    def data(self, data):
+        self.planned_actions = data['planned_actions']
+        self._id_generator = data['id_generator']
 
-class PlannedAction(Base):
+    @classmethod
+    def from_data(cls, data):
+        return cls(**data)
+
+
+class PlannedAction(Datastructure):
     """Represents an action which has been scheduled in a plan.
 
     Parameters
@@ -243,6 +296,7 @@ class PlannedAction(Base):
         The ids of the actions upon which `action` is dependent.
     """
     def __init__(self, action_id, action, dependency_ids):
+        super(PlannedAction, self).__init__()
         self.id = action_id
         self.action = action
         self.dependency_ids = dependency_ids
@@ -261,13 +315,24 @@ class PlannedAction(Base):
     @property
     def data(self):
         return dict(
-            id=self.id,
+            action_id=self.id,
             action=self.action,
-            dependency_ids=self.dependency_ids,
+            # sets are not json serializable
+            dependency_ids=list(self.dependency_ids),
         )
 
+    @data.setter
+    def data(self, data):
+        self.id = data['action_id']
+        self.action = data['action']
+        self.dependency_ids = data['dependency_ids']
 
-class Action(Base):
+    @classmethod
+    def from_data(cls, data):
+        return cls(**data)
+
+
+class Action(Datastructure):
     """Abstract representation of an event independent of its timing.
 
     Parameters
@@ -278,6 +343,7 @@ class Action(Base):
         Any other content associated to the action housed in key-value pairs.
     """
     def __init__(self, name, parameters=None):
+        super(Action, self).__init__()
         self.name = name
         self.parameters = parameters or {}
 
@@ -290,3 +356,12 @@ class Action(Base):
             name=self.name,
             parameters=self.parameters,
         )
+
+    @data.setter
+    def data(self, data):
+        self.name = data['name']
+        self.parameters = data['parameters']
+
+    @classmethod
+    def from_data(cls, data):
+        return cls(**data)
