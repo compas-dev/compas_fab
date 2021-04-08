@@ -76,6 +76,9 @@ def test_plan_with_custom_id_generator():
         def __next__(self):
             return chr(next(self._generator))
 
+        # alias for ironpython
+        next = __next__
+
     plan = Plan([], CustomIdGenerator())
     action_a = Action('action_a', {})
     plan.plan_action(action_a, [])
