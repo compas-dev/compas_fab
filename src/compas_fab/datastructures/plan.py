@@ -134,7 +134,7 @@ class Plan(Datastructure):
 
         Returns
         -------
-            The id of the newly planned.
+            The id of the newly planned action.
         """
         self.check_dependency_ids(dependency_ids)
         action_id = self._get_next_action_id()
