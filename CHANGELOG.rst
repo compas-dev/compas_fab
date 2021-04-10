@@ -16,6 +16,8 @@ Unreleased
 
 **Changed**
 
+* Lazily load `V-REP remoteApi` library
+
 **Fixed**
 
 * Fix ``repr()`` of ``ROSmsg`` class
