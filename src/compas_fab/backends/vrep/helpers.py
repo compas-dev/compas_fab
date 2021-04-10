@@ -2,9 +2,10 @@ import socket
 
 from compas.geometry import Frame
 from compas.geometry import matrix_from_frame
+from compas.robots import Configuration
 
 from compas_fab.backends.exceptions import BackendError
-from compas_fab.robots import Configuration
+
 
 __all__ = [
     'VrepError',

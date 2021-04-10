@@ -52,6 +52,7 @@ forward kinematics:
 
 .. code-block:: python
 
+    from compas.robots import Configuration
     from compas_fab.robots import *
     from compas_fab.robots import rfl
     from compas_fab.backends import VrepClient
@@ -114,6 +115,7 @@ Here is an example of such a request:
 .. code-block:: python
 
     from compas.geometry import Frame
+    from compas.robots import Configuration
     from compas_fab.robots import *
     from compas_fab.robots import rfl
     from compas_fab.backends import VrepClient

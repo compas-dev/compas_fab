@@ -13,17 +13,23 @@ Unreleased
 **Added**
 
 * Added support for MoveIt on ROS Noetic
+* Added support for Python 3.9
 
 **Changed**
 
+* The `Configuration` class has moved to `compas.robots`, but is still aliased within `compas_fab.robots`
 * Lazily load `V-REP remoteApi` library
 
 **Fixed**
 
-* Fix ``repr()`` of ``ROSmsg`` class
-* Fix data type of secs and nsecs in ``Time`` ROS message
+* Fixed ``repr()`` of ``ROSmsg`` class
+* Fixed data type of secs and nsecs in ``Time`` ROS message
+* Fixed ``CollisionObject.to_collision_meshes``
+* Fixed serialization of joint names for ``compas_fab.robots.JointTrajectoryPoint``
 
 **Deprecated**
+
+* `compas_fab.robots.Configuration` is being deprecated in favor of `compas.robots.Configuration`
 
 **Removed**
 

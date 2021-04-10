@@ -833,7 +833,7 @@ unload_modules("roslibpy")</item>
                     <item name="CodeInput" type_name="gh_string" type_code="10">import math
 import Grasshopper
 from compas.robots import Joint
-from compas_fab.robots import Configuration
+from compas.robots import Configuration
 
 if set_joint_positions:
 
@@ -3048,7 +3048,7 @@ robot = st[robot_key]
               <chunks count="1">
                 <chunk name="Container">
                   <items count="11">
-                    <item name="CodeInput" type_name="gh_string" type_code="10">from compas_fab.robots import Configuration
+                    <item name="CodeInput" type_name="gh_string" type_code="10">from compas.robots import Configuration
 
 if robot:
     types = robot.get_configurable_joint_types()
@@ -3914,7 +3914,7 @@ print planes</item>
               <chunks count="1">
                 <chunk name="Container">
                   <items count="11">
-                    <item name="CodeInput" type_name="gh_string" type_code="10">from compas_fab.robots import Configuration
+                    <item name="CodeInput" type_name="gh_string" type_code="10">from compas.robots import Configuration
 
 if robot:
     types = robot.get_configurable_joint_types()
@@ -7162,7 +7162,7 @@ Add path constraints</item>
               <chunks count="1">
                 <chunk name="Container">
                   <items count="11">
-                    <item name="CodeInput" type_name="gh_string" type_code="10">from compas_fab.robots import Configuration
+                    <item name="CodeInput" type_name="gh_string" type_code="10">from compas.robots import Configuration
 
 if robot:
     types = robot.get_configurable_joint_types()

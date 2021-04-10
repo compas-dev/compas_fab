@@ -3,10 +3,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas.robots import Configuration
+from compas.robots.configuration import FixedLengthList
 from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots.time_ import Duration
-from compas_fab.robots.configuration import Configuration
-from compas_fab.robots.configuration import FixedLengthList
 
 __all__ = [
     'JointTrajectoryPoint',
@@ -146,6 +146,7 @@ class JointTrajectoryPoint(Configuration):
     def data(self, data):
         self._joint_values = FixedLengthList(data.get('joint_values') or [])
         self._joint_types = FixedLengthList(data.get('joint_types') or [])
+        self._joint_names = FixedLengthList(data.get('joint_names') or [])
         self._velocities = FixedLengthList(data.get('velocities') or [])
         self._accelerations = FixedLengthList(data.get('accelerations') or [])
         self._effort = FixedLengthList(data.get('effort') or [])

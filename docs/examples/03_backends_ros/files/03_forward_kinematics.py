@@ -1,5 +1,5 @@
+from compas.robots import Configuration
 from compas_fab.backends import RosClient
-from compas_fab.robots import Configuration
 
 with RosClient() as client:
     robot = client.load_robot()

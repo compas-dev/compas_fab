@@ -1,6 +1,6 @@
 import math
 from compas.geometry import Frame
-from compas_fab.robots import Configuration
+from compas.robots import Configuration
 from compas_fab.backends import RosClient
 
 with RosClient() as client:

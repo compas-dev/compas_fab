@@ -4,22 +4,71 @@ Getting started
 
 .. highlight:: bash
 
-Installation
-============
+**COMPAS FAB** can be easily installed on multiple platforms,
+using popular package managers such as conda or pip.
 
-The recommended way to install **COMPAS FAB** is to use `Anaconda/conda <https://docs.conda.io/>`_:
+Install with conda
+==================
 
-::
-
-    conda install -c conda-forge compas_fab
-
-
-But it can also be installed using ``pip``:
+The recommended way to install **COMPAS FAB** is with `conda <https://conda.io/docs/>`_.
+For example, create an environment named ``my-project`` and install COMPAS and COMPAS FAB.
 
 ::
+
+    conda config --add channels conda-forge
+    conda create -n my-project compas_fab
+
+Afterwards, simply activate the environment
+and run the following command to check if the installation process was successful.
+
+.. code-block:: bash
+
+    conda activate my-project
+    python -c "import compas_fab; print(compas_fab.__version__)"
+
+.. code-block:: none
+
+    0.17.0
+
+You are ready to use **COMPAS FAB**!
+
+Installation options
+--------------------
+
+Install COMPAS FAB in an environment with a specific version of Python.
+
+.. code-block:: bash
+
+    conda create -n my-project python=3.8 compas_fab
+
+Install COMPAS FAB in an existing environment.
+
+.. code-block:: bash
+
+    conda install -n my-project compas_fab
+
+Install with pip
+================
+
+Install COMPAS FAB using ``pip`` from the Python Package Index.
+
+.. code-block:: bash
 
     pip install compas_fab
 
+Install an editable version from local source.
+
+.. code-block:: bash
+
+    cd path/to/compas_fab
+    pip install -e .
+
+Note that installation with ``pip`` is also possible within a ``conda`` environment.
+
+.. code-block:: bash
+
+    conda activate my-project
+    pip install -e .
 
 .. note::
 
@@ -27,22 +76,10 @@ But it can also be installed using ``pip``:
     `Microsoft Visual C++ 14.0 <https://www.scivision.dev/python-windows-visual-c-14-required/>`_.
 
 
-Once the installation is completed, you can verify your setup.
-Start Python from the command prompt and run the following:
-
-::
-
-    >>> import compas_fab
-
-You are ready to use **COMPAS FAB**!
-
-Update
-======
-
 Update with conda
------------------
+=================
 
-To update COMPAS to the latest version with ``conda``
+To update COMPAS FAB to the latest version with ``conda``
 
 .. code-block:: bash
 
@@ -52,13 +89,13 @@ To switch to a specific version
 
 .. code-block:: bash
 
-    conda install compas_fab=0.15.0
+    conda install compas_fab=0.17.0
 
 
 Update with pip
----------------
+===============
 
-If you installed COMPAS with ``pip`` the update command is the following
+If you installed COMPAS FAB with ``pip`` the update command is the following
 
 .. code-block:: bash
 
@@ -68,7 +105,7 @@ Or to switch to a specific version
 
 .. code-block:: bash
 
-    pip install compas_fab==0.15.0
+    pip install compas_fab==0.17.0
 
 
 Working in Rhino
