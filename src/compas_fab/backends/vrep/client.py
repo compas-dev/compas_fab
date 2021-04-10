@@ -2,9 +2,9 @@ from __future__ import print_function
 
 import logging
 
-from compas_fab.backends.vrep.helpers import DEFAULT_OP_MODE
 from compas_fab.backends.interfaces.client import ClientInterface
 from compas_fab.backends.vrep import VrepError
+from compas_fab.backends.vrep.helpers import DEFAULT_OP_MODE
 from compas_fab.backends.vrep.helpers import assert_robot
 from compas_fab.backends.vrep.helpers import config_from_vrep
 from compas_fab.backends.vrep.helpers import config_to_vrep
@@ -12,11 +12,13 @@ from compas_fab.backends.vrep.helpers import floats_from_vrep
 from compas_fab.backends.vrep.helpers import floats_to_vrep
 from compas_fab.backends.vrep.helpers import resolve_host
 from compas_fab.backends.vrep.planner import VrepPlanner
-from compas_fab.backends.vrep.remote_api import vrep
+from compas_fab.utilities import LazyLoader
 
 DEFAULT_SCALE = 1.
-CHILD_SCRIPT_TYPE = vrep.sim_scripttype_childscript
+CHILD_SCRIPT_TYPE = 1    # defined in vrepConst.sim_scripttype_childscript, but redefined here to prevent loading the remoteApi library
 LOG = logging.getLogger('compas_fab.backends.vrep.client')
+
+vrep = LazyLoader('vrep', globals(), 'compas_fab.backends.vrep.remote_api.vrep')
 
 __all__ = [
     'VrepClient',
