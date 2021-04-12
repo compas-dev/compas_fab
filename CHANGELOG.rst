@@ -13,7 +13,7 @@ Unreleased
 **Added**
 
 * Added support for MoveIt on ROS Noetic
-* In`compas.datastructures`, added `Plan`, `PlannedAction`, `Action` and `IntegerIdGenerator`
+* In ``compas.datastructures``, added ``Plan``, ``PlannedAction``, ``Action`` and ``IntegerIdGenerator``
 
 **Changed**
 
