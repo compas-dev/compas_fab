@@ -275,10 +275,6 @@ class Plan(Datastructure):
         self.planned_actions = data['planned_actions']
         self._id_generator = data['id_generator']
 
-    @classmethod
-    def from_data(cls, data):
-        return cls(**data)
-
 
 class PlannedAction(Base):
     """Represents an action which has been scheduled in a plan.
