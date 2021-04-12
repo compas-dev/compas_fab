@@ -13,6 +13,7 @@ Unreleased
 **Added**
 
 * Added support for MoveIt on ROS Noetic
+* Added support for Python 3.9
 * In ``compas.datastructures``, added ``Plan``, ``PlannedAction``, ``Action`` and ``IntegerIdGenerator``
 
 **Changed**
@@ -21,9 +22,10 @@ Unreleased
 
 **Fixed**
 
-* Fix ``repr()`` of ``ROSmsg`` class
-* Fix data type of secs and nsecs in ``Time`` ROS message
-* Fix ``CollisionObject.to_collision_meshes``
+* Fixed ``repr()`` of ``ROSmsg`` class
+* Fixed data type of secs and nsecs in ``Time`` ROS message
+* Fixed ``CollisionObject.to_collision_meshes``
+* Fixed serialization of joint names for ``compas_fab.robots.JointTrajectoryPoint``
 
 **Deprecated**
 

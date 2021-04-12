@@ -146,6 +146,7 @@ class JointTrajectoryPoint(Configuration):
     def data(self, data):
         self._joint_values = FixedLengthList(data.get('joint_values') or [])
         self._joint_types = FixedLengthList(data.get('joint_types') or [])
+        self._joint_names = FixedLengthList(data.get('joint_names') or [])
         self._velocities = FixedLengthList(data.get('velocities') or [])
         self._accelerations = FixedLengthList(data.get('accelerations') or [])
         self._effort = FixedLengthList(data.get('effort') or [])
