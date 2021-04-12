@@ -2,15 +2,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import json
 import threading
 from collections import OrderedDict
 from itertools import count
 
+import compas
 from compas.base import Base
 from compas.datastructures import Datastructure
-from compas.utilities import DataDecoder
-from compas.utilities import DataEncoder
 
 
 __all__ = [
@@ -59,16 +57,11 @@ class IntegerIdGenerator(Base):
 
     @classmethod
     def from_json(cls, filepath):
-        with open(filepath, 'r') as fp:
-            data = json.load(fp, cls=DataDecoder)
+        data = compas.json_load(filepath)
         return cls.from_data(data)
 
     def to_json(self, filepath, pretty=False):
-        with open(filepath, 'w+') as f:
-            if pretty:
-                json.dump(self.data, f, sort_keys=True, indent=4, cls=DataEncoder)
-            else:
-                json.dump(self.data, f, cls=DataEncoder)
+        compas.json_dump(self.data, filepath)
 
 
 class DependencyIdException(Exception):
