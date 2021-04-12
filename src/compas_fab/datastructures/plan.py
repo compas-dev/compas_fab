@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import threading
 from collections import OrderedDict
+from copy import deepcopy
 from itertools import count
 
 import compas
@@ -60,7 +61,7 @@ class IntegerIdGenerator(Base):
         data = compas.json_load(filepath)
         return cls.from_data(data)
 
-    def to_json(self, filepath, pretty=False):
+    def to_json(self, filepath):
         compas.json_dump(self.data, filepath)
 
 
@@ -279,7 +280,7 @@ class Plan(Datastructure):
         return cls(**data)
 
 
-class PlannedAction(Datastructure):
+class PlannedAction(Base):
     """Represents an action which has been scheduled in a plan.
 
     Parameters
@@ -328,8 +329,24 @@ class PlannedAction(Datastructure):
     def from_data(cls, data):
         return cls(**data)
 
+    def to_data(self):
+        return self.data
 
-class Action(Datastructure):
+    @classmethod
+    def from_json(cls, filepath):
+        data = compas.json_load(filepath)
+        return cls.from_data(data)
+
+    def to_json(self, filepath):
+        compas.json_dump(self.data, filepath)
+
+    def copy(self, cls=None):
+        if not cls:
+            cls = type(self)
+        return cls.from_data(deepcopy(self.data))
+
+
+class Action(Base):
     """Abstract representation of an event independent of its timing.
 
     Parameters
@@ -362,3 +379,19 @@ class Action(Datastructure):
     @classmethod
     def from_data(cls, data):
         return cls(**data)
+
+    def to_data(self):
+        return self.data
+
+    @classmethod
+    def from_json(cls, filepath):
+        data = compas.json_load(filepath)
+        return cls.from_data(data)
+
+    def to_json(self, filepath):
+        compas.json_dump(self.data, filepath)
+
+    def copy(self, cls=None):
+        if not cls:
+            cls = type(self)
+        return cls.from_data(deepcopy(self.data))
