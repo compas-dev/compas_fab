@@ -6,10 +6,6 @@ import threading
 from collections import OrderedDict
 from copy import deepcopy
 from itertools import count
-from networkx import all_topological_sorts
-from networkx import find_cycle
-from networkx import lexicographical_topological_sort
-from networkx import NetworkXNoCycle
 
 import compas
 from compas.base import Base
@@ -236,11 +232,13 @@ class Plan(Datastructure):
 
     def check_for_cycles(self):
         """"Checks whether cycles exist in the dependency graph."""
+        from networkx import find_cycle
+        from networkx import NetworkXNoCycle
         try:
             cycle = find_cycle(self.networkx)
         except NetworkXNoCycle:
             return
-        raise Exception("Cycle found with edges {}".format(cycle))  # !!!
+        raise Exception("Cycle found with edges {}".format(cycle))
 
     def get_linear_sort(self):
         """Sorts the planned actions linearly respecting the dependency ids.
@@ -249,6 +247,7 @@ class Plan(Datastructure):
         -------
         :obj:`list` of :class:`compas_fab.datastructure.Action`
         """
+        from networkx import lexicographical_topological_sort
         self.check_for_cycles()
         return [self.get_action(action_id) for action_id in lexicographical_topological_sort(self.networkx)]
 
@@ -259,6 +258,7 @@ class Plan(Datastructure):
         -------
         :obj:`list` of :obj:`list of :class:`compas_fab.datastructure.Action`
         """
+        from networkx import all_topological_sorts
         self.check_for_cycles()
         return [[self.get_action(action_id) for action_id in sorting] for sorting in all_topological_sorts(self.networkx)]
 
