@@ -14,7 +14,7 @@ Unreleased
 
 * Added support for MoveIt on ROS Noetic
 * Added support for Python 3.9
-* In ``compas.datastructures``, added ``Plan``, ``PlannedAction``, ``Action`` and ``IntegerIdGenerator``
+* In ``compas.datastructures``, added ``Plan``, ``Action`` and ``IntegerIdGenerator``
 
 **Changed**
 
