@@ -16,7 +16,6 @@ Plan
     DependencyIdException
     IntegerIdGenerator
     Plan
-    PlannedAction
 
 """
 
@@ -24,8 +23,7 @@ from .plan import (
     Action,
     DependencyIdException,
     IntegerIdGenerator,
-    Plan,
-    PlannedAction
+    Plan
 )
 
 
@@ -34,5 +32,4 @@ __all__ = [
     'DependencyIdException',
     'IntegerIdGenerator',
     'Plan',
-    'PlannedAction',
 ]

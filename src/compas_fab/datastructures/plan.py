@@ -6,18 +6,21 @@ import threading
 from collections import OrderedDict
 from copy import deepcopy
 from itertools import count
+from networkx import all_topological_sorts
+from networkx import find_cycle
+from networkx import lexicographical_topological_sort
+from networkx import NetworkXNoCycle
 
 import compas
 from compas.base import Base
 from compas.datastructures import Datastructure
-
+from compas.datastructures import Graph
 
 __all__ = [
     'Action',
     'DependencyIdException',
     'IntegerIdGenerator',
     'Plan',
-    'PlannedAction',
 ]
 
 
@@ -79,43 +82,60 @@ class DependencyIdException(Exception):
 
 
 class Plan(Datastructure):
-    """Data structure for holding the information of a partially ordered plan
-    (a directed acyclic graph).  The content of any event of the plan is contained
-    in an :class:`compas_fab.datastructures.Action`. An event is scheduled and
-    added to the plan through a :class:`compas_fab.datastructures.PlannedAction`.
-    The dependency ids of a planned action can be thought of as pointers to the
-    parents of that planned action.
+    """Data structure extending :class:`compas.datastructures.Graph` for creating
+    and maintaining a partially ordered plan (directed acyclic graph).
+    The content of any event of the plan is contained in an
+    :class:`compas_fab.datastructures.Action`.  The dependency ids of a planned
+    action can be thought of as pointers to the parents of that planned action.
+    While actions can be added and removed using the methods of
+    :attr:`compas_fab.datastructures.Plan.graph`, it is strongly recommended
+    that the methods ``plan_action``, ``append_action`` and ``remove_action``
+    are used instead.
 
-    Parameters
+    Attributes
     ----------
-    planned_actions : list of :class:`compas_fab.datastructures.PlannedAction`
-        The planned actions will be stored as an ordered dictionary, so their
-        ids should be distinct.  Defaults to an empty list.
+    graph : :class:`compas.datastructures.Graph
     id_generator : Generator[Hashable, None, None]
         Object which generates keys (via ``next()``) for
         :class:`compas_fab.datastructures.Action`s added using this object's
         methods.  Defaults to :class:`compas_fab.datastructures.IntegerIdGenerator`.
     """
-    def __init__(self, planned_actions=None, id_generator=None):
+    def __init__(self, id_generator=None):
         super(Plan, self).__init__()
-        planned_actions = planned_actions or []
-        self.planned_actions = planned_actions
-        if id_generator is None:
-            try:
-                start_value = max(self.planned_actions.keys()) + 1 if self.planned_actions else 1
-            except Exception:
-                raise Exception('Given ids not compatible with default id_generator.')
-            id_generator = IntegerIdGenerator(start_value)
-        self._id_generator = id_generator
+        self.graph = Graph()
+        self.graph.node = OrderedDict()
+        self._id_generator = id_generator or IntegerIdGenerator()
 
     @property
-    def planned_actions(self):
-        return self._planned_actions
+    def networkx(self):
+        """A new NetworkX DiGraph instance from ``graph``."""
+        return self.graph.to_networkx()
 
-    @planned_actions.setter
-    def planned_actions(self, planned_actions):
-        self._planned_actions = OrderedDict({pa.id: pa for pa in planned_actions})
-        self.check_all_dependency_ids()
+    @property
+    def actions(self):
+        """A dictionary of id-:class:`compas_fab.datastructures.Action` pairs."""
+        return {action_id: self.get_action(action_id) for action_id in self.graph.nodes()}
+
+    def get_action(self, action_id):
+        """Gets the action for the associated ``action_id``
+
+        Parameters
+        ----------
+        action_id : hashable
+
+        Returns
+        -------
+        :class:`compas_fab.datastructures.Action`
+        """
+        action = self.graph.node_attribute(action_id, 'action')
+        if action is None:
+            raise Exception("Action with id {} not found".format(action_id))
+        return action
+
+    def remove_action(self, action_id):
+        action = self.get_action(action_id)
+        self.graph.delete_node(action_id)
+        return action
 
     def plan_action(self, action, dependency_ids):
         """Adds the action to the plan with the given dependencies,
@@ -135,8 +155,9 @@ class Plan(Datastructure):
         """
         self.check_dependency_ids(dependency_ids)
         action_id = self._get_next_action_id()
-        planned_action = PlannedAction(action_id, action, dependency_ids)
-        self.planned_actions[action_id] = planned_action
+        self.graph.add_node(action_id, action=action)
+        for dependency_id in dependency_ids:
+            self.graph.add_edge(dependency_id, action_id)
         return action_id
 
     def append_action(self, action):
@@ -153,47 +174,44 @@ class Plan(Datastructure):
             The id of the newly planned action.
         """
         dependency_ids = set()
-        if self.planned_actions:
+        if self.graph.node:
             last_action_id = self._get_last_action_id()
             dependency_ids = {last_action_id}
         return self.plan_action(action, dependency_ids)
 
-    def remove_action_by_id(self, action_id):
-        """Removes the action with the given id from the plan and all its
-        dependencies.
-
-        Parameters
-        ----------
-        action_id : Hashable
-            Id of the planned action to be removed.
-
-        Returns
-        -------
-        :class:`compas_fab.datastructure.Action`
-            The action of the removed :class:`compas_fab.datastructure.PlannedAction`
-        """
-        planned_action = self.planned_actions.pop(action_id)
-        for pa in self.planned_actions.values():
-            pa.dependency_ids.discard(action_id)
-        return planned_action.action
-
     def _get_last_action_id(self):
-        last_action_id, last_action = self.planned_actions.popitem()
-        self.planned_actions[last_action_id] = last_action
+        last_action_id, last_action_attrs = self.graph.node.popitem()
+        self.graph.node[last_action_id] = last_action_attrs
         return last_action_id
 
     def _get_next_action_id(self):
         return next(self._id_generator)
 
-    def check_dependency_ids(self, dependency_ids, planned_action_id=None):
+    def get_dependency_ids(self, action_id):
+        """Return the identifiers of actions upon which the action with id ``action_id`` is dependent.
+
+        Parameters
+        ----------
+        action_id : hashable
+            The identifier of the action.
+
+        Returns
+        -------
+        :obj:`list`
+            A list of action identifiers.
+
+        """
+        return self.graph.neighbors_in(action_id)
+
+    def check_dependency_ids(self, dependency_ids, action_id=None):
         """Checks whether the given dependency ids exist in the plan.
 
         Parameters
         ----------
         dependency_ids : set or list
             The dependency ids to be validated.
-        planned_action_id : Hashable
-            The id of the associated planned action.  Used only in
+        action_id : hashable
+            The id of the associated action.  Used only in
             the error message.  Defaults to ``None``.
 
         Raises
@@ -201,9 +219,9 @@ class Plan(Datastructure):
         :class:`compas_fab.datastructures.DependencyIdException`
         """
         dependency_ids = set(dependency_ids)
-        if not dependency_ids.issubset(self.planned_actions):
-            invalid_ids = dependency_ids.difference(self.planned_actions)
-            raise DependencyIdException(invalid_ids, planned_action_id)
+        if not dependency_ids.issubset(self.graph.node):
+            invalid_ids = dependency_ids.difference(self.graph.node)
+            raise DependencyIdException(invalid_ids, action_id)
 
     def check_all_dependency_ids(self):
         """Checks whether the dependency ids of all the planned actions
@@ -213,31 +231,18 @@ class Plan(Datastructure):
         ------
         :class:`compas_fab.datastructures.DependencyIdException`
         """
-        for pa_id, planned_action in self.planned_actions.items():
-            self.check_dependency_ids(planned_action.dependency_ids, pa_id)
+        for action_id in self.actions:
+            self.check_dependency_ids(self.get_dependency_ids(action_id), action_id)
 
     def check_for_cycles(self):
         """"Checks whether cycles exist in the dependency graph."""
-        self.check_all_dependency_ids()
+        try:
+            cycle = find_cycle(self.networkx)
+        except NetworkXNoCycle:
+            return
+        raise Exception("Cycle found with edges {}".format(cycle))  # !!!
 
-        def helper(cur, v, r):
-            v[cur] = True
-            r[cur] = True
-            for dep_id in self.planned_actions[cur].dependency_ids:
-                if not v[dep_id]:
-                    helper(dep_id, v, r)
-                elif r[dep_id]:
-                    raise Exception("Cycle found with action ids {}".format([pa_id for pa_id, seen in r.items() if seen]))
-            r[cur] = False
-
-        visited = {pa_id: False for pa_id in self.planned_actions}
-        rec_dict = {pa_id: False for pa_id in self.planned_actions}
-
-        for pa_id in self.planned_actions:
-            if not visited[pa_id]:
-                helper(pa_id, visited, rec_dict)
-
-    def linear_sort(self):
+    def get_linear_sort(self):
         """Sorts the planned actions linearly respecting the dependency ids.
 
         Returns
@@ -245,101 +250,31 @@ class Plan(Datastructure):
         :obj:`list` of :class:`compas_fab.datastructure.Action`
         """
         self.check_for_cycles()
+        return [self.get_action(action_id) for action_id in lexicographical_topological_sort(self.networkx)]
 
-        def helper(s, v, cur_id):
-            v.add(cur_id)
-            action = self.planned_actions[cur_id]
-            for dep_id in action.dependency_ids:
-                if dep_id not in v:
-                    helper(s, v, dep_id)
-            s.append(action)
+    def get_all_linear_sorts(self):
+        """Gets all possible linear sorts respecting the dependency ids.
 
-        stack = []
-        visited = set()
-
-        for action_id in self.planned_actions:
-            if action_id not in visited:
-                helper(stack, visited, action_id)
-
-        return stack
+        Returns
+        -------
+        :obj:`list` of :obj:`list of :class:`compas_fab.datastructure.Action`
+        """
+        self.check_for_cycles()
+        return [[self.get_action(action_id) for action_id in sorting] for sorting in all_topological_sorts(self.networkx)]
 
     @property
     def data(self):
-        return dict(
-            planned_actions=list(self.planned_actions.values()),
-            id_generator=self._id_generator,
-        )
+        return {
+            'graph': self.graph,
+            'id_generator': self._id_generator,
+        }
 
     @data.setter
     def data(self, data):
-        self.planned_actions = data['planned_actions']
+        graph = data['graph']
+        graph.node = OrderedDict(graph.node)
+        self.graph = graph
         self._id_generator = data['id_generator']
-
-
-class PlannedAction(Base):
-    """Represents an action which has been scheduled in a plan.
-
-    Parameters
-    ----------
-    action_id : Hashable
-        An identifier of the action.  Used by other actions and the plan
-        it is associated with.
-    action : :class:`compas_fab.datastructures.Action`
-        The action to be planned.
-    dependency_ids : set or list
-        The ids of the actions upon which `action` is dependent.
-    """
-    def __init__(self, action_id, action, dependency_ids):
-        super(PlannedAction, self).__init__()
-        self.id = action_id
-        self.action = action
-        self.dependency_ids = dependency_ids
-
-    @property
-    def dependency_ids(self):
-        return self._dependency_ids
-
-    @dependency_ids.setter
-    def dependency_ids(self, value):
-        self._dependency_ids = set(value)
-
-    def __str__(self):
-        return 'PlannedAction<id={}, action={}>'.format(self.id, self.action)
-
-    @property
-    def data(self):
-        return dict(
-            action_id=self.id,
-            action=self.action,
-            # sets are not json serializable
-            dependency_ids=list(self.dependency_ids),
-        )
-
-    @data.setter
-    def data(self, data):
-        self.id = data['action_id']
-        self.action = data['action']
-        self.dependency_ids = data['dependency_ids']
-
-    @classmethod
-    def from_data(cls, data):
-        return cls(**data)
-
-    def to_data(self):
-        return self.data
-
-    @classmethod
-    def from_json(cls, filepath):
-        data = compas.json_load(filepath)
-        return cls.from_data(data)
-
-    def to_json(self, filepath):
-        compas.json_dump(self.data, filepath)
-
-    def copy(self, cls=None):
-        if not cls:
-            cls = type(self)
-        return cls.from_data(deepcopy(self.data))
 
 
 class Action(Base):
