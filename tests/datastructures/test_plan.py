@@ -78,7 +78,7 @@ def test_plan_with_custom_id_generator():
 
 def test_plan_data():
     plan = Plan()
-    plan.append_action(Action('action_1'))
+    plan.append_action(Action('action_1', {'param': Frame.worldXY()}))
     other_plan = Plan.from_data(plan.data)
     assert plan.actions.keys() == other_plan.actions.keys()
 
@@ -88,6 +88,7 @@ def test_plan_data():
     other_plan_data = compas.json_loads(plan_json)
     other_plan = Plan.from_data(other_plan_data)
     assert plan.actions.keys() == other_plan.actions.keys()
+    assert other_plan.get_action(1).parameters['param'] == Frame.worldXY()
 
     # now there are two generators
     plan.append_action(Action('action_2'))
