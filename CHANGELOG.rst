@@ -18,6 +18,7 @@ Unreleased
 **Changed**
 
 * The `Configuration` class has moved to `compas.robots`, but is still aliased within `compas_fab.robots`
+* Lazily load `V-REP remoteApi` library
 
 **Fixed**
 
