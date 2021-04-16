@@ -88,7 +88,7 @@ def test_plan_data():
     other_plan_data = compas.json_loads(plan_json)
     other_plan = Plan.from_data(other_plan_data)
     assert plan.actions.keys() == other_plan.actions.keys()
-    assert other_plan.get_action(1).parameters['param'] == Frame.worldXY()
+    assert isinstance(other_plan.get_action(1).parameters['param'], Frame)
 
     # now there are two generators
     plan.append_action(Action('action_2'))

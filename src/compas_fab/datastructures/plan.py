@@ -256,7 +256,7 @@ class Plan(Datastructure):
 
         Returns
         -------
-        :obj:`list` of :obj:`list of :class:`compas_fab.datastructure.Action`
+        :obj:`list` of :obj:`list` of :class:`compas_fab.datastructure.Action`
         """
         from networkx import all_topological_sorts
         self.check_for_cycles()
