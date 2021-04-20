@@ -26,6 +26,7 @@ Unreleased
 * Fixed data type of secs and nsecs in ``Time`` ROS message
 * Fixed ``CollisionObject.to_collision_meshes``
 * Fixed serialization of joint names for ``compas_fab.robots.JointTrajectoryPoint``
+* Fixed deserialization of ``AttachedCollisionMesh``
 
 **Deprecated**
 
