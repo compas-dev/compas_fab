@@ -8,7 +8,7 @@ from copy import deepcopy
 from itertools import count
 
 import compas
-from compas.base import Base
+from compas.data import Data
 from compas.datastructures import Datastructure
 from compas.datastructures import Graph
 
@@ -20,7 +20,7 @@ __all__ = [
 ]
 
 
-class IntegerIdGenerator(Base):
+class IntegerIdGenerator(Data):
     """Generator object yielding integers sequentially in a thread safe manner.
 
     Parameters
@@ -60,8 +60,8 @@ class IntegerIdGenerator(Base):
         data = compas.json_load(filepath)
         return cls.from_data(data)
 
-    def to_json(self, filepath):
-        compas.json_dump(self.data, filepath)
+    def to_json(self, filepath, pretty=False):
+        compas.json_dump(self.data, filepath, pretty=pretty)
 
 
 class DependencyIdException(Exception):
@@ -277,7 +277,7 @@ class Plan(Datastructure):
         self._id_generator = data['id_generator']
 
 
-class Action(Base):
+class Action(Data):
     """Abstract representation of an event independent of its timing.
 
     Parameters
@@ -319,8 +319,8 @@ class Action(Base):
         data = compas.json_load(filepath)
         return cls.from_data(data)
 
-    def to_json(self, filepath):
-        compas.json_dump(self.data, filepath)
+    def to_json(self, filepath, pretty=False):
+        compas.json_dump(self.data, filepath, pretty=pretty)
 
     def copy(self, cls=None):
         if not cls:
