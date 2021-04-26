@@ -1,13 +1,9 @@
 """
 Visualizes a trajectory.
 """
-import Grasshopper
-import System
-from ghpythonlib.componentbase import executingcomponent as component
-
 from compas_ghpython import draw_frame
 from compas_ghpython import list_to_ghtree
-from compas_fab.ghpython.components.icons import trajectory_visualize_icon
+from ghpythonlib.componentbase import executingcomponent as component
 
 
 class TrajectoryVisualize(component):
