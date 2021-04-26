@@ -57,12 +57,17 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: NuGet/setup-nuget@v1.0.5
       - name: Install dependencies
         run: |
           choco install ironpython --version=2.7.8.1
           ipy -X:Frames -m ensurepip
           ipy -X:Frames -m pip install --no-deps compas roslibpy
           ipy -X:Frames -m pip install ironpython-pytest
+      - uses: compas-dev/compas-actions.ghpython_components@v1
+        with:
+          source: src/compas_fab/ghpython/components
+          target: dist
       - name: Run tests
         env:
           IRONPYTHONPATH: ./src
