@@ -1,7 +1,7 @@
 {
     "name": "ROS Robot",
     "nickname": "Robot",
-    "category": "COMPAS FABX",
+    "category": "COMPAS FAB",
     "subcategory": "ROS",
     "description": "Load robot directly from ROS.",
     "exposure": 2,

@@ -1,7 +1,7 @@
 {
     "name": "Robot Visualize",
     "nickname": "Robot Visualize",
-    "category": "COMPAS FABX",
+    "category": "COMPAS FAB",
     "subcategory": "Display",
     "description": "Visualizes the robot.",
     "exposure": 2,

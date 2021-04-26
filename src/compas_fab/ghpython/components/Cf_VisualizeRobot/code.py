@@ -1,4 +1,8 @@
-"""Visualizes the robot."""
+"""
+Visualizes the robot.
+
+COMPAS FAB v{{version}}
+"""
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_ghpython.artists import MeshArtist

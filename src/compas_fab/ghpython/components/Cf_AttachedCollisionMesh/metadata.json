@@ -1,7 +1,7 @@
 {
     "name": "Attached Collision Mesh",
     "nickname": "ACM",
-    "category": "COMPAS FABX",
+    "category": "COMPAS FAB",
     "subcategory": "Scene",
     "description": "Add or remove an attached collision mesh to the robot.",
     "exposure": 4,

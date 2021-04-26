@@ -1,5 +1,7 @@
 """
 Add or remove a collision mesh from the planning scene.
+
+COMPAS FAB v{{version}}
 """
 from compas_rhino.geometry import RhinoMesh
 from ghpythonlib.componentbase import executingcomponent as component

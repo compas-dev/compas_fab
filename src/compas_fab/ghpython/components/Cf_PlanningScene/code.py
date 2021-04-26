@@ -1,5 +1,7 @@
 """
 Create a planning scene.
+
+COMPAS FAB v{{version}}
 """
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st

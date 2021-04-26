@@ -1,7 +1,7 @@
 {
     "name": "Plan Cartesian Motion",
     "nickname": "Plan Cartesian Motion",
-    "category": "COMPAS FABX",
+    "category": "COMPAS FAB",
     "subcategory": "Planning",
     "description": "Calculate a cartesian motion path (linear in tool space).",
     "exposure": 4,

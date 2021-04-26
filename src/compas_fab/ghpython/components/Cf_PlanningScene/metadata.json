@@ -1,7 +1,7 @@
 {
     "name": "Planning Scene",
     "nickname": "Scene",
-    "category": "COMPAS FABX",
+    "category": "COMPAS FAB",
     "subcategory": "Scene",
     "description": "Create a planning scene.",
     "exposure": 2,

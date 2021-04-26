@@ -1,7 +1,7 @@
 {
     "name": "ROS Connect",
     "nickname": "ROS",
-    "category": "COMPAS FABX",
+    "category": "COMPAS FAB",
     "subcategory": "ROS",
     "description": "Connect or disconnect to ROS.",
     "exposure": 2,

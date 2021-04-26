@@ -1,7 +1,7 @@
 {
     "name": "Trajectory Visualize",
     "nickname": "Trajectory Visualize",
-    "category": "COMPAS FABX",
+    "category": "COMPAS FAB",
     "subcategory": "Display",
     "description": "Visualizes the trajectory.",
     "exposure": 2,

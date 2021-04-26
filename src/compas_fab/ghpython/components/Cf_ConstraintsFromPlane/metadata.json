@@ -1,7 +1,7 @@
 {
     "name": "Constraints From Plane",
     "nickname": "Constraints From Plane",
-    "category": "COMPAS FABX",
+    "category": "COMPAS FAB",
     "subcategory": "Planning",
     "description": "Create a position and an orientation constraint from a plane calculated for the group's end-effector link.",
     "exposure": 8,

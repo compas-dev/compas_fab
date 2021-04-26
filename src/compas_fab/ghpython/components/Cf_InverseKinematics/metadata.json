@@ -1,7 +1,7 @@
 {
     "name": "Inverse Kinematics",
     "nickname": "IK",
-    "category": "COMPAS FABX",
+    "category": "COMPAS FAB",
     "subcategory": "Planning",
     "description": "Calculate the robot's inverse kinematic for a given plane.",
     "exposure": 2,
