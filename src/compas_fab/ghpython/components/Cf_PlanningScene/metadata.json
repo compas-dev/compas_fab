@@ -1,0 +1,24 @@
+{
+    "name": "Planning Scene",
+    "nickname": "Scene",
+    "category": "COMPAS FABX",
+    "subcategory": "Scene",
+    "description": "Create a planning scene.",
+    "exposure": 2,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "robot",
+                "description": "The robot."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "scene",
+                "description": "A planning scene."
+            }
+        ]
+    }
+}

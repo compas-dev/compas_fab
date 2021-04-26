@@ -1,4 +1,4 @@
-import compas_fab
+from __future__ import absolute_import
 
 
 def create_id(component, name):

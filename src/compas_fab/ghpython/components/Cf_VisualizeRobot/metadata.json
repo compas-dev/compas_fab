@@ -1,0 +1,88 @@
+{
+    "name": "Robot Visualize",
+    "nickname": "Robot Visualize",
+    "category": "COMPAS FABX",
+    "subcategory": "Display",
+    "description": "Visualizes the robot.",
+    "exposure": 2,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "robot",
+                "description": "The robot."
+            },
+            {
+                "name": "group",
+                "description": "The planning group used for end-effector and base visualization.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "configuration",
+                "description": "The robot's full configuration."
+            },
+            {
+                "name": "attached_collision_meshes",
+                "description": "A list of attached collision meshes.",
+                "scriptParamAccess": "list"
+            },
+            {
+                "name": "show_visual",
+                "description": "Whether or not to show the robot's visual meshes.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "show_collision",
+                "description": "Whether or not to show the robot's collision meshes.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "show_frames",
+                "description": "Whether or not to show the robot's joint frames.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "show_base_frame",
+                "description": "Whether or not to show the robot's base frame.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "show_end_effector_frame",
+                "description": "Whether or not to show the robot's end-effector frame.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "show_acm",
+                "description": "Whether or not to show the attached collision meshes (if any).",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "visual",
+                "description": "Whether or not to show the attached collision meshes (if any)."
+            },
+            {
+                "name": "collision",
+                "description": "Whether or not to show the attached collision meshes (if any)."
+            },
+            {
+                "name": "attached_meshes",
+                "description": "Whether or not to show the attached collision meshes (if any)."
+            },
+            {
+                "name": "frames",
+                "description": "Whether or not to show the attached collision meshes (if any)."
+            },
+            {
+                "name": "base_frame",
+                "description": "Whether or not to show the attached collision meshes (if any)."
+            },
+            {
+                "name": "ee_frame",
+                "description": "Whether or not to show the attached collision meshes (if any)."
+            }
+        ]
+    }
+}

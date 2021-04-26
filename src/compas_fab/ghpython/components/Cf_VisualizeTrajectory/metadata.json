@@ -1,0 +1,61 @@
+{
+    "name": "Trajectory Visualize",
+    "nickname": "Trajectory Visualize",
+    "category": "COMPAS FABX",
+    "subcategory": "Display",
+    "description": "Visualizes the trajectory.",
+    "exposure": 2,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "robot",
+                "description": "The robot."
+            },
+            {
+                "name": "group",
+                "description": "The planning group for which this trajectory was planned.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "trajectory",
+                "description": "The calculated trajectory."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "start_configuration",
+                "description": "The start configuration of the trajectory."
+            },
+            {
+                "name": "configurations",
+                "description": "The full configurations along the trajectory."
+            },
+            {
+                "name": "fraction",
+                "description": "Indicates the percentage of requested trajectory that was calculated, e.g. 1 means the full trajectory was found."
+            },
+            {
+                "name": "time",
+                "description": "The time which is needed to execute that trajectory at full speed."
+            },
+            {
+                "name": "planes",
+                "description": "The planes of the robot's end-effector."
+            },
+            {
+                "name": "P",
+                "description": "The positions along the trajectory"
+            },
+            {
+                "name": "V",
+                "description": "The velocities along the trajectory"
+            },
+            {
+                "name": "A",
+                "description": "The accelerations along the trajectory"
+            }
+        ]
+    }
+}
