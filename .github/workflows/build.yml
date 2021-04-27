@@ -67,7 +67,7 @@ jobs:
       - uses: compas-dev/compas-actions.ghpython_components@v1
         with:
           source: src/compas_fab/ghpython/components
-          target: dist
+          target: src/compas_fab/ghpython/components
       - name: Run tests
         env:
           IRONPYTHONPATH: ./src
