@@ -103,27 +103,40 @@ The best way to send feedback is to file an issue on
 * Explain in detail how it would work.
 * Keep the scope as narrow as possible, to make it easier to implement.
 
+Grasshopper components
+----------------------
+
+Grasshopper user objects need to be built using `COMPAS Github Action componentizer <https://github.com/compas-dev/compas-actions.ghpython_components>`_.
+
+1. Apply your changes to the component source code (``src/compas_fab/ghpython/components``).
+2. Rebuild them:
+
+   .. code-block:: bash
+
+        invoke build-ghuser-components <path_to_ghio.dll>
+
+3. Install them on Rhino/Grasshopper as usual:
+
+   .. code-block:: bash
+
+        python -m compas_rhino.install
+
+The install step does not copy them, but creates a symlink to the location in which they are built,
+so after the first installation, it is usually not required to reinstall them, only rebuild them (unless a new component is added).
+
+.. note::
+
+    This step requires IronPython 2.7 to be available on the system, ie. `ipy` should be callable from the command line.
+    The path to the GH_IO.dll is platform-specific, on Mac it is under the ``GrasshopperPlugin.rhp`` of the Rhino app
+    and on Windows is in the ``Grasshopper`` folder within the Rhino folder in ``ProgramFiles``.
+
+
 A Note on Architecture for Backend Clients
 ------------------------------------------
 
 To maintain consistency from one backend client to another and to promote modularity,
 we make use of several interfaces.  Please reference :ref:`Note on Architecture <architecture>`
 for more details on how to add or amend a backend client.
-
-A Note on GhPython Components
------------------------------
-
-The Grasshopper components are made with the Python GHPY compiler based on the
-`Tutorial by Giulio Piacentino <https://discourse.mcneel.com/t/tutorial-creating-a-grasshopper-component-with-the-python-ghpy-compiler/38552>`_.
-If you make changes to the files in ``src/compas_fab/ghpython/components``, the components library has to be manually recompiled.
-This is done by executing ``src\compas_fab\ghpython\components\compile.py`` with Rhino's PythonScript Editor.
-Make sure to open Grasshopper before compiling, so that the assemblies are loaded.
-
-Once compilation is completed, the components (``.ghpy`` file) are installed using the same command
-that installs COMPAS on Rhino::
-
-    python -m compas_rhino.install
-
 
 Design documents
 ----------------

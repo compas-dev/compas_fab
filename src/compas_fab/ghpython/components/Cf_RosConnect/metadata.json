@@ -1,0 +1,39 @@
+{
+    "name": "ROS Connect",
+    "nickname": "ROS",
+    "category": "COMPAS FAB",
+    "subcategory": "ROS",
+    "description": "Connect or disconnect to ROS.",
+    "exposure": 2,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "ip",
+                "description": "The ip address ROS. Defaults to 127.0.0.1.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "port",
+                "description": "The port of ROS. Defaults to 9090.",
+                "typeHintID": "int"
+            },
+            {
+                "name": "connect",
+                "description": "If True, connects to ROS. If False, disconnects from ROS. Defaults to False.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "ros_client",
+                "description": "The ROS client."
+            },
+            {
+                "name": "is_connected",
+                "description": "True if connection established."
+            }
+        ]
+    }
+}

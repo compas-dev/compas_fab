@@ -2,9 +2,9 @@
 from __future__ import print_function
 
 import contextlib
-import glob
 import os
 import sys
+import tempfile
 from shutil import copytree
 from shutil import rmtree
 
@@ -211,14 +211,24 @@ def prepare_changelog(ctx):
 
 
 @task(help={
+      'gh_io_folder': 'Folder where GH_IO.dll is located. Usually Rhino installation folder.'})
+def build_ghuser_components(ctx, gh_io_folder):
+    """Build Grasshopper user objects from source"""
+    with chdir(BASE_FOLDER):
+        with tempfile.TemporaryDirectory('actions.ghcomponentizer') as action_dir:
+            source_dir = os.path.abspath('src/compas_fab/ghpython/components')
+            target_dir = source_dir
+            ctx.run('git clone https://github.com/compas-dev/compas-actions.ghpython_components.git {}'.format(action_dir))
+
+            ctx.run('ipy {} {} {} --ghio "{}"'.format(os.path.join(action_dir, 'componentize.py'), source_dir, target_dir, os.path.abspath(gh_io_folder)))
+
+
+@task(help={
       'release_type': 'Type of release follows semver rules. Must be one of: major, minor, patch.'})
 def release(ctx, release_type):
     """Releases the project in one swift command!"""
     if release_type not in ('patch', 'minor', 'major'):
         raise Exit('The release type parameter is invalid.\nMust be one of: major, minor, patch')
-
-    if not confirm('Have you compiled the Grasshopper components already? [y/N]'):
-        raise Exit('Please compile before release.')
 
     # Run checks
     ctx.run('invoke check test')

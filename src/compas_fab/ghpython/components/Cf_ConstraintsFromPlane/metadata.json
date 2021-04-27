@@ -1,0 +1,53 @@
+{
+    "name": "Constraints From Plane",
+    "nickname": "Constraints From Plane",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Create a position and an orientation constraint from a plane calculated for the group's end-effector link.",
+    "exposure": 8,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "robot",
+                "description": "The robot."
+            },
+            {
+                "name": "plane",
+                "description": "The plane or frame from which we create position and orientation constraints."
+            },
+            {
+                "name": "group",
+                "description": "The planning group for which we specify the constraint. Defaults to the robot's main planning group.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "tolerance_position",
+                "description": "The allowed tolerance to the frame's position (defined in the robot's units). Defaults to 0.001",
+                "typeHintID": "float"
+            },
+            {
+                "name": "tolerance_xaxis",
+                "description": "The allowed tolerance of the frame's X-axis in degrees.",
+                "typeHintID": "float"
+            },
+            {
+                "name": "tolerance_yaxis",
+                "description": "The allowed tolerance of the frame's Y-axis in degrees.",
+                "typeHintID": "float"
+            },
+            {
+                "name": "tolerance_zaxis",
+                "description": "The allowed tolerance of the frame's Z-axis in degrees.",
+                "typeHintID": "float"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "constraints",
+                "description": "A list containing a position and an orientation constraint."
+            }
+        ]
+    }
+}
