@@ -67,7 +67,6 @@ jobs:
           ipy -X:Frames -m pip install --no-deps compas.tar.gz
           ipy -X:Frames -m pip install --no-deps roslibpy.tar.gz
           ipy -X:Frames -m pip install --no-deps ironpython-pytest.tar.gz
-        shell: bash
       - name: Run tests
         env:
           IRONPYTHONPATH: ./src
