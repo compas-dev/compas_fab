@@ -34,7 +34,7 @@
             },
             {
                 "name": "fraction",
-                "description": "Indicates the percentage of requested trajectory that was calculated, e.g. 1 means the full trajectory was found."
+                "description": "Indicates the fraction of requested trajectory that was calculated, e.g. 1 means the full trajectory was found."
             },
             {
                 "name": "time",
