@@ -15,7 +15,7 @@
             },
             {
                 "name": "load",
-                "description": "If `True`, loads the robot from ROS. Defaults to False.",
+                "description": "If True, loads the robot from ROS. Defaults to False.",
                 "typeHintID": "bool"
             }
         ],

@@ -19,7 +19,7 @@
             },
             {
                 "name": "start_configuration",
-                "description": "If passed, the inverse will be calculated such that the calculated joint positions differ the least from the start_configuration. Defaults to the zero configuration."
+                "description": "If passed, calculates the inverse such that the joint positions differ the least from the start_configuration. Defaults to the zero configuration."
             },
             {
                 "name": "group",

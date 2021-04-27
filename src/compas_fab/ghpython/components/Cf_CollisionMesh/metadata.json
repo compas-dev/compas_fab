@@ -25,19 +25,19 @@
             },
             {
                 "name": "add",
-                "description": "If `True`, adds the collision mesh to the planning scene.",
+                "description": "If True, adds the collision mesh to the planning scene.",
                 "typeHintID": "bool"
             },
             {
                 "name": "remove",
-                "description": "If `True`, removes the collision mesh from the planning scene.",
+                "description": "If True, removes the collision mesh from the planning scene.",
                 "typeHintID": "bool"
             }
         ],
         "outputParameters": [
             {
                 "name": "ok",
-                "description": "`True` if the operation was successfully performed.",
+                "description": "True if the operation was successfully performed.",
                 "optional": false
             }
         ]

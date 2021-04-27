@@ -21,7 +21,7 @@
             },
             {
                 "name": "connect",
-                "description": "If `True`, connect to ROS. If `False`, disconnect from ROS. Defaults to False.",
+                "description": "If True, connects to ROS. If False, disconnects from ROS. Defaults to False.",
                 "typeHintID": "bool"
             }
         ],
@@ -32,7 +32,7 @@
             },
             {
                 "name": "is_connected",
-                "description": "`True` if connection established."
+                "description": "True if connection established."
             }
         ]
     }
