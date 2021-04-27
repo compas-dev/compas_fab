@@ -110,20 +110,21 @@ To maintain consistency from one backend client to another and to promote modula
 we make use of several interfaces.  Please reference :ref:`Note on Architecture <architecture>`
 for more details on how to add or amend a backend client.
 
-A Note on GhPython Components
------------------------------
+A Note on GhPython User Components
+----------------------------------
 
-The Grasshopper components are made with the Python GHPY compiler based on the
-`Tutorial by Giulio Piacentino <https://discourse.mcneel.com/t/tutorial-creating-a-grasshopper-component-with-the-python-ghpy-compiler/38552>`_.
-If you make changes to the files in ``src/compas_fab/ghpython/components``, the components library has to be manually recompiled.
-This is done by executing ``src\compas_fab\ghpython\components\compile.py`` with Rhino's PythonScript Editor.
-Make sure to open Grasshopper before compiling, so that the assemblies are loaded.
+The Grasshopper user objects are built with `COMPAS Github Action componentizer <https://github.com/compas-dev/compas-actions.ghpython_components>`_.
 
-Once compilation is completed, the components (``.ghpy`` file) are installed using the same command
-that installs COMPAS on Rhino::
+If you make changes to the files in ``src/compas_fab/ghpython/components``, the components need to be rebuilt.
+This is done using the ``invoke`` task::
+
+    invoke build-ghuser-components <path_to_ghio.dll>
+
+The components (``.ghuser`` files) are installed using the same command that installs COMPAS on Rhino::
 
     python -m compas_rhino.install
 
+The installation does not copy them, but creates a symlink to the location in which they are built in this repo.
 
 Design documents
 ----------------
