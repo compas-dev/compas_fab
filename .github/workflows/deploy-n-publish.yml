@@ -78,7 +78,10 @@ jobs:
           python setup.py clean --all sdist bdist_wheel
       - name: 📦 Publish release to PyPI
         if: success() && startsWith(github.ref, 'refs/tags')
-        uses: pypa/gh-action-pypi-publish@master
+        run: |
+            twine check dist/*
+            twine upload dist/* --skip-existing
         with:
-            password: ${{ secrets.pypi_password }}
+            TWINE_USERNAME: __token__
+            TWINE_PASSWORD: ${{ secrets.pypi_password }}
 
