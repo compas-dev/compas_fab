@@ -16,6 +16,8 @@ Unreleased
 
 **Fixed**
 
+* Fix error message during uninstall of Grasshopper components
+
 **Deprecated**
 
 **Removed**

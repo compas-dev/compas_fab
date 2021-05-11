@@ -66,7 +66,7 @@ def uninstall():
         symlinks = []
         for src in userobjects:
             dst = os.path.join(dstdir, os.path.basename(src))
-            symlinks.append((src, dst))
+            symlinks.append(dst)
 
         remove_symlinks(symlinks)
 
