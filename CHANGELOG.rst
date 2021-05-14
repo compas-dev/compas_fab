@@ -12,7 +12,11 @@ Unreleased
 
 **Added**
 
+* Added Grasshopper components to publish and subscribe to ROS topics.
+
 **Changed**
+
+* Updated to ``COMPAS 1.6.2``
 
 **Fixed**
 
