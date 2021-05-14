@@ -16,11 +16,16 @@ Unreleased
 
 **Fixed**
 
-* Fix error message during uninstall of Grasshopper components
-
 **Deprecated**
 
 **Removed**
+
+0.18.1
+----------
+
+**Fixed**
+
+* Fix error message during uninstall of Grasshopper components
 
 0.18.0
 ----------
