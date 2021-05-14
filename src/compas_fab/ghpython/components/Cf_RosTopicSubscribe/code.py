@@ -1,7 +1,7 @@
 """
 Subscribe to a ROS topic.
 
-COMPAS FAB v0.18.0
+COMPAS FAB v0.18.1
 """
 import time
 
@@ -60,7 +60,7 @@ class ROSTopicSubscribe(component):
         st[self.msg_key] = msg
 
         if self.is_subscribed:
-            ghdoc = ghenv.Component.OnPingDocument()
+            ghdoc = ghenv.Component.OnPingDocument()     # noqa: F821 This is defined by Grasshopper
             if not self.is_updating and ghdoc.SolutionState != Grasshopper.Kernel.GH_ProcessStep.Process:
                 self.is_updating = True
                 ghdoc.ScheduleSolution(
@@ -68,5 +68,5 @@ class ROSTopicSubscribe(component):
 
     def expire_callback(self, ghdoc):
         if ghdoc.SolutionState != Grasshopper.Kernel.GH_ProcessStep.Process:
-            ghenv.Component.ExpireSolution(False)
+            ghenv.Component.ExpireSolution(False)        # noqa: F821 This is defined by Grasshopper
         self.is_updating = False

@@ -1,24 +1,16 @@
 """
 Publishes messages to a ROS topic
 
-COMPAS FAB v0.18.0
+COMPAS FAB v0.18.1
 """
-import json
 import time
 
-import compas
 from ghpythonlib.componentbase import executingcomponent as component
-from roslibpy import Message
 from roslibpy import Topic
 from scriptcontext import sticky as st
 
 from compas_fab.backends.ros import ROSmsg
 from compas_fab.ghpython.components import create_id
-
-if compas.PY3:
-    from collections.abc import Mapping
-else:
-    from collections import Mapping
 
 
 class ROSTopicPublish(component):

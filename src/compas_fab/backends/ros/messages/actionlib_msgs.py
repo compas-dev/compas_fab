@@ -66,4 +66,3 @@ class GoalStatusArray(ROSmsg):
     def __init__(self, header=None, status_list=None):
         self.header = header or Header()
         self.status_list = status_list or []
-
