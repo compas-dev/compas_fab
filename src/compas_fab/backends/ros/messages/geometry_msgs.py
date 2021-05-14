@@ -11,6 +11,7 @@ from .std_msgs import ROSmsg
 class Point(ROSmsg):
     """https://docs.ros.org/api/geometry_msgs/html/msg/Point.html
     """
+    ROS_MSG_TYPE = 'geometry_msgs/Point'
 
     def __init__(self, x, y, z):
         self.x = x
@@ -26,6 +27,7 @@ class Point(ROSmsg):
 class Quaternion(ROSmsg):
     """https://docs.ros.org/api/geometry_msgs/html/msg/Quaternion.html
     """
+    ROS_MSG_TYPE = 'geometry_msgs/Quaternion'
 
     def __init__(self, x=0., y=0., z=0., w=1.):
         self.x = x
@@ -42,6 +44,7 @@ class Quaternion(ROSmsg):
 class Pose(ROSmsg):
     """https://docs.ros.org/api/geometry_msgs/html/msg/Pose.html
     """
+    ROS_MSG_TYPE = 'geometry_msgs/Pose'
 
     def __init__(self, position=None, orientation=None):
         self.position = position if position else Point(0, 0, 0)
@@ -70,6 +73,7 @@ class Pose(ROSmsg):
 class PoseStamped(ROSmsg):
     """https://docs.ros.org/api/geometry_msgs/html/msg/PoseStamped.html
     """
+    ROS_MSG_TYPE = 'geometry_msgs/PoseStamped'
 
     def __init__(self, header=None, pose=None):
         self.header = header or Header()
@@ -85,6 +89,7 @@ class PoseStamped(ROSmsg):
 class Vector3(ROSmsg):
     """https://docs.ros.org/api/geometry_msgs/html/msg/Vector3.html
     """
+    ROS_MSG_TYPE = 'geometry_msgs/Vector3'
 
     def __init__(self, x=0., y=0., z=0.):
         self.x = x
@@ -100,6 +105,7 @@ class Vector3(ROSmsg):
 class Transform(ROSmsg):
     """https://docs.ros.org/api/geometry_msgs/html/msg/Transform.html
     """
+    ROS_MSG_TYPE = 'geometry_msgs/Transform'
 
     def __init__(self, translation=None, rotation=None):
         self.translation = translation or Vector3()
@@ -109,6 +115,7 @@ class Transform(ROSmsg):
 class Twist(ROSmsg):
     """https://docs.ros.org/api/geometry_msgs/html/msg/Twist.html
     """
+    ROS_MSG_TYPE = 'geometry_msgs/Twist'
 
     def __init__(self, linear=None, angular=None):
         self.linear = linear or Vector3()
@@ -129,6 +136,7 @@ class Wrench(ROSmsg):
     >>> ros_wrench.wrench
     Wrench(Vector(0.000, 0.000, -98.000), Vector(0.000, 0.000, 0.000))
     """
+    ROS_MSG_TYPE = 'geometry_msgs/Wrench'
 
     def __init__(self, force=None, torque=None):
         self.force = force or Vector3()
@@ -158,6 +166,7 @@ class WrenchStamped(ROSmsg):
 
     A wrench with reference coordinate frame and timestamp.
     """
+    ROS_MSG_TYPE = 'geometry_msgs/WrenchStamped'
 
     def __init__(self, header=None, wrench=None):
         self.header = header or Header()
@@ -182,6 +191,7 @@ class Inertia(ROSmsg):
     >>> ros_inertia.inertia
     Inertia([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], 1.0, Point(0.100, 3.100, 4.400))
     """
+    ROS_MSG_TYPE = 'geometry_msgs/Inertia'
 
     def __init__(self, m=0.0, com=None, ixx=0., ixy=0., ixz=0., iyy=0., iyz=0., izz=0.):
         self.m = float(m)  # Mass [kg]
