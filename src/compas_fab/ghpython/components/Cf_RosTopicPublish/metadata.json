@@ -1,0 +1,41 @@
+{
+    "name": "Publish to topic",
+    "nickname": "Publish",
+    "category": "COMPAS FAB",
+    "subcategory": "ROS",
+    "description": "Publishes messages to a ROS topic.",
+    "exposure": 4,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "ros_client",
+                "description": "The ROS client."
+            },
+            {
+                "name": "topic_name",
+                "description": "Name of the topic to publish to, eg. /joint_states",
+                "typeHintID": "str"
+            },
+            {
+                "name": "topic_type",
+                "description": "Type of the topic to publish to, eg. sensor_msgs/JointState",
+                "typeHintID": "str"
+            },
+            {
+                "name": "msg",
+                "description": "The message to publish. It can be an instance of ROSMsg, a Python dict, or a JSON string."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "topic",
+                "description": "The topic instance."
+            },
+            {
+                "name": "is_advertised",
+                "description": "Indicates if the topic is current advertised or not."
+            }
+        ]
+    }
+}
