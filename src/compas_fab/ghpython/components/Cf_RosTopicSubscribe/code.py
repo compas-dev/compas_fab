@@ -47,7 +47,7 @@ class ROSTopicSubscribe(component):
         self.is_subscribed = topic and topic.is_subscribed
 
         if last_msg:
-            last_msg = ROSmsg.parse(last_msg)
+            last_msg = ROSmsg.parse(last_msg, topic_type)
 
         return (topic, last_msg, self.is_subscribed)
 

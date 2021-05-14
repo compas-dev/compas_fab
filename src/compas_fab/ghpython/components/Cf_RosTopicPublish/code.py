@@ -35,7 +35,7 @@ class ROSTopicPublish(component):
         self.is_advertised = topic and topic.is_advertised
 
         if msg:
-            msg = ROSmsg.parse(msg)
+            msg = ROSmsg.parse(msg, topic_type)
             topic.publish(msg.msg)
 
         return (topic, self.is_advertised)
