@@ -21,6 +21,9 @@ class ROSTopicSubscribe(component):
         if not topic_type:
             raise ValueError('Please specify the type of the topic')
 
+        if not hasattr(self, 'message_count'):
+            self.message_count = 0
+
         self.interval = interval or 25  # in milliseconds
         self.is_updating = False
         self.is_subscribed = False
@@ -49,6 +52,11 @@ class ROSTopicSubscribe(component):
         if last_msg:
             last_msg = ROSmsg.parse(last_msg, topic_type)
 
+        if self.is_subscribed:
+            self.Message = 'Subscribed, {} messages'.format(self.message_count)
+        else:
+            self.Message = 'Not subscribed'
+
         return (topic, last_msg, self.is_subscribed)
 
     def _unsubscribe(self, topic):
@@ -57,6 +65,7 @@ class ROSTopicSubscribe(component):
             time.sleep(0.2)
 
     def topic_callback(self, msg):
+        self.message_count += 1
         st[self.msg_key] = msg
 
         if self.is_subscribed:
