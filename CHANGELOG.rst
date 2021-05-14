@@ -10,17 +10,9 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 Unreleased
 ----------
 
-**Added**
-
-**Changed**
-
 **Fixed**
 
 * Fix error message during uninstall of Grasshopper components
-
-**Deprecated**
-
-**Removed**
 
 0.18.0
 ----------
