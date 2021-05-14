@@ -28,7 +28,7 @@ and run the following command to check if the installation process was successfu
 
 .. code-block:: none
 
-    0.18.1
+    0.18.2
 
 You are ready to use **COMPAS FAB**!
 
@@ -89,7 +89,7 @@ To switch to a specific version
 
 .. code-block:: bash
 
-    conda install compas_fab=0.18.1
+    conda install compas_fab=0.18.2
 
 
 Update with pip
@@ -105,7 +105,7 @@ Or to switch to a specific version
 
 .. code-block:: bash
 
-    pip install compas_fab==0.18.1
+    pip install compas_fab==0.18.2
 
 
 Working in Rhino
