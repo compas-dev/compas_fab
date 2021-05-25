@@ -5,7 +5,7 @@ compas_fab.datastructures
 
 .. currentmodule:: compas_fab.datastructures
 
-Plan
+PartialOrder
 -----
 
 .. autosummary::
@@ -15,15 +15,15 @@ Plan
     Action
     DependencyIdException
     IntegerIdGenerator
-    Plan
+    PartialOrder
 
 """
 
-from .plan import (
+from .partial_order import (
     Action,
     DependencyIdException,
     IntegerIdGenerator,
-    Plan
+    PartialOrder
 )
 
 
@@ -31,5 +31,5 @@ __all__ = [
     'Action',
     'DependencyIdException',
     'IntegerIdGenerator',
-    'Plan',
+    'PartialOrder',
 ]

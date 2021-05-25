@@ -16,7 +16,7 @@ __all__ = [
     'Action',
     'DependencyIdException',
     'IntegerIdGenerator',
-    'Plan',
+    'PartialOrder',
 ]
 
 
@@ -77,14 +77,14 @@ class DependencyIdException(Exception):
         return 'Found invalid dependency ids {}'.format(invalid_ids)
 
 
-class Plan(Datastructure):
+class PartialOrder(Datastructure):
     """Data structure extending :class:`compas.datastructures.Graph` for creating
     and maintaining a partially ordered plan (directed acyclic graph).
     The content of any event of the plan is contained in an
     :class:`compas_fab.datastructures.Action`.  The dependency ids of a planned
     action can be thought of as pointers to the parents of that planned action.
     While actions can be added and removed using the methods of
-    :attr:`compas_fab.datastructures.Plan.graph`, it is strongly recommended
+    :attr:`compas_fab.datastructures.PartialOrder.graph`, it is strongly recommended
     that the methods ``plan_action``, ``append_action`` and ``remove_action``
     are used instead.
 
@@ -97,7 +97,7 @@ class Plan(Datastructure):
         methods.  Defaults to :class:`compas_fab.datastructures.IntegerIdGenerator`.
     """
     def __init__(self, id_generator=None):
-        super(Plan, self).__init__()
+        super(PartialOrder, self).__init__()
         self.graph = Graph()
         self.graph.node = OrderedDict()
         self._id_generator = id_generator or IntegerIdGenerator()

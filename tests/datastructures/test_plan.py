@@ -6,7 +6,7 @@ import pytest
 from compas.geometry import Frame
 from compas_fab.datastructures import Action
 from compas_fab.datastructures import IntegerIdGenerator
-from compas_fab.datastructures import Plan
+from compas_fab.datastructures import PartialOrder
 from compas_fab.datastructures import DependencyIdException
 
 
@@ -35,13 +35,13 @@ def test_integer_id_generator():
 
 
 def test_plan():
-    plan = Plan()
+    plan = PartialOrder()
     assert len(plan.actions) == 0
 
 
 def test_plan_generator_compatibility():
     action = Action('action', {'param': 3})
-    plan = Plan()
+    plan = PartialOrder()
     action_id = plan.plan_action(action, [])
     assert action_id == 1
     assert next(plan._id_generator) == 2
@@ -58,7 +58,7 @@ def test_plan_with_custom_id_generator():
         # alias for ironpython
         next = __next__
 
-    plan = Plan(CustomIdGenerator())
+    plan = PartialOrder(CustomIdGenerator())
     action_a = Action('action_a', {})
     plan.plan_action(action_a, [])
     action_b = Action('action_b', {})
@@ -77,16 +77,16 @@ def test_plan_with_custom_id_generator():
 
 
 def test_plan_data():
-    plan = Plan()
+    plan = PartialOrder()
     plan.append_action(Action('action_1', {'param': Frame.worldXY()}))
-    other_plan = Plan.from_data(plan.data)
+    other_plan = PartialOrder.from_data(plan.data)
     assert plan.actions.keys() == other_plan.actions.keys()
 
     # the data attributes point to the same generator,
     # so no testing `append_action` yet
     plan_json = compas.json_dumps(plan.data)
     other_plan_data = compas.json_loads(plan_json)
-    other_plan = Plan.from_data(other_plan_data)
+    other_plan = PartialOrder.from_data(other_plan_data)
     assert plan.actions.keys() == other_plan.actions.keys()
     assert isinstance(other_plan.get_action(1).parameters['param'], Frame)
 
@@ -97,7 +97,7 @@ def test_plan_data():
 
 
 def test_plan_action():
-    plan = Plan()
+    plan = PartialOrder()
     action_1_id = plan.plan_action(Action('action_1'), [])
     assert action_1_id == 1
     assert plan.get_action(action_1_id).name == 'action_1'
@@ -109,7 +109,7 @@ def test_plan_action():
 
 
 def test_append_action():
-    plan = Plan()
+    plan = PartialOrder()
     action_1_id = plan.append_action(Action('action_1'))
     assert action_1_id == 1
     assert plan.get_action(action_1_id).name == 'action_1'
@@ -123,7 +123,7 @@ def test_append_action():
 
 
 def test_remove_action():
-    plan = Plan()
+    plan = PartialOrder()
     action_1_id = plan.append_action(Action('action_1'))
     action_2_id = plan.append_action(Action('action_2'))
     action_3_id = plan.append_action(Action('action_3'))
@@ -135,7 +135,7 @@ def test_remove_action():
 
 
 def test_check_dependency_ids():
-    plan = Plan()
+    plan = PartialOrder()
     with pytest.raises(DependencyIdException):
         plan.check_dependency_ids([1])
     id_1 = plan.append_action(Action('action_1'))
@@ -150,7 +150,7 @@ def test_check_dependency_ids():
 
 
 def test_check_all_dependency_ids():
-    plan = Plan()
+    plan = PartialOrder()
     plan.check_all_dependency_ids()
     plan.plan_action(Action('action_1'), [])
     plan.plan_action(Action('action_2'), [1])
