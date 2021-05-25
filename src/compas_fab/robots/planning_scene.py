@@ -170,7 +170,8 @@ class AttachedCollisionMesh(object):
 
     def __init__(self, collision_mesh, link_name, touch_links=None, weight=1.):
         self.collision_mesh = collision_mesh
-        self.collision_mesh.root_name = link_name
+        if self.collision_mesh:
+            self.collision_mesh.root_name = link_name
         self.link_name = link_name
         self.touch_links = touch_links if touch_links else [link_name]
         self.weight = weight

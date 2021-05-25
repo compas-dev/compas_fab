@@ -1,0 +1,56 @@
+{
+    "name": "Attached Collision Mesh",
+    "nickname": "ACM",
+    "category": "COMPAS FAB",
+    "subcategory": "Scene",
+    "description": "Add or remove an attached collision mesh to the robot.",
+    "exposure": 4,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "scene",
+                "description": "The planning scene."
+            },
+            {
+                "name": "mesh",
+                "description": "A collision mesh.",
+                "typeHintID": "mesh"
+            },
+            {
+                "name": "identifier",
+                "description": "The identifier of the collision mesh.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "link_name",
+                "description": "The robot's link name to attach the mesh to.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "touch_links",
+                "description": "Names of links that the robot is allowed to touch.",
+                "typeHintID": "str",
+                "scriptParamAccess": "list"
+            },
+            {
+                "name": "add",
+                "description": "If True, adds the collision mesh to the planning scene.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "remove",
+                "description": "If True, removes the collision mesh from the planning scene.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "attached_collision_mesh",
+                "description": "A collision mesh that is attached to a robot's link.",
+                "optional": false
+            }
+        ]
+    }
+}

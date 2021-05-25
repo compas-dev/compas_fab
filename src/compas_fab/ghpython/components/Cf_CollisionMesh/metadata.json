@@ -1,0 +1,45 @@
+{
+    "name": "Collision Mesh",
+    "nickname": "CM",
+    "category": "COMPAS FAB",
+    "subcategory": "Scene",
+    "description": "Add or remove a collision mesh from the planning scene.",
+    "exposure": 4,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "scene",
+                "description": "The planning scene."
+            },
+            {
+                "name": "mesh",
+                "description": "A collision mesh.",
+                "typeHintID": "mesh"
+            },
+            {
+                "name": "identifier",
+                "description": "The identifier of the collision mesh.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "add",
+                "description": "If True, adds the collision mesh to the planning scene.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "remove",
+                "description": "If True, removes the collision mesh from the planning scene.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "ok",
+                "description": "True if the operation was successfully performed.",
+                "optional": false
+            }
+        ]
+    }
+}

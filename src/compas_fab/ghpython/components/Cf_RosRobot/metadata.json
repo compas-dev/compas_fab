@@ -1,0 +1,29 @@
+{
+    "name": "ROS Robot",
+    "nickname": "Robot",
+    "category": "COMPAS FAB",
+    "subcategory": "ROS",
+    "description": "Load robot directly from ROS.",
+    "exposure": 2,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "ros_client",
+                "description": "The ROS client."
+            },
+            {
+                "name": "load",
+                "description": "If True, loads the robot from ROS. Defaults to False.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "robot",
+                "description": "The robot."
+            }
+        ]
+    }
+}

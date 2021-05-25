@@ -123,7 +123,6 @@ Ready to release a new version of **COMPAS FAB**? Here's how to do it:
   * ``major``: backwards-incompatible changes.
 
 * Update the ``CHANGELOG.rst`` with all novelty!
-* Compile Grasshopper components.
 * Ready? Release everything in one command:
 
 ::

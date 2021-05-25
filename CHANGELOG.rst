@@ -12,6 +12,40 @@ Unreleased
 
 **Added**
 
+**Changed**
+
+**Fixed**
+
+**Deprecated**
+
+**Removed**
+
+0.18.2
+----------
+
+**Added**
+
+**Changed**
+
+**Fixed**
+
+**Deprecated**
+
+**Removed**
+
+0.18.1
+----------
+
+**Fixed**
+
+* Fix error message during uninstall of Grasshopper components
+
+0.18.0
+----------
+
+**Added**
+
+* Grasshopper components now also for Mac
 * Added support for MoveIt on ROS Noetic
 * Added support for Python 3.9
 * In ``compas.datastructures``, added ``Plan``, ``Action`` and ``IntegerIdGenerator``
@@ -19,6 +53,7 @@ Unreleased
 **Changed**
 
 * The `Configuration` class has moved to `compas.robots`, but is still aliased within `compas_fab.robots`
+* Lazily load `V-REP remoteApi` library
 
 **Fixed**
 
@@ -26,12 +61,11 @@ Unreleased
 * Fixed data type of secs and nsecs in ``Time`` ROS message
 * Fixed ``CollisionObject.to_collision_meshes``
 * Fixed serialization of joint names for ``compas_fab.robots.JointTrajectoryPoint``
+* Fixed deserialization of ``AttachedCollisionMesh``
 
 **Deprecated**
 
 * `compas_fab.robots.Configuration` is being deprecated in favor of `compas.robots.Configuration`
-
-**Removed**
 
 0.17.0
 ----------
