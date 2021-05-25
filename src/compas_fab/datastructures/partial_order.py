@@ -133,7 +133,7 @@ class PartialOrder(Datastructure):
         self.graph.delete_node(action_id)
         return action
 
-    def plan_action(self, action, dependency_ids):
+    def add_action(self, action, dependency_ids):
         """Adds the action to the plan with the given dependencies,
         and generates an id for the newly planned action.
 
@@ -173,7 +173,7 @@ class PartialOrder(Datastructure):
         if self.graph.node:
             last_action_id = self._get_last_action_id()
             dependency_ids = {last_action_id}
-        return self.plan_action(action, dependency_ids)
+        return self.add_action(action, dependency_ids)
 
     def _get_last_action_id(self):
         last_action_id, last_action_attrs = self.graph.node.popitem()

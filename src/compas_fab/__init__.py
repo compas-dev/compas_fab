@@ -14,6 +14,7 @@ environments.
 
     compas_fab.backends
     compas_fab.robots
+    compas_fab.datastructures
     compas_fab.utilities
     compas_fab.sensors
     compas_fab.blender
