@@ -603,7 +603,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     # =======================================
     def convert_mesh_to_body(self, mesh, frame, _name=None, concavity=False, mass=const.STATIC_MASS):
-        """Convert compas mesh and its frame to a pybullet body
+        """Convert compas mesh and its frame to a pybullet body.
 
         Parameters
         ----------
@@ -621,6 +621,14 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         Returns
         -------
         :obj:`int`
+
+        Notes
+        -----
+        If this method is called several times with the same ``mesh`` instance, but the ``mesh`` has been modified
+        in between calls, PyBullet's default caching behavior will prevent it from recognizing these changes.  It
+        is best practice to create a new mesh instance or to make use of the `frame` argument, if applicable.  If
+        this is not possible, PyBullet's caching behavior can be changed with
+        ``pybullet.setPhysicsEngineParameter(enableFileCaching=0)``.
         """
         tmp_obj_path = os.path.join(self._cache_dir.name, '{}.obj'.format(mesh.guid))
         mesh.to_obj(tmp_obj_path)
