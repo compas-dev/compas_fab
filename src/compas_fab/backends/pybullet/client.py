@@ -622,7 +622,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         -------
         :obj:`int`
         """
-        tmp_obj_path = os.path.join(self._cache_dir.name, 'temp.obj')
+        tmp_obj_path = os.path.join(self._cache_dir.name, '{}.obj'.format(mesh.guid))
         mesh.to_obj(tmp_obj_path)
         tmp_obj_path = self._handle_concavity(tmp_obj_path, self._cache_dir.name, concavity, mass)
         pyb_body_id = self.body_from_obj(tmp_obj_path, concavity=concavity, mass=mass)

@@ -16,6 +16,8 @@ Unreleased
 
 **Fixed**
 
+* Fixed bug in ``compas.backends.PyBulletClient.convert_mesh_to_body`` circumventing PyBullet's propensity to cache
+
 **Deprecated**
 
 **Removed**
@@ -51,8 +53,8 @@ Unreleased
 
 **Changed**
 
-* The `Configuration` class has moved to `compas.robots`, but is still aliased within `compas_fab.robots`
-* Lazily load `V-REP remoteApi` library
+* The ``Configuration`` class has moved to ``compas.robots``, but is still aliased within ``compas_fab.robots``
+* Lazily load ``V-REP remoteApi`` library
 
 **Fixed**
 
@@ -64,7 +66,7 @@ Unreleased
 
 **Deprecated**
 
-* `compas_fab.robots.Configuration` is being deprecated in favor of `compas.robots.Configuration`
+* ``compas_fab.robots.Configuration`` is being deprecated in favor of ``compas.robots.Configuration``
 
 0.17.0
 ----------
