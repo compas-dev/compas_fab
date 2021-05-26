@@ -95,6 +95,10 @@ class PartialOrder(Datastructure):
         Object which generates keys (via ``next()``) for
         :class:`compas_fab.datastructures.Action`s added using this object's
         methods.  Defaults to :class:`compas_fab.datastructures.IntegerIdGenerator`.
+
+    Notes
+    -----
+    See <https://en.wikipedia.org/wiki/Partial-order_planning>.
     """
     def __init__(self, id_generator=None):
         super(PartialOrder, self).__init__()
