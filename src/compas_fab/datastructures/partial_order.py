@@ -266,6 +266,20 @@ class PartialOrder(Datastructure):
         self.check_for_cycles()
         return [[self.get_action(action_id) for action_id in sorting] for sorting in all_topological_sorts(self.networkx)]
 
+    def accept(self, visitor, source_first=True):
+        sources = [key for key in self.graph.nodes() if len(self.graph.neighbors_in(key)) == 0]
+        for source in sources:
+            self._accept(source, visitor, source_first)
+
+    def _accept(self, key, visitor, source_first):
+        action = self.graph.node_attribute(key, 'action')
+        if source_first:
+            action.accept(visitor)
+        for child in self.graph.neighbors_out(key):
+            self._accept(child, visitor, source_first)
+        if not source_first:
+            action.accept(visitor)
+
     @property
     def data(self):
         return {
@@ -330,3 +344,6 @@ class Action(Data):
         if not cls:
             cls = type(self)
         return cls.from_data(deepcopy(self.data))
+
+    def accept(self, visitor):
+        raise NotImplementedError
