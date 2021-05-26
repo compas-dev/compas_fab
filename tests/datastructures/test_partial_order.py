@@ -88,7 +88,8 @@ def test_partial_order_data():
     other_partial_order_data = compas.json_loads(partial_order_json)
     other_partial_order = PartialOrder.from_data(other_partial_order_data)
     assert partial_order.actions.keys() == other_partial_order.actions.keys()
-    assert isinstance(other_partial_order.get_action(1).parameters['param'], Frame)
+    other_frame = other_partial_order.get_action(1).parameters['param']
+    assert other_frame == Frame.worldXY()
 
     # now there are two generators
     partial_order.append_action(Action('action_2'))
