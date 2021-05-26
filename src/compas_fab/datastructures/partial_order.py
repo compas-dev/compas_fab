@@ -272,7 +272,7 @@ class PartialOrder(Datastructure):
             self._accept(source, visitor, source_first)
 
     def _accept(self, key, visitor, source_first):
-        action = self.graph.node_attribute(key, 'action')
+        action = self.get_action(key)
         if source_first:
             action.accept(visitor)
         for child in self.graph.neighbors_out(key):
