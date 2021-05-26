@@ -85,7 +85,7 @@ class PartialOrder(Datastructure):
     action can be thought of as pointers to the parents of that planned action.
     While actions can be added and removed using the methods of
     :attr:`compas_fab.datastructures.PartialOrder.graph`, it is strongly recommended
-    that the methods ``plan_action``, ``append_action`` and ``remove_action``
+    that the methods ``add_action``, ``append_action`` and ``remove_action``
     are used instead.
 
     Attributes
