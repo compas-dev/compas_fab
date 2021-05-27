@@ -1,7 +1,7 @@
 """
 Visualizes the robot.
 
-COMPAS FAB v0.18.0
+COMPAS FAB v0.18.2
 """
 from compas.geometry import Frame
 from compas.geometry import Transformation

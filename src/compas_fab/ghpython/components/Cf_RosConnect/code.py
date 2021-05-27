@@ -1,7 +1,7 @@
 """
 Connect or disconnect to ROS.
 
-COMPAS FAB v0.18.0
+COMPAS FAB v0.18.2
 """
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
