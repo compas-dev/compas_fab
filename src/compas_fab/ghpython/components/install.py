@@ -28,7 +28,7 @@ def install():
             results.append(('compas_fab', 'Uninstalled old GHPY component: {}'.format(f), True))
 
         dstdir = get_grasshopper_userobjects_path(version)
-        srcdir = os.path.dirname(__file__)
+        srcdir = os.path.join(os.path.dirname(__file__), 'ghuser')
         userobjects = glob.glob(os.path.join(srcdir, '*.ghuser'))
 
         symlinks_to_remove = []

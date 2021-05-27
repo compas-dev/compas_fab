@@ -62,7 +62,7 @@ def help(ctx):
     'docs': 'True to generate documentation, otherwise False',
     'bytecode': 'True to clean up compiled python files, otherwise False.',
     'builds': 'True to clean up build/packaging artifacts, otherwise False.'})
-def clean(ctx, docs=True, bytecode=True, builds=True):
+def clean(ctx, docs=True, bytecode=True, builds=True, ghuser=True):
     """Cleans the local copy from compiled artifacts."""
     if builds:
         ctx.run('python setup.py clean')
@@ -88,6 +88,9 @@ def clean(ctx, docs=True, bytecode=True, builds=True):
     if builds:
         folders.append('build/')
         folders.append('src/compas_fab.egg-info/')
+
+    if ghuser:
+        folders.append('src/compas_fab/ghpython/components/ghuser')
 
     for folder in folders:
         rmtree(os.path.join(BASE_FOLDER, folder), ignore_errors=True)
@@ -218,7 +221,7 @@ def build_ghuser_components(ctx, gh_io_folder=None, ironpython=None):
     with chdir(BASE_FOLDER):
         with tempfile.TemporaryDirectory('actions.ghcomponentizer') as action_dir:
             source_dir = os.path.abspath('src/compas_fab/ghpython/components')
-            target_dir = source_dir
+            target_dir = os.path.join(source_dir, 'ghuser')
             ctx.run('git clone https://github.com/compas-dev/compas-actions.ghpython_components.git {}'.format(action_dir))
 
             if not gh_io_folder:
