@@ -14,6 +14,8 @@ Unreleased
 
 **Changed**
 
+* Made consist use of ``repr`` in nested objects
+
 **Fixed**
 
 * Fixed bug in ``compas.backends.PyBulletClient.convert_mesh_to_body`` circumventing PyBullet's propensity to cache
