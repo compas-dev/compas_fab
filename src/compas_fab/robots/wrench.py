@@ -186,7 +186,7 @@ class Wrench():
     # ==========================================================================
 
     def __repr__(self):
-        return "Wrench({0}, {1})".format(self.force, self.torque)
+        return "Wrench({!r}, {!r})".format(self.force, self.torque)
 
     # ==========================================================================
     # helpers
