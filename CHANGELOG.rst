@@ -14,6 +14,8 @@ Unreleased
 
 **Changed**
 
+* Updated ``build-ghuser-components`` task
+
 **Fixed**
 
 **Deprecated**
