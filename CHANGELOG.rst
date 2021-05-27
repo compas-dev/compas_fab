@@ -14,7 +14,7 @@ Unreleased
 
 **Changed**
 
-* Made consist use of ``repr`` in nested objects
+* Made consistent use of ``repr`` in nested objects
 
 **Fixed**
 
