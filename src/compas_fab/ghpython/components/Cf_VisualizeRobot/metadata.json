@@ -77,7 +77,7 @@
             },
             {
                 "name": "base_frame",
-                "description": "Tthe robot's base frame as a Rhino plane (if any)."
+                "description": "The robot's base frame as a Rhino plane (if any)."
             },
             {
                 "name": "ee_frame",
