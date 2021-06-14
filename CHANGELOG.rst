@@ -12,6 +12,8 @@ Unreleased
 
 **Added**
 
+* Added documentation for Grasshopper components.
+
 **Changed**
 
 **Fixed**
