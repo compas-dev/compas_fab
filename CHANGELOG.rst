@@ -16,6 +16,9 @@ Unreleased
 
 **Changed**
 
+* Updated ``build-ghuser-components`` task
+* Updated to COMPAS 1.7
+
 **Fixed**
 
 **Deprecated**

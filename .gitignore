@@ -118,4 +118,4 @@ temp/**
 !temp/.gitkeep
 
 # Grasshopper generated objects
-src/compas_fab/ghpython/components/*.ghuser
+src/compas_fab/ghpython/components/ghuser/*.ghuser
