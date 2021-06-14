@@ -155,7 +155,7 @@ class BoundingVolume(object):
 
     def __repr__(self):
         """Printable representation of :class:`BoundingVolume`."""
-        return "BoundingVolume({0}, {1})".format(self.type, self.volume)
+        return "BoundingVolume({!r}, {!r})".format(self.type, self.volume)
 
     def copy(self):
         """Make a copy of this :class:`BoundingVolume`.
@@ -307,7 +307,7 @@ class JointConstraint(Constraint):
 
     def __repr__(self):
         """Printable representation of :class:`JointConstraint`."""
-        return "JointConstraint('{0}', {1}, {2}, {3}, {4})".format(self.joint_name, self.value, self.tolerance_above, self.tolerance_below, self.weight)
+        return "JointConstraint({!r}, {!r}, {!r}, {!r}, {!r})".format(self.joint_name, self.value, self.tolerance_above, self.tolerance_below, self.weight)
 
     def copy(self):
         """Create a copy of this :class:`JointConstraint`.
@@ -392,7 +392,7 @@ class OrientationConstraint(Constraint):
 
     def __repr__(self):
         """Printable representation of :class:`OrientationConstraint`."""
-        return "OrientationConstraint('{0}', {1}, {2}, {3})".format(self.link_name, self.quaternion, self.tolerances, self.weight)
+        return "OrientationConstraint({!r}, {!r}, {!r}, {!r})".format(self.link_name, self.quaternion, self.tolerances, self.weight)
 
     def copy(self):
         """Create a copy of this :class:`OrientationConstraint`.
@@ -550,7 +550,7 @@ class PositionConstraint(Constraint):
 
     def __repr__(self):
         """Printable representation of :class:`PositionConstraint`."""
-        return "PositionConstraint('{0}', {1}, {2})".format(self.link_name, self.bounding_volume, self.weight)
+        return "PositionConstraint({!r}, {!r}, {!r})".format(self.link_name, self.bounding_volume, self.weight)
 
     def copy(self):
         """Create a copy of this :class:`PositionConstraint`.

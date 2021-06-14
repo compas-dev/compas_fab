@@ -28,7 +28,7 @@ and run the following command to check if the installation process was successfu
 
 .. code-block:: none
 
-    0.18.2
+    0.18.3
 
 You are ready to use **COMPAS FAB**!
 
@@ -89,7 +89,7 @@ To switch to a specific version
 
 .. code-block:: bash
 
-    conda install compas_fab=0.18.2
+    conda install compas_fab=0.18.3
 
 
 Update with pip
@@ -105,14 +105,14 @@ Or to switch to a specific version
 
 .. code-block:: bash
 
-    pip install compas_fab==0.18.2
+    pip install compas_fab==0.18.3
 
 
 Working in Rhino
 ================
 
-To make **COMPAS FAB** available inside Rhino, open the *command prompt*
-and type the following:
+To make **COMPAS FAB** available inside Rhino, open the *command prompt*,
+activate the appropriate environment, and type the following:
 
 ::
 
@@ -125,6 +125,10 @@ and type the following:
 
 Open Rhino, start the Python script editor, type ``import compas_fab`` and
 run it to verify that your installation is working.
+
+Making **COMPAS FAB** available in Rhino also installs a suite of Grasshopper
+components with **COMPAS FAB** functionality.  See
+:ref:`ROS in Grasshopper <examples_ros_in_grasshopper>` for an example.
 
 Working in Blender
 ==================

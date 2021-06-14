@@ -23,7 +23,7 @@ class Duration(object):
         self.nsecs = int(nsecs)
 
     def __str__(self):
-        return 'Duration({}, {})'.format(self.secs, self.nsecs)
+        return 'Duration({!r}, {!r})'.format(self.secs, self.nsecs)
 
     def __repr__(self):
         return self.__str__()

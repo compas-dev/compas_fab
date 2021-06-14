@@ -1,3 +1,5 @@
+.. _examples_ros_in_grasshopper:
+
 *******************************************************************************
 ROS in Grasshopper
 *******************************************************************************
@@ -21,4 +23,15 @@ features could be integrated:
 
     </div>
     </div>
+
+Grasshopper Components
+======================
+
+Many of the features of the Grasshopper playground have been packaged into Grasshopper
+components for simplicity of use.  Below is a screenshot of a canvas which loads a
+robot from ROS and visualizes it using the Grasshopper components of **COMPAS FAB**.
+
+.. figure:: files/06_ros_in_grasshopper.jpg
+    :figclass: figure
+    :class: figure-img img-fluid
 

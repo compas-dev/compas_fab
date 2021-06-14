@@ -9,4 +9,4 @@ frame_WCF = robot.forward_kinematics(configuration)
 print("Frame in the world coordinate system")
 print(frame_WCF)
 
-assert str(frame_WCF.point) == 'Point(0.300, 0.100, 0.500)'
+assert repr(frame_WCF.point) == 'Point(0.300, 0.100, 0.500)'

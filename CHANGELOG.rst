@@ -12,6 +12,7 @@ Unreleased
 
 **Added**
 
+* Added documentation for Grasshopper components.
 * Added Grasshopper components to publish and subscribe to ROS topics.
 
 **Changed**
@@ -19,6 +20,23 @@ Unreleased
 * Updated to ``COMPAS 1.6.2``
 
 **Fixed**
+
+**Deprecated**
+
+**Removed**
+
+0.18.3
+----------
+
+**Added**
+
+**Changed**
+
+* Made consistent use of ``repr`` in nested objects
+
+**Fixed**
+
+* Fixed bug in ``compas.backends.PyBulletClient.convert_mesh_to_body`` circumventing PyBullet's propensity to cache
 
 **Deprecated**
 
@@ -55,8 +73,8 @@ Unreleased
 
 **Changed**
 
-* The `Configuration` class has moved to `compas.robots`, but is still aliased within `compas_fab.robots`
-* Lazily load `V-REP remoteApi` library
+* The ``Configuration`` class has moved to ``compas.robots``, but is still aliased within ``compas_fab.robots``
+* Lazily load ``V-REP remoteApi`` library
 
 **Fixed**
 
@@ -68,7 +86,7 @@ Unreleased
 
 **Deprecated**
 
-* `compas_fab.robots.Configuration` is being deprecated in favor of `compas.robots.Configuration`
+* ``compas_fab.robots.Configuration`` is being deprecated in favor of ``compas.robots.Configuration``
 
 0.17.0
 ----------
