@@ -1,7 +1,7 @@
 """
 Add an attached collision mesh to the robot.
 
-COMPAS FAB v0.18.3
+COMPAS FAB v0.19.0
 """
 from ghpythonlib.componentbase import executingcomponent as component
 
