@@ -1,7 +1,7 @@
 """
 Calculate the robot's inverse kinematic for a given plane.
 
-COMPAS FAB v0.19.0
+COMPAS FAB v0.19.1
 """
 from ghpythonlib.componentbase import executingcomponent as component
 
