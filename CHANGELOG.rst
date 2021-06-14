@@ -16,6 +16,8 @@ Unreleased
 
 **Fixed**
 
+* Fixed bundling of ghuser components
+
 **Deprecated**
 
 **Removed**
