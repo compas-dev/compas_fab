@@ -1,7 +1,7 @@
 """
 Calculate a cartesian motion path (linear in tool space).
 
-COMPAS FAB v0.18.2
+COMPAS FAB v0.18.3
 """
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
