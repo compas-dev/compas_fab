@@ -18,6 +18,7 @@ __all__ = [
 def redirect_stdout(to=os.devnull, enabled=True):
     """Context manager to capture and redirect console output.
     https://stackoverflow.com/a/17954769
+
     Parameters
     ----------
     to : Location to redirect output to.  Defaults to ``os.devnull``.
@@ -37,7 +38,10 @@ def redirect_stdout(to=os.devnull, enabled=True):
 
     # Pytest interferes with file descriptor capture.
     called_from_test = 'pytest' in sys.modules
-    enabled = False if called_from_test else enabled
+    # jupyter notebook (ipython) raises UnsupportedOperation on fileno(): https://github.com/ipython/ipython/pull/3072/
+    called_from_ipykernel = 'ipykernel' in sys.modules
+
+    enabled = False if called_from_test or called_from_ipykernel else enabled
 
     if not enabled:
         yield

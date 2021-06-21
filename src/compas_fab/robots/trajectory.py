@@ -334,7 +334,7 @@ class JointTrajectory(Trajectory):
         if data.get('start_configuration'):
             self.start_configuration = Configuration.from_data(data.get('start_configuration'))
         self.fraction = data.get('fraction')
-        self.attached_collision_meshes = [AttachedCollisionMesh.from_data(acm_data) for acm_data in data.get('attached_collision_meshes')]
+        self.attached_collision_meshes = [AttachedCollisionMesh.from_data(acm_data) for acm_data in data.get('attached_collision_meshes', [])]
 
     @property
     def time_from_start(self):
