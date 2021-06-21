@@ -16,6 +16,10 @@ Unreleased
 
 **Fixed**
 
+* Fixed `UnsupportedOperation` error when using `PybulletClient` in Jupyter notebook (raised by `redirect_stdout`)
+* Fixed `JointTrajectoryPoint.from_data` to be backward-compatible with JSON data generated before `compas_fab 0.18`
+* Fixed `JointTrajectory.from_data` to be backward-compatible with JSON data generated before `compas_fab 0.17`
+
 **Deprecated**
 
 **Removed**
