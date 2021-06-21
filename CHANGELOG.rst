@@ -7,12 +7,47 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-Unreleased
+0.19.1
 ----------
 
 **Added**
 
 **Changed**
+
+**Fixed**
+
+* Fixed bundling of ghuser components
+
+**Deprecated**
+
+**Removed**
+
+0.19.0
+----------
+
+**Added**
+
+* Added documentation for Grasshopper components.
+
+**Changed**
+
+* Updated ``build-ghuser-components`` task
+* Updated to COMPAS 1.7
+
+**Fixed**
+
+**Deprecated**
+
+**Removed**
+
+0.18.3
+----------
+
+**Added**
+
+**Changed**
+
+* Made consistent use of ``repr`` in nested objects
 
 **Fixed**
 

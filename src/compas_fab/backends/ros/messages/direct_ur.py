@@ -10,11 +10,7 @@ class URmsg(object):
             setattr(self, k, v)
 
     def __str__(self):
-        result = ""
-        for key, value in self.__dict__.items():
-            if value:
-                result += "%s, " % value
-        return result[:-2]
+        return ", ".join(["{!r}" for value in self.__dict__.values() if value])
 
     def __repr__(self):
         return self.__str__

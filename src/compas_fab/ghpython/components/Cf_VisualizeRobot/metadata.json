@@ -61,27 +61,27 @@
         "outputParameters": [
             {
                 "name": "visual",
-                "description": "Whether or not to show the attached collision meshes (if any)."
+                "description": "The robot's visual Rhino meshes (if any)."
             },
             {
                 "name": "collision",
-                "description": "Whether or not to show the attached collision meshes (if any)."
+                "description": "The robot's collision Rhino meshes (if any)."
             },
             {
                 "name": "attached_meshes",
-                "description": "Whether or not to show the attached collision meshes (if any)."
+                "description": "The attached collision Rhino meshes (if any)."
             },
             {
                 "name": "frames",
-                "description": "Whether or not to show the attached collision meshes (if any)."
+                "description": "The robot's joint frames as Rhino planes (if any)."
             },
             {
                 "name": "base_frame",
-                "description": "Whether or not to show the attached collision meshes (if any)."
+                "description": "The robot's base frame as a Rhino plane (if any)."
             },
             {
                 "name": "ee_frame",
-                "description": "Whether or not to show the attached collision meshes (if any)."
+                "description": "The robot's end-effector frame as a Rhino plane (if any)."
             }
         ]
     }

@@ -35,7 +35,7 @@ jobs:
       - uses: compas-dev/compas-actions.ghpython_components@v1
         with:
           source: src/compas_fab/ghpython/components
-          target: src/compas_fab/ghpython/components
+          target: src/compas_fab/ghpython/components/ghuser
       - name: 📃 Generate docs
         if: success()
         run: |
