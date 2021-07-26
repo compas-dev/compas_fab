@@ -26,7 +26,7 @@ def test_nested_repr():
 
 def test_float32_multiarray():
     m = Float32MultiArray(data=[1.3, 0.5, 3.4])
-    assert(repr(m) == "Float32MultiArray(layout=MultiArrayLayout(dim=[], data_offset=0), data=[1.3, 0.5, 3.4])")
+    assert(repr(m) == "Float32MultiArray(layout=MultiArrayLayout(dim=[], data_offset=0), data=[1.3, 0.5, 3.0])")
 
 
 def test_int8_multiarray():
