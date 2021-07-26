@@ -93,7 +93,7 @@ class MultiArrayLayout(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        dim = msg['dim']
+        dim = [MultiArrayDimension.from_msg(d) for d in msg['dim']]
         return cls(dim, msg['data_offset'])
 
 
