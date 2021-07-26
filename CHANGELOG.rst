@@ -11,6 +11,7 @@ Unreleased
 ----------
 
 **Added**
+* Added ``PoseArray``, ``MultiArrayDimension``, ``MultiArrayLayout``, ``Int8MultiArray``, ``Float32MultiArray``, ``Int32`` to ``compas_fab.backends.ros.messages``
 
 **Changed**
 
