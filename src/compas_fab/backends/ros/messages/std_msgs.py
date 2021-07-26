@@ -67,3 +67,71 @@ class String(ROSmsg):
 
     def __init__(self, data=''):
         self.data = data
+
+
+class MultiArrayDimension(ROSmsg):
+    """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayDimension.html
+    """
+
+    def __init__(self, label=None, size=0, stride=0):
+        self.label = label or ""  # label of given dimension
+        self.size = size  # size of given dimension (in type units)
+        self.stride = stride  # stride of given dimension
+
+    @classmethod
+    def from_msg(cls, msg):
+        return cls(msg['label'], msg['size'], msg['stride'])
+
+
+class MultiArrayLayout(ROSmsg):
+    """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayLayout.html
+    """
+
+    def __init__(self, dim=None, data_offset=None):
+        self.dim = dim or []
+        self.data_offset = data_offset or 0
+
+    @classmethod
+    def from_msg(cls, msg):
+        dim = msg['dim']
+        return cls(dim, msg['data_offset'])
+
+
+class Int8MultiArray(ROSmsg):
+    """http://docs.ros.org/en/api/std_msgs/html/msg/Int8MultiArray.html
+    """
+
+    def __init__(self, layout=None, data=None):
+        self.layout = layout or MultiArrayLayout()
+        self.data = data or []
+
+    @classmethod
+    def from_msg(cls, msg):
+        layout = MultiArrayLayout.from_msg(msg['layout'])
+        return cls(layout, msg['data'])
+
+
+class Float32MultiArray(ROSmsg):
+    """http://docs.ros.org/en/api/std_msgs/html/msg/Float32MultiArray.html
+    """
+
+    def __init__(self, layout=None, data=None):
+        self.layout = layout or MultiArrayLayout()
+        self.data = data or []
+
+    @classmethod
+    def from_msg(cls, msg):
+        layout = MultiArrayLayout.from_msg(msg['layout'])
+        return cls(layout, msg['data'])
+
+
+class Int32(ROSmsg):
+    """http://docs.ros.org/en/melodic/api/std_msgs/html/msg/Int32.html
+    """
+
+    def __init__(self, data=None):
+        self.data = data or 0
+
+    @classmethod
+    def from_msg(cls, msg):
+        return cls(msg['data'])
