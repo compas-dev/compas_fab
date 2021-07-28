@@ -7,8 +7,8 @@ from compas.geometry import Frame
 from compas.geometry import Scale
 
 __all__ = [
-    'CollisionMesh',
     'AttachedCollisionMesh',
+    'CollisionMesh',
     'PlanningScene',
 ]
 

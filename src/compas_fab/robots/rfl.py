@@ -1,7 +1,7 @@
 """This module is mostly for explanatory purposes, to have a usable setup
 to test and show features onto.
 
-It needs to be explicitely imported, since it is not a fundamental part
+It needs to be explicitly imported, since it is not a fundamental part
 of the compas_fab.robots package at all.
 """
 from __future__ import absolute_import

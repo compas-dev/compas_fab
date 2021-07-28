@@ -1,0 +1,71 @@
+{
+  "metadata": {
+    "compas_fab_version": "0.19.1", 
+    "generated_on": "20210728"
+  }, 
+  "modules": {
+    "compas_fab": [
+      "get"
+    ], 
+    "compas_fab.backends": [
+      "BackendError", 
+      "CancellableFutureResult", 
+      "FutureResult", 
+      "MoveItPlanner", 
+      "RosClient", 
+      "RosError", 
+      "RosFileServerLoader", 
+      "RosValidationError", 
+      "VrepClient", 
+      "VrepError", 
+      "VrepPlanner"
+    ], 
+    "compas_fab.robots": [
+      "AttachedCollisionMesh", 
+      "BoundingVolume", 
+      "CollisionMesh", 
+      "Configuration", 
+      "Constraint", 
+      "Duration", 
+      "Inertia", 
+      "JointConstraint", 
+      "JointTrajectory", 
+      "JointTrajectoryPoint", 
+      "OrientationConstraint", 
+      "PathPlan", 
+      "PlanningScene", 
+      "PositionConstraint", 
+      "Robot", 
+      "RobotSemantics", 
+      "Tool", 
+      "Trajectory", 
+      "Wrench", 
+      "to_degrees", 
+      "to_radians"
+    ], 
+    "compas_fab.sensors": [
+      "PosCon3D", 
+      "PosConCM", 
+      "SerialSensor"
+    ], 
+    "compas_fab.utilities": [
+      "LazyLoader", 
+      "allclose", 
+      "arange", 
+      "argmax", 
+      "argmin", 
+      "argsort", 
+      "clamp", 
+      "diffs", 
+      "list_files_in_directory", 
+      "map_range", 
+      "range_geometric_row", 
+      "read_csv_to_dictionary", 
+      "read_data_from_json", 
+      "read_data_from_pickle", 
+      "sign", 
+      "write_data_to_json", 
+      "write_data_to_pickle"
+    ]
+  }
+}

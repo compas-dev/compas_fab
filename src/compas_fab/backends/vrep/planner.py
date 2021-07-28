@@ -12,6 +12,11 @@ from compas_fab.backends.vrep.backend_features.vrep_plan_motion import VrepPlanM
 from compas_fab.backends.vrep.backend_features.vrep_remove_collision_mesh import VrepRemoveCollisionMesh
 
 
+__all__ = [
+    'VrepPlanner',
+]
+
+
 class VrepPlanner(PlannerInterface):
     """Implement the planner backend interface for V-REP
     """

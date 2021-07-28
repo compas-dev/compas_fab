@@ -1,5 +1,9 @@
 from compas.geometry import Point
 
+__all__ = [
+    'Inertia',
+]
+
 
 class Inertia():
     """The moments of inertia represent the spatial distribution of mass in a rigid body.
