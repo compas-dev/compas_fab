@@ -57,7 +57,7 @@ def compas_fab_stubs():
 
     _, _, filenames = next(os.walk(TEMP))
 
-    # shutil.rmtree(TEMP, ignore_errors=True)
+    shutil.rmtree(TEMP, ignore_errors=True)
 
     stubs = {}
     for name in filenames:
