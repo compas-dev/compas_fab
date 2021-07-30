@@ -74,7 +74,7 @@ html_theme_options = {
     "package_version": release,
     "package_repo": 'https://github.com/compas-dev/compas_fab',
     "package_docs": 'https://gramaziokohler.github.io/compas_fab/',
-    "package_old_versions_txt": 'https://gramaziokohler.github.io/compas_fab/doc_versions.txt'
+    "package_old_versions_txt": 'https://raw.githubusercontent.com/compas-dev/compas_fab/main/docs/doc_versions.txt'
 }
 
 html_split_index = False
