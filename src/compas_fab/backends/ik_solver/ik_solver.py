@@ -1,38 +1,79 @@
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_fab.backends.ik_solver import fit_within_bounds
+from compas_fab.backends.interfaces import InverseKinematics
+
+"""
+class InverseKinematics(object):
+    def __call__(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
+        return self.inverse_kinematics(robot, frame_WCF, start_configuration, group, options)
+
+    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
+"""
 
 
-class InverseKinematicsSolver(object):
+class AnalyticalInverseKinematics(object):
+
+    def __init__(self, robot, start_configuration=None, group=None):
+        self.robot = robot
+        self.group = group or robot.main_group_name
+        self.start_configuration = start_configuration
+
+    def __call__(self, frame_WCF, options=None):
+        return self.inverse_kinematics(frame_WCF, options)
+
+    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, return_full_configuration=False, options=None):
+
+        start_configuration = start_configuration or self.start_configuration
+        group = group or self.group
+
+        frame = frame_WCF
+        if self.robot.attached_tool:
+            frame = self.robot.attached_tool.from_tcf_to_t0cf([frame])[0]
+
+        if start_configuration:
+            base_frame = self.robot.get_base_frame(group, full_configuration=start_configuration)
+            frame = base_frame.to_local_coordinates(frame)
+
+        return self.__inverse_kinematics(frame)
+
+    def __inverse_kinematics(self, frame):
+        pass
+
+        return UR5_Kinematics().inverse(frame)
+
+
+class InverseKinematicsSolver(InverseKinematics):
     """Create a custom InverseKinematicsSolver for a robot.
+
+
+    Examples
+    --------
+
+    >>> ik_solver = InverseKinematicsSolver(robot, "robotA", ik_abb_irb4600_40_255, base_frame, robotA_tool.frame)
+    >>> robot.inverse_kinematics = ik_solver.inverse_kinematics_function()
+    >>> ikfast_fn = get_ik_fn_from_ikfast(ikfast_abb_irb4600_40_255.get_ik)
+    >>> ik_solver = InverseKinematicsSolver(robot, "robotA", ikfast_fn, base_frame, robotA_tool.frame)
     """
     # TODO create with class `Tool`, not tool frame!!
 
-    def __init__(self, robot, group, function, base_frame=None, tool_frame=None):
+    def __init__(self, robot, start_configuration=None, group=None):
 
-        self.robot = robot
-        self.group = group
-        self.joints = robot.get_configurable_joints(group=group)
-        self.joint_names = robot.get_configurable_joint_names(group=group)
-        self.function = function
+        if robot.attached_tool:
+            tool_frame = robot.tool.tool_model.frame
+
+        base_frame = robot.get_base_frame(group=group, full_configuration=start_configuration)
 
         self.base_transformation = Transformation.from_frame(base_frame).inverse() if base_frame else None
         self.tool_transformation = Transformation.from_frame(tool_frame).inverse() if tool_frame else None
 
-    def update_base_transformation(self, base_frame):
-        self.base_transformation = Transformation.from_frame(base_frame).inverse()
-
-    def convert_frame_wcf_to_tool0_wcf(self, frame_wcf):
-        return Frame.from_transformation(Transformation.from_frame(frame_wcf) * self.tool_transformation)
-
     def convert_frame_wcf_to_frame_tool0_rcf(self, frame_wcf, base_transformation=None, tool_transformation=None):
-        T = Transformation.from_frame(frame_wcf)
-        if base_transformation:
-            T = base_transformation * T
-        if tool_transformation:
-            T = T * tool_transformation
-        return Frame.from_transformation(T)
-        # return Frame.from_transformation(self.base_transformation * Transformation.from_frame(frame_wcf) * self.tool_transformation)
+        frame = frame_wcf
+        if self.robot.attached_tool:
+            frame = self.robot.attached_tool.from_tcf_to_t0cf([frame_wcf])[0]
+        if self.base_frame:
+            frame = self.base_frame.to_local_coordinates(frame)
+        return frame
 
     def try_to_fit_configurations_between_bounds(self, configurations):
         """
@@ -58,7 +99,7 @@ class InverseKinematicsSolver(object):
         for i, c in enumerate(configurations):
             configurations[i].joint_names = self.joint_names[:]
 
-    def inverse_kinematics_function(self):
+    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         """
         """
 
@@ -116,3 +157,30 @@ class InverseKinematicsSolver(object):
 
             return configurations
         return inverse_kinematics
+
+
+class UR5KinematicsSolver(AnalyticalInverseKinematics):
+
+    def __inverse_kinematics(self, frame):
+        return UR5_Kinematics().inverse(frame)
+
+
+if __name__ == "__main__":
+    import compas_fab
+    from compas_fab.robots.ur5 import Robot
+    from compas_fab.backends.ik_solver import UR5_Kinematics
+    from compas_fab.robots import Tool
+    from compas.datastructures import Mesh
+    from compas.geometry import Point, Vector
+
+    mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+    robot = Robot(load_geometry=False)
+    robot.attach_tool(Tool(mesh, Frame((0.07, 0, 0), (0, 0, 1), (0, 1, 0)), name="light_pen"))
+
+    start_configuration = robot.zero_configuration()
+    kinematics = UR5KinematicsSolver(robot, start_configuration=start_configuration)
+
+    f = Frame((0.5, 0.0, 0.3), (0.1, -0.1, -1.0), (-0.0, -1.0, 0.1))
+    configurations = kinematics.inverse_kinematics(f)
+    for c in configurations:
+        print(c)

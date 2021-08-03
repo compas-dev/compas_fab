@@ -9,22 +9,21 @@ from compas.geometry import intersection_plane_circle
 from compas.geometry import tangent_points_to_circle_xy
 
 
-def forward_kinematics_spherical_wrist(p1, p2, p3, p4, joint_values):
+def forward_kinematics_spherical_wrist(joint_values, points):
     """Forward kinematics function for spherical wrist robots.
 
     Parameters
     ----------
-    p1 : Point
-    p2 : Point
-    p3 : Point
-    p4 : Point
     joint_values : list of float
         List of 6 joint values in radians.
+    points : list of point
 
     Returns
     -------
     :class:`compas.geometry.Frame`
     """
+
+    p1, p2, p3, p4 = points
 
     a1, a2, a3, a4, a5, a6 = joint_values
 
@@ -70,7 +69,7 @@ def forward_kinematics_spherical_wrist(p1, p2, p3, p4, joint_values):
     return axis_frames[5]
 
 
-def inverse_kinematics_spherical_wrist(p1, p2, p3, p4, target_frame):
+def inverse_kinematics_spherical_wrist(target_frame, points):
     """Inverse kinematics function for spherical wrist robots.
 
     This is a modification of the *Lobster* tool for solving the inverse
@@ -83,6 +82,8 @@ def inverse_kinematics_spherical_wrist(p1, p2, p3, p4, target_frame):
 
     check p2, p3, p4 must be in one XY plane!
     """
+    p1, p2, p3, p4 = points
+
     end_frame = Frame(target_frame.point, target_frame.yaxis, target_frame.xaxis)
 
     wrist_offset = p4.x - p3.x
@@ -131,7 +132,7 @@ def inverse_kinematics_spherical_wrist(p1, p2, p3, p4, target_frame):
         elbow_frame = Frame(p1A, elbow_dir, [0, 0, 1])
         elbow_plane = (p1A, elbow_frame.normal)
 
-        case, (center, radius, normal) = intersection_sphere_sphere(sphere1, sphere2)
+        _, (center, radius, normal) = intersection_sphere_sphere(sphere1, sphere2)
         circle = ((center, normal), radius)
 
         intersect_pt1, intersect_pt2 = intersection_plane_circle(elbow_plane, circle)
@@ -194,8 +195,5 @@ def inverse_kinematics_spherical_wrist(p1, p2, p3, p4, target_frame):
                 endx, endy, endz = axis6_frame.to_local_coords(end_frame.to_world_coords(Point(1, 0, 0)))
                 axis6_angle = math.atan2(endy, endx)
                 axis6_angles.append(axis6_angle)
-
-    # for joint_values in zip(axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles):
-    #    print(forward_kinematics_spherical_wrist(p1, p2, p3, p4, joint_values))
 
     return axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles
