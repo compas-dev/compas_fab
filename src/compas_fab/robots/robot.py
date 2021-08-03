@@ -712,7 +712,7 @@ class Robot(object):
         >>> frame_RCF
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
         """
-        frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group, full_configuration))
+        frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
         return frame_RCF
 
     def to_world_coordinates(self, frame_RCF, group=None):
@@ -737,7 +737,7 @@ class Robot(object):
         >>> frame_WCF
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
         """
-        frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group, full_configuration))
+        frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
         return frame_WCF
 
     def from_tcf_to_t0cf(self, frames_tcf):
