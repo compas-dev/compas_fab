@@ -143,8 +143,8 @@ def inverse_kinematics_spherical_wrist(p1, p2, p3, p4, target_frame):
                 elbow_pt = intersect_pt2
             elbow_pt = Point(*elbow_pt)
 
-            elbowx, elbowy, elbowz = elbow_frame.to_local_coords(elbow_pt)
-            wristx, wristy, wristz = elbow_frame.to_local_coords(wrist)
+            elbowx, elbowy, _ = elbow_frame.to_local_coords(elbow_pt)
+            wristx, wristy, _ = elbow_frame.to_local_coords(wrist)
 
             axis2_angle = math.atan2(elbowy, elbowx)
             axis3_angle = math.pi - axis2_angle + math.atan2(wristy - elbowy, wristx - elbowx) - axis4_offset_angle

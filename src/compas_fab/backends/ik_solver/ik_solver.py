@@ -6,7 +6,8 @@ from compas_fab.backends.ik_solver import fit_within_bounds
 class InverseKinematicsSolver(object):
     """Create a custom InverseKinematicsSolver for a robot.
     """
-    # TODO create with class `Tool`, not tool frame!! 
+    # TODO create with class `Tool`, not tool frame!!
+
     def __init__(self, robot, group, function, base_frame=None, tool_frame=None):
 
         self.robot = robot
@@ -20,7 +21,7 @@ class InverseKinematicsSolver(object):
 
     def update_base_transformation(self, base_frame):
         self.base_transformation = Transformation.from_frame(base_frame).inverse()
-    
+
     def convert_frame_wcf_to_tool0_wcf(self, frame_wcf):
         return Frame.from_transformation(Transformation.from_frame(frame_wcf) * self.tool_transformation)
 
@@ -96,23 +97,22 @@ class InverseKinematicsSolver(object):
 
             # add joint names to configurations
             self.add_joint_names_to_configurations(configurations)
-            
+
             # fit configurations within joint bounds (sets those to `None` that are not working)
             self.try_to_fit_configurations_between_bounds(configurations)
             # check collisions for all configurations (sets those to `None` that are not working)
             if self.robot.client:
                 self.robot.client.check_configurations_for_collision(configurations)
-            
+
             if return_closest_to_start:
                 diffs = [c.max_difference(start_configuration) for c in configurations if c is not None]
                 if len(diffs):
                     idx = diffs.index(min(diffs))
-                    return configurations[idx] # only one
+                    return configurations[idx]  # only one
                 return None
 
             if cull:
                 configurations = [c for c in configurations if c is not None]
 
-            
             return configurations
         return inverse_kinematics

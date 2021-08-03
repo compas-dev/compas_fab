@@ -13,6 +13,7 @@ def get_smaller_angle(angle):
     else:
         return angle
 
+
 def fit_within_bounds(angle, lower, upper):
     angle = get_smaller_angle(angle)
     if angle < lower:
