@@ -2,17 +2,16 @@ import socket
 
 from compas.geometry import Frame
 from compas.geometry import matrix_from_frame
+from compas.robots import Configuration
 
 from compas_fab.backends.exceptions import BackendError
-from compas_fab.backends.vrep.remote_api import vrep
 
-from compas_fab.robots import Configuration
 
 __all__ = [
     'VrepError',
 ]
 
-DEFAULT_OP_MODE = vrep.simx_opmode_blocking
+DEFAULT_OP_MODE = 0x010000  # defined in vrepConst.simx_opmode_blocking, but redefined here to prevent loading the remoteApi library
 
 # --------------------------------------------------------------------------
 # MAPPINGS

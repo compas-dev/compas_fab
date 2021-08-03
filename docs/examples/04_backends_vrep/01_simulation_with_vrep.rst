@@ -2,7 +2,7 @@
 Simulation examples with V-REP
 ********************************************************************************
 
-The following examples demonstrate the `V-REP <http://www.coppeliarobotics.com/>`_
+The following examples demonstrate the `V-REP <https://www.coppeliarobotics.com/>`_
 simulation backend. They are based on a sample scene of the Robotic Fabrication
 Lab (RFL).
 
@@ -52,6 +52,7 @@ forward kinematics:
 
 .. code-block:: python
 
+    from compas.robots import Configuration
     from compas_fab.robots import *
     from compas_fab.robots import rfl
     from compas_fab.backends import VrepClient
@@ -114,6 +115,7 @@ Here is an example of such a request:
 .. code-block:: python
 
     from compas.geometry import Frame
+    from compas.robots import Configuration
     from compas_fab.robots import *
     from compas_fab.robots import rfl
     from compas_fab.backends import VrepClient

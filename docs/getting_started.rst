@@ -4,48 +4,119 @@ Getting started
 
 .. highlight:: bash
 
-Installation
-============
+**COMPAS FAB** can be easily installed on multiple platforms,
+using popular package managers such as conda or pip.
 
-The recommended way to install **COMPAS FAB** is to use `Anaconda/conda <https://conda.io/docs/>`_:
+Install with conda
+==================
 
-::
-
-    conda install -c conda-forge compas_fab
-
-
-But it can also be installed using ``pip``:
+The recommended way to install **COMPAS FAB** is with `conda <https://conda.io/docs/>`_.
+For example, create an environment named ``my-project`` and install COMPAS and COMPAS FAB.
 
 ::
+
+    conda config --add channels conda-forge
+    conda create -n my-project compas_fab
+
+Afterwards, simply activate the environment
+and run the following command to check if the installation process was successful.
+
+.. code-block:: bash
+
+    conda activate my-project
+    python -c "import compas_fab; print(compas_fab.__version__)"
+
+.. code-block:: none
+
+    0.19.1
+
+You are ready to use **COMPAS FAB**!
+
+Installation options
+--------------------
+
+Install COMPAS FAB in an environment with a specific version of Python.
+
+.. code-block:: bash
+
+    conda create -n my-project python=3.8 compas_fab
+
+Install COMPAS FAB in an existing environment.
+
+.. code-block:: bash
+
+    conda install -n my-project compas_fab
+
+Install with pip
+================
+
+Install COMPAS FAB using ``pip`` from the Python Package Index.
+
+.. code-block:: bash
 
     pip install compas_fab
 
+Install an editable version from local source.
+
+.. code-block:: bash
+
+    cd path/to/compas_fab
+    pip install -e .
+
+Note that installation with ``pip`` is also possible within a ``conda`` environment.
+
+.. code-block:: bash
+
+    conda activate my-project
+    pip install -e .
 
 .. note::
 
     On Windows, you may need to install
-    `Microsoft Visual C++ 14.0 <https://www.scivision.co/python-windows-visual-c++-14-required/>`_.
+    `Microsoft Visual C++ 14.0 <https://www.scivision.dev/python-windows-visual-c-14-required/>`_.
 
 
-Once the installation is completed, you can verify your setup.
-Start Python from the command prompt and run the following:
+Update with conda
+=================
 
-::
+To update COMPAS FAB to the latest version with ``conda``
 
-    >>> import compas_fab
+.. code-block:: bash
 
-You are ready to use **COMPAS FAB**!
+    conda update compas_fab
+
+To switch to a specific version
+
+.. code-block:: bash
+
+    conda install compas_fab=0.19.1
+
+
+Update with pip
+===============
+
+If you installed COMPAS FAB with ``pip`` the update command is the following
+
+.. code-block:: bash
+
+    pip install --upgrade compas_fab
+
+Or to switch to a specific version
+
+.. code-block:: bash
+
+    pip install compas_fab==0.19.1
+
 
 Working in Rhino
 ================
 
-To make **COMPAS FAB** available inside Rhino, open the *command prompt*
-and type the following which will install it on both Rhino 5.0 and 6.0:
+To make **COMPAS FAB** available inside Rhino, open the *command prompt*,
+activate the appropriate environment, and type the following:
 
 ::
 
-    python -m compas_fab.rhino.install -v 5.0
-    python -m compas_fab.rhino.install -v 6.0
+    python -m compas_rhino.install
 
 .. note:
 
@@ -55,11 +126,15 @@ and type the following which will install it on both Rhino 5.0 and 6.0:
 Open Rhino, start the Python script editor, type ``import compas_fab`` and
 run it to verify that your installation is working.
 
+Making **COMPAS FAB** available in Rhino also installs a suite of Grasshopper
+components with **COMPAS FAB** functionality.  See
+:ref:`ROS in Grasshopper <examples_ros_in_grasshopper>` for an example.
+
 Working in Blender
 ==================
 
 Once **COMPAS** itself is installed for Blender following the
-`documented procedure <https://compas.dev/compas/gettingstarted/cad/blender.html>`_,
+`documented procedure <https://compas.dev/compas/latest/gettingstarted/blender.html>`_,
 **COMPAS FAB** will automatically be available as well after installing it.
 
 
@@ -131,5 +206,5 @@ Next Steps
 * :ref:`Working with backends <backends>`
 * :ref:`COMPAS FAB Examples <examples>`
 * :ref:`COMPAS FAB API Reference <reference>`
-* `COMPAS Tutorials <https://compas.dev/compas/tutorial.html>`_
-* `COMPAS API Reference <https://compas.dev/compas/api.html>`_
+* `COMPAS Tutorials <https://compas.dev/compas/latest/tutorial.html>`_
+* `COMPAS API Reference <https://compas.dev/compas/latest/api.html>`_

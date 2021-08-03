@@ -10,8 +10,7 @@ from os.path import abspath, basename, dirname, join, splitext
 from setuptools import find_packages, setup
 
 requirements = [
-    # Until COMPAS reaches 1.0, we pin major.minor and allow patch version updates
-    'compas>=0.16.1,<0.17',
+    'compas>=1.7,<2.0',
     'roslibpy>=1.1.0',
     'pybullet',
     'pyserial',
@@ -65,6 +64,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: IronPython',
         'Topic :: Scientific/Engineering',

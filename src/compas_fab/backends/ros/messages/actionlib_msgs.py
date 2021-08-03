@@ -6,7 +6,7 @@ from .std_msgs import Time
 
 
 class GoalID(ROSmsg):
-    """http://docs.ros.org/api/actionlib_msgs/html/msg/GoalID.html
+    """https://docs.ros.org/api/actionlib_msgs/html/msg/GoalID.html
     """
 
     def __init__(self, stamp=Time(), id=""):
@@ -21,7 +21,7 @@ class GoalID(ROSmsg):
 
 
 class GoalStatus(ROSmsg):
-    """http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
+    """https://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html
     """
 
     PENDING = 0
@@ -57,7 +57,7 @@ class GoalStatus(ROSmsg):
 
 
 class GoalStatusArray(ROSmsg):
-    """http://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatusArray.html
+    """https://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatusArray.html
     """
 
     def __init__(self, header=None, status_list=None):

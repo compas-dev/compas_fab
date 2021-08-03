@@ -2,26 +2,34 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas_rhino.install
-
-__all__ = []
-
-INSTALLABLE_PACKAGES = ['compas_fab', 'roslibpy']
+import compas
+import compas.plugins
 
 
-# ==============================================================================
-# Main
-# ==============================================================================
+@compas.plugins.plugin(category='install')
+def installable_rhino_packages():
+    return ['compas_fab', 'roslibpy']
+
+
+@compas.plugins.plugin(category='install')
+def after_rhino_install(installed_packages):
+    if 'compas_fab' not in installed_packages:
+        return []
+
+    import compas_fab.ghpython.components.install
+    return compas_fab.ghpython.components.install.install()
+
+
+@compas.plugins.plugin(category='install')
+def after_rhino_uninstall(installed_packages):
+    if 'compas_fab' not in installed_packages:
+        return []
+
+    import compas_fab.ghpython.components.install
+    return compas_fab.ghpython.components.install.uninstall()
+
 
 if __name__ == "__main__":
-
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-v', '--version', choices=['5.0', '6.0'], default='6.0', help="The version of Rhino to install the packages in.")
-
-    args = parser.parse_args()
-
-    packages = set(compas_rhino.install.INSTALLABLE_PACKAGES + INSTALLABLE_PACKAGES)
-
-    compas_rhino.install.install(version=args.version, packages=packages)
+    print('This installation method is obsolete.')
+    print('Please use `python -m compas_rhino.install` instead')
+    print('COMPAS FAB will be automatically detected and installed')

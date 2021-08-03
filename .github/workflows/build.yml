@@ -3,13 +3,13 @@ name: build
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
-  build:
+  build-cpython:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -17,6 +17,7 @@ jobs:
           "windows-py38",
           "macos-py37",
           "ubuntu-py36",
+          "ubuntu-py39",
         ]
         include:
           - name: "windows-py38"
@@ -28,6 +29,9 @@ jobs:
           - name: "ubuntu-py36"
             os: ubuntu-latest
             python-version: 3.6
+          - name: "ubuntu-py39"
+            os: ubuntu-latest
+            python-version: 3.9
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -37,6 +41,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          python -m pip install wheel
           python -m pip install cython --install-option="--no-cython-compile"
       - name: Install
         run: |
@@ -46,4 +51,24 @@ jobs:
           invoke lint
       - name: Run tests
         run: |
-          invoke test
+          pytest
+  build-ironpython:
+    name: windows-ironpython
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          curl -o compas.tar.gz -LJO https://pypi.debian.net/compas/latest
+          curl -o roslibpy.tar.gz -LJO https://pypi.debian.net/roslibpy/latest
+          curl -o ironpython-pytest.tar.gz -LJO https://pypi.debian.net/ironpython-pytest/latest
+          choco install ironpython --version=2.7.8.1
+          ipy -X:Frames -m ensurepip
+          ipy -X:Frames -m pip install --no-deps compas.tar.gz
+          ipy -X:Frames -m pip install --no-deps roslibpy.tar.gz
+          ipy -X:Frames -m pip install --no-deps ironpython-pytest.tar.gz
+      - name: Run tests
+        env:
+          IRONPYTHONPATH: ./src
+        run: |
+          ipy tests/ipy_test_runner.py

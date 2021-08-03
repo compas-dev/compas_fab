@@ -38,13 +38,13 @@ class PyBulletInverseKinematics(InverseKinematics):
             joint positions differ the least from the start_configuration.
             Defaults to the zero configuration.
         group: str, optional
-            The planning group used for calculation. Defaults to the robot's
-            main planning group.
+            The planning group used for determining the end effector and labeling
+            the ``start_configuration``. Defaults to the robot's main planning group.
         options: dict, optional
             Dictionary containing the following key-value pairs:
 
             - ``"link_name"``: (:obj:`str`, optional ) Name of the link for which
-              to compute the inverse kinematics.  Defaults to the given robot's end
+              to compute the inverse kinematics.  Defaults to the given group's end
               effector.
             - ``"semi-constrained"``: (:obj:`bool`, optional) When ``True``, only the
               position and not the orientation of ``frame_WCF`` will not be considered
@@ -62,11 +62,14 @@ class PyBulletInverseKinematics(InverseKinematics):
         ------
         :class:`compas_fab.backends.InverseKinematicsError`
         """
+        options = options or {}
         link_name = options.get('link_name') or robot.get_end_effector_link_name(group)
-        link_id = self.client._get_link_id_by_name(link_name, robot)
+        cached_robot = self.client.get_cached_robot(robot)
+        body_id = self.client.get_uid(cached_robot)
+        link_id = self.client._get_link_id_by_name(link_name, cached_robot)
         point, orientation = pose_from_frame(frame_WCF)
 
-        joints = robot.get_configurable_joints()
+        joints = cached_robot.get_configurable_joints()
         joints.sort(key=lambda j: j.attr['pybullet']['id'])
         joint_names = [joint.name for joint in joints]
 
@@ -75,7 +78,6 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         called_from_test = 'pytest' in sys.modules
         if options.get('enforce_joint_limits', True) and not called_from_test:
-
             lower_limits = [joint.limit.lower if joint.type != Joint.CONTINUOUS else 0 for joint in joints]
             upper_limits = [joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi for joint in joints]
             # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.
@@ -87,7 +89,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
             if options.get('semi-constrained'):
                 joint_positions = pybullet.calculateInverseKinematics(
-                    robot.attributes['pybullet_uid'],
+                    body_id,
                     link_id,
                     point,
                     lowerLimits=lower_limits,
@@ -97,7 +99,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 )
             else:
                 joint_positions = pybullet.calculateInverseKinematics(
-                    robot.attributes['pybullet_uid'],
+                    body_id,
                     link_id,
                     point,
                     orientation,
@@ -109,13 +111,13 @@ class PyBulletInverseKinematics(InverseKinematics):
         else:
             if options.get('semi-constrained'):
                 joint_positions = pybullet.calculateInverseKinematics(
-                    robot.attributes['pybullet_uid'],
+                    body_id,
                     link_id,
                     point,
                 )
             else:
                 joint_positions = pybullet.calculateInverseKinematics(
-                    robot.attributes['pybullet_uid'],
+                    body_id,
                     link_id,
                     point,
                     orientation,
@@ -127,5 +129,5 @@ class PyBulletInverseKinematics(InverseKinematics):
         return joint_positions, joint_names
 
     def _get_rest_poses(self, joint_names, configuration):
-        name_value_map = {configuration.joint_names[i]: configuration.values[i] for i in range(len(configuration.joint_names))}
+        name_value_map = {configuration.joint_names[i]: configuration.joint_values[i] for i in range(len(configuration.joint_names))}
         return [name_value_map[name] for name in joint_names]

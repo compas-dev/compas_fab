@@ -6,7 +6,7 @@ import compas
 from compas.geometry import Vector
 from compas.geometry import cross_vectors
 
-if not compas.is_ironpython():
+if not compas.IPY:
     from scipy import stats
 else:
     stats = None
@@ -186,7 +186,7 @@ class Wrench():
     # ==========================================================================
 
     def __repr__(self):
-        return "Wrench({0}, {1})".format(self.force, self.torque)
+        return "Wrench({!r}, {!r})".format(self.force, self.torque)
 
     # ==========================================================================
     # helpers
@@ -373,7 +373,8 @@ class Wrench():
         ----------
         .. [1] Vougioukas S., *Bias Estimation and Gravity Compensation For
             Force-Torque Sensors*,
-            Available at: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.552.109.
+            Available at: http://wseas.us/e-library/conferences/crete2002/papers/444-809.pdf
+
         """
         # transform gravity vector to FT Sensor coordinate system (FTSCS)
         gravity_vector_FTSCS = ft_sensor_frame.to_local_coordinates(gravity_vector)

@@ -12,7 +12,6 @@ environments.
 .. toctree::
     :maxdepth: 3
 
-    compas_fab.artists
     compas_fab.backends
     compas_fab.robots
     compas_fab.utilities
@@ -55,7 +54,7 @@ try:
 
     if os.path.exists(git_head_file):
         # git head file contains one line that looks like this:
-        # ref: refs/heads/master
+        # ref: refs/heads/main
         with open(git_head_file, 'r') as git_head:
             _, ref_path = git_head.read().strip().split(' ')
             ref_path = ref_path.split('/')
@@ -69,4 +68,5 @@ try:
 except Exception:
     pass
 
+__all_plugins__ = ['compas_fab.rhino.install']
 __all__ = ['__author__', '__author_email__', '__copyright__', '__description__', '__license__', '__title__', '__url__', '__version__', 'get']

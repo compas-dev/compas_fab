@@ -3,10 +3,10 @@ name: integration
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -20,20 +20,20 @@ jobs:
           python-version: 3.8
       - name: Set up docker containers
         run: |
-          docker run -p 19997:19997 --name vrep_rfl -d gramaziokohler/vrep-rfl
-          docker-compose -f "docs/backends/files/ur5-demo/docker-compose.yml" up -d --build
+          docker-compose -f "tests/integration_setup/docker-compose.yml" up -d --build
           docker ps -a
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          python -m pip install wheel
           python -m pip install cython --install-option="--no-cython-compile"
       - name: Install
         run: |
           python -m pip install --no-cache-dir -r requirements-dev.txt
       - name: Run integration tests
         run: |
-          invoke test --doctest --codeblock
+          pytest --doctest-modules --ignore-glob="**ghpython/components/**.py"
+          pytest docs
       - name: Tear down docker containers
         run: |
-          docker-compose -f "docs/backends/files/ur5-demo/docker-compose.yml" down
-          docker rm -f vrep_rfl
+          docker-compose -f "tests/integration_setup/docker-compose.yml" down

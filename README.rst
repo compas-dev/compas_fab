@@ -30,6 +30,10 @@ COMPAS FAB: Robotic Fabrication for COMPAS
 .. image:: https://zenodo.org/badge/107952684.svg
    :target: https://zenodo.org/badge/latestdoi/107952684
 
+.. image:: https://img.shields.io/twitter/follow/compas_dev?style=social
+   :target: https://twitter.com/compas_dev
+   :alt: Twitter Follow
+
 .. end-badges
 
 **Robotic fabrication package for the COMPAS Framework** that facilitates the
@@ -103,7 +107,7 @@ Contributing
 
 We love contributions!
 
-Check the `Contributor's Guide <https://github.com/compas-dev/compas_fab/blob/master/CONTRIBUTING.rst>`_
+Check the `Contributor's Guide <https://github.com/compas-dev/compas_fab/blob/main/CONTRIBUTING.rst>`_
 for more details.
 
 
@@ -131,4 +135,4 @@ Credits
 -------
 
 This package is maintained by Gramazio Kohler Research `@gramaziokohler <https://github.com/gramaziokohler>`_
-and a long list of `contributors <https://github.com/compas-dev/compas_fab/blob/master/AUTHORS.rst>`_
+and a long list of `contributors <https://github.com/compas-dev/compas_fab/blob/main/AUTHORS.rst>`_

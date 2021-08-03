@@ -3,7 +3,6 @@ from __future__ import division
 from __future__ import print_function
 
 from compas_fab.backends.interfaces import RemoveAttachedCollisionMesh
-from compas_fab.backends.pybullet.utils import LOG
 from compas_fab.utilities import LazyLoader
 
 pybullet = LazyLoader('pybullet', globals(), 'pybullet')
@@ -26,17 +25,23 @@ class PyBulletRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
         ----------
         id : str
             Name of collision mesh to be removed.
-        options : dict, optional
-            Unused parameter.
+        options : dict
+            Dictionary containing the following key-value pairs:
+
+            - ``"robot"``: (:class:`compas_fab.robots.Robot`) Robot instance
+              to which the object should be attached.
 
         Returns
         -------
         ``None``
         """
-        if id not in self.client.attached_collision_objects:
-            LOG.warning("Attached collision object with name '{}' does not exist in scene.".format(id))
-            return
+        robot = options['robot']
+        self.client.ensure_cached_robot_geometry(robot)
 
-        for constraint_info in self.client.attached_collision_objects[id]:
-            pybullet.removeConstraint(constraint_info.constraint_id, physicsClientId=self.client.client_id)
-            pybullet.removeBody(constraint_info.body_id, physicsClientId=self.client.client_id)
+        cached_robot_model = self.client.get_cached_robot(robot)
+
+        # remove link and fixed joint
+        cached_robot_model.remove_link(id)
+        cached_robot_model.remove_joint(id + '_fixed_joint')
+
+        self.client.reload_from_cache(robot)

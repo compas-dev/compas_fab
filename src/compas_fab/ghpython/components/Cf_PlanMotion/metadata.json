@@ -1,0 +1,58 @@
+{
+    "name": "Plan Motion",
+    "nickname": "Plan Motion",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Calculate a motion path.",
+    "exposure": 4,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "robot",
+                "description": "The robot."
+            },
+            {
+                "name": "goal_constraints",
+                "description": "The goal to be achieved, defined in a set of constraints. Constraints can be very specific, for example defining value domains for each joint, such that the goal configuration is included, or defining a volume in space, to which a specific robot link (e.g. the end-effector) is required to move to.",
+                "scriptParamAccess": "list"
+            },
+            {
+                "name": "start_configuration",
+                "description": "The robot's full configuration, i.e. values for all configurable joints of the entire robot, at the starting position. Defaults to the all-zero configuration."
+            },
+            {
+                "name": "group",
+                "description": "The planning group used for calculation. Defaults to the robot's main planning group.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "attached_collision_meshes",
+                "description": "A list of attached collision meshes to be included for planning.",
+                "scriptParamAccess": "list"
+            },
+            {
+                "name": "path_constraints",
+                "description": "Optional constraints that can be imposed along the solution path. Note that path calculation won't work if the start_configuration violates these constraints. Defaults to None.",
+                "scriptParamAccess": "list"
+            },
+            {
+                "name": "planner_id",
+                "description": "The name of the algorithm used for path planning. Defaults to 'RRTConnectkConfigDefault'",
+                "typeHintID": "str"
+            },
+            {
+                "name": "compute",
+                "description": "If True, calculates a trajectory.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "trajectory",
+                "description": "The calculated trajectory."
+            }
+        ]
+    }
+}

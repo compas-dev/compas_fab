@@ -32,7 +32,7 @@ Loading model from ROS
 
 .. note::
 
-    The following example uses the `ROS <http://www.ros.org/>`_ backend
+    The following example uses the `ROS <https://www.ros.org/>`_ backend
     and loads the robot description model from it. Before running it, please
     make sure you have the :ref:`ROS backend <ros_backend>` correctly
     configured and the :ref:`Panda Demo <ros_bundles_list>` started.
@@ -58,13 +58,13 @@ Visualizing robot models
 
 Once a model is loaded, we can visualize it in our favorite design environment.
 
-**COMPAS** includes the concept of `artists`: classes that assist with the
+**COMPAS** includes the concept of ``artists``: classes that assist with the
 visualization of datastructures and models, in a way that maintains the data
 separated from the specific CAD interfaces, while providing a way to leverage
 native performance of the CAD environment.
 
 In the main library there are artists for various datastructures (meshes,
-networks, etc), and **COMPAS FAB** adds a ``RobotArtist`` to them.
+networks, etc), including a ``RobotModelArtist`` to visualize robots.
 Robot artists allow visualizing robot models easily and efficiently.
 
 The following example illustrates how to load an entire robot model from
@@ -80,6 +80,7 @@ ROS and render it in Rhino:
     <div class="card-title">Downloads</div>
 
 * :download:`Robot artist from ROS (Rhino) (.PY) <files/02_robot_artist_rhino_from_ros.py>`
+* :download:`Robot artist from ROS (Grasshopper) (.GHX) <files/02_robot_artist_grasshopper_panda.ghx>`
 * :download:`Robot artist from Github (Rhino) (.PY) <files/02_robot_artist_rhino.py>`
 * :download:`Robot artist from Github (Blender) (.PY) <files/02_robot_artist_blender.py>`
 * :download:`Robot artist from Github (Grasshopper) (.GHX) <files/02_robot_artist_grasshopper.ghx>`

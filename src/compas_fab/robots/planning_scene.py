@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Scale
 
@@ -81,6 +82,53 @@ class CollisionMesh(object):
         self.mesh = self.mesh.copy()
         self.scale(scale_factor)
 
+    def to_data(self):
+        """Get the data dictionary that represents the collision mesh.
+
+        This can be used to reconstruct the :class:`CollisionMesh` instance.
+
+        Returns
+        -------
+        :obj:`dict`
+        """
+        return self.data
+
+    @classmethod
+    def from_data(cls, data):
+        """Construct a collision mesh from its data representation.
+
+        Parameters
+        ----------
+        data : :obj:`dict`
+            The data dictionary.
+
+        Returns
+        -------
+        :class:`CollisionMesh`
+             An instance of :class:`CollisionMesh`.
+        """
+        collision_mesh = cls(None, None)
+        collision_mesh.data = data
+        return collision_mesh
+
+    @property
+    def data(self):
+        """:obj:`dict` : The data representing the collision mesh."""
+        data_obj = {}
+        data_obj['id'] = self.id
+        data_obj['mesh'] = self.mesh.to_data()
+        data_obj['frame'] = self.frame.to_data()
+        data_obj['root_name'] = self.root_name
+
+        return data_obj
+
+    @data.setter
+    def data(self, data_obj):
+        self.id = data_obj['id']
+        self.mesh = Mesh.from_data(data_obj['mesh'])
+        self.frame = Frame.from_data(data_obj['frame'])
+        self.root_name = data_obj['root_name']
+
 
 class AttachedCollisionMesh(object):
     """Represents a collision mesh that is attached to a :class:`Robot`'s :class:`~compas.robots.Link`.
@@ -122,10 +170,58 @@ class AttachedCollisionMesh(object):
 
     def __init__(self, collision_mesh, link_name, touch_links=None, weight=1.):
         self.collision_mesh = collision_mesh
-        self.collision_mesh.root_name = link_name
+        if self.collision_mesh:
+            self.collision_mesh.root_name = link_name
         self.link_name = link_name
         self.touch_links = touch_links if touch_links else [link_name]
         self.weight = weight
+
+    def to_data(self):
+        """Get the data dictionary that represents the attached collision mesh.
+
+        This can be used to reconstruct the :class:`AttachedCollisionMesh` instance.
+
+        Returns
+        -------
+        :obj:`dict`
+        """
+        return self.data
+
+    @classmethod
+    def from_data(cls, data):
+        """Construct an attached collision mesh from its data representation.
+
+        Parameters
+        ----------
+        data : :obj:`dict`
+            The data dictionary.
+
+        Returns
+        -------
+        :class:`AttachedCollisionMesh`
+             An instance of :class:`AttachedCollisionMesh`.
+        """
+        acm = cls(None, None)
+        acm.data = data
+        return acm
+
+    @property
+    def data(self):
+        """:obj:`dict` : The data representing the attached collision mesh."""
+        data_obj = {}
+        data_obj['collision_mesh'] = self.collision_mesh.to_data()
+        data_obj['link_name'] = self.link_name
+        data_obj['touch_links'] = self.touch_links
+        data_obj['weight'] = self.weight
+
+        return data_obj
+
+    @data.setter
+    def data(self, data_obj):
+        self.collision_mesh = CollisionMesh.from_data(data_obj['collision_mesh'])
+        self.link_name = data_obj['link_name']
+        self.touch_links = data_obj['touch_links']
+        self.weight = data_obj['weight']
 
 
 class PlanningScene(object):
@@ -163,6 +259,11 @@ class PlanningScene(object):
         if not self.client:
             raise Exception(
                 'This method is only callable once a client is assigned')
+
+    def reset(self):
+        """Resets the planning scene, removing all added collision meshes."""
+        self.ensure_client()
+        self.client.reset_planning_scene()
 
     def add_collision_mesh(self, collision_mesh, scale=False):
         """Add a collision mesh to the planning scene.
@@ -343,12 +444,12 @@ class PlanningScene(object):
         >>> group = robot.main_group_name
         >>> scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)
 
-        >>> # wait for it to be attached
-        >>> time.sleep(1)
-
-        >>> # wait for it to be removed
+        >>> # check if it's really there
+        >>> planning_scene = robot.client.get_planning_scene()
+        >>> objects = [c.object['id'] for c in planning_scene.robot_state.attached_collision_objects]
+        >>> 'tip' in objects
+        True
         >>> scene.remove_attached_collision_mesh('tip')
-        >>> time.sleep(1)
 
         >>> # check if it's really gone
         >>> planning_scene = robot.client.get_planning_scene()
@@ -367,14 +468,19 @@ class PlanningScene(object):
         acm = AttachedCollisionMesh(collision_mesh, ee_link_name, touch_links)
         self.add_attached_collision_mesh(acm)
 
-    def add_attached_tool(self):
+    def add_attached_tool(self, tool=None):
         """Add the robot's attached tool to the planning scene if tool is set."""
         self.ensure_client()
+        if tool:
+            self.robot.attach_tool(tool)
         if self.robot.attached_tool:
-            self.add_attached_collision_mesh(self.robot.attached_tool.attached_collision_mesh)
+            for acm in self.robot.attached_tool.attached_collision_meshes:
+                self.add_attached_collision_mesh(acm)
 
     def remove_attached_tool(self):
         """Remove the robot's attached tool from the planning scene."""
         self.ensure_client()
         if self.robot.attached_tool:
-            self.remove_attached_collision_mesh(self.robot.attached_tool.name)
+            for acm in self.robot.attached_tool.attached_collision_meshes:
+                self.remove_attached_collision_mesh(acm.collision_mesh.id)
+        self.robot.detach_tool()

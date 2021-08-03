@@ -22,8 +22,8 @@ class PyBulletForwardKinematics(ForwardKinematics):
             full configuration is passed, the zero-joint state for the other
             configurable joints is assumed.
         group : str, optional
-            The planning group used for calculation. Defaults to the robot's
-            main planning group.
+            The planning group used for determining the end effector and labeling
+            the ``configuration``. Defaults to the robot's main planning group.
         options : dict, optional
             Dictionary containing the following key-value pairs:
 
@@ -39,9 +39,11 @@ class PyBulletForwardKinematics(ForwardKinematics):
             The frame in the world's coordinate system (WCF).
         """
         link_name = options.get('link') or robot.get_end_effector_link_name(group)
-        link_id = self.client._get_link_id_by_name(link_name, robot)
+        cached_robot = self.client.get_cached_robot(robot)
+        body_id = self.client.get_uid(cached_robot)
+        link_id = self.client._get_link_id_by_name(link_name, cached_robot)
         self.client.set_robot_configuration(robot, configuration, group)
-        frame = self.client._get_link_frame(link_id, robot.attributes['pybullet_uid'])
+        frame = self.client._get_link_frame(link_id, body_id)
         if options.get('check_collision'):
             self.client.collision_check()
         return frame

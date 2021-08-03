@@ -1,0 +1,37 @@
+{
+    "name": "Inverse Kinematics",
+    "nickname": "IK",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Calculate the robot's inverse kinematic for a given plane.",
+    "exposure": 2,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "robot",
+                "description": "The robot."
+            },
+            {
+                "name": "plane",
+                "description": "The plane or frame to calculate the inverse kinematic for."
+            },
+            {
+                "name": "start_configuration",
+                "description": "If passed, calculates the inverse such that the joint positions differ the least from the start_configuration. Defaults to the zero configuration."
+            },
+            {
+                "name": "group",
+                "description": "The planning group used for calculation. Defaults to the robot's main planning group.",
+                "typeHintID": "str"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "configuration",
+                "description": "The planning group's configuration."
+            }
+        ]
+    }
+}

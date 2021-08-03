@@ -1,0 +1,25 @@
+<launch>
+  <arg name="debug" default="false" />
+
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+    <arg name="unregister_timeout" value="28800" />
+  </include>
+  <include file="$(find file_server)/launch/file_server.launch" />
+
+  <include file="$(find ur5_moveit_config)/launch/planning_context.launch">
+    <arg name="load_robot_description" value="true"/>
+  </include>
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="/use_gui" value="false"/>
+    <rosparam param="/source_list">[/move_group/fake_controller_joint_states]</rosparam>
+  </node>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
+
+  <include file="$(find ur5_moveit_config)/launch/move_group.launch">
+    <arg name="allow_trajectory_execution" value="true"/>
+    <arg name="fake_execution" value="true"/>
+    <arg name="info" value="true"/>
+    <arg name="debug" value="$(arg debug)"/>
+  </include>
+</launch>

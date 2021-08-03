@@ -83,7 +83,7 @@ from .vrep.client import *              # noqa: F401,F403
 from .vrep.helpers import *             # noqa: F401,F403
 from .vrep.planner import *             # noqa: F401,F403
 
-if not compas.is_ironpython():
+if not compas.IPY:
     from .pybullet.client import *            # noqa: F401,F403
     from .pybullet.exceptions import *        # noqa: F401,F403
     from .pybullet.planner import *           # noqa: F401,F403

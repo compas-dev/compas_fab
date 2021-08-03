@@ -43,6 +43,7 @@ Planning scene interfaces
     RemoveCollisionMesh
     AddAttachedCollisionMesh
     RemoveAttachedCollisionMesh
+    ResetPlanningScene
 
 """
 
@@ -56,6 +57,7 @@ from .backend_features import PlanCartesianMotion
 from .backend_features import PlanMotion
 from .backend_features import RemoveAttachedCollisionMesh
 from .backend_features import RemoveCollisionMesh
+from .backend_features import ResetPlanningScene
 from .client import ClientInterface
 from .client import PlannerInterface
 
@@ -70,6 +72,7 @@ __all__ = [
     'RemoveCollisionMesh',
     'AddAttachedCollisionMesh',
     'RemoveAttachedCollisionMesh',
+    'ResetPlanningScene',
     'ClientInterface',
     'PlannerInterface',
 ]
