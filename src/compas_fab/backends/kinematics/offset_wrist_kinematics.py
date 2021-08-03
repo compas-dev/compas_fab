@@ -4,6 +4,8 @@ from .offset_wrist import forward_kinematics_offset_wrist
 
 
 class OffsetWristKinematics(object):
+    """
+    """
 
     def __init__(self, params):
         self.params = params

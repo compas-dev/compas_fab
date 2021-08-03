@@ -23,7 +23,7 @@ class SphericalWristKinematics(object):
         return angles
 
 
-class Staubli_TX2_60L_Kinematics(SphericalWristKinematics):
+class Staubli_TX2_60L(SphericalWristKinematics):
     """
     """
 
@@ -32,7 +32,7 @@ class Staubli_TX2_60L_Kinematics(SphericalWristKinematics):
                   Point(0.000, 0.020, 0.775),
                   Point(0.450, 0.020, 0.775),
                   Point(0.520, 0.020, 0.775)]
-        super(Staubli_TX2_60L_Kinematics, self).__init__(points)
+        super(Staubli_TX2_60L, self).__init__(points)
 
     def _post_process(self, angles):
         A1, A2, A3, A4, A5, A6 = angles
@@ -44,7 +44,7 @@ class Staubli_TX2_60L_Kinematics(SphericalWristKinematics):
         return (A1, A2, A3, A4, A5, A6)
 
 
-class ABB_IRB_4600_40_255_Kinematics(SphericalWristKinematics):
+class ABB_IRB_4600_40_255(SphericalWristKinematics):
     """
     """
 
@@ -53,7 +53,7 @@ class ABB_IRB_4600_40_255_Kinematics(SphericalWristKinematics):
                   Point(0.175, 0.000, 1.590),
                   Point(1.446, 0.000, 1.765),
                   Point(1.581, 0.000, 1.765)]
-        super(ABB_IRB_4600_40_255_Kinematics, self).__init__(points)
+        super(ABB_IRB_4600_40_255, self).__init__(points)
 
     def _post_process(self, angles):
         A1, A2, A3, A4, A5, A6 = angles

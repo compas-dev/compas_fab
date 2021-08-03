@@ -185,14 +185,14 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
                 axis5_frame = axis4_frame.copy()
                 axis5_frame.transform(Rotation.from_axis_and_angle(axis4_frame.zaxis, axis4_angle))
                 axis5_frame = Frame(wrist, axis5_frame.zaxis * -1, axis5_frame.xaxis)
-                axis6x, axis6y, axis6z = axis5_frame.to_local_coords(end_frame.point)
+                axis6x, axis6y, _ = axis5_frame.to_local_coords(end_frame.point)
                 axis5_angle = math.atan2(axis6y, axis6x)
                 axis5_angles.append(axis5_angle)
 
                 axis6_frame = axis5_frame.copy()
                 axis6_frame.transform(Rotation.from_axis_and_angle(axis5_frame.zaxis, axis5_angle))
                 axis6_frame = Frame(wrist, axis6_frame.yaxis * -1, axis6_frame.zaxis)
-                endx, endy, endz = axis6_frame.to_local_coords(end_frame.to_world_coords(Point(1, 0, 0)))
+                endx, endy, _ = axis6_frame.to_local_coords(end_frame.to_world_coords(Point(1, 0, 0)))
                 axis6_angle = math.atan2(endy, endx)
                 axis6_angles.append(axis6_angle)
 
