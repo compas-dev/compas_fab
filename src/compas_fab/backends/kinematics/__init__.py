@@ -1,5 +1,5 @@
 from .utils import *
-from .ik_solver import *
+from .ik_solver import UR5KinematicsSolver
 from .offset_wrist_kinematics import UR3_Kinematics
 from .offset_wrist_kinematics import UR5_Kinematics
 from .offset_wrist_kinematics import UR10_Kinematics
