@@ -8,6 +8,8 @@ from compas.geometry import intersection_sphere_sphere
 from compas.geometry import intersection_plane_circle
 from compas.geometry import tangent_points_to_circle_xy
 
+# TODO: This is very slow...
+
 
 def forward_kinematics_spherical_wrist(joint_values, points):
     """Forward kinematics function for spherical wrist robots.
@@ -15,12 +17,25 @@ def forward_kinematics_spherical_wrist(joint_values, points):
     Parameters
     ----------
     joint_values : list of float
-        List of 6 joint values in radians.
+        A list of 6 joint values in radians.
     points : list of point
+        A list of 4 points specifying the robot's joint positions.
 
     Returns
     -------
     :class:`compas.geometry.Frame`
+
+    Notes
+    -----
+    This is a modification of the *Lobster* tool for solving the inverse
+    kinematics problem for a spherical wrist robots.
+
+    https://www.grasshopper3d.com/forum/topics/lobster-reloaded?groupUrl=lobster&
+
+    This is the instruction on how to determine the 4 points.
+    https://api.ning.com/files/KRgE1yt2kgG2IF9H8sre4CWfIDL9ytv5WvVn54zdOx6HE84gDordaHzo0jqwP-Qhry7MyRQ4IQxY1p3cIkqEDj1FAVVR2Xg0/Lobster_IK.pdf
+
+    Check p2, p3, p4 must be in one XY plane!
     """
 
     p1, p2, p3, p4 = points
@@ -72,6 +87,21 @@ def forward_kinematics_spherical_wrist(joint_values, points):
 def inverse_kinematics_spherical_wrist(target_frame, points):
     """Inverse kinematics function for spherical wrist robots.
 
+    Parameters
+    ----------
+    frame : :class:`compas.geometry.Frame`
+        The frame we search the inverse kinematics for.
+    points : list of point
+        A list of 4 points specifying the robot's joint positions.
+
+    Returns
+    -------
+    list of list of float
+        The 8 analytical IK solutions.
+
+
+    Notes
+    -----
     This is a modification of the *Lobster* tool for solving the inverse
     kinematics problem for a spherical wrist robots.
 
@@ -80,7 +110,7 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
     This is the instruction on how to determine the 4 points.
     https://api.ning.com/files/KRgE1yt2kgG2IF9H8sre4CWfIDL9ytv5WvVn54zdOx6HE84gDordaHzo0jqwP-Qhry7MyRQ4IQxY1p3cIkqEDj1FAVVR2Xg0/Lobster_IK.pdf
 
-    check p2, p3, p4 must be in one XY plane!
+    Check p2, p3, p4 must be in one XY plane!
     """
     p1, p2, p3, p4 = points
 

@@ -1,4 +1,3 @@
-from compas.robots import Configuration
 from .offset_wrist import inverse_kinematics_offset_wrist
 from .offset_wrist import forward_kinematics_offset_wrist
 
