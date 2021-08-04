@@ -1,2 +1,1 @@
-from .utils import *
-from .ik_solver import UR5KinematicsSolver
+from .kinematics import UR5Kinematics  # noqa F401
