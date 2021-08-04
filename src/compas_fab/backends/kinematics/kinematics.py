@@ -1,6 +1,6 @@
 from compas.geometry import Frame
 from compas.robots import Configuration
-from compas_fab.backends.kinematics import fit_within_bounds
+from compas_fab.backends.kinematics.utils import fit_within_bounds
 
 
 class AnalyticalKinematics(object):
@@ -9,10 +9,10 @@ class AnalyticalKinematics(object):
     Examples
     --------
 
-    >>> ik_solver = InverseKinematicsSolver(robot, "robotA", ik_abb_irb4600_40_255, base_frame, robotA_tool.frame)
+    >>> ik_solver = InverseKinematicsSolver(robot, "robotA", ik_abb_irb4600_40_255)
     >>> robot.inverse_kinematics = ik_solver.inverse_kinematics_function()
     >>> ikfast_fn = get_ik_fn_from_ikfast(ikfast_abb_irb4600_40_255.get_ik)
-    >>> ik_solver = InverseKinematicsSolver(robot, "robotA", ikfast_fn, base_frame, robotA_tool.frame)
+    >>> ik_solver = InverseKinematicsSolver(robot, "robotA", ikfast_fn)
     """
 
     def __init__(self, robot, start_configuration=None, group=None):
@@ -41,6 +41,15 @@ class AnalyticalKinematics(object):
 
         A1, A2, A3, A4, A5, A6 = self._inverse_kinematics(frame)
 
+        # The ik solution for 6 axes industrial robots returns by default 8
+        # configurations, which are sorted. That means, the if you call ik
+        # on 2 frames that are close to each other, and compare the 8
+        # configurations of the first one with the 8 of the second one at
+        # their respective indices, then these configurations are 'close' to
+        # each other. That is why for certain use cases, e.g. custom cartesian
+        # path planning it makes sense to keep the sorting and set the ones
+        # that are out of joint limits or in collison to `None`.
+
         return self.joint_angles_to_configuration(A1, A2, A3, A4, A5, A6)
 
         """
@@ -52,14 +61,7 @@ class AnalyticalKinematics(object):
                                return_closest_to_start=False,
                                return_idxs=None
 
-        # The ik solution for 6 axes industrial robots returns by default 8
-            # configurations, which are sorted. That means, the if you call ik
-            # on 2 frames that are close to each other, and compare the 8
-            # configurations of the first one with the 8 of the second one at
-            # their respective indices, then these configurations are 'close' to
-            # each other. That is why for certain use cases, e.g. custom cartesian
-            # path planning it makes sense to keep the sorting and set the ones
-            # that are out of joint limits or in collison to `None`.
+        
 
             if return_idxs:
                 configurations = [configurations[i] for i in return_idxs]
@@ -129,15 +131,68 @@ if __name__ == "__main__":
     from compas_fab.robots.ur5 import Robot
     from compas_fab.robots import Tool
     from compas.datastructures import Mesh
+    from compas.geometry import Point, Vector
+    from compas.robots import LocalPackageMeshLoader
 
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
-    robot = Robot(load_geometry=False)
+    robot = Robot(load_geometry=True)
     robot.attach_tool(Tool(mesh, Frame((0.07, 0, 0), (0, 0, 1), (0, 1, 0)), name="light_pen"))
 
     start_configuration = robot.zero_configuration()
     kinematics = UR5Kinematics(robot, start_configuration=start_configuration)
 
-    f = Frame((0.5, 0.0, 0.3), (0.1, -0.1, -1.0), (-0.0, -1.0, 0.1))
+    f = Frame(Point(0.407, 0.073, 0.320), Vector(0.922, 0.000, 0.388), Vector(0.113, 0.956, -0.269))
     configurations = kinematics.inverse_kinematics(f)
     for c in configurations:
         print(c)
+    
+    frames_WCF = [Frame(Point(0.407, 0.073, 0.320), Vector(0.922, 0.000, 0.388), Vector(0.113, 0.956, -0.269)), Frame(Point(0.404, 0.057, 0.324), Vector(0.919, 0.000, 0.394), Vector(0.090, 0.974, -0.210)), Frame(Point(0.390, 0.064, 0.315), Vector(0.891, 0.000, 0.454), Vector(0.116, 0.967, -0.228)), Frame(Point(0.388, 0.079, 0.309), Vector(0.881, 0.000, 0.473), Vector(0.149, 0.949, -0.278)), Frame(Point(0.376, 0.087, 0.299), Vector(0.850, 0.000, 0.528), Vector(0.184, 0.937, -0.296))]
+    start_configuration = configurations[2]
+
+    frames_WCF_T0 = robot.attached_tool.from_tcf_to_t0cf(frames_WCF)
+
+    urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
+
+    loader = LocalPackageMeshLoader(compas_fab.get('universal_robot'), 'ur_description')
+
+    from compas_fab.backends import PyBulletClient
+
+    #with PyBulletClient() as client:
+    #urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
+    #robot = client.load_robot(urdf_filename)
+
+    configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.])
+
+    frame_WCF = robot.forward_kinematics(configuration)
+
+    print("Frame in the world coordinate system")
+    print(frame_WCF)
+    import time
+
+    with PyBulletClient() as client: #connection_type='direct'
+
+        robot = client.load_robot(urdf_filename)
+
+        print(type(robot))
+        #robot.client = client
+        
+        """
+        cached_robot_file_name = str(robot.model.guid) + '.urdf'
+
+        client.cache_robot(robot)
+        urdf_fp = robot.attributes['pybullet']['cached_robot_filepath']
+
+        client._load_robot_to_pybullet(urdf_fp, robot)
+        #client.load_robot(cached_robot_file_name)
+
+        #print(client.plan_cartesian_motion(frames_WCF, start_configuration))
+
+        print(robot.inverse_kinematics(frames_WCF_T0[0], start_configuration))
+        """
+
+        #print(client.check_collisions(robot, start_configuration))
+        #print(robot.forward_kinematics(start_configuration, options={"check_collision" : True}))
+        print(start_configuration)
+        print(robot.forward_kinematics(start_configuration))
+        time.sleep(25)
+        #print(client.check_collisions(robot, start_configuration))
