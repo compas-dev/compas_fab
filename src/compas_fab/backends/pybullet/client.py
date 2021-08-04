@@ -461,7 +461,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """
         cached_robot = self.get_cached_robot(robot)
         body_id = self.get_uid(cached_robot)
-        link_names = cached_robot.get_link_names_with_collision_geometry()
+        link_names = [link.name for link in cached_robot.iter_links() if link.collision]
         # check for collisions between robot links
         for link_1_name, link_2_name in combinations(link_names, 2):
             if {link_1_name, link_2_name} in self.disabled_collisions:
