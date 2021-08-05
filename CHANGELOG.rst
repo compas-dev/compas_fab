@@ -12,14 +12,15 @@ Unreleased
 
 **Added**
 * Added ``PoseArray``, ``MultiArrayDimension``, ``MultiArrayLayout``, ``Int8MultiArray``, ``Float32MultiArray``, ``Int32`` to ``compas_fab.backends.ros.messages``
+* Added ``unordered_disabled_collisions`` attribute to ``PyBulletClient`` and ``RobotSemantics``
 
 **Changed**
 
 **Fixed**
 
-* Fixed `UnsupportedOperation` error when using `PybulletClient` in Jupyter notebook (raised by `redirect_stdout`)
-* Fixed `JointTrajectoryPoint.from_data` to be backward-compatible with JSON data generated before `compas_fab 0.18`
-* Fixed `JointTrajectory.from_data` to be backward-compatible with JSON data generated before `compas_fab 0.17`
+* Fixed ``UnsupportedOperation`` error when using ``PyBulletClient`` in Jupyter notebook (raised by ``redirect_stdout``)
+* Fixed ``JointTrajectoryPoint.from_data`` to be backward-compatible with JSON data generated before ``compas_fab`` 0.18
+* Fixed ``JointTrajectory.from_data`` to be backward-compatible with JSON data generated before ``compas_fab`` 0.17
 
 **Deprecated**
 

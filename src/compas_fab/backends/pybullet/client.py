@@ -153,6 +153,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self._cache_dir.cleanup()
         self.disconnect()
 
+    @property
+    def unordered_disabled_collisions(self):
+        return {frozenset(pair) for pair in self.disabled_collisions}
+
     def step_simulation(self):
         """By default, the physics server will not step the simulation,
         unless you explicitly send a ``step_simulation`` command.  This
@@ -464,7 +468,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         link_names = [link.name for link in cached_robot.iter_links() if link.collision]
         # check for collisions between robot links
         for link_1_name, link_2_name in combinations(link_names, 2):
-            if {link_1_name, link_2_name} in self.disabled_collisions:
+            if {link_1_name, link_2_name} in self.unordered_disabled_collisions:
                 continue
             link_1_id = self._get_link_id_by_name(link_1_name, cached_robot)
             link_2_id = self._get_link_id_by_name(link_2_name, cached_robot)
