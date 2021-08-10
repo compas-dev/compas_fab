@@ -26,10 +26,10 @@ class CollisionMesh(object):
         :meth:`~PlanningScene.remove_collision_mesh`,
         :meth:`~PlanningScene.append_collision_mesh` etc.)
     frame : :class:`compas.geometry.Frame`, optional
-        The frame of the mesh. Defaults to :meth:`~compas.geometry.Frame.worldXY().
+        The frame of the mesh. Defaults to :meth:`compas.geometry.Frame.worldXY`.
     root_name : :obj:`str`
         The name of the root link the collision mesh will be placed in. Defaults
-        to `'world'`.
+        to ``'world'``.
 
     Attributes
     ----------
@@ -41,10 +41,10 @@ class CollisionMesh(object):
         :meth:`~PlanningScene.remove_collision_mesh`,
         :meth:`~PlanningScene.append_collision_mesh` etc.)
     frame : :class:`compas.geometry.Frame`, optional
-        The frame of the mesh. Defaults to :meth:`~compas.geometry.Frame.worldXY().
+        The frame of the mesh. Defaults to :meth:`compas.geometry.Frame.worldXY`.
     root_name : :obj:`str`
         The name of the root link the collision mesh will be placed in. Defaults
-        to `'world'`.
+        to ``'world'``.
 
     Examples
     --------
