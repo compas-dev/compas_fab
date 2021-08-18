@@ -61,6 +61,7 @@ jobs:
 
           echo "Docs will be deployed to https://gramaziokohler.github.io/compas_fab/$BRANCH_OR_TAG"
           mkdir -p deploy/compas_fab/$BRANCH_OR_TAG && mv -T dist/docs deploy/compas_fab/$BRANCH_OR_TAG/
+          mv docs/doc_versions.txt deploy/compas_fab/doc_versions.txt
         shell: bash
       - name: 🚢 Deploy docs
         if: success()
