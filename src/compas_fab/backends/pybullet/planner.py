@@ -12,6 +12,10 @@ from compas_fab.backends.pybullet.backend_features.pybullet_append_collision_mes
 from compas_fab.backends.pybullet.backend_features.pybullet_remove_attached_collision_mesh import PyBulletRemoveAttachedCollisionMesh
 from compas_fab.backends.pybullet.backend_features.pybullet_remove_collision_mesh import PyBulletRemoveCollisionMesh
 
+__all__ = [
+    'PyBulletPlanner',
+]
+
 
 class PyBulletPlanner(PlannerInterface):
     """Implement the planner backend interface for PyBullet."""

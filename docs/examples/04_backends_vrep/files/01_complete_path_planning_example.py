@@ -4,7 +4,6 @@ from compas.datastructures import Mesh
 from compas.geometry import Frame
 
 import compas_fab
-from compas_fab.robots import *
 from compas_fab.robots import rfl
 from compas_fab.backends import VrepClient
 

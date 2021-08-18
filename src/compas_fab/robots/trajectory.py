@@ -9,8 +9,8 @@ from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots.time_ import Duration
 
 __all__ = [
-    'JointTrajectoryPoint',
     'JointTrajectory',
+    'JointTrajectoryPoint',
     'Trajectory',
 ]
 

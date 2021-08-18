@@ -31,6 +31,7 @@ Path planning
     JointTrajectory
     JointTrajectoryPoint
     PathPlan
+    Trajectory
 
 Planning scene
 --------------
@@ -71,17 +72,72 @@ The following functions help with converting units from one system to the other.
 
 """
 
-from .configuration import *          # noqa: F401,F403
-from .constraints import *            # noqa: F401,F403
-from .path_plan import *              # noqa: F401,F403
-from .planning_scene import *         # noqa: F401,F403
-from .units import *                  # noqa: F401,F403
-from .robot import *                  # noqa: F401,F403
-from .semantics import *              # noqa: F401,F403
-from .time_ import *                  # noqa: F401,F403
-from .tool import *                   # noqa: F401,F403
-from .trajectory import *             # noqa: F401,F403
-from .wrench import *                 # noqa: F401,F403
-from .inertia import *                # noqa: F401,F403
+from .configuration import (
+    Configuration
+)
+from .constraints import (
+    BoundingVolume,
+    Constraint,
+    JointConstraint,
+    OrientationConstraint,
+    PositionConstraint,
+)
+from .path_plan import (
+    PathPlan
+)
+from .planning_scene import (
+    AttachedCollisionMesh,
+    CollisionMesh,
+    PlanningScene,
+)
+from .units import (
+    to_degrees,
+    to_radians,
+)
+from .robot import (
+    Robot,
+)
+from .semantics import (
+    RobotSemantics,
+)
+from .time_ import (
+    Duration,
+)
+from .tool import (
+    Tool,
+)
+from .trajectory import (
+    JointTrajectory,
+    JointTrajectoryPoint,
+    Trajectory,
+)
+from .wrench import (
+    Wrench,
+)
+from .inertia import (
+    Inertia,
+)
 
-__all__ = [name for name in dir() if not name.startswith('_')]
+__all__ = [
+    'AttachedCollisionMesh',
+    'BoundingVolume',
+    'CollisionMesh',
+    'Configuration',
+    'Constraint',
+    'Duration',
+    'Inertia',
+    'JointConstraint',
+    'JointTrajectory',
+    'JointTrajectoryPoint',
+    'OrientationConstraint',
+    'PathPlan',
+    'PlanningScene',
+    'PositionConstraint',
+    'Robot',
+    'RobotSemantics',
+    'Tool',
+    'Trajectory',
+    'Wrench',
+    'to_degrees',
+    'to_radians',
+]
