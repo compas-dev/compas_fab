@@ -20,6 +20,11 @@ from compas_fab.backends.ros.backend_features.move_it_remove_attached_collision_
 from compas_fab.backends.ros.backend_features.move_it_remove_collision_mesh import MoveItRemoveCollisionMesh
 
 
+__all__ = [
+    'MoveItPlanner',
+]
+
+
 class MoveItPlanner(PlannerInterface):
     """Implement the planner backend interface based on MoveIt!
     """

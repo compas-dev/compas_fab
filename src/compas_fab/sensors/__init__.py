@@ -32,7 +32,16 @@ Baumer sensors
 
 """
 
-from .base import *         # noqa: F401,F403
-from .baumer import *       # noqa: F401,F403
+from .base import (
+    SerialSensor,
+)
+from .baumer import (
+    PosCon3D,
+    PosConCM,
+)
 
-__all__ = [name for name in dir() if not name.startswith('_')]
+__all__ = [
+    "PosCon3D",
+    "PosConCM",
+    "SerialSensor",
+]

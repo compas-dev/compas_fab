@@ -117,7 +117,7 @@ def argmax(numbers):
 
 
 def clamp(value, min_value, max_value):
-    """Clamps a value witin the bound [min_value, max_value]
+    """Clamps a value within the bound [min_value, max_value]
 
     Returns
     -------

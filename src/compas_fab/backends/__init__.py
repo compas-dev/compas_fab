@@ -37,6 +37,7 @@ PyBullet
 
     PyBulletClient
     PyBulletPlanner
+    PyBulletError
 
 Long-running tasks
 ------------------
@@ -73,19 +74,68 @@ the :ref:`architecture` documentation.
 
 import compas
 
-from .exceptions import *               # noqa: F401,F403
-from .tasks import *                    # noqa: F401,F403
-from .ros.client import *               # noqa: F401,F403
-from .ros.exceptions import *           # noqa: F401,F403
-from .ros.fileserver_loader import *    # noqa: F401,F403
-from .ros.planner import *              # noqa: F401,F403
-from .vrep.client import *              # noqa: F401,F403
-from .vrep.helpers import *             # noqa: F401,F403
-from .vrep.planner import *             # noqa: F401,F403
+from .exceptions import (
+    BackendError,
+)
+from .tasks import (
+    FutureResult,
+    CancellableFutureResult,
+)
+from .ros.client import (
+    RosClient,
+)
+from .ros.exceptions import (
+    RosError,
+    RosValidationError,
+)
+from .ros.fileserver_loader import (
+    RosFileServerLoader,
+)
+from .ros.planner import (
+    MoveItPlanner,
+)
+from .vrep.client import (
+    VrepClient,
+)
+from .vrep.helpers import (
+    VrepError,
+)
+from .vrep.planner import (
+    VrepPlanner,
+)
 
 if not compas.IPY:
-    from .pybullet.client import *            # noqa: F401,F403
-    from .pybullet.exceptions import *        # noqa: F401,F403
-    from .pybullet.planner import *           # noqa: F401,F403
+    from .pybullet.client import (
+        PyBulletClient,
+    )
+    from .pybullet.exceptions import (
+        CollisionError,
+        InverseKinematicsError,
+        PyBulletError,
+    )
+    from .pybullet.planner import (
+        PyBulletPlanner,
+    )
 
-__all__ = [name for name in dir() if not name.startswith('_')]
+__all__ = [
+      'BackendError',
+      'CancellableFutureResult',
+      'FutureResult',
+      'MoveItPlanner',
+      'RosClient',
+      'RosError',
+      'RosFileServerLoader',
+      'RosValidationError',
+      'VrepClient',
+      'VrepError',
+      'VrepPlanner',
+    ]
+
+if not compas.IPY:
+    __all__ += [
+        'CollisionError',
+        'InverseKinematicsError',
+        'PyBulletClient',
+        'PyBulletError',
+        'PyBulletPlanner',
+    ]

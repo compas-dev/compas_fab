@@ -71,8 +71,8 @@ forward kinematics:
         group_a = robot_a.model.attr['index']
         group_b = robot_b.model.attr['index']
 
-        frame_a = client.forward_kinematics(robot, None, group=group_a)
-        frame_b = client.forward_kinematics(robot, None, group=group_b)
+        frame_a = client.forward_kinematics(robot_a, None, group=group_a)
+        frame_b = client.forward_kinematics(robot_b, None, group=group_b)
         print('End effector poses: ', str(frame_a), str(frame_b))
 
 Inverse Kinematics
