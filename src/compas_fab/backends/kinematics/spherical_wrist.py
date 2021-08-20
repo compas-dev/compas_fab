@@ -57,6 +57,7 @@ def forward_kinematics_spherical_wrist(joint_values, points):
 
     axis_frames = [af1, af2, af3, af4, af5, af6]
 
+    # TODO: this is slow
     Rot1 = Rotation.from_axis_and_angle((0, 0, 1), -1 * a1)
     for i in range(0, 6):
         axis_frames[i].transform(Rot1)
@@ -121,7 +122,7 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
     upper_arm_length = (p3 - p2).length
     pln_offset = math.fabs(p2.y - p1.y)
     axis4_offset_angle = math.atan2(p3.z - p2.z, p3.x - p2.x)
-    wrist = end_frame.to_world_coords(Point(0, 0, wrist_offset))
+    wrist = end_frame.to_world_coordinates(Point(0, 0, wrist_offset))
 
     p1_proj = p1.copy()
     p1_proj.y = p2.y
@@ -174,8 +175,8 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
                 elbow_pt = intersect_pt2
             elbow_pt = Point(*elbow_pt)
 
-            elbowx, elbowy, _ = elbow_frame.to_local_coords(elbow_pt)
-            wristx, wristy, _ = elbow_frame.to_local_coords(wrist)
+            elbowx, elbowy, _ = elbow_frame.to_local_coordinates(elbow_pt)
+            wristx, wristy, _ = elbow_frame.to_local_coordinates(wrist)
 
             axis2_angle = math.atan2(elbowy, elbowx)
             axis3_angle = math.pi - axis2_angle + math.atan2(wristy - elbowy, wristx - elbowx) - axis4_offset_angle
@@ -197,7 +198,7 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
 
                 # // B = TempPlane
                 axis4_frame = Frame(wrist, temp_frame.zaxis, temp_frame.yaxis * -1.0)
-                axis6x, axis6y, axis6z = axis4_frame.to_local_coords(end_frame.point)
+                axis6x, axis6y, axis6z = axis4_frame.to_local_coordinates(end_frame.point)
 
                 axis4_angle = math.atan2(axis6y, axis6x)
                 if k == 1:
@@ -215,15 +216,27 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
                 axis5_frame = axis4_frame.copy()
                 axis5_frame.transform(Rotation.from_axis_and_angle(axis4_frame.zaxis, axis4_angle))
                 axis5_frame = Frame(wrist, axis5_frame.zaxis * -1, axis5_frame.xaxis)
-                axis6x, axis6y, _ = axis5_frame.to_local_coords(end_frame.point)
+                axis6x, axis6y, _ = axis5_frame.to_local_coordinates(end_frame.point)
                 axis5_angle = math.atan2(axis6y, axis6x)
                 axis5_angles.append(axis5_angle)
 
                 axis6_frame = axis5_frame.copy()
                 axis6_frame.transform(Rotation.from_axis_and_angle(axis5_frame.zaxis, axis5_angle))
                 axis6_frame = Frame(wrist, axis6_frame.yaxis * -1, axis6_frame.zaxis)
-                endx, endy, _ = axis6_frame.to_local_coords(end_frame.to_world_coords(Point(1, 0, 0)))
+                endx, endy, _ = axis6_frame.to_local_coordinates(end_frame.to_world_coordinates(Point(1, 0, 0)))
                 axis6_angle = math.atan2(endy, endx)
                 axis6_angles.append(axis6_angle)
 
-    return axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles
+    return [[a1, a2, a3, a4, a5, a6] for a1, a2, a3, a4, a5, a6 in zip(axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles)]
+
+
+if __name__ == "__main__":
+    from compas.geometry import allclose
+    points = [Point(0.000, 0.000, 0.375),
+              Point(0.000, 0.020, 0.775),
+              Point(0.450, 0.020, 0.775),
+              Point(0.520, 0.020, 0.775)]  # Staubli_TX2_60L
+    q = [0.2, -0.7832, 1.4, 1.3, 2.6, -2.6832]
+    frame = forward_kinematics_spherical_wrist(q, points)
+    sol = inverse_kinematics_spherical_wrist(frame, points)
+    assert(allclose(sol[0], q))
