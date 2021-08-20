@@ -82,12 +82,7 @@ def inverse_kinematics_offset_wrist(frame, params, q6_des=0.):
     ZERO_THRESH = 0.00000001
     d1, a2, a3, d4, d5, d6 = params
 
-    axis1_angles = []
-    axis2_angles = []
-    axis3_angles = []
-    axis4_angles = []
-    axis5_angles = []
-    axis6_angles = []
+    solutions = []
 
     T02, T12, T22 = frame.xaxis
     T00, T10, T20 = frame.yaxis
@@ -230,14 +225,9 @@ def inverse_kinematics_offset_wrist(frame, params, q6_des=0.):
                 elif(q4[k] < 0.0):
                     q4[k] += 2.0*pi
 
-                axis1_angles.append(q1[i])
-                axis2_angles.append(q2[k])
-                axis3_angles.append(q3[k])
-                axis4_angles.append(q4[k])
-                axis5_angles.append(q5[i][j])
-                axis6_angles.append(q6)
+                solutions.append([q1[i], q2[k], q3[k], q4[k], q5[i][j], q6])
 
-    return axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles
+    return solutions
 
 
 if __name__ == "__main__":
@@ -245,6 +235,5 @@ if __name__ == "__main__":
     params = [0.089159, -0.42500, -0.39225, 0.10915, 0.09465, 0.0823]  # ur5
     q = [0.2, 5.5, 1.4, 1.3, 2.6, 3.6]
     frame = forward_kinematics_offset_wrist(q, params)
-    angles = inverse_kinematics_offset_wrist(frame, params)
-    sol = [a[0] for a in angles]
-    assert(allclose(sol, q))
+    sol = inverse_kinematics_offset_wrist(frame, params)
+    assert(allclose(sol[0], q))
