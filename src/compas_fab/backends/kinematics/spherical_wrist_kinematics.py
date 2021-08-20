@@ -1,8 +1,8 @@
 
 import math
 from compas.geometry import Point
-from .spherical_wrist import forward_kinematics_spherical_wrist
-from .spherical_wrist import inverse_kinematics_spherical_wrist
+from compas_fab.backends.kinematics.spherical_wrist import forward_kinematics_spherical_wrist
+from compas_fab.backends.kinematics.spherical_wrist import inverse_kinematics_spherical_wrist
 
 
 class SphericalWristKinematics(object):
@@ -13,14 +13,19 @@ class SphericalWristKinematics(object):
         self.points = points
 
     def forward(self, joint_values):
+        joint_values = self._pre_process(joint_values)
         return forward_kinematics_spherical_wrist(joint_values, self.points)
 
     def inverse(self, frame_rcf):
-        angles = inverse_kinematics_spherical_wrist(frame_rcf, self.points)
-        return self._post_process(angles)
+        solutions = inverse_kinematics_spherical_wrist(frame_rcf, self.points)
+        return list(self._post_process(solutions))
+        # return solutions
 
-    def _post_process(self, angles):
-        return angles
+    def _post_process(self, solutions):
+        return solutions
+
+    def _pre_process(self, joint_values):
+        return joint_values
 
 
 class Staubli_TX2_60L(SphericalWristKinematics):
@@ -34,14 +39,21 @@ class Staubli_TX2_60L(SphericalWristKinematics):
                   Point(0.520, 0.020, 0.775)]
         super(Staubli_TX2_60L, self).__init__(points)
 
-    def _post_process(self, angles):
-        A1, A2, A3, A4, A5, A6 = angles
-        for i in range(8):
-            A1[i] = -1 * A1[i]
-            A2[i] = A2[i] + math.pi / 2
-            A4[i] = A4[i] * -1
-            A6[i] = A6[i] * -1 + math.pi / 2
-        return (A1, A2, A3, A4, A5, A6)
+    def _pre_process(self, joint_values):
+        q1, q2, q3, q4, q5, q6 = joint_values
+        q1 = -1 * q1
+        q2 = q2 - math.pi / 2
+        q4 = q4 * -1
+        q6 = q6 * -1 + math.pi / 2
+        return [q1, q2, q3, q4, q5, q6]
+
+    def _post_process(self, solutions):
+        for q1, q2, q3, q4, q5, q6 in solutions:
+            q1 = -1 * q1
+            q2 = q2 + math.pi / 2
+            q4 = q4 * -1
+            q6 = q6 * -1 + math.pi / 2
+            yield [q1, q2, q3, q4, q5, q6]
 
 
 class ABB_IRB_4600_40_255(SphericalWristKinematics):
@@ -55,12 +67,36 @@ class ABB_IRB_4600_40_255(SphericalWristKinematics):
                   Point(1.581, 0.000, 1.765)]
         super(ABB_IRB_4600_40_255, self).__init__(points)
 
-    def _post_process(self, angles):
-        A1, A2, A3, A4, A5, A6 = angles
-        for i in range(8):
-            A1[i] = -1 * A1[i]
-            A2[i] = A2[i] + math.pi / 2
-            A3[i] = A3[i] - math.pi / 2
-            A4[i] = -1 * A4[i]
-            A6[i] = -1 * A6[i] + math.pi/2
-        return (A1, A2, A3, A4, A5, A6)
+    def _pre_process(self, joint_values):
+        q1, q2, q3, q4, q5, q6 = joint_values
+        q1 = -1 * q1
+        q2 = q2 - math.pi / 2
+        q3 = q3 + math.pi / 2
+        q4 = q4 * -1
+        q6 = q6 * -1 + math.pi / 2
+        return [q1, q2, q3, q4, q5, q6]
+
+    def _post_process(self, solutions):
+        for q1, q2, q3, q4, q5, q6 in solutions:
+            q1 = -1 * q1
+            q2 = q2 + math.pi / 2
+            q3 = q3 - math.pi / 2
+            q4 = q4 * -1
+            q6 = q6 * -1 + math.pi / 2
+            yield [q1, q2, q3, q4, q5, q6]
+
+
+if __name__ == "__main__":
+    from compas.geometry import allclose
+
+    kin = ABB_IRB_4600_40_255()
+    q = [0.2, 0.5, 1.4, 1.3, 2.6, 2.3]
+    frame = kin.forward(q)
+    sol = kin.inverse(frame)
+    assert(allclose(sol[0], q))
+
+    kin = Staubli_TX2_60L()
+    q = [0.2, 0.5, 1.4, 1.3, 2.6, 2.3]
+    frame = kin.forward(q)
+    sol = kin.inverse(frame)
+    assert(allclose(sol[0], q))

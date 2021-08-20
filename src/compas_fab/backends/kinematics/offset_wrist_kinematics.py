@@ -1,5 +1,5 @@
-from .offset_wrist import inverse_kinematics_offset_wrist
-from .offset_wrist import forward_kinematics_offset_wrist
+from compas_fab.backends.kinematics.offset_wrist import inverse_kinematics_offset_wrist
+from compas_fab.backends.kinematics.offset_wrist import forward_kinematics_offset_wrist
 
 
 class OffsetWristKinematics(object):
@@ -63,3 +63,25 @@ class UR10(OffsetWristKinematics):
     def __init__(self):
         params = [UR10_PARAMS[k] for k in ['d1', 'a2', 'a3', 'd4', 'd5', 'd6']]
         super(UR10, self).__init__(params)
+
+
+if __name__ == "__main__":
+    from compas.geometry import allclose
+
+    kin = UR3()
+    q = [0.2, 0.5, 1.4, 1.3, 2.6, 2.3]
+    frame = kin.forward(q)
+    sol = kin.inverse(frame)
+    assert(allclose(sol[0], q))
+
+    kin = UR5()
+    q = [0.2, 0.5, 1.4, 1.3, 2.6, 2.3]
+    frame = kin.forward(q)
+    sol = kin.inverse(frame)
+    assert(allclose(sol[0], q))
+
+    kin = UR10()
+    q = [0.2, 0.5, 1.4, 1.3, 2.6, 2.3]
+    frame = kin.forward(q)
+    sol = kin.inverse(frame)
+    assert(allclose(sol[0], q))
