@@ -123,6 +123,8 @@ if __name__ == "__main__":
         configurations_along_path = []
 
         for frame in frames_WCF_T0:
+            # the following is not working because in robot we split joint_names and joint_values and do not support lists as outcomes
+            # configurations = robot.inverse_kinematics(frame_WCF)
             configurations = client.inverse_kinematics(robot, frame, options={"check_collision": True})
             configurations_along_path.append(configurations)
 
@@ -139,5 +141,3 @@ if __name__ == "__main__":
                 print(frame_WCF)
                 time.sleep(0.1)
             print("=")
-
-        # robot.inverse_kinematics(frame_WCF) # this is not working because in robot we split joint_names and joint_values
