@@ -71,7 +71,7 @@ class Analytical_InverseKinematics(InverseKinematics):
                 a4 = fit_within_bounds(a4, j4.limit.lower, j4.limit.upper)
                 a5 = fit_within_bounds(a5, j5.limit.lower, j5.limit.upper)
                 a6 = fit_within_bounds(a6, j6.limit.lower, j6.limit.upper)
-                configurations[i].values = [a1, a2, a3, a4, a5, a6]
+                configurations[i].joint_values = [a1, a2, a3, a4, a5, a6]
             except AssertionError:
                 configurations[i] = None
         return configurations
