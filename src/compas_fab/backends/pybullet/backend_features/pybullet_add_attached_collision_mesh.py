@@ -54,6 +54,9 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
               the pose of the collision reference frame, relative to the link
               reference frame. Defaults to
               :class:`compas.geometry.Frame.worldXY()`.
+            - ``"concavity"``: (:obj:`bool`) When ``False`` (the default),
+              the mesh will be loaded as its convex hull for collision checking purposes.
+              When ``True``, a non-static mesh will be decomposed into convex parts using v-HACD.
 
         Returns
         -------
@@ -63,6 +66,7 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         self.client.ensure_cached_robot_geometry(robot)
 
         mass = options.get('mass', 1.)
+        concavity = options.get('concavity', False)
         inertia = options.get('inertia', [1., 0., 0., 1., 0., 1.])
         inertial_origin = options.get('inertial_origin', Frame.worldXY())
         collision_origin = options.get('collision_origin', Frame.worldXY())
@@ -72,9 +76,10 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         # add link
         mesh = attached_collision_mesh.collision_mesh.mesh
         name = attached_collision_mesh.collision_mesh.id
-        mesh_file_name = name + '.stl'
+        mesh_file_name = name + '.obj'
         mesh_fp = os.path.join(self.client._cache_dir.name, mesh_file_name)
-        mesh.to_stl(mesh_fp, binary=True)
+        mesh.to_obj(mesh_fp)
+        mesh_fp = self.client._handle_concavity(mesh_fp, self.client._cache_dir.name, concavity, mass, name)
         link = cached_robot_model.add_link(name, visual_meshes=[mesh], collision_meshes=[mesh])
         mass_urdf = Mass(mass)
         inertia_urdf = Inertia(*inertia)
