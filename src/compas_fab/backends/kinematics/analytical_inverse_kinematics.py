@@ -52,7 +52,7 @@ class Analytical_InverseKinematics(InverseKinematics):
     def _inverse_kinematics(self, frame):
         pass
 
-    def joint_angles_to_configuration(self, robot, solutions):
+    def joint_angles_to_configurations(self, robot, solutions):
         joint_names = robot.get_configurable_joint_names()
         return [Configuration.from_revolute_values(q, joint_names=joint_names) for q in solutions]
 
