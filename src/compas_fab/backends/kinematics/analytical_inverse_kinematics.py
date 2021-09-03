@@ -50,7 +50,7 @@ class Analytical_InverseKinematics(InverseKinematics):
         return configurations
 
     def _inverse_kinematics(self, frame):
-        pass
+        raise NotImplementedError
 
     def joint_angles_to_configurations(self, robot, solutions):
         joint_names = robot.get_configurable_joint_names()
