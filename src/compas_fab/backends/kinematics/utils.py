@@ -2,16 +2,11 @@ import math
 
 
 def get_smaller_angle(angle):
-    while angle > 2 * math.pi:
-        angle -= 2 * math.pi
-    while angle < -2 * math.pi:
-        angle += 2 * math.pi
-    if math.fabs(angle - 2 * math.pi) < math.fabs(angle):
-        return angle - 2 * math.pi
-    elif math.fabs(angle + 2 * math.pi) < math.fabs(angle):
-        return angle + 2 * math.pi
-    else:
-        return angle
+    angle = angle % (2 * math.pi)
+    sign = 1 if angle >= 0 else -1
+    if math.fabs(angle) > math.pi:
+        angle = angle - sign * 2*math.pi
+    return angle
 
 
 def fit_within_bounds(angle, lower, upper):
