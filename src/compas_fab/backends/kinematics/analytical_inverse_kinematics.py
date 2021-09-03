@@ -5,7 +5,7 @@ from compas_fab.backends.kinematics.utils import fit_within_bounds
 from compas_fab.backends.interfaces import InverseKinematics
 
 
-class Analytical_InverseKinematics(InverseKinematics):
+class AnalyticalInverseKinematics(InverseKinematics):
     """Create a custom InverseKinematicsSolver for a robot.
 
     The ik for 6 axes industrial robots returns by default 8 possible solutions.
@@ -20,7 +20,7 @@ class Analytical_InverseKinematics(InverseKinematics):
     Examples
     --------
 
-    >>> ik_solver = Analytical_InverseKinematics()
+    >>> ik_solver = AnalyticalInverseKinematics()
     """
 
     def __init__(self, client=None):
@@ -77,7 +77,7 @@ class Analytical_InverseKinematics(InverseKinematics):
         return configurations
 
 
-class UR5_Analytical_IK(Analytical_InverseKinematics):
+class UR5_Analytical_IK(AnalyticalInverseKinematics):
 
     def _inverse_kinematics(self, frame):
         from compas_fab.backends.kinematics.offset_wrist_kinematics import UR5
