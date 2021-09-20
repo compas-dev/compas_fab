@@ -1173,11 +1173,11 @@ class Robot(object):
         options['attached_collision_meshes'] = attached_collision_meshes
 
         # The returned joint names might be more than the requested ones if there are passive joints present
-        joint_positions, joint_names = self.client.inverse_kinematics(self,
-                                                                      frame_WCF_scaled,
-                                                                      start_configuration_scaled,
-                                                                      group,
-                                                                      options)
+        joint_positions, joint_names = next(self.client.inverse_kinematics(self,
+                                                                           frame_WCF_scaled,
+                                                                           start_configuration_scaled,
+                                                                           group,
+                                                                           options))
         if return_full_configuration:
             # build configuration including passive joints, but no sorting
             joint_types = self.get_joint_types_by_names(joint_names)

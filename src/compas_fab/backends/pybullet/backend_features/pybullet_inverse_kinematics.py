@@ -53,7 +53,7 @@ class PyBulletInverseKinematics(InverseKinematics):
               robot's joint limits will be ignored in the calculation.  Defaults to
               ``True``.
 
-        Returns
+        Yields
         -------
         :obj:`tuple` of :obj:`list`
             A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
@@ -126,7 +126,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         if not joint_positions:
             raise InverseKinematicsError()
 
-        return joint_positions, joint_names
+        yield joint_positions, joint_names
 
     def _get_rest_poses(self, joint_names, configuration):
         name_value_map = {configuration.joint_names[i]: configuration.joint_values[i] for i in range(len(configuration.joint_names))}

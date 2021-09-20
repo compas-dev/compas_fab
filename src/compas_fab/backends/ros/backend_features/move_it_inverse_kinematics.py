@@ -75,7 +75,7 @@ class MoveItInverseKinematics(InverseKinematics):
         compas_fab.backends.exceptions.BackendError
             If no configuration can be found.
 
-        Returns
+        Yields
         -------
         :obj:`tuple` of :obj:`list`
             A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
@@ -91,7 +91,7 @@ class MoveItInverseKinematics(InverseKinematics):
         # Use base_link or fallback to model's root link
         options['base_link'] = options.get('base_link', robot.model.root.name)
 
-        return await_callback(self.inverse_kinematics_async, **kwargs)
+        yield await_callback(self.inverse_kinematics_async, **kwargs)
 
     def inverse_kinematics_async(self, callback, errback,
                                  frame_WCF, start_configuration=None, group=None, options=None):

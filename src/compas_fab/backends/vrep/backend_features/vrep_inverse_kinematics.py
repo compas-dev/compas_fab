@@ -40,9 +40,9 @@ class VrepInverseKinematics(InverseKinematics):
                   to retry infinitely.
                 - ``"max_results"``: (:obj:`int`) Maximum number of result states to return.
 
-        Returns:
-            list: List of :class:`Configuration` objects representing
-            the collision-free configuration for the ``goal_frame``.
+        Yields:
+            :obj:`tuple` of :obj:`list`
+                A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
         """
         options = options or {}
         num_joints = options['num_joints']
@@ -59,5 +59,7 @@ class VrepInverseKinematics(InverseKinematics):
 
         states = self.client.find_raw_robot_states(group, frame_to_vrep_pose(frame_WCF, self.client.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
 
-        return [config_from_vrep(states[i:i + num_joints], self.client.scale)
-                for i in range(0, len(states), num_joints)]
+        joint_names = robot.get_configurable_joint_names()
+
+        for i in range(0, len(states), num_joints):
+            yield config_from_vrep(states[i: i+num_joints], self.client.scale).joint_values, joint_names

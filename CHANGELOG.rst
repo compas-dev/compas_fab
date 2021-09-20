@@ -18,6 +18,9 @@ Unreleased
 
 **Changed**
 
+* Changed the backend feature `InverseKinematics.inverse_kinematics` to be a generator
+* Standardized the yielded type of `InverseKinematics.inverse_kinematics` across the PyBullet, MoveIt and V-REP planners
+
 **Fixed**
 
 * Fixed ``UnsupportedOperation`` error when using ``PyBulletClient`` in Jupyter notebook (raised by ``redirect_stdout``)
