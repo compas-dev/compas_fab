@@ -15,6 +15,7 @@ Unreleased
 * Added ``PoseArray``, ``MultiArrayDimension``, ``MultiArrayLayout``, ``Int8MultiArray``, ``Float32MultiArray``, ``Int32`` to ``compas_fab.backends.ros.messages``
 * Added ``unordered_disabled_collisions`` attribute to ``PyBulletClient`` and ``RobotSemantics``
 * Added better support for concave meshes in the ``PyBulletClient``
+* Added ``Robot.iter_inverse_kinematics`` to allow iterating over all IK solutions provided by a solver.
 
 **Changed**
 

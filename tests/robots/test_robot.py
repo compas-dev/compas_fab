@@ -52,6 +52,24 @@ def ur5_robot_instance():
 
 
 @pytest.fixture
+def ur5_with_fake_ik(ur5_robot_instance, fake_client):
+    class FakeInverseKinematics(InverseKinematics):
+        def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
+            results = [
+                ((-1.572, -2.560, 2.196, 2.365, 0.001, 1.137), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint')),
+                ((-2.238, -3.175, 2.174, 4.143, -5.616, -6.283), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint')),
+            ]
+
+            for ik in results:
+                yield (ik[0], ik[2])
+
+    ur5_robot_instance.client = fake_client
+    ur5_robot_instance.client.inverse_kinematics = FakeInverseKinematics()
+
+    return ur5_robot_instance
+
+
+@pytest.fixture
 def ur5_joints(ur5_robot_instance):
     return ur5_robot_instance.model.joints
 
@@ -228,20 +246,8 @@ def test_get_configurable_joints_wo_semantics(panda_robot_instance_wo_semantics)
     assert all(matches)
 
 
-def test_inverse_kinematics_repeated_calls_will_return_next_result(ur5_robot_instance, fake_client):
-    class FakeInverseKinematics(InverseKinematics):
-        def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
-            results = [
-                ((-1.572, -2.560, 2.196, 2.365, 0.001, 1.137), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint')),
-                ((-2.238, -3.175, 2.174, 4.143, -5.616, -6.283), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint')),
-            ]
-
-            for ik in results:
-                yield (ik[0], ik[2])
-
-    robot = ur5_robot_instance
-    robot.client = fake_client
-    robot.client.inverse_kinematics = FakeInverseKinematics()
+def test_inverse_kinematics_repeated_calls_will_return_next_result(ur5_with_fake_ik):
+    robot = ur5_with_fake_ik
 
     frame = Frame.worldXY()
     start_config = robot.zero_configuration()
@@ -252,3 +258,15 @@ def test_inverse_kinematics_repeated_calls_will_return_next_result(ur5_robot_ins
     assert str(configuration) == "Configuration((-2.238, -3.175, 2.174, 4.143, -5.616, -6.283), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
     configuration = robot.inverse_kinematics(frame, start_config)
     assert str(configuration) == "Configuration((-1.572, -2.560, 2.196, 2.365, 0.001, 1.137), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
+
+
+def test_iter_inverse_kinematics(ur5_with_fake_ik):
+    robot = ur5_with_fake_ik
+
+    frame = Frame.worldXY()
+    start_config = robot.zero_configuration()
+
+    solutions = list(robot.iter_inverse_kinematics(frame, start_config))
+    assert len(solutions) == 2
+    assert str(solutions[0]) == "Configuration((-1.572, -2.560, 2.196, 2.365, 0.001, 1.137), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
+    assert str(solutions[1]) == "Configuration((-2.238, -3.175, 2.174, 4.143, -5.616, -6.283), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"

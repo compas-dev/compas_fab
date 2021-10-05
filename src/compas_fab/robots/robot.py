@@ -1123,13 +1123,14 @@ class Robot(object):
     def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, return_full_configuration=False, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
-        The inverse kinematic solvers are implemented as generators which fits both analytic
-        and numerical solver approaches. However, this class abstracts that away and returns one or zero
-        configuration at a time to simplify its usage. In order to keep the usefulness of the generator,
-        calls to this method will recall the last retrieved iterator and keep returning results
-        yielded by it, one at a time.
-        This is true only as long as the request is identical to the last one. If not, the last generator
-        is discarded and the client IK implementation is called again.
+        The inverse kinematic solvers are implemented as generators in order to fit both analytic
+        and numerical solver approaches. However, this method abstracts that away and returns one
+        configuration at a time to simplify its usage.
+
+        To keep the usefulness of the generator, calls to this method will recall the last retrieved
+        iterator and keep returning results yielded by it, one at a time. This is true only as long as
+        the request is identical to the last one. If the arguments change, the last generator
+        is discarded and the client IK implementation is invoked again.
 
         Parameters
         ----------
@@ -1158,7 +1159,7 @@ class Robot(object):
         Returns
         -------
         :class:`Configuration`
-            The planning group's configuration.
+            An inverse kinematic solution represented as a configuration.
 
         Examples
         --------
@@ -1172,11 +1173,62 @@ class Robot(object):
         request_id = '{}-{}-{}-{}-{}'.format(str(frame_WCF), str(start_configuration), str(group), str(return_full_configuration), str(options))
 
         if self._current_ik['request_id'] == request_id and self._current_ik['solutions'] is not None:
-            ik = next(self._current_ik['solutions'], None)
-            if ik is not None:
-                joint_positions, joint_names = ik
-                return self._build_configuration(joint_positions, joint_names, group, return_full_configuration)
+            solution = next(self._current_ik['solutions'], None)
+            if solution is not None:
+                return solution
 
+        solutions = self.iter_inverse_kinematics(frame_WCF, start_configuration, group, return_full_configuration, options)
+        self._current_ik['request_id'] = request_id
+        self._current_ik['solutions'] = solutions
+
+        return next(solutions)
+
+    def iter_inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, return_full_configuration=False, options=None):
+        """Iterate over the inverse kinematic solutions of a robot.
+
+        This method exposes the generator-based inverse kinematic solvers. Analytics solvers will return
+        generators that include all possible solutions, hence exhausting the iterator indicates there are
+        no more solutions to be found. Numerical solvers, on the other hand, will keep returning solutions
+        until one fails to be found (usually caused by a timeout rather than infeasibility) or until the user
+        code stops the iteration.
+
+        Parameters
+        ----------
+        frame_WCF : :class:`compas.geometry.Frame`
+            The frame to calculate the inverse kinematic for.
+        start_configuration : :class:`Configuration`, optional
+            If passed, the inverse will be calculated such that the calculated
+            joint positions differ the least from the start_configuration.
+            Defaults to the zero configuration.
+        group: :obj:`str`, optional
+            The planning group used for calculation. Defaults to the robot's
+            main planning group.
+        return_full_configuration : :obj:`bool`, optional
+            If ``True``, returns a full configuration with all joint values
+            specified, including passive ones if available. Defaults to ``False``.
+        options: :obj:`dict`, optional
+            Dictionary containing the key-value pairs of additional options.
+            The valid options are specific to the backend in use.
+            Check the API reference of the IK backend implementation for more details.
+
+        Raises
+        ------
+        :exc:`compas_fab.backends.BackendError`
+            If no configuration can be found.
+
+        Yields
+        -------
+        :class:`Configuration`
+            An inverse kinematic solution represented as a configuration.
+
+        Examples
+        --------
+        >>> frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
+        >>> start_configuration = robot.zero_configuration()
+        >>> group = robot.main_group_name
+        >>> next(robot.iter_inverse_kinematics(frame_WCF, start_configuration, group))      # doctest: +SKIP
+        Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
+        """
         options = options or {}
         attached_collision_meshes = options.get('attached_collision_meshes') or []
 
@@ -1198,13 +1250,10 @@ class Robot(object):
                                                    start_configuration_scaled,
                                                    group,
                                                    options)
-        self._current_ik['request_id'] = request_id
-        self._current_ik['solutions'] = solutions
 
         # The returned joint names might be more than the requested ones if there are passive joints present
-        joint_positions, joint_names = next(solutions)
-
-        return self._build_configuration(joint_positions, joint_names, group, return_full_configuration)
+        for joint_positions, joint_names in solutions:
+            yield self._build_configuration(joint_positions, joint_names, group, return_full_configuration)
 
     def _build_configuration(self, joint_positions, joint_names, group, return_full_configuration):
         if return_full_configuration:
