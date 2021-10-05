@@ -55,6 +55,10 @@ class Robot(object):
         self.semantics = semantics
         self.client = client
         self.attributes = {}
+        self._current_ik = {
+            'request_id': None,
+            'solutions': None
+        }
 
     @property
     def artist(self):
@@ -1119,6 +1123,14 @@ class Robot(object):
     def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, return_full_configuration=False, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
+        The inverse kinematic solvers are implemented as generators which fits both analytic
+        and numerical solver approaches. However, this class abstracts that away and returns one or zero
+        configuration at a time to simplify its usage. In order to keep the usefulness of the generator,
+        calls to this method will recall the last retrieved iterator and keep returning results
+        yielded by it, one at a time.
+        This is true only as long as the request is identical to the last one. If not, the last generator
+        is discarded and the client IK implementation is called again.
+
         Parameters
         ----------
         frame_WCF : :class:`compas.geometry.Frame`
@@ -1156,6 +1168,15 @@ class Robot(object):
         >>> robot.inverse_kinematics(frame_WCF, start_configuration, group)                 # doctest: +SKIP
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
+        # Pseudo-memoized sequential calls will re-use iterator if not exhaused
+        request_id = '{}-{}-{}-{}-{}'.format(id(frame_WCF), id(start_configuration), id(group), id(return_full_configuration), id(options))
+
+        if self._current_ik['request_id'] == request_id and self._current_ik['solutions'] is not None:
+            ik = next(self._current_ik['solutions'], None)
+            if ik is not None:
+                joint_positions, joint_names = ik
+                return self._build_configuration(joint_positions, joint_names, group, return_full_configuration)
+
         options = options or {}
         attached_collision_meshes = options.get('attached_collision_meshes') or []
 
@@ -1172,12 +1193,20 @@ class Robot(object):
 
         options['attached_collision_meshes'] = attached_collision_meshes
 
+        solutions = self.client.inverse_kinematics(self,
+                                                   frame_WCF_scaled,
+                                                   start_configuration_scaled,
+                                                   group,
+                                                   options)
+        self._current_ik['request_id'] = request_id
+        self._current_ik['solutions'] = solutions
+
         # The returned joint names might be more than the requested ones if there are passive joints present
-        joint_positions, joint_names = next(self.client.inverse_kinematics(self,
-                                                                           frame_WCF_scaled,
-                                                                           start_configuration_scaled,
-                                                                           group,
-                                                                           options))
+        joint_positions, joint_names = next(solutions)
+
+        return self._build_configuration(joint_positions, joint_names, group, return_full_configuration)
+
+    def _build_configuration(self, joint_positions, joint_names, group, return_full_configuration):
         if return_full_configuration:
             # build configuration including passive joints, but no sorting
             joint_types = self.get_joint_types_by_names(joint_names)
