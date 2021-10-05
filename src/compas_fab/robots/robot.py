@@ -1169,7 +1169,7 @@ class Robot(object):
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
         # Pseudo-memoized sequential calls will re-use iterator if not exhaused
-        request_id = '{}-{}-{}-{}-{}'.format(id(frame_WCF), id(start_configuration), id(group), id(return_full_configuration), id(options))
+        request_id = '{}-{}-{}-{}-{}'.format(str(frame_WCF), str(start_configuration), str(group), str(return_full_configuration), str(options))
 
         if self._current_ik['request_id'] == request_id and self._current_ik['solutions'] is not None:
             ik = next(self._current_ik['solutions'], None)
