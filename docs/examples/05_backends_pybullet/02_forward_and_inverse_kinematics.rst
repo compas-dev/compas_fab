@@ -31,3 +31,8 @@ Here is an example of such a calculation using PyBullet:
 
 .. literalinclude :: files/02_inverse_kinematics.py
    :language: python
+
+It is also possible to request multiple inverse kinematic solutions:
+
+.. literalinclude :: files/02_iter_inverse_kinematics.py
+   :language: python

@@ -21,6 +21,7 @@ Unreleased
 
 * Changed the backend feature ``InverseKinematics.inverse_kinematics`` to be a generator. As a consequence of this, ``ClientInterface.inverse_kinematics`` and ``PlannerInterface.inverse_kinematics`` have changed to generators as well.
 * Standardized the yielded type of ``InverseKinematics.inverse_kinematics`` across the PyBullet, MoveIt and V-REP planners
+* Added iterative accurate IK resolution for Pybullet
 
 **Fixed**
 
