@@ -69,6 +69,8 @@ class MoveItInverseKinematics(InverseKinematics):
               Defaults to ``None``.
             - ``"attempts"``: (:obj:`int`, optional) The maximum number of inverse kinematic attempts.
               Defaults to ``8``. This value is ignored on ROS Noetic and newer, use ``"timeout"`` instead.
+            - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
+              Defaults to ``100``.
 
         Raises
         ------
@@ -88,10 +90,13 @@ class MoveItInverseKinematics(InverseKinematics):
         kwargs['start_configuration'] = start_configuration
         kwargs['errback_name'] = 'errback'
 
+        max_results = options.get('max_results', 100)
+
         # Use base_link or fallback to model's root link
         options['base_link'] = options.get('base_link', robot.model.root.name)
 
-        yield await_callback(self.inverse_kinematics_async, **kwargs)
+        for _ in range(max_results):
+            yield await_callback(self.inverse_kinematics_async, **kwargs)
 
     def inverse_kinematics_async(self, callback, errback,
                                  frame_WCF, start_configuration=None, group=None, options=None):

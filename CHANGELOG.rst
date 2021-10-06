@@ -15,11 +15,13 @@ Unreleased
 * Added ``PoseArray``, ``MultiArrayDimension``, ``MultiArrayLayout``, ``Int8MultiArray``, ``Float32MultiArray``, ``Int32`` to ``compas_fab.backends.ros.messages``
 * Added ``unordered_disabled_collisions`` attribute to ``PyBulletClient`` and ``RobotSemantics``
 * Added better support for concave meshes in the ``PyBulletClient``
+* Added ``Robot.iter_inverse_kinematics`` to allow iterating over all IK solutions provided by a solver.
 
 **Changed**
 
-* Changed the backend feature `InverseKinematics.inverse_kinematics` to be a generator
-* Standardized the yielded type of `InverseKinematics.inverse_kinematics` across the PyBullet, MoveIt and V-REP planners
+* Changed the backend feature ``InverseKinematics.inverse_kinematics`` to be a generator. As a consequence of this, ``ClientInterface.inverse_kinematics`` and ``PlannerInterface.inverse_kinematics`` have changed to generators as well.
+* Standardized the yielded type of ``InverseKinematics.inverse_kinematics`` across the PyBullet, MoveIt and V-REP planners
+* Added iterative accurate IK resolution for Pybullet
 
 **Fixed**
 
