@@ -4,7 +4,6 @@ from __future__ import print_function
 
 import math
 import random
-import sys
 
 from compas.robots import Joint
 
@@ -93,8 +92,6 @@ class PyBulletInverseKinematics(InverseKinematics):
         rest_configuration = start_configuration or robot.zero_configuration()
         rest_poses = self._get_rest_poses(joint_names, rest_configuration)
 
-        called_from_test = 'pytest' in sys.modules
-
         for _ in range(max_results):
             ik_options = dict(
                 bodyUniqueId=body_id,
@@ -103,7 +100,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 physicsClientId=self.client.client_id,
             )
 
-            if options.get('enforce_joint_limits', True) and not called_from_test:
+            if options.get('enforce_joint_limits', True):
                 # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.
                 # https://stackoverflow.com/questions/49674179/understanding-inverse-kinematics-pybullet
                 # https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/preview?pru=AAABc7276PI*zazLer2rlZ8tAUI8lF98Kw#heading=h.9i02ojf4k3ve
