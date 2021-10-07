@@ -98,7 +98,7 @@ that there is at least one valid configuration to reach the goal pose.
         options = {
             'num_joints': len(robot.get_configurable_joints()),
         }
-        configs = client.inverse_kinematics(robot, goal_pose, group=group, options=options)
+        configs = list(client.inverse_kinematics(robot, goal_pose, group=group, options=options))
 
         assert len(configs) > 0, 'No IK solution found'
         print('Found valid configuration: ', str(configs[-1]))

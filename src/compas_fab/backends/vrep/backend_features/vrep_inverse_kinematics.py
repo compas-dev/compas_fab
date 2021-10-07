@@ -38,11 +38,12 @@ class VrepInverseKinematics(InverseKinematics):
                   arm joints. Use this if you want to restrict the working area in which to search for states.
                 - ``"max_trials"``: (:obj:`int`) Number of trials to run. Set to ``None``
                   to retry infinitely.
-                - ``"max_results"``: (:obj:`int`) Maximum number of result states to return.
+                - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
+                  Defaults to ``100``.
 
-        Returns:
-            list: List of :class:`Configuration` objects representing
-            the collision-free configuration for the ``goal_frame``.
+        Yields:
+            :obj:`tuple` of :obj:`list`
+                A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
         """
         options = options or {}
         num_joints = options['num_joints']
@@ -50,7 +51,7 @@ class VrepInverseKinematics(InverseKinematics):
         gantry_joint_limits = options.get('gantry_joint_limits')
         arm_joint_limits = options.get('arm_joint_limits')
         max_trials = options.get('max_trials')
-        max_results = options.get('max_results', 1)
+        max_results = options.get('max_results', 100)
 
         if not metric_values:
             metric_values = [0.1] * num_joints
@@ -59,5 +60,7 @@ class VrepInverseKinematics(InverseKinematics):
 
         states = self.client.find_raw_robot_states(group, frame_to_vrep_pose(frame_WCF, self.client.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
 
-        return [config_from_vrep(states[i:i + num_joints], self.client.scale)
-                for i in range(0, len(states), num_joints)]
+        joint_names = robot.get_configurable_joint_names()
+
+        for i in range(0, len(states), num_joints):
+            yield config_from_vrep(states[i: i+num_joints], self.client.scale).joint_values, joint_names
