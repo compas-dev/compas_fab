@@ -28,6 +28,9 @@ class PyBulletAddCollisionMesh(AddCollisionMesh):
 
             - ``"mass"``: (:obj:`float`) The mass of the object, in kg.
               If `0` is given, (the default), the object added is static.
+            - ``"concavity"``: (:obj:`bool`) When ``False`` (the default),
+              the mesh will be loaded as its convex hull for collision checking purposes.
+              When ``True``, a non-static mesh will be decomposed into convex parts using v-HACD.
 
         Returns
         -------
@@ -38,10 +41,11 @@ class PyBulletAddCollisionMesh(AddCollisionMesh):
         name = collision_mesh.id
         frame = collision_mesh.frame
         mass = options.get('mass', STATIC_MASS)
+        concavity = options.get('concavity', False)
 
         # mimic ROS' behavior: collision object with same name is replaced
         if name in self.client.collision_objects:
             self.client.remove_collision_mesh(name)
 
-        body_id = self.client.convert_mesh_to_body(mesh, frame, name, mass)
+        body_id = self.client.convert_mesh_to_body(mesh, frame, name, concavity, mass)
         self.client.collision_objects[name] = [body_id]

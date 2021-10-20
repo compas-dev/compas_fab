@@ -86,6 +86,22 @@ class PoseStamped(ROSmsg):
         return cls(header, pose)
 
 
+class PoseArray(ROSmsg):
+    """http://docs.ros.org/en/api/geometry_msgs/html/msg/PoseArray.html
+    """
+    ROS_MSG_TYPE = 'geometry_msgs/PoseArray'
+
+    def __init__(self, header=None, poses=None):
+        self.header = header or Header()
+        self.poses = poses or []
+
+    @classmethod
+    def from_msg(cls, msg):
+        header = Header.from_msg(msg['header'])
+        poses = [Pose.from_msg(p) for p in msg['poses']]
+        return cls(header, poses)
+
+
 class Vector3(ROSmsg):
     """https://docs.ros.org/api/geometry_msgs/html/msg/Vector3.html
     """

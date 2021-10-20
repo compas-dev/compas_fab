@@ -55,6 +55,8 @@ class InverseKinematics(object):
     def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
+        Note that unlike other backend features, `inverse_kinematics` produces a generator.
+
         Parameters
         ----------
         robot : :class:`compas_fab.robots.Robot`
@@ -68,7 +70,7 @@ class InverseKinematics(object):
             Dictionary containing kwargs for arguments specific to
             the client being queried.
 
-        Returns
+        Yields
         -------
         :obj:`tuple` of :obj:`list`
             A tuple of 2 elements containing a list of joint positions and a list of matching joint names.

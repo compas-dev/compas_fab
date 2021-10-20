@@ -12,12 +12,54 @@ Unreleased
 
 **Added**
 
+* Added ``PoseArray``, ``MultiArrayDimension``, ``MultiArrayLayout``, ``Int8MultiArray``, ``Float32MultiArray``, ``Int32`` to ``compas_fab.backends.ros.messages``
+* Added ``unordered_disabled_collisions`` attribute to ``PyBulletClient`` and ``RobotSemantics``
+* Added better support for concave meshes in the ``PyBulletClient``
+* Added ``Robot.iter_inverse_kinematics`` to allow iterating over all IK solutions provided by a solver
+
+**Changed**
+
+* Changed the backend feature ``InverseKinematics.inverse_kinematics`` to be a generator. As a consequence of this, ``ClientInterface.inverse_kinematics`` and ``PlannerInterface.inverse_kinematics`` have changed to generators as well
+* Standardized the yielded type of ``InverseKinematics.inverse_kinematics`` across the PyBullet, MoveIt and V-REP planners
+* Added iterative accurate IK resolution for PyBullet
+
+**Fixed**
+
+* Fixed ``UnsupportedOperation`` error when using ``PyBulletClient`` in Jupyter notebook (raised by ``redirect_stdout``)
+* Fixed ``JointTrajectoryPoint.from_data`` to be backward-compatible with JSON data generated before ``compas_fab`` 0.18
+* Fixed ``JointTrajectory.from_data`` to be backward-compatible with JSON data generated before ``compas_fab`` 0.17
+
+**Deprecated**
+
+**Removed**
+
+0.19.1
+----------
+
+**Added**
+
+**Changed**
+
+**Fixed**
+
+* Fixed bundling of ghuser components
+
+**Deprecated**
+
+**Removed**
+
+0.19.0
+----------
+
+**Added**
+
 * Added documentation for Grasshopper components.
 * Added Grasshopper components to publish and subscribe to ROS topics.
 
 **Changed**
 
-* Updated to ``COMPAS 1.6.2``
+* Updated ``build-ghuser-components`` task
+* Updated to COMPAS 1.7
 
 **Fixed**
 

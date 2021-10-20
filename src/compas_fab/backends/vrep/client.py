@@ -192,7 +192,9 @@ class VrepClient(ClientInterface):
             'num_joints': joints,
             'metric_values': [0.] * joints,
         }
-        config = self.inverse_kinematics(robot, frame, group=robot.model.attr['index'], options=options)[-1]
+        joint_values, joint_names = list(self.inverse_kinematics(robot, frame, group=robot.model.attr['index'], options=options))[-1]
+
+        config = config_from_vrep(joint_values, self.scale)
 
         if not config:
             raise ValueError('Cannot find a valid config for the given pose')

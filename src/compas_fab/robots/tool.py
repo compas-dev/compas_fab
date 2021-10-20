@@ -4,10 +4,16 @@ from __future__ import print_function
 
 import json
 
-from compas.robots import ToolModel, Geometry
+from compas.robots import Geometry
+from compas.robots import ToolModel
 
 from compas_fab.robots.planning_scene import AttachedCollisionMesh
 from compas_fab.robots.planning_scene import CollisionMesh
+
+
+__all__ = [
+    'Tool'
+]
 
 
 class Tool(object):

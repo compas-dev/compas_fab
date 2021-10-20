@@ -39,6 +39,10 @@ class RobotSemantics(object):
     def group_names(self):
         return list(self.groups.keys())
 
+    @property
+    def unordered_disabled_collisions(self):
+        return {frozenset(pair) for pair in self.disabled_collisions}
+
     @classmethod
     def from_srdf_file(cls, file, robot_model):
         """Create an instance of semantics based on an SRDF file path or file-like object."""
