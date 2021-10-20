@@ -62,7 +62,7 @@ class ROSmsg(object):
 
     @staticmethod
     def parse(msg, msg_type):
-        """Parses a msg in various possible input formats and tries to return an instance of the that wraps it.
+        """Parses a msg in various possible input formats and tries to return an instance of the class that wraps it.
 
         Parameters
         ----------
