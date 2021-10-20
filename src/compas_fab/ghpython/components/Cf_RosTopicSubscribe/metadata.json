@@ -49,7 +49,7 @@
             },
             {
                 "name": "is_subscribed",
-                "description": "Indicates if the topic is current subscribed or not."
+                "description": "Indicates if the topic is currently subscribed or not."
             }
         ]
     }
