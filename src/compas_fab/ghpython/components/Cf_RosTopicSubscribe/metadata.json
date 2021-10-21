@@ -1,0 +1,56 @@
+{
+    "name": "Subscribe to topic",
+    "nickname": "Subscribe",
+    "category": "COMPAS FAB",
+    "subcategory": "ROS",
+    "description": "Receives messages that have been published to a ROS topic.",
+    "exposure": 4,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "ros_client",
+                "description": "The ROS client."
+            },
+            {
+                "name": "topic_name",
+                "description": "Name of the topic to subscribe to, eg. /joint_states",
+                "typeHintID": "str"
+            },
+            {
+                "name": "topic_type",
+                "description": "Type of the topic to subscribe to, eg. sensor_msgs/JointState",
+                "typeHintID": "str"
+            },
+            {
+                "name": "interval",
+                "description": "Interval in milliseconds at which to expire the solution to propagate received messages. Defaults to 25ms. Messages are not queued, so if the interval is greater than the rate at which messages are published, some messages will be dropped.",
+                "typeHintID": "int"
+            },
+            {
+                "name": "start",
+                "description": "Start receiving messages.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "stop",
+                "description": "Stop receiving messages.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "topic",
+                "description": "The subscribed topic instance."
+            },
+            {
+                "name": "last_msg",
+                "description": "The last received message."
+            },
+            {
+                "name": "is_subscribed",
+                "description": "Indicates if the topic is currently subscribed or not."
+            }
+        ]
+    }
+}

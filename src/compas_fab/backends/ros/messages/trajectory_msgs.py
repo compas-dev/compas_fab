@@ -8,6 +8,7 @@ from .std_msgs import Time
 class JointTrajectoryPoint(ROSmsg):
     """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectoryPoint.html
     """
+    ROS_MSG_TYPE = 'trajectory_msgs/JointTrajectoryPoint'
 
     def __init__(self, positions=None, velocities=None, accelerations=None, effort=None, time_from_start=None):
         self.positions = positions or []
@@ -35,6 +36,7 @@ class JointTrajectoryPoint(ROSmsg):
 class JointTrajectory(ROSmsg):
     """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectory.html
     """
+    ROS_MSG_TYPE = 'trajectory_msgs/JointTrajectory'
 
     def __init__(self, header=None, joint_names=None, points=None):
         self.header = header or Header()
@@ -52,6 +54,7 @@ class JointTrajectory(ROSmsg):
 class MultiDOFJointTrajectoryPoint(ROSmsg):
     """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectoryPoint.html
     """
+    ROS_MSG_TYPE = 'trajectory_msgs/MultiDOFJointTrajectoryPoint'
 
     def __init__(self, transforms=None, velocities=None, accelerations=None, time_from_start=None):
         self.transforms = transforms or []        # geometry_msgs/Transform[]
@@ -63,6 +66,7 @@ class MultiDOFJointTrajectoryPoint(ROSmsg):
 class MultiDOFJointTrajectory(ROSmsg):
     """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectory.html
     """
+    ROS_MSG_TYPE = 'trajectory_msgs/MultiDOFJointTrajectory'
 
     def __init__(self, header=None, joint_names=None, points=None):
         self.header = header or Header()

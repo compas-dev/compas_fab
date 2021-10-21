@@ -3,7 +3,7 @@
     "nickname": "Plan Cartesian Motion",
     "category": "COMPAS FAB",
     "subcategory": "Planning",
-    "description": "Calculate a cartesian motion path (linear in tool space).",
+    "description": "Calculate a cartesian motion plan (linear in tool space).",
     "exposure": 4,
 
     "ghpython": {

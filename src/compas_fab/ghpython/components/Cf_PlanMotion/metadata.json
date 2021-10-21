@@ -3,7 +3,7 @@
     "nickname": "Plan Motion",
     "category": "COMPAS FAB",
     "subcategory": "Planning",
-    "description": "Calculate a motion path.",
+    "description": "Calculate a motion plan.",
     "exposure": 4,
 
     "ghpython": {

@@ -54,6 +54,7 @@ Unreleased
 **Added**
 
 * Added documentation for Grasshopper components.
+* Added Grasshopper components to publish and subscribe to ROS topics.
 
 **Changed**
 

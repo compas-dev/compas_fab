@@ -4,7 +4,6 @@ import re
 import pytest
 from compas.geometry import Frame
 from compas.robots import RobotModel
-from compas.robots.base_artist import BaseRobotModelArtist
 
 from compas_fab.backends.interfaces import ClientInterface
 from compas_fab.backends.interfaces import InverseKinematics
@@ -35,8 +34,12 @@ def panda_robot_instance(panda_urdf, panda_srdf):
 
 @pytest.fixture
 def panda_robot_instance_w_artist(panda_robot_instance):
+    class FakeArtist(object):
+        def scale(self, _):
+            pass
+
     robot = panda_robot_instance
-    robot.artist = BaseRobotModelArtist(robot.model)
+    robot.artist = FakeArtist()
 
     return robot
 
