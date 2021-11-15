@@ -1,7 +1,7 @@
 """
 Subscribe to a ROS topic.
 
-COMPAS FAB v0.18.2
+COMPAS FAB v0.19.1
 """
 import time
 
