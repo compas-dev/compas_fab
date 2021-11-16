@@ -30,6 +30,8 @@ jobs:
       - name: Install
         run: |
           python -m pip install --no-cache-dir -r requirements-dev.txt
+          # Get V-REP remote API for integration testing
+          curl --output $(python -c "import os;import compas_fab.backends.vrep.remote_api as v; print(os.path.dirname(v.__file__))")/remoteApi.so https://wolke.ethz.ch/s/idbWPRKzJ8pFkAn/download/remoteApi.so
       - name: Run integration tests
         run: |
           pytest --doctest-modules --ignore-glob="**ghpython/components/**.py"
