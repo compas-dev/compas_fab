@@ -20,6 +20,8 @@ Unreleased
 
 **Removed**
 
+* Removed the bundled binary files for the `VrepClient` remote API. To use V-REP, use the `remoteApi` binaries provided with the software.
+
 0.20.0
 ----------
 
