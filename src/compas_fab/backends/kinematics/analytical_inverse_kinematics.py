@@ -30,7 +30,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         solutions = self._inverse_kinematics(frame_RCF)
 
-        configurations = self.joint_angles_to_configuration(robot, solutions)
+        configurations = self.joint_angles_to_configuration(robot, solutions, group=group)
 
         # check collisions for all configurations (sets those to `None` that are not working)
         if options and "check_collision" in options and options["check_collision"] is True:
@@ -42,6 +42,10 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         # fit configurations within joint bounds (sets those to `None` that are not working)
         configurations = self.try_to_fit_configurations_between_bounds(robot, configurations)
+        
+        if start_configuration:
+            # return the one "closest" to start configuration
+            raise NotImplementedError
 
         # removes the `None` ones
         if options and "cull" in options and options["cull"] is True:
@@ -52,8 +56,8 @@ class AnalyticalInverseKinematics(InverseKinematics):
     def _inverse_kinematics(self, frame):
         raise NotImplementedError
 
-    def joint_angles_to_configurations(self, robot, solutions):
-        joint_names = robot.get_configurable_joint_names()
+    def joint_angles_to_configurations(self, robot, solutions, group=None):
+        joint_names = robot.get_configurable_joint_names(group=group)
         return [Configuration.from_revolute_values(q, joint_names=joint_names) for q in solutions]
 
     def try_to_fit_configurations_between_bounds(self, robot, configurations):
