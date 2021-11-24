@@ -133,7 +133,7 @@ def check(ctx):
         lint(ctx)
 
         log.write('Checking MANIFEST.in...')
-        ctx.run('check-manifest --ignore-bad-ideas=remoteApi.so')
+        ctx.run('check-manifest')
 
         log.write('Checking ReStructuredText formatting...')
         ctx.run('python setup.py check --strict --metadata --restructuredtext')

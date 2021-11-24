@@ -48,3 +48,8 @@ The following code exemplifies how to calculate this:
 
 .. literalinclude :: files/03_inverse_kinematics.py
    :language: python
+
+It is also possible to request multiple inverse kinematic solutions:
+
+.. literalinclude :: files/03_iter_inverse_kinematics.py
+   :language: python

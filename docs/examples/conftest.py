@@ -5,7 +5,7 @@ import re
 
 from sybil import Region
 from sybil import Sybil
-from sybil.parsers.codeblock import CodeBlockParser
+from sybil.parsers.codeblock import PythonCodeBlockParser
 from sybil.parsers.doctest import DocTestParser
 
 LITERALPYTHON_START = re.compile(r'\.\.\s*literalinclude\s*::(.*\.py)')
@@ -42,7 +42,7 @@ def parse_literalinclude_python_blocks(document):
 pytest_collect_file = Sybil(
     parsers=[
         DocTestParser(),
-        CodeBlockParser(),
+        PythonCodeBlockParser(),
         parse_literalinclude_python_blocks
     ],
     pattern='*.rst',
