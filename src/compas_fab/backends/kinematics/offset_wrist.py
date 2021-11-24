@@ -194,7 +194,7 @@ def inverse_kinematics_offset_wrist(frame, params, q6_des=0.):
             if(fabs(fabs(c3) - 1.0) < ZERO_THRESH):
                 c3 = sign(c3)
             elif(fabs(c3) > 1.0):
-                # TODO NO SOLUTION
+                solutions.extend([None, None])
                 continue
 
             arccos = acos(c3)
