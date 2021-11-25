@@ -6,33 +6,54 @@ from compas_fab.backends.interfaces import InverseKinematics
 
 
 class AnalyticalInverseKinematics(InverseKinematics):
-    """Create a custom InverseKinematicsSolver for a robot.
-
-    The ik for 6 axes industrial robots returns by default 8 possible solutions.
-    Those solutions are also sorted. That means, the if you call ik
-    on 2 frames that are close to each other, and compare the 8
-    configurations of the first one with the 8 of the second one at
-    their respective indices, then these configurations are 'close' to
-    each other. That is why for certain use cases, e.g. custom cartesian
-    path planning it makes sense to keep the sorting and set the ones
-    that are out of joint limits or in collison to `None`.
-
-    Examples
-    --------
-
-    >>> ik_solver = AnalyticalInverseKinematics()
-    """
+    """Callable to calculate the robot's inverse kinematics for a given frame."""
 
     def __init__(self, client=None):
         self.client = client
 
-    def inverse_kinematics(self, robot, frame_RCF, start_configuration=None, group=None, options=None):
+    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
+        """Calculate the robot's inverse kinematic (IK) for a given frame.
 
+        The IK for 6-axis industrial robots returns by default 8 possible solutions.
+        These solutions are also sorted. This means that if you call IK on two
+        subsequent frames and compare the 8 configurations of the first frame
+        with the 8 configurations of the second frame at their respective indices,
+        then these configurations are "close" to each other. For this reason,
+        for certain use cases, e.g. for cartesian path planning, it makes sense
+        to keep the sorting and set the configurations that are outside the
+        joint boundaries or in collision to ``None``.
+
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which inverse kinematics is being calculated.
+        frame_WCF: :class:`compas.geometry.Frame`
+            The frame to calculate the inverse for.
+        start_configuration: :class:`compas_fab.robots.Configuration`, optional
+            The start_configuration of the robot.
+        group: str, optional
+            The planning group used for determining the end effector and labeling
+            the ``start_configuration``. Defaults to the robot's main planning group.
+        options: dict, optional
+            Dictionary containing the following key-value pairs:
+            - ``"check_collision"``: (:obj:`str`, optional ) When ``True``, checks
+                if the robot is in collision. Defaults to ``False``.
+
+        Yields
+        -------
+        :obj:`tuple` of :obj:`list`
+            A tuple of 2 elements containing a list of joint positions and a list of matching joint names or a tuple of ``None``, ``None``
+        """
+
+        # convert the frame WCF to RCF
+        base_frame = robot.get_base_frame(group=group, full_configuration=start_configuration)
+        frame_RCF = base_frame.to_local_coordinates(frame_WCF)
+
+        # calculate inverse with 8 solutions
         solutions = self._inverse_kinematics(frame_RCF)
+        configurations = self.joint_angles_to_configurations(robot, solutions, group=group)
 
-        configurations = self.joint_angles_to_configuration(robot, solutions, group=group)
-
-        # check collisions for all configurations (sets those to `None` that are not working)
+        # check collisions for all configurations (>> sets those to `None` that are not working)
         if options and "check_collision" in options and options["check_collision"] is True:
             for i, config in enumerate(configurations):
                 try:
@@ -40,27 +61,23 @@ class AnalyticalInverseKinematics(InverseKinematics):
                 except BackendError:
                     configurations[i] = None
 
-        # fit configurations within joint bounds (sets those to `None` that are not working)
-        configurations = self.try_to_fit_configurations_between_bounds(robot, configurations)
-        
-        if start_configuration:
-            # return the one "closest" to start configuration
-            raise NotImplementedError
+        # fit configurations within joint bounds (>> sets those to `None` that are not working)
+        configurations = self.try_to_fit_configurations_between_bounds(robot, configurations, group=group)
 
-        # removes the `None` ones
-        if options and "cull" in options and options["cull"] is True:
-            configurations = [c for c in configurations if c is not None]
-
-        return configurations
+        for config in configurations:
+            if config:
+                yield config.joint_values, config.joint_names
+            else:
+                yield None, None
 
     def _inverse_kinematics(self, frame):
         raise NotImplementedError
 
     def joint_angles_to_configurations(self, robot, solutions, group=None):
         joint_names = robot.get_configurable_joint_names(group=group)
-        return [Configuration.from_revolute_values(q, joint_names=joint_names) for q in solutions]
+        return [Configuration.from_revolute_values(q, joint_names=joint_names) if q else None for q in solutions]
 
-    def try_to_fit_configurations_between_bounds(self, robot, configurations):
+    def try_to_fit_configurations_between_bounds(self, robot, configurations, group=None):
         """
         """
         j1, j2, j3, j4, j5, j6 = robot.get_configurable_joints()
@@ -89,17 +106,24 @@ class UR5_Analytical_IK(AnalyticalInverseKinematics):
 
 
 if __name__ == "__main__":
-    import time
+    import logging
     import compas_fab
     from compas_fab.robots import Tool
     from compas.datastructures import Mesh
     from compas.geometry import Point, Vector
     from compas_fab.robots import RobotSemantics
     from compas_fab.backends import PyBulletClient
+    from compas_fab.backends.pybullet import LOG
+    from compas_fab.backends.kinematics.analytical_plan_cartesian_motion import AnalyticalPlanCartesianMotion
+
+    LOG.setLevel(logging.ERROR)
 
     class Client(PyBulletClient):
         def inverse_kinematics(self, *args, **kwargs):
             return UR5_Analytical_IK(self)(*args, **kwargs)
+        
+        def plan_cartesian_motion(self, *args, **kwargs):
+            return AnalyticalPlanCartesianMotion(self)(*args, **kwargs)
 
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
 
@@ -127,10 +151,17 @@ if __name__ == "__main__":
         configurations_along_path = []
 
         for frame in frames_WCF_T0:
-            # the following is not working because in robot we split joint_names and joint_values and do not support lists as outcomes
-            # configurations = robot.inverse_kinematics(frame_WCF)
-            configurations = client.inverse_kinematics(robot, frame, options={"check_collision": True})
+            configurations = list(robot.iter_inverse_kinematics(frame, options={"check_collision": True}))
             configurations_along_path.append(configurations)
+        
+
+        trajectory = robot.plan_cartesian_motion(frames_WCF_T0)
+
+        j = [c.joint_values for c in trajectory.points]
+        import matplotlib.pyplot as plt
+        plt.plot(j)
+        plt.show()
+
 
         # with a bit of work we can turn this into a cartesian planner that returns up to 8 possible paths
         paths = []
@@ -143,5 +174,13 @@ if __name__ == "__main__":
             for configuration in path:
                 frame_WCF = robot.forward_kinematics(configuration, options={"check_collision": True})
                 print(frame_WCF)
-                time.sleep(0.1)
             print("=")
+
+        # visualize paths
+        """
+        J = [[c.joint_values for c in path] for path in paths]
+        import matplotlib.pyplot as plt
+        for j in J:
+            plt.plot(j)
+            plt.show()
+        """
