@@ -151,7 +151,7 @@ if __name__ == "__main__":
             configurations = list(robot.iter_inverse_kinematics(frame, options={"check_collision": True, "keep_order": True}))
             configurations_along_path.append(configurations)
 
-        start_configurations = list(robot.iter_inverse_kinematics(frames_WCF_T0[0], options={"check_collision": True, "keep_order": True}))
+        start_configurations = list(robot.iter_inverse_kinematics(frames_WCF_T0[0], options={"check_collision": True}))
 
         trajectory = robot.plan_cartesian_motion(frames_WCF_T0)
         j = [c.joint_values for c in trajectory.points]
