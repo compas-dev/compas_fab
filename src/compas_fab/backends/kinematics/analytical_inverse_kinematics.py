@@ -5,6 +5,7 @@ from compas_fab.backends.kinematics.utils import fit_within_bounds
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.kinematics.spherical_wrist_kinematics import *  # noqa: F403, F401
 from compas_fab.backends.kinematics.offset_wrist_kinematics import *  # noqa: F403, F401
+from compas_fab.backends.kinematics.exceptions import InverseKinematicsError
 
 
 class AnalyticalInverseKinematics(InverseKinematics):
@@ -57,12 +58,6 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         keep_order = options["keep_order"] if options and "keep_order" in options else False
 
-        # TODO
-        # what is the expected behaviour of this function?
-        # - if start_configuration is passed, should we move the solution which
-        #   is closest at the first place? if yes, then keeping the order makes
-        #   no sense anymore
-
         # convert the frame WCF to RCF
         base_frame = robot.get_base_frame(group=group, full_configuration=start_configuration)
         frame_RCF = base_frame.to_local_coordinates(frame_WCF)
@@ -81,6 +76,9 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         # fit configurations within joint bounds (>> sets those to `None` that are not working)
         configurations = self.try_to_fit_configurations_between_bounds(robot, configurations, group=group)
+
+        if not any(configurations):
+            raise InverseKinematicsError("No solutions found.")
 
         for config in configurations:
             if config:

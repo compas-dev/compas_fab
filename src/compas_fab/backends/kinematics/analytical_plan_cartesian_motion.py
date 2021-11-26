@@ -52,6 +52,8 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
             configurations = list(robot.iter_inverse_kinematics(frame, options=options))
             configurations_along_path.append(configurations)
 
+        # TODO: how to handle path not complete?
+
         paths = []
         for configurations in zip(*configurations_along_path):
             if all(configurations):
