@@ -12,6 +12,8 @@ Unreleased
 
 **Added**
 
+* Added a new backend: analytical kinematics for spherical-wrist and offset-wrist robots.
+
 **Changed**
 
 **Fixed**
