@@ -3,6 +3,8 @@ from compas.robots import Configuration
 from compas_fab.backends.exceptions import BackendError
 from compas_fab.backends.kinematics.utils import fit_within_bounds
 from compas_fab.backends.interfaces import InverseKinematics
+from compas_fab.backends.kinematics.spherical_wrist_kinematics import *  # noqa: F403, F401
+from compas_fab.backends.kinematics.offset_wrist_kinematics import *  # noqa: F403, F401
 
 
 class AnalyticalInverseKinematics(InverseKinematics):
@@ -15,13 +17,15 @@ class AnalyticalInverseKinematics(InverseKinematics):
         """Calculate the robot's inverse kinematic (IK) for a given frame.
 
         The IK for 6-axis industrial robots returns by default 8 possible solutions.
-        These solutions are also sorted. This means that if you call IK on two
+        These solutions have an order. That means that if you call IK on two
         subsequent frames and compare the 8 configurations of the first frame
         with the 8 configurations of the second frame at their respective indices,
-        then these configurations are "close" to each other. For this reason,
+        then these configurations are "close" to one another. For this reason,
         for certain use cases, e.g. for cartesian path planning, it makes sense
-        to keep the sorting and set the configurations that are outside the
-        joint boundaries or in collision to ``None``.
+        to keep the order of solutions. This can be achieved by setting the
+        optional parameter ``keep_order`` to ``True``. The configurations that
+        are in collision or outside joint boundaries are then not removed from
+        the list of solutions, they are set to ``None``.
 
         Parameters
         ----------
@@ -38,19 +42,33 @@ class AnalyticalInverseKinematics(InverseKinematics):
             Dictionary containing the following key-value pairs:
             - ``"check_collision"``: (:obj:`str`, optional ) When ``True``, checks
                 if the robot is in collision. Defaults to ``False``.
+            - ``"keep_order"``: (:obj:`str`, optional ) When ``False``, removes the
+                ``None``- solutions. Defaults to ``False``.
 
         Yields
         -------
         :obj:`tuple` of :obj:`list`
-            A tuple of 2 elements containing a list of joint positions and a list of matching joint names or a tuple of ``None``, ``None``
+            A tuple of 2 elements containing a list of joint positions and a list
+            of matching joint names. If ``"keep_order"`` is ``True`` this list
+            contains also ``None``, ``None``
         """
+        # What is the most elegant way to do this?
+        inverse_kinematics_function = eval("%sKinematics().inverse" % robot.name.upper())
+
+        keep_order = options["keep_order"] if options and "keep_order" in options else False
+
+        # TODO
+        # what is the expected behaviour of this function?
+        # - if start_configuration is passed, should we move the solution which
+        #   is closest at the first place? if yes, then keeping the order makes
+        #   no sense anymore
 
         # convert the frame WCF to RCF
         base_frame = robot.get_base_frame(group=group, full_configuration=start_configuration)
         frame_RCF = base_frame.to_local_coordinates(frame_WCF)
 
         # calculate inverse with 8 solutions
-        solutions = self._inverse_kinematics(frame_RCF)
+        solutions = inverse_kinematics_function(frame_RCF)
         configurations = self.joint_angles_to_configurations(robot, solutions, group=group)
 
         # check collisions for all configurations (>> sets those to `None` that are not working)
@@ -67,11 +85,8 @@ class AnalyticalInverseKinematics(InverseKinematics):
         for config in configurations:
             if config:
                 yield config.joint_values, config.joint_names
-            else:
+            elif keep_order:
                 yield None, None
-
-    def _inverse_kinematics(self, frame):
-        raise NotImplementedError
 
     def joint_angles_to_configurations(self, robot, solutions, group=None):
         joint_names = robot.get_configurable_joint_names(group=group)
@@ -98,36 +113,18 @@ class AnalyticalInverseKinematics(InverseKinematics):
         return configurations
 
 
-class UR5_Analytical_IK(AnalyticalInverseKinematics):
-
-    def _inverse_kinematics(self, frame):
-        from compas_fab.backends.kinematics.offset_wrist_kinematics import UR5
-        return UR5().inverse(frame)
-
-
 if __name__ == "__main__":
-    import logging
     import compas_fab
     from compas_fab.robots import Tool
     from compas.datastructures import Mesh
     from compas.geometry import Point, Vector
     from compas_fab.robots import RobotSemantics
-    from compas_fab.backends import PyBulletClient
-    from compas_fab.backends.pybullet import LOG
-    from compas_fab.backends.kinematics.analytical_plan_cartesian_motion import AnalyticalPlanCartesianMotion
 
-    LOG.setLevel(logging.ERROR)
-
-    class Client(PyBulletClient):
-        def inverse_kinematics(self, *args, **kwargs):
-            return UR5_Analytical_IK(self)(*args, **kwargs)
-        
-        def plan_cartesian_motion(self, *args, **kwargs):
-            return AnalyticalPlanCartesianMotion(self)(*args, **kwargs)
+    from compas_fab.backends.kinematics.client import AnalyticalPyBulletClient
 
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
 
-    with Client() as client:
+    with AnalyticalPyBulletClient() as client:
         urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
         srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
 
@@ -151,36 +148,13 @@ if __name__ == "__main__":
         configurations_along_path = []
 
         for frame in frames_WCF_T0:
-            configurations = list(robot.iter_inverse_kinematics(frame, options={"check_collision": True}))
+            configurations = list(robot.iter_inverse_kinematics(frame, options={"check_collision": True, "keep_order": True}))
             configurations_along_path.append(configurations)
-        
+
+        start_configurations = list(robot.iter_inverse_kinematics(frames_WCF_T0[0], options={"check_collision": True, "keep_order": True}))
 
         trajectory = robot.plan_cartesian_motion(frames_WCF_T0)
-
         j = [c.joint_values for c in trajectory.points]
         import matplotlib.pyplot as plt
         plt.plot(j)
         plt.show()
-
-
-        # with a bit of work we can turn this into a cartesian planner that returns up to 8 possible paths
-        paths = []
-        for configurations in zip(*configurations_along_path):
-            if all(configurations):
-                paths.append(configurations)
-
-        # visualize
-        for path in paths:
-            for configuration in path:
-                frame_WCF = robot.forward_kinematics(configuration, options={"check_collision": True})
-                print(frame_WCF)
-            print("=")
-
-        # visualize paths
-        """
-        J = [[c.joint_values for c in path] for path in paths]
-        import matplotlib.pyplot as plt
-        for j in J:
-            plt.plot(j)
-            plt.show()
-        """
