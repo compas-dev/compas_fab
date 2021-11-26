@@ -9,6 +9,7 @@ from compas.geometry import intersection_plane_circle
 from compas.geometry import tangent_points_to_circle_xy
 
 # TODO: This is very slow...
+# can this be improved? for example https://github.com/visose/Robots/blob/master/Robots/Kinematics.cs
 
 
 def forward_kinematics_spherical_wrist(joint_values, points):
