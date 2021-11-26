@@ -228,15 +228,3 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
                 axis6_angles.append(axis6_angle)
 
     return [[a1, a2, a3, a4, a5, a6] for a1, a2, a3, a4, a5, a6 in zip(axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles)]
-
-
-if __name__ == "__main__":
-    from compas.geometry import allclose
-    points = [Point(0.000, 0.000, 0.375),
-              Point(0.000, 0.020, 0.775),
-              Point(0.450, 0.020, 0.775),
-              Point(0.520, 0.020, 0.775)]  # Staubli_TX2_60L
-    q = [0.2, -0.7832, 1.4, 1.3, 2.6, -2.6832]
-    frame = forward_kinematics_spherical_wrist(q, points)
-    sol = inverse_kinematics_spherical_wrist(frame, points)
-    assert(allclose(sol[0], q))
