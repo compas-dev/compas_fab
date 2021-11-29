@@ -1,10 +1,13 @@
+import compas
 from compas.geometry import Frame
 from compas.robots.configuration import Configuration
 import compas_fab
 from compas_fab.robots.ur5 import Robot
 from compas_fab.robots import RobotSemantics
-from compas_fab.backends.kinematics import AnalyticalInverseKinematics
-from compas_fab.backends.kinematics.client import AnalyticalPyBulletClient
+
+if not compas.IPY:
+    from compas_fab.backends.kinematics import AnalyticalInverseKinematics
+    from compas_fab.backends.kinematics.client import AnalyticalPyBulletClient
 
 urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
 srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
@@ -21,6 +24,8 @@ def test_inverse_kinematics():
 
 
 def test_kinematics_client():
+    if compas.IPY:
+        return
     frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269))
     with AnalyticalPyBulletClient(connection_type='direct') as client:
         robot = client.load_robot(urdf_filename)
@@ -31,6 +36,8 @@ def test_kinematics_client():
 
 
 def test_kinematics_cartesian():
+    if compas.IPY:
+        return
     frames_WCF = [Frame((0.407, 0.073, 0.320), (0.922, 0.000, 0.388), (0.113, 0.956, -0.269)),
                   Frame((0.404, 0.057, 0.324), (0.919, 0.000, 0.394), (0.090, 0.974, -0.210)),
                   Frame((0.390, 0.064, 0.315), (0.891, 0.000, 0.454), (0.116, 0.967, -0.228)),
