@@ -1,4 +1,3 @@
-from compas.geometry import Frame
 from compas.robots import Configuration
 from compas_fab.backends.exceptions import BackendError
 from compas_fab.backends.kinematics.utils import fit_within_bounds
@@ -67,7 +66,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         configurations = self.joint_angles_to_configurations(robot, solutions, group=group)
 
         # check collisions for all configurations (>> sets those to `None` that are not working)
-        if options and "check_collision" in options and options["check_collision"] is True:
+        if options and "check_collision" in options and options["check_collision"] is True:  # raises if there is no client
             for i, config in enumerate(configurations):
                 try:
                     self.client.check_collisions(robot, config)
@@ -109,50 +108,3 @@ class AnalyticalInverseKinematics(InverseKinematics):
             except AssertionError:
                 configurations[i] = None
         return configurations
-
-
-if __name__ == "__main__":
-    import compas_fab
-    from compas_fab.robots import Tool
-    from compas.datastructures import Mesh
-    from compas.geometry import Point, Vector
-    from compas_fab.robots import RobotSemantics
-
-    from compas_fab.backends.kinematics.client import AnalyticalPyBulletClient
-
-    mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
-
-    with AnalyticalPyBulletClient() as client:
-        urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
-        srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
-
-        # Load UR5
-        robot = client.load_robot(urdf_filename)
-        robot.semantics = RobotSemantics.from_srdf_file(srdf_filename, robot.model)
-
-        # Update disabled collisions
-        client.disabled_collisions = robot.semantics.disabled_collisions
-
-        # Attach tool and convert frames
-        robot.attach_tool(Tool(mesh, Frame((0.07, 0, 0), (0, 0, 1), (0, 1, 0)), name="light_pen"))
-        frames_WCF = [Frame(Point(0.407, 0.073, 0.320), Vector(0.922, 0.000, 0.388), Vector(0.113, 0.956, -0.269)),
-                      Frame(Point(0.404, 0.057, 0.324), Vector(0.919, 0.000, 0.394), Vector(0.090, 0.974, -0.210)),
-                      Frame(Point(0.390, 0.064, 0.315), Vector(0.891, 0.000, 0.454), Vector(0.116, 0.967, -0.228)),
-                      Frame(Point(0.388, 0.079, 0.309), Vector(0.881, 0.000, 0.473), Vector(0.149, 0.949, -0.278)),
-                      Frame(Point(0.376, 0.087, 0.299), Vector(0.850, 0.000, 0.528), Vector(0.184, 0.937, -0.296))]
-        frames_WCF_T0 = robot.attached_tool.from_tcf_to_t0cf(frames_WCF)
-
-        # Now check each frame
-        configurations_along_path = []
-
-        for frame in frames_WCF_T0:
-            configurations = list(robot.iter_inverse_kinematics(frame, options={"check_collision": True, "keep_order": True}))
-            configurations_along_path.append(configurations)
-
-        start_configurations = list(robot.iter_inverse_kinematics(frames_WCF_T0[0], options={"check_collision": True}))
-
-        trajectory = robot.plan_cartesian_motion(frames_WCF_T0)
-        j = [c.joint_values for c in trajectory.points]
-        import matplotlib.pyplot as plt
-        plt.plot(j)
-        plt.show()
