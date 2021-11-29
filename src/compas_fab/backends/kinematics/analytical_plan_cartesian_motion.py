@@ -66,7 +66,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         path = paths[idx]
         path = self.smooth_configurations(path)
         trajectory = JointTrajectory()
-        trajectory.fraction = len(path[0])/len(frames_RCF)
+        trajectory.fraction = len(path)/len(frames_RCF)
         trajectory.joint_names = path[0].joint_names
         trajectory.points = [JointTrajectoryPoint(config.joint_values, config.joint_types) for config in path]
         trajectory.start_configuration = robot.merge_group_with_full_configuration(path[0], start_configuration, group)
