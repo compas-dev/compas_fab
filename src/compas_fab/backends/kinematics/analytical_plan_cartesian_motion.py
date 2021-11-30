@@ -4,6 +4,7 @@ from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
 from compas_fab.backends.interfaces import PlanCartesianMotion
 from compas_fab.backends.kinematics.utils import smallest_joint_angles
+from compas_fab.backends.kinematics.exceptions import CartesianMotionError
 
 
 class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
@@ -52,12 +53,13 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
             configurations = list(robot.iter_inverse_kinematics(frame, options=options))
             configurations_along_path.append(configurations)
 
-        # TODO: how to handle path not complete?
-
         paths = []
         for configurations in zip(*configurations_along_path):
             if all(configurations):
                 paths.append(configurations)
+
+        if not len(paths):
+            raise CartesianMotionError("No complete trajectory found.")
 
         # now select the path that is closest to the start configuration.
         first_configurations = [path[0] for path in paths]
