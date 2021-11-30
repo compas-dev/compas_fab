@@ -86,7 +86,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
                 c2 = c1 - 2 * math.pi
                 c3 = c1 + 2 * math.pi
                 values = [c1, c2, c3]
-                diffs = [math.fabs(p - c) for c in values]
+                diffs = [math.fabs(p - v) for v in values]
                 idx = diffs.index(min(diffs))
                 corrected.append(values[idx])
             prev = corrected
