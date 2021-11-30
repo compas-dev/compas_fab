@@ -66,7 +66,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         configurations = self.joint_angles_to_configurations(robot, solutions, group=group)
 
         # check collisions for all configurations (>> sets those to `None` that are not working)
-        if options and "check_collision" in options and options["check_collision"] is True:  # raises if there is no client
+        if option.get( "check_collision", False) is True: 
             for i, config in enumerate(configurations):
                 try:
                     self.client.check_collisions(robot, config)
