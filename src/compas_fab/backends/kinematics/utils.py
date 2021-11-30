@@ -16,5 +16,5 @@ def fit_within_bounds(angle, lower, upper):
         angle += 2 * math.pi
     while angle > upper:
         angle -= 2 * math.pi
-    assert(angle >= lower and angle <= upper)
+    assert(angle >= lower and angle <= upper, "Joint angle out of bounds.")
     return angle

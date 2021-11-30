@@ -34,9 +34,9 @@ def forward_kinematics_spherical_wrist(joint_values, points):
     https://www.grasshopper3d.com/forum/topics/lobster-reloaded?groupUrl=lobster&
 
     This is the instruction on how to determine the 4 points.
-    https://api.ning.com/files/KRgE1yt2kgG2IF9H8sre4CWfIDL9ytv5WvVn54zdOx6HE84gDordaHzo0jqwP-Qhry7MyRQ4IQxY1p3cIkqEDj1FAVVR2Xg0/Lobster_IK.pdf
+    http://archive.fabacademy.org/archives/2017/fablabcept/students/184/assets/lobster_ik.pdf
 
-    Check p2, p3, p4 must be in one XY plane!
+    Check that p2, p3, and p4 are all in the XZ plane (y coordinates are zero)!
     """
 
     p1, p2, p3, p4 = points
@@ -110,9 +110,9 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
     https://www.grasshopper3d.com/forum/topics/lobster-reloaded?groupUrl=lobster&
 
     This is the instruction on how to determine the 4 points.
-    https://api.ning.com/files/KRgE1yt2kgG2IF9H8sre4CWfIDL9ytv5WvVn54zdOx6HE84gDordaHzo0jqwP-Qhry7MyRQ4IQxY1p3cIkqEDj1FAVVR2Xg0/Lobster_IK.pdf
+    http://archive.fabacademy.org/archives/2017/fablabcept/students/184/assets/lobster_ik.pdf
 
-    Check p2, p3, p4 must be in one XY plane!
+    Check that p2, p3, and p4 are all in the XZ plane (y coordinates are zero)!
     """
     p1, p2, p3, p4 = points
 
@@ -194,7 +194,7 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
             for k in range(2):
                 axis4 = wrist - elbow_pt
                 axis4.transform(Rotation.from_axis_and_angle(elbow_frame.zaxis, -axis4_offset_angle))
-                temp_frame = elbow_frame.copy()  # copy yes or no?
+                temp_frame = elbow_frame.copy()
                 temp_frame.transform(Rotation.from_axis_and_angle(temp_frame.zaxis, axis2_angle + axis3_angle))
 
                 # // B = TempPlane

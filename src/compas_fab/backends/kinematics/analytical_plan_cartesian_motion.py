@@ -94,11 +94,12 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
 
         # now that the values are continuous, try to bring them all "down"
         for i, j in enumerate(zip(*joint_values_corrected)):
-            v1 = min(j) + max(j)
-            v2 = min(j) - 2 * math.pi + max(j) - 2 * math.pi
-            v3 = min(j) + 2 * math.pi + max(j) + 2 * math.pi
+            minj, maxj = min(j), max(j)
+            v1 = minj + maxj
+            v2 = minj - 2 * math.pi + maxj - 2 * math.pi
+            v3 = minj + 2 * math.pi + maxj + 2 * math.pi
             values = [math.fabs(v) for v in [v1, v2, v3]]
-            idx = values.index(min(values))
+            idx = argmin(values)
             if idx == 1:
                 for k in range(len(joint_values_corrected)):
                     joint_values_corrected[k][i] -= 2 * math.pi
