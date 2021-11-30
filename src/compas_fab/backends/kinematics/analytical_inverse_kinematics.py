@@ -57,7 +57,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         """
         # What is the most elegant way to do this?
         inverse_kinematics_function = eval("%sKinematics().inverse" % robot.name.upper())
-
+options = options or {}
         keep_order = options.get("keep_order", False)
 
         # convert the frame WCF to RCF
