@@ -1,6 +1,6 @@
-from compas.robots import Configuration
 from compas_fab.backends.exceptions import BackendError
-from compas_fab.backends.kinematics.utils import fit_within_bounds
+from compas_fab.backends.kinematics.utils import try_to_fit_configurations_between_bounds
+from compas_fab.backends.kinematics.utils import joint_angles_to_configurations
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.kinematics.spherical_wrist_kinematics import *  # noqa: F403, F401
 from compas_fab.backends.kinematics.offset_wrist_kinematics import *  # noqa: F403, F401
@@ -9,7 +9,7 @@ from compas_fab.backends.kinematics.exceptions import InverseKinematicsError
 
 class AnalyticalInverseKinematics(InverseKinematics):
     """Callable to calculate the robot's inverse kinematics for a given frame.
-    
+
     This works only for industrial robot arms with six revolute joints.
     """
 
@@ -66,10 +66,10 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         # calculate inverse with 8 solutions
         solutions = inverse_kinematics_function(frame_RCF)
-        configurations = self.joint_angles_to_configurations(robot, solutions, group=group)
+        configurations = joint_angles_to_configurations(robot, solutions, group=group)
 
         # check collisions for all configurations (>> sets those to `None` that are not working)
-        if options.get( "check_collision", False) is True: 
+        if options.get("check_collision", False) is True:
             for i, config in enumerate(configurations):
                 try:
                     self.client.check_collisions(robot, config)
@@ -77,7 +77,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
                     configurations[i] = None
 
         # fit configurations within joint bounds (>> sets those to `None` that are not working)
-        configurations = self.try_to_fit_configurations_between_bounds(robot, configurations, group=group)
+        configurations = try_to_fit_configurations_between_bounds(robot, configurations, group=group)
 
         if not any(configurations):
             raise InverseKinematicsError("No solutions found.")
@@ -87,27 +87,3 @@ class AnalyticalInverseKinematics(InverseKinematics):
                 yield config.joint_values, config.joint_names
             elif keep_order:
                 yield None, None
-
-    def joint_angles_to_configurations(self, robot, solutions, group=None):
-        joint_names = robot.get_configurable_joint_names(group=group)
-        return [Configuration.from_revolute_values(q, joint_names=joint_names) if q else None for q in solutions]
-
-    def try_to_fit_configurations_between_bounds(self, robot, configurations, group=None):
-        """
-        """
-        j1, j2, j3, j4, j5, j6 = robot.get_configurable_joints()
-        for i, c in enumerate(configurations):
-            if c is None:
-                continue
-            a1, a2, a3, a4, a5, a6 = c.values()
-            try:
-                a1 = fit_within_bounds(a1, j1.limit.lower, j1.limit.upper)
-                a2 = fit_within_bounds(a2, j2.limit.lower, j2.limit.upper)
-                a3 = fit_within_bounds(a3, j3.limit.lower, j3.limit.upper)
-                a4 = fit_within_bounds(a4, j4.limit.lower, j4.limit.upper)
-                a5 = fit_within_bounds(a5, j5.limit.lower, j5.limit.upper)
-                a6 = fit_within_bounds(a6, j6.limit.lower, j6.limit.upper)
-                configurations[i].joint_values = [a1, a2, a3, a4, a5, a6]
-            except AssertionError:
-                configurations[i] = None
-        return configurations
