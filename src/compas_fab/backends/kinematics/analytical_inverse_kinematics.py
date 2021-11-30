@@ -58,7 +58,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         # What is the most elegant way to do this?
         inverse_kinematics_function = eval("%sKinematics().inverse" % robot.name.upper())
 
-        keep_order = options["keep_order"] if options and "keep_order" in options else False
+        keep_order = options.get("keep_order", False)
 
         # convert the frame WCF to RCF
         base_frame = robot.get_base_frame(group=group, full_configuration=start_configuration)
@@ -69,7 +69,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         configurations = self.joint_angles_to_configurations(robot, solutions, group=group)
 
         # check collisions for all configurations (>> sets those to `None` that are not working)
-        if options and "check_collision" in options and options["check_collision"] is True:  # raises if there is no client
+        if option.get( "check_collision", False) is True: 
             for i, config in enumerate(configurations):
                 try:
                     self.client.check_collisions(robot, config)
