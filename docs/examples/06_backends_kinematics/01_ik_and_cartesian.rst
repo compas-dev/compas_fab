@@ -46,7 +46,7 @@ end-effector to reach a certain target pose.
 
 Here is an example of using ``AnalyticalInverseKinematics``:
 
-.. literalinclude :: files/01_iter_ik_stanalone.py
+.. literalinclude :: files/01_iter_ik.py
    :language: python
 
 
