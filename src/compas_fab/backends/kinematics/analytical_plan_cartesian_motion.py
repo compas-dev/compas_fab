@@ -20,14 +20,14 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         ----------
         robot : :class:`compas_fab.robots.Robot`
             The robot instance for which the cartesian motion path is being calculated.
-        frames_WCF: list of :class:`compas.geometry.Frame`
+        frames_WCF : list of :class:`compas.geometry.Frame`
             The frames through which the path is defined.
-        start_configuration: :class:`Configuration`, optional
+        start_configuration : :class:`Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the starting position.
-        group: str, optional
+        group : str, optional
             The planning group used for calculation.
-        options: dict, optional
+        options : dict, optional
             Dictionary containing kwargs for arguments specific to
             the client being queried.
 
@@ -105,7 +105,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
                     joint_values_corrected[k][i] -= 2 * math.pi
             elif idx == 2:
                 for k in range(len(joint_values_corrected)):
-                    joint_values_corrected[k][i] -= 2 * math.pi
+                    joint_values_corrected[k][i] += 2 * math.pi
 
         for i in range(len(joint_values_corrected)):
             configurations[i].joint_values = joint_values_corrected[i]
