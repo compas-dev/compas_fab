@@ -8,7 +8,10 @@ from compas_fab.backends.kinematics.exceptions import InverseKinematicsError
 
 
 class AnalyticalInverseKinematics(InverseKinematics):
-    """Callable to calculate the robot's inverse kinematics for a given frame."""
+    """Callable to calculate the robot's inverse kinematics for a given frame.
+    
+    This works only for industrial robot arms with six revolute joints.
+    """
 
     def __init__(self, client=None):
         self.client = client
