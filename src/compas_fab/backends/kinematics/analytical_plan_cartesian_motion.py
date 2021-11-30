@@ -14,7 +14,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         self.client = client
 
     def plan_cartesian_motion(self, robot, frames_WCF, start_configuration=None, group=None, options=None):
-        """Calculates a cartesian motion paths (linear in tool space).
+        """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
         ----------
