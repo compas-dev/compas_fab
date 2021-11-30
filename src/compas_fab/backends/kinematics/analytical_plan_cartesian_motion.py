@@ -60,7 +60,8 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
                 paths.append(configurations)
 
         # now select the path that is closest to the start configuration.
-        diffs = [sum([abs(d) for d in start_configuration.iter_differences(c)]) for c in [path[0] for path in paths]]
+        first_configurations = [path[0] for path in paths]
+        diffs = [sum([abs(d) for d in start_configuration.iter_differences(c)]) for c in first_configurations]
         idx = argmin(diffs)
 
         path = paths[idx]
