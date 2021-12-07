@@ -16,6 +16,7 @@ from compas.robots import RobotModel
 from compas_fab.backends.interfaces.client import ClientInterface
 from compas_fab.robots import Robot
 from compas_fab.utilities import LazyLoader
+from compas_fab.robots import RobotSemantics
 
 from . import const
 from .conversions import frame_from_pose
@@ -205,6 +206,20 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self._load_robot_to_pybullet(urdf_fp, robot)
 
         return robot
+
+    def load_semantics(self, robot, srdf_filename):
+        """Loads the semantic information of a robot.
+
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot to be saved for use with PyBullet.
+        srdf_filename  : :obj:`str` or file object
+            Absolute file path to the srdf file name.
+        """
+        cached_robot = self.get_cached_robot(robot)
+        robot.semantics = RobotSemantics.from_srdf_file(srdf_filename, cached_robot)
+        self.disabled_collisions = robot.semantics.disabled_collisions
 
     def _load_robot_to_pybullet(self, urdf_file, robot):
         cached_robot = self.get_cached_robot(robot)
