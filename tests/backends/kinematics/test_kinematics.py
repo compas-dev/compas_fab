@@ -1,8 +1,8 @@
 from compas.geometry import allclose
 
-from compas_fab.backends.kinematics.offset_wrist_kinematics import UR5eKinematics
-from compas_fab.backends.kinematics.spherical_wrist_kinematics import Staubli_TX260LKinematics
-from compas_fab.backends.kinematics.spherical_wrist_kinematics import ABB_IRB4600_40_255Kinematics
+from compas_fab.backends.kinematics.solvers import UR5eKinematics
+from compas_fab.backends.kinematics.solvers import Staubli_TX260LKinematics
+from compas_fab.backends.kinematics.solvers import ABB_IRB4600_40_255Kinematics
 
 
 def test_kinematic_functions():

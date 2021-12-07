@@ -3,8 +3,8 @@ from compas.geometry import Frame
 from compas.robots.configuration import Configuration
 import compas_fab
 from compas_fab.robots.ur5 import Robot
-from compas_fab.robots import RobotSemantics
 from compas_fab.backends.kinematics import AnalyticalInverseKinematics
+from compas_fab.backends.kinematics import IK_SOLVERS
 
 if not compas.IPY:
     from compas_fab.backends.kinematics.client import AnalyticalPyBulletClient
@@ -12,11 +12,12 @@ if not compas.IPY:
 urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
 srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
 
+
 def test_inverse_kinematics():
     ik = AnalyticalInverseKinematics()
     robot = Robot()
     frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269))
-    solutions = list(ik.inverse_kinematics(robot, frame_WCF, start_configuration=None, group=None, options=None))
+    solutions = list(ik.inverse_kinematics(robot, frame_WCF, start_configuration=None, group=None, options={"solver": IK_SOLVERS['ur5']}))
     assert(len(solutions) == 8)
     joint_positions, _ = solutions[0]
     correct = Configuration.from_revolute_values((0.022, 4.827, 1.508, 1.126, 1.876, 3.163))
@@ -30,7 +31,7 @@ def test_kinematics_client():
     with AnalyticalPyBulletClient(connection_type='direct') as client:
         robot = client.load_robot(urdf_filename)
         client.load_semantics(robot, srdf_filename)
-        solutions = list(robot.iter_inverse_kinematics(frame_WCF, options={"check_collision": True, "keep_order": False}))
+        solutions = list(robot.iter_inverse_kinematics(frame_WCF, options={"solver": IK_SOLVERS['ur5'], "check_collision": True, "keep_order": False}))
         assert(len(solutions) == 5)
 
 
@@ -46,6 +47,8 @@ def test_kinematics_cartesian():
     with AnalyticalPyBulletClient(connection_type='direct') as client:
         robot = client.load_robot(urdf_filename)
         client.load_semantics(robot, srdf_filename)
-        start_configuration = list(robot.iter_inverse_kinematics(frames_WCF[0], options={"check_collision": True, "keep_order": False}))[-1]
-        trajectory = robot.plan_cartesian_motion(frames_WCF, start_configuration=start_configuration)
+
+        options = {"solver": IK_SOLVERS['ur5'], "check_collision": True}
+        start_configuration = list(robot.iter_inverse_kinematics(frames_WCF[0], options=options))[-1]
+        trajectory = robot.plan_cartesian_motion(frames_WCF, start_configuration=start_configuration, options=options)
         assert(trajectory.fraction == 1.)
