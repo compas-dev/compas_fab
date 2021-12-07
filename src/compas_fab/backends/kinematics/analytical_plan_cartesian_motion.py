@@ -36,7 +36,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         -------
         :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
-        
+
         Notes
         -----
         This will only work with robots that have 6 revolute joints.
