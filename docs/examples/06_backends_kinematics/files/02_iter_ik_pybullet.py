@@ -1,7 +1,7 @@
 from compas.geometry import Frame
 import compas_fab
-from compas_fab.robots import RobotSemantics
 from compas_fab.backends.kinematics import AnalyticalInverseKinematics
+from compas_fab.backends.kinematics import IK_SOLVERS
 from compas_fab.backends import PyBulletClient
 
 
@@ -21,5 +21,7 @@ with PyBulletClient(connection_type='direct') as client:
     # set a new IK function
     client.inverse_kinematics = ik.inverse_kinematics
 
-    for solution in robot.iter_inverse_kinematics(frame_WCF, options={"check_collision": True, "keep_order": True}):
+    options = {"solver": IK_SOLVERS['ur5'], "check_collision": True, "keep_order": True}
+
+    for solution in robot.iter_inverse_kinematics(frame_WCF, options=options):
         print(solution)
