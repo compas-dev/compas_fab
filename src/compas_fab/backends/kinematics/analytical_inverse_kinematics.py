@@ -2,8 +2,6 @@ from compas_fab.backends.exceptions import BackendError
 from compas_fab.backends.kinematics.utils import try_to_fit_configurations_between_bounds
 from compas_fab.backends.kinematics.utils import joint_angles_to_configurations
 from compas_fab.backends.interfaces import InverseKinematics
-from compas_fab.backends.kinematics.spherical_wrist_kinematics import *  # noqa: F403, F401
-from compas_fab.backends.kinematics.offset_wrist_kinematics import *  # noqa: F403, F401
 from compas_fab.backends.kinematics.exceptions import InverseKinematicsError
 
 
@@ -12,7 +10,9 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
     Notes
     -----
-    This works only for industrial robot arms with six revolute joints.
+    This works only for industrial robot arms with six revolute joints and only
+    with a client that supports ``"check_collision"``, so for now only the
+    `PyBulletClient`.
     """
 
     def __init__(self, client=None):
@@ -43,8 +43,9 @@ class AnalyticalInverseKinematics(InverseKinematics):
         group: str, optional
             The planning group used for determining the end effector and labeling
             the ``start_configuration``. Defaults to the robot's main planning group.
-        options: dict, optional
+        options: dict
             Dictionary containing the following key-value pairs:
+            - ``"solver"``: (:obj:`str`) The solver to use to calculate IK.
             - ``"check_collision"``: (:obj:`str`, optional ) When ``True``, checks
                 if the robot is in collision. Defaults to ``False``.
             - ``"keep_order"``: (:obj:`str`, optional ) When ``False``, removes the
@@ -56,14 +57,20 @@ class AnalyticalInverseKinematics(InverseKinematics):
             A tuple of 2 elements containing a list of joint positions and a list
             of matching joint names. If ``"keep_order"`` is ``True`` this list
             contains also ``None``, ``None``
-        
+
         Notes
         -----
         This will only work with robots that have 6 revolute joints.
+
+        Raises
+        ------
+        ValueError : If the solver to solve the kinematics has not been passed.
         """
-        # What is the most elegant way to do this?
-        inverse_kinematics_function = eval("%sKinematics().inverse" % robot.name.upper())
         options = options or {}
+        solver = options.get('solver')
+        if not solver:
+            raise ValueError("Please pass an inverse kinematics solver")
+
         keep_order = options.get("keep_order", False)
 
         # convert the frame WCF to RCF
@@ -71,7 +78,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         frame_RCF = base_frame.to_local_coordinates(frame_WCF)
 
         # calculate inverse with 8 solutions
-        solutions = inverse_kinematics_function(frame_RCF)
+        solutions = solver(frame_RCF)
         configurations = joint_angles_to_configurations(robot, solutions, group=group)
 
         # check collisions for all configurations (>> sets those to `None` that are not working)
