@@ -15,7 +15,8 @@ Running a ROS system usually involves multiple nodes (i.e. computers, real or
 virtual), interconnected through a master controller.
 
 There are at least 3 different ways to run ROS: using Docker, using Linux, and
-using WSL on Windows.
+using WSL on Windows. In recent times, it became possible to install ROS using
+Conda on Windows as well.
 
 
 ROS on Docker
@@ -35,7 +36,7 @@ many more to be found online.
 You can start a minimally functional ROS system, containing a ROS master and
 the `ROS Bridge`_ with the following command::
 
-    docker run -p 9090:9090 -t gramaziokohler/ros-base roslaunch rosbridge_server rosbridge_websocket.launch
+    docker run -p 9090:9090 -t gramaziokohler/ros-noetic-base roslaunch rosbridge_server rosbridge_websocket.launch
 
 Complete ROS systems
 --------------------
@@ -56,143 +57,30 @@ You now have a ROS system with two nodes running: a ROS master and
 the `ROS Bridge`_ which adds a web socket channel to communicate with ROS.
 
 Creating new ROS bundles using containers is usually only a matter of combining
-them into a new ``docker-compose.yml`` file.
+them into a new ``docker-compose.yml`` file, which is relatively simple but we
+prepared some very common ones as examples.
 
 .. _ros_bundles_list:
 
-**List of complete ROS systems**
+**Complete ROS system examples**
 
-.. list-table:: Table of ROS systems provided via ``docker compose``
-   :widths: 20 8 8 14 18 8 10 14
-   :header-rows: 1
+* ROS Noetic Base setup: :download:`Link <files/base/docker-compose.yml>`
+* ABB IRB120: :download:`Link <files/abb-irb120-demo/docker-compose.yml>`
+* ABB IRB120T: :download:`Link <files/abb-irb120t-demo/docker-compose.yml>`
+* ABB IRB1600: :download:`Link <files/abb-irb1600-demo/docker-compose.yml>`
+* ABB IRB4600 40/255: :download:`Link <files/abb-irb4600_40_255-demo/docker-compose.yml>`
+* ABB IRB4600 60/205: :download:`Link <files/abb-irb4600_60_205-demo/docker-compose.yml>`
+* Panda: :download:`Link <files/panda-demo/docker-compose.yml>`
+* RFL: :download:`Link <files/rfl-demo/docker-compose.yml>`
+* UR3: :download:`Link <files/ur3-planner/docker-compose.yml>`
+* UR3e: :download:`Link <files/ur3e-planner/docker-compose.yml>`
+* UR5: :download:`Link <files/ur5-planner/docker-compose.yml>`
+* UR5e: :download:`Link <files/ur5e-planner/docker-compose.yml>`
+* UR10: :download:`Link <files/ur10-planner/docker-compose.yml>`
+* UR10e: :download:`Link <files/ur10e-planner/docker-compose.yml>`
 
-   * - Name
-     - Core
-     - Bridge
-     - Planner
-     - Robot drivers
-     - RViz
-     - Web UI [#f1]_
-     - Download
-   * - Base setup
-     - ✅
-     - ✅
-     - ❌
-     - ❌
-     - ❌
-     - ❌
-     - :download:`Link <files/base/docker-compose.yml>`
-   * - Panda Demo
-     - ✅
-     - ✅
-     - MoveIt!
-     - ❌
-     - ✅
-     - ✅
-     - :download:`Link <files/panda-demo/docker-compose.yml>`
-   * - ABB IRB1600 Demo
-     - ✅
-     - ✅
-     - MoveIt!
-     - ``abb_driver``
-     - ✅
-     - ✅
-     - :download:`Link <files/abb-irb1600-demo/docker-compose.yml>`
-   * - Kuka IIWA7 Demo
-     - ✅
-     - ✅
-     - MoveIt!
-     - ❌
-     - ✅
-     - ✅
-     - :download:`Link <files/kuka-iiwa7-demo/docker-compose.yml>`
-   * - Kuka IIWA14 Demo
-     - ✅
-     - ✅
-     - MoveIt!
-     - ❌
-     - ✅
-     - ✅
-     - :download:`Link <files/kuka-iiwa14-demo/docker-compose.yml>`
-   * - UR3 Planner
-     - ✅
-     - ✅
-     - MoveIt!
-     - ``ur_modern_driver``
-     - ❌
-     - ❌
-     - :download:`Link <files/ur3-planner/docker-compose.yml>`
-   * - UR5 Planner
-     - ✅
-     - ✅
-     - MoveIt!
-     - ``ur_modern_driver``
-     - ❌
-     - ❌
-     - :download:`Link <files/ur5-planner/docker-compose.yml>`
-   * - UR10 Planner
-     - ✅
-     - ✅
-     - MoveIt!
-     - ``ur_modern_driver``
-     - ❌
-     - ❌
-     - :download:`Link <files/ur10-planner/docker-compose.yml>`
-   * - UR3 Demo
-     - ✅
-     - ✅
-     - MoveIt!
-     - ``ur_modern_driver``
-     - ✅
-     - ✅
-     - :download:`Link <files/ur3-demo/docker-compose.yml>`
-   * - UR5 Demo
-     - ✅
-     - ✅
-     - MoveIt!
-     - ``ur_modern_driver``
-     - ✅
-     - ✅
-     - :download:`Link <files/ur5-demo/docker-compose.yml>`
-   * - UR10 Demo
-     - ✅
-     - ✅
-     - MoveIt!
-     - ``ur_modern_driver``
-     - ✅
-     - ✅
-     - :download:`Link <files/ur10-demo/docker-compose.yml>`
-   * - UR3 e-series Demo
-     - ✅
-     - ✅
-     - MoveIt!
-     - ``ur_modern_driver``
-     - ✅
-     - ✅
-     - :download:`Link <files/ur3e-demo/docker-compose.yml>`
-   * - UR5 e-series Demo
-     - ✅
-     - ✅
-     - MoveIt!
-     - ``ur_modern_driver``
-     - ✅
-     - ✅
-     - :download:`Link <files/ur5e-demo/docker-compose.yml>`
-   * - UR10 e-series Demo
-     - ✅
-     - ✅
-     - MoveIt!
-     - ``ur_modern_driver``
-     - ✅
-     - ✅
-     - :download:`Link <files/ur10e-demo/docker-compose.yml>`
-
-For access to the web UI, start your browser and go to:
-
-::
-
-    http://localhost:8080/vnc.html?resize=scale&autoconnect=true
-
+Once the containers are running, it is possible to access the graphic user interface.
+Check :ref:`the following page <backends_gui>` for more details.
 
 ROS on Linux
 ============
@@ -203,17 +91,17 @@ from your computer.
 
 Follow the `ROS installation instructions`_ for all the details, or
 alternatively, use the following commands as a brief outline of the steps
-required to install ROS on **Ubuntu 16.04**:
+required to install ROS on **Ubuntu 20.04**:
 
 ::
 
     sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-    sudo apt-get update
-    sudo apt-get install ros-kinetic-desktop-full ros-kinetic-rosbridge-server ros-kinetic-tf2-web-republisher python-rosinstall python-rosinstall-generator python-wstool
+    curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+    sudo apt update
+    sudo apt install ros-noetic-desktop-full ros-noetic-rosbridge-server python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential
 
     sudo rosdep init && rosdep update
-    echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+    echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
     source ~/.bashrc
 
     mkdir -p ~/catkin_ws/src
@@ -240,9 +128,10 @@ To install WSL, open PowerShell as administrator and run:
 
 ::
 
-    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+    wsl --install
 
-Open the Microsoft Store and install ``Ubuntu 16.04`` Linux distribution.
+This command will enable the required optional components, download the latest Linux kernel,
+set WSL 2 as your default, and install a Linux distribution for you.
 Once the installation is completed, run ``bash`` and follow the instructions
 above to install ROS on Linux.
 

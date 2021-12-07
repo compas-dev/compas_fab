@@ -32,18 +32,7 @@ This feature is possible thanks to `NoVNC <https://novnc.com/>`_.
 Visualization forwarding display
 ================================
 
-.. note::
-
-    🐉 HERE BE DRAGONS!
-
-    Be aware that the following can be time-consuming and frustrating to configure.
-    We recommend using the web browser visualization in the general case, and only
-    use X11 forwarding if you know what you are getting yourself into.
-
-
-This option allows to forward a display directly to your operating system. It is
-especially useful when used in combination with WSL.
-
+This option allows to forward a display directly to your operating system.
 However, it is important to note this is not entirely supported in all platforms.
 
 First install an ``X11`` server:
@@ -60,8 +49,17 @@ Configure ``X11`` security:
   ``xhost -local:root``.
 
 Finally, set the ``DISPLAY`` variable to point to your ``X11`` server as follows
-replacing ``YOUR_IP_ADDRESS`` with your current IP:
+replacing ``YOUR_IP_ADDRESS`` with your current IP.
+
+For usage from WSL, set it using the following command:
 
 ::
 
     export DISPLAY=YOUR_IP_ADDRESS:0.0
+
+For usage from Docker, set it adding the following environment
+variable to the ``moveit`` service in the ``docker-compose.yml`` file:
+
+::
+
+    - DISPLAY=host.docker.internal:0.0
