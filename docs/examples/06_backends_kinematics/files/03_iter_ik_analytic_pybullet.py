@@ -8,8 +8,7 @@ srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srd
 
 with AnalyticalPyBulletClient(connection_type='direct') as client:
     robot = client.load_robot(urdf_filename)
-    robot.semantics = RobotSemantics.from_srdf_file(srdf_filename, robot.model)
-    client.disabled_collisions = robot.semantics.disabled_collisions
+    client.load_semantics(robot, srdf_filename)
 
     frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269))
 

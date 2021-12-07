@@ -29,8 +29,7 @@ def test_kinematics_client():
     frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269))
     with AnalyticalPyBulletClient(connection_type='direct') as client:
         robot = client.load_robot(urdf_filename)
-        robot.semantics = RobotSemantics.from_srdf_file(srdf_filename, robot.model)
-        client.disabled_collisions = robot.semantics.disabled_collisions
+        client.load_semantics(robot, srdf_filename)
         solutions = list(robot.iter_inverse_kinematics(frame_WCF, options={"check_collision": True, "keep_order": False}))
         assert(len(solutions) == 5)
 
@@ -46,8 +45,7 @@ def test_kinematics_cartesian():
 
     with AnalyticalPyBulletClient(connection_type='direct') as client:
         robot = client.load_robot(urdf_filename)
-        robot.semantics = RobotSemantics.from_srdf_file(srdf_filename, robot.model)
-        client.disabled_collisions = robot.semantics.disabled_collisions
+        client.load_semantics(robot, srdf_filename)
         start_configuration = list(robot.iter_inverse_kinematics(frames_WCF[0], options={"check_collision": True, "keep_order": False}))[-1]
         trajectory = robot.plan_cartesian_motion(frames_WCF, start_configuration=start_configuration)
         assert(trajectory.fraction == 1.)

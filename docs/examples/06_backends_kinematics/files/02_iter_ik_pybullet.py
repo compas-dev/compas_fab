@@ -15,9 +15,7 @@ with PyBulletClient(connection_type='direct') as client:
 
     # Load UR5
     robot = client.load_robot(urdf_filename)
-    robot.semantics = RobotSemantics.from_srdf_file(srdf_filename, robot.model)
-    # Update disabled collisions
-    client.disabled_collisions = robot.semantics.disabled_collisions
+    client.load_semantics(robot, srdf_filename)
 
     ik = AnalyticalInverseKinematics(client)
     # set a new IK function

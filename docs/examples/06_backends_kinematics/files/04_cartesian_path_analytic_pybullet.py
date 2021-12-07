@@ -15,8 +15,7 @@ frames_WCF = [Frame((0.407, 0.073, 0.320), (0.922, 0.000, 0.388), (0.113, 0.956,
 
 with AnalyticalPyBulletClient(connection_type='direct') as client:
     robot = client.load_robot(urdf_filename)
-    robot.semantics = RobotSemantics.from_srdf_file(srdf_filename, robot.model)
-    client.disabled_collisions = robot.semantics.disabled_collisions
+    client.load_semantics(robot, srdf_filename)
 
     start_configuration = list(robot.iter_inverse_kinematics(frames_WCF[0], options={"check_collision": True, "keep_order": False}))[-1]
     trajectory = robot.plan_cartesian_motion(frames_WCF, start_configuration=start_configuration)
