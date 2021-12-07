@@ -72,12 +72,12 @@ prepared some very common ones as examples.
 * ABB IRB4600 60/205: :download:`Link <files/abb-irb4600_60_205-demo/docker-compose.yml>`
 * Panda: :download:`Link <files/panda-demo/docker-compose.yml>`
 * RFL: :download:`Link <files/rfl-demo/docker-compose.yml>`
-* UR3: :download:`Link <files/ur3-planner/docker-compose.yml>`
-* UR3e: :download:`Link <files/ur3e-planner/docker-compose.yml>`
-* UR5: :download:`Link <files/ur5-planner/docker-compose.yml>`
-* UR5e: :download:`Link <files/ur5e-planner/docker-compose.yml>`
-* UR10: :download:`Link <files/ur10-planner/docker-compose.yml>`
-* UR10e: :download:`Link <files/ur10e-planner/docker-compose.yml>`
+* UR3: :download:`Link <files/ur3-demo/docker-compose.yml>`
+* UR3e: :download:`Link <files/ur3e-demo/docker-compose.yml>`
+* UR5: :download:`Link <files/ur5-demo/docker-compose.yml>`
+* UR5e: :download:`Link <files/ur5e-demo/docker-compose.yml>`
+* UR10: :download:`Link <files/ur10-demo/docker-compose.yml>`
+* UR10e: :download:`Link <files/ur10e-demo/docker-compose.yml>`
 
 Once the containers are running, it is possible to access the graphic user interface.
 Check :ref:`the following page <backends_gui>` for more details.
