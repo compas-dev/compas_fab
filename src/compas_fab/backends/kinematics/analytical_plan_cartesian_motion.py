@@ -36,6 +36,10 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         -------
         :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
+        
+        Notes
+        -----
+        This will only work with robots that have 6 revolute joints.
         """
         # what is the expected behaviour of that function?
         # - Return all possible paths or select only the one that is closest to the start_configuration?
@@ -89,7 +93,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
                 c3 = c1 + 2 * math.pi
                 values = [c1, c2, c3]
                 diffs = [math.fabs(p - v) for v in values]
-                idx = diffs.index(min(diffs))
+                idx = argmin(diffs)
                 corrected.append(values[idx])
             prev = corrected
             joint_values_corrected.append(corrected)

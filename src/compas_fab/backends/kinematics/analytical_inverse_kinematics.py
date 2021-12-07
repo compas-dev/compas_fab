@@ -10,6 +10,8 @@ from compas_fab.backends.kinematics.exceptions import InverseKinematicsError
 class AnalyticalInverseKinematics(InverseKinematics):
     """Callable to calculate the robot's inverse kinematics for a given frame.
 
+    Notes
+    -----
     This works only for industrial robot arms with six revolute joints.
     """
 
@@ -54,6 +56,10 @@ class AnalyticalInverseKinematics(InverseKinematics):
             A tuple of 2 elements containing a list of joint positions and a list
             of matching joint names. If ``"keep_order"`` is ``True`` this list
             contains also ``None``, ``None``
+        
+        Notes
+        -----
+        This will only work with robots that have 6 revolute joints.
         """
         # What is the most elegant way to do this?
         inverse_kinematics_function = eval("%sKinematics().inverse" % robot.name.upper())
