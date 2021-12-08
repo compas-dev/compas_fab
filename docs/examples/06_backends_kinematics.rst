@@ -1,4 +1,4 @@
-.. _examples_pybullet:
+.. _examples_kinematics:
 
 *******************************************************************************
 Backends: Analytical Kinematics
