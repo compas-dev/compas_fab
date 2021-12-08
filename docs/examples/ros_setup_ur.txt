@@ -1,4 +1,4 @@
-1. ur_modern driveer
+1. ur_modern driver
 
 sudo apt-get install ros-kinetic-ur-msgs
 sudo apt-get install ros-kinetic-hardware-interface

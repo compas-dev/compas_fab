@@ -1253,7 +1253,10 @@ class Robot(object):
 
         # The returned joint names might be more than the requested ones if there are passive joints present
         for joint_positions, joint_names in solutions:
-            yield self._build_configuration(joint_positions, joint_names, group, return_full_configuration)
+            if joint_positions:
+                yield self._build_configuration(joint_positions, joint_names, group, return_full_configuration)
+            else:
+                yield None  # to accomodate analytic ik with keeping the order of solutions
 
     def _build_configuration(self, joint_positions, joint_names, group, return_full_configuration):
         if return_full_configuration:
