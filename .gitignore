@@ -119,3 +119,4 @@ temp/**
 
 # Grasshopper generated objects
 src/compas_fab/ghpython/components/ghuser/*.ghuser
+docs/api/generated/*
