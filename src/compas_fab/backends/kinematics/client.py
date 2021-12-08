@@ -1,10 +1,6 @@
-import logging
 from compas_fab.backends import PyBulletClient
-from compas_fab.backends.pybullet import LOG
 from compas_fab.backends.kinematics import AnalyticalInverseKinematics
 from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion
-
-LOG.setLevel(logging.ERROR)
 
 
 class AnalyticalPyBulletClient(PyBulletClient):
