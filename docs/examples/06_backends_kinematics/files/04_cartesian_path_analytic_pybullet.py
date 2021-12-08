@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
 from compas.geometry import Frame
 import compas_fab
-from compas_fab.backends.kinematics import AnalyticalPyBulletClient
-from compas_fab.backends.kinematics import IK_SOLVERS
+from compas_fab.backends.kinematics.client import AnalyticalPyBulletClient
 
 urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
 srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
@@ -17,7 +16,7 @@ with AnalyticalPyBulletClient(connection_type='direct') as client:
     robot = client.load_robot(urdf_filename)
     client.load_semantics(robot, srdf_filename)
 
-    options = {"solver": IK_SOLVERS['ur5'], "check_collision": True}
+    options = {"solver": "ur5", "check_collision": True}
     start_configuration = list(robot.iter_inverse_kinematics(frames_WCF[0], options=options))[-1]
     trajectory = robot.plan_cartesian_motion(frames_WCF, start_configuration=start_configuration, options=options)
     assert(trajectory.fraction == 1.)
