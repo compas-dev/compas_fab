@@ -1,12 +1,21 @@
 from compas_fab.backends.exceptions import BackendError
-from compas_fab.backends.kinematics.utils import try_to_fit_configurations_between_bounds
-from compas_fab.backends.kinematics.utils import joint_angles_to_configurations
 from compas_fab.backends.interfaces import InverseKinematics
-from compas_fab.backends.kinematics.exceptions import InverseKinematicsError
+from .utils import try_to_fit_configurations_between_bounds
+from .utils import joint_angles_to_configurations
+from .exceptions import InverseKinematicsError
+from .solvers import PLANNER_BACKENDS
 
 
 class AnalyticalInverseKinematics(InverseKinematics):
     """Callable to calculate the robot's inverse kinematics for a given frame.
+
+    Parameters
+    ----------
+    client : :class:`compas_fab.backends.interfaces.ClientInterface`, optional
+        The backend client to use for communication, for now only the
+        :class:`compas_fab.backends.PyBulletClient` is supported.
+    solver : :obj:`str`, optional
+        The solver to use to calculate IK.
 
     Notes
     -----
@@ -15,8 +24,9 @@ class AnalyticalInverseKinematics(InverseKinematics):
     `PyBulletClient`.
     """
 
-    def __init__(self, client=None):
+    def __init__(self, client=None, solver=None):
         self.client = client
+        self.planner = PLANNER_BACKENDS[solver]() if solver else None
 
     def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculate the robot's inverse kinematic (IK) for a given frame.
@@ -68,7 +78,9 @@ class AnalyticalInverseKinematics(InverseKinematics):
         """
         options = options or {}
         solver = options.get('solver')
-        if not solver:
+        if solver:
+            self.planner = PLANNER_BACKENDS[solver]()
+        elif not self.planner: # no solver, no planner
             raise ValueError("Please pass an inverse kinematics solver")
 
         keep_order = options.get("keep_order", False)
@@ -78,7 +90,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         frame_RCF = base_frame.to_local_coordinates(frame_WCF)
 
         # calculate inverse with 8 solutions
-        solutions = solver(frame_RCF)
+        solutions = self.planner.inverse(frame_RCF)
         configurations = joint_angles_to_configurations(robot, solutions, group=group)
 
         # check collisions for all configurations (>> sets those to `None` that are not working)
