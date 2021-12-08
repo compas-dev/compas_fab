@@ -80,7 +80,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         solver = options.get('solver')
         if solver:
             self.planner = PLANNER_BACKENDS[solver]()
-        elif not self.planner: # no solver, no planner
+        elif not self.planner:  # no solver, no planner
             raise ValueError("Please pass an inverse kinematics solver")
 
         keep_order = options.get("keep_order", False)
