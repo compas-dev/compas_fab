@@ -1,25 +1,26 @@
 version: '2'
 services:
-  ros-master:
-    image: gramaziokohler/ros-base:20.11
-    container_name: ros-master
+  ros-core:
+    image: gramaziokohler/ros-noetic-base
+    container_name: ros-core
     ports:
       - "11311:11311"
     command:
       - roscore
 
   ros-bridge:
-    image: gramaziokohler/ros-base:20.11
+    image: gramaziokohler/ros-noetic-base
     container_name: ros-bridge
     environment:
       - "ROS_HOSTNAME=ros-bridge"
-      - "ROS_MASTER_URI=http://ros-master:11311"
+      - "ROS_MASTER_URI=http://ros-core:11311"
     ports:
       - "9090:9090"
     depends_on:
-      - ros-master
+      - ros-core
     command:
       - roslaunch
       - --wait
       - rosbridge_server
       - rosbridge_websocket.launch
+      - unregister_timeout:=28800
