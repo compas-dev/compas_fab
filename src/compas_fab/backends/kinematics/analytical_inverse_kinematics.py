@@ -76,6 +76,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         ------
         ValueError : If the solver to solve the kinematics has not been passed.
         """
+
         options = options or {}
         solver = options.get('solver')
         if solver:
@@ -90,11 +91,19 @@ class AnalyticalInverseKinematics(InverseKinematics):
         frame_RCF = base_frame.to_local_coordinates(frame_WCF)
 
         # calculate inverse with 8 solutions
-        solutions = self.planner.inverse(frame_RCF)
+        try:
+            solutions = self.planner.inverse(frame_RCF)
+        except ValueError:
+            raise InverseKinematicsError()
         configurations = joint_angles_to_configurations(robot, solutions, group=group)
 
         # check collisions for all configurations (>> sets those to `None` that are not working)
         if options.get("check_collision", False) is True:
+            acms = options.get('attached_collision_meshes', [])
+            for acm in acms:
+                cached_robot_model = self.client.get_cached_robot(robot)
+                if not cached_robot_model.get_link_by_name(acm.collision_mesh.id):
+                    self.client.add_attached_collision_mesh(acm, options={'robot': robot})
             for i, config in enumerate(configurations):
                 try:
                     self.client.check_collisions(robot, config)
@@ -105,7 +114,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         configurations = try_to_fit_configurations_between_bounds(robot, configurations, group=group)
 
         if not any(configurations):
-            raise InverseKinematicsError("No solutions found.")
+            raise InverseKinematicsError()
 
         for config in configurations:
             if config:
