@@ -1,4 +1,5 @@
 from compas.geometry import Frame
+from compas.robots import LocalPackageMeshLoader
 import compas_fab
 from compas_fab.backends.kinematics import AnalyticalInverseKinematics
 from compas_fab.backends import PyBulletClient
@@ -13,7 +14,8 @@ frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956,
 with PyBulletClient(connection_type='direct') as client:
 
     # Load UR5
-    robot = client.load_robot(urdf_filename)
+    loader = LocalPackageMeshLoader(compas_fab.get('universal_robot'), 'ur_description')
+    robot = client.load_robot(urdf_filename, [loader])
     client.load_semantics(robot, srdf_filename)
 
     ik = AnalyticalInverseKinematics(client)

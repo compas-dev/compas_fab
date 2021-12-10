@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from compas.geometry import Frame
+from compas.robots import LocalPackageMeshLoader
 import compas_fab
 from compas_fab.backends.kinematics.client import AnalyticalPyBulletClient
 
@@ -13,7 +14,8 @@ frames_WCF = [Frame((0.407, 0.073, 0.320), (0.922, 0.000, 0.388), (0.113, 0.956,
               Frame((0.376, 0.087, 0.299), (0.850, 0.000, 0.528), (0.184, 0.937, -0.296))]
 
 with AnalyticalPyBulletClient(connection_type='direct') as client:
-    robot = client.load_robot(urdf_filename)
+    loader = LocalPackageMeshLoader(compas_fab.get('universal_robot'), 'ur_description')
+    robot = client.load_robot(urdf_filename, [loader])
     client.load_semantics(robot, srdf_filename)
 
     options = {"solver": "ur5", "check_collision": True}

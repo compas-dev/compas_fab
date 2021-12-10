@@ -18,6 +18,8 @@ Unreleased
 
 **Fixed**
 
+* Consider ``AttachedCollisionMesh`` in ``AnalyticalInverseKinematics``
+
 **Deprecated**
 
 **Removed**
