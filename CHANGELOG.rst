@@ -14,26 +14,12 @@ Unreleased
 
 * Added a new backend: analytical kinematics for spherical-wrist and offset-wrist robots.
 
-**Changed**
-
 **Fixed**
 
-* Consider ``AttachedCollisionMesh`` in ``AnalyticalInverseKinematics``
-
-**Deprecated**
-
-**Removed**
+* Consider ``AttachedCollisionMesh`` in ``AnalyticalInverseKinematics``.
 
 0.20.1
 ----------
-
-**Added**
-
-**Changed**
-
-**Fixed**
-
-**Deprecated**
 
 **Removed**
 
