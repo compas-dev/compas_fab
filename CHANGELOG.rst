@@ -18,7 +18,7 @@ Unreleased
 
 **Fixed**
 
-* Docs for analytical kinematics
+* Consider ``AttachedCollisionMesh`` in ``AnalyticalInverseKinematics``
 
 **Deprecated**
 
