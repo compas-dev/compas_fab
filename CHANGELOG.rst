@@ -18,6 +18,8 @@ Unreleased
 
 **Fixed**
 
+* Docs for analytical kinematics
+
 **Deprecated**
 
 **Removed**
