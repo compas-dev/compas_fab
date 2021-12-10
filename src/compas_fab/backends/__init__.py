@@ -39,6 +39,19 @@ PyBullet
     PyBulletPlanner
     PyBulletError
 
+
+Analytical Kinematics
+---------------------
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    AnalyticalPyBulletClient
+    AnalyticalInverseKinematics
+    AnalyticalPlanCartesianMotion
+
+
 Long-running tasks
 ------------------
 
@@ -116,6 +129,15 @@ if not compas.IPY:
     from .pybullet.planner import (
         PyBulletPlanner,
     )
+    from .kinematics.client import (
+        AnalyticalPyBulletClient,
+    )
+    from .kinematics import (
+        AnalyticalInverseKinematics,
+    )
+    from .kinematics.client import (
+        AnalyticalPlanCartesianMotion,
+    )
 
 __all__ = [
       'BackendError',
@@ -138,4 +160,8 @@ if not compas.IPY:
         'PyBulletClient',
         'PyBulletError',
         'PyBulletPlanner',
+        'AnalyticalPyBulletClient',
+        'AnalyticalInverseKinematics',
+        'AnalyticalPlanCartesianMotion',
+
     ]
