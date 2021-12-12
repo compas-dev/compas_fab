@@ -11,7 +11,8 @@
         "inputParameters": [
             {
                 "name": "robot",
-                "description": "The robot."
+                "description": "The robot.",
+                "wireDisplay": "hidden"
             },
             {
                 "name": "planes",
