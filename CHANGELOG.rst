@@ -14,6 +14,8 @@ Unreleased
 
 **Changed**
 
+* Changed default wire visibility to hidden in some GH components for cleaner Grasshopper files.
+
 **Fixed**
 
 **Deprecated**
