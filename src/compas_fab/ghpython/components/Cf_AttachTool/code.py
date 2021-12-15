@@ -1,7 +1,7 @@
 """
 Attach a tool to the robot.
 
-COMPAS FAB v0.21.1
+COMPAS FAB v0.22.0
 """
 from ghpythonlib.componentbase import executingcomponent as component
 from compas_rhino.conversions import RhinoMesh

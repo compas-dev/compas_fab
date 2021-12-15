@@ -1,7 +1,7 @@
 """
 Publishes messages to a ROS topic
 
-COMPAS FAB v0.21.1
+COMPAS FAB v0.22.0
 """
 import time
 
