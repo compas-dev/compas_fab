@@ -1,0 +1,39 @@
+{
+    "name": "Attached Tool",
+    "nickname": "Tool",
+    "category": "COMPAS FAB",
+    "subcategory": "Scene",
+    "description": "Attach a tool to the robot.",
+    "exposure": 4,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "robot",
+                "description": "The robot.",
+                "wireDisplay": "hidden"
+            },
+            {
+                "name": "visual_mesh",
+                "description": "A visual mesh for the tool.",
+                "typeHintID": "mesh"
+            },
+            {
+                "name": "collision_mesh",
+                "description": "A collision mesh for the tool.",
+                "typeHintID": "mesh"
+            },
+            {
+                "name": "tcf_plane",
+                "description": "The frame of the tool in tool0 frame."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "robot",
+                "description": "The robot."
+            }
+        ]
+    }
+}

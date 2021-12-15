@@ -12,6 +12,8 @@ Unreleased
 
 **Added**
 
+* Added ``Attach Tool`` GH component: crowd-coded at McNeel's Robotic Fabrication Workshop!
+
 **Changed**
 
 **Fixed**
