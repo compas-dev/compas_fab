@@ -34,7 +34,7 @@ instructions.
 Installing Docker
 -----------------
 
-Download and install `Docker Community Edition`_:
+Download and install `Docker Desktop`_:
 
 * `Docker for Windows`_
 * `Docker for Mac`_
@@ -57,11 +57,6 @@ Working with containers
 
 For Visual Studio Code users, we recommend installing the ``Docker`` extension.
 
-Alternatively, install `Kitematic` to have a visual overview of the
-running containers:
-
-* `Kitematic for Windows`_
-* `Kitematic for Mac`_
 
 Developing new backends
 =======================
@@ -84,9 +79,7 @@ Check documentation for your backend of choice:
 
 
 .. _Docker: https://www.docker.com/
-.. _Docker Community Edition: https://www.docker.com/get-started
+.. _Docker Desktop: https://www.docker.com/get-started
 .. _Docker containers: https://www.docker.com/resources/what-container
 .. _Docker for Windows: https://hub.docker.com/editions/community/docker-ce-desktop-windows
 .. _Docker for Mac: https://hub.docker.com/editions/community/docker-ce-desktop-mac
-.. _Kitematic for Windows: https://download.docker.com/kitematic/Kitematic-Windows.zip
-.. _Kitematic for Mac: https://download.docker.com/kitematic/Kitematic-Mac.zip

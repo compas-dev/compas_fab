@@ -1,99 +1,100 @@
+# flake8: noqa
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
+# If your documentation needs a minimal Sphinx version, state it here.
+#
+# needs_sphinx = "1.0"
+
+import sys
 import os
-import sphinx_compas_theme
+import inspect
+import importlib
 
+import sphinx_compas_theme
 from sphinx.ext.napoleon.docstring import NumpyDocstring
 
-extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.coverage',
-    'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.extlinks',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.todo',
-    'sphinx.ext.viewcode',
-]
-if os.getenv('SPELLCHECK'):
-    extensions += 'sphinxcontrib.spelling',
-    spelling_show_suggestions = True
-    spelling_lang = 'en_US'
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../src'))
 
-source_suffix = '.rst'
-master_doc = 'index'
+# -- General configuration ------------------------------------------------
+
 project = 'COMPAS FAB'
 year = '2018'
 author = 'Gramazio Kohler Research'
 copyright = '{0}, {1}'.format(year, author)
 version = release = '0.22.0'
 
-pygments_style = 'sphinx'
+master_doc = "index"
+source_suffix = [".rst", ]
+templates_path = sphinx_compas_theme.get_autosummary_templates_path()
+exclude_patterns = []
+
+pygments_style = "sphinx"
 show_authors = True
 add_module_names = True
-templates_path = ['_templates', ]
-extlinks = {
-    'issue': ('https://github.com/compas-dev/compas_fab/issues/%s', '#'),
-    'pr': ('https://github.com/compas-dev/compas_fab/pull/%s', 'PR #'),
-}
+language = None
 
-# intersphinx options
-intersphinx_mapping = {'python': ('https://docs.python.org/', None),
-                       'compas': ('https://compas.dev/compas/latest/', None),
-                       'roslibpy': ('https://roslibpy.readthedocs.io/en/latest/', None)}
+# -- Extension configuration ------------------------------------------------
 
-linkcheck_ignore = [r'http://localhost:\d+/']
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.doctest",
+    "sphinx.ext.coverage",
+    "sphinx.ext.linkcode",
+    "sphinx.ext.extlinks",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.githubpages",
+    "matplotlib.sphinxext.plot_directive",
+    "tabs"
+]
 
 # autodoc options
+
+autodoc_mock_imports = [
+    "System",
+    "clr",
+    "Eto",
+    "Rhino",
+    "Grasshopper",
+    "scriptcontext",
+    "rhinoscriptsyntax",
+    "bpy",
+    "bmesh",
+    "mathutils"
+]
+
 autodoc_default_options = {
-    'member-order': 'bysource',
-    'exclude-members': '__weakref__',
-    'undoc-members': True,
-    'private-members': True,
-    'show-inheritance': True,
+    "undoc-members": True,
+    "show-inheritance": True,
 }
 
-autodoc_member_order = 'alphabetical'
+autodoc_member_order = "alphabetical"
+
+autoclass_content = "class"
+
+
+def skip(app, what, name, obj, would_skip, options):
+    if name.startswith('_'):
+        return True
+    return would_skip
+
+def setup(app):
+    app.connect("autodoc-skip-member", skip)
+
 
 # autosummary options
+
 autosummary_generate = True
 
-# linkcheck options
-linkcheck_ignore = [r'http://localhost:\d+/']
-
-# on_rtd is whether we are on readthedocs.org
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-html_theme = 'compaspkg'
-html_theme_path = sphinx_compas_theme.get_html_theme_path()
-html_theme_options = {
-    "package_name": 'compas_fab',
-    "package_title": project,
-    "package_version": release,
-    "package_repo": 'https://github.com/compas-dev/compas_fab',
-    "package_docs": 'https://gramaziokohler.github.io/compas_fab/',
-    "package_old_versions_txt": 'https://gramaziokohler.github.io/compas_fab/doc_versions.txt'
-}
-
-html_split_index = False
-html_short_title = '%s-%s' % (project, version)
-html_context = {}
-html_static_path = ['_static']
-html_last_updated_fmt = '%b %d, %Y'
-html_copy_source = False
-html_show_sourcelink = False
-html_permalinks = False
-html_add_permalinks = ''
-html_experimental_html5_writer = True
-html_compact_lists = True
 
 # napoleon options
-napoleon_google_docstring = True
+
+napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 napoleon_include_init_with_doc = False
-napoleon_include_private_with_doc = True
+napoleon_include_private_with_doc = False
 napoleon_include_special_with_doc = True
 napoleon_use_admonition_for_examples = False
 napoleon_use_admonition_for_notes = False
@@ -102,38 +103,100 @@ napoleon_use_ivar = False
 napoleon_use_param = False
 napoleon_use_rtype = False
 
-# Parse Attributes and Class Attributes on Class docs same as parameters.
-# first, we define new methods for any new sections and add them to the class
+# plot options
 
+plot_html_show_source_link = False
+plot_html_show_formats = False
 
-def parse_keys_section(self, section):
-    return self._format_fields('Keys', self._consume_fields())
-
-
-NumpyDocstring._parse_keys_section = parse_keys_section
-
+# docstring sections
 
 def parse_attributes_section(self, section):
-    return self._format_fields('Attributes', self._consume_fields())
-
+    return self._format_fields("Attributes", self._consume_fields())
 
 NumpyDocstring._parse_attributes_section = parse_attributes_section
 
-
-def parse_class_attributes_section(self, section):
-    return self._format_fields('Class Attributes', self._consume_fields())
-
-
-NumpyDocstring._parse_class_attributes_section = parse_class_attributes_section
-
-
-# we now patch the parse method to guarantee that the the above methods are
-# assigned to the _section dict
 def patched_parse(self):
-    self._sections['keys'] = self._parse_keys_section
-    self._sections['class attributes'] = self._parse_class_attributes_section
+    self._sections["attributes"] = self._parse_attributes_section
     self._unpatched_parse()
-
 
 NumpyDocstring._unpatched_parse = NumpyDocstring._parse
 NumpyDocstring._parse = patched_parse
+
+# intersphinx options
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/', None),
+    'compas': ('https://compas.dev/compas/latest/', None),
+    'roslibpy': ('https://roslibpy.readthedocs.io/en/latest/', None)
+}
+
+# linkcode
+
+def linkcode_resolve(domain, info):
+    if domain != 'py':
+        return None
+    if not info['module']:
+        return None
+    if not info['fullname']:
+        return None
+
+    package = info['module'].split('.')[0]
+    if not package.startswith('compas_fab'):
+        return None
+
+    module = importlib.import_module(info['module'])
+    parts = info['fullname'].split('.')
+
+    if len(parts) == 1:
+        obj = getattr(module, info['fullname'])
+        filename = inspect.getmodule(obj).__name__.replace('.', '/')
+        lineno = inspect.getsourcelines(obj)[1]
+    elif len(parts) == 2:
+        obj_name, attr_name = parts
+        obj = getattr(module, obj_name)
+        attr = getattr(obj, attr_name)
+        if inspect.isfunction(attr):
+            filename = inspect.getmodule(obj).__name__.replace('.', '/')
+            lineno = inspect.getsourcelines(attr)[1]
+        else:
+            return None
+    else:
+        return None
+
+    return f"https://github.com/compas-dev/compas_fab/blob/main/src/{filename}.py#L{lineno}"
+
+# extlinks
+
+extlinks = {
+    'issue': ('https://github.com/compas-dev/compas_fab/issues/%s', '#'),
+    'pr': ('https://github.com/compas-dev/compas_fab/pull/%s', 'PR #'),
+}
+
+# linkcheck options
+
+linkcheck_ignore = [r'http://localhost:\d+/']
+
+
+# -- Options for HTML output ----------------------------------------------
+
+html_theme = "compaspkg"
+html_theme_path = sphinx_compas_theme.get_html_theme_path()
+
+html_theme_options = {
+    "package_name"    : 'compas_fab',
+    "package_title"   : project,
+    "package_version" : release,
+    "package_author"  : "{{ cookiecutter.author_name }}",
+    "package_docs"    : "https://gramaziokohler.github.io/compas_fab/",
+    "package_repo"    : "https://github.com/compas-dev/compas_fab",
+    "package_old_versions_txt": "https://gramaziokohler.github.io/compas_fab/doc_versions.txt"
+}
+
+html_context = {}
+html_static_path = []
+html_extra_path = []
+html_last_updated_fmt = ""
+html_copy_source = False
+html_show_sourcelink = False
+html_permalinks = False
+html_compact_lists = True

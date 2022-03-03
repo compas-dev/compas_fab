@@ -9,16 +9,37 @@ This library provides tools to plan and execute robotic fabrication processes us
 the COMPAS Framework with a special focus on enabling its usage from within CAD
 environments.
 
-.. toctree::
-    :maxdepth: 3
+Robots
+------
 
-    compas_fab.backends
+The core features are located in the ``robots`` module with the specific backend
+implementations in the ``backends`` modules:
+
+.. toctree::
+    :maxdepth: 1
+
     compas_fab.robots
-    compas_fab.utilities
-    compas_fab.sensors
+    compas_fab.backends
+
+CAD integration
+---------------
+
+.. toctree::
+    :maxdepth: 1
+
     compas_fab.blender
     compas_fab.ghpython
     compas_fab.rhino
+
+Utilities
+---------
+
+.. toctree::
+    :maxdepth: 1
+
+    compas_fab.sensors
+    compas_fab.utilities
+
 
 """
 
