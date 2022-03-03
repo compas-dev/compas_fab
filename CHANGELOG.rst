@@ -18,6 +18,9 @@ Unreleased
 
 **Deprecated**
 
+* Deprecated ``compas_fab.utilities.write_data_to_json`` in favor of ``compas.data.json_dump``.
+* Deprecated ``compas_fab.utilities.read_data_from_json`` in favor of ``compas.data.json_load``.
+
 **Removed**
 
 0.22.0
