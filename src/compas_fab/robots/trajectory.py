@@ -1,4 +1,3 @@
-"""Classes used to define robot trajectories."""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -258,7 +257,7 @@ class JointTrajectory(Trajectory):
     fraction : :obj:`float`, optional
         Indicates the percentage of requested trajectory that was calculated,
         e.g. ``1`` means the full trajectory was found.
-    attached_collision_meshes : :obj:`list` of :closs:`compas_fab.robots.AttachedCollisionMesh`
+    attached_collision_meshes : :obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`
         The attached collision meshes included in the calculation of this trajectory.
 
     Attributes
