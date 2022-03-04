@@ -15,8 +15,11 @@ Unreleased
 **Changed**
 
 * Moved all public API classes in ``compas_fab.backends`` to second-level imports.
+* Updated to COMPAS 1.14.
 
 **Fixed**
+
+* Fixed PyBullet loading of meshes.
 
 **Deprecated**
 

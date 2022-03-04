@@ -285,12 +285,12 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             for element in itertools.chain(link.visual, link.collision):
                 shape = element.geometry.shape
                 if isinstance(shape, MeshDescriptor):
-                    mesh = shape.geometry
-                    mesh_file_name = str(mesh.guid) + '.obj'
-                    fp = os.path.join(self._cache_dir.name, mesh_file_name)
-                    mesh.to_obj(fp)
-                    fp = self._handle_concavity(fp, self._cache_dir.name, concavity, 1, str(mesh.guid))
-                    address_dict[shape.filename] = fp
+                    for mesh in shape.meshes:
+                        mesh_file_name = str(mesh.guid) + '.obj'
+                        fp = os.path.join(self._cache_dir.name, mesh_file_name)
+                        mesh.to_obj(fp)
+                        fp = self._handle_concavity(fp, self._cache_dir.name, concavity, 1, str(mesh.guid))
+                        address_dict[shape.filename] = fp
 
         # create urdf with new mesh locations
         urdf = URDF.from_robot(robot.model)
