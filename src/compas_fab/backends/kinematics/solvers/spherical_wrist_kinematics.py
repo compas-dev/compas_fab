@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 import math
 from compas.geometry import Point
