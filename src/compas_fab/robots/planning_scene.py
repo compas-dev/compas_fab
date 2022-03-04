@@ -442,20 +442,8 @@ class PlanningScene(object):
         >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> cm = CollisionMesh(mesh, 'tip')
         >>> group = robot.main_group_name
-        >>> scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)
-
-        >>> # check if it's really there
-        >>> planning_scene = robot.client.get_planning_scene()
-        >>> objects = [c.object['id'] for c in planning_scene.robot_state.attached_collision_objects]
-        >>> 'tip' in objects
-        True
-        >>> scene.remove_attached_collision_mesh('tip')
-
-        >>> # check if it's really gone
-        >>> planning_scene = robot.client.get_planning_scene()
-        >>> objects = [c.object['id'] for c in planning_scene.robot_state.attached_collision_objects]
-        >>> 'tip' in objects
-        False
+        >>> scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)      # attach to ee
+        >>> scene.remove_attached_collision_mesh('tip')                             # now detach
         """
         self.ensure_client()
 
