@@ -1,8 +1,4 @@
 """
-********************************************************************************
-compas_fab.backends.interfaces
-********************************************************************************
-
 .. currentmodule:: compas_fab.backends.interfaces
 
 This package defines the interfaces required to integrate backends into
