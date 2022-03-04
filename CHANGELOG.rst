@@ -14,6 +14,8 @@ Unreleased
 
 **Changed**
 
+* Moved all public API classes in ``compas_fab.backends`` to second-level imports.
+
 **Fixed**
 
 **Deprecated**
@@ -204,7 +206,7 @@ Unreleased
 * Added ``compas_fab.robots.Robot.ensure_geometry``
 * Added serialization methods to ``compas_fab.robots.CollisionMesh`` and ``compas_fab.robots.AttachedCollisionMesh``
 * Added ``attached_collision_meshes`` attribute to ``compas_fab.robots.JointTrajectory``
-* Added ``compas_fab.backends.ros.PlanningSceneComponents.__ne__``
+* Added ``compas_fab.backends.PlanningSceneComponents.__ne__``
 * Added dictionary behavior to ``compas_fab.robots.JointTrajectoryPoint.merge``
 * Added length limitations to attributes of ``compas_fab.robots.JointTrajectoryPoint.merge``
 

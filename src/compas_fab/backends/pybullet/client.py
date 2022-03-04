@@ -14,6 +14,8 @@ from compas.robots import MeshDescriptor
 from compas.robots import RobotModel
 
 from compas_fab.backends.interfaces.client import ClientInterface
+from compas_fab.backends.kinematics import AnalyticalInverseKinematics
+from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion
 from compas_fab.robots import Robot
 from compas_fab.utilities import LazyLoader
 from compas_fab.robots import RobotSemantics
@@ -31,6 +33,7 @@ pybullet = LazyLoader('pybullet', globals(), 'pybullet')
 
 __all__ = [
     'PyBulletClient',
+    'AnalyticalPyBulletClient',
 ]
 
 
@@ -770,3 +773,11 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         if concavity:
             geometry_args['flags'] = pybullet.GEOM_FORCE_CONCAVE_TRIMESH
         return geometry_args
+
+
+class AnalyticalPyBulletClient(PyBulletClient):
+    def inverse_kinematics(self, *args, **kwargs):
+        return AnalyticalInverseKinematics(self)(*args, **kwargs)
+
+    def plan_cartesian_motion(self, *args, **kwargs):
+        return AnalyticalPlanCartesianMotion(self)(*args, **kwargs)

@@ -6,8 +6,8 @@ Backend Client Architecture
 
 To maintain consistency from one backend client to another and to promote
 modularity, we make use of several interfaces.  Any new backend client
-should inherit from ``ClientInterface`` and
-make use of the ``PlannerInterface``.  Methods for connecting,
+should inherit from :class:`~compas_fab.backends.interfaces.ClientInterface` and
+make use of the :class:`~compas_fab.backends.interfaces.PlannerInterface`.  Methods for connecting,
 disconnecting, and generally managing the client state are a part
 of the client, while any methods for planning, scene management or
 kinematics are attached to the planner.  Eventually, methods for

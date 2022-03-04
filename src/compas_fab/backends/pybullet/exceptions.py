@@ -18,10 +18,3 @@ class CollisionError(PyBulletError):
         super(CollisionError, self).__init__(message)
         self.name1 = name1
         self.name2 = name2
-
-
-class InverseKinematicsError(PyBulletError):
-    """Exception raised when no IK solution can be found in PyBullet."""
-    def __init__(self):
-        message = "No inverse kinematics solution found."
-        super(InverseKinematicsError, self).__init__(message)
