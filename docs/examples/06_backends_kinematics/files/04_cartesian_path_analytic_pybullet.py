@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from compas.geometry import Frame
 from compas.robots import LocalPackageMeshLoader
 import compas_fab
-from compas_fab.backends.kinematics.client import AnalyticalPyBulletClient
+from compas_fab.backends import AnalyticalPyBulletClient
 
 urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
 srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')

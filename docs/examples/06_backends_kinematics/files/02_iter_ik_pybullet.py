@@ -1,7 +1,7 @@
 from compas.geometry import Frame
 from compas.robots import LocalPackageMeshLoader
 import compas_fab
-from compas_fab.backends.kinematics import AnalyticalInverseKinematics
+from compas_fab.backends import AnalyticalInverseKinematics
 from compas_fab.backends import PyBulletClient
 
 
