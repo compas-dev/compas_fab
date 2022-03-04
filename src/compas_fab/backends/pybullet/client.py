@@ -13,12 +13,13 @@ from compas.geometry import Frame
 from compas.robots import MeshDescriptor
 from compas.robots import RobotModel
 
+import compas_fab
 from compas_fab.backends.interfaces.client import ClientInterface
 from compas_fab.backends.kinematics import AnalyticalInverseKinematics
 from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion
 from compas_fab.robots import Robot
-from compas_fab.utilities import LazyLoader
 from compas_fab.robots import RobotSemantics
+from compas_fab.utilities import LazyLoader
 
 from . import const
 from .conversions import frame_from_pose
@@ -169,6 +170,41 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         and integration. The timestep is 1/240 second.
         """
         pybullet.stepSimulation(physicsClientId=self.client_id)
+
+    def load_ur5(self, load_geometry=False, concavity=False):
+        """"Load a UR5 robot to PyBullet.
+
+        Parameters
+        ----------
+        load_geometry : :obj:`bool`, optional
+            Indicate whether to load the geometry of the robot or not.
+        concavity : :obj:`bool`, optional
+            When ``False`` (the default), the mesh will be loaded as its
+            convex hull for collision checking purposes.  When ``True``,
+            a non-static mesh will be decomposed into convex parts using v-HACD.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Robot`
+            A robot instance.
+        """
+        robot_model = RobotModel.ur5(load_geometry)
+        robot = Robot(robot_model, client=self)
+        robot.attributes['pybullet'] = {}
+        if load_geometry:
+            self.cache_robot(robot, concavity)
+        else:
+            robot.attributes['pybullet']['cached_robot'] = robot.model
+            robot.attributes['pybullet']['cached_robot_filepath'] = compas.get('ur_description/urdf/ur5.urdf')
+
+        urdf_fp = robot.attributes['pybullet']['cached_robot_filepath']
+
+        self._load_robot_to_pybullet(urdf_fp, robot)
+
+        srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
+        self.load_semantics(robot, srdf_filename)
+
+        return robot
 
     def load_robot(self, urdf_file, resource_loaders=None, concavity=False):
         """Create a pybullet robot using the input urdf file.

@@ -12,6 +12,8 @@ Unreleased
 
 **Added**
 
+* Added ``compas_fab.backends.PyBulletClient.load_ur5()`` method to simplify some examples.
+
 **Changed**
 
 * Moved all public API classes in ``compas_fab.backends`` to second-level imports.
