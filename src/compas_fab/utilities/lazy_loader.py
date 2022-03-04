@@ -22,6 +22,10 @@ from __future__ import print_function
 import importlib
 import types
 
+__all__ = [
+    'LazyLoader'
+]
+
 
 class LazyLoader(types.ModuleType):
     """Lazily import a module, mainly to avoid pulling in large dependencies.
