@@ -10,7 +10,7 @@ from compas_fab.robots import CollisionMesh, AttachedCollisionMesh
 
 with RosClient() as client:
     robot = client.load_robot()
-    assert robot.name == 'ur5'
+    assert robot.name == 'ur5_robot'
 
     ee_link_name = robot.get_end_effector_link_name()
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))

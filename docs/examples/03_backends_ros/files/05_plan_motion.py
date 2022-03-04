@@ -5,7 +5,7 @@ from compas_fab.backends import RosClient
 
 with RosClient() as client:
     robot = client.load_robot()
-    assert robot.name == 'ur5'
+    assert robot.name == 'ur5_robot'
 
     frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
     tolerance_position = 0.001

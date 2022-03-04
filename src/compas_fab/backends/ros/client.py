@@ -187,7 +187,7 @@ class RosClient(Ros, ClientInterface):
         >>> with RosClient() as client:
         ...     robot = client.load_robot()
         ...     print(robot.name)
-        ur5
+        ur5_robot
         """
         robot_name = None
 
