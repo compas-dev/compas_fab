@@ -19,16 +19,22 @@ Main classes
 Baumer sensors
 --------------
 
-.. currentmodule:: compas_fab.sensors.baumer
-
-:mod:`compas_fab.sensors.baumer`
-
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
     PosCon3D
     PosConCM
+
+Exceptions
+----------
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    ProtocolError
+    SensorTimeoutError
 
 """
 
@@ -39,9 +45,18 @@ from .baumer import (
     PosCon3D,
     PosConCM,
 )
+from .exceptions import (
+    ProtocolError,
+    SensorTimeoutError
+)
 
 __all__ = [
-    "PosCon3D",
-    "PosConCM",
-    "SerialSensor",
+    # base
+    'SerialSensor',
+    # baumer
+    'PosCon3D',
+    'PosConCM',
+    # exceptions
+    'ProtocolError',
+    'SensorTimeoutError'
 ]
