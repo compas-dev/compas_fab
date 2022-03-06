@@ -471,4 +471,5 @@ class PlanningScene(object):
         if self.robot.attached_tool:
             for acm in self.robot.attached_tool.attached_collision_meshes:
                 self.remove_attached_collision_mesh(acm.collision_mesh.id)
+                self.remove_collision_mesh(acm.collision_mesh.id)
         self.robot.detach_tool()
