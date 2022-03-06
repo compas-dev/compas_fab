@@ -50,5 +50,6 @@ class MoveItResetPlanningScene(ResetPlanningScene):
         for collision_object in scene.robot_state.attached_collision_objects:
             collision_object.object['operation'] = CollisionObject.REMOVE
         scene.is_diff = True
+        scene.robot_state.is_diff = True
         request = dict(scene=scene)
         self.APPLY_PLANNING_SCENE(self.ros_client, request, callback, errback)

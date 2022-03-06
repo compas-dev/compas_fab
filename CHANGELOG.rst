@@ -22,6 +22,7 @@ Unreleased
 **Fixed**
 
 * Fixed PyBullet loading of meshes.
+* Fixed missing flag in reset planning scene call.
 
 **Deprecated**
 
