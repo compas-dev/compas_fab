@@ -1,20 +1,60 @@
 version: '2'
 services:
-  moveit_planner:
-    image: gramaziokohler/ros-ur-planner
-    container_name: moveit_planner
+  moveit-demo:
+    image: gramaziokohler/ros-noetic-moveit
+    container_name: moveit-demo
     environment:
-      - ROS_HOSTNAME=moveit_planner
-      - ROS_MASTER_URI=http://moveit_planner:11311
-      - ROS_LANG_DISABLE=genlisp:gennodejs:geneus
-      - DISPLAY=host.docker.internal:0.0
-    ports:
-      - "9090:9090"
+      - ROS_HOSTNAME=moveit-demo
+      - ROS_MASTER_URI=http://ros-core:11311
+    #   - DISPLAY=host.docker.internal:0.0
+    depends_on:
+      - ros-core
     command:
       - roslaunch
-      - /root/catkin_ws/scripts/main.launch
-    volumes:
-      - ./scripts:/root/catkin_ws/scripts
+      - --wait
+      - ur5_moveit_config
+      - demo.launch
+      - use_rviz:=false
+    #   - use_rviz:=true
+
+  ros-core:
+    image: gramaziokohler/ros-noetic-moveit
+    container_name: ros-core
+    ports:
+      - "11311:11311"
+    command:
+      - roscore
+
+  ros-bridge:
+    image: gramaziokohler/ros-noetic-moveit
+    container_name: ros-bridge
+    environment:
+      - "ROS_HOSTNAME=ros-bridge"
+      - "ROS_MASTER_URI=http://ros-core:11311"
+    ports:
+      - "9090:9090"
+    depends_on:
+      - ros-core
+    command:
+      - roslaunch
+      - --wait
+      - rosbridge_server
+      - rosbridge_websocket.launch
+
+  ros-fileserver:
+    image: gramaziokohler/ros-noetic-moveit
+    container_name: ros-fileserver
+    environment:
+      - ROS_HOSTNAME=ros-fileserver
+      - ROS_MASTER_URI=http://ros-core:11311
+    depends_on:
+      - ros-core
+    command:
+      - roslaunch
+      - --wait
+      - file_server
+      - file_server.launch
+
   vrep-planner:
     image: gramaziokohler/vrep-rfl
     container_name: vrep_planner

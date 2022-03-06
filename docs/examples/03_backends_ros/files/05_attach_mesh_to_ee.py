@@ -1,11 +1,12 @@
 import time
 
 from compas.datastructures import Mesh
+from compas.geometry import Frame
 
 import compas_fab
 from compas_fab.backends import RosClient
-from compas_fab.robots import CollisionMesh
 from compas_fab.robots import PlanningScene
+from compas_fab.robots import Tool
 
 with RosClient() as client:
     robot = client.load_robot()
@@ -14,20 +15,19 @@ with RosClient() as client:
 
     # create collision object
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
-    cm = CollisionMesh(mesh, 'tip')
-
-    # attach it to the end-effector
-    group = robot.main_group_name
-    scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)
+    t1cf = Frame([0.14, 0, 0], [0, 0, 1], [0, 1, 0])          # TODO: check this frame!
+    tool = Tool(mesh, t1cf, name='tip')
+    scene.add_attached_tool(tool)
 
     # sleep a bit before removing the tip
     time.sleep(1)
 
     # check if it's really there
     planning_scene = robot.client.get_planning_scene()
-    assert 'tip' in [c.object['id'] for c in planning_scene.robot_state.attached_collision_objects]
+    acm = planning_scene.robot_state.attached_collision_objects
+    assert acm[0].object['id'].startswith('tip_')
 
-    scene.reset()
+    scene.remove_attached_tool()
 
     planning_scene = robot.client.get_planning_scene()
-    assert 'tip' not in [c.object['id'] for c in planning_scene.robot_state.attached_collision_objects]
+    assert acm[0].object['id'] not in [c.object['id'] for c in planning_scene.robot_state.attached_collision_objects]
