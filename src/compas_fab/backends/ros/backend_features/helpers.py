@@ -2,13 +2,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import itertools
+
+from compas.robots import Configuration
+
 from compas_fab.backends.ros.exceptions import RosError
 from compas_fab.backends.ros.messages import Constraints
 from compas_fab.backends.ros.messages import JointConstraint
 from compas_fab.backends.ros.messages import MoveItErrorCodes
-from compas_fab.backends.ros.messages import PositionConstraint
 from compas_fab.backends.ros.messages import OrientationConstraint
+from compas_fab.backends.ros.messages import PositionConstraint
 from compas_fab.robots import Duration
+from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
 
 
@@ -55,3 +60,24 @@ def convert_trajectory_points(points, joint_types):
         result.append(jtp)
 
     return result
+
+
+def convert_trajectory(joints, solution, solution_start_state, fraction, planning_time, source_message):
+    trajectory = JointTrajectory()
+    trajectory.source_message = source_message
+    trajectory.fraction = fraction
+    trajectory.joint_names = solution.joint_trajectory.joint_names
+    trajectory.planning_time = planning_time
+
+    joint_types = [joints[name] for name in trajectory.joint_names]
+    trajectory.points = convert_trajectory_points(
+        solution.joint_trajectory.points, joint_types)
+
+    start_state = solution_start_state.joint_state
+    start_state_types = [joints[name] for name in start_state.name]
+    trajectory.start_configuration = Configuration(start_state.position, start_state_types, start_state.name)
+    trajectory.attached_collision_meshes = list(itertools.chain(*[
+        aco.to_attached_collision_meshes()
+        for aco in solution_start_state.attached_collision_objects]))
+
+    return trajectory

@@ -16,6 +16,8 @@ Unreleased
 
 **Fixed**
 
+* Fixed issue on cartesian and kinematic planning when model contains passive joints.
+
 **Deprecated**
 
 **Removed**
