@@ -18,8 +18,7 @@ __all__ = [
 
 
 class VrepPlanner(PlannerInterface):
-    """Implement the planner backend interface for V-REP
-    """
+    """Implement the planner backend interface for V-REP."""
     def __init__(self, client):
         super(VrepPlanner, self).__init__(client)
 

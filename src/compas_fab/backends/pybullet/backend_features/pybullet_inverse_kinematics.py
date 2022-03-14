@@ -7,9 +7,9 @@ import random
 
 from compas.robots import Joint
 
+from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.pybullet.conversions import pose_from_frame
-from compas_fab.backends.pybullet.exceptions import InverseKinematicsError
 from compas_fab.utilities import LazyLoader
 
 pybullet = LazyLoader('pybullet', globals(), 'pybullet')

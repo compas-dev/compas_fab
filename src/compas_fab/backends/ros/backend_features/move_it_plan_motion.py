@@ -64,7 +64,7 @@ class MoveItPlanMotion(PlanMotion):
               violates these constraints. Defaults to ``None``.
             - ``"planner_id"``: (:obj:`str`)
               The name of the algorithm used for path planning.
-              Defaults to ``'RRTConnectkConfigDefault'``.
+              Defaults to ``'RRTConnect'``.
             - ``"num_planning_attempts"``: (:obj:`int`, optional)
               Normally, if one motion plan is needed, one motion plan is computed.
               However, for algorithms that use randomization in their execution
@@ -132,7 +132,7 @@ class MoveItPlanMotion(PlanMotion):
                        goal_constraints=goal_constraints,
                        path_constraints=path_constraints,
                        trajectory_constraints=trajectory_constraints,
-                       planner_id=options.get('planner_id', 'RRTConnectkConfigDefault'),
+                       planner_id=options.get('planner_id', 'RRTConnect'),
                        group_name=group,
                        num_planning_attempts=options.get('num_planning_attempts', 1),
                        allowed_planning_time=options.get('allowed_planning_time', 2.),

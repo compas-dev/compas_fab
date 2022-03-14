@@ -18,7 +18,9 @@ There are 2 function that allow to plan a robotic movement without collisions:
 Plan cartesian motion
 =====================
 
-.. literalinclude :: files/05_plan_cartesian_motion.py
+Cartesian planning allows to plan motions that follow a sequence of defined frames.
+
+.. literalinclude :: files/04_plan_cartesian_motion.py
    :language: python
 
 Plan motion
@@ -27,5 +29,5 @@ Plan motion
 In contrast to the cartesian path, the :class:`~compas_fab.robots.plan_motion`
 allows to describe the goal with constraints rather than defined frames.
 
-.. literalinclude :: files/05_plan_motion.py
+.. literalinclude :: files/04_plan_motion.py
    :language: python

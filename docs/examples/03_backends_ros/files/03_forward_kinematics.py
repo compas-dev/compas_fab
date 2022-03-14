@@ -3,7 +3,8 @@ from compas_fab.backends import RosClient
 
 with RosClient() as client:
     robot = client.load_robot()
-    assert robot.name == 'ur5'
+    print(robot.name)
+    assert robot.name == 'ur5_robot'
 
     configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.])
 

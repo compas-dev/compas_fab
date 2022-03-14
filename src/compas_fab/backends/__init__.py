@@ -7,18 +7,11 @@ compas_fab.backends
 
 This package contains classes backends for simulation, planning and execution.
 
-V-REP
------
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    VrepClient
-    VrepPlanner
-
 ROS
----
+===
+
+Classes to interact with `ROS <https://ros.org/>`_ and the ``MoveIt`` planning
+framework.
 
 .. autosummary::
     :toctree: generated/
@@ -27,9 +20,14 @@ ROS
     RosClient
     RosFileServerLoader
     MoveItPlanner
+    RosError
+    RosValidationError
+
 
 PyBullet
---------
+========
+
+Classes to interact with `PyBullet <http://pybullet.org/>`_.
 
 .. autosummary::
     :toctree: generated/
@@ -38,22 +36,58 @@ PyBullet
     PyBulletClient
     PyBulletPlanner
     PyBulletError
+    CollisionError
 
+V-REP
+=====
 
-Analytical Kinematics
----------------------
+Classes to interact with `V-REP <https://www.coppeliarobotics.com/>`_.
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
-    AnalyticalPyBulletClient
+    VrepClient
+    VrepPlanner
+    VrepError
+
+
+Analytical Kinematics
+=====================
+
+Pure-python implementation of analytic IK solvers.
+
+IK solvers
+----------
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
     AnalyticalInverseKinematics
     AnalyticalPlanCartesianMotion
+    OffsetWristKinematics
+    SphericalWristKinematics
+    AnalyticalPyBulletClient
 
+Robot-specific kinematics
+-------------------------
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    UR3Kinematics
+    UR3eKinematics
+    UR5Kinematics
+    UR5eKinematics
+    UR10Kinematics
+    UR10eKinematics
+    Staubli_TX260LKinematics
+    ABB_IRB4600_40_255Kinematics
 
 Long-running tasks
-------------------
+==================
 
 .. autosummary::
     :toctree: generated/
@@ -63,22 +97,19 @@ Long-running tasks
     CancellableFutureResult
 
 Exceptions
-----------
+==========
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
     BackendError
-    CollisionError
+    CartesianMotionError
+    KinematicsError
     InverseKinematicsError
-    RosError
-    RosValidationError
-    VrepError
-
 
 Interfaces
-----------
+==========
 
 For details about integrating new backends, check
 the :ref:`architecture` documentation.
@@ -87,81 +118,101 @@ the :ref:`architecture` documentation.
 
 import compas
 
+# Base imports
 from .exceptions import (
     BackendError,
+    KinematicsError,
+    InverseKinematicsError,
 )
 from .tasks import (
     FutureResult,
     CancellableFutureResult,
 )
-from .ros.client import (
+
+# ROS imports
+from .ros import (
     RosClient,
-)
-from .ros.exceptions import (
     RosError,
     RosValidationError,
-)
-from .ros.fileserver_loader import (
     RosFileServerLoader,
-)
-from .ros.planner import (
     MoveItPlanner,
 )
-from .vrep.client import (
+
+# VREP imports
+from .vrep import (
     VrepClient,
-)
-from .vrep.helpers import (
     VrepError,
-)
-from .vrep.planner import (
     VrepPlanner,
 )
 
+# Analytic IK
+from .kinematics import (
+    AnalyticalInverseKinematics,
+    AnalyticalPlanCartesianMotion,
+    OffsetWristKinematics,
+    SphericalWristKinematics,
+    CartesianMotionError,
+)
+# Robot-specific analytic IK
+from .kinematics import (
+    UR3Kinematics,
+    UR3eKinematics,
+    UR5Kinematics,
+    UR5eKinematics,
+    UR10Kinematics,
+    UR10eKinematics,
+    Staubli_TX260LKinematics,
+    ABB_IRB4600_40_255Kinematics,
+)
+
 if not compas.IPY:
-    from .pybullet.client import (
+    from .pybullet import (
         PyBulletClient,
-    )
-    from .pybullet.exceptions import (
         CollisionError,
-        InverseKinematicsError,
         PyBulletError,
-    )
-    from .pybullet.planner import (
         PyBulletPlanner,
-    )
-    from .kinematics.client import (
         AnalyticalPyBulletClient,
-    )
-    from .kinematics import (
-        AnalyticalInverseKinematics,
-    )
-    from .kinematics.client import (
-        AnalyticalPlanCartesianMotion,
     )
 
 __all__ = [
-      'BackendError',
-      'CancellableFutureResult',
-      'FutureResult',
-      'MoveItPlanner',
-      'RosClient',
-      'RosError',
-      'RosFileServerLoader',
-      'RosValidationError',
-      'VrepClient',
-      'VrepError',
-      'VrepPlanner',
-    ]
+    # Base
+    'BackendError',
+    'KinematicsError',
+    'InverseKinematicsError',
+    'FutureResult',
+    'CancellableFutureResult',
+    # ROS
+    'RosClient',
+    'RosError',
+    'RosValidationError',
+    'RosFileServerLoader',
+    'MoveItPlanner',
+    # VREP
+    'VrepClient',
+    'VrepError',
+    'VrepPlanner',
+    # Analytic IK
+    'AnalyticalInverseKinematics',
+    'AnalyticalPlanCartesianMotion',
+    'OffsetWristKinematics',
+    'SphericalWristKinematics',
+    'CartesianMotionError',
+    # Robot-specific analytic IK
+    'UR3Kinematics',
+    'UR3eKinematics',
+    'UR5Kinematics',
+    'UR5eKinematics',
+    'UR10Kinematics',
+    'UR10eKinematics',
+    'Staubli_TX260LKinematics',
+    'ABB_IRB4600_40_255Kinematics',
+]
 
 if not compas.IPY:
     __all__ += [
-        'CollisionError',
-        'InverseKinematicsError',
         'PyBulletClient',
+        'CollisionError',
         'PyBulletError',
         'PyBulletPlanner',
         'AnalyticalPyBulletClient',
-        'AnalyticalInverseKinematics',
-        'AnalyticalPlanCartesianMotion',
-
     ]

@@ -1,15 +1,16 @@
 import math
 
 __all__ = [
+    'allclose',
+    'arange',
+    'argmax',
+    'argmin',
+    'argsort',
+    'clamp',
+    'diffs',
     'map_range',
     'range_geometric_row',
-    'arange',
-    'diffs',
-    'allclose',
-    'argsort',
-    'argmin',
-    'argmax',
-    'clamp',
+    'sign',
 ]
 
 
@@ -114,6 +115,22 @@ def argmax(numbers):
     since this function might take too long.
     """
     return argsort(numbers)[-1]
+
+
+def sign(number):
+    """Returns the sign of a number: +1 or -1.
+
+    Parameters
+    ----------
+    number : float
+        A number.
+
+    Returns
+    -------
+    int
+        `+1` if the number has positive sign, otherwise `-1`.
+    """
+    return int(int((number) > 0) - int((number) < 0))
 
 
 def clamp(value, min_value, max_value):

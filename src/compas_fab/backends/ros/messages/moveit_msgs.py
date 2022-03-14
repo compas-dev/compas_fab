@@ -34,7 +34,7 @@ class CollisionObject(ROSmsg):
     def __init__(self, header=None, id="collision_obj", type=None,
                  primitives=None, primitive_poses=None, meshes=None, mesh_poses=None,
                  planes=None, plane_poses=None,
-                 subframe_names=None, subframe_poses=None, operation=0):
+                 subframe_names=None, subframe_poses=None, operation=0, pose=None):
         self.header = header or Header()  # a header, used for interpreting the poses
         self.id = id  # the id of the object (name used in MoveIt)
         self.type = type or ObjectType()  # The object type in a database of known objects

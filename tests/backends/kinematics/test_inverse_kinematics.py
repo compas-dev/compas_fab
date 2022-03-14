@@ -1,12 +1,13 @@
 import compas
 from compas.geometry import Frame
 from compas.robots.configuration import Configuration
+
 import compas_fab
+from compas_fab.backends import AnalyticalInverseKinematics
 from compas_fab.robots.ur5 import Robot
-from compas_fab.backends.kinematics import AnalyticalInverseKinematics
 
 if not compas.IPY:
-    from compas_fab.backends.kinematics.client import AnalyticalPyBulletClient
+    from compas_fab.backends import AnalyticalPyBulletClient
 
 urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
 srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')

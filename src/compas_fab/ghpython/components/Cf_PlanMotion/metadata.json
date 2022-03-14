@@ -40,7 +40,7 @@
             },
             {
                 "name": "planner_id",
-                "description": "The name of the algorithm used for path planning. Defaults to 'RRTConnectkConfigDefault'",
+                "description": "The name of the algorithm used for path planning. Defaults to 'RRTConnect'",
                 "typeHintID": "str"
             },
             {

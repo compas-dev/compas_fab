@@ -1,7 +1,6 @@
 import compas_fab
 from compas.geometry import Frame
 from compas_fab.backends import PyBulletClient
-from compas_fab.backends import InverseKinematicsError
 
 with PyBulletClient(connection_type='direct') as client:
     urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')

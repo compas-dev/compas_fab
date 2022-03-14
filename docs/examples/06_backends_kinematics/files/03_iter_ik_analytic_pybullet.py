@@ -1,15 +1,9 @@
-import compas_fab
 from compas.geometry import Frame
-from compas.robots import LocalPackageMeshLoader
-from compas_fab.backends.kinematics.client import AnalyticalPyBulletClient
+from compas_fab.backends import AnalyticalPyBulletClient
 
-urdf_filename = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
-srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
 
 with AnalyticalPyBulletClient(connection_type='direct') as client:
-    loader = LocalPackageMeshLoader(compas_fab.get('universal_robot'), 'ur_description')
-    robot = client.load_robot(urdf_filename, [loader])
-    client.load_semantics(robot, srdf_filename)
+    robot = client.load_ur5(load_geometry=True)
 
     frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269))
 
