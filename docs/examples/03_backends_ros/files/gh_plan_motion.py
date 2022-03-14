@@ -16,7 +16,7 @@
             the end-effector) is required to move to.
         planner_id: str
             The name of the algorithm used for path planning.
-            Defaults to ``'RRTConnectkConfigDefault'``.
+            Defaults to ``'RRTConnect'``.
         attached_collision_meshes: list of :class:`compas_fab.robots.AttachedCollisionMesh`
             Defaults to None.
         compute: bool

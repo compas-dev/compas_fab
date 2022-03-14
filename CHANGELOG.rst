@@ -18,10 +18,12 @@ Unreleased
 
 * Moved all public API classes in ``compas_fab.backends`` to second-level imports.
 * Updated to COMPAS 1.14.
+* Simplified call to remove an attached tool by also removing the remaining collision mesh from the world automatically.
 
 **Fixed**
 
 * Fixed PyBullet loading of meshes.
+* Fixed missing flag in reset planning scene call.
 
 **Deprecated**
 

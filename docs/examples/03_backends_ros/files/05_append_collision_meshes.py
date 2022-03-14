@@ -10,7 +10,7 @@ from compas_fab.robots import PlanningScene
 with RosClient() as client:
     robot = client.load_robot()
     scene = PlanningScene(robot)
-    assert robot.name == 'ur5'
+    assert robot.name == 'ur5_robot'
 
     brick = Box.from_width_height_depth(0.11, 0.07, 0.25)
 
