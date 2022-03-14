@@ -16,9 +16,7 @@ File system functions
 
     list_files_in_directory
     read_csv_to_dictionary
-    read_data_from_json
     read_data_from_pickle
-    write_data_to_json
     write_data_to_pickle
 
 Numerical functions
@@ -34,6 +32,7 @@ Numerical functions
     diffs
     map_range
     range_geometric_row
+    sign
 
 Other functions
 ===============
@@ -46,7 +45,6 @@ Other functions
     argmin
     argsort
     LazyLoader
-    sign
 
 """
 
@@ -68,18 +66,26 @@ from .numbers import (
     arange,
     argmax,
     argmin,
+    argsort,
     clamp,
     diffs,
     map_range,
     range_geometric_row,
-)
-from .utilities import (
-    argsort,
     sign,
 )
 
 __all__ = [
+    # file_io
+    'read_csv_to_dictionary',
+    'read_data_from_json',
+    'read_data_from_pickle',
+    'write_data_to_json',
+    'write_data_to_pickle',
+    # filesystem
+    'list_files_in_directory',
+    # lazy_loader
     'LazyLoader',
+    # numbers
     'allclose',
     'arange',
     'argmax',
@@ -87,13 +93,7 @@ __all__ = [
     'argsort',
     'clamp',
     'diffs',
-    'list_files_in_directory',
     'map_range',
     'range_geometric_row',
-    'read_csv_to_dictionary',
-    'read_data_from_json',
-    'read_data_from_pickle',
     'sign',
-    'write_data_to_json',
-    'write_data_to_pickle',
 ]

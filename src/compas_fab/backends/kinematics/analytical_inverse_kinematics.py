@@ -1,9 +1,10 @@
 from compas_fab.backends.exceptions import BackendError
+from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics
-from .utils import try_to_fit_configurations_between_bounds
-from .utils import joint_angles_to_configurations
-from .exceptions import InverseKinematicsError
+
 from .solvers import PLANNER_BACKENDS
+from .utils import joint_angles_to_configurations
+from .utils import try_to_fit_configurations_between_bounds
 
 
 class AnalyticalInverseKinematics(InverseKinematics):
@@ -12,16 +13,15 @@ class AnalyticalInverseKinematics(InverseKinematics):
     Parameters
     ----------
     client : :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-        The backend client to use for communication, for now only the
-        :class:`compas_fab.backends.PyBulletClient` is supported.
+        The backend client to use for communication.
     solver : :obj:`str`, optional
         The solver to use to calculate IK.
 
     Notes
     -----
-    This works only for industrial robot arms with six revolute joints and only
-    with a client that supports ``"check_collision"``, so for now only the
-    `PyBulletClient`.
+    This works only for industrial robot arms with six revolute joints.
+    If ``check_collision`` is `True`, it is required to use a client
+    that supports ``"check_collision"``, so for now only the `PyBulletClient`.
     """
 
     def __init__(self, client=None, solver=None):

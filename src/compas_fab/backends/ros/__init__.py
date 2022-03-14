@@ -1,30 +1,15 @@
-"""
-*******************************************************************************
-compas_fab.backends.ros
-*******************************************************************************
-
-.. module:: compas_fab.backends.ros
-
-Package with functionality to interact with `ROS <https://ros.org/>`_.
-
-.. autosummary::
-    :toctree: generated/
-
-    RosClient
-    RosFileServerLoader
-    RosError
-    RosValidationError
-    MoveItPlanner
-
-"""
-
 from __future__ import absolute_import
 
-from .client import *                     # noqa: F401,F403
-from .direct_ur_action_client import *    # noqa: F401,F403
-from .exceptions import *                 # noqa: F401,F403
-from .fileserver_loader import *          # noqa: F401,F403
-from .messages import *                   # noqa: F401,F403
-from .planner import *                    # noqa: F401,F403
+from .client import RosClient
+from .exceptions import RosError
+from .exceptions import RosValidationError
+from .fileserver_loader import RosFileServerLoader
+from .planner import MoveItPlanner
 
-__all__ = [name for name in dir() if not name.startswith('_')]
+__all__ = [
+    'RosClient',
+    'RosFileServerLoader',
+    'RosError',
+    'RosValidationError',
+    'MoveItPlanner',
+]

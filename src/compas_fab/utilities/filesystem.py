@@ -5,23 +5,26 @@ __all__ = [
 ]
 
 
-def list_files_in_directory(directory, fullpath=False, extensions=[]):
+def list_files_in_directory(directory, fullpath=False, extensions=None):
     """This function lists just the files in a directory, not sub-directories.
 
-    Args:
-        directory (str): the directory to search for files.
-        fullpath (:obj:`bool`, optional): specifies if the returned list of
-            strings is with the full path. Defaults to False.
-        extensions (:obj:`list` of :obj:`str`, optional): a list of allowed
-            extensions, e.g. ["jpg", "png"] if you just want to list images.
-            Defaults to empty list.
+    Parameters
+    ----------
+    directory : :obj:`str`
+        The directory to search for files.
+    fullpath : :obj:`bool`, optional
+        Specifies if the returned list of strings is with the full path.
+    extensions : :obj:`list` of :obj:`str`, optional
+        A list of allowed extensions, e.g. ["jpg", "png"] if you just want to list images.
 
-    Returns:
-        files (:obj:`list` of :obj:`str`): A list of files as string if files
-            exist, or empty list.
+    Returns
+    -------
+    :obj:`list` of :obj:`str`
+        A list of files as string if files exist, or empty list.
     """
     directory = os.path.abspath(directory)
     files = []
+    extensions = extensions or []
     extensions = [".%s" % ext for ext in extensions if ext[0] != "."]
     for item in os.listdir(directory):
         item_fullpath = os.path.join(directory, item)

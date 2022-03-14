@@ -1,23 +1,37 @@
-"""
-*******************************************************************************
-compas_fab.backends.kinematics
-*******************************************************************************
-
-.. module:: compas_fab.backends.kinematics
-
-.. autosummary::
-    :toctree: generated/
-
-    AnalyticalInverseKinematics
-    AnalyticalPlanCartesianMotion
-    InverseKinematicsError
-    CartesianMotionError
-
-"""
-
 from __future__ import absolute_import
-from .analytical_inverse_kinematics import AnalyticalInverseKinematics  # noqa: F401
-from .analytical_plan_cartesian_motion import AnalyticalPlanCartesianMotion  # noqa: F401
-from .exceptions import *                 # noqa: F401,F403
 
-__all__ = [name for name in dir() if not name.startswith('_')]
+from .exceptions import CartesianMotionError
+
+from .analytical_inverse_kinematics import AnalyticalInverseKinematics
+from .analytical_plan_cartesian_motion import AnalyticalPlanCartesianMotion
+
+from .solvers import (
+    OffsetWristKinematics,
+    SphericalWristKinematics,
+    UR3Kinematics,
+    UR3eKinematics,
+    UR5Kinematics,
+    UR5eKinematics,
+    UR10Kinematics,
+    UR10eKinematics,
+    Staubli_TX260LKinematics,
+    ABB_IRB4600_40_255Kinematics,
+)
+__all__ = [
+    # exceptions
+    'CartesianMotionError',
+    # clients / backend features
+    'AnalyticalInverseKinematics',
+    'AnalyticalPlanCartesianMotion',
+    # solvers
+    'OffsetWristKinematics',
+    'SphericalWristKinematics',
+    'UR3Kinematics',
+    'UR3eKinematics',
+    'UR5Kinematics',
+    'UR5eKinematics',
+    'UR10Kinematics',
+    'UR10eKinematics',
+    'Staubli_TX260LKinematics',
+    'ABB_IRB4600_40_255Kinematics',
+]

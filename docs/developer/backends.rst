@@ -1,15 +1,18 @@
 .. _architecture:
 
 *******************************************************************************
-Backend Client Architecture
+Backend clients
 *******************************************************************************
 
+This document details the architecture used to implement backend clients and
+backend features.
+
 To maintain consistency from one backend client to another and to promote
-modularity, we make use of several interfaces.  Any new backend client
-should inherit from ``ClientInterface`` and
-make use of the ``PlannerInterface``.  Methods for connecting,
-disconnecting, and generally managing the client state are a part
-of the client, while any methods for planning, scene management or
+modularity, we make use of several interfaces. Any new backend client
+should inherit from :class:`~compas_fab.backends.interfaces.ClientInterface` and
+make use of the :class:`~compas_fab.backends.interfaces.PlannerInterface`.
+Methods for connecting, disconnecting, and generally managing the client state
+are a part of the client, while any methods for planning, scene management or
 kinematics are attached to the planner.  Eventually, methods for
 execution and control will be included in the ``ControlInterface``,
 but for now, such methods and attributes will be left with the
@@ -75,10 +78,7 @@ of ``ClientA``, while the motion planning is calculated by the backend of
 ``ClientBPlanMotion`` inherit from ``InverseKinematics`` and
 ``PlanMotion``, resp.)
 
-Interfaces
-==========
+Backend interfaces
+==================
 
-.. toctree::
-    :maxdepth: 3
-
-    interfaces
+.. automodule:: compas_fab.backends.interfaces

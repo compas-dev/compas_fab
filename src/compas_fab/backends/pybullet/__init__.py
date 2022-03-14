@@ -1,23 +1,3 @@
-"""
-*******************************************************************************
-compas_fab.backends.pybullet
-*******************************************************************************
-
-.. module:: compas_fab.backends.pybullet
-
-Package with functionality to interact with `PyBullet <http://pybullet.org/>`_.
-
-.. autosummary::
-    :toctree: generated/
-
-    PyBulletClient
-    PyBulletError
-    CollisionError
-    InverseKinematicsError
-    PyBulletPlanner
-
-"""
-
 from __future__ import absolute_import
 
 from .client import *                     # noqa: F401,F403
