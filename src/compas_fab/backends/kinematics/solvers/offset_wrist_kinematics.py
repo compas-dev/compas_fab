@@ -63,36 +63,42 @@ class OffsetWristKinematics(object):
 
 
 class UR3Kinematics(OffsetWristKinematics):
+    """Analytical IK solver for UR3 robots."""
     def __init__(self):
         params = [UR3_PARAMS[k] for k in ['d1', 'a2', 'a3', 'd4', 'd5', 'd6']]
         super(UR3Kinematics, self).__init__(params)
 
 
 class UR3eKinematics(OffsetWristKinematics):
+    """Analytical IK solver for UR3 e-Series robots."""
     def __init__(self):
         params = [UR3_PARAMS[k] for k in ['d1', 'a2', 'a3', 'd4', 'd5', 'd6']]
         super(UR3eKinematics, self).__init__(params)
 
 
 class UR5Kinematics(OffsetWristKinematics):
+    """Analytical IK solver for UR5 robots."""
     def __init__(self):
         params = [UR5_PARAMS[k] for k in ['d1', 'a2', 'a3', 'd4', 'd5', 'd6']]
         super(UR5Kinematics, self).__init__(params)
 
 
 class UR5eKinematics(OffsetWristKinematics):
+    """Analytical IK solver for UR5 e-Series robots."""
     def __init__(self):
         params = [UR5e_PARAMS[k] for k in ['d1', 'a2', 'a3', 'd4', 'd5', 'd6']]
         super(UR5eKinematics, self).__init__(params)
 
 
 class UR10Kinematics(OffsetWristKinematics):
+    """Analytical IK solver for UR10 e-Series robots."""
     def __init__(self):
         params = [UR10_PARAMS[k] for k in ['d1', 'a2', 'a3', 'd4', 'd5', 'd6']]
         super(UR10Kinematics, self).__init__(params)
 
 
 class UR10eKinematics(OffsetWristKinematics):
+    """Analytical IK solver for UR10 e-Series robots."""
     def __init__(self):
         params = [UR10_PARAMS[k] for k in ['d1', 'a2', 'a3', 'd4', 'd5', 'd6']]
         super(UR10eKinematics, self).__init__(params)

@@ -373,7 +373,7 @@ class Wrench():
         ----------
         .. [1] Vougioukas S., *Bias Estimation and Gravity Compensation For
             Force-Torque Sensors*,
-            Available at: http://wseas.us/e-library/conferences/crete2002/papers/444-809.pdf
+            Available at: https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.552.109
 
         """
         # transform gravity vector to FT Sensor coordinate system (FTSCS)

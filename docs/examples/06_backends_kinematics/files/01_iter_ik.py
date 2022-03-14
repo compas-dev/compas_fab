@@ -1,6 +1,6 @@
 from compas.geometry import Frame
 from compas_fab.robots.ur5 import Robot
-from compas_fab.backends.kinematics import AnalyticalInverseKinematics
+from compas_fab.backends import AnalyticalInverseKinematics
 
 ik = AnalyticalInverseKinematics()
 robot = Robot()

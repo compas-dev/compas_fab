@@ -88,4 +88,7 @@ def test_compas_api_stubs(compas_fab_api, compas_fab_stubs):
         for name in compas_fab_api[packmod]:
             if name in ['Configuration', 'PosCon3D', 'PosConCM']:
                 continue
-            assert name in compas_fab_stubs[packmod]
+            # deprecated functions
+            if name in ['read_data_from_json', 'write_data_to_json']:
+                continue
+            assert name in compas_fab_stubs[packmod], 'missing {} in {}'.format(name, packmod)

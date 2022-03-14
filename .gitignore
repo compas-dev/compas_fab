@@ -108,8 +108,9 @@ ENV/
 # compas
 # ------------------------------------------------------------------------------
 
-docs/reference/generated/
-docs/generated/
+docs/developer/generated/*
+docs/api/generated/*
+docs/generated/*
 
 *.3dmbak
 *.rhl
@@ -119,4 +120,3 @@ temp/**
 
 # Grasshopper generated objects
 src/compas_fab/ghpython/components/ghuser/*.ghuser
-docs/api/generated/*

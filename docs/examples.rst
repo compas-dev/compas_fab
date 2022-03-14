@@ -17,7 +17,6 @@ Robotic fabrication examples
 ============================
 
 .. toctree::
-    :numbered:
     :maxdepth: 2
     :glob:
 

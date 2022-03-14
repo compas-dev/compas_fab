@@ -44,6 +44,9 @@ def read_csv_to_dictionary(csvfile, delimiter=';'):
 def write_data_to_json(data, file):
     """Write data to json file.
 
+    .. deprecated:: 0.23
+        Use :func:`compas.data.json_dump` instead.
+
     Parameters
     ----------
     data : dict, list, tuple, str, unicode, int, long, float, boolean, None
@@ -57,6 +60,9 @@ def write_data_to_json(data, file):
 
 def read_data_from_json(file):
     """Read data from json file.
+
+    .. deprecated:: 0.23
+        Use :func:`compas.data.json_load` instead.
 
     Parameters
     ----------

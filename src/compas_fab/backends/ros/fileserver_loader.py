@@ -180,18 +180,20 @@ class RosFileServerLoader(object):
         """
         return url.startswith(self.schema_prefix)
 
-    def load_mesh(self, url):
-        """Loads a mesh from local storage.
+    def load_meshes(self, url):
+        """Load meshes from the given URL in the ROS file server.
+
+        A single mesh url can contain multiple meshes depending on the format.
 
         Parameters
         ----------
         url : str
-            Mesh location
+            Mesh URL
 
         Returns
         -------
-        :class:`Mesh` or list of :class:`Mesh`
-            Instance of a mesh.
+        list[:class:`compas.datastructures.Mesh`]
+            List of meshes.
         """
         use_local_file = False
         file_extension = _get_file_format(url)
@@ -225,6 +227,24 @@ class RosFileServerLoader(object):
             LOGGER.debug('Loading mesh file %s from local cache dir', local_filename)
 
         return _fileserver_mesh_import(url, local_filename, self.precision)
+
+    def load_mesh(self, url):
+        """Load the mesh from the given URL.
+
+        .. deprecated:: 0.23
+            Use :meth:`load_meshes` instead.
+
+        Parameters
+        ----------
+        url : str
+            Mesh URL
+
+        Returns
+        -------
+        :class:`compas.datastructures.Mesh`
+            Instance of a mesh.
+        """
+        return self.load_mesh(url)
 
     def _local_mesh_filename(self, url):
         return os.path.abspath(os.path.join(self._robot_resource_path, url[len('package://'):]))

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 import math
 from compas.geometry import Point
@@ -29,9 +30,7 @@ class SphericalWristKinematics(object):
 
 
 class Staubli_TX260LKinematics(SphericalWristKinematics):
-    """
-    """
-
+    """Analytical IK solver for the Stäubli TX2 60L robot."""
     def __init__(self):
         points = [Point(0.000, 0.000, 0.375),
                   Point(0.000, 0.020, 0.775),
@@ -57,9 +56,7 @@ class Staubli_TX260LKinematics(SphericalWristKinematics):
 
 
 class ABB_IRB4600_40_255Kinematics(SphericalWristKinematics):
-    """
-    """
-
+    """Analytical IK solver for the ABB IRB4600 40/255 robot."""
     def __init__(self):
         points = [Point(0.175, 0.000, 0.495),
                   Point(0.175, 0.000, 1.590),

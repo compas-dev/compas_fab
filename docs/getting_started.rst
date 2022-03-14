@@ -11,24 +11,23 @@ Install with conda
 ==================
 
 The recommended way to install **COMPAS FAB** is with `conda <https://conda.io/docs/>`_.
-For example, create an environment named ``my-project`` and install COMPAS and COMPAS FAB.
+For example, create an environment named ``project_name`` and install COMPAS and COMPAS FAB.
 
 ::
 
-    conda config --add channels conda-forge
-    conda create -n my-project compas_fab
+    conda create -n project_name -c conda-forge compas_fab
 
-Afterwards, simply activate the environment
-and run the following command to check if the installation process was successful.
+Afterwards, simply activate the environment and run the following
+command to check if the installation process was successful.
 
 .. code-block:: bash
 
-    conda activate my-project
-    python -c "import compas_fab; print(compas_fab.__version__)"
+    conda activate project_name
+    python -m compas_fab
 
 .. code-block:: none
 
-    0.22.0
+    Yay! COMPAS FAB is installed correctly!
 
 You are ready to use **COMPAS FAB**!
 
@@ -39,13 +38,13 @@ Install COMPAS FAB in an environment with a specific version of Python.
 
 .. code-block:: bash
 
-    conda create -n my-project python=3.8 compas_fab
+    conda create -n project_name python=3.8 compas_fab
 
 Install COMPAS FAB in an existing environment.
 
 .. code-block:: bash
 
-    conda install -n my-project compas_fab
+    conda install -n project_name compas_fab
 
 Install with pip
 ================
@@ -67,7 +66,7 @@ Note that installation with ``pip`` is also possible within a ``conda`` environm
 
 .. code-block:: bash
 
-    conda activate my-project
+    conda activate project_name
     pip install -e .
 
 .. note::
@@ -117,11 +116,6 @@ activate the appropriate environment, and type the following:
 ::
 
     python -m compas_rhino.install
-
-.. note:
-
-    On Windows, you might need to run the *command prompt* as administrator
-    before running the install command.
 
 Open Rhino, start the Python script editor, type ``import compas_fab`` and
 run it to verify that your installation is working.
@@ -194,7 +188,7 @@ Virtual environments
 
 If you are using ``conda`` to manage your virtual environments, VS Code has
 built-in support for them. When a ``.py`` file is open on VS Code, the bottom
-left side of the **Status bar** will show the Python interpreter used to run
+right side of the **Status bar** will show the Python interpreter used to run
 scripts. Click on it and a list of all available interpreters including all
 environments will be shown. Select one, and the next time you run a script,
 the newly selected interpreter will be used.
