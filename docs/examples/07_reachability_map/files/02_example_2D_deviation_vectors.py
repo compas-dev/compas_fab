@@ -8,9 +8,12 @@ from compas.geometry import Sphere
 from compas_fab.backends import AnalyticalInverseKinematics
 from compas_fab.backends import PyBulletClient
 from compas_fab.robots import ReachabilityMap
+from compas_fab.robots.reachability_map import DeviationVectorsGenerator
 from compas_fab import DATA
 
-# 1. Define frames on a sphere
+
+# 1. Define generators
+
 sphere = Sphere((0.4, 0, 0), 0.15)
 
 
@@ -30,7 +33,20 @@ def points_on_sphere_generator(sphere):
             yield Frame(f.point, f.zaxis, f.yaxis)
 
 
-# 3. Create reachability map 1D
+def deviation_vector_generator(frame):
+    for xaxis in DeviationVectorsGenerator(frame.xaxis, math.radians(40), 1):
+        yaxis = frame.zaxis.cross(xaxis)
+        yield Frame(frame.point, xaxis, yaxis)
+
+# 2. Create 2D generator
+
+
+def generator():
+    for frame in points_on_sphere_generator(sphere):
+        yield deviation_vector_generator(frame)
+
+# 3. Create reachability map 2D
+
 
 with PyBulletClient(connection_type='direct') as client:
     # load robot and define settings
@@ -40,6 +56,6 @@ with PyBulletClient(connection_type='direct') as client:
     options = {"solver": "ur5", "check_collision": True, "keep_order": True}
     # calculate reachability map
     map = ReachabilityMap()
-    map.calculate(points_on_sphere_generator(sphere), robot, options)
+    map.calculate(generator(), robot, options)
     # save to json
-    map.to_json(os.path.join(DATA, "reachability", "map1D.json"))
+    map.to_json(os.path.join(DATA, "reachability", "map2D_deviation.json"))
