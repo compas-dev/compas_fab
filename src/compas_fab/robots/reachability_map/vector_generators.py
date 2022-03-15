@@ -144,20 +144,6 @@ class DeviationVectorsGenerator(object):
                 yield self.axis.transformed(R2 * R1)
 
 
-class FrameGenerator(object):
-    """A frame generator generates frames for the reachability map
-    """
-    # Define your own frame generator, this is specific to the application, but
-    # class methods from FrameGenerator may help. # TODO: move somewhere else?
-    # Frame generators should yield a number and a frame. # TODO: make class?
-
-    def __iter__(self, pt):
-        for zaxis in DeviationVectorsGenerator((0, 0, -1), math.radians(90), 1):
-            for xaxis in OrthonormalVectorsFromAxisGenerator(zaxis, math.radians(90)):
-                yaxis = zaxis.cross(xaxis)
-                yield Frame(pt, xaxis, yaxis)
-
-
 if __name__ == "__main__":
 
     generator = OrthonormalVectorsFromAxisGenerator((0, 0, 1), math.radians(120))
