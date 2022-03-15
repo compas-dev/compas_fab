@@ -1,7 +1,6 @@
 from compas.data import Data
 from compas.geometry import Frame
 from compas.robots import Configuration
-from compas_fab.backends.exceptions import InverseKinematicsError
 
 
 class ReachabilityMap(Data):
@@ -24,12 +23,6 @@ class ReachabilityMap(Data):
         The number of solutions per frame.
     points : list of :class:`compas.geometry.Point`
         The points per frame.
-
-    Notes
-    -----
-    This works only for industrial robot arms with six revolute joints.
-    If ``check_collision`` is `True`, it is required to use a client
-    that supports ``"check_collision"``, so for now only the `PyBulletClient`.
 
 
     Links
@@ -54,10 +47,12 @@ class ReachabilityMap(Data):
             The robot instance for which inverse kinematics is being calculated.
             This makes only sense if the robot has an analytic inverse kinematic
             solvers set.
-        ik_options : dict
+        ik_options : dict, optional
             Optional arguments to be passed on to the robot's inverse kinematics
             function.
         """
+
+        from compas_fab.backends.exceptions import InverseKinematicsError
 
         def calculate_and_append(obj, flist, clist):
             if isinstance(obj, Frame):
@@ -78,6 +73,26 @@ class ReachabilityMap(Data):
 
         for frame in frame_generator:  # 1D or 2D
             calculate_and_append(frame, self.frames, self.configurations)
+
+    def reachable_frames_and_configurations_at_ik_index(self, ik_index):
+        """Returns the reachable frames and configurations at a specific ik index.
+        """
+
+        def check_and_append(f, c, flist, clist):
+            if isinstance(f, Frame):
+                configuration = c[ik_index]
+                if configuration:
+                    clist.append(configuration)
+                    flist.append(f)
+            else:
+                for subf, subc in zip(f, c):
+                    check_and_append(subf, subc, flist, clist)
+
+        configurations_at_ik_index = []
+        frames_at_ik_index = []
+        for f, c in zip(self.frames, self.configurations):
+            check_and_append(f, c, frames_at_ik_index, configurations_at_ik_index)
+        return frames_at_ik_index, configurations_at_ik_index
 
     @property
     def score(self):
@@ -118,77 +133,3 @@ class ReachabilityMap(Data):
 
         self.frames = data_decode(data['frames'], Frame)
         self.configurations = data_decode(data['configurations'], Configuration)
-
-
-if __name__ == "__main__":
-
-    import os
-    import math
-    from compas.geometry import Frame, Vector
-    from compas_fab.backends import AnalyticalInverseKinematics
-    from compas_fab.backends import PyBulletClient
-    from compas_fab import DATA
-
-    from compas_fab.robots.reachability_map.frame_generator import DeviationVectorsGenerator
-    from compas_fab.robots.reachability_map.frame_generator import OrthonormalVectorsFromAxisGenerator
-
-    frames = []
-    frame = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269))
-    step = 0.05
-    for i in range(10):
-        point = frame.point + Vector(1, 0, 0) * (step * i)
-        frames.append(Frame(point, frame.xaxis, frame.yaxis))
-
-    # Version 1: iterate over frames along a line, frames = 1D list
-
-    with PyBulletClient(connection_type='direct') as client:
-        robot = client.load_ur5(load_geometry=True)
-
-        ik = AnalyticalInverseKinematics(client)
-        # set a new IK function
-        client.inverse_kinematics = ik.inverse_kinematics
-
-        options = {"solver": "ur5", "check_collision": True, "keep_order": True}
-
-        map = ReachabilityMap()
-        map.calculate(frames, robot, options)
-        map.to_json(os.path.join(DATA, "reachability", "map1D.json"))
-        #map = ReachabilityMap.from_json(os.path.join(DATA, "reachability", "map1D.json"))
-        # print("=====================")
-        # print(map.frames)
-        # print(map.configurations)
-
-    print(map.score)
-
-    """
-
-    # Version 2: iterate over frames around each point on the line, frames = 2D list
-
-    def generator(frames):
-
-        def gen(pt):
-            for zaxis in DeviationVectorsGenerator((0, 0, -1), math.radians(90), 1):
-                for xaxis in OrthonormalVectorsFromAxisGenerator(zaxis, math.radians(90)):
-                    yaxis = zaxis.cross(xaxis)
-                    yield Frame(pt, xaxis, yaxis)
-
-        for f in frames:
-            yield gen(f.point)
-
-    with PyBulletClient(connection_type='direct') as client:
-        robot = client.load_ur5(load_geometry=True)
-
-        ik = AnalyticalInverseKinematics(client)
-        # set a new IK function
-        client.inverse_kinematics = ik.inverse_kinematics
-
-        options = {"solver": "ur5", "check_collision": True, "keep_order": True}
-
-        map = ReachabilityMap()
-        map.calculate(generator(frames), robot, options)
-        map.to_json(os.path.join(DATA, "reachability", "map2D.json"))
-        #map = ReachabilityMap.from_json(os.path.join(DATA, "reachability", "map2D.json"))
-        #print("=====================")
-        #print(map.frames)
-        #print(map.configurations)
-    """
