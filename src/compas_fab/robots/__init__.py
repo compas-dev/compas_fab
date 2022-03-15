@@ -94,6 +94,9 @@ from .units import (
     to_degrees,
     to_radians,
 )
+from .reachability_map import (
+    ReachabilityMap,
+)
 from .robot import (
     Robot,
 )
@@ -133,6 +136,7 @@ __all__ = [
     'PathPlan',
     'PlanningScene',
     'PositionConstraint',
+    'ReachabilityMap',
     'Robot',
     'RobotSemantics',
     'Tool',
