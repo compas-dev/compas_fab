@@ -1,0 +1,28 @@
+{
+    "name": "Merge config",
+    "nickname": "Merge config",
+    "category": "COMPAS FAB",
+    "subcategory": "Config",
+    "description": "Merge two configurations.",
+    "exposure": 4,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "config_a",
+                "description": "The configuration to use as base for the merge."
+            },
+            {
+                "name": "config_b",
+                "description": "The configuration used to merge into the base one."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "config",
+                "description": "The merged configuration."
+            }
+        ]
+    }
+}

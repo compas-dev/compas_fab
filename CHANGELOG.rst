@@ -13,6 +13,7 @@ Unreleased
 **Added**
 
 * Added ``compas_fab.backends.PyBulletClient.load_ur5()`` method to simplify some examples.
+* Added Grasshopper components to get a zero configuration and to merge two configurations.
 
 **Changed**
 
