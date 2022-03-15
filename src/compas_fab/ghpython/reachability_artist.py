@@ -4,6 +4,7 @@ from compas_ghpython.artists import FrameArtist
 from compas_ghpython.artists import PointArtist
 from ghpythonlib.treehelpers import list_to_tree
 
+
 class ReachabilityMapArtist(object):  # how base on GHArtist without error?
 
     def __init__(self, reachability_map, **kwargs):
@@ -21,6 +22,10 @@ class ReachabilityMapArtist(object):  # how base on GHArtist without error?
                     frames[-1].append(FrameArtist(f).draw())
             frames = list_to_tree(frames)
         return frames
+
+    def draw_frames_at_ik_index(self, ik_index):
+        frames, configurations = self.reachability_map.reachable_frames_and_configurations_at_ik_index(ik_index)
+        return [FrameArtist(f).draw() for f in frames]
 
     def draw_cloud(self, colormap='viridis'):
 
