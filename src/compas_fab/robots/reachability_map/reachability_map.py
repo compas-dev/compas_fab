@@ -1,6 +1,7 @@
 from compas.data import Data
 from compas.geometry import Frame
 from compas.robots import Configuration
+from compas.geometry import argmax
 
 
 class ReachabilityMap(Data):
@@ -18,11 +19,13 @@ class ReachabilityMap(Data):
         a 2D list.
     configurations : list of list of :class:`compas.robots.Configuration` or list of list of list of :class:`compas.robots.Configuration`
         The configurations at the frames, either a 2D list or a 3D list,
-        depending on the frames respectively.
+        depending on the dimension of the frames respectively.
     score : list of int
-        The number of solutions per frame.
+        The number of solutions per frame (1D) or per frame list (2D)
     points : list of :class:`compas.geometry.Point`
-        The points per frame.
+        The points per frame (1D) or per frame list (2D)
+    shape : tuple of int
+        The shape of the frame array
 
 
     Links
@@ -42,7 +45,7 @@ class ReachabilityMap(Data):
         ----------
         frame_generator : generator
             A 1D or 2D frame generator to yield :class:`compas.geometry.Frame`.
-            The solutions are saved depending on the dimensionality.
+            The solutions are saved depending on the dimensions.
         robot : :class:`compas_fab.robots.Robot`
             The robot instance for which inverse kinematics is being calculated.
             This makes only sense if the robot has an analytic inverse kinematic
@@ -74,6 +77,15 @@ class ReachabilityMap(Data):
         for frame in frame_generator:  # 1D or 2D
             calculate_and_append(frame, self.frames, self.configurations)
 
+    @property
+    def shape(self):
+        dimension = []
+        f = self.frames
+        while not isinstance(f, Frame):
+            dimension.append(len(f))
+            f = f[0]
+        return tuple(dimension)
+
     def reachable_frames_and_configurations_at_ik_index(self, ik_index):
         """Returns the reachable frames and configurations at a specific ik index.
         """
@@ -104,11 +116,21 @@ class ReachabilityMap(Data):
         return [sum_score(configuration) for configuration in self.configurations]
 
     @property
+    def best_score(self):
+        score = self.score
+        return max(score), argmax(score)
+
+    @property
     def points(self):
-        if isinstance(self.frames[0], Frame):
-            return [frame.point for frame in self.frames]
-        else:
-            return [frames_per_point[0].point for frames_per_point in self.frames]
+        """Returns a 1D list of points.
+
+        If self.frames is a 2D list, the point of the first frame is returned.
+        """
+        def get_first_point(f):
+            while not isinstance(f, Frame):
+                f = f[0]
+            return f.point
+        return [get_first_point(f) for f in self.frames]
 
     @property
     def data(self):
