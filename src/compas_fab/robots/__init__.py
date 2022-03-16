@@ -21,6 +21,7 @@ Main classes
     Duration
     Wrench
     Inertia
+    ReachabilityMap
 
 Path planning
 -------------
