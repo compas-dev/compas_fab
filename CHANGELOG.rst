@@ -13,6 +13,9 @@ Unreleased
 **Added**
 
 * Added ``compas_fab.backends.PyBulletClient.load_ur5()`` method to simplify some examples.
+* Added ``compas_fab.robots.ReachabilityMap``
+* Added ``compas_fab.robots.reachability_map.DeviationVectorsGenerator``
+* Added ``compas_fab.robots.reachability_map.OrthonormalVectorsFromAxisGenerator``
 
 **Changed**
 
