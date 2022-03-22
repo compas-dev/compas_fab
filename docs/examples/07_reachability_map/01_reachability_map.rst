@@ -72,7 +72,7 @@ real robot cell, this will usually be the case.
         client.inverse_kinematics = ik.inverse_kinematics
         options = {"solver": "ur5", "check_collision": True, "keep_order": True}
 
-Now we create a ``ReachabilityMap``. We calculate it with passing the ``Frame``
+Now we create a ``ReachabilityMap``. We calculate it passing the ``Frame``
 generator, the robot and the IK options. After calculation, we save the map as
 json for later visualization in Rhino/GH.
 
