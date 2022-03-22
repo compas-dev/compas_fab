@@ -138,8 +138,16 @@ Projects where the reachability map was applied
 `Adaptive Detailing <https://gramaziokohler.arch.ethz.ch/web/forschung/e/0/0/0/361.html>`_
 ------------------------------------------------------------------------------------------
 
-In this project, connections between structural elements are 3D printed in place, directly on top of parts, i.e. collision objects. A ``ReachabilityMap`` was created to capture the space where connections can be placed and ultimately find connecting geometries that the robot can print in between these objects. Printing process constraints can be included in the reachability map by choosing a meaningful ``max_alpha`` in the ``DeviationVectorsGenerator``.
+In this project, connections between structural elements are 3D printed in place,
+directly on top of parts, i.e. collision objects. A ``ReachabilityMap`` was created
+to capture the space where connections can be placed and ultimately find connecting
+geometries that the robot can print in between these objects. Printing process
+constraints can be included in the reachability map by choosing a meaningful
+``max_alpha`` in the ``DeviationVectorsGenerator``.
 
+.. figure:: files/adaptive_detailing.png
+    :figclass: figure
+    :class: figure-img img-fluid
 
 ------------------------------------------------------------------------------------------
 `Robotic 360° Light Painting Workshop <https://gramaziokohler.arch.ethz.ch/web/lehre/e/0/0/0/439.html>`_
@@ -148,5 +156,7 @@ In this project, connections between structural elements are 3D printed in place
 This project served as inspiration for the presented examples 01-03. The robot TCP
 had to be oriented towards the 360° camera. The light paths were mapped on a hemisphere
 to maintain equal distance to the camera and little distortion of the designed paths.
-The reachability map was used to determine the best position and radius for the sphere with the UR5e robot model, the light tool, and the camera and tripods as collision objects.
+The reachability map was used to determine the best position and radius for the
+sphere with the UR5e robot model, the light tool, and the camera and tripods as
+collision objects.
 
