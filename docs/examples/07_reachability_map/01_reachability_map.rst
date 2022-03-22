@@ -24,8 +24,8 @@ Let's consider the following (abstract) example:
 
 We have a UR5 and want the TCP of the robot to always orient itself towards a
 defined position in front of the robot. Therefore, we define a (half-)sphere
-with a certain radius and we evaluate points on this sphere. Then we create a
-plane which normal points towards the center of this sphere. From these planes
+with a certain radius and we evaluate points on this sphere. At each point, we then
+create a plane whose normal vector points towards the center of this sphere. From these planes
 we create frames for the robot's TCP. The function is written as a generator
 because the ``ReachabilityMap`` takes a ``Frame`` generator as input.
 
