@@ -138,7 +138,7 @@ Projects where the reachability map was applied
 `Adaptive Detailing <https://gramaziokohler.arch.ethz.ch/web/forschung/e/0/0/0/361.html>`_
 ------------------------------------------------------------------------------------------
 
-The reachability map was actually developed in this project ... credits Ines Ariza.
+In this project, connections between structural elements are 3D printed in place, directly on top of parts, i.e. collision objects. A ``ReachabilityMap`` was created to capture the space where connections can be placed and ultimately find connecting geometries that the robot can print in between these objects. Printing process constraints can be included in the reachability map by choosing a meaningful ``max_alpha`` in the ``DeviationVectorsGenerator``.
 
 
 ------------------------------------------------------------------------------------------
