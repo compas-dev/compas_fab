@@ -34,7 +34,7 @@ def arange(start, stop, step):
 
 
 class OrthonormalVectorsFromAxisGenerator(object):
-    """Generate vectors that are orthonormal an axis.
+    """Generate vectors that are orthonormal to an axis.
 
     Parameters
     ----------
