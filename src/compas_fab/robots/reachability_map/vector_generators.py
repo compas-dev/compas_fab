@@ -39,7 +39,7 @@ class OrthonormalVectorsFromAxisGenerator(object):
     Parameters
     ----------
     axis : :class:`compas.geometry.Vector`
-        The axis to which the vectors should be orthonormal to
+        The axis to which the vectors should be orthonormal to.
     angle_step : float
         The angle in radians as the spacing between generated vectors.
 
