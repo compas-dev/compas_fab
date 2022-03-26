@@ -138,6 +138,8 @@ __all__ = [
     'PlanningScene',
     'PositionConstraint',
     'ReachabilityMap',
+    'DeviationVectorsGenerator',
+    'OrthonormalVectorsFromAxisGenerator',
     'Robot',
     'RobotSemantics',
     'Tool',
