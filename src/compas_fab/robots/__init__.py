@@ -97,6 +97,8 @@ from .units import (
 )
 from .reachability_map import (
     ReachabilityMap,
+    DeviationVectorsGenerator,
+    OrthonormalVectorsFromAxisGenerator,
 )
 from .robot import (
     Robot,
