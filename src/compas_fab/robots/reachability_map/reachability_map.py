@@ -63,7 +63,7 @@ class ReachabilityMap(Data):
                     configurations = [config for config in robot.iter_inverse_kinematics(obj, options=ik_options)]
                 except InverseKinematicsError:
                     if "keep_order" in ik_options:
-                        configurations = [None for _ in range(8)]
+                        configurations = [None] * 8
                     else:
                         configurations = []
                 flist.append(obj)
