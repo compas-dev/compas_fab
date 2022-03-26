@@ -22,6 +22,8 @@ Main classes
     Wrench
     Inertia
     ReachabilityMap
+    DeviationVectorsGenerator
+    OrthonormalVectorsFromAxisGenerator
 
 Path planning
 -------------
