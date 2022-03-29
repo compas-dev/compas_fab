@@ -53,5 +53,5 @@ class MoveItAddCollisionMesh(AddCollisionMesh):
         co.operation = CollisionObject.ADD
         world = PlanningSceneWorld(collision_objects=[co])
         scene = PlanningScene(world=world, is_diff=True)
-        request = dict(scene=scene)
+        request = scene.to_request(self.ros_client.ros_distro)
         self.APPLY_PLANNING_SCENE(self.ros_client, request, callback, errback)
