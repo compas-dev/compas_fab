@@ -26,6 +26,7 @@ Unreleased
 * Fixed PyBullet loading of meshes.
 * Fixed missing flag in reset planning scene call.
 * Fixed issue on cartesian and kinematic planning when model contains passive joints.
+* Fixed pose of collision mesh in ROS Noetic being ignored.
 
 **Deprecated**
 
