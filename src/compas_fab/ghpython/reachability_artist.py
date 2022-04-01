@@ -1,8 +1,8 @@
-from compas.geometry import Frame
 from compas.colors import ColorMap
 from compas.artists import PrimitiveArtist
 from ghpythonlib.treehelpers import list_to_tree
 from compas_ghpython.artists import GHArtist
+
 
 class ReachabilityMapArtist(GHArtist):
     """Artist for drawing a reachability map.
@@ -28,7 +28,7 @@ class ReachabilityMapArtist(GHArtist):
             index reaches from 0 to 7 (8 solutions).
         """
 
-        if ik_index == None:
+        if ik_index is None:
             xframes = []
             for frames in self.reachability_map.frames:
                 xframes.append([])
