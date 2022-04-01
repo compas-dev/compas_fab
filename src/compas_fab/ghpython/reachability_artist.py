@@ -2,9 +2,9 @@ from compas.geometry import Frame
 from compas.colors import ColorMap
 from compas.artists import PrimitiveArtist
 from ghpythonlib.treehelpers import list_to_tree
+from compas_ghpython.artists import GHArtist
 
-
-class ReachabilityMapArtist(object):  # how base on GHArtist without error?
+class ReachabilityMapArtist(GHArtist):
     """Artist for drawing a reachability map.
 
     Parameters
@@ -29,18 +29,13 @@ class ReachabilityMapArtist(object):  # how base on GHArtist without error?
         """
 
         if ik_index == None:
-            def convert_to_xframe(f, flist):
-                if isinstance(f, Frame):
-                    flist.append(PrimitiveArtist(f).draw())
-                else:
-                    flist.append([])
-                    for subf in f:
-                        convert_to_xframe(subf, flist[-1])
-            frames = []
-            [convert_to_xframe(f, frames) for f in self.reachability_map.frames]
-            if len(self.reachability_map.shape) > 1:
-                frames = list_to_tree(frames)  # does this cover lists which shape dim > 2
-            return frames
+            xframes = []
+            for frames in self.reachability_map.frames:
+                xframes.append([])
+                for frame in frames:
+                    xframes[-1].append(PrimitiveArtist(frame).draw())
+            xframes = list_to_tree(xframes)
+            return xframes
         else:
             frames, _ = self.reachability_map.reachable_frames_and_configurations_at_ik_index(ik_index)
             return [PrimitiveArtist(f).draw() for f in frames]
