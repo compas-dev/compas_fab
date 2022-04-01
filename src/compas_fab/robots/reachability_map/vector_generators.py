@@ -65,7 +65,7 @@ class OrthonormalVectorsFromAxisGenerator(object):
 
 
 class DeviationVectorsGenerator(object):
-    """Calculates equally distributed vectors that deviate from the passed one by a maximal angle of max_alpha.
+    """Calculates equally distributed vectors that deviate from the specified one by a maximal angle of `max_alpha`.
 
     Parameters
     ----------
