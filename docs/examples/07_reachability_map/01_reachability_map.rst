@@ -122,7 +122,7 @@ In the example below, the highest score is 4 (yellow) and the lowest score is 2 
 
 
 If you want to visualize the frames at a specific IK index (= number between 0-7), use the method
-``artist.draw_frames_at_ik_index(ik_index)``. If you compare the figure below
+``artist.draw_frames(ik_index=ik_index)``. If you compare the figure below
 with the figure of ``draw_frames``, you will see that a certain portion is not
 reachable at the selected IK index.
 

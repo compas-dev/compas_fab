@@ -18,35 +18,32 @@ class ReachabilityMapArtist(object):  # how base on GHArtist without error?
     def __init__(self, reachability_map, **kwargs):
         self.reachability_map = reachability_map
 
-    def draw_frames(self):
+    def draw_frames(self, ik_index=None):
         """Returns the frames of the reachability map.
-        """
-
-        def convert_to_xframe(f, flist):
-            if isinstance(f, Frame):
-                flist.append(PrimitiveArtist(f).draw())
-            else:
-                flist.append([])
-                for subf in f:
-                    convert_to_xframe(subf, flist[-1])
-        frames = []
-        [convert_to_xframe(f, frames) for f in self.reachability_map.frames]
-        if len(self.reachability_map.shape) > 1:
-            frames = list_to_tree(frames)  # does this cover lists which shape dim > 2
-        return frames
-
-    def draw_frames_at_ik_index(self, ik_index):
-        """Returns only the reachable frames at a given IK index.
 
         Parameters
         ----------
-        ik_index : int
-            The index of the IK solution. For a 6-axis industrial robot this
+        ik_index : int, optional
+            If passed, returns only the reachable frames at a given IK index. For a 6-axis industrial robot this
             index reaches from 0 to 7 (8 solutions).
         """
 
-        frames, _ = self.reachability_map.reachable_frames_and_configurations_at_ik_index(ik_index)
-        return [PrimitiveArtist(f).draw() for f in frames]
+        if ik_index == None:
+            def convert_to_xframe(f, flist):
+                if isinstance(f, Frame):
+                    flist.append(PrimitiveArtist(f).draw())
+                else:
+                    flist.append([])
+                    for subf in f:
+                        convert_to_xframe(subf, flist[-1])
+            frames = []
+            [convert_to_xframe(f, frames) for f in self.reachability_map.frames]
+            if len(self.reachability_map.shape) > 1:
+                frames = list_to_tree(frames)  # does this cover lists which shape dim > 2
+            return frames
+        else:
+            frames, _ = self.reachability_map.reachable_frames_and_configurations_at_ik_index(ik_index)
+            return [PrimitiveArtist(f).draw() for f in frames]
 
     def draw(self, colormap='viridis'):
         return self.draw_cloud(colormap)
