@@ -52,7 +52,7 @@ because the ``ReachabilityMap`` takes a ``Frame`` generator as input.
                 plane = Plane((x, y, z), axis)
                 f = Frame.from_plane(plane)
                 # for the old UR5 model from ROS Kinetic is zaxis the xaxis
-                yield Frame(f.point, f.zaxis, f.yaxis)
+                yield [Frame(f.point, f.zaxis, f.yaxis)]
 
 
 Then we create a ``PyBulletClient`` (for collision checking), load the UR5 robot,
@@ -93,9 +93,8 @@ json for later visualization in Rhino/GH.
 Visualization
 =============
 
-In Grasshopper, we can source the reachability map from the json file and use
-the ``Artist`` to visualize the saved frames by using the
-artist's function ``draw_frames``.
+We can source the reachability map from the json file and use the ``Artist`` to
+visualize the saved frames by using the artist's function ``draw_frames``.
 
 .. code-block:: python
 

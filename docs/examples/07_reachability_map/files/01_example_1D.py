@@ -27,7 +27,7 @@ def points_on_sphere_generator(sphere):
             plane = Plane((x, y, z), axis)
             f = Frame.from_plane(plane)
             # for UR5 is zaxis the xaxis
-            yield Frame(f.point, f.zaxis, f.yaxis)
+            yield [Frame(f.point, f.zaxis, f.yaxis)] # 2D frame generator
 
 
 # 3. Create reachability map 1D
