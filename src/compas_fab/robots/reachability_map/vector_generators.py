@@ -102,7 +102,7 @@ class DeviationVectorsGenerator(object):
 
     def __iter__(self):
         yield self.axis
-        alphas = arange(self.max_alpha/self.step, self.max_alpha + self.max_alpha/self.step, self.max_alpha/self.step)
+        alphas = arange(self.max_alpha / self.step, self.max_alpha + self.max_alpha/self.step, self.max_alpha / self.step)
         radii = [math.sin(alpha) for alpha in alphas]
         x, y = math.cos(alphas[0]), math.sin(alphas[0])
         d = math.sqrt((1 - x)**2 + y**2)
