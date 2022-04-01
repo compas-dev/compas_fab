@@ -3,34 +3,7 @@ from compas.geometry import Vector
 from compas.geometry import Frame
 from compas.geometry import Plane
 from compas.geometry import Rotation
-
-
-def arange(start, stop, step):
-    """Return evenly spaced values within a given interval.
-
-    Values are generated within the half-open interval [start, stop) (in other
-    words, the interval including start but excluding stop). Similar to numpy's
-    arange function.
-
-    Parameters
-    ----------
-    start : float
-        Start of interval. The interval includes this value.
-    stop : float
-        End of interval. The interval does not include this value.
-    step : float
-        Spacing between values.
-
-    Examples
-    --------
-    >>> values = arange(0, 0.8, 0.2)
-    """
-    assert(step != 0)
-    values = []
-    while start < stop:
-        values.append(start)
-        start += step
-    return values
+from compas_fab.utilities import arange
 
 
 class OrthonormalVectorsFromAxisGenerator(object):
