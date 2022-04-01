@@ -94,13 +94,13 @@ Visualization
 =============
 
 In Grasshopper, we can source the reachability map from the json file and use
-the ``ReachabilityMapArtist`` to visualize the saved frames by using the
+the ``Artist`` to visualize the saved frames by using the
 artist's function ``draw_frames``.
 
 .. code-block:: python
 
     map = ReachabilityMap.from_json(filepath)
-    artist = ReachabilityMapArtist(map)
+    artist = Artist(map)
     frames = artist.draw_frames()
 
 
