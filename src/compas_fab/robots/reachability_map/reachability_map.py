@@ -2,7 +2,7 @@ from compas.data import Data
 from compas.geometry import Frame
 from compas.robots import Configuration
 from compas.geometry import argmax
-
+from compas_fab.backends.exceptions import InverseKinematicsError
 
 class ReachabilityMap(Data):
     """The ReachabilityMap describes the reachability of a robot.
@@ -54,8 +54,6 @@ class ReachabilityMap(Data):
             Optional arguments to be passed on to the robot's inverse kinematics
             function.
         """
-
-        from compas_fab.backends.exceptions import InverseKinematicsError
 
         def calculate_and_append(obj, flist, clist):
             if isinstance(obj, Frame):
