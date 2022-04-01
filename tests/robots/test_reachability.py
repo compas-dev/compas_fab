@@ -20,8 +20,14 @@ def test_vector_generators():
     assert str(result) == solution
 
 
-def test_reachability():
+def test_reachability_scores():
+    map = ReachabilityMap.from_json(filename)
 
+    assert allclose(map.score, [0, 38, 102, 145, 132, 137])
+    assert allclose(map.best_score, (145, 3))
+
+
+if __name__ == "__main__":
     import os
     filename = os.path.join(os.path.dirname(__file__), "fixtures", "map.json")
 
@@ -37,30 +43,12 @@ def test_reachability():
             pt = Point(0, 0, 0) + Vector(0, i * 0.1, 0)
             yield frame_generator(pt)
 
-    def calculate_map():
+    with PyBulletClient(connection_type='direct') as client:
+        robot = client.load_ur5(load_geometry=True)
+        ik = AnalyticalInverseKinematics(client)
+        client.inverse_kinematics = ik.inverse_kinematics
+        options = {"solver": "ur5", "check_collision": True, "keep_order": True}
 
-        with PyBulletClient(connection_type='direct') as client:
-
-            robot = client.load_ur5(load_geometry=True)
-            ik = AnalyticalInverseKinematics(client)
-            client.inverse_kinematics = ik.inverse_kinematics
-            options = {"solver": "ur5", "check_collision": True, "keep_order": True}
-
-            map = ReachabilityMap()
-            map.calculate(generator(), robot, options)
-            map.to_json(filename)
-            return map
-
-    calculate = False
-    if calculate:
-        map = calculate_map()
-    else:
-        map = ReachabilityMap.from_json(filename)
-
-    assert allclose(map.score, [0, 38, 102, 145, 132, 137])
-    assert allclose(map.best_score, (145, 3))
-
-
-if __name__ == "__main__":
-    test_vector_generators()
-    test_reachability()
+        map = ReachabilityMap()
+        map.calculate(generator(), robot, options)
+        map.to_json(filename)
