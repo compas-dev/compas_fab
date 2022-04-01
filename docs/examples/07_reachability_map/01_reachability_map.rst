@@ -51,7 +51,7 @@ because the ``ReachabilityMap`` takes a ``Frame`` generator as input.
                 axis = sphere.point - point
                 plane = Plane((x, y, z), axis)
                 f = Frame.from_plane(plane)
-                # for UR5 is zaxis the xaxis
+                # for the old UR5 model from ROS Kinetic is zaxis the xaxis
                 yield Frame(f.point, f.zaxis, f.yaxis)
 
 
