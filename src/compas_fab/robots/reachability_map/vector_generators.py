@@ -115,15 +115,3 @@ class DeviationVectorsGenerator(object):
             for beta in betas:
                 R2 = Rotation.from_axis_and_angle(self.axis, beta)
                 yield self.axis.transformed(R2 * R1)
-
-
-if __name__ == "__main__":
-
-    generator = OrthonormalVectorsFromAxisGenerator((0, 0, 1), math.radians(120))
-    xaxes = [xaxis for xaxis in generator]
-    print(xaxes)
-    print(arange(0, 0.8, 0.2))
-
-    generator = DeviationVectorsGenerator((0, 0, -1), math.radians(120), 1)
-    zaxes = [zaxis for zaxis in generator]
-    print(zaxes)
