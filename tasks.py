@@ -180,7 +180,7 @@ def test(ctx, checks=False, doctest=False, codeblock=False, coverage=False):
     with chdir(BASE_FOLDER):
         pytest_args = ['pytest']
         if doctest:
-            pytest_args.append('--doctest-modules --ignore-glob="**ghpython/components/**.py"')
+            pytest_args.append('--doctest-modules')
         if coverage:
             pytest_args.append('--cov=compas_fab')
 
