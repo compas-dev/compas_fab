@@ -1,12 +1,16 @@
-import os
 import math
-from compas.geometry import Point, Vector, Frame, allclose
-from compas_fab.robots.reachability_map import OrthonormalVectorsFromAxisGenerator
-from compas_fab.robots.reachability_map import DeviationVectorsGenerator
+import os
+
+from compas.geometry import Frame
+from compas.geometry import Point
+from compas.geometry import Vector
+from compas.geometry import allclose
 
 from compas_fab.backends import AnalyticalInverseKinematics
-from compas_fab.backends import PyBulletClient
 from compas_fab.robots import ReachabilityMap
+from compas_fab.robots.reachability_map import DeviationVectorsGenerator
+from compas_fab.robots.reachability_map import OrthonormalVectorsFromAxisGenerator
+
 
 filename = os.path.join(os.path.dirname(__file__), "fixtures", "map.json")
 
@@ -31,6 +35,7 @@ def test_reachability_scores():
 
 
 if __name__ == "__main__":
+    from compas_fab.backends import PyBulletClient
 
     def frame_generator(pt):
         zaxis = Vector(0, 0, 1)
