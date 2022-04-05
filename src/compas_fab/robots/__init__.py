@@ -21,6 +21,9 @@ Main classes
     Duration
     Wrench
     Inertia
+    ReachabilityMap
+    DeviationVectorsGenerator
+    OrthonormalVectorsFromAxisGenerator
 
 Path planning
 -------------
@@ -94,6 +97,11 @@ from .units import (
     to_degrees,
     to_radians,
 )
+from .reachability_map import (
+    ReachabilityMap,
+    DeviationVectorsGenerator,
+    OrthonormalVectorsFromAxisGenerator,
+)
 from .robot import (
     Robot,
 )
@@ -133,6 +141,9 @@ __all__ = [
     'PathPlan',
     'PlanningScene',
     'PositionConstraint',
+    'ReachabilityMap',
+    'DeviationVectorsGenerator',
+    'OrthonormalVectorsFromAxisGenerator',
     'Robot',
     'RobotSemantics',
     'Tool',

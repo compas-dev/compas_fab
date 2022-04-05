@@ -12,6 +12,10 @@ Unreleased
 
 **Added**
 
+* Added ``compas_fab.robots.ReachabilityMap``
+* Added ``compas_fab.robots.DeviationVectorsGenerator``
+* Added ``compas_fab.robots.OrthonormalVectorsFromAxisGenerator``
+
 **Changed**
 
 **Fixed**
