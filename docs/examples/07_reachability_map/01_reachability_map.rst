@@ -159,7 +159,13 @@ The reachability map was used to determine the best position and radius for the
 sphere with the UR5e robot model, the light tool, and the camera and tripods as
 collision objects.
 
-.. image:: files/workshop_sjsu_1.png
-    :width: 40%
-.. image:: files/workshop_sjsu_2.jpg
-    :width: 40%
+.. |logo1| image:: files/workshop_sjsu_1.png
+   :scale: 45%
+   :align: middle
+.. |logo2| image:: files/workshop_sjsu_2.jpg
+   :scale: 45%
+   :align: middle
+
++---------+---------+
+| |logo1| | |logo2| |
++---------+---------+
