@@ -10,6 +10,7 @@ from compas_fab.robots import ReachabilityMap
 
 filename = os.path.join(os.path.dirname(__file__), "fixtures", "map.json")
 
+
 def test_vector_generators():
     generator = OrthonormalVectorsFromAxisGenerator((0, 0, 1), math.radians(120))
     result = [xaxis for xaxis in generator]
