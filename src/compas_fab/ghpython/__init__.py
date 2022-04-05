@@ -40,4 +40,4 @@ if compas.RHINO:
 
         'RobotArtist',              # deprecated
         'RobotModelArtist',         # deprecated
-        ]
+    ]
