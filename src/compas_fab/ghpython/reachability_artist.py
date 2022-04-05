@@ -1,7 +1,7 @@
-from compas.colors import ColorMap
 from compas.artists import PrimitiveArtist
-from ghpythonlib.treehelpers import list_to_tree
+from compas.colors import ColorMap
 from compas_ghpython.artists import GHArtist
+from ghpythonlib.treehelpers import list_to_tree
 
 
 class ReachabilityMapArtist(GHArtist):
