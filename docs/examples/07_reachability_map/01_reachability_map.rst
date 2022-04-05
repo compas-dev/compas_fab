@@ -160,6 +160,6 @@ sphere with the UR5e robot model, the light tool, and the camera and tripods as
 collision objects.
 
 .. image:: files/workshop_sjsu_1.png
-    :width: 50%
+    :width: 40%
 .. image:: files/workshop_sjsu_2.jpg
-    :width: 50%
+    :width: 40%
