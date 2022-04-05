@@ -36,6 +36,13 @@ because the ``ReachabilityMap`` takes a ``Frame`` generator as input.
 
 .. code-block:: python
 
+    import math
+
+    from compas.geometry import Frame
+    from compas.geometry import Plane
+    from compas.geometry import Point
+    from compas.geometry import Sphere
+
     # 1. Define frames on a sphere
     sphere = Sphere((0.4, 0, 0), 0.15)
 
@@ -64,6 +71,8 @@ real robot cell, this will usually be the case.
 .. code-block:: python
 
     # 2. Set up robot cell
+    from compas_fab.backends import AnalyticalInverseKinematics
+    from compas_fab.backends import PyBulletClient
 
     with PyBulletClient(connection_type='direct') as client:
         # load robot and define settings
@@ -76,15 +85,10 @@ Now we create a ``ReachabilityMap``. We calculate it passing the ``Frame``
 generator, the robot and the IK options. After calculation, we save the map as
 json for later visualization in Rhino/GH.
 
-.. code-block:: python
-
-        # 3. Create reachability map 1D
-
-        map = ReachabilityMap()
-        map.calculate(points_on_sphere_generator(sphere), robot, options)
-        # save to json
-        map.to_json(os.path.join(DATA, "reachability", "map1D.json"))
-
+>>> # 3. Create reachability map 1D
+>>> map = ReachabilityMap()                                                 # doctest: +SKIP
+>>> map.calculate(points_on_sphere_generator(sphere), robot, options)       # doctest: +SKIP
+>>> map.to_json(os.path.join(DATA, "reachability", "map1D.json"))           # doctest: +SKIP
 
 
 `Link to full script <files/01_example_1D.py>`_
@@ -96,11 +100,9 @@ Visualization
 We can source the reachability map from the json file and use the ``Artist`` to
 visualize the saved frames by using the artist's function ``draw_frames``.
 
-.. code-block:: python
-
-    map = ReachabilityMap.from_json(filepath)
-    artist = Artist(map)
-    frames = artist.draw_frames()
+>>> map = ReachabilityMap.from_json(filepath)  # doctest: +SKIP
+>>> artist = Artist(map)                       # doctest: +SKIP
+>>> frames = artist.draw_frames()              # doctest: +SKIP
 
 
 .. figure:: files/00_robot_halfsphere.jpg
@@ -148,9 +150,9 @@ constraints can be included in the reachability map by choosing a meaningful
     :figclass: figure
     :class: figure-img img-fluid
 
-------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
 `Robotic 360° Light Painting Workshop <https://gramaziokohler.arch.ethz.ch/web/lehre/e/0/0/0/439.html>`_
-------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
 
 This project served as inspiration for the presented examples 01-03. The robot TCP
 had to be oriented towards the 360° camera. The light paths were mapped on a hemisphere

@@ -21,19 +21,19 @@ In the example below, the given axis is visualized in red, and the generated vec
     :figclass: figure
     :class: figure-img img-fluid
 
-.. code-block:: python
-
-    >>> zaxis = Vector(0, 0, 1)
-    >>> max_alpha = 60
-    >>> for xaxis in OrthonormalVectorsFromAxisGenerator(zaxis, math.radians(max_alpha)):
-    >>>     print(xaxis)
-    Vector(0.000, -1.000, 0.000)
-    Vector(0.866, -0.500, 0.000)
-    Vector(0.866, 0.500, 0.000)
-    Vector(0.000, 1.000, 0.000)
-    Vector(-0.866, 0.500, 0.000)
-    Vector(-0.866, -0.500, 0.000)
-    Vector(-0.000, -1.000, 0.000)
+>>> import math
+>>> from compas.geometry import Vector
+>>> from compas_fab.robots import OrthonormalVectorsFromAxisGenerator
+>>> zaxis = Vector(0, 0, 1)
+>>> max_alpha = 60
+>>> for xaxis in OrthonormalVectorsFromAxisGenerator(zaxis, math.radians(max_alpha)):
+...     print(xaxis)
+Vector(0.000, -1.000, 0.000)
+Vector(0.866, -0.500, 0.000)
+Vector(0.866, 0.500, 0.000)
+Vector(0.000, 1.000, 0.000)
+Vector(-0.866, 0.500, 0.000)
+Vector(-0.866, -0.500, 0.000)
 
 
 Generate vectors that deviate
@@ -47,21 +47,20 @@ In the example below, the given axis is visualized in red, and the generated vec
     :figclass: figure
     :class: figure-img img-fluid
 
-.. code-block:: python
-
-    >>> zaxis = Vector(0, 0, 1)
-    >>> max_alpha = 40
-    >>> step = 1
-    >>> for axis in DeviationVectorsGenerator(zaxis, math.radians(max_alpha), step):
-    >>>     print(axis)
-    Vector(0.000, 0.000, 1.000)
-    Vector(-0.643, 0.000, 0.766)
-    Vector(-0.321, -0.557, 0.766)
-    Vector(0.321, -0.557, 0.766)
-    Vector(0.643, -0.000, 0.766)
-    Vector(0.321, 0.557, 0.766)
-    Vector(-0.321, 0.557, 0.766)
-    Vector(-0.643, 0.000, 0.766)
+>>> import math
+>>> from compas_fab.robots import DeviationVectorsGenerator
+>>> zaxis = Vector(0, 0, 1)
+>>> max_alpha = 40
+>>> step = 1
+>>> for axis in DeviationVectorsGenerator(zaxis, math.radians(max_alpha), step):
+...     print(axis)
+Vector(0.000, 0.000, 1.000)
+Vector(-0.643, 0.000, 0.766)
+Vector(-0.321, -0.557, 0.766)
+Vector(0.321, -0.557, 0.766)
+Vector(0.643, -0.000, 0.766)
+Vector(0.321, 0.557, 0.766)
+Vector(-0.321, 0.557, 0.766)
 
 
 Or another example with using ``max_angle = 60`` and ``step = 2``.
@@ -77,6 +76,12 @@ Generate frames
 Now having these two vector generators, we can combine them for generating frames.
 
 .. code-block:: python
+
+    from compas.geometry import Frame
+    from compas.geometry import Point
+    from compas.geometry import Vector
+    from compas_fab.robots import DeviationVectorsGenerator
+    from compas_fab.robots import OrthonormalVectorsFromAxisGenerator
 
     def frame_generator():
         for i in range(6):

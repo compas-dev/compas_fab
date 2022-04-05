@@ -15,6 +15,10 @@ Additionally to the ``points_on_sphere_generator`` from Example 01, we create a
 
 .. code-block:: python
 
+    import math
+    from compas.geometry import Frame
+    from compas_fab.robots import DeviationVectorsGenerator
+
     def deviation_vector_generator(frame):
         for xaxis in DeviationVectorsGenerator(frame.xaxis, math.radians(40), 1):
             yaxis = frame.zaxis.cross(xaxis)
@@ -30,11 +34,9 @@ And combine both generators into a generator that yields a list of a list of fra
 
 The robot is set up as in Example 01 and we calculate the reachability map as follows.
 
-.. code-block:: python
-
-    map = ReachabilityMap()
-    map.calculate(generator(), robot, options)
-    map.to_json(os.path.join(DATA, "reachability", "map2D_deviation.json"))
+>>> map = ReachabilityMap()                                                      # doctest: +SKIP
+>>> map.calculate(generator(), robot, options)                                   # doctest: +SKIP
+>>> map.to_json(os.path.join(DATA, "reachability", "map2D_deviation.json"))      # doctest: +SKIP
 
 
 The visualization of the results in Rhino/GH looks different than in Example 01, as the scores per evaluated point are now more scattered and range between 16 (dark purple) and 26 (yellow).
@@ -56,6 +58,9 @@ In this example, we want to know the best reachable sphere from Example 01.
 Therefore, we create a sphere generator:
 
 .. code-block:: python
+
+    from compas.geometry import Sphere
+    from compas.geometry import Vector
 
     def sphere_generator():
         sphere = Sphere((0.35, 0, 0), 0.15)
@@ -84,19 +89,15 @@ In this case, we actually evaluate 5705 (= 35 x 163) frames, see figure below.
 
 We can easily check the shape of the reachability as follows:
 
-.. code-block:: python
-
-    >>> map.shape
-    (35, 163)
+>>> map.shape       # doctest: +SKIP
+(35, 163)           # doctest: +SKIP
 
 Visualizing the results in Rhino/GH gives an indication of the best position for
 the tested spheres. The score ranges now from 436 to 937. We can ask the map for the
 best core, returning the score and the index:
 
-.. code-block:: python
-
-    >>> map.best_score
-    (937, 20)
+>>> map.best_score  # doctest: +SKIP
+(937, 20)           # doctest: +SKIP
 
 
 .. figure:: files/09_example_03_result.jpg
@@ -111,9 +112,7 @@ best core, returning the score and the index:
     changed by passing the ``sphere_centers`` for the artist to override.
 
 
-.. code-block:: python
-
-    >>> points, colors = artist.draw(points=sphere_centers)
+>>> points, colors = artist.draw(points=sphere_centers)   # doctest: +SKIP
 
 
 .. figure:: files/10_example_03_result_override.jpg

@@ -1,7 +1,6 @@
 from compas.artists import PrimitiveArtist
 from compas.colors import ColorMap
 from compas_ghpython.artists import GHArtist
-from ghpythonlib.treehelpers import list_to_tree
 
 
 class ReachabilityMapArtist(GHArtist):
@@ -28,6 +27,7 @@ class ReachabilityMapArtist(GHArtist):
             If passed, returns only the reachable frames at a given IK index. For a 6-axis industrial robot this
             index reaches from 0 to 7 (8 solutions).
         """
+        from ghpythonlib.treehelpers import list_to_tree
 
         if ik_index is None:
             xframes = []
