@@ -1,0 +1,30 @@
+{
+    "name": "Zero config",
+    "nickname": "Zero config",
+    "category": "COMPAS FAB",
+    "subcategory": "Config",
+    "description": "Get a zero configuration for a robot.",
+    "exposure": 4,
+
+    "ghpython": {
+        "isAdvancedMode": true,
+        "inputParameters": [
+            {
+                "name": "robot",
+                "description": "The robot.",
+                "wireDisplay": "hidden"
+            },
+            {
+                "name": "group",
+                "description": "If assigned, it will return the zero configuration for the given group, otherwise a full zero configuration.",
+                "typeHintID": "str"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "config",
+                "description": "The zero configuration."
+            }
+        ]
+    }
+}

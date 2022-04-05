@@ -2,14 +2,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import itertools
-
-from compas.robots import Configuration
 from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import PlanCartesianMotion
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
-from compas_fab.backends.ros.backend_features.helpers import convert_trajectory_points
+from compas_fab.backends.ros.backend_features.helpers import convert_trajectory
 from compas_fab.backends.ros.backend_features.helpers import validate_response
 from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import GetCartesianPathRequest
@@ -20,7 +17,6 @@ from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
-from compas_fab.robots import JointTrajectory
 
 __all__ = [
     'MoveItPlanCartesianMotion',
@@ -94,8 +90,8 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
 
         # Use base_link or fallback to model's root link
         options['base_link'] = options.get('base_link', robot.model.root.name)
-        options['joint_names'] = robot.get_configurable_joint_names()
-        options['joint_types'] = robot.get_configurable_joint_types()
+        options['joints'] = {j.name: j.type for j in robot.model.joints}
+
         options['link'] = options.get('link') or robot.get_end_effector_link_name(group)
         if options['link'] not in robot.get_link_names(group):
             raise ValueError('Link name {} does not exist in planning group'.format(options['link']))
@@ -105,9 +101,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
     def plan_cartesian_motion_async(self, callback, errback,
                                     frames_WCF, start_configuration=None, group=None, options=None):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
-        joint_names = options['joint_names']
-        joint_types = options['joint_types']
-        joint_type_by_name = dict(zip(joint_names, joint_types))
+        joints = options['joints']
 
         header = Header(frame_id=options['base_link'])
         waypoints = [Pose.from_frame(frame) for frame in frames_WCF]
@@ -133,27 +127,16 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
                        avoid_collisions=bool(options.get('avoid_collisions', True)),
                        path_constraints=path_constraints)
 
-        def convert_to_trajectory(response):
+        def response_handler(response):
             try:
-                trajectory = JointTrajectory()
-                trajectory.source_message = response
-                trajectory.fraction = response.fraction
-                trajectory.joint_names = response.solution.joint_trajectory.joint_names
-
-                joint_types = [joint_type_by_name[name] for name in trajectory.joint_names]
-                trajectory.points = convert_trajectory_points(
-                    response.solution.joint_trajectory.points, joint_types)
-
-                start_state = response.start_state.joint_state
-                start_state_types = [joint_type_by_name[name] for name in start_state.name]
-                trajectory.start_configuration = Configuration(start_state.position, start_state_types, start_state.name)
-                trajectory.attached_collision_meshes = list(itertools.chain(*[
-                    aco.to_attached_collision_meshes()
-                    for aco in response.start_state.attached_collision_objects]))
-
+                trajectory = convert_trajectory(joints,
+                                                response.solution,
+                                                response.start_state,
+                                                response.fraction,
+                                                None,
+                                                response)
                 callback(trajectory)
-
             except Exception as e:
                 errback(e)
 
-        self.GET_CARTESIAN_PATH(self.ros_client, request, convert_to_trajectory, errback)
+        self.GET_CARTESIAN_PATH(self.ros_client, request, response_handler, errback)

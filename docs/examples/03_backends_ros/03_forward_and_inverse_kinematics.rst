@@ -17,7 +17,7 @@ Forward kinematics
 ==================
 
 The forward kinematics function calculates the pose of the robot's end-effector
-from joint states (**cartesian space** to **joint space**). This means the
+from joint states (**joint space** to **cartesian space**). This means the
 state of each joint in the articulated body of a robot needs to be defined.
 
 Joint states are described in **COMPAS FAB** with the
@@ -40,9 +40,9 @@ Inverse kinematics
 ==================
 
 Inverse kinematics is the inverse function of forward kinematics. The
-inverse kinematics function calculates the joint states required for the
-end-effector to reach a certain target pose (**joint space** to
-**cartesian space**).
+inverse kinematics function calculates the feasible joint states for the
+end-effector to reach a certain target pose (**cartesian space** to
+**joint space**).
 
 The following code exemplifies how to calculate this:
 

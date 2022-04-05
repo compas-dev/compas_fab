@@ -10,7 +10,7 @@ from compas_fab.robots import PlanningScene
 with RosClient() as client:
     robot = client.load_robot()
     scene = PlanningScene(robot)
-    assert robot.name == 'ur5'
+    assert robot.name == 'ur5_robot'
 
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/floor.stl'))
     cm = CollisionMesh(mesh, 'floor')
