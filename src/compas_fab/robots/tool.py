@@ -57,7 +57,7 @@ class Tool(object):
             for i, item in enumerate(link.collision):
                 meshes = Geometry._get_item_meshes(item)
                 for mesh in meshes:
-                    collision_mesh_name = '{}_collision_{}'.format(link.name, i)
+                    collision_mesh_name = '{}_{}_collision_{}'.format(self.tool_model.name, link.name, i)
                     collision_mesh = CollisionMesh(mesh, collision_mesh_name)
                     attached_collision_mesh = AttachedCollisionMesh(collision_mesh, self.link_name, [self.link_name])
                     acms.append(attached_collision_mesh)

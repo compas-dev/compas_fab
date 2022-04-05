@@ -12,19 +12,38 @@ Unreleased
 
 **Added**
 
-* Added ``compas_fab.backends.PyBulletClient.load_ur5()`` method to simplify some examples.
 * Added ``compas_fab.robots.ReachabilityMap``
 * Added ``compas_fab.robots.DeviationVectorsGenerator``
 * Added ``compas_fab.robots.OrthonormalVectorsFromAxisGenerator``
 
 **Changed**
 
+**Fixed**
+
+**Deprecated**
+
+**Removed**
+
+0.23.0
+----------
+
+**Added**
+
+* Added ``compas_fab.backends.PyBulletClient.load_ur5()`` method to simplify some examples.
+* Added Grasshopper components to get a zero configuration and to merge two configurations.
+
+**Changed**
+
 * Moved all public API classes in ``compas_fab.backends`` to second-level imports.
 * Updated to COMPAS 1.14.
+* Simplified call to remove an attached tool by also removing the remaining collision mesh from the world automatically.
 
 **Fixed**
 
 * Fixed PyBullet loading of meshes.
+* Fixed missing flag in reset planning scene call.
+* Fixed issue on cartesian and kinematic planning when model contains passive joints.
+* Fixed pose of collision mesh in ROS Noetic being ignored.
 
 **Deprecated**
 

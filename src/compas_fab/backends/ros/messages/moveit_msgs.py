@@ -7,6 +7,7 @@ from compas_fab.backends.ros.messages.geometry_msgs import Quaternion
 from compas_fab.backends.ros.messages.geometry_msgs import Vector3
 from compas_fab.backends.ros.messages.object_recognition_msgs import ObjectType
 from compas_fab.backends.ros.messages.octomap_msgs import OctomapWithPose
+from compas_fab.backends.ros.messages.ros_releases import RosDistro
 from compas_fab.backends.ros.messages.sensor_msgs import JointState
 from compas_fab.backends.ros.messages.sensor_msgs import MultiDOFJointState
 from compas_fab.backends.ros.messages.shape_msgs import Mesh
@@ -34,10 +35,12 @@ class CollisionObject(ROSmsg):
     def __init__(self, header=None, id="collision_obj", type=None,
                  primitives=None, primitive_poses=None, meshes=None, mesh_poses=None,
                  planes=None, plane_poses=None,
-                 subframe_names=None, subframe_poses=None, operation=0):
+                 subframe_names=None, subframe_poses=None, operation=0, pose=None):
         self.header = header or Header()  # a header, used for interpreting the poses
         self.id = id  # the id of the object (name used in MoveIt)
         self.type = type or ObjectType()  # The object type in a database of known objects
+        self.pose = pose or Pose()  # currently not actively used in FAB, but needed to be present otherwise ROS Noetic complains about empty quaternion
+
         # solid geometric primitives
         self.primitives = primitives or []
         self.primitive_poses = primitive_poses or []
@@ -59,6 +62,7 @@ class CollisionObject(ROSmsg):
         kwargs['id'] = collision_mesh.id
         kwargs['meshes'] = [Mesh.from_mesh(collision_mesh.mesh)]
         kwargs['mesh_poses'] = [Pose.from_frame(collision_mesh.frame)]
+        kwargs['pose'] = Pose()
 
         return cls(**kwargs)
 
@@ -69,6 +73,7 @@ class CollisionObject(ROSmsg):
         kwargs['header'] = Header.from_msg(msg['header'])
         kwargs['id'] = msg['id']
         kwargs['type'] = ObjectType.from_msg(msg['type'])
+        kwargs['pose'] = Pose.from_msg(msg['pose']) if 'pose' in msg else Pose()
 
         kwargs['primitives'] = [SolidPrimitive.from_msg(i) for i in msg['primitives']]
         kwargs['primitive_poses'] = [Pose.from_msg(i) for i in msg['primitive_poses']]
@@ -554,6 +559,20 @@ class PlanningScene(ROSmsg):
         self.object_colors = object_colors or []                    # moveit_msgs/ObjectColor[]
         self.world = world or PlanningSceneWorld()                  # moveit_msgs/PlanningSceneWorld
         self.is_diff = is_diff                                      # bool
+
+    def to_request(self, ros_distro):
+        self.filter_fields_for_distro(ros_distro)
+        return dict(scene=self)
+
+    def filter_fields_for_distro(self, ros_distro):
+        """To maintain backwards compatibility with older ROS distros,
+        we need to make sure newly added fields are removed from the request."""
+        # Remove the field `pose` for distros older than NOETIC
+        if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC):
+            for aco in self.robot_state.attached_collision_objects:
+                del aco.object.pose
+            for co in self.world.collision_objects:
+                del co.pose
 
     @classmethod
     def from_msg(cls, msg):

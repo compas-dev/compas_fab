@@ -55,5 +55,5 @@ class MoveItRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
         aco.object.operation = CollisionObject.REMOVE
         robot_state = RobotState(attached_collision_objects=[aco], is_diff=True)
         scene = PlanningScene(robot_state=robot_state, is_diff=True)
-        request = dict(scene=scene)
+        request = scene.to_request(self.ros_client.ros_distro)
         self.APPLY_PLANNING_SCENE(self.ros_client, request, callback, errback)

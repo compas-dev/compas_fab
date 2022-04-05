@@ -91,8 +91,8 @@ First Steps
 * `Documentation <https://gramaziokohler.github.io/compas_fab/>`_
 * `COMPAS FAB Examples <https://gramaziokohler.github.io/compas_fab/latest/examples.html>`_
 * `COMPAS FAB API Reference <https://gramaziokohler.github.io/compas_fab/latest/reference.html>`_
-* `COMPAS Tutorials <https://compas.dev/compas/tutorial.html>`_
-* `COMPAS API Reference <https://compas.dev/compas/api.html>`_
+* `COMPAS Tutorials <https://compas.dev/compas/latest/tutorial.html>`_
+* `COMPAS API Reference <https://compas.dev/compas/latest/api.html>`_
 
 
 Questions and feedback

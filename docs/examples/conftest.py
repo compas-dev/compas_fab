@@ -12,7 +12,8 @@ LITERALPYTHON_START = re.compile(r'\.\.\s*literalinclude\s*::(.*\.py)')
 LITERALPYTHON_END = re.compile(r'(\n\Z|\n(?=\S))')
 IGNORES = [
     'files/01_ros_*.py',
-    'files/02_robot_artist_rhino*.py'
+    'files/02_robot_artist_rhino*.py',
+    'files/04_cartesian_path_analytic_pybullet.py',
 ]
 
 
