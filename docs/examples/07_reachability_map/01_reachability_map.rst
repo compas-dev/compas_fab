@@ -14,7 +14,7 @@ available robots.
 
 Links
 =====
-* `Realuex (ROS's reachability map) <http://wiki.ros.org/reuleaux>`_
+* `Reuleaux (ROS's reachability map) <http://wiki.ros.org/reuleaux>`_
 
 
 Example 01: reachability map 1D
