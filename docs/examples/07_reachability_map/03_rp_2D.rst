@@ -94,7 +94,7 @@ We can easily check the shape of the reachability as follows:
 
 Visualizing the results in Rhino/GH gives an indication of the best position for
 the tested spheres. The score ranges now from 436 to 937. We can ask the map for the
-best core, returning the score and the index:
+best score, returning the score and the index:
 
 >>> map.best_score  # doctest: +SKIP
 (937, 20)           # doctest: +SKIP
