@@ -14,6 +14,8 @@ Unreleased
 
 **Changed**
 
+* Changed to use ``compas_rhino.conversions`` to coerce frames.
+
 **Fixed**
 
 **Deprecated**
