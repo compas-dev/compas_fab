@@ -16,6 +16,8 @@ Unreleased
 
 **Fixed**
 
+* Fixed uninstall process not removing GH components.
+
 **Deprecated**
 
 **Removed**

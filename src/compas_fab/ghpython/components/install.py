@@ -61,7 +61,7 @@ def uninstall():
 
         dstdir = get_grasshopper_userobjects_path(version)
         srcdir = os.path.dirname(__file__)
-        userobjects = glob.glob(os.path.join(srcdir, '*.ghuser'))
+        userobjects = glob.glob(os.path.join(srcdir, 'ghuser', '*.ghuser'))
 
         symlinks = []
         for src in userobjects:
