@@ -14,6 +14,8 @@ Unreleased
 
 **Changed**
 
+* Changed Grasshopper components to default to icon display.
+
 **Fixed**
 
 **Deprecated**
