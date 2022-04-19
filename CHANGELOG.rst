@@ -33,6 +33,8 @@ Unreleased
 
 **Fixed**
 
+* Fixed ``ROSmsg`` import on GH components for publish/subscribe.
+
 **Deprecated**
 
 **Removed**
