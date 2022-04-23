@@ -18,6 +18,9 @@ Unreleased
 
 **Fixed**
 
+* Fixed link parameter name when doing FK inside the GH component to display attached collision meshes.
+* Fixed transform of the attached collision mesh frame inside the GH component.
+
 **Deprecated**
 
 **Removed**
