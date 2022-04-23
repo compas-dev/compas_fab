@@ -16,6 +16,14 @@ COMPAS FAB: Robotic Fabrication for COMPAS
     :target: https://pypi.python.org/pypi/compas_fab
     :alt: License
 
+.. image:: https://img.shields.io/conda/dn/conda-forge/compas_fab
+    :target: https://anaconda.org/conda-forge/compas_fab
+    :alt: Conda Downloads
+
+.. image:: https://img.shields.io/pypi/dm/compas_fab
+    :target: https://pypi.python.org/project/compas_fab
+    :alt: pip downloads
+
 .. image:: https://img.shields.io/pypi/v/compas_fab.svg
     :target: https://pypi.python.org/pypi/compas_fab
     :alt: PyPI Package latest release

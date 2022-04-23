@@ -9,7 +9,7 @@ from ghpythonlib.componentbase import executingcomponent as component
 from roslibpy import Topic
 from scriptcontext import sticky as st
 
-from compas_fab.backends.ros import ROSmsg
+from compas_fab.backends.ros.messages import ROSmsg
 from compas_fab.ghpython.components import create_id
 
 

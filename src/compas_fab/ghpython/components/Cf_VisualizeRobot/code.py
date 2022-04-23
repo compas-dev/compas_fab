@@ -3,7 +3,6 @@ Visualizes the robot.
 
 COMPAS FAB v0.24.0
 """
-from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_ghpython.artists import FrameArtist
 from compas_ghpython.artists import MeshArtist
@@ -54,8 +53,8 @@ class RobotVisualize(component):
             if show_acm:
                 attached_meshes = []
                 for acm in attached_collision_meshes:
-                    frame = robot.forward_kinematics(configuration, options=dict(solver='model', link_name=acm.link_name))
-                    T = Transformation.from_frame_to_frame(Frame.worldXY(), frame)
+                    frame = robot.forward_kinematics(configuration, options=dict(solver='model', link=acm.link_name))
+                    T = Transformation.from_frame_to_frame(acm.collision_mesh.frame, frame)
                     mesh = acm.collision_mesh.mesh.transformed(T)
                     attached_meshes.append(MeshArtist(mesh).draw())
 
