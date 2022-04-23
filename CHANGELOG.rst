@@ -14,8 +14,13 @@ Unreleased
 
 **Changed**
 
+* Changed Grasshopper components to default to icon display.
+* Changed to use ``compas_rhino.conversions`` to coerce frames.
+
 **Fixed**
 
+* Fixed link parameter name when doing FK inside the GH component to display attached collision meshes.
+* Fixed transform of the attached collision mesh frame inside the GH component.
 * Fixed uninstall process not removing GH components.
 
 **Deprecated**
@@ -34,6 +39,8 @@ Unreleased
 **Changed**
 
 **Fixed**
+
+* Fixed ``ROSmsg`` import on GH components for publish/subscribe.
 
 **Deprecated**
 
