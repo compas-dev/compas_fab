@@ -5,9 +5,8 @@ COMPAS FAB v0.24.0
 """
 import math
 
+from compas_rhino.conversions import RhinoPlane
 from ghpythonlib.componentbase import executingcomponent as component
-
-from compas_fab.ghpython.components import coerce_frame
 
 
 class ConstraintsFromPlane(component):
@@ -19,7 +18,7 @@ class ConstraintsFromPlane(component):
             tolerance_yaxis = tolerance_yaxis or 1.
             tolerance_zaxis = tolerance_zaxis or 1.
 
-            frame = coerce_frame(plane)
+            frame = RhinoPlane.from_geometry(plane).to_compas_frame()
             tolerances_axes = [math.radians(tolerance_xaxis), math.radians(tolerance_yaxis), math.radians(tolerance_zaxis)]
             goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
 

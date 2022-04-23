@@ -15,6 +15,7 @@ Unreleased
 **Changed**
 
 * Changed Grasshopper components to default to icon display.
+* Changed to use ``compas_rhino.conversions`` to coerce frames.
 
 **Fixed**
 
