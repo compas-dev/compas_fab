@@ -10,8 +10,6 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 Unreleased
 ----------
 
-**Added**
-
 **Changed**
 
 * Changed Grasshopper components to default to icon display.
@@ -22,10 +20,6 @@ Unreleased
 * Fixed link parameter name when doing FK inside the GH component to display attached collision meshes.
 * Fixed transform of the attached collision mesh frame inside the GH component.
 * Fixed uninstall process not removing GH components.
-
-**Deprecated**
-
-**Removed**
 
 0.24.0
 ----------
