@@ -1,7 +1,7 @@
 """
 Load robot directly from ROS.
 
-COMPAS FAB v0.24.0
+COMPAS FAB v0.25.0
 """
 from compas_ghpython.artists import RobotModelArtist
 from ghpythonlib.componentbase import executingcomponent as component
