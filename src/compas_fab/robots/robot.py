@@ -43,14 +43,14 @@ class Robot(object):
         e.g. :class:`compas_fab.backends.RosClient`
     attributes : :obj:`dict`
         Named attributes related to the robot instance.
-    attached_tool : :class:`compas_fab.robots.Tool`
-        Instance of the tool attached to the robot, if any.
+    attached_tools : :class:`compas_fab.robots.Tool`
+        Dictionary mapping planning groups to the tool currently attached to them, if any.
     """
 
     def __init__(self, model, artist=None, semantics=None, client=None):
         self._scale_factor = 1.
         self.model = model
-        self.attached_tool = None
+        self.attached_tools = {}  # { planning_group_name: robots.tool.Tool }
         self.artist = artist
         self.semantics = semantics
         self.client = client
@@ -70,8 +70,8 @@ class Robot(object):
         self._artist = artist
         if len(self.model.joints) > 0 and len(self.model.links) > 0:
             self.scale(self._scale_factor)
-            if self.attached_tool:
-                self.artist.attach_tool_model(self.attached_tool.tool_model)
+            if self.attached_tools:
+                self.artist.attach_tool_model(self.attached_tools[self.main_group_name].tool_model)
 
     @classmethod
     def basic(cls, name, joints=None, links=None, materials=None, **kwargs):
@@ -428,6 +428,16 @@ class Robot(object):
         configurable_joints = self.get_configurable_joints(group)
         return [j.type for j in configurable_joints]
 
+    def get_attached_tool_collision_meshes(self):
+        """Returns a list of all attached collisions meshes of each of the attached tools, if any.
+
+        Returns
+        -------
+        A list of lists.
+        List[List[compas_fab.robots.planning_scene.CollisionMesh]]
+        """
+        return [tool.attached_collision_meshes for tool in self.attached_tools.values()]
+
     # ==========================================================================
     # configurations
     # ==========================================================================
@@ -744,13 +754,25 @@ class Robot(object):
         frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
         return frame_WCF
 
-    def from_tcf_to_t0cf(self, frames_tcf):
+    def _get_attached_tool_for_group(self, group_name=None):
+        """Get the tool attached to the given planning group. Group name defaults to main_group_name.
+         Raises ValueError if group name is unknown or there is no tool currently attached to it"""
+        group = group_name or self.main_group_name
+        if not (group in self.attached_tools and self.attached_tools[group]):
+            raise ValueError("Planning group {} not found or no tool attached".format(group))
+        return self.attached_tools[group]
+
+    def from_tcf_to_t0cf(self, frames_tcf, group=None):
         """Convert a list of frames at the robot's tool tip (tcf frame) to frames at the robot's flange (tool0 frame) using the attached tool.
 
         Parameters
         ----------
         frames_tcf : :obj:`list` of :class:`compas.geometry.Frame`
             Frames (in WCF) at the robot's tool tip (tcf).
+
+        group : :obj:`str`, optional
+            The planning group whose tool to use. Defaults to the main
+            planning group.
 
         Returns
         -------
@@ -771,17 +793,20 @@ class Robot(object):
         >>> robot.from_tcf_to_t0cf(frames_tcf)
         [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
         """
-        if not self.attached_tool:
-            raise Exception("Please attach a tool first.")
-        return self.attached_tool.from_tcf_to_t0cf(frames_tcf)
+        tool = self._get_attached_tool_for_group(group_name=group)
+        return tool.from_tcf_to_t0cf(frames_tcf)
 
-    def from_t0cf_to_tcf(self, frames_t0cf):
+    def from_t0cf_to_tcf(self, frames_t0cf, group=None):
         """Convert frames at the robot's flange (tool0 frame) to frames at the robot's tool tip (tcf frame) using the attached tool.
 
         Parameters
         ----------
         frames_t0cf : :obj:`list` of :class:`compas.geometry.Frame`
             Frames (in WCF) at the robot's flange (tool0).
+
+        group : :obj:`str`, optional
+            The planning group to attach this tool to. Defaults to the main
+            planning group.
 
         Returns
         -------
@@ -800,11 +825,11 @@ class Robot(object):
         >>> robot.attach_tool(Tool(mesh, frame))
         >>> frames_t0cf = [Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))]
         >>> robot.from_t0cf_to_tcf(frames_t0cf)
+        >>> robot.from_t0cf_to_tcf(frames_t0cf, group="group_name")
         [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
         """
-        if not self.attached_tool:
-            raise Exception("Please attach a tool first.")
-        return self.attached_tool.from_t0cf_to_tcf(frames_t0cf)
+        tool = self._get_attached_tool_for_group(group_name=group)
+        return tool.from_t0cf_to_tcf(frames_t0cf)
 
     def attach_tool(self, tool, group=None, touch_links=None):
         """Attach a tool to the robot independently of the model definition.
@@ -834,23 +859,37 @@ class Robot(object):
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> tool = Tool(mesh, frame)
         >>> robot.attach_tool(tool)
+        >>> robot.attach_tool(tool, group="planning_group_name")
         """
         if not tool.link_name:
             group = group or self.main_group_name
             tool.link_name = self.get_end_effector_link_name(group)
         tool.update_touch_links(touch_links)
-        self.attached_tool = tool
+        self.attached_tools[group] = tool
+
+        # TODO: add support to RobotArtist for multiple tools
         if self.artist:
             self.artist.attach_tool_model(tool.tool_model)
 
-    def detach_tool(self):
+    def detach_tool(self, group=None):
         """Detach the attached tool.
+
+        Parameters
+        ----------
+        group : :obj:`str`, optional
+            The planning group to attach this tool to. Defaults to the main
+            planning group.
 
         See Also
         --------
         * :meth:`attach_tool`
         """
-        self.attached_tool = None
+        group = group or self.main_group_name
+        if group not in self.attached_tools:
+            raise ValueError("Planning group {} not found!".format(group))
+
+        if self.attached_tools[group]:
+            del self.attached_tools[group]
         if self.artist:
             self.artist.detach_tool_model()
 
@@ -1240,8 +1279,9 @@ class Robot(object):
         frame_WCF_scaled = frame_WCF.copy()
         frame_WCF_scaled.point /= self.scale_factor  # must be in meters
 
-        if self.attached_tool:
-            attached_collision_meshes.extend(self.attached_tool.attached_collision_meshes)
+        for _, tool in self.attached_tools.items():
+            if tool:
+                attached_collision_meshes.extend(tool.attached_collision_meshes)
 
         options['attached_collision_meshes'] = attached_collision_meshes
 
@@ -1464,8 +1504,9 @@ class Robot(object):
         else:
             path_constraints_WCF_scaled = None
 
-        if self.attached_tool:
-            attached_collision_meshes.extend(self.attached_tool.attached_collision_meshes)
+        for _, tool in self.attached_tools.items():
+            if tool:
+                attached_collision_meshes.extend(tool.attached_collision_meshes)
 
         options['attached_collision_meshes'] = attached_collision_meshes
         options['path_constraints'] = path_constraints
@@ -1554,7 +1595,7 @@ class Robot(object):
         >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.])
         >>> group = robot.main_group_name
         >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
-        >>> robot.attached_tool = None
+        >>> robot.attached_tools = None
         >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnect'})
         >>> trajectory.fraction
         1.0
@@ -1624,8 +1665,9 @@ class Robot(object):
         else:
             path_constraints_WCF_scaled = None
 
-        if self.attached_tool:
-            attached_collision_meshes.extend(self.attached_tool.attached_collision_meshes)
+        for _, tool in self.attached_tools.items():
+            if tool:
+                attached_collision_meshes.extend(tool.attached_collision_meshes)
 
         options['attached_collision_meshes'] = attached_collision_meshes
         options['path_constraints'] = path_constraints_WCF_scaled
@@ -1789,8 +1831,8 @@ class Robot(object):
             configurable_joints = self.get_configurable_joints()
         print("The end-effector's name is '%s'." %
               self.get_end_effector_link_name())
-        if self.attached_tool:
-            print("The robot has a tool at the %s link attached." % self.attached_tool.link_name)
+        if self.attached_tools:
+            print("The robot has a tool at the %s link attached." % self.attached_tools.link_name)
         else:
             print("The robot has NO tool attached.")
         print("The base link's name is '%s'" % self.get_base_link_name())
