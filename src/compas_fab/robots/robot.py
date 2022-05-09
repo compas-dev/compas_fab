@@ -50,7 +50,7 @@ class Robot(object):
     def __init__(self, model, artist=None, semantics=None, client=None):
         self._scale_factor = 1.
         self.model = model
-        self.attached_tools = {}  # { planning_group_name: robots.tool.Tool }
+        self._attached_tools = {}  # { planning_group_name: robots.tool.Tool }
         self.artist = artist
         self.semantics = semantics
         self.client = client
@@ -154,6 +154,21 @@ class Robot(object):
         """
         self.ensure_semantics()
         return self.semantics.group_states
+
+    @property
+    def attached_tools(self):
+        """:obj:`dict` of :obj:`robot.Tool`: Maps planning group to the tool attached to it"""
+        return self._attached_tools
+
+    @attached_tools.setter
+    def attached_tools(self, value):
+        if isinstance(value, dict):
+            self._attached_tools = value
+
+    @property
+    def attached_tool(self):
+        """:obj:`robot.Tool`: For backwards compatibility. Returns the tool attached to the default group, or None."""
+        return self._attached_tools.get(self.main_group_name, None)
 
     def get_end_effector_link_name(self, group=None):
         """Get the name of the robot's end effector link.
@@ -1279,7 +1294,7 @@ class Robot(object):
         frame_WCF_scaled = frame_WCF.copy()
         frame_WCF_scaled.point /= self.scale_factor  # must be in meters
 
-        for _, tool in self.attached_tools.items():
+        for tool in self.attached_tools:
             if tool:
                 attached_collision_meshes.extend(tool.attached_collision_meshes)
 
@@ -1665,7 +1680,7 @@ class Robot(object):
         else:
             path_constraints_WCF_scaled = None
 
-        for _, tool in self.attached_tools.items():
+        for tool in self.attached_tools:
             if tool:
                 attached_collision_meshes.extend(tool.attached_collision_meshes)
 

@@ -355,3 +355,12 @@ def test_wrond_gorup_name_raises_exception(ur5_robot_instance, robot_tool1):
 
     with pytest.raises(Exception):
         robot.attach_tool(tool, group=wrong_group_name)
+
+
+def test_attached_tools_always_dict(ur5_robot_instance, robot_tool1):
+    robot = ur5_robot_instance
+
+    robot.attached_tools = None
+
+    assert isinstance(robot.attached_tools, dict)
+
