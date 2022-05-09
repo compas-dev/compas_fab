@@ -99,14 +99,14 @@ def fake_client():
     return client
 
 
-@pytest.fixture()
+@pytest.fixture
 def robot_tool1():
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
     frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
     return Tool(mesh, frame)
 
 
-@pytest.fixture()
+@pytest.fixture
 def robot_tool2():
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
     frame = Frame([0.89, 0, 0], [0, 1, 0], [0, 0, 1])
