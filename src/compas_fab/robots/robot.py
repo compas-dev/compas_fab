@@ -1297,7 +1297,7 @@ class Robot(object):
         frame_WCF_scaled = frame_WCF.copy()
         frame_WCF_scaled.point /= self.scale_factor  # must be in meters
 
-        for tool in self.attached_tools:
+        for tool in self.attached_tools.values():
             if tool:
                 attached_collision_meshes.extend(tool.attached_collision_meshes)
 
@@ -1683,7 +1683,7 @@ class Robot(object):
         else:
             path_constraints_WCF_scaled = None
 
-        for tool in self.attached_tools:
+        for tool in self.attached_tools.values():
             if tool:
                 attached_collision_meshes.extend(tool.attached_collision_meshes)
 
@@ -1850,7 +1850,7 @@ class Robot(object):
         print("The end-effector's name is '%s'." %
               self.get_end_effector_link_name())
         if self.attached_tools:
-            for tool in self.attached_tools:
+            for tool in self.attached_tools.values():
                 print("The robot has a tool at the %s link attached." % tool.link_name)
         else:
             print("The robot has NO tool attached.")
