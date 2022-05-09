@@ -806,6 +806,8 @@ class Robot(object):
         >>> robot.attach_tool(Tool(mesh, frame))
         >>> frames_tcf = [Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))]
         >>> robot.from_tcf_to_t0cf(frames_tcf)
+        >>> robot.from_tcf_to_t0cf(frames_tcf, group=robot.main_group_name)
+        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
         [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
         """
         tool = self._get_attached_tool_for_group(group_name=group)
@@ -840,7 +842,8 @@ class Robot(object):
         >>> robot.attach_tool(Tool(mesh, frame))
         >>> frames_t0cf = [Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))]
         >>> robot.from_t0cf_to_tcf(frames_t0cf)
-        >>> robot.from_t0cf_to_tcf(frames_t0cf, group="group_name")
+        >>> robot.from_t0cf_to_tcf(frames_t0cf, group=robot.main_group_name)
+        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
         [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
         """
         tool = self._get_attached_tool_for_group(group_name=group)
@@ -1847,7 +1850,8 @@ class Robot(object):
         print("The end-effector's name is '%s'." %
               self.get_end_effector_link_name())
         if self.attached_tools:
-            print("The robot has a tool at the %s link attached." % self.attached_tools.link_name)
+            for tool in self.attached_tools:
+                print("The robot has a tool at the %s link attached." % tool.link_name)
         else:
             print("The robot has NO tool attached.")
         print("The base link's name is '%s'" % self.get_base_link_name())

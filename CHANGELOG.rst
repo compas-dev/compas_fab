@@ -12,9 +12,15 @@ Unreleased
 
 **Added**
 
+* Added a ``Robot().attached_tools`` property to allow attaching tools to multiple planning groups simultaneously.
+
 **Changed**
 
+* ``Robot().attached_tool`` now points to the tool attached to the ``robot.main_group_name``.
+
 **Fixed**
+
+* Attaching a tool to a planning group doesn't overwrite the tool attached to other groups.
 
 **Deprecated**
 
