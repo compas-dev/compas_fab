@@ -12,6 +12,8 @@ Unreleased
 
 **Added**
 
+* Added some missing information to GH and V-REP docs.
+
 **Changed**
 
 **Fixed**
