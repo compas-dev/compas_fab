@@ -12,6 +12,7 @@ Unreleased
 
 **Added**
 
+* Added some missing information to GH and V-REP docs.
 * Added a ``Robot().attached_tools`` property to allow attaching tools to multiple planning groups simultaneously.
 
 **Changed**

@@ -11,7 +11,7 @@ Grasshopper user objects need to be built using `COMPAS Github Action componenti
 
    .. code-block:: bash
 
-        invoke build-ghuser-components <path_to_ghio.dll>
+        invoke build-ghuser-components --gh-io-folder=<path_to_ghio.dll>
 
 3. Install them on Rhino/Grasshopper as usual:
 

@@ -31,6 +31,12 @@ container with the following commands on the command prompt::
     to `download V-REP <https://www.coppeliarobotics.com/downloads>`_ and
     install it as a normal application.
 
+.. note::
+
+    `vrep.py` uses `remoteApi <https://www.coppeliarobotics.com/helpFiles/en/remoteApiOverview.htm>`_ to communicate with the simulator's instance. For this purpose, the `remoteApi`
+    shared library is expected in the same path as this module. The library can be obtained from the installation path
+    of the simulator and has to be copied or symlinked to `compas_fab/backends/vrep/remote_api/`.
+
 .. _Docker: https://www.docker.com/
 .. _Docker Hub: https://hub.docker.com/u/gramaziokohler/vrep/
 
