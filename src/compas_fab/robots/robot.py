@@ -880,7 +880,6 @@ class Robot(object):
         tool.update_touch_links(touch_links)
         self.attached_tools[group] = tool
 
-        # TODO: add support to RobotArtist for multiple tools
         if self.artist:
             self.artist.attach_tool_model(tool.tool_model)
 
