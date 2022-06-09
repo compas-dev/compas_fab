@@ -5,14 +5,19 @@ COMPAS FAB v0.25.0
 """
 import math
 
+from compas.robots import Joint
 from ghpythonlib.componentbase import executingcomponent as component
 
 
 class ConstraintsFromTargetConfiguration(component):
+
+    DEFAULT_TOLERANCE_METERS = .001
+    DEFAULT_TOLERANCE_RADIANS = math.radians(1)
+
     def RunScript(self, robot, target_configuration, tolerance_above, tolerance_below, group_name):
         if robot and target_configuration:
-            tolerance_above = tolerance_above or [math.radians(1)] * 6
-            tolerance_below = tolerance_below or [math.radians(1)] * 6
+            tolerance_above = tolerance_above or self._generate_default_tolerances(robot.get_configurable_joints(group_name))
+            tolerance_below = tolerance_below or self._generate_default_tolerances(robot.get_configurable_joints(group_name))
 
             constraints = robot.constraints_from_configuration(
                 configuration=target_configuration,
@@ -22,3 +27,11 @@ class ConstraintsFromTargetConfiguration(component):
             )
 
             return constraints
+
+    def _generate_default_tolerances(self, joints):
+        return [
+            self.DEFAULT_TOLERANCE_METERS if j.type in [Joint.PRISMATIC, Joint.PLANAR]
+            else self.DEFAULT_TOLERANCE_RADIANS
+            for j in joints
+        ]
+
