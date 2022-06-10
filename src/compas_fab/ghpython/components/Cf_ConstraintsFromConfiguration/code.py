@@ -33,4 +33,3 @@ class ConstraintsFromTargetConfiguration(component):
             else self.DEFAULT_TOLERANCE_RADIANS
             for j in joints
         ]
-
