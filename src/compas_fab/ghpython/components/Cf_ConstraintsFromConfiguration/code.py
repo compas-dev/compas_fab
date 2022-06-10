@@ -13,16 +13,16 @@ class ConstraintsFromTargetConfiguration(component):
     DEFAULT_TOLERANCE_METERS = .001
     DEFAULT_TOLERANCE_RADIANS = math.radians(1)
 
-    def RunScript(self, robot, target_configuration, tolerance_above, tolerance_below, group_name):
+    def RunScript(self, robot, target_configuration, tolerance_above, tolerance_below, group):
         if robot and target_configuration:
-            tolerance_above = tolerance_above or self._generate_default_tolerances(robot.get_configurable_joints(group_name))
-            tolerance_below = tolerance_below or self._generate_default_tolerances(robot.get_configurable_joints(group_name))
+            tolerance_above = tolerance_above or self._generate_default_tolerances(robot.get_configurable_joints(group))
+            tolerance_below = tolerance_below or self._generate_default_tolerances(robot.get_configurable_joints(group))
 
             constraints = robot.constraints_from_configuration(
                 configuration=target_configuration,
                 tolerances_above=tolerance_above,
                 tolerances_below=tolerance_below,
-                group=group_name
+                group=group
             )
 
             return constraints
