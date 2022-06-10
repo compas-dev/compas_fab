@@ -1,5 +1,5 @@
 """
-Create a position and an orientation constraint from a robot configuration.
+Create joint constraints for each of the robot's configurable joints based on a given target configuration.
 
 COMPAS FAB v0.25.0
 """

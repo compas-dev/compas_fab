@@ -3,7 +3,7 @@
     "nickname": "Constraints From Configuration",
     "category": "COMPAS FAB",
     "subcategory": "Planning",
-    "description": "Create a position and an orientation constraint from a given target configuration.",
+    "description": "Create joint constraints for each of the robot's configurable joints based on a given target configuration.",
     "exposure": 8,
 
     "ghpython": {
@@ -21,12 +21,12 @@
             },
             {
                 "name": "tolerance_above",
-                "description": "The tolerances above the targeted configuration's joint value on each of the joints, defining the upper bound in radians to be achieved.",
+                "description": "The tolerances above the targeted joint value of each configurable joint, defining the upper bound in radians/meters to be achieved.",
                 "typeHintID": "float"
             },
             {
                 "name": "tolerance_below",
-                "description": "The tolerances below the targeted configuration's joint value on each of the joints, defining the upper bound in radians to be achieved",
+                "description": "The tolerances below the targeted joint value of each configurable joint, defining the lower bound in radians/meters to be achieved.",
                 "typeHintID": "float"
             },
             {
@@ -38,7 +38,7 @@
         "outputParameters": [
             {
                 "name": "constraints",
-                "description": "A list containing a position and an orientation constraint."
+                "description": "A list joint constraints in radians/meters."
             }
         ]
     }
