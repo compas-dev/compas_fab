@@ -5,7 +5,6 @@ COMPAS FAB v0.25.0
 """
 import math
 
-from compas.robots import Joint
 from ghpythonlib.componentbase import executingcomponent as component
 
 
@@ -30,7 +29,7 @@ class ConstraintsFromTargetConfiguration(component):
 
     def _generate_default_tolerances(self, joints):
         return [
-            self.DEFAULT_TOLERANCE_METERS if j.type in [Joint.PRISMATIC, Joint.PLANAR]
+            self.DEFAULT_TOLERANCE_METERS if j.is_scalable()
             else self.DEFAULT_TOLERANCE_RADIANS
             for j in joints
         ]
