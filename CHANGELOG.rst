@@ -13,8 +13,11 @@ Unreleased
 **Added**
 
 * Added some missing information to GH and V-REP docs.
+* Added a new GH component - ``ConstraintsFromTargetConfiguration``
 
 **Changed**
+
+* Replaced icon for GH component - ``ConstraintsFromPlane``
 
 **Fixed**
 
