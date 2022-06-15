@@ -65,6 +65,6 @@ attaches and removes it to the robot's end-effector.
 
 The backend's updated planning scene while executing the above script.
 
-.. figure:: files/04_collision_objects_attached.jpg
+.. figure:: files/05_collision_objects_attached.jpg
     :figclass: figure
     :class: figure-img img-fluid
