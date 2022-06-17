@@ -868,7 +868,6 @@ class Robot(object):
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> tool = Tool(mesh, frame)
         >>> robot.attach_tool(tool)
-        >>> robot.attach_tool(tool, group="planning_group_name")
         """
         group = group or self.main_group_name
         if group not in self.semantics.group_names:
@@ -1589,7 +1588,6 @@ class Robot(object):
         >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.])
         >>> group = robot.main_group_name
         >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
-        >>> robot.attached_tools = None
         >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnect'})
         >>> trajectory.fraction
         1.0
