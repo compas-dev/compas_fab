@@ -156,11 +156,6 @@ class Robot(object):
         """:obj:`dict` of :obj:`robot.Tool`: Maps planning group to the tool attached to it"""
         return self._attached_tools
 
-    @attached_tools.setter
-    def attached_tools(self, value):
-        if isinstance(value, dict):
-            self._attached_tools = value
-
     @property
     def attached_tool(self):
         """:obj:`robot.Tool`: For backwards compatibility. Returns the tool attached to the default group, or None."""
@@ -602,7 +597,7 @@ class Robot(object):
         """
         names = self.get_configurable_joint_names(group)
         if len(names) != len(configuration.joint_values):
-            raise ValueError("Please pass a configuration with %d joint_values or specify group" % len(names))
+            raise ValueError("Please pass a configuration with {} joint_values or specify group".format(len(names)))
         return configuration.joint_values[names.index(joint_name)]
 
     def _check_full_configuration_and_scale(self, full_configuration=None):
@@ -768,8 +763,9 @@ class Robot(object):
         """Get the tool attached to the given planning group. Group name defaults to main_group_name.
         Raises ValueError if group name is unknown or there is no tool currently attached to it"""
         group = group_name or self.main_group_name
-        if not (group in self.attached_tools and self.attached_tools[group]):
-            raise ValueError("Planning group {} not found or no tool attached".format(group))
+        if group not in self.attached_tools:
+            raise ValueError("No tool attached to group {}".format(group))
+
         return self.attached_tools[group]
 
     def from_tcf_to_t0cf(self, frames_tcf, group=None):
@@ -874,8 +870,11 @@ class Robot(object):
         >>> robot.attach_tool(tool)
         >>> robot.attach_tool(tool, group="planning_group_name")
         """
+        group = group or self.main_group_name
+        if group not in self.semantics.group_names:
+            raise ValueError("No such group: {}".format(group))
+
         if not tool.link_name:
-            group = group or self.main_group_name
             tool.link_name = self.get_end_effector_link_name(group)
         tool.update_touch_links(touch_links)
         self.attached_tools[group] = tool
@@ -1147,15 +1146,15 @@ class Robot(object):
 
         joint_names = self.get_configurable_joint_names(group)
         if len(joint_names) != len(configuration.joint_values):
-            raise ValueError("The passed configuration has %d joint_values, the group %s needs however: %d" % (len(configuration.joint_values), group, len(joint_names)))
+            raise ValueError("The passed configuration has {} joint_values, the group {} needs however: {}".format(len(configuration.joint_values), group, len(joint_names)))
         if len(tolerances_above) == 1:
             tolerances_above = tolerances_above * len(joint_names)
         elif len(tolerances_above) != len(configuration.joint_values):
-            raise ValueError("The passed configuration has %d joint_values, the tolerances_above however: %d" % (len(configuration.joint_values), len(tolerances_above)))
+            raise ValueError("The passed configuration has {} joint_values, the tolerances_above however: {}".format(len(configuration.joint_values), len(tolerances_above)))
         if len(tolerances_below) == 1:
             tolerances_below = tolerances_below * len(joint_names)
         elif len(tolerances_below) != len(configuration.joint_values):
-            raise ValueError("The passed configuration has %d joint_values, the tolerances_below however: %d" % (len(configuration.joint_values), len(tolerances_below)))
+            raise ValueError("The passed configuration has {} joint_values, the tolerances_below however: {}".format(len(configuration.joint_values), len(tolerances_below)))
 
         constraints = []
         for name, value, tolerance_above, tolerance_below in zip(joint_names, configuration.joint_values, tolerances_above, tolerances_below):
@@ -1825,26 +1824,26 @@ class Robot(object):
 
     def info(self):
         """Print information about the robot."""
-        print("The robot's name is '%s'." % self.name)
+        print("The robot's name is '{}'.".format(self.name))
         if self.semantics:
             print("The planning groups are:", self.group_names)
-            print("The main planning group is '%s'." % self.main_group_name)
+            print("The main planning group is '{}'.".format(self.main_group_name))
             configurable_joints = self.get_configurable_joints(self.main_group_name)
         else:
             configurable_joints = self.get_configurable_joints()
-        print("The end-effector's name is '%s'." % self.get_end_effector_link_name())
+        print("The end-effector's name is '{}'.".format(self.get_end_effector_link_name()))
         if self.attached_tools:
             for tool in self.attached_tools.values():
-                print("The robot has a tool at the %s link attached." % tool.link_name)
+                print("The robot has a tool at the {} link attached.".format(tool.link_name))
         else:
             print("The robot has NO tool attached.")
-        print("The base link's name is '%s'" % self.get_base_link_name())
+        print("The base link's name is '{}'".format(self.get_base_link_name()))
         print("The base_frame is:", self.get_base_frame())
         print("The robot's joints are:")
         for joint in configurable_joints:
-            info = "\t* '%s' is of type '%s'" % (joint.name, list(Joint.SUPPORTED_TYPES)[joint.type])
+            info = "\t* '{}' is of type '{}'".format(joint.name, list(Joint.SUPPORTED_TYPES)[joint.type])
             if joint.limit:
-                info += " and has limits [%.3f, %.3f]" % (joint.limit.upper, joint.limit.lower)
+                info += " and has limits [{:.3f}, {:.3f}]".format(joint.limit.upper, joint.limit.lower)
             print(info)
         print("The robot's links are:")
         print([link.name for link in self.model.links])

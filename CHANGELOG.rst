@@ -20,7 +20,7 @@ Unreleased
 
 * Replaced icon for GH component - ``ConstraintsFromPlane``
 * ``Robot().attached_tool`` now points to the tool attached to the ``robot.main_group_name``.
-* Added parameter `group` to the ``AttachToolComponent``
+* Added parameter ``group`` to the ``AttachToolComponent``
 
 **Fixed**
 

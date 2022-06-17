@@ -8,6 +8,7 @@ flake8
 autopep8
 pylint
 pytest>=4.6
+pytest_mock
 pytest-cov
 sybil
 isort
