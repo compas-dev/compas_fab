@@ -456,20 +456,24 @@ class PlanningScene(object):
         acm = AttachedCollisionMesh(collision_mesh, ee_link_name, touch_links)
         self.add_attached_collision_mesh(acm)
 
-    def add_attached_tool(self, tool=None):
+    def add_attached_tool(self, tool=None, group=None):
         """Add the robot's attached tool to the planning scene if tool is set."""
         self.ensure_client()
         if tool:
-            self.robot.attach_tool(tool)
-        if self.robot.attached_tool:
-            for acm in self.robot.attached_tool.attached_collision_meshes:
-                self.add_attached_collision_mesh(acm)
+            self.robot.attach_tool(tool, group)
+
+        # robot has 0 or more tools, each tool has a list of attached meshes
+        for tool_mesh_list in self.robot.get_attached_tool_collision_meshes():
+            for attached_collision_mesh in tool_mesh_list:
+                self.add_attached_collision_mesh(attached_collision_mesh)
 
     def remove_attached_tool(self):
         """Remove the robot's attached tool from the planning scene."""
         self.ensure_client()
-        if self.robot.attached_tool:
-            for acm in self.robot.attached_tool.attached_collision_meshes:
-                self.remove_attached_collision_mesh(acm.collision_mesh.id)
-                self.remove_collision_mesh(acm.collision_mesh.id)
+
+        # robot has 0 or more tools, each tool has a list of attached meshes
+        for tool_mesh_list in self.robot.get_attached_tool_collision_meshes():
+            for attached_collision_mesh in tool_mesh_list:
+                self.remove_attached_collision_mesh(attached_collision_mesh.collision_mesh.id)
+                self.remove_collision_mesh(attached_collision_mesh.collision_mesh.id)
         self.robot.detach_tool()

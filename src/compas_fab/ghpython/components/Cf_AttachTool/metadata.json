@@ -28,7 +28,12 @@
             {
                 "name": "tcf_plane",
                 "description": "The frame of the tool in tool0 frame."
+            },
+            {
+                "name": "group",
+                "description": "The planning group to which the tool should be attached."
             }
+
         ],
         "outputParameters": [
             {

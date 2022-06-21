@@ -2,13 +2,16 @@ import os
 import re
 
 import pytest
+from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.robots import RobotModel
 
+import compas_fab
 from compas_fab.backends.interfaces import ClientInterface
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.interfaces import PlannerInterface
 from compas_fab.robots import Robot
+from compas_fab.robots import Tool
 from compas_fab.robots import RobotSemantics
 from compas_fab.robots.ur5 import Robot as Ur5Robot
 
@@ -94,6 +97,20 @@ def fake_client():
     client.planner = FakePlanner(client)
 
     return client
+
+
+@pytest.fixture
+def robot_tool1():
+    mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+    frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
+    return Tool(mesh, frame)
+
+
+@pytest.fixture
+def robot_tool2():
+    mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+    frame = Frame([0.89, 0, 0], [0, 1, 0], [0, 0, 1])
+    return Tool(mesh, frame)
 
 
 def test_basic_name_only():
@@ -273,3 +290,93 @@ def test_iter_inverse_kinematics(ur5_with_fake_ik):
     assert len(solutions) == 2
     assert str(solutions[0]) == "Configuration((-1.572, -2.560, 2.196, 2.365, 0.001, 1.137), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
     assert str(solutions[1]) == "Configuration((-2.238, -3.175, 2.174, 4.143, -5.616, -6.283), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
+
+
+def test_attach_tool_without_group(ur5_robot_instance, robot_tool1):
+    robot = ur5_robot_instance
+    tool = robot_tool1
+
+    robot.attach_tool(tool)
+
+    assert len(robot.attached_tools) == 1
+    assert robot.main_group_name in robot.attached_tools
+
+
+def test_attach_tool_with_group(ur5_robot_instance, robot_tool1):
+    robot = ur5_robot_instance
+    tool = robot_tool1
+    group_name = "endeffector"
+
+    robot.attach_tool(tool, group=group_name)
+
+    assert len(robot.attached_tools) == 1
+    assert group_name in robot.attached_tools
+
+
+def test_attach_tool_group_doesnt_exist(ur5_robot_instance, robot_tool1):
+    robot = ur5_robot_instance
+    tool = robot_tool1
+    non_existent_group_name = "supergroup"
+
+    with pytest.raises(ValueError):
+        robot.attach_tool(tool, non_existent_group_name)
+
+
+def test_attach_multiple_tools(ur5_robot_instance, robot_tool1, robot_tool2):
+    robot = ur5_robot_instance
+    tool1 = robot_tool1
+    tool2 = robot_tool2
+    group_name = "endeffector"
+
+    robot.attach_tool(tool1)
+    robot.attach_tool(tool2, group=group_name)
+
+    assert len(robot.attached_tools) == 2
+    assert group_name in robot.attached_tools
+    assert robot.main_group_name in robot.attached_tools
+
+
+def test_detach_tool_without_group(ur5_robot_instance, robot_tool1):
+    robot = ur5_robot_instance
+    tool = robot_tool1
+    robot.attach_tool(tool)
+    assert len(robot.attached_tools) == 1
+    assert robot.main_group_name in robot.attached_tools
+
+    robot.detach_tool()
+
+    assert len(robot.attached_tools) == 0
+
+
+def test_detach_tool_with_group(ur5_robot_instance, robot_tool1):
+    robot = ur5_robot_instance
+    tool = robot_tool1
+    group_name = "endeffector"
+    robot.attach_tool(tool, group_name)
+    assert len(robot.attached_tools) == 1
+    assert group_name in robot.attached_tools
+
+    robot.detach_tool(group=group_name)
+
+    assert len(robot.attached_tools) == 0
+
+
+def test_wrond_gorup_name_raises_exception(ur5_robot_instance, robot_tool1):
+    robot = ur5_robot_instance
+    tool = robot_tool1
+    wrong_group_name = "theavengers"
+
+    with pytest.raises(Exception):
+        robot.attach_tool(tool, group=wrong_group_name)
+
+
+def test_attached_tools_no_assigning(ur5_robot_instance, robot_tool1):
+    robot = ur5_robot_instance
+
+    with pytest.raises(AttributeError):
+        robot.attached_tools = None
+
+
+def test_print_robot_info(ur5_robot_instance):
+    robot = ur5_robot_instance
+    robot.info()

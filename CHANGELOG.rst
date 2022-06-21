@@ -12,14 +12,19 @@ Unreleased
 
 **Added**
 
-* Added some missing information to GH and V-REP docs.
 * Added a new GH component - ``ConstraintsFromTargetConfiguration``
+* Added some missing information to GH and V-REP docs.
+* Added a ``Robot().attached_tools`` property to allow attaching tools to multiple planning groups simultaneously.
 
 **Changed**
 
 * Replaced icon for GH component - ``ConstraintsFromPlane``
+* ``Robot().attached_tool`` now points to the tool attached to the ``robot.main_group_name``.
+* Added parameter ``group`` to the ``AttachToolComponent``
 
 **Fixed**
+
+* Attaching a tool to a planning group doesn't overwrite the tool attached to other groups.
 
 **Deprecated**
 

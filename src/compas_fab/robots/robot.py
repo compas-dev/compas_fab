@@ -17,7 +17,7 @@ from compas_fab.robots.constraints import OrientationConstraint
 from compas_fab.robots.constraints import PositionConstraint
 
 __all__ = [
-    'Robot',
+    "Robot",
 ]
 
 
@@ -43,22 +43,19 @@ class Robot(object):
         e.g. :class:`compas_fab.backends.RosClient`
     attributes : :obj:`dict`
         Named attributes related to the robot instance.
-    attached_tool : :class:`compas_fab.robots.Tool`
-        Instance of the tool attached to the robot, if any.
+    attached_tools : :class:`compas_fab.robots.Tool`
+        Dictionary mapping planning groups to the tool currently attached to them, if any.
     """
 
     def __init__(self, model, artist=None, semantics=None, client=None):
-        self._scale_factor = 1.
+        self._scale_factor = 1.0
         self.model = model
-        self.attached_tool = None
+        self._attached_tools = {}  # { planning_group_name: robots.tool.Tool }
         self.artist = artist
         self.semantics = semantics
         self.client = client
         self.attributes = {}
-        self._current_ik = {
-            'request_id': None,
-            'solutions': None
-        }
+        self._current_ik = {"request_id": None, "solutions": None}
 
     @property
     def artist(self):
@@ -70,8 +67,8 @@ class Robot(object):
         self._artist = artist
         if len(self.model.joints) > 0 and len(self.model.links) > 0:
             self.scale(self._scale_factor)
-            if self.attached_tool:
-                self.artist.attach_tool_model(self.attached_tool.tool_model)
+            for tool in self.attached_tools.values():
+                self.artist.attach_tool_model(tool.tool_model)
 
     @classmethod
     def basic(cls, name, joints=None, links=None, materials=None, **kwargs):
@@ -103,8 +100,7 @@ class Robot(object):
         >>> robot.name
         'A robot'
         """
-        model = RobotModel(name, joints=joints or [], links=links or [],
-                           materials=materials or [], **kwargs)
+        model = RobotModel(name, joints=joints or [], links=links or [], materials=materials or [], **kwargs)
         return cls(model, None)
 
     @property
@@ -154,6 +150,16 @@ class Robot(object):
         """
         self.ensure_semantics()
         return self.semantics.group_states
+
+    @property
+    def attached_tools(self):
+        """:obj:`dict` of :obj:`robot.Tool`: Maps planning group to the tool attached to it"""
+        return self._attached_tools
+
+    @property
+    def attached_tool(self):
+        """:obj:`robot.Tool`: For backwards compatibility. Returns the tool attached to the default group, or None."""
+        return self._attached_tools.get(self.main_group_name, None)
 
     def get_end_effector_link_name(self, group=None):
         """Get the name of the robot's end effector link.
@@ -428,6 +434,16 @@ class Robot(object):
         configurable_joints = self.get_configurable_joints(group)
         return [j.type for j in configurable_joints]
 
+    def get_attached_tool_collision_meshes(self):
+        """Returns a list of all attached collisions meshes of each of the attached tools, if any.
+
+        Returns
+        -------
+        A list of lists.
+        List[List[compas_fab.robots.planning_scene.CollisionMesh]]
+        """
+        return [tool.attached_collision_meshes for tool in self.attached_tools.values()]
+
     # ==========================================================================
     # configurations
     # ==========================================================================
@@ -449,7 +465,7 @@ class Robot(object):
         joint_types = []
         for joint in self.get_configurable_joints(group):
             if joint.limit and not (0 <= joint.limit.upper and 0 >= joint.limit.lower):
-                values.append((joint.limit.upper + joint.limit.lower)/2.)
+                values.append((joint.limit.upper + joint.limit.lower) / 2.0)
             else:
                 values.append(0)
             joint_names.append(joint.name)
@@ -581,8 +597,7 @@ class Robot(object):
         """
         names = self.get_configurable_joint_names(group)
         if len(names) != len(configuration.joint_values):
-            raise ValueError(
-                "Please pass a configuration with %d joint_values or specify group" % len(names))
+            raise ValueError("Please pass a configuration with {} joint_values or specify group".format(len(names)))
         return configuration.joint_values[names.index(joint_name)]
 
     def _check_full_configuration_and_scale(self, full_configuration=None):
@@ -608,7 +623,7 @@ class Robot(object):
             configuration = full_configuration.copy()
             if not configuration.joint_names:
                 configuration.joint_names = joint_names
-        return configuration, configuration.scaled(1. / self.scale_factor)
+        return configuration, configuration.scaled(1.0 / self.scale_factor)
 
     def get_configuration_from_group_state(self, group, group_state):
         """Get a ``Configuration`` from a group's group state.
@@ -744,13 +759,26 @@ class Robot(object):
         frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
         return frame_WCF
 
-    def from_tcf_to_t0cf(self, frames_tcf):
+    def _get_attached_tool_for_group(self, group_name=None):
+        """Get the tool attached to the given planning group. Group name defaults to main_group_name.
+        Raises ValueError if group name is unknown or there is no tool currently attached to it"""
+        group = group_name or self.main_group_name
+        if group not in self.attached_tools:
+            raise ValueError("No tool attached to group {}".format(group))
+
+        return self.attached_tools[group]
+
+    def from_tcf_to_t0cf(self, frames_tcf, group=None):
         """Convert a list of frames at the robot's tool tip (tcf frame) to frames at the robot's flange (tool0 frame) using the attached tool.
 
         Parameters
         ----------
         frames_tcf : :obj:`list` of :class:`compas.geometry.Frame`
             Frames (in WCF) at the robot's tool tip (tcf).
+
+        group : :obj:`str`, optional
+            The planning group whose tool to use. Defaults to the main
+            planning group.
 
         Returns
         -------
@@ -770,18 +798,23 @@ class Robot(object):
         >>> frames_tcf = [Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))]
         >>> robot.from_tcf_to_t0cf(frames_tcf)
         [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
+        >>> robot.from_tcf_to_t0cf(frames_tcf, group=robot.main_group_name)
+        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
         """
-        if not self.attached_tool:
-            raise Exception("Please attach a tool first.")
-        return self.attached_tool.from_tcf_to_t0cf(frames_tcf)
+        tool = self._get_attached_tool_for_group(group_name=group)
+        return tool.from_tcf_to_t0cf(frames_tcf)
 
-    def from_t0cf_to_tcf(self, frames_t0cf):
+    def from_t0cf_to_tcf(self, frames_t0cf, group=None):
         """Convert frames at the robot's flange (tool0 frame) to frames at the robot's tool tip (tcf frame) using the attached tool.
 
         Parameters
         ----------
         frames_t0cf : :obj:`list` of :class:`compas.geometry.Frame`
             Frames (in WCF) at the robot's flange (tool0).
+
+        group : :obj:`str`, optional
+            The planning group to attach this tool to. Defaults to the main
+            planning group.
 
         Returns
         -------
@@ -801,10 +834,11 @@ class Robot(object):
         >>> frames_t0cf = [Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))]
         >>> robot.from_t0cf_to_tcf(frames_t0cf)
         [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
+        >>> robot.from_t0cf_to_tcf(frames_t0cf, group=robot.main_group_name)
+        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
         """
-        if not self.attached_tool:
-            raise Exception("Please attach a tool first.")
-        return self.attached_tool.from_t0cf_to_tcf(frames_t0cf)
+        tool = self._get_attached_tool_for_group(group_name=group)
+        return tool.from_t0cf_to_tcf(frames_t0cf)
 
     def attach_tool(self, tool, group=None, touch_links=None):
         """Attach a tool to the robot independently of the model definition.
@@ -835,24 +869,39 @@ class Robot(object):
         >>> tool = Tool(mesh, frame)
         >>> robot.attach_tool(tool)
         """
+        group = group or self.main_group_name
+        if group not in self.semantics.group_names:
+            raise ValueError("No such group: {}".format(group))
+
         if not tool.link_name:
-            group = group or self.main_group_name
             tool.link_name = self.get_end_effector_link_name(group)
         tool.update_touch_links(touch_links)
-        self.attached_tool = tool
+        self.attached_tools[group] = tool
+
         if self.artist:
             self.artist.attach_tool_model(tool.tool_model)
 
-    def detach_tool(self):
+    def detach_tool(self, group=None):
         """Detach the attached tool.
+
+        Parameters
+        ----------
+        group : :obj:`str`, optional
+            The planning group to attach this tool to. Defaults to the main
+            planning group.
 
         See Also
         --------
         * :meth:`attach_tool`
         """
-        self.attached_tool = None
-        if self.artist:
-            self.artist.detach_tool_model()
+        group = group or self.main_group_name
+        if group not in self.attached_tools:
+            raise ValueError("No tool attached to group {}".format(group))
+
+        tool_to_remove = self.attached_tools[group]
+        if self.artist and tool_to_remove:
+            self.artist.detach_tool_model(tool_to_remove.tool_model)
+        self.attached_tools.pop(group)
 
     # ==========================================================================
     # checks
@@ -860,14 +909,13 @@ class Robot(object):
 
     def ensure_client(self):
         """Check if the client is set.
-       Raises
-       ------
-       :exc:`Exception`
-           If :attr:`client` is not set
-       """
+        Raises
+        ------
+        :exc:`Exception`
+            If :attr:`client` is not set
+        """
         if not self.client:
-            raise Exception(
-                'This method is only callable once a client is assigned.')
+            raise Exception("This method is only callable once a client is assigned.")
 
     def ensure_semantics(self):
         """Check if semantics is set.
@@ -877,8 +925,7 @@ class Robot(object):
             If :attr:`semantics` is not set.
         """
         if not self.semantics:
-            raise Exception(
-                'This method is only callable once a semantic model is assigned.')
+            raise Exception("This method is only callable once a semantic model is assigned.")
 
     def ensure_geometry(self):
         """Check if the model's geometry has been loaded.
@@ -888,12 +935,12 @@ class Robot(object):
             If geometry has not been loaded.
         """
         self.model.ensure_geometry()
+
     # ==========================================================================
     # constraints
     # ==========================================================================
 
-    def orientation_constraint_from_frame(self, frame_WCF, tolerances_axes,
-                                          group=None):
+    def orientation_constraint_from_frame(self, frame_WCF, tolerances_axes, group=None):
         r"""Create an orientation constraint from a frame on the group's end-effector link.
 
         Parameters
@@ -1098,18 +1145,15 @@ class Robot(object):
 
         joint_names = self.get_configurable_joint_names(group)
         if len(joint_names) != len(configuration.joint_values):
-            raise ValueError("The passed configuration has %d joint_values, the group %s needs however: %d" % (
-                len(configuration.joint_values), group, len(joint_names)))
+            raise ValueError("The passed configuration has {} joint_values, the group {} needs however: {}".format(len(configuration.joint_values), group, len(joint_names)))
         if len(tolerances_above) == 1:
             tolerances_above = tolerances_above * len(joint_names)
         elif len(tolerances_above) != len(configuration.joint_values):
-            raise ValueError("The passed configuration has %d joint_values, the tolerances_above however: %d" % (
-                len(configuration.joint_values), len(tolerances_above)))
+            raise ValueError("The passed configuration has {} joint_values, the tolerances_above however: {}".format(len(configuration.joint_values), len(tolerances_above)))
         if len(tolerances_below) == 1:
             tolerances_below = tolerances_below * len(joint_names)
         elif len(tolerances_below) != len(configuration.joint_values):
-            raise ValueError("The passed configuration has %d joint_values, the tolerances_below however: %d" % (
-                len(configuration.joint_values), len(tolerances_below)))
+            raise ValueError("The passed configuration has {} joint_values, the tolerances_below however: {}".format(len(configuration.joint_values), len(tolerances_below)))
 
         constraints = []
         for name, value, tolerance_above, tolerance_below in zip(joint_names, configuration.joint_values, tolerances_above, tolerances_below):
@@ -1170,16 +1214,16 @@ class Robot(object):
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
         # Pseudo-memoized sequential calls will re-use iterator if not exhaused
-        request_id = '{}-{}-{}-{}-{}'.format(str(frame_WCF), str(start_configuration), str(group), str(return_full_configuration), str(options))
+        request_id = "{}-{}-{}-{}-{}".format(str(frame_WCF), str(start_configuration), str(group), str(return_full_configuration), str(options))
 
-        if self._current_ik['request_id'] == request_id and self._current_ik['solutions'] is not None:
-            solution = next(self._current_ik['solutions'], None)
+        if self._current_ik["request_id"] == request_id and self._current_ik["solutions"] is not None:
+            solution = next(self._current_ik["solutions"], None)
             if solution is not None:
                 return solution
 
         solutions = self.iter_inverse_kinematics(frame_WCF, start_configuration, group, return_full_configuration, options)
-        self._current_ik['request_id'] = request_id
-        self._current_ik['solutions'] = solutions
+        self._current_ik["request_id"] = request_id
+        self._current_ik["solutions"] = solutions
 
         return next(solutions)
 
@@ -1230,7 +1274,7 @@ class Robot(object):
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
         options = options or {}
-        attached_collision_meshes = options.get('attached_collision_meshes') or []
+        attached_collision_meshes = options.get("attached_collision_meshes") or []
 
         self.ensure_client()
         group = group or self.main_group_name if self.semantics else None
@@ -1240,16 +1284,13 @@ class Robot(object):
         frame_WCF_scaled = frame_WCF.copy()
         frame_WCF_scaled.point /= self.scale_factor  # must be in meters
 
-        if self.attached_tool:
-            attached_collision_meshes.extend(self.attached_tool.attached_collision_meshes)
+        for tool in self.attached_tools.values():
+            if tool:
+                attached_collision_meshes.extend(tool.attached_collision_meshes)
 
-        options['attached_collision_meshes'] = attached_collision_meshes
+        options["attached_collision_meshes"] = attached_collision_meshes
 
-        solutions = self.client.inverse_kinematics(self,
-                                                   frame_WCF_scaled,
-                                                   start_configuration_scaled,
-                                                   group,
-                                                   options)
+        solutions = self.client.inverse_kinematics(self, frame_WCF_scaled, start_configuration_scaled, group, options)
 
         # The returned joint names might be more than the requested ones if there are passive joints present
         for joint_positions, joint_names in solutions:
@@ -1272,21 +1313,21 @@ class Robot(object):
 
         return configuration.scaled(self.scale_factor)
 
-    def inverse_kinematics_deprecated(self, frame_WCF, start_configuration=None,
-                                      group=None, avoid_collisions=True,
-                                      constraints=None, attempts=8,
-                                      attached_collision_meshes=None,
-                                      return_full_configuration=False):
-        return self.inverse_kinematics(frame_WCF,
-                                       start_configuration,
-                                       group,
-                                       return_full_configuration,
-                                       options=dict(
-                                           avoid_collisions=avoid_collisions,
-                                           constraints=constraints,
-                                           attempts=attempts,
-                                           attached_collision_meshes=attached_collision_meshes,
-                                       ))
+    def inverse_kinematics_deprecated(
+        self, frame_WCF, start_configuration=None, group=None, avoid_collisions=True, constraints=None, attempts=8, attached_collision_meshes=None, return_full_configuration=False
+    ):
+        return self.inverse_kinematics(
+            frame_WCF,
+            start_configuration,
+            group,
+            return_full_configuration,
+            options=dict(
+                avoid_collisions=avoid_collisions,
+                constraints=constraints,
+                attempts=attempts,
+                attached_collision_meshes=attached_collision_meshes,
+            ),
+        )
 
     def forward_kinematics(self, configuration, group=None, options=None):
         """Calculate the robot's forward kinematic.
@@ -1341,7 +1382,7 @@ class Robot(object):
         True
         """
         options = options or {}
-        solver = options.get('solver')
+        solver = options.get("solver")
 
         group = group or self.main_group_name if self.semantics else None
 
@@ -1350,24 +1391,21 @@ class Robot(object):
 
         # If there's no client, we default to `model` solver if there is no other assigned.
         if not self.client:
-            solver = solver or 'model'
+            solver = solver or "model"
 
         # Solve with the model
-        if solver == 'model':
-            link = options.get('link', options.get('ee_link'))
+        if solver == "model":
+            link = options.get("link", options.get("ee_link"))
             link = link or self.get_end_effector_link_name(group)
             if link not in self.get_link_names(group):
-                raise ValueError('Link name {} does not exist in planning group'.format(link))
+                raise ValueError("Link name {} does not exist in planning group".format(link))
 
             frame_WCF = self.model.forward_kinematics(full_configuration, link)
 
         # Otherwise, pass everything down to the client
         else:
             self.ensure_client()
-            frame_WCF = self.client.forward_kinematics(self,
-                                                       full_configuration_scaled,
-                                                       group,
-                                                       options)
+            frame_WCF = self.client.forward_kinematics(self, full_configuration_scaled, group, options)
 
         # Scale and return
         frame_WCF.point *= self.scale_factor
@@ -1434,9 +1472,9 @@ class Robot(object):
         >>> ros.close()
         """
         options = options or {}
-        max_step = options.get('max_step')
-        path_constraints = options.get('path_constraints')
-        attached_collision_meshes = options.get('attached_collision_meshes') or []
+        max_step = options.get("max_step")
+        path_constraints = options.get("path_constraints")
+        attached_collision_meshes = options.get("attached_collision_meshes") or []
 
         self.ensure_client()
         if not group:
@@ -1448,7 +1486,7 @@ class Robot(object):
 
         frames_WCF_scaled = []
         for frame in frames_WCF:
-            frames_WCF_scaled.append(Frame(frame.point * 1. / self.scale_factor, frame.xaxis, frame.yaxis))
+            frames_WCF_scaled.append(Frame(frame.point * 1.0 / self.scale_factor, frame.xaxis, frame.yaxis))
 
         if path_constraints:
             path_constraints_WCF_scaled = []
@@ -1457,27 +1495,23 @@ class Robot(object):
                 if c.type == Constraint.JOINT:
                     joint = self.get_joint_by_name(c.joint_name)
                     if joint.is_scalable():
-                        cp.scale(1. / self.scale_factor)
+                        cp.scale(1.0 / self.scale_factor)
                 else:
-                    cp.scale(1. / self.scale_factor)
+                    cp.scale(1.0 / self.scale_factor)
                 path_constraints_WCF_scaled.append(cp)
         else:
             path_constraints_WCF_scaled = None
 
-        if self.attached_tool:
-            attached_collision_meshes.extend(self.attached_tool.attached_collision_meshes)
+        for _, tool in self.attached_tools.items():
+            if tool:
+                attached_collision_meshes.extend(tool.attached_collision_meshes)
 
-        options['attached_collision_meshes'] = attached_collision_meshes
-        options['path_constraints'] = path_constraints
+        options["attached_collision_meshes"] = attached_collision_meshes
+        options["path_constraints"] = path_constraints
         if max_step:
-            options['max_step'] = max_step / self.scale_factor
+            options["max_step"] = max_step / self.scale_factor
 
-        trajectory = self.client.plan_cartesian_motion(
-            robot=self,
-            frames_WCF=frames_WCF_scaled,
-            start_configuration=start_configuration_scaled,
-            group=group,
-            options=options)
+        trajectory = self.client.plan_cartesian_motion(robot=self, frames_WCF=frames_WCF_scaled, start_configuration=start_configuration_scaled, group=group, options=options)
 
         # Scale everything back to robot's scale
         for pt in trajectory.points:
@@ -1487,21 +1521,21 @@ class Robot(object):
 
         return trajectory
 
-    def plan_cartesian_motion_deprecated(self, frames_WCF, start_configuration=None,
-                                         max_step=0.01, jump_threshold=1.57,
-                                         avoid_collisions=True, group=None,
-                                         path_constraints=None,
-                                         attached_collision_meshes=None):
-        return self.plan_cartesian_motion(frames_WCF,
-                                          start_configuration=start_configuration,
-                                          group=group,
-                                          options=dict(
-                                              max_step=max_step,
-                                              jump_threshold=jump_threshold,
-                                              avoid_collisions=avoid_collisions,
-                                              path_constraints=path_constraints,
-                                              attached_collision_meshes=attached_collision_meshes,
-                                          ))
+    def plan_cartesian_motion_deprecated(
+        self, frames_WCF, start_configuration=None, max_step=0.01, jump_threshold=1.57, avoid_collisions=True, group=None, path_constraints=None, attached_collision_meshes=None
+    ):
+        return self.plan_cartesian_motion(
+            frames_WCF,
+            start_configuration=start_configuration,
+            group=group,
+            options=dict(
+                max_step=max_step,
+                jump_threshold=jump_threshold,
+                avoid_collisions=avoid_collisions,
+                path_constraints=path_constraints,
+                attached_collision_meshes=attached_collision_meshes,
+            ),
+        )
 
     def plan_motion(self, goal_constraints, start_configuration=None, group=None, options=None):
         """Calculate a motion path.
@@ -1554,7 +1588,6 @@ class Robot(object):
         >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.])
         >>> group = robot.main_group_name
         >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
-        >>> robot.attached_tool = None
         >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnect'})
         >>> trajectory.fraction
         1.0
@@ -1580,8 +1613,8 @@ class Robot(object):
         >>> ros.close()
         """
         options = options or {}
-        path_constraints = options.get('path_constraints')
-        attached_collision_meshes = options.get('attached_collision_meshes') or []
+        path_constraints = options.get("path_constraints")
+        attached_collision_meshes = options.get("attached_collision_meshes") or []
 
         # TODO: for the motion plan request a list of possible goal constraints
         # can be passed, from which the planner will try to find a path that
@@ -1604,9 +1637,9 @@ class Robot(object):
             if c.type == Constraint.JOINT:
                 joint = self.get_joint_by_name(c.joint_name)
                 if joint.is_scalable():
-                    cp.scale(1. / self.scale_factor)
+                    cp.scale(1.0 / self.scale_factor)
             else:
-                cp.scale(1. / self.scale_factor)
+                cp.scale(1.0 / self.scale_factor)
             goal_constraints_WCF_scaled.append(cp)
 
         # Transform path constraints to RCF and scale
@@ -1617,18 +1650,19 @@ class Robot(object):
                 if c.type == Constraint.JOINT:
                     joint = self.get_joint_by_name(c.joint_name)
                     if joint.is_scalable():
-                        cp.scale(1. / self.scale_factor)
+                        cp.scale(1.0 / self.scale_factor)
                 else:
-                    cp.scale(1. / self.scale_factor)
+                    cp.scale(1.0 / self.scale_factor)
                 path_constraints_WCF_scaled.append(cp)
         else:
             path_constraints_WCF_scaled = None
 
-        if self.attached_tool:
-            attached_collision_meshes.extend(self.attached_tool.attached_collision_meshes)
+        for tool in self.attached_tools.values():
+            if tool:
+                attached_collision_meshes.extend(tool.attached_collision_meshes)
 
-        options['attached_collision_meshes'] = attached_collision_meshes
-        options['path_constraints'] = path_constraints_WCF_scaled
+        options["attached_collision_meshes"] = attached_collision_meshes
+        options["path_constraints"] = path_constraints_WCF_scaled
 
         trajectory = self.client.plan_motion(
             robot=self,
@@ -1646,24 +1680,33 @@ class Robot(object):
 
         return trajectory
 
-    def plan_motion_deprecated(self, goal_constraints, start_configuration=None,
-                               group=None, path_constraints=None, planner_id='RRTConnect',
-                               num_planning_attempts=1, allowed_planning_time=2.,
-                               max_velocity_scaling_factor=1.,
-                               max_acceleration_scaling_factor=1.,
-                               attached_collision_meshes=None):
-        return self.plan_motion(goal_constraints,
-                                start_configuration,
-                                group,
-                                options=dict(
-                                    path_constraints=path_constraints,
-                                    planner_id=planner_id,
-                                    num_planning_attempts=num_planning_attempts,
-                                    allowed_planning_time=allowed_planning_time,
-                                    max_velocity_scaling_factor=max_velocity_scaling_factor,
-                                    max_acceleration_scaling_factor=max_acceleration_scaling_factor,
-                                    attached_collision_meshes=attached_collision_meshes,
-                                ))
+    def plan_motion_deprecated(
+        self,
+        goal_constraints,
+        start_configuration=None,
+        group=None,
+        path_constraints=None,
+        planner_id="RRTConnect",
+        num_planning_attempts=1,
+        allowed_planning_time=2.0,
+        max_velocity_scaling_factor=1.0,
+        max_acceleration_scaling_factor=1.0,
+        attached_collision_meshes=None,
+    ):
+        return self.plan_motion(
+            goal_constraints,
+            start_configuration,
+            group,
+            options=dict(
+                path_constraints=path_constraints,
+                planner_id=planner_id,
+                num_planning_attempts=num_planning_attempts,
+                allowed_planning_time=allowed_planning_time,
+                max_velocity_scaling_factor=max_velocity_scaling_factor,
+                max_acceleration_scaling_factor=max_acceleration_scaling_factor,
+                attached_collision_meshes=attached_collision_meshes,
+            ),
+        )
 
     def transformed_frames(self, configuration, group=None):
         """Get the robot's transformed frames.
@@ -1779,29 +1822,26 @@ class Robot(object):
 
     def info(self):
         """Print information about the robot."""
-        print("The robot's name is '%s'." % self.name)
+        print("The robot's name is '{}'.".format(self.name))
         if self.semantics:
             print("The planning groups are:", self.group_names)
-            print("The main planning group is '%s'." % self.main_group_name)
-            configurable_joints = self.get_configurable_joints(
-                self.main_group_name)
+            print("The main planning group is '{}'.".format(self.main_group_name))
+            configurable_joints = self.get_configurable_joints(self.main_group_name)
         else:
             configurable_joints = self.get_configurable_joints()
-        print("The end-effector's name is '%s'." %
-              self.get_end_effector_link_name())
-        if self.attached_tool:
-            print("The robot has a tool at the %s link attached." % self.attached_tool.link_name)
+        print("The end-effector's name is '{}'.".format(self.get_end_effector_link_name()))
+        if self.attached_tools:
+            for tool in self.attached_tools.values():
+                print("The robot has a tool at the {} link attached.".format(tool.link_name))
         else:
             print("The robot has NO tool attached.")
-        print("The base link's name is '%s'" % self.get_base_link_name())
+        print("The base link's name is '{}'".format(self.get_base_link_name()))
         print("The base_frame is:", self.get_base_frame())
         print("The robot's joints are:")
         for joint in configurable_joints:
-            info = "\t* '%s' is of type '%s'" % (
-                joint.name, list(Joint.SUPPORTED_TYPES)[joint.type])
+            info = "\t* '{}' is of type '{}'".format(joint.name, list(Joint.SUPPORTED_TYPES)[joint.type])
             if joint.limit:
-                info += " and has limits [%.3f, %.3f]" % (
-                    joint.limit.upper, joint.limit.lower)
+                info += " and has limits [{:.3f}, {:.3f}]".format(joint.limit.upper, joint.limit.lower)
             print(info)
         print("The robot's links are:")
         print([link.name for link in self.model.links])
