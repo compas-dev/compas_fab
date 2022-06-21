@@ -1,4 +1,3 @@
-import copy
 import os
 import re
 
@@ -376,42 +375,6 @@ def test_attached_tools_no_assigning(ur5_robot_instance, robot_tool1):
 
     with pytest.raises(AttributeError):
         robot.attached_tools = None
-
-
-def test_get_position_by_joint_name_raises_value_error(mocker, ur5_robot_instance):
-    robot = ur5_robot_instance
-    mocker.patch("compas_fab.robots.Robot.get_configurable_joint_names")
-    robot.get_configurable_joint_names.return_value = [1, 2]
-    mock_configuration = mocker.Mock(joint_values=[1, 2, 3])
-
-    with pytest.raises(ValueError):
-        robot.get_position_by_joint_name(mock_configuration, mocker.Mock())
-
-
-def test_constraints_from_configuration_mismatch_joint_names_values(mocker, ur5_robot_instance):
-    robot = ur5_robot_instance
-    mocker.patch("compas_fab.robots.Robot.get_configurable_joint_names")
-    robot.get_configurable_joint_names.return_value = ["jimmy", "kim", "mike"]
-    mock_configuration = mocker.Mock(joint_values=[1, 2])
-
-    with pytest.raises(ValueError):
-        robot.constraints_from_configuration(mock_configuration, mocker.Mock(), mocker.Mock())
-
-
-def test_constraints_from_configuration_mismatch_joint_names_above_tolerance(mocker, ur5_robot_instance):
-    robot = ur5_robot_instance
-    mocker.patch("compas_fab.robots.Robot.get_configurable_joint_names")
-    number_of_joints = 6
-    robot.get_configurable_joint_names.return_value = ["jimmy"] * number_of_joints
-    mock_configuration = mocker.Mock(joint_values=[1] * number_of_joints)
-    tolerances_one_missing = [.1] * 5
-    tolerance_single = [.1]
-
-    with pytest.raises(ValueError):
-        robot.constraints_from_configuration(mock_configuration, tolerances_above=tolerances_one_missing, tolerances_below=tolerance_single)
-
-    with pytest.raises(ValueError):
-        robot.constraints_from_configuration(mock_configuration, tolerances_above=tolerance_single, tolerances_below=tolerances_one_missing)
 
 
 def test_print_robot_info(ur5_robot_instance):
