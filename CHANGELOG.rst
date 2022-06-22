@@ -25,6 +25,7 @@ Unreleased
 **Fixed**
 
 * Attaching a tool to a planning group doesn't overwrite the tool attached to other groups.
+* Changed ``Trajectory`` to inherit from ``compas.data.Data`` class to fix a serialization error that expects guid to be present.
 
 **Deprecated**
 

@@ -2,8 +2,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas.data import Data
 from compas.robots import Configuration
 from compas.robots.configuration import FixedLengthList
+
 from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots.time_ import Duration
 
@@ -230,7 +232,7 @@ class JointTrajectoryPoint(Configuration):
         return JointTrajectoryPoint(joint_values, joint_types, velocities, accelerations, effort, joint_names=joint_names)
 
 
-class Trajectory(object):
+class Trajectory(Data):
     """Base trajectory class.
 
     Attribute
