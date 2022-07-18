@@ -16,6 +16,8 @@ Unreleased
 
 **Fixed**
 
+* Fixed DH params for analytical IK solver of UR3e and UR10e.
+
 **Deprecated**
 
 **Removed**
