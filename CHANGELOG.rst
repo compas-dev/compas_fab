@@ -12,6 +12,8 @@ Unreleased
 
 **Added**
 
+* Added a prefix to all GH components.
+
 **Changed**
 
 **Fixed**
