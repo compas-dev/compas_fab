@@ -189,6 +189,14 @@ class RobotState(ROSmsg):
             item) for item in msg['attached_collision_objects']]
         return cls(joint_state, multi_dof_joint_state, attached_collision_objects, msg['is_diff'])
 
+    def filter_fields_for_distro(self, ros_distro):
+        """To maintain backwards compatibility with older ROS distros,
+        we need to make sure newly added fields are removed from the request."""
+        # Remove the field `pose` for distros older than NOETIC
+        if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC):
+            for aco in self.attached_collision_objects:
+                del aco.object.pose
+
 
 class PositionIKRequest(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionIKRequest.html
@@ -539,6 +547,14 @@ class PlanningSceneWorld(ROSmsg):
 
         return cls(collision_objects, octomap)
 
+    def filter_fields_for_distro(self, ros_distro):
+        """To maintain backwards compatibility with older ROS distros,
+        we need to make sure newly added fields are removed from the request."""
+        # Remove the field `pose` for distros older than NOETIC
+        if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC):
+            for co in self.collision_objects:
+                del co.pose
+
 
 class PlanningScene(ROSmsg):
     """https://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningScene.html
@@ -568,11 +584,8 @@ class PlanningScene(ROSmsg):
         """To maintain backwards compatibility with older ROS distros,
         we need to make sure newly added fields are removed from the request."""
         # Remove the field `pose` for distros older than NOETIC
-        if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC):
-            for aco in self.robot_state.attached_collision_objects:
-                del aco.object.pose
-            for co in self.world.collision_objects:
-                del co.pose
+        self.robot_state.filter_fields_for_distro(ros_distro)
+        self.world.filter_fields_for_distro(ros_distro)
 
     @classmethod
     def from_msg(cls, msg):

@@ -109,6 +109,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
                                  name=start_configuration.joint_names,
                                  position=start_configuration.joint_values)
         start_state = RobotState(joint_state, MultiDOFJointState(header=header), is_diff=True)
+        start_state.filter_fields_for_distro(self.ros_client.ros_distro)
 
         if options.get('attached_collision_meshes'):
             for acm in options['attached_collision_meshes']:
