@@ -8,7 +8,6 @@ from compas_rhino.conversions import RhinoMesh
 from compas_rhino.conversions import plane_to_compas_frame
 
 from compas.geometry import Frame
-from compas_fab.robots import PlanningScene
 from compas_fab.robots import Tool
 
 
@@ -27,8 +26,6 @@ class AttachToolComponent(component):
                 frame = plane_to_compas_frame(tcf_plane)
             tool = Tool(c_visual_mesh, frame, c_collision_mesh)
 
-            scene = PlanningScene(robot)
             robot.attach_tool(tool, group)
-            scene.add_attached_tool()
 
         return robot
