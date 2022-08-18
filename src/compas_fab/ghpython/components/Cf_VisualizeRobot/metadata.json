@@ -5,7 +5,6 @@
     "subcategory": "Display",
     "description": "Visualizes the robot.",
     "exposure": 2,
-
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,
@@ -23,11 +22,6 @@
             {
                 "name": "configuration",
                 "description": "The robot's full configuration."
-            },
-            {
-                "name": "attached_collision_meshes",
-                "description": "A list of attached collision meshes.",
-                "scriptParamAccess": "list"
             },
             {
                 "name": "show_visual",
@@ -55,6 +49,11 @@
                 "typeHintID": "bool"
             },
             {
+                "name": "show_cm",
+                "description": "Whether or not to show the collision meshes (if any).",
+                "typeHintID": "bool"
+            },
+            {
                 "name": "show_acm",
                 "description": "Whether or not to show the attached collision meshes (if any).",
                 "typeHintID": "bool"
@@ -63,15 +62,19 @@
         "outputParameters": [
             {
                 "name": "visual",
-                "description": "The robot's visual Rhino meshes (if any)."
+                "description": "Rhino meshes of the robot's visual geometry (if any)."
             },
             {
                 "name": "collision",
-                "description": "The robot's collision Rhino meshes (if any)."
+                "description": "Rhino meshes of the robot's collision geometry (if any)."
+            },
+            {
+                "name": "collision_meshes",
+                "description": "Rhino meshes of the scene's collision meshes (if any)."
             },
             {
                 "name": "attached_meshes",
-                "description": "The attached collision Rhino meshes (if any)."
+                "description": "Rhino meshes of the scene's attached collision meshes (if any)."
             },
             {
                 "name": "frames",
