@@ -1,2 +1,14 @@
 [tool.black]
 line-length = 180
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["src", "tests"]
+python_files = [
+    "test_*.py",
+    "*_test.py",
+    "tests.py"
+]
+addopts = "-ra --strict --doctest-glob=*.rst --tb=short"
+doctest_optionflags= "NORMALIZE_WHITESPACE IGNORE_EXCEPTION_DETAIL ALLOW_UNICODE ALLOW_BYTES"
+filterwarnings = "ignore::DeprecationWarning"

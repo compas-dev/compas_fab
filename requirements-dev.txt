@@ -7,7 +7,7 @@ check-manifest>=0.36
 flake8
 autopep8
 pylint
-pytest>=4.6
+pytest>=6.0
 pytest_mock
 pytest-cov
 sybil
