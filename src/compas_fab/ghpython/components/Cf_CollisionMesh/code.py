@@ -10,13 +10,16 @@ from compas_fab.robots import CollisionMesh
 
 
 class CollisionMeshComponent(component):
-    def RunScript(self, scene, M, name, add, remove):
+    def RunScript(self, scene, M, name, add, append, remove):
         ok = False
         if scene and M and name:
             mesh = RhinoMesh.from_geometry(M).to_compas()
             collision_mesh = CollisionMesh(mesh, name)
             if add:
                 scene.add_collision_mesh(collision_mesh)
+                ok = True
+            if append:
+                scene.append_collision_mesh(collision_mesh)
                 ok = True
             if remove:
                 scene.remove_collision_mesh(name)
