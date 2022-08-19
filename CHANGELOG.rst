@@ -12,9 +12,12 @@ Unreleased
 
 **Added**
 
+* Added support for attached and non-attached collision mesh visualization to the ``Robot Visualize`` GH component.
 * Added a prefix to all GH components.
 
 **Changed**
+
+* Changed behavior of ``Attach Tool`` GH component to only attach the tool but not add it to the planning scene state.
 
 **Fixed**
 
