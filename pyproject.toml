@@ -12,3 +12,15 @@ python_files = [
 addopts = "-ra --strict --doctest-glob=*.rst --tb=short"
 doctest_optionflags= "NORMALIZE_WHITESPACE IGNORE_EXCEPTION_DETAIL ALLOW_UNICODE ALLOW_BYTES"
 filterwarnings = "ignore::DeprecationWarning"
+
+[tool.pydocstyle]
+convention = "numpy"
+add-ignore = ["D100"]
+
+[tool.isort]
+force_single_line = true
+line_length = 180
+known_first_party = "compas_fab"
+default_section = "THIRDPARTY"
+forced_separate = "test_compas_fab"
+skip = ["__init__.py"]
