@@ -21,6 +21,7 @@ Unreleased
 **Fixed**
 
 * Fixed DH params for analytical IK solver of UR3e and UR10e.
+* Fixed ``Publish to topic`` Grasshopper component when the ``ros_client`` has been replaced (eg. disconnected and reconnected).
 
 **Deprecated**
 

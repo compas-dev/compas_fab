@@ -25,8 +25,8 @@ class ROSTopicPublish(component):
         topic = st.get(key, None)
 
         if ros_client and ros_client.is_connected:
-            if not topic:
-                topic = Topic(ros_client, topic_name, topic_type)
+            if not topic or topic.ros != ros_client:
+                topic = Topic(ros_client, topic_name, topic_type, reconnect_on_close=False)
                 topic.advertise()
                 time.sleep(0.2)
 
