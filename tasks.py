@@ -234,7 +234,16 @@ def build_ghuser_components(ctx, gh_io_folder=None, ironpython=None):
             if not ironpython:
                 ironpython = 'ipy'
 
-            ctx.run('{} {} {} {} --ghio "{}"'.format(ironpython, os.path.join(action_dir, 'componentize.py'), source_dir, target_dir, os.path.abspath(gh_io_folder)))
+            ctx.run(
+                '{} {} {} {} --ghio "{}" --prefix "{}"'.format(
+                    ironpython,
+                    os.path.join(action_dir, 'componentize.py'),
+                    source_dir,
+                    target_dir,
+                    os.path.abspath(gh_io_folder),
+                    "(COMPAS-FAB) "
+                )
+            )
 
 
 @task(help={
