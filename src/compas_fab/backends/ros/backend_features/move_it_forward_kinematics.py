@@ -87,6 +87,7 @@ class MoveItForwardKinematics(ForwardKinematics):
             name=configuration.joint_names, position=configuration.joint_values, header=header)
         robot_state = RobotState(
             joint_state, MultiDOFJointState(header=header))
+        robot_state.filter_fields_for_distro(self.ros_client.ros_distro)
 
         def convert_to_frame(response):
             callback(response.pose_stamped[0].pose.frame)

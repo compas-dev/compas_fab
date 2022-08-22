@@ -13,6 +13,7 @@ Unreleased
 **Added**
 
 * Added support for attached and non-attached collision mesh visualization to the ``Robot Visualize`` GH component.
+* Added a prefix to all GH components.
 
 **Changed**
 
@@ -21,6 +22,7 @@ Unreleased
 **Fixed**
 
 * Fixed DH params for analytical IK solver of UR3e and UR10e.
+* Fixed Kinetic support on IK, FK, and motion planning calls.
 * Fixed ``Publish to topic`` Grasshopper component when the ``ros_client`` has been replaced (eg. disconnected and reconnected).
 
 **Deprecated**
