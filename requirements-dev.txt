@@ -1,5 +1,5 @@
 attrs>=19.3.0
-autopep8
+black
 bump2version>=1.0
 check-manifest>=0.36
 flake8
