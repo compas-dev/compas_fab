@@ -178,17 +178,17 @@ def test(ctx, checks=False, doctest=False, codeblock=False, coverage=False):
         check(ctx)
 
     with chdir(BASE_FOLDER):
-        pytest_args = ['pytest']
+        pytest_args = ["pytest"]
         if doctest:
-            pytest_args.append('--doctest-modules')
+            pytest_args.append("--doctest-modules")
         if coverage:
-            pytest_args.append('--cov=compas_fab')
+            pytest_args.append("--cov-branch --cov=compas_fab")
 
         ctx.run(" ".join(pytest_args))
 
         # Using --doctest-modules together with docs as the testpaths goes bananas
         if codeblock:
-            ctx.run('pytest docs')
+            ctx.run("pytest docs")
 
 
 @task
@@ -234,7 +234,16 @@ def build_ghuser_components(ctx, gh_io_folder=None, ironpython=None):
             if not ironpython:
                 ironpython = 'ipy'
 
-            ctx.run('{} {} {} {} --ghio "{}"'.format(ironpython, os.path.join(action_dir, 'componentize.py'), source_dir, target_dir, os.path.abspath(gh_io_folder)))
+            ctx.run(
+                '{} {} {} {} --ghio "{}" --prefix "{}"'.format(
+                    ironpython,
+                    os.path.join(action_dir, 'componentize.py'),
+                    source_dir,
+                    target_dir,
+                    os.path.abspath(gh_io_folder),
+                    "(COMPAS-FAB) "
+                )
+            )
 
 
 @task(help={
