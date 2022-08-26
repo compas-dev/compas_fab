@@ -5,7 +5,6 @@
     "subcategory": "Scene",
     "description": "Add or remove a collision mesh from the planning scene.",
     "exposure": 4,
-
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,
@@ -27,6 +26,11 @@
             {
                 "name": "add",
                 "description": "If True, adds the collision mesh to the planning scene.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "append",
+                "description": "If True, appends the collision mesh to the planning scene.",
                 "typeHintID": "bool"
             },
             {

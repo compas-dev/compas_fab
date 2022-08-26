@@ -92,7 +92,7 @@ class RobotVisualize(component):
                 if show_acm:
                     for aco in scene.robot_state.attached_collision_objects:
                         for acm in aco.to_attached_collision_meshes():
-                            frame_id = aco.object.header.frame_id
+                            frame_id = aco.object["header"]["frame_id"]
                             frame = robot.forward_kinematics(
                                 configuration, options=dict(link=frame_id)
                             )
