@@ -117,9 +117,16 @@ class MoveItInverseKinematics(InverseKinematics):
                 start_state.attached_collision_objects.append(aco)
 
         constraints = convert_constraints_to_rosmsg(options.get('constraints'), header)
-
+        
+        sec_to_nano_factor = 1e9
         timeout_in_secs = options.get('timeout', 2)
-        timeout_duration = Duration(timeout_in_secs, 0).to_data()
+        
+        quotient, remainder = divmod(timeout_in_secs,1)
+        
+        timeout_sec = int(quotient)
+        timeout_nsec = remainder*sec_to_nano_factor 
+        
+        timeout_duration = Duration(timeout_sec, timeout_nsec).to_data()
 
         ik_request = PositionIKRequest(group_name=group,
                                        robot_state=start_state,
