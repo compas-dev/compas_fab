@@ -8,12 +8,15 @@ __all__ = [
 
 
 class Duration(object):
-    """Duration consists of two integers: seconds and nanoseconds.
+    """Duration consists of two values: seconds (float) and nanoseconds (int). 
+    
+    The total number of seconds is the sum of these values.
+    The decimal portion of the secs variable is converted to an integer and added to nsecs. 
 
     Attributes
     ----------
-    secs: int
-        Integer representing number of seconds.
+    secs: float
+        Float representing number of seconds.
     nsecs: int
         Integer representing number of nanoseconds.
     """
