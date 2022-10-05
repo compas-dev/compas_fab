@@ -6,9 +6,14 @@ def test_seconds():
     assert d.seconds == 2.5
 
 
-def test_ctor_only_takes_integers():
-    d = Duration(2.5, 5e+8)
-    assert d.seconds == 2.5
+def test_ctor_takes_sec_as_float():
+    d = Duration(2.6, 0)
+    assert d.seconds == 2.6
+
+
+def test_sec_remainder_add_to_nsec():
+    d = Duration(2.6, 5e+8)
+    assert d.seconds == 3.1
 
 
 def test_repr():
