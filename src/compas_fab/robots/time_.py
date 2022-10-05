@@ -8,19 +8,24 @@ __all__ = [
 
 
 class Duration(object):
-    """Duration consists of two integers: seconds and nanoseconds.
+    """Duration consists of two values: seconds (float) and nanoseconds (int).
+    The total number of seconds is the sum of these values.
+    The decimal portion of the secs variable is converted to an integer and added to nsecs.
 
     Attributes
     ----------
-    secs: int
-        Integer representing number of seconds.
+    secs: float
+        Float representing number of seconds.
     nsecs: int
         Integer representing number of nanoseconds.
     """
 
     def __init__(self, secs, nsecs):
-        self.secs = int(secs)
-        self.nsecs = int(nsecs)
+        sec_to_nano_factor = 1e9
+        quotient, remainder = divmod(secs, 1)
+
+        self.secs = int(quotient)
+        self.nsecs = int(remainder*sec_to_nano_factor) + int(nsecs)
 
     def __str__(self):
         return 'Duration({!r}, {!r})'.format(self.secs, self.nsecs)
