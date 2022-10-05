@@ -47,3 +47,5 @@ Authors
 * Beverly Lytle <lytle@arch.ethz.ch> `@beverlylytle <https://github.com/beverlylytle>`_
 * Yijiang Huang <yijiangh@mit.edu> `@yijiangh <https://github.com/yijiangh>`_
 * Chen Kasirer <kasirer@arch.ethz.ch> `@chenkasirer <https://github.com/chenkasirer>`_
+* Edvard Bruun <ebruun@princeton.edu> `@ebruun <https://github.com/ebruun>`_
+
