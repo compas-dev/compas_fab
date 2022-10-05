@@ -19,6 +19,7 @@ Unreleased
 **Changed**
 
 * Changed behavior of ``Attach Tool`` GH component to only attach the tool but not add it to the planning scene state.
+* Duration class takes floats as ``sec`` variable
 
 **Fixed**
 
