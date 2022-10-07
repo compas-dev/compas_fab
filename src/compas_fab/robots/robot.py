@@ -940,7 +940,7 @@ class Robot(object):
     # constraints
     # ==========================================================================
 
-    def orientation_constraint_from_frame(self, frame_WCF, tolerances_axes, group=None):
+    def orientation_constraint_from_frame(self, frame_WCF, tolerances_axes, group=None, use_attached_tool_frame=True):
         r"""Create an orientation constraint from a frame on the group's end-effector link.
 
         Parameters
@@ -953,6 +953,9 @@ class Robot(object):
         group: :obj:`str`, optional
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
+        use_attached_tool_frame : :obj:`bool`, optional
+            If ``True`` and there is a tool attached to the planning group, it will use its TCF
+            instead of the T0CF to create the constraints. Defaults to ``True``.
 
         Returns
         -------
@@ -982,6 +985,10 @@ class Robot(object):
         OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)
         """
 
+        attached_tool = self.attached_tools.get(group)
+        if use_attached_tool_frame and attached_tool:
+            frame_WCF = self.from_tcf_to_t0cf([frame_WCF], group)[0]
+
         ee_link = self.get_end_effector_link_name(group)
 
         tolerances_axes = list(tolerances_axes)
@@ -989,9 +996,10 @@ class Robot(object):
             tolerances_axes *= 3
         elif len(tolerances_axes) != 3:
             raise ValueError("Must give either one or 3 values")
+
         return OrientationConstraint(ee_link, frame_WCF.quaternion, tolerances_axes)
 
-    def position_constraint_from_frame(self, frame_WCF, tolerance_position, group=None):
+    def position_constraint_from_frame(self, frame_WCF, tolerance_position, group=None, use_attached_tool_frame=True):
         """Create a position constraint from a frame on the group's end-effector link.
 
         Parameters
@@ -1004,6 +1012,9 @@ class Robot(object):
         group: :obj:`str`, optional
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
+        use_attached_tool_frame : :obj:`bool`, optional
+            If ``True`` and there is a tool attached to the planning group, it will use its TCF
+            instead of the T0CF to create the constraints. Defaults to ``True``.
 
         Returns
         -------
@@ -1032,11 +1043,15 @@ class Robot(object):
         PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)
         """
 
+        attached_tool = self.attached_tools.get(group)
+        if use_attached_tool_frame and attached_tool:
+            frame_WCF = self.from_tcf_to_t0cf([frame_WCF], group)[0]
+
         ee_link = self.get_end_effector_link_name(group)
         sphere = Sphere(frame_WCF.point, tolerance_position)
         return PositionConstraint.from_sphere(ee_link, sphere)
 
-    def constraints_from_frame(self, frame_WCF, tolerance_position, tolerances_axes, group=None):
+    def constraints_from_frame(self, frame_WCF, tolerance_position, tolerances_axes, group=None, use_attached_tool_frame=True):
         r"""Create a position and an orientation constraint from a frame calculated for the group's end-effector link.
 
         Parameters
@@ -1052,6 +1067,9 @@ class Robot(object):
         group: :obj:`str`, optional
             The planning group for which we specify the constraint. Defaults to
             the robot's main planning group.
+        use_attached_tool_frame : :obj:`bool`, optional
+            If ``True`` and there is a tool attached to the planning group, it will use its TCF
+            instead of the T0CF to create the constraints. Defaults to ``True``.
 
         Returns
         -------
@@ -1084,8 +1102,8 @@ class Robot(object):
         [PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0),
         OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)]
         """
-        pc = self.position_constraint_from_frame(frame_WCF, tolerance_position, group)
-        oc = self.orientation_constraint_from_frame(frame_WCF, tolerances_axes, group)
+        pc = self.position_constraint_from_frame(frame_WCF, tolerance_position, group, use_attached_tool_frame)
+        oc = self.orientation_constraint_from_frame(frame_WCF, tolerances_axes, group, use_attached_tool_frame)
         return [pc, oc]
 
     def constraints_from_configuration(self, configuration, tolerances_above, tolerances_below, group=None):
@@ -1164,7 +1182,7 @@ class Robot(object):
     # services
     # ==========================================================================
 
-    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, return_full_configuration=False, options=None):
+    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, return_full_configuration=False, use_attached_tool_frame=True, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
         The inverse kinematic solvers are implemented as generators in order to fit both analytic
@@ -1190,6 +1208,9 @@ class Robot(object):
         return_full_configuration : :obj:`bool`, optional
             If ``True``, returns a full configuration with all joint values
             specified, including passive ones if available. Defaults to ``False``.
+        use_attached_tool_frame : :obj:`bool`, optional
+            If ``True`` and there is a tool attached to the planning group, it will use its TCF
+            instead of the T0CF to calculate IK. Defaults to ``True``.
         options: :obj:`dict`, optional
             Dictionary containing the key-value pairs of additional options.
             The valid options are specific to the backend in use.
@@ -1221,13 +1242,13 @@ class Robot(object):
             if solution is not None:
                 return solution
 
-        solutions = self.iter_inverse_kinematics(frame_WCF, start_configuration, group, return_full_configuration, options)
+        solutions = self.iter_inverse_kinematics(frame_WCF, start_configuration, group, return_full_configuration, use_attached_tool_frame, options)
         self._current_ik["request_id"] = request_id
         self._current_ik["solutions"] = solutions
 
         return next(solutions)
 
-    def iter_inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, return_full_configuration=False, options=None):
+    def iter_inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, return_full_configuration=False, use_attached_tool_frame=True, options=None):
         """Iterate over the inverse kinematic solutions of a robot.
 
         This method exposes the generator-based inverse kinematic solvers. Analytics solvers will return
@@ -1250,6 +1271,9 @@ class Robot(object):
         return_full_configuration : :obj:`bool`, optional
             If ``True``, returns a full configuration with all joint values
             specified, including passive ones if available. Defaults to ``False``.
+        use_attached_tool_frame : :obj:`bool`, optional
+            If ``True`` and there is a tool attached to the planning group, it will use its TCF
+            instead of the T0CF to calculate IK. Defaults to ``True``.
         options: :obj:`dict`, optional
             Dictionary containing the key-value pairs of additional options.
             The valid options are specific to the backend in use.
@@ -1280,6 +1304,10 @@ class Robot(object):
         group = group or self.main_group_name if self.semantics else None
 
         start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
+
+        attached_tool = self.attached_tools.get(group)
+        if use_attached_tool_frame and attached_tool:
+            frame_WCF = self.from_tcf_to_t0cf([frame_WCF], group)[0]
 
         frame_WCF_scaled = frame_WCF.copy()
         frame_WCF_scaled.point /= self.scale_factor  # must be in meters
@@ -1329,7 +1357,7 @@ class Robot(object):
             ),
         )
 
-    def forward_kinematics(self, configuration, group=None, options=None):
+    def forward_kinematics(self, configuration, group=None, use_attached_tool_frame=True, options=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
@@ -1341,6 +1369,9 @@ class Robot(object):
         group: obj:`str`, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
+        use_attached_tool_frame : :obj:`bool`, optional
+            If ``True`` and there is a tool attached to the planning group, FK will return
+            the TCF of the attached tool instead of the T0CF. Defaults to ``True``.
         options: obj:`dict`, optional
             Dictionary containing the following key-value pairs:
 
@@ -1409,12 +1440,17 @@ class Robot(object):
 
         # Scale and return
         frame_WCF.point *= self.scale_factor
+
+        attached_tool = self.attached_tools.get(group)
+        if use_attached_tool_frame and attached_tool:
+            frame_WCF = self.from_t0cf_to_tcf([frame_WCF], group)[0]
+
         return frame_WCF
 
     def forward_kinematics_deprecated(self, configuration, group=None, backend=None, ee_link=None):
         return self.forward_kinematics(configuration, group, options=dict(solver=backend, link=ee_link))
 
-    def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, options=None):
+    def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, use_attached_tool_frame=True, options=None):
         """Calculate a cartesian motion path (linear in tool space).
 
         Parameters
@@ -1428,6 +1464,9 @@ class Robot(object):
         group : :obj:`str`, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
+        use_attached_tool_frame : :obj:`bool`, optional
+            If ``True`` and there is a tool attached to the planning group, it will use its TCF
+            instead of the T0CF to calculate cartesian paths. Defaults to ``True``.
         options : :obj:`dict`, optional
             Dictionary containing the following key-value pairs:
 
@@ -1483,6 +1522,10 @@ class Robot(object):
         # NOTE: start_configuration has to be a full robot configuration, such
         # that all configurable joints of the whole robot are defined for planning.
         start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
+
+        attached_tool = self.attached_tools.get(group)
+        if use_attached_tool_frame and attached_tool:
+            frames_WCF = self.from_tcf_to_t0cf(frames_WCF, group)
 
         frames_WCF_scaled = []
         for frame in frames_WCF:

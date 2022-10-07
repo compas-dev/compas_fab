@@ -19,7 +19,8 @@ Unreleased
 **Changed**
 
 * Changed behavior of ``Attach Tool`` GH component to only attach the tool but not add it to the planning scene state.
-* Duration class takes floats as ``sec`` variable
+* Duration class takes floats as ``sec`` variable.
+* Changed the behavior of ``forward_kinematics``, ``inverse_kinematics``, ``iter_inverse_kinematics``, ``plan_cartesian_motion`` and constraints construction methods (``orientation_constraint_from_frame``, ``position_constraint_from_frame``, ``constraints_from_frame``) in ``Robot`` class to use the frame of the attached tool if a tool is attached. This behavior can be reverted back (ie. only calculate T0CF) using the flag ``use_attached_tool_frame`` of all these methods.
 
 **Fixed**
 
