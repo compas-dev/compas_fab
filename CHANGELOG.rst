@@ -27,6 +27,7 @@ Unreleased
 * Fixed DH params for analytical IK solver of UR3e and UR10e.
 * Fixed Kinetic support on IK, FK, and motion planning calls.
 * Fixed ``Publish to topic`` Grasshopper component when the ``ros_client`` has been replaced (eg. disconnected and reconnected).
+* Fixed usage of ``tangent_points_to_circle_xy`` in Spherica Wrist solver to work with COMPAS v1.16 and older.
 
 **Deprecated**
 

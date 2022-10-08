@@ -145,9 +145,19 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
             axis1_angle -= 2 * math.pi
         axis1_angles += [axis1_angle] * 4
     else:
-        circle = (0, 0, 0), pln_offset
+        circle = ((0, 0, 0), (0, 0, 1)), pln_offset
         point = (wrist.x, wrist.y, 0)
-        t1, t2 = tangent_points_to_circle_xy(circle, point)
+        # On COMPAS v1.17+, this function correctly expects a circle to be
+        # defined as a plane and float (in which plane needs to be a point and vector)
+        # however, in version v1.16 and older, the function expected only a point
+        # we default to the correct behavior for v1.17+ but if we get a TypeError
+        # it means an older COMPAS core is installed so we revert to defining the
+        # circle in the old, incorrect way of using just a point and float
+        try:
+            t1, t2 = tangent_points_to_circle_xy(circle, point)
+        except TypeError:
+            circle = (0, 0, 0), pln_offset
+            t1, t2 = tangent_points_to_circle_xy(circle, point)
         a1 = Vector(0, 1, 0).angle_signed(t1, (0, 0, -1))
         a2 = Vector(0, 1, 0).angle_signed(t2, (0, 0, -1))
         axis1_angles += [a1] * 4
@@ -185,9 +195,9 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
             for k in range(2):
                 axis2_angles.append(-axis2_angle)
                 axis3_angle_wrapped = -axis3_angle + math.pi
-                while (axis3_angle_wrapped >= math.pi):
+                while axis3_angle_wrapped >= math.pi:
                     axis3_angle_wrapped -= 2 * math.pi
-                while (axis3_angle_wrapped < -math.pi):
+                while axis3_angle_wrapped < -math.pi:
                     axis3_angle_wrapped += 2 * math.pi
                 axis3_angles.append(axis3_angle_wrapped)
 
@@ -208,9 +218,9 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
                         axis4_angle -= 2 * math.pi
 
                 axis4_angle_wrapped = axis4_angle + math.pi / 2
-                while (axis4_angle_wrapped >= math.pi):
+                while axis4_angle_wrapped >= math.pi:
                     axis4_angle_wrapped -= 2 * math.pi
-                while (axis4_angle_wrapped < -math.pi):
+                while axis4_angle_wrapped < -math.pi:
                     axis4_angle_wrapped += 2 * math.pi
                 axis4_angles.append(axis4_angle_wrapped)
 
