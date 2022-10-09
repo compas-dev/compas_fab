@@ -6,7 +6,7 @@ prune tests
 prune temp
 
 include AUTHORS.rst
-include CHANGELOG.rst
+include CHANGELOG.md
 include CONTRIBUTING.rst
 include LICENSE
 include README.rst
