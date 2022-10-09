@@ -14,9 +14,7 @@ class RosError(BackendError):
     """Wraps an exception that occurred on the communication with ROS."""
 
     def __init__(self, message, error_code):
-        super(RosError, self).__init__('Error code: ' +
-                                       str(error_code) +
-                                       '; ' + message)
+        super(RosError, self).__init__('Error code: ' + str(error_code) + '; ' + message)
         self.error_code = error_code
 
 

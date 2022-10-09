@@ -33,12 +33,27 @@ def vrep_pose_from_plane(plane):
     """
     translation_matrix = rs.XformTranslation(((plane[0][0]), (plane[0][1]), plane[0][2]))
     plane_start = rs.PlaneFromFrame(rs.AddPoint(0, 0, 0), rs.AddPoint(1, 0, 0), rs.AddPoint(0, 1, 0))
-    plane_end = rs.PlaneFromFrame(rs.AddPoint(0, 0, 0), rs.AddPoint(plane[1][0], (plane[1][1]), plane[1][2]), rs.AddPoint(plane[2][0], plane[2][1], plane[2][2]))
+    plane_end = rs.PlaneFromFrame(
+        rs.AddPoint(0, 0, 0),
+        rs.AddPoint(plane[1][0], (plane[1][1]), plane[1][2]),
+        rs.AddPoint(plane[2][0], plane[2][1], plane[2][2]),
+    )
     rotation_matrix = rs.XformRotation1(plane_start, plane_end)
     matrix = rs.XformMultiply(translation_matrix, rotation_matrix)
-    return [matrix.M00, matrix.M01, matrix.M02, matrix.M03,
-            matrix.M10, matrix.M11, matrix.M12, matrix.M13,
-            matrix.M20, matrix.M21, matrix.M22, matrix.M23]
+    return [
+        matrix.M00,
+        matrix.M01,
+        matrix.M02,
+        matrix.M03,
+        matrix.M10,
+        matrix.M11,
+        matrix.M12,
+        matrix.M13,
+        matrix.M20,
+        matrix.M21,
+        matrix.M22,
+        matrix.M23,
+    ]
 
 
 def _transform_to_origin(mesh, xform):
@@ -52,8 +67,8 @@ def _transform_to_origin(mesh, xform):
 
 
 def _create_rhino_mesh(vertices, faces):
-    vertices = [vertices[i:i + 3] for i in range(0, len(vertices), 3)]
-    faces = [faces[i:i + 3] for i in range(0, len(faces), 3)]
+    vertices = [vertices[i : i + 3] for i in range(0, len(vertices), 3)]
+    faces = [faces[i : i + 3] for i in range(0, len(faces), 3)]
     mesh = rg.Mesh()
     for a, b, c in vertices:
         mesh.Vertices.Add(a, b, c)
@@ -152,7 +167,7 @@ class PathVisualizer(object):
         for i in range(0, len(mesh_matrices), 12):
             handle = shape_handles[i // 12]
             vertices, faces = shape_geometry[i // 12]
-            transform = _to_xform(mesh_matrices[i:i + 12])
+            transform = _to_xform(mesh_matrices[i : i + 12])
             mesh = _transform_to_origin(_create_rhino_mesh(vertices, faces), transform)
             scene_meshes[handle] = mesh
 
@@ -169,7 +184,9 @@ class PathVisualizer(object):
         matrix = self.simulator.get_object_matrices([handle])[handle]
 
         parent_handle = self.simulator.get_object_handle('customGripper' + self.robot.name)
-        _, _, mesh_matrix, _, _ = self.simulator.run_child_script('getShapeMatrixRelative', [handle, parent_handle], [], [])
+        _, _, mesh_matrix, _, _ = self.simulator.run_child_script(
+            'getShapeMatrixRelative', [handle, parent_handle], [], []
+        )
 
         relative_transform = _to_xform(mesh_matrix)
 
@@ -179,9 +196,7 @@ class PathVisualizer(object):
         if self.debug:
             LOG.debug('Execution time: building member=%.2f', timer() - start)
 
-        return {'mesh': mesh_at_origin,
-                'parent_handle': parent_handle,
-                'relative_transform': relative_transform}
+        return {'mesh': mesh_at_origin, 'parent_handle': parent_handle, 'relative_transform': relative_transform}
 
 
 class InputParameterParser(object):

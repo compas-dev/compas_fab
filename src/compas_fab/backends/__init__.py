@@ -153,6 +153,7 @@ from .kinematics import (
     SphericalWristKinematics,
     CartesianMotionError,
 )
+
 # Robot-specific analytic IK
 from .kinematics import (
     UR3Kinematics,

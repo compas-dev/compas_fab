@@ -12,8 +12,8 @@ class TrajectoryVisualize(component):
     def RunScript(self, robot, group, trajectory):
         start_configuration = None
         configurations = []
-        fraction = 0.
-        time = 0.
+        fraction = 0.0
+        time = 0.0
 
         planes = []
         positions = []
@@ -24,7 +24,9 @@ class TrajectoryVisualize(component):
             group = group or robot.main_group_name
 
             for c in trajectory.points:
-                configurations.append(robot.merge_group_with_full_configuration(c, trajectory.start_configuration, group))
+                configurations.append(
+                    robot.merge_group_with_full_configuration(c, trajectory.start_configuration, group)
+                )
                 frame = robot.forward_kinematics(c, group, options=dict(solver='model'))
                 planes.append(draw_frame(frame))
                 positions.append(c.positions)

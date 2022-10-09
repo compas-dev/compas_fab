@@ -7,6 +7,7 @@ def forward_docstring(backend_feature):
     def dec(obj):
         obj.__doc__ = backend_feature.__dict__[obj.__name__].__doc__
         return obj
+
     return dec
 
 
@@ -14,6 +15,7 @@ class ClientInterface(object):
     """Interface for all backend clients.  Forwards all planning services and
     planning scene management to the planner.
     """
+
     def __init__(self):
         self.planner = PlannerInterface(self)
         # self.control = ControlInterface()
@@ -70,6 +72,7 @@ class ClientInterface(object):
         """Forwards call to appropriate method in the planner."""
         return self.planner.remove_attached_collision_mesh(*args, **kwargs)
 
+
 #     # ==========================================================================
 #     # executing
 #     # ==========================================================================
@@ -100,6 +103,7 @@ class PlannerInterface(object):
     behavior for all planning services and planning scene management methods.  To be
     use in conjunction with backend feature interfaces.
     """
+
     def __init__(self, client):
         super(PlannerInterface, self).__init__()
         self.client = client

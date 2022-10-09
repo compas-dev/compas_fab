@@ -34,13 +34,39 @@ RED = (1, 0, 0, 1)
 
 BodyInfo = namedtuple('BodyInfo', ['base_name', 'body_name'])
 ConstraintInfo = namedtuple('ConstraintInfo', ['constraint_id', 'body_id', 'robot_uid'])
-JointInfo = namedtuple('JointInfo', ['jointIndex', 'jointName', 'jointType',
-                                     'qIndex', 'uIndex', 'flags',
-                                     'jointDamping', 'jointFriction', 'jointLowerLimit', 'jointUpperLimit',
-                                     'jointMaxForce', 'jointMaxVelocity', 'linkName', 'jointAxis',
-                                     'parentFramePos', 'parentFrameOrn', 'parentIndex'])
-JointState = namedtuple('JointState', ['jointPosition', 'jointVelocity',
-                                       'jointReactionForces', 'appliedJointMotorTorque'])
-LinkState = namedtuple('LinkState', ['linkWorldPosition', 'linkWorldOrientation',
-                                     'localInertialFramePosition', 'localInertialFrameOrientation',
-                                     'worldLinkFramePosition', 'worldLinkFrameOrientation'])
+JointInfo = namedtuple(
+    'JointInfo',
+    [
+        'jointIndex',
+        'jointName',
+        'jointType',
+        'qIndex',
+        'uIndex',
+        'flags',
+        'jointDamping',
+        'jointFriction',
+        'jointLowerLimit',
+        'jointUpperLimit',
+        'jointMaxForce',
+        'jointMaxVelocity',
+        'linkName',
+        'jointAxis',
+        'parentFramePos',
+        'parentFrameOrn',
+        'parentIndex',
+    ],
+)
+JointState = namedtuple(
+    'JointState', ['jointPosition', 'jointVelocity', 'jointReactionForces', 'appliedJointMotorTorque']
+)
+LinkState = namedtuple(
+    'LinkState',
+    [
+        'linkWorldPosition',
+        'linkWorldOrientation',
+        'localInertialFramePosition',
+        'localInertialFrameOrientation',
+        'worldLinkFramePosition',
+        'worldLinkFrameOrientation',
+    ],
+)

@@ -32,7 +32,9 @@ def test_subclasses_define_type_name():
 
 def test_consistent_naming():
     for cls in ROSmsg.__subclasses__():
-        assert cls.ROS_MSG_TYPE.split('/')[1] == cls.__name__, 'Class {} does not match to the ROS msg type name={}'.format(cls.__name__, cls.ROS_MSG_TYPE)
+        assert (
+            cls.ROS_MSG_TYPE.split('/')[1] == cls.__name__
+        ), 'Class {} does not match to the ROS msg type name={}'.format(cls.__name__, cls.ROS_MSG_TYPE)
 
 
 def test_uniqueness_of_msg_type():
@@ -69,16 +71,20 @@ def test_parse_unknown_type():
 
 def test_float32_multiarray():
     m = Float32MultiArray(data=[1.3, 0.5, 3.0])
-    assert(repr(m) == "Float32MultiArray(layout=MultiArrayLayout(dim=[], data_offset=0), data=[1.3, 0.5, 3.0])")
+    assert repr(m) == "Float32MultiArray(layout=MultiArrayLayout(dim=[], data_offset=0), data=[1.3, 0.5, 3.0])"
 
 
 def test_int8_multiarray():
     m = Int8MultiArray(data=[1, 2, 3, 4])
-    assert(repr(m) == "Int8MultiArray(layout=MultiArrayLayout(dim=[], data_offset=0), data=[1, 2, 3, 4])")
+    assert repr(m) == "Int8MultiArray(layout=MultiArrayLayout(dim=[], data_offset=0), data=[1, 2, 3, 4])"
 
 
 def test_posearray():
     from compas.geometry import Frame
+
     p = [Pose.from_frame(f) for f in [Frame.worldXY()]]
     m = PoseArray(header=Header(), poses=p)
-    assert(repr(m) == "PoseArray(header=Header(seq=0, stamp=Time(secs=0, nsecs=0), frame_id='/world'), poses=[Pose(position=Point(x=0.0, y=0.0, z=0.0), orientation=Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))])")  # noqa E501
+    assert (
+        repr(m)
+        == "PoseArray(header=Header(seq=0, stamp=Time(secs=0, nsecs=0), frame_id='/world'), poses=[Pose(position=Point(x=0.0, y=0.0, z=0.0), orientation=Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))])"
+    )  # noqa E501

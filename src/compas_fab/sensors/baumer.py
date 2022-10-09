@@ -43,17 +43,21 @@ class PosCon3D(SerialSensor):
     ...         sensor.set_precision(2)                                             # doctest: +SKIP
     ...         data = sensor.get_measurement()                                     # doctest: +SKIP
     """
+
     FRAME_HEAD = '{%s,%s,%s'
     FRAME_TAIL = '%s%s}'
     BROADCAST_ADDRESS = 0
-    MEASUREMENT_TYPES = ('Edge L rise', 'Edge L fall', 'Edge R rise',
-                         'Edge R fall', 'Width', 'Center width', 'Gap', 'Center gap')
-    QUALITY = {
-        0: 'Valid',
-        1: 'Low signal',
-        2: 'No edge',
-        3: 'Low signal, no edge',
-        4: 'No signal'}
+    MEASUREMENT_TYPES = (
+        'Edge L rise',
+        'Edge L fall',
+        'Edge R rise',
+        'Edge R fall',
+        'Width',
+        'Center width',
+        'Gap',
+        'Center gap',
+    )
+    QUALITY = {0: 'Valid', 1: 'Low signal', 2: 'No edge', 3: 'Low signal, no edge', 4: 'No signal'}
     ERROR_CODES = {
         '000': 'No error',
         '001': 'False checksum',
@@ -70,7 +74,8 @@ class PosCon3D(SerialSensor):
         '101': 'Angle out of Range (see FSP)',
         '102': 'Flatness out of Range (see FSP)',
         '103': 'Length out of Range (see FSP)',
-        '200': 'Fatal Error (Reset sensor, Power Off / On)'}
+        '200': 'Fatal Error (Reset sensor, Power Off / On)',
+    }
 
     def __init__(self, serial, address):
         super(PosCon3D, self).__init__(serial)
@@ -148,7 +153,10 @@ class PosCon3D(SerialSensor):
 
             expected_frame_head = self.FRAME_HEAD % (address, command, '')
             if not result.startswith(expected_frame_head):
-                raise ProtocolError('Invalid response, command/address mismatch. Expected to start with="%s", Got="%s"' % (expected_frame_head, result))
+                raise ProtocolError(
+                    'Invalid response, command/address mismatch. Expected to start with="%s", Got="%s"'
+                    % (expected_frame_head, result)
+                )
 
             return self.get_payload(result)
 
@@ -366,19 +374,8 @@ class PosConCM(SerialSensor):
     FRAME_HEAD = ':%s%s;%s;'
     FRAME_TAIL = '%s%s\r\n'
     BROADCAST_ADDRESS = 0
-    MEASUREMENT_TYPES = {
-        'Diameter': 28,
-        'X_center': 29,
-        'Z_center': 30,
-        'X_left': 31,
-        'X_right': 32,
-        'Z_top': 33}
-    QUALITY = {
-        0: 'Valid',
-        1: 'Low signal',
-        2: 'No edge',
-        3: 'Low signal, no edge',
-        4: 'No signal'}
+    MEASUREMENT_TYPES = {'Diameter': 28, 'X_center': 29, 'Z_center': 30, 'X_left': 31, 'X_right': 32, 'Z_top': 33}
+    QUALITY = {0: 'Valid', 1: 'Low signal', 2: 'No edge', 3: 'Low signal, no edge', 4: 'No signal'}
     ERROR_CODES = {
         '1': 'Wrong message type',
         '2': 'Wrong payload format',
@@ -391,7 +388,8 @@ class PosConCM(SerialSensor):
         '9': 'Not enough memory for encoding',
         '10': 'Not possible to encode argument',
         '11': 'Application specific error',
-        '12': 'Wrong state'}
+        '12': 'Wrong state',
+    }
 
     def __init__(self, serial, address):
         super(PosConCM, self).__init__(serial)
@@ -444,8 +442,11 @@ class PosConCM(SerialSensor):
 
         if result_type == 'E':
             error_index = frame_head.split(';')
-            raise ProtocolError('Application error, Result=%s' % frame_head +
-                                'Error type: ' + str(self.ERROR_CODES[str(error_index[1])]))
+            raise ProtocolError(
+                'Application error, Result=%s' % frame_head
+                + 'Error type: '
+                + str(self.ERROR_CODES[str(error_index[1])])
+            )
 
         if result_type == 'B':
             raise ProtocolError('Sensor is busy, Result=%s' % frame_head)

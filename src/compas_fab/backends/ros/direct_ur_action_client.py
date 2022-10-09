@@ -19,8 +19,8 @@ class DirectUrActionClient(EventEmitterMixin):
     """Direct UR Script action client to simulate an action interface
     on arbitrary URScript commands.
     """
-    def __init__(self, ros, timeout=None,
-                 omit_feedback=False, omit_status=False, omit_result=False):
+
+    def __init__(self, ros, timeout=None, omit_feedback=False, omit_status=False, omit_result=False):
         super(DirectUrActionClient, self).__init__()
 
         self.server_name = '/ur_driver/URScript'
@@ -46,7 +46,7 @@ class DirectUrActionClient(EventEmitterMixin):
 
         # If timeout specified, emit a 'timeout' event if the action server does not respond
         if self.timeout:
-            self.ros.call_later(self.timeout / 1000., self._trigger_timeout)
+            self.ros.call_later(self.timeout / 1000.0, self._trigger_timeout)
 
         self._internal_state = 'idle'
 
@@ -110,8 +110,7 @@ class DirectUrActionClient(EventEmitterMixin):
         self._urscript_topic.publish(message)
 
         if timeout:
-            self.ros.call_later(
-                timeout / 1000., goal._trigger_timeout)
+            self.ros.call_later(timeout / 1000.0, goal._trigger_timeout)
 
 
 def direct_ur_movel(ros_client, callback, frames, acceleration=None, velocity=None, time=None, radius=None):

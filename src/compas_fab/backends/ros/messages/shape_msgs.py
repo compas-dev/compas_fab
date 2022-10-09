@@ -8,8 +8,8 @@ from compas.datastructures import mesh_quads_to_triangles
 
 
 class SolidPrimitive(ROSmsg):
-    """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/SolidPrimitive.html
-    """
+    """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/SolidPrimitive.html"""
+
     ROS_MSG_TYPE = 'shape_msgs/SolidPrimitive'
 
     BOX = 1
@@ -76,8 +76,8 @@ class SolidPrimitive(ROSmsg):
 
 
 class Mesh(ROSmsg):
-    """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/Mesh.html
-    """
+    """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/Mesh.html"""
+
     ROS_MSG_TYPE = 'shape_msgs/Mesh'
 
     def __init__(self, triangles=None, vertices=None):
@@ -86,8 +86,7 @@ class Mesh(ROSmsg):
 
     @classmethod
     def from_mesh(cls, compas_mesh):
-        """Construct a `Mesh` message from a :class:`compas.datastructures.Mesh`.
-        """
+        """Construct a `Mesh` message from a :class:`compas.datastructures.Mesh`."""
         mesh_quads_to_triangles(compas_mesh)
         vertices, faces = compas_mesh.to_vertices_and_faces()
         triangles = [MeshTriangle(face) for face in faces]
@@ -109,8 +108,8 @@ class Mesh(ROSmsg):
 
 
 class MeshTriangle(ROSmsg):
-    """https://docs.ros.org/api/shape_msgs/html/msg/MeshTriangle.html
-    """
+    """https://docs.ros.org/api/shape_msgs/html/msg/MeshTriangle.html"""
+
     ROS_MSG_TYPE = 'shape_msgs/MeshTriangle'
 
     def __init__(self, vertex_indices=None):
@@ -125,8 +124,8 @@ class MeshTriangle(ROSmsg):
 
 
 class Plane(ROSmsg):
-    """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/Plane.html
-    """
+    """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/Plane.html"""
+
     ROS_MSG_TYPE = 'shape_msgs/Plane'
 
     def __init__(self, coef):

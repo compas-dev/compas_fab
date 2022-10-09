@@ -8,8 +8,7 @@ from compas_fab.backends.kinematics.exceptions import CartesianMotionError
 
 
 class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
-    """
-    """
+    """ """
 
     def __init__(self, client=None):
         self.client = client
@@ -73,7 +72,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         path = paths[idx]
         path = self.smooth_configurations(path)
         trajectory = JointTrajectory()
-        trajectory.fraction = len(path)/len(frames_RCF)
+        trajectory.fraction = len(path) / len(frames_RCF)
         trajectory.joint_names = path[0].joint_names
         trajectory.points = [JointTrajectoryPoint(config.joint_values, config.joint_types) for config in path]
         trajectory.start_configuration = robot.merge_group_with_full_configuration(path[0], start_configuration, group)
@@ -88,7 +87,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
             curr = configurations[i].joint_values
             corrected = []
             for p, c in zip(prev, curr):
-                c1 = c/abs(c) * (abs(c) % (2 * math.pi))
+                c1 = c / abs(c) * (abs(c) % (2 * math.pi))
                 c2 = c1 - 2 * math.pi
                 c3 = c1 + 2 * math.pi
                 values = [c1, c2, c3]

@@ -13,6 +13,7 @@ from compas_fab.backends.pybullet.const import STATIC_MASS
 
 class PyBulletAddCollisionMesh(AddCollisionMesh):
     """Callable to add a collision mesh to the planning scene."""
+
     def __init__(self, client):
         self.client = client
 

@@ -15,6 +15,7 @@ __all__ = [
 
 class PyBulletRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
     """Callable to remove an attached collision mesh from the robot."""
+
     def __init__(self, client):
         self.client = client
 

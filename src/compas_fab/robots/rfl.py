@@ -15,10 +15,10 @@ from compas.robots import Link
 import compas_fab.robots.robot
 
 ROBOTS = {
-    'A': dict(id=11, index=0, base_external_axes=[7., -2., -4.]),
-    'B': dict(id=12, index=1, base_external_axes=[7., -10., -4.]),
-    'C': dict(id=21, index=2, base_external_axes=[30., -2., -4.]),
-    'D': dict(id=22, index=3, base_external_axes=[30., -10., -4.]),
+    'A': dict(id=11, index=0, base_external_axes=[7.0, -2.0, -4.0]),
+    'B': dict(id=12, index=1, base_external_axes=[7.0, -10.0, -4.0]),
+    'C': dict(id=21, index=2, base_external_axes=[30.0, -2.0, -4.0]),
+    'D': dict(id=22, index=3, base_external_axes=[30.0, -10.0, -4.0]),
 }
 
 __all__ = [
@@ -79,7 +79,15 @@ def _create_model():
         Joint('joint_6', 'revolute', parent='link_5', child='link_6', limit=Limit()),
     ]
     links = [
-        Link('rfl'), Link('bridge'), Link('vertical'), Link('base_link'),
-        Link('link_1'), Link('link_2'), Link('link_3'), Link('link_4'), Link('link_5'), Link('link_6'),
+        Link('rfl'),
+        Link('bridge'),
+        Link('vertical'),
+        Link('base_link'),
+        Link('link_1'),
+        Link('link_2'),
+        Link('link_3'),
+        Link('link_4'),
+        Link('link_5'),
+        Link('link_6'),
     ]
     return joints, links

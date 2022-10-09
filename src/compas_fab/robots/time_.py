@@ -25,7 +25,7 @@ class Duration(object):
         quotient, remainder = divmod(secs, 1)
 
         self.secs = int(quotient)
-        self.nsecs = int(remainder*sec_to_nano_factor) + int(nsecs)
+        self.nsecs = int(remainder * sec_to_nano_factor) + int(nsecs)
 
     def __str__(self):
         return 'Duration({!r}, {!r})'.format(self.secs, self.nsecs)
@@ -79,10 +79,7 @@ class Duration(object):
     @property
     def data(self):
         """:obj:`dict` : The data representing the duration."""
-        return {
-            'secs': self.secs,
-            'nsecs': self.nsecs
-        }
+        return {'secs': self.secs, 'nsecs': self.nsecs}
 
     @data.setter
     def data(self, data):

@@ -69,13 +69,14 @@ class ROSTopicSubscribe(component):
         st[self.msg_key] = msg
 
         if self.is_subscribed:
-            ghdoc = ghenv.Component.OnPingDocument()     # noqa: F821 This is defined by Grasshopper
+            ghdoc = ghenv.Component.OnPingDocument()  # noqa: F821 This is defined by Grasshopper
             if not self.is_updating and ghdoc.SolutionState != Grasshopper.Kernel.GH_ProcessStep.Process:
                 self.is_updating = True
                 ghdoc.ScheduleSolution(
-                    self.interval, Grasshopper.Kernel.GH_Document.GH_ScheduleDelegate(self.expire_callback))
+                    self.interval, Grasshopper.Kernel.GH_Document.GH_ScheduleDelegate(self.expire_callback)
+                )
 
     def expire_callback(self, ghdoc):
         if ghdoc.SolutionState != Grasshopper.Kernel.GH_ProcessStep.Process:
-            ghenv.Component.ExpireSolution(False)        # noqa: F821 This is defined by Grasshopper
+            ghenv.Component.ExpireSolution(False)  # noqa: F821 This is defined by Grasshopper
         self.is_updating = False

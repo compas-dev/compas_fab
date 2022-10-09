@@ -17,12 +17,26 @@ __all__ = [
 
 
 class VrepPlanMotion(PlanMotion):
-    """Callable to find a path plan to move the selected robot from its current position to the `goal_constraints`.
-    """
-    SUPPORTED_PLANNERS = ('bitrrt', 'bkpiece1', 'est', 'kpiece1',
-                          'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst',
-                          'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar',
-                          'sbl', 'stride', 'trrt')
+    """Callable to find a path plan to move the selected robot from its current position to the `goal_constraints`."""
+
+    SUPPORTED_PLANNERS = (
+        'bitrrt',
+        'bkpiece1',
+        'est',
+        'kpiece1',
+        'lazyprmstar',
+        'lbkpiece1',
+        'lbtrrt',
+        'pdst',
+        'prm',
+        'prrt',
+        'rrt',
+        'rrtconnect',
+        'rrtstar',
+        'sbl',
+        'stride',
+        'trrt',
+    )
 
     def __init__(self, client):
         self.client = client
@@ -76,10 +90,21 @@ class VrepPlanMotion(PlanMotion):
         optimize_path_length = options.get('optimize_path_length', False)
         log = options.get('log')
 
-        return self._find_path_plan(group, {'target_type': 'pose', 'target': goal_constraints},
-                                    num_joints, metric_values, collision_meshes, planner_id, trials, resolution,
-                                    gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length,
-                                    log)
+        return self._find_path_plan(
+            group,
+            {'target_type': 'pose', 'target': goal_constraints},
+            num_joints,
+            metric_values,
+            collision_meshes,
+            planner_id,
+            trials,
+            resolution,
+            gantry_joint_limits,
+            arm_joint_limits,
+            shallow_state_search,
+            optimize_path_length,
+            log,
+        )
 
     def plan_motion_to_config(self, robot, goal_configs, start_configuration=None, group=None, options=None):
         """Find a path plan to move the selected robot from its current position to one of the `goal_configs`.
@@ -132,15 +157,38 @@ class VrepPlanMotion(PlanMotion):
         shallow_state_search = options.get('shallow_state_search', True)
         optimize_path_length = options.get('optimize_path_length', False)
         log = options.get('log')
-        return self._find_path_plan(group, {'target_type': 'config', 'target': goal_configs},
-                                    num_joints, metric_values, collision_meshes, planner_id, trials, resolution,
-                                    gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length,
-                                    log)
+        return self._find_path_plan(
+            group,
+            {'target_type': 'config', 'target': goal_configs},
+            num_joints,
+            metric_values,
+            collision_meshes,
+            planner_id,
+            trials,
+            resolution,
+            gantry_joint_limits,
+            arm_joint_limits,
+            shallow_state_search,
+            optimize_path_length,
+            log,
+        )
 
-    def _find_path_plan(self, group, goal, num_joints, metric_values, collision_meshes,
-                        planner_id, trials, resolution,
-                        gantry_joint_limits, arm_joint_limits, shallow_state_search, optimize_path_length,
-                        log):
+    def _find_path_plan(
+        self,
+        group,
+        goal,
+        num_joints,
+        metric_values,
+        collision_meshes,
+        planner_id,
+        trials,
+        resolution,
+        gantry_joint_limits,
+        arm_joint_limits,
+        shallow_state_search,
+        optimize_path_length,
+        log,
+    ):
         if not metric_values:
             metric_values = [0.1] * num_joints
 
@@ -169,7 +217,14 @@ class VrepPlanMotion(PlanMotion):
             start = timer() if log else None
             max_trials = None if shallow_state_search else 80
             max_results = 1 if shallow_state_search else 80
-            states = self.client.find_raw_robot_states(group, frame_to_vrep_pose(goal['target'], self.client.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
+            states = self.client.find_raw_robot_states(
+                group,
+                frame_to_vrep_pose(goal['target'], self.client.scale),
+                gantry_joint_limits,
+                arm_joint_limits,
+                max_trials,
+                max_results,
+            )
             if log:
                 log.debug('Execution time: search_robot_states=%.2f', timer() - start)
 
@@ -182,15 +237,20 @@ class VrepPlanMotion(PlanMotion):
             string_param_list.append(','.join(map(str, joint_limits)))
 
         if log:
-            log.debug('About to execute path planner: planner_id=%s, trials=%d, shallow_state_search=%s, optimize_path_length=%s',
-                      planner_id, trials, shallow_state_search, optimize_path_length)
+            log.debug(
+                'About to execute path planner: planner_id=%s, trials=%d, shallow_state_search=%s, optimize_path_length=%s',
+                planner_id,
+                trials,
+                shallow_state_search,
+                optimize_path_length,
+            )
 
-        res, _, path, _, _ = self.client.run_child_script('searchRobotPath',
-                                                          [group,
-                                                           trials,
-                                                           (int)(resolution * 1000),
-                                                           1 if optimize_path_length else 0],
-                                                          states, string_param_list)
+        res, _, path, _, _ = self.client.run_child_script(
+            'searchRobotPath',
+            [group, trials, (int)(resolution * 1000), 1 if optimize_path_length else 0],
+            states,
+            string_param_list,
+        )
         if log:
             log.debug('Execution time: search_robot_path=%.2f', timer() - start)
 
@@ -200,5 +260,4 @@ class VrepPlanMotion(PlanMotion):
         if log:
             log.debug('Execution time: total=%.2f', timer() - first_start)
 
-        return [config_from_vrep(path[i:i + num_joints], self.client.scale)
-                for i in range(0, len(path), num_joints)]
+        return [config_from_vrep(path[i : i + num_joints], self.client.scale) for i in range(0, len(path), num_joints)]

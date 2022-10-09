@@ -23,10 +23,7 @@ def fit_within_bounds(angle, lower, upper):
 
 def joint_angles_to_configurations(robot, solutions, group=None):
     joint_names = robot.get_configurable_joint_names(group=group)
-    return [
-        Configuration.from_revolute_values(q, joint_names=joint_names) if q else None
-        for q in solutions
-    ]
+    return [Configuration.from_revolute_values(q, joint_names=joint_names) if q else None for q in solutions]
 
 
 def try_to_fit_configurations_between_bounds(robot, configurations, group=None):

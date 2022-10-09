@@ -168,7 +168,7 @@ class AttachedCollisionMesh(object):
     >>> acm = AttachedCollisionMesh(cm, ee_link_name, touch_links)
     """
 
-    def __init__(self, collision_mesh, link_name, touch_links=None, weight=1.):
+    def __init__(self, collision_mesh, link_name, touch_links=None, weight=1.0):
         self.collision_mesh = collision_mesh
         if self.collision_mesh:
             self.collision_mesh.root_name = link_name
@@ -257,8 +257,7 @@ class PlanningScene(object):
             If no client is set for planning scene's robot.
         """
         if not self.client:
-            raise Exception(
-                'This method is only callable once a client is assigned')
+            raise Exception('This method is only callable once a client is assigned')
 
     def reset(self):
         """Resets the planning scene, removing all added collision meshes."""
@@ -295,7 +294,7 @@ class PlanningScene(object):
         collision_mesh.root_name = self.robot.root_name
 
         if scale:
-            scale_factor = 1. / self.robot.scale_factor
+            scale_factor = 1.0 / self.robot.scale_factor
             collision_mesh.scaled(scale_factor)
 
         self.client.add_collision_mesh(collision_mesh)
@@ -356,7 +355,7 @@ class PlanningScene(object):
         collision_mesh.root_name = self.robot.root_name
 
         if scale:
-            scale_factor = 1. / self.robot.scale_factor
+            scale_factor = 1.0 / self.robot.scale_factor
             collision_mesh.scaled(scale_factor)
 
         self.robot.client.append_collision_mesh(collision_mesh)
@@ -391,7 +390,7 @@ class PlanningScene(object):
         self.ensure_client()
 
         if scale:
-            scale_factor = 1. / self.robot.scale_factor
+            scale_factor = 1.0 / self.robot.scale_factor
             attached_collision_mesh.collision_mesh.scaled(scale_factor)
 
         self.client.add_attached_collision_mesh(attached_collision_mesh)
@@ -448,7 +447,7 @@ class PlanningScene(object):
         self.ensure_client()
 
         if scale:
-            scale_factor = 1. / self.robot.scale_factor
+            scale_factor = 1.0 / self.robot.scale_factor
             collision_mesh.scaled(scale_factor)
 
         ee_link_name = self.robot.get_end_effector_link_name(group)

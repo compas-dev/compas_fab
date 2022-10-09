@@ -514,7 +514,9 @@ class Robot(object):
         :class:`Configuration`
             The configuration of the group.
         """
-        full_configuration = self._check_full_configuration_and_scale(full_configuration)[0]  # adds joint_names to full_configuration and makes copy
+        full_configuration = self._check_full_configuration_and_scale(full_configuration)[
+            0
+        ]  # adds joint_names to full_configuration and makes copy
         group_joint_names = self.get_configurable_joint_names(group)
         values = [full_configuration[name] for name in group_joint_names]
         return Configuration(values, self.get_configurable_joint_types(group), group_joint_names)
@@ -548,7 +550,9 @@ class Robot(object):
         if not group_configuration.joint_names:
             group_configuration.joint_names = self.get_configurable_joint_names(group)
 
-        full_configuration = self._check_full_configuration_and_scale(full_configuration)[0]  # adds joint_names to full_configuration and makes copy
+        full_configuration = self._check_full_configuration_and_scale(full_configuration)[
+            0
+        ]  # adds joint_names to full_configuration and makes copy
 
         full_configuration = full_configuration.merged(group_configuration)
         return full_configuration
@@ -619,7 +623,11 @@ class Robot(object):
             joint_names = self.get_configurable_joint_names()  # full configuration
             # full_configuration might have passive joints specified as well, we allow this.
             if len(joint_names) > len(full_configuration.joint_values):
-                raise ValueError("Please pass a configuration with {} values, for all configurable joints of the robot.".format(len(joint_names)))
+                raise ValueError(
+                    "Please pass a configuration with {} values, for all configurable joints of the robot.".format(
+                        len(joint_names)
+                    )
+                )
             configuration = full_configuration.copy()
             if not configuration.joint_names:
                 configuration.joint_names = joint_names
@@ -1051,7 +1059,9 @@ class Robot(object):
         sphere = Sphere(frame_WCF.point, tolerance_position)
         return PositionConstraint.from_sphere(ee_link, sphere)
 
-    def constraints_from_frame(self, frame_WCF, tolerance_position, tolerances_axes, group=None, use_attached_tool_frame=True):
+    def constraints_from_frame(
+        self, frame_WCF, tolerance_position, tolerances_axes, group=None, use_attached_tool_frame=True
+    ):
         r"""Create a position and an orientation constraint from a frame calculated for the group's end-effector link.
 
         Parameters
@@ -1163,18 +1173,32 @@ class Robot(object):
 
         joint_names = self.get_configurable_joint_names(group)
         if len(joint_names) != len(configuration.joint_values):
-            raise ValueError("The passed configuration has {} joint_values, the group {} needs however: {}".format(len(configuration.joint_values), group, len(joint_names)))
+            raise ValueError(
+                "The passed configuration has {} joint_values, the group {} needs however: {}".format(
+                    len(configuration.joint_values), group, len(joint_names)
+                )
+            )
         if len(tolerances_above) == 1:
             tolerances_above = tolerances_above * len(joint_names)
         elif len(tolerances_above) != len(configuration.joint_values):
-            raise ValueError("The passed configuration has {} joint_values, the tolerances_above however: {}".format(len(configuration.joint_values), len(tolerances_above)))
+            raise ValueError(
+                "The passed configuration has {} joint_values, the tolerances_above however: {}".format(
+                    len(configuration.joint_values), len(tolerances_above)
+                )
+            )
         if len(tolerances_below) == 1:
             tolerances_below = tolerances_below * len(joint_names)
         elif len(tolerances_below) != len(configuration.joint_values):
-            raise ValueError("The passed configuration has {} joint_values, the tolerances_below however: {}".format(len(configuration.joint_values), len(tolerances_below)))
+            raise ValueError(
+                "The passed configuration has {} joint_values, the tolerances_below however: {}".format(
+                    len(configuration.joint_values), len(tolerances_below)
+                )
+            )
 
         constraints = []
-        for name, value, tolerance_above, tolerance_below in zip(joint_names, configuration.joint_values, tolerances_above, tolerances_below):
+        for name, value, tolerance_above, tolerance_below in zip(
+            joint_names, configuration.joint_values, tolerances_above, tolerances_below
+        ):
             constraints.append(JointConstraint(name, value, tolerance_above, tolerance_below))
         return constraints
 
@@ -1182,7 +1206,15 @@ class Robot(object):
     # services
     # ==========================================================================
 
-    def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, return_full_configuration=False, use_attached_tool_frame=True, options=None):
+    def inverse_kinematics(
+        self,
+        frame_WCF,
+        start_configuration=None,
+        group=None,
+        return_full_configuration=False,
+        use_attached_tool_frame=True,
+        options=None,
+    ):
         """Calculate the robot's inverse kinematic for a given frame.
 
         The inverse kinematic solvers are implemented as generators in order to fit both analytic
@@ -1235,20 +1267,32 @@ class Robot(object):
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
         # Pseudo-memoized sequential calls will re-use iterator if not exhaused
-        request_id = "{}-{}-{}-{}-{}".format(str(frame_WCF), str(start_configuration), str(group), str(return_full_configuration), str(options))
+        request_id = "{}-{}-{}-{}-{}".format(
+            str(frame_WCF), str(start_configuration), str(group), str(return_full_configuration), str(options)
+        )
 
         if self._current_ik["request_id"] == request_id and self._current_ik["solutions"] is not None:
             solution = next(self._current_ik["solutions"], None)
             if solution is not None:
                 return solution
 
-        solutions = self.iter_inverse_kinematics(frame_WCF, start_configuration, group, return_full_configuration, use_attached_tool_frame, options)
+        solutions = self.iter_inverse_kinematics(
+            frame_WCF, start_configuration, group, return_full_configuration, use_attached_tool_frame, options
+        )
         self._current_ik["request_id"] = request_id
         self._current_ik["solutions"] = solutions
 
         return next(solutions)
 
-    def iter_inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, return_full_configuration=False, use_attached_tool_frame=True, options=None):
+    def iter_inverse_kinematics(
+        self,
+        frame_WCF,
+        start_configuration=None,
+        group=None,
+        return_full_configuration=False,
+        use_attached_tool_frame=True,
+        options=None,
+    ):
         """Iterate over the inverse kinematic solutions of a robot.
 
         This method exposes the generator-based inverse kinematic solvers. Analytics solvers will return
@@ -1342,7 +1386,15 @@ class Robot(object):
         return configuration.scaled(self.scale_factor)
 
     def inverse_kinematics_deprecated(
-        self, frame_WCF, start_configuration=None, group=None, avoid_collisions=True, constraints=None, attempts=8, attached_collision_meshes=None, return_full_configuration=False
+        self,
+        frame_WCF,
+        start_configuration=None,
+        group=None,
+        avoid_collisions=True,
+        constraints=None,
+        attempts=8,
+        attached_collision_meshes=None,
+        return_full_configuration=False,
     ):
         return self.inverse_kinematics(
             frame_WCF,
@@ -1450,7 +1502,9 @@ class Robot(object):
     def forward_kinematics_deprecated(self, configuration, group=None, backend=None, ee_link=None):
         return self.forward_kinematics(configuration, group, options=dict(solver=backend, link=ee_link))
 
-    def plan_cartesian_motion(self, frames_WCF, start_configuration=None, group=None, use_attached_tool_frame=True, options=None):
+    def plan_cartesian_motion(
+        self, frames_WCF, start_configuration=None, group=None, use_attached_tool_frame=True, options=None
+    ):
         """Calculate a cartesian motion path (linear in tool space).
 
         Parameters
@@ -1554,7 +1608,13 @@ class Robot(object):
         if max_step:
             options["max_step"] = max_step / self.scale_factor
 
-        trajectory = self.client.plan_cartesian_motion(robot=self, frames_WCF=frames_WCF_scaled, start_configuration=start_configuration_scaled, group=group, options=options)
+        trajectory = self.client.plan_cartesian_motion(
+            robot=self,
+            frames_WCF=frames_WCF_scaled,
+            start_configuration=start_configuration_scaled,
+            group=group,
+            options=options,
+        )
 
         # Scale everything back to robot's scale
         for pt in trajectory.points:
@@ -1565,7 +1625,15 @@ class Robot(object):
         return trajectory
 
     def plan_cartesian_motion_deprecated(
-        self, frames_WCF, start_configuration=None, max_step=0.01, jump_threshold=1.57, avoid_collisions=True, group=None, path_constraints=None, attached_collision_meshes=None
+        self,
+        frames_WCF,
+        start_configuration=None,
+        max_step=0.01,
+        jump_threshold=1.57,
+        avoid_collisions=True,
+        group=None,
+        path_constraints=None,
+        attached_collision_meshes=None,
     ):
         return self.plan_cartesian_motion(
             frames_WCF,

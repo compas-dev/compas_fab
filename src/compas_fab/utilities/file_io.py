@@ -7,7 +7,7 @@ __all__ = [
     'write_data_to_json',
     'read_data_from_json',
     'write_data_to_pickle',
-    'read_data_from_pickle'
+    'read_data_from_pickle',
 ]
 
 

@@ -78,7 +78,8 @@ class RosFileServerLoader(object):
 
         if self.local_cache_enabled:
             self.local_cache_directory = local_cache_directory or os.path.join(
-                os.path.expanduser('~'), 'robot_description')
+                os.path.expanduser('~'), 'robot_description'
+            )
 
     @property
     def _robot_resource_path(self):
@@ -247,7 +248,7 @@ class RosFileServerLoader(object):
         return self.load_mesh(url)
 
     def _local_mesh_filename(self, url):
-        return os.path.abspath(os.path.join(self._robot_resource_path, url[len('package://'):]))
+        return os.path.abspath(os.path.join(self._robot_resource_path, url[len('package://') :]))
 
 
 def _dae_mesh_importer(filename, precision):
@@ -271,10 +272,7 @@ def _dae_mesh_importer(filename, precision):
             M = [float(i) for i in matrix_node.text.split()]
 
             # If it's the identity matrix, then ignore, we don't need to transform it
-            if M != [1., 0., 0., 0.,
-                     0., 1., 0., 0.,
-                     0., 0., 1., 0.,
-                     0., 0., 0., 1.]:
+            if M != [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0]:
                 M = M[0:4], M[4:8], M[8:12], M[12:16]
                 transform = Transformation.from_matrix(M)
 
@@ -306,17 +304,23 @@ def _dae_mesh_importer(filename, precision):
 
                     if instance_effect is not None:
                         instance_effect_id = instance_effect.attrib['url'][1:]
-                        colors = effects.findall('effect[@id="{}"]/profile_COMMON/technique/phong/*/color'.format(instance_effect_id))
+                        colors = effects.findall(
+                            'effect[@id="{}"]/profile_COMMON/technique/phong/*/color'.format(instance_effect_id)
+                        )
                         for color_node in colors:
                             rgba = [float(i) for i in color_node.text.split()]
                             mesh_colors['mesh_color.{}'.format(color_node.attrib['sid'])] = rgba
                 except Exception:
-                    LOGGER.exception('Exception while loading materials, all materials of mesh file %s will be ignored ', filename)
+                    LOGGER.exception(
+                        'Exception while loading materials, all materials of mesh file %s will be ignored ', filename
+                    )
 
             # Parse vertices
             all_offsets = sorted([int(i.attrib['offset']) for i in primitive_element_set.findall('input[@offset]')])
             if not all_offsets:
-                raise Exception('Primitive element node does not contain offset information! Primitive tag={}'.format(primitive_tag))
+                raise Exception(
+                    'Primitive element node does not contain offset information! Primitive tag={}'.format(primitive_tag)
+                )
 
             vertices_input = primitive_element_set.find('input[@semantic="VERTEX"]')
             vertices_id = vertices_input.attrib['source'][1:]
@@ -324,7 +328,7 @@ def _dae_mesh_importer(filename, precision):
             positions = mesh_xml.find('source[@id="{}"]/float_array'.format(vertices_link.attrib['source'][1:]))
             positions = positions.text.split()
 
-            vertices = [[float(p) for p in positions[i:i + 3]] for i in range(0, len(positions), 3)]
+            vertices = [[float(p) for p in positions[i : i + 3]] for i in range(0, len(positions), 3)]
 
             # Parse faces
             # Every nth element is a vertex key, we ignore the rest based on the offsets defined
@@ -337,7 +341,9 @@ def _dae_mesh_importer(filename, precision):
                 vcount = [int(v) for v in primitive_element_set.find('vcount').text.split()]
 
             if len(vcount) != primitive_count:
-                raise Exception('Primitive count does not match vertex per face count, vertex input id={}'.format(vertices_id))
+                raise Exception(
+                    'Primitive count does not match vertex per face count, vertex input id={}'.format(vertices_id)
+                )
 
             fkeys = [int(f) for f in primitive_set_data[::skip_step]]
             faces = []

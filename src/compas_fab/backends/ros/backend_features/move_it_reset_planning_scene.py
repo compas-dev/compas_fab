@@ -17,11 +17,13 @@ __all__ = [
 
 class MoveItResetPlanningScene(ResetPlanningScene):
     """Callable to add a collision mesh to the planning scene."""
-    APPLY_PLANNING_SCENE = ServiceDescription('/apply_planning_scene',
-                                              'ApplyPlanningScene',
-                                              ApplyPlanningSceneRequest,
-                                              ApplyPlanningSceneResponse,
-                                              )
+
+    APPLY_PLANNING_SCENE = ServiceDescription(
+        '/apply_planning_scene',
+        'ApplyPlanningScene',
+        ApplyPlanningSceneRequest,
+        ApplyPlanningSceneResponse,
+    )
 
     def __init__(self, ros_client):
         self.ros_client = ros_client

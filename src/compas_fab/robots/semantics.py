@@ -22,10 +22,16 @@ class RobotSemantics(object):
 
     """
 
-    def __init__(self, robot_model,
-                 groups=None, main_group_name=None, passive_joints=None,
-                 end_effectors=None, disabled_collisions=None,
-                 group_states=None):
+    def __init__(
+        self,
+        robot_model,
+        groups=None,
+        main_group_name=None,
+        passive_joints=None,
+        end_effectors=None,
+        disabled_collisions=None,
+        group_states=None,
+    ):
         self.robot_model = robot_model
 
         self.groups = groups or {}
@@ -209,7 +215,4 @@ def _get_end_effectors(root):
 
 
 def _get_disabled_collisions(root):
-    return {
-        tuple([dc.attrib['link1'], dc.attrib['link2']])
-        for dc in root.iter('disable_collisions')
-    }
+    return {tuple([dc.attrib['link1'], dc.attrib['link2']]) for dc in root.iter('disable_collisions')}

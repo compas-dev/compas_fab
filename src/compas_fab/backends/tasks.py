@@ -4,10 +4,7 @@ from __future__ import print_function
 
 import threading
 
-__all__ = [
-    'FutureResult',
-    'CancellableFutureResult'
-]
+__all__ = ['FutureResult', 'CancellableFutureResult']
 
 
 class FutureResult(object):

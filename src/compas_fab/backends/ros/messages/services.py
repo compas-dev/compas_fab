@@ -16,8 +16,8 @@ from .std_msgs import ROSmsg
 
 
 class GetPositionIKRequest(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionIK.html
-    """
+    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionIK.html"""
+
     ROS_MSG_TYPE = 'moveit_msgs/GetPositionIKRequest'
 
     def __init__(self, ik_request=None):
@@ -25,8 +25,8 @@ class GetPositionIKRequest(ROSmsg):
 
 
 class GetPositionIKResponse(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionIK.html
-    """
+    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionIK.html"""
+
     ROS_MSG_TYPE = 'moveit_msgs/GetPositionIKResponse'
 
     def __init__(self, solution=None, error_code=None):
@@ -41,8 +41,8 @@ class GetPositionIKResponse(ROSmsg):
 
 
 class GetPositionFKRequest(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html
-    """
+    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html"""
+
     ROS_MSG_TYPE = 'moveit_msgs/GetPositionFKRequest'
 
     def __init__(self, header=None, fk_link_names=None, robot_state=None):
@@ -52,8 +52,8 @@ class GetPositionFKRequest(ROSmsg):
 
 
 class GetPositionFKResponse(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html
-    """
+    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html"""
+
     ROS_MSG_TYPE = 'moveit_msgs/GetPositionFKResponse'
 
     def __init__(self, pose_stamped=None, fk_link_names=None, error_code=None):
@@ -70,13 +70,22 @@ class GetPositionFKResponse(ROSmsg):
 
 
 class GetCartesianPathRequest(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetCartesianPath.html
-    """
+    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetCartesianPath.html"""
+
     ROS_MSG_TYPE = 'moveit_msgs/GetCartesianPathRequest'
 
-    def __init__(self, header=None, start_state=None, group_name='',
-                 link_name='', waypoints=None, max_step=10., jump_threshold=0.,
-                 avoid_collisions=True, path_constraints=None):
+    def __init__(
+        self,
+        header=None,
+        start_state=None,
+        group_name='',
+        link_name='',
+        waypoints=None,
+        max_step=10.0,
+        jump_threshold=0.0,
+        avoid_collisions=True,
+        path_constraints=None,
+    ):
         self.header = header or Header()
         self.start_state = start_state or RobotState()  # moveit_msgs/RobotState
         self.group_name = group_name
@@ -89,12 +98,11 @@ class GetCartesianPathRequest(ROSmsg):
 
 
 class GetCartesianPathResponse(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetCartesianPath.html
-    """
+    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetCartesianPath.html"""
+
     ROS_MSG_TYPE = 'moveit_msgs/GetCartesianPathResponse'
 
-    def __init__(self, start_state=None, solution=None,
-                 fraction=0., error_code=None):
+    def __init__(self, start_state=None, solution=None, fraction=0.0, error_code=None):
         self.start_state = start_state or RobotState()  # moveit_msgs/RobotState
         self.solution = solution or RobotTrajectory()  # moveit_msgs/RobotTrajectory
         self.fraction = fraction
@@ -109,8 +117,8 @@ class GetCartesianPathResponse(ROSmsg):
 
 
 class SetPlannerParamsRequest(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/SetPlannerParams.html
-    """
+    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/SetPlannerParams.html"""
+
     ROS_MSG_TYPE = 'moveit_msgs/SetPlannerParamsRequest'
 
     def __init__(self, planner_config='', group='', params=None, replace=True):
@@ -121,21 +129,31 @@ class SetPlannerParamsRequest(ROSmsg):
 
 
 class MotionPlanRequest(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanRequest.html
-    """
+    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanRequest.html"""
+
     ROS_MSG_TYPE = 'moveit_msgs/MotionPlanRequest'
 
-    def __init__(self, workspace_parameters=None, start_state=None,
-                 goal_constraints=None, path_constraints=None,
-                 trajectory_constraints=None, planner_id='',
-                 group_name='', num_planning_attempts=8,
-                 allowed_planning_time=2., max_velocity_scaling_factor=1.,
-                 max_acceleration_scaling_factor=1.):
+    def __init__(
+        self,
+        workspace_parameters=None,
+        start_state=None,
+        goal_constraints=None,
+        path_constraints=None,
+        trajectory_constraints=None,
+        planner_id='',
+        group_name='',
+        num_planning_attempts=8,
+        allowed_planning_time=2.0,
+        max_velocity_scaling_factor=1.0,
+        max_acceleration_scaling_factor=1.0,
+    ):
         self.workspace_parameters = workspace_parameters or WorkspaceParameters()  # moveit_msgs/WorkspaceParameters
         self.start_state = start_state or RobotState()  # moveit_msgs/RobotState
         self.goal_constraints = goal_constraints or []  # moveit_msgs/Constraints[]
         self.path_constraints = path_constraints or Constraints()  # moveit_msgs/Constraints
-        self.trajectory_constraints = trajectory_constraints or TrajectoryConstraints()  # moveit_msgs/TrajectoryConstraints
+        self.trajectory_constraints = (
+            trajectory_constraints or TrajectoryConstraints()
+        )  # moveit_msgs/TrajectoryConstraints
         self.planner_id = planner_id  # string
         self.group_name = group_name  # string
         self.num_planning_attempts = int(num_planning_attempts)  # int32
@@ -150,17 +168,16 @@ class MotionPlanRequest(ROSmsg):
 
 
 class MotionPlanResponse(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanResponse.html
-    """
+    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanResponse.html"""
+
     ROS_MSG_TYPE = 'moveit_msgs/MotionPlanResponse'
 
-    def __init__(self, trajectory_start=None, group_name=None, trajectory=None,
-                 planning_time=None, error_code=None):
+    def __init__(self, trajectory_start=None, group_name=None, trajectory=None, planning_time=None, error_code=None):
 
         self.trajectory_start = trajectory_start or RobotState()
         self.group_name = group_name or ''
         self.trajectory = trajectory or RobotTrajectory()
-        self.planning_time = planning_time or 3.
+        self.planning_time = planning_time or 3.0
         self.error_code = error_code or MoveItErrorCodes()
 
     @classmethod
@@ -173,8 +190,8 @@ class MotionPlanResponse(ROSmsg):
 
 
 class GetPlanningSceneRequest(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html
-    """
+    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html"""
+
     ROS_MSG_TYPE = 'moveit_msgs/GetPlanningSceneRequest'
 
     def __init__(self, components=None):
@@ -182,8 +199,8 @@ class GetPlanningSceneRequest(ROSmsg):
 
 
 class GetPlanningSceneResponse(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html
-    """
+    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html"""
+
     ROS_MSG_TYPE = 'moveit_msgs/GetPlanningSceneResponse'
 
     def __init__(self, scene=None):
@@ -195,8 +212,8 @@ class GetPlanningSceneResponse(ROSmsg):
 
 
 class ApplyPlanningSceneRequest(ROSmsg):
-    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html
-    """
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html"""
+
     ROS_MSG_TYPE = 'moveit_msgs/ApplyPlanningSceneRequest'
 
     def __init__(self, scene=None):
@@ -204,8 +221,8 @@ class ApplyPlanningSceneRequest(ROSmsg):
 
 
 class ApplyPlanningSceneResponse(ROSmsg):
-    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html
-    """
+    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html"""
+
     ROS_MSG_TYPE = 'moveit_msgs/ApplyPlanningSceneResponse'
 
     def __init__(self, success=False):

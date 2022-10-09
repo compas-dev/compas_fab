@@ -6,8 +6,8 @@ from .std_msgs import Time
 
 
 class JointTrajectoryPoint(ROSmsg):
-    """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectoryPoint.html
-    """
+    """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectoryPoint.html"""
+
     ROS_MSG_TYPE = 'trajectory_msgs/JointTrajectoryPoint'
 
     def __init__(self, positions=None, velocities=None, accelerations=None, effort=None, time_from_start=None):
@@ -34,8 +34,8 @@ class JointTrajectoryPoint(ROSmsg):
 
 
 class JointTrajectory(ROSmsg):
-    """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectory.html
-    """
+    """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectory.html"""
+
     ROS_MSG_TYPE = 'trajectory_msgs/JointTrajectory'
 
     def __init__(self, header=None, joint_names=None, points=None):
@@ -52,20 +52,20 @@ class JointTrajectory(ROSmsg):
 
 
 class MultiDOFJointTrajectoryPoint(ROSmsg):
-    """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectoryPoint.html
-    """
+    """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectoryPoint.html"""
+
     ROS_MSG_TYPE = 'trajectory_msgs/MultiDOFJointTrajectoryPoint'
 
     def __init__(self, transforms=None, velocities=None, accelerations=None, time_from_start=None):
-        self.transforms = transforms or []        # geometry_msgs/Transform[]
-        self.velocities = velocities or []        # geometry_msgs/Twist[]
+        self.transforms = transforms or []  # geometry_msgs/Transform[]
+        self.velocities = velocities or []  # geometry_msgs/Twist[]
         self.accelerations = accelerations or []  # geometry_msgs/Twist[]
         self.time_from_start = time_from_start or Time()
 
 
 class MultiDOFJointTrajectory(ROSmsg):
-    """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectory.html
-    """
+    """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectory.html"""
+
     ROS_MSG_TYPE = 'trajectory_msgs/MultiDOFJointTrajectory'
 
     def __init__(self, header=None, joint_names=None, points=None):

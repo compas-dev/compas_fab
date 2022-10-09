@@ -17,6 +17,7 @@ def after_rhino_install(installed_packages):
         return []
 
     import compas_fab.ghpython.components.install
+
     return compas_fab.ghpython.components.install.install()
 
 
@@ -26,6 +27,7 @@ def after_rhino_uninstall(installed_packages):
         return []
 
     import compas_fab.ghpython.components.install
+
     return compas_fab.ghpython.components.install.uninstall()
 
 

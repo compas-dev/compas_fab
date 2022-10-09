@@ -19,11 +19,13 @@ __all__ = [
 
 class MoveItAppendCollisionMesh(AppendCollisionMesh):
     """Callable to append a collision mesh to the planning scene."""
-    APPLY_PLANNING_SCENE = ServiceDescription('/apply_planning_scene',
-                                              'ApplyPlanningScene',
-                                              ApplyPlanningSceneRequest,
-                                              ApplyPlanningSceneResponse,
-                                              )
+
+    APPLY_PLANNING_SCENE = ServiceDescription(
+        '/apply_planning_scene',
+        'ApplyPlanningScene',
+        ApplyPlanningSceneRequest,
+        ApplyPlanningSceneResponse,
+    )
 
     def __init__(self, ros_client):
         self.ros_client = ros_client

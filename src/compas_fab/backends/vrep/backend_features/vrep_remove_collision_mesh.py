@@ -14,8 +14,8 @@ vrep = LazyLoader('vrep', globals(), 'compas_fab.backends.vrep.remote_api.vrep')
 
 
 class VrepRemoveCollisionMesh(RemoveCollisionMesh):
-    """Callable to remove collision meshes from the 3D scene.
-    """
+    """Callable to remove collision meshes from the 3D scene."""
+
     def __init__(self, client):
         self.client = client
 

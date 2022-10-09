@@ -14,8 +14,10 @@ from compas_fab.backends.vrep.helpers import resolve_host
 from compas_fab.backends.vrep.planner import VrepPlanner
 from compas_fab.utilities import LazyLoader
 
-DEFAULT_SCALE = 1.
-CHILD_SCRIPT_TYPE = 1    # defined in vrepConst.sim_scripttype_childscript, but redefined here to prevent loading the remoteApi library
+DEFAULT_SCALE = 1.0
+CHILD_SCRIPT_TYPE = (
+    1  # defined in vrepConst.sim_scripttype_childscript, but redefined here to prevent loading the remoteApi library
+)
 LOG = logging.getLogger('compas_fab.backends.vrep.client')
 
 vrep = LazyLoader('vrep', globals(), 'compas_fab.backends.vrep.remote_api.vrep')
@@ -73,9 +75,9 @@ class VrepClient(ClientInterface):
             LOG.debug('Connecting to V-REP on %s:%d...', self.host, self.port)
 
         # Connect to V-REP, set a very large timeout for blocking commands
-        self.client_id = vrep.simxStart(self.host, self.port, True, True,
-                                        self.default_timeout_in_ms,
-                                        self.thread_cycle_in_ms)
+        self.client_id = vrep.simxStart(
+            self.host, self.port, True, True, self.default_timeout_in_ms, self.thread_cycle_in_ms
+        )
 
         # Start simulation
         vrep.simxStartSimulation(self.client_id, DEFAULT_OP_MODE)
@@ -117,9 +119,7 @@ class VrepClient(ClientInterface):
         Returns:
             int: Object handle.
         """
-        _res, handle = vrep.simxGetObjectHandle(self.client_id,
-                                                object_name,
-                                                DEFAULT_OP_MODE)
+        _res, handle = vrep.simxGetObjectHandle(self.client_id, object_name, DEFAULT_OP_MODE)
         return handle
 
     def get_object_matrices(self, object_handles):
@@ -144,7 +144,12 @@ class VrepClient(ClientInterface):
             The resulting dictionary is keyed by object handle.
         """
         _res, _, matrices, _, _ = self.run_child_script('getShapeMatrices', object_handles, [], [])
-        return dict([(object_handles[i // 12], floats_from_vrep(matrices[i:i + 12], self.scale)) for i in range(0, len(matrices), 12)])
+        return dict(
+            [
+                (object_handles[i // 12], floats_from_vrep(matrices[i : i + 12], self.scale))
+                for i in range(0, len(matrices), 12)
+            ]
+        )
 
     def get_all_visible_handles(self):
         """Gets a list of object handles (identifiers) for all visible
@@ -168,11 +173,17 @@ class VrepClient(ClientInterface):
             metric_values (:obj:`list` of :obj:`float`): List containing one value
                 per configurable joint. Each value ranges from 0 to 1.
         """
-        vrep.simxCallScriptFunction(self.client_id,
-                                    self.lua_script,
-                                    CHILD_SCRIPT_TYPE, 'setTheMetric',
-                                    [group], metric_values, [],
-                                    bytearray(), DEFAULT_OP_MODE)
+        vrep.simxCallScriptFunction(
+            self.client_id,
+            self.lua_script,
+            CHILD_SCRIPT_TYPE,
+            'setTheMetric',
+            [group],
+            metric_values,
+            [],
+            bytearray(),
+            DEFAULT_OP_MODE,
+        )
 
     def set_robot_pose(self, robot, frame):
         """Moves the robot to a given pose, specified as a frame.
@@ -190,9 +201,11 @@ class VrepClient(ClientInterface):
         joints = len(robot.get_configurable_joints())
         options = {
             'num_joints': joints,
-            'metric_values': [0.] * joints,
+            'metric_values': [0.0] * joints,
         }
-        joint_values, joint_names = list(self.inverse_kinematics(robot, frame, group=robot.model.attr['index'], options=options))[-1]
+        joint_values, joint_names = list(
+            self.inverse_kinematics(robot, frame, group=robot.model.attr['index'], options=options)
+        )[-1]
 
         config = config_from_vrep(joint_values, self.scale)
 
@@ -229,8 +242,7 @@ class VrepClient(ClientInterface):
         values = config_to_vrep(config, self.scale)
 
         self.set_robot_metric(robot.model.attr['index'], [0.0] * len(config.joint_values))
-        self.run_child_script('moveRobotFK',
-                              [], values, ['robot' + robot.name])
+        self.run_child_script('moveRobotFK', [], values, ['robot' + robot.name])
 
     def get_robot_config(self, robot):
         """Gets the current configuration of the specified robot.
@@ -249,12 +261,12 @@ class VrepClient(ClientInterface):
         """
         assert_robot(robot)
 
-        _res, _, config, _, _ = self.run_child_script('getRobotState',
-                                                      [robot.model.attr['index']],
-                                                      [], [])
+        _res, _, config, _, _ = self.run_child_script('getRobotState', [robot.model.attr['index']], [], [])
         return config_from_vrep(config, self.scale)
 
-    def find_raw_robot_states(self, group, goal_vrep_pose, gantry_joint_limits, arm_joint_limits, max_trials=None, max_results=1):
+    def find_raw_robot_states(
+        self, group, goal_vrep_pose, gantry_joint_limits, arm_joint_limits, max_trials=None, max_results=1
+    ):
         i = 0
         final_states = []
         retry_until_success = True if not max_trials else False
@@ -267,11 +279,9 @@ class VrepClient(ClientInterface):
                 joint_limits.extend(arm_joint_limits or [])
                 string_param_list.append(','.join(map(str, joint_limits)))
 
-            res, _, states, _, _ = self.run_child_script('searchRobotStates',
-                                                         [group,
-                                                          max_trials or 1,
-                                                          max_results],
-                                                         goal_vrep_pose, string_param_list)
+            res, _, states, _, _ = self.run_child_script(
+                'searchRobotStates', [group, max_trials or 1, max_results], goal_vrep_pose, string_param_list
+            )
 
             # Even if the retry_until_success is set to True, we short circuit
             # at some point to prevent infinite loops caused by misconfiguration
@@ -290,8 +300,14 @@ class VrepClient(ClientInterface):
         return final_states
 
     def run_child_script(self, function_name, in_ints, in_floats, in_strings):
-        return vrep.simxCallScriptFunction(self.client_id,
-                                           self.lua_script,
-                                           CHILD_SCRIPT_TYPE, function_name,
-                                           in_ints, in_floats, in_strings,
-                                           bytearray(), DEFAULT_OP_MODE)
+        return vrep.simxCallScriptFunction(
+            self.client_id,
+            self.lua_script,
+            CHILD_SCRIPT_TYPE,
+            function_name,
+            in_ints,
+            in_floats,
+            in_strings,
+            bytearray(),
+            DEFAULT_OP_MODE,
+        )

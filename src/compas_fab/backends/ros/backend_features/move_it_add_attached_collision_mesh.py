@@ -20,11 +20,13 @@ __all__ = [
 
 class MoveItAddAttachedCollisionMesh(AddAttachedCollisionMesh):
     """Callable to add a collision mesh and attach it to the robot."""
-    APPLY_PLANNING_SCENE = ServiceDescription('/apply_planning_scene',
-                                              'ApplyPlanningScene',
-                                              ApplyPlanningSceneRequest,
-                                              ApplyPlanningSceneResponse,
-                                              )
+
+    APPLY_PLANNING_SCENE = ServiceDescription(
+        '/apply_planning_scene',
+        'ApplyPlanningScene',
+        ApplyPlanningSceneRequest,
+        ApplyPlanningSceneResponse,
+    )
 
     def __init__(self, ros_client):
         self.ros_client = ros_client
@@ -50,8 +52,7 @@ class MoveItAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         return await_callback(self.add_attached_collision_mesh_async, **kwargs)
 
     def add_attached_collision_mesh_async(self, callback, errback, attached_collision_mesh):
-        aco = AttachedCollisionObject.from_attached_collision_mesh(
-            attached_collision_mesh)
+        aco = AttachedCollisionObject.from_attached_collision_mesh(attached_collision_mesh)
         aco.object.operation = CollisionObject.ADD
         robot_state = RobotState(attached_collision_objects=[aco], is_diff=True)
         scene = PlanningScene(robot_state=robot_state, is_diff=True)

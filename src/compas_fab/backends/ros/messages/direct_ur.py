@@ -2,8 +2,7 @@ from __future__ import absolute_import
 
 
 class URmsg(object):
-    """
-    """
+    """ """
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
@@ -17,8 +16,7 @@ class URmsg(object):
 
 
 class Point(URmsg):
-    """
-    """
+    """ """
 
     def __init__(self, x, y, z):
         self.x = x  # [m]
@@ -30,8 +28,7 @@ class Point(URmsg):
 
 
 class AxisAngle(URmsg):
-    """
-    """
+    """ """
 
     def __init__(self, x, y, z):
         self.x = x
@@ -43,8 +40,7 @@ class AxisAngle(URmsg):
 
 
 class URPose(URmsg):
-    """
-    """
+    """ """
 
     def __init__(self, position=Point(0, 0, 0), orientation=AxisAngle(0, 0, 0)):
         self.position = position
@@ -61,8 +57,7 @@ class URPose(URmsg):
 
 
 class URPoseTrajectoryPoint(URmsg):
-    """
-    """
+    """ """
 
     def __init__(self, pose=URPose(), acceleration=None, velocity=None, time=None, radius=None):
         self.pose = pose
@@ -85,8 +80,7 @@ class URPoseTrajectoryPoint(URmsg):
 
 
 class URMovej(URmsg):
-    """
-    """
+    """ """
 
     def __init__(self, pose_trajectory_point=URPoseTrajectoryPoint()):
         self.pose_trajectory_point = pose_trajectory_point
@@ -96,8 +90,7 @@ class URMovej(URmsg):
 
 
 class URMovel(URmsg):
-    """
-    """
+    """ """
 
     def __init__(self, pose_trajectory_point=URPoseTrajectoryPoint()):
         self.pose_trajectory_point = pose_trajectory_point
@@ -107,8 +100,7 @@ class URMovel(URmsg):
 
 
 class URGoal(URmsg):
-    """
-    """
+    """ """
 
     def __init__(self, script_lines=[]):
         self.script = "def prog():\n\t"
@@ -123,20 +115,20 @@ class URGoal(URmsg):
 if __name__ == "__main__":
 
     from compas.geometry import Frame
-    f1 = Frame((0., -193, 1001.), (-1., 0., 0.), (0., 0., -1.))
-    f2 = Frame((0., -193, 709.0), (-1., 0., 0.), (0., 0., -1.))
-    f1.point /= 1000.
-    f2.point /= 1000.
+
+    f1 = Frame((0.0, -193, 1001.0), (-1.0, 0.0, 0.0), (0.0, 0.0, -1.0))
+    f2 = Frame((0.0, -193, 709.0), (-1.0, 0.0, 0.0), (0.0, 0.0, -1.0))
+    f1.point /= 1000.0
+    f2.point /= 1000.0
     frames = [f1, f2]
 
     acceleration = 0.35
     velocity = 0.17
-    time = 5.
+    time = 5.0
     script_lines = []
 
     for frame in frames:
-        ptp = URPoseTrajectoryPoint(URPose.from_frame(
-            frame), acceleration, velocity, time, None)
+        ptp = URPoseTrajectoryPoint(URPose.from_frame(frame), acceleration, velocity, time, None)
         move = URMovej(ptp)
         script_lines.append(move)
 

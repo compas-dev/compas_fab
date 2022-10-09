@@ -12,8 +12,8 @@ __all__ = [
 
 
 class VrepAddCollisionMesh(AddCollisionMesh):
-    """Callable to add a mesh to the 3D scene.
-    """
+    """Callable to add a mesh to the 3D scene."""
+
     def __init__(self, client):
         self.client = client
 
@@ -53,13 +53,11 @@ class VrepAddCollisionMesh(AddCollisionMesh):
                 raise ValueError('The V-REP client only supports tri-meshes')
 
             vertices, faces = mesh.to_vertices_and_faces()
-            vrep_packing = (floats_to_vrep([item for sublist in vertices for item in sublist], self.client.scale) +
-                            [item for sublist in faces for item in sublist])
+            vrep_packing = floats_to_vrep([item for sublist in vertices for item in sublist], self.client.scale) + [
+                item for sublist in faces for item in sublist
+            ]
             params = [[len(vertices) * 3, len(faces) * 4], vrep_packing]
-            handles = self.client.run_child_script('buildMesh',
-                                                   params[0],
-                                                   params[1],
-                                                   [])[1]
+            handles = self.client.run_child_script('buildMesh', params[0], params[1], [])[1]
             mesh_handles.extend(handles)
             self.client._added_handles.extend(handles)
 

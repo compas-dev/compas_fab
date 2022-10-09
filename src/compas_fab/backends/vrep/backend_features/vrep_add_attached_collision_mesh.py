@@ -16,8 +16,8 @@ vrep = LazyLoader('vrep', globals(), 'compas_fab.backends.vrep.remote_api.vrep')
 
 
 class VrepAddAttachedCollisionMesh(AddAttachedCollisionMesh):
-    """Callable to add a building member to the 3D scene and attach it to the robot.
-    """
+    """Callable to add a building member to the 3D scene and attach it to the robot."""
+
     def __init__(self, client):
         self.client = client
 

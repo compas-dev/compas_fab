@@ -31,6 +31,7 @@ def redirect_stdout(to=os.devnull, enabled=True):
     ...     print("from Python")                                         # doctest: +SKIP
     ...     os.system("echo non-Python applications are also supported") # doctest: +SKIP
     """
+
     def _redirect_stdout(to_):
         sys.stdout.close()  # + implicit flush()
         os.dup2(to_.fileno(), fd)
@@ -61,14 +62,19 @@ def get_logger(name):
 
     try:
         from colorlog import ColoredFormatter
-        formatter = ColoredFormatter("%(log_color)s%(levelname)-8s%(reset)s %(white)s%(message)s",
-                                     datefmt=None,
-                                     reset=True,
-                                     log_colors={'DEBUG': 'cyan', 'INFO': 'green',
-                                                 'WARNING': 'yellow',
-                                                 'ERROR': 'red', 'CRITICAL': 'red',
-                                                 }
-                                     )
+
+        formatter = ColoredFormatter(
+            "%(log_color)s%(levelname)-8s%(reset)s %(white)s%(message)s",
+            datefmt=None,
+            reset=True,
+            log_colors={
+                'DEBUG': 'cyan',
+                'INFO': 'green',
+                'WARNING': 'yellow',
+                'ERROR': 'red',
+                'CRITICAL': 'red',
+            },
+        )
     except ImportError:
         formatter = logging.Formatter('[%(levelname)s] %(message)s')
 

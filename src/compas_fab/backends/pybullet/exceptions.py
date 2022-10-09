@@ -7,12 +7,14 @@ from compas_fab.backends.exceptions import BackendError
 
 class PyBulletError(BackendError):
     """Base case for exceptions in ``compas_fab.backends.pybullet``."""
+
     def __init__(self, message):
         super(PyBulletError, self).__init__(message)
 
 
 class CollisionError(PyBulletError):
     """Exception raised when two objects have been found to be in collision in PyBullet."""
+
     def __init__(self, name1, name2):
         message = "Collision between '{}' and '{}'".format(name1, name2)
         super(CollisionError, self).__init__(message)

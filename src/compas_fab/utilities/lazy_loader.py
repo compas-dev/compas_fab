@@ -22,9 +22,7 @@ from __future__ import print_function
 import importlib
 import types
 
-__all__ = [
-    'LazyLoader'
-]
+__all__ = ['LazyLoader']
 
 
 class LazyLoader(types.ModuleType):

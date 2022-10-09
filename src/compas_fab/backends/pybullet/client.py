@@ -92,8 +92,12 @@ class PyBulletBase(object):
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_GUI, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_TINY_RENDERER, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_RGB_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
-        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_DEPTH_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
-        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, False, physicsClientId=self.client_id)
+        pybullet.configureDebugVisualizer(
+            pybullet.COV_ENABLE_DEPTH_BUFFER_PREVIEW, False, physicsClientId=self.client_id
+        )
+        pybullet.configureDebugVisualizer(
+            pybullet.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, False, physicsClientId=self.client_id
+        )
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SHADOWS, shadows, physicsClientId=self.client_id)
 
     def disconnect(self):
@@ -140,6 +144,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     Connected: True
 
     """
+
     def __init__(self, connection_type='gui', verbose=False):
         super(PyBulletClient, self).__init__(connection_type)
         self.planner = PyBulletPlanner(self)
@@ -172,7 +177,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         pybullet.stepSimulation(physicsClientId=self.client_id)
 
     def load_ur5(self, load_geometry=False, concavity=False):
-        """"Load a UR5 robot to PyBullet.
+        """ "Load a UR5 robot to PyBullet.
 
         Parameters
         ----------
@@ -263,9 +268,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def _load_robot_to_pybullet(self, urdf_file, robot):
         cached_robot = self.get_cached_robot(robot)
         with redirect_stdout(enabled=not self.verbose):
-            pybullet_uid = pybullet.loadURDF(urdf_file, useFixedBase=True,
-                                             physicsClientId=self.client_id,
-                                             flags=pybullet.URDF_USE_SELF_COLLISION)
+            pybullet_uid = pybullet.loadURDF(
+                urdf_file, useFixedBase=True, physicsClientId=self.client_id, flags=pybullet.URDF_USE_SELF_COLLISION
+            )
             cached_robot.attr['uid'] = pybullet_uid
 
         self._add_ids_to_robot_joints(cached_robot)
@@ -348,15 +353,13 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def ensure_cached_robot(robot):
         """Checks if a :class:`compas_fab.robots.Robot` has been cached for use with PyBullet."""
         if not robot.attributes['pybullet']['cached_robot']:
-            raise Exception(
-                'This method is only callable once the robot has been cached.')
+            raise Exception('This method is only callable once the robot has been cached.')
 
     @staticmethod
     def ensure_cached_robot_geometry(robot):
         """Checks if the geometry of a :class:`compas_fab.robots.Robot` has been cached for use with PyBullet."""
         if not robot.attributes['pybullet'].get('robot_geometry_cached'):
-            raise Exception(
-                'This method is only callable once the robot with loaded geometry has been cached.')
+            raise Exception('This method is only callable once the robot with loaded geometry has been cached.')
 
     def get_cached_robot(self, robot):
         """Returns the editable copy of the robot's model for shadowing the state
@@ -574,13 +577,17 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return self._get_body_info(body_id).base_name.decode(encoding='UTF-8')
 
     def _get_link_state(self, link_id, body_id):
-        return const.LinkState(*pybullet.getLinkState(body_id, link_id, computeForwardKinematics=True, physicsClientId=self.client_id))
+        return const.LinkState(
+            *pybullet.getLinkState(body_id, link_id, computeForwardKinematics=True, physicsClientId=self.client_id)
+        )
 
     def _get_joint_state(self, joint_id, body_id):
         return const.JointState(*pybullet.getJointState(body_id, joint_id, physicsClientId=self.client_id))
 
     def _get_joint_states(self, joint_ids, body_id):
-        return [const.JointState(*js) for js in pybullet.getJointStates(body_id, joint_ids, physicsClientId=self.client_id)]
+        return [
+            const.JointState(*js) for js in pybullet.getJointStates(body_id, joint_ids, physicsClientId=self.client_id)
+        ]
 
     def _get_body_info(self, body_id):
         return const.BodyInfo(*pybullet.getBodyInfo(body_id, physicsClientId=self.client_id))
@@ -721,7 +728,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             pybullet.vhacd(tmp_obj_path, tmp_vhacd_obj_path, tmp_log_path)
         return tmp_vhacd_obj_path
 
-    def body_from_obj(self, path, scale=1., concavity=False, mass=const.STATIC_MASS, collision=True, color=const.GREY):
+    def body_from_obj(self, path, scale=1.0, concavity=False, mass=const.STATIC_MASS, collision=True, color=const.GREY):
         """Create a PyBullet body from an OBJ file.
 
         Parameters
@@ -759,8 +766,12 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return body_id
 
     def _create_body(self, collision_id=const.NULL_ID, visual_id=const.NULL_ID, mass=const.STATIC_MASS):
-        return pybullet.createMultiBody(baseMass=mass, baseCollisionShapeIndex=collision_id,
-                                        baseVisualShapeIndex=visual_id, physicsClientId=self.client_id)
+        return pybullet.createMultiBody(
+            baseMass=mass,
+            baseCollisionShapeIndex=collision_id,
+            baseVisualShapeIndex=visual_id,
+            physicsClientId=self.client_id,
+        )
 
     @staticmethod
     def _create_collision_shape(collision_args):
@@ -800,7 +811,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return collision_args
 
     @staticmethod
-    def _get_geometry_args(path, concavity=False, scale=1.):
+    def _get_geometry_args(path, concavity=False, scale=1.0):
         geometry_args = {
             'shapeType': pybullet.GEOM_MESH,
             'fileName': path,

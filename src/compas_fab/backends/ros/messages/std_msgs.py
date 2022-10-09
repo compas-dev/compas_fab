@@ -93,8 +93,8 @@ class ROSmsg(object):
 
 
 class Time(ROSmsg):
-    """https://docs.ros.org/kinetic/api/std_msgs/html/msg/Time.html
-    """
+    """https://docs.ros.org/kinetic/api/std_msgs/html/msg/Time.html"""
+
     ROS_MSG_TYPE = 'std_msgs/Time'
 
     def __init__(self, secs=0, nsecs=0):
@@ -106,8 +106,8 @@ class Time(ROSmsg):
 
 
 class Header(ROSmsg):
-    """https://docs.ros.org/melodic/api/std_msgs/html/msg/Header.html
-    """
+    """https://docs.ros.org/melodic/api/std_msgs/html/msg/Header.html"""
+
     ROS_MSG_TYPE = 'std_msgs/Header'
 
     def __init__(self, seq=0, stamp=Time(), frame_id='/world'):
@@ -117,8 +117,8 @@ class Header(ROSmsg):
 
 
 class String(ROSmsg):
-    """https://docs.ros.org/api/std_msgs/html/msg/String.html
-    """
+    """https://docs.ros.org/api/std_msgs/html/msg/String.html"""
+
     ROS_MSG_TYPE = 'std_msgs/String'
 
     def __init__(self, data=''):
@@ -126,8 +126,7 @@ class String(ROSmsg):
 
 
 class MultiArrayDimension(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayDimension.html
-    """
+    """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayDimension.html"""
 
     ROS_MSG_TYPE = 'std_msgs/MultiArrayDimension'
 
@@ -142,8 +141,7 @@ class MultiArrayDimension(ROSmsg):
 
 
 class MultiArrayLayout(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayLayout.html
-    """
+    """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayLayout.html"""
 
     ROS_MSG_TYPE = 'std_msgs/MultiArrayLayout'
 
@@ -158,8 +156,7 @@ class MultiArrayLayout(ROSmsg):
 
 
 class Int8MultiArray(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/Int8MultiArray.html
-    """
+    """http://docs.ros.org/en/api/std_msgs/html/msg/Int8MultiArray.html"""
 
     ROS_MSG_TYPE = 'std_msgs/Int8MultiArray'
 
@@ -174,8 +171,7 @@ class Int8MultiArray(ROSmsg):
 
 
 class Float32MultiArray(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/Float32MultiArray.html
-    """
+    """http://docs.ros.org/en/api/std_msgs/html/msg/Float32MultiArray.html"""
 
     ROS_MSG_TYPE = 'std_msgs/Float32MultiArray'
 
@@ -190,8 +186,7 @@ class Float32MultiArray(ROSmsg):
 
 
 class Int32(ROSmsg):
-    """http://docs.ros.org/en/melodic/api/std_msgs/html/msg/Int32.html
-    """
+    """http://docs.ros.org/en/melodic/api/std_msgs/html/msg/Int32.html"""
 
     ROS_MSG_TYPE = 'std_msgs/Int32'
 

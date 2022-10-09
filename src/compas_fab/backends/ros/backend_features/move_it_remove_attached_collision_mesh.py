@@ -20,11 +20,13 @@ __all__ = [
 
 class MoveItRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
     """Callable to remove an attached collision mesh from the robot."""
-    APPLY_PLANNING_SCENE = ServiceDescription('/apply_planning_scene',
-                                              'ApplyPlanningScene',
-                                              ApplyPlanningSceneRequest,
-                                              ApplyPlanningSceneResponse,
-                                              )
+
+    APPLY_PLANNING_SCENE = ServiceDescription(
+        '/apply_planning_scene',
+        'ApplyPlanningScene',
+        ApplyPlanningSceneRequest,
+        ApplyPlanningSceneResponse,
+    )
 
     def __init__(self, ros_client):
         self.ros_client = ros_client

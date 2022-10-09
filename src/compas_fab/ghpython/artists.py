@@ -23,8 +23,8 @@ if compas.RHINO:
 
     # deprecated artists (aliased for backwards compat)
     __all__ += [
-        'RobotArtist',              # deprecated
-        'RobotModelArtist',         # deprecated
+        'RobotArtist',  # deprecated
+        'RobotModelArtist',  # deprecated
     ]
 
     RobotArtist = RobotModelArtist

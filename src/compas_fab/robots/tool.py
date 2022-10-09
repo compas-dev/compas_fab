@@ -11,9 +11,7 @@ from compas_fab.robots.planning_scene import AttachedCollisionMesh
 from compas_fab.robots.planning_scene import CollisionMesh
 
 
-__all__ = [
-    'Tool'
-]
+__all__ = ['Tool']
 
 
 class Tool(object):
@@ -40,8 +38,7 @@ class Tool(object):
 
     """
 
-    def __init__(self, visual, frame_in_tool0_frame, collision=None,
-                 name="attached_tool", link_name=None):
+    def __init__(self, visual, frame_in_tool0_frame, collision=None, name="attached_tool", link_name=None):
         self.tool_model = ToolModel(visual, frame_in_tool0_frame, collision, name, link_name)
 
     @classmethod

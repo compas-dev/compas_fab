@@ -12,8 +12,8 @@ __all__ = [
 
 
 class VrepInverseKinematics(InverseKinematics):
-    """Callable to calculate inverse kinematics to find valid robot configurations for the specified goal frame.
-    """
+    """Callable to calculate inverse kinematics to find valid robot configurations for the specified goal frame."""
+
     def __init__(self, client):
         self.client = client
 
@@ -58,9 +58,16 @@ class VrepInverseKinematics(InverseKinematics):
 
         self.client.set_robot_metric(group, metric_values)
 
-        states = self.client.find_raw_robot_states(group, frame_to_vrep_pose(frame_WCF, self.client.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
+        states = self.client.find_raw_robot_states(
+            group,
+            frame_to_vrep_pose(frame_WCF, self.client.scale),
+            gantry_joint_limits,
+            arm_joint_limits,
+            max_trials,
+            max_results,
+        )
 
         joint_names = robot.get_configurable_joint_names()
 
         for i in range(0, len(states), num_joints):
-            yield config_from_vrep(states[i: i+num_joints], self.client.scale).joint_values, joint_names
+            yield config_from_vrep(states[i : i + num_joints], self.client.scale).joint_values, joint_names

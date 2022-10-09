@@ -11,7 +11,9 @@ __all__ = [
     'VrepError',
 ]
 
-DEFAULT_OP_MODE = 0x010000  # defined in vrepConst.simx_opmode_blocking, but redefined here to prevent loading the remoteApi library
+DEFAULT_OP_MODE = (
+    0x010000  # defined in vrepConst.simx_opmode_blocking, but redefined here to prevent loading the remoteApi library
+)
 
 # --------------------------------------------------------------------------
 # MAPPINGS
@@ -66,6 +68,7 @@ def assert_robot(robot):
     if 'index' not in robot.model.attr:
         raise ValueError('Robot model needs to define an index as part of the model.attr dictionary')
 
+
 # --------------------------------------------------------------------------
 # NETWORKING HELPERS
 # A couple of simple networking helpers for host name resolution
@@ -91,7 +94,5 @@ class VrepError(BackendError):
     """Wraps an exception that occurred inside the simulation engine."""
 
     def __init__(self, message, error_code):
-        super(VrepError, self).__init__('Error code: ' +
-                                        str(error_code) +
-                                        '; ' + message)
+        super(VrepError, self).__init__('Error code: ' + str(error_code) + '; ' + message)
         self.error_code = error_code

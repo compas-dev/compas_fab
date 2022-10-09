@@ -5,8 +5,7 @@ from __future__ import division
 from compas.geometry import Scale
 from compas.geometry import Rotation
 
-__all__ = ['BoundingVolume', 'Constraint', 'JointConstraint',
-           'OrientationConstraint', 'PositionConstraint']
+__all__ = ['BoundingVolume', 'Constraint', 'JointConstraint', 'OrientationConstraint', 'PositionConstraint']
 
 
 class BoundingVolume(object):
@@ -211,7 +210,7 @@ class Constraint(object):
     #:  List of possible constraint types.
     CONSTRAINT_TYPES = (JOINT, POSITION, ORIENTATION)
 
-    def __init__(self, constraint_type, weight=1.):
+    def __init__(self, constraint_type, weight=1.0):
         if constraint_type not in self.CONSTRAINT_TYPES:
             raise ValueError("Type must be %d, %d or %d" % self.CONSTRAINT_TYPES)
         self.type = constraint_type
@@ -286,7 +285,7 @@ class JointConstraint(Constraint):
     >>> jc = JointConstraint("joint_0", 1.4, 0.1, 0.1, 1.0)
     """
 
-    def __init__(self, joint_name, value, tolerance_above=0., tolerance_below=0., weight=1.):
+    def __init__(self, joint_name, value, tolerance_above=0.0, tolerance_below=0.0, weight=1.0):
         super(JointConstraint, self).__init__(self.JOINT, weight)
         self.joint_name = joint_name
         self.value = value
@@ -307,7 +306,9 @@ class JointConstraint(Constraint):
 
     def __repr__(self):
         """Printable representation of :class:`JointConstraint`."""
-        return "JointConstraint({!r}, {!r}, {!r}, {!r}, {!r})".format(self.joint_name, self.value, self.tolerance_above, self.tolerance_below, self.weight)
+        return "JointConstraint({!r}, {!r}, {!r}, {!r}, {!r})".format(
+            self.joint_name, self.value, self.tolerance_above, self.tolerance_below, self.weight
+        )
 
     def copy(self):
         """Create a copy of this :class:`JointConstraint`.
@@ -372,7 +373,7 @@ class OrientationConstraint(Constraint):
     >>> oc = OrientationConstraint("link_0", frame.quaternion)
     """
 
-    def __init__(self, link_name, quaternion, tolerances=None, weight=1.):
+    def __init__(self, link_name, quaternion, tolerances=None, weight=1.0):
         super(OrientationConstraint, self).__init__(self.ORIENTATION, weight)
         self.link_name = link_name
         self.quaternion = [float(a) for a in list(quaternion)]
@@ -392,7 +393,9 @@ class OrientationConstraint(Constraint):
 
     def __repr__(self):
         """Printable representation of :class:`OrientationConstraint`."""
-        return "OrientationConstraint({!r}, {!r}, {!r}, {!r})".format(self.link_name, self.quaternion, self.tolerances, self.weight)
+        return "OrientationConstraint({!r}, {!r}, {!r}, {!r})".format(
+            self.link_name, self.quaternion, self.tolerances, self.weight
+        )
 
     def copy(self):
         """Create a copy of this :class:`OrientationConstraint`.
@@ -438,14 +441,14 @@ class PositionConstraint(Constraint):
     >>> pc = PositionConstraint('link_0', bv, weight=1.)
     """
 
-    def __init__(self, link_name, bounding_volume, weight=1.):
+    def __init__(self, link_name, bounding_volume, weight=1.0):
         super(PositionConstraint, self).__init__(self.POSITION, weight)
         self.link_name = link_name
         self.bounding_volume = bounding_volume
         self.weight = weight
 
     @classmethod
-    def from_box(cls, link_name, box, weight=1.):
+    def from_box(cls, link_name, box, weight=1.0):
         """Create a :class:`PositionConstraint` from a :class:`compas.geometry.Box`.
 
         Parameters
@@ -473,7 +476,7 @@ class PositionConstraint(Constraint):
         return cls(link_name, bounding_volume, weight)
 
     @classmethod
-    def from_sphere(cls, link_name, sphere, weight=1.):
+    def from_sphere(cls, link_name, sphere, weight=1.0):
         """Create a :class:`PositionConstraint` from a :class:`compas.geometry.Sphere`.
 
         Parameters
@@ -501,7 +504,7 @@ class PositionConstraint(Constraint):
         return cls(link_name, bounding_volume, weight)
 
     @classmethod
-    def from_mesh(cls, link_name, mesh, weight=1.):
+    def from_mesh(cls, link_name, mesh, weight=1.0):
         """Create a class:`PositionConstraint` from a :class:`compas.datastructures.Mesh`.
 
         Parameters

@@ -5,7 +5,7 @@ __all__ = [
 ]
 
 
-class Inertia():
+class Inertia:
     """The moments of inertia represent the spatial distribution of mass in a rigid body.
 
     It depends on the mass, size, and shape of a rigid body with units of
@@ -49,8 +49,7 @@ class Inertia():
 
     @property
     def principal_moments(self):
-        """Returns the diagonal elements of the inertia tensor [ixx, iyy, izz]
-        """
+        """Returns the diagonal elements of the inertia tensor [ixx, iyy, izz]"""
         inertia_tensor = self.inertia_tensor
         return [inertia_tensor[0][0], inertia_tensor[1][1], inertia_tensor[2][2]]
 
@@ -59,6 +58,5 @@ class Inertia():
 
     @staticmethod
     def calculate_inertia_tensor(cls, mesh):
-        """Returns the inertia tensor.
-        """
+        """Returns the inertia tensor."""
         raise NotImplementedError

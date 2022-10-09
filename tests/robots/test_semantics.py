@@ -26,32 +26,38 @@ def test_panda_srdf_file(panda_srdf, panda_urdf):
     assert semantics.main_group_name == 'panda_arm_hand'
     assert semantics.get_base_link_name('panda_arm') == 'panda_link0'
     assert semantics.get_end_effector_link_name('panda_arm') == 'panda_link8'
-    assert semantics.get_configurable_joint_names('panda_arm') == ['panda_joint1',
-                                                                   'panda_joint2',
-                                                                   'panda_joint3',
-                                                                   'panda_joint4',
-                                                                   'panda_joint5',
-                                                                   'panda_joint6',
-                                                                   'panda_joint7']
+    assert semantics.get_configurable_joint_names('panda_arm') == [
+        'panda_joint1',
+        'panda_joint2',
+        'panda_joint3',
+        'panda_joint4',
+        'panda_joint5',
+        'panda_joint6',
+        'panda_joint7',
+    ]
     all_configurable_joint_names = [j.name for j in semantics.get_all_configurable_joints()]
-    assert all_configurable_joint_names == ['panda_joint1',
-                                            'panda_joint2',
-                                            'panda_joint3',
-                                            'panda_joint4',
-                                            'panda_joint5',
-                                            'panda_joint6',
-                                            'panda_joint7',
-                                            'panda_finger_joint1']
+    assert all_configurable_joint_names == [
+        'panda_joint1',
+        'panda_joint2',
+        'panda_joint3',
+        'panda_joint4',
+        'panda_joint5',
+        'panda_joint6',
+        'panda_joint7',
+        'panda_finger_joint1',
+    ]
     configurable_joints = semantics.get_configurable_joints('panda_arm_hand')
     assert [j.type for j in configurable_joints] == [0, 0, 0, 0, 0, 0, 0, 2]
     set_joints = set(semantics.group_states['panda_arm']['ready'].keys())
-    assert set_joints == {'panda_joint1',
-                          'panda_joint2',
-                          'panda_joint3',
-                          'panda_joint4',
-                          'panda_joint5',
-                          'panda_joint6',
-                          'panda_joint7'}
+    assert set_joints == {
+        'panda_joint1',
+        'panda_joint2',
+        'panda_joint3',
+        'panda_joint4',
+        'panda_joint5',
+        'panda_joint6',
+        'panda_joint7',
+    }
 
 
 def test_ur5_semantics():
@@ -61,12 +67,14 @@ def test_ur5_semantics():
     assert semantics.main_group_name == 'manipulator'
     assert semantics.get_base_link_name() == 'base_link'
     assert semantics.get_end_effector_link_name() == 'ee_link'
-    assert semantics.get_configurable_joint_names() == ['shoulder_pan_joint',
-                                                        'shoulder_lift_joint',
-                                                        'elbow_joint',
-                                                        'wrist_1_joint',
-                                                        'wrist_2_joint',
-                                                        'wrist_3_joint']
+    assert semantics.get_configurable_joint_names() == [
+        'shoulder_pan_joint',
+        'shoulder_lift_joint',
+        'elbow_joint',
+        'wrist_1_joint',
+        'wrist_2_joint',
+        'wrist_3_joint',
+    ]
 
 
 def test_disabled_collisions(panda_srdf, panda_urdf):

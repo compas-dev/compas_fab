@@ -11,7 +11,9 @@ from compas_fab.ghpython.components import create_id
 
 
 class PlanCartesianMotion(component):
-    def RunScript(self, robot, planes, start_configuration, group, attached_collision_meshes, path_constraints, max_step, compute):
+    def RunScript(
+        self, robot, planes, start_configuration, group, attached_collision_meshes, path_constraints, max_step, compute
+    ):
 
         key = create_id(self, 'trajectory')
 
@@ -21,14 +23,16 @@ class PlanCartesianMotion(component):
 
         if robot and robot.client and robot.client.is_connected and start_configuration and planes and compute:
             frames = [RhinoPlane.from_geometry(plane).to_compas_frame() for plane in planes]
-            st[key] = robot.plan_cartesian_motion(frames,
-                                                  start_configuration=start_configuration,
-                                                  group=group,
-                                                  options=dict(
-                                                      max_step=max_step,
-                                                      path_constraints=path_constraints,
-                                                      attached_collision_meshes=attached_collision_meshes
-                                                  ))
+            st[key] = robot.plan_cartesian_motion(
+                frames,
+                start_configuration=start_configuration,
+                group=group,
+                options=dict(
+                    max_step=max_step,
+                    path_constraints=path_constraints,
+                    attached_collision_meshes=attached_collision_meshes,
+                ),
+            )
 
         trajectory = st.get(key, None)
         return trajectory

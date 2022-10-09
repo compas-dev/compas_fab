@@ -17,6 +17,7 @@ from .solvers import (
     Staubli_TX260LKinematics,
     ABB_IRB4600_40_255Kinematics,
 )
+
 __all__ = [
     # exceptions
     'CartesianMotionError',

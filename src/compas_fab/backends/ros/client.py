@@ -33,9 +33,7 @@ __all__ = [
     'RosClient',
 ]
 
-PLANNER_BACKENDS = {
-    'moveit': MoveItPlanner
-}
+PLANNER_BACKENDS = {'moveit': MoveItPlanner}
 
 
 class CancellableRosActionResult(CancellableFutureResult):
@@ -98,9 +96,7 @@ class LocalCacheInfo(object):
         path_parts, robot_name = path_parts[:-1], path_parts[-1]
         local_cache_directory = os.path.sep.join(path_parts)
 
-        return LocalCacheInfo(use_local_cache=True,
-                              robot_name=robot_name,
-                              local_cache_directory=local_cache_directory)
+        return LocalCacheInfo(use_local_cache=True, robot_name=robot_name, local_cache_directory=local_cache_directory)
 
 
 class RosClient(Ros, ClientInterface):
@@ -161,7 +157,14 @@ class RosClient(Ros, ClientInterface):
 
         return self._ros_distro
 
-    def load_robot(self, load_geometry=False, urdf_param_name='/robot_description', srdf_param_name='/robot_description_semantic', precision=None, local_cache_directory=None):
+    def load_robot(
+        self,
+        load_geometry=False,
+        urdf_param_name='/robot_description',
+        srdf_param_name='/robot_description_semantic',
+        precision=None,
+        local_cache_directory=None,
+    ):
         """Load an entire robot instance -including model and semantics- directly from ROS.
 
         Parameters
@@ -222,8 +225,10 @@ class RosClient(Ros, ClientInterface):
     def follow_configurations(self, callback, joint_names, configurations, timesteps, timeout=60000):
 
         if len(configurations) != len(timesteps):
-            raise ValueError("%d configurations must have %d timesteps, but %d given." % (
-                len(configurations), len(timesteps), len(timesteps)))
+            raise ValueError(
+                "%d configurations must have %d timesteps, but %d given."
+                % (len(configurations), len(timesteps), len(timesteps))
+            )
 
         if not timeout:
             timeout = timesteps[-1] * 1000 * 2
@@ -231,12 +236,12 @@ class RosClient(Ros, ClientInterface):
         points = []
         num_joints = len(configurations[0].joint_values)
         for config, time in zip(configurations, timesteps):
-            pt = RosMsgJointTrajectoryPoint(positions=config.joint_values, velocities=[
-                                      0] * num_joints, time_from_start=Time(secs=(time)))
+            pt = RosMsgJointTrajectoryPoint(
+                positions=config.joint_values, velocities=[0] * num_joints, time_from_start=Time(secs=(time))
+            )
             points.append(pt)
 
-        joint_trajectory = RosMsgJointTrajectory(
-            Header(), joint_names, points)  # specify header necessary?
+        joint_trajectory = RosMsgJointTrajectory(Header(), joint_names, points)  # specify header necessary?
         return self.follow_joint_trajectory(joint_trajectory=joint_trajectory, callback=callback, timeout=timeout)
 
     def _convert_to_ros_trajectory(self, joint_trajectory):
@@ -255,14 +260,21 @@ class RosClient(Ros, ClientInterface):
                 velocities=point.velocities,
                 accelerations=point.accelerations,
                 effort=point.effort,
-                time_from_start=Time(
-                    point.time_from_start.secs, point.time_from_start.nsecs),
+                time_from_start=Time(point.time_from_start.secs, point.time_from_start.nsecs),
             )
             trajectory.points.append(ros_point)
 
         return trajectory
 
-    def follow_joint_trajectory(self, joint_trajectory, action_name='/joint_trajectory_action', callback=None, errback=None, feedback_callback=None, timeout=60000):
+    def follow_joint_trajectory(
+        self,
+        joint_trajectory,
+        action_name='/joint_trajectory_action',
+        callback=None,
+        errback=None,
+        feedback_callback=None,
+        timeout=60000,
+    ):
         """Follow the joint trajectory as computed by MoveIt planner.
 
         Parameters
@@ -298,9 +310,7 @@ class RosClient(Ros, ClientInterface):
         def handle_result(msg):
             result = FollowJointTrajectoryResult.from_msg(msg)
             if result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:
-                ros_error = RosError(
-                    'Follow trajectory failed={}'.format(result.error_string),
-                    int(result.error_code))
+                ros_error = RosError('Follow trajectory failed={}'.format(result.error_string), int(result.error_code))
                 action_result._set_error_result(ros_error)
                 if errback:
                     errback(ros_error)
@@ -322,14 +332,21 @@ class RosClient(Ros, ClientInterface):
             goal.on('feedback', handle_feedback)
 
         if errback:
-            goal.on('timeout', lambda: handle_failure(
-                RosError('Action Goal timeout', -1)))
+            goal.on('timeout', lambda: handle_failure(RosError('Action Goal timeout', -1)))
 
         goal.send(timeout=timeout)
 
         return action_result
 
-    def execute_joint_trajectory(self, joint_trajectory, action_name='/execute_trajectory', callback=None, errback=None, feedback_callback=None, timeout=60000):
+    def execute_joint_trajectory(
+        self,
+        joint_trajectory,
+        action_name='/execute_trajectory',
+        callback=None,
+        errback=None,
+        feedback_callback=None,
+        timeout=60000,
+    ):
         """Execute a joint trajectory via the MoveIt infrastructure.
 
         Note
@@ -370,7 +387,10 @@ class RosClient(Ros, ClientInterface):
         def handle_result(msg):
             result = ExecuteTrajectoryResult.from_msg(msg)
             if result.error_code != MoveItErrorCodes.SUCCESS:
-                ros_error = RosError('Execute trajectory failed. Message={}'.format(result.error_code.human_readable), int(result.error_code))
+                ros_error = RosError(
+                    'Execute trajectory failed. Message={}'.format(result.error_code.human_readable),
+                    int(result.error_code),
+                )
                 action_result._set_error_result(ros_error)
                 if errback:
                     errback(ros_error)

@@ -75,9 +75,7 @@ The following functions help with converting units from one system to the other.
 
 """
 
-from .configuration import (
-    Configuration
-)
+from .configuration import Configuration
 from .constraints import (
     BoundingVolume,
     Constraint,
@@ -85,9 +83,7 @@ from .constraints import (
     OrientationConstraint,
     PositionConstraint,
 )
-from .path_plan import (
-    PathPlan
-)
+from .path_plan import PathPlan
 from .planning_scene import (
     AttachedCollisionMesh,
     CollisionMesh,

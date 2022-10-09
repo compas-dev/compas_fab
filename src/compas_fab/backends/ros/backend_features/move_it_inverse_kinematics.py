@@ -28,11 +28,10 @@ __all__ = [
 
 class MoveItInverseKinematics(InverseKinematics):
     """Callable to calculate the robot's inverse kinematics for a given frame."""
-    GET_POSITION_IK = ServiceDescription('/compute_ik',
-                                         'GetPositionIK',
-                                         GetPositionIKRequest,
-                                         GetPositionIKResponse,
-                                         validate_response)
+
+    GET_POSITION_IK = ServiceDescription(
+        '/compute_ik', 'GetPositionIK', GetPositionIKRequest, GetPositionIKResponse, validate_response
+    )
 
     def __init__(self, ros_client):
         self.ros_client = ros_client
@@ -98,17 +97,18 @@ class MoveItInverseKinematics(InverseKinematics):
         for _ in range(max_results):
             yield await_callback(self.inverse_kinematics_async, **kwargs)
 
-    def inverse_kinematics_async(self, callback, errback,
-                                 frame_WCF, start_configuration=None, group=None, options=None):
+    def inverse_kinematics_async(
+        self, callback, errback, frame_WCF, start_configuration=None, group=None, options=None
+    ):
         """Asynchronous handler of MoveIt IK service."""
         base_link = options['base_link']
         header = Header(frame_id=base_link)
         pose_stamped = PoseStamped(header, Pose.from_frame(frame_WCF))
 
         joint_state = JointState(
-            name=start_configuration.joint_names, position=start_configuration.joint_values, header=header)
-        start_state = RobotState(
-            joint_state, MultiDOFJointState(header=header))
+            name=start_configuration.joint_names, position=start_configuration.joint_values, header=header
+        )
+        start_state = RobotState(joint_state, MultiDOFJointState(header=header))
         start_state.filter_fields_for_distro(self.ros_client.ros_distro)
 
         if options.get('attached_collision_meshes'):
@@ -121,13 +121,15 @@ class MoveItInverseKinematics(InverseKinematics):
         timeout_in_secs = options.get('timeout', 2)
         timeout_duration = Duration(timeout_in_secs, 0).to_data()
 
-        ik_request = PositionIKRequest(group_name=group,
-                                       robot_state=start_state,
-                                       constraints=constraints,
-                                       pose_stamped=pose_stamped,
-                                       avoid_collisions=options.get('avoid_collisions', True),
-                                       attempts=options.get('attempts', 8),
-                                       timeout=timeout_duration)
+        ik_request = PositionIKRequest(
+            group_name=group,
+            robot_state=start_state,
+            constraints=constraints,
+            pose_stamped=pose_stamped,
+            avoid_collisions=options.get('avoid_collisions', True),
+            attempts=options.get('attempts', 8),
+            timeout=timeout_duration,
+        )
 
         # The field `attempts` was removed in Noetic (and higher)
         # so it needs to be removed from the message otherwise it causes a serialization error
@@ -138,4 +140,4 @@ class MoveItInverseKinematics(InverseKinematics):
         def convert_to_positions(response):
             callback((response.solution.joint_state.position, response.solution.joint_state.name))
 
-        self.GET_POSITION_IK(self.ros_client, (ik_request, ), convert_to_positions, errback)
+        self.GET_POSITION_IK(self.ros_client, (ik_request,), convert_to_positions, errback)
