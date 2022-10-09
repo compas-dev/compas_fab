@@ -1,146 +1,95 @@
-============================================================
-COMPAS FAB: Robotic Fabrication for COMPAS
-============================================================
+# COMPAS FAB: Robotic Fabrication for COMPAS
 
-.. start-badges
+[![Github Actions Build Status](https://github.com/compas-dev/compas_fab/workflows/build/badge.svg)](https://github.com/compas-dev/compas_fab/actions)
+[![Github Actions Integration Status](https://github.com/compas-dev/compas_fab/workflows/integration/badge.svg)](https://github.com/compas-dev/compas_fab/actions)
+[![License](https://img.shields.io/github/license/compas-dev/compas_fab.svg)](https://pypi.python.org/pypi/compas_fab)
+[![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/compas_fab)](https://anaconda.org/conda-forge/compas_fab)
+[![pip downloads](https://img.shields.io/pypi/dm/compas_fab)](https://pypi.python.org/project/compas_fab)
+[![PyPI Package latest release](https://img.shields.io/pypi/v/compas_fab.svg)](https://pypi.python.org/pypi/compas_fab)
+[![Anaconda](https://img.shields.io/conda/vn/conda-forge/compas_fab.svg)](https://anaconda.org/conda-forge/compas_fab)
+[![Supported implementations](https://img.shields.io/pypi/implementation/compas_fab.svg)](https://pypi.python.org/pypi/compas_fab)
+[![DOI](https://zenodo.org/badge/107952684.svg)](https://zenodo.org/badge/latestdoi/107952684)
+[![Twitter Follow](https://img.shields.io/twitter/follow/compas_dev?style=social)](https://twitter.com/compas_dev)
 
-.. image:: https://github.com/compas-dev/compas_fab/workflows/build/badge.svg
-    :target: https://github.com/compas-dev/compas_fab/actions
-    :alt: Github Actions Build Status
-
-.. image:: https://github.com/compas-dev/compas_fab/workflows/integration/badge.svg
-    :target: https://github.com/compas-dev/compas_fab/actions
-    :alt: Github Actions Integration Status
-
-.. image:: https://img.shields.io/github/license/compas-dev/compas_fab.svg
-    :target: https://pypi.python.org/pypi/compas_fab
-    :alt: License
-
-.. image:: https://img.shields.io/conda/dn/conda-forge/compas_fab
-    :target: https://anaconda.org/conda-forge/compas_fab
-    :alt: Conda Downloads
-
-.. image:: https://img.shields.io/pypi/dm/compas_fab
-    :target: https://pypi.python.org/project/compas_fab
-    :alt: pip downloads
-
-.. image:: https://img.shields.io/pypi/v/compas_fab.svg
-    :target: https://pypi.python.org/pypi/compas_fab
-    :alt: PyPI Package latest release
-
-.. image:: https://img.shields.io/conda/vn/conda-forge/compas_fab.svg
-    :target: https://anaconda.org/conda-forge/compas_fab
-
-.. image:: https://img.shields.io/pypi/implementation/compas_fab.svg
-    :target: https://pypi.python.org/pypi/compas_fab
-    :alt: Supported implementations
-
-.. image:: https://zenodo.org/badge/107952684.svg
-   :target: https://zenodo.org/badge/latestdoi/107952684
-
-.. image:: https://img.shields.io/twitter/follow/compas_dev?style=social
-   :target: https://twitter.com/compas_dev
-   :alt: Twitter Follow
-
-.. end-badges
-
-**Robotic fabrication package for the COMPAS Framework** that facilitates the
+*Robotic fabrication package for the COMPAS Framework** that facilitates the
 planning and execution of robotic fabrication processes. It provides interfaces
 to existing software libraries and tools available in the field of robotics
 (e.g. OMPL, ROS) and makes them accessible from within the parametric design
-environment. The package builds upon `COMPAS <https://compas.dev/>`_,
+environment. The package builds upon [COMPAS](https://compas.dev/),
 an open-source Python-based framework for collaboration and research in
 architecture, engineering and digital fabrication.
 
 
-Main features
--------------
+## Main features
 
-* Multiple backends for simulation and execution (e.g. `ROS: Robot Operating System <https://ros.org>`_)
+* Multiple backends for simulation and execution (eg. [ROS: Robot Operating System](https://ros.org))
 * Planning tools: kinematic solvers, path planning, etc.
 * Execution tools: feedback loops, robot control, etc.
 
 **COMPAS FAB** runs on Python 3.x and IronPython 2.7.
 
 
-Getting Started
----------------
+## Getting Started
 
-The recommended way to install **COMPAS FAB** is to use `Anaconda/conda <https://conda.io/docs/>`_:
-
-::
+The recommended way to install **COMPAS FAB** is to use [anaconda/conda](https://conda.io/docs/):
 
     conda install -c conda-forge compas_fab
 
-But it can also be installed using ``pip``:
-
-::
+It can also be installed using `pip`:
 
     pip install compas_fab
 
 
-.. note::
-
-    On Windows, you may need to install
-    `Microsoft Visual C++ 14.0 <https://www.scivision.co/python-windows-visual-c++-14-required/>`_.
+> On Windows, you may need to install [Microsoft Visual C++ 14.0](https://www.scivision.co/python-windows-visual-c++-14-required/).
 
 
 Once the installation is completed, you can verify your setup.
 Start Python from the command prompt and run the following:
 
-::
-
     >>> import compas_fab
 
 
-First Steps
------------
+## First Steps
 
-* `Documentation <https://gramaziokohler.github.io/compas_fab/>`_
-* `COMPAS FAB Examples <https://gramaziokohler.github.io/compas_fab/latest/examples.html>`_
-* `COMPAS FAB API Reference <https://gramaziokohler.github.io/compas_fab/latest/reference.html>`_
-* `COMPAS Tutorials <https://compas.dev/compas/latest/tutorial.html>`_
-* `COMPAS API Reference <https://compas.dev/compas/latest/api.html>`_
+* [Documentation](https://gramaziokohler.github.io/compas_fab/)
+* [COMPAS FAB Examples](https://gramaziokohler.github.io/compas_fab/latest/examples.html)
+* [COMPAS FAB API Reference](https://gramaziokohler.github.io/compas_fab/latest/reference.html)
+* [COMPAS Tutorials](https://compas.dev/compas/latest/tutorial.html)
+* [COMPAS API Reference](https://compas.dev/compas/latest/api.html)
 
 
-Questions and feedback
-----------------------
+## Questions and feedback
 
-We encourage the use of the `COMPAS framework forum <https://forum.compas-framework.org/>`_
+We encourage the use of the [COMPAS framework forum](https://forum.compas-framework.org/)
 for questions and discussions.
 
 
-Contributing
-------------
+## Contributing
 
 We love contributions!
 
-Check the `Contributor's Guide <https://github.com/compas-dev/compas_fab/blob/main/CONTRIBUTING.rst>`_
+Check the [Contributor's Guide](https://github.com/compas-dev/compas_fab/blob/main/CONTRIBUTING.rst)
 for more details.
 
 
-Releasing this project
-----------------------
+## Releasing this project
 
 Ready to release a new version of **COMPAS FAB**? Here's how to do it:
 
-* We use `semver <https://semver.org/>`_, i.e. we bump versions as follows:
+* We use [semver][https://semver.org/], ie. we bump versions as follows:
 
-  * ``patch``: bugfixes.
-  * ``minor``: backwards-compatible features added.
-  * ``major``: backwards-incompatible changes.
+  * `patch`: bugfixes.
+  * `minor`: backwards-compatible features added.
+  * `major`: backwards-incompatible changes.
 
-* Update the ``CHANGELOG.rst`` with all novelty!
+* Update the `CHANGELOG.rst` with all novelty!
 * Ready? Release everything in one command:
 
-::
-
-    invoke release [patch|minor|major]
+      invoke release [patch|minor|major]
 
 * Celebrate! 💃
 
-Credits
--------
+## Credits
 
-This package is maintained by Gramazio Kohler Research `@gramaziokohler <https://github.com/gramaziokohler>`_
-and a long list of `contributors <https://github.com/compas-dev/compas_fab/blob/main/AUTHORS.rst>`_
+This package is maintained by Gramazio Kohler Research [`@gramaziokohler`](https://github.com/gramaziokohler)
+and a long list of [contributors](https://github.com/compas-dev/compas_fab/blob/main/AUTHORS.rst).

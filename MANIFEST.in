@@ -9,7 +9,7 @@ include AUTHORS.rst
 include CHANGELOG.md
 include CONTRIBUTING.rst
 include LICENSE
-include README.rst
+include README.md
 
 exclude requirements-dev.txt
 exclude .deepsource.toml
