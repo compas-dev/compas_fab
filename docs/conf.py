@@ -9,29 +9,55 @@ import sys
 import os
 import inspect
 import importlib
+import m2r2
 
 import sphinx_compas_theme
 from sphinx.ext.napoleon.docstring import NumpyDocstring
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../src'))
+# sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../src"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "_ext"))
+
+# patches
+
+current_m2r2_setup = m2r2.setup
+
+
+def patched_m2r2_setup(app):
+    try:
+        return current_m2r2_setup(app)
+    except (AttributeError):
+        app.add_source_suffix(".md", "markdown")
+        app.add_source_parser(m2r2.M2RParser)
+    return dict(
+        version=m2r2.__version__,
+        parallel_read_safe=True,
+        parallel_write_safe=True,
+    )
+
+
+m2r2.setup = patched_m2r2_setup
 
 # -- General configuration ------------------------------------------------
 
-project = 'COMPAS FAB'
-year = '2018'
-author = 'Gramazio Kohler Research'
-copyright = '{0}, {1}'.format(year, author)
-version = release = '0.26.0'
+project = "COMPAS FAB"
+year = "2018"
+author = "Gramazio Kohler Research"
+copyright = "{0}, {1}".format(year, author)
+version = release = "0.26.0"
 
 master_doc = "index"
-source_suffix = [".rst", ]
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
 templates_path = sphinx_compas_theme.get_autosummary_templates_path()
-exclude_patterns = []
+exclude_patterns = ["_build", "**.ipynb_checkpoints", "_notebooks", "**/__temp"]
 
 pygments_style = "sphinx"
 show_authors = True
 add_module_names = True
-language = None
+language = "en"
+
 
 # -- Extension configuration ------------------------------------------------
 
@@ -39,18 +65,30 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.doctest",
-    "sphinx.ext.coverage",
-    "sphinx.ext.linkcode",
-    "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
+    "sphinx.ext.linkcode",
+    "sphinx.ext.extlinks",
     "sphinx.ext.githubpages",
+    "sphinx.ext.coverage",
+    "sphinx.ext.inheritance_diagram",
+    "sphinx.ext.graphviz",
     "matplotlib.sphinxext.plot_directive",
-    "tabs"
+    "m2r2",
+    # "nbsphinx",
+    "sphinx.ext.autodoc.typehints",
+    "tabs",
 ]
 
 # autodoc options
+
+autodoc_type_aliases = {}
+
+# this does not work properly yet
+autodoc_typehints = "none"
+autodoc_typehints_format = "short"
+autodoc_typehints_description_target = "documented"
 
 autodoc_mock_imports = [
     "System",
@@ -62,7 +100,7 @@ autodoc_mock_imports = [
     "rhinoscriptsyntax",
     "bpy",
     "bmesh",
-    "mathutils"
+    "mathutils",
 ]
 
 autodoc_default_options = {
@@ -70,15 +108,16 @@ autodoc_default_options = {
     "show-inheritance": True,
 }
 
-autodoc_member_order = "alphabetical"
+autodoc_member_order = "groupwise"
 
 autoclass_content = "class"
 
 
 def skip(app, what, name, obj, would_skip, options):
-    if name.startswith('_'):
+    if name.startswith("_"):
         return True
     return would_skip
+
 
 def setup(app):
     app.connect("autodoc-skip-member", skip)
@@ -87,7 +126,23 @@ def setup(app):
 # autosummary options
 
 autosummary_generate = True
+autosummary_mock_imports = [
+    "System",
+    "clr",
+    "Eto",
+    "Rhino",
+    "Grasshopper",
+    "scriptcontext",
+    "rhinoscriptsyntax",
+    "bpy",
+    "bmesh",
+    "mathutils",
+]
 
+# graph options
+
+inheritance_graph_attrs = dict(rankdir="LR", resolution=150)
+inheritance_node_attrs = dict(fontsize=8)
 
 # napoleon options
 
@@ -103,60 +158,118 @@ napoleon_use_ivar = False
 napoleon_use_param = False
 napoleon_use_rtype = False
 
-# plot options
 
-plot_html_show_source_link = False
-plot_html_show_formats = False
+# first, we define new methods for any new sections and add them to the class
+def parse_keys_section(self, section):
+    return self._format_fields("Keys", self._consume_fields())
 
-# docstring sections
+
+NumpyDocstring._parse_keys_section = parse_keys_section
+
 
 def parse_attributes_section(self, section):
     return self._format_fields("Attributes", self._consume_fields())
 
+
 NumpyDocstring._parse_attributes_section = parse_attributes_section
 
+
+def parse_class_attributes_section(self, section):
+    return self._format_fields("Class Attributes", self._consume_fields())
+
+
+NumpyDocstring._parse_class_attributes_section = parse_class_attributes_section
+
+
+def parse_other_attributes_section(self, section):
+    return self._format_fields("Other Attributes", self._consume_fields())
+
+
+NumpyDocstring._parse_other_attributes_section = parse_other_attributes_section
+
+
+# we now patch the parse method to guarantee that the the above methods are
+# assigned to the _section dict
 def patched_parse(self):
+    self._sections["keys"] = self._parse_keys_section
     self._sections["attributes"] = self._parse_attributes_section
+    self._sections["class attributes"] = self._parse_class_attributes_section
+    self._sections["other attributes"] = self._parse_other_attributes_section
     self._unpatched_parse()
+
 
 NumpyDocstring._unpatched_parse = NumpyDocstring._parse
 NumpyDocstring._parse = patched_parse
 
+
+# plot options
+
+plot_include_source = False
+plot_html_show_source_link = False
+plot_html_show_formats = False
+plot_formats = ["png"]
+# plot_pre_code
+# plot_basedir
+# plot_rcparams
+# plot_apply_rcparams
+# plot_working_directory
+
+plot_template = """
+{{ only_html }}
+
+   {% for img in images %}
+   {% set has_class = false %}
+
+   .. figure:: {{ build_dir }}/{{ img.basename }}.{{ default_fmt }}
+      :class: figure-img img-fluid
+
+      {{ caption }}
+
+   {% endfor %}
+"""
+
 # intersphinx options
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/', None),
-    'compas': ('https://compas.dev/compas/latest/', None),
-    'roslibpy': ('https://roslibpy.readthedocs.io/en/latest/', None)
+    "python": ("https://docs.python.org/", None),
+    "compas": ("https://compas.dev/compas/latest/", None),
+    "roslibpy": ("https://roslibpy.readthedocs.io/en/latest/", None),
 }
 
 # linkcode
 
+
 def linkcode_resolve(domain, info):
-    if domain != 'py':
+    if domain != "py":
         return None
-    if not info['module']:
+    if not info["module"]:
         return None
-    if not info['fullname']:
-        return None
-
-    package = info['module'].split('.')[0]
-    if not package.startswith('compas_fab'):
+    if not info["fullname"]:
         return None
 
-    module = importlib.import_module(info['module'])
-    parts = info['fullname'].split('.')
+    package = info["module"].split(".")[0]
+    if not package.startswith("compas_fab"):
+        return None
+
+    module = importlib.import_module(info["module"])
+    parts = info["fullname"].split(".")
 
     if len(parts) == 1:
-        obj = getattr(module, info['fullname'])
-        filename = inspect.getmodule(obj).__name__.replace('.', '/')
+        obj = getattr(module, info["fullname"])
+        mod = inspect.getmodule(obj)
+        if not mod:
+            return None
+        filename = mod.__name__.replace(".", "/")
         lineno = inspect.getsourcelines(obj)[1]
     elif len(parts) == 2:
         obj_name, attr_name = parts
         obj = getattr(module, obj_name)
         attr = getattr(obj, attr_name)
         if inspect.isfunction(attr):
-            filename = inspect.getmodule(obj).__name__.replace('.', '/')
+            mod = inspect.getmodule(attr)
+            if not mod:
+                return None
+            filename = mod.__name__.replace(".", "/")
             lineno = inspect.getsourcelines(attr)[1]
         else:
             return None
@@ -165,16 +278,17 @@ def linkcode_resolve(domain, info):
 
     return f"https://github.com/compas-dev/compas_fab/blob/main/src/{filename}.py#L{lineno}"
 
+
 # extlinks
 
 extlinks = {
-    'issue': ('https://github.com/compas-dev/compas_fab/issues/%s', '#'),
-    'pr': ('https://github.com/compas-dev/compas_fab/pull/%s', 'PR #'),
+    "issue": ("https://github.com/compas-dev/compas_fab/issues/%s", "#"),
+    "pr": ("https://github.com/compas-dev/compas_fab/pull/%s", "PR #"),
 }
 
 # linkcheck options
 
-linkcheck_ignore = [r'http://localhost:\d+/']
+linkcheck_ignore = [r"http://localhost:\d+/"]
 
 
 # -- Options for HTML output ----------------------------------------------
@@ -183,13 +297,13 @@ html_theme = "compaspkg"
 html_theme_path = sphinx_compas_theme.get_html_theme_path()
 
 html_theme_options = {
-    "package_name"    : 'compas_fab',
-    "package_title"   : project,
-    "package_version" : release,
-    "package_author"  : "{{ cookiecutter.author_name }}",
-    "package_docs"    : "https://gramaziokohler.github.io/compas_fab/",
-    "package_repo"    : "https://github.com/compas-dev/compas_fab",
-    "package_old_versions_txt": "https://gramaziokohler.github.io/compas_fab/doc_versions.txt"
+    "package_name": "compas_fab",
+    "package_title": project,
+    "package_version": release,
+    "package_author": "{{ cookiecutter.author_name }}",
+    "package_docs": "https://gramaziokohler.github.io/compas_fab/",
+    "package_repo": "https://github.com/compas-dev/compas_fab",
+    "package_old_versions_txt": "https://gramaziokohler.github.io/compas_fab/doc_versions.txt",
 }
 
 html_context = {}

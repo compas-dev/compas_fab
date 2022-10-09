@@ -5,6 +5,7 @@ check-manifest>=0.36
 flake8
 invoke>=0.14
 isort
+m2r2
 pylint
 pytest_mock
 pytest-cov
