@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed behavior of `Attach Tool` GH component to only attach the tool but not add it to the planning scene state.
 * Duration class takes floats as `sec` variable.
 * Changed the behavior of `forward_kinematics`, `inverse_kinematics`, `iter_inverse_kinematics`, `plan_cartesian_motion` and constraints construction methods (`orientation_constraint_from_frame`, `position_constraint_from_frame`, `constraints_from_frame`) in `Robot` class to use the frame of the attached tool if a tool is attached. This behavior can be reverted back (ie. only calculate T0CF) using the flag `use_attached_tool_frame` of all these methods.
+* Fixed usage of `tangent_points_to_circle_xy` in Spherical Wrist solver to work with COMPAS v1.16 and older.
 
 ### Fixed
 
