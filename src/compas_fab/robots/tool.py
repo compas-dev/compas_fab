@@ -11,7 +11,7 @@ from compas_fab.robots.planning_scene import AttachedCollisionMesh
 from compas_fab.robots.planning_scene import CollisionMesh
 
 
-__all__ = ['Tool']
+__all__ = ["Tool"]
 
 
 class Tool(object):
@@ -54,7 +54,7 @@ class Tool(object):
             for i, item in enumerate(link.collision):
                 meshes = Geometry._get_item_meshes(item)
                 for mesh in meshes:
-                    collision_mesh_name = '{}_{}_collision_{}'.format(self.tool_model.name, link.name, i)
+                    collision_mesh_name = "{}_{}_collision_{}".format(self.tool_model.name, link.name, i)
                     collision_mesh = CollisionMesh(mesh, collision_mesh_name)
                     attached_collision_mesh = AttachedCollisionMesh(collision_mesh, self.link_name, [self.link_name])
                     acms.append(attached_collision_mesh)
@@ -141,7 +141,7 @@ class Tool(object):
         >>> filepath = os.path.join(compas_fab.DATA, "planning_scene", "cone_tool.json")
         >>> tool = Tool.from_json(filepath)
         """
-        with open(filepath, 'r') as f:
+        with open(filepath, "r") as f:
             data = json.load(f)
         return cls.from_data(data)
 
@@ -165,7 +165,7 @@ class Tool(object):
         >>> filepath = os.path.join(compas_fab.DATA, "planning_scene", "cone_tool.json")
         >>> tool.to_json(filepath)
         """
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(self.data, f, indent=4, sort_keys=True)
 
     def update_touch_links(self, touch_links=None):

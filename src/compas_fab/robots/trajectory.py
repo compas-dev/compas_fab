@@ -10,9 +10,9 @@ from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots.time_ import Duration
 
 __all__ = [
-    'JointTrajectory',
-    'JointTrajectoryPoint',
-    'Trajectory',
+    "JointTrajectory",
+    "JointTrajectoryPoint",
+    "Trajectory",
 ]
 
 
@@ -82,13 +82,13 @@ class JointTrajectoryPoint(Configuration):
 
     def __str__(self):
         """Return a human-readable string representation of the instance."""
-        vs = '%.' + self._precision
-        return 'JointTrajectoryPoint(({}), {}, ({}), ({}), ({}), {})'.format(
-            ', '.join(vs % i for i in self.joint_values),
+        vs = "%." + self._precision
+        return "JointTrajectoryPoint(({}), {}, ({}), ({}), ({}), {})".format(
+            ", ".join(vs % i for i in self.joint_values),
             tuple(self.joint_types),
-            ', '.join(vs % i for i in self.velocities),
-            ', '.join(vs % i for i in self.accelerations),
-            ', '.join(vs % i for i in self.effort),
+            ", ".join(vs % i for i in self.velocities),
+            ", ".join(vs % i for i in self.accelerations),
+            ", ".join(vs % i for i in self.effort),
             self.time_from_start,
         )
 
@@ -105,7 +105,7 @@ class JointTrajectoryPoint(Configuration):
     @velocities.setter
     def velocities(self, velocities):
         if len(self.joint_values) != len(velocities):
-            raise ValueError('Must have {} velocities, but {} given.'.format(len(self.joint_values), len(velocities)))
+            raise ValueError("Must have {} velocities, but {} given.".format(len(self.joint_values), len(velocities)))
 
         self._velocities = FixedLengthList(velocities)
 
@@ -118,7 +118,7 @@ class JointTrajectoryPoint(Configuration):
     def accelerations(self, accelerations):
         if len(self.joint_values) != len(accelerations):
             raise ValueError(
-                'Must have {} accelerations, but {} given.'.format(len(self.joint_values), len(accelerations))
+                "Must have {} accelerations, but {} given.".format(len(self.joint_values), len(accelerations))
             )
 
         self._accelerations = FixedLengthList(accelerations)
@@ -131,7 +131,7 @@ class JointTrajectoryPoint(Configuration):
     @effort.setter
     def effort(self, effort):
         if len(self.joint_values) != len(effort):
-            raise ValueError('Must have {} efforts, but {} given.'.format(len(self.joint_values), len(effort)))
+            raise ValueError("Must have {} efforts, but {} given.".format(len(self.joint_values), len(effort)))
 
         self._effort = FixedLengthList(effort)
 
@@ -144,22 +144,22 @@ class JointTrajectoryPoint(Configuration):
         and setter should always be used in combination with each other.
         """
         data_obj = super(JointTrajectoryPoint, self).data
-        data_obj['velocities'] = self.velocities
-        data_obj['accelerations'] = self.accelerations
-        data_obj['effort'] = self.effort
-        data_obj['time_from_start'] = self.time_from_start.to_data()
+        data_obj["velocities"] = self.velocities
+        data_obj["accelerations"] = self.accelerations
+        data_obj["effort"] = self.effort
+        data_obj["time_from_start"] = self.time_from_start.to_data()
 
         return data_obj
 
     @data.setter
     def data(self, data):
-        self._joint_values = FixedLengthList(data.get('joint_values') or data.get('values') or [])
-        self._joint_types = FixedLengthList(data.get('joint_types') or data.get('types') or [])
-        self._joint_names = FixedLengthList(data.get('joint_names') or [])
-        self._velocities = FixedLengthList(data.get('velocities') or [])
-        self._accelerations = FixedLengthList(data.get('accelerations') or [])
-        self._effort = FixedLengthList(data.get('effort') or [])
-        self.time_from_start = Duration.from_data(data.get('time_from_start') or {})
+        self._joint_values = FixedLengthList(data.get("joint_values") or data.get("values") or [])
+        self._joint_types = FixedLengthList(data.get("joint_types") or data.get("types") or [])
+        self._joint_names = FixedLengthList(data.get("joint_names") or [])
+        self._velocities = FixedLengthList(data.get("velocities") or [])
+        self._accelerations = FixedLengthList(data.get("accelerations") or [])
+        self._effort = FixedLengthList(data.get("effort") or [])
+        self.time_from_start = Duration.from_data(data.get("time_from_start") or {})
 
     def copy(self):
         """Create a copy of this :class:`JointTrajectoryPoint`.
@@ -337,23 +337,23 @@ class JointTrajectory(Trajectory):
     def data(self):
         """:obj:`dict` : The data representing the trajectory."""
         data_obj = {}
-        data_obj['points'] = [p.to_data() for p in self.points]
-        data_obj['joint_names'] = self.joint_names or []
-        data_obj['start_configuration'] = self.start_configuration.to_data() if self.start_configuration else None
-        data_obj['fraction'] = self.fraction
-        data_obj['attached_collision_meshes'] = [acm.to_data() for acm in self.attached_collision_meshes]
+        data_obj["points"] = [p.to_data() for p in self.points]
+        data_obj["joint_names"] = self.joint_names or []
+        data_obj["start_configuration"] = self.start_configuration.to_data() if self.start_configuration else None
+        data_obj["fraction"] = self.fraction
+        data_obj["attached_collision_meshes"] = [acm.to_data() for acm in self.attached_collision_meshes]
 
         return data_obj
 
     @data.setter
     def data(self, data):
-        self.points = list(map(JointTrajectoryPoint.from_data, data.get('points') or []))
-        self.joint_names = data.get('joint_names', [])
-        if data.get('start_configuration'):
-            self.start_configuration = Configuration.from_data(data.get('start_configuration'))
-        self.fraction = data.get('fraction')
+        self.points = list(map(JointTrajectoryPoint.from_data, data.get("points") or []))
+        self.joint_names = data.get("joint_names", [])
+        if data.get("start_configuration"):
+            self.start_configuration = Configuration.from_data(data.get("start_configuration"))
+        self.fraction = data.get("fraction")
         self.attached_collision_meshes = [
-            AttachedCollisionMesh.from_data(acm_data) for acm_data in data.get('attached_collision_meshes', [])
+            AttachedCollisionMesh.from_data(acm_data) for acm_data in data.get("attached_collision_meshes", [])
         ]
 
     @property

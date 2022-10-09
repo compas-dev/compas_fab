@@ -14,7 +14,7 @@ from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
 
 __all__ = [
-    'MoveItRemoveAttachedCollisionMesh',
+    "MoveItRemoveAttachedCollisionMesh",
 ]
 
 
@@ -22,8 +22,8 @@ class MoveItRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
     """Callable to remove an attached collision mesh from the robot."""
 
     APPLY_PLANNING_SCENE = ServiceDescription(
-        '/apply_planning_scene',
-        'ApplyPlanningScene',
+        "/apply_planning_scene",
+        "ApplyPlanningScene",
         ApplyPlanningSceneRequest,
         ApplyPlanningSceneResponse,
     )
@@ -46,8 +46,8 @@ class MoveItRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
         ``None``
         """
         kwargs = {}
-        kwargs['id'] = id
-        kwargs['errback_name'] = 'errback'
+        kwargs["id"] = id
+        kwargs["errback_name"] = "errback"
 
         return await_callback(self.remove_attached_collision_mesh_async, **kwargs)
 

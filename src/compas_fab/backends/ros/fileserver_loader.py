@@ -17,11 +17,11 @@ from compas.robots.resources.basic import _get_file_format
 from compas.robots.resources.basic import _mesh_import
 from compas.utilities import geometric_key
 
-LOGGER = logging.getLogger('compas_fab.backends.ros')
+LOGGER = logging.getLogger("compas_fab.backends.ros")
 TIMEOUT = 10
 
 __all__ = [
-    'RosFileServerLoader',
+    "RosFileServerLoader",
 ]
 
 
@@ -29,15 +29,15 @@ def _cache_file_exists(filename):
     return os.path.isfile(filename)
 
 
-def _read_file(filename, mode='r'):
-    LOGGER.debug('Loading file %s from local cache dir', filename)
+def _read_file(filename, mode="r"):
+    LOGGER.debug("Loading file %s from local cache dir", filename)
 
     with open(filename, mode) as f:
         return f.read()
 
 
-def _write_file(filename, file_contents, mode='w'):
-    LOGGER.debug('Saving file to %s', filename)
+def _write_file(filename, file_contents, mode="w"):
+    LOGGER.debug("Saving file to %s", filename)
 
     dirname = os.path.dirname(filename)
 
@@ -70,7 +70,7 @@ class RosFileServerLoader(object):
 
     def __init__(self, ros=None, local_cache=False, local_cache_directory=None, precision=None):
         self.robot_name = None
-        self.schema_prefix = 'package://'
+        self.schema_prefix = "package://"
         self.ros = ros
         self.local_cache_directory = None
         self.local_cache_enabled = local_cache
@@ -78,28 +78,28 @@ class RosFileServerLoader(object):
 
         if self.local_cache_enabled:
             self.local_cache_directory = local_cache_directory or os.path.join(
-                os.path.expanduser('~'), 'robot_description'
+                os.path.expanduser("~"), "robot_description"
             )
 
     @property
     def _robot_resource_path(self):
         if not self.robot_name:
-            raise Exception('Robot name is not assigned, make sure you loaded URDF first')
+            raise Exception("Robot name is not assigned, make sure you loaded URDF first")
 
         if not self.local_cache_directory:
-            raise ValueError('local_cache_directory not set')
+            raise ValueError("local_cache_directory not set")
 
         return os.path.join(self.local_cache_directory, self.robot_name)
 
     @property
     def _urdf_filename(self):
-        return os.path.join(self._robot_resource_path, 'urdf', 'robot_description.urdf')
+        return os.path.join(self._robot_resource_path, "urdf", "robot_description.urdf")
 
     @property
     def _srdf_filename(self):
-        return os.path.join(self._robot_resource_path, 'robot_description_semantic.srdf')
+        return os.path.join(self._robot_resource_path, "robot_description_semantic.srdf")
 
-    def load_urdf(self, parameter_name='/robot_description'):
+    def load_urdf(self, parameter_name="/robot_description"):
         """Loads a URDF model from the specified ROS parameter.
 
         Parameters
@@ -131,7 +131,7 @@ class RosFileServerLoader(object):
 
         return urdf
 
-    def load_srdf(self, parameter_name='/robot_description_semantic'):
+    def load_srdf(self, parameter_name="/robot_description_semantic"):
         """Loads an SRDF model from the specified ROS parameter.
 
         Parameters
@@ -163,7 +163,7 @@ class RosFileServerLoader(object):
         # TODO: Optimize this. We really don't need to parse the full URDF
         # only to read the robot's name (only used for local caching)
         xml = XML.from_string(robot_description)
-        return xml.root.attrib['name']
+        return xml.root.attrib["name"]
 
     def can_load_mesh(self, url):
         """Determine whether this loader can load a given mesh URL.
@@ -203,29 +203,29 @@ class RosFileServerLoader(object):
             local_filename = self._local_mesh_filename(url)
             use_local_file = _cache_file_exists(local_filename)
         else:
-            _, local_filename = tempfile.mkstemp(suffix='.' + file_extension, prefix='ros_fileserver_')
+            _, local_filename = tempfile.mkstemp(suffix="." + file_extension, prefix="ros_fileserver_")
 
         if not use_local_file:
-            service = roslibpy.Service(self.ros, '/file_server/get_file', 'file_server/GetBinaryFile')
+            service = roslibpy.Service(self.ros, "/file_server/get_file", "file_server/GetBinaryFile")
             request = roslibpy.ServiceRequest(dict(name=url))
             response = service.call(request, timeout=TIMEOUT)
 
-            file_content = binascii.a2b_base64(response.data['value'])
+            file_content = binascii.a2b_base64(response.data["value"])
 
             # Just look away, we're about to do something nasty!
             # namespaces are handled differently between the CLI and CPython
             # XML parsers, so, we just get rid of it for DAE files
-            if file_extension == 'dae':
-                file_content = file_content.replace(b'xmlns="http://www.collada.org/2005/11/COLLADASchema"', b'')
-                file_content = file_content.replace(b'xmlns="https://www.collada.org/2005/11/COLLADASchema"', b'')
+            if file_extension == "dae":
+                file_content = file_content.replace(b'xmlns="http://www.collada.org/2005/11/COLLADASchema"', b"")
+                file_content = file_content.replace(b'xmlns="https://www.collada.org/2005/11/COLLADASchema"', b"")
 
             # compas.files does not support file-like objects so we need to
             # save the file to disk always. If local caching is enabled,
             # we store it in the cache folder, otherwise, as a temp file.
-            _write_file(local_filename, file_content, 'wb')
+            _write_file(local_filename, file_content, "wb")
         else:
             # Nothing to do here, the file will be read by the mesh importer
-            LOGGER.debug('Loading mesh file %s from local cache dir', local_filename)
+            LOGGER.debug("Loading mesh file %s from local cache dir", local_filename)
 
         return _fileserver_mesh_import(url, local_filename, self.precision)
 
@@ -248,7 +248,7 @@ class RosFileServerLoader(object):
         return self.load_mesh(url)
 
     def _local_mesh_filename(self, url):
-        return os.path.abspath(os.path.join(self._robot_resource_path, url[len('package://') :]))
+        return os.path.abspath(os.path.join(self._robot_resource_path, url[len("package://") :]))
 
 
 def _dae_mesh_importer(filename, precision):
@@ -258,13 +258,13 @@ def _dae_mesh_importer(filename, precision):
     """
     dae = XML.from_file(filename)
     meshes = []
-    visual_scenes = dae.root.find('library_visual_scenes')
-    materials = dae.root.find('library_materials')
-    effects = dae.root.find('library_effects')
+    visual_scenes = dae.root.find("library_visual_scenes")
+    materials = dae.root.find("library_materials")
+    effects = dae.root.find("library_effects")
 
-    for geometry in dae.root.findall('library_geometries/geometry'):
-        mesh_xml = geometry.find('mesh')
-        mesh_id = geometry.attrib['id']
+    for geometry in dae.root.findall("library_geometries/geometry"):
+        mesh_xml = geometry.find("mesh")
+        mesh_id = geometry.attrib["id"]
         matrix_node = visual_scenes.find('visual_scene/node/instance_geometry[@url="#{}"]/../matrix'.format(mesh_id))
         transform = None
 
@@ -280,15 +280,15 @@ def _dae_mesh_importer(filename, precision):
         # lines, linestrips, polygons, polylist, triangles, trifans, tristrips
         # The current implementation only supports triangles and polylist of triangular meshes
         primitive_element_sets = []
-        primitive_element_sets.extend(mesh_xml.findall('triangles'))
-        primitive_element_sets.extend(mesh_xml.findall('polylist'))
+        primitive_element_sets.extend(mesh_xml.findall("triangles"))
+        primitive_element_sets.extend(mesh_xml.findall("polylist"))
 
         if len(primitive_element_sets) == 0:
-            raise Exception('No primitive elements found (currently only triangles and polylist are supported)')
+            raise Exception("No primitive elements found (currently only triangles and polylist are supported)")
 
         for primitive_element_set in primitive_element_sets:
             primitive_tag = primitive_element_set.tag
-            primitive_set_data = primitive_element_set.find('p').text.split()
+            primitive_set_data = primitive_element_set.find("p").text.split()
 
             # Try to retrieve mesh colors
             mesh_colors = {}
@@ -296,36 +296,36 @@ def _dae_mesh_importer(filename, precision):
             if materials is not None and effects is not None:
                 try:
                     instance_effect = None
-                    material_id = primitive_element_set.attrib.get('material')
-                    primitive_count = int(primitive_element_set.attrib['count'])
+                    material_id = primitive_element_set.attrib.get("material")
+                    primitive_count = int(primitive_element_set.attrib["count"])
 
                     if material_id is not None:
                         instance_effect = materials.find('material[@id="{}"]/instance_effect'.format(material_id))
 
                     if instance_effect is not None:
-                        instance_effect_id = instance_effect.attrib['url'][1:]
+                        instance_effect_id = instance_effect.attrib["url"][1:]
                         colors = effects.findall(
                             'effect[@id="{}"]/profile_COMMON/technique/phong/*/color'.format(instance_effect_id)
                         )
                         for color_node in colors:
                             rgba = [float(i) for i in color_node.text.split()]
-                            mesh_colors['mesh_color.{}'.format(color_node.attrib['sid'])] = rgba
+                            mesh_colors["mesh_color.{}".format(color_node.attrib["sid"])] = rgba
                 except Exception:
                     LOGGER.exception(
-                        'Exception while loading materials, all materials of mesh file %s will be ignored ', filename
+                        "Exception while loading materials, all materials of mesh file %s will be ignored ", filename
                     )
 
             # Parse vertices
-            all_offsets = sorted([int(i.attrib['offset']) for i in primitive_element_set.findall('input[@offset]')])
+            all_offsets = sorted([int(i.attrib["offset"]) for i in primitive_element_set.findall("input[@offset]")])
             if not all_offsets:
                 raise Exception(
-                    'Primitive element node does not contain offset information! Primitive tag={}'.format(primitive_tag)
+                    "Primitive element node does not contain offset information! Primitive tag={}".format(primitive_tag)
                 )
 
             vertices_input = primitive_element_set.find('input[@semantic="VERTEX"]')
-            vertices_id = vertices_input.attrib['source'][1:]
+            vertices_id = vertices_input.attrib["source"][1:]
             vertices_link = mesh_xml.find('vertices[@id="{}"]/input'.format(vertices_id))
-            positions = mesh_xml.find('source[@id="{}"]/float_array'.format(vertices_link.attrib['source'][1:]))
+            positions = mesh_xml.find('source[@id="{}"]/float_array'.format(vertices_link.attrib["source"][1:]))
             positions = positions.text.split()
 
             vertices = [[float(p) for p in positions[i : i + 3]] for i in range(0, len(positions), 3)]
@@ -335,14 +335,14 @@ def _dae_mesh_importer(filename, precision):
             # Usually, every second item is the normal, but there can be other items offset in there (vertex tangents, etc)
             skip_step = 1 + all_offsets[-1]
 
-            if primitive_tag == 'triangles':
+            if primitive_tag == "triangles":
                 vcount = [3] * primitive_count
-            elif primitive_tag == 'polylist':
-                vcount = [int(v) for v in primitive_element_set.find('vcount').text.split()]
+            elif primitive_tag == "polylist":
+                vcount = [int(v) for v in primitive_element_set.find("vcount").text.split()]
 
             if len(vcount) != primitive_count:
                 raise Exception(
-                    'Primitive count does not match vertex per face count, vertex input id={}'.format(vertices_id)
+                    "Primitive count does not match vertex per face count, vertex input id={}".format(vertices_id)
                 )
 
             fkeys = [int(f) for f in primitive_set_data[::skip_step]]
@@ -385,7 +385,7 @@ def _fileserver_mesh_import(url, filename, precision=None):
     to the _mesh_import function of compas.robots."""
     file_extension = _get_file_format(url)
 
-    if file_extension == 'dae':
+    if file_extension == "dae":
         # Magic!
         return _dae_mesh_importer(filename, precision)
     else:
@@ -404,13 +404,13 @@ if __name__ == "__main__":
     from compas.robots import RobotModel
     from compas_fab.backends import RosClient
 
-    FORMAT = '%(asctime)-15s [%(levelname)s] %(message)s'
+    FORMAT = "%(asctime)-15s [%(levelname)s] %(message)s"
     logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
     with RosClient() as ros:
-        local_directory = os.path.join(os.path.expanduser('~'), 'workspace', 'robot_description')
+        local_directory = os.path.join(os.path.expanduser("~"), "workspace", "robot_description")
         importer = RosFileServerLoader(ros, local_cache=True, local_cache_directory=local_directory)
-        importer.robot_name = 'abb_irb1600_6_12'
+        importer.robot_name = "abb_irb1600_6_12"
 
         urdf = importer.load_urdf()
         srdf = importer.load_srdf()

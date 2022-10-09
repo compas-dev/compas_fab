@@ -32,11 +32,11 @@ class ROSmsg(object):
     def msg(self):
         msg = {}
         for key, value in self.__dict__.items():
-            if hasattr(value, 'msg'):
+            if hasattr(value, "msg"):
                 msg[key] = value.msg
             elif isinstance(value, list):
                 if len(value):
-                    if hasattr(value[0], 'msg'):
+                    if hasattr(value[0], "msg"):
                         msg[key] = [v.msg for v in value]
                     else:
                         msg[key] = value
@@ -56,9 +56,9 @@ class ROSmsg(object):
     def __repr__(self):
         args = []
         for key, value in self.__dict__.items():
-            args.append('{}={!r}'.format(key, value))
+            args.append("{}={!r}".format(key, value))
 
-        return '{}({})'.format(self.__class__.__name__, ', '.join(args))
+        return "{}({})".format(self.__class__.__name__, ", ".join(args))
 
     @staticmethod
     def parse(msg, msg_type):
@@ -85,7 +85,7 @@ class ROSmsg(object):
             msg = json.loads(msg)
 
         if not isinstance(msg, Mapping):
-            raise Exception('Unsupported message type, use either a ROSmsg, a dict, or a json string')
+            raise Exception("Unsupported message type, use either a ROSmsg, a dict, or a json string")
 
         wrapper_cls = _TYPE_MAP.get(msg_type, ROSmsg)
 
@@ -95,7 +95,7 @@ class ROSmsg(object):
 class Time(ROSmsg):
     """https://docs.ros.org/kinetic/api/std_msgs/html/msg/Time.html"""
 
-    ROS_MSG_TYPE = 'std_msgs/Time'
+    ROS_MSG_TYPE = "std_msgs/Time"
 
     def __init__(self, secs=0, nsecs=0):
         self.secs = secs
@@ -108,9 +108,9 @@ class Time(ROSmsg):
 class Header(ROSmsg):
     """https://docs.ros.org/melodic/api/std_msgs/html/msg/Header.html"""
 
-    ROS_MSG_TYPE = 'std_msgs/Header'
+    ROS_MSG_TYPE = "std_msgs/Header"
 
-    def __init__(self, seq=0, stamp=Time(), frame_id='/world'):
+    def __init__(self, seq=0, stamp=Time(), frame_id="/world"):
         self.seq = seq
         self.stamp = stamp
         self.frame_id = frame_id
@@ -119,16 +119,16 @@ class Header(ROSmsg):
 class String(ROSmsg):
     """https://docs.ros.org/api/std_msgs/html/msg/String.html"""
 
-    ROS_MSG_TYPE = 'std_msgs/String'
+    ROS_MSG_TYPE = "std_msgs/String"
 
-    def __init__(self, data=''):
+    def __init__(self, data=""):
         self.data = data
 
 
 class MultiArrayDimension(ROSmsg):
     """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayDimension.html"""
 
-    ROS_MSG_TYPE = 'std_msgs/MultiArrayDimension'
+    ROS_MSG_TYPE = "std_msgs/MultiArrayDimension"
 
     def __init__(self, label=None, size=0, stride=0):
         self.label = label or ""  # label of given dimension
@@ -137,13 +137,13 @@ class MultiArrayDimension(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        return cls(msg['label'], msg['size'], msg['stride'])
+        return cls(msg["label"], msg["size"], msg["stride"])
 
 
 class MultiArrayLayout(ROSmsg):
     """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayLayout.html"""
 
-    ROS_MSG_TYPE = 'std_msgs/MultiArrayLayout'
+    ROS_MSG_TYPE = "std_msgs/MultiArrayLayout"
 
     def __init__(self, dim=None, data_offset=None):
         self.dim = dim or []
@@ -151,14 +151,14 @@ class MultiArrayLayout(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        dim = [MultiArrayDimension.from_msg(d) for d in msg['dim']]
-        return cls(dim, msg['data_offset'])
+        dim = [MultiArrayDimension.from_msg(d) for d in msg["dim"]]
+        return cls(dim, msg["data_offset"])
 
 
 class Int8MultiArray(ROSmsg):
     """http://docs.ros.org/en/api/std_msgs/html/msg/Int8MultiArray.html"""
 
-    ROS_MSG_TYPE = 'std_msgs/Int8MultiArray'
+    ROS_MSG_TYPE = "std_msgs/Int8MultiArray"
 
     def __init__(self, layout=None, data=None):
         self.layout = layout or MultiArrayLayout()
@@ -166,14 +166,14 @@ class Int8MultiArray(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        layout = MultiArrayLayout.from_msg(msg['layout'])
-        return cls(layout, msg['data'])
+        layout = MultiArrayLayout.from_msg(msg["layout"])
+        return cls(layout, msg["data"])
 
 
 class Float32MultiArray(ROSmsg):
     """http://docs.ros.org/en/api/std_msgs/html/msg/Float32MultiArray.html"""
 
-    ROS_MSG_TYPE = 'std_msgs/Float32MultiArray'
+    ROS_MSG_TYPE = "std_msgs/Float32MultiArray"
 
     def __init__(self, layout=None, data=None):
         self.layout = layout or MultiArrayLayout()
@@ -181,18 +181,18 @@ class Float32MultiArray(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        layout = MultiArrayLayout.from_msg(msg['layout'])
-        return cls(layout, msg['data'])
+        layout = MultiArrayLayout.from_msg(msg["layout"])
+        return cls(layout, msg["data"])
 
 
 class Int32(ROSmsg):
     """http://docs.ros.org/en/melodic/api/std_msgs/html/msg/Int32.html"""
 
-    ROS_MSG_TYPE = 'std_msgs/Int32'
+    ROS_MSG_TYPE = "std_msgs/Int32"
 
     def __init__(self, data=None):
         self.data = data or 0
 
     @classmethod
     def from_msg(cls, msg):
-        return cls(msg['data'])
+        return cls(msg["data"])

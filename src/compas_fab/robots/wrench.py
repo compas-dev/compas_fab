@@ -17,7 +17,7 @@ g = 9.80665
 gravity_vector = Vector(0, 0, -g)
 
 
-__all__ = ['Wrench']
+__all__ = ["Wrench"]
 
 
 class Wrench:
@@ -157,7 +157,7 @@ class Wrench:
         dict
             The wrench data.
         """
-        return {'force': list(self.force), 'torque': list(self.torque)}
+        return {"force": list(self.force), "torque": list(self.torque)}
 
     def to_data(self):
         """Returns the data dictionary that represents the wrench.

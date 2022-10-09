@@ -23,7 +23,7 @@ from compas_fab.backends.ros.backend_features.move_it_remove_collision_mesh impo
 
 
 __all__ = [
-    'MoveItPlanner',
+    "MoveItPlanner",
 ]
 
 

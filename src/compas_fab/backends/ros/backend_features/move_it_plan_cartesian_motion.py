@@ -19,7 +19,7 @@ from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
 
 __all__ = [
-    'MoveItPlanCartesianMotion',
+    "MoveItPlanCartesianMotion",
 ]
 
 
@@ -27,8 +27,8 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
     """Callable to calculate a cartesian motion path (linear in tool space)."""
 
     GET_CARTESIAN_PATH = ServiceDescription(
-        '/compute_cartesian_path',
-        'GetCartesianPath',
+        "/compute_cartesian_path",
+        "GetCartesianPath",
         GetCartesianPathRequest,
         GetCartesianPathResponse,
         validate_response,
@@ -84,20 +84,20 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         """
         options = options or {}
         kwargs = {}
-        kwargs['options'] = options
-        kwargs['frames_WCF'] = frames_WCF
-        kwargs['start_configuration'] = start_configuration
-        kwargs['group'] = group
+        kwargs["options"] = options
+        kwargs["frames_WCF"] = frames_WCF
+        kwargs["start_configuration"] = start_configuration
+        kwargs["group"] = group
 
-        kwargs['errback_name'] = 'errback'
+        kwargs["errback_name"] = "errback"
 
         # Use base_link or fallback to model's root link
-        options['base_link'] = options.get('base_link', robot.model.root.name)
-        options['joints'] = {j.name: j.type for j in robot.model.joints}
+        options["base_link"] = options.get("base_link", robot.model.root.name)
+        options["joints"] = {j.name: j.type for j in robot.model.joints}
 
-        options['link'] = options.get('link') or robot.get_end_effector_link_name(group)
-        if options['link'] not in robot.get_link_names(group):
-            raise ValueError('Link name {} does not exist in planning group'.format(options['link']))
+        options["link"] = options.get("link") or robot.get_end_effector_link_name(group)
+        if options["link"] not in robot.get_link_names(group):
+            raise ValueError("Link name {} does not exist in planning group".format(options["link"]))
 
         return await_callback(self.plan_cartesian_motion_async, **kwargs)
 
@@ -105,9 +105,9 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         self, callback, errback, frames_WCF, start_configuration=None, group=None, options=None
     ):
         """Asynchronous handler of MoveIt cartesian motion planner service."""
-        joints = options['joints']
+        joints = options["joints"]
 
-        header = Header(frame_id=options['base_link'])
+        header = Header(frame_id=options["base_link"])
         waypoints = [Pose.from_frame(frame) for frame in frames_WCF]
         joint_state = JointState(
             header=header, name=start_configuration.joint_names, position=start_configuration.joint_values
@@ -115,22 +115,22 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         start_state = RobotState(joint_state, MultiDOFJointState(header=header), is_diff=True)
         start_state.filter_fields_for_distro(self.ros_client.ros_distro)
 
-        if options.get('attached_collision_meshes'):
-            for acm in options['attached_collision_meshes']:
+        if options.get("attached_collision_meshes"):
+            for acm in options["attached_collision_meshes"]:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
                 start_state.attached_collision_objects.append(aco)
 
-        path_constraints = convert_constraints_to_rosmsg(options.get('path_constraints'), header)
+        path_constraints = convert_constraints_to_rosmsg(options.get("path_constraints"), header)
 
         request = dict(
             header=header,
             start_state=start_state,
             group_name=group,
-            link_name=options['link'],
+            link_name=options["link"],
             waypoints=waypoints,
-            max_step=float(options.get('max_step', 0.01)),
-            jump_threshold=float(options.get('jump_threshold', 1.57)),
-            avoid_collisions=bool(options.get('avoid_collisions', True)),
+            max_step=float(options.get("max_step", 0.01)),
+            jump_threshold=float(options.get("jump_threshold", 1.57)),
+            avoid_collisions=bool(options.get("avoid_collisions", True)),
             path_constraints=path_constraints,
         )
 

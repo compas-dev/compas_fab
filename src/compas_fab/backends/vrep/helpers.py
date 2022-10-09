@@ -8,7 +8,7 @@ from compas_fab.backends.exceptions import BackendError
 
 
 __all__ = [
-    'VrepError',
+    "VrepError",
 ]
 
 DEFAULT_OP_MODE = (
@@ -62,11 +62,11 @@ def floats_from_vrep(list_of_floats, scale):
 
 def assert_robot(robot):
     if not robot:
-        raise ValueError('No instance of robot found')
+        raise ValueError("No instance of robot found")
     if not robot.model:
-        raise ValueError('The robot instance has no model information attached')
-    if 'index' not in robot.model.attr:
-        raise ValueError('Robot model needs to define an index as part of the model.attr dictionary')
+        raise ValueError("The robot instance has no model information attached")
+    if "index" not in robot.model.attr:
+        raise ValueError("Robot model needs to define an index as part of the model.attr dictionary")
 
 
 # --------------------------------------------------------------------------
@@ -94,5 +94,5 @@ class VrepError(BackendError):
     """Wraps an exception that occurred inside the simulation engine."""
 
     def __init__(self, message, error_code):
-        super(VrepError, self).__init__('Error code: ' + str(error_code) + '; ' + message)
+        super(VrepError, self).__init__("Error code: " + str(error_code) + "; " + message)
         self.error_code = error_code

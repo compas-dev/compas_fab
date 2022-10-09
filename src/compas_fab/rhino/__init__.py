@@ -33,7 +33,7 @@ if compas.RHINO:
     )
 
     __all__ = [
-        'ReachabilityMapArtist',
-        'RobotArtist',  # deprecated
-        'RobotModelArtist',  # deprecated
+        "ReachabilityMapArtist",
+        "RobotArtist",  # deprecated
+        "RobotModelArtist",  # deprecated
     ]

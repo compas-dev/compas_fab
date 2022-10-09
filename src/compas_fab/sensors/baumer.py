@@ -4,7 +4,7 @@ from compas_fab.sensors import SerialSensor
 from compas_fab.sensors.exceptions import ProtocolError
 from compas_fab.sensors.exceptions import SensorTimeoutError
 
-__all__ = ['PosCon3D', 'PosConCM']
+__all__ = ["PosCon3D", "PosConCM"]
 
 
 class PosCon3D(SerialSensor):
@@ -44,37 +44,37 @@ class PosCon3D(SerialSensor):
     ...         data = sensor.get_measurement()                                     # doctest: +SKIP
     """
 
-    FRAME_HEAD = '{%s,%s,%s'
-    FRAME_TAIL = '%s%s}'
+    FRAME_HEAD = "{%s,%s,%s"
+    FRAME_TAIL = "%s%s}"
     BROADCAST_ADDRESS = 0
     MEASUREMENT_TYPES = (
-        'Edge L rise',
-        'Edge L fall',
-        'Edge R rise',
-        'Edge R fall',
-        'Width',
-        'Center width',
-        'Gap',
-        'Center gap',
+        "Edge L rise",
+        "Edge L fall",
+        "Edge R rise",
+        "Edge R fall",
+        "Width",
+        "Center width",
+        "Gap",
+        "Center gap",
     )
-    QUALITY = {0: 'Valid', 1: 'Low signal', 2: 'No edge', 3: 'Low signal, no edge', 4: 'No signal'}
+    QUALITY = {0: "Valid", 1: "Low signal", 2: "No edge", 3: "Low signal, no edge", 4: "No signal"}
     ERROR_CODES = {
-        '000': 'No error',
-        '001': 'False checksum',
-        '002': 'False command',
-        '003': 'False frame',
-        '004': 'False value or parameter',
-        '005': 'Missed command 000 to begin RS-485 control',
-        '006': 'Out of range',
-        '007': 'Buffer overflow',
-        '010': 'All outputs Off',
-        '020': 'Display Off',
-        '99': 'Argument out of Range',
-        '100': 'Distance out of Range (see FSP)',
-        '101': 'Angle out of Range (see FSP)',
-        '102': 'Flatness out of Range (see FSP)',
-        '103': 'Length out of Range (see FSP)',
-        '200': 'Fatal Error (Reset sensor, Power Off / On)',
+        "000": "No error",
+        "001": "False checksum",
+        "002": "False command",
+        "003": "False frame",
+        "004": "False value or parameter",
+        "005": "Missed command 000 to begin RS-485 control",
+        "006": "Out of range",
+        "007": "Buffer overflow",
+        "010": "All outputs Off",
+        "020": "Display Off",
+        "99": "Argument out of Range",
+        "100": "Distance out of Range (see FSP)",
+        "101": "Angle out of Range (see FSP)",
+        "102": "Flatness out of Range (see FSP)",
+        "103": "Length out of Range (see FSP)",
+        "200": "Fatal Error (Reset sensor, Power Off / On)",
     }
 
     def __init__(self, serial, address):
@@ -96,7 +96,7 @@ class PosCon3D(SerialSensor):
         This method only needs to be called if not using
         a ``with`` statement to handle lifetime of the `PosCon3D` instance.
         """
-        return self.send_command(self.address, '000', '1')
+        return self.send_command(self.address, "000", "1")
 
     def end(self):
         """Unlocks the sensor from RS-485 communication.
@@ -106,7 +106,7 @@ class PosCon3D(SerialSensor):
         This method only needs to be called if not using
         a ``with`` statement to handle lifetime of the `PosCon3D` instance.
         """
-        return self.send_command(self.address, '000', '0')
+        return self.send_command(self.address, "000", "0")
 
     def send_command(self, address, command, data=None):
         """Sends a command to the sensor's address specified. The command
@@ -137,21 +137,21 @@ class PosCon3D(SerialSensor):
         cmd = self.format_command(address, command, data)
 
         # Python 2 vs 3
-        if hasattr(cmd, 'decode'):
+        if hasattr(cmd, "decode"):
             self.serial.write(cmd)
             result = self.serial.readline()
         else:
-            self.serial.write(cmd.encode('ascii'))
-            result = self.serial.readline().decode('ascii')
+            self.serial.write(cmd.encode("ascii"))
+            result = self.serial.readline().decode("ascii")
 
         if result:
             frame_head = result[:-4]
             checksum = result[-4:-1]
             expected = self.calculate_checksum(frame_head)
             if expected != checksum:
-                raise ProtocolError('Invalid response, checksum mismatch. Expected=%s, Got=%s' % (expected, checksum))
+                raise ProtocolError("Invalid response, checksum mismatch. Expected=%s, Got=%s" % (expected, checksum))
 
-            expected_frame_head = self.FRAME_HEAD % (address, command, '')
+            expected_frame_head = self.FRAME_HEAD % (address, command, "")
             if not result.startswith(expected_frame_head):
                 raise ProtocolError(
                     'Invalid response, command/address mismatch. Expected to start with="%s", Got="%s"'
@@ -164,7 +164,7 @@ class PosCon3D(SerialSensor):
 
     def format_command(self, address, command, data=None):
         """Formats the command."""
-        data = data + ',' if data else ''
+        data = data + "," if data else ""
         frame = self.FRAME_HEAD % (address, command, data)
         return self.FRAME_TAIL % (frame, self.calculate_checksum(frame))
 
@@ -179,13 +179,13 @@ class PosCon3D(SerialSensor):
 
     def get_payload(self, result):
         """Gets payload."""
-        data = result.split(',')[2:-1]
+        data = result.split(",")[2:-1]
         if not data:
             return None
         elif len(data) == 1:
             return data[0]
         else:
-            if data[0] == 'E':
+            if data[0] == "E":
                 raise ProtocolError(self.ERROR_CODES[str(data[1])])
 
             return data
@@ -204,7 +204,7 @@ class PosCon3D(SerialSensor):
         ----
         Only one PosCon3D sensor can be connected to the bus for this operation to succeed.
         """
-        return int(self.send_command(self.address, '013'))
+        return int(self.send_command(self.address, "013"))
 
     def set_measurement_type(self, measurement_type):
         """Defines the measurement type to use.
@@ -229,9 +229,9 @@ class PosCon3D(SerialSensor):
 
         """
         if measurement_type not in self.MEASUREMENT_TYPES:
-            raise ProtocolError('Unsupported measure type, must be one of ' + str(self.MEASUREMENT_TYPES))
+            raise ProtocolError("Unsupported measure type, must be one of " + str(self.MEASUREMENT_TYPES))
 
-        return self.send_command(self.address, '020', str(self.MEASUREMENT_TYPES.index(measurement_type)))
+        return self.send_command(self.address, "020", str(self.MEASUREMENT_TYPES.index(measurement_type)))
 
     def set_precision(self, precision):
         """Defines the precision the sensor will use to determine edges:
@@ -254,8 +254,8 @@ class PosCon3D(SerialSensor):
         The higher the precision, the slower the measurement gets.
         """
         if precision < 0 or precision > 2:
-            raise ProtocolError('Precision must be 0 (standard), 1 (high) or 2 (very high)')
-        return self.send_command(self.address, '040', str(precision))
+            raise ProtocolError("Precision must be 0 (standard), 1 (high) or 2 (very high)")
+        return self.send_command(self.address, "040", str(precision))
 
     def set_edge_height(self, height):
         """Defines the minimum height of an edge to be detected.
@@ -265,7 +265,7 @@ class PosCon3D(SerialSensor):
         height : :obj:`float`
             Minimum edge height.
         """
-        return self.send_command(self.address, '042', str(height))
+        return self.send_command(self.address, "042", str(height))
 
     def get_measurement(self):
         """Retrieves the current measurement of the sensor according to the current settings.
@@ -275,10 +275,10 @@ class PosCon3D(SerialSensor):
         `tuple`
             The current measurement and additionally a value indicating the quality of the measured value.
         """
-        result = self.send_command(self.address, '031')
+        result = self.send_command(self.address, "031")
 
         if len(result) != 2:
-            raise ProtocolError('Unexpected result: ' + str(result))
+            raise ProtocolError("Unexpected result: " + str(result))
 
         value = result[0]
         quality = int(result[1])
@@ -302,36 +302,36 @@ class PosCon3D(SerialSensor):
         ----
         This function is designed to aid in the installation of the sensor at an angle.
         """
-        result = self.send_command(self.address, '093')
+        result = self.send_command(self.address, "093")
         if len(result) != 2:
-            raise ProtocolError('Unexpected result: ' + str(result))
+            raise ProtocolError("Unexpected result: " + str(result))
 
         return map(float, result)
 
     def reset(self):
         """Resets the sensor to factory settings."""
-        self.send_command(self.address, '003')
+        self.send_command(self.address, "003")
 
     def activate_flex_mount(self, reference_thickness):
         """Activates the FLEX Mount feature of the sensor to allow positioning it on an
         angled installation. The reference thickness is only required if the surface is
         uneven and an additional leveling auxiliary plate as been added."""
-        result = self.send_command(self.address, '062', str(reference_thickness))
+        result = self.send_command(self.address, "062", str(reference_thickness))
         return map(float, result)
 
     def deactivate_flex_mount(self):
         """Deactivates the FLEX Mount feature."""
-        self.send_command(self.address, '063')
+        self.send_command(self.address, "063")
 
     def set_flex_mount(self, angle, distance):
         """Sets the FLEX Mount feature to a specific angle and distance."""
-        result = self.send_command(self.address, '060', '%.2f,%.2f' % (angle, distance))
+        result = self.send_command(self.address, "060", "%.2f,%.2f" % (angle, distance))
         return map(float, result)
 
     def adjust_to_dark_object(self, is_dark_object):
         """Adjusts the sensor to detect darker or lighter surfaces."""
-        data = '1' if is_dark_object else '0'
-        return self.send_command(self.address, '044', data)
+        data = "1" if is_dark_object else "0"
+        return self.send_command(self.address, "044", data)
 
 
 class PosConCM(SerialSensor):
@@ -371,24 +371,24 @@ class PosConCM(SerialSensor):
     ...         data = sensor.get_measurement()                                     # doctest: +SKIP
     """
 
-    FRAME_HEAD = ':%s%s;%s;'
-    FRAME_TAIL = '%s%s\r\n'
+    FRAME_HEAD = ":%s%s;%s;"
+    FRAME_TAIL = "%s%s\r\n"
     BROADCAST_ADDRESS = 0
-    MEASUREMENT_TYPES = {'Diameter': 28, 'X_center': 29, 'Z_center': 30, 'X_left': 31, 'X_right': 32, 'Z_top': 33}
-    QUALITY = {0: 'Valid', 1: 'Low signal', 2: 'No edge', 3: 'Low signal, no edge', 4: 'No signal'}
+    MEASUREMENT_TYPES = {"Diameter": 28, "X_center": 29, "Z_center": 30, "X_left": 31, "X_right": 32, "Z_top": 33}
+    QUALITY = {0: "Valid", 1: "Low signal", 2: "No edge", 3: "Low signal, no edge", 4: "No signal"}
     ERROR_CODES = {
-        '1': 'Wrong message type',
-        '2': 'Wrong payload format',
-        '3': 'Wrong argument',
-        '4': 'Wrong argument count',
-        '5': 'Not enough data',
-        '6': 'Index do not exist',
-        '7': 'Index locked',
-        '8': 'Access not allowed',
-        '9': 'Not enough memory for encoding',
-        '10': 'Not possible to encode argument',
-        '11': 'Application specific error',
-        '12': 'Wrong state',
+        "1": "Wrong message type",
+        "2": "Wrong payload format",
+        "3": "Wrong argument",
+        "4": "Wrong argument count",
+        "5": "Not enough data",
+        "6": "Index do not exist",
+        "7": "Index locked",
+        "8": "Access not allowed",
+        "9": "Not enough memory for encoding",
+        "10": "Not possible to encode argument",
+        "11": "Application specific error",
+        "12": "Wrong state",
     }
 
     def __init__(self, serial, address):
@@ -410,7 +410,7 @@ class PosConCM(SerialSensor):
         This method only needs to be called if not using
         a ``with`` statement to handle lifetime of the `PosConCM` instance.
         """
-        return self.send_command(self.address, 'W010', '0')
+        return self.send_command(self.address, "W010", "0")
 
     def end(self):
         """Unlocks the sensor from RS-485 communication.
@@ -420,38 +420,38 @@ class PosConCM(SerialSensor):
         This method only needs to be called if not using
         a ``with`` statement to handle lifetime of the `PosConCM` instance.
         """
-        return self.send_command(self.address, 'W010', '1')
+        return self.send_command(self.address, "W010", "1")
 
     def format_command(self, address, command, data=None):
         """Formats the command."""
-        data = data or ''
+        data = data or ""
         frame = self.FRAME_HEAD % (str(address).zfill(2), command, data)
         return self.FRAME_TAIL % (frame, self.calculate_checksum(frame))
 
     def calculate_checksum(self, command):
         """Checks that message is complete."""
-        return '****'
+        return "****"
 
     def get_payload(self, result):
         """Gets payload."""
         frame_head = result[:-6]
         result_type = frame_head[3]
 
-        if result_type == 'a':
-            raise SensorTimeoutError('Sensor has not completed reading')
+        if result_type == "a":
+            raise SensorTimeoutError("Sensor has not completed reading")
 
-        if result_type == 'E':
-            error_index = frame_head.split(';')
+        if result_type == "E":
+            error_index = frame_head.split(";")
             raise ProtocolError(
-                'Application error, Result=%s' % frame_head
-                + 'Error type: '
+                "Application error, Result=%s" % frame_head
+                + "Error type: "
                 + str(self.ERROR_CODES[str(error_index[1])])
             )
 
-        if result_type == 'B':
-            raise ProtocolError('Sensor is busy, Result=%s' % frame_head)
+        if result_type == "B":
+            raise ProtocolError("Sensor is busy, Result=%s" % frame_head)
 
-        return result[5:-6].split(';')
+        return result[5:-6].split(";")
 
     def send_command(self, address, command, data=None):
         """Sends a command to the sensor's address specified. The command
@@ -482,12 +482,12 @@ class PosConCM(SerialSensor):
             cmd = self.format_command(address, command, data)
 
             # Python 2 vs 3
-            if hasattr(cmd, 'decode'):
+            if hasattr(cmd, "decode"):
                 self.serial.write(cmd)
                 result = self.serial.readline()
             else:
-                self.serial.write(cmd.encode('ascii'))
-                result = self.serial.readline().decode('ascii')
+                self.serial.write(cmd.encode("ascii"))
+                result = self.serial.readline().decode("ascii")
 
             if result:
                 try:
@@ -512,7 +512,7 @@ class PosConCM(SerialSensor):
         ----
         Only one PosConCM sensor can be connected to the bus for this operation to succeed.
         """
-        result = self.send_command(self.address, 'R005')
+        result = self.send_command(self.address, "R005")
         return int(result[0])
 
     def set_measurement_type(self, measurement_type):
@@ -535,9 +535,9 @@ class PosConCM(SerialSensor):
             Measurement type.
         """
         if measurement_type not in self.MEASUREMENT_TYPES:
-            raise ProtocolError('Unsupported measure type, must be one of ' + str(self.MEASUREMENT_TYPES))
+            raise ProtocolError("Unsupported measure type, must be one of " + str(self.MEASUREMENT_TYPES))
 
-        return self.send_command(self.address, 'W020', str(self.MEASUREMENT_TYPES[measurement_type]))
+        return self.send_command(self.address, "W020", str(self.MEASUREMENT_TYPES[measurement_type]))
 
     def set_precision(self, precision):
         """Defines the precision the sensor will use to determine edges:
@@ -560,8 +560,8 @@ class PosConCM(SerialSensor):
         The higher the precision, the slower the measurement gets.
         """
         if precision < 0 or precision > 2:
-            raise ProtocolError('Precision must be 0 (standard), 1 (high) or 2 (very high)')
-        return self.send_command(self.address, 'W033', str(precision))
+            raise ProtocolError("Precision must be 0 (standard), 1 (high) or 2 (very high)")
+        return self.send_command(self.address, "W033", str(precision))
 
     def get_measurement(self):
         """Retrieves the current measurement of the sensor according to the current settings.
@@ -571,10 +571,10 @@ class PosConCM(SerialSensor):
         `tuple`
             The current measurement and additionally a value indicating the quality of the measured value.
         """
-        result = self.send_command(self.address, 'R021')
+        result = self.send_command(self.address, "R021")
 
         if len(result) != 3:
-            raise ProtocolError('Unexpected result: ' + str(result))
+            raise ProtocolError("Unexpected result: " + str(result))
 
         value = result[0]
         quality = int(result[1])
@@ -589,29 +589,29 @@ class PosConCM(SerialSensor):
         """Activates the FLEX Mount feature of the sensor to allow positioning it on an
         angled installation. The reference thickness is only required if the surface is
         uneven and an additional leveling auxiliary plate as been added."""
-        result = self.send_command(self.address, 'W035', '1')
+        result = self.send_command(self.address, "W035", "1")
         return map(float, result)
 
     def deactivate_flex_mount(self):
         """Deactivates the FLEX Mount feature."""
-        result = self.send_command(self.address, 'W035', '0')
+        result = self.send_command(self.address, "W035", "0")
         return map(float, result)
 
     def set_flex_mount(self, angle, distance):
         """Sets the FLEX Mount feature to a specific angle and distance."""
-        data = '{:.2f};{:.2f}'.format(angle, distance)
-        return self.send_command(self.address, 'W036', data)
+        data = "{:.2f};{:.2f}".format(angle, distance)
+        return self.send_command(self.address, "W036", data)
 
     def teach_flex_mount(self, reference_thickness):
         """Sets the FLEX Mount feature to a specific angle and distance."""
-        return self.send_command(self.address, 'W037', str(reference_thickness))
+        return self.send_command(self.address, "W037", str(reference_thickness))
 
     def adjust_to_dark_object(self, is_dark_object):
         """Adjusts the sensor to detect darker or lighter surfaces."""
-        data = '1' if is_dark_object else '0'
-        result = self.send_command(self.address, 'W032', data)
+        data = "1" if is_dark_object else "0"
+        result = self.send_command(self.address, "W032", data)
         return map(float, result)
 
     def reset(self):
         """Resets the sensor to factory settings."""
-        self.send_command(self.address, 'W202', '0')
+        self.send_command(self.address, "W202", "0")

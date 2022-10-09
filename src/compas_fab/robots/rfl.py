@@ -15,14 +15,14 @@ from compas.robots import Link
 import compas_fab.robots.robot
 
 ROBOTS = {
-    'A': dict(id=11, index=0, base_external_axes=[7.0, -2.0, -4.0]),
-    'B': dict(id=12, index=1, base_external_axes=[7.0, -10.0, -4.0]),
-    'C': dict(id=21, index=2, base_external_axes=[30.0, -2.0, -4.0]),
-    'D': dict(id=22, index=3, base_external_axes=[30.0, -10.0, -4.0]),
+    "A": dict(id=11, index=0, base_external_axes=[7.0, -2.0, -4.0]),
+    "B": dict(id=12, index=1, base_external_axes=[7.0, -10.0, -4.0]),
+    "C": dict(id=21, index=2, base_external_axes=[30.0, -2.0, -4.0]),
+    "D": dict(id=22, index=3, base_external_axes=[30.0, -10.0, -4.0]),
 }
 
 __all__ = [
-    'Robot',
+    "Robot",
 ]
 
 
@@ -68,26 +68,26 @@ def Robot(name, client=None):
 
 def _create_model():
     joints = [
-        Joint('joint_x', 'prismatic', parent='rfl', child='bridge', limit=Limit()),
-        Joint('joint_y', 'prismatic', parent='bridge', child='vertical', limit=Limit()),
-        Joint('joint_z', 'prismatic', parent='vertical', child='base_link', limit=Limit()),
-        Joint('joint_1', 'revolute', parent='base_link', child='link_1', limit=Limit()),
-        Joint('joint_2', 'revolute', parent='link_1', child='link_2', limit=Limit()),
-        Joint('joint_3', 'revolute', parent='link_2', child='link_3', limit=Limit()),
-        Joint('joint_4', 'revolute', parent='link_3', child='link_4', limit=Limit()),
-        Joint('joint_5', 'revolute', parent='link_4', child='link_5', limit=Limit()),
-        Joint('joint_6', 'revolute', parent='link_5', child='link_6', limit=Limit()),
+        Joint("joint_x", "prismatic", parent="rfl", child="bridge", limit=Limit()),
+        Joint("joint_y", "prismatic", parent="bridge", child="vertical", limit=Limit()),
+        Joint("joint_z", "prismatic", parent="vertical", child="base_link", limit=Limit()),
+        Joint("joint_1", "revolute", parent="base_link", child="link_1", limit=Limit()),
+        Joint("joint_2", "revolute", parent="link_1", child="link_2", limit=Limit()),
+        Joint("joint_3", "revolute", parent="link_2", child="link_3", limit=Limit()),
+        Joint("joint_4", "revolute", parent="link_3", child="link_4", limit=Limit()),
+        Joint("joint_5", "revolute", parent="link_4", child="link_5", limit=Limit()),
+        Joint("joint_6", "revolute", parent="link_5", child="link_6", limit=Limit()),
     ]
     links = [
-        Link('rfl'),
-        Link('bridge'),
-        Link('vertical'),
-        Link('base_link'),
-        Link('link_1'),
-        Link('link_2'),
-        Link('link_3'),
-        Link('link_4'),
-        Link('link_5'),
-        Link('link_6'),
+        Link("rfl"),
+        Link("bridge"),
+        Link("vertical"),
+        Link("base_link"),
+        Link("link_1"),
+        Link("link_2"),
+        Link("link_3"),
+        Link("link_4"),
+        Link("link_5"),
+        Link("link_6"),
     ]
     return joints, links

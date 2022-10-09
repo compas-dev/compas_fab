@@ -22,7 +22,7 @@ from compas_fab.backends.ros.service_description import ServiceDescription
 from compas_fab.robots import Duration
 
 __all__ = [
-    'MoveItInverseKinematics',
+    "MoveItInverseKinematics",
 ]
 
 
@@ -30,7 +30,7 @@ class MoveItInverseKinematics(InverseKinematics):
     """Callable to calculate the robot's inverse kinematics for a given frame."""
 
     GET_POSITION_IK = ServiceDescription(
-        '/compute_ik', 'GetPositionIK', GetPositionIKRequest, GetPositionIKResponse, validate_response
+        "/compute_ik", "GetPositionIK", GetPositionIKRequest, GetPositionIKResponse, validate_response
     )
 
     def __init__(self, ros_client):
@@ -83,16 +83,16 @@ class MoveItInverseKinematics(InverseKinematics):
         """
         options = options or {}
         kwargs = {}
-        kwargs['options'] = options
-        kwargs['frame_WCF'] = frame_WCF
-        kwargs['group'] = group
-        kwargs['start_configuration'] = start_configuration
-        kwargs['errback_name'] = 'errback'
+        kwargs["options"] = options
+        kwargs["frame_WCF"] = frame_WCF
+        kwargs["group"] = group
+        kwargs["start_configuration"] = start_configuration
+        kwargs["errback_name"] = "errback"
 
-        max_results = options.get('max_results', 100)
+        max_results = options.get("max_results", 100)
 
         # Use base_link or fallback to model's root link
-        options['base_link'] = options.get('base_link', robot.model.root.name)
+        options["base_link"] = options.get("base_link", robot.model.root.name)
 
         for _ in range(max_results):
             yield await_callback(self.inverse_kinematics_async, **kwargs)
@@ -101,7 +101,7 @@ class MoveItInverseKinematics(InverseKinematics):
         self, callback, errback, frame_WCF, start_configuration=None, group=None, options=None
     ):
         """Asynchronous handler of MoveIt IK service."""
-        base_link = options['base_link']
+        base_link = options["base_link"]
         header = Header(frame_id=base_link)
         pose_stamped = PoseStamped(header, Pose.from_frame(frame_WCF))
 
@@ -111,14 +111,14 @@ class MoveItInverseKinematics(InverseKinematics):
         start_state = RobotState(joint_state, MultiDOFJointState(header=header))
         start_state.filter_fields_for_distro(self.ros_client.ros_distro)
 
-        if options.get('attached_collision_meshes'):
-            for acm in options['attached_collision_meshes']:
+        if options.get("attached_collision_meshes"):
+            for acm in options["attached_collision_meshes"]:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
                 start_state.attached_collision_objects.append(aco)
 
-        constraints = convert_constraints_to_rosmsg(options.get('constraints'), header)
+        constraints = convert_constraints_to_rosmsg(options.get("constraints"), header)
 
-        timeout_in_secs = options.get('timeout', 2)
+        timeout_in_secs = options.get("timeout", 2)
         timeout_duration = Duration(timeout_in_secs, 0).to_data()
 
         ik_request = PositionIKRequest(
@@ -126,8 +126,8 @@ class MoveItInverseKinematics(InverseKinematics):
             robot_state=start_state,
             constraints=constraints,
             pose_stamped=pose_stamped,
-            avoid_collisions=options.get('avoid_collisions', True),
-            attempts=options.get('attempts', 8),
+            avoid_collisions=options.get("avoid_collisions", True),
+            attempts=options.get("attempts", 8),
             timeout=timeout_duration,
         )
 

@@ -15,15 +15,15 @@ from compas_fab.backends.ros.backend_features.move_it_remove_collision_mesh impo
 from compas_fab.backends.ros.backend_features.move_it_reset_planning_scene import MoveItResetPlanningScene
 
 __all__ = [
-    'MoveItAddAttachedCollisionMesh',
-    'MoveItAddCollisionMesh',
-    'MoveItAppendCollisionMesh',
-    'MoveItForwardKinematics',
-    'MoveItInverseKinematics',
-    'MoveItPlanCartesianMotion',
-    'MoveItPlanMotion',
-    'MoveItPlanningScene',
-    'MoveItRemoveAttachedCollisionMesh',
-    'MoveItRemoveCollisionMesh',
-    'MoveItResetPlanningScene',
+    "MoveItAddAttachedCollisionMesh",
+    "MoveItAddCollisionMesh",
+    "MoveItAppendCollisionMesh",
+    "MoveItForwardKinematics",
+    "MoveItInverseKinematics",
+    "MoveItPlanCartesianMotion",
+    "MoveItPlanMotion",
+    "MoveItPlanningScene",
+    "MoveItRemoveAttachedCollisionMesh",
+    "MoveItRemoveCollisionMesh",
+    "MoveItResetPlanningScene",
 ]

@@ -11,9 +11,9 @@ from .geometry_msgs import Pose
 class Octomap(ROSmsg):
     """https://docs.ros.org/kinetic/api/octomap_msgs/html/msg/Octomap.html"""
 
-    ROS_MSG_TYPE = 'octomap_msgs/Octomap'
+    ROS_MSG_TYPE = "octomap_msgs/Octomap"
 
-    def __init__(self, header=None, binary=False, id='', resolution=0.0, data=None):
+    def __init__(self, header=None, binary=False, id="", resolution=0.0, data=None):
         self.header = header or Header()  # Header
         self.binary = binary  # Flag to denote a binary (only free/occupied) or full occupancy octree (.bt/.ot file)
         self.id = id  # Class id of the contained octree
@@ -24,7 +24,7 @@ class Octomap(ROSmsg):
 class OctomapWithPose(ROSmsg):
     """https://docs.ros.org/kinetic/api/octomap_msgs/html/msg/OctomapWithPose.html"""
 
-    ROS_MSG_TYPE = 'octomap_msgs/OctomapWithPose'
+    ROS_MSG_TYPE = "octomap_msgs/OctomapWithPose"
 
     def __init__(self, header=None, origin=None, octomap=None):
         self.header = header or Header()  # Header

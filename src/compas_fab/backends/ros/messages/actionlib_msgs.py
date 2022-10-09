@@ -8,7 +8,7 @@ from .std_msgs import Time
 class GoalID(ROSmsg):
     """https://docs.ros.org/api/actionlib_msgs/html/msg/GoalID.html"""
 
-    ROS_MSG_TYPE = 'actionlib_msgs/GoalID'
+    ROS_MSG_TYPE = "actionlib_msgs/GoalID"
 
     def __init__(self, stamp=Time(), id=""):
         self.stamp = stamp
@@ -16,15 +16,15 @@ class GoalID(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        stamp = Time.from_msg(msg['stamp'])
-        id = msg['id']
+        stamp = Time.from_msg(msg["stamp"])
+        id = msg["id"]
         return cls(stamp, id)
 
 
 class GoalStatus(ROSmsg):
     """https://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html"""
 
-    ROS_MSG_TYPE = 'actionlib_msgs/GoalStatus'
+    ROS_MSG_TYPE = "actionlib_msgs/GoalStatus"
 
     PENDING = 0
     ACTIVE = 1
@@ -37,16 +37,16 @@ class GoalStatus(ROSmsg):
     RECALLED = 8
     LOST = 9
 
-    def __init__(self, goal_id=GoalID(), status=0, text=''):
+    def __init__(self, goal_id=GoalID(), status=0, text=""):
         self.goal_id = goal_id
         self.status = status
         self.text = text
 
     @classmethod
     def from_msg(cls, msg):
-        goal_id = GoalID.from_msg(msg['goal_id'])
-        status = msg['status']
-        text = msg['text']
+        goal_id = GoalID.from_msg(msg["goal_id"])
+        status = msg["status"]
+        text = msg["text"]
         return cls(goal_id, status, text)
 
     @property
@@ -55,13 +55,13 @@ class GoalStatus(ROSmsg):
         for k, v in cls.__dict__.items():
             if v == self.status:
                 return k
-        return ''
+        return ""
 
 
 class GoalStatusArray(ROSmsg):
     """https://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatusArray.html"""
 
-    ROS_MSG_TYPE = 'actionlib_msgs/GoalStatusArray'
+    ROS_MSG_TYPE = "actionlib_msgs/GoalStatusArray"
 
     def __init__(self, header=None, status_list=None):
         self.header = header or Header()

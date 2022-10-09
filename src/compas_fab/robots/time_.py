@@ -3,7 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 __all__ = [
-    'Duration',
+    "Duration",
 ]
 
 
@@ -28,7 +28,7 @@ class Duration(object):
         self.nsecs = int(remainder * sec_to_nano_factor) + int(nsecs)
 
     def __str__(self):
-        return 'Duration({!r}, {!r})'.format(self.secs, self.nsecs)
+        return "Duration({!r}, {!r})".format(self.secs, self.nsecs)
 
     def __repr__(self):
         return self.__str__()
@@ -79,9 +79,9 @@ class Duration(object):
     @property
     def data(self):
         """:obj:`dict` : The data representing the duration."""
-        return {'secs': self.secs, 'nsecs': self.nsecs}
+        return {"secs": self.secs, "nsecs": self.nsecs}
 
     @data.setter
     def data(self, data):
-        self.secs = data.get('secs') or 0
-        self.nsecs = data.get('nsecs') or 0
+        self.secs = data.get("secs") or 0
+        self.nsecs = data.get("nsecs") or 0

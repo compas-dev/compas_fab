@@ -24,7 +24,7 @@ class Point(URmsg):
         self.z = z  # [m]
 
     def __str__(self):
-        return '%.6f, %.6f, %.6f' % (self.x, self.y, self.z)
+        return "%.6f, %.6f, %.6f" % (self.x, self.y, self.z)
 
 
 class AxisAngle(URmsg):
@@ -36,7 +36,7 @@ class AxisAngle(URmsg):
         self.z = z
 
     def __str__(self):
-        return '%.6f, %.6f, %.6f' % (self.x, self.y, self.z)
+        return "%.6f, %.6f, %.6f" % (self.x, self.y, self.z)
 
 
 class URPose(URmsg):

@@ -18,12 +18,12 @@ DEFAULT_SCALE = 1.0
 CHILD_SCRIPT_TYPE = (
     1  # defined in vrepConst.sim_scripttype_childscript, but redefined here to prevent loading the remoteApi library
 )
-LOG = logging.getLogger('compas_fab.backends.vrep.client')
+LOG = logging.getLogger("compas_fab.backends.vrep.client")
 
-vrep = LazyLoader('vrep', globals(), 'compas_fab.backends.vrep.remote_api.vrep')
+vrep = LazyLoader("vrep", globals(), "compas_fab.backends.vrep.remote_api.vrep")
 
 __all__ = [
-    'VrepClient',
+    "VrepClient",
 ]
 
 
@@ -53,7 +53,7 @@ class VrepClient(ClientInterface):
         For more examples, check out the :ref:`V-REP examples page <examples_vrep>`.
     """
 
-    def __init__(self, host='127.0.0.1', port=19997, scale=DEFAULT_SCALE, lua_script='RFL', debug=False):
+    def __init__(self, host="127.0.0.1", port=19997, scale=DEFAULT_SCALE, lua_script="RFL", debug=False):
         super(VrepClient, self).__init__()
         self.client_id = None
         self.host = resolve_host(host)
@@ -72,7 +72,7 @@ class VrepClient(ClientInterface):
         vrep.simxFinish(-1)
 
         if self.debug:
-            LOG.debug('Connecting to V-REP on %s:%d...', self.host, self.port)
+            LOG.debug("Connecting to V-REP on %s:%d...", self.host, self.port)
 
         # Connect to V-REP, set a very large timeout for blocking commands
         self.client_id = vrep.simxStart(
@@ -83,7 +83,7 @@ class VrepClient(ClientInterface):
         vrep.simxStartSimulation(self.client_id, DEFAULT_OP_MODE)
 
         if self.client_id == -1:
-            raise VrepError('Unable to connect to V-REP on %s:%d' % (self.host, self.port), -1)
+            raise VrepError("Unable to connect to V-REP on %s:%d" % (self.host, self.port), -1)
 
         return self
 
@@ -99,7 +99,7 @@ class VrepClient(ClientInterface):
         self._added_handles = []
 
         if self.debug:
-            LOG.debug('Disconnected from V-REP')
+            LOG.debug("Disconnected from V-REP")
 
     @property
     def is_connected(self):
@@ -143,7 +143,7 @@ class VrepClient(ClientInterface):
         .. note::
             The resulting dictionary is keyed by object handle.
         """
-        _res, _, matrices, _, _ = self.run_child_script('getShapeMatrices', object_handles, [], [])
+        _res, _, matrices, _, _ = self.run_child_script("getShapeMatrices", object_handles, [], [])
         return dict(
             [
                 (object_handles[i // 12], floats_from_vrep(matrices[i : i + 12], self.scale))
@@ -158,7 +158,7 @@ class VrepClient(ClientInterface):
         Returns:
             list: List of object handles (identifiers) of the 3D model.
         """
-        return self.run_child_script('getRobotVisibleShapeHandles', [], [], [])[1]
+        return self.run_child_script("getRobotVisibleShapeHandles", [], [], [])[1]
 
     def set_robot_metric(self, group, metric_values):
         """Assigns a metric defining relations between axis values of a robot.
@@ -177,7 +177,7 @@ class VrepClient(ClientInterface):
             self.client_id,
             self.lua_script,
             CHILD_SCRIPT_TYPE,
-            'setTheMetric',
+            "setTheMetric",
             [group],
             metric_values,
             [],
@@ -200,17 +200,17 @@ class VrepClient(ClientInterface):
         # First check if the start state is reachable
         joints = len(robot.get_configurable_joints())
         options = {
-            'num_joints': joints,
-            'metric_values': [0.0] * joints,
+            "num_joints": joints,
+            "metric_values": [0.0] * joints,
         }
         joint_values, joint_names = list(
-            self.inverse_kinematics(robot, frame, group=robot.model.attr['index'], options=options)
+            self.inverse_kinematics(robot, frame, group=robot.model.attr["index"], options=options)
         )[-1]
 
         config = config_from_vrep(joint_values, self.scale)
 
         if not config:
-            raise ValueError('Cannot find a valid config for the given pose')
+            raise ValueError("Cannot find a valid config for the given pose")
 
         self.set_robot_config(robot, config)
 
@@ -237,12 +237,12 @@ class VrepClient(ClientInterface):
         assert_robot(robot)
 
         if not config:
-            raise ValueError('Unsupported config value')
+            raise ValueError("Unsupported config value")
 
         values = config_to_vrep(config, self.scale)
 
-        self.set_robot_metric(robot.model.attr['index'], [0.0] * len(config.joint_values))
-        self.run_child_script('moveRobotFK', [], values, ['robot' + robot.name])
+        self.set_robot_metric(robot.model.attr["index"], [0.0] * len(config.joint_values))
+        self.run_child_script("moveRobotFK", [], values, ["robot" + robot.name])
 
     def get_robot_config(self, robot):
         """Gets the current configuration of the specified robot.
@@ -261,7 +261,7 @@ class VrepClient(ClientInterface):
         """
         assert_robot(robot)
 
-        _res, _, config, _, _ = self.run_child_script('getRobotState', [robot.model.attr['index']], [], [])
+        _res, _, config, _, _ = self.run_child_script("getRobotState", [robot.model.attr["index"]], [], [])
         return config_from_vrep(config, self.scale)
 
     def find_raw_robot_states(
@@ -277,25 +277,25 @@ class VrepClient(ClientInterface):
                 joint_limits = []
                 joint_limits.extend(floats_to_vrep(gantry_joint_limits or [], self.scale))
                 joint_limits.extend(arm_joint_limits or [])
-                string_param_list.append(','.join(map(str, joint_limits)))
+                string_param_list.append(",".join(map(str, joint_limits)))
 
             res, _, states, _, _ = self.run_child_script(
-                'searchRobotStates', [group, max_trials or 1, max_results], goal_vrep_pose, string_param_list
+                "searchRobotStates", [group, max_trials or 1, max_results], goal_vrep_pose, string_param_list
             )
 
             # Even if the retry_until_success is set to True, we short circuit
             # at some point to prevent infinite loops caused by misconfiguration
             i += 1
             if i > 20 or (res != 0 and not retry_until_success):
-                raise VrepError('Failed to search robot states', res)
+                raise VrepError("Failed to search robot states", res)
 
             final_states.extend(states)
 
             if len(final_states):
-                LOG.info('Found %d valid robot states', len(final_states) // 9)
+                LOG.info("Found %d valid robot states", len(final_states) // 9)
                 break
             else:
-                LOG.info('No valid robot states found, will retry.')
+                LOG.info("No valid robot states found, will retry.")
 
         return final_states
 

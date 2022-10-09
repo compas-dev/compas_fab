@@ -11,7 +11,7 @@ from compas_fab.backends.ros.messages import PlanningSceneComponents
 from compas_fab.backends.ros.service_description import ServiceDescription
 
 __all__ = [
-    'MoveItPlanningScene',
+    "MoveItPlanningScene",
 ]
 
 
@@ -19,7 +19,7 @@ class MoveItPlanningScene(GetPlanningScene):
     """Callable to retrieve the planning scene."""
 
     GET_PLANNING_SCENE = ServiceDescription(
-        '/get_planning_scene', 'GetPlanningScene', GetPlanningSceneRequest, GetPlanningSceneResponse
+        "/get_planning_scene", "GetPlanningScene", GetPlanningSceneRequest, GetPlanningSceneResponse
     )
 
     def __init__(self, ros_client):
@@ -38,7 +38,7 @@ class MoveItPlanningScene(GetPlanningScene):
         :class:`compas_fab.backends.ros.messages.moveit_msgs.PlanningScene`
         """
         kwargs = {}
-        kwargs['errback_name'] = 'errback'
+        kwargs["errback_name"] = "errback"
 
         return await_callback(self.get_planning_scene_async, **kwargs)
 

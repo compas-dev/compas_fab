@@ -22,11 +22,11 @@ class PlanMotion(component):
         compute,
     ):
 
-        key = create_id(self, 'trajectory')
+        key = create_id(self, "trajectory")
 
         path_constraints = list(path_constraints) if path_constraints else None
         attached_collision_meshes = list(attached_collision_meshes) if attached_collision_meshes else None
-        planner_id = str(planner_id) if planner_id else 'RRTConnect'
+        planner_id = str(planner_id) if planner_id else "RRTConnect"
 
         if (
             robot

@@ -25,7 +25,7 @@ from compas_fab.robots import CollisionMesh
 class CollisionObject(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/CollisionObject.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/CollisionObject'
+    ROS_MSG_TYPE = "moveit_msgs/CollisionObject"
 
     ADD = 0
     REMOVE = 1
@@ -71,11 +71,11 @@ class CollisionObject(ROSmsg):
     def from_collision_mesh(cls, collision_mesh):
         """Creates a collision object from a :class:`compas_fab.robots.CollisionMesh`"""
         kwargs = {}
-        kwargs['header'] = Header(frame_id=collision_mesh.root_name)
-        kwargs['id'] = collision_mesh.id
-        kwargs['meshes'] = [Mesh.from_mesh(collision_mesh.mesh)]
-        kwargs['mesh_poses'] = [Pose.from_frame(collision_mesh.frame)]
-        kwargs['pose'] = Pose()
+        kwargs["header"] = Header(frame_id=collision_mesh.root_name)
+        kwargs["id"] = collision_mesh.id
+        kwargs["meshes"] = [Mesh.from_mesh(collision_mesh.mesh)]
+        kwargs["mesh_poses"] = [Pose.from_frame(collision_mesh.frame)]
+        kwargs["pose"] = Pose()
 
         return cls(**kwargs)
 
@@ -83,19 +83,19 @@ class CollisionObject(ROSmsg):
     def from_msg(cls, msg):
         kwargs = {}
 
-        kwargs['header'] = Header.from_msg(msg['header'])
-        kwargs['id'] = msg['id']
-        kwargs['type'] = ObjectType.from_msg(msg['type'])
-        kwargs['pose'] = Pose.from_msg(msg['pose']) if 'pose' in msg else Pose()
+        kwargs["header"] = Header.from_msg(msg["header"])
+        kwargs["id"] = msg["id"]
+        kwargs["type"] = ObjectType.from_msg(msg["type"])
+        kwargs["pose"] = Pose.from_msg(msg["pose"]) if "pose" in msg else Pose()
 
-        kwargs['primitives'] = [SolidPrimitive.from_msg(i) for i in msg['primitives']]
-        kwargs['primitive_poses'] = [Pose.from_msg(i) for i in msg['primitive_poses']]
-        kwargs['meshes'] = [Mesh.from_msg(i) for i in msg['meshes']]
-        kwargs['mesh_poses'] = [Pose.from_msg(i) for i in msg['mesh_poses']]
-        kwargs['planes'] = [Plane.from_msg(i) for i in msg['planes']]
-        kwargs['plane_poses'] = [Pose.from_frame(i) for i in msg['plane_poses']]
+        kwargs["primitives"] = [SolidPrimitive.from_msg(i) for i in msg["primitives"]]
+        kwargs["primitive_poses"] = [Pose.from_msg(i) for i in msg["primitive_poses"]]
+        kwargs["meshes"] = [Mesh.from_msg(i) for i in msg["meshes"]]
+        kwargs["mesh_poses"] = [Pose.from_msg(i) for i in msg["mesh_poses"]]
+        kwargs["planes"] = [Plane.from_msg(i) for i in msg["planes"]]
+        kwargs["plane_poses"] = [Pose.from_frame(i) for i in msg["plane_poses"]]
 
-        kwargs['operation'] = msg['operation']
+        kwargs["operation"] = msg["operation"]
 
         return cls(**kwargs)
 
@@ -124,7 +124,7 @@ class CollisionObject(ROSmsg):
                 vertex.x = float(vertex.x)
                 vertex.y = float(vertex.y)
                 vertex.z = float(vertex.z)
-            root_name = getattr(self.header, 'frame_id', None) or self.header['frame_id']
+            root_name = getattr(self.header, "frame_id", None) or self.header["frame_id"]
             cm = CollisionMesh(mesh.mesh, self.id, pose.frame, root_name)
             collision_meshes.append(cm)
         return collision_meshes
@@ -133,10 +133,10 @@ class CollisionObject(ROSmsg):
 class AttachedCollisionObject(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/AttachedCollisionObject'
+    ROS_MSG_TYPE = "moveit_msgs/AttachedCollisionObject"
 
     def __init__(self, link_name=None, object=None, touch_links=None, detach_posture=None, weight=0):
-        self.link_name = link_name or ''
+        self.link_name = link_name or ""
         self.object = object or CollisionObject()
         self.touch_links = touch_links or []
         self.detach_posture = detach_posture or JointTrajectory()
@@ -147,10 +147,10 @@ class AttachedCollisionObject(ROSmsg):
         """Creates an attached collision object from a :class:`compas_fab.robots.AttachedCollisionMesh`"""
 
         kwargs = {}
-        kwargs['link_name'] = attached_collision_mesh.link_name
-        kwargs['object'] = CollisionObject.from_collision_mesh(attached_collision_mesh.collision_mesh)
-        kwargs['touch_links'] = [str(s) for s in attached_collision_mesh.touch_links]
-        kwargs['weight'] = attached_collision_mesh.weight
+        kwargs["link_name"] = attached_collision_mesh.link_name
+        kwargs["object"] = CollisionObject.from_collision_mesh(attached_collision_mesh.collision_mesh)
+        kwargs["touch_links"] = [str(s) for s in attached_collision_mesh.touch_links]
+        kwargs["weight"] = attached_collision_mesh.weight
 
         return cls(**kwargs)
 
@@ -168,11 +168,11 @@ class AttachedCollisionObject(ROSmsg):
 class Constraints(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/Constraints.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/Constraints'
+    ROS_MSG_TYPE = "moveit_msgs/Constraints"
 
     def __init__(
         self,
-        name='',
+        name="",
         joint_constraints=None,
         position_constraints=None,
         orientation_constraints=None,
@@ -188,7 +188,7 @@ class Constraints(ROSmsg):
 class RobotState(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/RobotState.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/RobotState'
+    ROS_MSG_TYPE = "moveit_msgs/RobotState"
 
     def __init__(self, joint_state=None, multi_dof_joint_state=None, attached_collision_objects=None, is_diff=False):
         self.joint_state = joint_state if joint_state else JointState()
@@ -198,12 +198,12 @@ class RobotState(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        joint_state = JointState.from_msg(msg['joint_state'])
-        multi_dof_joint_state = MultiDOFJointState.from_msg(msg['multi_dof_joint_state'])
+        joint_state = JointState.from_msg(msg["joint_state"])
+        multi_dof_joint_state = MultiDOFJointState.from_msg(msg["multi_dof_joint_state"])
         attached_collision_objects = [
-            AttachedCollisionObject.from_msg(item) for item in msg['attached_collision_objects']
+            AttachedCollisionObject.from_msg(item) for item in msg["attached_collision_objects"]
         ]
-        return cls(joint_state, multi_dof_joint_state, attached_collision_objects, msg['is_diff'])
+        return cls(joint_state, multi_dof_joint_state, attached_collision_objects, msg["is_diff"])
 
     def filter_fields_for_distro(self, ros_distro):
         """To maintain backwards compatibility with older ROS distros,
@@ -217,7 +217,7 @@ class RobotState(ROSmsg):
 class PositionIKRequest(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionIKRequest.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/PositionIKRequest'
+    ROS_MSG_TYPE = "moveit_msgs/PositionIKRequest"
 
     def __init__(
         self,
@@ -241,7 +241,7 @@ class PositionIKRequest(ROSmsg):
 class RobotTrajectory(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/RobotTrajectory.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/RobotTrajectory'
+    ROS_MSG_TYPE = "moveit_msgs/RobotTrajectory"
 
     def __init__(self, joint_trajectory=JointTrajectory(), multi_dof_joint_trajectory=MultiDOFJointTrajectory()):
         self.joint_trajectory = joint_trajectory
@@ -249,15 +249,15 @@ class RobotTrajectory(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        joint_trajectory = JointTrajectory.from_msg(msg['joint_trajectory'])
-        multi_dof_joint_trajectory = MultiDOFJointTrajectory.from_msg(msg['multi_dof_joint_trajectory'])
+        joint_trajectory = JointTrajectory.from_msg(msg["joint_trajectory"])
+        multi_dof_joint_trajectory = MultiDOFJointTrajectory.from_msg(msg["multi_dof_joint_trajectory"])
         return cls(joint_trajectory, multi_dof_joint_trajectory)
 
 
 class MoveItErrorCodes(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MoveItErrorCodes.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/MoveItErrorCodes'
+    ROS_MSG_TYPE = "moveit_msgs/MoveItErrorCodes"
 
     # overall behavior
     SUCCESS = 1
@@ -312,13 +312,13 @@ class MoveItErrorCodes(ROSmsg):
         for k, v in cls.__dict__.items():
             if v == self.val:
                 return k
-        return ''
+        return ""
 
 
 class PlannerParams(ROSmsg):
     """https://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlannerParams.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/PlannerParams'
+    ROS_MSG_TYPE = "moveit_msgs/PlannerParams"
 
     def __init__(self, keys=None, values=None, descriptions=None):
         self.keys = keys or []  # parameter names (same size as values)
@@ -329,7 +329,7 @@ class PlannerParams(ROSmsg):
 class WorkspaceParameters(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/WorkspaceParameters.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/WorkspaceParameters'
+    ROS_MSG_TYPE = "moveit_msgs/WorkspaceParameters"
 
     def __init__(self, header=None, min_corner=None, max_corner=None):
         self.header = header or Header()
@@ -340,7 +340,7 @@ class WorkspaceParameters(ROSmsg):
 class TrajectoryConstraints(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/TrajectoryConstraints.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/TrajectoryConstraints'
+    ROS_MSG_TYPE = "moveit_msgs/TrajectoryConstraints"
 
     def __init__(self, constraints=None):
         self.constraints = constraints or []  # Constraints[]
@@ -349,7 +349,7 @@ class TrajectoryConstraints(ROSmsg):
 class JointConstraint(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/JointConstraint.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/JointConstraint'
+    ROS_MSG_TYPE = "moveit_msgs/JointConstraint"
 
     def __init__(self, joint_name="", position=0, tolerance_above=0, tolerance_below=0, weight=1.0):
         self.joint_name = joint_name
@@ -368,7 +368,7 @@ class JointConstraint(ROSmsg):
 class VisibilityConstraint(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/VisibilityConstraint.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/VisibilityConstraint'
+    ROS_MSG_TYPE = "moveit_msgs/VisibilityConstraint"
 
     def __init__(self):
         raise NotImplementedError
@@ -377,7 +377,7 @@ class VisibilityConstraint(ROSmsg):
 class BoundingVolume(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/BoundingVolume.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/BoundingVolume'
+    ROS_MSG_TYPE = "moveit_msgs/BoundingVolume"
 
     def __init__(self, primitives=None, primitive_poses=None, meshes=None, mesh_poses=None):
         self.primitives = primitives or []  # shape_msgs/SolidPrimitive[]
@@ -442,7 +442,7 @@ class BoundingVolume(ROSmsg):
 class PositionConstraint(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionConstraint.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/PositionConstraint'
+    ROS_MSG_TYPE = "moveit_msgs/PositionConstraint"
 
     def __init__(self, header=None, link_name=None, target_point_offset=None, constraint_region=None, weight=None):
         self.header = header or Header()
@@ -461,7 +461,7 @@ class PositionConstraint(ROSmsg):
 class OrientationConstraint(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/OrientationConstraint.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/OrientationConstraint'
+    ROS_MSG_TYPE = "moveit_msgs/OrientationConstraint"
 
     def __init__(
         self,
@@ -497,13 +497,13 @@ class OrientationConstraint(ROSmsg):
         ax, ay, az = orientation_constraint.tolerances
 
         kwargs = {}
-        kwargs['header'] = header
-        kwargs['orientation'] = Quaternion(qx, qy, qz, qw)
-        kwargs['link_name'] = orientation_constraint.link_name
-        kwargs['absolute_x_axis_tolerance'] = ax
-        kwargs['absolute_y_axis_tolerance'] = ay
-        kwargs['absolute_z_axis_tolerance'] = az
-        kwargs['weight'] = orientation_constraint.weight
+        kwargs["header"] = header
+        kwargs["orientation"] = Quaternion(qx, qy, qz, qw)
+        kwargs["link_name"] = orientation_constraint.link_name
+        kwargs["absolute_x_axis_tolerance"] = ax
+        kwargs["absolute_y_axis_tolerance"] = ay
+        kwargs["absolute_z_axis_tolerance"] = az
+        kwargs["weight"] = orientation_constraint.weight
 
         return cls(**kwargs)
 
@@ -511,7 +511,7 @@ class OrientationConstraint(ROSmsg):
 class PlanningSceneComponents(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PlanningSceneComponents.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/PlanningSceneComponents'
+    ROS_MSG_TYPE = "moveit_msgs/PlanningSceneComponents"
 
     SCENE_SETTINGS = 1
     ROBOT_STATE = 2
@@ -539,13 +539,13 @@ class PlanningSceneComponents(ROSmsg):
         for k, v in cls.__dict__.items():
             if v == self.components:
                 return k
-        return ''
+        return ""
 
 
 class AllowedCollisionMatrix(ROSmsg):
     """https://docs.ros.org/melodic/api/moveit_msgs/html/msg/AllowedCollisionMatrix.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/AllowedCollisionMatrix'
+    ROS_MSG_TYPE = "moveit_msgs/AllowedCollisionMatrix"
 
     def __init__(self, entry_names=None, entry_values=None, default_entry_names=None, default_entry_values=None):
         self.entry_names = entry_names or []  # string[]
@@ -557,7 +557,7 @@ class AllowedCollisionMatrix(ROSmsg):
 class PlanningSceneWorld(ROSmsg):
     """https://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningSceneWorld.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/PlanningSceneWorld'
+    ROS_MSG_TYPE = "moveit_msgs/PlanningSceneWorld"
 
     def __init__(self, collision_objects=None, octomap=None):
         self.collision_objects = collision_objects or []  # collision objects # CollisionObject[]
@@ -565,8 +565,8 @@ class PlanningSceneWorld(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        collision_objects = [CollisionObject.from_msg(i) for i in msg['collision_objects']]
-        octomap = msg['octomap']  # TODO: Add OctomapWithPose.from_msg(msg['octomap'])
+        collision_objects = [CollisionObject.from_msg(i) for i in msg["collision_objects"]]
+        octomap = msg["octomap"]  # TODO: Add OctomapWithPose.from_msg(msg['octomap'])
 
         return cls(collision_objects, octomap)
 
@@ -582,13 +582,13 @@ class PlanningSceneWorld(ROSmsg):
 class PlanningScene(ROSmsg):
     """https://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningScene.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/PlanningScene'
+    ROS_MSG_TYPE = "moveit_msgs/PlanningScene"
 
     def __init__(
         self,
-        name='',
+        name="",
         robot_state=None,
-        robot_model_name='',
+        robot_model_name="",
         fixed_frame_transforms=None,
         allowed_collision_matrix=None,
         link_padding=None,
@@ -621,28 +621,28 @@ class PlanningScene(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        robot_state = RobotState.from_msg(msg['robot_state'])
-        allowed_collision_matrix = msg['allowed_collision_matrix']
-        world = PlanningSceneWorld.from_msg(msg['world'])
+        robot_state = RobotState.from_msg(msg["robot_state"])
+        allowed_collision_matrix = msg["allowed_collision_matrix"]
+        world = PlanningSceneWorld.from_msg(msg["world"])
 
         return cls(
-            msg['name'],
+            msg["name"],
             robot_state,
-            msg['robot_model_name'],
-            msg['fixed_frame_transforms'],
+            msg["robot_model_name"],
+            msg["fixed_frame_transforms"],
             allowed_collision_matrix,
-            msg['link_padding'],
-            msg['link_scale'],
-            msg['object_colors'],
+            msg["link_padding"],
+            msg["link_scale"],
+            msg["object_colors"],
             world,
-            msg['is_diff'],
+            msg["is_diff"],
         )
 
 
 class ExecuteTrajectoryGoal(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/action/ExecuteTrajectory.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/ExecuteTrajectoryGoal'
+    ROS_MSG_TYPE = "moveit_msgs/ExecuteTrajectoryGoal"
 
     def __init__(self, trajectory=None):
         self.trajectory = trajectory or RobotTrajectory()
@@ -651,25 +651,25 @@ class ExecuteTrajectoryGoal(ROSmsg):
 class ExecuteTrajectoryFeedback(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/action/ExecuteTrajectory.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/ExecuteTrajectoryFeedback'
+    ROS_MSG_TYPE = "moveit_msgs/ExecuteTrajectoryFeedback"
 
     def __init__(self, state=None):
         self.state = state
 
     @classmethod
     def from_msg(cls, msg):
-        return cls(msg['state'])
+        return cls(msg["state"])
 
 
 class ExecuteTrajectoryResult(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/action/ExecuteTrajectory.html"""
 
-    ROS_MSG_TYPE = 'moveit_msgs/ExecuteTrajectoryResult'
+    ROS_MSG_TYPE = "moveit_msgs/ExecuteTrajectoryResult"
 
     def __init__(self, error_code=None):
         self.error_code = error_code or MoveItErrorCodes()  # moveit_msgs/MoveItErrorCodes
 
     @classmethod
     def from_msg(cls, msg):
-        error_code = MoveItErrorCodes.from_msg(msg['error_code'])
+        error_code = MoveItErrorCodes.from_msg(msg["error_code"])
         return cls(error_code)

@@ -14,11 +14,11 @@ from compas_fab.backends.pybullet.backend_features.pybullet_remove_collision_mes
 
 
 __all__ = [
-    'PyBulletAddAttachedCollisionMesh',
-    'PyBulletAddCollisionMesh',
-    'PyBulletAppendCollisionMesh',
-    'PyBulletRemoveCollisionMesh',
-    'PyBulletRemoveAttachedCollisionMesh',
-    'PyBulletForwardKinematics',
-    'PyBulletInverseKinematics',
+    "PyBulletAddAttachedCollisionMesh",
+    "PyBulletAddCollisionMesh",
+    "PyBulletAppendCollisionMesh",
+    "PyBulletRemoveCollisionMesh",
+    "PyBulletRemoveAttachedCollisionMesh",
+    "PyBulletForwardKinematics",
+    "PyBulletInverseKinematics",
 ]

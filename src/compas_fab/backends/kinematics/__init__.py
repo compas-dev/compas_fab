@@ -20,19 +20,19 @@ from .solvers import (
 
 __all__ = [
     # exceptions
-    'CartesianMotionError',
+    "CartesianMotionError",
     # clients / backend features
-    'AnalyticalInverseKinematics',
-    'AnalyticalPlanCartesianMotion',
+    "AnalyticalInverseKinematics",
+    "AnalyticalPlanCartesianMotion",
     # solvers
-    'OffsetWristKinematics',
-    'SphericalWristKinematics',
-    'UR3Kinematics',
-    'UR3eKinematics',
-    'UR5Kinematics',
-    'UR5eKinematics',
-    'UR10Kinematics',
-    'UR10eKinematics',
-    'Staubli_TX260LKinematics',
-    'ABB_IRB4600_40_255Kinematics',
+    "OffsetWristKinematics",
+    "SphericalWristKinematics",
+    "UR3Kinematics",
+    "UR3eKinematics",
+    "UR5Kinematics",
+    "UR5eKinematics",
+    "UR10Kinematics",
+    "UR10eKinematics",
+    "Staubli_TX260LKinematics",
+    "ABB_IRB4600_40_255Kinematics",
 ]

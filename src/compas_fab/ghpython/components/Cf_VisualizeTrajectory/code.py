@@ -27,7 +27,7 @@ class TrajectoryVisualize(component):
                 configurations.append(
                     robot.merge_group_with_full_configuration(c, trajectory.start_configuration, group)
                 )
-                frame = robot.forward_kinematics(c, group, options=dict(solver='model'))
+                frame = robot.forward_kinematics(c, group, options=dict(solver="model"))
                 planes.append(draw_frame(frame))
                 positions.append(c.positions)
                 velocities.append(c.velocities)

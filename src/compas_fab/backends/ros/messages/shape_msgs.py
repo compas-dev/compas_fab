@@ -10,7 +10,7 @@ from compas.datastructures import mesh_quads_to_triangles
 class SolidPrimitive(ROSmsg):
     """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/SolidPrimitive.html"""
 
-    ROS_MSG_TYPE = 'shape_msgs/SolidPrimitive'
+    ROS_MSG_TYPE = "shape_msgs/SolidPrimitive"
 
     BOX = 1
     SPHERE = 2
@@ -72,13 +72,13 @@ class SolidPrimitive(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        return cls(msg['type'], msg['dimensions'])
+        return cls(msg["type"], msg["dimensions"])
 
 
 class Mesh(ROSmsg):
     """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/Mesh.html"""
 
-    ROS_MSG_TYPE = 'shape_msgs/Mesh'
+    ROS_MSG_TYPE = "shape_msgs/Mesh"
 
     def __init__(self, triangles=None, vertices=None):
         self.triangles = triangles or []  # shape_msgs/MeshTriangle[]
@@ -95,8 +95,8 @@ class Mesh(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        triangles = [MeshTriangle.from_msg(t) for t in msg['triangles']]
-        vertices = [Point.from_msg(v) for v in msg['vertices']]
+        triangles = [MeshTriangle.from_msg(t) for t in msg["triangles"]]
+        vertices = [Point.from_msg(v) for v in msg["vertices"]]
         return cls(triangles, vertices)
 
     @property
@@ -110,7 +110,7 @@ class Mesh(ROSmsg):
 class MeshTriangle(ROSmsg):
     """https://docs.ros.org/api/shape_msgs/html/msg/MeshTriangle.html"""
 
-    ROS_MSG_TYPE = 'shape_msgs/MeshTriangle'
+    ROS_MSG_TYPE = "shape_msgs/MeshTriangle"
 
     def __init__(self, vertex_indices=None):
         if len(vertex_indices) != 3:
@@ -119,18 +119,18 @@ class MeshTriangle(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        vertex_indices = msg['vertex_indices']
+        vertex_indices = msg["vertex_indices"]
         return cls(vertex_indices)
 
 
 class Plane(ROSmsg):
     """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/Plane.html"""
 
-    ROS_MSG_TYPE = 'shape_msgs/Plane'
+    ROS_MSG_TYPE = "shape_msgs/Plane"
 
     def __init__(self, coef):
         self.coef = coef
 
     @classmethod
     def from_msg(cls, msg):
-        return cls(msg['coef'])
+        return cls(msg["coef"])

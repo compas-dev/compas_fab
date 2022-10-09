@@ -11,7 +11,7 @@ from compas_rhino import _check_rhino_version
 
 def get_version_from_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-v', '--version', choices=['5.0', '6.0', '7.0'], default='6.0')
+    parser.add_argument("-v", "--version", choices=["5.0", "6.0", "7.0"], default="6.0")
     args = parser.parse_args()
     return _check_rhino_version(args.version)
 
@@ -25,11 +25,11 @@ def install():
         grasshopper_library_path = get_grasshopper_library_path(version)
 
         for f in _remove_old_ghpy_components(grasshopper_library_path):
-            results.append(('compas_fab', 'Uninstalled old GHPY component: {}'.format(f), True))
+            results.append(("compas_fab", "Uninstalled old GHPY component: {}".format(f), True))
 
         dstdir = get_grasshopper_userobjects_path(version)
-        srcdir = os.path.join(os.path.dirname(__file__), 'ghuser')
-        userobjects = glob.glob(os.path.join(srcdir, '*.ghuser'))
+        srcdir = os.path.join(os.path.dirname(__file__), "ghuser")
+        userobjects = glob.glob(os.path.join(srcdir, "*.ghuser"))
 
         symlinks_to_remove = []
         symlinks_to_add = []
@@ -41,9 +41,9 @@ def install():
         remove_symlinks(symlinks_to_remove)
         create_symlinks(symlinks_to_add)
 
-        results.append(('compas_fab', 'Installed {} GH User Objects'.format(len(userobjects)), True))
+        results.append(("compas_fab", "Installed {} GH User Objects".format(len(userobjects)), True))
     except PermissionError:
-        raise Exception('Please close first all instances of Rhino and then rerun the command')
+        raise Exception("Please close first all instances of Rhino and then rerun the command")
 
     return results
 
@@ -57,11 +57,11 @@ def uninstall():
         grasshopper_library_path = get_grasshopper_library_path(version)
 
         for f in _remove_old_ghpy_components(grasshopper_library_path):
-            results.append(('compas_fab', 'Uninstalled old component: {}'.format(f), True))
+            results.append(("compas_fab", "Uninstalled old component: {}".format(f), True))
 
         dstdir = get_grasshopper_userobjects_path(version)
         srcdir = os.path.dirname(__file__)
-        userobjects = glob.glob(os.path.join(srcdir, 'ghuser', '*.ghuser'))
+        userobjects = glob.glob(os.path.join(srcdir, "ghuser", "*.ghuser"))
 
         symlinks = []
         for src in userobjects:
@@ -70,19 +70,19 @@ def uninstall():
 
         remove_symlinks(symlinks)
 
-        results.append(('compas_fab', 'Uninstalled {} GH User Objects'.format(len(userobjects)), True))
+        results.append(("compas_fab", "Uninstalled {} GH User Objects".format(len(userobjects)), True))
     except PermissionError:
-        raise Exception('Please close first all instances of Rhino and then rerun the command')
+        raise Exception("Please close first all instances of Rhino and then rerun the command")
 
     return results
 
 
 def _remove_old_ghpy_components(grasshopper_library_path):
-    oldlibs = glob.glob('%s*.ghpy' % os.path.join(grasshopper_library_path, 'COMPAS FAB_0.1'))
+    oldlibs = glob.glob("%s*.ghpy" % os.path.join(grasshopper_library_path, "COMPAS FAB_0.1"))
     for f in oldlibs:
         os.remove(f)
         yield f
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     install()

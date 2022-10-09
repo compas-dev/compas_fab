@@ -12,7 +12,7 @@ from compas_fab.robots import PlanningScene
 
 class PlanningSceneComponent(component):
     def RunScript(self, robot):
-        key = create_id(self, 'planning_scene')
+        key = create_id(self, "planning_scene")
         if robot:
             st[key] = PlanningScene(robot)
         return st.get(key, None)

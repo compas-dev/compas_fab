@@ -1,16 +1,16 @@
 import math
 
 __all__ = [
-    'allclose',
-    'arange',
-    'argmax',
-    'argmin',
-    'argsort',
-    'clamp',
-    'diffs',
-    'map_range',
-    'range_geometric_row',
-    'sign',
+    "allclose",
+    "arange",
+    "argmax",
+    "argmin",
+    "argsort",
+    "clamp",
+    "diffs",
+    "map_range",
+    "range_geometric_row",
+    "sign",
 ]
 
 

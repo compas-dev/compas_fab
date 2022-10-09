@@ -17,19 +17,19 @@ from compas_fab.ghpython.components import create_id
 class ROSTopicSubscribe(component):
     def RunScript(self, ros_client, topic_name, topic_type, interval, start, stop):
         if not topic_name:
-            raise ValueError('Please specify the name of the topic')
+            raise ValueError("Please specify the name of the topic")
         if not topic_type:
-            raise ValueError('Please specify the type of the topic')
+            raise ValueError("Please specify the type of the topic")
 
-        if not hasattr(self, 'message_count'):
+        if not hasattr(self, "message_count"):
             self.message_count = 0
 
         self.interval = interval or 25  # in milliseconds
         self.is_updating = False
         self.is_subscribed = False
 
-        self.msg_key = create_id(self, 'last_msg')
-        key = create_id(self, 'topic')
+        self.msg_key = create_id(self, "last_msg")
+        key = create_id(self, "topic")
 
         last_msg = st.get(self.msg_key, None)
         topic = st.get(key, None)
@@ -53,9 +53,9 @@ class ROSTopicSubscribe(component):
             last_msg = ROSmsg.parse(last_msg, topic_type)
 
         if self.is_subscribed:
-            self.Message = 'Subscribed, {} messages'.format(self.message_count)
+            self.Message = "Subscribed, {} messages".format(self.message_count)
         else:
-            self.Message = 'Not subscribed'
+            self.Message = "Not subscribed"
 
         return (topic, last_msg, self.is_subscribed)
 

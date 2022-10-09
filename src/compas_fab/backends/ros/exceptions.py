@@ -5,8 +5,8 @@ from __future__ import print_function
 from compas_fab.backends.exceptions import BackendError
 
 __all__ = [
-    'RosError',
-    'RosValidationError',
+    "RosError",
+    "RosValidationError",
 ]
 
 
@@ -14,7 +14,7 @@ class RosError(BackendError):
     """Wraps an exception that occurred on the communication with ROS."""
 
     def __init__(self, message, error_code):
-        super(RosError, self).__init__('Error code: ' + str(error_code) + '; ' + message)
+        super(RosError, self).__init__("Error code: " + str(error_code) + "; " + message)
         self.error_code = error_code
 
 

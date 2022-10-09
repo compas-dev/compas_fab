@@ -17,7 +17,7 @@ from compas_fab.backends.pybullet.backend_features.pybullet_remove_attached_coll
 from compas_fab.backends.pybullet.backend_features.pybullet_remove_collision_mesh import PyBulletRemoveCollisionMesh
 
 __all__ = [
-    'PyBulletPlanner',
+    "PyBulletPlanner",
 ]
 
 

@@ -6,7 +6,7 @@ from compas_fab.backends.interfaces import ForwardKinematics
 from compas_fab.backends.vrep.helpers import vrep_pose_to_frame
 
 __all__ = [
-    'VrepForwardKinematics',
+    "VrepForwardKinematics",
 ]
 
 
@@ -36,5 +36,5 @@ class VrepForwardKinematics(ForwardKinematics):
             An instance of :class:`Frame`.
         """
 
-        _res, _, pose, _, _ = self.client.run_child_script('getIkTipPose', [group], [], [])
+        _res, _, pose, _, _ = self.client.run_child_script("getIkTipPose", [group], [], [])
         return vrep_pose_to_frame(pose, self.client.scale)

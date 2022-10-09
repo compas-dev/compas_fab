@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import threading
 
-__all__ = ['FutureResult', 'CancellableFutureResult']
+__all__ = ["FutureResult", "CancellableFutureResult"]
 
 
 class FutureResult(object):
@@ -29,7 +29,7 @@ class FutureResult(object):
         """
         if not self.done:
             if not self.event.wait(timeout):
-                raise Exception('Timeout: future result not available')
+                raise Exception("Timeout: future result not available")
 
         if self.error:
             raise self.error
@@ -69,4 +69,4 @@ class CancellableFutureResult(FutureResult):
         then the method will return ``False``, otherwise the call will
         be cancelled and the method will return ``True``.
         """
-        raise NotImplementedError('Needs concrete implementation')
+        raise NotImplementedError("Needs concrete implementation")

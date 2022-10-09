@@ -9,8 +9,8 @@ from contextlib import contextmanager
 
 
 __all__ = [
-    'LOG',
-    'redirect_stdout',
+    "LOG",
+    "redirect_stdout",
 ]
 
 
@@ -35,12 +35,12 @@ def redirect_stdout(to=os.devnull, enabled=True):
     def _redirect_stdout(to_):
         sys.stdout.close()  # + implicit flush()
         os.dup2(to_.fileno(), fd)
-        sys.stdout = os.fdopen(fd, 'w')
+        sys.stdout = os.fdopen(fd, "w")
 
     # Pytest interferes with file descriptor capture.
-    called_from_test = 'pytest' in sys.modules
+    called_from_test = "pytest" in sys.modules
     # jupyter notebook (ipython) raises UnsupportedOperation on fileno(): https://github.com/ipython/ipython/pull/3072/
-    called_from_ipykernel = 'ipykernel' in sys.modules
+    called_from_ipykernel = "ipykernel" in sys.modules
 
     enabled = False if called_from_test or called_from_ipykernel else enabled
 
@@ -48,8 +48,8 @@ def redirect_stdout(to=os.devnull, enabled=True):
         yield
     else:
         fd = sys.stdout.fileno()
-        with os.fdopen(os.dup(fd), 'w') as old_stdout:
-            with open(to, 'w') as file:
+        with os.fdopen(os.dup(fd), "w") as old_stdout:
+            with open(to, "w") as file:
                 _redirect_stdout(to_=file)
             try:
                 yield
@@ -68,15 +68,15 @@ def get_logger(name):
             datefmt=None,
             reset=True,
             log_colors={
-                'DEBUG': 'cyan',
-                'INFO': 'green',
-                'WARNING': 'yellow',
-                'ERROR': 'red',
-                'CRITICAL': 'red',
+                "DEBUG": "cyan",
+                "INFO": "green",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "red",
             },
         )
     except ImportError:
-        formatter = logging.Formatter('[%(levelname)s] %(message)s')
+        formatter = logging.Formatter("[%(levelname)s] %(message)s")
 
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)

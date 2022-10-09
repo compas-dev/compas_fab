@@ -5,5 +5,5 @@ from __future__ import print_function
 from compas.robots import Configuration
 
 __all__ = [
-    'Configuration',
+    "Configuration",
 ]

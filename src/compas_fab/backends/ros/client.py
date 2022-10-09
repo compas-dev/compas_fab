@@ -30,10 +30,10 @@ from compas_fab.robots import Robot
 from compas_fab.robots import RobotSemantics
 
 __all__ = [
-    'RosClient',
+    "RosClient",
 ]
 
-PLANNER_BACKENDS = {'moveit': MoveItPlanner}
+PLANNER_BACKENDS = {"moveit": MoveItPlanner}
 
 
 class CancellableRosActionResult(CancellableFutureResult):
@@ -49,7 +49,7 @@ class CancellableRosActionResult(CancellableFutureResult):
         be cancelled and the method will return ``True``.
         """
         if self.done:
-            raise Exception('Already completed action cannot be cancelled')
+            raise Exception("Already completed action cannot be cancelled")
 
         if self.goal.is_finished:
             return False
@@ -134,7 +134,7 @@ class RosClient(Ros, ClientInterface):
     For more examples, check out the :ref:`ROS examples page <ros_examples>`.
     """
 
-    def __init__(self, host='localhost', port=9090, is_secure=False, planner_backend='moveit'):
+    def __init__(self, host="localhost", port=9090, is_secure=False, planner_backend="moveit"):
         super(RosClient, self).__init__(host, port, is_secure)
 
         planner_backend_type = PLANNER_BACKENDS[planner_backend]
@@ -153,15 +153,15 @@ class RosClient(Ros, ClientInterface):
     def ros_distro(self):
         """Retrieves the ROS version to which the client is connected (eg. kinetic)"""
         if not self._ros_distro:
-            self._ros_distro = Param(self, '/rosdistro').get(timeout=1).strip()
+            self._ros_distro = Param(self, "/rosdistro").get(timeout=1).strip()
 
         return self._ros_distro
 
     def load_robot(
         self,
         load_geometry=False,
-        urdf_param_name='/robot_description',
-        srdf_param_name='/robot_description_semantic',
+        urdf_param_name="/robot_description",
+        srdf_param_name="/robot_description_semantic",
         precision=None,
         local_cache_directory=None,
     ):
@@ -269,7 +269,7 @@ class RosClient(Ros, ClientInterface):
     def follow_joint_trajectory(
         self,
         joint_trajectory,
-        action_name='/joint_trajectory_action',
+        action_name="/joint_trajectory_action",
         callback=None,
         errback=None,
         feedback_callback=None,
@@ -303,14 +303,14 @@ class RosClient(Ros, ClientInterface):
         joint_trajectory = self._convert_to_ros_trajectory(joint_trajectory)
         trajectory_goal = FollowJointTrajectoryGoal(trajectory=joint_trajectory)
 
-        action_client = ActionClient(self, action_name, 'control_msgs/FollowJointTrajectoryAction')
+        action_client = ActionClient(self, action_name, "control_msgs/FollowJointTrajectoryAction")
         goal = Goal(action_client, Message(trajectory_goal.msg))
         action_result = CancellableRosActionResult(goal)
 
         def handle_result(msg):
             result = FollowJointTrajectoryResult.from_msg(msg)
             if result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:
-                ros_error = RosError('Follow trajectory failed={}'.format(result.error_string), int(result.error_code))
+                ros_error = RosError("Follow trajectory failed={}".format(result.error_string), int(result.error_code))
                 action_result._set_error_result(ros_error)
                 if errback:
                     errback(ros_error)
@@ -326,13 +326,13 @@ class RosClient(Ros, ClientInterface):
         def handle_failure(error):
             errback(error)
 
-        goal.on('result', handle_result)
+        goal.on("result", handle_result)
 
         if feedback_callback:
-            goal.on('feedback', handle_feedback)
+            goal.on("feedback", handle_feedback)
 
         if errback:
-            goal.on('timeout', lambda: handle_failure(RosError('Action Goal timeout', -1)))
+            goal.on("timeout", lambda: handle_failure(RosError("Action Goal timeout", -1)))
 
         goal.send(timeout=timeout)
 
@@ -341,7 +341,7 @@ class RosClient(Ros, ClientInterface):
     def execute_joint_trajectory(
         self,
         joint_trajectory,
-        action_name='/execute_trajectory',
+        action_name="/execute_trajectory",
         callback=None,
         errback=None,
         feedback_callback=None,
@@ -380,7 +380,7 @@ class RosClient(Ros, ClientInterface):
         trajectory = RobotTrajectory(joint_trajectory=joint_trajectory)
         trajectory_goal = ExecuteTrajectoryGoal(trajectory=trajectory)
 
-        action_client = ActionClient(self, action_name, 'moveit_msgs/ExecuteTrajectoryAction')
+        action_client = ActionClient(self, action_name, "moveit_msgs/ExecuteTrajectoryAction")
         goal = Goal(action_client, Message(trajectory_goal.msg))
         action_result = CancellableRosActionResult(goal)
 
@@ -388,7 +388,7 @@ class RosClient(Ros, ClientInterface):
             result = ExecuteTrajectoryResult.from_msg(msg)
             if result.error_code != MoveItErrorCodes.SUCCESS:
                 ros_error = RosError(
-                    'Execute trajectory failed. Message={}'.format(result.error_code.human_readable),
+                    "Execute trajectory failed. Message={}".format(result.error_code.human_readable),
                     int(result.error_code),
                 )
                 action_result._set_error_result(ros_error)
@@ -406,13 +406,13 @@ class RosClient(Ros, ClientInterface):
         def handle_failure(error):
             errback(error)
 
-        goal.on('result', handle_result)
+        goal.on("result", handle_result)
 
         if feedback_callback:
-            goal.on('feedback', handle_feedback)
+            goal.on("feedback", handle_feedback)
 
         if errback:
-            goal.on('timeout', lambda: handle_failure(RosError('Action Goal timeout', -1)))
+            goal.on("timeout", lambda: handle_failure(RosError("Action Goal timeout", -1)))
 
         goal.send(timeout=timeout)
 

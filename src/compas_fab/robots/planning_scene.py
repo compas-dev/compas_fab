@@ -7,9 +7,9 @@ from compas.geometry import Frame
 from compas.geometry import Scale
 
 __all__ = [
-    'AttachedCollisionMesh',
-    'CollisionMesh',
-    'PlanningScene',
+    "AttachedCollisionMesh",
+    "CollisionMesh",
+    "PlanningScene",
 ]
 
 
@@ -58,7 +58,7 @@ class CollisionMesh(object):
         self.id = id
         self.mesh = mesh
         self.frame = frame or Frame.worldXY()
-        self.root_name = root_name or 'world'
+        self.root_name = root_name or "world"
 
     def scale(self, scale_factor):
         """Scales the collision mesh uniformly.
@@ -115,19 +115,19 @@ class CollisionMesh(object):
     def data(self):
         """:obj:`dict` : The data representing the collision mesh."""
         data_obj = {}
-        data_obj['id'] = self.id
-        data_obj['mesh'] = self.mesh.to_data()
-        data_obj['frame'] = self.frame.to_data()
-        data_obj['root_name'] = self.root_name
+        data_obj["id"] = self.id
+        data_obj["mesh"] = self.mesh.to_data()
+        data_obj["frame"] = self.frame.to_data()
+        data_obj["root_name"] = self.root_name
 
         return data_obj
 
     @data.setter
     def data(self, data_obj):
-        self.id = data_obj['id']
-        self.mesh = Mesh.from_data(data_obj['mesh'])
-        self.frame = Frame.from_data(data_obj['frame'])
-        self.root_name = data_obj['root_name']
+        self.id = data_obj["id"]
+        self.mesh = Mesh.from_data(data_obj["mesh"])
+        self.frame = Frame.from_data(data_obj["frame"])
+        self.root_name = data_obj["root_name"]
 
 
 class AttachedCollisionMesh(object):
@@ -209,19 +209,19 @@ class AttachedCollisionMesh(object):
     def data(self):
         """:obj:`dict` : The data representing the attached collision mesh."""
         data_obj = {}
-        data_obj['collision_mesh'] = self.collision_mesh.to_data()
-        data_obj['link_name'] = self.link_name
-        data_obj['touch_links'] = self.touch_links
-        data_obj['weight'] = self.weight
+        data_obj["collision_mesh"] = self.collision_mesh.to_data()
+        data_obj["link_name"] = self.link_name
+        data_obj["touch_links"] = self.touch_links
+        data_obj["weight"] = self.weight
 
         return data_obj
 
     @data.setter
     def data(self, data_obj):
-        self.collision_mesh = CollisionMesh.from_data(data_obj['collision_mesh'])
-        self.link_name = data_obj['link_name']
-        self.touch_links = data_obj['touch_links']
-        self.weight = data_obj['weight']
+        self.collision_mesh = CollisionMesh.from_data(data_obj["collision_mesh"])
+        self.link_name = data_obj["link_name"]
+        self.touch_links = data_obj["touch_links"]
+        self.weight = data_obj["weight"]
 
 
 class PlanningScene(object):
@@ -257,7 +257,7 @@ class PlanningScene(object):
             If no client is set for planning scene's robot.
         """
         if not self.client:
-            raise Exception('This method is only callable once a client is assigned')
+            raise Exception("This method is only callable once a client is assigned")
 
     def reset(self):
         """Resets the planning scene, removing all added collision meshes."""

@@ -5,11 +5,11 @@ from __future__ import print_function
 from compas_fab.backends.interfaces import RemoveAttachedCollisionMesh
 from compas_fab.utilities import LazyLoader
 
-pybullet = LazyLoader('pybullet', globals(), 'pybullet')
+pybullet = LazyLoader("pybullet", globals(), "pybullet")
 
 
 __all__ = [
-    'PyBulletRemoveAttachedCollisionMesh',
+    "PyBulletRemoveAttachedCollisionMesh",
 ]
 
 
@@ -36,13 +36,13 @@ class PyBulletRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
         -------
         ``None``
         """
-        robot = options['robot']
+        robot = options["robot"]
         self.client.ensure_cached_robot_geometry(robot)
 
         cached_robot_model = self.client.get_cached_robot(robot)
 
         # remove link and fixed joint
         cached_robot_model.remove_link(id)
-        cached_robot_model.remove_joint(id + '_fixed_joint')
+        cached_robot_model.remove_joint(id + "_fixed_joint")
 
         self.client.reload_from_cache(robot)

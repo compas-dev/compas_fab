@@ -5,7 +5,7 @@ from __future__ import division
 from compas.geometry import Scale
 from compas.geometry import Rotation
 
-__all__ = ['BoundingVolume', 'Constraint', 'JointConstraint', 'OrientationConstraint', 'PositionConstraint']
+__all__ = ["BoundingVolume", "Constraint", "JointConstraint", "OrientationConstraint", "PositionConstraint"]
 
 
 class BoundingVolume(object):

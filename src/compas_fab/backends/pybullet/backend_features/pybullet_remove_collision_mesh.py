@@ -6,11 +6,11 @@ from compas_fab.backends.interfaces import RemoveCollisionMesh
 from compas_fab.backends.pybullet.utils import LOG
 from compas_fab.utilities import LazyLoader
 
-pybullet = LazyLoader('pybullet', globals(), 'pybullet')
+pybullet = LazyLoader("pybullet", globals(), "pybullet")
 
 
 __all__ = [
-    'PyBulletRemoveCollisionMesh',
+    "PyBulletRemoveCollisionMesh",
 ]
 
 

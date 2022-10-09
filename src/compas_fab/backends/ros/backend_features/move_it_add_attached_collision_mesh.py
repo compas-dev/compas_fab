@@ -14,7 +14,7 @@ from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
 
 __all__ = [
-    'MoveItAddAttachedCollisionMesh',
+    "MoveItAddAttachedCollisionMesh",
 ]
 
 
@@ -22,8 +22,8 @@ class MoveItAddAttachedCollisionMesh(AddAttachedCollisionMesh):
     """Callable to add a collision mesh and attach it to the robot."""
 
     APPLY_PLANNING_SCENE = ServiceDescription(
-        '/apply_planning_scene',
-        'ApplyPlanningScene',
+        "/apply_planning_scene",
+        "ApplyPlanningScene",
         ApplyPlanningSceneRequest,
         ApplyPlanningSceneResponse,
     )
@@ -46,8 +46,8 @@ class MoveItAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         ``None``
         """
         kwargs = {}
-        kwargs['attached_collision_mesh'] = attached_collision_mesh
-        kwargs['errback_name'] = 'errback'
+        kwargs["attached_collision_mesh"] = attached_collision_mesh
+        kwargs["errback_name"] = "errback"
 
         return await_callback(self.add_attached_collision_mesh_async, **kwargs)
 

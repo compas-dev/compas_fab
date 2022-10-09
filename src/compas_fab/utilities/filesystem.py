@@ -1,6 +1,6 @@
 import os
 
-__all__ = ['list_files_in_directory']
+__all__ = ["list_files_in_directory"]
 
 
 def list_files_in_directory(directory, fullpath=False, extensions=None):

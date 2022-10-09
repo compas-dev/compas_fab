@@ -1,7 +1,7 @@
 from compas.geometry import Point
 
 __all__ = [
-    'Inertia',
+    "Inertia",
 ]
 
 

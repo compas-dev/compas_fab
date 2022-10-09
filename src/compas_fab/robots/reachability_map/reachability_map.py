@@ -127,8 +127,8 @@ class ReachabilityMap(Data):
                 return obj.data if obj else None
 
         data = {}
-        data['frames'] = data_encode(self.frames)
-        data['configurations'] = data_encode(self.configurations)
+        data["frames"] = data_encode(self.frames)
+        data["configurations"] = data_encode(self.configurations)
         return data
 
     @data.setter
@@ -139,5 +139,5 @@ class ReachabilityMap(Data):
             else:
                 return aclass.from_data(obj) if obj else None
 
-        self.frames = data_decode(data['frames'], Frame)
-        self.configurations = data_decode(data['configurations'], Configuration)
+        self.frames = data_decode(data["frames"], Frame)
+        self.configurations = data_decode(data["configurations"], Configuration)

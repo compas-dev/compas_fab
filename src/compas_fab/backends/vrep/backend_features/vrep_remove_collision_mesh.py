@@ -7,10 +7,10 @@ from compas_fab.backends.vrep.helpers import DEFAULT_OP_MODE
 from compas_fab.utilities import LazyLoader
 
 __all__ = [
-    'VrepRemoveCollisionMesh',
+    "VrepRemoveCollisionMesh",
 ]
 
-vrep = LazyLoader('vrep', globals(), 'compas_fab.backends.vrep.remote_api.vrep')
+vrep = LazyLoader("vrep", globals(), "compas_fab.backends.vrep.remote_api.vrep")
 
 
 class VrepRemoveCollisionMesh(RemoveCollisionMesh):

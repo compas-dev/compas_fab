@@ -13,7 +13,7 @@ from compas_fab.backends.vrep.backend_features.vrep_remove_collision_mesh import
 
 
 __all__ = [
-    'VrepPlanner',
+    "VrepPlanner",
 ]
 
 

@@ -16,7 +16,7 @@ from roslibpy import ServiceRequest
 
 from compas_fab.backends.ros.exceptions import RosValidationError
 
-__all__ = ['ServiceDescription']
+__all__ = ["ServiceDescription"]
 
 
 class ServiceDescription(object):

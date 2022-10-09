@@ -12,11 +12,11 @@ from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.pybullet.conversions import pose_from_frame
 from compas_fab.utilities import LazyLoader
 
-pybullet = LazyLoader('pybullet', globals(), 'pybullet')
+pybullet = LazyLoader("pybullet", globals(), "pybullet")
 
 
 __all__ = [
-    'PyBulletInverseKinematics',
+    "PyBulletInverseKinematics",
 ]
 
 
@@ -74,16 +74,16 @@ class PyBulletInverseKinematics(InverseKinematics):
         :class:`compas_fab.backends.InverseKinematicsError`
         """
         options = options or {}
-        high_accuracy = options.get('high_accuracy', True)
-        max_results = options.get('max_results', 100)
-        link_name = options.get('link_name') or robot.get_end_effector_link_name(group)
+        high_accuracy = options.get("high_accuracy", True)
+        max_results = options.get("max_results", 100)
+        link_name = options.get("link_name") or robot.get_end_effector_link_name(group)
         cached_robot = self.client.get_cached_robot(robot)
         body_id = self.client.get_uid(cached_robot)
         link_id = self.client._get_link_id_by_name(link_name, cached_robot)
         point, orientation = pose_from_frame(frame_WCF)
 
         joints = cached_robot.get_configurable_joints()
-        joints.sort(key=lambda j: j.attr['pybullet']['id'])
+        joints.sort(key=lambda j: j.attr["pybullet"]["id"])
         joint_names = [joint.name for joint in joints]
 
         lower_limits = [joint.limit.lower if joint.type != Joint.CONTINUOUS else 0 for joint in joints]
@@ -102,13 +102,13 @@ class PyBulletInverseKinematics(InverseKinematics):
                 physicsClientId=self.client.client_id,
             )
 
-            if options.get('enforce_joint_limits', True):
+            if options.get("enforce_joint_limits", True):
                 # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.
                 # https://stackoverflow.com/questions/49674179/understanding-inverse-kinematics-pybullet
                 # https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/preview?pru=AAABc7276PI*zazLer2rlZ8tAUI8lF98Kw#heading=h.9i02ojf4k3ve
                 joint_ranges = [u - l for u, l in zip(upper_limits, lower_limits)]
 
-                if options.get('semi-constrained'):
+                if options.get("semi-constrained"):
                     ik_options.update(
                         dict(
                             lowerLimits=lower_limits,
@@ -129,7 +129,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                         )
                     )
             else:
-                if not options.get('semi-constrained'):
+                if not options.get("semi-constrained"):
                     ik_options.update(
                         dict(
                             targetOrientation=orientation,
@@ -141,8 +141,8 @@ class PyBulletInverseKinematics(InverseKinematics):
                 ik_options.update(
                     dict(
                         joints=joints,
-                        threshold=options.get('high_accuracy_threshold', 1e-6),
-                        max_iter=options.get('high_accuracy_max_iter', 20),
+                        threshold=options.get("high_accuracy_threshold", 1e-6),
+                        max_iter=options.get("high_accuracy_max_iter", 20),
                     )
                 )
                 joint_positions, close_enough = self._accurate_inverse_kinematics(**ik_options)
@@ -167,7 +167,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
             # Randomize joints to get a different solution on the next iter
             self.client._set_joint_positions(
-                [joint.attr['pybullet']['id'] for joint in joints],
+                [joint.attr["pybullet"]["id"] for joint in joints],
                 [random.uniform(*limits) for limits in zip(lower_limits, upper_limits)],
                 body_id,
             )
@@ -187,10 +187,10 @@ class PyBulletInverseKinematics(InverseKinematics):
         close_enough = False
         iter = 0
         distance = None
-        joint_ids = [joint.attr['pybullet']['id'] for joint in joints]
-        body_id = kwargs['bodyUniqueId']
-        link_id = kwargs['endEffectorLinkIndex']
-        target_position = kwargs['targetPosition']
+        joint_ids = [joint.attr["pybullet"]["id"] for joint in joints]
+        body_id = kwargs["bodyUniqueId"]
+        link_id = kwargs["endEffectorLinkIndex"]
+        target_position = kwargs["targetPosition"]
 
         while not close_enough and iter < max_iter:
             joint_poses = pybullet.calculateInverseKinematics(**kwargs)
@@ -207,7 +207,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             ]
             distance = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]
             close_enough = distance < threshold
-            kwargs['restPoses'] = joint_poses
+            kwargs["restPoses"] = joint_poses
             iter += 1
 
         return joint_poses, close_enough

@@ -31,8 +31,8 @@ def test_to_data():
     d = Duration(2, 5e8)
     data = d.to_data()
 
-    assert data['secs'] == 2
-    assert data['nsecs'] == 5e8
+    assert data["secs"] == 2
+    assert data["nsecs"] == 5e8
 
 
 def test_equality():
