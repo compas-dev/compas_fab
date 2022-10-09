@@ -7,13 +7,13 @@ from compas_fab.backends.vrep.helpers import config_from_vrep
 from compas_fab.backends.vrep.helpers import frame_to_vrep_pose
 
 __all__ = [
-    'VrepInverseKinematics',
+    "VrepInverseKinematics",
 ]
 
 
 class VrepInverseKinematics(InverseKinematics):
-    """Callable to calculate inverse kinematics to find valid robot configurations for the specified goal frame.
-    """
+    """Callable to calculate inverse kinematics to find valid robot configurations for the specified goal frame."""
+
     def __init__(self, client):
         self.client = client
 
@@ -46,21 +46,28 @@ class VrepInverseKinematics(InverseKinematics):
                 A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
         """
         options = options or {}
-        num_joints = options['num_joints']
-        metric_values = options.get('metric_values')
-        gantry_joint_limits = options.get('gantry_joint_limits')
-        arm_joint_limits = options.get('arm_joint_limits')
-        max_trials = options.get('max_trials')
-        max_results = options.get('max_results', 100)
+        num_joints = options["num_joints"]
+        metric_values = options.get("metric_values")
+        gantry_joint_limits = options.get("gantry_joint_limits")
+        arm_joint_limits = options.get("arm_joint_limits")
+        max_trials = options.get("max_trials")
+        max_results = options.get("max_results", 100)
 
         if not metric_values:
             metric_values = [0.1] * num_joints
 
         self.client.set_robot_metric(group, metric_values)
 
-        states = self.client.find_raw_robot_states(group, frame_to_vrep_pose(frame_WCF, self.client.scale), gantry_joint_limits, arm_joint_limits, max_trials, max_results)
+        states = self.client.find_raw_robot_states(
+            group,
+            frame_to_vrep_pose(frame_WCF, self.client.scale),
+            gantry_joint_limits,
+            arm_joint_limits,
+            max_trials,
+            max_results,
+        )
 
         joint_names = robot.get_configurable_joint_names()
 
         for i in range(0, len(states), num_joints):
-            yield config_from_vrep(states[i: i+num_joints], self.client.scale).joint_values, joint_names
+            yield config_from_vrep(states[i : i + num_joints], self.client.scale).joint_values, joint_names

@@ -53,12 +53,12 @@ class OrthonormalVectorsFromAxisGenerator(object):
         if self.start_vector:
             # correct start_vector
             self.start_vector = (self.axis.cross(self.start_vector.unitized())).cross(self.axis)
-            for alpha in arange(0, 2*math.pi, self.angle_step):
+            for alpha in arange(0, 2 * math.pi, self.angle_step):
                 R = Rotation.from_axis_and_angle(self.axis, alpha)
                 yield self.start_vector.transformed(R)
         else:
             f = Frame.from_plane(Plane((0, 0, 0), self.axis))
-            for alpha in arange(0, 2*math.pi, self.angle_step):
+            for alpha in arange(0, 2 * math.pi, self.angle_step):
                 x = math.cos(alpha)
                 y = math.sin(alpha)
                 yield f.to_world_coordinates(Vector(x, y, 0))
@@ -102,16 +102,18 @@ class DeviationVectorsGenerator(object):
 
     def __iter__(self):
         yield self.axis
-        alphas = arange(self.max_alpha / self.step, self.max_alpha + self.max_alpha/self.step, self.max_alpha / self.step)
+        alphas = arange(
+            self.max_alpha / self.step, self.max_alpha + self.max_alpha / self.step, self.max_alpha / self.step
+        )
         radii = [math.sin(alpha) for alpha in alphas]
         x, y = math.cos(alphas[0]), math.sin(alphas[0])
-        d = math.sqrt((1 - x)**2 + y**2)
+        d = math.sqrt((1 - x) ** 2 + y**2)
         # get any vector normal to axis
         axis2 = Frame.from_plane(Plane((0, 0, 0), self.axis)).xaxis
         for alpha, r in zip(alphas, radii):
             R1 = Rotation.from_axis_and_angle(axis2, alpha)
-            amount = int(round(2*math.pi*r/d))
-            betas = arange(0, 2*math.pi, 2*math.pi/amount)
+            amount = int(round(2 * math.pi * r / d))
+            betas = arange(0, 2 * math.pi, 2 * math.pi / amount)
             for beta in betas:
                 R2 = Rotation.from_axis_and_angle(self.axis, beta)
                 yield self.axis.transformed(R2 * R1)

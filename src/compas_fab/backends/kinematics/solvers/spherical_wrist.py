@@ -238,4 +238,9 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
                 axis6_angle = math.atan2(endy, endx)
                 axis6_angles.append(axis6_angle)
 
-    return [[a1, a2, a3, a4, a5, a6] for a1, a2, a3, a4, a5, a6 in zip(axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles)]
+    return [
+        [a1, a2, a3, a4, a5, a6]
+        for a1, a2, a3, a4, a5, a6 in zip(
+            axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles
+        )
+    ]

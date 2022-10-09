@@ -49,7 +49,7 @@ if __name__ == "__main__":
             pt = Point(0, 0, 0) + Vector(0, i * 0.1, 0)
             yield frame_generator(pt)
 
-    with PyBulletClient(connection_type='direct') as client:
+    with PyBulletClient(connection_type="direct") as client:
         robot = client.load_ur5(load_geometry=True)
         ik = AnalyticalInverseKinematics(client)
         client.inverse_kinematics = ik.inverse_kinematics

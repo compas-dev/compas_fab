@@ -51,10 +51,10 @@ class ReachabilityMapArtist(RhinoArtist):
             frames, _ = self.reachability_map.reachable_frames_and_configurations_at_ik_index(ik_index)
             return [FrameArtist(f, layer=self.layer, scale=self.scale).draw() for f in frames]
 
-    def draw(self, colormap='viridis'):
+    def draw(self, colormap="viridis"):
         return self.draw_cloud(colormap)
 
-    def draw_cloud(self, colormap='viridis', points=None):
+    def draw_cloud(self, colormap="viridis", points=None):
         """Returns the points and colors to create a point cloud.
 
         The colors are calculated on the score at the respective frame. If the

@@ -78,7 +78,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         """
 
         options = options or {}
-        solver = options.get('solver')
+        solver = options.get("solver")
         if solver:
             self.planner = PLANNER_BACKENDS[solver]()
         elif not self.planner:  # no solver, no planner
@@ -99,11 +99,11 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         # check collisions for all configurations (>> sets those to `None` that are not working)
         if options.get("check_collision", False) is True:
-            acms = options.get('attached_collision_meshes', [])
+            acms = options.get("attached_collision_meshes", [])
             for acm in acms:
                 cached_robot_model = self.client.get_cached_robot(robot)
                 if not cached_robot_model.get_link_by_name(acm.collision_mesh.id):
-                    self.client.add_attached_collision_mesh(acm, options={'robot': robot})
+                    self.client.add_attached_collision_mesh(acm, options={"robot": robot})
                     for touch_link in acm.touch_links:
                         self.client.disabled_collisions.add((touch_link, acm.collision_mesh.id))
             for i, config in enumerate(configurations):

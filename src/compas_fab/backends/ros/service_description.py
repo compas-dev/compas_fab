@@ -16,9 +16,7 @@ from roslibpy import ServiceRequest
 
 from compas_fab.backends.ros.exceptions import RosValidationError
 
-__all__ = [
-    'ServiceDescription'
-]
+__all__ = ["ServiceDescription"]
 
 
 class ServiceDescription(object):
@@ -57,8 +55,7 @@ class ServiceDescription(object):
         else:
             request_msg = self.request_class(**request)
         srv = Service(client, self.name, self.type)
-        srv.call(ServiceRequest(request_msg.msg),
-                 callback=inner_handler, errback=errback)
+        srv.call(ServiceRequest(request_msg.msg), callback=inner_handler, errback=errback)
 
     def __call__(self, client, request, callback, errback):
         return self.call(client, request, callback, errback)

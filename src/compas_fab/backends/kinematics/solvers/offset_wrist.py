@@ -40,34 +40,15 @@ def forward_kinematics_offset_wrist(joint_values, params):
     T[0] = c234 * c1 * s5 - c5 * s1
     T[1] = c6 * (s1 * s5 + c234 * c1 * c5) - s234 * c1 * s6
     T[2] = -s6 * (s1 * s5 + c234 * c1 * c5) - s234 * c1 * c6
-    T[3] = (
-        d6 * c234 * c1 * s5
-        - a3 * c23 * c1
-        - a2 * c1 * c2
-        - d6 * c5 * s1
-        - d5 * s234 * c1
-        - d4 * s1
-    )
+    T[3] = d6 * c234 * c1 * s5 - a3 * c23 * c1 - a2 * c1 * c2 - d6 * c5 * s1 - d5 * s234 * c1 - d4 * s1
     T[4] = c1 * c5 + c234 * s1 * s5
     T[5] = -c6 * (c1 * s5 - c234 * c5 * s1) - s234 * s1 * s6
     T[6] = s6 * (c1 * s5 - c234 * c5 * s1) - s234 * c6 * s1
-    T[7] = (
-        d6 * (c1 * c5 + c234 * s1 * s5)
-        + d4 * c1
-        - a3 * c23 * s1
-        - a2 * c2 * s1
-        - d5 * s234 * s1
-    )
+    T[7] = d6 * (c1 * c5 + c234 * s1 * s5) + d4 * c1 - a3 * c23 * s1 - a2 * c2 * s1 - d5 * s234 * s1
     T[8] = -s234 * s5
     T[9] = -c234 * s6 - s234 * c5 * c6
     T[10] = s234 * c5 * s6 - c234 * c6
-    T[11] = (
-        d1
-        + a3 * s23
-        + a2 * s2
-        - d5 * (c23 * c4 - s23 * s4)
-        - d6 * s5 * (c23 * s4 + s23 * c4)
-    )
+    T[11] = d1 + a3 * s23 + a2 * s2 - d5 * (c23 * c4 - s23 * s4) - d6 * s5 * (c23 * s4 + s23 * c4)
     T[15] = 1.0
 
     frame = Frame((T[3], T[7], T[11]), (T[0], T[4], T[8]), (T[1], T[5], T[9]))
@@ -186,9 +167,7 @@ def inverse_kinematics_offset_wrist(frame, params, q6_des=0.0):
             if fabs(s5) < ZERO_THRESH:
                 q6 = q6_des
             else:
-                q6 = atan2(
-                    sign(s5) * -(T01 * s1 - T11 * c1), sign(s5) * (T00 * s1 - T10 * c1)
-                )
+                q6 = atan2(sign(s5) * -(T01 * s1 - T11 * c1), sign(s5) * (T00 * s1 - T10 * c1))
             if fabs(q6) < ZERO_THRESH:
                 q6 = 0.0
             if q6 < 0.0:
@@ -199,9 +178,7 @@ def inverse_kinematics_offset_wrist(frame, params, q6_des=0.0):
 
             c6 = cos(q6)
             s6 = sin(q6)
-            x04x = -s5 * (T02 * c1 + T12 * s1) - c5 * (
-                s6 * (T01 * c1 + T11 * s1) - c6 * (T00 * c1 + T10 * s1)
-            )
+            x04x = -s5 * (T02 * c1 + T12 * s1) - c5 * (s6 * (T01 * c1 + T11 * s1) - c6 * (T00 * c1 + T10 * s1))
             x04y = c5 * (T20 * c6 - T21 * s6) - T22 * s5
             p13x = (
                 d5 * (s6 * (T00 * c1 + T10 * s1) + c6 * (T01 * c1 + T11 * s1))

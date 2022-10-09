@@ -13,17 +13,19 @@ from compas_fab.backends.ros.messages import PlanningSceneWorld
 from compas_fab.backends.ros.service_description import ServiceDescription
 
 __all__ = [
-    'MoveItRemoveCollisionMesh',
+    "MoveItRemoveCollisionMesh",
 ]
 
 
 class MoveItRemoveCollisionMesh(RemoveCollisionMesh):
     """Callable to remove a collision mesh from the planning scene."""
-    APPLY_PLANNING_SCENE = ServiceDescription('/apply_planning_scene',
-                                              'ApplyPlanningScene',
-                                              ApplyPlanningSceneRequest,
-                                              ApplyPlanningSceneResponse,
-                                              )
+
+    APPLY_PLANNING_SCENE = ServiceDescription(
+        "/apply_planning_scene",
+        "ApplyPlanningScene",
+        ApplyPlanningSceneRequest,
+        ApplyPlanningSceneResponse,
+    )
 
     def __init__(self, ros_client):
         self.ros_client = ros_client
@@ -43,8 +45,8 @@ class MoveItRemoveCollisionMesh(RemoveCollisionMesh):
         ``None``
         """
         kwargs = {}
-        kwargs['id'] = id
-        kwargs['errback_name'] = 'errback'
+        kwargs["id"] = id
+        kwargs["errback_name"] = "errback"
 
         return await_callback(self.remove_collision_mesh_async, **kwargs)
 

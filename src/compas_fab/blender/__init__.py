@@ -26,4 +26,4 @@ else:
     from .artists import RobotArtist
     from .artists import RobotModelArtist
 
-    __all__ = ['RobotArtist', 'RobotModelArtist']
+    __all__ = ["RobotArtist", "RobotModelArtist"]

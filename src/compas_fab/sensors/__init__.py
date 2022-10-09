@@ -45,18 +45,15 @@ from .baumer import (
     PosCon3D,
     PosConCM,
 )
-from .exceptions import (
-    ProtocolError,
-    SensorTimeoutError
-)
+from .exceptions import ProtocolError, SensorTimeoutError
 
 __all__ = [
     # base
-    'SerialSensor',
+    "SerialSensor",
     # baumer
-    'PosCon3D',
-    'PosConCM',
+    "PosCon3D",
+    "PosConCM",
     # exceptions
-    'ProtocolError',
-    'SensorTimeoutError'
+    "ProtocolError",
+    "SensorTimeoutError",
 ]

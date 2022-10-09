@@ -1,5 +1,10 @@
 [tool.black]
 line-length = 120
+extend-exclude = """
+(
+    ^/src/compas_fab/backends/vrep/remote_api/*
+)
+"""
 
 [tool.pytest.ini_options]
 minversion = "6.0"

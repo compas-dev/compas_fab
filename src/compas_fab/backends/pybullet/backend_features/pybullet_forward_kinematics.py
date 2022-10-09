@@ -7,6 +7,7 @@ from compas_fab.backends.interfaces import ForwardKinematics
 
 class PyBulletForwardKinematics(ForwardKinematics):
     """Callable to calculate the robot's forward kinematic."""
+
     def __init__(self, client):
         self.client = client
 
@@ -38,12 +39,12 @@ class PyBulletForwardKinematics(ForwardKinematics):
         :class:`Frame`
             The frame in the world's coordinate system (WCF).
         """
-        link_name = options.get('link') or robot.get_end_effector_link_name(group)
+        link_name = options.get("link") or robot.get_end_effector_link_name(group)
         cached_robot = self.client.get_cached_robot(robot)
         body_id = self.client.get_uid(cached_robot)
         link_id = self.client._get_link_id_by_name(link_name, cached_robot)
         self.client.set_robot_configuration(robot, configuration, group)
         frame = self.client._get_link_frame(link_id, body_id)
-        if options.get('check_collision'):
+        if options.get("check_collision"):
             self.client.check_collisions(robot, configuration)
         return frame

@@ -57,12 +57,12 @@ from .__version__ import __url__
 from .__version__ import __version__
 
 HERE = compas._os.realpath(os.path.dirname(__file__))
-HOME = os.path.abspath(os.path.join(HERE, '../..'))
-DATA = os.path.abspath(os.path.join(HERE, 'data'))
+HOME = os.path.abspath(os.path.join(HERE, "../.."))
+DATA = os.path.abspath(os.path.join(HERE, "data"))
 
 
 def _find_resource(filename):
-    filename = filename.strip('/')
+    filename = filename.strip("/")
     return os.path.abspath(os.path.join(DATA, filename))
 
 
@@ -73,40 +73,40 @@ def get(filename):
 # Check if COMPAS is installed from git
 # If that's the case, try to append the current head's hash to __version__
 try:
-    git_head_file = os.path.abspath(os.path.join(HOME, '.git', 'HEAD'))
+    git_head_file = os.path.abspath(os.path.join(HOME, ".git", "HEAD"))
 
     if os.path.exists(git_head_file):
         # git head file contains one line that looks like this:
         # ref: refs/heads/main
-        with open(git_head_file, 'r') as git_head:
-            _, ref_path = git_head.read().strip().split(' ')
-            ref_path = ref_path.split('/')
+        with open(git_head_file, "r") as git_head:
+            _, ref_path = git_head.read().strip().split(" ")
+            ref_path = ref_path.split("/")
 
-            git_head_refs_file = os.path.abspath(os.path.join(HOME, '.git', *ref_path))
+            git_head_refs_file = os.path.abspath(os.path.join(HOME, ".git", *ref_path))
 
         if os.path.exists(git_head_refs_file):
-            with open(git_head_refs_file, 'r') as git_head_ref:
+            with open(git_head_refs_file, "r") as git_head_ref:
                 git_commit = git_head_ref.read().strip()
-                __version__ += '-' + git_commit[:8]
+                __version__ += "-" + git_commit[:8]
 except Exception:
     pass
 
 
 __all_plugins__ = [
-    'compas_fab.rhino.install',
-    'compas_fab.rhino.artists',
-    'compas_fab.ghpython.artists',
-    'compas_fab.blender.artists',
+    "compas_fab.rhino.install",
+    "compas_fab.rhino.artists",
+    "compas_fab.ghpython.artists",
+    "compas_fab.blender.artists",
 ]
 
 __all__ = [
-    '__author__',
-    '__author_email__',
-    '__copyright__',
-    '__description__',
-    '__license__',
-    '__title__',
-    '__url__',
-    '__version__',
-    'get',
+    "__author__",
+    "__author_email__",
+    "__copyright__",
+    "__description__",
+    "__license__",
+    "__title__",
+    "__url__",
+    "__version__",
+    "get",
 ]

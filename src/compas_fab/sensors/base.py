@@ -11,6 +11,7 @@ class SerialSensor(object):
         >>> with Serial('COM5', 57600, timeout=1) as serial:    # doctest: +SKIP
         ...     sensor = SerialSensor(serial)                   # doctest: +SKIP
     """
+
     def __init__(self, serial):
         self.serial = serial
 

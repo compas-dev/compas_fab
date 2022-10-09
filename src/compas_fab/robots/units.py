@@ -6,8 +6,8 @@ from __future__ import print_function
 import math
 
 __all__ = [
-    'to_radians',
-    'to_degrees',
+    "to_radians",
+    "to_degrees",
 ]
 
 

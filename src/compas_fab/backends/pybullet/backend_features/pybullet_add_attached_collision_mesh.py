@@ -15,16 +15,17 @@ from compas.robots import Origin
 from compas_fab.backends.interfaces import AddAttachedCollisionMesh
 from compas_fab.utilities import LazyLoader
 
-pybullet = LazyLoader('pybullet', globals(), 'pybullet')
+pybullet = LazyLoader("pybullet", globals(), "pybullet")
 
 
 __all__ = [
-    'PyBulletAddAttachedCollisionMesh',
+    "PyBulletAddAttachedCollisionMesh",
 ]
 
 
 class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
     """Callable to add a collision mesh and attach it to the robot."""
+
     def __init__(self, client):
         self.client = client
 
@@ -62,21 +63,21 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         -------
         ``None``
         """
-        robot = options['robot']
+        robot = options["robot"]
         self.client.ensure_cached_robot_geometry(robot)
 
-        mass = options.get('mass', 1.)
-        concavity = options.get('concavity', False)
-        inertia = options.get('inertia', [1., 0., 0., 1., 0., 1.])
-        inertial_origin = options.get('inertial_origin', Frame.worldXY())
-        collision_origin = options.get('collision_origin', Frame.worldXY())
+        mass = options.get("mass", 1.0)
+        concavity = options.get("concavity", False)
+        inertia = options.get("inertia", [1.0, 0.0, 0.0, 1.0, 0.0, 1.0])
+        inertial_origin = options.get("inertial_origin", Frame.worldXY())
+        collision_origin = options.get("collision_origin", Frame.worldXY())
 
         cached_robot_model = self.client.get_cached_robot(robot)
 
         # add link
         mesh = attached_collision_mesh.collision_mesh.mesh
         name = attached_collision_mesh.collision_mesh.id
-        mesh_file_name = name + '.obj'
+        mesh_file_name = name + ".obj"
         mesh_fp = os.path.join(self.client._cache_dir.name, mesh_file_name)
         mesh.to_obj(mesh_fp)
         mesh_fp = self.client._handle_concavity(mesh_fp, self.client._cache_dir.name, concavity, mass, name)
@@ -93,6 +94,6 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
 
         # add joint
         parent_link = cached_robot_model.get_link_by_name(attached_collision_mesh.link_name)
-        cached_robot_model.add_joint(name + '_fixed_joint', Joint.FIXED, parent_link, link)
+        cached_robot_model.add_joint(name + "_fixed_joint", Joint.FIXED, parent_link, link)
 
         self.client.reload_from_cache(robot)

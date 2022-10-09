@@ -18,18 +18,15 @@ from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import TrajectoryConstraints
 from compas_fab.backends.ros.service_description import ServiceDescription
 
-__all__ = [
-    'MoveItPlanMotion'
-]
+__all__ = ["MoveItPlanMotion"]
 
 
 class MoveItPlanMotion(PlanMotion):
     """Callable to find a path plan to move the selected robot from its current position within the `goal_constraints`."""
-    GET_MOTION_PLAN = ServiceDescription('/plan_kinematic_path',
-                                         'GetMotionPlan',
-                                         MotionPlanRequest,
-                                         MotionPlanResponse,
-                                         validate_response)
+
+    GET_MOTION_PLAN = ServiceDescription(
+        "/plan_kinematic_path", "GetMotionPlan", MotionPlanRequest, MotionPlanResponse, validate_response
+    )
 
     def __init__(self, ros_client):
         self.ros_client = ros_client
@@ -88,67 +85,67 @@ class MoveItPlanMotion(PlanMotion):
         """
         options = options or {}
         kwargs = {}
-        kwargs['goal_constraints'] = goal_constraints
-        kwargs['start_configuration'] = start_configuration
-        kwargs['group'] = group
-        kwargs['options'] = options
-        kwargs['errback_name'] = 'errback'
+        kwargs["goal_constraints"] = goal_constraints
+        kwargs["start_configuration"] = start_configuration
+        kwargs["group"] = group
+        kwargs["options"] = options
+        kwargs["errback_name"] = "errback"
 
         # Use base_link or fallback to model's root link
-        options['base_link'] = options.get('base_link', robot.model.root.name)
-        options['joints'] = {j.name: j.type for j in robot.model.joints}
+        options["base_link"] = options.get("base_link", robot.model.root.name)
+        options["joints"] = {j.name: j.type for j in robot.model.joints}
 
         return await_callback(self.plan_motion_async, **kwargs)
 
-    def plan_motion_async(self, callback, errback,
-                          goal_constraints, start_configuration=None, group=None, options=None):
+    def plan_motion_async(
+        self, callback, errback, goal_constraints, start_configuration=None, group=None, options=None
+    ):
         """Asynchronous handler of MoveIt motion planner service."""
         # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
         # TODO: if list of frames (goals) => receive multiple solutions?
 
-        joints = options['joints']
-        header = Header(frame_id=options['base_link'])
+        joints = options["joints"]
+        header = Header(frame_id=options["base_link"])
         joint_state = JointState(
-            header=header,
-            name=start_configuration.joint_names,
-            position=start_configuration.joint_values)
-        start_state = RobotState(
-            joint_state, MultiDOFJointState(header=header), is_diff=True)
+            header=header, name=start_configuration.joint_names, position=start_configuration.joint_values
+        )
+        start_state = RobotState(joint_state, MultiDOFJointState(header=header), is_diff=True)
         start_state.filter_fields_for_distro(self.ros_client.ros_distro)
 
-        if options.get('attached_collision_meshes'):
-            for acm in options['attached_collision_meshes']:
+        if options.get("attached_collision_meshes"):
+            for acm in options["attached_collision_meshes"]:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
                 start_state.attached_collision_objects.append(aco)
 
         # convert constraints
         goal_constraints = [convert_constraints_to_rosmsg(goal_constraints, header)]
-        path_constraints = convert_constraints_to_rosmsg(options.get('path_constraints'), header)
-        trajectory_constraints = options.get('trajectory_constraints')
+        path_constraints = convert_constraints_to_rosmsg(options.get("path_constraints"), header)
+        trajectory_constraints = options.get("trajectory_constraints")
 
         if trajectory_constraints is not None:
-            trajectory_constraints = TrajectoryConstraints(constraints=convert_constraints_to_rosmsg(options['trajectory_constraints'], header))
+            trajectory_constraints = TrajectoryConstraints(
+                constraints=convert_constraints_to_rosmsg(options["trajectory_constraints"], header)
+            )
 
-        request = dict(start_state=start_state,
-                       goal_constraints=goal_constraints,
-                       path_constraints=path_constraints,
-                       trajectory_constraints=trajectory_constraints,
-                       planner_id=options.get('planner_id', 'RRTConnect'),
-                       group_name=group,
-                       num_planning_attempts=options.get('num_planning_attempts', 1),
-                       allowed_planning_time=options.get('allowed_planning_time', 2.),
-                       max_velocity_scaling_factor=options.get('max_velocity_scaling_factor', 1.),
-                       max_acceleration_scaling_factor=options.get('max_acceleration_scaling_factor', 1.))
+        request = dict(
+            start_state=start_state,
+            goal_constraints=goal_constraints,
+            path_constraints=path_constraints,
+            trajectory_constraints=trajectory_constraints,
+            planner_id=options.get("planner_id", "RRTConnect"),
+            group_name=group,
+            num_planning_attempts=options.get("num_planning_attempts", 1),
+            allowed_planning_time=options.get("allowed_planning_time", 2.0),
+            max_velocity_scaling_factor=options.get("max_velocity_scaling_factor", 1.0),
+            max_acceleration_scaling_factor=options.get("max_acceleration_scaling_factor", 1.0),
+        )
         # workspace_parameters=options.get('workspace_parameters')
 
         def response_handler(response):
             try:
-                trajectory = convert_trajectory(joints,
-                                                response.trajectory,
-                                                response.trajectory_start,
-                                                1.,
-                                                response.planning_time,
-                                                response)
+                trajectory = convert_trajectory(
+                    joints, response.trajectory, response.trajectory_start, 1.0, response.planning_time, response
+                )
                 callback(trajectory)
             except Exception as e:
                 errback(e)

@@ -4,7 +4,7 @@ from __future__ import print_function
 
 
 __all__ = [
-    'PathPlan',
+    "PathPlan",
 ]
 
 
@@ -49,8 +49,7 @@ class PathPlan(object):
             Trajectory of the robot.
         """
         if robot.name not in self.trajectories:
-            raise ValueError('No trajectory stored for the specified robot: '
-                             + robot.name)
+            raise ValueError("No trajectory stored for the specified robot: " + robot.name)
 
         return self.trajectories[robot.name]
 

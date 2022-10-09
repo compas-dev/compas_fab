@@ -54,9 +54,7 @@ class RobotVisualize(component):
                 base_frame = artist.draw()
 
             if show_end_effector_frame:
-                ee_compas_frame = robot.forward_kinematics(
-                    configuration, group, options=dict(solver="model")
-                )
+                ee_compas_frame = robot.forward_kinematics(configuration, group, options=dict(solver="model"))
                 artist = Artist(ee_compas_frame)
                 ee_frame = artist.draw()
 
@@ -93,19 +91,12 @@ class RobotVisualize(component):
                     for aco in scene.robot_state.attached_collision_objects:
                         for acm in aco.to_attached_collision_meshes():
                             frame_id = aco.object["header"]["frame_id"]
-                            frame = robot.forward_kinematics(
-                                configuration, options=dict(link=frame_id)
-                            )
+                            frame = robot.forward_kinematics(configuration, options=dict(link=frame_id))
                             t = Transformation.from_frame(frame)
 
                             # Local CM frame
-                            if (
-                                acm.collision_mesh.frame
-                                and acm.collision_mesh.frame != Frame.worldXY()
-                            ):
-                                t = t * Transformation.from_frame(
-                                    acm.collision_mesh.frame
-                                )
+                            if acm.collision_mesh.frame and acm.collision_mesh.frame != Frame.worldXY():
+                                t = t * Transformation.from_frame(acm.collision_mesh.frame)
 
                             mesh = acm.collision_mesh.mesh.transformed(t)
 
