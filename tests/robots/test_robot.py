@@ -298,17 +298,20 @@ def test_inverse_kinematics_repeated_calls_will_return_next_result(ur5_with_fake
     configuration = robot.inverse_kinematics(frame, start_config)
     assert (
         str(configuration)
-        == "Configuration((-1.572, -2.560, 2.196, 2.365, 0.001, 1.137), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
+        == "Configuration((-1.572, -2.560, 2.196, 2.365, 0.001, 1.137), (0, 0, 0, 0, 0, 0), "
+        + "('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
     )
     configuration = robot.inverse_kinematics(frame, start_config)
     assert (
         str(configuration)
-        == "Configuration((-2.238, -3.175, 2.174, 4.143, -5.616, -6.283), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
+        == "Configuration((-2.238, -3.175, 2.174, 4.143, -5.616, -6.283), (0, 0, 0, 0, 0, 0), "
+        + "('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
     )
     configuration = robot.inverse_kinematics(frame, start_config)
     assert (
         str(configuration)
-        == "Configuration((-1.572, -2.560, 2.196, 2.365, 0.001, 1.137), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
+        == "Configuration((-1.572, -2.560, 2.196, 2.365, 0.001, 1.137), (0, 0, 0, 0, 0, 0), "
+        + "('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
     )
 
 
@@ -322,11 +325,13 @@ def test_iter_inverse_kinematics(ur5_with_fake_ik):
     assert len(solutions) == 2
     assert (
         str(solutions[0])
-        == "Configuration((-1.572, -2.560, 2.196, 2.365, 0.001, 1.137), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
+        == "Configuration((-1.572, -2.560, 2.196, 2.365, 0.001, 1.137), (0, 0, 0, 0, 0, 0), "
+        + "('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
     )
     assert (
         str(solutions[1])
-        == "Configuration((-2.238, -3.175, 2.174, 4.143, -5.616, -6.283), (0, 0, 0, 0, 0, 0), ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
+        == "Configuration((-2.238, -3.175, 2.174, 4.143, -5.616, -6.283), (0, 0, 0, 0, 0, 0), "
+        + "('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))"
     )
 
 

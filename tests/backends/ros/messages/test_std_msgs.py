@@ -86,5 +86,6 @@ def test_posearray():
     m = PoseArray(header=Header(), poses=p)
     assert (
         repr(m)
-        == "PoseArray(header=Header(seq=0, stamp=Time(secs=0, nsecs=0), frame_id='/world'), poses=[Pose(position=Point(x=0.0, y=0.0, z=0.0), orientation=Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))])"
+        == "PoseArray(header=Header(seq=0, stamp=Time(secs=0, nsecs=0), frame_id='/world'), "
+        + "poses=[Pose(position=Point(x=0.0, y=0.0, z=0.0), orientation=Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))])"
     )  # noqa E501
