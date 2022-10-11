@@ -1,7 +1,7 @@
 """
 Calculate a cartesian motion path (linear in tool space).
 
-COMPAS FAB v0.26.0
+COMPAS FAB v0.27.0
 """
 from compas_rhino.conversions import RhinoPlane
 from ghpythonlib.componentbase import executingcomponent as component

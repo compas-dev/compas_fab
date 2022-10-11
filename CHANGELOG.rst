@@ -12,6 +12,19 @@ Unreleased
 
 **Added**
 
+**Changed**
+
+**Fixed**
+
+**Deprecated**
+
+**Removed**
+
+0.27.0
+----------
+
+**Added**
+
 * Added support for attached and non-attached collision mesh visualization to the ``Robot Visualize`` GH component.
 * Added a prefix to all GH components.
 * Added ``append`` to the operations of the ``Collision Mesh`` GH component.
