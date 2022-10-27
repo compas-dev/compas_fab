@@ -5,12 +5,11 @@ from .std_msgs import Header
 
 
 class JointState(ROSmsg):
-    """https://docs.ros.org/kinetic/api/sensor_msgs/html/msg/JointState.html
-    """
-    ROS_MSG_TYPE = 'sensor_msgs/JointState'
+    """https://docs.ros.org/kinetic/api/sensor_msgs/html/msg/JointState.html"""
 
-    def __init__(self, header=None, name=None, position=None, velocity=None,
-                 effort=None):
+    ROS_MSG_TYPE = "sensor_msgs/JointState"
+
+    def __init__(self, header=None, name=None, position=None, velocity=None, effort=None):
         self.header = header if header else Header()
         self.name = name if name else []
         self.position = position if position else []
@@ -31,21 +30,20 @@ class JointState(ROSmsg):
 
     @classmethod
     def from_msg(cls, msg):
-        header = Header.from_msg(msg['header'])
-        name = msg['name']
-        position = msg['position']
-        velocity = msg['velocity']
-        effort = msg['effort']
+        header = Header.from_msg(msg["header"])
+        name = msg["name"]
+        position = msg["position"]
+        velocity = msg["velocity"]
+        effort = msg["effort"]
         return cls(header, name, position, velocity, effort)
 
 
 class MultiDOFJointState(ROSmsg):
-    """https://docs.ros.org/kinetic/api/sensor_msgs/html/msg/MultiDOFJointState.html
-    """
-    ROS_MSG_TYPE = 'sensor_msgs/MultiDOFJointState'
+    """https://docs.ros.org/kinetic/api/sensor_msgs/html/msg/MultiDOFJointState.html"""
 
-    def __init__(self, header=None, joint_names=None, transforms=None, twist=None,
-                 wrench=None):
+    ROS_MSG_TYPE = "sensor_msgs/MultiDOFJointState"
+
+    def __init__(self, header=None, joint_names=None, transforms=None, twist=None, wrench=None):
         self.header = header if header else Header()
         self.joint_names = joint_names if joint_names else []
         self.transforms = transforms if transforms else []

@@ -14,12 +14,16 @@ class ConstraintsFromPlane(component):
         goal_constraints = None
         if robot and plane:
             tolerance_position = tolerance_position or 0.001
-            tolerance_xaxis = tolerance_xaxis or 1.
-            tolerance_yaxis = tolerance_yaxis or 1.
-            tolerance_zaxis = tolerance_zaxis or 1.
+            tolerance_xaxis = tolerance_xaxis or 1.0
+            tolerance_yaxis = tolerance_yaxis or 1.0
+            tolerance_zaxis = tolerance_zaxis or 1.0
 
             frame = RhinoPlane.from_geometry(plane).to_compas_frame()
-            tolerances_axes = [math.radians(tolerance_xaxis), math.radians(tolerance_yaxis), math.radians(tolerance_zaxis)]
+            tolerances_axes = [
+                math.radians(tolerance_xaxis),
+                math.radians(tolerance_yaxis),
+                math.radians(tolerance_zaxis),
+            ]
             goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
 
         return goal_constraints

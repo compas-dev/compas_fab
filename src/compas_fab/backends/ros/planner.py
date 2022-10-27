@@ -16,18 +16,19 @@ from compas_fab.backends.ros.backend_features.move_it_inverse_kinematics import 
 from compas_fab.backends.ros.backend_features.move_it_plan_cartesian_motion import MoveItPlanCartesianMotion
 from compas_fab.backends.ros.backend_features.move_it_plan_motion import MoveItPlanMotion
 from compas_fab.backends.ros.backend_features.move_it_planning_scene import MoveItPlanningScene
-from compas_fab.backends.ros.backend_features.move_it_remove_attached_collision_mesh import MoveItRemoveAttachedCollisionMesh
+from compas_fab.backends.ros.backend_features.move_it_remove_attached_collision_mesh import (
+    MoveItRemoveAttachedCollisionMesh,
+)
 from compas_fab.backends.ros.backend_features.move_it_remove_collision_mesh import MoveItRemoveCollisionMesh
 
 
 __all__ = [
-    'MoveItPlanner',
+    "MoveItPlanner",
 ]
 
 
 class MoveItPlanner(PlannerInterface):
-    """Implement the planner backend interface based on MoveIt!
-    """
+    """Implement the planner backend interface based on MoveIt!"""
 
     def __init__(self, client):
         super(MoveItPlanner, self).__init__(client)

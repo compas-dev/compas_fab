@@ -12,7 +12,7 @@ else:
     from compas_blender.artists import RobotModelArtist
 
     __all__ = [
-        'RobotModelArtist',
+        "RobotModelArtist",
     ]
 
     # deprecated alias

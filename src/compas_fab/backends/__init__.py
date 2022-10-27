@@ -153,6 +153,7 @@ from .kinematics import (
     SphericalWristKinematics,
     CartesianMotionError,
 )
+
 # Robot-specific analytic IK
 from .kinematics import (
     UR3Kinematics,
@@ -176,43 +177,43 @@ if not compas.IPY:
 
 __all__ = [
     # Base
-    'BackendError',
-    'KinematicsError',
-    'InverseKinematicsError',
-    'FutureResult',
-    'CancellableFutureResult',
+    "BackendError",
+    "KinematicsError",
+    "InverseKinematicsError",
+    "FutureResult",
+    "CancellableFutureResult",
     # ROS
-    'RosClient',
-    'RosError',
-    'RosValidationError',
-    'RosFileServerLoader',
-    'MoveItPlanner',
+    "RosClient",
+    "RosError",
+    "RosValidationError",
+    "RosFileServerLoader",
+    "MoveItPlanner",
     # VREP
-    'VrepClient',
-    'VrepError',
-    'VrepPlanner',
+    "VrepClient",
+    "VrepError",
+    "VrepPlanner",
     # Analytic IK
-    'AnalyticalInverseKinematics',
-    'AnalyticalPlanCartesianMotion',
-    'OffsetWristKinematics',
-    'SphericalWristKinematics',
-    'CartesianMotionError',
+    "AnalyticalInverseKinematics",
+    "AnalyticalPlanCartesianMotion",
+    "OffsetWristKinematics",
+    "SphericalWristKinematics",
+    "CartesianMotionError",
     # Robot-specific analytic IK
-    'UR3Kinematics',
-    'UR3eKinematics',
-    'UR5Kinematics',
-    'UR5eKinematics',
-    'UR10Kinematics',
-    'UR10eKinematics',
-    'Staubli_TX260LKinematics',
-    'ABB_IRB4600_40_255Kinematics',
+    "UR3Kinematics",
+    "UR3eKinematics",
+    "UR5Kinematics",
+    "UR5eKinematics",
+    "UR10Kinematics",
+    "UR10eKinematics",
+    "Staubli_TX260LKinematics",
+    "ABB_IRB4600_40_255Kinematics",
 ]
 
 if not compas.IPY:
     __all__ += [
-        'PyBulletClient',
-        'CollisionError',
-        'PyBulletError',
-        'PyBulletPlanner',
-        'AnalyticalPyBulletClient',
+        "PyBulletClient",
+        "CollisionError",
+        "PyBulletError",
+        "PyBulletPlanner",
+        "AnalyticalPyBulletClient",
     ]

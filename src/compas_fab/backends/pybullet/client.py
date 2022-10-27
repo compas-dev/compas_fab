@@ -29,12 +29,12 @@ from .planner import PyBulletPlanner
 from .utils import LOG
 from .utils import redirect_stdout
 
-pybullet = LazyLoader('pybullet', globals(), 'pybullet')
+pybullet = LazyLoader("pybullet", globals(), "pybullet")
 
 
 __all__ = [
-    'PyBulletClient',
-    'AnalyticalPyBulletClient',
+    "PyBulletClient",
+    "AnalyticalPyBulletClient",
 ]
 
 
@@ -68,32 +68,36 @@ class PyBulletBase(object):
         with redirect_stdout():
             self.client_id = pybullet.connect(const.CONNECTION_TYPE[self.connection_type], options=options)
         if self.client_id < 0:
-            raise Exception('Error in establishing connection with PyBullet.')
-        if self.connection_type == 'gui':
+            raise Exception("Error in establishing connection with PyBullet.")
+        if self.connection_type == "gui":
             self._configure_debug_visualizer(shadows)
 
     def _detect_display(self):
-        if self.connection_type == 'gui' and not compas.OSX and not compas.WINDOWS and ('DISPLAY' not in os.environ):
-            self.connection_type = 'direct'
-            print('No display detected! Continuing without GUI.')
+        if self.connection_type == "gui" and not compas.OSX and not compas.WINDOWS and ("DISPLAY" not in os.environ):
+            self.connection_type = "direct"
+            print("No display detected! Continuing without GUI.")
 
     @staticmethod
     def _compose_options(color, width, height):
-        options = ''
+        options = ""
         if color is not None:
-            options += '--background_color_red={} --background_color_green={} --background_color_blue={}'.format(*color)
+            options += "--background_color_red={} --background_color_green={} --background_color_blue={}".format(*color)
         if width is not None:
-            options += '--width={}'.format(width)
+            options += "--width={}".format(width)
         if height is not None:
-            options += '--height={}'.format(height)
+            options += "--height={}".format(height)
         return options
 
     def _configure_debug_visualizer(self, shadows):
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_GUI, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_TINY_RENDERER, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_RGB_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
-        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_DEPTH_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
-        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, False, physicsClientId=self.client_id)
+        pybullet.configureDebugVisualizer(
+            pybullet.COV_ENABLE_DEPTH_BUFFER_PREVIEW, False, physicsClientId=self.client_id
+        )
+        pybullet.configureDebugVisualizer(
+            pybullet.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, False, physicsClientId=self.client_id
+        )
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SHADOWS, shadows, physicsClientId=self.client_id)
 
     def disconnect(self):
@@ -112,7 +116,7 @@ class PyBulletBase(object):
         """
         if self.client_id is None:
             return False
-        return pybullet.getConnectionInfo(physicsClientId=self.client_id)['isConnected'] == 1
+        return pybullet.getConnectionInfo(physicsClientId=self.client_id)["isConnected"] == 1
 
 
 class PyBulletClient(PyBulletBase, ClientInterface):
@@ -140,7 +144,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     Connected: True
 
     """
-    def __init__(self, connection_type='gui', verbose=False):
+
+    def __init__(self, connection_type="gui", verbose=False):
         super(PyBulletClient, self).__init__(connection_type)
         self.planner = PyBulletPlanner(self)
         self.verbose = verbose
@@ -172,7 +177,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         pybullet.stepSimulation(physicsClientId=self.client_id)
 
     def load_ur5(self, load_geometry=False, concavity=False):
-        """"Load a UR5 robot to PyBullet.
+        """ "Load a UR5 robot to PyBullet.
 
         Parameters
         ----------
@@ -190,18 +195,18 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """
         robot_model = RobotModel.ur5(load_geometry)
         robot = Robot(robot_model, client=self)
-        robot.attributes['pybullet'] = {}
+        robot.attributes["pybullet"] = {}
         if load_geometry:
             self.cache_robot(robot, concavity)
         else:
-            robot.attributes['pybullet']['cached_robot'] = robot.model
-            robot.attributes['pybullet']['cached_robot_filepath'] = compas.get('ur_description/urdf/ur5.urdf')
+            robot.attributes["pybullet"]["cached_robot"] = robot.model
+            robot.attributes["pybullet"]["cached_robot_filepath"] = compas.get("ur_description/urdf/ur5.urdf")
 
-        urdf_fp = robot.attributes['pybullet']['cached_robot_filepath']
+        urdf_fp = robot.attributes["pybullet"]["cached_robot_filepath"]
 
         self._load_robot_to_pybullet(urdf_fp, robot)
 
-        srdf_filename = compas_fab.get('universal_robot/ur5_moveit_config/config/ur5.srdf')
+        srdf_filename = compas_fab.get("universal_robot/ur5_moveit_config/config/ur5.srdf")
         self.load_semantics(robot, srdf_filename)
 
         return robot
@@ -232,15 +237,15 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """
         robot_model = RobotModel.from_urdf_file(urdf_file)
         robot = Robot(robot_model, client=self)
-        robot.attributes['pybullet'] = {}
+        robot.attributes["pybullet"] = {}
         if resource_loaders:
             robot_model.load_geometry(*resource_loaders)
             self.cache_robot(robot, concavity)
         else:
-            robot.attributes['pybullet']['cached_robot'] = robot.model
-            robot.attributes['pybullet']['cached_robot_filepath'] = urdf_file
+            robot.attributes["pybullet"]["cached_robot"] = robot.model
+            robot.attributes["pybullet"]["cached_robot_filepath"] = urdf_file
 
-        urdf_fp = robot.attributes['pybullet']['cached_robot_filepath']
+        urdf_fp = robot.attributes["pybullet"]["cached_robot_filepath"]
 
         self._load_robot_to_pybullet(urdf_fp, robot)
 
@@ -263,10 +268,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def _load_robot_to_pybullet(self, urdf_file, robot):
         cached_robot = self.get_cached_robot(robot)
         with redirect_stdout(enabled=not self.verbose):
-            pybullet_uid = pybullet.loadURDF(urdf_file, useFixedBase=True,
-                                             physicsClientId=self.client_id,
-                                             flags=pybullet.URDF_USE_SELF_COLLISION)
-            cached_robot.attr['uid'] = pybullet_uid
+            pybullet_uid = pybullet.loadURDF(
+                urdf_file, useFixedBase=True, physicsClientId=self.client_id, flags=pybullet.URDF_USE_SELF_COLLISION
+            )
+            cached_robot.attr["uid"] = pybullet_uid
 
         self._add_ids_to_robot_joints(cached_robot)
         self._add_ids_to_robot_links(cached_robot)
@@ -322,7 +327,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                 shape = element.geometry.shape
                 if isinstance(shape, MeshDescriptor):
                     for mesh in shape.meshes:
-                        mesh_file_name = str(mesh.guid) + '.obj'
+                        mesh_file_name = str(mesh.guid) + ".obj"
                         fp = os.path.join(self._cache_dir.name, mesh_file_name)
                         mesh.to_obj(fp)
                         fp = self._handle_concavity(fp, self._cache_dir.name, concavity, 1, str(mesh.guid))
@@ -330,33 +335,31 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         # create urdf with new mesh locations
         urdf = URDF.from_robot(robot.model)
-        meshes = list(urdf.xml.root.iter('mesh'))
+        meshes = list(urdf.xml.root.iter("mesh"))
         for mesh in meshes:
-            filename = mesh.attrib['filename']
-            mesh.attrib['filename'] = address_dict[filename]
+            filename = mesh.attrib["filename"]
+            mesh.attrib["filename"] = address_dict[filename]
 
         # write urdf
-        cached_robot_file_name = str(robot.model.guid) + '.urdf'
+        cached_robot_file_name = str(robot.model.guid) + ".urdf"
         cached_robot_filepath = os.path.join(self._cache_dir.name, cached_robot_file_name)
         urdf.to_file(cached_robot_filepath, prettify=True)
         cached_robot = RobotModel.from_urdf_file(cached_robot_filepath)
-        robot.attributes['pybullet']['cached_robot'] = cached_robot
-        robot.attributes['pybullet']['cached_robot_filepath'] = cached_robot_filepath
-        robot.attributes['pybullet']['robot_geometry_cached'] = True
+        robot.attributes["pybullet"]["cached_robot"] = cached_robot
+        robot.attributes["pybullet"]["cached_robot_filepath"] = cached_robot_filepath
+        robot.attributes["pybullet"]["robot_geometry_cached"] = True
 
     @staticmethod
     def ensure_cached_robot(robot):
         """Checks if a :class:`compas_fab.robots.Robot` has been cached for use with PyBullet."""
-        if not robot.attributes['pybullet']['cached_robot']:
-            raise Exception(
-                'This method is only callable once the robot has been cached.')
+        if not robot.attributes["pybullet"]["cached_robot"]:
+            raise Exception("This method is only callable once the robot has been cached.")
 
     @staticmethod
     def ensure_cached_robot_geometry(robot):
         """Checks if the geometry of a :class:`compas_fab.robots.Robot` has been cached for use with PyBullet."""
-        if not robot.attributes['pybullet'].get('robot_geometry_cached'):
-            raise Exception(
-                'This method is only callable once the robot with loaded geometry has been cached.')
+        if not robot.attributes["pybullet"].get("robot_geometry_cached"):
+            raise Exception("This method is only callable once the robot with loaded geometry has been cached.")
 
     def get_cached_robot(self, robot):
         """Returns the editable copy of the robot's model for shadowing the state
@@ -378,7 +381,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         """
         self.ensure_cached_robot(robot)
-        return robot.attributes['pybullet']['cached_robot']
+        return robot.attributes["pybullet"]["cached_robot"]
 
     def get_cached_robot_filepath(self, robot):
         """Returns the filepath of the editable copy of the robot's model for shadowing the state
@@ -400,7 +403,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         """
         self.ensure_cached_robot(robot)
-        return robot.attributes['pybullet']['cached_robot_filepath']
+        return robot.attributes["pybullet"]["cached_robot_filepath"]
 
     def get_uid(self, cached_robot):
         """Returns the internal PyBullet id of the robot's model for shadowing the state
@@ -416,7 +419,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         :obj:`int`
 
         """
-        return cached_robot.attr['uid']
+        return cached_robot.attr["uid"]
 
     def _add_ids_to_robot_joints(self, cached_robot):
         body_id = self.get_uid(cached_robot)
@@ -424,8 +427,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         for joint_id in joint_ids:
             joint_name = self._get_joint_name(joint_id, body_id)
             joint = cached_robot.get_joint_by_name(joint_name)
-            pybullet_attr = {'id': joint_id}
-            joint.attr.setdefault('pybullet', {}).update(pybullet_attr)
+            pybullet_attr = {"id": joint_id}
+            joint.attr.setdefault("pybullet", {}).update(pybullet_attr)
 
     def _add_ids_to_robot_links(self, cached_robot):
         body_id = self.get_uid(cached_robot)
@@ -433,17 +436,17 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         for link_id in joint_ids:
             link_name = self._get_link_name(link_id, body_id)
             link = cached_robot.get_link_by_name(link_name)
-            pybullet_attr = {'id': link_id}
-            link.attr.setdefault('pybullet', {}).update(pybullet_attr)
+            pybullet_attr = {"id": link_id}
+            link.attr.setdefault("pybullet", {}).update(pybullet_attr)
 
     def _get_joint_id_by_name(self, name, cached_robot):
-        return cached_robot.get_joint_by_name(name).attr['pybullet']['id']
+        return cached_robot.get_joint_by_name(name).attr["pybullet"]["id"]
 
     def _get_joint_ids_by_name(self, names, cached_robot):
         return tuple(self._get_joint_id_by_name(name, cached_robot) for name in names)
 
     def _get_link_id_by_name(self, name, cached_robot):
-        return cached_robot.get_link_by_name(name).attr['pybullet']['id']
+        return cached_robot.get_link_by_name(name).attr["pybullet"]["id"]
 
     def _get_link_ids_by_name(self, names, cached_robot):
         return tuple(self._get_link_id_by_name(name, cached_robot) for name in names)
@@ -511,7 +514,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """
         for name, body_ids in self.collision_objects.items():
             for body_id in body_ids:
-                self._check_collision(self.get_uid(self.get_cached_robot(robot)), 'robot', body_id, name)
+                self._check_collision(self.get_uid(self.get_cached_robot(robot)), "robot", body_id, name)
 
     def check_robot_self_collision(self, robot):
         """Checks whether the robot and its attached collision objects with its current
@@ -552,12 +555,12 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def _check_collision(self, body_1_id, body_1_name, body_2_id, body_2_name, link_index_1=None, link_index_2=None):
         kwargs = {
-            'bodyA': body_1_id,
-            'bodyB': body_2_id,
-            'distance': 0,
-            'physicsClientId': self.client_id,
-            'linkIndexA': link_index_1,
-            'linkIndexB': link_index_2,
+            "bodyA": body_1_id,
+            "bodyB": body_2_id,
+            "distance": 0,
+            "physicsClientId": self.client_id,
+            "linkIndexA": link_index_1,
+            "linkIndexB": link_index_2,
         }
         kwargs = {key: value for key, value in kwargs.items() if value is not None}
         pts = pybullet.getClosestPoints(**kwargs)
@@ -571,16 +574,20 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return frame_from_pose(pose)
 
     def _get_base_name(self, body_id):
-        return self._get_body_info(body_id).base_name.decode(encoding='UTF-8')
+        return self._get_body_info(body_id).base_name.decode(encoding="UTF-8")
 
     def _get_link_state(self, link_id, body_id):
-        return const.LinkState(*pybullet.getLinkState(body_id, link_id, computeForwardKinematics=True, physicsClientId=self.client_id))
+        return const.LinkState(
+            *pybullet.getLinkState(body_id, link_id, computeForwardKinematics=True, physicsClientId=self.client_id)
+        )
 
     def _get_joint_state(self, joint_id, body_id):
         return const.JointState(*pybullet.getJointState(body_id, joint_id, physicsClientId=self.client_id))
 
     def _get_joint_states(self, joint_ids, body_id):
-        return [const.JointState(*js) for js in pybullet.getJointStates(body_id, joint_ids, physicsClientId=self.client_id)]
+        return [
+            const.JointState(*js) for js in pybullet.getJointStates(body_id, joint_ids, physicsClientId=self.client_id)
+        ]
 
     def _get_body_info(self, body_id):
         return const.BodyInfo(*pybullet.getBodyInfo(body_id, physicsClientId=self.client_id))
@@ -595,12 +602,12 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return list(range(self._get_num_joints(body_id)))
 
     def _get_joint_name(self, joint_id, body_id):
-        return self._get_joint_info(joint_id, body_id).jointName.decode('UTF-8')
+        return self._get_joint_info(joint_id, body_id).jointName.decode("UTF-8")
 
     def _get_link_name(self, link_id, body_id):
         if link_id == const.BASE_LINK_ID:
             return self._get_base_name(body_id)
-        return self._get_joint_info(link_id, body_id).linkName.decode('UTF-8')
+        return self._get_joint_info(link_id, body_id).linkName.decode("UTF-8")
 
     def _get_link_frame(self, link_id, body_id):
         if link_id == const.BASE_LINK_ID:
@@ -619,7 +626,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def _set_joint_positions(self, joint_ids, values, body_id):
         if len(joint_ids) != len(values):
-            raise Exception('Joints and values must have the same length.')
+            raise Exception("Joints and values must have the same length.")
         for joint_id, value in zip(joint_ids, values):
             self._set_joint_position(joint_id, value, body_id)
 
@@ -697,7 +704,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         this is not possible, PyBullet's caching behavior can be changed with
         ``pybullet.setPhysicsEngineParameter(enableFileCaching=0)``.
         """
-        tmp_obj_path = os.path.join(self._cache_dir.name, '{}.obj'.format(mesh.guid))
+        tmp_obj_path = os.path.join(self._cache_dir.name, "{}.obj".format(mesh.guid))
         mesh.to_obj(tmp_obj_path)
         tmp_obj_path = self._handle_concavity(tmp_obj_path, self._cache_dir.name, concavity, mass)
         pyb_body_id = self.body_from_obj(tmp_obj_path, concavity=concavity, mass=mass)
@@ -710,18 +717,18 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return pyb_body_id
 
     @staticmethod
-    def _handle_concavity(tmp_obj_path, tmp_dir, concavity, mass, mesh_name=''):
+    def _handle_concavity(tmp_obj_path, tmp_dir, concavity, mass, mesh_name=""):
         if not concavity or mass == const.STATIC_MASS:
             return tmp_obj_path
         if mesh_name:
-            mesh_name += '_'
-        tmp_vhacd_obj_path = os.path.join(tmp_dir, mesh_name + 'vhacd_temp.obj')
-        tmp_log_path = os.path.join(tmp_dir, mesh_name + 'log.txt')
+            mesh_name += "_"
+        tmp_vhacd_obj_path = os.path.join(tmp_dir, mesh_name + "vhacd_temp.obj")
+        tmp_log_path = os.path.join(tmp_dir, mesh_name + "log.txt")
         with redirect_stdout():
             pybullet.vhacd(tmp_obj_path, tmp_vhacd_obj_path, tmp_log_path)
         return tmp_vhacd_obj_path
 
-    def body_from_obj(self, path, scale=1., concavity=False, mass=const.STATIC_MASS, collision=True, color=const.GREY):
+    def body_from_obj(self, path, scale=1.0, concavity=False, mass=const.STATIC_MASS, collision=True, color=const.GREY):
         """Create a PyBullet body from an OBJ file.
 
         Parameters
@@ -759,8 +766,12 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return body_id
 
     def _create_body(self, collision_id=const.NULL_ID, visual_id=const.NULL_ID, mass=const.STATIC_MASS):
-        return pybullet.createMultiBody(baseMass=mass, baseCollisionShapeIndex=collision_id,
-                                        baseVisualShapeIndex=visual_id, physicsClientId=self.client_id)
+        return pybullet.createMultiBody(
+            baseMass=mass,
+            baseCollisionShapeIndex=collision_id,
+            baseVisualShapeIndex=visual_id,
+            physicsClientId=self.client_id,
+        )
 
     @staticmethod
     def _create_collision_shape(collision_args):
@@ -768,46 +779,46 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     @staticmethod
     def _create_visual_shape(visual_args):
-        if visual_args.get('rgbaColor') is None:
+        if visual_args.get("rgbaColor") is None:
             return const.NULL_ID
         return pybullet.createVisualShape(**visual_args)
 
     def _get_visual_args(self, geometry_args, frame=Frame.worldXY(), color=const.RED, specular=None):
         point, quaternion = pose_from_frame(frame)
         visual_args = {
-            'rgbaColor': color,
-            'visualFramePosition': point,
-            'visualFrameOrientation': quaternion,
-            'physicsClientId': self.client_id,
+            "rgbaColor": color,
+            "visualFramePosition": point,
+            "visualFrameOrientation": quaternion,
+            "physicsClientId": self.client_id,
         }
         visual_args.update(geometry_args)
         if specular is not None:
-            visual_args['specularColor'] = specular
+            visual_args["specularColor"] = specular
         return visual_args
 
     def _get_collision_args(self, geometry_args, frame=Frame.worldXY()):
         point, quaternion = pose_from_frame(frame)
         collision_args = {
-            'collisionFramePosition': point,
-            'collisionFrameOrientation': quaternion,
-            'physicsClientId': self.client_id,
+            "collisionFramePosition": point,
+            "collisionFrameOrientation": quaternion,
+            "physicsClientId": self.client_id,
         }
         collision_args.update(geometry_args)
-        if 'length' in collision_args:
+        if "length" in collision_args:
             # pybullet bug visual => length, collision => height
-            collision_args['height'] = collision_args['length']
-            del collision_args['length']
+            collision_args["height"] = collision_args["length"]
+            del collision_args["length"]
         return collision_args
 
     @staticmethod
-    def _get_geometry_args(path, concavity=False, scale=1.):
+    def _get_geometry_args(path, concavity=False, scale=1.0):
         geometry_args = {
-            'shapeType': pybullet.GEOM_MESH,
-            'fileName': path,
-            'meshScale': [scale] * 3,
+            "shapeType": pybullet.GEOM_MESH,
+            "fileName": path,
+            "meshScale": [scale] * 3,
         }
         if concavity:
-            geometry_args['flags'] = pybullet.GEOM_FORCE_CONCAVE_TRIMESH
+            geometry_args["flags"] = pybullet.GEOM_FORCE_CONCAVE_TRIMESH
         return geometry_args
 
 

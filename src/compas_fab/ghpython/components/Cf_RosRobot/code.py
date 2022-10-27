@@ -12,11 +12,11 @@ from compas_fab.ghpython.components import create_id
 
 class ROSRobot(component):
     def RunScript(self, ros_client, load):
-        key = create_id(self, 'robot')
+        key = create_id(self, "robot")
 
         if ros_client and ros_client.is_connected and load:
             # Load URDF from ROS
-            st[key] = ros_client.load_robot(load_geometry=True, precision='12f')
+            st[key] = ros_client.load_robot(load_geometry=True, precision="12f")
             st[key].artist = RobotModelArtist(st[key].model)
 
         robot = st.get(key, None)

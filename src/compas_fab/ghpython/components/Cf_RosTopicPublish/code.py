@@ -16,11 +16,11 @@ from compas_fab.ghpython.components import create_id
 class ROSTopicPublish(component):
     def RunScript(self, ros_client, topic_name, topic_type, msg):
         if not topic_name:
-            raise ValueError('Please specify the name of the topic')
+            raise ValueError("Please specify the name of the topic")
         if not topic_type:
-            raise ValueError('Please specify the type of the topic')
+            raise ValueError("Please specify the type of the topic")
 
-        key = create_id(self, 'topic')
+        key = create_id(self, "topic")
 
         topic = st.get(key, None)
 
@@ -37,9 +37,9 @@ class ROSTopicPublish(component):
         if msg:
             msg = ROSmsg.parse(msg, topic_type)
             topic.publish(msg.msg)
-            self.Message = 'Message published'
+            self.Message = "Message published"
         else:
             if self.is_advertised:
-                self.Message = 'Topic advertised'
+                self.Message = "Topic advertised"
 
         return (topic, self.is_advertised)

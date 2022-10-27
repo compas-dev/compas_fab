@@ -1,22 +1,22 @@
 import math
 
 __all__ = [
-    'allclose',
-    'arange',
-    'argmax',
-    'argmin',
-    'argsort',
-    'clamp',
-    'diffs',
-    'map_range',
-    'range_geometric_row',
-    'sign',
+    "allclose",
+    "arange",
+    "argmax",
+    "argmin",
+    "argsort",
+    "clamp",
+    "diffs",
+    "map_range",
+    "range_geometric_row",
+    "sign",
 ]
 
 
 def map_range(value, from_min, from_max, to_min, to_max):
     """Performs a linear interpolation of a value within the range of [from_min,
-        from_max] to another range of [to_min, to_max].
+    from_max] to another range of [to_min, to_max].
     """
     from_range = from_max - from_min
     to_range = to_max - to_min
@@ -34,7 +34,7 @@ def range_geometric_row(number, d, r=1.1):
     if r <= 0:
         raise ValueError("r must be > 0")
 
-    n0 = number / ((1 - (1 / r)**d) / (1 - 1 / r))
+    n0 = number / ((1 - (1 / r) ** d) / (1 - 1 / r))
 
     numbers = [n0]
     for i in range(d - 1):
@@ -88,7 +88,7 @@ def argsort(numbers):
     For a large list of numbers reconsider using NumPy's *argsort* function,
     since this function might take too long.
     """
-    return [i[0] for i in sorted(enumerate(numbers), key=lambda x:x[1])]
+    return [i[0] for i in sorted(enumerate(numbers), key=lambda x: x[1])]
 
 
 def argmin(numbers):

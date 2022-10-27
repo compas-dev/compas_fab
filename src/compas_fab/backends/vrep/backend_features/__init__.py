@@ -8,10 +8,10 @@ from .vrep_plan_motion import VrepPlanMotion
 from .vrep_remove_collision_mesh import VrepRemoveCollisionMesh
 
 __all__ = [
-    'VrepForwardKinematics',
-    'VrepInverseKinematics',
-    'VrepPlanMotion',
-    'VrepAddAttachedCollisionMesh',
-    'VrepAddCollisionMesh',
-    'VrepRemoveCollisionMesh',
+    "VrepForwardKinematics",
+    "VrepInverseKinematics",
+    "VrepPlanMotion",
+    "VrepAddAttachedCollisionMesh",
+    "VrepAddCollisionMesh",
+    "VrepRemoveCollisionMesh",
 ]

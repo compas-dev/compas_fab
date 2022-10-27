@@ -56,7 +56,9 @@ class ReachabilityMap(Data):
         ValueError : If the frame_generator does not produce a 2D list of frames
         """
 
-        from compas_fab.backends.exceptions import InverseKinematicsError  # tests\api\test_api_completeness.py complains otherwise
+        from compas_fab.backends.exceptions import (
+            InverseKinematicsError,
+        )  # tests\api\test_api_completeness.py complains otherwise
 
         for frames in frame_generator:  # 2D
             if isinstance(frames, Frame):
@@ -84,8 +86,7 @@ class ReachabilityMap(Data):
         return tuple(dimension)
 
     def reachable_frames_and_configurations_at_ik_index(self, ik_index):
-        """Returns the reachable frames and configurations at a specific ik index.
-        """
+        """Returns the reachable frames and configurations at a specific ik index."""
         configurations_at_ik_index = []
         frames_at_ik_index = []
         for f, c in zip(self.frames, self.configurations):
@@ -104,6 +105,7 @@ class ReachabilityMap(Data):
                 return sum([sum_score(sub) for sub in obj])
             else:
                 return 1 if obj else 0
+
         return [sum_score(configuration) for configuration in self.configurations]
 
     @property
@@ -113,8 +115,7 @@ class ReachabilityMap(Data):
 
     @property
     def points(self):
-        """Returns a 1D list of points from the first frame in the list.
-        """
+        """Returns a 1D list of points from the first frame in the list."""
         return [f[0].point for f in self.frames]
 
     @property
@@ -126,8 +127,8 @@ class ReachabilityMap(Data):
                 return obj.data if obj else None
 
         data = {}
-        data['frames'] = data_encode(self.frames)
-        data['configurations'] = data_encode(self.configurations)
+        data["frames"] = data_encode(self.frames)
+        data["configurations"] = data_encode(self.configurations)
         return data
 
     @data.setter
@@ -138,5 +139,5 @@ class ReachabilityMap(Data):
             else:
                 return aclass.from_data(obj) if obj else None
 
-        self.frames = data_decode(data['frames'], Frame)
-        self.configurations = data_decode(data['configurations'], Configuration)
+        self.frames = data_decode(data["frames"], Frame)
+        self.configurations = data_decode(data["configurations"], Configuration)

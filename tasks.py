@@ -120,10 +120,10 @@ def docs(ctx, doctest=False, rebuild=False, check_links=False):
 @task()
 def lint(ctx):
     """Check the consistency of coding style."""
-    log.write('Running flake8 python linter...')
-
-    with chdir(BASE_FOLDER):
-        ctx.run('flake8 src')
+    log.write("Running flake8 python linter...")
+    ctx.run("flake8 src tests")
+    log.write("Running black python linter...")
+    ctx.run("black --check --diff --color src tests")
 
 
 @task()

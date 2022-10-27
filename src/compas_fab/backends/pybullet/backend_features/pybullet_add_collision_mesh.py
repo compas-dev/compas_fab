@@ -5,7 +5,7 @@ from __future__ import print_function
 from compas_fab.backends.interfaces import AddCollisionMesh
 
 __all__ = [
-    'PyBulletAddCollisionMesh',
+    "PyBulletAddCollisionMesh",
 ]
 
 from compas_fab.backends.pybullet.const import STATIC_MASS
@@ -13,6 +13,7 @@ from compas_fab.backends.pybullet.const import STATIC_MASS
 
 class PyBulletAddCollisionMesh(AddCollisionMesh):
     """Callable to add a collision mesh to the planning scene."""
+
     def __init__(self, client):
         self.client = client
 
@@ -40,8 +41,8 @@ class PyBulletAddCollisionMesh(AddCollisionMesh):
         mesh = collision_mesh.mesh
         name = collision_mesh.id
         frame = collision_mesh.frame
-        mass = options.get('mass', STATIC_MASS)
-        concavity = options.get('concavity', False)
+        mass = options.get("mass", STATIC_MASS)
+        concavity = options.get("concavity", False)
 
         # mimic ROS' behavior: collision object with same name is replaced
         if name in self.client.collision_objects:

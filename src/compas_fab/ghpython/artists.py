@@ -14,17 +14,17 @@ if compas.RHINO:
     from .reachability_artist import ReachabilityMapArtist
 
     __all__ = [
-        'ReachabilityMapArtist',
+        "ReachabilityMapArtist",
     ]
 
-    @plugin(category='factories', requires=['Rhino'])
+    @plugin(category="factories", requires=["Rhino"])
     def register_artists():
-        Artist.register(ReachabilityMap, ReachabilityMapArtist, context='Grasshopper')
+        Artist.register(ReachabilityMap, ReachabilityMapArtist, context="Grasshopper")
 
     # deprecated artists (aliased for backwards compat)
     __all__ += [
-        'RobotArtist',              # deprecated
-        'RobotModelArtist',         # deprecated
+        "RobotArtist",  # deprecated
+        "RobotModelArtist",  # deprecated
     ]
 
     RobotArtist = RobotModelArtist

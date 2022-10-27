@@ -14,10 +14,10 @@ class ROSConnect(component):
     def RunScript(self, ip, port, connect):
         ros_client = None
 
-        ip = ip or '127.0.0.1'
+        ip = ip or "127.0.0.1"
         port = port or 9090
 
-        key = create_id(self, 'ros_client')
+        key = create_id(self, "ros_client")
         ros_client = st.get(key, None)
 
         if ros_client:

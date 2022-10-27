@@ -7,8 +7,7 @@ from .spherical_wrist import inverse_kinematics_spherical_wrist
 
 
 class SphericalWristKinematics(object):
-    """
-    """
+    """ """
 
     def __init__(self, points):
         self.points = points
@@ -31,11 +30,14 @@ class SphericalWristKinematics(object):
 
 class Staubli_TX260LKinematics(SphericalWristKinematics):
     """Analytical IK solver for the Stäubli TX2 60L robot."""
+
     def __init__(self):
-        points = [Point(0.000, 0.000, 0.375),
-                  Point(0.000, 0.020, 0.775),
-                  Point(0.450, 0.020, 0.775),
-                  Point(0.520, 0.020, 0.775)]
+        points = [
+            Point(0.000, 0.000, 0.375),
+            Point(0.000, 0.020, 0.775),
+            Point(0.450, 0.020, 0.775),
+            Point(0.520, 0.020, 0.775),
+        ]
         super(Staubli_TX260LKinematics, self).__init__(points)
 
     def _pre_process(self, joint_values):
@@ -57,11 +59,14 @@ class Staubli_TX260LKinematics(SphericalWristKinematics):
 
 class ABB_IRB4600_40_255Kinematics(SphericalWristKinematics):
     """Analytical IK solver for the ABB IRB4600 40/255 robot."""
+
     def __init__(self):
-        points = [Point(0.175, 0.000, 0.495),
-                  Point(0.175, 0.000, 1.590),
-                  Point(1.446, 0.000, 1.765),
-                  Point(1.581, 0.000, 1.765)]
+        points = [
+            Point(0.175, 0.000, 0.495),
+            Point(0.175, 0.000, 1.590),
+            Point(1.446, 0.000, 1.765),
+            Point(1.581, 0.000, 1.765),
+        ]
         super(ABB_IRB4600_40_255Kinematics, self).__init__(points)
 
     def _pre_process(self, joint_values):

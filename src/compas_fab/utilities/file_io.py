@@ -3,15 +3,15 @@ import json
 import pickle
 
 __all__ = [
-    'read_csv_to_dictionary',
-    'write_data_to_json',
-    'read_data_from_json',
-    'write_data_to_pickle',
-    'read_data_from_pickle'
+    "read_csv_to_dictionary",
+    "write_data_to_json",
+    "read_data_from_json",
+    "write_data_to_pickle",
+    "read_data_from_pickle",
 ]
 
 
-def read_csv_to_dictionary(csvfile, delimiter=';'):
+def read_csv_to_dictionary(csvfile, delimiter=";"):
     """Reads a csv file and returns a dictionary with the respective keys
     specified in the first row of the csv file.
 
@@ -27,7 +27,7 @@ def read_csv_to_dictionary(csvfile, delimiter=';'):
     dict
     """
     data = []
-    with open(csvfile, mode='r') as infile:
+    with open(csvfile, mode="r") as infile:
         reader = csv.reader(infile, delimiter=delimiter)
         for rows in reader:
             data.append(rows)
@@ -54,7 +54,7 @@ def write_data_to_json(data, file):
     file : str
         The path where to save the data.
     """
-    with open(file, 'w') as f:
+    with open(file, "w") as f:
         json.dump(data, f)
 
 
@@ -89,7 +89,7 @@ def write_data_to_pickle(data, file):
     file : str
         The path where to save the data.
     """
-    with open(file, 'wb') as f:
+    with open(file, "wb") as f:
         pickle.dump(data, f)
 
 
@@ -106,6 +106,6 @@ def read_data_from_pickle(file):
     object
         An object containing the reconstituted object hierarchy.
     """
-    with open(file, 'rb') as f:
+    with open(file, "rb") as f:
         data = pickle.load(f)
     return data

@@ -5,12 +5,13 @@ from __future__ import print_function
 from compas_fab.backends.interfaces import AppendCollisionMesh
 
 __all__ = [
-    'PyBulletAppendCollisionMesh',
+    "PyBulletAppendCollisionMesh",
 ]
 
 
 class PyBulletAppendCollisionMesh(AppendCollisionMesh):
     """Callable to append a collision mesh to the planning scene."""
+
     def __init__(self, client):
         self.client = client
 
@@ -35,7 +36,7 @@ class PyBulletAppendCollisionMesh(AppendCollisionMesh):
         mesh = collision_mesh.mesh
         name = collision_mesh.id
         frame = collision_mesh.frame
-        concavity = options.get('concavity', False)
+        concavity = options.get("concavity", False)
         if name in self.client.collision_objects:
             body_id = self.client.convert_mesh_to_body(mesh, frame, name, concavity)
             self.client.collision_objects[name].append(body_id)

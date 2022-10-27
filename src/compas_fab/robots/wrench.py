@@ -17,10 +17,10 @@ g = 9.80665
 gravity_vector = Vector(0, 0, -g)
 
 
-__all__ = ['Wrench']
+__all__ = ["Wrench"]
 
 
-class Wrench():
+class Wrench:
     """A wrench represents force in free space, separated into its linear (force) and angular (torque) parts.
 
     Attributes
@@ -157,8 +157,7 @@ class Wrench():
         dict
             The wrench data.
         """
-        return {'force': list(self.force),
-                'torque': list(self.torque)}
+        return {"force": list(self.force), "torque": list(self.torque)}
 
     def to_data(self):
         """Returns the data dictionary that represents the wrench.
@@ -237,9 +236,7 @@ class Wrench():
             The resulting new ``Wrench``.
 
         """
-        return Wrench(
-            self.force + other.force,
-            self.torque + other.torque)
+        return Wrench(self.force + other.force, self.torque + other.torque)
 
     def __sub__(self, other):
         """Return a ``Wrench`` that is the the difference between this ``Wrench`` and another wrench.
@@ -254,9 +251,7 @@ class Wrench():
         Wrench
             The resulting new ``Wrench``.
         """
-        return Wrench(
-            self.force - other.force,
-            self.torque - other.torque)
+        return Wrench(self.force - other.force, self.torque - other.torque)
 
     def __neg__(self):
         """Return the negated ``Wrench``.
@@ -266,9 +261,7 @@ class Wrench():
         Wrench
             The negated ``Wrench``.
         """
-        return Wrench(
-            self.force * -1.0,
-            self.torque * -1.0)
+        return Wrench(self.force * -1.0, self.torque * -1.0)
 
     def __len__(self):
         return 6

@@ -13,12 +13,13 @@ from compas_fab.backends.vrep.backend_features.vrep_remove_collision_mesh import
 
 
 __all__ = [
-    'VrepPlanner',
+    "VrepPlanner",
 ]
 
 
 class VrepPlanner(PlannerInterface):
     """Implement the planner backend interface for V-REP."""
+
     def __init__(self, client):
         super(VrepPlanner, self).__init__(client)
 
