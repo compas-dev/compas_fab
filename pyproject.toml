@@ -24,7 +24,7 @@ add-ignore = ["D100"]
 
 [tool.isort]
 force_single_line = true
-line_length = 180
+line_length = 120
 known_first_party = "compas_fab"
 default_section = "THIRDPARTY"
 forced_separate = "test_compas_fab"
