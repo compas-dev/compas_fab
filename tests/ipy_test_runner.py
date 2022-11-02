@@ -6,6 +6,7 @@ import pytest
 
 HERE = os.path.dirname(__file__)
 
+
 if __name__ == "__main__":
     # Fake Rhino modules
     pytest.load_fake_module("Rhino")
