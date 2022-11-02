@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+**Added**
+
+**Changed**
+
+**Fixed**
+
+**Deprecated**
+
+**Removed**
+
+## 0.27.0
+
 ### Added
 
 * Added support for attached and non-attached collision mesh visualization to the `Robot Visualize` GH component.
