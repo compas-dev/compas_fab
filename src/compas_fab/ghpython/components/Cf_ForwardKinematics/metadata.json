@@ -1,0 +1,44 @@
+{
+    "name": "Forward Kinematics",
+    "nickname": "FK",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Calculate the robot's forward kinematic for a given configuration.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "robot",
+                "description": "The robot.",
+                "wireDisplay": "hidden"
+            },
+            {
+                "name": "config",
+                "description": "The configuration to calculate the forward kinematics for."
+            },
+            {
+                "name": "group",
+                "description": "The planning group used for calculation. Defaults to the robot's main planning group.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "link",
+                "description": "The link name to calculate forward kinematics for. Defaults to the robot's end effector.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "use_only_model",
+                "description": "If True, use only the robot model instead of the connected backend to calculate FK.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "frame",
+                "description": "The resulting frame."
+            }
+        ]
+    }
+}
