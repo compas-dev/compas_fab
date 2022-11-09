@@ -3,7 +3,6 @@ Calculate the robot's forward kinematic for a given configuration.
 
 COMPAS FAB v0.27.0
 """
-from compas_rhino.conversions import RhinoPlane
 from ghpythonlib.componentbase import executingcomponent as component
 
 
