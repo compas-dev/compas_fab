@@ -114,7 +114,6 @@ class DirectUrActionClient(EventEmitterMixin):
 
 
 def direct_ur_movel(ros_client, callback, frames, acceleration=None, velocity=None, time=None, radius=None):
-
     action_client = DirectUrActionClient(ros_client, timeout=50000)
 
     script_lines = []

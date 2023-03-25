@@ -173,7 +173,6 @@ class MotionPlanResponse(ROSmsg):
     ROS_MSG_TYPE = "moveit_msgs/MotionPlanResponse"
 
     def __init__(self, trajectory_start=None, group_name=None, trajectory=None, planning_time=None, error_code=None):
-
         self.trajectory_start = trajectory_start or RobotState()
         self.group_name = group_name or ""
         self.trajectory = trajectory or RobotTrajectory()

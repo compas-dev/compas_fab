@@ -223,7 +223,6 @@ class RosClient(Ros, ClientInterface):
         pass
 
     def follow_configurations(self, callback, joint_names, configurations, timesteps, timeout=60000):
-
         if len(configurations) != len(timesteps):
             raise ValueError(
                 "%d configurations must have %d timesteps, but %d given."

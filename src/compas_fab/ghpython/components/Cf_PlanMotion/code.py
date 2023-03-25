@@ -21,7 +21,6 @@ class PlanMotion(component):
         planner_id,
         compute,
     ):
-
         key = create_id(self, "trajectory")
 
         path_constraints = list(path_constraints) if path_constraints else None

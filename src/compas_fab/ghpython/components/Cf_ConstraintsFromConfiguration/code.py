@@ -9,7 +9,6 @@ from ghpythonlib.componentbase import executingcomponent as component
 
 
 class ConstraintsFromTargetConfiguration(component):
-
     DEFAULT_TOLERANCE_METERS = 0.001
     DEFAULT_TOLERANCE_RADIANS = math.radians(1)
 
