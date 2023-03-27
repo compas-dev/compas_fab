@@ -164,7 +164,6 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
         axis1_angles += [a2] * 4
 
     for i in range(2):
-
         axis1_angle = axis1_angles[i * 4]
         Rot1 = Rotation.from_axis_and_angle([0, 0, 1], -1 * axis1_angle, point=[0, 0, 0])
         p1A = p1_proj.transformed(Rot1)

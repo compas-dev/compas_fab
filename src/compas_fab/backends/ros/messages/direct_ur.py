@@ -113,7 +113,6 @@ class URGoal(URmsg):
 
 
 if __name__ == "__main__":
-
     from compas.geometry import Frame
 
     f1 = Frame((0.0, -193, 1001.0), (-1.0, 0.0, 0.0), (0.0, 0.0, -1.0))

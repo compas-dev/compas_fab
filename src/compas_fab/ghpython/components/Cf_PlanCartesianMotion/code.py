@@ -14,7 +14,6 @@ class PlanCartesianMotion(component):
     def RunScript(
         self, robot, planes, start_configuration, group, attached_collision_meshes, path_constraints, max_step, compute
     ):
-
         key = create_id(self, "trajectory")
 
         max_step = float(max_step) if max_step else 0.01

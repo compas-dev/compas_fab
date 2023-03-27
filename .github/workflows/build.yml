@@ -16,7 +16,6 @@ jobs:
         name: [
           "windows-py38",
           "macos-py37",
-          "ubuntu-py36",
           "ubuntu-py39",
         ]
         include:
@@ -26,9 +25,6 @@ jobs:
           - name: "macos-py37"
             os: macos-latest
             python-version: 3.7
-          - name: "ubuntu-py36"
-            os: ubuntu-latest
-            python-version: 3.6
           - name: "ubuntu-py39"
             os: ubuntu-latest
             python-version: 3.9
