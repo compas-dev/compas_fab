@@ -3,11 +3,16 @@ Visualizes the robot.
 
 COMPAS FAB v0.27.0
 """
+import time
+
 from compas.artists import Artist
 from compas.geometry import Frame
 from compas.geometry import Transformation
-from compas_fab.robots import PlanningScene
 from ghpythonlib.componentbase import executingcomponent as component
+from scriptcontext import sticky as st
+
+from compas_fab.ghpython.components import create_id
+from compas_fab.robots import PlanningScene
 
 
 class RobotVisualize(component):
@@ -24,6 +29,7 @@ class RobotVisualize(component):
         show_cm,
         show_acm,
     ):
+
         visual = None
         collision = None
         collision_meshes = None
@@ -64,14 +70,28 @@ class RobotVisualize(component):
                     frame = artist.draw()
                     frames.append(frame)
 
+            cached_scene_key = create_id(self, "cached_scene")
+
             if show_cm or show_acm:
-                scene = PlanningScene(robot)
-                scene = robot.client.get_planning_scene()
+                cached_scene = st.get(cached_scene_key)
+                if not cached_scene:
+                    cached_scene = {"time": 0}
 
-                collision_meshes = []
-                attached_meshes = []
+                # expire cache if the component has not been executed in the last 2 seconds
+                # this allows to slide through a list of configurations
+                # without triggering refreshes of the scene in the middle of it
+                if time.time() - cached_scene["time"] > 2:
+                    update_scene = True
+                else:
+                    update_scene = False
 
-                if show_cm:
+                if update_scene:
+                    scene = PlanningScene(robot)
+                    scene = robot.client.get_planning_scene()
+
+                if update_scene and show_cm:
+                    collision_meshes = []
+
                     for co in scene.world.collision_objects:
                         header = co.header
                         frame_id = header.frame_id
@@ -86,7 +106,13 @@ class RobotVisualize(component):
 
                             collision_meshes.append(Artist(mesh).draw())
 
-                if show_acm:
+                        cached_scene["cm"] = collision_meshes
+
+                collision_meshes = cached_scene.get("cm", [])
+
+                if update_scene and show_acm:
+                    attached_meshes = []
+
                     for aco in scene.robot_state.attached_collision_objects:
                         for acm in aco.to_attached_collision_meshes():
                             frame_id = aco.object["header"]["frame_id"]
@@ -100,6 +126,13 @@ class RobotVisualize(component):
                             mesh = acm.collision_mesh.mesh.transformed(t)
 
                             attached_meshes.append(Artist(mesh).draw())
+
+                    cached_scene["acm"] = attached_meshes
+
+                attached_meshes = cached_scene.get("acm", [])
+
+                cached_scene["time"] = time.time()
+                st[cached_scene_key] = cached_scene
 
         return (
             visual,
