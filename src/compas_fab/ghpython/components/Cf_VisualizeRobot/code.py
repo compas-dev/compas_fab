@@ -29,7 +29,6 @@ class RobotVisualize(component):
         show_cm,
         show_acm,
     ):
-
         visual = None
         collision = None
         collision_meshes = None
