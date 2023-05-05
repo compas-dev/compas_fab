@@ -7,19 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-**Added**
+### Added
 
 * Added `Forward Kinematics` GH component.
 
-**Changed**
+### Changed
 
 * Updated install process of GH components.
 
-**Fixed**
+### Fixed
 
-**Deprecated**
+* Fixed pre-Noetic support on the MoveIt planner when a tool is attached to the robot.
 
-**Removed**
+### Deprecated
+
+### Removed
 
 ## 0.27.0
 
