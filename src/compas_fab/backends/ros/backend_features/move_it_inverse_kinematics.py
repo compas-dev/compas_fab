@@ -109,12 +109,14 @@ class MoveItInverseKinematics(InverseKinematics):
             name=start_configuration.joint_names, position=start_configuration.joint_values, header=header
         )
         start_state = RobotState(joint_state, MultiDOFJointState(header=header))
-        start_state.filter_fields_for_distro(self.ros_client.ros_distro)
 
         if options.get("attached_collision_meshes"):
             for acm in options["attached_collision_meshes"]:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
                 start_state.attached_collision_objects.append(aco)
+
+        # Filter needs to happen after all objects have been added
+        start_state.filter_fields_for_distro(self.ros_client.ros_distro)
 
         constraints = convert_constraints_to_rosmsg(options.get("constraints"), header)
 
