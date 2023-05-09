@@ -115,7 +115,7 @@ class MoveItInverseKinematics(InverseKinematics):
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
                 start_state.attached_collision_objects.append(aco)
 
-        # Filter needs to happend after all objects have been added
+        # Filter needs to happen after all objects have been added
         start_state.filter_fields_for_distro(self.ros_client.ros_distro)
 
         constraints = convert_constraints_to_rosmsg(options.get("constraints"), header)
