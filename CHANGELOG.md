@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Updated install process of GH components.
+* Added caching to the GH component that visualizes scene, to avoid retrieving the whole scene too often.
 
 ### Fixed
 
