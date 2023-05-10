@@ -1,7 +1,7 @@
 """
 Calculate a motion path.
 
-COMPAS FAB v0.27.0
+COMPAS FAB v0.28.0
 """
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st

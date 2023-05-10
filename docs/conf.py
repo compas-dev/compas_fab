@@ -43,7 +43,7 @@ project = "COMPAS FAB"
 year = "2018"
 author = "Gramazio Kohler Research"
 copyright = "{0}, {1}".format(year, author)
-version = release = "0.27.0"
+version = release = "0.28.0"
 
 master_doc = "index"
 source_suffix = {
