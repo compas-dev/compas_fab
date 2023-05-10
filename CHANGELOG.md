@@ -20,10 +20,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Fixed pre-Noetic support on the MoveIt planner when a tool is attached to the robot.
 
-### Deprecated
-
-### Removed
-
 ## 0.27.0
 
 ### Added
