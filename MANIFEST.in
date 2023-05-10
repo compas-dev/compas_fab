@@ -10,6 +10,7 @@ include CHANGELOG.md
 include CONTRIBUTING.rst
 include LICENSE
 include README.md
+include requirements.txt
 
 exclude requirements-dev.txt
 exclude .deepsource.toml
