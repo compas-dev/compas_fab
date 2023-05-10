@@ -82,7 +82,7 @@ Ready to release a new version of **COMPAS FAB**? Here's how to do it:
   * `minor`: backwards-compatible features added.
   * `major`: backwards-incompatible changes.
 
-* Update the `CHANGELOG.rst` with all novelty!
+* Update the `CHANGELOG.md` with all novelty!
 * Ready? Release everything in one command:
 
       invoke release [patch|minor|major]
