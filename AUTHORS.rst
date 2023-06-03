@@ -21,7 +21,8 @@ If you use COMPAS FAB in a project, please use the following citation:
             Pacher, M. and
             Lytle, B. and
             Huang, Y. and
-            Kasirer, C.
+            Kasirer, C. and
+            Bruun, E.
             },
         howpublished={https://github.com/compas-dev/compas\_fab/},
         note={Gramazio Kohler Research, ETH Z\"{u}rich},
