@@ -50,7 +50,7 @@ class Robot(Data):
 
     def __init__(self, model=None, artist=None, semantics=None, client=None):
         super(Robot, self).__init__()
-        # These attributes have to be initiated first, 
+        # These attributes have to be initiated first,
         # because they are used in the setters of the other attributes
         self._scale_factor = 1.0
         self._attached_tools = {}  # { planning_group_name: robots.tool.Tool }
@@ -65,27 +65,25 @@ class Robot(Data):
     @property
     def data(self):
         data = {
-            '_scale_factor': self._scale_factor,
-            '_attached_tools': self._attached_tools,
-            '_current_ik': self._current_ik,
-            'model': self.model.data,
-            # 'artist': self.artist.data if self.artist else None,
-            # 'semantics': self.semantics.data if self.semantics else None,
-            # 'client': self.client.data if self.client else None,
-            'attributes': self.attributes,
+            "_scale_factor": self._scale_factor,
+            "_attached_tools": self._attached_tools,
+            "_current_ik": self._current_ik,
+            "model": self.model.data,
+            "attributes": self.attributes,
+            # The following attributes cannnot be serizlied
+            # "artist": self.artist.data if self.artist else None,
+            # "semantics": self.semantics.data if self.semantics else None,
+            # "client": self.client.data if self.client else None,
         }
         return data
 
     @data.setter
     def data(self, data):
-        self._scale_factor = data.get('_scale_factor', 1.0)
-        self._attached_tools = data.get('_attached_tools', {})
-        self._current_ik = data.get('_current_ik', {"request_id": None, "solutions": None})
-        self.model = RobotModel.from_data(data['model'])
-        # self.artist = data.get('artist', None)
-        # self.semantics = data.get('semantics', None)
-        # self.client = data.get('client', None)
-        self.attributes = data.get('attributes', {})
+        self._scale_factor = data.get("_scale_factor", 1.0)
+        self._attached_tools = data.get("_attached_tools", {})
+        self._current_ik = data.get("_current_ik", {"request_id": None, "solutions": None})
+        self.model = RobotModel.from_data(data["model"])
+        self.attributes = data.get("attributes", {})
 
     @property
     def artist(self):

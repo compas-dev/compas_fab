@@ -43,7 +43,6 @@ class Tool(Data):
         super(Tool, self).__init__()
         self.tool_model = ToolModel(visual, frame_in_tool0_frame, collision, name, link_name)
 
-
     @classmethod
     def from_tool_model(cls, tool_model):
         tool = cls(None, None)
