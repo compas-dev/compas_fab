@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import json
 
+from compas.data import Data
 from compas.robots import Geometry
 from compas.robots import ToolModel
 
@@ -14,7 +15,7 @@ from compas_fab.robots.planning_scene import CollisionMesh
 __all__ = ["Tool"]
 
 
-class Tool(object):
+class Tool(Data):
     """Represents a tool to be attached to the robot's flange.
 
     Attributes
@@ -39,7 +40,9 @@ class Tool(object):
     """
 
     def __init__(self, visual, frame_in_tool0_frame, collision=None, name="attached_tool", link_name=None):
+        super(Tool, self).__init__()
         self.tool_model = ToolModel(visual, frame_in_tool0_frame, collision, name, link_name)
+
 
     @classmethod
     def from_tool_model(cls, tool_model):

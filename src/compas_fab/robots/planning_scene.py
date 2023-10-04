@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas.data import Data
 from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Scale
@@ -13,7 +14,7 @@ __all__ = [
 ]
 
 
-class CollisionMesh(object):
+class CollisionMesh(Data):
     """Represents a collision mesh.
 
     Parameters
@@ -55,6 +56,7 @@ class CollisionMesh(object):
     """
 
     def __init__(self, mesh, id, frame=None, root_name=None):
+        super(CollisionMesh, self).__init__()
         self.id = id
         self.mesh = mesh
         self.frame = frame or Frame.worldXY()
@@ -130,7 +132,7 @@ class CollisionMesh(object):
         self.root_name = data_obj["root_name"]
 
 
-class AttachedCollisionMesh(object):
+class AttachedCollisionMesh(Data):
     """Represents a collision mesh that is attached to a :class:`Robot`'s :class:`~compas.robots.Link`.
 
     Parameters
@@ -169,6 +171,7 @@ class AttachedCollisionMesh(object):
     """
 
     def __init__(self, collision_mesh, link_name, touch_links=None, weight=1.0):
+        super(AttachedCollisionMesh, self).__init__()
         self.collision_mesh = collision_mesh
         if self.collision_mesh:
             self.collision_mesh.root_name = link_name
@@ -224,7 +227,7 @@ class AttachedCollisionMesh(object):
         self.weight = data_obj["weight"]
 
 
-class PlanningScene(object):
+class PlanningScene(Data):
     """Represents the planning scene.
 
     Parameters
@@ -241,6 +244,7 @@ class PlanningScene(object):
     """
 
     def __init__(self, robot):
+        super(PlanningScene, self).__init__()
         self.robot = robot
 
     @property

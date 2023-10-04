@@ -3,13 +3,14 @@ from __future__ import division
 from __future__ import print_function
 
 from compas.files import XML
+from compas.data import Data
 
 __all__ = [
     "RobotSemantics",
 ]
 
 
-class RobotSemantics(object):
+class RobotSemantics(Data):
     """Represents semantic information of a robot.
 
     The semantic model is based on the

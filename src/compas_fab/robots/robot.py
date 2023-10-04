@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import random
 
+from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Sphere
 from compas.geometry import Transformation
@@ -21,7 +22,7 @@ __all__ = [
 ]
 
 
-class Robot(object):
+class Robot(Data):
     """Represents a robot.
 
     This class binds together several building blocks, such as the robot's
@@ -47,15 +48,44 @@ class Robot(object):
         Dictionary mapping planning groups to the tool currently attached to them, if any.
     """
 
-    def __init__(self, model, artist=None, semantics=None, client=None):
+    def __init__(self, model=None, artist=None, semantics=None, client=None):
+        super(Robot, self).__init__()
+        # These attributes have to be initiated first, 
+        # because they are used in the setters of the other attributes
         self._scale_factor = 1.0
-        self.model = model
         self._attached_tools = {}  # { planning_group_name: robots.tool.Tool }
+        self._current_ik = {"request_id": None, "solutions": None}
+
+        self.model = model
         self.artist = artist
         self.semantics = semantics
         self.client = client
         self.attributes = {}
-        self._current_ik = {"request_id": None, "solutions": None}
+
+    @property
+    def data(self):
+        data = {
+            '_scale_factor': self._scale_factor,
+            '_attached_tools': self._attached_tools,
+            '_current_ik': self._current_ik,
+            'model': self.model.data,
+            # 'artist': self.artist.data if self.artist else None,
+            # 'semantics': self.semantics.data if self.semantics else None,
+            # 'client': self.client.data if self.client else None,
+            'attributes': self.attributes,
+        }
+        return data
+
+    @data.setter
+    def data(self, data):
+        self._scale_factor = data.get('_scale_factor', 1.0)
+        self._attached_tools = data.get('_attached_tools', {})
+        self._current_ik = data.get('_current_ik', {"request_id": None, "solutions": None})
+        self.model = RobotModel.from_data(data['model'])
+        # self.artist = data.get('artist', None)
+        # self.semantics = data.get('semantics', None)
+        # self.client = data.get('client', None)
+        self.attributes = data.get('attributes', {})
 
     @property
     def artist(self):
@@ -65,6 +95,8 @@ class Robot(object):
     @artist.setter
     def artist(self, artist):
         self._artist = artist
+        if artist is None:
+            return
         if len(self.model.joints) > 0 and len(self.model.links) > 0:
             self.scale(self._scale_factor)
             for tool in self.attached_tools.values():
