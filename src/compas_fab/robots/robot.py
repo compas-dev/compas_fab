@@ -69,10 +69,10 @@ class Robot(Data):
             "_attached_tools": self._attached_tools,
             "_current_ik": self._current_ik,
             "model": self.model.data,
+            "semantics": self.semantics,
             "attributes": self.attributes,
             # The following attributes cannnot be serizlied
             # "artist": self.artist.data if self.artist else None,
-            # "semantics": self.semantics.data if self.semantics else None,
             # "client": self.client.data if self.client else None,
         }
         return data
@@ -83,6 +83,7 @@ class Robot(Data):
         self._attached_tools = data.get("_attached_tools", {})
         self._current_ik = data.get("_current_ik", {"request_id": None, "solutions": None})
         self.model = RobotModel.from_data(data["model"])
+        self.semantics = data.get("semantics", None)
         self.attributes = data.get("attributes", {})
 
     @property

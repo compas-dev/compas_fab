@@ -33,6 +33,7 @@ class RobotSemantics(Data):
         disabled_collisions=None,
         group_states=None,
     ):
+        super(RobotSemantics, self).__init__()
         self.robot_model = robot_model
 
         self.groups = groups or {}
@@ -50,7 +51,7 @@ class RobotSemantics(Data):
             "main_group_name": self.main_group_name,
             "passive_joints": self.passive_joints,
             "end_effectors": self.end_effectors,
-            "disabled_collisions": self.disabled_collisions,
+            "disabled_collisions": sorted(self.disabled_collisions),
             "group_states": self.group_states,
         }
         return data
@@ -63,6 +64,8 @@ class RobotSemantics(Data):
         self.passive_joints = data.get("passive_joints", [])
         self.end_effectors = data.get("end_effectors", [])
         self.disabled_collisions = data.get("disabled_collisions", set())
+        if len(self.disabled_collisions) > 0:
+            self.disabled_collisions = {tuple(pair) for pair in self.disabled_collisions}
         self.group_states = data.get("group_states", {})
 
     @classmethod
