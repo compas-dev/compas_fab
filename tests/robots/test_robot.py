@@ -3,6 +3,7 @@ import os
 import re
 
 import pytest
+from compas.data import json_dumps, json_loads
 from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.robots import RobotModel
@@ -287,6 +288,43 @@ def test_get_configurable_joints_wo_semantics(panda_robot_instance_wo_semantics)
     pattern = re.compile(r"panda_.*joint\d")
     matches = [pattern.match(joint.name) for joint in joints]
     assert all(matches)
+
+
+def test_semantics_serialization(panda_srdf, panda_urdf):
+    model = RobotModel.from_urdf_file(panda_urdf)
+    semantics = RobotSemantics.from_srdf_file(panda_srdf, model)
+    semantics_string = json_dumps(semantics)
+    semantics2 = json_loads(semantics_string)
+    assert isinstance(semantics, RobotSemantics)
+    assert isinstance(semantics2, RobotSemantics)
+    assert ("panda_hand", "panda_link6") in semantics2.disabled_collisions
+    assert ("panda_hand", "panda_leftfinger") in semantics2.disabled_collisions
+
+
+def test_robot_serialization(panda_robot_instance):
+    robot = panda_robot_instance
+    robot_string = json_dumps(robot)
+    robot2 = json_loads(robot_string)
+    robot2_string = json_dumps(robot2)
+    assert isinstance(robot, Robot)
+    assert isinstance(robot2, Robot)
+    assert robot_string == robot2_string
+    assert robot.model.data == robot2.model.data
+    assert robot.attributes == robot2.attributes
+
+
+def test_robot_serialization_with_tool(ur5_robot_instance, robot_tool1):
+    robot = ur5_robot_instance
+    tool = robot_tool1
+    robot.attach_tool(tool)
+    robot_string = json_dumps(robot)
+    robot2 = json_loads(robot_string)
+    robot2_string = json_dumps(robot2)
+    for tool in robot2.attached_tools.values():
+        assert isinstance(tool, Tool)
+    assert robot_string == robot2_string
+    assert len(robot2.attached_tools) == 1
+    assert robot2.main_group_name == robot2.main_group_name
 
 
 def test_inverse_kinematics_repeated_calls_will_return_next_result(ur5_with_fake_ik):
