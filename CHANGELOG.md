@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* `CollisionMesh` now inherit from `compas.data.Data`
+* `AttachedCollisionMesh` now inherit from `compas.data.Data`
+* `Robot` now inherit from `compas.data.Data`
+* `RobotSemantics` now inherit from `compas.data.Data`
+* `Tool` now inherit from `compas.data.Data`
+
 ### Removed
 
 
