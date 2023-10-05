@@ -227,7 +227,7 @@ class AttachedCollisionMesh(Data):
         self.weight = data_obj["weight"]
 
 
-class PlanningScene(Data):
+class PlanningScene(object):
     """Represents the planning scene.
 
     Parameters
@@ -244,7 +244,6 @@ class PlanningScene(Data):
     """
 
     def __init__(self, robot):
-        super(PlanningScene, self).__init__()
         self.robot = robot
 
     @property
