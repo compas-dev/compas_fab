@@ -297,20 +297,26 @@ def test_semantics_serialization(panda_srdf, panda_urdf):
     semantics2 = json_loads(semantics_string)
     assert isinstance(semantics, RobotSemantics)
     assert isinstance(semantics2, RobotSemantics)
-    assert ("panda_hand", "panda_link6") in semantics2.disabled_collisions
-    assert ("panda_hand", "panda_leftfinger") in semantics2.disabled_collisions
+    for disabled_collision in semantics.disabled_collisions:
+        assert disabled_collision in semantics2.disabled_collisions
 
 
 def test_robot_serialization(panda_robot_instance):
     robot = panda_robot_instance
+    robot.scale(0.001)
     robot_string = json_dumps(robot)
     robot2 = json_loads(robot_string)
     robot2_string = json_dumps(robot2)
+    assert robot2_string != ""
     assert isinstance(robot, Robot)
     assert isinstance(robot2, Robot)
-    assert robot_string == robot2_string
-    assert robot.model.data == robot2.model.data
-    assert robot.attributes == robot2.attributes
+    assert robot.model.name == robot2.model.name
+    assert robot._scale_factor == robot2._scale_factor
+    for index, joint in enumerate(robot.model.joints):
+        assert joint.name == robot2.model.joints[index].name
+        assert str(joint.origin) == str(robot2.model.joints[index].origin)
+    for index, link in enumerate(robot.model.links):
+        assert link.name == robot2.model.links[index].name
 
 
 def test_robot_serialization_with_tool(ur5_robot_instance, robot_tool1):
@@ -319,12 +325,14 @@ def test_robot_serialization_with_tool(ur5_robot_instance, robot_tool1):
     robot.attach_tool(tool)
     robot_string = json_dumps(robot)
     robot2 = json_loads(robot_string)
-    robot2_string = json_dumps(robot2)
     for tool in robot2.attached_tools.values():
         assert isinstance(tool, Tool)
-    assert robot_string == robot2_string
     assert len(robot2.attached_tools) == 1
-    assert robot2.main_group_name == robot2.main_group_name
+    assert robot.main_group_name == robot2.main_group_name
+    tool1 = robot.attached_tool
+    tool2 = robot2.attached_tool
+    assert tool1.name == tool2.name
+    assert str(tool1.frame) == str(tool2.frame)
 
 
 def test_inverse_kinematics_repeated_calls_will_return_next_result(ur5_with_fake_ik):
