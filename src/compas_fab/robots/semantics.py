@@ -43,6 +43,35 @@ class RobotSemantics(Data):
         self.group_states = group_states or {}
 
     @property
+    def data(self):
+        data = {
+            "robot_model": self.robot_model,
+            "groups": self.groups,
+            "main_group_name": self.main_group_name,
+            "passive_joints": self.passive_joints,
+            "end_effectors": self.end_effectors,
+            "disabled_collisions": self.disabled_collisions,
+            "group_states": self.group_states,
+        }
+        return data
+
+    @data.setter
+    def data(self, data):
+        self.robot_model = data.get("robot_model", None)
+        self.groups = data.get("groups", {})
+        self.main_group_name = data.get("main_group_name", None)
+        self.passive_joints = data.get("passive_joints", [])
+        self.end_effectors = data.get("end_effectors", [])
+        self.disabled_collisions = data.get("disabled_collisions", set())
+        self.group_states = data.get("group_states", {})
+
+    @classmethod
+    def from_data(cls, data):
+        robot_semantics = cls(None)
+        robot_semantics.data = data
+        return robot_semantics
+
+    @property
     def group_names(self):
         return list(self.groups.keys())
 
