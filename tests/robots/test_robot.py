@@ -296,6 +296,9 @@ def test_semantics_serialization(panda_srdf, panda_urdf):
     semantics = RobotSemantics.from_srdf_file(panda_srdf, model)
     semantics_string = json_dumps(semantics)
     semantics2 = json_loads(semantics_string)
+    assert semantics.main_group_name == semantics2.main_group_name
+    for group_name in semantics.group_names:
+        assert group_name in semantics2.group_names
     assert isinstance(semantics, RobotSemantics)
     assert isinstance(semantics2, RobotSemantics)
     for disabled_collision in semantics.disabled_collisions:
