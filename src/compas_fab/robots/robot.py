@@ -71,9 +71,7 @@ class Robot(Data):
             "model": self.model.data,
             "semantics": self.semantics,
             "attributes": self.attributes,
-            # The following attributes cannnot be serizlied
-            # "artist": self.artist.data if self.artist else None,
-            # "client": self.client.data if self.client else None,
+            # The following attributes cannot be serialized: artist, client
         }
         return data
 
