@@ -17,12 +17,21 @@ __all__ = [
 
 
 class SceneState(Data):
-    """Class for describing a scene. A scene contains the states of all objects.
+    """Class for describing a static scene, aka. a single moment in time.
+    The SceneState describe the states of all workpieces, tools and robot.
     Current implementation supports only one robot in the scene.
 
     There can be multiple tools and workpieces in the scene. However, only
     one (or none) tool can be attached to the robot at any time. Similarly,
     there can only be one (or none) workpiece attached to the tool at any time.
+    See `SceneState.get_attached_tool_id()` and `SceneState.get_attached_workpiece_id()`.
+
+    When constructing a SceneState, all the workpieces and tools id should be provided
+    to the constructor. The initial :class:`WorkpieceState` and :class:`ToolState` are
+    automatically created and can be accessed by the `SceneState.get_workpiece_state()` and
+    `SceneState.get_tool_state()`. An empty RobotState is created by default and
+    can be accessed by `SceneState.get_robot_state()`.
+
 
     Attributes
     ----------
@@ -51,8 +60,9 @@ class SceneState(Data):
             self.workpiece_states[workpiece_id] = WorkpieceState(workpiece_id)
         for tool_id in tool_ids:
             self.tool_states[tool_id] = ToolState(tool_id)
-        self.workpiece_states['s'].attached_to_tool_grasp
-        self.tool_states['s'].attached_to_robot_grasp
+        self.workpiece_states["s"].attached_to_tool_grasp
+        self.tool_states["s"].attached_to_robot_grasp
+
     @property
     def data(self):
         data = {}
@@ -73,6 +83,7 @@ class SceneState(Data):
 
     def get_robot_state(self):
         # type: () -> RobotState
+        """Returns the state of the only robot in the scene."""
         return self.robot_state
 
     def get_tool_state(self, tool_id=None):
@@ -84,6 +95,7 @@ class SceneState(Data):
         ----------
         tool_id : str, optional
             The id of the tool.
+            If tool_id is `None` and there is only one tool in the scene, the tool id is inferred.
         """
         if tool_id is None:
             if len(self.tool_ids) > 1:
@@ -132,13 +144,19 @@ class WorkpieceState(Data):
     ----------
     workpiece_id : str
         The id of the workpiece.
-    frame : :class:`compas.geometry.Frame`, optional
+    frame : :class:`compas.geometry.Frame`
         The current location of the workpiece.
-    attached_to_tool_id : str, optional
+        (default: :class:`compas.geometry.Frame.worldXY`)
+    attached_to_tool_id : str or None
         If the workpiece is attached to a tool, the id of the tool.
-    attached_to_tool_grasp : :class:`compas.geometry.Transformation`, optional
+        If the workpiece is not attached to a tool, `None`. (default: `None`)
+    attached_to_tool_grasp : :class:`compas.geometry.Transformation`
         If the workpiece is attached to a tool, the grasp frame of the workpiece.
-
+        If not specified, defaults to the identity transformation.
+        If the workpiece is not attached to a tool, `None`.
+    is_hidden : bool
+        If the workpiece is hidden, `True`. Else, `False`. (default: `False`)
+        A hidden workpiece will not be included for collision detection of the scene.
     """
 
     def __init__(self, workpiece_id="undefined_workpiece"):
@@ -146,7 +164,8 @@ class WorkpieceState(Data):
         self.workpiece_id = workpiece_id
         self.frame = Frame.worldXY()  # type: Frame
         self.attached_to_tool_id = None  # type: Optional[str]
-        self.attached_to_tool_grasp = None  # type: Optional[Transformation]
+        self.attached_to_tool_grasp = Transformation()  # type: Optional[Transformation]
+        self.is_hidden = False  # type: bool
 
     @property
     def data(self):
@@ -155,6 +174,7 @@ class WorkpieceState(Data):
         data["frame"] = self.frame
         data["attached_to_tool_id"] = self.attached_to_tool_id
         data["attached_to_tool_grasp"] = self.attached_to_tool_grasp
+        data["is_hidden"] = self.is_hidden
         return data
 
     @data.setter
@@ -163,6 +183,7 @@ class WorkpieceState(Data):
         self.frame = data.get("frame", self.frame)
         self.attached_to_tool_id = data.get("attached_to_tool_id", self.attached_to_tool_id)
         self.attached_to_tool_grasp = data.get("attached_to_tool_grasp", self.attached_to_tool_grasp)
+        self.is_hidden = data.get("is_hidden", self.is_hidden)
 
 
 class ToolState(Data):

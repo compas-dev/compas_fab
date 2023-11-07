@@ -27,7 +27,7 @@ class Action(Data):
 
     def __init__(self):
         super(Action, self).__init__()
-        self.act_n = -1  # type: int
+        self.act_id = -1  # type: int
         self.tag = "Generic Action"
 
     @property
@@ -35,7 +35,7 @@ class Action(Data):
         data = {}
         # For class inhereited from Action, use the following line
         # data = super(Action, self).data
-        data["act_n"] = self.act_n
+        data["act_id"] = self.act_id
         data["tag"] = self.tag
         return data
 
@@ -43,7 +43,7 @@ class Action(Data):
     def data(self, data):
         # For class inhereited from Action, use the following line
         # super(Action, type(self)).data.fset(self, data)
-        self.act_n = data["act_n"]
+        self.act_id = data["act_id"]
         self.tag = data["tag"]
 
     def apply_to(self, scene_state, debug=False):
@@ -68,6 +68,13 @@ class RoboticMovement(Action):
     fixed_configuration : :class:`compas_fab.robots.Configuration`, optional
         The configuration of the robot if the target needs a fixed configuration.
         For example, if a taught position is used as a target.
+    fixed_trajectory : :class:`compas_fab.robots.JointTrajectory`, optional
+        The trajectory of the robot if the trajectory is fixed.
+        For example, if a pre-planned or recorded trajectory is preferred for this action.
+        Specifying a fixed trajectory will force the chained motion planner to respect this trajectory
+        when planning neighbouring robotic movements. This can be used to improve repeatibility.
+        Users must be careful to specify a trajectory that is collision free and does not violate
+        the kinematic limits of the robot.
     intermediate_planning_waypoint : list(:class:`compas_fab.robots.Configuration`), optional
         List of configurations that are used as waypoints during planning.
     planned_trajectory : :class:`compas_fab.robots.JointTrajectory`
@@ -84,6 +91,7 @@ class RoboticMovement(Action):
         self.robot_target = None  # type: Frame
         self.allowed_collision_pairs = []  # type: list(tuple(str,str))
         self.fixed_configuration = None  # type: Optional[Configuration]
+        self.fixed_trajectory = None  # type: Optional[JointTrajectory]
         self.intermediate_planning_waypoint = []  # type: list(Configuration)
 
         # After Planning
@@ -162,13 +170,13 @@ class RoboticMovement(Action):
 
 
 class LinearMovement(RoboticMovement):
-    """Base class for all linear robotic movements.
+    """Action class for linear robotic movements.
     Linear robotic movements are planned by Linear Motion Planners.
     """
 
 
 class FreeMovement(RoboticMovement):
-    """Base class for all free robotic movements.
+    """Action class for free robotic movements.
     Free robotic movements are planned by Free Motion Planners.
     """
 
@@ -297,8 +305,10 @@ class CloseGripper(Action):
 
 
 class LoadWorkpiece(Action):
-    """Action to load a workpiece, probably performed manually.
+    """Action to load a workpiece, assumed to be performed by a human operator.
     This moves the workpiece to a specific frame.
+    Typically used for loading a workpiece into a gripper.
+    Can also be used to model the manual attachment of scaffolding (modeled as a :class:`Workpiece`)
 
     Attributes
     ----------
