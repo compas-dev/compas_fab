@@ -65,9 +65,10 @@ class Robot(Data):
     @property
     def data(self):
         data = {
-            "_scale_factor": self._scale_factor,
-            "_attached_tools": self._attached_tools,
-            "_current_ik": self._current_ik,
+            "scale_factor": self._scale_factor,
+            "attached_tools": self._attached_tools,
+            # The current_ik is an extrinsic state that is not serialized with the robot
+            # "current_ik": self._current_ik,
             "model": self.model.data,
             "semantics": self.semantics,
             "attributes": self.attributes,
@@ -79,9 +80,8 @@ class Robot(Data):
 
     @data.setter
     def data(self, data):
-        self._scale_factor = data.get("_scale_factor", 1.0)
-        self._attached_tools = data.get("_attached_tools", {})
-        self._current_ik = data.get("_current_ik", {"request_id": None, "solutions": None})
+        self._scale_factor = data.get("scale_factor", 1.0)
+        self._attached_tools = data.get("attached_tools", {})
         self.model = RobotModel.from_data(data["model"])
         self.semantics = data.get("semantics", None)
         self.attributes = data.get("attributes", {})
