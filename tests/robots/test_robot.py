@@ -3,7 +3,8 @@ import os
 import re
 
 import pytest
-from compas.data import json_dumps, json_loads
+from compas.data import json_dumps
+from compas.data import json_loads
 from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.robots import RobotModel
@@ -295,6 +296,9 @@ def test_semantics_serialization(panda_srdf, panda_urdf):
     semantics = RobotSemantics.from_srdf_file(panda_srdf, model)
     semantics_string = json_dumps(semantics)
     semantics2 = json_loads(semantics_string)
+    assert semantics.main_group_name == semantics2.main_group_name
+    for group_name in semantics.group_names:
+        assert group_name in semantics2.group_names
     assert isinstance(semantics, RobotSemantics)
     assert isinstance(semantics2, RobotSemantics)
     for disabled_collision in semantics.disabled_collisions:
@@ -321,10 +325,11 @@ def test_robot_serialization(panda_robot_instance):
 
 def test_robot_serialization_with_tool(ur5_robot_instance, robot_tool1):
     robot = ur5_robot_instance
-    tool = robot_tool1
-    robot.attach_tool(tool)
+    robot.attach_tool(robot_tool1)
+    # serialization and deserialization using compas data serialization
     robot_string = json_dumps(robot)
     robot2 = json_loads(robot_string)
+
     for tool in robot2.attached_tools.values():
         assert isinstance(tool, Tool)
     assert len(robot2.attached_tools) == 1
