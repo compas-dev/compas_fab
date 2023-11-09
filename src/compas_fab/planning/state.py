@@ -17,20 +17,24 @@ __all__ = [
 
 
 class SceneState(Data):
-    """Class for describing a static scene, aka. a single moment in time.
-    The SceneState describe the states of all workpieces, tools and robot.
-    Current implementation supports only one robot in the scene.
+    """Container for the states of all workpieces, tools and robot in a static scene.
 
-    There can be multiple tools and workpieces in the scene. However, only
-    one (or none) tool can be attached to the robot at any time. Similarly,
-    there can only be one (or none) workpiece attached to the tool at any time.
-    See `SceneState.get_attached_tool_id()` and `SceneState.get_attached_workpiece_id()`.
+    Current implementation supports multiple workpieces and tools, but only one robot.
+
+    No more than one tool can be attached to the robot at any time. Similarly,
+    no more than one workpiece can be attached to the tool at any time.
+    It is not possible to attach a workpiece to the robot directly.
+    Use a dummy tool (with identity transformation and no visual or collision meshes) if necessary.
+
+    SceneState provides convinence functions such as :meth:`SceneState.get_attached_tool_id()`
+    and :meth:`SceneState.get_attached_workpiece_id()` for identifying which tool and workpiece
+    are currently attached to the robot.
 
     When constructing a SceneState, all the workpieces and tools id should be provided
-    to the constructor. The initial :class:`WorkpieceState` and :class:`ToolState` are
-    automatically created and can be accessed by the `SceneState.get_workpiece_state()` and
-    `SceneState.get_tool_state()`. An empty RobotState is created by default and
-    can be accessed by `SceneState.get_robot_state()`.
+    to the constructor. Default :class:`WorkpieceState`, :class:`ToolState` and
+    :class:`RobotState` are automatically created and can be accessed by
+    :meth:`SceneState.get_workpiece_state()`, :meth:`SceneState.get_tool_state()` and
+    :meth:`SceneState.get_robot_state()`.
 
 
     Attributes
@@ -140,10 +144,12 @@ class SceneState(Data):
 class WorkpieceState(Data):
     """Class for describing the state of a workpiece.
 
+    WorkpieceState objects are typically created by the constructor of :class:`SceneState`.
+
     Attributes
     ----------
     workpiece_id : str
-        The id of the workpiece.
+        Unique identifier of the workpiece used in Process.workpieces and SceneState.workpiece_states.
     frame : :class:`compas.geometry.Frame`
         The current location of the workpiece.
         (default: :class:`compas.geometry.Frame.worldXY`)
@@ -189,10 +195,13 @@ class WorkpieceState(Data):
 class ToolState(Data):
     """Class for describing the state of a tool.
 
+    ToolState objects are typically created by the constructor of :class:`SceneState`.
+
+
     Attributes
     ----------
     tool_id : str
-        The id of the tool.
+        Unique identifier of the tool used in Process.tools and SceneState.tool_states.
     frame : :class:`compas.geometry.Frame`
         The current location of the tool.
     attached_to_robot : bool
@@ -203,13 +212,13 @@ class ToolState(Data):
         If the tool is kinematic, the current configuration of the tool.
     """
 
-    def __init__(self, tool_id="undefined_tool", initial_configuration=None):
+    def __init__(self, tool_id="undefined_tool", configuration=None):
         super(ToolState, self).__init__()
         self.tool_id = tool_id
         self.frame = Frame.worldXY()  # type: Frame
         self.attached_to_robot = False  # type: bool
         self.attached_to_robot_grasp = None  # type: Optional[Transformation]
-        self.configuration = initial_configuration  # type: Optional[Configuration]
+        self.configuration = configuration  # type: Optional[Configuration]
 
     @property
     def data(self):
@@ -233,6 +242,11 @@ class ToolState(Data):
 class RobotState(Data):
     """Class for describing the state of a robot.
 
+    RobotState objects are typically created by the constructor of :class:`SceneState`.
+    However it is possible to create a RobotState object manually. For example, when specifying
+    the initial state of a robot in a planning process.
+
+
     Attributes
     ----------
     frame : :class:`compas.geometry.Frame`
@@ -241,10 +255,10 @@ class RobotState(Data):
         The current configuration of the robot.
     """
 
-    def __init__(self, initial_configuration=None, initial_frame=None):
+    def __init__(self,  frame=None, configuration=None):
         super(RobotState, self).__init__()
-        self.frame = initial_frame  # type: Frame
-        self.configuration = initial_configuration  # type: Optional[Configuration]
+        self.frame = frame  # type: Frame
+        self.configuration = configuration  # type: Optional[Configuration]
 
     @property
     def data(self):
