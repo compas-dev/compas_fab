@@ -85,7 +85,7 @@ class RoboticMovement(Action):
 
     When applied to a scene state, Robotic movements also changes the state of the
     attached tool and workpiece. If the trajectory have been planned, the configuration
-    of the robot is updated to the last configuration of the trajectory. See 
+    of the robot is updated to the last configuration of the trajectory. See
     :meth:`compas_fab.planning.RoboticMovement.apply_to` for more details.
 
     Attributes
@@ -215,7 +215,7 @@ class OpenGripper(Action):
     """Action to open the gripper.
 
     Current implementation only changes the attachment state of the workpiece.
-    It does not change the configuration of the gripper, even if it is a 
+    It does not change the configuration of the gripper, even if it is a
     :class:`compas_fab.robots.ToolModel` with kinematic joints.
 
     If the gripper is closed around a workpiece, the workpiece is detached from the gripper.

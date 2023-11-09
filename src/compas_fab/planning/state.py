@@ -255,7 +255,7 @@ class RobotState(Data):
         The current configuration of the robot.
     """
 
-    def __init__(self,  frame=None, configuration=None):
+    def __init__(self, frame=None, configuration=None):
         super(RobotState, self).__init__()
         self.frame = frame  # type: Frame
         self.configuration = configuration  # type: Optional[Configuration]
