@@ -23,12 +23,32 @@ __all__ = [
 
 
 class Action(Data):
-    """Base class for all actions."""
+    """Base class for all actions.
+
+    The Action Classes are intended to be used to model the actions of a human operator or a robot.
+    Current Implementation assumes discrete actions that are executed sequentially, aka. one after another.
+
+    Actions can be created automatically or manually. They are stored in a :class:`compas_fab.planning.Processs`.
+    Some actions contain references to workpieces, tools, or other objects in the scene. Those objects are
+    stored in dictionaries under the Process object and are identified by their id.
+
+    Actions are closely related to the :class:`compas_fab.planning.SceneState` because each action changes the scene state.
+    Provided with an starting scene state, the actions can be *applied to* create the ending scene state.
+    The only exception are robotic configurations that are changed by :class:`compas_fab.planning.RoboticMovement` actions.
+    Those actions changes the robot configuration and their effect is not known until after the planning process.
+
+    Attributes
+    ----------
+    act_id : [str | int]
+        A unique id of the action, it is optional but recommended for debugging.
+    tag : str
+        A human readable tag that describes the action. It is printed out during visualization, debugging, execution and logging.
+    """
 
     def __init__(self):
         super(Action, self).__init__()
-        self.act_id = -1  # type: int
-        self.tag = "Generic Action"
+        self.act_id = -1  # type: [str | int]
+        self.tag = "Generic Action"  # type: str
 
     @property
     def data(self):
@@ -51,13 +71,22 @@ class Action(Data):
         """Applies the action to a scene state.
         This method is called by the assembly process to apply the action to the scene state.
         """
-        raise NotImplementedError
+        raise NotImplementedError("Action.apply_to() is not implemented by %s." % type(self))
 
 
 class RoboticMovement(Action):
     """Base class for all robotic movements.
-    - Robotic movements are actions that changes the configuration of the robot.
-    - Robotic movements require motion planning and are planned by a motion planner.
+    Robotic movements are actions that changes the robot flange frame and
+    configuration of the robot.
+
+    Robotic movements contain robotic trajectory that are planned by a motion planner.
+    After motion planning, the trajectory is stored in the action and can be used
+    for visualization and execution.
+
+    When applied to a scene state, Robotic movements also changes the state of the
+    attached tool and workpiece. If the trajectory have been planned, the configuration
+    of the robot is updated to the last configuration of the trajectory. See 
+    :meth:`compas_fab.planning.RoboticMovement.apply_to` for more details.
 
     Attributes
     ----------
@@ -65,6 +94,7 @@ class RoboticMovement(Action):
         The target frame of the robot. In world coordinate frame.
     allowed_collision_pairs : list(tuple(str,str))
         List of pairs of collision objects that are allowed to collide.
+        Objects are identified by workpiece_id, tool_id, or static_object_id.
     fixed_configuration : :class:`compas_fab.robots.Configuration`, optional
         The configuration of the robot if the target needs a fixed configuration.
         For example, if a taught position is used as a target.
@@ -183,6 +213,11 @@ class FreeMovement(RoboticMovement):
 
 class OpenGripper(Action):
     """Action to open the gripper.
+
+    Current implementation only changes the attachment state of the workpiece.
+    It does not change the configuration of the gripper, even if it is a 
+    :class:`compas_fab.robots.ToolModel` with kinematic joints.
+
     If the gripper is closed around a workpiece, the workpiece is detached from the gripper.
     It is possible to open the gripper with or without a workpiece attached.
     """

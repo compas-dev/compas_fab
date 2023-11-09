@@ -9,8 +9,15 @@ This package contains data classes for modeling robotic process and algorithms f
 The current implementation supports single-robot (:class:`compas_fab.robots.Robot`)
 processes with one or more workpieces (:class:`Workpiece`) and tools (:class:`compas_fab.robots.Tool`).
 The processes contains actions that are assumed to be sequentially executed by the robot
-or by the operator (manually). Concurrent actions either by multuiple robots, or by robot-operator
-collaboration are not supported.
+or by the operator (manually). Concurrent actions are not supported.
+
+The FabricationProcess class and its subclasses (such as :class:`PickAndPlaceProcess` and
+:class:`ExtrusionProcess`) are used to model a process. They provider helper methods for
+creating a ordered list of actions that are used for planning and execution. The beining of the
+process is defined by the initial state of the scene, which is a container for the state of all
+objects in the scene (see :class:`SceneState`). The initial state is used to plan the first action
+in the process. The resulting state of the first action is used as the initial state for the next
+action, and so on. See tutorial on :ref:`planning_process` for more details.
 
 
 Actions
