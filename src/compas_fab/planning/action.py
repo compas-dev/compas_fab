@@ -1,5 +1,8 @@
 from compas.data import Data
-from compas.geometry import Frame, Transformation
+from compas.geometry import Point
+from compas.geometry import Frame
+from compas.geometry import Transformation
+
 from compas_fab.robots import Configuration, JointTrajectory  # noqa: F401
 
 try:
@@ -76,26 +79,32 @@ class Action(Data):
 
 class RoboticMovement(Action):
     """Base class for all robotic movements.
-    Robotic movements are actions that changes the robot flange frame and
-    configuration of the robot.
 
-    Robotic movements contain robotic trajectory that are planned by a motion planner.
-    After motion planning, the trajectory is stored in the action and can be used
-    for visualization and execution.
+    Robotic movements are actions that changes the robot configuration and
+    hence also the frame of the robot flange and all attached tools and workpieces.
+
+    The RoboticMovement class only describes the target (ending state)
+    of the robotic movement, whereas the starting state is defined using a
+    :class:`compas_fab.planning.SceneState` object. The starting state also
+    defines the attached tools and workpieces.
+    Both objects are required by the motion planner to plan a trajectory.
+
+    After motion planning, the trajectory can be stored in the same RoboticMovement class
+    and can be used for visualization and execution.
 
     When applied to a scene state, Robotic movements also changes the state of the
     attached tool and workpiece. If the trajectory have been planned, the configuration
     of the robot is updated to the last configuration of the trajectory. See
     :meth:`compas_fab.planning.RoboticMovement.apply_to` for more details.
 
-    Attributes
-    ----------
-    robot_target : :class:`compas.geometry.Frame`
-        The target frame of the robot. In world coordinate frame.
+    Attributes (Before Planning)
+    ----------------------------
+    target_robot_flange_frame : :class:`compas.geometry.Frame`
+        The robot flange frame of the robot at target. In world coordinate frame.
     allowed_collision_pairs : list(tuple(str,str))
         List of pairs of collision objects that are allowed to collide.
         Objects are identified by workpiece_id, tool_id, or static_object_id.
-    fixed_configuration : :class:`compas_fab.robots.Configuration`, optional
+    fixed_target_configuration : :class:`compas.robots.Configuration`, optional
         The configuration of the robot if the target needs a fixed configuration.
         For example, if a taught position is used as a target.
     fixed_trajectory : :class:`compas_fab.robots.JointTrajectory`, optional
@@ -105,12 +114,24 @@ class RoboticMovement(Action):
         when planning neighbouring robotic movements. This can be used to improve repeatibility.
         Users must be careful to specify a trajectory that is collision free and does not violate
         the kinematic limits of the robot.
-    intermediate_planning_waypoint : list(:class:`compas_fab.robots.Configuration`), optional
-        List of configurations that are used as waypoints during planning.
+    tag : str
+        A human readable tag that describes the action.
+        It can printed out during visualization, debugging, execution and logging.
+
+    Attributes (After Planning)
+    ---------------------------
     planned_trajectory : :class:`compas_fab.robots.JointTrajectory`
-        The planned trajectory of the robotic movement.
+        The planned trajectory of the robotic movement. Available after planning. The first and last
+        trajectory points corresponds to the starting and ending configuration of the robotic movement.
     planner_seed : int
-        The random seed used by the planner to generate the trajectory.
+        The random seed used by the planner to generate the trajectory. Used by some planners.
+
+    Attributes (For Execution)
+    --------------------------
+    speed_data_id : str
+        The id (or name) of the speed data to be used for execution.
+    ----------
+
     """
 
     def __init__(self):
@@ -118,9 +139,9 @@ class RoboticMovement(Action):
         self.tag = "Generic Action"
 
         # Before Planning
-        self.robot_target = None  # type: Frame
+        self.target_robot_flange_frame = None  # type: Frame
         self.allowed_collision_pairs = []  # type: list(tuple(str,str))
-        self.fixed_configuration = None  # type: Optional[Configuration]
+        self.fixed_target_configuration = None  # type: Optional[Configuration]
         self.fixed_trajectory = None  # type: Optional[JointTrajectory]
         self.intermediate_planning_waypoint = []  # type: list(Configuration)
 
@@ -128,37 +149,45 @@ class RoboticMovement(Action):
         self.planned_trajectory = None  # type: Optional[JointTrajectory]
         self.planner_seed = None  # type: Optional[int]
 
+        # For Execution
+        self.speed_data_id = None  # type: Optional[str]
+
     @property
     def data(self):
         data = super(RoboticMovement, self).data
         data["tag"] = self.tag
-        data["robot_target"] = self.robot_target
+        data["target_robot_flange_frame"] = self.target_robot_flange_frame
         data["allowed_collision_pairs"] = self.allowed_collision_pairs
-        data["fixed_configuration"] = self.fixed_configuration
+        data["fixed_target_configuration"] = self.fixed_target_configuration
+        data["fixed_trajectory"] = self.fixed_trajectory
         data["intermediate_planning_waypoint"] = self.intermediate_planning_waypoint
         data["planned_trajectory"] = self.planned_trajectory
         data["planner_seed"] = self.planner_seed
+        data["speed_data_id"] = self.speed_data_id
         return data
 
     @data.setter
     def data(self, data):
         super(RoboticMovement, type(self)).data.fset(self, data)
         self.tag = data.get("tag", self.tag)
-        self.robot_target = data.get("robot_target", self.robot_target)
+        self.target_robot_flange_frame = data.get("target_robot_flange_frame", self.target_robot_flange_frame)
         self.allowed_collision_pairs = data.get("allowed_collision_pairs", self.allowed_collision_pairs)
-        self.fixed_configuration = data.get("fixed_configuration", self.fixed_configuration)
+        self.fixed_target_configuration = data.get("fixed_target_configuration", self.fixed_target_configuration)
+        self.fixed_trajectory = data.get("fixed_trajectory", self.fixed_trajectory)
         self.intermediate_planning_waypoint = data.get(
             "intermediate_planning_waypoint", self.intermediate_planning_waypoint
         )
         self.planned_trajectory = data.get("planned_trajectory", self.planned_trajectory)
         self.planner_seed = data.get("planner_seed", self.planner_seed)
+        self.speed_data_id = data.get("speed_data_id", self.speed_data_id)
 
     def apply_to(self, scene_state, debug=False):
         # type: (SceneState, bool) -> None
         """Applies the action to a scene state.
 
         The SceneState is updated with the new robot state.
-        If a trajectory is available, the robot state is updated with the last configuration of the trajectory.
+        If a fixed_trajectory or planned_trajectory is available, the robot_state.configuration is updated with the last configuration of the trajectory.
+        If fixed_target_configuration is available, the robot_state.configuration is updated with the fixed_target_configuration.
 
         Parameters
         ----------
@@ -168,9 +197,11 @@ class RoboticMovement(Action):
         robot_state = scene_state.get_robot_state()
         if self.planned_trajectory is not None:
             robot_state.configuration = self.planned_trajectory.points[-1]
-        elif self.fixed_configuration is not None:
-            robot_state.configuration = self.fixed_configuration
-        robot_state.frame = self.robot_target
+        elif self.fixed_trajectory is not None:
+            robot_state.configuration = self.fixed_trajectory.points[-1]
+        elif self.fixed_target_configuration is not None:
+            robot_state.configuration = self.fixed_target_configuration
+        robot_state.frame = self.target_robot_flange_frame
         if debug:
             print("Robot Moved.")
 
@@ -202,14 +233,77 @@ class RoboticMovement(Action):
 class LinearMovement(RoboticMovement):
     """Action class for linear robotic movements.
     Linear robotic movements are planned by Linear Motion Planners.
+
+    Attributes
+    ----------
+    polyline_target : list(:class:`compas.geometry.Point`)
+        List of points to define a linear movement that is a polyline.
+        Specified in world coordinate frame.
+        The first point (the starting point) is not required.
+        The second point onwards, including the last point (the ending point) is required.
+
+    see :class:`compas_fab.planning.RoboticMovement` for other attributes.
     """
+
+    def __init__(self):
+        super(LinearMovement, self).__init__()
+        self.polyline_target = []  # type: list(Point)
+        self.tag = "Linear Movement"
+
+    @property
+    def data(self):
+        data = super(LinearMovement, self).data
+        data["polyline_target"] = self.polyline_target
+        return data
+
+    @data.setter
+    def data(self, data):
+        super(LinearMovement, type(self)).data.fset(self, data)
+        self.polyline_target = data.get("polyline_target", self.polyline_target)
 
 
 class FreeMovement(RoboticMovement):
     """Action class for free robotic movements.
     Free robotic movements are planned by Free Motion Planners.
+
+    Attributes
+    ----------
+    intermediate_planning_waypoint : list(:class:`compas.robots.Configuration`)
+        List of configurations to define a multi-step free movement.
+        The first and last configuration (the starting and target configuration) is not required.
+        Only include the intermediate waypoints.
+        Waypoints can be used to help the planner 'manually' to find a feasible path around obstacles.
+    smoothing_required : bool
+        If True, the trajectory smoothing algorithm is invoked after planning to smooth the trajectory.
+        Note that smoothing may not be available for all planners. (default: True)
+    smoothing_keep_waypoints : bool
+        If True, the trajectory smoothing algorithm is allowed to remove the provided waypoints. (default: False)
+
+
+    see :class:`compas_fab.planning.RoboticMovement` for other attributes.
     """
 
+    def __init__(self):
+        super(FreeMovement, self).__init__()
+        self.intermediate_planning_waypoint = []  # type: list(Configuration)
+        self.smoothing_required = True
+        self.smoothing_keep_waypoints = False
+        self.tag = "Free Movement"
+
+    @property
+    def data(self):
+        data = super(FreeMovement, self).data
+        data["intermediate_planning_waypoint"] = self.intermediate_planning_waypoint
+        data["smoothing_required"] = self.smoothing_required
+        data["smoothing_keep_waypoints"] = self.smoothing_keep_waypoints
+        return data
+
+    @data.setter
+    def data(self, data):
+        super(FreeMovement, type(self)).data.fset(self, data)
+        self.intermediate_planning_waypoint = data.get("intermediate_planning_waypoint", self.intermediate_planning_waypoint)
+        self.smoothing_required = data.get("smoothing_required", self.smoothing_required)
+        self.smoothing_keep_waypoints = data.get("smoothing_keep_waypoints", self.smoothing_keep_waypoints)
 
 class OpenGripper(Action):
     """Action to open the gripper.
@@ -385,3 +479,4 @@ class LoadWorkpiece(Action):
         workpiece_state.frame = self.frame
         if debug:
             print("Workpiece %s loaded to new location." % self.workpiece_id)
+
