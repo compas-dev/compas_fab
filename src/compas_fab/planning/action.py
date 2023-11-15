@@ -18,7 +18,7 @@ except ImportError:
 __all__ = [
     "Action",
     "RoboticMovement",
-    "LinearMovement",
+    "CartesianMovement",
     "FreeMovement",
     "OpenGripper",
     "CloseGripper",
@@ -230,9 +230,12 @@ class RoboticMovement(Action):
                 print("- Attached Workpiece %s Followed." % attached_workpiece_id)
 
 
-class LinearMovement(RoboticMovement):
-    """Action class for linear robotic movements.
-    Linear robotic movements are planned by Linear Motion Planners.
+class CartesianMovement(RoboticMovement):
+    """Action class to describe a Cartesian robotic movement.
+
+    The trajectory of the robot flange is interpolated in Cartesian space.
+    Typically, the orientation between the starting frame and the target frame is the same.
+    However some linear motion planners can interpolate between different orientations.
 
     Attributes
     ----------
@@ -246,19 +249,19 @@ class LinearMovement(RoboticMovement):
     """
 
     def __init__(self):
-        super(LinearMovement, self).__init__()
+        super(CartesianMovement, self).__init__()
         self.polyline_target = []  # type: list(Point)
         self.tag = "Linear Movement"
 
     @property
     def data(self):
-        data = super(LinearMovement, self).data
+        data = super(CartesianMovement, self).data
         data["polyline_target"] = self.polyline_target
         return data
 
     @data.setter
     def data(self, data):
-        super(LinearMovement, type(self)).data.fset(self, data)
+        super(CartesianMovement, type(self)).data.fset(self, data)
         self.polyline_target = data.get("polyline_target", self.polyline_target)
 
 
@@ -304,6 +307,7 @@ class FreeMovement(RoboticMovement):
         self.intermediate_planning_waypoint = data.get("intermediate_planning_waypoint", self.intermediate_planning_waypoint)
         self.smoothing_required = data.get("smoothing_required", self.smoothing_required)
         self.smoothing_keep_waypoints = data.get("smoothing_keep_waypoints", self.smoothing_keep_waypoints)
+
 
 class OpenGripper(Action):
     """Action to open the gripper.
