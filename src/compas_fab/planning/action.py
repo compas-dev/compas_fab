@@ -12,6 +12,7 @@ except ImportError:
 
 try:
     from typing import Optional  # noqa: F401
+    from typing import Tuple  # noqa: F401
 except ImportError:
     pass
 
@@ -22,6 +23,7 @@ __all__ = [
     "FreeMotion",
     "OpenGripper",
     "CloseGripper",
+    "ManuallyMoveWorkpiece",
 ]
 
 
@@ -69,12 +71,38 @@ class Action(Data):
         self.act_id = data["act_id"]
         self.tag = data["tag"]
 
-    def apply_to(self, scene_state, debug=False):
+    def check_preconditions(self, scene_state):
+        # type: (SceneState) -> Tuple(bool, str)
+        """Checks if the action can be applied to a scene state.
+
+        This function can be used to check if the action can be applied to a scene state.
+        It can be used to ensure consistancy of the scene state before applying an action.
+
+        Default implementation always returns True. Child classes can override this function
+        to implement their own preconditions. This function must not modify the scene state.
+
+        Parameters
+        ----------
+        scene_state : :class:`compas_fab.planning.SceneState`
+            The scene state to apply the action to.
+
+        Returns
+        -------
+        Tuple(bool, str)
+            A tuple of a boolean and a string.
+            The boolean indicates if the action can be applied to the scene state.
+            The string is a human readable message that describes the reason for failure.
+        """
+        return (True, None)
+
+    def apply_effects(self, scene_state, debug=False):
         # type: (SceneState, bool) -> None
         """Applies the action to a scene state.
+
         This method is called by the assembly process to apply the action to the scene state.
+        The SceneState object is modified in place.
         """
-        raise NotImplementedError("Action.apply_to() is not implemented by %s." % type(self))
+        raise NotImplementedError("Action.apply_effects() is not implemented by %s." % type(self))
 
 
 class RoboticAction(Action):
@@ -95,7 +123,7 @@ class RoboticAction(Action):
     When applied to a scene state, Robotic movements also changes the state of the
     attached tool and workpiece. If the trajectory have been planned, the configuration
     of the robot is updated to the last configuration of the trajectory. See
-    :meth:`compas_fab.planning.RoboticAction.apply_to` for more details.
+    :meth:`compas_fab.planning.RoboticAction.apply_effects` for more details.
 
     Attributes (Before Planning)
     ----------------------------
@@ -181,7 +209,7 @@ class RoboticAction(Action):
         self.planner_seed = data.get("planner_seed", self.planner_seed)
         self.speed_data_id = data.get("speed_data_id", self.speed_data_id)
 
-    def apply_to(self, scene_state, debug=False):
+    def apply_effects(self, scene_state, debug=False):
         # type: (SceneState, bool) -> None
         """Applies the action to a scene state.
 
@@ -216,15 +244,13 @@ class RoboticAction(Action):
             )
             if debug:
                 print("- Attached Tool %s Followed." % attached_tool_id)
+
         # Transform attached workpieces
         attached_workpiece_id = scene_state.get_attached_workpiece_id()
         if attached_workpiece_id is not None:
             attached_workpiece = scene_state.get_workpiece_state(attached_workpiece_id)
-            assert (
-                attached_workpiece.attached_to_tool_id == attached_tool_id
-            ), "Inconsistency: Attached workpiece must be attached to the attached tool."
             attached_workpiece.frame = Frame.from_transformation(
-                Transformation.from_frame(attached_tool_state.frame) * attached_workpiece.attached_to_tool_grasp
+                Transformation.from_frame(robot_state.frame) * attached_workpiece.attached_to_robot_grasp
             )
             if debug:
                 print("- Attached Workpiece %s Followed." % attached_workpiece_id)
@@ -304,7 +330,9 @@ class FreeMotion(RoboticAction):
     @data.setter
     def data(self, data):
         super(FreeMotion, type(self)).data.fset(self, data)
-        self.intermediate_planning_waypoint = data.get("intermediate_planning_waypoint", self.intermediate_planning_waypoint)
+        self.intermediate_planning_waypoint = data.get(
+            "intermediate_planning_waypoint", self.intermediate_planning_waypoint
+        )
         self.smoothing_required = data.get("smoothing_required", self.smoothing_required)
         self.smoothing_keep_waypoints = data.get("smoothing_keep_waypoints", self.smoothing_keep_waypoints)
 
@@ -320,19 +348,49 @@ class OpenGripper(Action):
     It is possible to open the gripper with or without a workpiece attached.
     """
 
-    def __init__(self):
+    def __init__(self, tool_id = None, ):
         super(OpenGripper, self).__init__()
+        self.tool_id = tool_id  # type: Frame
 
     @property
     def data(self):
         data = super(OpenGripper, self).data
+        data["tool_id"] = self.tool_id
         return data
 
     @data.setter
     def data(self, data):
         super(OpenGripper, type(self)).data.fset(self, data)
+        self.tool_id = data.get("tool_id", self.tool_id)
 
-    def apply_to(self, scene_state, debug=False):
+    def check_preconditions(self, scene_state):
+        # type: (SceneState) -> Tuple(bool, str)
+        """Checks if the action can be applied to a scene state.
+
+        This function does not change the scene state.
+
+        Parameters
+        ----------
+        scene_state : :class:`compas_fab.planning.SceneState`
+            The scene state to apply the action to.
+
+        Returns
+        -------
+        Tuple(bool, str)
+            A tuple of a boolean and a string.
+            The boolean indicates if the action can be applied to the scene state.
+            The string is a human readable message that describes the reason for failure.
+        """
+        attached_tool_id = scene_state.get_attached_tool_id()
+        if attached_tool_id is None:
+            return (False, "Inconsistency: No tool attached to robot.")
+        if self.tool_id != attached_tool_id:
+            return (False, "Inconsistency: OpenGripper.tool_id does not match the attached tool id.")
+        # attached_tool_state = scene_state.get_tool_state(attached_tool_id)
+        # TODO: Check if tool is a gripper
+        return (True, None)
+
+    def apply_effects(self, scene_state, debug=False):
         # type: (SceneState, bool) -> None
         """Applies the action to a scene state.
 
@@ -344,11 +402,7 @@ class OpenGripper(Action):
         scene_state : :class:`compas_fab.planning.SceneState`
             The scene state to apply the action to.
         """
-        # Transform attached objects
-        attached_tool_id = scene_state.get_attached_tool_id()
-        assert attached_tool_id is not None, "Inconsistency: No tool attached to robot."
-        # attached_tool_state = scene_state.get_tool_state(attached_tool_id)
-        # TODO: Check if tool is a gripper
+
         # TODO: Change the configuration of the gripper to opened
 
         # Transform attached workpieces
@@ -357,8 +411,8 @@ class OpenGripper(Action):
             print("Gripper opened.")
         if attached_workpiece_id is not None:
             attached_workpiece = scene_state.get_workpiece_state(attached_workpiece_id)
-            attached_workpiece.attached_to_tool_id = None
-            attached_workpiece.attached_to_tool_grasp = None
+            attached_workpiece.attached_to_robot = False
+            attached_workpiece.attached_to_robot_grasp = None
             if debug:
                 print("- Workpiece %s detached from tool." % attached_workpiece_id)
 
@@ -372,35 +426,69 @@ class CloseGripper(Action):
     ----------
     tool_id : str
         The id of the gripper tool that is used.
-    attached_workpiece_id : str, optional
+    attaching_workpiece_id : str, optional
         The id of the workpiece attached to the gripper.
-        If the workpiece is not specified, the gripper is assumed to be empty.
-    attached_workpiece_grasp : :class:`compas.geometry.Transformation`, optional
-        The grasp frame of the workpiece relative to the robot flange.
-        If the workpiece_frame is not specified, the workpiece Frame is
-        assumed to be the same as the gripper's TCP.
+        If no workpiece is attached during the gripper closure, None.
+    attaching_workpiece_grasp : :class:`compas.geometry.Transformation`, optional
+        If attaching_workpiece_id is not None, the grasp frame of the workpiece
+        relative to the robot flange. Default is the identity transformation.
+        If attaching_workpiece_id is None, this attribute is meaningless.
     """
 
-    def __init__(self):
+    def __init__(self, tool_id = None, attaching_workpiece_id=None, attaching_workpiece_grasp=Transformation()):
         super(CloseGripper, self).__init__()
-        self.tool_id = None  # type: Frame
-        self.attached_workpiece_id = None  # type: Frame
-        self.attached_workpiece_grasp = None  # type: Frame
+        self.tool_id = tool_id  # type: Frame
+        self.attaching_workpiece_id = attaching_workpiece_id  # type: Optional[str]
+        self.attaching_workpiece_grasp = attaching_workpiece_grasp  # type: Optional[Transformation]
 
     @property
     def data(self):
         data = super(CloseGripper, self).data
-        data["attached_workpiece_id"] = self.attached_workpiece_id
-        data["attached_workpiece_grasp"] = self.attached_workpiece_grasp
+        data["attaching_workpiece_id"] = self.attaching_workpiece_id
+        data["attaching_workpiece_grasp"] = self.attaching_workpiece_grasp
         return data
 
     @data.setter
     def data(self, data):
         super(CloseGripper, type(self)).data.fset(self, data)
-        self.attached_workpiece_id = data.get("attached_workpiece_id", self.attached_workpiece_id)
-        self.attached_workpiece_grasp = data.get("attached_workpiece_grasp", self.attached_workpiece_grasp)
+        self.attaching_workpiece_id = data.get("attaching_workpiece_id", self.attaching_workpiece_id)
+        self.attaching_workpiece_grasp = data.get("attaching_workpiece_grasp", self.attaching_workpiece_grasp)
 
-    def apply_to(self, scene_state, debug=False):
+    def check_preconditions(self, scene_state):
+        # type: (SceneState) -> Tuple(bool, str)
+        """Checks if the action can be applied to a scene state.
+
+        This function does not change the scene state.
+
+        Parameters
+        ----------
+        scene_state : :class:`compas_fab.planning.SceneState`
+            The scene state to apply the action to.
+
+        Returns
+        -------
+        Tuple(bool, str)
+            A tuple of a boolean and a string.
+            The boolean indicates if the action can be applied to the scene state.
+            The string is a human readable message that describes the reason for failure.
+        """
+        attached_tool_id = scene_state.get_attached_tool_id()
+        if attached_tool_id is None:
+            return (False, "Inconsistency: No tool attached to robot.")
+        if self.tool_id != attached_tool_id:
+            return (False, "Inconsistency: CloseGripper.tool_id does not match the attached tool id.")
+        if self.attaching_workpiece_id is not None:
+            attached_workpiece_id = scene_state.get_attached_workpiece_id()
+            if attached_workpiece_id == self.attaching_workpiece_id:
+                return (False, "Inconsistency: Workpiece is already attached to the tool.")
+            if attached_workpiece_id is not None:
+                return (False, "Inconsistency: Another workpiece is already attached to the tool.")
+            if self.attaching_workpiece_id not in scene_state.workpiece_states:
+                return (False, "Inconsistency: Workpiece is not in the scene.")
+        # TODO: Check if tool is a gripper
+        return (True, None)
+
+    def apply_effects(self, scene_state, debug=False):
         # type: (SceneState, bool) -> None
         """Applies the action to a scene state.
 
@@ -412,32 +500,24 @@ class CloseGripper(Action):
         scene_state : :class:`compas_fab.planning.SceneState`
             The scene state to apply the action to.
         """
-        # Transform attached objects
-        attached_tool_id = scene_state.get_attached_tool_id()
-        assert attached_tool_id is not None, "Inconsistency: No tool attached to robot."
-        attached_tool_state = scene_state.get_tool_state(attached_tool_id)
-        # TODO: Check if tool is a gripper
         # TODO: Change the configuration of the gripper to closed
 
         if debug:
             print("Gripper closed.")
         # Transform attached workpieces
-        if self.attached_workpiece_id is not None:
-            existing_workpiece_id = scene_state.get_attached_workpiece_id()
-            assert existing_workpiece_id is None, "Inconsistency: Another workpiece is already attached to the tool."
-            attached_workpiece = scene_state.get_workpiece_state(self.attached_workpiece_id)
+        if self.attaching_workpiece_id is not None:
+            workpiece_state = scene_state.get_workpiece_state(self.attaching_workpiece_id)
             # Update the workpiece grasp and frame
-            attached_workpiece.attached_to_tool_id = attached_tool_id
-            attached_workpiece.attached_to_tool_grasp = self.attached_workpiece_grasp or Transformation()
+            workpiece_state.attached_to_robot = True
+            workpiece_state.attached_to_robot_grasp = self.attaching_workpiece_grasp or Transformation()
+            robot_flange_frame = scene_state.get_robot_state().frame
+            workpiece_state.frame = Frame.from_transformation(
+                Transformation.from_frame(robot_flange_frame) * workpiece_state.attached_to_robot_grasp)
             if debug:
-                print("- Workpiece %s attached to tool." % self.attached_workpiece_id)
-            # attached_workpiece.frame = attached_tool_state.frame * attached_workpiece.attached_to_tool_grasp
-            attached_workpiece.frame = Frame.from_transformation(
-                Transformation.from_frame(attached_tool_state.frame) * attached_workpiece.attached_to_tool_grasp
-            )
+                print("- Workpiece %s attached to tool." % self.attaching_workpiece_id)
 
 
-class LoadWorkpiece(Action):
+class ManuallyMoveWorkpiece(Action):
     """Action to load a workpiece, assumed to be performed by a human operator.
     This moves the workpiece to a specific frame.
     Typically used for loading a workpiece into a gripper.
@@ -446,28 +526,56 @@ class LoadWorkpiece(Action):
     Attributes
     ----------
     workpiece_id : str
-        The id of the workpiece to be loaded.
+        The id of the workpiece to be moved.
+    frame : :class:`compas.geometry.Frame`
+        The frame of the workpiece at the target location.
+        Specified in world coordinate frame.
     """
 
-    def __init__(self):
-        super(LoadWorkpiece, self).__init__()
-        self.workpiece_id = None  # type: str
-        self.frame = None  # type: Frame
+    def __init__(self, workpiece_id=None, frame=Frame.worldXY()):
+        super(ManuallyMoveWorkpiece, self).__init__()
+        self.workpiece_id = workpiece_id  # type: str
+        self.frame = frame  # type: Frame
 
     @property
     def data(self):
-        data = super(LoadWorkpiece, self).data
+        data = super(ManuallyMoveWorkpiece, self).data
         data["workpiece_id"] = self.workpiece_id
         data["frame"] = self.frame
         return data
 
     @data.setter
     def data(self, data):
-        super(LoadWorkpiece, type(self)).data.fset(self, data)
+        super(ManuallyMoveWorkpiece, type(self)).data.fset(self, data)
         self.workpiece_id = data.get("workpiece_id", self.workpiece_id)
         self.frame = data.get("frame", self.frame)
 
-    def apply_to(self, scene_state, debug=False):
+    def check_preconditions(self, scene_state):
+        # type: (SceneState) -> Tuple(bool, str)
+        """Checks if the action can be applied to a scene state.
+
+        This function does not change the scene state.
+
+        Parameters
+        ----------
+        scene_state : :class:`compas_fab.planning.SceneState`
+            The scene state to apply the action to.
+
+        Returns
+        -------
+        Tuple(bool, str)
+            A tuple of a boolean and a string.
+            The boolean indicates if the action can be applied to the scene state.
+            The string is a human readable message that describes the reason for failure.
+        """
+        if self.workpiece_id not in scene_state.workpiece_states:
+            return (False, "Inconsistency: Workpiece is not in the scene.")
+        workpiece_state = scene_state.get_workpiece_state(self.workpiece_id)
+        if workpiece_state.attached_to_robot is True:
+            return (False, "Inconsistency: Workpiece is already attached to the robot.")
+        return (True, None)
+
+    def apply_effects(self, scene_state, debug=False):
         # type: (SceneState, bool) -> None
         """Applies the action to a scene state.
         The SceneState is updated with the new robot state.
@@ -479,8 +587,6 @@ class LoadWorkpiece(Action):
         """
         # Transform attached objects
         workpiece_state = scene_state.get_workpiece_state(self.workpiece_id)
-        assert workpiece_state.attached_to_tool_id is None, "Inconsistency: Workpiece is already attached to a tool."
         workpiece_state.frame = self.frame
         if debug:
             print("Workpiece %s loaded to new location." % self.workpiece_id)
-

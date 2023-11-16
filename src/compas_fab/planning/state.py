@@ -64,8 +64,6 @@ class SceneState(Data):
             self.workpiece_states[workpiece_id] = WorkpieceState(workpiece_id)
         for tool_id in tool_ids:
             self.tool_states[tool_id] = ToolState(tool_id)
-        self.workpiece_states["s"].attached_to_tool_grasp
-        self.tool_states["s"].attached_to_robot_grasp
 
     @property
     def data(self):
@@ -136,7 +134,7 @@ class SceneState(Data):
         If no workpiece is attached, `None` is returned.
         """
         for workpiece_id, workpiece_state in self.workpiece_states.items():
-            if workpiece_state.attached_to_tool_id:
+            if workpiece_state.attached_to_robot:
                 return workpiece_id
         return None
 
@@ -153,33 +151,41 @@ class WorkpieceState(Data):
     frame : :class:`compas.geometry.Frame`
         The current location of the workpiece.
         (default: :class:`compas.geometry.Frame.worldXY`)
-    attached_to_tool_id : str or None
-        If the workpiece is attached to a tool, the id of the tool.
-        If the workpiece is not attached to a tool, `None`. (default: `None`)
-    attached_to_tool_grasp : :class:`compas.geometry.Transformation`
-        If the workpiece is attached to a tool, the grasp frame of the workpiece.
+    attached_to_robot : bool
+        If the workpiece is attached to the robot, `True`. Else, `False`.
+    attached_to_robot_grasp : :class:`compas.geometry.Transformation`, optional
+        The grasp transformation of the workpiece if it is attached to the robot. The grasp
+        is defined as the transformation that can transform the robot flange frame
+        into the workpiece frame.
         If not specified, defaults to the identity transformation.
-        If the workpiece is not attached to a tool, `None`.
+        If the workpiece is not attached to the robot, `None`.
     is_hidden : bool
         If the workpiece is hidden, `True`. Else, `False`. (default: `False`)
         A hidden workpiece will not be included for collision detection of the scene.
     """
 
-    def __init__(self, workpiece_id="undefined_workpiece"):
+    def __init__(
+        self,
+        workpiece_id="undefined_workpiece",
+        frame=None,
+        attached_to_robot=False,
+        attached_to_robot_grasp=Transformation(),
+        is_hidden=False,
+    ):
         super(WorkpieceState, self).__init__()
         self.workpiece_id = workpiece_id
-        self.frame = Frame.worldXY()  # type: Frame
-        self.attached_to_tool_id = None  # type: Optional[str]
-        self.attached_to_tool_grasp = Transformation()  # type: Optional[Transformation]
-        self.is_hidden = False  # type: bool
+        self.frame = frame or Frame.worldXY()  # type: Frame
+        self.attached_to_robot = attached_to_robot  # type: Optional[str]
+        self.attached_to_robot_grasp = attached_to_robot_grasp  # type: Optional[Transformation]
+        self.is_hidden = is_hidden  # type: bool
 
     @property
     def data(self):
         data = {}
         data["workpiece_id"] = self.workpiece_id
         data["frame"] = self.frame
-        data["attached_to_tool_id"] = self.attached_to_tool_id
-        data["attached_to_tool_grasp"] = self.attached_to_tool_grasp
+        data["attached_to_robot"] = self.attached_to_robot
+        data["attached_to_robot_grasp"] = self.attached_to_robot_grasp
         data["is_hidden"] = self.is_hidden
         return data
 
@@ -187,8 +193,8 @@ class WorkpieceState(Data):
     def data(self, data):
         self.workpiece_id = data.get("workpiece_id", self.workpiece_id)
         self.frame = data.get("frame", self.frame)
-        self.attached_to_tool_id = data.get("attached_to_tool_id", self.attached_to_tool_id)
-        self.attached_to_tool_grasp = data.get("attached_to_tool_grasp", self.attached_to_tool_grasp)
+        self.attached_to_robot = data.get("attached_to_robot", self.attached_to_robot)
+        self.attached_to_robot_grasp = data.get("attached_to_robot_grasp", self.attached_to_robot_grasp)
         self.is_hidden = data.get("is_hidden", self.is_hidden)
 
 
@@ -203,21 +209,22 @@ class ToolState(Data):
     tool_id : str
         Unique identifier of the tool used in Process.tools and SceneState.tool_states.
     frame : :class:`compas.geometry.Frame`
-        The current location of the tool.
+        The current location of the base frame of the tool.
     attached_to_robot : bool
         If the tool is attached to a robot, `True`. Else, `False`.
     attached_to_robot_grasp : :class:`compas.geometry.Transformation`
         If the tool is attached to a robot, the base frame of the tool relative to the robot flange.
+        Defaults to the identity transformation.
     configuration : :class:`compas.robots.Configuration`, optional
         If the tool is kinematic, the current configuration of the tool.
     """
 
-    def __init__(self, tool_id="undefined_tool", configuration=None):
+    def __init__(self, tool_id="undefined_tool", frame=None, attached_to_robot_grasp=None, configuration=None):
         super(ToolState, self).__init__()
         self.tool_id = tool_id
-        self.frame = Frame.worldXY()  # type: Frame
+        self.frame = frame or Frame.worldXY()  # type: Frame
         self.attached_to_robot = False  # type: bool
-        self.attached_to_robot_grasp = None  # type: Optional[Transformation]
+        self.attached_to_robot_grasp = attached_to_robot_grasp or Transformation()  # type: Transformation
         self.configuration = configuration  # type: Optional[Configuration]
 
     @property

@@ -40,7 +40,7 @@ workpieces in the scene. Action classes are used for modelling a process for the
     FreeMotion
     OpenGripper
     CloseGripper
-    LoadWorkpiece
+    ManuallyMoveWorkpiece
 
 State
 -----
@@ -72,11 +72,11 @@ actions in the process. See tutorial on :ref:`planning_process` for more details
 from .action import (
     Action,
     RoboticAction,
-    LinearMovement,
+    CartesianMotion,
     FreeMotion,
     OpenGripper,
     CloseGripper,
-    LoadWorkpiece,
+    ManuallyMoveWorkpiece,
 )
 
 from .state import (
@@ -89,11 +89,11 @@ from .state import (
 __all__ = [
     "Action",
     "RoboticAction",
-    "LinearMovement",
+    "CartesianMotion",
     "FreeMotion",
     "OpenGripper",
     "CloseGripper",
-    "LoadWorkpiece",
+    "ManuallyMoveWorkpiece",
     "SceneState",
     "WorkpieceState",
     "ToolState",
