@@ -35,9 +35,9 @@ workpieces in the scene. Action classes are used for modelling a process for the
     :nosignatures:
 
     Action
-    RoboticMovement
+    RoboticAction
     LinearMovement
-    FreeMovement
+    FreeMotion
     OpenGripper
     CloseGripper
     LoadWorkpiece
@@ -71,9 +71,9 @@ actions in the process. See tutorial on :ref:`planning_process` for more details
 
 from .action import (
     Action,
-    RoboticMovement,
+    RoboticAction,
     LinearMovement,
-    FreeMovement,
+    FreeMotion,
     OpenGripper,
     CloseGripper,
     LoadWorkpiece,
@@ -88,9 +88,9 @@ from .state import (
 
 __all__ = [
     "Action",
-    "RoboticMovement",
+    "RoboticAction",
     "LinearMovement",
-    "FreeMovement",
+    "FreeMotion",
     "OpenGripper",
     "CloseGripper",
     "LoadWorkpiece",

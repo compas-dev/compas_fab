@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added `compas_fab.planning` that contains `Action` classes and `SceneState`
+* Added `RoboticAction`, `CartesianMotion`, `FreeMotion`, `OpenGripper` and `CloseGripper`.
+* Added `SceneState` as container for `WorkpieceState`, `ToolState` and `RobotState`.
+
 ### Changed
 
 * `CollisionMesh` now inherit from `compas.data.Data`

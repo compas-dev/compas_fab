@@ -17,9 +17,9 @@ except ImportError:
 
 __all__ = [
     "Action",
-    "RoboticMovement",
-    "CartesianMovement",
-    "FreeMovement",
+    "RoboticAction",
+    "CartesianMotion",
+    "FreeMotion",
     "OpenGripper",
     "CloseGripper",
 ]
@@ -37,7 +37,7 @@ class Action(Data):
 
     Actions are closely related to the :class:`compas_fab.planning.SceneState` because each action changes the scene state.
     Provided with an starting scene state, the actions can be *applied to* create the ending scene state.
-    The only exception are robotic configurations that are changed by :class:`compas_fab.planning.RoboticMovement` actions.
+    The only exception are robotic configurations that are changed by :class:`compas_fab.planning.RoboticAction` actions.
     Those actions changes the robot configuration and their effect is not known until after the planning process.
 
     Attributes
@@ -77,25 +77,25 @@ class Action(Data):
         raise NotImplementedError("Action.apply_to() is not implemented by %s." % type(self))
 
 
-class RoboticMovement(Action):
+class RoboticAction(Action):
     """Base class for all robotic movements.
 
     Robotic movements are actions that changes the robot configuration and
     hence also the frame of the robot flange and all attached tools and workpieces.
 
-    The RoboticMovement class only describes the target (ending state)
+    The RoboticAction class only describes the target (ending state)
     of the robotic movement, whereas the starting state is defined using a
     :class:`compas_fab.planning.SceneState` object. The starting state also
     defines the attached tools and workpieces.
     Both objects are required by the motion planner to plan a trajectory.
 
-    After motion planning, the trajectory can be stored in the same RoboticMovement class
+    After motion planning, the trajectory can be stored in the same RoboticAction class
     and can be used for visualization and execution.
 
     When applied to a scene state, Robotic movements also changes the state of the
     attached tool and workpiece. If the trajectory have been planned, the configuration
     of the robot is updated to the last configuration of the trajectory. See
-    :meth:`compas_fab.planning.RoboticMovement.apply_to` for more details.
+    :meth:`compas_fab.planning.RoboticAction.apply_to` for more details.
 
     Attributes (Before Planning)
     ----------------------------
@@ -135,7 +135,7 @@ class RoboticMovement(Action):
     """
 
     def __init__(self):
-        super(RoboticMovement, self).__init__()
+        super(RoboticAction, self).__init__()
         self.tag = "Generic Action"
 
         # Before Planning
@@ -154,7 +154,7 @@ class RoboticMovement(Action):
 
     @property
     def data(self):
-        data = super(RoboticMovement, self).data
+        data = super(RoboticAction, self).data
         data["tag"] = self.tag
         data["target_robot_flange_frame"] = self.target_robot_flange_frame
         data["allowed_collision_pairs"] = self.allowed_collision_pairs
@@ -168,7 +168,7 @@ class RoboticMovement(Action):
 
     @data.setter
     def data(self, data):
-        super(RoboticMovement, type(self)).data.fset(self, data)
+        super(RoboticAction, type(self)).data.fset(self, data)
         self.tag = data.get("tag", self.tag)
         self.target_robot_flange_frame = data.get("target_robot_flange_frame", self.target_robot_flange_frame)
         self.allowed_collision_pairs = data.get("allowed_collision_pairs", self.allowed_collision_pairs)
@@ -230,7 +230,7 @@ class RoboticMovement(Action):
                 print("- Attached Workpiece %s Followed." % attached_workpiece_id)
 
 
-class CartesianMovement(RoboticMovement):
+class CartesianMotion(RoboticAction):
     """Action class to describe a Cartesian robotic movement.
 
     The trajectory of the robot flange is interpolated in Cartesian space.
@@ -245,27 +245,27 @@ class CartesianMovement(RoboticMovement):
         The first point (the starting point) is not required.
         The second point onwards, including the last point (the ending point) is required.
 
-    see :class:`compas_fab.planning.RoboticMovement` for other attributes.
+    see :class:`compas_fab.planning.RoboticAction` for other attributes.
     """
 
     def __init__(self):
-        super(CartesianMovement, self).__init__()
+        super(CartesianMotion, self).__init__()
         self.polyline_target = []  # type: list(Point)
         self.tag = "Linear Movement"
 
     @property
     def data(self):
-        data = super(CartesianMovement, self).data
+        data = super(CartesianMotion, self).data
         data["polyline_target"] = self.polyline_target
         return data
 
     @data.setter
     def data(self, data):
-        super(CartesianMovement, type(self)).data.fset(self, data)
+        super(CartesianMotion, type(self)).data.fset(self, data)
         self.polyline_target = data.get("polyline_target", self.polyline_target)
 
 
-class FreeMovement(RoboticMovement):
+class FreeMotion(RoboticAction):
     """Action class for free robotic movements.
     Free robotic movements are planned by Free Motion Planners.
 
@@ -283,11 +283,11 @@ class FreeMovement(RoboticMovement):
         If True, the trajectory smoothing algorithm is allowed to remove the provided waypoints. (default: False)
 
 
-    see :class:`compas_fab.planning.RoboticMovement` for other attributes.
+    see :class:`compas_fab.planning.RoboticAction` for other attributes.
     """
 
     def __init__(self):
-        super(FreeMovement, self).__init__()
+        super(FreeMotion, self).__init__()
         self.intermediate_planning_waypoint = []  # type: list(Configuration)
         self.smoothing_required = True
         self.smoothing_keep_waypoints = False
@@ -295,7 +295,7 @@ class FreeMovement(RoboticMovement):
 
     @property
     def data(self):
-        data = super(FreeMovement, self).data
+        data = super(FreeMotion, self).data
         data["intermediate_planning_waypoint"] = self.intermediate_planning_waypoint
         data["smoothing_required"] = self.smoothing_required
         data["smoothing_keep_waypoints"] = self.smoothing_keep_waypoints
@@ -303,7 +303,7 @@ class FreeMovement(RoboticMovement):
 
     @data.setter
     def data(self, data):
-        super(FreeMovement, type(self)).data.fset(self, data)
+        super(FreeMotion, type(self)).data.fset(self, data)
         self.intermediate_planning_waypoint = data.get("intermediate_planning_waypoint", self.intermediate_planning_waypoint)
         self.smoothing_required = data.get("smoothing_required", self.smoothing_required)
         self.smoothing_keep_waypoints = data.get("smoothing_keep_waypoints", self.smoothing_keep_waypoints)
