@@ -1,5 +1,6 @@
 from compas.data import Data
 from compas.geometry import Frame
+from compas.geometry import Point  # noqa: F401
 from compas.geometry import Transformation
 
 from compas_fab.robots import Configuration, JointTrajectory  # noqa: F401
@@ -275,7 +276,7 @@ class CartesianMotion(RoboticAction):
 
     def __init__(self):
         super(CartesianMotion, self).__init__()
-        self.polyline_target = []  # type: list(Point)
+        self.polyline_target = []  # type: list[Point]
         self.tag = "Linear Movement"
 
     @property
