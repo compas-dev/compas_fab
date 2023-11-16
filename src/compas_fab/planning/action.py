@@ -1,5 +1,4 @@
 from compas.data import Data
-from compas.geometry import Point
 from compas.geometry import Frame
 from compas.geometry import Transformation
 
@@ -348,7 +347,7 @@ class OpenGripper(Action):
     It is possible to open the gripper with or without a workpiece attached.
     """
 
-    def __init__(self, tool_id = None, ):
+    def __init__(self, tool_id=None):
         super(OpenGripper, self).__init__()
         self.tool_id = tool_id  # type: Frame
 
@@ -435,7 +434,7 @@ class CloseGripper(Action):
         If attaching_workpiece_id is None, this attribute is meaningless.
     """
 
-    def __init__(self, tool_id = None, attaching_workpiece_id=None, attaching_workpiece_grasp=Transformation()):
+    def __init__(self, tool_id=None, attaching_workpiece_id=None, attaching_workpiece_grasp=Transformation()):
         super(CloseGripper, self).__init__()
         self.tool_id = tool_id  # type: Frame
         self.attaching_workpiece_id = attaching_workpiece_id  # type: Optional[str]
@@ -512,7 +511,8 @@ class CloseGripper(Action):
             workpiece_state.attached_to_robot_grasp = self.attaching_workpiece_grasp or Transformation()
             robot_flange_frame = scene_state.get_robot_state().frame
             workpiece_state.frame = Frame.from_transformation(
-                Transformation.from_frame(robot_flange_frame) * workpiece_state.attached_to_robot_grasp)
+                Transformation.from_frame(robot_flange_frame) * workpiece_state.attached_to_robot_grasp
+            )
             if debug:
                 print("- Workpiece %s attached to tool." % self.attaching_workpiece_id)
 
