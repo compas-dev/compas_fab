@@ -213,7 +213,7 @@ class RoboticAction(Action):
         # type: (SceneState, bool) -> None
         """Applies the action to a scene state.
 
-        The SceneState is updated with the new robot state.
+        The SceneState is modified in place with the effect of the Action.
         If a fixed_trajectory or planned_trajectory is available, the robot_state.configuration is updated with the last configuration of the trajectory.
         If fixed_target_configuration is available, the robot_state.configuration is updated with the fixed_target_configuration.
 
@@ -394,7 +394,7 @@ class OpenGripper(Action):
         # type: (SceneState, bool) -> None
         """Applies the action to a scene state.
 
-        The SceneState is updated with the new robot state.
+        The SceneState is modified in place with the effect of the Action.
         It is possible to open the gripper with or without a workpiece attached.
 
         Parameters
@@ -492,7 +492,7 @@ class CloseGripper(Action):
         # type: (SceneState, bool) -> None
         """Applies the action to a scene state.
 
-        The SceneState is updated with the new robot state.
+        The SceneState is modified in place with the effect of the Action.
         It is possible to open the gripper with or without a workpiece attached.
 
         Parameters
@@ -519,7 +519,7 @@ class CloseGripper(Action):
 
 
 class ManuallyMoveWorkpiece(Action):
-    """Action to load a workpiece, assumed to be performed by a human operator.
+    """Operator action to move a workpiece from one place to another.
     This moves the workpiece to a specific frame.
     Typically used for loading a workpiece into a gripper.
     Can also be used to model the manual attachment of scaffolding (modeled as a :class:`Workpiece`)
@@ -579,7 +579,8 @@ class ManuallyMoveWorkpiece(Action):
     def apply_effects(self, scene_state, debug=False):
         # type: (SceneState, bool) -> None
         """Applies the action to a scene state.
-        The SceneState is updated with the new robot state.
+
+        The SceneState is modified in place with the effect of the Action.
 
         Parameters
         ----------
@@ -591,3 +592,161 @@ class ManuallyMoveWorkpiece(Action):
         workpiece_state.frame = self.frame
         if debug:
             print("Workpiece %s loaded to new location." % self.workpiece_id)
+
+
+class HideWorkpieces(Action):
+    """Action to hide workpieces. Can be used to model objects that are removed the scene.
+
+    This changes the WorkpieceState.is_hidden property.
+    Can also be used to model the manual detachment of scaffolding (modeled as a :class:`Workpiece`)
+
+    Attributes
+    ----------
+    workpiece_ids : list(str)
+        List of workpiece ids to be hidden.
+    """
+
+    def __init__(self, workpiece_ids=[]):
+        super(HideWorkpieces, self).__init__()
+        self.workpiece_ids = workpiece_ids  # type: list[str]
+
+    @property
+    def data(self):
+        data = super(HideWorkpieces, self).data
+        data["workpiece_ids"] = self.workpiece_ids
+        return data
+
+    @data.setter
+    def data(self, data):
+        super(HideWorkpieces, type(self)).data.fset(self, data)
+        self.workpiece_ids = data.get("workpiece_ids", self.workpiece_ids)
+
+    def check_preconditions(self, scene_state):
+        # type: (SceneState) -> Tuple(bool, str)
+        """Checks if the action can be applied to a scene state.
+
+        All the workpiece_ids must be:
+        - in the scene
+        - not hidden
+        - not attached to the robot
+
+        This function does not change the scene state.
+
+        Parameters
+        ----------
+        scene_state : :class:`compas_fab.planning.SceneState`
+            The scene state to apply the action to.
+
+        Returns
+        -------
+        Tuple(bool, str)
+            A tuple of a boolean and a string.
+            The boolean indicates if the action can be applied to the scene state.
+            The string is a human readable message that describes the reason for failure.
+        """
+        for workpiece_id in self.workpiece_ids:
+            if workpiece_id not in scene_state.workpiece_states:
+                return (False, "Inconsistency: Workpiece %s is not in the scene." % workpiece_id)
+            workpiece_state = scene_state.get_workpiece_state(workpiece_id)
+            if workpiece_state.is_hidden:
+                return (False, "Inconsistency: Workpiece %s is already hidden." % workpiece_id)
+            if workpiece_state.attached_to_robot:
+                return (False, "Inconsistency: Workpiece %s is attached to the robot." % workpiece_id)
+
+        return (True, None)
+
+    def apply_effects(self, scene_state, debug=False):
+        # type: (SceneState, bool) -> None
+        """Applies the action to a scene state.
+
+        The SceneState is modified in place with the effect of the Action.
+
+        Parameters
+        ----------
+        scene_state : :class:`compas_fab.planning.SceneState`
+            The scene state to apply the action to.
+        """
+        for workpiece_id in self.workpiece_ids:
+            workpiece_state = scene_state.get_workpiece_state(workpiece_id)
+            workpiece_state.is_hidden = True
+            if debug:
+                print("Workpiece %s is hidden." % workpiece_id)
+
+
+class ShowWorkpieces(Action):
+    """Action to show workpieces. Can be used to model objects that are added to the scene.
+
+    This changes the WorkpieceState.is_hidden property.
+    Can also be used to model the manual attachment of scaffolding (modeled as a :class:`Workpiece`)
+
+    Attributes
+    ----------
+    workpiece_ids : list(str)
+        List of workpiece ids to be shown.
+    """
+
+    def __init__(self, workpiece_ids=[]):
+        super(ShowWorkpieces, self).__init__()
+        self.workpiece_ids = workpiece_ids  # type: list[str]
+
+    @property
+    def data(self):
+        data = super(ShowWorkpieces, self).data
+        data["workpiece_ids"] = self.workpiece_ids
+        return data
+
+    @data.setter
+    def data(self, data):
+        super(ShowWorkpieces, type(self)).data.fset(self, data)
+        self.workpiece_ids = data.get("workpiece_ids", self.workpiece_ids)
+
+    def check_preconditions(self, scene_state):
+        # type: (SceneState) -> Tuple(bool, str)
+        """Checks if the action can be applied to a scene state.
+
+        All the workpiece_ids must be:
+        - in the scene
+        - hidden
+        - not attached to the robot
+
+        This function does not change the scene state.
+
+        Parameters
+        ----------
+        scene_state : :class:`compas_fab.planning.SceneState`
+            The scene state to apply the action to.
+
+        Returns
+        -------
+        Tuple(bool, str)
+            A tuple of a boolean and a string.
+            The boolean indicates if the action can be applied to the scene state.
+            The string is a human readable message that describes the reason for failure.
+        """
+        for workpiece_id in self.workpiece_ids:
+            if workpiece_id not in scene_state.workpiece_states:
+                return (False, "Inconsistency: Workpiece %s is not in the scene." % workpiece_id)
+            workpiece_state = scene_state.get_workpiece_state(workpiece_id)
+            if not workpiece_state.is_hidden:
+                return (False, "Inconsistency: Workpiece %s is not hidden." % workpiece_id)
+            if workpiece_state.attached_to_robot:
+                return (False, "Inconsistency: Workpiece %s is attached to the robot." % workpiece_id)
+
+        return (True, None)
+
+    def apply_effects(self, scene_state, debug=False):
+        # type: (SceneState, bool) -> None
+        """Applies the action to a scene state.
+
+        The SceneState is modified in place with the effect of the Action.
+
+        Parameters
+        ----------
+        scene_state : :class:`compas_fab.planning.SceneState`
+            The scene state to apply the action to.
+        """
+        for workpiece_id in self.workpiece_ids:
+            workpiece_state = scene_state.get_workpiece_state(workpiece_id)
+            workpiece_state.is_hidden = False
+            if debug:
+                print("Workpiece %s is shown." % workpiece_id)

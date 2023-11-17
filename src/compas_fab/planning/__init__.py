@@ -23,7 +23,7 @@ action, and so on. See tutorial on :ref:`planning_process` for more details.
 Actions
 --------
 
-Actions are abstractions of the robot's (and, or operator's) capability to manupulate tools and
+Action classes are abstractions of the robot's (and, or the operator's) capability to manupulate tools and
 workpieces in the scene. Action classes are used for modelling a process for the following purpose:
 
 * To plan trajectories for robotic motions
@@ -42,8 +42,8 @@ workpieces in the scene. Action classes are used for modelling a process for the
     CloseGripper
     ManuallyMoveWorkpiece
 
-State
------
+States
+------
 
 State classes are used to model the static state of objects in the planning scene. This include:
 :class:`RobotState` for :class:`compas_fab.robots.Robot`,
@@ -77,6 +77,8 @@ from .action import (
     OpenGripper,
     CloseGripper,
     ManuallyMoveWorkpiece,
+    HideWorkpieces,
+    ShowWorkpieces,
 )
 
 from .state import (
@@ -94,6 +96,8 @@ __all__ = [
     "OpenGripper",
     "CloseGripper",
     "ManuallyMoveWorkpiece",
+    "HideWorkpieces",
+    "ShowWorkpieces",
     "SceneState",
     "WorkpieceState",
     "ToolState",
