@@ -75,7 +75,6 @@ The following functions help with converting units from one system to the other.
 
 """
 
-from .configuration import Configuration
 from .constraints import (
     BoundingVolume,
     Constraint,
@@ -126,7 +125,6 @@ __all__ = [
     "AttachedCollisionMesh",
     "BoundingVolume",
     "CollisionMesh",
-    "Configuration",
     "Constraint",
     "Duration",
     "Inertia",
