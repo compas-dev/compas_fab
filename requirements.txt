@@ -1,4 +1,5 @@
-compas >= 1.14 , < 2.0
+compas >= 2.0.0a2, < 3
+compas_robot
 roslibpy >= 1.1.0
 pybullet
 pyserial
