@@ -19,7 +19,7 @@ except ImportError:
 __all__ = [
     "Action",
     "RoboticAction",
-    "CartesianMotion",
+    "LinearMotion",
     "FreeMotion",
     "OpenGripper",
     "CloseGripper",
@@ -256,7 +256,7 @@ class RoboticAction(Action):
                 print("- Attached Workpiece %s Followed." % attached_workpiece_id)
 
 
-class CartesianMotion(RoboticAction):
+class LinearMotion(RoboticAction):
     """Action class to describe a Cartesian robotic movement.
 
     The trajectory of the robot flange is interpolated in Cartesian space.
@@ -275,19 +275,19 @@ class CartesianMotion(RoboticAction):
     """
 
     def __init__(self):
-        super(CartesianMotion, self).__init__()
+        super(LinearMotion, self).__init__()
         self.polyline_target = []  # type: list[Point]
         self.tag = "Linear Movement"
 
     @property
     def data(self):
-        data = super(CartesianMotion, self).data
+        data = super(LinearMotion, self).data
         data["polyline_target"] = self.polyline_target
         return data
 
     @data.setter
     def data(self, data):
-        super(CartesianMotion, type(self)).data.fset(self, data)
+        super(LinearMotion, type(self)).data.fset(self, data)
         self.polyline_target = data.get("polyline_target", self.polyline_target)
 
 

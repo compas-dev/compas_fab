@@ -72,7 +72,7 @@ actions in the process. See tutorial on :ref:`planning_process` for more details
 from .action import (
     Action,
     RoboticAction,
-    CartesianMotion,
+    LinearMotion,
     FreeMotion,
     OpenGripper,
     CloseGripper,
@@ -91,7 +91,7 @@ from .state import (
 __all__ = [
     "Action",
     "RoboticAction",
-    "CartesianMotion",
+    "LinearMotion",
     "FreeMotion",
     "OpenGripper",
     "CloseGripper",

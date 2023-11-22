@@ -90,13 +90,13 @@ def trj():
 def test_action_members():
     # Test child class of Action
     assert isinstance(RoboticAction(), Action)
-    assert isinstance(CartesianMotion(), Action)
+    assert isinstance(LinearMotion(), Action)
     assert isinstance(FreeMotion(), Action)
     assert isinstance(OpenGripper(), Action)
     assert isinstance(CloseGripper(), Action)
     assert isinstance(ManuallyMoveWorkpiece(), Action)
     # Test child class of RoboticAction
-    assert isinstance(CartesianMotion(), RoboticAction)
+    assert isinstance(LinearMotion(), RoboticAction)
     assert isinstance(FreeMotion(), RoboticAction)
 
 
