@@ -24,6 +24,8 @@ __all__ = [
     "OpenGripper",
     "CloseGripper",
     "ManuallyMoveWorkpiece",
+    "HideWorkpieces",
+    "ShowWorkpieces",
 ]
 
 
