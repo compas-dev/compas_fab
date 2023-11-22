@@ -257,38 +257,44 @@ class RoboticAction(Action):
 
 
 class LinearMotion(RoboticAction):
-    """Action class to describe a Cartesian robotic movement.
+    """Action class to describe a Linear robotic movement.
 
-    The trajectory of the robot flange is interpolated in Cartesian space.
+    A linear robotic movement moves the robot flange linearly in Cartesian space. The motion can
+    contain multiple linear segments (see intermediate_targets attribute).
+
     Typically, the orientation between the starting frame and the target frame is the same.
-    However some linear motion planners can interpolate between different orientations.
+    However some linear motion planners can also interpolate between different orientations, check
+    the documentation of the planner for more details.
+
 
     Attributes
     ----------
-    polyline_target : list(:class:`compas.geometry.Point`)
-        List of points to define a linear movement that is a polyline.
-        Specified in world coordinate frame.
-        The first point (the starting point) is not required.
-        The second point onwards, including the last point (the ending point) is required.
+    intermediate_targets : list(:class:`compas.geometry.Frame`), optional
+        List of frames to define a linear movement that has multiple linear segments.
+        The frames are specified in the world coordinate frame.
+        Note that only the intermediate targets are specified, the starting and ending frames
+        should not be included in this list. The ending frame is specified by the target_robot_flange_frame attribute.
+
+        Default is an empty list, meaning the movement only has a single linear segment.
 
     see :class:`compas_fab.planning.RoboticAction` for other attributes.
     """
 
     def __init__(self):
         super(LinearMotion, self).__init__()
-        self.polyline_target = []  # type: list[Point]
+        self.intermediate_targets = []  # type: Optional[list[Point]]
         self.tag = "Linear Movement"
 
     @property
     def data(self):
         data = super(LinearMotion, self).data
-        data["polyline_target"] = self.polyline_target
+        data["intermediate_targets"] = self.intermediate_targets
         return data
 
     @data.setter
     def data(self, data):
         super(LinearMotion, type(self)).data.fset(self, data)
-        self.polyline_target = data.get("polyline_target", self.polyline_target)
+        self.intermediate_targets = data.get("intermediate_targets", self.intermediate_targets)
 
 
 class FreeMotion(RoboticAction):
