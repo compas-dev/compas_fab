@@ -15,7 +15,7 @@ from compas_fab.robots import JointTrajectoryPoint
 
 from compas_fab.planning import Action
 from compas_fab.planning import RoboticAction
-from compas_fab.planning import CartesianMotion
+from compas_fab.planning import LinearMotion
 from compas_fab.planning import FreeMotion
 from compas_fab.planning import OpenGripper
 from compas_fab.planning import CloseGripper
