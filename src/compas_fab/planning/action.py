@@ -35,12 +35,17 @@ class Action(Data):
     The Action Classes are intended to be used to model the actions of a human operator or a robot.
     Current Implementation assumes discrete actions that are executed sequentially, aka. one after another.
 
-    Actions can be created automatically or manually. They are stored in a :class:`compas_fab.planning.Processs`.
+    Actions can be created automatically or manually. They are stored in a :class:`compas_fab.planning.FabricationProcess`.
     Some actions contain references to workpieces, tools, or other objects in the scene. Those objects are
-    stored in dictionaries under the Process object and are identified by their id.
+    stored in dictionaries under the FabricationProcess object and are identified by their id.
 
     Actions are closely related to the :class:`compas_fab.planning.SceneState` because each action changes the scene state.
-    Provided with an starting scene state, the actions can be *applied to* create the ending scene state.
+    The actions can be *applied* to a starting scene state to create the ending scene state. This is done by
+    calling the :meth:`compas_fab.planning.Action.apply_effects` method. It is also possible to check if an action can be applied
+    to a scene state by calling the :meth:`compas_fab.planning.Action.check_preconditions` method. Users that implement their own
+    actions must override these methods for the automatic planning function in the Robot class. See
+    :ref:`chained_planning_process` for more details.
+
     The only exception are robotic configurations that are changed by :class:`compas_fab.planning.RoboticAction` actions.
     Those actions changes the robot configuration and their effect is not known until after the planning process.
 
