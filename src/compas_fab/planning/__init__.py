@@ -21,7 +21,7 @@ action, and so on. See tutorial on :ref:`planning_process` for more details.
 
 
 Actions
---------
+-------
 
 Action classes are abstractions of the robot's (and, or the operator's) capability to manupulate tools and
 workpieces in the scene. Action classes are used for modelling a process for the following purpose:
@@ -36,11 +36,13 @@ workpieces in the scene. Action classes are used for modelling a process for the
 
     Action
     RoboticAction
-    LinearMovement
+    LinearMotion
     FreeMotion
     OpenGripper
     CloseGripper
     ManuallyMoveWorkpiece
+    HideWorkpieces
+    ShowWorkpieces
 
 States
 ------
