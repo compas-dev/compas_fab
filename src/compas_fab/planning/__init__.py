@@ -69,6 +69,22 @@ actions in the process. See tutorial on :ref:`planning_process` for more details
     RobotState
 
 
+Fabrication Process
+-------------------
+
+The :class:`FabricationProcess` class is used to model a process. It contains helper methods for
+creating a ordered list of actions that are used for planning and execution. The beining of the
+process is defined by the initial state of the scene, which is a container for the state of all
+objects in the scene (see :class:`SceneState`). The initial state is used to plan the first action
+in the process. The resulting state of the first action is used as the initial state for the next
+action, and so on. See tutorial on :ref:`planning_process` for more details.
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    FabricationProcess
+
 """
 
 from .action import (
@@ -90,6 +106,8 @@ from .state import (
     RobotState,
 )
 
+from .fabrication_process import FabricationProcess
+
 __all__ = [
     "Action",
     "RoboticAction",
@@ -104,4 +122,5 @@ __all__ = [
     "WorkpieceState",
     "ToolState",
     "RobotState",
+    "FabricationProcess",
 ]
