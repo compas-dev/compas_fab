@@ -44,7 +44,7 @@ class Action(Data):
     calling the :meth:`compas_fab.planning.Action.apply_effects` method. It is also possible to check if an action can be applied
     to a scene state by calling the :meth:`compas_fab.planning.Action.check_preconditions` method. Users that implement their own
     actions must override these methods for the automatic planning function in the Robot class. See
-    :ref:`chained_planning_process` for more details.
+    :ref:`Chained Planning Process <chained_planning_process>` for more details.
 
     The only exception are robotic configurations that are changed by :class:`compas_fab.planning.RoboticAction` actions.
     Those actions changes the robot configuration and their effect is not known until after the planning process.
