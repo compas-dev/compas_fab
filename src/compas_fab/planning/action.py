@@ -1,6 +1,7 @@
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Point  # noqa: F401
+from compas.geometry import Plane  # noqa: F401
 from compas.geometry import Transformation
 
 from compas_fab.robots import Configuration, JointTrajectory  # noqa: F401
@@ -13,6 +14,7 @@ except ImportError:
 try:
     from typing import Optional  # noqa: F401
     from typing import Tuple  # noqa: F401
+    from typing import Union  # noqa: F401
 except ImportError:
     pass
 
@@ -264,7 +266,7 @@ class RoboticAction(Action):
 
 
 class LinearMotion(RoboticAction):
-    """Action class to describe a Linear robotic movement.
+    """Action class to describe a Linear Robotic Movement.
 
     A linear robotic movement moves the robot flange linearly in Cartesian space. The motion can
     contain multiple linear segments (see intermediate_targets attribute).
@@ -305,7 +307,7 @@ class LinearMotion(RoboticAction):
 
 
 class FreeMotion(RoboticAction):
-    """Action class for free robotic movements.
+    """Action class to describe a Free Robotic Motion.
     Free robotic movements are planned by Free Motion Planners.
 
     Attributes
@@ -348,6 +350,69 @@ class FreeMotion(RoboticAction):
         )
         self.smoothing_required = data.get("smoothing_required", self.smoothing_required)
         self.smoothing_keep_waypoints = data.get("smoothing_keep_waypoints", self.smoothing_keep_waypoints)
+
+
+class UnderconstrainedMotion(RoboticAction):
+    """Action to describe an Underconstrained robotic movement.
+
+    The only type of underconstrained motion currently supported is a trajectory that
+    is defined with a list of :class:`compas.geometry.Plane`, each of them is eqivalent to a
+    5 DOF target where the tool tip and the tool's normal axis is fixed. However, the rotation
+    of the tool around the tool's normal axis is not fixed. This is also called a Point-Axis target.
+
+    Underconstrained motions can be used to model processes where the tool's orientation
+    around the tool's normal axis is not important. For example, when using a drilling tool,
+    a screwdriver, a 3D printing extruder or a welding tool. Modeling these processes
+    using the Underconstrained Motion (compared to :class:`compas_fab.planning.LinearMotion`)
+    can improve the chance of finding a feasible solution with the motion planner. This is
+    because the motion planner has more freedom to find a configuration that can reach the target
+    while avoiding collisions and joint limits.
+
+    Different from the :class:`compas_fab.planning.LinearMotion`, the underconstrained motion
+    definition requires the tool's grasp transformation. The free-rotate axis is defined
+    as the Z axis of the tool's target frame (aka. Tool Coordinate Frame). See :ref:`tool_coordinate_frames`
+    for more details.
+
+
+    Attributes
+    ----------
+    target_robot_flange_frame: :class:`compas.geometry.Plane` or :class:`compas.geometry.Frame`
+
+    target_tool_coordinate_frame:
+        The last target of the trajectory. Can be defined using Plane or Frame in world coordinate frame.
+        If Plane is used, the rotation of the tool at the final step is not fixed.
+        If Frame is used, the rotation of the tool at the final step is fixed.
+
+    trajectory_planes : list(:class:`compas.geometry.Plane`)
+        List of planes to define a trajectory that has multiple segments.
+        The planes are specified in the world coordinate frame.
+        Note that only the intermediate targets are specified, the starting and ending frames
+        should not be included in this list. The ending frame is specified by the target_robot_flange_frame attribute.
+        If the motion has only one segment, leave this list empty.
+
+    tool_grasp : :class:`compas.geometry.Transformation`
+        The grasp transformation of the tool relative to the robot flange frame.
+
+    """
+
+    def __init__(self):
+        super(UnderconstrainedMotion, self).__init__()
+        self.target_robot_flange_frame = None  # type: Union[Frame, Plane]
+        self.trajectory_planes = []  # type: Optional[list[Plane]]
+        self.tag = "Underconstrained Motion"
+
+    @property
+    def data(self):
+        data = super(UnderconstrainedMotion, self).data
+        data["target_robot_flange_frame"] = self.target_robot_flange_frame
+        data["trajectory_planes"] = self.trajectory_planes
+        return data
+
+    @data.setter
+    def data(self, data):
+        super(UnderconstrainedMotion, type(self)).data.fset(self, data)
+        self.target_robot_flange_frame = data.get("target_robot_flange_frame", self.target_robot_flange_frame)
+        self.trajectory_planes = data.get("trajectory_planes", self.trajectory_planes)
 
 
 class OpenGripper(Action):
