@@ -18,6 +18,7 @@ Main classes
     Robot
     RobotSemantics
     Tool
+    WorkpieceModel
     Duration
     Wrench
     Inertia
@@ -115,6 +116,9 @@ from .trajectory import (
     JointTrajectoryPoint,
     Trajectory,
 )
+from .workpiece_model import (
+    WorkpieceModel,
+)
 from .wrench import (
     Wrench,
 )
@@ -144,6 +148,7 @@ __all__ = [
     "RobotSemantics",
     "Tool",
     "Trajectory",
+    "WorkpieceModel",
     "Wrench",
     "to_degrees",
     "to_radians",
