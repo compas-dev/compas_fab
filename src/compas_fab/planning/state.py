@@ -1,5 +1,6 @@
 from compas.data import Data
-from compas.geometry import Frame, Transformation  # noqa F401
+from compas.geometry import Frame  # noqa F401
+from compas.geometry import Transformation  # noqa F401
 from compas.robots import Configuration  # noqa F401
 
 try:
