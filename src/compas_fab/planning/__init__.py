@@ -41,6 +41,8 @@ workpieces in the scene. Action classes are used for modeling a process for the 
     OpenGripper
     CloseGripper
     ManualWorkpieceMotion
+    HideWorkpieces
+    ShowWorkpieces
 
 States
 ------
