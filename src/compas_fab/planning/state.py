@@ -26,7 +26,7 @@ class SceneState(Data):
     It is not possible to attach a workpiece to the robot directly.
     Use a dummy tool (with identity transformation and no visual or collision meshes) if necessary.
 
-    SceneState provides convinence functions such as :meth:`SceneState.get_attached_tool_id()`
+    SceneState provides convenience functions such as :meth:`SceneState.get_attached_tool_id()`
     and :meth:`SceneState.get_attached_workpiece_id()` for identifying which tool and workpiece
     are currently attached to the robot.
 

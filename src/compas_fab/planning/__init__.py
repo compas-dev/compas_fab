@@ -12,7 +12,7 @@ The processes contains actions that are assumed to be sequentially executed by t
 or by the operator (manually). Concurrent actions are not supported.
 
 The FabricationProcess class and its subclasses (such as :class:`PickAndPlaceProcess` and
-:class:`ExtrusionProcess`) are used to model a process. They provider helper methods for
+:class:`ExtrusionProcess`) are used to model a process. They provide helper methods for
 creating a ordered list of actions that are used for planning and execution. The beining of the
 process is defined by the initial state of the scene, which is a container for the state of all
 objects in the scene (see :class:`SceneState`). The initial state is used to plan the first action
@@ -23,12 +23,12 @@ action, and so on. See tutorial on :ref:`planning_process` for more details.
 Actions
 --------
 
-Action classes are abstractions of the robot's (and, or the operator's) capability to manupulate tools and
-workpieces in the scene. Action classes are used for modelling a process for the following purpose:
+Action classes are abstractions of the robot's (and, or the operator's) capability to manipulate tools and
+workpieces in the scene. Action classes are used for modeling a process for the following purpose:
 
 * To plan trajectories for robotic motions
 * To simulate and visualize the process in a virtual environment
-* To execute the process on a real robot (or by an operator)
+* To execute the process on a real robot or a human-robot collaboration process
 
 .. autosummary::
     :toctree: generated/
@@ -36,16 +36,16 @@ workpieces in the scene. Action classes are used for modelling a process for the
 
     Action
     RoboticAction
-    LinearMovement
+    LinearMotion
     FreeMotion
     OpenGripper
     CloseGripper
-    ManuallyMoveWorkpiece
+    ManualWorkpieceMotion
 
 States
 ------
 
-State classes are used to model the static state of objects in the planning scene. This include:
+State classes are used to model the immutable, static state of objects in the planning scene. These include:
 :class:`RobotState` for :class:`compas_fab.robots.Robot`,
 :class:`ToolState` for :class:`compas_fab.robots.Tool` and
 :class:`WorkpieceState` for :class:`compas_fab.robots.Workpiece`.
