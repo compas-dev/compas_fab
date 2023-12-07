@@ -1,28 +1,29 @@
 from compas.data import Data
 
 try:
+    from compas_fab.robots import CollisionMesh  # noqa: F401
     from compas_fab.robots import Robot  # noqa: F401
     from compas_fab.robots import Tool  # noqa: F401
     from compas_fab.robots import WorkpieceModel  # noqa: F401
-    from compas_fab.robots import CollisionMesh  # noqa: F401
 except ImportError:
     pass
 
 try:
-    from compas_fab.planning import SceneState  # noqa: F401
-    from compas_fab.planning import RoboticAction  # noqa: F401
     from compas_fab.planning import Action  # noqa: F401
-    from compas_fab.planning import LinearMotion  # noqa: F401
     from compas_fab.planning import FreeMotion  # noqa: F401
+    from compas_fab.planning import LinearMotion  # noqa: F401
+    from compas_fab.planning import RoboticAction  # noqa: F401
+    from compas_fab.planning import SceneState  # noqa: F401
 except ImportError:
     pass
 
 try:
+    from typing import Dict  # noqa: F401
     from typing import List  # noqa: F401
     from typing import Optional  # noqa: F401
-    from typing import Union  # noqa: F401
-    from typing import Dict  # noqa: F401
     from typing import Tuple  # noqa: F401
+    from typing import Type  # noqa: F401
+    from typing import Union  # noqa: F401
 except ImportError:
     pass
 
@@ -153,3 +154,338 @@ class FabricationProcess(Data):
         self.static_objects = {}  # type: Dict[str, CollisionMesh]
         self.initial_scene_state = None  # type: SceneState
         self.actions = []  # type: List[Action]
+
+    def __str__(self):
+        robot_name = self.robot.name if self.robot else "None"
+        return "FabricationProcess(robot={}, {} tools, {} workpieces, {} static_objects, {} actions)".format(
+            robot_name, len(self.tools), len(self.workpieces), len(self.static_objects), len(self.actions)
+        )
+
+    @property
+    def data(self):
+        data = {
+            "robot": self.robot,
+            "robot_planning_group": self.robot_planning_group,
+            "tools": self.tools,
+            "workpieces": self.workpieces,
+            "static_objects": self.static_objects,
+            "initial_scene_state": self.initial_scene_state,
+            "actions": self.actions,
+        }
+        return data
+
+    @data.setter
+    def data(self, data):
+        self.robot = data["robot"]
+        self.robot_planning_group = data["robot_planning_group"]
+        self.tools = data["tools"]
+        self.workpieces = data["workpieces"]
+        self.static_objects = data["static_objects"]
+        self.initial_scene_state = data["initial_scene_state"]
+        self.actions = data["actions"]
+
+    # ##################
+    # Validation methods
+    # ##################
+
+    def validate_task_planning_ready(self):
+        # type: () -> Tuple[bool, Optional[str]]
+        """Validates that the process is ready for Task Planning.
+
+        This function is intended to be called after the initial_scene_state before the list of actions are created.
+        It validates that the initial_scene_state is set and that the list of actions are valid.
+        See :ref:`Task Planning <task_planning>` for more details.
+
+        If the fabrication process is valid, this function returns None without raising any exceptions.
+
+        Returns
+        ------
+        (True, None)
+        - If the fabrication process is valid.
+
+        (False, str)
+        - If the initial_scene_state is not set.
+        - If the robot is not set or if the robot_planning_group is not set or if the robot_planning_group is not present in the robot.
+        - If there are no tools in the process.
+        - If the names of the tools, workpieces and static objects are not unique.
+        - If the names of the tools and workpieces are not present in the initial_scene_state.
+
+        """
+        # Check that the initial_scene_state is set
+        if not self.initial_scene_state:
+            raise Exception("Initial scene state is not set.")
+
+        # Check that the robot and robot_planning_group are set
+        if not self.robot:
+            raise Exception("Robot is not set.")
+        if not self.robot_planning_group:
+            raise Exception("Robot planning group is not set.")
+        if self.robot_planning_group not in self.robot.semantics.groups:
+            raise Exception("Robot planning group is not present in the robot.")
+
+        # Check that there are tools in the process
+        if not self.tools:
+            raise Exception("There are no tools in the process.")
+
+        # Check that the names of the tools, workpieces and static objects are unique
+        names = []
+        names.extend(self.tools.keys())
+        names.extend(self.workpieces.keys())
+        names.extend(self.static_objects.keys())
+        if len(names) != len(set(names)):
+            raise KeyError("The names of the tools, workpieces and static objects are not unique.")
+
+        # Check that the names of the tools, workpieces and static objects are present in the initial_scene_state
+        for key in self.tools.keys():
+            if key not in self.initial_scene_state.tool_states.keys():
+                raise KeyError("The name of the tool '{}' is not present in the initial_scene_state.".format(key))
+        for key in self.workpieces.keys():
+            if key not in self.initial_scene_state.workpiece_states.keys():
+                raise KeyError("The name of the workpiece '{}' is not present in the initial_scene_state.".format(key))
+
+    def validate_motion_planning_ready(self):
+        # type: () -> Tuple[bool, str]
+        """Validates that the process is ready for Motion Planning.
+
+        This function is intended to be called after the list of actions are created.
+        It validates that the list of actions are valid.
+        See :ref:`Motion Planning <motion_planning>` for more details.
+
+        If the fabrication process is valid, this function returns None without raising any exceptions.
+
+        Returns
+        ------
+        (True, None)
+        - If the fabrication process is valid.
+
+        (False, str)
+        - If the list of actions are empty.
+        - If the trajectory of RoboticMotions are not planned.
+        - If the trajectory of RoboticMotions are not valid.
+
+        """
+        # Check that the list of actions are not empty
+        if not self.actions:
+            return (False, "The list of actions are empty.")
+
+        # Check that the trajectory of RoboticMotions are planned
+        for action in self.actions:
+            if isinstance(action, RoboticAction):
+                if not action.trajectory:
+                    raise (False, "The trajectory of RoboticMotions are not planned.")
+
+        # Check that the trajectory of RoboticMotions are valid
+        for action in self.actions:
+            if isinstance(action, RoboticAction):
+                if not action.trajectory.is_valid():
+                    raise (False, "The trajectory of RoboticMotions are not valid.")
+
+        return (True, None)
+
+    # #######################
+    # Actions related methods
+    # #######################
+
+    def get_robotic_actions(self):
+        # type: () -> list[RoboticAction]
+        """Filter the action list and returns only the RoboticAction(s).
+
+        Note
+        ----
+        This function can only be used after the list of actions (FabricationProcess.actions) are created.
+        """
+        return [action for action in self.actions if isinstance(action, RoboticAction)]
+
+    def get_next_action_of_type(self, action, type_filter=None):
+        # type: (Action, Optional[Type]) -> (Action|None)
+        """Returns the next robotic action in the list of actions (FabricationProcess.actions).
+
+        If type_filter is specified, returns the next action that is an instance of the specified type.
+        For example, if type is :class:`RoboticAction`, the returned action can be any subclass of RoboticAction,
+        such as :class:`FreeMotion` or class:`LinearMotion`.
+
+        If there are no more actions in the list, returns None.
+
+        Note
+        ----
+        This function can only be used after the list of actions (FabricationProcess.actions) are created.
+
+        Parameters
+        ----------
+        action : :class:`compas_fab.planning.Action`, optional
+            The current action to query.
+            The action must be present in the list of actions (FabricationProcess.actions).
+            If None, the first robotic action in the list of actions is returned.
+        type_filter : Type, optional , default None
+            The type of the next robotic action to query. The type must be a subclass of
+            :class:`compas_fab.planning.Action`
+
+        Exceptions
+        ----------
+        ValueError
+            If the action is not present in the list of actions (FabricationProcess.actions).
+        TypeError
+            If the type is not a subclass of :class:`compas_fab.planning.Action`.
+        """
+        # Raise error if type is not a subclass of Action
+        if action is not None and not issubclass(type_filter, Action):
+            raise TypeError("type must be a subclass of Action.")
+
+        # Use the index of the action to find the next action
+        if action is None:
+            action_index = 0  # Start searching from the first action
+        else:
+            action_index = self.actions.index(action) + 1  # Start searching from the next action
+
+        # Search for the next action that is an instance of the specified type
+        while action_index < len(self.actions):
+            next_action = self.actions[action_index]
+            if type_filter is None or isinstance(next_action, type_filter):
+                return next_action
+            action_index += 1  # Continue searching next action
+
+        # Search failed, return None
+        return None
+
+    def get_previous_action_of_type(self, action, type_filter=None):
+        # type: (Action, Optional[Type]) -> (Action|None)
+        """Returns the previous robotic action in the list of actions (FabricationProcess.actions).
+
+        If type_filter is specified, returns the previous action that is an instance of the specified type.
+
+        See Also
+        --------
+        :meth:`get_next_action_of_type`
+
+        Note
+        ----
+        This function can only be used after the list of actions (FabricationProcess.actions) are created.
+
+        Parameters
+        ----------
+        action : :class:`compas_fab.planning.Action`, optional
+            The current action to query.
+            The action must be present in the list of actions (FabricationProcess.actions).
+            If None, the last robotic action in the list of actions is returned.
+        type_filter : Type, optional , default None
+            The type of the previous robotic action to query. The type must be a subclass of
+            :class:`compas_fab.planning.Action`
+
+        Exceptions
+        ----------
+        ValueError
+            If the action is not present in the list of actions (FabricationProcess.actions).
+        TypeError
+            If the type is not a subclass of :class:`compas_fab.planning.Action`.
+        """
+        # Raise error if type is not a subclass of Action
+        if action is not None and not issubclass(type_filter, Action):
+            raise TypeError("type must be a subclass of Action.")
+
+        # Use the index of the action to find the previous action
+        if action is None:
+            action_index = len(self.actions) - 1  # Start searching from the last action
+        else:
+            action_index = self.actions.index(action) - 1  # Start searching from the previous action
+
+        # Search for the previous action that is an instance of the specified type
+        while action_index >= 0:
+            previous_action = self.actions[action_index]
+            if type_filter is None or isinstance(previous_action, type_filter):
+                return previous_action
+            action_index -= 1  # Continue searching previous action
+
+        # Search failed, return None
+        return None
+
+    def get_next_robotic_action(self, action):
+        # type: (RoboticAction) -> Optional[RoboticAction]
+        """Returns the next robotic action in the list of actions (FabricationProcess.actions).
+
+        If there are no more robotic actions in the list, returns None.
+
+        Note
+        ----
+        This function can only be used after the list of actions (FabricationProcess.actions) are created.
+
+        See Also
+        --------
+        :meth:`get_next_action_of_type`
+
+        Parameters
+        ----------
+        action : :class:`compas_fab.planning.RoboticAction`, optional
+            The current ction to query.
+            The action must be present in the list of actions (FabricationProcess.actions).
+            If None, the first robotic action in the list of actions is returned.
+        """
+        return self.get_next_action_of_type(action, RoboticAction)
+
+    def get_previous_robotic_action(self, action):
+        # type: (Optional[RoboticAction]) -> Optional[RoboticAction]
+        """Returns the previous robotic action in the list of actions (FabricationProcess.actions).
+
+        If there are no more robotic actions in the list, returns None.
+
+        Note
+        ----
+        This function can only be used after the list of actions (FabricationProcess.actions) are created.
+
+        See Also
+        --------
+        :meth:`get_previous_action_of_type`
+
+        Parameters
+        ----------
+        action : :class:`compas_fab.planning.RoboticAction`, optional
+            The current action to query.
+            The action must be present in the list of actions (FabricationProcess.actions).
+            If None, the last robotic action in the list of actions is returned.
+        """
+        return self.get_previous_action_of_type(action, RoboticAction)
+
+    # #####################
+    # State related methods
+    # #####################
+
+    def get_intermediate_scene_state(self, state_index, debug=False):
+        # type: (int, bool) -> SceneState
+        """Parses the actions in the process and returns an intermediate scene state of the process.
+
+        Starting from the initial state, this function iteratively applies the actions in the process
+        using :meth:`Action.apply_effects` until the specified state_index is reached.
+        The returned scene state is after applying action[state_index].
+
+        Note
+        ----
+        This function can only be used after the list of actions (FabricationProcess.actions) are created
+        and the :attr:`initial_scene_state` is set.
+
+        Parameters
+        ----------
+        state_index : int
+            The index of state to return. Index 0 is equal to the initial state.
+            The index must be smaller than or equal to the number of actions in the process.
+        debug : bool, optional, default False
+            If True, prints debug messages when iteratively applying the actions.
+
+        Execption
+        ---------
+        IndexError
+            If the state_index is larger than the number of actions in the process.
+            If the state_index is negative.
+        ValueError
+            If the initial_scene_state is not set.
+        """
+        if state_index < 0:
+            raise IndexError("state_index must be larger than or equal to 0.")
+        if state_index <= len(self.actions):
+            raise IndexError("state_index must be smaller than or equal to the number of actions in the process.")
+        if not self.initial_scene_state:
+            raise ValueError("Initial scene state is not set.")
+
+        # A copy of the initial state is used to avoid modifying the initial state
+        scene_state = self.initial_scene_state.copy()
+        for action in self.actions[:state_index]:
+            action.apply_effects(scene_state, debug=debug)
+        return scene_state
