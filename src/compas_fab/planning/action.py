@@ -108,6 +108,25 @@ class Action(Data):
 
         This method is called by the assembly process to apply the action to the scene state.
         The SceneState object is modified in place.
+        The implementation of this method depends on the type of action.
+        See the documentation of the child classes for more details.
+
+        See Also
+        --------
+        * :meth:`RoboticAction.apply_effects`
+        * :meth:`OpenGripper.apply_effects`
+        * :meth:`CloseGripper.apply_effects`
+        * :meth:`ManuallyMoveWorkpiece.apply_effects`
+        * :meth:`HideWorkpieces.apply_effects`
+        * :meth:`ShowWorkpieces.apply_effects`
+
+        Parameters
+        ----------
+        scene_state : :class:`compas_fab.planning.SceneState`
+            The scene state to apply the action to.
+            Note that the scene state is modified in place.
+        debug : bool
+            If True, prints debug messages to the console.
         """
         raise NotImplementedError("Action.apply_effects() is not implemented by %s." % type(self))
 
