@@ -143,7 +143,8 @@ class SceneState(Data):
 class WorkpieceState(Data):
     """Class for describing the state of a workpiece.
 
-    WorkpieceState objects are typically created by the constructor of :class:`SceneState`.
+    WorkpieceState objects are typically created automatically by the :class:`FabricationProcess`.
+    However it is possible to customize the initial state of the process by creating or modifying the WorkpieceStates manually.
 
     Attributes
     ----------
@@ -154,15 +155,45 @@ class WorkpieceState(Data):
         (default: :class:`compas.geometry.Frame.worldXY`)
     attached_to_robot : bool
         If the workpiece is attached to the robot, `True`. Else, `False`.
+        (default: `False`)
     attached_to_robot_grasp : :class:`compas.geometry.Transformation`, optional
         The grasp transformation of the workpiece if it is attached to the robot. The grasp
         is defined as the transformation that can transform the robot flange frame
         into the workpiece frame.
-        If not specified, defaults to the identity transformation.
-        If the workpiece is not attached to the robot, `None`.
+        If the workpiece is not attached to the robot, `None`. (default: `None`)
     is_hidden : bool
         If the workpiece is hidden, `True`. Else, `False`. (default: `False`)
         A hidden workpiece will not be included for collision detection of the scene.
+
+    Example
+    -------
+
+    Example of a workpiece state that is not attached to robot:
+
+        >>> from compas.geometry import Frame
+        >>> from compas_fab.robots import WorkpieceState
+        >>> workpiece_state = WorkpieceState(
+        >>>     workpiece_id="wbeam1",
+        >>>     frame=Frame.worldXY()
+        >>>     )
+
+    Example of a workpiece state that is attached to robot:
+
+        >>> from compas.geometry import Frame
+        >>> from compas.geometry import Transformation
+        >>> from compas_fab.robots import WorkpieceState
+        >>> # In this example the workpiece is located at the pickup location
+        >>> # the pickup frame of the workpiece is defined in world coordinates
+        >>> beam_pickup_frame = Frame([200, 200, 500], [1, 0, 0], [0, 1, 0])
+        >>> # The grasp transformation of the workpiece is relative to the robot flange
+        >>> grasp = Transformation.from_frame(Frame([0, 0, 100], [1, 0, 0], [0, 1, 0]))
+        >>> workpiece_state = WorkpieceState(
+        >>>     workpiece_id="wbeam2",
+        >>>     frame=beam_pickup_frame,
+        >>>     attached_to_robot=True,
+        >>>     attached_to_robot_grasp=grasp,
+        >>> )
+
     """
 
     def __init__(
@@ -170,7 +201,7 @@ class WorkpieceState(Data):
         workpiece_id="undefined_workpiece",
         frame=None,
         attached_to_robot=False,
-        attached_to_robot_grasp=Transformation(),
+        attached_to_robot_grasp=None,
         is_hidden=False,
     ):
         super(WorkpieceState, self).__init__()
@@ -202,8 +233,8 @@ class WorkpieceState(Data):
 class ToolState(Data):
     """Class for describing the state of a tool.
 
-    ToolState objects are typically created by the constructor of :class:`SceneState`.
-
+    ToolState objects are typically created automatically by the :class:`FabricationProcess`.
+    However it is possible to customize the initial state of the process by creating or modifying the ToolStates manually.
 
     Attributes
     ----------
@@ -250,10 +281,8 @@ class ToolState(Data):
 class RobotState(Data):
     """Class for describing the state of a robot.
 
-    RobotState objects are typically created by the constructor of :class:`SceneState`.
-    However it is possible to create a RobotState object manually. For example, when specifying
-    the initial state of a robot in a planning process.
-
+    RobotState objects are typically created automatically by the :class:`FabricationProcess`.
+    However it is possible to customize the initial state of the robot by creating or modifying the RobotState manually.
 
     Attributes
     ----------
