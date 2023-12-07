@@ -19,7 +19,7 @@ from compas_fab.planning import LinearMotion
 from compas_fab.planning import FreeMotion
 from compas_fab.planning import OpenGripper
 from compas_fab.planning import CloseGripper
-from compas_fab.planning import ManuallyMoveWorkpiece
+from compas_fab.planning import ManualWorkpieceMotion
 
 from compas_fab.planning import SceneState
 from compas_fab.planning import WorkpieceState
@@ -94,7 +94,7 @@ def test_action_members():
     assert isinstance(FreeMotion(), Action)
     assert isinstance(OpenGripper(), Action)
     assert isinstance(CloseGripper(), Action)
-    assert isinstance(ManuallyMoveWorkpiece(), Action)
+    assert isinstance(ManualWorkpieceMotion(), Action)
     # Test child class of RoboticAction
     assert isinstance(LinearMotion(), RoboticAction)
     assert isinstance(FreeMotion(), RoboticAction)
@@ -231,7 +231,7 @@ def test_close_gripper_preconditions(start_scene_state):
 
 
 def test_load_workpiece_preconditions(start_scene_state):
-    action = ManuallyMoveWorkpiece("w1", None)
+    action = ManualWorkpieceMotion("w1", None)
     # Default state object has one object attached to the robot
     assert start_scene_state.get_attached_tool_id() == "t1"
     assert start_scene_state.get_attached_workpiece_id() == "w1"
@@ -239,18 +239,18 @@ def test_load_workpiece_preconditions(start_scene_state):
 
     # Detach the workpiece from the robot
     start_scene_state.workpiece_states["w1"].attached_to_robot = False
-    # ManuallyMoveWorkpiece action requires that the workpiece is not attached to the robot
+    # ManualWorkpieceMotion action requires that the workpiece is not attached to the robot
     assert action.check_preconditions(start_scene_state)[0] is True
 
     # Check non-existing workpiece
-    action = ManuallyMoveWorkpiece("w3", None)
+    action = ManualWorkpieceMotion("w3", None)
     assert action.check_preconditions(start_scene_state)[0] is False
 
 
 def test_load_workpiece_effect(start_scene_state):
     workpiece_frame = Frame(Point(100.0, 200.0, 300.0), Vector(1.0, 0.0, 0.0), Vector(0.0, 1.0, 0.0))
     assert start_scene_state.get_attached_workpiece_id() == "w1"
-    action = ManuallyMoveWorkpiece("w2", workpiece_frame)
+    action = ManualWorkpieceMotion("w2", workpiece_frame)
 
     action.apply_effects(start_scene_state)
     # Workpiece w2 should remain unattached but moved

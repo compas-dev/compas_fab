@@ -76,7 +76,7 @@ from .action import (
     FreeMotion,
     OpenGripper,
     CloseGripper,
-    ManuallyMoveWorkpiece,
+    ManualWorkpieceMotion,
     HideWorkpieces,
     ShowWorkpieces,
 )
@@ -95,7 +95,7 @@ __all__ = [
     "FreeMotion",
     "OpenGripper",
     "CloseGripper",
-    "ManuallyMoveWorkpiece",
+    "ManualWorkpieceMotion",
     "HideWorkpieces",
     "ShowWorkpieces",
     "SceneState",

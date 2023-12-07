@@ -23,7 +23,7 @@ __all__ = [
     "FreeMotion",
     "OpenGripper",
     "CloseGripper",
-    "ManuallyMoveWorkpiece",
+    "ManualWorkpieceMotion",
     "HideWorkpieces",
     "ShowWorkpieces",
 ]
@@ -531,7 +531,7 @@ class CloseGripper(Action):
                 print("- Workpiece %s attached to tool." % self.attaching_workpiece_id)
 
 
-class ManuallyMoveWorkpiece(Action):
+class ManualWorkpieceMotion(Action):
     """Operator action to move a workpiece from one place to another.
     This moves the workpiece to a specific frame.
     Typically used for loading a workpiece into a gripper.
@@ -547,20 +547,20 @@ class ManuallyMoveWorkpiece(Action):
     """
 
     def __init__(self, workpiece_id=None, frame=Frame.worldXY()):
-        super(ManuallyMoveWorkpiece, self).__init__()
+        super(ManualWorkpieceMotion, self).__init__()
         self.workpiece_id = workpiece_id  # type: str
         self.frame = frame  # type: Frame
 
     @property
     def data(self):
-        data = super(ManuallyMoveWorkpiece, self).data
+        data = super(ManualWorkpieceMotion, self).data
         data["workpiece_id"] = self.workpiece_id
         data["frame"] = self.frame
         return data
 
     @data.setter
     def data(self, data):
-        super(ManuallyMoveWorkpiece, type(self)).data.fset(self, data)
+        super(ManualWorkpieceMotion, type(self)).data.fset(self, data)
         self.workpiece_id = data.get("workpiece_id", self.workpiece_id)
         self.frame = data.get("frame", self.frame)
 
