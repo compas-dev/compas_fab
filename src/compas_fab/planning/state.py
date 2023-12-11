@@ -173,9 +173,9 @@ class WorkpieceState(Data):
         >>> from compas.geometry import Frame
         >>> from compas_fab.planning import WorkpieceState
         >>> workpiece_state = WorkpieceState(
-        >>>     workpiece_id="wbeam1",
-        >>>     frame=Frame.worldXY()
-        >>>     )
+        ...     workpiece_id="wbeam1",
+        ...     frame=Frame.worldXY()
+        ...     )
 
     Example of a workpiece state that is attached to robot:
 
@@ -188,11 +188,11 @@ class WorkpieceState(Data):
         >>> # The grasp transformation of the workpiece is relative to the robot flange
         >>> grasp = Transformation.from_frame(Frame([0, 0, 100], [1, 0, 0], [0, 1, 0]))
         >>> workpiece_state = WorkpieceState(
-        >>>     workpiece_id="wbeam2",
-        >>>     frame=beam_pickup_frame,
-        >>>     attached_to_robot=True,
-        >>>     attached_to_robot_grasp=grasp,
-        >>> )
+        ...     workpiece_id="wbeam2",
+        ...     frame=beam_pickup_frame,
+        ...     attached_to_robot=True,
+        ...     attached_to_robot_grasp=grasp,
+        ... )
 
     """
 
