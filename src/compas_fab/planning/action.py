@@ -534,7 +534,7 @@ class CloseGripper(Action):
 class ManualWorkpieceMotion(Action):
     """Operator action to move a workpiece from one place to another.
     This moves the workpiece to a specific frame.
-    Typically used for loading a workpiece into a gripper.
+    Typically used for attaching a workpiece into a gripper.
     Can also be used to model the manual attachment of scaffolding (modeled as a :class:`Workpiece`)
 
     Attributes
