@@ -171,7 +171,7 @@ class WorkpieceState(Data):
     Example of a workpiece state that is not attached to robot:
 
         >>> from compas.geometry import Frame
-        >>> from compas_fab.robots import WorkpieceState
+        >>> from compas_fab.planning import WorkpieceState
         >>> workpiece_state = WorkpieceState(
         >>>     workpiece_id="wbeam1",
         >>>     frame=Frame.worldXY()
@@ -181,7 +181,7 @@ class WorkpieceState(Data):
 
         >>> from compas.geometry import Frame
         >>> from compas.geometry import Transformation
-        >>> from compas_fab.robots import WorkpieceState
+        >>> from compas_fab.planning import WorkpieceState
         >>> # In this example the workpiece is located at the pickup location
         >>> # the pickup frame of the workpiece is defined in world coordinates
         >>> beam_pickup_frame = Frame([200, 200, 500], [1, 0, 0], [0, 1, 0])
