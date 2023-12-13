@@ -56,10 +56,8 @@ class AnalyticalInverseKinematics(InverseKinematics):
         options: dict
             Dictionary containing the following key-value pairs:
             - ``"solver"``: (:obj:`str`) The solver to use to calculate IK.
-            - ``"check_collision"``: (:obj:`str`, optional ) When ``True``, checks
-                if the robot is in collision. Defaults to ``False``.
-            - ``"keep_order"``: (:obj:`str`, optional ) When ``False``, removes the
-                ``None``- solutions. Defaults to ``False``.
+            - ``"check_collision"``: (:obj:`str`, optional ) When ``True``, checks if the robot is in collision. Defaults to ``False``.
+            - ``"keep_order"``: (:obj:`str`, optional ) When ``False``, removes the ``None``- solutions. Defaults to ``False``.
 
         Yields
         -------

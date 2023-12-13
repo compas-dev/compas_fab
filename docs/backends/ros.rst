@@ -154,7 +154,7 @@ Check :ref:`the following page <backends_gui>` for more details.
 Next Steps
 ==========
 
-* :ref:`Tutorial: COMPAS Robots <compas:robots>`
+* `Tutorial: COMPAS Robots <https://compas.dev/compas/1.17.9/tutorial/robots.html>`__
 * :ref:`Examples: Description models <examples_description_models>`
 * :ref:`Examples: ROS Backend <examples_ros>`
 * :ref:`COMPAS FAB API Reference <reference>`

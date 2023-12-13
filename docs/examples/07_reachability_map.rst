@@ -1,4 +1,4 @@
-.. _examples_kinematics:
+.. _examples_reachability_map:
 
 *******************************************************************************
 Planning: Reachability Map

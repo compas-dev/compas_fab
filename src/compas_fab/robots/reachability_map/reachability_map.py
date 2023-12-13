@@ -26,8 +26,8 @@ class ReachabilityMap(Data):
         The shape of the frames array
 
 
-    Links
-    -----
+    References
+    ----------
     http://wiki.ros.org/reuleaux
     """
 

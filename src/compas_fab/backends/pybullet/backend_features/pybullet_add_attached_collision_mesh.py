@@ -43,7 +43,7 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
               to which the object should be attached.
             - ``"mass"``: (:obj:`float`) The mass of the attached collision
               object.  Defaults to ``1``.
-            - ``inertia"``: (:obj:`list`) The elements of the inertia matrix
+            - ``"inertia"``: (:obj:`list`) The elements of the inertia matrix
               of the attached collision object given as
               ``[<ixx>, <ixy>, <ixz>, <iyy>, <iyz>, <izz>]``.  Defaults to
               ``[1., 0., 0., 1., 0., 1.]``.
@@ -51,7 +51,7 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
               the pose of the inertial reference frame, relative to the link
               reference frame. Defaults to
               :class:`compas.geometry.Frame.worldXY()`.
-            - ``"collision_origin"``(:class:`compas.geometry.Frame`) This is
+            - ``"collision_origin"``: (:class:`compas.geometry.Frame`) This is
               the pose of the collision reference frame, relative to the link
               reference frame. Defaults to
               :class:`compas.geometry.Frame.worldXY()`.

@@ -245,8 +245,8 @@ class JointTrajectoryPoint(Configuration):
 class Trajectory(Data):
     """Base trajectory class.
 
-    Attribute
-    ---------
+    Attributes
+    ----------
     planning_time : :obj:`float`
         Amount of time it took to complete the motion plan
     """
