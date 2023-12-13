@@ -22,7 +22,8 @@ If you use COMPAS FAB in a project, please use the following citation:
             Lytle, B. and
             Huang, Y. and
             Kasirer, C. and
-            Bruun, E.
+            Bruun, E. and
+            Leung, P.Y.V.
             },
         howpublished={https://github.com/compas-dev/compas\_fab/},
         note={Gramazio Kohler Research, ETH Z\"{u}rich},
@@ -49,4 +50,5 @@ Authors
 * Yijiang Huang <yijiangh@mit.edu> `@yijiangh <https://github.com/yijiangh>`_
 * Chen Kasirer <kasirer@arch.ethz.ch> `@chenkasirer <https://github.com/chenkasirer>`_
 * Edvard Bruun <ebruun@princeton.edu> `@ebruun <https://github.com/ebruun>`_
+* Victor Pok Yin Leung <yck011522@gmail.com> `@yck011522 <https://github.com/yck011522>`_
 
