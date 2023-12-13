@@ -165,7 +165,6 @@ class RoboticAction(Action):
         It can printed out during visualization, debugging, execution and logging.
     speed_data_id : str
         The id (or name) of the speed data to be used for execution.
-    ----------
 
     """
 
