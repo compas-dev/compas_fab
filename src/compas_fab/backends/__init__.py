@@ -38,19 +38,6 @@ Classes to interact with `PyBullet <http://pybullet.org/>`_.
     PyBulletError
     CollisionError
 
-V-REP
-=====
-
-Classes to interact with `V-REP <https://www.coppeliarobotics.com/>`_.
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    VrepClient
-    VrepPlanner
-    VrepError
-
 
 Analytical Kinematics
 =====================
@@ -138,13 +125,6 @@ from .ros import (
     MoveItPlanner,
 )
 
-# VREP imports
-from .vrep import (
-    VrepClient,
-    VrepError,
-    VrepPlanner,
-)
-
 # Analytic IK
 from .kinematics import (
     AnalyticalInverseKinematics,
@@ -188,10 +168,6 @@ __all__ = [
     "RosValidationError",
     "RosFileServerLoader",
     "MoveItPlanner",
-    # VREP
-    "VrepClient",
-    "VrepError",
-    "VrepPlanner",
     # Analytic IK
     "AnalyticalInverseKinematics",
     "AnalyticalPlanCartesianMotion",

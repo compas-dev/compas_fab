@@ -248,7 +248,7 @@ class PlanningScene(object):
 
     @property
     def client(self):
-        """:class:`compas_fab.backend.RosClient` or :class:`compas_fab.backend.VrepClient` : The backend client."""
+        """:class:`compas_fab.backend.RosClient`: The backend client."""
         return self.robot.client
 
     def ensure_client(self):
