@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Added `compas_fab.planning` that contains `Action` classes and `SceneState`
-* Added `RoboticAction`, `LinearMotion`, `FreeMotion`, `OpenGripper`, `CloseGripper`, and `ManualWorkpieceMotion` actions.
+* Added `RoboticAction`, `LinearMotion`, `FreeMotion`, `OpenGripper`, `CloseGripper`, `ManualWorkpieceMotion`, `HideWorkpieces` and `ShowWorkpieces`.
 * Added `SceneState` as container for `WorkpieceState`, `ToolState` and `RobotState`.
 
 ### Changed

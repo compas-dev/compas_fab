@@ -106,8 +106,16 @@ class Action(Data):
         # type: (SceneState, bool) -> None
         """Applies the action to a scene state.
 
-        This method is called by the assembly process to apply the action to the scene state.
-        The SceneState object is modified in place.
+        This method is called by the assembly process to apply the action to the given scene state.
+        The SceneState object is modified in place to represent the state after the action is taken.
+
+        If the action is a :class:`compas_fab.planning.RoboticAction`, the parameter `action_plan_result`
+        can be provided to update the robot configuration to the last configuration of the planned trajectory.
+        Otherwise, the robot configuration is not changed.
+
+        See Also
+        --------
+        :meth:`compas_fab.planning.RoboticAction.apply_effects`
         """
         raise NotImplementedError("Action.apply_effects() is not implemented by %s." % type(self))
 
@@ -132,8 +140,8 @@ class RoboticAction(Action):
     of the robot is updated to the last configuration of the trajectory. See
     :meth:`compas_fab.planning.RoboticAction.apply_effects` for more details.
 
-    Attributes (Before Planning)
-    ----------------------------
+    Attributes
+    ----------
     target_robot_flange_frame : :class:`compas.geometry.Frame`
         The robot flange frame of the robot at target. In world coordinate frame.
     allowed_collision_pairs : list(tuple(str,str))
@@ -149,20 +157,12 @@ class RoboticAction(Action):
         when planning neighbouring robotic movements. This can be used to improve repeatibility.
         Users must be careful to specify a trajectory that is collision free and does not violate
         the kinematic limits of the robot.
+    planning_group : str, optional
+        The planning group to be used for planning. If None, the default planning group of the robot is used.
+        It is safe to leave this as None (default), unless the robot has multiple planning groups.
     tag : str
         A human readable tag that describes the action.
         It can printed out during visualization, debugging, execution and logging.
-
-    Attributes (After Planning)
-    ---------------------------
-    planned_trajectory : :class:`compas_fab.robots.JointTrajectory`
-        The planned trajectory of the robotic movement. Available after planning. The first and last
-        trajectory points corresponds to the starting and ending configuration of the robotic movement.
-    planner_seed : int
-        The random seed used by the planner to generate the trajectory. Used by some planners.
-
-    Attributes (For Execution)
-    --------------------------
     speed_data_id : str
         The id (or name) of the speed data to be used for execution.
     ----------
@@ -173,16 +173,12 @@ class RoboticAction(Action):
         super(RoboticAction, self).__init__()
         self.tag = "Generic Action"
 
-        # Before Planning
+        # For Planning
         self.target_robot_flange_frame = None  # type: Frame
         self.allowed_collision_pairs = []  # type: list(tuple(str,str))
         self.fixed_target_configuration = None  # type: Optional[Configuration]
         self.fixed_trajectory = None  # type: Optional[JointTrajectory]
-        self.intermediate_planning_waypoint = []  # type: list(Configuration)
-
-        # After Planning
-        self.planned_trajectory = None  # type: Optional[JointTrajectory]
-        self.planner_seed = None  # type: Optional[int]
+        self.planning_group = None  # type: Optional[str]
 
         # For Execution
         self.speed_data_id = None  # type: Optional[str]
@@ -195,9 +191,7 @@ class RoboticAction(Action):
         data["allowed_collision_pairs"] = self.allowed_collision_pairs
         data["fixed_target_configuration"] = self.fixed_target_configuration
         data["fixed_trajectory"] = self.fixed_trajectory
-        data["intermediate_planning_waypoint"] = self.intermediate_planning_waypoint
-        data["planned_trajectory"] = self.planned_trajectory
-        data["planner_seed"] = self.planner_seed
+        data["planning_group"] = self.planning_group
         data["speed_data_id"] = self.speed_data_id
         return data
 
@@ -209,11 +203,7 @@ class RoboticAction(Action):
         self.allowed_collision_pairs = data.get("allowed_collision_pairs", self.allowed_collision_pairs)
         self.fixed_target_configuration = data.get("fixed_target_configuration", self.fixed_target_configuration)
         self.fixed_trajectory = data.get("fixed_trajectory", self.fixed_trajectory)
-        self.intermediate_planning_waypoint = data.get(
-            "intermediate_planning_waypoint", self.intermediate_planning_waypoint
-        )
-        self.planned_trajectory = data.get("planned_trajectory", self.planned_trajectory)
-        self.planner_seed = data.get("planner_seed", self.planner_seed)
+        self.planning_group = data.get("planning_group", self.planning_group)
         self.speed_data_id = data.get("speed_data_id", self.speed_data_id)
 
     def apply_effects(self, scene_state, debug=False):
@@ -228,11 +218,17 @@ class RoboticAction(Action):
         ----------
         scene_state : :class:`compas_fab.planning.SceneState`
             The scene state to apply the action to.
+        action_plan_result : :class:`compas_fab.robots.ActionPlanResult`, optional
+
+        Todo
+        ----
+        ActionPlanResult input is not yet supported. This function needs to support
+        updating the config after planning by accepting an ActionPlanResult object.
         """
         robot_state = scene_state.get_robot_state()
-        if self.planned_trajectory is not None:
-            robot_state.configuration = self.planned_trajectory.points[-1]
-        elif self.fixed_trajectory is not None:
+        # if action_plan_result is not None:
+        #     robot_state.configuration = action_plan_result.planned_trajectory[-1]
+        if self.fixed_trajectory is not None:
             robot_state.configuration = self.fixed_trajectory.points[-1]
         elif self.fixed_target_configuration is not None:
             robot_state.configuration = self.fixed_target_configuration
