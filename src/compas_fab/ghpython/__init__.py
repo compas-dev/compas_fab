@@ -33,8 +33,6 @@ if compas.RHINO:
         RobotModelArtist,
     )
 
-    from .path_planning import *  # noqa: F401,F403
-
     __all__ = [
         "ReachabilityMapArtist",
         "RobotArtist",  # deprecated
