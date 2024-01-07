@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Removed V-Rep backend.
 * Removed outdated `PathPlan` class.
 * Removed outdated rfl demo class.
+* Remove deprecated aliases for artists (currently on `compas_robots`).
 
 ## [0.28.0] 2023-05-10
 

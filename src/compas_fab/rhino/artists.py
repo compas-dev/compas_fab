@@ -20,11 +20,3 @@ if compas.RHINO:
     @plugin(category="factories", requires=["Rhino"])
     def register_artists():
         Artist.register(ReachabilityMap, ReachabilityMapArtist, context="Rhino")
-
-    # deprecated artists (aliased for backwards compat)
-    __all__ += [
-        "RobotArtist",  # deprecated
-        "RobotModelArtist",  # deprecated
-    ]
-
-    RobotArtist = RobotModelArtist
