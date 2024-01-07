@@ -27,7 +27,7 @@ class Tool(Data):
         The collision mesh representation of the tool.
     name : :obj:`str`
         The name of the `Tool`. Defaults to 'attached_tool'.
-    link_name : :obj:`str`
+    connected_to : :obj:`str`
         The name of the `Link` to which the tool is attached.  Defaults to ``None``.
 
     Examples
@@ -38,9 +38,9 @@ class Tool(Data):
 
     """
 
-    def __init__(self, visual, frame_in_tool0_frame, collision=None, name="attached_tool", link_name=None):
+    def __init__(self, visual, frame_in_tool0_frame, collision=None, name="attached_tool", connected_to=None):
         super(Tool, self).__init__()
-        self.tool_model = ToolModel(visual, frame_in_tool0_frame, collision, name, link_name)
+        self.tool_model = ToolModel(visual, frame_in_tool0_frame, collision, name, connected_to)
 
     @classmethod
     def from_tool_model(cls, tool_model):
@@ -57,7 +57,9 @@ class Tool(Data):
                 for mesh in meshes:
                     collision_mesh_name = "{}_{}_collision_{}".format(self.tool_model.name, link.name, i)
                     collision_mesh = CollisionMesh(mesh, collision_mesh_name)
-                    attached_collision_mesh = AttachedCollisionMesh(collision_mesh, self.link_name, [self.link_name])
+                    attached_collision_mesh = AttachedCollisionMesh(
+                        collision_mesh, self.connected_to, [self.connected_to]
+                    )
                     acms.append(attached_collision_mesh)
         return acms
 
@@ -66,12 +68,12 @@ class Tool(Data):
         return self.tool_model.name
 
     @property
-    def link_name(self):
-        return self.tool_model.link_name
+    def connected_to(self):
+        return self.tool_model.connected_to
 
-    @link_name.setter
-    def link_name(self, link_name):
-        self.tool_model.link_name = link_name
+    @connected_to.setter
+    def connected_to(self, link_name):
+        self.tool_model.connected_to = link_name
 
     @property
     def frame(self):
@@ -93,10 +95,6 @@ class Tool(Data):
         """
         data = self.tool_model.data
         return data
-
-    @data.setter
-    def data(self, data):
-        self.tool_model.data = data
 
     @classmethod
     def from_data(cls, data):
@@ -120,7 +118,7 @@ class Tool(Data):
         >>> tool = Tool.from_data(data)
         """
         tool = cls(None, None)
-        tool.data = data
+        tool.tool_model = ToolModel.from_data(data)
         return tool
 
     @classmethod

@@ -11,13 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* `CollisionMesh` now inherit from `compas.data.Data`
-* `AttachedCollisionMesh` now inherit from `compas.data.Data`
-* `Robot` now inherit from `compas.data.Data`
-* `RobotSemantics` now inherit from `compas.data.Data`
-* `Tool` now inherit from `compas.data.Data`
+* Changed `CollisionMesh` inherit from `compas.data.Data`
+* Changed `AttachedCollisionMesh` to inherit from `compas.data.Data`
+* Changed `Robot` inherit from `compas.data.Data`
+* Changed `RobotSemantics` inherit from `compas.data.Data`
+* Changed `Tool` to inherit from `compas.data.Data`
+* Renamed `Tool.link_name` to `Tool.connected_to`
 * Migrate to COMPAS 2.x: add dependency to `compas_robots`
 * Migrate to COMPAS 2.x: use `compas.tolerance` module instead of `compas.PRECISION`
+
 
 ### Removed
 

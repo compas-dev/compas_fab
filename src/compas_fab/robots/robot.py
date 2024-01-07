@@ -910,8 +910,8 @@ class Robot(Data):
         if group not in self.semantics.group_names:
             raise ValueError("No such group: {}".format(group))
 
-        if not tool.link_name:
-            tool.link_name = self.get_end_effector_link_name(group)
+        if not tool.connected_to:
+            tool.connected_to = self.get_end_effector_link_name(group)
         tool.update_touch_links(touch_links)
         self.attached_tools[group] = tool
 
