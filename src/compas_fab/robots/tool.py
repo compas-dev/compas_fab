@@ -6,7 +6,7 @@ import json
 
 from compas.data import Data
 from compas_robots import ToolModel
-from compas_robots.model import Geometry
+from compas_robots.model import LinkGeometry
 
 from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots import CollisionMesh
@@ -53,7 +53,7 @@ class Tool(Data):
         acms = []
         for link in self.tool_model.iter_links():
             for i, item in enumerate(link.collision):
-                meshes = Geometry._get_item_meshes(item)
+                meshes = LinkGeometry._get_item_meshes(item)
                 for mesh in meshes:
                     collision_mesh_name = "{}_{}_collision_{}".format(self.tool_model.name, link.name, i)
                     collision_mesh = CollisionMesh(mesh, collision_mesh_name)
