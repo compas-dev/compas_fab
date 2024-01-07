@@ -29,7 +29,6 @@
       "JointTrajectory",
       "JointTrajectoryPoint",
       "OrientationConstraint",
-      "PathPlan",
       "PlanningScene",
       "PositionConstraint",
       "Robot",

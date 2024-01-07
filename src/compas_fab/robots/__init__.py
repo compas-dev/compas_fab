@@ -33,7 +33,6 @@ Path planning
 
     JointTrajectory
     JointTrajectoryPoint
-    PathPlan
     Trajectory
 
 Planning scene
@@ -82,7 +81,6 @@ from .constraints import (
     OrientationConstraint,
     PositionConstraint,
 )
-from .path_plan import PathPlan
 from .planning_scene import (
     AttachedCollisionMesh,
     CollisionMesh,
@@ -132,7 +130,6 @@ __all__ = [
     "JointTrajectory",
     "JointTrajectoryPoint",
     "OrientationConstraint",
-    "PathPlan",
     "PlanningScene",
     "PositionConstraint",
     "ReachabilityMap",
