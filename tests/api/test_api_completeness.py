@@ -1,12 +1,13 @@
 from __future__ import absolute_import
 
-import os
-import pytest
-import shutil
-import subprocess
 import importlib
 import inspect
+import os
+import shutil
+import subprocess
+
 import compas
+import pytest
 
 
 def get_names_in_module(module_name):

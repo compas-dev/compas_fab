@@ -2,8 +2,8 @@ import math
 import os
 import time
 
-import pytest
 import compas
+import pytest
 from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Rotation

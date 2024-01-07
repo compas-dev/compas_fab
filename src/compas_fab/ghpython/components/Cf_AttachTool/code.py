@@ -3,11 +3,11 @@ Attach a tool to the robot.
 
 COMPAS FAB v0.28.0
 """
-from ghpythonlib.componentbase import executingcomponent as component
+from compas.geometry import Frame
 from compas_rhino.conversions import RhinoMesh
 from compas_rhino.conversions import plane_to_compas_frame
+from ghpythonlib.componentbase import executingcomponent as component
 
-from compas.geometry import Frame
 from compas_fab.robots import Tool
 
 

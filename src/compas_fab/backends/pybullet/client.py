@@ -8,10 +8,10 @@ import tempfile
 from itertools import combinations
 
 import compas
-from compas.files import URDF
 from compas.geometry import Frame
-from compas.robots import MeshDescriptor
-from compas.robots import RobotModel
+from compas_robots import RobotModel
+from compas_robots.files import URDF
+from compas_robots.model import MeshDescriptor
 
 import compas_fab
 from compas_fab.backends.interfaces.client import ClientInterface
@@ -220,7 +220,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             Absolute file path to the urdf file name or file object. The mesh file can be linked by either
             `"package::"` or relative path.
         resource_loaders : :obj:`list`
-            List of :class:`compas.robots.AbstractMeshLoader` for loading geometry of the robot.  That the
+            List of :class:`compas_robots.AbstractMeshLoader` for loading geometry of the robot.  That the
             geometry of the robot model is loaded is required before adding or removing attached collision meshes
             to or from the scene. Defaults to the empty list.
         concavity : :obj:`bool`
@@ -372,7 +372,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Returns
         -------
-        :class:`compas.robots.RobotModel`
+        :class:`compas_robots.RobotModel`
 
         Raises
         ------
@@ -411,7 +411,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        cached_robot : :class:`compas.robots.RobotModel`
+        cached_robot : :class:`compas_robots.RobotModel`
             The robot model saved for use with PyBullet.
 
         Returns
@@ -665,7 +665,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Returns
         -------
-        :class:`compas.robots.Configuration`
+        :class:`compas_robots.Configuration`
         """
         cached_robot = self.get_cached_robot(robot)
         body_id = self.get_uid(cached_robot)

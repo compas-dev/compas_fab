@@ -8,9 +8,9 @@ from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Sphere
 from compas.geometry import Transformation
-from compas.robots import Configuration
-from compas.robots import Joint
-from compas.robots import RobotModel
+from compas_robots import Configuration
+from compas_robots import RobotModel
+from compas_robots.model import Joint
 
 from compas_fab.robots.constraints import Constraint
 from compas_fab.robots.constraints import JointConstraint
@@ -28,14 +28,14 @@ class Robot(Data):
     This class binds together several building blocks, such as the robot's
     descriptive model, its semantic information and an instance of a backend
     client into a cohesive programmable interface. This representation builds
-    upon the model described in the class :class:`compas.robots.RobotModel` of
+    upon the model described in the class :class:`compas_robots.RobotModel` of
     the **COMPAS** framework.
 
     Attributes
     ----------
     model : :class:`RobotModel`
         The robot model, usually created from an URDF structure.
-    artist : :class:`compas.robots.base_artist.BaseRobotModelArtist`
+    artist : :class:`compas_robots.base_artist.BaseRobotModelArtist`
         Instance of the artist used to visualize the robot model. Defaults to ``None``.
     semantics : :class:`compas_fab.robots.RobotSemantics`
         The semantic model of the robot. Defaults to ``None``.
@@ -86,7 +86,7 @@ class Robot(Data):
 
     @property
     def artist(self):
-        """:class:`compas.robots.base_artist.BaseRobotModelArtist`: Artist used to visualize robot model."""
+        """:class:`compas_robots.base_artist.BaseRobotModelArtist`: Artist used to visualize robot model."""
         return self._artist
 
     @artist.setter
@@ -107,14 +107,14 @@ class Robot(Data):
         ----------
         name : :obj:`str`
             Name of the robot
-        joints : :obj:`list` of :class:`compas.robots.Joint`, optional
+        joints : :obj:`list` of :class:`compas_robots.Joint`, optional
             Robot's joints.
-        links : :obj:`list` of :class:`compas.robots.Link`, optional
+        links : :obj:`list` of :class:`compas_robots.Link`, optional
             Robot's links.
-        materials : :obj:`list` of :class:`compas.robots.Material`, optional
+        materials : :obj:`list` of :class:`compas_robots.Material`, optional
             Material description of the robot.
         kwargs : :obj:`dict`
-            Keyword arguments passed to the :class:`compas.robots.RobotModel`
+            Keyword arguments passed to the :class:`compas_robots.RobotModel`
             `attr` :obj:`dict`. Accessible from `Robot.model.attr`.
 
 
@@ -222,7 +222,7 @@ class Robot(Data):
 
         Returns
         -------
-        :class:`compas.robots.Link`
+        :class:`compas_robots.Link`
 
         Examples
         --------
@@ -284,7 +284,7 @@ class Robot(Data):
 
         Returns
         -------
-        :class:`compas.robots.Link`
+        :class:`compas_robots.Link`
 
         Examples
         --------
@@ -362,7 +362,7 @@ class Robot(Data):
 
         Returns
         -------
-        :obj:`list` of :class:`compas.robots.Joint`
+        :obj:`list` of :class:`compas_robots.Joint`
 
         Note
         ----
@@ -393,7 +393,7 @@ class Robot(Data):
 
         Returns
         -------
-        :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+        :obj:`list` of :attr:`compas_robots.Joint.SUPPORTED_TYPES`
             List of joint types.
         """
         return self.model.get_joint_types_by_names(names)
@@ -408,7 +408,7 @@ class Robot(Data):
 
         Returns
         -------
-        :class:`compas.robots.Joint`
+        :class:`compas_robots.Joint`
         """
         return self.model.get_joint_by_name(name)
 
@@ -448,7 +448,7 @@ class Robot(Data):
 
         Returns
         -------
-        :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+        :obj:`list` of :attr:`compas_robots.Joint.SUPPORTED_TYPES`
 
         Note
         ----
@@ -511,7 +511,7 @@ class Robot(Data):
 
         Returns
         -------
-        :class:`compas.robots.Configuration`
+        :class:`compas_robots.Configuration`
 
         Note
         ----
@@ -1972,7 +1972,7 @@ class Robot(Data):
         print("The end-effector's name is '{}'.".format(self.get_end_effector_link_name()))
         if self.attached_tools:
             for tool in self.attached_tools.values():
-                print("The robot has a tool at the {} link attached.".format(tool.link_name))
+                print("The robot has a tool at the {} link attached.".format(tool.connected_to))
         else:
             print("The robot has NO tool attached.")
         print("The base link's name is '{}'".format(self.get_base_link_name()))

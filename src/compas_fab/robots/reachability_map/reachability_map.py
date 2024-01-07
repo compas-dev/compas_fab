@@ -1,7 +1,7 @@
 from compas.data import Data
 from compas.geometry import Frame
-from compas.robots import Configuration
 from compas.geometry import argmax
+from compas_robots import Configuration
 
 
 class ReachabilityMap(Data):
@@ -16,7 +16,7 @@ class ReachabilityMap(Data):
     ----------
     frames : list of list of :class:`compas.geometry.Frame`
         The frames at which the IK solutions are calculated.
-    configurations : list of list of list of :class:`compas.robots.Configuration`
+    configurations : list of list of list of :class:`compas_robots.Configuration`
         The configurations at the frames.
     score : list of int
         The number of solutions per frame list (2D)
@@ -56,9 +56,8 @@ class ReachabilityMap(Data):
         ValueError : If the frame_generator does not produce a 2D list of frames
         """
 
-        from compas_fab.backends.exceptions import (
-            InverseKinematicsError,
-        )  # tests\api\test_api_completeness.py complains otherwise
+        from compas_fab.backends.exceptions import \
+            InverseKinematicsError  # tests\api\test_api_completeness.py complains otherwise
 
         for frames in frame_generator:  # 2D
             if isinstance(frames, Frame):

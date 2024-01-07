@@ -11,7 +11,6 @@ from compas_fab.robots import ReachabilityMap
 from compas_fab.robots.reachability_map import DeviationVectorsGenerator
 from compas_fab.robots.reachability_map import OrthonormalVectorsFromAxisGenerator
 
-
 filename = os.path.join(os.path.dirname(__file__), "fixtures", "map.json")
 
 

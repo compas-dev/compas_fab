@@ -5,7 +5,7 @@ from __future__ import print_function
 import math
 import random
 
-from compas.robots import Joint
+from compas_robots.model import Joint
 
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics

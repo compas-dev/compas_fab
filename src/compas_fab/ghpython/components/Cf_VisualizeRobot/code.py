@@ -5,13 +5,13 @@ COMPAS FAB v0.28.0
 """
 import time
 
-from compas.artists import Artist
 from compas.geometry import Frame
 from compas.geometry import Transformation
+from compas.scene import SceneObject
+from compas_ghpython.utilities import create_id
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
 
-from compas_fab.ghpython.components import create_id
 from compas_fab.robots import PlanningScene
 
 

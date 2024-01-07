@@ -1,7 +1,7 @@
 import compas
 compas.PRECISION = '12f'
 
-from compas.robots import *
+from compas_robots import *
 from compas_rhino.artists import RobotModelArtist
 
 r = 'ros-industrial/abb'

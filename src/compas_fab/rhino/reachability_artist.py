@@ -9,7 +9,7 @@ class ReachabilityMapArtist(RhinoArtist):
 
     Parameters
     ----------
-    reachability_map : :class:`compas.robots.ReachabilityMap`
+    reachability_map : :class:`compas_robots.ReachabilityMap`
         Robot model.
     scale: float, optional
         Scale factor that controls the length of the axes.

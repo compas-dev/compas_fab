@@ -1,10 +1,10 @@
 from __future__ import absolute_import
 
-from compas_fab.backends.ros.messages.std_msgs import ROSmsg
-from compas_fab.backends.ros.messages.geometry_msgs import Point
-
 import compas.datastructures
 from compas.datastructures import mesh_quads_to_triangles
+
+from compas_fab.backends.ros.messages.geometry_msgs import Point
+from compas_fab.backends.ros.messages.std_msgs import ROSmsg
 
 
 class SolidPrimitive(ROSmsg):

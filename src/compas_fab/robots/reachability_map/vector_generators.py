@@ -1,8 +1,10 @@
 import math
-from compas.geometry import Vector
+
 from compas.geometry import Frame
 from compas.geometry import Plane
 from compas.geometry import Rotation
+from compas.geometry import Vector
+
 from compas_fab.utilities import arange
 
 

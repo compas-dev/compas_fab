@@ -1,5 +1,6 @@
-import time
 import threading
+import time
+
 from compas_fab.backends import FutureResult
 
 

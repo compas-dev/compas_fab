@@ -1,7 +1,7 @@
 import os
 
 import pytest
-from compas.robots import RobotModel
+from compas_robots import RobotModel
 
 from compas_fab.robots import RobotSemantics
 from compas_fab.robots.ur5 import Robot as Ur5Robot

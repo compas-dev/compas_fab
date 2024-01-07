@@ -1,4 +1,4 @@
-from compas.robots import RobotModel
+from compas_robots import RobotModel
 
 from compas_fab.backends import RosClient
 from compas_fab.robots import Robot

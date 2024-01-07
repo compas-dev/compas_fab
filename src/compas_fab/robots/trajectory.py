@@ -3,8 +3,8 @@ from __future__ import division
 from __future__ import print_function
 
 from compas.data import Data
-from compas.robots import Configuration
-from compas.robots.configuration import FixedLengthList
+from compas_robots import Configuration
+from compas_robots.configuration import FixedLengthList
 
 from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots.time_ import Duration
@@ -30,9 +30,9 @@ class JointTrajectoryPoint(Configuration):
     joint_values : :obj:`list` of :obj:`float`, optional
         Joint values expressed in radians or meters, depending on the respective
         type.
-    joint_types : :obj:`list` of :attr:`compas.robots.Joint.TYPE`, optional
+    joint_types : :obj:`list` of :attr:`compas_robots.Joint.TYPE`, optional
         Joint types, e.g. a :obj:`list` of
-        :attr:`compas.robots.Joint.REVOLUTE` for revolute joints.
+        :attr:`compas_robots.Joint.REVOLUTE` for revolute joints.
     velocities : :obj:`list` of :obj:`float`, optional
         Velocity of each joint.
     accelerations : :obj:`list` of :obj:`float`, optional
@@ -47,9 +47,9 @@ class JointTrajectoryPoint(Configuration):
     joint_values : :obj:`list` of :obj:`float`
         Joint values expressed in radians or meters, depending on the respective
         type.
-    joint_types : :obj:`list` of :attr:`compas.robots.Joint.TYPE`
+    joint_types : :obj:`list` of :attr:`compas_robots.Joint.TYPE`
         Joint types, e.g. a :obj:`list` of
-        :attr:`compas.robots.Joint.REVOLUTE` for revolute joints.
+        :attr:`compas_robots.Joint.REVOLUTE` for revolute joints.
     velocities : :obj:`list` of :obj:`float`
         Velocity of each joint.
     accelerations : :obj:`list` of :obj:`float`

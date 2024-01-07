@@ -1,9 +1,9 @@
-from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
 
-from compas.geometry import Scale
 from compas.geometry import Rotation
+from compas.geometry import Scale
 
 __all__ = ["BoundingVolume", "Constraint", "JointConstraint", "OrientationConstraint", "PositionConstraint"]
 

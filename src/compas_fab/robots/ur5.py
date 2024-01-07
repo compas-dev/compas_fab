@@ -7,8 +7,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas.robots import LocalPackageMeshLoader
-from compas.robots import RobotModel
+from compas_robots import RobotModel
+from compas_robots.resources import LocalPackageMeshLoader
 
 import compas_fab
 from compas_fab.robots import Robot as RobotClass

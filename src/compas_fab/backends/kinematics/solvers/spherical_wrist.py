@@ -1,11 +1,12 @@
 import math
-from compas.geometry import Point
-from compas.geometry import Vector
+
 from compas.geometry import Frame
+from compas.geometry import Point
 from compas.geometry import Rotation
 from compas.geometry import Sphere
-from compas.geometry import intersection_sphere_sphere
+from compas.geometry import Vector
 from compas.geometry import intersection_plane_circle
+from compas.geometry import intersection_sphere_sphere
 from compas.geometry import tangent_points_to_circle_xy
 
 # TODO: This is very slow...

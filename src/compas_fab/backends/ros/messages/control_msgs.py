@@ -1,10 +1,10 @@
-from .std_msgs import ROSmsg
-from .std_msgs import Header
-from .std_msgs import Time
 from .actionlib_msgs import GoalID
 from .actionlib_msgs import GoalStatus
-from .trajectory_msgs import JointTrajectoryPoint
+from .std_msgs import Header
+from .std_msgs import ROSmsg
+from .std_msgs import Time
 from .trajectory_msgs import JointTrajectory
+from .trajectory_msgs import JointTrajectoryPoint
 
 
 class JointTolerance(ROSmsg):

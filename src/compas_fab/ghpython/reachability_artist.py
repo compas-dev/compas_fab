@@ -8,7 +8,7 @@ class ReachabilityMapArtist(GHArtist):
 
     Parameters
     ----------
-    reachability_map : :class:`compas.robots.ReachabilityMap`
+    reachability_map : :class:`compas_robots.ReachabilityMap`
         Robot model.
     **kwargs : dict, optional
         Additional keyword arguments.

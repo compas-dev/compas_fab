@@ -1,10 +1,12 @@
 import math
+
 from compas.geometry import argmin
+
+from compas_fab.backends.interfaces import PlanCartesianMotion
+from compas_fab.backends.kinematics.exceptions import CartesianMotionError
+from compas_fab.backends.kinematics.utils import smallest_joint_angles
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
-from compas_fab.backends.interfaces import PlanCartesianMotion
-from compas_fab.backends.kinematics.utils import smallest_joint_angles
-from compas_fab.backends.kinematics.exceptions import CartesianMotionError
 
 
 class AnalyticalPlanCartesianMotion(PlanCartesianMotion):

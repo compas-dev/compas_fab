@@ -4,9 +4,9 @@ import json
 import os
 from datetime import datetime
 
+import compas
 import pytest
 
-import compas
 import compas_fab
 
 

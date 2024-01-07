@@ -13,9 +13,9 @@ from compas.datastructures import Mesh
 from compas.datastructures import mesh_transform
 from compas.files import XML
 from compas.geometry import Transformation
-from compas.robots.resources.basic import _get_file_format
-from compas.robots.resources.basic import _mesh_import
-from compas.utilities import geometric_key
+from compas.tolerance import TOL
+from compas_robots.resources.basic import _get_file_format
+from compas_robots.resources.basic import _mesh_import
 
 LOGGER = logging.getLogger("compas_fab.backends.ros")
 TIMEOUT = 10
@@ -401,7 +401,9 @@ if __name__ == "__main__":
     roslaunch file_server.launch
     """
     import logging
-    from compas.robots import RobotModel
+
+    from compas_robots import RobotModel
+
     from compas_fab.backends import RosClient
 
     FORMAT = "%(asctime)-15s [%(levelname)s] %(message)s"

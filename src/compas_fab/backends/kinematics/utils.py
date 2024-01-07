@@ -1,5 +1,6 @@
 import math
-from compas.robots import Configuration
+
+from compas_robots import Configuration
 
 
 def get_smaller_angle(angle):  # delete

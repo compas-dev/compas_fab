@@ -1,7 +1,7 @@
 import pytest
+from compas_robots import Configuration
+from compas_robots.model import Joint
 
-from compas.robots import Configuration
-from compas.robots import Joint
 from compas_fab.robots import Duration
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
