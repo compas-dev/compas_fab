@@ -169,8 +169,8 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
         Rot1 = Rotation.from_axis_and_angle([0, 0, 1], -1 * axis1_angle, point=[0, 0, 0])
         p1A = p1_proj.transformed(Rot1)
         elbow_dir = Vector(1, 0, 0).transformed(Rot1)
-        sphere1 = Sphere(p1A, lower_arm_length)
-        sphere2 = Sphere(wrist, upper_arm_length)
+        sphere1 = Sphere(lower_arm_length, p1A)
+        sphere2 = Sphere(upper_arm_length, wrist)
         elbow_frame = Frame(p1A, elbow_dir, [0, 0, 1])
         elbow_plane = (p1A, elbow_frame.normal)
 
