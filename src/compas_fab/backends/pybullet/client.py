@@ -211,7 +211,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         return robot
 
-    def load_robot(self, urdf_file, resource_loaders=None, concavity=False):
+    def load_robot(self, urdf_file, resource_loaders=None, concavity=False, precision=None):
         """Create a pybullet robot using the input urdf file.
 
         Parameters
@@ -227,6 +227,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             When ``False`` (the default), the mesh will be loaded as its
             convex hull for collision checking purposes.  When ``True``,
             a non-static mesh will be decomposed into convex parts using v-HACD.
+        precision : int
+            Defines precision for importing/loading meshes. Defaults to ``compas.tolerance.TOL.precision``.
 
         Notes
         -----
@@ -239,7 +241,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         robot = Robot(robot_model, client=self)
         robot.attributes["pybullet"] = {}
         if resource_loaders:
-            robot_model.load_geometry(*resource_loaders)
+            robot_model.load_geometry(*resource_loaders, precision=precision)
             self.cache_robot(robot, concavity)
         else:
             robot.attributes["pybullet"]["cached_robot"] = robot.model

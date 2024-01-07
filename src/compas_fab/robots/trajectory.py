@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 from compas.data import Data
+from compas.tolerance import TOL
 from compas_robots import Configuration
 from compas_robots.configuration import FixedLengthList
 
@@ -82,13 +83,12 @@ class JointTrajectoryPoint(Configuration):
 
     def __str__(self):
         """Return a human-readable string representation of the instance."""
-        vs = "%." + self._precision
         return "JointTrajectoryPoint(({}), {}, ({}), ({}), ({}), {})".format(
-            ", ".join(vs % i for i in self.joint_values),
+            ", ".join(TOL.format_number(i) for i in self.joint_values),
             tuple(self.joint_types),
-            ", ".join(vs % i for i in self.velocities),
-            ", ".join(vs % i for i in self.accelerations),
-            ", ".join(vs % i for i in self.effort),
+            ", ".join(TOL.format_number(i) for i in self.velocities),
+            ", ".join(TOL.format_number(i) for i in self.accelerations),
+            ", ".join(TOL.format_number(i) for i in self.effort),
             self.time_from_start,
         )
 

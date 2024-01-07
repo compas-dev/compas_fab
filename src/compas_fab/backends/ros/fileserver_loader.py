@@ -64,17 +64,14 @@ class RosFileServerLoader(object):
     local_cache_directory : str, optional
         Directory name to store the cached files. Only used if
         ``local_cache`` is ``True``. Defaults to ``~/robot_description``.
-    precision : float
-        Defines precision for importing/loading meshes. Defaults to ``compas.PRECISION``.
     """
 
-    def __init__(self, ros=None, local_cache=False, local_cache_directory=None, precision=None):
+    def __init__(self, ros=None, local_cache=False, local_cache_directory=None):
         self.robot_name = None
         self.schema_prefix = "package://"
         self.ros = ros
         self.local_cache_directory = None
         self.local_cache_enabled = local_cache
-        self.precision = precision
 
         if self.local_cache_enabled:
             self.local_cache_directory = local_cache_directory or os.path.join(
@@ -181,7 +178,7 @@ class RosFileServerLoader(object):
         """
         return url.startswith(self.schema_prefix)
 
-    def load_meshes(self, url):
+    def load_meshes(self, url, precision=None):
         """Load meshes from the given URL in the ROS file server.
 
         A single mesh url can contain multiple meshes depending on the format.
@@ -190,6 +187,8 @@ class RosFileServerLoader(object):
         ----------
         url : str
             Mesh URL
+        precision: int, optional
+            The precision for parsing geometric data.
 
         Returns
         -------
@@ -227,7 +226,7 @@ class RosFileServerLoader(object):
             # Nothing to do here, the file will be read by the mesh importer
             LOGGER.debug("Loading mesh file %s from local cache dir", local_filename)
 
-        return _fileserver_mesh_import(url, local_filename, self.precision)
+        return _fileserver_mesh_import(url, local_filename, precision)
 
     def load_mesh(self, url):
         """Load the mesh from the given URL.
@@ -309,7 +308,8 @@ def _dae_mesh_importer(filename, precision):
                         )
                         for color_node in colors:
                             rgba = [float(i) for i in color_node.text.split()]
-                            mesh_colors["mesh_color.{}".format(color_node.attrib["sid"])] = rgba
+                            if "sid" in color_node.attrib:
+                                mesh_colors["mesh_color.{}".format(color_node.attrib["sid"])] = rgba
                 except Exception:
                     LOGGER.exception(
                         "Exception while loading materials, all materials of mesh file %s will be ignored ", filename
@@ -358,7 +358,7 @@ def _dae_mesh_importer(filename, precision):
             vertex = OrderedDict()
 
             for i, xyz in enumerate(vertices):
-                key = geometric_key(xyz, precision)
+                key = TOL.geometric_key(xyz, precision)
                 index_key[i] = key
                 vertex[key] = xyz
 
@@ -382,15 +382,14 @@ def _dae_mesh_importer(filename, precision):
 
 def _fileserver_mesh_import(url, filename, precision=None):
     """Internal function that adds primitive support for DAE files
-    to the _mesh_import function of compas.robots."""
+    to the _mesh_import function of compas_robots."""
     file_extension = _get_file_format(url)
 
     if file_extension == "dae":
         # Magic!
         return _dae_mesh_importer(filename, precision)
     else:
-        # TODO: This _mesh_import should also add support for precision
-        return _mesh_import(url, filename)
+        return _mesh_import(url, filename, precision)
 
 
 if __name__ == "__main__":

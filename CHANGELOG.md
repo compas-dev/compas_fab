@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `RobotSemantics` now inherit from `compas.data.Data`
 * `Tool` now inherit from `compas.data.Data`
 * Migrate to COMPAS 2.x: add dependency to `compas_robots`
+* Migrate to COMPAS 2.x: use `compas.tolerance` module instead of `compas.PRECISION`
 
 ### Removed
 

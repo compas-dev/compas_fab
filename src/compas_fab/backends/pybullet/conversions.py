@@ -4,7 +4,6 @@ from __future__ import print_function
 
 from compas.geometry import Frame
 
-
 __all__ = ["pose_from_frame", "frame_from_pose"]
 
 
