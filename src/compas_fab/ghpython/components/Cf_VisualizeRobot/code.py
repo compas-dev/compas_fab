@@ -54,19 +54,19 @@ class RobotVisualize(component):
 
             if show_base_frame:
                 base_compas_frame = compas_frames[0]
-                artist = Artist(base_compas_frame)
-                base_frame = artist.draw()
+                sceneobject = SceneObject(base_compas_frame)
+                base_frame = sceneobject.draw()
 
             if show_end_effector_frame:
                 ee_compas_frame = robot.forward_kinematics(configuration, group, options=dict(solver="model"))
-                artist = Artist(ee_compas_frame)
-                ee_frame = artist.draw()
+                sceneobject = SceneObject(ee_compas_frame)
+                ee_frame = sceneobject.draw()
 
             if show_frames:
                 frames = []
                 for compas_frame in compas_frames[1:]:
-                    artist = Artist(compas_frame)
-                    frame = artist.draw()
+                    sceneobject = SceneObject(compas_frame)
+                    frame = sceneobject.draw()
                     frames.append(frame)
 
             cached_scene_key = create_id(self, "cached_scene")
@@ -103,7 +103,7 @@ class RobotVisualize(component):
                             else:
                                 mesh = cm.mesh
 
-                            collision_meshes.append(Artist(mesh).draw())
+                            collision_meshes.append(SceneObject(mesh).draw())
 
                         cached_scene["cm"] = collision_meshes
 

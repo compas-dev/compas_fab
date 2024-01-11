@@ -3,20 +3,18 @@ from __future__ import division
 from __future__ import print_function
 
 import compas
-from compas.artists import Artist
 from compas.plugins import plugin
+from compas.scene import SceneObject
 
 from compas_fab.robots import ReachabilityMap
 
 if compas.RHINO:
-    from compas_rhino.artists import RobotModelArtist
-
-    from .reachability_artist import ReachabilityMapArtist
+    from .reachabilitymapobject import ReachabilityMapObject
 
     __all__ = [
         "ReachabilityMapArtist",
     ]
 
     @plugin(category="factories", requires=["Rhino"])
-    def register_artists():
-        Artist.register(ReachabilityMap, ReachabilityMapArtist, context="Rhino")
+    def register_scene_objects():
+        SceneObject.register(ReachabilityMap, ReachabilityMapObject, context="Rhino")

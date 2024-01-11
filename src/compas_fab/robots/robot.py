@@ -35,8 +35,8 @@ class Robot(Data):
     ----------
     model : :class:`RobotModel`
         The robot model, usually created from an URDF structure.
-    artist : :class:`compas_robots.base_artist.BaseRobotModelArtist`
-        Instance of the artist used to visualize the robot model. Defaults to ``None``.
+    scene_object : :class:`compas_robots.scene.BaseRobotModelObject`
+        Instance of the scene object used to visualize the robot model. Defaults to ``None``.
     semantics : :class:`compas_fab.robots.RobotSemantics`
         The semantic model of the robot. Defaults to ``None``.
     client : :class:`compas_fab.backends.interfaces.ClientInterface`
@@ -48,7 +48,7 @@ class Robot(Data):
         Dictionary mapping planning groups to the tool currently attached to them, if any.
     """
 
-    def __init__(self, model=None, artist=None, semantics=None, client=None):
+    def __init__(self, model=None, scene_object=None, semantics=None, client=None):
         super(Robot, self).__init__()
         # These attributes have to be initiated first,
         # because they are used in the setters of the other attributes
@@ -57,7 +57,7 @@ class Robot(Data):
         self._current_ik = {"request_id": None, "solutions": None}
 
         self.model = model
-        self.artist = artist
+        self.scene_object = scene_object
         self.semantics = semantics
         self.client = client
         self.attributes = {}
@@ -72,7 +72,7 @@ class Robot(Data):
             "model": self.model.data,
             "semantics": self.semantics,
             "attributes": self.attributes,
-            # The following attributes cannot be serialized: artist, client
+            # The following attributes cannot be serialized: scene_object, client
         }
         return data
 
@@ -85,19 +85,19 @@ class Robot(Data):
         self.attributes = data.get("attributes", {})
 
     @property
-    def artist(self):
-        """:class:`compas_robots.base_artist.BaseRobotModelArtist`: Artist used to visualize robot model."""
-        return self._artist
+    def scene_object(self):
+        """:class:`compas_robots.scene.BaseRobotModelObject`: Scene object used to visualize robot model."""
+        return self._scene_object
 
-    @artist.setter
-    def artist(self, artist):
-        self._artist = artist
-        if artist is None:
+    @scene_object.setter
+    def scene_object(self, value):
+        self._scene_object = value
+        if value is None:
             return
         if len(self.model.joints) > 0 and len(self.model.links) > 0:
             self.scale(self._scale_factor)
             for tool in self.attached_tools.values():
-                self.artist.attach_tool_model(tool.tool_model)
+                self.scene_object.attach_tool_model(tool.tool_model)
 
     @classmethod
     def basic(cls, name, joints=None, links=None, materials=None, **kwargs):
@@ -915,8 +915,8 @@ class Robot(Data):
         tool.update_touch_links(touch_links)
         self.attached_tools[group] = tool
 
-        if self.artist:
-            self.artist.attach_tool_model(tool.tool_model)
+        if self.scene_object:
+            self.scene_object.attach_tool_model(tool.tool_model)
 
     def detach_tool(self, group=None):
         """Detach the attached tool.
@@ -936,8 +936,8 @@ class Robot(Data):
             raise ValueError("No tool attached to group {}".format(group))
 
         tool_to_remove = self.attached_tools[group]
-        if self.artist and tool_to_remove:
-            self.artist.detach_tool_model(tool_to_remove.tool_model)
+        if self.scene_object and tool_to_remove:
+            self.scene_object.detach_tool_model(tool_to_remove.tool_model)
         self.attached_tools.pop(group)
 
     # ==========================================================================
@@ -1914,25 +1914,25 @@ class Robot(Data):
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
 
-        self.artist.update(configuration, visual, collision)
+        self.scene_object.update(configuration, visual, collision)
 
     def draw_visual(self):
-        """Draw the robot's visual geometry using the defined :attr:`Robot.artist`."""
-        return self.artist.draw_visual()
+        """Draw the robot's visual geometry using the defined :attr:`Robot.scene_object`."""
+        return self.scene_object.draw_visual()
 
     def draw_collision(self):
-        """Draw the robot's collision geometry using the defined :attr:`Robot.artist`."""
-        return self.artist.draw_collision()
+        """Draw the robot's collision geometry using the defined :attr:`Robot.scene_object`."""
+        return self.scene_object.draw_collision()
 
     def draw(self):
         """Alias of :meth:`draw_visual`."""
         return self.draw_visual()
 
-    # TODO: add artist.draw_attached_tool
+    # TODO: add scene_object.draw_attached_tool
     # def draw_attached_tool(self):
-    #     """Draw the attached tool using the defined :attr:`Robot.artist`."""
-    #     if self.artist and self.attached_tool:
-    #         return self.artist.draw_attached_tool()
+    #     """Draw the attached tool using the defined :attr:`Robot.scene_object`."""
+    #     if self.scene_object and self.attached_tool:
+    #         return self.scene_object.draw_attached_tool()
 
     def scale(self, factor):
         """Scale the robot geometry by a factor (absolute).
@@ -1947,16 +1947,16 @@ class Robot(Data):
         ``None``
         """
         self.model.scale(factor)
-        if self.artist:
-            self.artist.scale(factor)
+        if self.scene_object:
+            self.scene_object.scale(factor)
         else:
             self._scale_factor = factor
 
     @property
     def scale_factor(self):
         """:obj:`float`: Robot's scale factor."""
-        if self.artist:
-            return self.artist.scale_factor
+        if self.scene_object:
+            return self.scene_object.scale_factor
         else:
             return self._scale_factor
 

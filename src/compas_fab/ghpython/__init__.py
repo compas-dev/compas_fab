@@ -27,14 +27,10 @@ Additionally, this package provides deprecated aliases to the
 import compas
 
 if compas.RHINO:
-    from .artists import (
-        ReachabilityMapArtist,
-        RobotArtist,
-        RobotModelArtist,
+    from .scene import (
+        ReachabilityMapObject,
     )
 
     __all__ = [
-        "ReachabilityMapArtist",
-        "RobotArtist",  # deprecated
-        "RobotModelArtist",  # deprecated
+        "ReachabilityMapObject",
     ]
