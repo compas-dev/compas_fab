@@ -1085,7 +1085,7 @@ class Robot(Data):
             frame_WCF = self.from_tcf_to_t0cf([frame_WCF], group)[0]
 
         ee_link = self.get_end_effector_link_name(group)
-        sphere = Sphere(frame_WCF.point, tolerance_position)
+        sphere = Sphere(radius=tolerance_position, point=frame_WCF.point)
         return PositionConstraint.from_sphere(ee_link, sphere)
 
     def constraints_from_frame(

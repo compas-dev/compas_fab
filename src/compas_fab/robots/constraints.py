@@ -75,7 +75,7 @@ class BoundingVolume(object):
         >>> from compas.geometry import Frame
         >>> from compas.geometry import Box
         >>> from compas_fab.robots import BoundingVolume
-        >>> box = Box(Frame.worldXY(), 1., 1., 1.)
+        >>> box = Box(1., 1., 1.)
         >>> bv = BoundingVolume.from_box(box)
         >>> bv.type
         1
@@ -469,7 +469,7 @@ class PositionConstraint(Constraint):
         --------
         >>> from compas.geometry import Frame
         >>> from compas.geometry import Box
-        >>> box = Box(Frame.worldXY(), 4, 4, 4)
+        >>> box = Box(4, 4, 4, Frame.worldXY())
         >>> pc = PositionConstraint.from_box('link_0', box)
         """
         bounding_volume = BoundingVolume.from_box(box)
