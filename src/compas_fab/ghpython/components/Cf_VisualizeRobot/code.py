@@ -47,10 +47,10 @@ class RobotVisualize(component):
             compas_frames = robot.transformed_frames(configuration, group)
 
             if show_visual:
-                visual = robot.artist.draw_visual()
+                visual = robot.scene_object.draw_visual()
 
             if show_collision:
-                collision = robot.artist.draw_collision()
+                collision = robot.scene_object.draw_collision()
 
             if show_base_frame:
                 base_compas_frame = compas_frames[0]
@@ -124,7 +124,7 @@ class RobotVisualize(component):
 
                             mesh = acm.collision_mesh.mesh.transformed(t)
 
-                            attached_meshes.append(Artist(mesh).draw())
+                            attached_meshes.append(SceneObject(mesh).draw())
 
                     cached_scene["acm"] = attached_meshes
 
