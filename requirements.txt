@@ -1,4 +1,4 @@
-compas >= 2.0.0a2, < 3
+compas >= 2.0.0b2
 compas_robot > 0.12.0, < 1
 roslibpy >= 1.1.0
 pybullet
