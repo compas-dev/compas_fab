@@ -10,7 +10,6 @@ from collections import OrderedDict
 
 import roslibpy
 from compas.datastructures import Mesh
-from compas.datastructures import mesh_transform
 from compas.files import XML
 from compas.geometry import Transformation
 from compas.tolerance import TOL
@@ -373,7 +372,7 @@ def _dae_mesh_importer(filename, precision):
                 mesh.attributes.update(mesh_colors)
 
             if transform:
-                mesh_transform(mesh, transform)
+                mesh.transform(transform)
 
             meshes.append(mesh)
 
