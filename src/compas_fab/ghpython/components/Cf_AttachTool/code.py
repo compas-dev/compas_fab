@@ -4,7 +4,7 @@ Attach a tool to the robot.
 COMPAS FAB v0.28.0
 """
 from compas.geometry import Frame
-from compas_rhino.conversions import RhinoMesh
+from compas_rhino.conversions import mesh_to_compas
 from compas_rhino.conversions import plane_to_compas_frame
 from ghpythonlib.componentbase import executingcomponent as component
 
@@ -17,8 +17,8 @@ class AttachToolComponent(component):
             if not collision_mesh:
                 collision_mesh = visual_mesh
 
-            c_visual_mesh = RhinoMesh.from_geometry(visual_mesh).to_compas()
-            c_collision_mesh = RhinoMesh.from_geometry(collision_mesh).to_compas()
+            c_visual_mesh = mesh_to_compas(visual_mesh)
+            c_collision_mesh = mesh_to_compas(collision_mesh)
 
             if not tcf_plane:
                 frame = Frame.worldXY()

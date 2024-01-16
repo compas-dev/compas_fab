@@ -3,7 +3,7 @@ Add an attached collision mesh to the robot.
 
 COMPAS FAB v0.28.0
 """
-from compas_rhino.geometry import RhinoMesh
+from compas_rhino.conversions import mesh_to_compas
 from ghpythonlib.componentbase import executingcomponent as component
 
 from compas_fab.robots import AttachedCollisionMesh
@@ -14,7 +14,7 @@ class AttachedCollisionMeshComponent(component):
     def RunScript(self, scene, mesh, identifier, link_name, touch_links, add, remove):
         attached_collision_mesh = None
         if scene and mesh and identifier and link_name:
-            compas_mesh = RhinoMesh.from_geometry(mesh).to_compas()
+            compas_mesh = mesh_to_compas(mesh)
             collision_mesh = CollisionMesh(compas_mesh, identifier)
             attached_collision_mesh = AttachedCollisionMesh(collision_mesh, link_name, touch_links)
             if add:

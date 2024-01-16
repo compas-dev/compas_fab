@@ -3,7 +3,7 @@ Add or remove a collision mesh from the planning scene.
 
 COMPAS FAB v0.28.0
 """
-from compas_rhino.geometry import RhinoMesh
+from compas_rhino.conversions import mesh_to_compas
 from ghpythonlib.componentbase import executingcomponent as component
 
 from compas_fab.robots import CollisionMesh
@@ -19,7 +19,7 @@ class CollisionMeshComponent(component):
             raise Exception(self.Message)
 
         if scene and M and name:
-            mesh = RhinoMesh.from_geometry(M).to_compas()
+            mesh = mesh_to_compas(M)
             collision_mesh = CollisionMesh(mesh, name)
             if add:
                 scene.add_collision_mesh(collision_mesh)
