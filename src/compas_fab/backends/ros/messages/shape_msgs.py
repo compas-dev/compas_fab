@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 import compas.datastructures
-from compas.datastructures import mesh_quads_to_triangles
 
 from compas_fab.backends.ros.messages.geometry_msgs import Point
 from compas_fab.backends.ros.messages.std_msgs import ROSmsg
@@ -87,7 +86,7 @@ class Mesh(ROSmsg):
     @classmethod
     def from_mesh(cls, compas_mesh):
         """Construct a `Mesh` message from a :class:`compas.datastructures.Mesh`."""
-        mesh_quads_to_triangles(compas_mesh)
+        compas_mesh.quads_to_triangles()
         vertices, faces = compas_mesh.to_vertices_and_faces()
         triangles = [MeshTriangle(face) for face in faces]
         vertices = [Point(*v) for v in vertices]
