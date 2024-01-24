@@ -56,8 +56,9 @@ class ReachabilityMap(Data):
         ValueError : If the frame_generator does not produce a 2D list of frames
         """
 
-        from compas_fab.backends.exceptions import \
-            InverseKinematicsError  # tests\api\test_api_completeness.py complains otherwise
+        from compas_fab.backends.exceptions import (
+            InverseKinematicsError,
+        )  # tests\api\test_api_completeness.py complains otherwise
 
         for frames in frame_generator:  # 2D
             if isinstance(frames, Frame):
