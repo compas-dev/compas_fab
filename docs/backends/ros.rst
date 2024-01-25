@@ -156,7 +156,7 @@ Next Steps
 
 * `Tutorial: COMPAS Robots <https://compas.dev/compas/1.17.9/tutorial/robots.html>`__
 ..
-  TODO: whatever user intersphinx link for compas compas robots tutorial
+  TODO: use intersphinx link for compas compas robots tutorial when new compas sphinx is settled
   Something like this: * :ref:`Tutorial: COMPAS Robots <compas:robots>`
 * :ref:`Examples: Description models <examples_description_models>`
 * :ref:`Examples: ROS Backend <examples_ros>`
