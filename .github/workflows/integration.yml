@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - 'compas-2.x-compat'
   pull_request:
     branches:
       - main
+      - 'compas-2.x-compat'
 
 jobs:
   build:
