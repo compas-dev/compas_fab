@@ -16,7 +16,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `Robot` now inherit from `compas.data.Data`
 * `RobotSemantics` now inherit from `compas.data.Data`
 * `Tool` now inherit from `compas.data.Data`
-* Fixed a number of Sphinx warnings
 
 ### Removed
 
