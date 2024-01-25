@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added `compas_fab.robot.Target` class to represent a motion planning target.
+* Added also child classes `FrameTarget`, `PointAxisTarget`, `ConfigurationTarget`, `ConstraintSetTarget`
+
 ### Changed
 
 * Changed `CollisionMesh` inherit from `compas.data.Data`
