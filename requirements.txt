@@ -1,5 +1,5 @@
 compas >= 2.0.0b2
-compas_robots >= 0.1.0, < 1
+compas_robots @ git+https://github.com/compas-dev/compas_robots@main
 roslibpy >= 1.1.0
 pybullet
 pyserial
