@@ -15,7 +15,7 @@ with RosClient() as client:
     brick = Box.from_width_height_depth(0.11, 0.07, 0.25)
 
     for i in range(5):
-        mesh = Mesh.from_vertices_and_faces(brick.vertices, brick.faces)
+        mesh = brick.to_mesh(triangulated=True)
         cm = CollisionMesh(mesh, 'brick')
         cm.frame.point.y += 0.5
         cm.frame.point.z += brick.zsize * i
