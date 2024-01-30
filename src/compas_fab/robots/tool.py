@@ -2,8 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import json
-
 from compas.data import Data
 from compas_robots import ToolModel
 from compas_robots.model import LinkGeometry

@@ -394,6 +394,7 @@ def test_forward_kinematics_without_tool(ur5_robot_instance):
     assert str(frame_t0cf.xaxis) == "Vector(x=-0.000, y=1.000, z=0.000)"
     assert str(frame_t0cf.yaxis) == "Vector(x=1.000, y=0.000, z=0.000)"
 
+
 def test_forward_kinematics_with_tool(ur5_robot_instance, robot_tool1):
     robot = ur5_robot_instance
     tool = robot_tool1

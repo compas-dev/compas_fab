@@ -28,6 +28,7 @@ def test_vector_generators():
     assert allclose(result[2], Vector(0.433, 0.750, 0.500), tol=1e-3)
     assert allclose(result[3], Vector(0.433, -0.750, 0.500), tol=1e-3)
 
+
 def test_reachability_scores():
     map = ReachabilityMap.from_json(filename)
 
