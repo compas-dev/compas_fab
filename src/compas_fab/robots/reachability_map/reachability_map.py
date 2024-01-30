@@ -144,4 +144,3 @@ class ReachabilityMap(Data):
         configurations = _recursive_decode(data["configurations"], Configuration)
         name = data.get("name", None)
         return cls(frames, configurations, name)
-

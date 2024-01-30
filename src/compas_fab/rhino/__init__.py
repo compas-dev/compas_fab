@@ -23,6 +23,7 @@ Additionally, this package provides deprecated aliases to the
 :class:`~compas_rhino.artists.RobotModelArtist` implemented in COMPAS.
 
 """
+
 import compas
 
 if compas.RHINO:

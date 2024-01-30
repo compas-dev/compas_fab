@@ -3,6 +3,7 @@ Visualizes the robot.
 
 COMPAS FAB v0.28.0
 """
+
 import time
 
 from compas.geometry import Frame

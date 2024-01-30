@@ -117,6 +117,7 @@ class CollisionMesh(Data):
 
         return data_obj
 
+
 class AttachedCollisionMesh(Data):
     """Represents a collision mesh that is attached to a :class:`Robot`'s :class:`~compas.robots.Link`.
 
@@ -196,7 +197,6 @@ class AttachedCollisionMesh(Data):
         data_obj["weight"] = self.weight
 
         return data_obj
-
 
 
 class PlanningScene(object):

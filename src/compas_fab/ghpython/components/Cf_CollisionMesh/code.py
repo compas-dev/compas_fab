@@ -3,6 +3,7 @@ Add or remove a collision mesh from the planning scene.
 
 COMPAS FAB v0.28.0
 """
+
 from compas_rhino.conversions import mesh_to_compas
 from ghpythonlib.componentbase import executingcomponent as component
 
