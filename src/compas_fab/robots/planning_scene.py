@@ -52,7 +52,7 @@ class CollisionMesh(Data):
     >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/floor.stl'))
     >>> cm = CollisionMesh(mesh, 'floor')
     >>> cm.frame
-    Frame(Point(0.000, 0.000, 0.000), Vector(1.000, 0.000, 0.000), Vector(0.000, 1.000, 0.000))
+    Frame(point=Point(x=0.0, y=0.0, z=0.0), xaxis=Vector(x=1.0, y=0.0, z=0.0), yaxis=Vector(x=0.0, y=1.0, z=0.0))
     """
 
     def __init__(self, mesh, id, frame=None, root_name=None):
