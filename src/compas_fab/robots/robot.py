@@ -63,26 +63,32 @@ class Robot(Data):
         self.attributes = {}
 
     @property
-    def data(self):
+    def __data__(self):
         data = {
             "scale_factor": self._scale_factor,
             "attached_tools": self._attached_tools,
             # The current_ik is an extrinsic state that is not serialized with the robot
             # "current_ik": self._current_ik,
-            "model": self.model.data,
+            "model": self.model.__data__,
             "semantics": self.semantics,
             "attributes": self.attributes,
             # The following attributes cannot be serialized: scene_object, client
         }
         return data
 
-    @data.setter
-    def data(self, data):
-        self._scale_factor = data.get("scale_factor", 1.0)
-        self._attached_tools = data.get("attached_tools", {})
-        self.model = RobotModel.from_data(data["model"])
-        self.semantics = data.get("semantics", None)
-        self.attributes = data.get("attributes", {})
+    @classmethod
+    def __from_data__(cls, data):
+        _scale_factor = data.get("scale_factor", 1.0)
+        _attached_tools = data.get("attached_tools", {})
+        model = RobotModel.__from_data__(data["model"])
+        semantics = data.get("semantics", None)
+        attributes = data.get("attributes", {})
+
+        robot = cls(model, None, semantics=semantics)
+        robot._scale_factor = _scale_factor
+        robot._attached_tools = _attached_tools
+        robot.attributes = attributes
+        return robot
 
     @property
     def scene_object(self):

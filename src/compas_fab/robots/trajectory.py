@@ -136,41 +136,41 @@ class JointTrajectoryPoint(Configuration):
         self._effort = FixedLengthList(effort)
 
     @property
-    def data(self):
+    def __data__(self):
         """:obj:`dict` : The data representing the trajectory point.
 
         By assigning a data dictionary to this property, the current data of the
         configuration will be replaced by the data in the :obj:`dict`. The data getter
         and setter should always be used in combination with each other.
         """
-        data_obj = super(JointTrajectoryPoint, self).data
+        data_obj = super(JointTrajectoryPoint, self).__data__
         data_obj["velocities"] = self.velocities
         data_obj["accelerations"] = self.accelerations
         data_obj["effort"] = self.effort
-        data_obj["time_from_start"] = self.time_from_start.to_data()
+        data_obj["time_from_start"] = self.time_from_start.__data__
 
         return data_obj
 
-    @data.setter
-    def data(self, data):
-        self._joint_values = FixedLengthList(data.get("joint_values") or data.get("values") or [])
-        self._joint_types = FixedLengthList(data.get("joint_types") or data.get("types") or [])
-        self._joint_names = FixedLengthList(data.get("joint_names") or [])
-        self._velocities = FixedLengthList(data.get("velocities") or [])
-        self._accelerations = FixedLengthList(data.get("accelerations") or [])
-        self._effort = FixedLengthList(data.get("effort") or [])
-        self.time_from_start = Duration.from_data(data.get("time_from_start") or {})
+    @classmethod
+    def __from_data__(cls, data):
+        joint_values = FixedLengthList(data.get("joint_values") or data.get("values") or [])
+        joint_types = FixedLengthList(data.get("joint_types") or data.get("types") or [])
+        joint_names = FixedLengthList(data.get("joint_names") or [])
+        velocities = FixedLengthList(data.get("velocities") or [])
+        accelerations = FixedLengthList(data.get("accelerations") or [])
+        effort = FixedLengthList(data.get("effort") or [])
+        time_from_start = Duration.__from_data__(data.get("time_from_start") or {})
 
-    def copy(self):
-        """Create a copy of this :class:`JointTrajectoryPoint`.
-
-        Returns
-        -------
-        :class:`JointTrajectoryPoint`
-            An instance of :class:`JointTrajectoryPoint`
-        """
-        cls = type(self)
-        return cls.from_data(self.data)
+        tool_trajectory_point = cls(
+            joint_values=joint_values,
+            joint_types=joint_types,
+            velocities=velocities,
+            accelerations=accelerations,
+            effort=effort,
+            time_from_start=time_from_start,
+            joint_names=joint_names,
+        )
+        return tool_trajectory_point
 
     @property
     def velocity_dict(self):
@@ -322,39 +322,37 @@ class JointTrajectory(Trajectory):
         trajectory.data = data
         return trajectory
 
-    def to_data(self):
-        """Get the data dictionary that represents the trajectory.
-
-        This can be used to reconstruct the :class:`Trajectory` instance.
-
-        Returns
-        -------
-        :obj:`dict`
-        """
-        return self.data
-
     @property
-    def data(self):
+    def __data__(self):
         """:obj:`dict` : The data representing the trajectory."""
         data_obj = {}
-        data_obj["points"] = [p.to_data() for p in self.points]
+        data_obj["points"] = [p.__data__ for p in self.points]
         data_obj["joint_names"] = self.joint_names or []
-        data_obj["start_configuration"] = self.start_configuration.to_data() if self.start_configuration else None
+        data_obj["start_configuration"] = self.start_configuration.__data__ if self.start_configuration else None
         data_obj["fraction"] = self.fraction
-        data_obj["attached_collision_meshes"] = [acm.to_data() for acm in self.attached_collision_meshes]
+        data_obj["attached_collision_meshes"] = [acm.__data__ for acm in self.attached_collision_meshes]
 
         return data_obj
 
-    @data.setter
-    def data(self, data):
-        self.points = list(map(JointTrajectoryPoint.from_data, data.get("points") or []))
-        self.joint_names = data.get("joint_names", [])
-        if data.get("start_configuration"):
-            self.start_configuration = Configuration.from_data(data.get("start_configuration"))
-        self.fraction = data.get("fraction")
-        self.attached_collision_meshes = [
-            AttachedCollisionMesh.from_data(acm_data) for acm_data in data.get("attached_collision_meshes", [])
+    @classmethod
+    def __from_data__(cls, data):
+        points = list(map(JointTrajectoryPoint.__from_data__, data.get("points") or []))
+        joint_names = data.get("joint_names", [])
+        start_configuration = data.get("start_configuration", None)
+        start_configuration = Configuration.__from_data__(start_configuration) if start_configuration else None
+        fraction = data.get("fraction")
+        attached_collision_meshes = [
+            AttachedCollisionMesh.__from_data__(acm_data) for acm_data in data.get("attached_collision_meshes", [])
         ]
+
+        trajectory = cls(
+            trajectory_points=points,
+            joint_names=joint_names,
+            start_configuration=start_configuration,
+            fraction=fraction,
+            attached_collision_meshes=attached_collision_meshes,
+        )
+        return trajectory
 
     @property
     def time_from_start(self):

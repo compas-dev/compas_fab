@@ -85,7 +85,7 @@ class Wrench:
         Examples
         --------
         >>> data = {"force": [1, 2, 3], "torque": [0.1, 0.2, 0.3]}
-        >>> w = Wrench.from_data(data)
+        >>> w = Wrench.__from_data__(data)
         """
         force = data["force"]
         torque = data["torque"]
@@ -149,7 +149,7 @@ class Wrench:
         self._torque = torque
 
     @property
-    def data(self):
+    def __data__(self):
         """Returns the data dictionary that represents the wrench.
 
         Returns
@@ -157,17 +157,8 @@ class Wrench:
         dict
             The wrench data.
         """
-        return {"force": list(self.force), "torque": list(self.torque)}
+        return {"force": self.force.__data__, "torque": self.torque.__data__}
 
-    def to_data(self):
-        """Returns the data dictionary that represents the wrench.
-
-        Returns
-        -------
-        dict
-            The wrench data.
-        """
-        return self.data
 
     # ==========================================================================
     # access

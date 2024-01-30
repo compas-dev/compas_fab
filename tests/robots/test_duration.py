@@ -23,13 +23,13 @@ def test_repr():
 
 
 def test_from_data():
-    d = Duration.from_data(dict(secs=2, nsecs=5e8))
+    d = Duration.__from_data__(dict(secs=2, nsecs=5e8))
     assert d.seconds == 2.5
 
 
 def test_to_data():
     d = Duration(2, 5e8)
-    data = d.to_data()
+    data = d.__data__
 
     assert data["secs"] == 2
     assert data["nsecs"] == 5e8

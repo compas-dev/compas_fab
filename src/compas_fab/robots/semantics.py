@@ -44,7 +44,7 @@ class RobotSemantics(Data):
         self.group_states = group_states or {}
 
     @property
-    def data(self):
+    def __data__(self):
         data = {
             "robot_model": self.robot_model,
             "groups": self.groups,
@@ -56,22 +56,27 @@ class RobotSemantics(Data):
         }
         return data
 
-    @data.setter
-    def data(self, data):
-        self.robot_model = data.get("robot_model", None)
-        self.groups = data.get("groups", {})
-        self.main_group_name = data.get("main_group_name", None)
-        self.passive_joints = data.get("passive_joints", [])
-        self.end_effectors = data.get("end_effectors", [])
-        self.disabled_collisions = data.get("disabled_collisions", set())
-        if len(self.disabled_collisions) > 0:
-            self.disabled_collisions = {tuple(pair) for pair in self.disabled_collisions}
-        self.group_states = data.get("group_states", {})
-
     @classmethod
-    def from_data(cls, data):
-        robot_semantics = cls(None)
-        robot_semantics.data = data
+    def __from_data__(cls, data):
+        robot_model = data.get("robot_model", None)
+        groups = data.get("groups", {})
+        main_group_name = data.get("main_group_name", None)
+        passive_joints = data.get("passive_joints", [])
+        end_effectors = data.get("end_effectors", [])
+        disabled_collisions = data.get("disabled_collisions", set())
+        if len(disabled_collisions) > 0:
+            disabled_collisions = {tuple(pair) for pair in disabled_collisions}
+        group_states = data.get("group_states", {})
+
+        robot_semantics = cls(
+            robot_model,
+            groups=groups,
+            main_group_name=main_group_name,
+            passive_joints=passive_joints,
+            end_effectors=end_effectors,
+            disabled_collisions=disabled_collisions,
+            group_states=group_states,
+        )
         return robot_semantics
 
     @property

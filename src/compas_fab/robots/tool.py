@@ -50,6 +50,10 @@ class Tool(Data):
 
     @property
     def attached_collision_meshes(self):
+        # If the tool model is not set, return an empty list
+        if not self.tool_model or len(self.tool_model.links) == 0:
+            return []
+
         acms = []
         for link in self.tool_model.iter_links():
             for i, item in enumerate(link.collision):
@@ -84,7 +88,7 @@ class Tool(Data):
         self.tool_model.frame = frame
 
     @property
-    def data(self):
+    def __data__(self):
         """Returns the data dictionary that represents the tool.
 
         Returns
@@ -93,11 +97,11 @@ class Tool(Data):
             The frame data.
 
         """
-        data = self.tool_model.data
+        data = self.tool_model.__data__
         return data
 
     @classmethod
-    def from_data(cls, data):
+    def __from_data__(cls, data):
         """Construct a `Tool` from its data representation.
 
         Parameters
@@ -115,57 +119,11 @@ class Tool(Data):
         >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> data = {'visual': mesh.data, 'frame': frame.data}
-        >>> tool = Tool.from_data(data)
+        >>> tool = Tool.__from_data__(data)
         """
         tool = cls(None, None)
-        tool.tool_model = ToolModel.from_data(data)
+        tool.tool_model = ToolModel.__from_data__(data)
         return tool
-
-    @classmethod
-    def from_json(cls, filepath):
-        """Construct a `Tool` from the data contained in a JSON file.
-
-        Parameters
-        ----------
-        filepath : str
-            Path to the file containing the data.
-
-        Returns
-        -------
-        :class:`Tool`
-            The tool.
-
-        Examples
-        --------
-        >>> filepath = os.path.join(compas_fab.DATA, "planning_scene", "cone_tool.json")
-        >>> tool = Tool.from_json(filepath)
-        """
-        with open(filepath, "r") as f:
-            data = json.load(f)
-        return cls.from_data(data)
-
-    def to_json(self, filepath):
-        """Serialise the data dictionary representing the tool to JSON and store in a file.
-
-        Parameters
-        ----------
-        filepath : :obj:`str`
-            Path to the file.
-
-        Returns
-        -------
-        None
-
-        Examples
-        --------
-        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
-        >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
-        >>> tool = Tool(mesh, frame)
-        >>> filepath = os.path.join(compas_fab.DATA, "planning_scene", "cone_tool.json")
-        >>> tool.to_json(filepath)
-        """
-        with open(filepath, "w") as f:
-            json.dump(self.data, f, indent=4, sort_keys=True)
 
     def update_touch_links(self, touch_links=None):
         if touch_links:

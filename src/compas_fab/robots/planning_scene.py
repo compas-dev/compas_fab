@@ -84,19 +84,8 @@ class CollisionMesh(Data):
         self.mesh = self.mesh.copy()
         self.scale(scale_factor)
 
-    def to_data(self):
-        """Get the data dictionary that represents the collision mesh.
-
-        This can be used to reconstruct the :class:`CollisionMesh` instance.
-
-        Returns
-        -------
-        :obj:`dict`
-        """
-        return self.data
-
     @classmethod
-    def from_data(cls, data):
+    def __from_data__(cls, data):
         """Construct a collision mesh from its data representation.
 
         Parameters
@@ -109,28 +98,24 @@ class CollisionMesh(Data):
         :class:`CollisionMesh`
              An instance of :class:`CollisionMesh`.
         """
-        collision_mesh = cls(None, None)
-        collision_mesh.data = data
+        id = data["id"]
+        mesh = Mesh.__from_data__(data["mesh"])
+        frame = Frame.__from_data__(data["frame"])
+        root_name = data["root_name"]
+
+        collision_mesh = cls(mesh, id, frame, root_name)
         return collision_mesh
 
     @property
-    def data(self):
+    def __data__(self):
         """:obj:`dict` : The data representing the collision mesh."""
         data_obj = {}
         data_obj["id"] = self.id
-        data_obj["mesh"] = self.mesh.to_data()
-        data_obj["frame"] = self.frame.to_data()
+        data_obj["mesh"] = self.mesh.__data__
+        data_obj["frame"] = self.frame.__data__
         data_obj["root_name"] = self.root_name
 
         return data_obj
-
-    @data.setter
-    def data(self, data_obj):
-        self.id = data_obj["id"]
-        self.mesh = Mesh.from_data(data_obj["mesh"])
-        self.frame = Frame.from_data(data_obj["frame"])
-        self.root_name = data_obj["root_name"]
-
 
 class AttachedCollisionMesh(Data):
     """Represents a collision mesh that is attached to a :class:`Robot`'s :class:`~compas.robots.Link`.
@@ -179,19 +164,8 @@ class AttachedCollisionMesh(Data):
         self.touch_links = touch_links if touch_links else [link_name]
         self.weight = weight
 
-    def to_data(self):
-        """Get the data dictionary that represents the attached collision mesh.
-
-        This can be used to reconstruct the :class:`AttachedCollisionMesh` instance.
-
-        Returns
-        -------
-        :obj:`dict`
-        """
-        return self.data
-
     @classmethod
-    def from_data(cls, data):
+    def __from_data__(cls, data):
         """Construct an attached collision mesh from its data representation.
 
         Parameters
@@ -204,27 +178,25 @@ class AttachedCollisionMesh(Data):
         :class:`AttachedCollisionMesh`
              An instance of :class:`AttachedCollisionMesh`.
         """
-        acm = cls(None, None)
-        acm.data = data
+        collision_mesh = CollisionMesh.__from_data__(data["collision_mesh"])
+        link_name = data["link_name"]
+        touch_links = data["touch_links"]
+        weight = data["weight"]
+
+        acm = cls(collision_mesh, link_name, touch_links, weight)
         return acm
 
     @property
-    def data(self):
+    def __data__(self):
         """:obj:`dict` : The data representing the attached collision mesh."""
         data_obj = {}
-        data_obj["collision_mesh"] = self.collision_mesh.to_data()
+        data_obj["collision_mesh"] = self.collision_mesh.__data__
         data_obj["link_name"] = self.link_name
         data_obj["touch_links"] = self.touch_links
         data_obj["weight"] = self.weight
 
         return data_obj
 
-    @data.setter
-    def data(self, data_obj):
-        self.collision_mesh = CollisionMesh.from_data(data_obj["collision_mesh"])
-        self.link_name = data_obj["link_name"]
-        self.touch_links = data_obj["touch_links"]
-        self.weight = data_obj["weight"]
 
 
 class PlanningScene(object):
