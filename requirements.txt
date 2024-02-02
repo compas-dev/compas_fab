@@ -1,5 +1,4 @@
-# compas >= 2.0.0b4
-compas @ git+https://github.com/compas-dev/compas@bugfix/sphere_intersection
+compas >= 2.0.1
 compas_robots @ git+https://github.com/compas-dev/compas_robots@main
 roslibpy >= 1.1.0
 pybullet
