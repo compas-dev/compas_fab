@@ -252,7 +252,7 @@ class Trajectory(Datastructure):
     """
 
     def __init__(self):
-        self(Trajectory, self).__init__()
+        super(Trajectory, self).__init__()
         self.planning_time = None
 
     @property
