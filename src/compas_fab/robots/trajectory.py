@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas.data import Data
+from compas.datastructures import Datastructure
 from compas.tolerance import TOL
 from compas_robots import Configuration
 from compas_robots.configuration import FixedLengthList
@@ -242,7 +242,7 @@ class JointTrajectoryPoint(Configuration):
         )
 
 
-class Trajectory(Data):
+class Trajectory(Datastructure):
     """Base trajectory class.
 
     Attribute
@@ -252,7 +252,17 @@ class Trajectory(Data):
     """
 
     def __init__(self):
+        self(Trajectory, self).__init__()
         self.planning_time = None
+
+    @property
+    def planning_time(self):
+        """:obj:`float` : Amount of time it took to complete the motion plan."""
+        return self.attributes["planning_time"]
+
+    @planning_time.setter
+    def planning_time(self, planning_time):
+        self.attributes["planning_time"] = planning_time
 
 
 class JointTrajectory(Trajectory):
@@ -285,6 +295,7 @@ class JointTrajectory(Trajectory):
         e.g. ``1`` means the full trajectory was found.
     attached_collision_meshes : :obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`
         The attached collision meshes included in the calculation of this trajectory.
+    attributes : :obj:`dict`
     data : :obj:`dict`
         The data representing the trajectory.
     """
@@ -297,7 +308,7 @@ class JointTrajectory(Trajectory):
         fraction=None,
         attached_collision_meshes=None,
     ):
-        super(Trajectory, self).__init__()
+        super(JointTrajectory, self).__init__()
         self.points = trajectory_points or []
         self.joint_names = joint_names or []
         self.start_configuration = start_configuration
