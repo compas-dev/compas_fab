@@ -1,27 +1,27 @@
 # This script extracts the URDF from a MoveIt! instance running in docker
+import os
 
 from compas_fab.backends.ros.client import LocalCacheInfo, RosFileServerLoader
 from compas_fab.backends import RosClient
+from compas_robots import RobotModel
+from compas_robots.files import URDF
 
 with RosClient() as client:
 
     robot = client.load_robot()
     robot.info()
 
-    print (robot.name)
+    print(robot.name)
 
     local_cache_directory = None
-    urdf_param_name="/robot_description",
-    srdf_param_name="/robot_description_semantic",
-
-    cache_info = LocalCacheInfo.from_local_cache_directory(local_cache_directory)
-    use_local_cache = cache_info.use_local_cache
-    robot_name = cache_info.robot_name
-    local_cache_directory = cache_info.local_cache_directory
+    local_cache_directory = os.path.join(os.path.expanduser("~"), "robot_package")
+    print("Local cache directory:", local_cache_directory)
 
     loader = RosFileServerLoader(client, True, local_cache_directory)
-    loader.robot_name = robot_name
-    urdf = loader.load_urdf(urdf_param_name)
-    srdf = loader.load_srdf(srdf_param_name)
-#  ----------------
+    # The loader will retrieve URDF and SRDF from the ros server
+    urdf_string = loader.load_urdf("/robot_description")
+    srdf_string = loader.load_srdf("/robot_description_semantic")
+    # The meshes will be loaded over ros to the local cache directory
+    robot.model.load_geometry(loader)
+
 
