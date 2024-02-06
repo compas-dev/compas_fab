@@ -23,5 +23,3 @@ with RosClient() as client:
     srdf_string = loader.load_srdf("/robot_description_semantic")
     # The meshes will be loaded over ros to the local cache directory
     robot.model.load_geometry(loader)
-
-
