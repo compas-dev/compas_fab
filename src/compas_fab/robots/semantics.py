@@ -58,9 +58,9 @@ class RobotSemantics(Data):
 
     @classmethod
     def __from_data__(cls, data):
-        robot_model = data.get("robot_model", None)
+        robot_model = data.get("robot_model")
         groups = data.get("groups", {})
-        main_group_name = data.get("main_group_name", None)
+        main_group_name = data.get("main_group_name")
         passive_joints = data.get("passive_joints", [])
         end_effectors = data.get("end_effectors", [])
         disabled_collisions = data.get("disabled_collisions", set())
