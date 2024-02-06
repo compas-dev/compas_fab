@@ -3,6 +3,7 @@
 It needs to be explicitely imported, since it is not a fundamental part
 of the compas_fab.robots package at all.
 """
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function

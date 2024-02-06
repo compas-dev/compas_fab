@@ -24,6 +24,7 @@ Additionally, this package provides deprecated aliases to the
 
 
 """
+
 import compas
 
 if compas.RHINO:

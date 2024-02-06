@@ -14,6 +14,7 @@ specific CAD interfaces, while providing a way to leverage native performance
 of the CAD environment.
 
 """
+
 try:
     import bpy  # noqa: F401
     import mathutils  # noqa: F401

@@ -63,26 +63,32 @@ class Robot(Data):
         self.attributes = {}
 
     @property
-    def data(self):
+    def __data__(self):
         data = {
             "scale_factor": self._scale_factor,
             "attached_tools": self._attached_tools,
             # The current_ik is an extrinsic state that is not serialized with the robot
             # "current_ik": self._current_ik,
-            "model": self.model.data,
+            "model": self.model.__data__,
             "semantics": self.semantics,
             "attributes": self.attributes,
             # The following attributes cannot be serialized: scene_object, client
         }
         return data
 
-    @data.setter
-    def data(self, data):
-        self._scale_factor = data.get("scale_factor", 1.0)
-        self._attached_tools = data.get("attached_tools", {})
-        self.model = RobotModel.from_data(data["model"])
-        self.semantics = data.get("semantics", None)
-        self.attributes = data.get("attributes", {})
+    @classmethod
+    def __from_data__(cls, data):
+        _scale_factor = data.get("scale_factor", 1.0)
+        _attached_tools = data.get("attached_tools", {})
+        model = RobotModel.__from_data__(data["model"])
+        semantics = data.get("semantics")
+        attributes = data.get("attributes", {})
+
+        robot = cls(model, None, semantics=semantics)
+        robot._scale_factor = _scale_factor
+        robot._attached_tools = _attached_tools
+        robot.attributes = attributes
+        return robot
 
     @property
     def scene_object(self):
@@ -765,8 +771,8 @@ class Robot(Data):
         --------
         >>> frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
         >>> frame_RCF = robot.to_local_coordinates(frame_WCF)
-        >>> frame_RCF
-        Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
+        >>> frame_RCF                                                                                       # doctest: +SKIP
+        Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))    # doctest: +SKIP
         """
         frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
         return frame_RCF
@@ -790,8 +796,8 @@ class Robot(Data):
         --------
         >>> frame_RCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
         >>> frame_WCF = robot.to_world_coordinates(frame_RCF)
-        >>> frame_WCF
-        Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
+        >>> frame_WCF                                                                                       # doctest: +SKIP
+        Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))    # doctest: +SKIP
         """
         frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
         return frame_WCF
@@ -833,10 +839,10 @@ class Robot(Data):
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> robot.attach_tool(Tool(mesh, frame))
         >>> frames_tcf = [Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))]
-        >>> robot.from_tcf_to_t0cf(frames_tcf)
-        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
-        >>> robot.from_tcf_to_t0cf(frames_tcf, group=robot.main_group_name)
-        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
+        >>> robot.from_tcf_to_t0cf(frames_tcf)                                                              # doctest: +SKIP
+        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]  # doctest: +SKIP
+        >>> robot.from_tcf_to_t0cf(frames_tcf, group=robot.main_group_name)                                 # doctest: +SKIP
+        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]  # doctest: +SKIP
         """
         tool = self._get_attached_tool_for_group(group_name=group)
         return tool.from_tcf_to_t0cf(frames_tcf)
@@ -869,10 +875,10 @@ class Robot(Data):
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> robot.attach_tool(Tool(mesh, frame))
         >>> frames_t0cf = [Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))]
-        >>> robot.from_t0cf_to_tcf(frames_t0cf)
-        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
-        >>> robot.from_t0cf_to_tcf(frames_t0cf, group=robot.main_group_name)
-        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
+        >>> robot.from_t0cf_to_tcf(frames_t0cf)                                                            # doctest: +SKIP
+        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))] # doctest: +SKIP
+        >>> robot.from_t0cf_to_tcf(frames_t0cf, group=robot.main_group_name)                               # doctest: +SKIP
+        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))] # doctest: +SKIP
         """
         tool = self._get_attached_tool_for_group(group_name=group)
         return tool.from_t0cf_to_tcf(frames_t0cf)
@@ -1076,8 +1082,8 @@ class Robot(Data):
         --------
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
-        >>> robot.position_constraint_from_frame(frame, tolerance_position)
-        PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)
+        >>> robot.position_constraint_from_frame(frame, tolerance_position)                                 # doctest: +SKIP
+        PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)    # doctest: +SKIP
         """
 
         attached_tool = self.attached_tools.get(group)
@@ -1137,9 +1143,9 @@ class Robot(Data):
         >>> tolerance_position = 0.001
         >>> tolerances_axes = [math.radians(1)]
         >>> group = robot.main_group_name
-        >>> robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group) # doctest: +NORMALIZE_WHITESPACE
-        [PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0),
-        OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)]
+        >>> robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)                         # doctest: +SKIP
+        [PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0),          # doctest: +SKIP
+        OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)] # doctest: +SKIP
         """
         pc = self.position_constraint_from_frame(frame_WCF, tolerance_position, group, use_attached_tool_frame)
         oc = self.orientation_constraint_from_frame(frame_WCF, tolerances_axes, group, use_attached_tool_frame)

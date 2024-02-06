@@ -28,12 +28,12 @@ In the example below, the given axis is visualized in red, and the generated vec
 >>> max_alpha = 60
 >>> for xaxis in OrthonormalVectorsFromAxisGenerator(zaxis, math.radians(max_alpha)):
 ...     print(xaxis)
-Vector(0.000, -1.000, 0.000)
-Vector(0.866, -0.500, 0.000)
-Vector(0.866, 0.500, 0.000)
-Vector(0.000, 1.000, 0.000)
-Vector(-0.866, 0.500, 0.000)
-Vector(-0.866, -0.500, 0.000)
+Vector(x=0.000, y=-1.000, z=0.000)
+Vector(x=0.866, y=-0.500, z=0.000)
+Vector(x=0.866, y=0.500, z=0.000)
+Vector(x=0.000, y=1.000, z=0.000)
+Vector(x=-0.866, y=0.500, z=0.000)
+Vector(x=-0.866, y=-0.500, z=0.000)
 
 
 Generate vectors that deviate
@@ -54,13 +54,13 @@ In the example below, the given axis is visualized in red, and the generated vec
 >>> step = 1
 >>> for axis in DeviationVectorsGenerator(zaxis, math.radians(max_alpha), step):
 ...     print(axis)
-Vector(0.000, 0.000, 1.000)
-Vector(-0.643, 0.000, 0.766)
-Vector(-0.321, -0.557, 0.766)
-Vector(0.321, -0.557, 0.766)
-Vector(0.643, -0.000, 0.766)
-Vector(0.321, 0.557, 0.766)
-Vector(-0.321, 0.557, 0.766)
+Vector(x=0.000, y=0.000, z=1.000)
+Vector(x=-0.643, y=0.000, z=0.766)
+Vector(x=-0.321, y=-0.557, z=0.766)
+Vector(x=0.321, y=-0.557, z=0.766)
+Vector(x=0.643, y=-0.000, z=0.766)
+Vector(x=0.321, y=0.557, z=0.766)
+Vector(x=-0.321, y=0.557, z=0.766)
 
 
 Or another example with using ``max_angle = 60`` and ``step = 2``.

@@ -3,6 +3,7 @@ Create joint constraints for each of the robot's configurable joints based on a 
 
 COMPAS FAB v0.28.0
 """
+
 import math
 
 from ghpythonlib.componentbase import executingcomponent as component

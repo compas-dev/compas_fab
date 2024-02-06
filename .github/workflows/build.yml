@@ -17,16 +17,16 @@ jobs:
       matrix:
         name: [
           "windows-py38",
-          "macos-py37",
+          "macos-py39",
           "ubuntu-py39",
         ]
         include:
           - name: "windows-py38"
             os: windows-latest
             python-version: 3.8
-          - name: "macos-py37"
+          - name: "macos-py39"
             os: macos-latest
-            python-version: 3.7
+            python-version: 3.9
           - name: "ubuntu-py39"
             os: ubuntu-latest
             python-version: 3.9
@@ -57,14 +57,16 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: |
-          curl -o compas.tar.gz -LJO https://pypi.debian.net/COMPAS/COMPAS-1.17.7.tar.gz
+          curl -o compas.tar.gz -LJO https://pypi.debian.net/COMPAS/COMPAS-2.0.1.tar.gz
           curl -o roslibpy.tar.gz -LJO https://pypi.debian.net/roslibpy/latest
           curl -o ironpython-pytest.tar.gz -LJO https://pypi.debian.net/ironpython-pytest/latest
+          curl -o compas_robots.tar.gz -LJO https://pypi.debian.net/compas_robots/latest
           choco install ironpython --version=2.7.8.1
           ipy -X:Frames -m ensurepip
           ipy -X:Frames -m pip install --no-deps compas.tar.gz
           ipy -X:Frames -m pip install --no-deps roslibpy.tar.gz
           ipy -X:Frames -m pip install --no-deps ironpython-pytest.tar.gz
+          ipy -X:Frames -m pip install --no-deps compas_robots.tar.gz
       - name: Run tests
         env:
           IRONPYTHONPATH: ./src

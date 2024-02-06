@@ -73,9 +73,9 @@ before sending it as a target pose to the robot.
 
     from compas_fab.robots import Robot
 
-    from compas.robots import RobotModel
-    from compas.robots import Joint
-    from compas.robots import Link
+    from compas_robots import RobotModel
+    from compas_robots.model import Joint
+    from compas_robots.model import Link
 
     from compas.geometry import Frame
     from compas.geometry import Transformation
