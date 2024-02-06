@@ -127,8 +127,8 @@ class ReachabilityMap(Data):
                 return obj.__data__ if obj else None
 
         data = {}
-        data["frames"] = _resursive_encode(self.frames)
-        data["configurations"] = _resursive_encode(self.configurations)
+        data["frames"] = _recursive_encode(self.frames)
+        data["configurations"] = _recursive_encode(self.configurations)
         data["name"] = self.name
         return data
 
