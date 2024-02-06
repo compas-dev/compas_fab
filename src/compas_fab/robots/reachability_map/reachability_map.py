@@ -122,7 +122,7 @@ class ReachabilityMap(Data):
     def __data__(self):
         def _recursive_encode(obj):
             if isinstance(obj, list):
-                return [_resursive_encode(sub) for sub in obj]
+                return [_recursive_encode(sub) for sub in obj]
             else:
                 return obj.__data__ if obj else None
 
