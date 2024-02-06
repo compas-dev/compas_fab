@@ -60,7 +60,7 @@ jobs:
           curl -o compas.tar.gz -LJO https://pypi.debian.net/COMPAS/COMPAS-2.0.1.tar.gz
           curl -o roslibpy.tar.gz -LJO https://pypi.debian.net/roslibpy/latest
           curl -o ironpython-pytest.tar.gz -LJO https://pypi.debian.net/ironpython-pytest/latest
-          curl -o compas_robots.tar.gz -L https://github.com/compas-dev/compas_robots/archive/main.tar.gz
+          curl -o compas_robots.tar.gz -LJO https://pypi.debian.net/compas_robots/latest
           choco install ironpython --version=2.7.8.1
           ipy -X:Frames -m ensurepip
           ipy -X:Frames -m pip install --no-deps compas.tar.gz
