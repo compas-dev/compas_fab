@@ -81,7 +81,7 @@ class Robot(Data):
         _scale_factor = data.get("scale_factor", 1.0)
         _attached_tools = data.get("attached_tools", {})
         model = RobotModel.__from_data__(data["model"])
-        semantics = data.get("semantics", None)
+        semantics = data.get("semantics")
         attributes = data.get("attributes", {})
 
         robot = cls(model, None, semantics=semantics)
