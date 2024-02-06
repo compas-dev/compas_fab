@@ -2,7 +2,6 @@ from __future__ import print_function
 
 import os
 
-from compas.tolerance import TOL
 from compas_robots import RobotModel
 from roslibpy import Message
 from roslibpy import Param

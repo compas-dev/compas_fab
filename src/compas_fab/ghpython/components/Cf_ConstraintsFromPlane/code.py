@@ -3,6 +3,7 @@ Create a position and an orientation constraint from a plane calculated for the 
 
 COMPAS FAB v0.28.0
 """
+
 import math
 
 from compas_rhino.conversions import plane_to_compas_frame

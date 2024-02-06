@@ -19,7 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Renamed `Tool.link_name` to `Tool.connected_to`
 * Migrate to COMPAS 2.x: add dependency to `compas_robots`
 * Migrate to COMPAS 2.x: use `compas.tolerance` module instead of `compas.PRECISION`
-
+* Add `attributes` to `Trajectory` class.
+* Fixed `data` serialization API to comply with `COMPAS 2.0` private data API.
 
 ### Removed
 

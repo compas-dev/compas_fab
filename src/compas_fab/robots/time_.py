@@ -2,12 +2,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas.data import Data
+
 __all__ = [
     "Duration",
 ]
 
 
-class Duration(object):
+class Duration(Data):
     """Duration consists of two values: seconds (float) and nanoseconds (int).
     The total number of seconds is the sum of these values.
     The decimal portion of the secs variable is converted to an integer and added to nsecs.
@@ -21,6 +23,7 @@ class Duration(object):
     """
 
     def __init__(self, secs, nsecs):
+        super(Duration, self).__init__()
         sec_to_nano_factor = 1e9
         quotient, remainder = divmod(secs, 1)
 
@@ -53,35 +56,7 @@ class Duration(object):
         """
         return self.secs + 1e-9 * self.nsecs
 
-    @classmethod
-    def from_data(cls, data):
-        """Construct a duration from its data representation.
-
-        Parameters
-        ----------
-        data : :obj:`dict`
-            The data dictionary.
-
-        Returns
-        -------
-        :class:`Duration`
-             An instance of :class:`Duration`.
-        """
-        duration = cls(0, 0)
-        duration.data = data
-        return duration
-
-    def to_data(self):
-        """Return the data dictionary that represents the duration, and from
-        which it can be reconstructed."""
-        return self.data
-
     @property
-    def data(self):
+    def __data__(self):
         """:obj:`dict` : The data representing the duration."""
         return {"secs": self.secs, "nsecs": self.nsecs}
-
-    @data.setter
-    def data(self, data):
-        self.secs = data.get("secs") or 0
-        self.nsecs = data.get("nsecs") or 0

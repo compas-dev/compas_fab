@@ -12,7 +12,7 @@ if compas.RHINO:
     from .reachabilitymapobject import ReachabilityMapObject
 
     __all__ = [
-        "ReachabilityMapArtist",
+        "ReachabilityMapObject",
     ]
 
     @plugin(category="factories", requires=["Rhino"])

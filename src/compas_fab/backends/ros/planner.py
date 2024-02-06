@@ -1,6 +1,7 @@
 """
 Internal implementation of the planner backend interface for MoveIt!
 """
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -16,8 +17,9 @@ from compas_fab.backends.ros.backend_features.move_it_inverse_kinematics import 
 from compas_fab.backends.ros.backend_features.move_it_plan_cartesian_motion import MoveItPlanCartesianMotion
 from compas_fab.backends.ros.backend_features.move_it_plan_motion import MoveItPlanMotion
 from compas_fab.backends.ros.backend_features.move_it_planning_scene import MoveItPlanningScene
-from compas_fab.backends.ros.backend_features.move_it_remove_attached_collision_mesh import \
-    MoveItRemoveAttachedCollisionMesh
+from compas_fab.backends.ros.backend_features.move_it_remove_attached_collision_mesh import (
+    MoveItRemoveAttachedCollisionMesh,
+)
 from compas_fab.backends.ros.backend_features.move_it_remove_collision_mesh import MoveItRemoveCollisionMesh
 
 __all__ = [

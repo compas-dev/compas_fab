@@ -56,8 +56,9 @@ class ReachabilityMap(Data):
         ValueError : If the frame_generator does not produce a 2D list of frames
         """
 
-        from compas_fab.backends.exceptions import \
-            InverseKinematicsError  # tests\api\test_api_completeness.py complains otherwise
+        from compas_fab.backends.exceptions import (
+            InverseKinematicsError,
+        )  # tests\api\test_api_completeness.py complains otherwise
 
         for frames in frame_generator:  # 2D
             if isinstance(frames, Frame):
@@ -118,25 +119,28 @@ class ReachabilityMap(Data):
         return [f[0].point for f in self.frames]
 
     @property
-    def data(self):
-        def data_encode(obj):
+    def __data__(self):
+        def _recursive_encode(obj):
             if isinstance(obj, list):
-                return [data_encode(sub) for sub in obj]
+                return [_recursive_encode(sub) for sub in obj]
             else:
-                return obj.data if obj else None
+                return obj.__data__ if obj else None
 
         data = {}
-        data["frames"] = data_encode(self.frames)
-        data["configurations"] = data_encode(self.configurations)
+        data["frames"] = _recursive_encode(self.frames)
+        data["configurations"] = _recursive_encode(self.configurations)
+        data["name"] = self.name
         return data
 
-    @data.setter
-    def data(self, data):
-        def data_decode(obj, aclass):
+    @classmethod
+    def __from_data__(cls, data):
+        def _recursive_decode(obj, aclass):
             if isinstance(obj, list):
-                return [data_decode(sub, aclass) for sub in obj]
+                return [_recursive_decode(sub, aclass) for sub in obj]
             else:
-                return aclass.from_data(obj) if obj else None
+                return aclass.__from_data__(obj) if obj else None
 
-        self.frames = data_decode(data["frames"], Frame)
-        self.configurations = data_decode(data["configurations"], Configuration)
+        frames = _recursive_decode(data["frames"], Frame)
+        configurations = _recursive_decode(data["configurations"], Configuration)
+        name = data.get("name", None)
+        return cls(frames, configurations, name)

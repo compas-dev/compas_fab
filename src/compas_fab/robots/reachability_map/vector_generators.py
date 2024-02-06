@@ -26,8 +26,11 @@ class OrthonormalVectorsFromAxisGenerator(object):
     Examples
     --------
     >>> generator = OrthonormalVectorsFromAxisGenerator((0, 0, 1), math.radians(120))
-    >>> [xaxis for xaxis in generator]
-    [Vector(0.000, -1.000, 0.000), Vector(0.866, 0.500, 0.000), Vector(-0.866, 0.500, 0.000)]
+    >>> [print(xaxis) for xaxis in generator]
+    Vector(x=0.000, y=-1.000, z=0.000)
+    Vector(x=0.866, y=0.500, z=0.000)
+    Vector(x=-0.866, y=0.500, z=0.000)
+    [None, None, None]
     """
 
     def __init__(self, axis, angle_step, start_vector=None):
@@ -85,8 +88,12 @@ class DeviationVectorsGenerator(object):
     Examples
     --------
     >>> generator = DeviationVectorsGenerator((0, 0, -1), math.radians(120), 1)
-    >>> [zaxis for zaxis in generator]
-    [Vector(0.000, 0.000, -1.000), Vector(-0.866, 0.000, 0.500), Vector(0.433, 0.750, 0.500), Vector(0.433, -0.750, 0.500)]
+    >>> [print(zaxis) for zaxis in generator]
+    Vector(x=0.000, y=0.000, z=-1.000)
+    Vector(x=-0.866, y=0.000, z=0.500)
+    Vector(x=0.433, y=0.750, z=0.500)
+    Vector(x=0.433, y=-0.750, z=0.500)
+    [None, None, None, None]
     """
 
     def __init__(self, axis, max_alpha, step):

@@ -3,6 +3,7 @@ Get a zero configuration for a robot.
 
 COMPAS FAB v0.28.0
 """
+
 from ghpythonlib.componentbase import executingcomponent as component
 
 

@@ -44,7 +44,7 @@ because the ``ReachabilityMap`` takes a ``Frame`` generator as input.
     from compas.geometry import Sphere
 
     # 1. Define frames on a sphere
-    sphere = Sphere((0.4, 0, 0), 0.15)
+    sphere = Sphere(radius=0.15, point=[0.4, 0, 0])
 
     def points_on_sphere_generator(sphere):
         for theta_deg in range(0, 360, 20):

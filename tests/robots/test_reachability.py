@@ -17,13 +17,16 @@ filename = os.path.join(os.path.dirname(__file__), "fixtures", "map.json")
 def test_vector_generators():
     generator = OrthonormalVectorsFromAxisGenerator((0, 0, 1), math.radians(120))
     result = [xaxis for xaxis in generator]
-    solution = "[Vector(0.000, -1.000, 0.000), Vector(0.866, 0.500, 0.000), Vector(-0.866, 0.500, 0.000)]"
-    assert str(result) == solution
+    assert allclose(result[0], Vector(0.000, -1.000, 0.000), tol=1e-3)
+    assert allclose(result[1], Vector(0.866, 0.500, 0.000), tol=1e-3)
+    assert allclose(result[2], Vector(-0.866, 0.500, 0.000), tol=1e-3)
 
     generator = DeviationVectorsGenerator((0, 0, -1), math.radians(120), 1)
     result = [zaxis for zaxis in generator]
-    solution = "[Vector(0.000, 0.000, -1.000), Vector(-0.866, 0.000, 0.500), Vector(0.433, 0.750, 0.500), Vector(0.433, -0.750, 0.500)]"
-    assert str(result) == solution
+    assert allclose(result[0], Vector(0.000, 0.000, -1.000), tol=1e-3)
+    assert allclose(result[1], Vector(-0.866, 0.000, 0.500), tol=1e-3)
+    assert allclose(result[2], Vector(0.433, 0.750, 0.500), tol=1e-3)
+    assert allclose(result[3], Vector(0.433, -0.750, 0.500), tol=1e-3)
 
 
 def test_reachability_scores():
