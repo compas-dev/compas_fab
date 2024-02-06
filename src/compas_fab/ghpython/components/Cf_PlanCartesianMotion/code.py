@@ -3,6 +3,7 @@ Calculate a cartesian motion path (linear in tool space).
 
 COMPAS FAB v0.28.0
 """
+
 from compas_rhino.conversions import plane_to_compas_frame
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st

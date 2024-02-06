@@ -26,7 +26,6 @@
       "AttachedCollisionMesh",
       "BoundingVolume",
       "CollisionMesh",
-      "Configuration",
       "Constraint",
       "Duration",
       "Inertia",

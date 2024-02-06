@@ -19,7 +19,6 @@ from compas_fab.backends.ros.messages import PositionIKRequest
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import RosDistro
 from compas_fab.backends.ros.service_description import ServiceDescription
-from compas_fab.robots import Duration
 
 __all__ = [
     "MoveItInverseKinematics",
@@ -121,7 +120,7 @@ class MoveItInverseKinematics(InverseKinematics):
         constraints = convert_constraints_to_rosmsg(options.get("constraints"), header)
 
         timeout_in_secs = options.get("timeout", 2)
-        timeout_duration = Duration(timeout_in_secs, 0).to_data()
+        timeout_duration = {"secs": timeout_in_secs, "nsecs": 0}
 
         ik_request = PositionIKRequest(
             group_name=group,

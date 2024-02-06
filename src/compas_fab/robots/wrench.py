@@ -3,6 +3,7 @@ from __future__ import print_function
 import math
 
 import compas
+from compas.data import Data
 from compas.geometry import Vector
 from compas.geometry import cross_vectors
 
@@ -20,7 +21,7 @@ gravity_vector = Vector(0, 0, -g)
 __all__ = ["Wrench"]
 
 
-class Wrench:
+class Wrench(Data):
     """A wrench represents force in free space, separated into its linear (force) and angular (torque) parts.
 
     Attributes
@@ -39,8 +40,20 @@ class Wrench:
     """
 
     def __init__(self, force, torque):
+        super(Wrench, self).__init__()
         self.force = force
         self.torque = torque
+
+    @property
+    def __data__(self):
+        """Returns the data dictionary that represents the wrench.
+
+        Returns
+        -------
+        dict
+            The wrench data.
+        """
+        return {"force": self.force.__data__, "torque": self.torque.__data__}
 
     # ==========================================================================
     # factory
@@ -69,29 +82,6 @@ class Wrench:
         return cls(force, torque)
 
     @classmethod
-    def from_data(cls, data):
-        """Construct a wrench from its data representation.
-
-        Parameters
-        ----------
-        data : :obj:`dict`
-            The data dictionary.
-
-        Returns
-        -------
-        :class:`Wrench`
-            The constructed wrench.
-
-        Examples
-        --------
-        >>> data = {"force": [1, 2, 3], "torque": [0.1, 0.2, 0.3]}
-        >>> w = Wrench.from_data(data)
-        """
-        force = data["force"]
-        torque = data["torque"]
-        return cls(force, torque)
-
-    @classmethod
     def by_samples(cls, wrenches, proportion_to_cut=0.1):
         """
         Construct the wrench by sampled data, allowing to filter.
@@ -114,8 +104,10 @@ class Wrench:
         >>> w2 = Wrench([2, 2, 2], [.2,.2,.2])
         >>> w3 = Wrench([3, 3, 3], [.3,.3,.3])
         >>> w = Wrench.by_samples([w1, w2, w3])
-        >>> print(w)
-        Wrench(Vector(2.000, 2.000, 2.000), Vector(0.200, 0.200, 0.200))
+        >>> print(w.force)
+        Vector(x=2.000, y=2.000, z=2.000)
+        >>> print(w.torque)
+        Vector(x=0.200, y=0.200, z=0.200)
         """
         if not stats:
             raise NotImplementedError("Not supported on this platform")
@@ -147,27 +139,6 @@ class Wrench:
     def torque(self, vector):
         torque = Vector(*list(vector))
         self._torque = torque
-
-    @property
-    def data(self):
-        """Returns the data dictionary that represents the wrench.
-
-        Returns
-        -------
-        dict
-            The wrench data.
-        """
-        return {"force": list(self.force), "torque": list(self.torque)}
-
-    def to_data(self):
-        """Returns the data dictionary that represents the wrench.
-
-        Returns
-        -------
-        dict
-            The wrench data.
-        """
-        return self.data
 
     # ==========================================================================
     # access
@@ -349,14 +320,20 @@ class Wrench:
         >>> mass, com = 10, [0, 0, 1]
         >>> f = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
         >>> w = Wrench([0, 0, -98], [0, 0, 0])
-        >>> w.gravity_compensated(f, mass, com)
-        Wrench(Vector(0.000, 0.000, 0.066), Vector(0.000, 0.000, 0.000))
+        >>> x = w.gravity_compensated(f, mass, com)
+        >>> print(x.force)
+        Vector(x=0.000, y=0.000, z=0.066)
+        >>> print(x.torque)
+        Vector(x=0.000, y=0.000, z=0.000)
 
         >>> mass, com = 10, [1, 1, 1]
         >>> f = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
         >>> w = Wrench([0, 0, -98], [-98, 98, 0])
-        >>> w.gravity_compensated(f, mass, com)
-        Wrench(Vector(0.000, 0.000, 0.066), Vector(-88.193, 88.193, 0.000))
+        >>> x = w.gravity_compensated(f, mass, com)
+        >>> print(x.force)
+        Vector(x=0.000, y=0.000, z=0.066)
+        >>> print(x.torque)
+        Vector(x=-88.193, y=88.193, z=0.000)
 
         Notes
         -----

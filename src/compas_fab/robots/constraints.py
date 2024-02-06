@@ -99,7 +99,7 @@ class BoundingVolume(object):
         --------
         >>> from compas.geometry import Sphere
         >>> from compas_fab.robots import BoundingVolume
-        >>> sphere = Sphere((1., 1., 1.), 5.)
+        >>> sphere = Sphere(5.0, Frame.worldXY())
         >>> bv = BoundingVolume.from_sphere(sphere)
         >>> bv.type
         2
@@ -437,7 +437,7 @@ class PositionConstraint(Constraint):
     >>> from compas.geometry import Sphere
     >>> from compas_fab.robots import PositionConstraint
     >>> from compas_fab.robots import BoundingVolume
-    >>> bv = BoundingVolume.from_sphere(Sphere((3,4,5), 0.5))
+    >>> bv = BoundingVolume.from_sphere(Sphere(0.5, point=[3,4,5]))
     >>> pc = PositionConstraint('link_0', bv, weight=1.)
     """
 
@@ -497,7 +497,7 @@ class PositionConstraint(Constraint):
         --------
         >>> from compas_fab.robots import PositionConstraint
         >>> from compas.geometry import Sphere
-        >>> sphere = Sphere((3,4,5), 0.5)
+        >>> sphere = Sphere(radius=0.5, point=[3,4,5])
         >>> pc = PositionConstraint.from_sphere('link_0', sphere, weight=1.)
         """
         bounding_volume = BoundingVolume.from_sphere(sphere)

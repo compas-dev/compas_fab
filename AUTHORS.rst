@@ -49,4 +49,4 @@ Authors
 * Yijiang Huang <yijiangh@mit.edu> `@yijiangh <https://github.com/yijiangh>`_
 * Chen Kasirer <kasirer@arch.ethz.ch> `@chenkasirer <https://github.com/chenkasirer>`_
 * Edvard Bruun <ebruun@princeton.edu> `@ebruun <https://github.com/ebruun>`_
-* Victor Pok Yin Leung <leung@arch.ethz.ch> `@yck011522 <https://github/yck011522>`_
+* Victor Pok Yin Leung <leung@arch.ethz.ch> `@yck011522 <https://github.com/yck011522>`_

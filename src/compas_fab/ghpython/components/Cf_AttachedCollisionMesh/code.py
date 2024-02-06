@@ -3,6 +3,7 @@ Add an attached collision mesh to the robot.
 
 COMPAS FAB v0.28.0
 """
+
 from compas_rhino.conversions import mesh_to_compas
 from ghpythonlib.componentbase import executingcomponent as component
 

@@ -54,8 +54,8 @@ Start Python from the command prompt and run the following:
 * [Documentation](https://gramaziokohler.github.io/compas_fab/)
 * [COMPAS FAB Examples](https://gramaziokohler.github.io/compas_fab/latest/examples.html)
 * [COMPAS FAB API Reference](https://gramaziokohler.github.io/compas_fab/latest/reference.html)
-* [COMPAS Tutorials](https://compas.dev/compas/latest/tutorial.html)
-* [COMPAS API Reference](https://compas.dev/compas/latest/api.html)
+* [COMPAS User Guide](https://compas.dev/compas/latest/userguide)
+* [COMPAS API Reference](https://compas.dev/compas/latest/api)
 
 
 ## Questions and feedback

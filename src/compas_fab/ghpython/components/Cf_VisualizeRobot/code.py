@@ -3,12 +3,13 @@ Visualizes the robot.
 
 COMPAS FAB v0.28.0
 """
+
 import time
 
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas.scene import SceneObject
-from compas_ghpython.utilities import create_id
+from compas_ghpython import create_id
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
 
@@ -103,7 +104,7 @@ class RobotVisualize(component):
                             else:
                                 mesh = cm.mesh
 
-                            collision_meshes.append(SceneObject(mesh).draw())
+                            collision_meshes.extend(SceneObject(mesh).draw())
 
                         cached_scene["cm"] = collision_meshes
 
@@ -124,7 +125,7 @@ class RobotVisualize(component):
 
                             mesh = acm.collision_mesh.mesh.transformed(t)
 
-                            attached_meshes.append(SceneObject(mesh).draw())
+                            attached_meshes.extend(SceneObject(mesh).draw())
 
                     cached_scene["acm"] = attached_meshes
 
