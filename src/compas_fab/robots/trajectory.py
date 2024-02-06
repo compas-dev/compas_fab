@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas.datastructures import Datastructure
+from compas.data import Data
 from compas.tolerance import TOL
 from compas_robots import Configuration
 from compas_robots.configuration import FixedLengthList
@@ -242,17 +242,20 @@ class JointTrajectoryPoint(Configuration):
         )
 
 
-class Trajectory(Datastructure):
+class Trajectory(Data):
     """Base trajectory class.
 
-    Attribute
-    ---------
+    Attributes
+    ----------
     planning_time : :obj:`float`
         Amount of time it took to complete the motion plan
+    attributes : :obj:`dict`
+        Custom attributes of the trajectory.
     """
 
-    def __init__(self):
+    def __init__(self, attributes=None):
         super(Trajectory, self).__init__()
+        self.attributes = attributes or {}
         self.planning_time = None
 
     @property
@@ -315,24 +318,6 @@ class JointTrajectory(Trajectory):
         self.fraction = fraction
         self.attached_collision_meshes = attached_collision_meshes or []
 
-    @classmethod
-    def from_data(cls, data):
-        """Construct a trajectory from its data representation.
-
-        Parameters
-        ----------
-        data : :obj:`dict`
-            The data dictionary.
-
-        Returns
-        -------
-        :class:`JointTrajectory`
-             An instance of :class:`JointTrajectory`.
-        """
-        trajectory = cls()
-        trajectory.data = data
-        return trajectory
-
     @property
     def __data__(self):
         """:obj:`dict` : The data representing the trajectory."""
@@ -342,6 +327,7 @@ class JointTrajectory(Trajectory):
         data_obj["start_configuration"] = self.start_configuration.__data__ if self.start_configuration else None
         data_obj["fraction"] = self.fraction
         data_obj["attached_collision_meshes"] = [acm.__data__ for acm in self.attached_collision_meshes]
+        data_obj["attributes"] = self.attributes
 
         return data_obj
 
@@ -363,6 +349,7 @@ class JointTrajectory(Trajectory):
             fraction=fraction,
             attached_collision_meshes=attached_collision_meshes,
         )
+        trajectory.attributes = data["attributes"]
         return trajectory
 
     @property
