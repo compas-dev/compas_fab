@@ -903,7 +903,7 @@ class Robot(Data):
 
         See Also
         --------
-        * :meth:`detach_tool`
+        :meth:`Robot.detach_tool`
 
         Examples
         --------
@@ -935,7 +935,7 @@ class Robot(Data):
 
         See Also
         --------
-        * :meth:`attach_tool`
+        :meth:`Robot.attach_tool`
         """
         group = group or self.main_group_name
         if group not in self.attached_tools:
@@ -1065,9 +1065,9 @@ class Robot(Data):
 
         See Also
         --------
-        * :meth:`PositionConstraint.from_box`
-        * :meth:`PositionConstraint.from_mesh`
-        * :meth:`PositionConstraint.from_sphere`
+        :meth:`PositionConstraint.from_box`
+        :meth:`PositionConstraint.from_mesh`
+        :meth:`PositionConstraint.from_sphere`
 
         Notes
         -----
@@ -1122,10 +1122,10 @@ class Robot(Data):
 
         See Also
         --------
-        * :meth:`PositionConstraint.from_box`
-        * :meth:`PositionConstraint.from_mesh`
-        * :meth:`PositionConstraint.from_sphere`
-        * :meth:`orientation_constraint_from_frame`
+        :meth:`PositionConstraint.from_box`
+        :meth:`PositionConstraint.from_mesh`
+        :meth:`PositionConstraint.from_sphere`
+        :meth:`orientation_constraint_from_frame`
 
         Notes
         -----
