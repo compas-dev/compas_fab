@@ -65,7 +65,7 @@ class PyBulletInverseKinematics(InverseKinematics):
               Defaults to ``100``.
 
         Yields
-        -------
+        ------
         :obj:`tuple` of :obj:`list`
             A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
 

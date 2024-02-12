@@ -952,6 +952,7 @@ class Robot(Data):
 
     def ensure_client(self):
         """Check if the client is set.
+
         Raises
         ------
         :exc:`Exception`
@@ -962,6 +963,7 @@ class Robot(Data):
 
     def ensure_semantics(self):
         """Check if semantics is set.
+
         Raises
         ------
         :exc:`Exception`
@@ -972,6 +974,7 @@ class Robot(Data):
 
     def ensure_geometry(self):
         """Check if the model's geometry has been loaded.
+
         Raises
         ------
         :exc:`Exception`
@@ -1364,7 +1367,7 @@ class Robot(Data):
             If no configuration can be found.
 
         Yields
-        -------
+        ------
         :class:`Configuration`
             An inverse kinematic solution represented as a configuration.
 

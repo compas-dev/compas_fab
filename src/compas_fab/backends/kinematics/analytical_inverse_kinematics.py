@@ -62,7 +62,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
                 ``None``- solutions. Defaults to ``False``.
 
         Yields
-        -------
+        ------
         :obj:`tuple` of :obj:`list`
             A tuple of 2 elements containing a list of joint positions and a list
             of matching joint names. If ``"keep_order"`` is ``True`` this list
