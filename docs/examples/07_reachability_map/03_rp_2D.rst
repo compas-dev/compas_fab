@@ -47,7 +47,7 @@ The visualization of the results in Rhino/GH looks different than in Example 01,
     :class: figure-img img-fluid
 
 
-`Link to full script <files/02_example_2D_deviation_vectors.py>`_
+`Link to full script of Example 2 <files/02_example_2D_deviation_vectors.py>`_
 
 
 
@@ -120,4 +120,4 @@ best score, returning the score and the index:
     :class: figure-img img-fluid
 
 
-`Link to full script <files/03_example_2D_sphere_points.py>`_
+`Link to Link to full script of Example 3 <files/03_example_2D_sphere_points.py>`_
