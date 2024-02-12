@@ -26,9 +26,9 @@ class ReachabilityMap(Data):
         The shape of the frames array
 
 
-    Links
-    -----
-    http://wiki.ros.org/reuleaux
+    See Also
+    --------
+    <http://wiki.ros.org/reuleaux>
     """
 
     def __init__(self, frames=None, configurations=None, name=None):
