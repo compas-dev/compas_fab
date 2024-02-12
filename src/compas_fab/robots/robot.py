@@ -370,8 +370,8 @@ class Robot(Data):
         -------
         :obj:`list` of :class:`compas_robots.Joint`
 
-        Note
-        ----
+        Notes
+        -----
         If semantics is set and no group is passed, it returns all configurable
         joints of all groups.
 
@@ -430,8 +430,8 @@ class Robot(Data):
         -------
         :obj:`list` of :obj:`str`
 
-        Note
-        ----
+        Notes
+        -----
         If semantics is set and no group is passed, it returns all configurable
         joints of all groups.
 
@@ -456,8 +456,8 @@ class Robot(Data):
         -------
         :obj:`list` of :attr:`compas_robots.Joint.SUPPORTED_TYPES`
 
-        Note
-        ----
+        Notes
+        -----
         If :attr:`semantics` is set and no group is passed, it returns all
         configurable joint types of all groups.
 
@@ -519,8 +519,8 @@ class Robot(Data):
         -------
         :class:`compas_robots.Configuration`
 
-        Note
-        ----
+        Notes
+        -----
         No collision checking is involved, the configuration may be invalid.
         """
         configurable_joints = self.get_configurable_joints(group)
