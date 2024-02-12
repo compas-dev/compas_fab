@@ -140,6 +140,7 @@ html_theme_options = {
         "json_url": f"https://raw.githubusercontent.com/{organization}/{package}/gh-pages/versions.json",
         "version_match": version,
     },
+    "check_switcher": False,
     "logo": {
         "image_light": "_static/compas_icon_white.png",
         "image_dark": "_static/compas_icon_white.png",
