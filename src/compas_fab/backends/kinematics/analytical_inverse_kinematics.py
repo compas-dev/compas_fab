@@ -55,11 +55,12 @@ class AnalyticalInverseKinematics(InverseKinematics):
             the ``start_configuration``. Defaults to the robot's main planning group.
         options: dict
             Dictionary containing the following key-value pairs:
+
             - ``"solver"``: (:obj:`str`) The solver to use to calculate IK.
             - ``"check_collision"``: (:obj:`str`, optional ) When ``True``, checks
-                if the robot is in collision. Defaults to ``False``.
+              if the robot is in collision. Defaults to ``False``.
             - ``"keep_order"``: (:obj:`str`, optional ) When ``False``, removes the
-                ``None``- solutions. Defaults to ``False``.
+              ``None``- solutions. Defaults to ``False``.
 
         Yields
         ------
@@ -74,7 +75,8 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         Raises
         ------
-        ValueError : If the solver to solve the kinematics has not been passed.
+        ValueError
+            If the solver to solve the kinematics has not been passed.
         """
 
         options = options or {}
