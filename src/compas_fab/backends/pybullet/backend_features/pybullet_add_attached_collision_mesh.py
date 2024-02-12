@@ -50,7 +50,7 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
               the pose of the inertial reference frame, relative to the link
               reference frame. Defaults to
               :class:`compas.geometry.Frame.worldXY()`.
-            - ``"collision_origin"``(:class:`compas.geometry.Frame`) This is
+            - ``"collision_origin"``: (:class:`compas.geometry.Frame`) This is
               the pose of the collision reference frame, relative to the link
               reference frame. Defaults to
               :class:`compas.geometry.Frame.worldXY()`.
