@@ -29,15 +29,15 @@ class BoundingVolume(object):
         :class:`compas.geometry.Sphere`, or a
         :class:`compas.datastructures.Mesh`.
 
-    Class attributes
-    ----------------
-    BOX
+    Notes
+    -----
+    `BoundingVolume.BOX`
         Box bounding volume type.
-    SPHERE
+    `BoundingVolume.SPHERE`
         Sphere bounding volume type.
-    MESH
+    `BoundingVolume.MESH`
         Mesh bounding volume type.
-    VOLUME_TYPES
+    `BoundingVolume.VOLUME_TYPES`
         List of supported bounding volume types.
     """
 
