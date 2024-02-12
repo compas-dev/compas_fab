@@ -74,3 +74,5 @@ with RosClient() as client:
                     shape.filename = shape.filename + ".obj"
 
     robot.model.to_urdf_file(loader._urdf_filename, prettify=True)
+
+    print("Extraction Complete.")
