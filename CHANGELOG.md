@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Introduced `compas_fab.robots.RobotLibrary` class with 3 built-in robots.
+* Added a script to extract URDF, SRDF and meshes from a Docker MoveIt instance.
+
 ### Changed
 
 * Changed `CollisionMesh` inherit from `compas.data.Data`
