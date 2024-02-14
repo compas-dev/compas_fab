@@ -1,4 +1,4 @@
-name: build_docs
+name: docs
 
 on:
   push:
@@ -11,8 +11,8 @@ on:
       - 'compas-2.x-compat'
 
 jobs:
-  build:
-    name: ubuntu-py38-build_docs
+  docs:
+    name: build_docs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
