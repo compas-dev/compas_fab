@@ -15,13 +15,13 @@ is based on a client-server architecture, there is no need to spin up any Docker
 containers to run the server.  This, along with its speed, may make PyBullet a
 preferable backend for COMPAS_FAB.  However, it, alone, does not provide motion
 planning functionality.  PyBullet is also not compatible with IronPython. Hence to use
-it with Rhinoceros and Grasshopper it must be invoked through the 
+it with Rhinoceros and Grasshopper it must be invoked through the
 :mod:`compas.rpc` module.
 
 Next Steps
 ==========
 
-* :ref:`Tutorial: COMPAS Robots <compas:robots>`
+* :doc:`Tutorial: COMPAS Robots <compas_robots:tutorial>`
 * :ref:`Examples: Description models <examples_description_models>`
 * :ref:`Examples: PyBullet Backend <examples_pybullet>`
 * :ref:`COMPAS FAB API Reference <reference>`

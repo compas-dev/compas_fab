@@ -29,15 +29,15 @@ class BoundingVolume(object):
         :class:`compas.geometry.Sphere`, or a
         :class:`compas.datastructures.Mesh`.
 
-    Class attributes
-    ----------------
-    BOX
+    Notes
+    -----
+    `BoundingVolume.BOX`
         Box bounding volume type.
-    SPHERE
+    `BoundingVolume.SPHERE`
         Sphere bounding volume type.
-    MESH
+    `BoundingVolume.MESH`
         Mesh bounding volume type.
-    VOLUME_TYPES
+    `BoundingVolume.VOLUME_TYPES`
         List of supported bounding volume types.
     """
 
@@ -188,15 +188,15 @@ class Constraint(object):
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important.
 
-    Class Attributes
-    ----------------
-    JOINT
+    Notes
+    -----
+    Constraint.JOINT
         Joint constraint type.
-    POSITION
+    Constraint.POSITION
         Positional constraint type.
-    ORIENTATION
+    Constraint.ORIENTATION
         Orientational constraint type.
-    CONSTRAINT_TYPES
+    Constraint.CONSTRAINT_TYPES
         List of possible constraint types.
     """
 

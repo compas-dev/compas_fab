@@ -25,10 +25,9 @@ class ReachabilityMap(Data):
     shape : tuple of int
         The shape of the frames array
 
-
-    Links
+    Notes
     -----
-    http://wiki.ros.org/reuleaux
+    See Also `reuleaux <https://wiki.ros.org/reuleaux>`__
     """
 
     def __init__(self, frames=None, configurations=None, name=None):

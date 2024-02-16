@@ -91,8 +91,8 @@ class PosCon3D(SerialSensor):
     def begin(self):
         """Locks the sensor to start RS-485 communication.
 
-        Note
-        ----
+        Notes
+        -----
         This method only needs to be called if not using
         a ``with`` statement to handle lifetime of the `PosCon3D` instance.
         """
@@ -101,8 +101,8 @@ class PosCon3D(SerialSensor):
     def end(self):
         """Unlocks the sensor from RS-485 communication.
 
-        Note
-        ----
+        Notes
+        -----
         This method only needs to be called if not using
         a ``with`` statement to handle lifetime of the `PosCon3D` instance.
         """
@@ -200,8 +200,8 @@ class PosCon3D(SerialSensor):
         `int`
             Address of the PosCon3D sensor connected to the RS-485 bus.
 
-        Note
-        ----
+        Notes
+        -----
         Only one PosCon3D sensor can be connected to the bus for this operation to succeed.
         """
         return int(self.send_command(self.address, "013"))
@@ -249,8 +249,8 @@ class PosCon3D(SerialSensor):
         precision : :obj:`int`
             Sensor precision to use.
 
-        Note
-        ----
+        Notes
+        -----
         The higher the precision, the slower the measurement gets.
         """
         if precision < 0 or precision > 2:
@@ -298,8 +298,8 @@ class PosCon3D(SerialSensor):
         `list`
             angle and distance to the reference surface.
 
-        Note
-        ----
+        Notes
+        -----
         This function is designed to aid in the installation of the sensor at an angle.
         """
         result = self.send_command(self.address, "093")
@@ -405,8 +405,8 @@ class PosConCM(SerialSensor):
     def begin(self):
         """Locks the sensor to start RS-485 communication.
 
-        Note
-        ----
+        Notes
+        -----
         This method only needs to be called if not using
         a ``with`` statement to handle lifetime of the `PosConCM` instance.
         """
@@ -415,8 +415,8 @@ class PosConCM(SerialSensor):
     def end(self):
         """Unlocks the sensor from RS-485 communication.
 
-        Note
-        ----
+        Notes
+        -----
         This method only needs to be called if not using
         a ``with`` statement to handle lifetime of the `PosConCM` instance.
         """
@@ -508,8 +508,8 @@ class PosConCM(SerialSensor):
         `int`
             Address of the PosConCM sensor connected to the RS-485 bus.
 
-        Note
-        ----
+        Notes
+        -----
         Only one PosConCM sensor can be connected to the bus for this operation to succeed.
         """
         result = self.send_command(self.address, "R005")
@@ -555,7 +555,7 @@ class PosConCM(SerialSensor):
         precision : :obj:`int`
             Sensor precision to use.
 
-        Note
+        Notes
         -----
         The higher the precision, the slower the measurement gets.
         """

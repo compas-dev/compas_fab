@@ -195,8 +195,8 @@ class JointTrajectoryPoint(Configuration):
         with another ``JointTrajectoryPoint``.  The other ``JointTrajectoryPoint``
         takes precedence over this ``JointTrajectoryPoint`` in case a joint value is present in both.
 
-        Note
-        ----
+        Notes
+        -----
             Caution: ``joint_names`` may be rearranged.
 
         Parameters

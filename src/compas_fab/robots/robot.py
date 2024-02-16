@@ -370,8 +370,8 @@ class Robot(Data):
         -------
         :obj:`list` of :class:`compas_robots.Joint`
 
-        Note
-        ----
+        Notes
+        -----
         If semantics is set and no group is passed, it returns all configurable
         joints of all groups.
 
@@ -430,8 +430,8 @@ class Robot(Data):
         -------
         :obj:`list` of :obj:`str`
 
-        Note
-        ----
+        Notes
+        -----
         If semantics is set and no group is passed, it returns all configurable
         joints of all groups.
 
@@ -456,8 +456,8 @@ class Robot(Data):
         -------
         :obj:`list` of :attr:`compas_robots.Joint.SUPPORTED_TYPES`
 
-        Note
-        ----
+        Notes
+        -----
         If :attr:`semantics` is set and no group is passed, it returns all
         configurable joint types of all groups.
 
@@ -519,8 +519,8 @@ class Robot(Data):
         -------
         :class:`compas_robots.Configuration`
 
-        Note
-        ----
+        Notes
+        -----
         No collision checking is involved, the configuration may be invalid.
         """
         configurable_joints = self.get_configurable_joints(group)
@@ -903,7 +903,7 @@ class Robot(Data):
 
         See Also
         --------
-        * :meth:`detach_tool`
+        :meth:`Robot.detach_tool`
 
         Examples
         --------
@@ -935,7 +935,7 @@ class Robot(Data):
 
         See Also
         --------
-        * :meth:`attach_tool`
+        :meth:`Robot.attach_tool`
         """
         group = group or self.main_group_name
         if group not in self.attached_tools:
@@ -952,6 +952,7 @@ class Robot(Data):
 
     def ensure_client(self):
         """Check if the client is set.
+
         Raises
         ------
         :exc:`Exception`
@@ -962,6 +963,7 @@ class Robot(Data):
 
     def ensure_semantics(self):
         """Check if semantics is set.
+
         Raises
         ------
         :exc:`Exception`
@@ -972,6 +974,7 @@ class Robot(Data):
 
     def ensure_geometry(self):
         """Check if the model's geometry has been loaded.
+
         Raises
         ------
         :exc:`Exception`
@@ -1065,9 +1068,9 @@ class Robot(Data):
 
         See Also
         --------
-        * :meth:`PositionConstraint.from_box`
-        * :meth:`PositionConstraint.from_mesh`
-        * :meth:`PositionConstraint.from_sphere`
+        :meth:`PositionConstraint.from_box`
+        :meth:`PositionConstraint.from_mesh`
+        :meth:`PositionConstraint.from_sphere`
 
         Notes
         -----
@@ -1122,10 +1125,10 @@ class Robot(Data):
 
         See Also
         --------
-        * :meth:`PositionConstraint.from_box`
-        * :meth:`PositionConstraint.from_mesh`
-        * :meth:`PositionConstraint.from_sphere`
-        * :meth:`orientation_constraint_from_frame`
+        :meth:`PositionConstraint.from_box`
+        :meth:`PositionConstraint.from_mesh`
+        :meth:`PositionConstraint.from_sphere`
+        :meth:`orientation_constraint_from_frame`
 
         Notes
         -----
@@ -1364,7 +1367,7 @@ class Robot(Data):
             If no configuration can be found.
 
         Yields
-        -------
+        ------
         :class:`Configuration`
             An inverse kinematic solution represented as a configuration.
 

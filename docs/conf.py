@@ -80,6 +80,7 @@ plot_formats = ["png"]
 intersphinx_mapping = {
     "python": ("https://docs.python.org/", None),
     "compas": ("https://compas.dev/compas/latest/", None),
+    "compas_robots": ("https://compas.dev/compas_robots/latest/", None),
     "roslibpy": ("https://roslibpy.readthedocs.io/en/latest/", None),
 }
 
@@ -140,6 +141,7 @@ html_theme_options = {
         "json_url": f"https://raw.githubusercontent.com/{organization}/{package}/gh-pages/versions.json",
         "version_match": version,
     },
+    "check_switcher": False,
     "logo": {
         "image_light": "_static/compas_icon_white.png",
         "image_dark": "_static/compas_icon_white.png",
