@@ -1,0 +1,34 @@
+on:
+  push:
+    tags:
+      - 'v*'
+
+name: Create Release
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ['3.8', '3.9', '3.10']
+
+    steps:
+      - uses: compas-dev/compas-actions.build@v3
+        with:
+          python: ${{ matrix.python }}
+          invoke_lint: true
+          check_import: true
+
+  publish:
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - uses: compas-dev/compas-actions.publish@v2
+        with:
+          pypi_token: ${{ secrets.PYPI_PASSWORD }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          build_ghpython_components: true
+          gh_source: src/compas_fab/ghpython/components
+          gh_target: src/compas_fab/ghpython/components/ghuser
+          release_name_prefix: COMPAS FAB
