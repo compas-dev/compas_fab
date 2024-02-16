@@ -120,4 +120,4 @@ best score, returning the score and the index:
     :class: figure-img img-fluid
 
 
-`Link to Link to full script of Example 3 <files/03_example_2D_sphere_points.py>`_
+`Link to full script of Example 3 <files/03_example_2D_sphere_points.py>`_
