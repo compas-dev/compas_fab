@@ -11,12 +11,6 @@ def all_robots():
     return robots
 
 
-def test_load_robot_library():
-    RobotLibrary.rfl()
-    RobotLibrary.ur5()
-    RobotLibrary.abb_irb4600_40_255()
-
-
 def test_robot_semantics_and_geometry(all_robots):
     for robot in all_robots:
         robot.ensure_semantics()
