@@ -37,7 +37,9 @@ class RobotLibrary:
     """
 
     @classmethod
-    def _load_library_model(cls, urdf_filename, srdf_filename, local_package_mesh_folder, client=None, load_geometry=True):
+    def _load_library_model(
+        cls, urdf_filename, srdf_filename, local_package_mesh_folder, client=None, load_geometry=True
+    ):
         """Convenience method for loading robot from local cache directory."""
 
         model = RobotModel.from_urdf_file(urdf_filename)
@@ -80,7 +82,7 @@ class RobotLibrary:
             srdf_filename=compas_fab.get("robot_library/rfl/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/rfl",
             client=client,
-            load_geometry=load_geometry
+            load_geometry=load_geometry,
         )
 
         return robot
@@ -108,7 +110,7 @@ class RobotLibrary:
             srdf_filename=compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/ur5_robot",
             client=client,
-            load_geometry=load_geometry
+            load_geometry=load_geometry,
         )
 
         return robot
@@ -136,7 +138,7 @@ class RobotLibrary:
             srdf_filename=compas_fab.get("robot_library/abb_irb4600_40_255/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/abb_irb4600_40_255",
             client=client,
-            load_geometry=load_geometry
+            load_geometry=load_geometry,
         )
 
         return robot
