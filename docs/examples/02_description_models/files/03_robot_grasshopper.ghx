@@ -37,7 +37,7 @@
           <items count="3">
             <item name="Date" type_name="gh_date" type_code="8">636715287477544574</item>
             <item name="Description" type_name="gh_string" type_code="10"></item>
-            <item name="Name" type_name="gh_string" type_code="10">02_robot_artist_grasshopper.ghx</item>
+            <item name="Name" type_name="gh_string" type_code="10">03_robot_grasshopper.ghx</item>
           </items>
           <chunks count="3">
             <chunk name="Revisions">
@@ -153,7 +153,7 @@ if load:
     branch  = 'kinetic-devel'
 
     github = GithubPackageMeshLoader(repo, package, branch)
-    
+
     model = RobotModel.from_urdf_file(github.load_urdf('irb6640.urdf'))
     model.load_geometry(github, precision=12)
     scene_object = RobotModelObject(model)

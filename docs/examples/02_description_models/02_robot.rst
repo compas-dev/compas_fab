@@ -63,9 +63,8 @@ visualization of datastructures and models, in a way that maintains the data
 separated from the specific CAD interfaces, while providing a way to leverage
 native performance of the CAD environment.
 
-In the ``compas_robots`` there are artists for various datastructures (meshes,
-networks, etc), including a ``RobotModelObject`` to visualize robots.
-Robot scene objects allow visualizing robot models easily and efficiently.
+We use the ``compas_robots`` extension and its ``RobotModelObject`` to visualize
+robots easily and efficiently.
 
 The following example illustrates how to load an entire robot model from
 ROS and render it in Rhino:
