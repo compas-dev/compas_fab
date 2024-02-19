@@ -31,4 +31,6 @@ jobs:
           build_ghpython_components: true
           gh_source: src/compas_fab/ghpython/components
           gh_target: src/compas_fab/ghpython/components/ghuser
+          gh_prefix: "COMPAS FAB: "
+          gh_interpreter: "ironpython"
           release_name_prefix: COMPAS FAB
