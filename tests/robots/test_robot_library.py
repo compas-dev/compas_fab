@@ -7,6 +7,7 @@ def all_robots():
     robots = []
     robots.append(RobotLibrary.rfl())
     robots.append(RobotLibrary.ur5())
+    robots.append(RobotLibrary.ur10e())
     robots.append(RobotLibrary.abb_irb4600_40_255())
     return robots
 
