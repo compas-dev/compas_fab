@@ -14,8 +14,8 @@ else:
 
 # TODO: move to some constants file? g is also defined in scipy.constants
 # standard acceleration of gravity [m/s**2]
-g = 9.80665
-gravity_vector = Vector(0, 0, -g)
+G = 9.80665
+GRAVITY_VECTOR = Vector(0, 0, -G)
 
 
 __all__ = ["Wrench"]
@@ -347,7 +347,7 @@ class Wrench(Data):
 
         """
         # transform gravity vector to FT Sensor coordinate system (FTSCS)
-        gravity_vector_FTSCS = ft_sensor_frame.to_local_coordinates(gravity_vector)
+        gravity_vector_FTSCS = ft_sensor_frame.to_local_coordinates(GRAVITY_VECTOR)
 
         # F gravity compensation, F = gravity * mass
         force_gravity = gravity_vector_FTSCS * mass
