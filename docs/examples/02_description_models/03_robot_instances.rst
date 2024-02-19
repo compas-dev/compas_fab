@@ -29,6 +29,10 @@ The following packages are available:
       - Universal Robots
       - 6 DOF offset-wrist robot
       - :class:`~compas_fab.robots.RobotLibrary.ur5`
+    * - UR10e
+      - Universal Robots
+      - 6 DOF offset-wrist robot
+      - :class:`~compas_fab.robots.RobotLibrary.ur10e`
     * - IRB 4600-40/2.55
       - ABB
       - 6 DOF spherical-wrist robot
