@@ -59,7 +59,11 @@ class RobotVisualize(component):
                 base_frame = frame_to_rhino_plane(base_compas_frame)
 
             if show_end_effector_frame:
-                ee_compas_frame = robot.forward_kinematics(configuration, group, options=dict(solver="model"))
+                options = dict(solver="model")
+                if robot.attached_tool:
+                    options["link"] = robot.attached_tool.connected_to
+
+                ee_compas_frame = robot.forward_kinematics(configuration, group, options=options)
                 ee_frame = frame_to_rhino_plane(ee_compas_frame)
 
             if show_frames:
