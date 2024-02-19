@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Add parameter to control which link the tool is connected to in Grasshopper.
+
 ### Changed
 
 * Changed `CollisionMesh` inherit from `compas.data.Data`

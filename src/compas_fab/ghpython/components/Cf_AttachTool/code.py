@@ -13,7 +13,7 @@ from compas_fab.robots import Tool
 
 
 class AttachToolComponent(component):
-    def RunScript(self, robot, visual_mesh, collision_mesh, tcf_plane, group):
+    def RunScript(self, robot, visual_mesh, collision_mesh, tcf_plane, group, connected_to):
         if robot and robot.client and robot.client.is_connected and visual_mesh:
             if not collision_mesh:
                 collision_mesh = visual_mesh
@@ -25,7 +25,7 @@ class AttachToolComponent(component):
                 frame = Frame.worldXY()
             else:
                 frame = plane_to_compas_frame(tcf_plane)
-            tool = Tool(c_visual_mesh, frame, c_collision_mesh)
+            tool = Tool(c_visual_mesh, frame, c_collision_mesh, connected_to=connected_to)
 
             robot.attach_tool(tool, group)
 
