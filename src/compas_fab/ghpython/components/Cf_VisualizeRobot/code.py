@@ -10,6 +10,7 @@ from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas.scene import SceneObject
 from compas_ghpython import create_id
+from compas_rhino.conversions import frame_to_rhino_plane
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
 
@@ -55,19 +56,16 @@ class RobotVisualize(component):
 
             if show_base_frame:
                 base_compas_frame = compas_frames[0]
-                sceneobject = SceneObject(base_compas_frame)
-                base_frame = sceneobject.draw()
+                base_frame = frame_to_rhino_plane(base_compas_frame)
 
             if show_end_effector_frame:
                 ee_compas_frame = robot.forward_kinematics(configuration, group, options=dict(solver="model"))
-                sceneobject = SceneObject(ee_compas_frame)
-                ee_frame = sceneobject.draw()
+                ee_frame = frame_to_rhino_plane(ee_compas_frame)
 
             if show_frames:
                 frames = []
                 for compas_frame in compas_frames[1:]:
-                    sceneobject = SceneObject(compas_frame)
-                    frame = sceneobject.draw()
+                    frame = frame_to_rhino_plane(compas_frame)
                     frames.append(frame)
 
             cached_scene_key = create_id(self, "cached_scene")
