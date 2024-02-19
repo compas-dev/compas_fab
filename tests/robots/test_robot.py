@@ -39,18 +39,6 @@ def panda_robot_instance(panda_urdf, panda_srdf):
 
 
 @pytest.fixture
-def panda_robot_instance_w_artist(panda_robot_instance):
-    class FakeArtist(object):
-        def scale(self, _):
-            pass
-
-    robot = panda_robot_instance
-    robot.artist = FakeArtist()
-
-    return robot
-
-
-@pytest.fixture
 def panda_robot_instance_wo_semantics(panda_urdf):
     return Robot(RobotModel.from_urdf_file(panda_urdf), semantics=None)
 
@@ -257,8 +245,8 @@ def test_get_base_frame(panda_robot_instance):
     assert robot.get_base_frame(group="panda_arm") == Frame.worldXY()
 
 
-def test_get_base_frame_w_artist(panda_robot_instance_w_artist):
-    robot = panda_robot_instance_w_artist
+def test_get_base_frame_w_artist(panda_robot_instance):
+    robot = panda_robot_instance
 
     assert robot.get_base_frame(group=None) == Frame.worldXY()
     assert robot.get_base_frame(group="panda_arm") == Frame.worldXY()
