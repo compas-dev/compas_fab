@@ -26,7 +26,8 @@ Load model from URDF
 ====================
 
 Alternatively, the URDF model can be loaded from URDF files (stored locally
-or remotely):
+or remotely), and connect to the ROS backend to use the MoveIt! planner.
+Note that the robot model loaded must be the same as the one loaded in ROS:
 
 .. literalinclude :: files/02_robot_model_urdf.py
    :language: python

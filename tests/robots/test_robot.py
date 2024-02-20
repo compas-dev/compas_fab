@@ -14,9 +14,9 @@ from compas_fab.backends.interfaces import ClientInterface
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.interfaces import PlannerInterface
 from compas_fab.robots import Robot
+from compas_fab.robots import RobotLibrary
 from compas_fab.robots import RobotSemantics
 from compas_fab.robots import Tool
-from compas_fab.robots.ur5 import Robot as Ur5Robot
 
 BASE_FOLDER = os.path.dirname(__file__)
 
@@ -45,7 +45,7 @@ def panda_robot_instance_wo_semantics(panda_urdf):
 
 @pytest.fixture
 def ur5_robot_instance():
-    return Ur5Robot()
+    return RobotLibrary.ur5(load_geometry=False)
 
 
 @pytest.fixture
@@ -169,7 +169,7 @@ def test_main_group_name(panda_robot_instance):
 
 def test_root_name(ur5_robot_instance):
     robot = ur5_robot_instance
-    assert robot.root_name == "world"
+    assert robot.root_name == "base_link"
 
 
 def test_get_end_effector_link_name(panda_robot_instance):
@@ -188,8 +188,8 @@ def test_get_end_effector_link_name_wrong_group(panda_robot_instance):
 def test_get_end_effector_link(ur5_robot_instance):
     robot = ur5_robot_instance
 
-    assert robot.get_end_effector_link(group=None).name == "ee_link"
-    assert robot.get_end_effector_link(group="endeffector").name == "ee_link"
+    assert robot.get_end_effector_link(group=None).name == "tool0"
+    assert robot.get_end_effector_link(group="endeffector").name == "tool0"
 
 
 def test_get_end_effector_frame(panda_robot_instance):
@@ -202,7 +202,7 @@ def test_get_base_link_name(ur5_robot_instance):
     robot = ur5_robot_instance
 
     assert robot.get_base_link_name(group=None) == "base_link"
-    assert robot.get_base_link_name(group="endeffector") == "ee_link"
+    assert robot.get_base_link_name(group="endeffector") == "tool0"
 
 
 def test_get_base_link_name_wo_semantics(panda_robot_instance_wo_semantics):
@@ -257,8 +257,8 @@ def test_get_base_frame_when_link_has_parent(ur5_robot_instance):
     base_frame = robot.get_base_frame(group="endeffector")
 
     assert [round(v, 3) for v in list(base_frame.point)] == [0.817, 0.191, -0.005]
-    assert [round(v) for v in base_frame.__data__["xaxis"]] == [0, 1, 0]
-    assert [round(v) for v in base_frame.__data__["yaxis"]] == [1, 0, 0]
+    assert [round(v) for v in base_frame.__data__["xaxis"]] == [-1, 0, 0]
+    assert [round(v) for v in base_frame.__data__["yaxis"]] == [0, 0, 1]
 
 
 def test_get_configurable_joints(ur5_robot_instance):
@@ -379,8 +379,8 @@ def test_forward_kinematics_without_tool(ur5_robot_instance):
 
     frame_t0cf = robot.forward_kinematics(robot.zero_configuration())
     assert str(frame_t0cf.point) == "Point(x=0.817, y=0.191, z=-0.005)"
-    assert str(frame_t0cf.xaxis) == "Vector(x=-0.000, y=1.000, z=0.000)"
-    assert str(frame_t0cf.yaxis) == "Vector(x=1.000, y=0.000, z=0.000)"
+    assert str(frame_t0cf.xaxis) == "Vector(x=-1.000, y=0.000, z=0.000)"
+    assert str(frame_t0cf.yaxis) == "Vector(x=0.000, y=0.000, z=1.000)"
 
 
 def test_forward_kinematics_with_tool(ur5_robot_instance, robot_tool1):
@@ -390,7 +390,9 @@ def test_forward_kinematics_with_tool(ur5_robot_instance, robot_tool1):
     robot.attach_tool(tool)
     frame_t0cf = robot.forward_kinematics(robot.zero_configuration(), use_attached_tool_frame=False)
     frame_tcf = robot.forward_kinematics(robot.zero_configuration(), use_attached_tool_frame=True)
-    assert math.fabs(frame_t0cf.point.y - frame_tcf.point.y) == tool.frame.point.x
+    frame_distance = frame_t0cf.point.distance_to_point(frame_tcf.point)
+    tool_tip_distance = tool.frame.point.distance_to_point([0, 0, 0])
+    assert str(frame_distance) == str(tool_tip_distance)
 
 
 def test_attach_tool_without_group(ur5_robot_instance, robot_tool1):

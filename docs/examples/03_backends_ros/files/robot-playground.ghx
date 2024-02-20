@@ -2844,7 +2844,7 @@ if robot:
 from scriptcontext import sticky as st
 
 import compas
-from compas_fab.robots.ur5 import Robot
+from compas_fab.robots import RobotLibrary
 from compas_ghpython.artists import RobotModelArtist
 
 compas.PRECISION = '12f'
@@ -2857,7 +2857,7 @@ if robot_key not in st:
     st[robot_key] = None
 
 if load:
-    robot = Robot(load_geometry=True)
+    robot = RobotLibrary.ur5(load_geometry=True)
     robot.artist = RobotModelArtist(robot.model)
     st[robot_key] = robot
     robot.scale(scale_factor)
