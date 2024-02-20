@@ -27,7 +27,7 @@ class RobotLibrary:
     >>> from compas_fab.robots import RobotLibrary
     >>> robot = RobotLibrary.ur5()
     >>> robot.name
-    'ur5'
+    'ur5_robot'
     """
 
     @classmethod
