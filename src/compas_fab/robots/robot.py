@@ -145,7 +145,7 @@ class Robot(Data):
         Examples
         --------
         >>> robot.name
-        'ur5'
+        'ur5_robot'
         """
         return self.model.name
 
@@ -211,7 +211,7 @@ class Robot(Data):
         Examples
         --------
         >>> robot.get_end_effector_link_name()
-        'ee_link'
+        'tool0'
         """
         if not self.semantics:
             return self.model.get_end_effector_link_name()
@@ -234,7 +234,7 @@ class Robot(Data):
         --------
         >>> link = robot.get_end_effector_link()
         >>> link.name
-        'ee_link'
+        'tool0'
         """
         name = self.get_end_effector_link_name(group)
         return self.model.get_link_by_name(name)
@@ -335,7 +335,7 @@ class Robot(Data):
         Examples
         --------
         >>> robot.get_link_names('manipulator')
-        ['base_link', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link', 'ee_link']
+        ['base_link', 'base_link_inertia', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link', 'flange', 'tool0']
         """
         base_link_name = self.get_base_link_name(group)
         ee_link_name = self.get_end_effector_link_name(group)
@@ -354,7 +354,7 @@ class Robot(Data):
         Examples
         --------
         >>> robot.get_link_names_with_collision_geometry()
-        ['base_link', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link', 'ee_link']
+        ['base_link_inertia', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link']
         """
         return [link.name for link in self.model.iter_links() if link.collision]
 
@@ -1028,7 +1028,7 @@ class Robot(Data):
         >>> tolerances_axes = [math.radians(1)] * 3
         >>> group = robot.main_group_name
         >>> robot.orientation_constraint_from_frame(frame, tolerances_axes, group=group)
-        OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)
+        OrientationConstraint('tool0', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)
         """
 
         attached_tool = self.attached_tools.get(group)
