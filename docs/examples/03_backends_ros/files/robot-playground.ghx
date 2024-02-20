@@ -6410,7 +6410,7 @@ Add path constraints</item>
                     <item name="ScrollRatio" type_name="gh_double" type_code="6">0</item>
                     <item name="Source" index="0" type_name="gh_guid" type_code="9">63649309-f44e-4e3b-ad3a-514b976df80d</item>
                     <item name="SourceCount" type_name="gh_int32" type_code="3">1</item>
-                    <item name="UserText" type_name="gh_string" type_code="10">ee_link</item>
+                    <item name="UserText" type_name="gh_string" type_code="10">tool0</item>
                   </items>
                   <chunks count="2">
                     <chunk name="Attributes">
@@ -6680,7 +6680,7 @@ Add path constraints</item>
                     <item name="ScrollRatio" type_name="gh_double" type_code="6">0</item>
                     <item name="Source" index="0" type_name="gh_guid" type_code="9">96a2f2f6-5901-4527-abb3-829097bd2417</item>
                     <item name="SourceCount" type_name="gh_int32" type_code="3">1</item>
-                    <item name="UserText" type_name="gh_string" type_code="10">ee_link</item>
+                    <item name="UserText" type_name="gh_string" type_code="10">tool0</item>
                     <item name="WireDisplay" type_name="gh_int32" type_code="3">1</item>
                   </items>
                   <chunks count="2">

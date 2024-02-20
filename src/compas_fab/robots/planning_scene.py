@@ -151,9 +151,9 @@ class AttachedCollisionMesh(Data):
     --------
     >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
     >>> cm = CollisionMesh(mesh, 'tip')
-    >>> ee_link_name = 'ee_link'
-    >>> touch_links = ['wrist_3_link', 'ee_link']
-    >>> acm = AttachedCollisionMesh(cm, ee_link_name, touch_links)
+    >>> end_effector_link_name = 'tool0'
+    >>> touch_links = ['wrist_3_link', 'tool0']
+    >>> acm = AttachedCollisionMesh(cm, end_effector_link_name, touch_links)
     """
 
     def __init__(self, collision_mesh, link_name, touch_links=None, weight=1.0):
@@ -357,9 +357,9 @@ class PlanningScene(object):
         >>> scene = PlanningScene(robot)
         >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> cm = CollisionMesh(mesh, 'tip')
-        >>> ee_link_name = 'ee_link'
-        >>> touch_links = ['wrist_3_link', 'ee_link']
-        >>> acm = AttachedCollisionMesh(cm, ee_link_name, touch_links)
+        >>> end_effector_link_name = 'tool0'
+        >>> touch_links = ['wrist_3_link', 'tool0']
+        >>> acm = AttachedCollisionMesh(cm, end_effector_link_name, touch_links)
         >>> scene.add_attached_collision_mesh(acm)         # doctest: +SKIP
         """
         self.ensure_client()
@@ -425,9 +425,9 @@ class PlanningScene(object):
             scale_factor = 1.0 / self.robot.scale_factor
             collision_mesh.scaled(scale_factor)
 
-        ee_link_name = self.robot.get_end_effector_link_name(group)
-        touch_links = [ee_link_name]
-        acm = AttachedCollisionMesh(collision_mesh, ee_link_name, touch_links)
+        end_effector_link_name = self.robot.get_end_effector_link_name(group)
+        touch_links = [end_effector_link_name]
+        acm = AttachedCollisionMesh(collision_mesh, end_effector_link_name, touch_links)
         self.add_attached_collision_mesh(acm)
 
     def add_attached_tool(self, tool=None, group=None):

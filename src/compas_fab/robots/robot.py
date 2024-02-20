@@ -338,9 +338,9 @@ class Robot(Data):
         ['base_link', 'base_link_inertia', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link', 'flange', 'tool0']
         """
         base_link_name = self.get_base_link_name(group)
-        ee_link_name = self.get_end_effector_link_name(group)
+        end_effector_link_name = self.get_end_effector_link_name(group)
         link_names = []
-        for link in self.model.iter_link_chain(base_link_name, ee_link_name):
+        for link in self.model.iter_link_chain(base_link_name, end_effector_link_name):
             link_names.append(link.name)
         return link_names
 
@@ -1035,7 +1035,7 @@ class Robot(Data):
         if use_attached_tool_frame and attached_tool:
             frame_WCF = self.from_tcf_to_t0cf([frame_WCF], group)[0]
 
-        ee_link = self.get_end_effector_link_name(group)
+        end_effector_link_name = self.get_end_effector_link_name(group)
 
         tolerances_axes = list(tolerances_axes)
         if len(tolerances_axes) == 1:
@@ -1043,7 +1043,7 @@ class Robot(Data):
         elif len(tolerances_axes) != 3:
             raise ValueError("Must give either one or 3 values")
 
-        return OrientationConstraint(ee_link, frame_WCF.quaternion, tolerances_axes)
+        return OrientationConstraint(end_effector_link_name, frame_WCF.quaternion, tolerances_axes)
 
     def position_constraint_from_frame(self, frame_WCF, tolerance_position, group=None, use_attached_tool_frame=True):
         """Create a position constraint from a frame on the group's end-effector link.
@@ -1086,16 +1086,16 @@ class Robot(Data):
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
         >>> robot.position_constraint_from_frame(frame, tolerance_position)                                 # doctest: +SKIP
-        PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)    # doctest: +SKIP
+        PositionConstraint('tool0', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)    # doctest: +SKIP
         """
 
         attached_tool = self.attached_tools.get(group)
         if use_attached_tool_frame and attached_tool:
             frame_WCF = self.from_tcf_to_t0cf([frame_WCF], group)[0]
 
-        ee_link = self.get_end_effector_link_name(group)
+        end_effector_link_name = self.get_end_effector_link_name(group)
         sphere = Sphere(radius=tolerance_position, point=frame_WCF.point)
-        return PositionConstraint.from_sphere(ee_link, sphere)
+        return PositionConstraint.from_sphere(end_effector_link_name, sphere)
 
     def constraints_from_frame(
         self, frame_WCF, tolerance_position, tolerances_axes, group=None, use_attached_tool_frame=True
@@ -1147,8 +1147,8 @@ class Robot(Data):
         >>> tolerances_axes = [math.radians(1)]
         >>> group = robot.main_group_name
         >>> robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)                         # doctest: +SKIP
-        [PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0),          # doctest: +SKIP
-        OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)] # doctest: +SKIP
+        [PositionConstraint('tool0', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0),          # doctest: +SKIP
+        OrientationConstraint('tool0', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)] # doctest: +SKIP
         """
         pc = self.position_constraint_from_frame(frame_WCF, tolerance_position, group, use_attached_tool_frame)
         oc = self.orientation_constraint_from_frame(frame_WCF, tolerances_axes, group, use_attached_tool_frame)
@@ -1474,7 +1474,7 @@ class Robot(Data):
               calculate the forward kinematics for. Defaults to the group's end
               effector link.
               Backwards compatibility note: if there's no ``link`` option, the
-              planner will try also ``ee_link`` as fallback before defaulting
+              planner will try also ``tool0`` as fallback before defaulting
               to the end effector's link.
 
             There are additional options that are specific to the backend in use.
@@ -1516,7 +1516,7 @@ class Robot(Data):
 
         # Solve with the model
         if solver == "model":
-            link = options.get("link", options.get("ee_link"))
+            link = options.get("link", options.get("tool0"))
             link = link or self.get_end_effector_link_name(group)
             if link not in self.get_link_names(group):
                 raise ValueError("Link name {} does not exist in planning group".format(link))
