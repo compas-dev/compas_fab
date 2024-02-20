@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Latest",
+    "version": "latest",
+    "url": "https://gramaziokohler.github.io/compas_fab/latest/"
+  },
+  {
+    "name": "1.0.0 (stable)",
+    "version": "1.0.0",
+    "url": "https://gramaziokohler.github.io/compas_fab/1.0.0/"
+  }
+]
