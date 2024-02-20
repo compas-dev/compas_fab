@@ -6,6 +6,7 @@ from compas.data import json_dumps
 from compas.data import json_loads
 from compas.datastructures import Mesh
 from compas.geometry import Frame
+from compas.tolerance import Tolerance
 from compas_robots import RobotModel
 
 import compas_fab
@@ -377,9 +378,10 @@ def test_forward_kinematics_without_tool(ur5_robot_instance):
     robot = ur5_robot_instance
 
     frame_t0cf = robot.forward_kinematics(robot.zero_configuration())
-    assert str(frame_t0cf.point) == "Point(x=0.817, y=0.191, z=-0.005)"
-    assert str(frame_t0cf.xaxis) == "Vector(x=-1.000, y=0.000, z=0.000)"
-    assert str(frame_t0cf.yaxis) == "Vector(x=0.000, y=0.000, z=1.000)"
+    known_value = Frame([0.817, 0.191, -0.005], [-1, 0, 0], [0, 0, 1])
+    tolerance = Tolerance()
+    for a, b in zip(frame_t0cf.to_transformation().list, known_value.to_transformation().list):
+        assert tolerance.compare(a, b, 1e-3, 1e-3)
 
 
 def test_forward_kinematics_with_tool(ur5_robot_instance, robot_tool1):
