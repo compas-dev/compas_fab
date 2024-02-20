@@ -1,0 +1,1366 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <link rel="icon" href="_static/compas.ico" type="image/x-icon">
+    <title>CHANGELOG &#8212; COMPAS FAB</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/compas.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/tabs.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="_static/design-tabs.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'changelog';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/compas-dev/compas_fab/gh-pages/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.0';
+        </script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="License" href="license.html" />
+    <link rel="prev" title="Citing" href="authors.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/compas_icon_white.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="_static/compas_icon_white.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+    <p class="title logo__title">COMPAS docs</p>
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <!-- <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="getting_started.html">
+                        Getting started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="backends.html">
+                        Working with backends
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="contributing.html">
+                        Contributor’s Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="authors.html">
+                        Citing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        CHANGELOG
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://compas.dev">
+                    COMPAS Framework
+                  </a>
+                </li>
+                
+                </div>
+            </div>
+            
+  </ul> -->
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      1.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/compas-dev/compas_fab" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="http://forum.compas-framework.org/" title="Discourse" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-discourse"></i></span>
+            <label class="sr-only">Discourse</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/compas_fab/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <!-- <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="getting_started.html">
+                        Getting started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="backends.html">
+                        Working with backends
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="contributing.html">
+                        Contributor’s Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="authors.html">
+                        Citing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        CHANGELOG
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://compas.dev">
+                    COMPAS Framework
+                  </a>
+                </li>
+                
+                </div>
+            </div>
+            
+  </ul> -->
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      1.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/compas-dev/compas_fab" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="http://forum.compas-framework.org/" title="Discourse" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-discourse"></i></span>
+            <label class="sr-only">Discourse</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/compas_fab/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="backends.html">Working with backends</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="backends/pybullet.html">PyBullet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/ros.html">ROS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/web_x11_gui.html">Access backend GUI</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/01_fundamentals.html">Fundamentals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/02_description_models.html">Description Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/03_backends_ros.html">Backends: ROS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/05_backends_pybullet.html">Backends: PyBullet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/06_backends_kinematics.html">Backends: Analytical Kinematics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/07_reachability_map.html">Planning: Reachability Map</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/compas_fab.html">compas_fab</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="contributing.html">Contributor’s Guide</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer/backends.html">Backend clients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer/grasshopper.html">Grasshopper components</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Citing</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">CHANGELOG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="sidebar-primary-item"><div class="sidebar-primary-item">
+    <a href="https://compas.dev" target="_blank">
+        COMPAS.dev <i class="fa fa-external-link" aria-hidden="true"></i>
+    </a>
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">CHANGELOG</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="changelog">
+<h1>CHANGELOG</h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.1] 2024-02-20
+
+### Added
+
+### Changed
+
+### Removed
+
+
+## [1.0.0] 2024-02-20
+
+### Added
+
+* Add parameter to control which link the tool is connected to in Grasshopper.
+
+### Changed
+
+* Changed `CollisionMesh` inherit from `compas.data.Data`
+* Changed `AttachedCollisionMesh` to inherit from `compas.data.Data`
+* Changed `Robot` inherit from `compas.data.Data`
+* Changed `RobotSemantics` inherit from `compas.data.Data`
+* Changed `Tool` to inherit from `compas.data.Data`
+* Renamed `Tool.link_name` to `Tool.connected_to`
+* Migrate to COMPAS 2.x: add dependency to `compas_robots`
+* Migrate to COMPAS 2.x: use `compas.tolerance` module instead of `compas.PRECISION`
+* Add `attributes` to `Trajectory` class.
+* Fixed `data` serialization API to comply with `COMPAS 2.0` private data API.
+* Use the tool&#39;s `connected_to` link when showing end-effector frames in Grasshopper.
+
+### Removed
+
+* Removed V-Rep backend.
+* Removed outdated `PathPlan` class.
+* Removed outdated rfl demo class.
+* Remove deprecated aliases for artists (currently on `compas_robots`).
+
+## [0.28.0] 2023-05-10
+
+### Added
+
+* Added `Forward Kinematics` GH component.
+
+### Changed
+
+* Updated install process of GH components.
+* Added caching to the GH component that visualizes scene, to avoid retrieving the whole scene too often.
+
+### Fixed
+
+* Fixed pre-Noetic support on the MoveIt planner when a tool is attached to the robot.
+
+## 0.27.0
+
+### Added
+
+* Added support for attached and non-attached collision mesh visualization to the `Robot Visualize` GH component.
+* Added a prefix to all GH components.
+* Added `append` to the operations of the `Collision Mesh` GH component.
+
+### Changed
+
+* Changed behavior of `Attach Tool` GH component to only attach the tool but not add it to the planning scene state.
+* Duration class takes floats as `sec` variable.
+* Changed the behavior of `forward_kinematics`, `inverse_kinematics`, `iter_inverse_kinematics`, `plan_cartesian_motion` and constraints construction methods (`orientation_constraint_from_frame`, `position_constraint_from_frame`, `constraints_from_frame`) in `Robot` class to use the frame of the attached tool if a tool is attached. This behavior can be reverted back (ie. only calculate T0CF) using the flag `use_attached_tool_frame` of all these methods.
+* Fixed usage of `tangent_points_to_circle_xy` in Spherical Wrist solver to work with COMPAS v1.16 and older.
+
+### Fixed
+
+* Fixed DH params for analytical IK solver of UR3e and UR10e.
+* Fixed Kinetic support on IK, FK, and motion planning calls.
+* Fixed `Publish to topic` Grasshopper component when the `ros_client` has been replaced (eg. disconnected and reconnected).
+
+### Deprecated
+
+### Removed
+
+## 0.26.0
+
+### Added
+
+* Added a new GH component - `ConstraintsFromTargetConfiguration`
+* Added some missing information to GH and V-REP docs.
+* Added a `Robot().attached_tools` property to allow attaching tools to multiple planning groups simultaneously.
+
+### Changed
+
+* Replaced icon for GH component - `ConstraintsFromPlane`
+* `Robot().attached_tool` now points to the tool attached to the `robot.main_group_name`.
+* Added parameter `group` to the `AttachToolComponent`
+
+### Fixed
+
+* Attaching a tool to a planning group doesn&#39;t overwrite the tool attached to other groups.
+* Changed `Trajectory` to inherit from `compas.data.Data` class to fix a serialization error that expects guid to be present.
+
+### Deprecated
+
+### Removed
+
+## 0.25.0
+
+### Changed
+
+* Changed Grasshopper components to default to icon display.
+* Changed to use `compas_rhino.conversions` to coerce frames.
+
+### Fixed
+
+* Fixed link parameter name when doing FK inside the GH component to display attached collision meshes.
+* Fixed transform of the attached collision mesh frame inside the GH component.
+* Fixed uninstall process not removing GH components.
+
+## 0.24.0
+
+### Added
+
+* Added `compas_fab.robots.ReachabilityMap`
+* Added `compas_fab.robots.DeviationVectorsGenerator`
+* Added `compas_fab.robots.OrthonormalVectorsFromAxisGenerator`
+
+### Changed
+
+### Fixed
+
+* Fixed `ROSmsg` import on GH components for publish/subscribe.
+
+### Deprecated
+
+### Removed
+
+## 0.23.0
+
+### Added
+
+* Added `compas_fab.backends.PyBulletClient.load_ur5()` method to simplify some examples.
+* Added Grasshopper components to get a zero configuration and to merge two configurations.
+
+### Changed
+
+* Moved all public API classes in `compas_fab.backends` to second-level imports.
+* Updated to COMPAS 1.14.
+* Simplified call to remove an attached tool by also removing the remaining collision mesh from the world automatically.
+
+### Fixed
+
+* Fixed PyBullet loading of meshes.
+* Fixed missing flag in reset planning scene call.
+* Fixed issue on cartesian and kinematic planning when model contains passive joints.
+* Fixed pose of collision mesh in ROS Noetic being ignored.
+
+### Deprecated
+
+* Deprecated `compas_fab.utilities.write_data_to_json` in favor of `compas.data.json_dump`.
+* Deprecated `compas_fab.utilities.read_data_from_json` in favor of `compas.data.json_load`.
+
+### Removed
+
+## 0.22.0
+
+### Added
+
+* Added `Attach Tool` GH component: crowd-coded at McNeel&#39;s Robotic Fabrication Workshop!
+
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## 0.21.1
+
+### Added
+
+### Changed
+
+* Changed default wire visibility to hidden in some GH components for cleaner Grasshopper files.
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## 0.21.0
+
+### Added
+
+* Added a new backend: analytical kinematics for spherical-wrist and offset-wrist robots.
+
+### Fixed
+
+* Consider `AttachedCollisionMesh` in `AnalyticalInverseKinematics`.
+
+## 0.20.1
+
+### Removed
+
+* Removed the bundled binary files for the `VrepClient` remote API. To use V-REP, use the `remoteApi` binaries provided with the software.
+
+## 0.20.0
+
+### Added
+
+* Added `PoseArray`, `MultiArrayDimension`, `MultiArrayLayout`, `Int8MultiArray`, `Float32MultiArray`, `Int32` to `compas_fab.backends.ros.messages`
+* Added `unordered_disabled_collisions` attribute to `PyBulletClient` and `RobotSemantics`
+* Added better support for concave meshes in the `PyBulletClient`
+* Added `Robot.iter_inverse_kinematics` to allow iterating over all IK solutions provided by a solver
+
+### Changed
+
+* Changed the backend feature `InverseKinematics.inverse_kinematics` to be a generator. As a consequence of this, `ClientInterface.inverse_kinematics` and `PlannerInterface.inverse_kinematics` have changed to generators as well
+* Standardized the yielded type of `InverseKinematics.inverse_kinematics` across the PyBullet, MoveIt and V-REP planners
+* Added iterative accurate IK resolution for PyBullet
+
+### Fixed
+
+* Fixed `UnsupportedOperation` error when using `PyBulletClient` in Jupyter notebook (raised by `redirect_stdout`)
+* Fixed `JointTrajectoryPoint.from_data` to be backward-compatible with JSON data generated before `compas_fab` 0.18
+* Fixed `JointTrajectory.from_data` to be backward-compatible with JSON data generated before `compas_fab` 0.17
+
+### Deprecated
+
+### Removed
+
+## 0.19.1
+
+### Added
+
+### Changed
+
+### Fixed
+
+* Fixed bundling of ghuser components
+
+### Deprecated
+
+### Removed
+
+## 0.19.0
+
+### Added
+
+* Added documentation for Grasshopper components.
+* Added Grasshopper components to publish and subscribe to ROS topics.
+
+### Changed
+
+* Updated `build-ghuser-components` task
+* Updated to COMPAS 1.7
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## 0.18.3
+
+### Added
+
+### Changed
+
+* Made consistent use of `repr` in nested objects
+
+### Fixed
+
+* Fixed bug in `compas.backends.PyBulletClient.convert_mesh_to_body` circumventing PyBullet&#39;s propensity to cache
+
+### Deprecated
+
+### Removed
+
+## 0.18.2
+
+### Added
+
+### Changed
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## 0.18.1
+
+### Fixed
+
+* Fix error message during uninstall of Grasshopper components
+
+## 0.18.0
+
+### Added
+
+* Grasshopper components now also for Mac
+* Added support for MoveIt on ROS Noetic
+* Added support for Python 3.9
+
+### Changed
+
+* The `Configuration` class has moved to `compas.robots`, but is still aliased within `compas_fab.robots`
+* Lazily load `V-REP remoteApi` library
+
+### Fixed
+
+* Fixed `repr()` of `ROSmsg` class
+* Fixed data type of secs and nsecs in `Time` ROS message
+* Fixed `CollisionObject.to_collision_meshes`
+* Fixed serialization of joint names for `compas_fab.robots.JointTrajectoryPoint`
+* Fixed deserialization of `AttachedCollisionMesh`
+
+### Deprecated
+
+* `compas_fab.robots.Configuration` is being deprecated in favor of `compas.robots.Configuration`
+
+## 0.17.0
+
+### Added
+
+* Added python components library for Grasshopper
+* Added `compas_fab.robots.PyBulletClient.get_robot_configuration`
+* Added `compas_fab.robots.Robot.ensure_geometry`
+* Added serialization methods to `compas_fab.robots.CollisionMesh` and `compas_fab.robots.AttachedCollisionMesh`
+* Added `attached_collision_meshes` attribute to `compas_fab.robots.JointTrajectory`
+* Added `compas_fab.backends.PlanningSceneComponents.__ne__`
+* Added dictionary behavior to `compas_fab.robots.JointTrajectoryPoint.merge`
+* Added length limitations to attributes of `compas_fab.robots.JointTrajectoryPoint.merge`
+
+### Changed
+
+* Updated to `COMPAS 1.1`
+* `Configuration` &amp; `JointTrajectoryPoint`: the attributes `values` and `types` changed to `joint_values` and `joint_types` respectively.
+
+### Fixed
+
+* Fixed bug in the PyBullet client where one could not update the configuration of a robot with an attached collision mesh
+* Fixed bug existing since version 0.12 where `compas_fab.backends.RosClient.add_attached_collision_mesh` added collision objects to the scene, but did not attached them to the robot
+* Fixed bug when keys with `None` values were passed to the planner.
+
+### Deprecated
+
+### Removed
+
+* Remove `compas_fab.robots.JointTrajectoryPoint.merge`
+
+## 0.16.0
+
+### Changed
+
+* Updated to `COMPAS 1.0`
+
+## 0.15.0
+
+### Added
+
+### Changed
+
+* Updated to `COMPAS 0.19`
+
+### Fixed
+
+### Deprecated
+
+### Removed
+
+## 0.14.0
+
+### Added
+
+* Added new backend feature `ResetPlanningScene`
+* Added `MoveItResetPlanningScene`
+
+### Changed
+
+* Updated to `COMPAS 0.18`
+* Use `compas.IPY` to check for IronPython
+
+### Fixed
+
+* Fixed bug in `remove_attached_tool` of `PlanningScene`
+
+## 0.13.1
+
+### Added
+
+* Added `name` property to `Tool` class.
+
+### Fixed
+
+* Fixed bug in `add_attached_tool` of `PlanningScene`
+* Fixed `frame_id` generation when tool name changes
+* Fixed freeze with some sync planning scene methods on Grasshopper/IronPython
+
+## 0.13.0
+
+### Changed
+
+* Updated to `COMPAS 0.17`
+
+## 0.12.0
+
+### Added
+
+* **PyBullet integration**: added support for PyBullet client and forward/inverse kinematic solver
+* Added `ClientInterface`, `PlannerInterface` and various backend feature interfaces
+* Added implementations of these interfaces for ROS and V-REP
+* Added `attributes` dictionary to `Robot` class
+* Added `compas_fab.robots.Tool.from_t0cf_to_tcf`
+* Added `compas_fab.robots.Tool.from_tcf_to_t0cf`
+* Added `joint_names` as optional parameter for all `compas_fab.robots.Configuration` constructors
+* Added `compas_fab.robots.Configuration.iter_differences`
+* Added `compas_fab.robots.Configuration.max_difference`
+* Added `compas_fab.robots.Configuration.close_to`
+* Added `compas_fab.robots.Configuration.merge`
+* Added `compas_fab.robots.JointTrajectoryPoint.merge`
+* Added `compas_fab.robots.Semantics.group_states`
+* Added `compas_fab.robots.Robot.get_configuration_from_group_state`
+
+### Changed
+
+* Updated to `COMPAS 0.16.9`
+* Renamed `compas_fab.robots.Robot.to_local_coords` to `compas_fab.robots.Robot.to_local_coordinates`
+* Renamed `compas_fab.robots.Robot.to_world_coords` to `compas_fab.robots.Robot.to_world_coordinates`
+* Backend clients have been restructured according to the new interfaces
+* Parameter `backend` of forward kinematics has been renamed to `solver`
+* The signatures of all kinematics, motion planning and planning scene management methods have been homogenized across backend clients and within `Robot`
+* All examples have been updated to reflect these changes
+* The installer to Rhino has been unified with COMPAS core. Now running `python -m compas_rhino.install` will also detect and install COMPAS FAB and its dependencies.
+* Renamed all `RobotArtist` implementations to `RobotModelArtist` to reflect
+  the fact they depend on `compas.robots.RobotModel`.
+* Renamed  `compas_fab.robots.Robot.from_tool0_to_attached_tool` to `compas_fab.robots.Robot.from_t0cf_to_tcf`
+* Renamed  `compas_fab.robots.Robot.from_attached_tool_to_tool0` to `compas_fab.robots.Robot.from_tcf_to_t0cf`
+* Changed ROS planning scene methods to be synchronous.
+
+
+### Fixed
+
+* Attached collision meshes are included in inverse kinematics calculations in ROS
+
+### Deprecated
+
+* The methods `forward_kinematics`, `inverse_kinematics`, `plan_cartesian_motion` and `plan_motion`
+  of `Robot` class have been refactored, but a backwards-compatible deprecated version with the old
+  signatures still exists suffixed by `_deprecated`, e.g. `forward_kinematics_deprecated`.
+* `RobotArtist` are deprecated in favor of `RobotModelArtist`.
+
+### Removed
+
+## 0.11.0
+
+### Added
+
+* Added optional `joint_names` to `Configuration`
+* Added `Configuration.scaled`
+* Added `full_joint_state` to `Robot.inverse_kinematics`
+* Added `Semantics.get_all_configurable_joints`
+
+### Changed
+
+* Updated to `COMPAS 0.15`
+* Construct `full_configuration` with `values`, `types`, `joint_names` in `Robot` rather than in `MoveItPlanner`
+* `MoveItPlanner` returns `start_configuration` with set `joint_names`
+* Removed parameter `names` from `RobotArtist.update`
+* Updated Grasshopper examples
+* `Robot`: `forward_kinematics` returns now `frame_WCF`
+* `MoveItPlanner`: `forward_kinematics` takes now instance of `Configuration` and `robot`
+* `MoveItPlanner`: `inverse_kinematics` takes now instance of `Configuration` and `robot`
+* Property :class:`compas_fab.robots.Robot.artist` does not try to scale robot
+  geometry if links and/or joints are not defined.
+* In :class:`compas_fab.robots.constraints.JointConstraint`, added `tolerance_above` and
+  `tolerance_below` for allowing asymmetrical constraints.
+* In :class:`compas_fab.robots.Robot`, changed the `constraints_from_configuration`
+  function with `tolerances_above` and `tolerances_below`.
+* :meth:`compas_fab.robots.CollisionMesh.scale` now takes a scale factor
+  instead of a :class:`compas.geometry.Scale` instance as an argument.
+
+### Fixed
+
+* Convert constraints on inverse kinematics and cartesian planner to ROS messages
+* Fix support for trajectory constraints on kinematic planner
+
+## 0.10.2
+
+### Added
+
+* Added Python 3.8 support
+
+### Changed
+
+* Updated to `COMPAS 0.13`
+
+## 0.10.1
+
+### Fixed
+
+* Fix DAE parser to handle `polylist` meshes
+* Bumped `roslibpy` dependency to `0.7.1` to fix blocking service call issue on Mac OS
+
+## 0.10.0
+
+### Added
+
+* Added `attach_tool`, `detach_tool`, `draw_attached_tool`, `from_tool0_to_attached_tool` and `from_attached_tool_to_tool0` to `Robot`
+* Added `attach_tool` and `detach_tool` to `Artist`
+* Added `add_attached_tool` and `remove_attached_tool` to `PlanningScene`
+* Added redraw/clear layer support to :class:`~compas_fab.rhino.RobotArtist` for Rhino
+* Added material/color support for DAE files on ROS file loader
+
+### Changed
+
+* Changed `inverse_kinematics`, `plan_cartesian_motion` and `plan_motion` to use the attached_tool&#39;s `AttachedCollisionMesh` if set
+
+### Fixed
+
+* Fixed mutable init parameters of `Configuration`, `JointTrajectoryPoint`, `JointTrajectory` and `Robot.basic`.
+* Fixed interface of :class:`~compas_fab.blender.RobotArtist` for Blender
+* Fixed DAE parsing of meshes with multiple triangle sets
+
+## 0.9.0
+
+### Added
+
+* Added `load_robot` method to ROS client to simplify loading robots from running ROS setup.
+* Added `compas_fab.robots.Wrench`: a Wrench class representing force in free space, separated into its linear (force) and angular (torque) parts.
+* Added `compas_fab.robots.Inertia`: a Inertia class representing spatial distribution of mass in a rigid body
+
+### Changed
+
+* Updated to `COMPAS 0.11`
+
+## 0.8.0
+
+### Changed
+
+* Updated to `COMPAS 0.10`
+* Add better support for passive joints on IK, Cartesian and Kinematic planning
+
+### Fixed
+
+* Use WorldXY&#39;s origin as default for robots that are have no parent join on their base
+* Fixed parsing of semantics (SRDF) containing nested groups
+* Fixed DAE support on ROS File loader
+
+## 0.7.0
+
+### Changed
+
+* Fixed Python 2 vs Python 3 incompatibilities in `compas_fab.sensors` module
+* Changed example for loading PosConCM (includes parity argument, differs from PosCon3D)
+* Changed format `compas_fab.sensors.baumer.PosConCM.set_flex_mount()`
+* Changed tasks.py to run `invoke test`
+* Renamed `compas_fab.backends.CancellableTask` to `compas_fab.backends.CancellableFutureResult`
+* ROS client: changed joint trajectory follower (`follow_joint_trajectory`) to support generic `JointTrajectory` arguments.
+* ROS client: changed return type of trajectory execution methods to `CancellableFutureResult`
+
+### Added
+
+* Added `compas_fab.sensors.baumer.PosCon3D.reset()`
+* Added `compas_fab.sensors.baumer.PosConCM.reset()`
+* ROS client: added support for MoveIt! execution action via `client.execute_joint_trajectory`.
+* Added `compas_fab.backends.FutureResult` class to deal with long-running async tasks
+
+### Removed
+
+* Removed `compas_fab.sensors.baumer.PosConCM.get_live_monitor_data()`
+* Removed non-implemented methods from `compas_fab.robots.Robot`: `send_frame`, `send_configuration`, `send_trajectory`
+
+### Fixed
+
+* Fixed missing planner initialization when used without context manager.
+
+## 0.6.0
+
+### Changed
+
+* Updated `COMPAS` dependency to `0.8.1`
+* Base robot artist functionality moved to `compas.robots.RobotModel`
+* `Robot`: `inverse_kinematics` returns now group configuration
+* `Robot`: `forward_kinematics` has new parameter `backend` to select either `client` FK or `model` FK.
+* `Robot`: `forward_kinematics` returns now `frame_RCF`
+* `Robot`: `forward_kinematics` doesn&#39;t need full configuration anymore
+* Fixed delays when modifying the planning scene of ROS.
+
+### Added
+
+* Added `jump_threshold` parameter to `plan_cartesian_motion`
+* Added `action_name` parameter to reconfigure joint trajectory follower action.
+* Added support to retrieve the full planning scene.
+
+### Removed
+
+* Removed `compas_fab.Robot.get_configuration`
+
+## 0.5.0
+
+### Changed
+
+* ROS Client: renamed `compute_cartesian_path` to `plan_cartesian_motion`
+* ROS Client: renamed `motion_plan_goal_frame` and
+  `motion_plan_goal_configuration` to `plan_motion`
+* ROS Client: removed methods from `Robot` that are now handled with
+  `PlanningScene`, e.g. `add_collision_mesh` and
+  `add_attached_collision_mesh`
+* ROS Client: change the return type of `plan_motion` and `plan_cartesian_motion`
+  to the new trajectory classes.
+* ROS File Server Loader: moved to `compas_fab.backends` package
+* ROS File Server Loader: renamed `load` to `load_urdf` and sync&#39;d API to other loaders.
+* V-REP Client: renamed `get_end_effector_pose` to `forward_kinematics`
+* V-REP Client: renamed `find_robot_states` to `inverse_kinematics`
+* V-REP Client: renamed `find_path_plan_to_config` to
+  `plan_motion_to_config`
+* V-REP Client: renamed `find_path_plan` to `plan_motion`
+* V-REP Client: changed `is_connected` to become a property
+* Made `robot_artist` default `None` on `Robot` constructor
+* Changed `PathPlan` class to use the new trajectory classes
+
+### Added
+
+* Added `scale` method to `Configuration`
+* Implemented Constraints (`OrientationConstraint`, `PositionConstraint`, `JointConstraint`) to use with `plan_motion`
+* Implemented `PlanningScene`, `CollisionMesh` and `AttachedCollisionMesh`
+* Added generic representations for motion planning requests (`JointTrajectory`, `JointTrajectoryPoint`, `Duration`)
+* Added UR5 robot model data for example purposes
+* Added several doc examples
+
+### Removed
+
+* Aliases for `Frame` and `Transformation`. Import from `compas.geometry` instead.
+
+## 0.4.1
+
+### Fixed
+
+* Fixed missing library for V-REP on macOS
+
+### Deprecated
+
+* The aliases for `Frame` and `Transformation` will be removed, in the future, import directly from `compas` core.
+
+## 0.4.0
+
+### Added
+
+* Color parameter to Rhino robot artist
+
+### Changed
+
+* Updated to `COMPAS 0.4.10`
+
+## 0.3.0
+
+### Added
+
+* Deeper integration with MoveIt! motion planning services
+* Added sync and async versions of many ROS service calls
+* Added support for cancellable tasks/actions
+
+### Changed
+
+* Renamed `UrdfImporter` to `RosFileServerLoader`
+* Updated to `COMPAS 0.4.8`
+
+## 0.2.1
+
+### Added
+
+* Robot artist for Blender
+
+## 0.2.0
+
+### Added
+
+* First open source release!
+* V-REP and ROS clients
+* Updated to `COMPAS 0.3.2`
+
+## 0.1.0
+
+### Added
+
+* Initial version
+</pre></div>
+</div>
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright Gramazio Kohler Research.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
