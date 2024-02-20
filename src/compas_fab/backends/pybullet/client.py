@@ -203,7 +203,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         else:
             robot.attributes["pybullet"]["cached_robot"] = robot.model
             robot.attributes["pybullet"]["cached_robot_filepath"] = compas_fab.get(
-                "robot_library/ur5_robot/urdf/robot_description.urdf")
+                "robot_library/ur5_robot/urdf/robot_description.urdf"
+            )
 
         urdf_fp = robot.attributes["pybullet"]["cached_robot_filepath"]
 
