@@ -248,7 +248,7 @@ class Trajectory(Data):
     Attributes
     ----------
     planning_time : :obj:`float`
-        Amount of time it took to complete the motion plan
+        Amount of time it took to complete the motion plan.
     attributes : :obj:`dict`
         Custom attributes of the trajectory.
     """
@@ -256,16 +256,20 @@ class Trajectory(Data):
     def __init__(self, attributes=None):
         super(Trajectory, self).__init__()
         self.attributes = attributes or {}
-        self.planning_time = None
+        self.planning_time = -1
 
     @property
-    def planning_time(self):
-        """:obj:`float` : Amount of time it took to complete the motion plan."""
-        return self.attributes["planning_time"]
+    def __data__(self):
+        data_obj = {}
+        data_obj["planning_time"] = self.planning_time
+        data_obj["attributes"] = self.attributes
+        return data_obj
 
-    @planning_time.setter
-    def planning_time(self, planning_time):
-        self.attributes["planning_time"] = planning_time
+    @classmethod
+    def __from_data__(cls, data):
+        trajectory = cls(attributes=data["attributes"])
+        trajectory.planning_time = data["planning_time"]
+        return trajectory
 
 
 class JointTrajectory(Trajectory):
@@ -284,6 +288,8 @@ class JointTrajectory(Trajectory):
         e.g. ``1`` means the full trajectory was found.
     attached_collision_meshes : :obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`
         The attached collision meshes included in the calculation of this trajectory.
+    attributes : :obj:`dict`
+        Custom attributes of the trajectory.
 
     Attributes
     ----------
@@ -310,8 +316,9 @@ class JointTrajectory(Trajectory):
         start_configuration=None,
         fraction=None,
         attached_collision_meshes=None,
+        attributes=None,
     ):
-        super(JointTrajectory, self).__init__()
+        super(JointTrajectory, self).__init__(attributes=attributes)
         self.points = trajectory_points or []
         self.joint_names = joint_names or []
         self.start_configuration = start_configuration
@@ -327,6 +334,7 @@ class JointTrajectory(Trajectory):
         data_obj["start_configuration"] = self.start_configuration.__data__ if self.start_configuration else None
         data_obj["fraction"] = self.fraction
         data_obj["attached_collision_meshes"] = [acm.__data__ for acm in self.attached_collision_meshes]
+        data_obj["planning_time"] = self.planning_time
         data_obj["attributes"] = self.attributes
 
         return data_obj
@@ -348,8 +356,10 @@ class JointTrajectory(Trajectory):
             start_configuration=start_configuration,
             fraction=fraction,
             attached_collision_meshes=attached_collision_meshes,
+            attributes=data["attributes"],
         )
-        trajectory.attributes = data["attributes"]
+        trajectory.planning_time = data["planning_time"]
+
         return trajectory
 
     @property

@@ -82,7 +82,7 @@ class ReachabilityMapObject(RhinoSceneObject):
         guids = []
         for num, pt in zip(score, points):
             color = cmap(num, minv, maxv)
-            artist = SceneObject(pt, layer=self.layer)
-            guids.extend(artist.draw(color))
+            sceneobject = SceneObject(pt, layer=self.layer)
+            guids.extend(sceneobject.draw(color))
 
         return guids

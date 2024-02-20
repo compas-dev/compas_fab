@@ -62,7 +62,9 @@ class ReachabilityMapObject(GHSceneObject):
 
         points = points or self.reachability_map.points
 
-        xpoints = [SceneObject(pt).draw() for pt in points]
+        xpoints = []
+        for pt in points:
+            xpoints.extend(SceneObject(pt).draw())
 
         colors = []
         cmap = ColorMap.from_mpl(colormap)
