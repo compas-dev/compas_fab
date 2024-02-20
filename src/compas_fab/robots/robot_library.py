@@ -16,10 +16,12 @@ __all__ = [
 
 class RobotLibrary:
     """A collection of built-in robots that can be used for testing and example purposes.
-    This method serves mainly as help for writing examples, so that the code can stay short.
+    The :class:`compas_fab.robots.Robot` objects created by the factory methods
+    can be used to write examples, so that the example code can stay short.
 
     The robots are loaded from URDF, SRDF and mesh files located locally
-    in the folder `src/compas_fab/data/robot_library`
+    from the folder `src/compas_fab/data/robot_library`. The resulting robot object
+    contains the robot model, semantics, visual and collision meshes for the links.
 
     Examples
     --------
@@ -52,10 +54,9 @@ class RobotLibrary:
 
     @classmethod
     def rfl(cls, client=None, load_geometry=True):
-        """Returns the RFL robot with 4 ABB irb 4600 and twin-gantry setup.
+        """Create and return the RFL robot with 4 ABB irb 4600 and twin-gantry setup.
 
-        This method serves mainly as help for writing examples, so that the code can
-        stay short.
+        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
 
         Parameters
         ----------
@@ -85,6 +86,8 @@ class RobotLibrary:
     def ur5(cls, client=None, load_geometry=True):
         """Returns a UR5 robot.
 
+        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+
         Parameters
         ----------
         client: object
@@ -113,6 +116,8 @@ class RobotLibrary:
     def ur10e(cls, client=None, load_geometry=True):
         """Returns a UR10e robot.
 
+        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+
         Parameters
         ----------
         client: object
@@ -140,6 +145,8 @@ class RobotLibrary:
     @classmethod
     def abb_irb4600_40_255(cls, client=None, load_geometry=True):
         """Returns a ABB irb4600-40/2.55 robot.
+
+        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
 
         Parameters
         ----------
