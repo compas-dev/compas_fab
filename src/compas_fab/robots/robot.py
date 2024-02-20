@@ -1585,7 +1585,7 @@ class Robot(Data):
         --------
 
         >>> ros = RosClient()
-        >>> ros.run()
+        >>> ros.run(timeout=30)
         >>> robot = ros.load_robot()
         >>> frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\
                       Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0])]
@@ -1729,7 +1729,7 @@ class Robot(Data):
         Using position and orientation constraints:
 
         >>> ros = RosClient()
-        >>> ros.run()
+        >>> ros.run(timeout=30)
         >>> robot = ros.load_robot()
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
@@ -1747,7 +1747,7 @@ class Robot(Data):
         Using joint constraints (to the UP configuration):
 
         >>> ros = RosClient()
-        >>> ros.run()
+        >>> ros.run(timeout=30)
         >>> robot = ros.load_robot()
         >>> configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0])
         >>> tolerances_above = [math.radians(5)] * len(configuration.joint_values)
