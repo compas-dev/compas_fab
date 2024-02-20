@@ -1,5 +1,5 @@
-from .offset_wrist import inverse_kinematics_offset_wrist
 from .offset_wrist import forward_kinematics_offset_wrist
+from .offset_wrist import inverse_kinematics_offset_wrist
 
 # The following parameters for UR robots are taken from the following website:
 # https://www.universal-robots.com/articles/ur/application-installation/dh-parameters-for-calculations-of-kinematics-and-dynamics/

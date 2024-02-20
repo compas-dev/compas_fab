@@ -32,8 +32,11 @@
             {
                 "name": "group",
                 "description": "The planning group to which the tool should be attached."
+            },
+            {
+                "name": "connected_to",
+                "description": "The link to which the tool should be connected to."
             }
-
         ],
         "outputParameters": [
             {

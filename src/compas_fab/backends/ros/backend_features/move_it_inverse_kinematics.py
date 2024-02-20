@@ -7,7 +7,6 @@ from compas.utilities import await_callback
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
 from compas_fab.backends.ros.backend_features.helpers import validate_response
-from compas_fab.backends.ros.messages import RosDistro
 from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import GetPositionIKRequest
 from compas_fab.backends.ros.messages import GetPositionIKResponse
@@ -18,8 +17,8 @@ from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.messages import PoseStamped
 from compas_fab.backends.ros.messages import PositionIKRequest
 from compas_fab.backends.ros.messages import RobotState
+from compas_fab.backends.ros.messages import RosDistro
 from compas_fab.backends.ros.service_description import ServiceDescription
-from compas_fab.robots import Duration
 
 __all__ = [
     "MoveItInverseKinematics",
@@ -77,7 +76,7 @@ class MoveItInverseKinematics(InverseKinematics):
             If no configuration can be found.
 
         Yields
-        -------
+        ------
         :obj:`tuple` of :obj:`list`
             A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
         """
@@ -121,7 +120,7 @@ class MoveItInverseKinematics(InverseKinematics):
         constraints = convert_constraints_to_rosmsg(options.get("constraints"), header)
 
         timeout_in_secs = options.get("timeout", 2)
-        timeout_duration = Duration(timeout_in_secs, 0).to_data()
+        timeout_duration = {"secs": timeout_in_secs, "nsecs": 0}
 
         ik_request = PositionIKRequest(
             group_name=group,

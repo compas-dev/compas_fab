@@ -4,6 +4,7 @@ Interface definition for planner backend implementations.
 This is only internal, these interfaces and their implementations
 are managed internally by the RosClient class.
 """
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function

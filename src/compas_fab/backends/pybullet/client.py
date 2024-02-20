@@ -8,10 +8,10 @@ import tempfile
 from itertools import combinations
 
 import compas
-from compas.files import URDF
 from compas.geometry import Frame
-from compas.robots import MeshDescriptor
-from compas.robots import RobotModel
+from compas_robots import RobotModel
+from compas_robots.files import URDF
+from compas_robots.model import MeshDescriptor
 
 import compas_fab
 from compas_fab.backends.interfaces.client import ClientInterface
@@ -211,7 +211,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         return robot
 
-    def load_robot(self, urdf_file, resource_loaders=None, concavity=False):
+    def load_robot(self, urdf_file, resource_loaders=None, concavity=False, precision=None):
         """Create a pybullet robot using the input urdf file.
 
         Parameters
@@ -220,13 +220,15 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             Absolute file path to the urdf file name or file object. The mesh file can be linked by either
             `"package::"` or relative path.
         resource_loaders : :obj:`list`
-            List of :class:`compas.robots.AbstractMeshLoader` for loading geometry of the robot.  That the
+            List of :class:`compas_robots.AbstractMeshLoader` for loading geometry of the robot.  That the
             geometry of the robot model is loaded is required before adding or removing attached collision meshes
             to or from the scene. Defaults to the empty list.
         concavity : :obj:`bool`
             When ``False`` (the default), the mesh will be loaded as its
             convex hull for collision checking purposes.  When ``True``,
             a non-static mesh will be decomposed into convex parts using v-HACD.
+        precision : int
+            Defines precision for importing/loading meshes. Defaults to ``compas.tolerance.TOL.precision``.
 
         Notes
         -----
@@ -239,7 +241,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         robot = Robot(robot_model, client=self)
         robot.attributes["pybullet"] = {}
         if resource_loaders:
-            robot_model.load_geometry(*resource_loaders)
+            robot_model.load_geometry(*resource_loaders, precision=precision)
             self.cache_robot(robot, concavity)
         else:
             robot.attributes["pybullet"]["cached_robot"] = robot.model
@@ -372,7 +374,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Returns
         -------
-        :class:`compas.robots.RobotModel`
+        :class:`compas_robots.RobotModel`
 
         Raises
         ------
@@ -411,7 +413,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        cached_robot : :class:`compas.robots.RobotModel`
+        cached_robot : :class:`compas_robots.RobotModel`
             The robot model saved for use with PyBullet.
 
         Returns
@@ -488,7 +490,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             configuration will be checked.  Defaults to ``None``.
 
         Raises
-        -------
+        ------
         :class:`compas_fab.backends.pybullet.DetectedCollision`
         """
         cached_robot = self.get_cached_robot(robot)
@@ -509,7 +511,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             Robot whose configuration may be in collision.
 
         Raises
-        -------
+        ------
         :class:`compas_fab.backends.pybullet.DetectedCollision`
         """
         for name, body_ids in self.collision_objects.items():
@@ -526,7 +528,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             Robot whose configuration may be in collision.
 
         Raises
-        -------
+        ------
         :class:`compas_fab.backends.pybullet.DetectedCollision`
         """
         cached_robot = self.get_cached_robot(robot)
@@ -544,7 +546,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """Checks whether any of the collision objects are colliding.
 
         Raises
-        -------
+        ------
         :class:`compas_fab.backends.CollisionError`
         """
         names = self.collision_objects.keys()
@@ -665,7 +667,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Returns
         -------
-        :class:`compas.robots.Configuration`
+        :class:`compas_robots.Configuration`
         """
         cached_robot = self.get_cached_robot(robot)
         body_id = self.get_uid(cached_robot)

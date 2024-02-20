@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import math
+
 from compas.geometry import Point
+
 from .spherical_wrist import forward_kinematics_spherical_wrist
 from .spherical_wrist import inverse_kinematics_spherical_wrist
 

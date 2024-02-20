@@ -1,7 +1,7 @@
 import pytest
+from compas_robots import Configuration
+from compas_robots.model import Joint
 
-from compas.robots import Configuration
-from compas.robots import Joint
 from compas_fab.robots import Duration
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
@@ -24,11 +24,13 @@ def trj():
     p2 = JointTrajectoryPoint([0.571, 0, 0, 0.262, 0, 0], [0] * 6, [3.0] * 6, time_from_start=Duration(6, 0))
     config = Configuration.from_revolute_values([0.0] * 6)
 
-    return JointTrajectory(
+    trajectory = JointTrajectory(
         trajectory_points=[p1, p2],
         joint_names=["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"],
         start_configuration=config,
     )
+    trajectory.planning_time = 0.5
+    return trajectory
 
 
 def test_trajectory_points(trj):
@@ -37,16 +39,17 @@ def test_trajectory_points(trj):
 
 
 def test_joint_trajectory_point_serialization(jtp):
-    data = jtp.to_data()
-    new_jtp = JointTrajectoryPoint.from_data(data)
-    assert new_jtp.to_data() == data
+    data = jtp.__data__
+    new_jtp = JointTrajectoryPoint.__from_data__(data)
+    assert new_jtp.__data__ == data
     assert new_jtp["joint_1"] == 1.571
 
 
 def test_serialization(trj):
-    data = trj.to_data()
-    new_trj = JointTrajectory.from_data(data)
-    assert new_trj.to_data() == data
+    data = trj.__data__
+    new_trj = JointTrajectory.__from_data__(data)
+    assert new_trj.__data__ == data
+    assert new_trj.planning_time == 0.5
     assert new_trj.time_from_start == Duration(6, 0).seconds
 
 

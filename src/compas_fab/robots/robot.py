@@ -8,9 +8,9 @@ from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Sphere
 from compas.geometry import Transformation
-from compas.robots import Configuration
-from compas.robots import Joint
-from compas.robots import RobotModel
+from compas_robots import Configuration
+from compas_robots import RobotModel
+from compas_robots.model import Joint
 
 from compas_fab.robots.constraints import Constraint
 from compas_fab.robots.constraints import JointConstraint
@@ -28,15 +28,15 @@ class Robot(Data):
     This class binds together several building blocks, such as the robot's
     descriptive model, its semantic information and an instance of a backend
     client into a cohesive programmable interface. This representation builds
-    upon the model described in the class :class:`compas.robots.RobotModel` of
+    upon the model described in the class :class:`compas_robots.RobotModel` of
     the **COMPAS** framework.
 
     Attributes
     ----------
     model : :class:`RobotModel`
         The robot model, usually created from an URDF structure.
-    artist : :class:`compas.robots.base_artist.BaseRobotModelArtist`
-        Instance of the artist used to visualize the robot model. Defaults to ``None``.
+    scene_object : :class:`compas_robots.scene.BaseRobotModelObject`
+        Instance of the scene object used to visualize the robot model. Defaults to ``None``.
     semantics : :class:`compas_fab.robots.RobotSemantics`
         The semantic model of the robot. Defaults to ``None``.
     client : :class:`compas_fab.backends.interfaces.ClientInterface`
@@ -48,7 +48,7 @@ class Robot(Data):
         Dictionary mapping planning groups to the tool currently attached to them, if any.
     """
 
-    def __init__(self, model=None, artist=None, semantics=None, client=None):
+    def __init__(self, model=None, scene_object=None, semantics=None, client=None):
         super(Robot, self).__init__()
         # These attributes have to be initiated first,
         # because they are used in the setters of the other attributes
@@ -57,47 +57,53 @@ class Robot(Data):
         self._current_ik = {"request_id": None, "solutions": None}
 
         self.model = model
-        self.artist = artist
+        self.scene_object = scene_object
         self.semantics = semantics
         self.client = client
         self.attributes = {}
 
     @property
-    def data(self):
+    def __data__(self):
         data = {
             "scale_factor": self._scale_factor,
             "attached_tools": self._attached_tools,
             # The current_ik is an extrinsic state that is not serialized with the robot
             # "current_ik": self._current_ik,
-            "model": self.model.data,
+            "model": self.model.__data__,
             "semantics": self.semantics,
             "attributes": self.attributes,
-            # The following attributes cannot be serialized: artist, client
+            # The following attributes cannot be serialized: scene_object, client
         }
         return data
 
-    @data.setter
-    def data(self, data):
-        self._scale_factor = data.get("scale_factor", 1.0)
-        self._attached_tools = data.get("attached_tools", {})
-        self.model = RobotModel.from_data(data["model"])
-        self.semantics = data.get("semantics", None)
-        self.attributes = data.get("attributes", {})
+    @classmethod
+    def __from_data__(cls, data):
+        _scale_factor = data.get("scale_factor", 1.0)
+        _attached_tools = data.get("attached_tools", {})
+        model = RobotModel.__from_data__(data["model"])
+        semantics = data.get("semantics")
+        attributes = data.get("attributes", {})
+
+        robot = cls(model, None, semantics=semantics)
+        robot._scale_factor = _scale_factor
+        robot._attached_tools = _attached_tools
+        robot.attributes = attributes
+        return robot
 
     @property
-    def artist(self):
-        """:class:`compas.robots.base_artist.BaseRobotModelArtist`: Artist used to visualize robot model."""
-        return self._artist
+    def scene_object(self):
+        """:class:`compas_robots.scene.BaseRobotModelObject`: Scene object used to visualize robot model."""
+        return self._scene_object
 
-    @artist.setter
-    def artist(self, artist):
-        self._artist = artist
-        if artist is None:
+    @scene_object.setter
+    def scene_object(self, value):
+        self._scene_object = value
+        if value is None:
             return
         if len(self.model.joints) > 0 and len(self.model.links) > 0:
             self.scale(self._scale_factor)
             for tool in self.attached_tools.values():
-                self.artist.attach_tool_model(tool.tool_model)
+                self.scene_object.attach_tool_model(tool.tool_model)
 
     @classmethod
     def basic(cls, name, joints=None, links=None, materials=None, **kwargs):
@@ -107,14 +113,14 @@ class Robot(Data):
         ----------
         name : :obj:`str`
             Name of the robot
-        joints : :obj:`list` of :class:`compas.robots.Joint`, optional
+        joints : :obj:`list` of :class:`compas_robots.Joint`, optional
             Robot's joints.
-        links : :obj:`list` of :class:`compas.robots.Link`, optional
+        links : :obj:`list` of :class:`compas_robots.Link`, optional
             Robot's links.
-        materials : :obj:`list` of :class:`compas.robots.Material`, optional
+        materials : :obj:`list` of :class:`compas_robots.Material`, optional
             Material description of the robot.
         kwargs : :obj:`dict`
-            Keyword arguments passed to the :class:`compas.robots.RobotModel`
+            Keyword arguments passed to the :class:`compas_robots.RobotModel`
             `attr` :obj:`dict`. Accessible from `Robot.model.attr`.
 
 
@@ -222,7 +228,7 @@ class Robot(Data):
 
         Returns
         -------
-        :class:`compas.robots.Link`
+        :class:`compas_robots.Link`
 
         Examples
         --------
@@ -284,7 +290,7 @@ class Robot(Data):
 
         Returns
         -------
-        :class:`compas.robots.Link`
+        :class:`compas_robots.Link`
 
         Examples
         --------
@@ -362,10 +368,10 @@ class Robot(Data):
 
         Returns
         -------
-        :obj:`list` of :class:`compas.robots.Joint`
+        :obj:`list` of :class:`compas_robots.Joint`
 
-        Note
-        ----
+        Notes
+        -----
         If semantics is set and no group is passed, it returns all configurable
         joints of all groups.
 
@@ -393,7 +399,7 @@ class Robot(Data):
 
         Returns
         -------
-        :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+        :obj:`list` of :attr:`compas_robots.Joint.SUPPORTED_TYPES`
             List of joint types.
         """
         return self.model.get_joint_types_by_names(names)
@@ -408,7 +414,7 @@ class Robot(Data):
 
         Returns
         -------
-        :class:`compas.robots.Joint`
+        :class:`compas_robots.Joint`
         """
         return self.model.get_joint_by_name(name)
 
@@ -424,8 +430,8 @@ class Robot(Data):
         -------
         :obj:`list` of :obj:`str`
 
-        Note
-        ----
+        Notes
+        -----
         If semantics is set and no group is passed, it returns all configurable
         joints of all groups.
 
@@ -448,10 +454,10 @@ class Robot(Data):
 
         Returns
         -------
-        :obj:`list` of :attr:`compas.robots.Joint.SUPPORTED_TYPES`
+        :obj:`list` of :attr:`compas_robots.Joint.SUPPORTED_TYPES`
 
-        Note
-        ----
+        Notes
+        -----
         If :attr:`semantics` is set and no group is passed, it returns all
         configurable joint types of all groups.
 
@@ -511,10 +517,10 @@ class Robot(Data):
 
         Returns
         -------
-        :class:`compas.robots.Configuration`
+        :class:`compas_robots.Configuration`
 
-        Note
-        ----
+        Notes
+        -----
         No collision checking is involved, the configuration may be invalid.
         """
         configurable_joints = self.get_configurable_joints(group)
@@ -765,8 +771,8 @@ class Robot(Data):
         --------
         >>> frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
         >>> frame_RCF = robot.to_local_coordinates(frame_WCF)
-        >>> frame_RCF
-        Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
+        >>> frame_RCF                                                                                       # doctest: +SKIP
+        Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))    # doctest: +SKIP
         """
         frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
         return frame_RCF
@@ -790,8 +796,8 @@ class Robot(Data):
         --------
         >>> frame_RCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
         >>> frame_WCF = robot.to_world_coordinates(frame_RCF)
-        >>> frame_WCF
-        Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))
+        >>> frame_WCF                                                                                       # doctest: +SKIP
+        Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))    # doctest: +SKIP
         """
         frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
         return frame_WCF
@@ -833,10 +839,10 @@ class Robot(Data):
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> robot.attach_tool(Tool(mesh, frame))
         >>> frames_tcf = [Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))]
-        >>> robot.from_tcf_to_t0cf(frames_tcf)
-        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
-        >>> robot.from_tcf_to_t0cf(frames_tcf, group=robot.main_group_name)
-        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]
+        >>> robot.from_tcf_to_t0cf(frames_tcf)                                                              # doctest: +SKIP
+        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]  # doctest: +SKIP
+        >>> robot.from_tcf_to_t0cf(frames_tcf, group=robot.main_group_name)                                 # doctest: +SKIP
+        [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]  # doctest: +SKIP
         """
         tool = self._get_attached_tool_for_group(group_name=group)
         return tool.from_tcf_to_t0cf(frames_tcf)
@@ -869,10 +875,10 @@ class Robot(Data):
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> robot.attach_tool(Tool(mesh, frame))
         >>> frames_t0cf = [Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))]
-        >>> robot.from_t0cf_to_tcf(frames_t0cf)
-        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
-        >>> robot.from_t0cf_to_tcf(frames_t0cf, group=robot.main_group_name)
-        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))]
+        >>> robot.from_t0cf_to_tcf(frames_t0cf)                                                            # doctest: +SKIP
+        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))] # doctest: +SKIP
+        >>> robot.from_t0cf_to_tcf(frames_t0cf, group=robot.main_group_name)                               # doctest: +SKIP
+        [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))] # doctest: +SKIP
         """
         tool = self._get_attached_tool_for_group(group_name=group)
         return tool.from_t0cf_to_tcf(frames_t0cf)
@@ -897,7 +903,7 @@ class Robot(Data):
 
         See Also
         --------
-        * :meth:`detach_tool`
+        :meth:`Robot.detach_tool`
 
         Examples
         --------
@@ -910,13 +916,13 @@ class Robot(Data):
         if group not in self.semantics.group_names:
             raise ValueError("No such group: {}".format(group))
 
-        if not tool.link_name:
-            tool.link_name = self.get_end_effector_link_name(group)
+        if not tool.connected_to:
+            tool.connected_to = self.get_end_effector_link_name(group)
         tool.update_touch_links(touch_links)
         self.attached_tools[group] = tool
 
-        if self.artist:
-            self.artist.attach_tool_model(tool.tool_model)
+        if self.scene_object:
+            self.scene_object.attach_tool_model(tool.tool_model)
 
     def detach_tool(self, group=None):
         """Detach the attached tool.
@@ -929,15 +935,15 @@ class Robot(Data):
 
         See Also
         --------
-        * :meth:`attach_tool`
+        :meth:`Robot.attach_tool`
         """
         group = group or self.main_group_name
         if group not in self.attached_tools:
             raise ValueError("No tool attached to group {}".format(group))
 
         tool_to_remove = self.attached_tools[group]
-        if self.artist and tool_to_remove:
-            self.artist.detach_tool_model(tool_to_remove.tool_model)
+        if self.scene_object and tool_to_remove:
+            self.scene_object.detach_tool_model(tool_to_remove.tool_model)
         self.attached_tools.pop(group)
 
     # ==========================================================================
@@ -946,6 +952,7 @@ class Robot(Data):
 
     def ensure_client(self):
         """Check if the client is set.
+
         Raises
         ------
         :exc:`Exception`
@@ -956,6 +963,7 @@ class Robot(Data):
 
     def ensure_semantics(self):
         """Check if semantics is set.
+
         Raises
         ------
         :exc:`Exception`
@@ -966,6 +974,7 @@ class Robot(Data):
 
     def ensure_geometry(self):
         """Check if the model's geometry has been loaded.
+
         Raises
         ------
         :exc:`Exception`
@@ -1059,9 +1068,9 @@ class Robot(Data):
 
         See Also
         --------
-        * :meth:`PositionConstraint.from_box`
-        * :meth:`PositionConstraint.from_mesh`
-        * :meth:`PositionConstraint.from_sphere`
+        :meth:`PositionConstraint.from_box`
+        :meth:`PositionConstraint.from_mesh`
+        :meth:`PositionConstraint.from_sphere`
 
         Notes
         -----
@@ -1076,8 +1085,8 @@ class Robot(Data):
         --------
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
-        >>> robot.position_constraint_from_frame(frame, tolerance_position)
-        PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)
+        >>> robot.position_constraint_from_frame(frame, tolerance_position)                                 # doctest: +SKIP
+        PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)    # doctest: +SKIP
         """
 
         attached_tool = self.attached_tools.get(group)
@@ -1085,7 +1094,7 @@ class Robot(Data):
             frame_WCF = self.from_tcf_to_t0cf([frame_WCF], group)[0]
 
         ee_link = self.get_end_effector_link_name(group)
-        sphere = Sphere(frame_WCF.point, tolerance_position)
+        sphere = Sphere(radius=tolerance_position, point=frame_WCF.point)
         return PositionConstraint.from_sphere(ee_link, sphere)
 
     def constraints_from_frame(
@@ -1116,10 +1125,10 @@ class Robot(Data):
 
         See Also
         --------
-        * :meth:`PositionConstraint.from_box`
-        * :meth:`PositionConstraint.from_mesh`
-        * :meth:`PositionConstraint.from_sphere`
-        * :meth:`orientation_constraint_from_frame`
+        :meth:`PositionConstraint.from_box`
+        :meth:`PositionConstraint.from_mesh`
+        :meth:`PositionConstraint.from_sphere`
+        :meth:`orientation_constraint_from_frame`
 
         Notes
         -----
@@ -1137,9 +1146,9 @@ class Robot(Data):
         >>> tolerance_position = 0.001
         >>> tolerances_axes = [math.radians(1)]
         >>> group = robot.main_group_name
-        >>> robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group) # doctest: +NORMALIZE_WHITESPACE
-        [PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0),
-        OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)]
+        >>> robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)                         # doctest: +SKIP
+        [PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0),          # doctest: +SKIP
+        OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)] # doctest: +SKIP
         """
         pc = self.position_constraint_from_frame(frame_WCF, tolerance_position, group, use_attached_tool_frame)
         oc = self.orientation_constraint_from_frame(frame_WCF, tolerances_axes, group, use_attached_tool_frame)
@@ -1358,7 +1367,7 @@ class Robot(Data):
             If no configuration can be found.
 
         Yields
-        -------
+        ------
         :class:`Configuration`
             An inverse kinematic solution represented as a configuration.
 
@@ -1914,25 +1923,25 @@ class Robot(Data):
         if not len(configuration.joint_names):
             configuration.joint_names = self.get_configurable_joint_names(group)
 
-        self.artist.update(configuration, visual, collision)
+        self.scene_object.update(configuration, visual, collision)
 
     def draw_visual(self):
-        """Draw the robot's visual geometry using the defined :attr:`Robot.artist`."""
-        return self.artist.draw_visual()
+        """Draw the robot's visual geometry using the defined :attr:`Robot.scene_object`."""
+        return self.scene_object.draw_visual()
 
     def draw_collision(self):
-        """Draw the robot's collision geometry using the defined :attr:`Robot.artist`."""
-        return self.artist.draw_collision()
+        """Draw the robot's collision geometry using the defined :attr:`Robot.scene_object`."""
+        return self.scene_object.draw_collision()
 
     def draw(self):
         """Alias of :meth:`draw_visual`."""
         return self.draw_visual()
 
-    # TODO: add artist.draw_attached_tool
+    # TODO: add scene_object.draw_attached_tool
     # def draw_attached_tool(self):
-    #     """Draw the attached tool using the defined :attr:`Robot.artist`."""
-    #     if self.artist and self.attached_tool:
-    #         return self.artist.draw_attached_tool()
+    #     """Draw the attached tool using the defined :attr:`Robot.scene_object`."""
+    #     if self.scene_object and self.attached_tool:
+    #         return self.scene_object.draw_attached_tool()
 
     def scale(self, factor):
         """Scale the robot geometry by a factor (absolute).
@@ -1947,16 +1956,16 @@ class Robot(Data):
         ``None``
         """
         self.model.scale(factor)
-        if self.artist:
-            self.artist.scale(factor)
+        if self.scene_object:
+            self.scene_object.scale(factor)
         else:
             self._scale_factor = factor
 
     @property
     def scale_factor(self):
         """:obj:`float`: Robot's scale factor."""
-        if self.artist:
-            return self.artist.scale_factor
+        if self.scene_object:
+            return self.scene_object.scale_factor
         else:
             return self._scale_factor
 
@@ -1972,7 +1981,7 @@ class Robot(Data):
         print("The end-effector's name is '{}'.".format(self.get_end_effector_link_name()))
         if self.attached_tools:
             for tool in self.attached_tools.values():
-                print("The robot has a tool at the {} link attached.".format(tool.link_name))
+                print("The robot has a tool at the {} link attached.".format(tool.connected_to))
         else:
             print("The robot has NO tool attached.")
         print("The base link's name is '{}'".format(self.get_base_link_name()))

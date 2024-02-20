@@ -1,11 +1,11 @@
-from compas_fab.backends.ros.messages import Header
-from compas_fab.backends.ros.messages import ROSmsg
-from compas_fab.backends.ros.messages import String
-from compas_fab.backends.ros.messages import Time
 from compas_fab.backends.ros.messages import Float32MultiArray
+from compas_fab.backends.ros.messages import Header
 from compas_fab.backends.ros.messages import Int8MultiArray
 from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.messages import PoseArray
+from compas_fab.backends.ros.messages import ROSmsg
+from compas_fab.backends.ros.messages import String
+from compas_fab.backends.ros.messages import Time
 
 
 def test_rosmsg_attributes():

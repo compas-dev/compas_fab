@@ -58,19 +58,18 @@ Visualizing robot models
 
 Once a model is loaded, we can visualize it in our favorite design environment.
 
-**COMPAS** includes the concept of ``artists``: classes that assist with the
+**COMPAS** includes the concept of ``scene objects``: classes that assist with the
 visualization of datastructures and models, in a way that maintains the data
 separated from the specific CAD interfaces, while providing a way to leverage
 native performance of the CAD environment.
 
-In the main library there are artists for various datastructures (meshes,
-networks, etc), including a ``RobotModelArtist`` to visualize robots.
-Robot artists allow visualizing robot models easily and efficiently.
+We use the ``compas_robots`` extension and its ``RobotModelObject`` to visualize
+robots easily and efficiently.
 
 The following example illustrates how to load an entire robot model from
 ROS and render it in Rhino:
 
-.. literalinclude :: files/02_robot_artist_rhino_from_ros.py
+.. literalinclude :: files/03_robot_rhino_from_ros.py
    :language: python
 
 .. raw:: html
@@ -79,11 +78,11 @@ ROS and render it in Rhino:
     <div class="card-body">
     <div class="card-title">Downloads</div>
 
-* :download:`Robot artist from ROS (Rhino) (.PY) <files/02_robot_artist_rhino_from_ros.py>`
-* :download:`Robot artist from ROS (Grasshopper) (.GHX) <files/02_robot_artist_grasshopper_panda.ghx>`
-* :download:`Robot artist from Github (Rhino) (.PY) <files/02_robot_artist_rhino.py>`
-* :download:`Robot artist from Github (Blender) (.PY) <files/02_robot_artist_blender.py>`
-* :download:`Robot artist from Github (Grasshopper) (.GHX) <files/02_robot_artist_grasshopper.ghx>`
+* :download:`Visualize robot from ROS (Rhino) (.PY) <files/03_robot_rhino_from_ros.py>`
+* :download:`Visualize robot from ROS (Grasshopper) (.GHX) <files/03_robot_grasshopper_from_ros.ghx>`
+* :download:`Visualize robot from Github (Rhino) (.PY) <files/03_robot_rhino.py>`
+* :download:`Visualize robot from Github (Blender) (.PY) <files/03_robot_blender.py>`
+* :download:`Visualize robot from Github (Grasshopper) (.GHX) <files/03_robot_grasshopper.ghx>`
 
 .. raw:: html
 

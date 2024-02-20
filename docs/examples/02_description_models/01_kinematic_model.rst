@@ -52,9 +52,9 @@ snippet shows how to describe a UR5 robot:
 
 .. code-block:: python
 
-    from compas.robots import RobotModel
-    from compas.robots import Joint
-    from compas.robots import Link
+    from compas_robots import RobotModel
+    from compas_robots.model import Joint
+    from compas_robots.model import Link
 
     robot = RobotModel('ur5',
                   joints=[

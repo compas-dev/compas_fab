@@ -1,7 +1,7 @@
 import time
 
 from compas.datastructures import Mesh
-from compas.robots import LocalPackageMeshLoader
+from compas_robots.resources import LocalPackageMeshLoader
 
 import compas_fab
 from compas_fab.backends import PyBulletClient

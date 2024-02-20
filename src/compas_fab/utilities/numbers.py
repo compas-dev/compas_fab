@@ -83,8 +83,8 @@ def argsort(numbers):
 
     The function is similar to NumPy's *argsort* function.
 
-    Note
-    ----
+    Notes
+    -----
     For a large list of numbers reconsider using NumPy's *argsort* function,
     since this function might take too long.
     """
@@ -96,8 +96,8 @@ def argmin(numbers):
 
     The function is similar to NumPy's *argmin* function.
 
-    Note
-    ----
+    Notes
+    -----
     For a large list of numbers reconsider using NumPy's *argmin* function,
     since this function might take too long.
     """
@@ -109,8 +109,8 @@ def argmax(numbers):
 
     The function is similar to NumPy's *argmax* function.
 
-    Note
-    ----
+    Notes
+    -----
     For a large list of numbers reconsider using NumPy's *argmax* function,
     since this function might take too long.
     """

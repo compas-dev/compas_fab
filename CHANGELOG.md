@@ -9,17 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Add parameter to control which link the tool is connected to in Grasshopper.
+
 ### Changed
 
-* `CollisionMesh` now inherit from `compas.data.Data`
-* `AttachedCollisionMesh` now inherit from `compas.data.Data`
-* `Robot` now inherit from `compas.data.Data`
-* `RobotSemantics` now inherit from `compas.data.Data`
-* `Tool` now inherit from `compas.data.Data`
+* Changed `CollisionMesh` inherit from `compas.data.Data`
+* Changed `AttachedCollisionMesh` to inherit from `compas.data.Data`
+* Changed `Robot` inherit from `compas.data.Data`
+* Changed `RobotSemantics` inherit from `compas.data.Data`
+* Changed `Tool` to inherit from `compas.data.Data`
+* Renamed `Tool.link_name` to `Tool.connected_to`
+* Migrate to COMPAS 2.x: add dependency to `compas_robots`
+* Migrate to COMPAS 2.x: use `compas.tolerance` module instead of `compas.PRECISION`
+* Add `attributes` to `Trajectory` class.
+* Fixed `data` serialization API to comply with `COMPAS 2.0` private data API.
+* Use the tool's `connected_to` link when showing end-effector frames in Grasshopper.
 
 ### Removed
 
-* V-Rep backend is removed.
+* Removed V-Rep backend.
+* Removed outdated `PathPlan` class.
+* Removed outdated rfl demo class.
+* Remove deprecated aliases for artists (currently on `compas_robots`).
 
 ## [0.28.0] 2023-05-10
 

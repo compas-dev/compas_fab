@@ -1,9 +1,9 @@
-from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
 
-from compas.geometry import Scale
 from compas.geometry import Rotation
+from compas.geometry import Scale
 
 __all__ = ["BoundingVolume", "Constraint", "JointConstraint", "OrientationConstraint", "PositionConstraint"]
 
@@ -29,15 +29,15 @@ class BoundingVolume(object):
         :class:`compas.geometry.Sphere`, or a
         :class:`compas.datastructures.Mesh`.
 
-    Class attributes
-    ----------------
-    BOX
+    Notes
+    -----
+    `BoundingVolume.BOX`
         Box bounding volume type.
-    SPHERE
+    `BoundingVolume.SPHERE`
         Sphere bounding volume type.
-    MESH
+    `BoundingVolume.MESH`
         Mesh bounding volume type.
-    VOLUME_TYPES
+    `BoundingVolume.VOLUME_TYPES`
         List of supported bounding volume types.
     """
 
@@ -75,7 +75,7 @@ class BoundingVolume(object):
         >>> from compas.geometry import Frame
         >>> from compas.geometry import Box
         >>> from compas_fab.robots import BoundingVolume
-        >>> box = Box(Frame.worldXY(), 1., 1., 1.)
+        >>> box = Box(1., 1., 1.)
         >>> bv = BoundingVolume.from_box(box)
         >>> bv.type
         1
@@ -99,7 +99,7 @@ class BoundingVolume(object):
         --------
         >>> from compas.geometry import Sphere
         >>> from compas_fab.robots import BoundingVolume
-        >>> sphere = Sphere((1., 1., 1.), 5.)
+        >>> sphere = Sphere(5.0, Frame.worldXY())
         >>> bv = BoundingVolume.from_sphere(sphere)
         >>> bv.type
         2
@@ -188,15 +188,15 @@ class Constraint(object):
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important.
 
-    Class Attributes
-    ----------------
-    JOINT
+    Notes
+    -----
+    Constraint.JOINT
         Joint constraint type.
-    POSITION
+    Constraint.POSITION
         Positional constraint type.
-    ORIENTATION
+    Constraint.ORIENTATION
         Orientational constraint type.
-    CONSTRAINT_TYPES
+    Constraint.CONSTRAINT_TYPES
         List of possible constraint types.
     """
 
@@ -437,7 +437,7 @@ class PositionConstraint(Constraint):
     >>> from compas.geometry import Sphere
     >>> from compas_fab.robots import PositionConstraint
     >>> from compas_fab.robots import BoundingVolume
-    >>> bv = BoundingVolume.from_sphere(Sphere((3,4,5), 0.5))
+    >>> bv = BoundingVolume.from_sphere(Sphere(0.5, point=[3,4,5]))
     >>> pc = PositionConstraint('link_0', bv, weight=1.)
     """
 
@@ -469,7 +469,7 @@ class PositionConstraint(Constraint):
         --------
         >>> from compas.geometry import Frame
         >>> from compas.geometry import Box
-        >>> box = Box(Frame.worldXY(), 4, 4, 4)
+        >>> box = Box(4, 4, 4, Frame.worldXY())
         >>> pc = PositionConstraint.from_box('link_0', box)
         """
         bounding_volume = BoundingVolume.from_box(box)
@@ -497,7 +497,7 @@ class PositionConstraint(Constraint):
         --------
         >>> from compas_fab.robots import PositionConstraint
         >>> from compas.geometry import Sphere
-        >>> sphere = Sphere((3,4,5), 0.5)
+        >>> sphere = Sphere(radius=0.5, point=[3,4,5])
         >>> pc = PositionConstraint.from_sphere('link_0', sphere, weight=1.)
         """
         bounding_volume = BoundingVolume.from_sphere(sphere)

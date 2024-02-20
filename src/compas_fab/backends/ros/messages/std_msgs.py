@@ -16,8 +16,8 @@ _TYPE_MAP = {}
 class ROSmsg(object):
     """The base class for ROS messages.
 
-    Class Attributes
-    ----------------
+    Attributes
+    ----------
     ROS_MSG_TYPE : :obj:`str`
         Name of the message type that the class represents. Sub-classes of ROSmsg must define this type. e.g. ``std_msgs/String``
     """

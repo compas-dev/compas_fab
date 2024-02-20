@@ -1,5 +1,14 @@
-from math import sin, cos, fabs, asin, acos, sqrt, atan2, pi
+from math import acos
+from math import asin
+from math import atan2
+from math import cos
+from math import fabs
+from math import pi
+from math import sin
+from math import sqrt
+
 from compas.geometry import Frame
+
 from compas_fab.utilities import sign
 
 

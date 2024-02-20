@@ -832,8 +832,8 @@ unload_modules("roslibpy")</item>
                   <items count="11">
                     <item name="CodeInput" type_name="gh_string" type_code="10">import math
 import Grasshopper
-from compas.robots import Joint
-from compas.robots import Configuration
+from compas_robots import Configuration
+from compas_robots.model import Joint
 
 if set_joint_positions:
 
@@ -12940,7 +12940,7 @@ if running_key not in st:
     st[running_key] = False
 
 
-    
+
 
 if start:
     st[running_key] = True
@@ -14969,7 +14969,7 @@ if running_key not in st:
     st[running_key] = False
 
 
-    
+
 
 if start:
     st[running_key] = True

@@ -1,6 +1,6 @@
 import compas
 from compas.geometry import Frame
-from compas.robots.configuration import Configuration
+from compas_robots import Configuration
 
 import compas_fab
 from compas_fab.backends import AnalyticalInverseKinematics
