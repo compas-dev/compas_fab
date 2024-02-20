@@ -20,18 +20,16 @@
 # The extracted SRDF is located in "\robot_packages\{robot_name}\robot_description_semantic.srdf"
 # The extracted meshes are stored in paths relative to the package root and are defined in the URDF file.
 
+import itertools
 import os
+
+from compas.datastructures import Mesh
 
 from compas_fab.backends.ros.client import RosFileServerLoader
 from compas_fab.backends import RosClient
-from compas_robots import RobotModel
-from compas_robots.files import URDF
-
-from compas.files import STLParser
-from compas.datastructures import Mesh
-import itertools
 
 HERE = os.path.dirname(__file__)
+
 
 with RosClient() as client:
     # Standard way to load a robot from a MoveIt! instance.
@@ -65,6 +63,7 @@ with RosClient() as client:
                     # Check if the STL file already exists (e.g. RFL have multiple links with the same mesh file)
                     if not os.path.exists(local_path_to_stl):
                         meshes = loader.load_meshes(shape.filename, precision=mesh_precision)
+                        # Join all meshes into one for OBJ conversion (Note: Do not weld the vertices)
                         combined_mesh = Mesh()
                         for mesh in meshes:
                             combined_mesh.join(mesh, precision=mesh_precision)
