@@ -1,7 +1,7 @@
 """
 Visualizes a trajectory.
 
-COMPAS FAB v1.0.0
+COMPAS FAB v1.0.1
 """
 
 from compas_ghpython import draw_frame

@@ -1,7 +1,7 @@
 """
 Load robot directly from ROS.
 
-COMPAS FAB v1.0.0
+COMPAS FAB v1.0.1
 """
 
 from compas.scene import SceneObject

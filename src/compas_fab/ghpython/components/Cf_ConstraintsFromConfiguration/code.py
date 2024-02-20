@@ -1,7 +1,7 @@
 """
 Create joint constraints for each of the robot's configurable joints based on a given target configuration.
 
-COMPAS FAB v1.0.0
+COMPAS FAB v1.0.1
 """
 
 import math

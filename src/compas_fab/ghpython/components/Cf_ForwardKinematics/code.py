@@ -1,7 +1,7 @@
 """
 Calculate the robot's forward kinematic for a given configuration.
 
-COMPAS FAB v1.0.0
+COMPAS FAB v1.0.1
 """
 
 from ghpythonlib.componentbase import executingcomponent as component

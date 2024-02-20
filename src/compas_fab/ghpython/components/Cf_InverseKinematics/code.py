@@ -1,7 +1,7 @@
 """
 Calculate the robot's inverse kinematic for a given plane.
 
-COMPAS FAB v1.0.0
+COMPAS FAB v1.0.1
 """
 
 from compas_rhino.conversions import plane_to_compas_frame
