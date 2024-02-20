@@ -10,13 +10,13 @@ from compas_fab.robots import CollisionMesh
 
 
 with PyBulletClient() as client:
-    urdf_filepath = compas_fab.get('universal_robot/ur_description/urdf/ur5.urdf')
-    loader = LocalPackageMeshLoader(compas_fab.get('universal_robot'), 'ur_description')
+    urdf_filepath = compas_fab.get('robot_library/ur5_robot/urdf/robot_description.urdf')
+    loader = LocalPackageMeshLoader(compas_fab.get('robot_library/ur5_robot'), '')
     robot = client.load_robot(urdf_filepath, [loader])
 
     mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
     cm = CollisionMesh(mesh, 'tip')
-    acm = AttachedCollisionMesh(cm, 'ee_link')
+    acm = AttachedCollisionMesh(cm, 'tool0')
     client.add_attached_collision_mesh(acm, {'mass': 0.5, 'robot': robot})
 
     time.sleep(1)

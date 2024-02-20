@@ -10,8 +10,8 @@ from compas_fab.robots import RobotLibrary
 if not compas.IPY:
     from compas_fab.backends import AnalyticalPyBulletClient
 
-urdf_filename = compas_fab.get("universal_robot/ur_description/urdf/ur5.urdf")
-srdf_filename = compas_fab.get("universal_robot/ur5_moveit_config/config/ur5.srdf")
+urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
+srdf_filename = compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf")
 
 
 def test_inverse_kinematics():
@@ -92,7 +92,7 @@ def test_kinematics_client_with_attached_tool():
                 frame_WCF, options={"solver": "ur5", "check_collision": True, "keep_order": False}
             )
         )
-        assert len(solutions) == 4
+        assert len(solutions) == 6
 
 
 def test_kinematics_cartesian():

@@ -195,6 +195,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             A robot instance.
         """
         robot = RobotLibrary.ur5(client=self, load_geometry=load_geometry)
+        robot.ensure_semantics()
+
         robot.attributes["pybullet"] = {}
         if load_geometry:
             self.cache_robot(robot, concavity)
@@ -206,6 +208,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         urdf_fp = robot.attributes["pybullet"]["cached_robot_filepath"]
 
         self._load_robot_to_pybullet(urdf_fp, robot)
+        self.disabled_collisions = robot.semantics.disabled_collisions
 
         return robot
 
