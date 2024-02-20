@@ -1,0 +1,910 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <link rel="icon" href="../../_static/compas.ico" type="image/x-icon">
+    <title>Creating a MoveIt! package from the custom created URDF &#8212; COMPAS FAB</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/compas.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/tabs.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/03_backends_ros/08_ros_create_moveit_package_from_custom_urdf';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/compas-dev/compas_fab/gh-pages/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
+        </script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Creating a URDF of the UR10 on two linear axes" href="09_ros_create_urdf_ur10_on_tower.html" />
+    <link rel="prev" title="Creating a URDF with an UR5 robot and a custom end-effector" href="07_ros_create_urdf_ur5_with_measurement_tool.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/compas_icon_white.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../_static/compas_icon_white.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+    <p class="title logo__title">COMPAS docs</p>
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <!-- <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../getting_started.html">
+                        Getting started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../backends.html">
+                        Working with backends
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../contributing.html">
+                        Contributor’s Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../authors.html">
+                        Citing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../changelog.html">
+                        CHANGELOG
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://compas.dev">
+                    COMPAS Framework
+                  </a>
+                </li>
+                
+                </div>
+            </div>
+            
+  </ul> -->
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      latest  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/compas-dev/compas_fab" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="http://forum.compas-framework.org/" title="Discourse" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-discourse"></i></span>
+            <label class="sr-only">Discourse</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/compas_fab/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <!-- <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        Introduction
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../getting_started.html">
+                        Getting started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../backends.html">
+                        Working with backends
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../contributing.html">
+                        Contributor’s Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../authors.html">
+                        Citing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../changelog.html">
+                        CHANGELOG
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../license.html">
+                        License
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://compas.dev">
+                    COMPAS Framework
+                  </a>
+                </li>
+                
+                </div>
+            </div>
+            
+  </ul> -->
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      latest  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/compas-dev/compas_fab" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="http://forum.compas-framework.org/" title="Discourse" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-discourse"></i></span>
+            <label class="sr-only">Discourse</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/compas_fab/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-python"></i></span>
+            <label class="sr-only">PyPI</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../backends.html">Working with backends</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../backends/pybullet.html">PyBullet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../backends/ros.html">ROS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../backends/web_x11_gui.html">Access backend GUI</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../examples.html">Examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../01_fundamentals.html">Fundamentals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_description_models.html">Description Models</a></li>
+<li class="toctree-l2 current active"><a class="reference internal" href="../03_backends_ros.html">Backends: ROS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../05_backends_pybullet.html">Backends: PyBullet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../06_backends_kinematics.html">Backends: Analytical Kinematics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../07_reachability_map.html">Planning: Reachability Map</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/compas_fab.html">compas_fab</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../contributing.html">Contributor’s Guide</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../developer/backends.html">Backend clients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../developer/grasshopper.html">Grasshopper components</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Citing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">CHANGELOG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="sidebar-primary-item"><div class="sidebar-primary-item">
+    <a href="https://compas.dev" target="_blank">
+        COMPAS.dev <i class="fa fa-external-link" aria-hidden="true"></i>
+    </a>
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../examples.html" class="nav-link">Examples</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../03_backends_ros.html" class="nav-link">Backends: ROS</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Creating a MoveIt! package from the custom created URDF</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="creating-a-moveit-package-from-the-custom-created-urdf">
+<span id="ros-examples-create-moveit-package-from-custom-urdf"></span><h1>Creating a MoveIt! package from the custom created URDF</h1>
+<p>This example is mainly copied from <a class="reference external" href="https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html">MoveIt! Setup Assistant Tutorial</a></p>
+<p>It is based on the previous example:
+<a class="reference internal" href="07_ros_create_urdf_ur5_with_measurement_tool.html#ros-examples-create-urdf-ur5-with-measurement-tool"><span class="std std-ref">Creating a URDF with an UR5 robot and a custom end-effector</span></a></p>
+<section id="start-the-moveit-setup-assistant">
+<h2>Start the MoveIt! Setup Assistant</h2>
+<p>The MoveIt! Setup Assistant is a graphical user interface for configuring any
+robot for use with MoveIt!. Its primary functions are to generate a Semantic Robot
+Description Format (SRDF) file, to create the collision matrix of your robot
+and to define the planning groups.</p>
+<ul>
+<li><p>To start the MoveIt! Setup Assistant, launch the following from your Linux command prompt:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">roslaunch</span> <span class="n">moveit_setup_assistant</span> <span class="n">setup_assistant</span><span class="o">.</span><span class="n">launch</span>
+</pre></div>
+</div>
+</li>
+<li><p>Press <em>Create New MoveIt Configuration Package</em></p></li>
+<li><p>Click on the browse button and navigate to the <code class="docutils literal notranslate"><span class="pre">ur5_with_measurement_tool.urdf</span></code>
+file you created in the last example. Choose that file and then click
+<em>Load Files.</em> The Setup Assistant will load the files (this might take a few
+seconds) and present you with this screen:</p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_00.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_00.jpg" />
+</figure>
+</section>
+<section id="generate-self-collision-matrix">
+<h2>Generate Self-Collision Matrix</h2>
+<ul class="simple">
+<li><p>Click on the <em>Self-Collisions</em> pane selector on the left-hand side.</p></li>
+<li><p>Click on the <em>Generate Collision Matrix</em> button. The Setup Assistant will work for a few
+seconds before presenting you the results of its computation in the main table.</p></li>
+</ul>
+<dl class="simple">
+<dt>Note:</dt><dd><p>The sampling density specifies how many random robot positions to check for self
+collision. The default value of 10’000 collision checks should be fine.</p>
+</dd>
+</dl>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_01.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_01.jpg" />
+</figure>
+</section>
+<section id="add-virtual-joints">
+<h2>Add Virtual Joints</h2>
+<p>Virtual joints are used primarily to attach the robot to the world coordinate
+frame. We will define only one virtual joint, attaching the
+<code class="docutils literal notranslate"><span class="pre">ur5_with_measurement_tool</span></code> to the world coordinate frame.</p>
+<ul class="simple">
+<li><p>Click on the <em>Virtual Joints</em> pane selector. Click on <em>Add Virtual Joint</em></p></li>
+<li><p>Set the joint name as “virtual_joint”</p></li>
+<li><p>Set the child link as “world” and the parent frame name as “world”.</p></li>
+<li><p>Set the Joint Type as “fixed”.</p></li>
+<li><p>Click <em>Save</em>.</p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_02.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_02.jpg" />
+</figure>
+</section>
+<section id="add-planning-groups">
+<h2>Add Planning Groups</h2>
+<p>Planning groups are used for semantically describing different parts of your
+robot, such as defining what an arm is, or an end-effector. The planning group
+is later used for path- and motion planning.</p>
+<ul class="simple">
+<li><p>Click on the <em>Planning Groups</em> pane selector.</p></li>
+<li><p>Click on <em>Add Group</em> and you should see the following screen:</p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_03.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_03.jpg" />
+</figure>
+<section id="add-the-arm">
+<h3>Add the arm</h3>
+<ul class="simple">
+<li><p>Enter <em>Group Name</em> as “manipulator”</p></li>
+<li><p>Choose ur_kinematics/UR5KinematicsPlugin as the kinematics solver.</p></li>
+<li><p>Let <em>Kin. Search Resolution</em>, <em>Kin. Search Timeout (sec)</em>, <em>Kin. Solver Attempts</em> and
+<em>Group Default Planner</em> stay at their default values.</p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_04.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_04.jpg" />
+</figure>
+<ul class="simple">
+<li><p>Click on the <em>Add Kin. Chain</em> button. Press <em>Expand All</em></p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_05.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_05.jpg" />
+</figure>
+<ul class="simple">
+<li><p>Select the “base_link” as <em>Base Link</em> and the “tcp” as <em>Tip Link</em></p></li>
+<li><p>Press the <em>Save</em> button.</p></li>
+</ul>
+</section>
+<section id="add-the-gripper">
+<h3>Add the gripper</h3>
+<p>We will also add a group for the end-effector.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You will do this using a different procedure than adding the arm.</p>
+</div>
+<ul class="simple">
+<li><p>Click on the <em>Add Group</em> button.</p></li>
+<li><p>Enter <em>Group Name</em> as “measurement_tool”</p></li>
+<li><p>Let <em>Kinematic Solver</em>, <em>Kin. Search Resolution</em>, <em>Kin. Search Timeout (sec)</em>, <em>Kin. Solver Attempts</em> and
+<em>Group Default Planner</em> stay at their default values.</p></li>
+<li><p>Click on the <em>Add Links</em> button.</p></li>
+<li><p>Choose measurment_tool and tcp (The links you defined in the measurement_tool.xacro) and add them to the list of <em>Selected Links</em> on     the right hand side.</p></li>
+<li><p>Click <em>Save</em></p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_06.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_06.jpg" />
+</figure>
+</section>
+</section>
+<section id="add-robot-poses">
+<h2>Add Robot Poses</h2>
+<p>The <em>Setup Assistant</em> allows you to add certain fixed poses into the
+configuration. This helps if, for example, you want to define a certain position
+of the robot as a <em>Home</em> position.</p>
+<ul class="simple">
+<li><p>Click on the <em>Robot Poses</em> pane.</p></li>
+<li><p>Click <em>Add Pose</em>. Choose a name for the pose. The robot will be in its
+<em>Default</em> position where the joint values are set to the mid-range of the
+allowed joint value range. Move the individual joints around until you are happy
+and then <em>Save</em> the pose.</p></li>
+</ul>
+<dl class="simple">
+<dt>Tip:</dt><dd><p>Try to move all the joints around. If there is something wrong
+with the joint limits in your URDF, you should be able to see it immediately here.</p>
+</dd>
+</dl>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_07.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_07.jpg" />
+</figure>
+</section>
+<section id="label-end-effectors">
+<h2>Label End-Effectors</h2>
+<p>We have already added the measurement_tool of the ur5. Now, we will designate
+this group as a special group: end effectors.</p>
+<ul class="simple">
+<li><p>Click on the <em>End Effectors</em> pane.</p></li>
+<li><p>Click <em>Add End Effector</em>.</p></li>
+<li><p>Choose <code class="docutils literal notranslate"><span class="pre">measurement_tool</span></code> as the <em>End Effector Name</em> for the measurement tool.</p></li>
+<li><p>Select “measurement_tool” as the <em>End Effector Group</em>.</p></li>
+<li><p>Select “tool0” as the <em>Parent Link</em> for this end-effector.</p></li>
+<li><p>Leave <em>Parent Group</em> empty.</p></li>
+<li><p>Press <em>Save</em>.</p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_08.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_08.jpg" />
+</figure>
+</section>
+<section id="add-passive-joints">
+<h2>Add Passive Joints</h2>
+<p>Skip this step.</p>
+</section>
+<section id="add-author-information">
+<h2>Add Author Information</h2>
+<ul class="simple">
+<li><p>Click on the <em>Author Information</em> pane.</p></li>
+<li><p>Enter your name and email address.</p></li>
+</ul>
+</section>
+<section id="generate-configuration-files">
+<h2>Generate Configuration Files</h2>
+<p>You are almost there. One last step!</p>
+<ul class="simple">
+<li><p>Click on the Configuration Files pane.</p></li>
+<li><p>Click <em>Browse</em>, select the <code class="docutils literal notranslate"><span class="pre">robotic_setups/src</span></code> location. Click
+<em>Create New Folder</em>, call it “ur5_with_measurement_tool_moveit_config”, and
+click <em>Choose</em>.</p></li>
+<li><p>Click on the <em>Generate Package</em> button. The Setup Assistant will now generate
+and write a set of launch and config files into the directory of your choosing.
+All the generated files will appear in the Generated Files/Folders tab and you
+can click on each of them for a description of what they contain.</p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_09.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_09.jpg" />
+</figure>
+</section>
+<section id="start-the-newly-generated-moveit-configuration">
+<h2>Start the newly generated MoveIt! Configuration</h2>
+<p>Now, optionally, you can already start the MoveIt! Demo and play:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">~/</span><span class="n">robotic_setups</span>
+<span class="n">catkin_make</span>
+<span class="n">source</span> <span class="n">devel</span><span class="o">/</span><span class="n">setup</span><span class="o">.</span><span class="n">bash</span>
+<span class="n">roslaunch</span> <span class="n">ur5_with_measurement_tool_moveit_config</span>  <span class="n">demo</span><span class="o">.</span><span class="n">launch</span> <span class="n">rviz_tutorial</span><span class="o">:=</span><span class="n">true</span>
+</pre></div>
+</div>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_10.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_10.jpg" />
+</figure>
+</section>
+<section id="further-links">
+<h2>Further links</h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html">https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html</a></p></li>
+<li><p><a class="reference external" href="https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/urdf_srdf/urdf_srdf_tutorial.html">https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/urdf_srdf/urdf_srdf_tutorial.html</a></p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#start-the-moveit-setup-assistant">Start the MoveIt! Setup Assistant</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-self-collision-matrix">Generate Self-Collision Matrix</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-virtual-joints">Add Virtual Joints</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-planning-groups">Add Planning Groups</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#add-the-arm">Add the arm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#add-the-gripper">Add the gripper</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-robot-poses">Add Robot Poses</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#label-end-effectors">Label End-Effectors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-passive-joints">Add Passive Joints</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-author-information">Add Author Information</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-configuration-files">Generate Configuration Files</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#start-the-newly-generated-moveit-configuration">Start the newly generated MoveIt! Configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-links">Further links</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright Gramazio Kohler Research.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
