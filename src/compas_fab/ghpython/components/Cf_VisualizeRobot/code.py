@@ -14,6 +14,7 @@ from compas_rhino.conversions import frame_to_rhino_plane
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
 
+from compas_fab.backends import BackendFeatureNotSupportedError
 from compas_fab.robots import PlanningScene
 
 
@@ -89,7 +90,13 @@ class RobotVisualize(component):
 
                 if update_scene:
                     scene = PlanningScene(robot)
-                    scene = robot.client.get_planning_scene()
+                    try:
+                        scene = robot.client.get_planning_scene()
+                    except BackendFeatureNotSupportedError:
+                        print("The selected backend does not support displaying collision meshes. Feature disabled.")
+                        scene = None
+                        show_cm = False
+                        show_acm = False
 
                 if update_scene and show_cm:
                     collision_meshes = []
