@@ -1,7 +1,7 @@
 """
 Connect or disconnect to ROS.
 
-COMPAS FAB v1.0.1
+COMPAS FAB v1.0.2
 """
 
 from ghpythonlib.componentbase import executingcomponent as component

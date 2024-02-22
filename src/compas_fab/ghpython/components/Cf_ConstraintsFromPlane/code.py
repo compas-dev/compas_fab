@@ -1,7 +1,7 @@
 """
 Create a position and an orientation constraint from a plane calculated for the group's end-effector link.
 
-COMPAS FAB v1.0.1
+COMPAS FAB v1.0.2
 """
 
 import math

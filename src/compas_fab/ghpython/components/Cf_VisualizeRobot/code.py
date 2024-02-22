@@ -1,7 +1,7 @@
 """
 Visualizes the robot.
 
-COMPAS FAB v1.0.1
+COMPAS FAB v1.0.2
 """
 
 import time
