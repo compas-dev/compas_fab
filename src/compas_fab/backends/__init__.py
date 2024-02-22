@@ -91,9 +91,10 @@ Exceptions
     :nosignatures:
 
     BackendError
+    BackendFeatureNotSupportedError
     CartesianMotionError
-    KinematicsError
     InverseKinematicsError
+    KinematicsError
 
 Interfaces
 ==========
@@ -108,8 +109,9 @@ import compas
 # Base imports
 from .exceptions import (
     BackendError,
-    KinematicsError,
+    BackendFeatureNotSupportedError,
     InverseKinematicsError,
+    KinematicsError,
 )
 from .tasks import (
     FutureResult,
@@ -158,8 +160,9 @@ if not compas.IPY:
 __all__ = [
     # Base
     "BackendError",
-    "KinematicsError",
+    "BackendFeatureNotSupportedError",
     "InverseKinematicsError",
+    "KinematicsError",
     "FutureResult",
     "CancellableFutureResult",
     # ROS

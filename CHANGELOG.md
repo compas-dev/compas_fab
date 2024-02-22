@@ -9,6 +9,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Removed
+
+
+## [1.0.2] 2024-02-22
+
+### Added
+
+### Changed
+
+* Raise `BackendFeatureNotSupportedError` exceptions when a features is not supported by the planner, instead of generic `Exception`.
+
+### Removed
+
+
+## [1.0.1] 2024-02-20
+
+### Added
+
+### Changed
+
+### Removed
+
+
+## [1.0.0] 2024-02-20
+
+### Added
+
 * Add parameter to control which link the tool is connected to in Grasshopper.
 * Introduced `compas_fab.robots.RobotLibrary` class with 4 built-in robots.
 * Added a script to extract URDF, SRDF and meshes from a Docker MoveIt instance.

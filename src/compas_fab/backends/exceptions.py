@@ -4,8 +4,9 @@ from __future__ import print_function
 
 __all__ = [
     "BackendError",
-    "KinematicsError",
+    "BackendFeatureNotSupportedError",
     "InverseKinematicsError",
+    "KinematicsError",
 ]
 
 
@@ -15,6 +16,12 @@ class BackendError(Exception):
 
     def __init__(self, message):
         super(BackendError, self).__init__(message)
+
+
+class BackendFeatureNotSupportedError(Exception):
+    """Indicates that the selected backend does not support the selected feature."""
+
+    pass
 
 
 class KinematicsError(BackendError):
