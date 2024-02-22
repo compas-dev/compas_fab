@@ -1584,23 +1584,24 @@ class Robot(Data):
         Examples
         --------
 
-        >>> ros = RosClient()
-        >>> ros.run(timeout=30)
-        >>> robot = ros.load_robot()
-        >>> frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\
-                      Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0])]
-        >>> start_configuration = Configuration.from_revolute_values([-0.042, 0.033, -2.174, 5.282, -1.528, 0.000])
-        >>> group = robot.main_group_name
-        >>> options = {'max_step': 0.01,\
-                       'jump_threshold': 1.57,\
-                       'avoid_collisions': True}
-        >>> trajectory = robot.plan_cartesian_motion(frames,\
-                                                     start_configuration,\
-                                                     group=group,\
-                                                     options=options)
-        >>> len(trajectory.points) > 1
+        >>> from compas_fab.backends import RosClient
+        >>> with RosClient() as ros:
+        ...     ros.run(timeout=30)
+        ...     robot = ros.load_robot()
+        ...     frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\
+                          Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0])]
+        ...     start_configuration = Configuration.from_revolute_values([-0.042, 0.033, -2.174, 5.282, -1.528, 0.000])
+        ...     group = robot.main_group_name
+        ...     options = {'max_step': 0.01,\
+                           'jump_threshold': 1.57,\
+                           'avoid_collisions': True}
+        ...     trajectory = robot.plan_cartesian_motion(frames,\
+                                                         start_configuration,\
+                                                         group=group,\
+                                                         options=options)
+        ...     len(trajectory.points) > 1
         True
-        >>> ros.close()
+
         """
         options = options or {}
         max_step = options.get("max_step")
@@ -1728,6 +1729,7 @@ class Robot(Data):
 
         Using position and orientation constraints:
 
+        >>> from compas_fab.backends import RosClient
         >>> ros = RosClient()
         >>> ros.run(timeout=30)
         >>> robot = ros.load_robot()
@@ -1746,6 +1748,7 @@ class Robot(Data):
 
         Using joint constraints (to the UP configuration):
 
+        >>> from compas_fab.backends import RosClient
         >>> ros = RosClient()
         >>> ros.run(timeout=30)
         >>> robot = ros.load_robot()
