@@ -93,7 +93,9 @@ class RobotVisualize(component):
                     try:
                         scene = robot.client.get_planning_scene()
                     except BackendFeatureNotSupportedError:
-                        print("The selected backend does not support displaying collision meshes. Feature disabled.")
+                        print(
+                            "The selected backend does not support collision meshes. If you need collision mesh support, use a different backend."
+                        )
                         scene = None
                         show_cm = False
                         show_acm = False
