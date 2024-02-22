@@ -24,11 +24,13 @@ def trj():
     p2 = JointTrajectoryPoint([0.571, 0, 0, 0.262, 0, 0], [0] * 6, [3.0] * 6, time_from_start=Duration(6, 0))
     config = Configuration.from_revolute_values([0.0] * 6)
 
-    return JointTrajectory(
+    trajectory = JointTrajectory(
         trajectory_points=[p1, p2],
         joint_names=["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"],
         start_configuration=config,
     )
+    trajectory.planning_time = 0.5
+    return trajectory
 
 
 def test_trajectory_points(trj):
@@ -47,6 +49,7 @@ def test_serialization(trj):
     data = trj.__data__
     new_trj = JointTrajectory.__from_data__(data)
     assert new_trj.__data__ == data
+    assert new_trj.planning_time == 0.5
     assert new_trj.time_from_start == Duration(6, 0).seconds
 
 

@@ -490,7 +490,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             configuration will be checked.  Defaults to ``None``.
 
         Raises
-        -------
+        ------
         :class:`compas_fab.backends.pybullet.DetectedCollision`
         """
         cached_robot = self.get_cached_robot(robot)
@@ -511,7 +511,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             Robot whose configuration may be in collision.
 
         Raises
-        -------
+        ------
         :class:`compas_fab.backends.pybullet.DetectedCollision`
         """
         for name, body_ids in self.collision_objects.items():
@@ -528,7 +528,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             Robot whose configuration may be in collision.
 
         Raises
-        -------
+        ------
         :class:`compas_fab.backends.pybullet.DetectedCollision`
         """
         cached_robot = self.get_cached_robot(robot)
@@ -546,7 +546,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """Checks whether any of the collision objects are colliding.
 
         Raises
-        -------
+        ------
         :class:`compas_fab.backends.CollisionError`
         """
         names = self.collision_objects.keys()

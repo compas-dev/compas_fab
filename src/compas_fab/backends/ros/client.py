@@ -129,8 +129,8 @@ class RosClient(Ros, ClientInterface):
     ...     print('Connected: %s' % client.is_connected)
     Connected: True
 
-    Note
-    ----
+    Notes
+    -----
     For more examples, check out the :ref:`ROS examples page <ros_examples>`.
     """
 
@@ -348,8 +348,8 @@ class RosClient(Ros, ClientInterface):
     ):
         """Execute a joint trajectory via the MoveIt infrastructure.
 
-        Note
-        ----
+        Notes
+        -----
         This method does not support Multi-DOF Joint Trajectories.
 
         Parameters

@@ -14,6 +14,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Removed
+
+
+## [1.0.2] 2024-02-22
+
+### Added
+
+### Changed
+
+* Raise `BackendFeatureNotSupportedError` exceptions when a features is not supported by the planner, instead of generic `Exception`.
+
+### Removed
+
+
+## [1.0.1] 2024-02-20
+
+### Added
+
+### Changed
+
+### Removed
+
+
+## [1.0.0] 2024-02-20
+
+### Added
+
+* Add parameter to control which link the tool is connected to in Grasshopper.
+
+### Changed
+
 * Changed `CollisionMesh` inherit from `compas.data.Data`
 * Changed `AttachedCollisionMesh` to inherit from `compas.data.Data`
 * Changed `Robot` inherit from `compas.data.Data`
@@ -24,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Migrate to COMPAS 2.x: use `compas.tolerance` module instead of `compas.PRECISION`
 * Add `attributes` to `Trajectory` class.
 * Fixed `data` serialization API to comply with `COMPAS 2.0` private data API.
+* Use the tool's `connected_to` link when showing end-effector frames in Grasshopper.
 
 ### Removed
 

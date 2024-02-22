@@ -13,8 +13,8 @@ from compas.datastructures import Mesh
 from compas.files import XML
 from compas.geometry import Transformation
 from compas.tolerance import TOL
-from compas_robots.resources.basic import _get_file_format
-from compas_robots.resources.basic import _mesh_import
+from compas_robots.resources import get_file_format
+from compas_robots.resources import mesh_import
 
 LOGGER = logging.getLogger("compas_fab.backends.ros")
 TIMEOUT = 10
@@ -195,7 +195,7 @@ class RosFileServerLoader(object):
             List of meshes.
         """
         use_local_file = False
-        file_extension = _get_file_format(url)
+        file_extension = get_file_format(url)
 
         if self.local_cache_enabled:
             local_filename = self._local_mesh_filename(url)
@@ -381,14 +381,14 @@ def _dae_mesh_importer(filename, precision):
 
 def _fileserver_mesh_import(url, filename, precision=None):
     """Internal function that adds primitive support for DAE files
-    to the _mesh_import function of compas_robots."""
-    file_extension = _get_file_format(url)
+    to the mesh_import function of compas_robots."""
+    file_extension = get_file_format(url)
 
     if file_extension == "dae":
         # Magic!
         return _dae_mesh_importer(filename, precision)
     else:
-        return _mesh_import(url, filename, precision)
+        return mesh_import(url, filename, precision)
 
 
 if __name__ == "__main__":

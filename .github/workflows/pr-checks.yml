@@ -4,7 +4,6 @@ on:
     types: [assigned, opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - main
-      - 'compas-2.x-compat'
 
 jobs:
   build:
@@ -16,5 +15,6 @@ jobs:
         uses: Zomzog/changelog-checker@v1.1.0
         with:
           fileName: CHANGELOG.md
+          checkNotification: Simple
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

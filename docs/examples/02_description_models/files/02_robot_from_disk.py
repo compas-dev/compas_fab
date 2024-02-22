@@ -4,7 +4,7 @@ from compas_robots.resources import LocalPackageMeshLoader
 import compas_fab
 
 # Locate the URDF file inside compas fab installation
-urdf = compas_fab.get("universal_robot/ur_description/urdf/ur5.urdf")
+urdf = compas_fab.get("universal_robot/ur_description/urdf/ur10e.urdf")
 
 # Create robot model from URDF
 model = RobotModel.from_urdf_file(urdf)
