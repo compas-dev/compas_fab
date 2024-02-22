@@ -18,6 +18,7 @@ from compas_fab.backends.interfaces.client import ClientInterface
 from compas_fab.backends.kinematics import AnalyticalInverseKinematics
 from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion
 from compas_fab.robots import Robot
+from compas_fab.robots import RobotLibrary
 from compas_fab.robots import RobotSemantics
 from compas_fab.utilities import LazyLoader
 
@@ -193,21 +194,22 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         :class:`compas_fab.robots.Robot`
             A robot instance.
         """
-        robot_model = RobotModel.ur5(load_geometry)
-        robot = Robot(robot_model, client=self)
+        robot = RobotLibrary.ur5(client=self, load_geometry=load_geometry)
+        robot.ensure_semantics()
+
         robot.attributes["pybullet"] = {}
         if load_geometry:
             self.cache_robot(robot, concavity)
         else:
             robot.attributes["pybullet"]["cached_robot"] = robot.model
-            robot.attributes["pybullet"]["cached_robot_filepath"] = compas.get("ur_description/urdf/ur5.urdf")
+            robot.attributes["pybullet"]["cached_robot_filepath"] = compas_fab.get(
+                "robot_library/ur5_robot/urdf/robot_description.urdf"
+            )
 
         urdf_fp = robot.attributes["pybullet"]["cached_robot_filepath"]
 
         self._load_robot_to_pybullet(urdf_fp, robot)
-
-        srdf_filename = compas_fab.get("universal_robot/ur5_moveit_config/config/ur5.srdf")
-        self.load_semantics(robot, srdf_filename)
+        self.disabled_collisions = robot.semantics.disabled_collisions
 
         return robot
 

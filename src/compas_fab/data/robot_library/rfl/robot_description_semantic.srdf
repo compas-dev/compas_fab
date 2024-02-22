@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This does not replace URDF, and is not an extension of URDF.
+    This is a format for representing semantic information about the robot structure.
+    A URDF file must exist for this robot as well, where the joints and the links that are referenced are defined
+-->
+<robot name="rfl">
+    <!--GROUPS: Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
+    <!--LINKS: When a link is specified, the parent joint of that link (if it exists) is automatically included-->
+    <!--JOINTS: When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
+    <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
+    <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
+    <group name="robot11">
+        <chain base_link="robot11_base_link" tip_link="robot11_tool0"/>
+    </group>
+    <group name="robot12">
+        <chain base_link="robot12_base_link" tip_link="robot12_tool0"/>
+    </group>
+    <group name="robot11_eaXYZ">
+        <chain base_link="x_rail" tip_link="robot11_tool0"/>
+    </group>
+    <group name="robot12_eaYZ">
+        <chain base_link="bridge1" tip_link="robot12_tool0"/>
+    </group>
+    <group name="robot21">
+        <chain base_link="robot21_base_link" tip_link="robot21_tool0"/>
+    </group>
+    <group name="robot22">
+        <chain base_link="robot22_base_link" tip_link="robot22_tool0"/>
+    </group>
+    <group name="robot21_eaXYZ">
+        <chain base_link="x_rail" tip_link="robot21_tool0"/>
+    </group>
+    <group name="robot22_eaYZ">
+        <chain base_link="bridge2" tip_link="robot22_tool0"/>
+    </group>
+    <group name="robot11_eaYZ">
+        <chain base_link="bridge1" tip_link="robot11_tool0"/>
+    </group>
+    <group name="robot21_eaYZ">
+        <chain base_link="bridge2" tip_link="robot21_tool0"/>
+    </group>
+    <group name="robot12_eaXYZ">
+        <chain base_link="x_rail" tip_link="robot12_tool0"/>
+    </group>
+    <group name="robot22_eaXYZ">
+        <chain base_link="x_rail" tip_link="robot22_tool0"/>
+    </group>
+    <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
+    <group_state name="robot11_home" group="robot11">
+        <joint name="robot11_joint_1" value="0"/>
+        <joint name="robot11_joint_2" value="0"/>
+        <joint name="robot11_joint_3" value="0"/>
+        <joint name="robot11_joint_4" value="0"/>
+        <joint name="robot11_joint_5" value="0"/>
+        <joint name="robot11_joint_6" value="0"/>
+    </group_state>
+    <group_state name="robot12_home" group="robot12">
+        <joint name="robot12_joint_1" value="0"/>
+        <joint name="robot12_joint_2" value="0"/>
+        <joint name="robot12_joint_3" value="0"/>
+        <joint name="robot12_joint_4" value="0"/>
+        <joint name="robot12_joint_5" value="0"/>
+        <joint name="robot12_joint_6" value="0"/>
+    </group_state>
+    <group_state name="robot11_eaXYZ_home" group="robot11_eaXYZ">
+        <joint name="bridge1_joint_EA_X" value="0"/>
+        <joint name="robot11_joint_1" value="0"/>
+        <joint name="robot11_joint_2" value="0"/>
+        <joint name="robot11_joint_3" value="0"/>
+        <joint name="robot11_joint_4" value="0"/>
+        <joint name="robot11_joint_5" value="0"/>
+        <joint name="robot11_joint_6" value="0"/>
+        <joint name="robot11_joint_EA_Y" value="0"/>
+        <joint name="robot11_joint_EA_Z" value="-4.915"/>
+    </group_state>
+    <group_state name="robot12_eaYZ_home" group="robot12_eaYZ">
+        <joint name="robot12_joint_1" value="0"/>
+        <joint name="robot12_joint_2" value="0"/>
+        <joint name="robot12_joint_3" value="0"/>
+        <joint name="robot12_joint_4" value="0"/>
+        <joint name="robot12_joint_5" value="0"/>
+        <joint name="robot12_joint_6" value="0"/>
+        <joint name="robot12_joint_EA_Y" value="-12.237"/>
+        <joint name="robot12_joint_EA_Z" value="-4.915"/>
+    </group_state>
+    <group_state name="robot21_home" group="robot21">
+        <joint name="robot21_joint_1" value="0"/>
+        <joint name="robot21_joint_2" value="0"/>
+        <joint name="robot21_joint_3" value="0"/>
+        <joint name="robot21_joint_4" value="0"/>
+        <joint name="robot21_joint_5" value="0"/>
+        <joint name="robot21_joint_6" value="0"/>
+    </group_state>
+    <group_state name="robot22_home" group="robot22">
+        <joint name="robot22_joint_1" value="0"/>
+        <joint name="robot22_joint_2" value="0"/>
+        <joint name="robot22_joint_3" value="0"/>
+        <joint name="robot22_joint_4" value="0"/>
+        <joint name="robot22_joint_5" value="0"/>
+        <joint name="robot22_joint_6" value="0"/>
+    </group_state>
+    <group_state name="robot21_eaXYZ_home" group="robot21_eaXYZ">
+        <joint name="bridge2_joint_EA_X" value="39.805"/>
+        <joint name="robot21_joint_1" value="0"/>
+        <joint name="robot21_joint_2" value="0"/>
+        <joint name="robot21_joint_3" value="0"/>
+        <joint name="robot21_joint_4" value="0"/>
+        <joint name="robot21_joint_5" value="0"/>
+        <joint name="robot21_joint_6" value="0"/>
+        <joint name="robot21_joint_EA_Y" value="0"/>
+        <joint name="robot21_joint_EA_Z" value="-4.915"/>
+    </group_state>
+    <group_state name="robot22_eaYZ_home" group="robot22_eaYZ">
+        <joint name="robot22_joint_1" value="0"/>
+        <joint name="robot22_joint_2" value="0"/>
+        <joint name="robot22_joint_3" value="0"/>
+        <joint name="robot22_joint_4" value="0"/>
+        <joint name="robot22_joint_5" value="0"/>
+        <joint name="robot22_joint_6" value="0"/>
+        <joint name="robot22_joint_EA_Y" value="-12.237"/>
+        <joint name="robot22_joint_EA_Z" value="-4.915"/>
+    </group_state>
+    <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
+    <end_effector name="robot11_ee" parent_link="robot11_tool0" group="robot11"/>
+    <end_effector name="robot12_ee" parent_link="robot12_tool0" group="robot12"/>
+    <end_effector name="robot11_eaXYZ_ee" parent_link="robot11_tool0" group="robot11_eaXYZ"/>
+    <end_effector name="robot12_eaYZ_ee" parent_link="robot12_tool0" group="robot12_eaYZ"/>
+    <end_effector name="robot11_eaYZ_ee" parent_link="robot11_tool0" group="robot11_eaYZ"/>
+    <end_effector name="robot21_ee" parent_link="robot21_tool0" group="robot21"/>
+    <end_effector name="robot21_eaYZ_ee" parent_link="robot21_tool0" group="robot21_eaYZ"/>
+    <end_effector name="robot21_eaXYZ_ee" parent_link="robot21_tool0" group="robot21_eaXYZ"/>
+    <end_effector name="robot22_ee" parent_link="robot22_tool0" group="robot22"/>
+    <end_effector name="robot22_eaYZ_ee" parent_link="robot22_tool0" group="robot22_eaYZ"/>
+    <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
+    <virtual_joint name="virtual_joint" type="fixed" parent_frame="world" child_link="world"/>
+    <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
+    <disable_collisions link1="bridge1" link2="robot11_base" reason="Default"/>
+    <disable_collisions link1="bridge1" link2="robot11_base_link" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot11_link_1" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot11_link_2" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot11_link_3" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot11_xy_cart" reason="Adjacent"/>
+    <disable_collisions link1="bridge1" link2="robot12_base" reason="Default"/>
+    <disable_collisions link1="bridge1" link2="robot12_base_link" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot12_link_1" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot12_link_2" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot12_link_3" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot12_xy_cart" reason="Adjacent"/>
+    <disable_collisions link1="bridge1" link2="robot21_base" reason="User"/>
+    <disable_collisions link1="bridge1" link2="robot21_base_link" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot21_link_1" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot21_link_2" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot21_link_3" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot21_xy_cart" reason="User"/>
+    <disable_collisions link1="bridge1" link2="robot22_base" reason="User"/>
+    <disable_collisions link1="bridge1" link2="robot22_base_link" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot22_link_1" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot22_link_2" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot22_link_3" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="robot22_xy_cart" reason="User"/>
+    <disable_collisions link1="bridge1" link2="world" reason="Never"/>
+    <disable_collisions link1="bridge1" link2="x_rail" reason="Adjacent"/>
+    <disable_collisions link1="bridge2" link2="robot11_base" reason="User"/>
+    <disable_collisions link1="bridge2" link2="robot11_base_link" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="robot11_link_1" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="robot11_link_2" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="robot11_xy_cart" reason="User"/>
+    <disable_collisions link1="bridge2" link2="robot12_base" reason="User"/>
+    <disable_collisions link1="bridge2" link2="robot12_base_link" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="robot12_link_1" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="robot12_link_2" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="robot12_link_3" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="robot12_xy_cart" reason="User"/>
+    <disable_collisions link1="bridge2" link2="robot21_base" reason="Default"/>
+    <disable_collisions link1="bridge2" link2="robot21_base_link" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="robot21_link_1" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="robot21_link_2" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="robot21_xy_cart" reason="Adjacent"/>
+    <disable_collisions link1="bridge2" link2="robot22_base" reason="Default"/>
+    <disable_collisions link1="bridge2" link2="robot22_base_link" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="robot22_link_1" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="robot22_link_2" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="robot22_xy_cart" reason="Adjacent"/>
+    <disable_collisions link1="bridge2" link2="world" reason="Never"/>
+    <disable_collisions link1="bridge2" link2="x_rail" reason="Adjacent"/>
+    <disable_collisions link1="robot11_base" link2="robot11_base_link" reason="Adjacent"/>
+    <disable_collisions link1="robot11_base" link2="robot11_link_1" reason="Never"/>
+    <disable_collisions link1="robot11_base" link2="robot11_xy_cart" reason="Adjacent"/>
+    <disable_collisions link1="robot11_base" link2="robot12_base" reason="User"/>
+    <disable_collisions link1="robot11_base" link2="robot12_base_link" reason="User"/>
+    <disable_collisions link1="robot11_base" link2="robot12_link_1" reason="User"/>
+    <disable_collisions link1="robot11_base" link2="robot12_xy_cart" reason="User"/>
+    <disable_collisions link1="robot11_base" link2="robot21_base" reason="User"/>
+    <disable_collisions link1="robot11_base" link2="robot21_base_link" reason="User"/>
+    <disable_collisions link1="robot11_base" link2="robot21_link_1" reason="User"/>
+    <disable_collisions link1="robot11_base" link2="robot21_xy_cart" reason="User"/>
+    <disable_collisions link1="robot11_base" link2="robot22_base" reason="User"/>
+    <disable_collisions link1="robot11_base" link2="robot22_base_link" reason="User"/>
+    <disable_collisions link1="robot11_base" link2="robot22_link_1" reason="User"/>
+    <disable_collisions link1="robot11_base" link2="robot22_xy_cart" reason="User"/>
+    <disable_collisions link1="robot11_base" link2="world" reason="Never"/>
+    <disable_collisions link1="robot11_base" link2="x_rail" reason="User"/>
+    <disable_collisions link1="robot11_base_link" link2="robot11_link_1" reason="Adjacent"/>
+    <disable_collisions link1="robot11_base_link" link2="robot11_link_3" reason="Never"/>
+    <disable_collisions link1="robot11_base_link" link2="robot11_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot11_base_link" link2="robot12_base" reason="User"/>
+    <disable_collisions link1="robot11_base_link" link2="robot12_base_link" reason="User"/>
+    <disable_collisions link1="robot11_base_link" link2="robot12_link_1" reason="User"/>
+    <disable_collisions link1="robot11_base_link" link2="robot12_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot11_base_link" link2="robot21_base" reason="User"/>
+    <disable_collisions link1="robot11_base_link" link2="robot21_base_link" reason="User"/>
+    <disable_collisions link1="robot11_base_link" link2="robot21_link_1" reason="User"/>
+    <disable_collisions link1="robot11_base_link" link2="robot21_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot11_base_link" link2="robot22_base" reason="User"/>
+    <disable_collisions link1="robot11_base_link" link2="robot22_base_link" reason="User"/>
+    <disable_collisions link1="robot11_base_link" link2="robot22_link_1" reason="User"/>
+    <disable_collisions link1="robot11_base_link" link2="robot22_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot11_base_link" link2="world" reason="Never"/>
+    <disable_collisions link1="robot11_base_link" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot11_link_1" link2="robot11_link_2" reason="Adjacent"/>
+    <disable_collisions link1="robot11_link_1" link2="robot11_link_3" reason="Never"/>
+    <disable_collisions link1="robot11_link_1" link2="robot11_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot11_link_1" link2="robot12_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot11_link_1" link2="robot21_base" reason="User"/>
+    <disable_collisions link1="robot11_link_1" link2="robot21_base_link" reason="User"/>
+    <disable_collisions link1="robot11_link_1" link2="robot21_link_1" reason="User"/>
+    <disable_collisions link1="robot11_link_1" link2="robot21_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot11_link_1" link2="robot22_base" reason="User"/>
+    <disable_collisions link1="robot11_link_1" link2="robot22_base_link" reason="User"/>
+    <disable_collisions link1="robot11_link_1" link2="robot22_link_1" reason="User"/>
+    <disable_collisions link1="robot11_link_1" link2="robot22_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot11_link_1" link2="world" reason="Never"/>
+    <disable_collisions link1="robot11_link_1" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot11_link_2" link2="robot11_link_3" reason="Adjacent"/>
+    <disable_collisions link1="robot11_link_2" link2="robot11_link_4" reason="Never"/>
+    <disable_collisions link1="robot11_link_2" link2="robot11_link_5" reason="Never"/>
+    <disable_collisions link1="robot11_link_2" link2="robot11_link_6" reason="Never"/>
+    <disable_collisions link1="robot11_link_2" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot11_link_3" link2="robot11_link_4" reason="Adjacent"/>
+    <disable_collisions link1="robot11_link_3" link2="robot11_link_5" reason="Never"/>
+    <disable_collisions link1="robot11_link_3" link2="robot11_link_6" reason="Never"/>
+    <disable_collisions link1="robot11_link_3" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot11_link_4" link2="robot11_link_5" reason="Adjacent"/>
+    <disable_collisions link1="robot11_link_4" link2="robot11_link_6" reason="Default"/>
+    <disable_collisions link1="robot11_link_4" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot11_link_5" link2="robot11_link_6" reason="Adjacent"/>
+    <disable_collisions link1="robot11_link_5" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot11_link_6" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot11_xy_cart" link2="robot12_base" reason="User"/>
+    <disable_collisions link1="robot11_xy_cart" link2="robot12_base_link" reason="Never"/>
+    <disable_collisions link1="robot11_xy_cart" link2="robot12_link_1" reason="Never"/>
+    <disable_collisions link1="robot11_xy_cart" link2="robot21_base" reason="User"/>
+    <disable_collisions link1="robot11_xy_cart" link2="robot21_base_link" reason="Never"/>
+    <disable_collisions link1="robot11_xy_cart" link2="robot21_link_1" reason="Never"/>
+    <disable_collisions link1="robot11_xy_cart" link2="robot21_xy_cart" reason="User"/>
+    <disable_collisions link1="robot11_xy_cart" link2="robot22_base" reason="User"/>
+    <disable_collisions link1="robot11_xy_cart" link2="robot22_base_link" reason="Never"/>
+    <disable_collisions link1="robot11_xy_cart" link2="robot22_link_1" reason="Never"/>
+    <disable_collisions link1="robot11_xy_cart" link2="robot22_xy_cart" reason="User"/>
+    <disable_collisions link1="robot11_xy_cart" link2="world" reason="Never"/>
+    <disable_collisions link1="robot11_xy_cart" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot12_base" link2="robot12_base_link" reason="Adjacent"/>
+    <disable_collisions link1="robot12_base" link2="robot12_link_1" reason="Never"/>
+    <disable_collisions link1="robot12_base" link2="robot12_xy_cart" reason="Adjacent"/>
+    <disable_collisions link1="robot12_base" link2="robot21_base" reason="User"/>
+    <disable_collisions link1="robot12_base" link2="robot21_base_link" reason="User"/>
+    <disable_collisions link1="robot12_base" link2="robot21_link_1" reason="User"/>
+    <disable_collisions link1="robot12_base" link2="robot21_xy_cart" reason="User"/>
+    <disable_collisions link1="robot12_base" link2="robot22_base" reason="User"/>
+    <disable_collisions link1="robot12_base" link2="robot22_base_link" reason="User"/>
+    <disable_collisions link1="robot12_base" link2="robot22_link_1" reason="User"/>
+    <disable_collisions link1="robot12_base" link2="robot22_xy_cart" reason="User"/>
+    <disable_collisions link1="robot12_base" link2="world" reason="Never"/>
+    <disable_collisions link1="robot12_base" link2="x_rail" reason="User"/>
+    <disable_collisions link1="robot12_base_link" link2="robot12_link_1" reason="Adjacent"/>
+    <disable_collisions link1="robot12_base_link" link2="robot12_link_3" reason="Never"/>
+    <disable_collisions link1="robot12_base_link" link2="robot12_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot12_base_link" link2="robot21_base_link" reason="User"/>
+    <disable_collisions link1="robot12_base_link" link2="robot21_link_1" reason="User"/>
+    <disable_collisions link1="robot12_base_link" link2="robot21_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot12_base_link" link2="robot22_base" reason="User"/>
+    <disable_collisions link1="robot12_base_link" link2="robot22_base_link" reason="User"/>
+    <disable_collisions link1="robot12_base_link" link2="robot22_link_1" reason="User"/>
+    <disable_collisions link1="robot12_base_link" link2="robot22_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot12_base_link" link2="world" reason="Never"/>
+    <disable_collisions link1="robot12_base_link" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot12_link_1" link2="robot12_link_2" reason="Adjacent"/>
+    <disable_collisions link1="robot12_link_1" link2="robot12_link_3" reason="Never"/>
+    <disable_collisions link1="robot12_link_1" link2="robot12_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot12_link_1" link2="robot21_base" reason="User"/>
+    <disable_collisions link1="robot12_link_1" link2="robot21_base_link" reason="User"/>
+    <disable_collisions link1="robot12_link_1" link2="robot21_link_1" reason="User"/>
+    <disable_collisions link1="robot12_link_1" link2="robot21_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot12_link_1" link2="robot22_base" reason="User"/>
+    <disable_collisions link1="robot12_link_1" link2="robot22_base_link" reason="User"/>
+    <disable_collisions link1="robot12_link_1" link2="robot22_link_1" reason="User"/>
+    <disable_collisions link1="robot12_link_1" link2="robot22_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot12_link_1" link2="world" reason="Never"/>
+    <disable_collisions link1="robot12_link_1" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot12_link_2" link2="robot12_link_3" reason="Adjacent"/>
+    <disable_collisions link1="robot12_link_2" link2="robot12_link_4" reason="Never"/>
+    <disable_collisions link1="robot12_link_2" link2="robot12_link_5" reason="Never"/>
+    <disable_collisions link1="robot12_link_2" link2="robot12_link_6" reason="Never"/>
+    <disable_collisions link1="robot12_link_2" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot12_link_3" link2="robot12_link_4" reason="Adjacent"/>
+    <disable_collisions link1="robot12_link_3" link2="robot12_link_5" reason="Never"/>
+    <disable_collisions link1="robot12_link_3" link2="robot12_link_6" reason="Never"/>
+    <disable_collisions link1="robot12_link_3" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot12_link_4" link2="robot12_link_5" reason="Adjacent"/>
+    <disable_collisions link1="robot12_link_4" link2="robot12_link_6" reason="Default"/>
+    <disable_collisions link1="robot12_link_4" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot12_link_5" link2="robot12_link_6" reason="Adjacent"/>
+    <disable_collisions link1="robot12_link_5" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot12_link_6" link2="robot21_link_6" reason="Never"/>
+    <disable_collisions link1="robot12_link_6" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot12_xy_cart" link2="robot21_base" reason="User"/>
+    <disable_collisions link1="robot12_xy_cart" link2="robot21_base_link" reason="Never"/>
+    <disable_collisions link1="robot12_xy_cart" link2="robot21_link_1" reason="Never"/>
+    <disable_collisions link1="robot12_xy_cart" link2="robot21_xy_cart" reason="User"/>
+    <disable_collisions link1="robot12_xy_cart" link2="robot22_base" reason="User"/>
+    <disable_collisions link1="robot12_xy_cart" link2="robot22_base_link" reason="Never"/>
+    <disable_collisions link1="robot12_xy_cart" link2="robot22_link_1" reason="Never"/>
+    <disable_collisions link1="robot12_xy_cart" link2="robot22_xy_cart" reason="User"/>
+    <disable_collisions link1="robot12_xy_cart" link2="world" reason="Never"/>
+    <disable_collisions link1="robot12_xy_cart" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot21_base" link2="robot21_base_link" reason="Adjacent"/>
+    <disable_collisions link1="robot21_base" link2="robot21_link_1" reason="Never"/>
+    <disable_collisions link1="robot21_base" link2="robot21_xy_cart" reason="Adjacent"/>
+    <disable_collisions link1="robot21_base" link2="robot22_base" reason="User"/>
+    <disable_collisions link1="robot21_base" link2="robot22_base_link" reason="User"/>
+    <disable_collisions link1="robot21_base" link2="robot22_link_1" reason="User"/>
+    <disable_collisions link1="robot21_base" link2="robot22_xy_cart" reason="User"/>
+    <disable_collisions link1="robot21_base" link2="world" reason="Never"/>
+    <disable_collisions link1="robot21_base" link2="x_rail" reason="User"/>
+    <disable_collisions link1="robot21_base_link" link2="robot21_link_1" reason="Adjacent"/>
+    <disable_collisions link1="robot21_base_link" link2="robot21_link_3" reason="Never"/>
+    <disable_collisions link1="robot21_base_link" link2="robot21_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot21_base_link" link2="robot22_base" reason="User"/>
+    <disable_collisions link1="robot21_base_link" link2="robot22_base_link" reason="User"/>
+    <disable_collisions link1="robot21_base_link" link2="robot22_link_1" reason="User"/>
+    <disable_collisions link1="robot21_base_link" link2="robot22_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot21_base_link" link2="world" reason="Never"/>
+    <disable_collisions link1="robot21_base_link" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot21_link_1" link2="robot21_link_2" reason="Adjacent"/>
+    <disable_collisions link1="robot21_link_1" link2="robot21_link_3" reason="Never"/>
+    <disable_collisions link1="robot21_link_1" link2="robot21_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot21_link_1" link2="robot22_base" reason="User"/>
+    <disable_collisions link1="robot21_link_1" link2="robot22_base_link" reason="User"/>
+    <disable_collisions link1="robot21_link_1" link2="robot22_link_1" reason="User"/>
+    <disable_collisions link1="robot21_link_1" link2="robot22_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot21_link_1" link2="world" reason="Never"/>
+    <disable_collisions link1="robot21_link_1" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot21_link_2" link2="robot21_link_3" reason="Adjacent"/>
+    <disable_collisions link1="robot21_link_2" link2="robot21_link_4" reason="Never"/>
+    <disable_collisions link1="robot21_link_2" link2="robot21_link_5" reason="Never"/>
+    <disable_collisions link1="robot21_link_2" link2="robot21_link_6" reason="Never"/>
+    <disable_collisions link1="robot21_link_2" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot21_link_3" link2="robot21_link_4" reason="Adjacent"/>
+    <disable_collisions link1="robot21_link_3" link2="robot21_link_5" reason="Never"/>
+    <disable_collisions link1="robot21_link_3" link2="robot21_link_6" reason="Never"/>
+    <disable_collisions link1="robot21_link_3" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot21_link_4" link2="robot21_link_5" reason="Adjacent"/>
+    <disable_collisions link1="robot21_link_4" link2="robot21_link_6" reason="Default"/>
+    <disable_collisions link1="robot21_link_4" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot21_link_5" link2="robot21_link_6" reason="Adjacent"/>
+    <disable_collisions link1="robot21_link_5" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot21_link_6" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot21_xy_cart" link2="robot22_base" reason="User"/>
+    <disable_collisions link1="robot21_xy_cart" link2="robot22_base_link" reason="Never"/>
+    <disable_collisions link1="robot21_xy_cart" link2="robot22_link_1" reason="Never"/>
+    <disable_collisions link1="robot21_xy_cart" link2="robot22_link_2" reason="User"/>
+    <disable_collisions link1="robot21_xy_cart" link2="world" reason="Never"/>
+    <disable_collisions link1="robot21_xy_cart" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot22_base" link2="robot22_base_link" reason="Adjacent"/>
+    <disable_collisions link1="robot22_base" link2="robot22_link_1" reason="Never"/>
+    <disable_collisions link1="robot22_base" link2="robot22_xy_cart" reason="Adjacent"/>
+    <disable_collisions link1="robot22_base" link2="world" reason="Never"/>
+    <disable_collisions link1="robot22_base" link2="x_rail" reason="User"/>
+    <disable_collisions link1="robot22_base_link" link2="robot22_link_1" reason="Adjacent"/>
+    <disable_collisions link1="robot22_base_link" link2="robot22_link_3" reason="Never"/>
+    <disable_collisions link1="robot22_base_link" link2="robot22_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot22_base_link" link2="world" reason="Never"/>
+    <disable_collisions link1="robot22_base_link" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot22_link_1" link2="robot22_link_2" reason="Adjacent"/>
+    <disable_collisions link1="robot22_link_1" link2="robot22_link_3" reason="Never"/>
+    <disable_collisions link1="robot22_link_1" link2="robot22_xy_cart" reason="Never"/>
+    <disable_collisions link1="robot22_link_1" link2="world" reason="Never"/>
+    <disable_collisions link1="robot22_link_1" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot22_link_2" link2="robot22_link_3" reason="Adjacent"/>
+    <disable_collisions link1="robot22_link_2" link2="robot22_link_4" reason="Never"/>
+    <disable_collisions link1="robot22_link_2" link2="robot22_link_5" reason="Never"/>
+    <disable_collisions link1="robot22_link_2" link2="robot22_link_6" reason="Never"/>
+    <disable_collisions link1="robot22_link_2" link2="robot22_xy_cart" reason="User"/>
+    <disable_collisions link1="robot22_link_2" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot22_link_3" link2="robot22_link_4" reason="Adjacent"/>
+    <disable_collisions link1="robot22_link_3" link2="robot22_link_5" reason="Never"/>
+    <disable_collisions link1="robot22_link_3" link2="robot22_link_6" reason="Never"/>
+    <disable_collisions link1="robot22_link_3" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot22_link_4" link2="robot22_link_5" reason="Adjacent"/>
+    <disable_collisions link1="robot22_link_4" link2="robot22_link_6" reason="Default"/>
+    <disable_collisions link1="robot22_link_4" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot22_link_5" link2="robot22_link_6" reason="Adjacent"/>
+    <disable_collisions link1="robot22_link_5" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot22_link_6" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="robot22_xy_cart" link2="world" reason="Never"/>
+    <disable_collisions link1="robot22_xy_cart" link2="x_rail" reason="Never"/>
+    <disable_collisions link1="world" link2="x_rail" reason="Adjacent"/>
+</robot>
