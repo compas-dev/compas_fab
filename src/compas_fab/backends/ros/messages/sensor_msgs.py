@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
-from .std_msgs import ROSmsg
 from .std_msgs import Header
+from .std_msgs import ROSmsg
 
 
 class JointState(ROSmsg):

@@ -1,22 +1,27 @@
-from compas.artists import PrimitiveArtist
 from compas.colors import ColorMap
-from compas_ghpython.artists import GHArtist
+from compas.scene import SceneObject
+from compas_rhino.scene import RhinoSceneObject
 
 
-class ReachabilityMapArtist(GHArtist):
-    """Artist for drawing a reachability map.
+class ReachabilityMapObject(RhinoSceneObject):
+    """Scene object for drawing a reachability map.
 
     Parameters
     ----------
-    reachability_map : :class:`compas.robots.ReachabilityMap`
+    reachability_map : :class:`compas_robots.ReachabilityMap`
         Robot model.
+    scale: float, optional
+        Scale factor that controls the length of the axes.
+    layer : str, optional
+        The layer that should contain the drawing.
     **kwargs : dict, optional
         Additional keyword arguments.
     """
 
-    def __init__(self, reachability_map, **kwargs):
-        super(ReachabilityMapArtist, self).__init__(**kwargs)
+    def __init__(self, reachability_map, layer=None, scale=1.0, **kwargs):
+        super(ReachabilityMapObject, self).__init__(layer=layer, **kwargs)
         self.reachability_map = reachability_map
+        self.scale = scale or 1.0
 
     def draw_frames(self, ik_index=None):
         """Returns the frames of the reachability map.
@@ -26,20 +31,24 @@ class ReachabilityMapArtist(GHArtist):
         ik_index : int, optional
             If passed, returns only the reachable frames at a given IK index. For a 6-axis industrial robot this
             index reaches from 0 to 7 (8 solutions).
+
+        Returns
+        -------
+        list[System.Guid]
+            The GUIDs of the created Rhino objects.
         """
-        from ghpythonlib.treehelpers import list_to_tree
 
         if ik_index is None:
             xframes = []
             for frames in self.reachability_map.frames:
                 xframes.append([])
                 for frame in frames:
-                    xframes[-1].append(PrimitiveArtist(frame).draw())
-            xframes = list_to_tree(xframes)
+                    xframes[-1].extend(SceneObject(frame, layer=self.layer, scale=self.scale).draw())
+
             return xframes
         else:
             frames, _ = self.reachability_map.reachable_frames_and_configurations_at_ik_index(ik_index)
-            return [PrimitiveArtist(f).draw() for f in frames]
+            return [SceneObject(f, layer=self.layer, scale=self.scale).draw() for f in frames]
 
     def draw(self, colormap="viridis"):
         return self.draw_cloud(colormap)
@@ -56,23 +65,24 @@ class ReachabilityMapArtist(GHArtist):
             The colormap for the point cloud.
         points : list of :class:`compas.geometry.Points`, optional
             Points to override the points from the reachability map.
-        """
 
-        from System.Drawing import Color
+        Returns
+        -------
+        list[System.Guid]
+            The GUIDs of the created Rhino objects.
+
+        """
 
         points = points or self.reachability_map.points
 
-        xpoints = [PrimitiveArtist(pt).draw() for pt in points]
-
-        colors = []
         cmap = ColorMap.from_mpl(colormap)
         score = self.reachability_map.score
         minv, maxv = min(score), max(score)
 
-        for num in score:
+        guids = []
+        for num, pt in zip(score, points):
             color = cmap(num, minv, maxv)
-            r, g, b, a = color.rgba255
-            rcolor = Color.FromArgb(a, r, g, b)
-            colors.append(rcolor)
+            sceneobject = SceneObject(pt, layer=self.layer)
+            guids.extend(sceneobject.draw(color))
 
-        return xpoints, colors
+        return guids

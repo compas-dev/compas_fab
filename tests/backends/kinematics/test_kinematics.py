@@ -1,8 +1,8 @@
 from compas.geometry import allclose
 
-from compas_fab.backends import UR5eKinematics
-from compas_fab.backends import Staubli_TX260LKinematics
 from compas_fab.backends import ABB_IRB4600_40_255Kinematics
+from compas_fab.backends import Staubli_TX260LKinematics
+from compas_fab.backends import UR5eKinematics
 
 
 def test_kinematic_functions():

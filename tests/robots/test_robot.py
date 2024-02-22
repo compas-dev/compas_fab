@@ -7,7 +7,7 @@ from compas.data import json_dumps
 from compas.data import json_loads
 from compas.datastructures import Mesh
 from compas.geometry import Frame
-from compas.robots import RobotModel
+from compas_robots import RobotModel
 
 import compas_fab
 from compas_fab.backends.interfaces import ClientInterface
@@ -36,18 +36,6 @@ def panda_robot_instance(panda_urdf, panda_srdf):
     model = RobotModel.from_urdf_file(panda_urdf)
     semantics = RobotSemantics.from_srdf_file(panda_srdf, model)
     return Robot(model, semantics=semantics)
-
-
-@pytest.fixture
-def panda_robot_instance_w_artist(panda_robot_instance):
-    class FakeArtist(object):
-        def scale(self, _):
-            pass
-
-    robot = panda_robot_instance
-    robot.artist = FakeArtist()
-
-    return robot
 
 
 @pytest.fixture
@@ -140,7 +128,7 @@ def robot_tool2():
 
 def test_basic_name_only():
     robot = Robot.basic("testbot")
-    assert robot.artist is None
+    assert robot.scene_object is None
 
 
 def test_basic_name_joints_links(ur5_joints, ur5_links):
@@ -257,8 +245,8 @@ def test_get_base_frame(panda_robot_instance):
     assert robot.get_base_frame(group="panda_arm") == Frame.worldXY()
 
 
-def test_get_base_frame_w_artist(panda_robot_instance_w_artist):
-    robot = panda_robot_instance_w_artist
+def test_get_base_frame_w_artist(panda_robot_instance):
+    robot = panda_robot_instance
 
     assert robot.get_base_frame(group=None) == Frame.worldXY()
     assert robot.get_base_frame(group="panda_arm") == Frame.worldXY()
@@ -269,8 +257,8 @@ def test_get_base_frame_when_link_has_parent(ur5_robot_instance):
     base_frame = robot.get_base_frame(group="endeffector")
 
     assert [round(v, 3) for v in list(base_frame.point)] == [0.817, 0.191, -0.005]
-    assert [round(v) for v in base_frame.data["xaxis"]] == [0, 1, 0]
-    assert [round(v) for v in base_frame.data["yaxis"]] == [1, 0, 0]
+    assert [round(v) for v in base_frame.__data__["xaxis"]] == [0, 1, 0]
+    assert [round(v) for v in base_frame.__data__["yaxis"]] == [1, 0, 0]
 
 
 def test_get_configurable_joints(ur5_robot_instance):
@@ -390,10 +378,9 @@ def test_forward_kinematics_without_tool(ur5_robot_instance):
     robot = ur5_robot_instance
 
     frame_t0cf = robot.forward_kinematics(robot.zero_configuration())
-    assert (
-        str(frame_t0cf)
-        == "Frame(Point(0.817, 0.191, -0.005), Vector(-0.000, 1.000, 0.000), Vector(1.000, 0.000, 0.000))"
-    )
+    assert str(frame_t0cf.point) == "Point(x=0.817, y=0.191, z=-0.005)"
+    assert str(frame_t0cf.xaxis) == "Vector(x=-0.000, y=1.000, z=0.000)"
+    assert str(frame_t0cf.yaxis) == "Vector(x=1.000, y=0.000, z=0.000)"
 
 
 def test_forward_kinematics_with_tool(ur5_robot_instance, robot_tool1):

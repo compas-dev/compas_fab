@@ -88,7 +88,7 @@ To switch to a specific version
 
 .. code-block:: bash
 
-    conda install compas_fab=0.28.0
+    conda install compas_fab=1.0.2
 
 
 Update with pip
@@ -104,7 +104,7 @@ Or to switch to a specific version
 
 .. code-block:: bash
 
-    pip install compas_fab==0.28.0
+    pip install compas_fab==1.0.2
 
 
 Working in Rhino
@@ -128,7 +128,7 @@ Working in Blender
 ==================
 
 Once **COMPAS** itself is installed for Blender following the
-`documented procedure <https://compas.dev/compas/latest/gettingstarted/blender.html>`_,
+`documented procedure <https://compas.dev/compas/latest/userguide/cad.blender.html>`_,
 **COMPAS FAB** will automatically be available as well after installing it.
 
 
@@ -200,5 +200,5 @@ Next Steps
 * :ref:`Working with backends <backends>`
 * :ref:`COMPAS FAB Examples <examples>`
 * :ref:`COMPAS FAB API Reference <reference>`
-* `COMPAS Tutorials <https://compas.dev/compas/latest/tutorial.html>`_
-* `COMPAS API Reference <https://compas.dev/compas/latest/api.html>`_
+* `COMPAS User Guide <https://compas.dev/compas/latest/userguide>`_
+* `COMPAS API Reference <https://compas.dev/compas/latest/api>`_

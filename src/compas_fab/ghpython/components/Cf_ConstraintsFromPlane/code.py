@@ -1,11 +1,12 @@
 """
 Create a position and an orientation constraint from a plane calculated for the group's end-effector link.
 
-COMPAS FAB v0.28.0
+COMPAS FAB v1.0.2
 """
+
 import math
 
-from compas_rhino.conversions import RhinoPlane
+from compas_rhino.conversions import plane_to_compas_frame
 from ghpythonlib.componentbase import executingcomponent as component
 
 
@@ -18,7 +19,7 @@ class ConstraintsFromPlane(component):
             tolerance_yaxis = tolerance_yaxis or 1.0
             tolerance_zaxis = tolerance_zaxis or 1.0
 
-            frame = RhinoPlane.from_geometry(plane).to_compas_frame()
+            frame = plane_to_compas_frame(plane)
             tolerances_axes = [
                 math.radians(tolerance_xaxis),
                 math.radians(tolerance_yaxis),

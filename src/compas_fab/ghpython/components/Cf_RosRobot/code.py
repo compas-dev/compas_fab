@@ -1,9 +1,10 @@
 """
 Load robot directly from ROS.
 
-COMPAS FAB v0.28.0
+COMPAS FAB v1.0.2
 """
-from compas_ghpython.artists import RobotModelArtist
+
+from compas.scene import SceneObject
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
 
@@ -16,8 +17,8 @@ class ROSRobot(component):
 
         if ros_client and ros_client.is_connected and load:
             # Load URDF from ROS
-            st[key] = ros_client.load_robot(load_geometry=True, precision="12f")
-            st[key].artist = RobotModelArtist(st[key].model)
+            st[key] = ros_client.load_robot(load_geometry=True, precision=12)
+            st[key].scene_object = SceneObject(st[key].model)
 
         robot = st.get(key, None)
         if robot:  # client sometimes need to be restarted, without needing to reload geometry

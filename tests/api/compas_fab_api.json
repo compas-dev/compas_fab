@@ -1,42 +1,58 @@
 {
   "metadata": {
-    "compas_fab_version": "0.19.1",
-    "generated_on": "20210728"
+    "compas_fab_version": "1.0.0",
+    "generated_on": "20240220"
   },
   "modules": {
     "compas_fab": [
       "get"
     ],
     "compas_fab.backends": [
+      "ABB_IRB4600_40_255Kinematics",
+      "AnalyticalInverseKinematics",
+      "AnalyticalPlanCartesianMotion",
+      "AnalyticalPyBulletClient",
       "BackendError",
       "CancellableFutureResult",
+      "CartesianMotionError",
       "CollisionError",
       "FutureResult",
       "InverseKinematicsError",
+      "KinematicsError",
       "MoveItPlanner",
+      "OffsetWristKinematics",
       "PyBulletClient",
       "PyBulletError",
       "PyBulletPlanner",
       "RosClient",
       "RosError",
       "RosFileServerLoader",
-      "RosValidationError"
+      "RosValidationError",
+      "SphericalWristKinematics",
+      "Staubli_TX260LKinematics",
+      "UR10Kinematics",
+      "UR10eKinematics",
+      "UR3Kinematics",
+      "UR3eKinematics",
+      "UR5Kinematics",
+      "UR5eKinematics"
     ],
     "compas_fab.robots": [
       "AttachedCollisionMesh",
       "BoundingVolume",
       "CollisionMesh",
-      "Configuration",
       "Constraint",
+      "DeviationVectorsGenerator",
       "Duration",
       "Inertia",
       "JointConstraint",
       "JointTrajectory",
       "JointTrajectoryPoint",
       "OrientationConstraint",
-      "PathPlan",
+      "OrthonormalVectorsFromAxisGenerator",
       "PlanningScene",
       "PositionConstraint",
+      "ReachabilityMap",
       "Robot",
       "RobotSemantics",
       "Tool",
@@ -48,6 +64,8 @@
     "compas_fab.sensors": [
       "PosCon3D",
       "PosConCM",
+      "ProtocolError",
+      "SensorTimeoutError",
       "SerialSensor"
     ],
     "compas_fab.utilities": [

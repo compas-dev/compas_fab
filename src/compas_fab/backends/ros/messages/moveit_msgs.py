@@ -406,7 +406,7 @@ class BoundingVolume(ROSmsg):
         sphere: `compas.geometry.Sphere`
         """
         primitive = SolidPrimitive.from_sphere(sphere)
-        pose = Pose(Point(*sphere.point), Quaternion(0, 0, 0, 1))
+        pose = Pose(Point(*sphere.frame.point), Quaternion(0, 0, 0, 1))
         return cls(primitives=[primitive], primitive_poses=[pose])
 
     @classmethod

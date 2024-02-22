@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import itertools
 
-from compas.robots import Configuration
+from compas_robots import Configuration
 
 from compas_fab.backends.ros.exceptions import RosError
 from compas_fab.backends.ros.messages import Constraints

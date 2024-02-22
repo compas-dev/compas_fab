@@ -149,7 +149,7 @@ class Wrench(ROSmsg):
     >>> ros_wrench.msg
     {'force': {'x': 0.0, 'y': 0.0, 'z': -98.0}, 'torque': {'x': 0.0, 'y': 0.0, 'z': 0.0}}
     >>> ros_wrench.wrench
-    Wrench(Vector(0.000, 0.000, -98.000), Vector(0.000, 0.000, 0.000))
+    Wrench(Vector(x=0.0, y=0.0, z=-98.0), Vector(x=0.0, y=0.0, z=0.0))
     """
 
     ROS_MSG_TYPE = "geometry_msgs/Wrench"
@@ -206,7 +206,7 @@ class Inertia(ROSmsg):
     >>> ros_inertia.msg
     {'m': 1.0, 'com': {'x': 0.1, 'y': 3.1, 'z': 4.4}, 'ixx': 0.0, 'ixy': 0.0, 'ixz': 0.0, 'iyy': 0.0, 'iyz': 0.0, 'izz': 0.0}
     >>> ros_inertia.inertia
-    Inertia([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], 1.0, Point(0.100, 3.100, 4.400))
+    Inertia([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], 1.0, Point(x=0.1, y=3.1, z=4.4))
     """
 
     ROS_MSG_TYPE = "geometry_msgs/Inertia"

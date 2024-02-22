@@ -1,8 +1,9 @@
 """
 Subscribe to a ROS topic.
 
-COMPAS FAB v0.28.0
+COMPAS FAB v1.0.2
 """
+
 import time
 
 import Grasshopper.Kernel

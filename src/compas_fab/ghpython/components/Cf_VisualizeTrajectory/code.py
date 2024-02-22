@@ -1,10 +1,11 @@
 """
 Visualizes a trajectory.
 
-COMPAS FAB v0.28.0
+COMPAS FAB v1.0.2
 """
+
 from compas_ghpython import draw_frame
-from compas_ghpython import list_to_ghtree
+from compas_ghpython.sets import list_to_ghtree
 from ghpythonlib.componentbase import executingcomponent as component
 
 

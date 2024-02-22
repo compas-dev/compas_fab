@@ -94,10 +94,10 @@ except Exception:
 
 __all_plugins__ = [
     "compas_fab.rhino.install",
-    "compas_fab.rhino.artists",
+    "compas_fab.rhino.scene",
     "compas_fab.ghpython.install",
-    "compas_fab.ghpython.artists",
-    "compas_fab.blender.artists",
+    "compas_fab.ghpython.scene",
+    "compas_fab.blender.scene",
 ]
 
 __all__ = [

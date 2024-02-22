@@ -33,7 +33,6 @@ Path planning
 
     JointTrajectory
     JointTrajectoryPoint
-    PathPlan
     Trajectory
 
 Planning scene
@@ -75,7 +74,6 @@ The following functions help with converting units from one system to the other.
 
 """
 
-from .configuration import Configuration
 from .constraints import (
     BoundingVolume,
     Constraint,
@@ -83,7 +81,6 @@ from .constraints import (
     OrientationConstraint,
     PositionConstraint,
 )
-from .path_plan import PathPlan
 from .planning_scene import (
     AttachedCollisionMesh,
     CollisionMesh,
@@ -126,7 +123,6 @@ __all__ = [
     "AttachedCollisionMesh",
     "BoundingVolume",
     "CollisionMesh",
-    "Configuration",
     "Constraint",
     "Duration",
     "Inertia",
@@ -134,7 +130,6 @@ __all__ = [
     "JointTrajectory",
     "JointTrajectoryPoint",
     "OrientationConstraint",
-    "PathPlan",
     "PlanningScene",
     "PositionConstraint",
     "ReachabilityMap",

@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import os
 
-from compas.robots import RobotModel
+from compas_robots import RobotModel
 from roslibpy import Message
 from roslibpy import Param
 from roslibpy import Ros
@@ -129,8 +129,8 @@ class RosClient(Ros, ClientInterface):
     ...     print('Connected: %s' % client.is_connected)
     Connected: True
 
-    Note
-    ----
+    Notes
+    -----
     For more examples, check out the :ref:`ROS examples page <ros_examples>`.
     """
 
@@ -175,8 +175,8 @@ class RosClient(Ros, ClientInterface):
             Parameter name where the URDF is defined. If not defined, it will default to ``/robot_description``.
         srdf_param_name : str, optional
             Parameter name where the SRDF is defined. If not defined, it will default to ``/robot_description_semantic``.
-        precision : float
-            Defines precision for importing/loading meshes. Defaults to ``compas.PRECISION``.
+        precision : int
+            Defines precision for importing/loading meshes. Defaults to ``compas.tolerance.TOL.precision``.
         local_cache_directory : str, optional
             Directory where the robot description (URDF, SRDF and meshes) are stored.
             This differs from the directory taken as parameter by the :class:`RosFileServerLoader`
@@ -199,7 +199,7 @@ class RosClient(Ros, ClientInterface):
         robot_name = cache_info.robot_name
         local_cache_directory = cache_info.local_cache_directory
 
-        loader = RosFileServerLoader(self, use_local_cache, local_cache_directory, precision)
+        loader = RosFileServerLoader(self, use_local_cache, local_cache_directory)
 
         if robot_name:
             loader.robot_name = robot_name
@@ -211,7 +211,7 @@ class RosClient(Ros, ClientInterface):
         semantics = RobotSemantics.from_srdf_string(srdf, model)
 
         if load_geometry:
-            model.load_geometry(loader)
+            model.load_geometry(loader, precision=precision)
 
         return Robot(model, semantics=semantics, client=self)
 
@@ -348,8 +348,8 @@ class RosClient(Ros, ClientInterface):
     ):
         """Execute a joint trajectory via the MoveIt infrastructure.
 
-        Note
-        ----
+        Notes
+        -----
         This method does not support Multi-DOF Joint Trajectories.
 
         Parameters

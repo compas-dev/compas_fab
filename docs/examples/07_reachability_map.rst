@@ -1,4 +1,4 @@
-.. _examples_reachability_map:
+.. _reachability_map:
 
 *******************************************************************************
 Planning: Reachability Map

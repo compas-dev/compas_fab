@@ -1,17 +1,20 @@
 """
 Visualizes the robot.
 
-COMPAS FAB v0.28.0
+COMPAS FAB v1.0.2
 """
+
 import time
 
-from compas.artists import Artist
 from compas.geometry import Frame
 from compas.geometry import Transformation
+from compas.scene import SceneObject
+from compas_ghpython import create_id
+from compas_rhino.conversions import frame_to_rhino_plane
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
 
-from compas_fab.ghpython.components import create_id
+from compas_fab.backends import BackendFeatureNotSupportedError
 from compas_fab.robots import PlanningScene
 
 
@@ -47,26 +50,27 @@ class RobotVisualize(component):
             compas_frames = robot.transformed_frames(configuration, group)
 
             if show_visual:
-                visual = robot.artist.draw_visual()
+                visual = robot.scene_object.draw_visual()
 
             if show_collision:
-                collision = robot.artist.draw_collision()
+                collision = robot.scene_object.draw_collision()
 
             if show_base_frame:
                 base_compas_frame = compas_frames[0]
-                artist = Artist(base_compas_frame)
-                base_frame = artist.draw()
+                base_frame = frame_to_rhino_plane(base_compas_frame)
 
             if show_end_effector_frame:
-                ee_compas_frame = robot.forward_kinematics(configuration, group, options=dict(solver="model"))
-                artist = Artist(ee_compas_frame)
-                ee_frame = artist.draw()
+                options = dict(solver="model")
+                if robot.attached_tool:
+                    options["link"] = robot.attached_tool.connected_to
+
+                ee_compas_frame = robot.forward_kinematics(configuration, group, options=options)
+                ee_frame = frame_to_rhino_plane(ee_compas_frame)
 
             if show_frames:
                 frames = []
                 for compas_frame in compas_frames[1:]:
-                    artist = Artist(compas_frame)
-                    frame = artist.draw()
+                    frame = frame_to_rhino_plane(compas_frame)
                     frames.append(frame)
 
             cached_scene_key = create_id(self, "cached_scene")
@@ -86,7 +90,15 @@ class RobotVisualize(component):
 
                 if update_scene:
                     scene = PlanningScene(robot)
-                    scene = robot.client.get_planning_scene()
+                    try:
+                        scene = robot.client.get_planning_scene()
+                    except BackendFeatureNotSupportedError:
+                        print(
+                            "The selected backend does not support collision meshes. If you need collision mesh support, use a different backend."
+                        )
+                        scene = None
+                        show_cm = False
+                        show_acm = False
 
                 if update_scene and show_cm:
                     collision_meshes = []
@@ -103,7 +115,7 @@ class RobotVisualize(component):
                             else:
                                 mesh = cm.mesh
 
-                            collision_meshes.append(Artist(mesh).draw())
+                            collision_meshes.extend(SceneObject(mesh).draw())
 
                         cached_scene["cm"] = collision_meshes
 
@@ -124,7 +136,7 @@ class RobotVisualize(component):
 
                             mesh = acm.collision_mesh.mesh.transformed(t)
 
-                            attached_meshes.append(Artist(mesh).draw())
+                            attached_meshes.extend(SceneObject(mesh).draw())
 
                     cached_scene["acm"] = attached_meshes
 

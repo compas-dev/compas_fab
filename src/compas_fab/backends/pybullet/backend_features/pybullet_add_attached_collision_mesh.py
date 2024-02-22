@@ -6,11 +6,10 @@ import itertools
 import os
 
 from compas.geometry import Frame
-from compas.robots import Inertia
-from compas.robots import Inertial
-from compas.robots import Joint
-from compas.robots import Mass
-from compas.robots import Origin
+from compas_robots.model import Inertia
+from compas_robots.model import Inertial
+from compas_robots.model import Joint
+from compas_robots.model import Mass
 
 from compas_fab.backends.interfaces import AddAttachedCollisionMesh
 from compas_fab.utilities import LazyLoader
@@ -84,10 +83,10 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         link = cached_robot_model.add_link(name, visual_meshes=[mesh], collision_meshes=[mesh])
         mass_urdf = Mass(mass)
         inertia_urdf = Inertia(*inertia)
-        inertial_origin_urdf = Origin(inertial_origin.point, inertial_origin.xaxis, inertial_origin.yaxis)
+        inertial_origin_urdf = Frame(inertial_origin.point, inertial_origin.xaxis, inertial_origin.yaxis)
         inertial_urdf = Inertial(inertial_origin_urdf, mass_urdf, inertia_urdf)
         link.inertial = inertial_urdf
-        collision_origin_urdf = Origin(collision_origin.point, collision_origin.xaxis, collision_origin.yaxis)
+        collision_origin_urdf = Frame(collision_origin.point, collision_origin.xaxis, collision_origin.yaxis)
         for element in itertools.chain(link.visual, link.collision):
             element.geometry.shape.filename = mesh_fp
             element.origin = collision_origin_urdf

@@ -21,7 +21,7 @@ it with Rhinoceros and Grasshopper it must be invoked through the
 Next Steps
 ==========
 
-* `Tutorial: COMPAS Robots <https://compas.dev/compas/1.17.9/tutorial/robots.html>`__
+* :doc:`Tutorial: COMPAS Robots <compas_robots:tutorial>`
 * :ref:`Examples: Description models <examples_description_models>`
 * :ref:`Examples: PyBullet Backend <examples_pybullet>`
 * :ref:`COMPAS FAB API Reference <reference>`
