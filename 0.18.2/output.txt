@@ -1,7 +1,0 @@
-contributing.rst:57: [redirected with Found] http://docs.pyinvoke.org/ to http://docs.pyinvoke.org/en/stable/
-getting_started.rst:13: [redirected with Found] https://conda.io/docs/ to https://conda.io/en/latest/
-examples\03_backends_ros\08_ros_create_moveit_package_from_custom_urdf.rst:215: [redirected with Found] https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/urdf_srdf/urdf_srdf_tutorial.html to https://docs.ros.org/en/kinetic/api/moveit_tutorials/html/doc/urdf_srdf/urdf_srdf_tutorial.html
-examples\03_backends_ros\08_ros_create_moveit_package_from_custom_urdf.rst:7: [redirected with Found] https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html to https://docs.ros.org/en/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html
-contributing.rst:54: [redirected permanently] https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests to https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests
-backends\pybullet.rst:9: [redirected permanently] https://pybullet.org/ to https://pybullet.org/wordpress/
-contributing.rst:74: [redirected with Found] https://www.sphinx-doc.org/ to https://www.sphinx-doc.org/en/master/
