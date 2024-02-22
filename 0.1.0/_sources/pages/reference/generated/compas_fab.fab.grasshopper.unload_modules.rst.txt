@@ -1,0 +1,6 @@
+unload_modules
+=========================================
+
+.. currentmodule:: compas_fab.fab.grasshopper
+
+.. autofunction:: unload_modules

@@ -1,0 +1,7 @@
+InputParameterParser
+=============================================================
+
+.. currentmodule:: compas_fab.fab.grasshopper.path_planning
+
+.. autoclass:: InputParameterParser
+   :members:

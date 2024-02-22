@@ -1,0 +1,12 @@
+contributing.rst:57: [redirected with Found] http://docs.pyinvoke.org/ to https://docs.pyinvoke.org/en/stable/
+api\generated\compas_fab.robots.Inertia.rst:28: [redirected permanently] http://gazebosim.org/tutorials?tut=inertia to https://classic.gazebosim.org/tutorials?tut=inertia
+api\compas_fab.backends.rst:29: [redirected permanently] http://pybullet.org/ to https://pybullet.org/wordpress/
+getting_started.rst:13: [redirected with Found] https://conda.io/docs/ to https://conda.io/en/latest/
+backends\ros.rst:143: [redirected permanently] https://docs.microsoft.com/en-us/windows/wsl/install-win10 to https://docs.microsoft.com/en-us/windows/wsl/install
+examples\03_backends_ros\08_ros_create_moveit_package_from_custom_urdf.rst:215: [redirected with Found] https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/urdf_srdf/urdf_srdf_tutorial.html to https://docs.ros.org/en/kinetic/api/moveit_tutorials/html/doc/urdf_srdf/urdf_srdf_tutorial.html
+examples\03_backends_ros\08_ros_create_moveit_package_from_custom_urdf.rst:7: [redirected with Found] https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html to https://docs.ros.org/en/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html
+contributing.rst:54: [redirected permanently] https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests to https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests
+backends.rst:40: [redirected permanently] https://hub.docker.com/editions/community/docker-ce-desktop-mac to https://docs.docker.com/desktop/mac/install/
+backends.rst:39: [redirected permanently] https://hub.docker.com/editions/community/docker-ce-desktop-windows to https://docs.docker.com/desktop/windows/install/
+backends\pybullet.rst:9: [redirected permanently] https://pybullet.org/ to https://pybullet.org/wordpress/
+contributing.rst:74: [redirected with Found] https://www.sphinx-doc.org/ to https://www.sphinx-doc.org/en/master/

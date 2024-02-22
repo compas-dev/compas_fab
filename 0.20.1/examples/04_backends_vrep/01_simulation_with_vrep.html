@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <title>compas_fab - 4.1. Simulation examples with V-REP</title>
+  
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <meta name="author" content="" />
+  <meta name="description" content="" />
+
+  <link rel="shortcut icon" href="../../_static/images/compas.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/default.min.css">
+  <link rel="stylesheet" type="text/css" href="../../_static/css/compas.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
+
+  
+    <link rel="next" title="5. Backends: PyBullet" href="../05_backends_pybullet.html" />
+  
+
+  
+    <link rel="prev" title="4. Backends: V-REP" href="../04_backends_vrep.html" />
+  
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body data-spy="scroll" data-target="#compas-toc">
+  <!-- header -->
+  <header id="header" class="compas-header d-flex align-items-center">
+    <nav class="navbar navbar-expand navbar-dark col flex-column flex-md-row text-center">
+      <!-- brand -->
+      <a class="navbar-brand" href="https://compas.dev/compas_fab/">
+        <img src="../../_static/images/compas_icon_white.png" alt="COMPAS FAB" width="48px" height="48px" />
+      </a>
+      <!-- brand -->
+      <!-- primary -->
+      <ul class="navbar-nav">
+        <li class="nav-item active"><a class="nav-link" href="https://compas.dev/compas_fab/">COMPAS FAB</a></li>
+      </ul>
+      <!-- primary -->
+      <ul class="navbar-nav d-none d-md-flex ml-md-auto">
+        <!-- version -->
+        
+        <meta id="doc_versions" data-url="https://compas.dev/compas_fab/doc_versions.txt" data-docs="https://compas.dev/compas_fab/">
+        <li class="nav-item nav-versions dropdown">
+          <a class="nav-item nav-link dropdown-toggle mr-md-2" href="#" id="bd-versions" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            0.20.1
+          </a>
+          <div id="doc_version_list" class="dropdown-menu dropdown-menu-md-right" aria-labelledby="bd-versions"></div>
+        </li>
+        
+        <!-- version -->
+        <!-- social -->
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/compas-dev/compas_fab" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+        </li>
+        <!-- social -->
+      </ul>
+    </nav>
+  </header>
+  <!-- header -->
+  <!-- main -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- main -->
+      <main class="col-12 col-md-9 col-xl-7 px-2 px-md-5 pt-2 pb-5 compas-content" role="main">
+        
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-3 bg-white px-0">
+            <li class="breadcrumb-item"><a href="../../index.html">docs</a></li>
+            
+              <li class="breadcrumb-item"><a href="../../examples.html">Examples</a></li>
+            
+              <li class="breadcrumb-item"><a href="../04_backends_vrep.html"><span class="section-number">4. </span>Backends: V-REP</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page"><span class="section-number">4.1. </span>Simulation examples with V-REP</li>
+          </ol>
+        </nav>
+        
+
+        
+        
+        <section id="simulation-examples-with-v-rep">
+<h1><span class="section-number">4.1. </span>Simulation examples with V-REP</h1>
+<p>The following examples demonstrate the <a class="reference external" href="https://www.coppeliarobotics.com/">V-REP</a>
+simulation backend. They are based on a sample scene of the Robotic Fabrication
+Lab (RFL).</p>
+<p>Before running them, make sure you have configured the
+<a class="reference internal" href="../../backends/vrep.html#vrep-backend"><span class="std std-ref">V-REP backend</span></a> correctly.</p>
+<section id="first-step">
+<h2><span class="section-number">4.1.1. </span>First step</h2>
+<p>The first step is just connect to the simulator and verify the connection
+is working.</p>
+<p>Copy and paste the following example into any Python environment
+(a standalone script, a CAD environment, etc) and run it, you should
+see the output <code class="docutils literal notranslate"><span class="pre">Connected:</span> <span class="pre">True</span></code> if everything is working properly:</p>
+<div class="language-python notranslate"><div class="highlight"><pre><code><span></span><span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">VrepClient</span>
+
+<span class="k">with</span> <span class="n">VrepClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Connected: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">client</span><span class="o">.</span><span class="n">is_connected</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</section>
+<section id="forward-kinematics">
+<h2><span class="section-number">4.1.2. </span>Forward Kinematics</h2>
+<section id="moving-robots">
+<h3><span class="section-number">4.1.2.1. </span>Moving robots</h3>
+<p>The RFL scene used on these examples has 4 robots that can be
+referenced by the identifiers: <code class="docutils literal notranslate"><span class="pre">A</span></code>, <code class="docutils literal notranslate"><span class="pre">B</span></code>, <code class="docutils literal notranslate"><span class="pre">C</span></code> and <code class="docutils literal notranslate"><span class="pre">D</span></code>.</p>
+<figure class="figure align-default">
+<img alt="../../_images/01_rfl.png" class="figure-img img-fluid" src="../../_images/01_rfl.png" />
+</figure>
+<p>When planning on a multi-robotic cell, it’s important to make sure all robots
+on the cell are positioned correctly and not colliding with each other
+at start, otherwise path planning will fail.</p>
+<p>The state of a robot is specified as an instance of
+<code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.robots.Configuration</span></code>.</p>
+<p>Here’s a simple example on how to position two of the robots using
+forward kinematics:</p>
+<div class="language-python notranslate"><div class="highlight"><pre><code><span></span><span class="kn">from</span> <span class="nn">compas.robots</span> <span class="kn">import</span> <span class="n">Configuration</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">rfl</span>
+<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">VrepClient</span>
+
+<span class="n">config_robot_a</span>    <span class="o">=</span> <span class="n">Configuration</span><span class="o">.</span><span class="n">from_prismatic_and_revolute_values</span><span class="p">([</span><span class="mf">8.260</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.000</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.690</span><span class="p">],</span>
+                                                                     <span class="n">to_radians</span><span class="p">([</span><span class="mi">190</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+
+<span class="n">config_robot_b</span>    <span class="o">=</span> <span class="n">Configuration</span><span class="o">.</span><span class="n">from_prismatic_and_revolute_values</span><span class="p">([</span><span class="mf">8.260</span><span class="p">,</span> <span class="o">-</span><span class="mf">8.320</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.690</span><span class="p">],</span>
+                                                                     <span class="n">to_radians</span><span class="p">([</span><span class="mi">190</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+
+<span class="k">with</span> <span class="n">VrepClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="n">robot_a</span> <span class="o">=</span> <span class="n">rfl</span><span class="o">.</span><span class="n">Robot</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span>
+    <span class="n">robot_b</span> <span class="o">=</span> <span class="n">rfl</span><span class="o">.</span><span class="n">Robot</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">)</span>
+    <span class="n">client</span><span class="o">.</span><span class="n">set_robot_config</span><span class="p">(</span><span class="n">robot_a</span><span class="p">,</span> <span class="n">config_robot_a</span><span class="p">)</span>
+    <span class="n">client</span><span class="o">.</span><span class="n">set_robot_config</span><span class="p">(</span><span class="n">robot_b</span><span class="p">,</span> <span class="n">config_robot_b</span><span class="p">)</span>
+    <span class="n">group_a</span> <span class="o">=</span> <span class="n">robot_a</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">attr</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span>
+    <span class="n">group_b</span> <span class="o">=</span> <span class="n">robot_b</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">attr</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span>
+
+    <span class="n">frame_a</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">forward_kinematics</span><span class="p">(</span><span class="n">robot_a</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group_a</span><span class="p">)</span>
+    <span class="n">frame_b</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">forward_kinematics</span><span class="p">(</span><span class="n">robot_b</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group_b</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;End effector poses: &#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">frame_a</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">frame_b</span><span class="p">))</span>
+</code></pre></div>
+</div>
+</section>
+</section>
+<section id="inverse-kinematics">
+<h2><span class="section-number">4.1.3. </span>Inverse Kinematics</h2>
+<p>When the configuration required to reach a certain frame with a robot is not
+know, we use inverse kinematics to resolve it and find a suitable pose.
+The following example shows how to calculate this. In this case, it will
+take collisions into account, but does not find a path to the goal pose, only
+that there is at least one valid configuration to reach the goal pose.</p>
+<div class="language-python notranslate"><div class="highlight"><pre><code><span></span><span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Frame</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">rfl</span>
+<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">VrepClient</span>
+
+<span class="n">goal_pose</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">((</span><span class="mf">8.110</span><span class="p">,</span> <span class="mf">7.020</span><span class="p">,</span> <span class="mf">1.810</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="k">with</span> <span class="n">VrepClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="n">robot</span> <span class="o">=</span> <span class="n">rfl</span><span class="o">.</span><span class="n">Robot</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">)</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">attr</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;num_joints&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">get_configurable_joints</span><span class="p">()),</span>
+    <span class="p">}</span>
+    <span class="n">configs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">inverse_kinematics</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">goal_pose</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">))</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">configs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;No IK solution found&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found valid configuration: &#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">configs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+</code></pre></div>
+</div>
+</section>
+<section id="path-planning">
+<h2><span class="section-number">4.1.4. </span>Path planning</h2>
+<p>Calculating a path plan requires several parameters to be configured in order
+to start the process. In its minimal expression, a path planning request must
+define a start configuration and a goal pose and rely on defaults for the rest.</p>
+<p>Here is an example of such a request:</p>
+<div class="language-python notranslate"><div class="highlight"><pre><code><span></span><span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Frame</span>
+<span class="kn">from</span> <span class="nn">compas.robots</span> <span class="kn">import</span> <span class="n">Configuration</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">rfl</span>
+<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">VrepClient</span>
+
+<span class="n">start_config</span>    <span class="o">=</span> <span class="n">Configuration</span><span class="o">.</span><span class="n">from_prismatic_and_revolute_values</span><span class="p">([</span><span class="mf">8.260</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.320</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.690</span><span class="p">],</span>
+                                                                   <span class="n">to_radians</span><span class="p">([</span><span class="o">-</span><span class="mi">143</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="o">-</span><span class="mi">112</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="o">-</span><span class="mi">126</span><span class="p">]))</span>
+<span class="n">goal_pose</span>       <span class="o">=</span> <span class="n">Frame</span><span class="p">((</span><span class="mf">8.110</span><span class="p">,</span> <span class="mf">7.020</span><span class="p">,</span> <span class="mf">1.810</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="k">with</span> <span class="n">VrepClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="n">robot</span> <span class="o">=</span> <span class="n">rfl</span><span class="o">.</span><span class="n">Robot</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">)</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">attr</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span>
+    <span class="n">client</span><span class="o">.</span><span class="n">set_robot_config</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">start_config</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">plan_motion</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">goal_pose</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found path of </span><span class="si">%d</span><span class="s1"> steps&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+</code></pre></div>
+</div>
+<p>A more elaborate request takes several additional parameters to control the planning process:</p>
+<div class="language-python notranslate"><div class="highlight"><pre><code><span></span><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">compas.datastructures</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Frame</span>
+
+<span class="kn">import</span> <span class="nn">compas_fab</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">rfl</span>
+<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">VrepClient</span>
+
+<span class="c1"># Configure logging to DEBUG to see detailed timing of the path planning</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+<span class="c1"># Configure parameters for path planning</span>
+<span class="n">start_pose</span>      <span class="o">=</span> <span class="n">Frame</span><span class="p">((</span><span class="mf">7.453</span><span class="p">,</span> <span class="mf">2.905</span><span class="p">,</span> <span class="mf">0.679</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">goal_pose</span>       <span class="o">=</span> <span class="n">Frame</span><span class="p">((</span><span class="mf">5.510</span><span class="p">,</span> <span class="mf">5.900</span><span class="p">,</span> <span class="mf">1.810</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">planner_id</span>      <span class="o">=</span> <span class="s1">&#39;rrtconnect&#39;</span>
+<span class="n">max_trials</span>      <span class="o">=</span> <span class="mi">1</span>
+<span class="n">resolution</span>      <span class="o">=</span> <span class="mf">0.02</span>
+<span class="n">building_member</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_obj</span><span class="p">(</span><span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;planning_scene/timber_beam.obj&#39;</span><span class="p">))</span>
+<span class="n">structure</span>       <span class="o">=</span> <span class="p">[</span><span class="n">Mesh</span><span class="o">.</span><span class="n">from_obj</span><span class="p">(</span><span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;planning_scene/timber_structure.obj&#39;</span><span class="p">))]</span>
+<span class="n">metric</span>          <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">9</span>
+<span class="n">fast_search</span>     <span class="o">=</span> <span class="kc">True</span>
+
+<span class="k">with</span> <span class="n">VrepClient</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="n">robot</span> <span class="o">=</span> <span class="n">rfl</span><span class="o">.</span><span class="n">Robot</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">)</span>
+    <span class="n">client</span><span class="o">.</span><span class="n">planner</span><span class="o">.</span><span class="n">pick_building_member</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">building_member</span><span class="p">,</span> <span class="n">start_pose</span><span class="p">)</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">attr</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">plan_motion</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span>
+                              <span class="n">goal_pose</span><span class="p">,</span>
+                              <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span>
+                              <span class="n">options</span><span class="o">=</span><span class="p">{</span>
+                                  <span class="s1">&#39;metric_values&#39;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
+                                  <span class="s1">&#39;collision_meshes&#39;</span><span class="p">:</span> <span class="n">structure</span><span class="p">,</span>
+                                  <span class="s1">&#39;planner_id&#39;</span><span class="p">:</span> <span class="n">planner_id</span><span class="p">,</span>
+                                  <span class="s1">&#39;trials&#39;</span><span class="p">:</span> <span class="n">max_trials</span><span class="p">,</span>
+                                  <span class="s1">&#39;resolution&#39;</span><span class="p">:</span> <span class="n">resolution</span><span class="p">,</span>
+                                  <span class="s1">&#39;shallow_state_search&#39;</span><span class="p">:</span> <span class="n">fast_search</span><span class="p">,</span>
+                              <span class="p">})</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found path of </span><span class="si">%d</span><span class="s1"> steps&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Path should not be empty&#39;</span>
+</code></pre></div>
+</div>
+<div class="card bg-light">
+<div class="card-body">
+<div class="card-title">Downloads</div><ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../_downloads/7a2788e7b3cd6f08e5ad4010f70e3a6e/01_complete_path_planning_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Path</span> <span class="pre">planning</span> <span class="pre">example</span> <span class="pre">(.PY)</span></code></a></p></li>
+</ul>
+</div>
+</div></section>
+<section id="grasshopper-integration">
+<h2><span class="section-number">4.1.5. </span>Grasshopper integration</h2>
+<figure class="figure align-default">
+<img alt="../../_images/01_grasshopper.png" class="figure-img img-fluid" src="../../_images/01_grasshopper.png" />
+</figure>
+<p>Besides the examples above that can be run standalone or inside CAD software,
+this package contains a ready-made integration for Grasshopper that allows
+configuration of most available parameters.</p>
+<div class="card bg-light">
+<div class="card-body">
+<div class="card-title">Downloads</div><ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../_downloads/b7e0bff9702a9afc8768d4d6ba208f48/01_grasshopper_basic_example.ghx"><code class="xref download docutils literal notranslate"><span class="pre">Basic</span> <span class="pre">path</span> <span class="pre">planning</span> <span class="pre">example</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="../../_downloads/8f1ca0b32b981b2c4a5d01c5c17e31cb/01_grasshopper_path_planner.ghx"><code class="xref download docutils literal notranslate"><span class="pre">Complete</span> <span class="pre">path</span> <span class="pre">planning</span> <span class="pre">example</span></code></a>.</p></li>
+</ul>
+</div>
+</div></section>
+</section>
+
+        
+      </main>
+      <!-- content -->
+      <!-- sidebar -->
+      <div class="col-12 col-md-3 compas-sidebar" role="navigation">
+        <form id="search" class="d-flex align-items-center compas-searchbox" action="../../search.html" method="get">
+          <input class="form-control" type="text" name="q" placeholder="Search docs" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+          <button class="navbar-toggler d-md-none" type="button" data-toggle="collapse" data-target="#compas-navigation" aria-controls="compas-navigation" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </form>
+        
+        
+          <div id="compas-navigation" class="collapse compas-navigation">
+          <ul class="nav flex-column active">
+<li class="nav-item"><a class="nav-link reference internal" href="../../overview.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../backends.html">Working with backends</a></li>
+<li class="nav-item active"><a class="nav-link reference internal" href="../../examples.html">Examples</a><ul class="nav flex-column active">
+<li class="nav-item"><a class="nav-link reference internal" href="../01_fundamentals.html">1. Fundamentals</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../02_description_models.html">2. Description Models</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../03_backends_ros.html">3. Backends: ROS</a></li>
+<li class="nav-item active"><a class="nav-link reference internal" href="../04_backends_vrep.html">4. Backends: V-REP</a><ul class="nav flex-column active">
+<li class="nav-item active"><a class="nav-link active current reference internal" href="#">4.1. Simulation examples with V-REP</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link reference internal" href="../05_backends_pybullet.html">5. Backends: PyBullet</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../reference.html">API Reference</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../contributing.html">Contributor’s Guide</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../authors.html">Citing</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../license.html">License</a></li>
+</ul>
+
+          </div>
+        
+      </div>
+      <!-- sidebar -->
+      <!-- toc -->
+      <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
+        
+        <ul class="nav flex-column" id="compas-toc">
+<li class="nav-item"><a class="nav-link reference internal" href="#">4.1. Simulation examples with V-REP</a><ul class="nav flex-column">
+<li class="nav-item"><a class="nav-link reference internal" href="#first-step">4.1.1. First step</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#forward-kinematics">4.1.2. Forward Kinematics</a><ul class="nav flex-column">
+<li class="nav-item"><a class="nav-link reference internal" href="#moving-robots">4.1.2.1. Moving robots</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link reference internal" href="#inverse-kinematics">4.1.3. Inverse Kinematics</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#path-planning">4.1.4. Path planning</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#grasshopper-integration">4.1.5. Grasshopper integration</a></li>
+</ul>
+</li>
+</ul>
+
+      </div>
+      <!-- toc -->
+    </div>
+  </div>
+  <!-- main -->
+  <!-- footer -->
+  <footer class="compas-footer">
+    <nav class="nav p-2">
+      
+        <a href="../04_backends_vrep.html" title="<span class="section-number">4. </span>Backends: V-REP" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+          <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
+          <div class="nav-title flex-grow-1 align-self-center">
+            <div class="nav-direction small font-weight-light">Previous</div>
+            <span class="section-number">4. </span>Backends: V-REP
+          </div>
+        </a>
+      
+
+      
+        <a href="../05_backends_pybullet.html" title="<span class="section-number">5. </span>Backends: PyBullet" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+          <div class="nav-title footer-link flex-grow-1 align-self-center">
+            <div class="nav-direction small font-weight-light">Next</div>
+            <span class="section-number">5. </span>Backends: PyBullet
+          </div>
+          <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
+        </a>
+      
+    </nav>  
+  </footer>
+  <!-- footer -->
+  <!-- below -->
+  <div class="below py-5" style="background-color: #222;">
+    <div class="container">
+      <div class="row flex-column">
+      <div class="col-12 col-md-6 mx-md-auto text-center">
+        <h4 class="pb-3 below-text">COMPAS</h4>
+        <p class="below-text">
+          A computational framework for collaboration and research
+          in Architecture, Engineering, Fabrication, and Construction.
+        </p>
+        <nav class="nav justify-content-center pb-3">
+          <a class="nav-link mx-2 px-0 below-link" href="http://github.com/compas-dev" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+          <a class="nav-link mx-2 px-0 below-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+          <a class="nav-link mx-2 px-0 below-link" href="https://pypi.org/project/COMPAS/" target="_blank">
+            <span class="fab fa-python fa-1x"></span>
+          </a>
+        </nav>
+      </div>
+      </div>
+      <div class="row">
+      <div class="col text-center">
+        <p class="p-0 m-0 below-text">Copyright &copy; 2017-2021 compas-dev</p>
+      </div>
+      </div>
+    </div>
+  </div>
+  <!-- below -->
+  <!-- scripts -->
+  <script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+  URL_ROOT          : '',
+  VERSION           : '0.20.1',
+  COLLAPSE_INDEX    : false,
+  FILE_SUFFIX       : '.html',
+  HAS_SOURCE        : 'false',
+  SOURCELINK_SUFFIX : '.txt'
+  };
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https:////cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.0.0/anchor.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+
+  <script src="../../_static/underscore.js"></script>
+  <script src="../../_static/doctools.js"></script>
+  <script src="../../_static/js/searchtools_.js"></script>
+
+  <script>
+  $(document).ready(function() {
+    $(".language-default code").addClass("python");
+    $(".language-python code").addClass("python");
+    $(".language-bash code").addClass("bash");
+    $(".language-cpp code").addClass("cpp");
+    $(".language-json code").addClass("json");
+    $(".language-none code").addClass("plaintext");
+
+    hljs.initHighlighting();
+    anchors.add();
+
+  });
+
+
+  var url = $("#doc_versions").data("url");
+  var docs_site = $("#doc_versions").data("docs");
+
+  if (url) {
+    $.get(url, res=>{
+      var lines = res.match(/[^\r\n]+/g);
+      lines.forEach(version => {
+        $("#doc_version_list").append("<a class=\"dropdown-item\" href=\""+ docs_site + version + "\">" + version + "</a>");
+      });
+
+      var selected_version = $('.nav-versions .dropdown-item').filter(function(i, ver) {
+        return window.location.href.startsWith(ver.href);
+      });
+      selected_version.addClass('active');
+      $("#bd-versions").text(selected_version.text());
+
+    })
+  }
+  </script>
+  <!-- scripts -->
+  
+  
+</body>
+</html>

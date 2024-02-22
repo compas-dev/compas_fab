@@ -1,0 +1,60 @@
+version: '2'
+services:
+  ros-master:
+    image: gramaziokohler/ros-base:19.11
+    container_name: ros-master
+    ports:
+      - "11311:11311"
+    command:
+      - roscore
+
+  ros-bridge:
+    image: gramaziokohler/ros-ur-planner:19.11
+    container_name: ros-bridge
+    environment:
+      - "ROS_HOSTNAME=ros-bridge"
+      - "ROS_MASTER_URI=http://ros-master:11311"
+    ports:
+      - "9090:9090"
+    depends_on:
+      - ros-master
+    command:
+      - roslaunch
+      - --wait
+      - rosbridge_server
+      - rosbridge_websocket.launch
+
+  ros-fileserver:
+    image: gramaziokohler/ros-ur-planner:19.11
+    container_name: ros-fileserver
+    environment:
+      - ROS_HOSTNAME=ros-fileserver
+      - ROS_MASTER_URI=http://ros-master:11311
+    depends_on:
+      - ros-master
+    command:
+      - roslaunch
+      - --wait
+      - file_server
+      - file_server.launch
+
+  ur-demo:
+    image: gramaziokohler/ros-ur-planner:19.11
+    container_name: ur-demo
+    environment:
+      - ROS_HOSTNAME=ur-demo
+      - ROS_MASTER_URI=http://ros-master:11311
+      - DISPLAY=gui:0.0
+    depends_on:
+      - ros-master
+      - gui
+    command:
+      - roslaunch
+      - --wait
+      - ur5_moveit_config
+      - demo.launch
+
+  gui:
+    image: gramaziokohler/novnc:latest
+    ports:
+      - "8080:8080"

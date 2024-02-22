@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <title>compas_fab - compas_fab.backends</title>
+  
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <meta name="author" content="{{ cookiecutter.author_name }}" />
+  <meta name="description" content="" />
+
+  <link rel="shortcut icon" href="../_static/images/compas.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/mono-blue.min.css">
+  <link rel="stylesheet" type="text/css" href="../_static/css/compas.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/compas-reference.css" />
+
+  
+  <link rel="next" title="RosClient" href="generated/compas_fab.backends.RosClient.html" />
+  
+
+  
+  <link rel="prev" title="to_radians" href="generated/compas_fab.robots.to_radians.html" />
+  
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body data-spy="scroll" data-target="#compas-toc">
+  <!-- header -->
+  <header id="header" class="compas-header d-flex align-items-center">
+    <nav class="navbar navbar-expand navbar-dark col flex-column flex-md-row text-center">
+      <!-- brand -->
+      <a class="navbar-brand" href="https://compas.dev/compas_fab/">
+        <img src="../_static/images/compas_icon_white.png" alt="COMPAS FAB" width="48px" height="48px" />
+      </a>
+      <!-- brand -->
+      <!-- primary -->
+      <ul class="navbar-nav">
+        <li class="nav-item active"><a class="nav-link" href="https://compas.dev/compas_fab/">COMPAS FAB</a></li>
+      </ul>
+      <!-- primary -->
+      <ul class="navbar-nav d-none d-md-flex ml-md-auto">
+        <!-- version -->
+        
+        <meta id="doc_versions" data-url="https://compas.dev/compas_fab/doc_versions.txt" data-docs="https://compas.dev/compas_fab/">
+        <li class="nav-item nav-versions dropdown">
+          <a class="nav-item nav-link dropdown-toggle mr-md-2" href="#" id="bd-versions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            0.25.0
+          </a>
+          <div id="doc_version_list" class="dropdown-menu dropdown-menu-md-right" aria-labelledby="bd-versions"></div>
+        </li>
+        
+        <!-- version -->
+        <!-- social -->
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/compas-dev/compas_fab" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+        </li>
+        <!-- social -->
+      </ul>
+    </nav>
+  </header>
+  <!-- header -->
+  <!-- main -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- main -->
+      <main class="col-12 col-md-9 col-xl-7 px-4 px-md-5 pt-2 pb-5 compas-content" role="main">
+        
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-3 bg-white px-0">
+            <li class="breadcrumb-item"><a href="../index.html">COMPAS FAB</a></li>
+            
+            <li class="breadcrumb-item"><a href="../api.html">API Reference</a></li>
+            
+            <li class="breadcrumb-item"><a href="compas_fab.html">compas_fab</a></li>
+            
+            <!-- <li class="breadcrumb-item active" aria-current="page">compas_fab.backends</li> -->
+          </ol>
+        </nav>
+        
+
+        
+        
+        <span class="target" id="module-compas_fab.backends"></span><section id="compas-fab-backends">
+<h1>compas_fab.backends</h1>
+<p>This package contains classes backends for simulation, planning and execution.</p>
+<section id="ros">
+<h2>ROS</h2>
+<p>Classes to interact with <a class="reference external" href="https://ros.org/">ROS</a> and the <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> planning
+framework.</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.RosClient.html#compas_fab.backends.RosClient" title="compas_fab.backends.RosClient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RosClient</span></code></a></p></td>
+<td><p>Interface to use ROS as backend via the <strong>rosbridge</strong>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.RosFileServerLoader.html#compas_fab.backends.RosFileServerLoader" title="compas_fab.backends.RosFileServerLoader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RosFileServerLoader</span></code></a></p></td>
+<td><p>Allows to retrieve the mesh files specified in the robot model from the ROS File Server.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.MoveItPlanner.html#compas_fab.backends.MoveItPlanner" title="compas_fab.backends.MoveItPlanner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItPlanner</span></code></a></p></td>
+<td><p>Implement the planner backend interface based on MoveIt!</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.RosError.html#compas_fab.backends.RosError" title="compas_fab.backends.RosError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RosError</span></code></a></p></td>
+<td><p>Wraps an exception that occurred on the communication with ROS.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.RosValidationError.html#compas_fab.backends.RosValidationError" title="compas_fab.backends.RosValidationError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RosValidationError</span></code></a></p></td>
+<td><p>Wraps an exception that occurred on validation of a ROS response.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="pybullet">
+<h2>PyBullet</h2>
+<p>Classes to interact with <a class="reference external" href="http://pybullet.org/">PyBullet</a>.</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.PyBulletClient.html#compas_fab.backends.PyBulletClient" title="compas_fab.backends.PyBulletClient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletClient</span></code></a></p></td>
+<td><p>Interface to use pybullet as backend.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.PyBulletPlanner.html#compas_fab.backends.PyBulletPlanner" title="compas_fab.backends.PyBulletPlanner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletPlanner</span></code></a></p></td>
+<td><p>Implement the planner backend interface for PyBullet.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.PyBulletError.html#compas_fab.backends.PyBulletError" title="compas_fab.backends.PyBulletError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletError</span></code></a></p></td>
+<td><p>Base case for exceptions in <code class="docutils literal notranslate"><span class="pre">compas_fab.backends.pybullet</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.CollisionError.html#compas_fab.backends.CollisionError" title="compas_fab.backends.CollisionError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CollisionError</span></code></a></p></td>
+<td><p>Exception raised when two objects have been found to be in collision in PyBullet.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="v-rep">
+<h2>V-REP</h2>
+<p>Classes to interact with <a class="reference external" href="https://www.coppeliarobotics.com/">V-REP</a>.</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.VrepClient.html#compas_fab.backends.VrepClient" title="compas_fab.backends.VrepClient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VrepClient</span></code></a></p></td>
+<td><p>Interface to run simulations using VREP as the engine for kinematics and path planning.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.VrepPlanner.html#compas_fab.backends.VrepPlanner" title="compas_fab.backends.VrepPlanner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VrepPlanner</span></code></a></p></td>
+<td><p>Implement the planner backend interface for V-REP.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.VrepError.html#compas_fab.backends.VrepError" title="compas_fab.backends.VrepError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VrepError</span></code></a></p></td>
+<td><p>Wraps an exception that occurred inside the simulation engine.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="analytical-kinematics">
+<h2>Analytical Kinematics</h2>
+<p>Pure-python implementation of analytic IK solvers.</p>
+<section id="ik-solvers">
+<h3>IK solvers</h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.AnalyticalInverseKinematics.html#compas_fab.backends.AnalyticalInverseKinematics" title="compas_fab.backends.AnalyticalInverseKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnalyticalInverseKinematics</span></code></a></p></td>
+<td><p>Callable to calculate the robot's inverse kinematics for a given frame.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.AnalyticalPlanCartesianMotion.html#compas_fab.backends.AnalyticalPlanCartesianMotion" title="compas_fab.backends.AnalyticalPlanCartesianMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnalyticalPlanCartesianMotion</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.OffsetWristKinematics.html#compas_fab.backends.OffsetWristKinematics" title="compas_fab.backends.OffsetWristKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OffsetWristKinematics</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.SphericalWristKinematics.html#compas_fab.backends.SphericalWristKinematics" title="compas_fab.backends.SphericalWristKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SphericalWristKinematics</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.AnalyticalPyBulletClient.html#compas_fab.backends.AnalyticalPyBulletClient" title="compas_fab.backends.AnalyticalPyBulletClient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnalyticalPyBulletClient</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="robot-specific-kinematics">
+<h3>Robot-specific kinematics</h3>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.UR3Kinematics.html#compas_fab.backends.UR3Kinematics" title="compas_fab.backends.UR3Kinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UR3Kinematics</span></code></a></p></td>
+<td><p>Analytical IK solver for UR3 robots.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.UR3eKinematics.html#compas_fab.backends.UR3eKinematics" title="compas_fab.backends.UR3eKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UR3eKinematics</span></code></a></p></td>
+<td><p>Analytical IK solver for UR3 e-Series robots.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.UR5Kinematics.html#compas_fab.backends.UR5Kinematics" title="compas_fab.backends.UR5Kinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UR5Kinematics</span></code></a></p></td>
+<td><p>Analytical IK solver for UR5 robots.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.UR5eKinematics.html#compas_fab.backends.UR5eKinematics" title="compas_fab.backends.UR5eKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UR5eKinematics</span></code></a></p></td>
+<td><p>Analytical IK solver for UR5 e-Series robots.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.UR10Kinematics.html#compas_fab.backends.UR10Kinematics" title="compas_fab.backends.UR10Kinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UR10Kinematics</span></code></a></p></td>
+<td><p>Analytical IK solver for UR10 e-Series robots.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.UR10eKinematics.html#compas_fab.backends.UR10eKinematics" title="compas_fab.backends.UR10eKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UR10eKinematics</span></code></a></p></td>
+<td><p>Analytical IK solver for UR10 e-Series robots.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.Staubli_TX260LKinematics.html#compas_fab.backends.Staubli_TX260LKinematics" title="compas_fab.backends.Staubli_TX260LKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Staubli_TX260LKinematics</span></code></a></p></td>
+<td><p>Analytical IK solver for the Stäubli TX2 60L robot.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.ABB_IRB4600_40_255Kinematics.html#compas_fab.backends.ABB_IRB4600_40_255Kinematics" title="compas_fab.backends.ABB_IRB4600_40_255Kinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ABB_IRB4600_40_255Kinematics</span></code></a></p></td>
+<td><p>Analytical IK solver for the ABB IRB4600 40/255 robot.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="long-running-tasks">
+<h2>Long-running tasks</h2>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.FutureResult.html#compas_fab.backends.FutureResult" title="compas_fab.backends.FutureResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FutureResult</span></code></a></p></td>
+<td><p>Represents a future result value.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.CancellableFutureResult.html#compas_fab.backends.CancellableFutureResult" title="compas_fab.backends.CancellableFutureResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CancellableFutureResult</span></code></a></p></td>
+<td><p>Represents a future result of a long-running asynchronous operation that can be cancelled.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="exceptions">
+<h2>Exceptions</h2>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.BackendError.html#compas_fab.backends.BackendError" title="compas_fab.backends.BackendError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackendError</span></code></a></p></td>
+<td><p>Indicates an exceptional state that caused an error within the backend engine.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.CartesianMotionError.html#compas_fab.backends.CartesianMotionError" title="compas_fab.backends.CartesianMotionError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CartesianMotionError</span></code></a></p></td>
+<td><p>Exception raised when no path can be found.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.KinematicsError.html#compas_fab.backends.KinematicsError" title="compas_fab.backends.KinematicsError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KinematicsError</span></code></a></p></td>
+<td><p>Indicates a kinematic solver exception.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.InverseKinematicsError.html#compas_fab.backends.InverseKinematicsError" title="compas_fab.backends.InverseKinematicsError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InverseKinematicsError</span></code></a></p></td>
+<td><p>Indicates that no IK solution could be found by the kinematic solver.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="interfaces">
+<h2>Interfaces</h2>
+<p>For details about integrating new backends, check
+the <a class="reference internal" href="../developer/backends.html#architecture"><span class="std std-ref">Backend clients</span></a> documentation.</p>
+</section>
+</section>
+
+        
+      </main>
+      <!-- content -->
+      <!-- sidebar -->
+      <div class="col-12 col-md-3 compas-sidebar" role="navigation">
+        <form id="search" class="d-flex align-items-center compas-searchbox" action="../search.html" method="get">
+          <input class="form-control" type="text" name="q" placeholder="Search docs" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+          <button class="navbar-toggler d-md-none" type="button" data-toggle="collapse" data-target="#compas-navigation" aria-controls="compas-navigation" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </form>
+        
+        
+        <div id="compas-navigation" class="collapse compas-navigation">
+          <ul class="nav flex-column collapse show active">
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../index.html">Introduction</a></li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../backends.html">Working with backends</a><ul class="nav flex-column collapse">
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../backends/pybullet.html">PyBullet</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../backends/ros.html">ROS</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../backends/vrep.html">V-REP</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../backends/web_x11_gui.html">Access backend GUI</a></li>
+</ul>
+</li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../examples.html">Examples</a><ul class="nav flex-column collapse">
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../examples/01_fundamentals.html">Fundamentals</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/01_fundamentals/01_frame_and_transformation.html">Frame and Transformation</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/01_fundamentals/02_coordinate_frames.html">Coordinate frames</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../examples/02_description_models.html">Description Models</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/02_description_models/01_kinematic_model.html">Kinematic model</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/02_description_models/02_robot.html">Robot models</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../examples/03_backends_ros.html">Backends: ROS</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/03_backends_ros/01_ros_examples.html">Using ROS</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/03_backends_ros/02_robot_models.html">Robots in ROS</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/03_backends_ros/03_forward_and_inverse_kinematics.html">Forward and inverse kinematics</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/03_backends_ros/04_plan_motion.html">Plan motion</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/03_backends_ros/05_collision_objects.html">Planning scene and collision objects</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/03_backends_ros/06_ros_in_grasshopper.html">ROS in Grasshopper</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/03_backends_ros/07_ros_create_urdf_ur5_with_measurement_tool.html">Creating a URDF with an UR5 robot and a custom end-effector</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/03_backends_ros/08_ros_create_moveit_package_from_custom_urdf.html">Creating a MoveIt! package from the custom created URDF</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/03_backends_ros/09_ros_create_urdf_ur10_on_tower.html">Creating a URDF of the UR10 on two linear axes</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../examples/04_backends_vrep.html">Backends: V-REP</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/04_backends_vrep/01_simulation_with_vrep.html">Simulation examples with V-REP</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../examples/05_backends_pybullet.html">Backends: PyBullet</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/05_backends_pybullet/01_pybullet_examples.html">Using PyBullet</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/05_backends_pybullet/02_forward_and_inverse_kinematics.html">Forward and inverse kinematics</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../examples/06_backends_kinematics.html">Backends: Analytical Kinematics</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/06_backends_kinematics/01_ik_and_cartesian.html">Analytical kinematics</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../examples/07_reachability_map.html">Planning: Reachability Map</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/07_reachability_map/01_reachability_map.html">Introduction to the Reachability Map</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/07_reachability_map/02_vector_generators.html">Vector Generators</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../examples/07_reachability_map/03_rp_2D.html">Reachability Map 2D</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 nav-item active"><a class="nav-link reference internal" href="../api.html">API Reference</a><ul class="nav flex-column collapse show active">
+<li class="toctree-l2 nav-item active"><a class="nav-link reference internal" href="compas_fab.html">compas_fab</a><ul class="nav flex-column collapse show active">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_fab.robots.html">compas_fab.robots</a></li>
+<li class="toctree-l3 nav-item active"><a class="nav-link active reference internal" href="#">compas_fab.backends</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_fab.blender.html">compas_fab.blender</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_fab.ghpython.html">compas_fab.ghpython</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_fab.rhino.html">compas_fab.rhino</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_fab.sensors.html">compas_fab.sensors</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="compas_fab.utilities.html">compas_fab.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../contributing.html">Contributor’s Guide</a><ul class="nav flex-column collapse">
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../developer/backends.html">Backend clients</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../developer/generated/compas_fab.backends.interfaces.ClientInterface.html">ClientInterface</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../developer/generated/compas_fab.backends.interfaces.PlannerInterface.html">PlannerInterface</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../developer/generated/compas_fab.backends.interfaces.ForwardKinematics.html">ForwardKinematics</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../developer/generated/compas_fab.backends.interfaces.InverseKinematics.html">InverseKinematics</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../developer/generated/compas_fab.backends.interfaces.PlanMotion.html">PlanMotion</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../developer/generated/compas_fab.backends.interfaces.PlanCartesianMotion.html">PlanCartesianMotion</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../developer/generated/compas_fab.backends.interfaces.GetPlanningScene.html">GetPlanningScene</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../developer/generated/compas_fab.backends.interfaces.AddCollisionMesh.html">AddCollisionMesh</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../developer/generated/compas_fab.backends.interfaces.AppendCollisionMesh.html">AppendCollisionMesh</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../developer/generated/compas_fab.backends.interfaces.RemoveCollisionMesh.html">RemoveCollisionMesh</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../developer/generated/compas_fab.backends.interfaces.AddAttachedCollisionMesh.html">AddAttachedCollisionMesh</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../developer/generated/compas_fab.backends.interfaces.RemoveAttachedCollisionMesh.html">RemoveAttachedCollisionMesh</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../developer/generated/compas_fab.backends.interfaces.ResetPlanningScene.html">ResetPlanningScene</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../developer/grasshopper.html">Grasshopper components</a></li>
+</ul>
+</li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../authors.html">Citing</a></li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../license.html">License</a></li>
+</ul>
+
+        </div>
+        
+      </div>
+      <!-- sidebar -->
+      <!-- toc -->
+      <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
+        
+        <ul class="nav flex-column" id="compas-toc">
+<li class="nav-item"><a class="nav-link reference internal" href="#">compas_fab.backends</a><ul class="nav flex-column">
+<li class="nav-item"><a class="nav-link reference internal" href="#ros">ROS</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#pybullet">PyBullet</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#v-rep">V-REP</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#analytical-kinematics">Analytical Kinematics</a><ul class="nav flex-column">
+<li class="nav-item"><a class="nav-link reference internal" href="#ik-solvers">IK solvers</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#robot-specific-kinematics">Robot-specific kinematics</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link reference internal" href="#long-running-tasks">Long-running tasks</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#exceptions">Exceptions</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#interfaces">Interfaces</a></li>
+</ul>
+</li>
+</ul>
+
+      </div>
+      <!-- toc -->
+    </div>
+  </div>
+  <!-- main -->
+  <!-- footer -->
+  <footer class="compas-footer">
+    <nav class="nav p-2">
+      
+      <a href="generated/compas_fab.robots.to_radians.html" title="to_radians" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+        <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
+        <div class="nav-title flex-grow-1 align-self-center">
+          <div class="nav-direction small font-weight-light">Previous</div>
+          to_radians
+        </div>
+      </a>
+      
+
+      
+      <a href="generated/compas_fab.backends.RosClient.html" title="RosClient" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+        <div class="nav-title footer-link flex-grow-1 align-self-center">
+          <div class="nav-direction small font-weight-light">Next</div>
+          RosClient
+        </div>
+        <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
+      </a>
+      
+    </nav>
+  </footer>
+  <!-- footer -->
+  <!-- below -->
+  <div class="below py-5" style="background-color: #222;">
+    <div class="container">
+      <div class="row flex-column">
+        <div class="col-12 col-md-6 mx-md-auto text-center">
+          <h4 class="pb-3 below-text">COMPAS</h4>
+          <p class="below-text">
+            A computational framework for collaboration and research
+            in Architecture, Engineering, Fabrication, and Construction.
+          </p>
+          <nav class="nav justify-content-center pb-3">
+            <a class="nav-link mx-2 px-0 below-link" href="http://github.com/compas-dev" target="_blank">
+              <span class="fab fa-github fa-1x"></span>
+            </a>
+            <a class="nav-link mx-2 px-0 below-link" href="http://forum.compas-framework.org" target="_blank">
+              <span class="fab fa-discourse fa-1x"></span>
+            </a>
+            <a class="nav-link mx-2 px-0 below-link" href="https://pypi.org/project/COMPAS/" target="_blank">
+              <span class="fab fa-python fa-1x"></span>
+            </a>
+          </nav>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col text-center">
+          <p class="p-0 m-0 below-text">Copyright &copy; 2017-2021 compas-dev</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- below -->
+  <!-- scripts -->
+  <script id="documentation_options" data-url_root="" src="../_static/documentation_options.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.0.0/anchor.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+
+  <script src="../_static/underscore.js"></script>
+  <script src="../_static/doctools.js"></script>
+  <script src="../_static/searchtools.js"></script>
+  <script src="../_static/language_data.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      $(".language-default code").addClass("python");
+      $(".language-python code").addClass("python");
+      $(".language-bash code").addClass("bash");
+      $(".language-cpp code").addClass("cpp");
+      $(".language-json code").addClass("json");
+      $(".language-none code").addClass("plaintext");
+
+      hljs.initHighlighting();
+      anchors.add();
+
+      new ClipboardJS(".btn.copy", {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+
+      $("#compas-navigation li.active > ul").each(function() {
+        var ul = $(this);
+        if (! ul.hasClass("show")) {
+          ul.addClass("show");
+        }
+      });
+
+      $("#compas-navigation li.toctree-l1").has("ul").each(function() {
+        var li = $(this);
+        li.addClass("has-children");
+        if (li.hasClass("active")) {
+          li.prepend('<span class="menu-toggle"><i class="fas fa-chevron-up"></i></span>');
+        }
+        else {
+          li.prepend('<span class="menu-toggle"><i class="fas fa-chevron-down"></i></span>');
+        }
+      });
+
+      $(".menu-toggle").click(function() {
+        var toggle = $(this);
+        toggle.siblings("ul").toggleClass("show");
+      });
+
+    });
+
+
+    var url = $("#doc_versions").data("url");
+    var docs_site = $("#doc_versions").data("docs");
+
+    if (url) {
+      $.get(url, res => {
+        var lines = res.match(/[^\r\n]+/g);
+        lines.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+        lines.reverse();
+        lines.forEach(version => {
+          $("#doc_version_list").append("<a class=\"dropdown-item\" href=\"" + docs_site + version + "\">" + version + "</a>");
+        });
+
+        var selected_version = $('.nav-versions .dropdown-item').filter(function (i, ver) {
+          return window.location.href.startsWith(ver.href);
+        });
+        selected_version.addClass('active');
+        $("#bd-versions").text(selected_version.text());
+
+      })
+    }
+  </script>
+  <!-- scripts -->
+  
+  
+</body>
+
+</html>

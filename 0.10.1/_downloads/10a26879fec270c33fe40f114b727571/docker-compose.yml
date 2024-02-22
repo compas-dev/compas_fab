@@ -1,0 +1,92 @@
+version: '2'
+services:
+  ros-master:
+    image: gramaziokohler/ros-base:19.11
+    container_name: ros-master
+    ports:
+      - "11311:11311"
+    command:
+      - roscore
+
+  ros-bridge:
+    image: gramaziokohler/ros-ur-planner:19.11
+    container_name: ros-bridge
+    environment:
+      - "ROS_HOSTNAME=ros-bridge"
+      - "ROS_MASTER_URI=http://ros-master:11311"
+    ports:
+      - "9090:9090"
+    depends_on:
+      - ros-master
+    command:
+      - roslaunch
+      - --wait
+      - rosbridge_server
+      - rosbridge_websocket.launch
+
+  ros-fileserver:
+    image: gramaziokohler/ros-ur-planner:19.11
+    container_name: ros-fileserver
+    environment:
+      - ROS_HOSTNAME=ros-fileserver
+      - ROS_MASTER_URI=http://ros-master:11311
+    depends_on:
+      - ros-master
+    command:
+      - roslaunch
+      - --wait
+      - file_server
+      - file_server.launch
+
+  ur-tf-base_link:
+    image: gramaziokohler/ros-ur-planner:19.11
+    container_name: ur-tf-base_link
+    environment:
+      - ROS_HOSTNAME=ur-tf-base_link
+      - ROS_MASTER_URI=http://ros-master:11311
+    depends_on:
+      - ros-master
+    command:
+      - rosrun
+      - tf
+      - static_transform_publisher
+      - '0'
+      - '0'
+      - '0'
+      - '0'
+      - '0'
+      - '0'
+      - '1'
+      - world
+      - base_link
+      - '100'
+
+  ur-description:
+    image: gramaziokohler/ros-ur-planner:19.11
+    container_name: ur-description
+    environment:
+      - ROS_HOSTNAME=ur-description
+      - ROS_MASTER_URI=http://ros-master:11311
+    depends_on:
+      - ros-master
+    command:
+      - roslaunch
+      - --wait
+      - ur3_moveit_config
+      - planning_context.launch
+      - load_robot_description:=true
+
+  ur-planner:
+    image: gramaziokohler/ros-ur-planner:19.11
+    container_name: ur-planner
+    environment:
+      - ROS_HOSTNAME=ur-planner
+      - ROS_MASTER_URI=http://ros-master:11311
+    depends_on:
+      - ros-master
+    command:
+      - roslaunch
+      - --wait
+      - ur3_moveit_config
+      - ur3_moveit_planning_execution.launch
+      - sim:=true

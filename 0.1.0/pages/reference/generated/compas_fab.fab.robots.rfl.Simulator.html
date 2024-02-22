@@ -1,0 +1,728 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Simulator &mdash; compas_fab 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="compas_fab 0.0.1 documentation" href="../../../index.html"/>
+        <link rel="up" title="compas_fab.fab.robots.rfl" href="../compas_fab.fab.robots.rfl.html"/>
+        <link rel="next" title="SimulationCoordinator" href="compas_fab.fab.robots.rfl.SimulationCoordinator.html"/>
+        <link rel="prev" title="Configuration" href="compas_fab.fab.robots.rfl.Configuration.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> compas_fab
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../gettingstarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../reference.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../compas_fab.html">compas_fab</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../compas_fab.fab.grasshopper.html">compas_fab.fab.grasshopper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compas_fab.fab.robots.html">compas_fab.fab.robots</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../compas_fab.fab.robots.rfl.html">compas_fab.fab.robots.rfl</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="compas_fab.fab.robots.rfl.Robot.html">Robot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="compas_fab.fab.robots.rfl.Configuration.html">Configuration</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Simulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="compas_fab.fab.robots.rfl.SimulationCoordinator.html">SimulationCoordinator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../compas_fab.fab.sensors.html">compas_fab.fab.sensors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">compas_fab</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../reference.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="../compas_fab.html">compas_fab</a> &raquo;</li>
+        
+          <li><a href="../compas_fab.fab.robots.rfl.html">compas_fab.fab.robots.rfl</a> &raquo;</li>
+        
+      <li>Simulator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="simulator">
+<h1>Simulator<a class="headerlink" href="#simulator" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="compas_fab.fab.robots.rfl.Simulator">
+<em class="property">class </em><code class="descclassname">compas_fab.fab.robots.rfl.</code><code class="descname">Simulator</code><span class="sig-paren">(</span><em>host='127.0.0.1'</em>, <em>port=19997</em>, <em>scale=1000.0</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Interface to run simulations on the RFL using VREP as
+the engine for inverse kinematics.</p>
+<p><a class="reference internal" href="#compas_fab.fab.robots.rfl.Simulator" title="compas_fab.fab.robots.rfl.Simulator"><code class="xref py py-class docutils literal"><span class="pre">Simulator</span></code></a> is a context manager type, so it&#8217;s best used in combination
+with the <code class="docutils literal"><span class="pre">with</span></code> statement to ensure resource deallocation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">str</span></code></a>) &#8211; IP address or DNS name of the V-REP simulator.</li>
+<li><strong>port</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">int</span></code></a>) &#8211; Port of the simulator.</li>
+<li><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">int</span></code></a>) &#8211; Scaling of the model. Defaults to millimeters (<code class="docutils literal"><span class="pre">1000</span></code>).</li>
+<li><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">bool</span></code></a>) &#8211; True to enable debug messages, False otherwise.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">compas_fab.fab.robots.rfl</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">Simulator</span><span class="p">()</span> <span class="k">as</span> <span class="n">simulator</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Connected: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">simulator</span><span class="o">.</span><span class="n">is_connected</span><span class="p">())</span>
+<span class="gp">...</span>
+<span class="go">Connected: True</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="compas_fab.fab.robots.rfl.Simulator.SUPPORTED_ALGORITHMS">
+<code class="descname">SUPPORTED_ALGORITHMS</code><em class="property"> = ('bitrrt', 'bkpiece1', 'est', 'kpiece1', 'lazyprmstar', 'lbkpiece1', 'lbtrrt', 'pdst', 'prm', 'prrt', 'rrt', 'rrtconnect', 'rrtstar', 'sbl', 'stride', 'trrt')</em><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.SUPPORTED_ALGORITHMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator._find_path_plan">
+<code class="descname">_find_path_plan</code><span class="sig-paren">(</span><em>robot</em>, <em>goal</em>, <em>metric_values</em>, <em>collision_meshes</em>, <em>algorithm</em>, <em>trials</em>, <em>resolution</em>, <em>gantry_joint_limits</em>, <em>arm_joint_limits</em>, <em>shallow_state_search</em>, <em>optimize_path_length</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator._find_path_plan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator._find_path_plan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator._find_raw_robot_states">
+<code class="descname">_find_raw_robot_states</code><span class="sig-paren">(</span><em>robot</em>, <em>goal_pose</em>, <em>gantry_joint_limits</em>, <em>arm_joint_limits</em>, <em>max_trials=None</em>, <em>max_results=1</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator._find_raw_robot_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator._find_raw_robot_states" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.add_building_member">
+<code class="descname">add_building_member</code><span class="sig-paren">(</span><em>robot</em>, <em>building_member_mesh</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.add_building_member"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.add_building_member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a building member to the RFL scene and attaches it to the robot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>robot</strong> (<a class="reference internal" href="compas_fab.fab.robots.rfl.Robot.html#compas_fab.fab.robots.rfl.Robot" title="compas_fab.fab.robots.rfl.Robot"><code class="xref py py-class docutils literal"><span class="pre">Robot</span></code></a>) &#8211; Robot instance to attach the building member to.</li>
+<li><strong>building_member_mesh</strong> (<code class="xref py py-class docutils literal"><span class="pre">compas.datastructures.mesh.Mesh</span></code>) &#8211; Mesh
+of the building member that will be attached to the robot.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>int</em> &#8211; Object handle (identifier) assigned to the building member.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">All meshes are automatically removed from the scene when the simulation ends.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.add_meshes">
+<code class="descname">add_meshes</code><span class="sig-paren">(</span><em>meshes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.add_meshes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.add_meshes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds meshes to the RFL scene.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>meshes</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">compas.datastructures.mesh.Mesh</span></code>) &#8211; List
+of meshes to add to the current simulation scene.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>list</em> &#8211; List of object handles (identifiers) assigned to the meshes.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">All meshes are automatically removed from the scene when the simulation ends.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.find_path_plan">
+<code class="descname">find_path_plan</code><span class="sig-paren">(</span><em>robot</em>, <em>goal_pose</em>, <em>metric_values=None</em>, <em>collision_meshes=None</em>, <em>algorithm='rrtconnect'</em>, <em>trials=1</em>, <em>resolution=0.02</em>, <em>gantry_joint_limits=None</em>, <em>arm_joint_limits=None</em>, <em>shallow_state_search=True</em>, <em>optimize_path_length=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.find_path_plan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.find_path_plan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a path plan to move the selected robot from its current position to the <cite>goal_pose</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>robot</strong> (<a class="reference internal" href="compas_fab.fab.robots.rfl.Robot.html#compas_fab.fab.robots.rfl.Robot" title="compas_fab.fab.robots.rfl.Robot"><code class="xref py py-class docutils literal"><span class="pre">Robot</span></code></a>) &#8211; Robot instance to move.</li>
+<li><strong>goal_pose</strong> (<a class="reference internal" href="compas_fab.fab.robots.Pose.html#compas_fab.fab.robots.Pose" title="compas_fab.fab.robots.Pose"><code class="xref py py-class docutils literal"><span class="pre">Pose</span></code></a>) &#8211; Target or goal pose instance.</li>
+<li><strong>metric_values</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>) &#8211; 9 <a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>
+values (3 for gantry + 6 for joints) ranging from 0 to 1,
+where 1 indicates the axis/joint is blocked and cannot
+move during inverse kinematic solving.</li>
+<li><strong>collision_meshes</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">compas.datastructures.mesh.Mesh</span></code>) &#8211; Collision meshes
+to be taken into account when calculating the motion plan.
+Defaults to <code class="docutils literal"><span class="pre">None</span></code>.</li>
+<li><strong>algorithm</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">str</span></code></a>) &#8211; Name of the algorithm to use. Defaults to <code class="docutils literal"><span class="pre">rrtconnect</span></code>.</li>
+<li><strong>trials</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">int</span></code></a>) &#8211; Number of search trials to run. Defaults to <code class="docutils literal"><span class="pre">1</span></code>.</li>
+<li><strong>resolution</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>) &#8211; Validity checking resolution. This value
+is specified as a fraction of the space&#8217;s extent.
+Defaults to <code class="docutils literal"><span class="pre">0.02</span></code>.</li>
+<li><strong>gantry_joint_limits</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <cite>float</cite>) &#8211; List of 6 floats defining the upper/lower limits of
+gantry joints. Use this if you want to restrict the working area of the path planner.</li>
+<li><strong>arm_joint_limits</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <cite>float</cite>) &#8211; List of 12 floats defining the upper/lower limits of
+arm joints. Use this if you want to restrict the working area of the path planner.</li>
+<li><strong>shallow_state_search</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">bool</span></code></a>) &#8211; True to search only a minimum of
+valid states before searching a path, False to search states intensively.</li>
+<li><strong>optimize_path_length</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">bool</span></code></a>) &#8211; True to search the path with minimal total length among all <cite>trials</cite>,
+False to return the first valid path found. It only affects the output if <cite>trials &gt; 1</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> &#8211; List of <a class="reference internal" href="compas_fab.fab.robots.rfl.Configuration.html#compas_fab.fab.robots.rfl.Configuration" title="compas_fab.fab.robots.rfl.Configuration"><code class="xref py py-class docutils literal"><span class="pre">Configuration</span></code></a> objects representing the
+collision-free path to the <code class="docutils literal"><span class="pre">goal_pose</span></code>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.find_path_plan_to_config">
+<code class="descname">find_path_plan_to_config</code><span class="sig-paren">(</span><em>robot</em>, <em>goal_configs</em>, <em>metric_values=None</em>, <em>collision_meshes=None</em>, <em>algorithm='rrtconnect'</em>, <em>trials=1</em>, <em>resolution=0.02</em>, <em>gantry_joint_limits=None</em>, <em>arm_joint_limits=None</em>, <em>shallow_state_search=True</em>, <em>optimize_path_length=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.find_path_plan_to_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.find_path_plan_to_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a path plan to move the selected robot from its current position to one of the <cite>goal_configs</cite>.</p>
+<p>This function is useful when it is required to get a path plan that ends in one
+specific goal configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>robot</strong> (<a class="reference internal" href="compas_fab.fab.robots.rfl.Robot.html#compas_fab.fab.robots.rfl.Robot" title="compas_fab.fab.robots.rfl.Robot"><code class="xref py py-class docutils literal"><span class="pre">Robot</span></code></a>) &#8211; Robot instance to move.</li>
+<li><strong>goal_configs</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="compas_fab.fab.robots.rfl.Configuration.html#compas_fab.fab.robots.rfl.Configuration" title="compas_fab.fab.robots.rfl.Configuration"><code class="xref py py-class docutils literal"><span class="pre">Configuration</span></code></a>) &#8211; List of target or goal configurations.</li>
+<li><strong>metric_values</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>) &#8211; 9 <a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>
+values (3 for gantry + 6 for joints) ranging from 0 to 1,
+where 1 indicates the axis/joint is blocked and cannot
+move during inverse kinematic solving.</li>
+<li><strong>collision_meshes</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">compas.datastructures.mesh.Mesh</span></code>) &#8211; Collision meshes
+to be taken into account when calculating the motion plan.
+Defaults to <code class="docutils literal"><span class="pre">None</span></code>.</li>
+<li><strong>algorithm</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">str</span></code></a>) &#8211; Name of the algorithm to use. Defaults to <code class="docutils literal"><span class="pre">rrtconnect</span></code>.</li>
+<li><strong>trials</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">int</span></code></a>) &#8211; Number of search trials to run. Defaults to <code class="docutils literal"><span class="pre">1</span></code>.</li>
+<li><strong>resolution</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>) &#8211; Validity checking resolution. This value
+is specified as a fraction of the space&#8217;s extent.
+Defaults to <code class="docutils literal"><span class="pre">0.02</span></code>.</li>
+<li><strong>gantry_joint_limits</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <cite>float</cite>) &#8211; List of 6 floats defining the upper/lower limits of
+gantry joints. Use this if you want to restrict the working area of the path planner.</li>
+<li><strong>arm_joint_limits</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <cite>float</cite>) &#8211; List of 12 floats defining the upper/lower limits of
+arm joints. Use this if you want to restrict the working area of the path planner.</li>
+<li><strong>shallow_state_search</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">bool</span></code></a>) &#8211; True to search only a minimum of
+valid states before searching a path, False to search states intensively.</li>
+<li><strong>optimize_path_length</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">bool</span></code></a>) &#8211; True to search the path with minimal total length among all <cite>trials</cite>,
+False to return the first valid path found. It only affects the output if <cite>trials &gt; 1</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> &#8211; List of <a class="reference internal" href="compas_fab.fab.robots.rfl.Configuration.html#compas_fab.fab.robots.rfl.Configuration" title="compas_fab.fab.robots.rfl.Configuration"><code class="xref py py-class docutils literal"><span class="pre">Configuration</span></code></a> objects representing the
+collision-free path to the <code class="docutils literal"><span class="pre">goal_pose</span></code>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.find_robot_states">
+<code class="descname">find_robot_states</code><span class="sig-paren">(</span><em>robot</em>, <em>goal_pose</em>, <em>metric_values=None</em>, <em>gantry_joint_limits=None</em>, <em>arm_joint_limits=None</em>, <em>max_trials=None</em>, <em>max_results=1</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.find_robot_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.find_robot_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds valid robot configurations for the specified goal pose.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>robot</strong> (<a class="reference internal" href="compas_fab.fab.robots.rfl.Robot.html#compas_fab.fab.robots.rfl.Robot" title="compas_fab.fab.robots.rfl.Robot"><code class="xref py py-class docutils literal"><span class="pre">Robot</span></code></a>) &#8211; Robot instance.</li>
+<li><strong>goal_pose</strong> (<a class="reference internal" href="compas_fab.fab.robots.Pose.html#compas_fab.fab.robots.Pose" title="compas_fab.fab.robots.Pose"><code class="xref py py-class docutils literal"><span class="pre">Pose</span></code></a>) &#8211; Target or goal pose instance.</li>
+<li><strong>metric_values</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>) &#8211; 9 <a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>
+values (3 for gantry + 6 for joints) ranging from 0 to 1,
+where 1 indicates the axis is blocked and cannot
+move during inverse kinematic solving.</li>
+<li><strong>gantry_joint_limits</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <cite>float</cite>) &#8211; List of 6 floats defining the upper/lower limits of
+gantry joints. Use this if you want to restrict the area in which to search for states.</li>
+<li><strong>arm_joint_limits</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <cite>float</cite>) &#8211; List of 12 floats defining the upper/lower limits of
+arm joints. Use this if you want to restrict the working area in which to search for states.</li>
+<li><strong>max_trials</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">int</span></code></a>) &#8211; Number of trials to run. Set to <code class="docutils literal"><span class="pre">None</span></code>
+to retry infinitely.</li>
+<li><strong>max_results</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">int</span></code></a>) &#8211; Maximum number of result states to return.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> &#8211; List of <a class="reference internal" href="compas_fab.fab.robots.rfl.Configuration.html#compas_fab.fab.robots.rfl.Configuration" title="compas_fab.fab.robots.rfl.Configuration"><code class="xref py py-class docutils literal"><span class="pre">Configuration</span></code></a> objects representing
+the collision-free configuration for the <code class="docutils literal"><span class="pre">goal_pose</span></code>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.get_all_visible_handles">
+<code class="descname">get_all_visible_handles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.get_all_visible_handles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.get_all_visible_handles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a list of object handles (identifiers) for all visible
+shapes of the RFL model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>list</em> &#8211; List of object handles (identifiers) of the RFL model.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.get_object_handle">
+<code class="descname">get_object_handle</code><span class="sig-paren">(</span><em>object_name</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.get_object_handle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.get_object_handle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the object handle (identifier) for a given object name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>object_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">str</span></code></a>) &#8211; Name of the object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>int</em> &#8211; Object handle.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.get_object_matrices">
+<code class="descname">get_object_matrices</code><span class="sig-paren">(</span><em>object_handles</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.get_object_matrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.get_object_matrices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a dictionary of matrices keyed by object handle.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>object_handles</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>) &#8211; List of object handles (identifiers)
+to retrieve matrices from.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>dict</em> &#8211; Dictionary of matrices represented by a <code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of 12 <a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a> values.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">compas_fab.fab.robots.rfl</span> <span class="k">import</span> <span class="n">Simulator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">Simulator</span><span class="p">()</span> <span class="k">as</span> <span class="n">simulator</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">matrices</span> <span class="o">=</span> <span class="n">simulator</span><span class="o">.</span><span class="n">get_object_matrices</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">matrices</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="go">[87, 242, 966, -11851, 996, -21, -85, 6233, 0, 970, -243, 5785]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The resulting dictionary is keyed by object handle.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.get_robot_config">
+<code class="descname">get_robot_config</code><span class="sig-paren">(</span><em>robot</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.get_robot_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.get_robot_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the current configuration of the specified robot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>robot</strong> (<a class="reference internal" href="compas_fab.fab.robots.rfl.Robot.html#compas_fab.fab.robots.rfl.Robot" title="compas_fab.fab.robots.rfl.Robot"><code class="xref py py-class docutils literal"><span class="pre">Robot</span></code></a>) &#8211; Robot instance.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">compas_fab.fab.robots.rfl</span> <span class="k">import</span> <span class="n">Robot</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">Simulator</span><span class="p">()</span> <span class="k">as</span> <span class="n">simulator</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">config</span> <span class="o">=</span> <span class="n">simulator</span><span class="o">.</span><span class="n">get_robot_config</span><span class="p">(</span><span class="n">Robot</span><span class="p">(</span><span class="mi">11</span><span class="p">))</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">An instance of <a class="reference internal" href="compas_fab.fab.robots.rfl.Configuration.html#compas_fab.fab.robots.rfl.Configuration" title="compas_fab.fab.robots.rfl.Configuration"><code class="xref py py-class docutils literal"><span class="pre">Configuration</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.is_connected">
+<code class="descname">is_connected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.is_connected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.is_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether the simulator has an active connection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>bool</em> &#8211; True if connected, False otherwise.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.pick_building_member">
+<code class="descname">pick_building_member</code><span class="sig-paren">(</span><em>robot</em>, <em>building_member_mesh</em>, <em>pickup_pose</em>, <em>metric_values=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.pick_building_member"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.pick_building_member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Picks up a building member and attaches it to the robot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>robot</strong> (<a class="reference internal" href="compas_fab.fab.robots.rfl.Robot.html#compas_fab.fab.robots.rfl.Robot" title="compas_fab.fab.robots.rfl.Robot"><code class="xref py py-class docutils literal"><span class="pre">Robot</span></code></a>) &#8211; Robot instance to use for pick up.</li>
+<li><strong>building_member_mesh</strong> (<code class="xref py py-class docutils literal"><span class="pre">compas.datastructures.mesh.Mesh</span></code>) &#8211; Mesh
+of the building member that will be attached to the robot.</li>
+<li><strong>pickup_pose</strong> (<a class="reference internal" href="compas_fab.fab.robots.Pose.html#compas_fab.fab.robots.Pose" title="compas_fab.fab.robots.Pose"><code class="xref py py-class docutils literal"><span class="pre">Pose</span></code></a>) &#8211; Pickup pose instance.</li>
+<li><strong>metric_values</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>) &#8211; 9 <a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>
+values (3 for gantry + 6 for joints) ranging from 0 to 1,
+where 1 indicates the axis/joint is blocked and cannot
+move during inverse kinematic solving.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>int</em> &#8211; Object handle (identifier) assigned to the building member.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.remove_meshes">
+<code class="descname">remove_meshes</code><span class="sig-paren">(</span><em>mesh_handles</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.remove_meshes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.remove_meshes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes meshes from the RFL scene.</p>
+<p>This is functionally identical to <code class="docutils literal"><span class="pre">remove_objects</span></code>, but it&#8217;s here for
+symmetry reasons.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mesh_handles</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">int</span></code></a>) &#8211; Object handles to remove.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.remove_objects">
+<code class="descname">remove_objects</code><span class="sig-paren">(</span><em>object_handles</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.remove_objects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.remove_objects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes objects from the RFL scene.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>object_handles</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">int</span></code></a>) &#8211; Object handles to remove.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Please note there&#8217;s no need to clean up objects manually after the simulation
+has completed, as those will be reset automatically anyway. This method is
+only useful if you need to remove objects <em>during</em> a simulation.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.reset_all_robots">
+<code class="descname">reset_all_robots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.reset_all_robots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.reset_all_robots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets all robots in the RFL to their base configuration.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">compas_fab.fab.robots.rfl</span> <span class="k">import</span> <span class="n">Simulator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">Simulator</span><span class="p">()</span> <span class="k">as</span> <span class="n">simulator</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">simulator</span><span class="o">.</span><span class="n">reset_all_robots</span><span class="p">()</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.run_child_script">
+<code class="descname">run_child_script</code><span class="sig-paren">(</span><em>function_name</em>, <em>in_ints</em>, <em>in_floats</em>, <em>in_strings</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.run_child_script"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.run_child_script" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.set_robot_config">
+<code class="descname">set_robot_config</code><span class="sig-paren">(</span><em>robot</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.set_robot_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.set_robot_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the robot the the specified configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>robot</strong> (<a class="reference internal" href="compas_fab.fab.robots.rfl.Robot.html#compas_fab.fab.robots.rfl.Robot" title="compas_fab.fab.robots.rfl.Robot"><code class="xref py py-class docutils literal"><span class="pre">Robot</span></code></a>) &#8211; Robot instance to move.</li>
+<li><strong>config</strong> (<a class="reference internal" href="compas_fab.fab.robots.rfl.Configuration.html#compas_fab.fab.robots.rfl.Configuration" title="compas_fab.fab.robots.rfl.Configuration"><code class="xref py py-class docutils literal"><span class="pre">Configuration</span></code></a> instance) &#8211; Describes the position of the
+robot as an instance of <a class="reference internal" href="compas_fab.fab.robots.rfl.Configuration.html#compas_fab.fab.robots.rfl.Configuration" title="compas_fab.fab.robots.rfl.Configuration"><code class="xref py py-class docutils literal"><span class="pre">Configuration</span></code></a>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">compas_fab.fab.robots.rfl</span> <span class="k">import</span> <span class="n">Robot</span><span class="p">,</span> <span class="n">Configuration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">Simulator</span><span class="p">()</span> <span class="k">as</span> <span class="n">simulator</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="o">.</span><span class="n">from_joints_and_external_axes</span><span class="p">([</span><span class="mi">90</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">],</span>
+<span class="gp">... </span>                                                         <span class="p">[</span><span class="mi">7600</span><span class="p">,</span> <span class="o">-</span><span class="mi">4500</span><span class="p">,</span> <span class="o">-</span><span class="mi">4500</span><span class="p">])</span>
+<span class="gp">... </span>    <span class="n">simulator</span><span class="o">.</span><span class="n">set_robot_config</span><span class="p">(</span><span class="n">Robot</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="n">config</span><span class="p">)</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.set_robot_metric">
+<code class="descname">set_robot_metric</code><span class="sig-paren">(</span><em>robot</em>, <em>metric_values</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.set_robot_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.set_robot_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns a metric defining relations between axis values of a robot.</p>
+<p>It takes a list of 9 <a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a> values (3 for gantry + 6 for joints)
+ranging from 0 to 1, where 1 indicates the axis is blocked and cannot
+move during inverse kinematic solving. A value of 1 on any of these
+effectively removes one degree of freedom (DOF).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>robot</strong> (<a class="reference internal" href="compas_fab.fab.robots.rfl.Robot.html#compas_fab.fab.robots.rfl.Robot" title="compas_fab.fab.robots.rfl.Robot"><code class="xref py py-class docutils literal"><span class="pre">Robot</span></code></a>) &#8211; Robot instance.</li>
+<li><strong>metric_values</strong> (<code class="xref py py-obj docutils literal"><span class="pre">list</span></code> of <a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>) &#8211; 9 <a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>
+values from 0 to 1.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.robots.rfl.Simulator.set_robot_pose">
+<code class="descname">set_robot_pose</code><span class="sig-paren">(</span><em>robot</em>, <em>pose</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/robots/rfl/simulator.html#Simulator.set_robot_pose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.robots.rfl.Simulator.set_robot_pose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the robot the the specified pose.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>robot</strong> (<a class="reference internal" href="compas_fab.fab.robots.rfl.Robot.html#compas_fab.fab.robots.rfl.Robot" title="compas_fab.fab.robots.rfl.Robot"><code class="xref py py-class docutils literal"><span class="pre">Robot</span></code></a>) &#8211; Robot instance to move.</li>
+<li><strong>pose</strong> (<a class="reference internal" href="compas_fab.fab.robots.Pose.html#compas_fab.fab.robots.Pose" title="compas_fab.fab.robots.Pose"><code class="xref py py-class docutils literal"><span class="pre">Pose</span></code></a>) &#8211; Target or goal pose instance.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An instance of <a class="reference internal" href="compas_fab.fab.robots.rfl.Configuration.html#compas_fab.fab.robots.rfl.Configuration" title="compas_fab.fab.robots.rfl.Configuration"><code class="xref py py-class docutils literal"><span class="pre">Configuration</span></code></a> found for the given pose.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="compas_fab.fab.robots.rfl.SimulationCoordinator.html" class="btn btn-neutral float-right" title="SimulationCoordinator" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="compas_fab.fab.robots.rfl.Configuration.html" class="btn btn-neutral" title="Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Gramazio Kohler Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

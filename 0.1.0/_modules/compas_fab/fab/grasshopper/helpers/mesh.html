@@ -1,0 +1,374 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compas_fab.fab.grasshopper.helpers.mesh &mdash; compas_fab 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../../search.html"/>
+    <link rel="top" title="compas_fab 0.0.1 documentation" href="../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../index.html"/> 
+
+  
+  <script src="../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> compas_fab
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../pages/gettingstarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../pages/examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../pages/reference.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">compas_fab</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>compas_fab.fab.grasshopper.helpers.mesh</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compas_fab.fab.grasshopper.helpers.mesh</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">rhinoscriptsyntax</span> <span class="k">as</span> <span class="nn">rs</span>
+    <span class="kn">import</span> <span class="nn">ghpythonlib.components</span> <span class="k">as</span> <span class="nn">ghcomp</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">platform</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_implementation</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;IronPython&#39;</span><span class="p">:</span>
+        <span class="k">raise</span>
+
+<span class="kn">from</span> <span class="nn">compas.datastructures.mesh</span> <span class="k">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">compas_fab.fab.grasshopper</span> <span class="k">import</span> <span class="n">xdraw_mesh</span>
+<span class="kn">from</span> <span class="nn">compas.utilities.colors</span> <span class="k">import</span> <span class="n">color_to_colordict</span>
+
+
+<div class="viewcode-block" id="mesh_from_guid"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.grasshopper.mesh_from_guid.html#compas_fab.fab.grasshopper.mesh_from_guid">[docs]</a><span class="k">def</span> <span class="nf">mesh_from_guid</span><span class="p">(</span><span class="n">guid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates an instance of a compAS mesh class from an identifier</span>
+<span class="sd">    in Rhino/Grasshopper.</span>
+
+<span class="sd">    This function is almost identical to ``mesh_from_guid`` in the core</span>
+<span class="sd">    framework, but there were some import issues when used from within</span>
+<span class="sd">    Grasshopper, but eventually, it should be migrated into the core.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">trimesh</span> <span class="o">=</span> <span class="n">ghcomp</span><span class="o">.</span><span class="n">Triangulate</span><span class="p">(</span><span class="n">rs</span><span class="o">.</span><span class="n">coercemesh</span><span class="p">(</span><span class="n">guid</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">vertices</span> <span class="o">=</span> <span class="p">[</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">vertex</span><span class="p">)</span> <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">rs</span><span class="o">.</span><span class="n">MeshVertices</span><span class="p">(</span><span class="n">trimesh</span><span class="p">)]</span>
+    <span class="n">faces</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">rs</span><span class="o">.</span><span class="n">MeshFaceVertices</span><span class="p">(</span><span class="n">trimesh</span><span class="p">))</span>
+    <span class="n">faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">face</span><span class="p">[:</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">face</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">face</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">else</span> <span class="n">face</span> <span class="k">for</span> <span class="n">face</span> <span class="ow">in</span> <span class="n">faces</span><span class="p">]</span>
+    <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_vertices_and_faces</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
+    <span class="n">mesh</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mesh</span></div>
+
+
+<span class="k">def</span> <span class="nf">draw_mesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span>
+              <span class="n">layer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">show_faces</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+              <span class="n">show_vertices</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+              <span class="n">show_edges</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+              <span class="n">show_wireframe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+              <span class="n">vertexcolor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">edgecolor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">wireframecolor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">facecolor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Draw a mesh object in Grasshopper.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        mesh (compas.datastructures.mesh.Mesh): The mesh object.</span>
+<span class="sd">        show_faces (bool): Optional. Show the faces. Default is ``True``.</span>
+<span class="sd">        show_vertices (bool): Optional. Show the vertices. Default is ``True``.</span>
+<span class="sd">        show_edges (bool): Optional. Show the edges. Default is ``True``.</span>
+<span class="sd">        vertexcolor (str, tuple, list, dict): Optional. The vertex color specification. Default is ``None``.</span>
+<span class="sd">        edgecolor (str, tuple, list, dict): Optional. The edge color specification. Default is ``None``.</span>
+<span class="sd">        facecolor (str, tuple, list, dict): Optional. The face color specification. Default is ``None``.</span>
+<span class="sd">        redraw (bool): Optional. Redraw instructions. Default is ``True``.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Colors can be specified in different ways:</span>
+
+<span class="sd">        * str: A hexadecimal color that will be applied to all elements subject to the specification.</span>
+<span class="sd">        * tuple, list: RGB color that will be applied to all elements subject to the specification.</span>
+<span class="sd">        * dict: RGB or hex color dict with a specification for some or all of the related elements.</span>
+
+<span class="sd">    Important:</span>
+<span class="sd">        RGB colors should specify color values between 0 and 255.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">vertexcolor</span> <span class="o">=</span> <span class="n">color_to_colordict</span><span class="p">(</span><span class="n">vertexcolor</span><span class="p">,</span>
+                                     <span class="n">mesh</span><span class="o">.</span><span class="n">vertices</span><span class="p">(),</span>
+                                     <span class="n">default</span><span class="o">=</span><span class="n">mesh</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;color.vertex&#39;</span><span class="p">],</span>
+                                     <span class="n">colorformat</span><span class="o">=</span><span class="s1">&#39;rgb&#39;</span><span class="p">,</span>
+                                     <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">edgecolor</span> <span class="o">=</span> <span class="n">color_to_colordict</span><span class="p">(</span><span class="n">edgecolor</span><span class="p">,</span>
+                                   <span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">(),</span>
+                                   <span class="n">default</span><span class="o">=</span><span class="n">mesh</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;color.edge&#39;</span><span class="p">],</span>
+                                   <span class="n">colorformat</span><span class="o">=</span><span class="s1">&#39;rgb&#39;</span><span class="p">,</span>
+                                   <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># facecolor = color_to_colordict(facecolor,</span>
+    <span class="c1">#                                mesh.faces(),</span>
+    <span class="c1">#                                default=mesh.attributes[&#39;color.face&#39;],</span>
+    <span class="c1">#                                colorformat=&#39;rgb&#39;,</span>
+    <span class="c1">#                                normalize=False)</span>
+
+    <span class="k">if</span> <span class="n">show_faces</span><span class="p">:</span>
+        <span class="n">key_index</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">index</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">vertices</span><span class="p">())}</span>
+        <span class="n">xyz</span>       <span class="o">=</span> <span class="p">[</span><span class="n">mesh</span><span class="o">.</span><span class="n">vertex_coordinates</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">mesh</span><span class="o">.</span><span class="n">vertices</span><span class="p">()]</span>
+        <span class="n">faces</span>     <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">color</span>     <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;color.face&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">fkey</span> <span class="ow">in</span> <span class="n">mesh</span><span class="o">.</span><span class="n">face</span><span class="p">:</span>
+            <span class="n">face</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">face_vertices</span><span class="p">(</span><span class="n">fkey</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">face</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Degenerate face: </span><span class="si">{0}</span><span class="s1"> =&gt; </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fkey</span><span class="p">,</span> <span class="n">face</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">v</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">key_index</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">face</span> <span class="o">+</span> <span class="p">[</span><span class="n">face</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]])</span>
+            <span class="k">elif</span> <span class="n">v</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">key_index</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">face</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span>
+                <span class="n">xyz</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">face_center</span><span class="p">(</span><span class="n">fkey</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">face</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">key</span> <span class="o">=</span> <span class="n">face</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">nbr</span> <span class="o">=</span> <span class="n">face</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="n">vertices</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">,</span> <span class="n">key_index</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">key_index</span><span class="p">[</span><span class="n">nbr</span><span class="p">],</span> <span class="n">key_index</span><span class="p">[</span><span class="n">nbr</span><span class="p">]]</span>
+                    <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">xdraw_mesh</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
+
+
+<span class="c1">#     if show_edges:</span>
+<span class="c1">#         lines = []</span>
+<span class="c1">#         color = mesh.attributes[&#39;color.edge&#39;]</span>
+<span class="c1">#         for u, v in mesh.edges():</span>
+<span class="c1">#             lines.append({</span>
+<span class="c1">#                 &#39;start&#39;: mesh.vertex_coordinates(u),</span>
+<span class="c1">#                 &#39;end&#39;  : mesh.vertex_coordinates(v),</span>
+<span class="c1">#                 &#39;name&#39; : &#39;{0}.edge.{1}-{2}&#39;.format(mesh.attributes[&#39;name&#39;], repr(u), repr(v)),</span>
+<span class="c1">#                 &#39;color&#39;: edgecolor.get((u, v), color),</span>
+<span class="c1">#             })</span>
+<span class="c1">#         xdraw_lines(lines)</span>
+<span class="c1">#</span>
+<span class="c1">#     if show_wireframe:</span>
+<span class="c1">#         lines = []</span>
+<span class="c1">#         color = mesh.attributes[&#39;color.edge&#39;]</span>
+<span class="c1">#         for u, v in mesh.wireframe():</span>
+<span class="c1">#             lines.append({</span>
+<span class="c1">#                 &#39;start&#39;: mesh.vertex_coordinates(u),</span>
+<span class="c1">#                 &#39;end&#39;  : mesh.vertex_coordinates(v),</span>
+<span class="c1">#                 &#39;name&#39; : &#39;{0}.edge.{1}-{2}&#39;.format(mesh.attributes[&#39;name&#39;], repr(u), repr(v)),</span>
+<span class="c1">#                 &#39;color&#39;: edgecolor.get((u, v), color),</span>
+<span class="c1">#             })</span>
+<span class="c1">#         xdraw_lines(lines)</span>
+<span class="c1">#</span>
+<span class="c1">#     if show_vertices:</span>
+<span class="c1">#         points = []</span>
+<span class="c1">#         color  = mesh.attributes[&#39;color.vertex&#39;]</span>
+<span class="c1">#         for key in mesh.vertices():</span>
+<span class="c1">#             points.append({</span>
+<span class="c1">#                 &#39;pos&#39;  : mesh.vertex_coordinates(key),</span>
+<span class="c1">#                 &#39;name&#39; : &#39;{0}.vertex.{1}&#39;.format(mesh.attributes[&#39;name&#39;], repr(key)),</span>
+<span class="c1">#                 &#39;color&#39;: vertexcolor.get(key, color),</span>
+<span class="c1">#             })</span>
+<span class="c1">#         xdraw_points(points)</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Gramazio Kohler Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

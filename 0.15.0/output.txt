@@ -1,0 +1,23 @@
+backends/pybullet.rst:9: [redirected permanently] https://pybullet.org/ to https://pybullet.org/wordpress/
+backends/ros.rst:31: [redirected permanently] https://hub.docker.com/r/gramaziokohler/ to https://hub.docker.com/u/gramaziokohler
+backends/ros.rst:9: [redirected with Found] http://www.ros.org to https://www.ros.org/
+backends/vrep.rst:30: [redirected permanently] http://www.coppeliarobotics.com/downloads.html to https://www.coppeliarobotics.com/downloads.html
+backends/vrep.rst:9: [redirected permanently] http://www.coppeliarobotics.com/ to https://www.coppeliarobotics.com/
+contributing.rst:45: [redirected with Found] http://docs.pyinvoke.org/ to http://docs.pyinvoke.org/en/stable/
+contributing.rst:42: [redirected permanently] https://help.github.com/articles/about-pull-requests/ to https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/about-pull-requests
+contributing.rst:62: [redirected with Found] http://sphinx-doc.org/index.html to https://www.sphinx-doc.org/en/master/
+contributing.rst:62: [redirected permanently] http://docutils.sourceforge.net/rst.html to https://docutils.sourceforge.io/rst.html
+examples/01_fundamentals/02_coordinate_frames.rst:124: [redirected with Found] http://www.ros.org/reps/rep-0105.html#id15 to https://www.ros.org/reps/rep-0105.html#id15
+examples/02_description_models/02_robot.rst:35: [redirected with Found] http://www.ros.org/ to https://www.ros.org/
+examples/03_backends_ros/01_ros_examples.rst:9: [redirected with Found] http://www.ros.org/ to https://www.ros.org/
+examples/03_backends_ros/02_robot_models.rst:7: [redirected with Found] http://www.ros.org/ to https://www.ros.org/
+examples/03_backends_ros/03_forward_and_inverse_kinematics.rst:11: [redirected with Found] http://www.ros.org/ to https://www.ros.org/
+examples/03_backends_ros/04_collision_objects.rst:7: [redirected with Found] http://www.ros.org/ to https://www.ros.org/
+examples/03_backends_ros/05_plan_motion.rst:7: [redirected with Found] http://www.ros.org/ to https://www.ros.org/
+examples/03_backends_ros/08_ros_create_moveit_package_from_custom_urdf.rst:214: [redirected with Found] http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html to http://docs.ros.org/en/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html
+examples/03_backends_ros/08_ros_create_moveit_package_from_custom_urdf.rst:215: [redirected with Found] http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/urdf_srdf/urdf_srdf_tutorial.html to http://docs.ros.org/en/kinetic/api/moveit_tutorials/html/doc/urdf_srdf/urdf_srdf_tutorial.html
+examples/03_backends_ros/08_ros_create_moveit_package_from_custom_urdf.rst:7: [redirected with Found] http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html to http://docs.ros.org/en/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html
+examples/04_backends_vrep/01_simulation_with_vrep.rst:5: [redirected permanently] http://www.coppeliarobotics.com/ to https://www.coppeliarobotics.com/
+getting_started.rst:26: [redirected permanently] https://www.scivision.co/python-windows-visual-c++-14-required/ to https://www.scivision.dev/python-windows-visual-c-14-required
+getting_started.rst:10: [redirected with Found] https://conda.io/docs/ to https://conda.io/en/latest/
+overview.rst:21: [redirected permanently] https://ros.org to https://www.ros.org/

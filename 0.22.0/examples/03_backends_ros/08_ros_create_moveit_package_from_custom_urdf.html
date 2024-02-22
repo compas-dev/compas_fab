@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <title>compas_fab - 3.8. Creating a MoveIt! package from the custom created URDF</title>
+  
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <meta name="author" content="" />
+  <meta name="description" content="" />
+
+  <link rel="shortcut icon" href="../../_static/images/compas.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/default.min.css">
+  <link rel="stylesheet" type="text/css" href="../../_static/css/compas.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
+
+  
+    <link rel="next" title="3.9. Creating a URDF of the UR10 on two linear axes" href="09_ros_create_urdf_ur10_on_tower.html" />
+  
+
+  
+    <link rel="prev" title="3.7. Creating a URDF with an UR5 robot and a custom end-effector" href="07_ros_create_urdf_ur5_with_measurement_tool.html" />
+  
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body data-spy="scroll" data-target="#compas-toc">
+  <!-- header -->
+  <header id="header" class="compas-header d-flex align-items-center">
+    <nav class="navbar navbar-expand navbar-dark col flex-column flex-md-row text-center">
+      <!-- brand -->
+      <a class="navbar-brand" href="https://compas.dev/compas_fab/">
+        <img src="../../_static/images/compas_icon_white.png" alt="COMPAS FAB" width="48px" height="48px" />
+      </a>
+      <!-- brand -->
+      <!-- primary -->
+      <ul class="navbar-nav">
+        <li class="nav-item active"><a class="nav-link" href="https://compas.dev/compas_fab/">COMPAS FAB</a></li>
+      </ul>
+      <!-- primary -->
+      <ul class="navbar-nav d-none d-md-flex ml-md-auto">
+        <!-- version -->
+        
+        <meta id="doc_versions" data-url="https://compas.dev/compas_fab/doc_versions.txt" data-docs="https://compas.dev/compas_fab/">
+        <li class="nav-item nav-versions dropdown">
+          <a class="nav-item nav-link dropdown-toggle mr-md-2" href="#" id="bd-versions" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            0.22.0
+          </a>
+          <div id="doc_version_list" class="dropdown-menu dropdown-menu-md-right" aria-labelledby="bd-versions"></div>
+        </li>
+        
+        <!-- version -->
+        <!-- social -->
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/compas-dev/compas_fab" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+        </li>
+        <!-- social -->
+      </ul>
+    </nav>
+  </header>
+  <!-- header -->
+  <!-- main -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- main -->
+      <main class="col-12 col-md-9 col-xl-7 px-2 px-md-5 pt-2 pb-5 compas-content" role="main">
+        
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-3 bg-white px-0">
+            <li class="breadcrumb-item"><a href="../../index.html">docs</a></li>
+            
+              <li class="breadcrumb-item"><a href="../../examples.html">Examples</a></li>
+            
+              <li class="breadcrumb-item"><a href="../03_backends_ros.html"><span class="section-number">3. </span>Backends: ROS</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page"><span class="section-number">3.8. </span>Creating a MoveIt! package from the custom created URDF</li>
+          </ol>
+        </nav>
+        
+
+        
+        
+        <section id="creating-a-moveit-package-from-the-custom-created-urdf">
+<span id="ros-examples-create-moveit-package-from-custom-urdf"></span><h1><span class="section-number">3.8. </span>Creating a MoveIt! package from the custom created URDF</h1>
+<p>This example is mainly copied from <a class="reference external" href="https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html">MoveIt! Setup Assistant Tutorial</a></p>
+<p>It is based on the previous example:
+<a class="reference internal" href="07_ros_create_urdf_ur5_with_measurement_tool.html#ros-examples-create-urdf-ur5-with-measurement-tool"><span class="std std-ref">Creating a URDF with an UR5 robot and a custom end-effector</span></a></p>
+<section id="start-the-moveit-setup-assistant">
+<h2><span class="section-number">3.8.1. </span>Start the MoveIt! Setup Assistant</h2>
+<p>The MoveIt! Setup Assistant is a graphical user interface for configuring any
+robot for use with MoveIt!. Its primary functions are to generate a Semantic Robot
+Description Format (SRDF) file, to create the collision matrix of your robot
+and to define the planning groups.</p>
+<ul>
+<li><p>To start the MoveIt! Setup Assistant, launch the following from your Linux command prompt:</p>
+<div class="language-python notranslate"><div class="highlight"><pre><code><span></span><span class="n">roslaunch</span> <span class="n">moveit_setup_assistant</span> <span class="n">setup_assistant</span><span class="o">.</span><span class="n">launch</span>
+</code></pre></div>
+</div>
+</li>
+<li><p>Press <em>Create New MoveIt Configuration Package</em></p></li>
+<li><p>Click on the browse button and navigate to the <code class="docutils literal notranslate"><span class="pre">ur5_with_measurement_tool.urdf</span></code>
+file you created in the last example. Choose that file and then click
+<em>Load Files.</em> The Setup Assistant will load the files (this might take a few
+seconds) and present you with this screen:</p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_00.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_00.jpg" />
+</figure>
+</section>
+<section id="generate-self-collision-matrix">
+<h2><span class="section-number">3.8.2. </span>Generate Self-Collision Matrix</h2>
+<ul class="simple">
+<li><p>Click on the <em>Self-Collisions</em> pane selector on the left-hand side.</p></li>
+<li><p>Click on the <em>Generate Collision Matrix</em> button. The Setup Assistant will work for a few
+seconds before presenting you the results of its computation in the main table.</p></li>
+</ul>
+<dl class="simple">
+<dt>Note:</dt><dd><p>The sampling density specifies how many random robot positions to check for self
+collision. The default value of 10’000 collision checks should be fine.</p>
+</dd>
+</dl>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_01.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_01.jpg" />
+</figure>
+</section>
+<section id="add-virtual-joints">
+<h2><span class="section-number">3.8.3. </span>Add Virtual Joints</h2>
+<p>Virtual joints are used primarily to attach the robot to the world coordinate
+frame. We will define only one virtual joint, attaching the
+<code class="docutils literal notranslate"><span class="pre">ur5_with_measurement_tool</span></code> to the world coordinate frame.</p>
+<ul class="simple">
+<li><p>Click on the <em>Virtual Joints</em> pane selector. Click on <em>Add Virtual Joint</em></p></li>
+<li><p>Set the joint name as “virtual_joint”</p></li>
+<li><p>Set the child link as “world” and the parent frame name as “world”.</p></li>
+<li><p>Set the Joint Type as “fixed”.</p></li>
+<li><p>Click <em>Save</em>.</p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_02.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_02.jpg" />
+</figure>
+</section>
+<section id="add-planning-groups">
+<h2><span class="section-number">3.8.4. </span>Add Planning Groups</h2>
+<p>Planning groups are used for semantically describing different parts of your
+robot, such as defining what an arm is, or an end-effector. The planning group
+is later used for path- and motion planning.</p>
+<ul class="simple">
+<li><p>Click on the <em>Planning Groups</em> pane selector.</p></li>
+<li><p>Click on <em>Add Group</em> and you should see the following screen:</p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_03.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_03.jpg" />
+</figure>
+<section id="add-the-arm">
+<h3><span class="section-number">3.8.4.1. </span>Add the arm</h3>
+<ul class="simple">
+<li><p>Enter <em>Group Name</em> as “manipulator”</p></li>
+<li><p>Choose ur_kinematics/UR5KinematicsPlugin as the kinematics solver.</p></li>
+<li><p>Let <em>Kin. Search Resolution</em>, <em>Kin. Search Timeout (sec)</em>, <em>Kin. Solver Attempts</em> and
+<em>Group Default Planner</em> stay at their default values.</p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_04.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_04.jpg" />
+</figure>
+<ul class="simple">
+<li><p>Click on the <em>Add Kin. Chain</em> button. Press <em>Expand All</em></p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_05.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_05.jpg" />
+</figure>
+<ul class="simple">
+<li><p>Select the “base_link” as <em>Base Link</em> and the “tcp” as <em>Tip Link</em></p></li>
+<li><p>Press the <em>Save</em> button.</p></li>
+</ul>
+</section>
+<section id="add-the-gripper">
+<h3><span class="section-number">3.8.4.2. </span>Add the gripper</h3>
+<p>We will also add a group for the end-effector.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You will do this using a different procedure than adding the arm.</p>
+</div>
+<ul class="simple">
+<li><p>Click on the <em>Add Group</em> button.</p></li>
+<li><p>Enter <em>Group Name</em> as “measurement_tool”</p></li>
+<li><p>Let <em>Kinematic Solver</em>, <em>Kin. Search Resolution</em>, <em>Kin. Search Timeout (sec)</em>, <em>Kin. Solver Attempts</em> and
+<em>Group Default Planner</em> stay at their default values.</p></li>
+<li><p>Click on the <em>Add Links</em> button.</p></li>
+<li><p>Choose measurment_tool and tcp (The links you defined in the measurement_tool.xacro) and add them to the list of <em>Selected Links</em> on     the right hand side.</p></li>
+<li><p>Click <em>Save</em></p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_06.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_06.jpg" />
+</figure>
+</section>
+</section>
+<section id="add-robot-poses">
+<h2><span class="section-number">3.8.5. </span>Add Robot Poses</h2>
+<p>The <em>Setup Assistant</em> allows you to add certain fixed poses into the
+configuration. This helps if, for example, you want to define a certain position
+of the robot as a <em>Home</em> position.</p>
+<ul class="simple">
+<li><p>Click on the <em>Robot Poses</em> pane.</p></li>
+<li><p>Click <em>Add Pose</em>. Choose a name for the pose. The robot will be in its
+<em>Default</em> position where the joint values are set to the mid-range of the
+allowed joint value range. Move the individual joints around until you are happy
+and then <em>Save</em> the pose.</p></li>
+</ul>
+<dl class="simple">
+<dt>Tip:</dt><dd><p>Try to move all the joints around. If there is something wrong
+with the joint limits in your URDF, you should be able to see it immediately here.</p>
+</dd>
+</dl>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_07.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_07.jpg" />
+</figure>
+</section>
+<section id="label-end-effectors">
+<h2><span class="section-number">3.8.6. </span>Label End-Effectors</h2>
+<p>We have already added the measurement_tool of the ur5. Now, we will designate
+this group as a special group: end effectors.</p>
+<ul class="simple">
+<li><p>Click on the <em>End Effectors</em> pane.</p></li>
+<li><p>Click <em>Add End Effector</em>.</p></li>
+<li><p>Choose <code class="docutils literal notranslate"><span class="pre">measurement_tool</span></code> as the <em>End Effector Name</em> for the measurement tool.</p></li>
+<li><p>Select “measurement_tool” as the <em>End Effector Group</em>.</p></li>
+<li><p>Select “tool0” as the <em>Parent Link</em> for this end-effector.</p></li>
+<li><p>Leave <em>Parent Group</em> empty.</p></li>
+<li><p>Press <em>Save</em>.</p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_08.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_08.jpg" />
+</figure>
+</section>
+<section id="add-passive-joints">
+<h2><span class="section-number">3.8.7. </span>Add Passive Joints</h2>
+<p>Skip this step.</p>
+</section>
+<section id="add-author-information">
+<h2><span class="section-number">3.8.8. </span>Add Author Information</h2>
+<ul class="simple">
+<li><p>Click on the <em>Author Information</em> pane.</p></li>
+<li><p>Enter your name and email address.</p></li>
+</ul>
+</section>
+<section id="generate-configuration-files">
+<h2><span class="section-number">3.8.9. </span>Generate Configuration Files</h2>
+<p>You are almost there. One last step!</p>
+<ul class="simple">
+<li><p>Click on the Configuration Files pane.</p></li>
+<li><p>Click <em>Browse</em>, select the <code class="docutils literal notranslate"><span class="pre">robotic_setups/src</span></code> location. Click
+<em>Create New Folder</em>, call it “ur5_with_measurement_tool_moveit_config”, and
+click <em>Choose</em>.</p></li>
+<li><p>Click on the <em>Generate Package</em> button. The Setup Assistant will now generate
+and write a set of launch and config files into the directory of your choosing.
+All the generated files will appear in the Generated Files/Folders tab and you
+can click on each of them for a description of what they contain.</p></li>
+</ul>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_09.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_09.jpg" />
+</figure>
+</section>
+<section id="start-the-newly-generated-moveit-configuration">
+<h2><span class="section-number">3.8.10. </span>Start the newly generated MoveIt! Configuration</h2>
+<p>Now, optionally, you can already start the MoveIt! Demo and play:</p>
+<div class="language-python notranslate"><div class="highlight"><pre><code><span></span><span class="n">cd</span> <span class="o">~/</span><span class="n">robotic_setups</span>
+<span class="n">catkin_make</span>
+<span class="n">source</span> <span class="n">devel</span><span class="o">/</span><span class="n">setup</span><span class="o">.</span><span class="n">bash</span>
+<span class="n">roslaunch</span> <span class="n">ur5_with_measurement_tool_moveit_config</span>  <span class="n">demo</span><span class="o">.</span><span class="n">launch</span> <span class="n">rviz_tutorial</span><span class="o">:=</span><span class="n">true</span>
+</code></pre></div>
+</div>
+<figure class="figure align-default">
+<img alt="../../_images/08_ros_create_moveit_package_10.jpg" class="figure-img img-fluid" src="../../_images/08_ros_create_moveit_package_10.jpg" />
+</figure>
+</section>
+<section id="further-links">
+<h2><span class="section-number">3.8.11. </span>Further links</h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html">https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html</a></p></li>
+<li><p><a class="reference external" href="https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/urdf_srdf/urdf_srdf_tutorial.html">https://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/urdf_srdf/urdf_srdf_tutorial.html</a></p></li>
+</ul>
+</section>
+</section>
+
+        
+      </main>
+      <!-- content -->
+      <!-- sidebar -->
+      <div class="col-12 col-md-3 compas-sidebar" role="navigation">
+        <form id="search" class="d-flex align-items-center compas-searchbox" action="../../search.html" method="get">
+          <input class="form-control" type="text" name="q" placeholder="Search docs" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+          <button class="navbar-toggler d-md-none" type="button" data-toggle="collapse" data-target="#compas-navigation" aria-controls="compas-navigation" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </form>
+        
+        
+          <div id="compas-navigation" class="collapse compas-navigation">
+          <ul class="nav flex-column active">
+<li class="nav-item"><a class="nav-link reference internal" href="../../overview.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../backends.html">Working with backends</a></li>
+<li class="nav-item active"><a class="nav-link reference internal" href="../../examples.html">Examples</a><ul class="nav flex-column active">
+<li class="nav-item"><a class="nav-link reference internal" href="../01_fundamentals.html">1. Fundamentals</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../02_description_models.html">2. Description Models</a></li>
+<li class="nav-item active"><a class="nav-link reference internal" href="../03_backends_ros.html">3. Backends: ROS</a><ul class="nav flex-column active">
+<li class="nav-item"><a class="nav-link reference internal" href="01_ros_examples.html">3.1. Using ROS</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="02_robot_models.html">3.2. Robots in ROS</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="03_forward_and_inverse_kinematics.html">3.3. Forward and inverse kinematics</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="04_collision_objects.html">3.4. Planning scene and collision objects</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="05_plan_motion.html">3.5. Plan motion</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="06_ros_in_grasshopper.html">3.6. ROS in Grasshopper</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="07_ros_create_urdf_ur5_with_measurement_tool.html">3.7. Creating a URDF with an UR5 robot and a custom end-effector</a></li>
+<li class="nav-item active"><a class="nav-link active current reference internal" href="#">3.8. Creating a MoveIt! package from the custom created URDF</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="09_ros_create_urdf_ur10_on_tower.html">3.9. Creating a URDF of the UR10 on two linear axes</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link reference internal" href="../04_backends_vrep.html">4. Backends: V-REP</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../05_backends_pybullet.html">5. Backends: PyBullet</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../06_backends_kinematics.html">6. Backends: Analytical Kinematics</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../reference.html">API Reference</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../contributing.html">Contributor’s Guide</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../authors.html">Citing</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../license.html">License</a></li>
+</ul>
+
+          </div>
+        
+      </div>
+      <!-- sidebar -->
+      <!-- toc -->
+      <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
+        
+        <ul class="nav flex-column" id="compas-toc">
+<li class="nav-item"><a class="nav-link reference internal" href="#">3.8. Creating a MoveIt! package from the custom created URDF</a><ul class="nav flex-column">
+<li class="nav-item"><a class="nav-link reference internal" href="#start-the-moveit-setup-assistant">3.8.1. Start the MoveIt! Setup Assistant</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#generate-self-collision-matrix">3.8.2. Generate Self-Collision Matrix</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#add-virtual-joints">3.8.3. Add Virtual Joints</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#add-planning-groups">3.8.4. Add Planning Groups</a><ul class="nav flex-column">
+<li class="nav-item"><a class="nav-link reference internal" href="#add-the-arm">3.8.4.1. Add the arm</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#add-the-gripper">3.8.4.2. Add the gripper</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link reference internal" href="#add-robot-poses">3.8.5. Add Robot Poses</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#label-end-effectors">3.8.6. Label End-Effectors</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#add-passive-joints">3.8.7. Add Passive Joints</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#add-author-information">3.8.8. Add Author Information</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#generate-configuration-files">3.8.9. Generate Configuration Files</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#start-the-newly-generated-moveit-configuration">3.8.10. Start the newly generated MoveIt! Configuration</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#further-links">3.8.11. Further links</a></li>
+</ul>
+</li>
+</ul>
+
+      </div>
+      <!-- toc -->
+    </div>
+  </div>
+  <!-- main -->
+  <!-- footer -->
+  <footer class="compas-footer">
+    <nav class="nav p-2">
+      
+        <a href="07_ros_create_urdf_ur5_with_measurement_tool.html" title="<span class="section-number">3.7. </span>Creating a URDF with an UR5 robot and a custom end-effector" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+          <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
+          <div class="nav-title flex-grow-1 align-self-center">
+            <div class="nav-direction small font-weight-light">Previous</div>
+            <span class="section-number">3.7. </span>Creating a URDF with an UR5 robot and a custom end-effector
+          </div>
+        </a>
+      
+
+      
+        <a href="09_ros_create_urdf_ur10_on_tower.html" title="<span class="section-number">3.9. </span>Creating a URDF of the UR10 on two linear axes" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+          <div class="nav-title footer-link flex-grow-1 align-self-center">
+            <div class="nav-direction small font-weight-light">Next</div>
+            <span class="section-number">3.9. </span>Creating a URDF of the UR10 on two linear axes
+          </div>
+          <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
+        </a>
+      
+    </nav>  
+  </footer>
+  <!-- footer -->
+  <!-- below -->
+  <div class="below py-5" style="background-color: #222;">
+    <div class="container">
+      <div class="row flex-column">
+      <div class="col-12 col-md-6 mx-md-auto text-center">
+        <h4 class="pb-3 below-text">COMPAS</h4>
+        <p class="below-text">
+          A computational framework for collaboration and research
+          in Architecture, Engineering, Fabrication, and Construction.
+        </p>
+        <nav class="nav justify-content-center pb-3">
+          <a class="nav-link mx-2 px-0 below-link" href="http://github.com/compas-dev" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+          <a class="nav-link mx-2 px-0 below-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+          <a class="nav-link mx-2 px-0 below-link" href="https://pypi.org/project/COMPAS/" target="_blank">
+            <span class="fab fa-python fa-1x"></span>
+          </a>
+        </nav>
+      </div>
+      </div>
+      <div class="row">
+      <div class="col text-center">
+        <p class="p-0 m-0 below-text">Copyright &copy; 2017-2021 compas-dev</p>
+      </div>
+      </div>
+    </div>
+  </div>
+  <!-- below -->
+  <!-- scripts -->
+  <script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+  URL_ROOT          : '',
+  VERSION           : '0.22.0',
+  COLLAPSE_INDEX    : false,
+  FILE_SUFFIX       : '.html',
+  HAS_SOURCE        : 'false',
+  SOURCELINK_SUFFIX : '.txt'
+  };
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https:////cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.0.0/anchor.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+
+  <script src="../../_static/underscore.js"></script>
+  <script src="../../_static/doctools.js"></script>
+  <script src="../../_static/js/searchtools_.js"></script>
+
+  <script>
+  $(document).ready(function() {
+    $(".language-default code").addClass("python");
+    $(".language-python code").addClass("python");
+    $(".language-bash code").addClass("bash");
+    $(".language-cpp code").addClass("cpp");
+    $(".language-json code").addClass("json");
+    $(".language-none code").addClass("plaintext");
+
+    hljs.initHighlighting();
+    anchors.add();
+
+  });
+
+
+  var url = $("#doc_versions").data("url");
+  var docs_site = $("#doc_versions").data("docs");
+
+  if (url) {
+    $.get(url, res=>{
+      var lines = res.match(/[^\r\n]+/g);
+      lines.sort( (a, b) => a.localeCompare(b, undefined, { numeric:true }) );
+      lines.reverse();
+      lines.forEach(version => {
+        $("#doc_version_list").append("<a class=\"dropdown-item\" href=\""+ docs_site + version + "\">" + version + "</a>");
+      });
+
+      var selected_version = $('.nav-versions .dropdown-item').filter(function(i, ver) {
+        return window.location.href.startsWith(ver.href);
+      });
+      selected_version.addClass('active');
+      $("#bd-versions").text(selected_version.text());
+
+    })
+  }
+  </script>
+  <!-- scripts -->
+  
+  
+</body>
+</html>

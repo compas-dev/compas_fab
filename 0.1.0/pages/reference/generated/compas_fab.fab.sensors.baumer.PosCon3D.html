@@ -1,0 +1,559 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>PosCon3D &mdash; compas_fab 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="compas_fab 0.0.1 documentation" href="../../../index.html"/>
+        <link rel="up" title="compas_fab.fab.sensors" href="../compas_fab.fab.sensors.html"/>
+        <link rel="prev" title="SerialSensor" href="compas_fab.fab.sensors.SerialSensor.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> compas_fab
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../gettingstarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../reference.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../compas_fab.html">compas_fab</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../compas_fab.fab.grasshopper.html">compas_fab.fab.grasshopper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compas_fab.fab.robots.html">compas_fab.fab.robots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../compas_fab.fab.robots.rfl.html">compas_fab.fab.robots.rfl</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../compas_fab.fab.sensors.html">compas_fab.fab.sensors</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="compas_fab.fab.sensors.SerialSensor.html">SerialSensor</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../compas_fab.fab.sensors.html#baumer-sensors">Baumer sensors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">compas_fab</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../reference.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="../compas_fab.html">compas_fab</a> &raquo;</li>
+        
+          <li><a href="../compas_fab.fab.sensors.html">compas_fab.fab.sensors</a> &raquo;</li>
+        
+      <li>PosCon3D</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/pages/reference/generated/compas_fab.fab.sensors.baumer.PosCon3D.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="poscon3d">
+<h1>PosCon3D<a class="headerlink" href="#poscon3d" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D">
+<em class="property">class </em><code class="descclassname">compas_fab.fab.sensors.baumer.</code><code class="descname">PosCon3D</code><span class="sig-paren">(</span><em>serial</em>, <em>address</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">compas_fab.fab.sensors.base.SerialSensor</span></code></p>
+<p>Provides an interface for the <a class="reference external" href="http://www.baumer.com/us-en/products/distance-measurement/light-section-sensors/poscon-3d-edge-measurement/">Baumer PosCon3D edge measurement sensor</a>.
+The sensor has different interfaces to retrieve its data. This
+class provides access to the serial interface (RS-485).</p>
+<p>This class is a context manager type, so it&#8217;s best used in combination
+with the <code class="docutils literal"><span class="pre">with</span></code> statement to ensure resource deallocation.</p>
+<p>The protocol of the sensor when operated via RS-485 indicates that
+access to it must be locked programmatically before starting operations
+and unlocked on completion. This is handled automatically if you use
+this class on a <code class="docutils literal"><span class="pre">with</span></code> statement, otherwise, the methods <code class="docutils literal"><span class="pre">begin()</span></code> and
+<code class="docutils literal"><span class="pre">end()</span></code> must be invoked by hand.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>serial</strong> (<code class="xref py py-obj docutils literal"><span class="pre">serial.Serial</span></code>) &#8211; Instance of the serial
+port used to communicate with the sensor.</li>
+<li><strong>address</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">int</span></code></a>) &#8211; PosCon3D sensors have an address
+assigned, which defaults to 1. There&#8217;s also a broadcast
+address (<code class="docutils literal"><span class="pre">PosCon3D.BROADCAST_ADDRESS</span></code>) that can be used
+to query the address of the sensor connected to the RS-485
+bus. Only one sensor can be in the bus when using the
+broadcast address to query for sensor&#8217;s address.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">serial</span> <span class="k">import</span> <span class="n">Serial</span>                                                   
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">Serial</span><span class="p">(</span><span class="s1">&#39;COM5&#39;</span><span class="p">,</span> <span class="mi">57600</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">as</span> <span class="n">serial</span><span class="p">:</span>                            
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">with</span> <span class="n">PosCon3D</span><span class="p">(</span><span class="n">serial</span><span class="p">,</span> <span class="n">PosCon3D</span><span class="o">.</span><span class="n">BROADCAST_ADDRESS</span><span class="p">)</span> <span class="k">as</span> <span class="n">broadcast_query</span><span class="p">:</span>   
+<span class="gp">... </span>        <span class="n">addr</span> <span class="o">=</span> <span class="n">broadcast_query</span><span class="o">.</span><span class="n">get_address</span><span class="p">()</span>                                
+<span class="gp">... </span>                                                                            
+<span class="gp">... </span>    <span class="k">with</span> <span class="n">PosCon3D</span><span class="p">(</span><span class="n">serial</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span> <span class="k">as</span> <span class="n">sensor</span><span class="p">:</span>                                  
+<span class="gp">... </span>        <span class="n">sensor</span><span class="o">.</span><span class="n">set_measurement_type</span><span class="p">(</span><span class="s1">&#39;Edge L rise&#39;</span><span class="p">)</span>                          
+<span class="gp">... </span>        <span class="n">sensor</span><span class="o">.</span><span class="n">set_precision</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>                                             
+<span class="gp">... </span>        <span class="n">data</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">get_measurement</span><span class="p">()</span>                                     
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.BROADCAST_ADDRESS">
+<code class="descname">BROADCAST_ADDRESS</code><em class="property"> = 0</em><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.BROADCAST_ADDRESS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.MEASUREMENT_TYPES">
+<code class="descname">MEASUREMENT_TYPES</code><em class="property"> = ('Edge L rise', 'Edge L fall', 'Edge R rise', 'Edge R fall', 'Width', 'Center width', 'Gap', 'Center gap')</em><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.MEASUREMENT_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.QUALITY">
+<code class="descname">QUALITY</code><em class="property"> = {0: 'Valid', 1: 'Low signal', 2: 'No edge', 3: 'Low signal, no edge', 4: 'No signal'}</em><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.QUALITY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.activate_flex_mount">
+<code class="descname">activate_flex_mount</code><span class="sig-paren">(</span><em>reference_thickness</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D.activate_flex_mount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.activate_flex_mount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Activates the FLEX Mount feature of the sensor to allow positioning it on an
+angled installation. The reference thickness is only required if the surface is
+uneven and an additional leveling auxiliary plate as been added.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.adjust_to_dark_object">
+<code class="descname">adjust_to_dark_object</code><span class="sig-paren">(</span><em>is_dark_object</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D.adjust_to_dark_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.adjust_to_dark_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjusts the sensor to detect darker or lighter surfaces.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.begin">
+<code class="descname">begin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D.begin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.begin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locks the sensor to start RS-485 communication.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method only needs to be called if not using
+a <code class="docutils literal"><span class="pre">with</span></code> statement to handle lifetime of the <cite>PosCon3D</cite> instance.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.deactivate_flex_mount">
+<code class="descname">deactivate_flex_mount</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D.deactivate_flex_mount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.deactivate_flex_mount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deactivates the FLEX Mount feature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.end">
+<code class="descname">end</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unlocks the sensor from RS-485 communication.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method only needs to be called if not using
+a <code class="docutils literal"><span class="pre">with</span></code> statement to handle lifetime of the <cite>PosCon3D</cite> instance.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.get_address">
+<code class="descname">get_address</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D.get_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.get_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the address of the RS-485 sensors currently connected to the bus. This command
+is only really useful when this class is initialized with the broadcast address,
+with the purpose of retrieving the address of a sensor connected.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>int</em> &#8211; Address of the PosCon3D sensor connected to the RS-485 bus.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Only one PosCon3D sensor can be connected to the bus for this operation to succeed.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.get_live_monitor_data">
+<code class="descname">get_live_monitor_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D.get_live_monitor_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.get_live_monitor_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the distance to the surface in the center of the laser beam and the
+angle at which it&#8217;s found.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>list</em> &#8211; angle and distance to the reference surface.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function is designed to aid in the installation of the sensor at an angle.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.get_measurement">
+<code class="descname">get_measurement</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D.get_measurement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.get_measurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the current measurement of the sensor according to the current settings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>tuple</em> &#8211; The current measurement and additionally a value indicating the quality of the measured value.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.send_command">
+<code class="descname">send_command</code><span class="sig-paren">(</span><em>address</em>, <em>command</em>, <em>data=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D.send_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.send_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a command to the sensor&#8217;s address specified. The command
+can optionally contain a data string.</p>
+<p>This method is mostly for internal use, as the higher-level API is
+exposed via dedicated methods.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>address</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">int</span></code></a>) &#8211; PosCon3D sensors have an address
+assigned, which defaults to 1. There&#8217;s also a broadcast
+address (<code class="docutils literal"><span class="pre">PosCon3D.BROADCAST_ADDRESS</span></code>) that can be used
+to query the address of the sensor connected to the RS-485
+bus. Only one sensor can be in the bus when using the
+broadcast address to query for sensor&#8217;s address.</li>
+<li><strong>command</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">string</span></code></a>) &#8211; A string indicating the command number
+to be executed.</li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">string</span></code></a>) &#8211; An optional string of data that is sent together with
+the command.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Result of the command. It can be a list or a single value depending on the operation.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.set_edge_height">
+<code class="descname">set_edge_height</code><span class="sig-paren">(</span><em>height</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D.set_edge_height"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.set_edge_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the minimum height of an edge to be detected.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>height</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">float</span></code></a>) &#8211; Minimum edge height.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.set_flex_mount">
+<code class="descname">set_flex_mount</code><span class="sig-paren">(</span><em>angle</em>, <em>distance</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D.set_flex_mount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.set_flex_mount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the FLEX Mount feature to a specific angle and distance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.set_measurement_type">
+<code class="descname">set_measurement_type</code><span class="sig-paren">(</span><em>measurement_type</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D.set_measurement_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.set_measurement_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the measurement type to use.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="67%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Measurement type</th>
+<th class="head">Function</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#8220;Edge L rise&#8221;</td>
+<td>Edge</td>
+</tr>
+<tr class="row-odd"><td>&#8220;Edge L fall&#8221;</td>
+<td>Edge</td>
+</tr>
+<tr class="row-even"><td>&#8220;Edge R rise&#8221;</td>
+<td>Edge</td>
+</tr>
+<tr class="row-odd"><td>&#8220;Edge R fall&#8221;</td>
+<td>Edge</td>
+</tr>
+<tr class="row-even"><td>&#8220;Width&#8221;</td>
+<td>Width</td>
+</tr>
+<tr class="row-odd"><td>&#8220;Center width&#8221;</td>
+<td>Width</td>
+</tr>
+<tr class="row-even"><td>&#8220;Gap&#8221;</td>
+<td>Gap</td>
+</tr>
+<tr class="row-odd"><td>&#8220;Center gap&#8221;</td>
+<td>Gap</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>measurement_type</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">string</span></code></a>) &#8211; Measurement type.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="compas_fab.fab.sensors.baumer.PosCon3D.set_precision">
+<code class="descname">set_precision</code><span class="sig-paren">(</span><em>precision</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/compas_fab/fab/sensors/baumer.html#PosCon3D.set_precision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compas_fab.fab.sensors.baumer.PosCon3D.set_precision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the precision the sensor will use to determine edges:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="20%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Value</th>
+<th class="head">Precision</th>
+<th class="head">Function values</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">0</span></code></td>
+<td>Standard</td>
+<td>Median=off, Moving Average=off</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">1</span></code></td>
+<td>High</td>
+<td>Median=7, Moving Average=16</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">2</span></code></td>
+<td>Very High</td>
+<td>Median=15, Moving Average=128</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>precision</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">int</span></code></a>) &#8211; Sensor precision to use.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The higher the precision, the slower the measurement gets.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="compas_fab.fab.sensors.SerialSensor.html" class="btn btn-neutral" title="SerialSensor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Gramazio Kohler Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

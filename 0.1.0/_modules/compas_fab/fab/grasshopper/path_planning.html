@@ -1,0 +1,504 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compas_fab.fab.grasshopper.path_planning &mdash; compas_fab 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../search.html"/>
+    <link rel="top" title="compas_fab 0.0.1 documentation" href="../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../index.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> compas_fab
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/gettingstarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/reference.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">compas_fab</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>compas_fab.fab.grasshopper.path_planning</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compas_fab.fab.grasshopper.path_planning</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">timeit</span> <span class="k">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
+<span class="kn">from</span> <span class="nn">compas_fab.fab.robots</span> <span class="k">import</span> <span class="n">Pose</span>
+<span class="kn">from</span> <span class="nn">compas_fab.fab.robots.rfl</span> <span class="k">import</span> <span class="n">Configuration</span><span class="p">,</span> <span class="n">SimulationCoordinator</span>
+<span class="kn">from</span> <span class="nn">compas_fab.fab.grasshopper.geometry</span> <span class="k">import</span> <span class="n">xform_from_matrix</span><span class="p">,</span> <span class="n">vrep_pose_from_plane</span>
+<span class="kn">from</span> <span class="nn">compas_fab.fab.grasshopper.helpers</span> <span class="k">import</span> <span class="n">mesh_from_guid</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">clr</span>
+    <span class="kn">import</span> <span class="nn">rhinoscriptsyntax</span> <span class="k">as</span> <span class="nn">rs</span>
+    <span class="kn">from</span> <span class="nn">Rhino.Geometry</span> <span class="k">import</span> <span class="n">Transform</span>
+    <span class="kn">from</span> <span class="nn">Rhino.Geometry</span> <span class="k">import</span> <span class="n">Mesh</span> <span class="k">as</span> <span class="n">RhinoMesh</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">platform</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_implementation</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;IronPython&#39;</span><span class="p">:</span>
+        <span class="k">raise</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;compas_fab.grasshopper.path_planning&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_transform_to_origin</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">xform</span><span class="p">):</span>
+    <span class="n">inverse</span> <span class="o">=</span> <span class="n">clr</span><span class="o">.</span><span class="n">StrongBox</span><span class="p">[</span><span class="n">Transform</span><span class="p">]()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">xform</span><span class="o">.</span><span class="n">TryGetInverse</span><span class="p">(</span><span class="n">inverse</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unable to get inverse of matrix&#39;</span><span class="p">)</span>
+
+    <span class="n">mesh</span><span class="o">.</span><span class="n">Transform</span><span class="p">(</span><span class="n">inverse</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mesh</span>
+
+
+<span class="k">def</span> <span class="nf">_create_rhino_mesh</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">):</span>
+    <span class="n">vertices</span> <span class="o">=</span> <span class="p">[</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vertices</span><span class="p">),</span> <span class="mi">3</span><span class="p">)]</span>
+    <span class="n">faces</span> <span class="o">=</span> <span class="p">[</span><span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">),</span> <span class="mi">3</span><span class="p">)]</span>
+    <span class="n">mesh</span> <span class="o">=</span> <span class="n">RhinoMesh</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">vertices</span><span class="p">:</span>
+        <span class="n">mesh</span><span class="o">.</span><span class="n">Vertices</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">face</span> <span class="ow">in</span> <span class="n">faces</span><span class="p">:</span>
+        <span class="n">mesh</span><span class="o">.</span><span class="n">Faces</span><span class="o">.</span><span class="n">AddFace</span><span class="p">(</span><span class="n">face</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">face</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">face</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">mesh</span>
+
+
+<div class="viewcode-block" id="PathVisualizer"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.grasshopper.path_planning.PathVisualizer.html#compas_fab.fab.grasshopper.path_planning.PathVisualizer">[docs]</a><span class="k">class</span> <span class="nc">PathVisualizer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handles the generation of meshes to visualize a full path plan</span>
+<span class="sd">    in Rhino/Grasshopper.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">building_member</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">building_member_pickup_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span> <span class="o">=</span> <span class="n">simulator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">robot</span> <span class="o">=</span> <span class="n">robot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">building_member</span> <span class="o">=</span> <span class="n">building_member</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">building_member_pickup_config</span> <span class="o">=</span> <span class="n">building_member_pickup_config</span>
+
+<div class="viewcode-block" id="PathVisualizer.get_frame_meshes"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.grasshopper.path_planning.PathVisualizer.html#compas_fab.fab.grasshopper.path_planning.PathVisualizer.get_frame_meshes">[docs]</a>    <span class="k">def</span> <span class="nf">get_frame_meshes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">ctx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieves all meshes required to render a specific frame of a path plan.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path (:obj:`list` of :class:`Configuration`): Represents a collision-free</span>
+<span class="sd">                path to a goal pose. It is the output of the path planning generated</span>
+<span class="sd">                by a :class:`Simulator` object.</span>
+<span class="sd">            frame (:obj:`int`): Frame number to retrieve.</span>
+<span class="sd">            ctx (:obj:`dict`): A dictionary to keep context. Within Grasshopper, this is</span>
+<span class="sd">                normally the ``sc.sticky`` object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: list of Rhino meshes that can be used to visualize the selected frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">first_start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">shape_handles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">get_all_visible_handles</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: get_all_visible_handles=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">first_start</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;rfl_meshes&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ctx</span><span class="p">:</span>
+            <span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;rfl_meshes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rfl_meshes</span><span class="p">(</span><span class="n">shape_handles</span><span class="p">)</span>
+
+        <span class="n">frame_config</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">set_robot_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="p">,</span> <span class="n">frame_config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: set_robot_config=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">meshes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">mesh_matrices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">get_object_matrices</span><span class="p">(</span><span class="n">shape_handles</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">handle</span><span class="p">,</span> <span class="n">mesh_matrix</span> <span class="ow">in</span> <span class="n">mesh_matrices</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">mesh</span> <span class="o">=</span> <span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;rfl_meshes&#39;</span><span class="p">][</span><span class="n">handle</span><span class="p">]</span><span class="o">.</span><span class="n">DuplicateShallow</span><span class="p">()</span>
+            <span class="n">mesh</span><span class="o">.</span><span class="n">Transform</span><span class="p">(</span><span class="n">xform_from_matrix</span><span class="p">(</span><span class="n">mesh_matrix</span><span class="p">))</span>
+            <span class="n">meshes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">building_member</span><span class="p">:</span>
+            <span class="n">gripping_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">building_member_pickup_config</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">building_member_pickup_config</span> <span class="k">else</span> <span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_building_member_info</span><span class="p">(</span><span class="n">gripping_config</span><span class="p">)</span>
+            <span class="n">mesh</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;mesh&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">DuplicateShallow</span><span class="p">()</span>
+            <span class="n">parent_transform</span> <span class="o">=</span> <span class="n">xform_from_matrix</span><span class="p">(</span><span class="n">mesh_matrices</span><span class="p">[</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;parent_handle&#39;</span><span class="p">]])</span>
+            <span class="n">relative_transform</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;relative_transform&#39;</span><span class="p">]</span>
+
+            <span class="n">mesh</span><span class="o">.</span><span class="n">Transform</span><span class="p">(</span><span class="n">Transform</span><span class="o">.</span><span class="n">Multiply</span><span class="p">(</span><span class="n">parent_transform</span><span class="p">,</span> <span class="n">relative_transform</span><span class="p">))</span>
+            <span class="n">meshes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: get all transformed meshes=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: total=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">first_start</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">meshes</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Indicates whether the path visualizer is in debug mode or not.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">debug</span>
+
+<div class="viewcode-block" id="PathVisualizer._get_rfl_meshes"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.grasshopper.path_planning.PathVisualizer.html#compas_fab.fab.grasshopper.path_planning.PathVisualizer._get_rfl_meshes">[docs]</a>    <span class="k">def</span> <span class="nf">_get_rfl_meshes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape_handles</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">shape_geometry</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">handle</span> <span class="ow">in</span> <span class="n">shape_handles</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;getShapeMesh&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">handle</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[])</span>
+            <span class="n">shape_geometry</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">))</span>
+
+        <span class="n">rfl_meshes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">mesh_matrices</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;getShapeMatrices&#39;</span><span class="p">,</span> <span class="n">shape_handles</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mesh_matrices</span><span class="p">),</span> <span class="mi">12</span><span class="p">):</span>
+            <span class="n">handle</span> <span class="o">=</span> <span class="n">shape_handles</span><span class="p">[</span><span class="n">i</span> <span class="o">//</span> <span class="mi">12</span><span class="p">]</span>
+            <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">shape_geometry</span><span class="p">[</span><span class="n">i</span> <span class="o">//</span> <span class="mi">12</span><span class="p">]</span>
+            <span class="n">transform</span> <span class="o">=</span> <span class="n">xform_from_matrix</span><span class="p">(</span><span class="n">mesh_matrices</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">12</span><span class="p">])</span>
+            <span class="n">mesh</span> <span class="o">=</span> <span class="n">_transform_to_origin</span><span class="p">(</span><span class="n">_create_rhino_mesh</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">),</span> <span class="n">transform</span><span class="p">)</span>
+            <span class="n">rfl_meshes</span><span class="p">[</span><span class="n">handle</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: create RFL meshes at origin=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">rfl_meshes</span></div>
+
+<div class="viewcode-block" id="PathVisualizer._get_building_member_info"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.grasshopper.path_planning.PathVisualizer.html#compas_fab.fab.grasshopper.path_planning.PathVisualizer._get_building_member_info">[docs]</a>    <span class="k">def</span> <span class="nf">_get_building_member_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gripping_config</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">set_robot_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="p">,</span> <span class="n">gripping_config</span><span class="p">)</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="n">mesh_from_guid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">building_member</span><span class="p">)</span>
+        <span class="n">handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">add_building_member</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="p">,</span> <span class="n">mesh</span><span class="p">)</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">get_object_matrices</span><span class="p">([</span><span class="n">handle</span><span class="p">])[</span><span class="n">handle</span><span class="p">]</span>
+
+        <span class="n">parent_handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">get_object_handle</span><span class="p">(</span><span class="s1">&#39;customGripper&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">mesh_matrix</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;getShapeMatrixRelative&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">handle</span><span class="p">,</span> <span class="n">parent_handle</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[])</span>
+
+        <span class="n">relative_transform</span> <span class="o">=</span> <span class="n">xform_from_matrix</span><span class="p">(</span><span class="n">mesh_matrix</span><span class="p">)</span>
+
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">xform_from_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+        <span class="n">mesh_at_origin</span> <span class="o">=</span> <span class="n">_transform_to_origin</span><span class="p">(</span><span class="n">rs</span><span class="o">.</span><span class="n">coercemesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">building_member</span><span class="p">),</span> <span class="n">transform</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: building member=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;mesh&#39;</span><span class="p">:</span> <span class="n">mesh_at_origin</span><span class="p">,</span>
+                <span class="s1">&#39;parent_handle&#39;</span><span class="p">:</span> <span class="n">parent_handle</span><span class="p">,</span>
+                <span class="s1">&#39;relative_transform&#39;</span><span class="p">:</span> <span class="n">relative_transform</span><span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="PathPlanner"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.grasshopper.path_planning.PathPlanner.html#compas_fab.fab.grasshopper.path_planning.PathPlanner">[docs]</a><span class="k">class</span> <span class="nc">PathPlanner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provides a simple/compact API to call the path planner from Grasshopper.&quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="PathPlanner.find_path"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.grasshopper.path_planning.PathPlanner.html#compas_fab.fab.grasshopper.path_planning.PathPlanner.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">19997</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Finds a path for the specified scene description. There is a large number</span>
+<span class="sd">        of parameters that can be passed as `kwargs`. It can run in two modes: *remote* or</span>
+<span class="sd">        *local*. In remote mode, the `host` and `port` parameters correspond to a</span>
+<span class="sd">        simulation coordinator, and in local mode, `host` and `port` correspond to</span>
+<span class="sd">        a V-REP instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            host (:obj:`str`): IP address of the service (simulation coordinator in `remote`, V-REP in `local` mode)</span>
+<span class="sd">            port (:obj:`int`): Port of the service.</span>
+<span class="sd">            mode (:obj:`str`): Execution mode, either ``local`` or ``remote``.</span>
+<span class="sd">            kwargs: Keyword arguments.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: list of configurations representing a path.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">InputParameterParser</span><span class="p">()</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;robots&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="n">active_robot</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="s1">&#39;robots&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">settings</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;robots&#39;</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="s1">&#39;robot&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;&#39;robot&#39; not found at kwargs[&#39;robots&#39;][</span><span class="si">%d</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+
+                <span class="n">robot</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;robot&#39;</span><span class="p">:</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;robot&#39;</span><span class="p">]}</span>
+
+                <span class="k">if</span> <span class="s1">&#39;start&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get_config_or_pose</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">start</span><span class="p">:</span>
+                        <span class="n">robot</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start</span><span class="o">.</span><span class="n">to_data</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="s1">&#39;goal&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">active_robot</span><span class="p">:</span>
+                        <span class="n">active_robot</span> <span class="o">=</span> <span class="n">robot</span>
+                        <span class="n">goal</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get_config_or_pose</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;goal&#39;</span><span class="p">])</span>
+                        <span class="k">if</span> <span class="n">goal</span><span class="p">:</span>
+                            <span class="n">robot</span><span class="p">[</span><span class="s1">&#39;goal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">goal</span><span class="o">.</span><span class="n">to_data</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Multi-move is not (yet) supported. Only one goal can be specified.&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="s1">&#39;building_member&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+                    <span class="n">robot</span><span class="p">[</span><span class="s1">&#39;building_member&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_from_guid</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;building_member&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to_data</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="s1">&#39;metric_values&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+                    <span class="n">robot</span><span class="p">[</span><span class="s1">&#39;metric_values&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;metric_values&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="s1">&#39;joint_limits&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+                    <span class="n">robot</span><span class="p">[</span><span class="s1">&#39;joint_limits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;joint_limits&#39;</span><span class="p">]</span>
+
+                <span class="n">options</span><span class="p">[</span><span class="s1">&#39;robots&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;collision_meshes&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">mesh_guids</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">compact_list</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;collision_meshes&#39;</span><span class="p">])</span>
+            <span class="n">options</span><span class="p">[</span><span class="s1">&#39;collision_meshes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">to_data</span><span class="p">(),</span> <span class="nb">map</span><span class="p">(</span><span class="n">mesh_from_guid</span><span class="p">,</span> <span class="n">mesh_guids</span><span class="p">))</span>
+
+        <span class="n">options</span><span class="p">[</span><span class="s1">&#39;debug&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">)</span>
+        <span class="n">options</span><span class="p">[</span><span class="s1">&#39;trials&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;trials&#39;</span><span class="p">)</span>
+        <span class="n">options</span><span class="p">[</span><span class="s1">&#39;shallow_state_search&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shallow_state_search&#39;</span><span class="p">)</span>
+        <span class="n">options</span><span class="p">[</span><span class="s1">&#39;optimize_path_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;optimize_path_length&#39;</span><span class="p">)</span>
+        <span class="n">options</span><span class="p">[</span><span class="s1">&#39;algorithm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;algorithm&#39;</span><span class="p">)</span>
+        <span class="n">options</span><span class="p">[</span><span class="s1">&#39;resolution&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;resolution&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;remote&#39;</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Running remote path planner executor. Host=</span><span class="si">%s</span><span class="s1">:</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">SimulationCoordinator</span><span class="o">.</span><span class="n">remote_executor</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Running local path planner executor. Host=</span><span class="si">%s</span><span class="s1">:</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">SimulationCoordinator</span><span class="o">.</span><span class="n">local_executor</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="InputParameterParser"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.grasshopper.path_planning.InputParameterParser.html#compas_fab.fab.grasshopper.path_planning.InputParameterParser">[docs]</a><span class="k">class</span> <span class="nc">InputParameterParser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Simplifies some tasks related to parsing Grasshopper input parameters</span>
+<span class="sd">    for path planning.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="InputParameterParser.compact_list"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.grasshopper.path_planning.InputParameterParser.html#compas_fab.fab.grasshopper.path_planning.InputParameterParser.compact_list">[docs]</a>    <span class="k">def</span> <span class="nf">compact_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compacts a list filtering all `None` values.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InputParameterParser.get_pose"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.grasshopper.path_planning.InputParameterParser.html#compas_fab.fab.grasshopper.path_planning.InputParameterParser.get_pose">[docs]</a>    <span class="k">def</span> <span class="nf">get_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plane_or_pose</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets a pose that is compatible with V-REP from a string containing</span>
+<span class="sd">        comma-separated floats or from a Rhino/Grasshopper plane.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            plane_or_pose (comma-separated :obj:`str` of a Rhino :obj:`Plane`):</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pose: :class:`.Pose` instance representing a transformation matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">plane_or_pose</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Pose</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="n">vrep_pose_from_plane</span><span class="p">(</span><span class="n">plane_or_pose</span><span class="p">))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Pose</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">plane_or_pose</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)))</span> <span class="k">if</span> <span class="n">plane_or_pose</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="InputParameterParser.get_config_or_pose"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.grasshopper.path_planning.InputParameterParser.html#compas_fab.fab.grasshopper.path_planning.InputParameterParser.get_config_or_pose">[docs]</a>    <span class="k">def</span> <span class="nf">get_config_or_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_values_or_plane</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parses multiple input data types and returns a configuration or a pose</span>
+<span class="sd">        represented as a transformation matrix.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config_values_or_plane (comma-separated :obj:`string`, or :class:`Configuration` instance,</span>
+<span class="sd">                or a Rhino :obj:`Plane`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config_values_or_plane</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Pose</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="n">vrep_pose_from_plane</span><span class="p">(</span><span class="n">config_values_or_plane</span><span class="p">))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">config_values_or_plane</span><span class="o">.</span><span class="n">external_axes</span> <span class="ow">and</span> <span class="n">config_values_or_plane</span><span class="o">.</span><span class="n">joint_values</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">config_values_or_plane</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">config_values_or_plane</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">Configuration</span><span class="o">.</span><span class="n">from_degrees_list</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Gramazio Kohler Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

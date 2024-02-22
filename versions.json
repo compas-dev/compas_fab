@@ -2,11 +2,151 @@
   {
     "name": "Latest",
     "version": "latest",
-    "url": "https://gramaziokohler.github.io/compas_fab/latest/"
+    "url": "https://compas.dev/compas_fab/latest/"
   },
   {
     "name": "1.0.1 (stable)",
     "version": "1.0.1",
-    "url": "https://gramaziokohler.github.io/compas_fab/1.0.1/"
+    "url": "https://compas.dev/compas_fab/1.0.1/"
+  },
+  {
+    "name": "0.28.0",
+    "version": "0.28.0",
+    "url": "https://compas.dev/compas_fab/0.28.0/"
+  },
+  {
+    "name": "0.27.0",
+    "version": "0.27.0",
+    "url": "https://compas.dev/compas_fab/0.27.0/"
+  },
+  {
+    "name": "0.26.0",
+    "version": "0.26.0",
+    "url": "https://compas.dev/compas_fab/0.26.0/"
+  },
+  {
+    "name": "0.25.0",
+    "version": "0.25.0",
+    "url": "https://compas.dev/compas_fab/0.25.0/"
+  },
+  {
+    "name": "0.24.0",
+    "version": "0.24.0",
+    "url": "https://compas.dev/compas_fab/0.24.0/"
+  },
+  {
+    "name": "0.23.0",
+    "version": "0.23.0",
+    "url": "https://compas.dev/compas_fab/0.23.0/"
+  },
+  {
+    "name": "0.22.0",
+    "version": "0.22.0",
+    "url": "https://compas.dev/compas_fab/0.22.0/"
+  },
+  {
+    "name": "0.21.1",
+    "version": "0.21.1",
+    "url": "https://compas.dev/compas_fab/0.21.1/"
+  },
+  {
+    "name": "0.21.0",
+    "version": "0.21.0",
+    "url": "https://compas.dev/compas_fab/0.21.0/"
+  },
+  {
+    "name": "0.20.1",
+    "version": "0.20.1",
+    "url": "https://compas.dev/compas_fab/0.20.1/"
+  },
+  {
+    "name": "0.20.0",
+    "version": "0.20.0",
+    "url": "https://compas.dev/compas_fab/0.20.0/"
+  },
+  {
+    "name": "0.19.1",
+    "version": "0.19.1",
+    "url": "https://compas.dev/compas_fab/0.19.1/"
+  },
+  {
+    "name": "0.19.0",
+    "version": "0.19.0",
+    "url": "https://compas.dev/compas_fab/0.19.0/"
+  },
+  {
+    "name": "0.18.3",
+    "version": "0.18.3",
+    "url": "https://compas.dev/compas_fab/0.18.3/"
+  },
+  {
+    "name": "0.18.2",
+    "version": "0.18.2",
+    "url": "https://compas.dev/compas_fab/0.18.2/"
+  },
+  {
+    "name": "0.18.0",
+    "version": "0.18.0",
+    "url": "https://compas.dev/compas_fab/0.18.0/"
+  },
+  {
+    "name": "0.17.1",
+    "version": "0.17.1",
+    "url": "https://compas.dev/compas_fab/0.17.1/"
+  },
+  {
+    "name": "0.17.0",
+    "version": "0.17.0",
+    "url": "https://compas.dev/compas_fab/0.17.0/"
+  },
+  {
+    "name": "0.16.0",
+    "version": "0.16.0",
+    "url": "https://compas.dev/compas_fab/0.16.0/"
+  },
+  {
+    "name": "0.15.0",
+    "version": "0.15.0",
+    "url": "https://compas.dev/compas_fab/0.15.0/"
+  },
+  {
+    "name": "0.14.0",
+    "version": "0.14.0",
+    "url": "https://compas.dev/compas_fab/0.14.0/"
+  },
+  {
+    "name": "0.13.1",
+    "version": "0.13.1",
+    "url": "https://compas.dev/compas_fab/0.13.1/"
+  },
+  {
+    "name": "0.13.0",
+    "version": "0.13.0",
+    "url": "https://compas.dev/compas_fab/0.13.0/"
+  },
+  {
+    "name": "0.12.0",
+    "version": "0.12.0",
+    "url": "https://compas.dev/compas_fab/0.12.0/"
+  },
+  {
+    "name": "0.11.0",
+    "version": "0.11.0",
+    "url": "https://compas.dev/compas_fab/0.11.0/"
+  },
+  {
+    "name": "0.10.1",
+    "version": "0.10.1",
+    "url": "https://compas.dev/compas_fab/0.10.1/"
+  },
+  {
+    "name": "0.10.0",
+    "version": "0.10.0",
+    "url": "https://compas.dev/compas_fab/0.10.0/"
+  },
+  {
+    "name": "0.1.0  ",
+    "version": "0.1.0  ",
+    "url": "https://compas.dev/compas_fab/0.1.0/"
   }
 ]

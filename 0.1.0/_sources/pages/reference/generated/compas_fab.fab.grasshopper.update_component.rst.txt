@@ -1,0 +1,6 @@
+update_component
+===========================================
+
+.. currentmodule:: compas_fab.fab.grasshopper
+
+.. autofunction:: update_component

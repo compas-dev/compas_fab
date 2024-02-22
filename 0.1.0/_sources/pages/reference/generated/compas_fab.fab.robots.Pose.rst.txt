@@ -1,0 +1,7 @@
+Pose
+==========================
+
+.. currentmodule:: compas_fab.fab.robots
+
+.. autoclass:: Pose
+   :members:

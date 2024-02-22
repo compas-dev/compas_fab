@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>compas_fab</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <meta name="author" content="" />
+    <meta name="description" content="" />
+
+    <link rel="shortcut icon" href="../../../../_static/images/compas.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/default.min.css">
+    <!-- <link rel="stylesheet" type="text/css" href="../../../../_static/css/prism.css" /> -->
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/compas.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/compas-reference.css" />
+
+    
+    
+    
+
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#compas-localnav">
+
+    <nav class="navbar navbar-expand compas-navbar">
+        <a class="navbar-brand" href="/">
+            <img src="../../../../_static/images/compas_icon_white.png" width="36px" height="36px" alt="compas" />
+        </a>
+
+        <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="../../../../index.html">COMPAS FAB</a></li>
+        </ul>
+
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a class="nav-link" target="_blank" href="https://github.com/compas-dev/compas_fab">Github</a></li>
+            <li class="nav-item"><a class="nav-link" target="_blank" href="https://compas-dev.github.io">COMPAS framework</a></li>
+        </ul>
+    </nav>    
+
+    <div class="container-fluid">
+        <div class="row flex-xl-nowrap">
+
+            <main class="col-12 col-md-9 col-xl-8 compas-content" role="main">
+                <div class="container">
+                
+
+                    
+
+                    <h1>Source code for compas_fab.backends.vrep.client</h1><div class="highlight"><pre><code>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">from</span> <span class="nn">timeit</span> <span class="k">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
+
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="k">import</span> <span class="n">Frame</span>
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="k">import</span> <span class="n">matrix_from_frame</span>
+
+<span class="kn">from</span> <span class="nn">compas_fab.backends.exceptions</span> <span class="k">import</span> <span class="n">BackendError</span>
+<span class="kn">from</span> <span class="nn">compas_fab.backends.vrep.remote_api</span> <span class="k">import</span> <span class="n">vrep</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="k">import</span> <span class="n">Configuration</span>
+
+<span class="n">DEFAULT_SCALE</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="n">DEFAULT_OP_MODE</span> <span class="o">=</span> <span class="n">vrep</span><span class="o">.</span><span class="n">simx_opmode_blocking</span>
+<span class="n">CHILD_SCRIPT_TYPE</span> <span class="o">=</span> <span class="n">vrep</span><span class="o">.</span><span class="n">sim_scripttype_childscript</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;compas_fab.backends.vrep.client&#39;</span><span class="p">)</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;VrepError&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;VrepClient&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="VrepError"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepError.html#compas_fab.backends.VrepError">[docs]</a><span class="k">class</span> <span class="nc">VrepError</span><span class="p">(</span><span class="n">BackendError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wraps an exception that occurred inside the simulation engine.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="VrepError.__init__"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepError.html#compas_fab.backends.VrepError.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">VrepError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">&#39;Error code: &#39;</span> <span class="o">+</span>
+                                        <span class="nb">str</span><span class="p">(</span><span class="n">error_code</span><span class="p">)</span> <span class="o">+</span>
+                                        <span class="s1">&#39;; &#39;</span> <span class="o">+</span> <span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_code</span> <span class="o">=</span> <span class="n">error_code</span></div></div>
+
+
+<div class="viewcode-block" id="VrepClient"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.html#compas_fab.backends.VrepClient">[docs]</a><span class="k">class</span> <span class="nc">VrepClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Interface to run simulations using VREP as</span>
+<span class="sd">    the engine for kinematics and path planning.</span>
+
+<span class="sd">    :class:`.VrepClient` is a context manager type, so it&#39;s best used in combination</span>
+<span class="sd">    with the ``with`` statement to ensure resource deallocation.</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        host (:obj:`str`): IP address or DNS name of the V-REP simulator.</span>
+<span class="sd">        port (:obj:`int`): Port of the V-REP simulator.</span>
+<span class="sd">        scale (:obj:`int`): Scaling of the model. Defaults to meters (``1``).</span>
+<span class="sd">        lua_script (:obj:`str`): Name of the LUA script on the V-REP scene.</span>
+<span class="sd">        debug (:obj:`bool`): True to enable debug messages, False otherwise.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; from compas_fab.backends import VrepClient</span>
+<span class="sd">        &gt;&gt;&gt; with VrepClient() as client:</span>
+<span class="sd">        ...     print (&#39;Connected: %s&#39; % client.is_connected)</span>
+<span class="sd">        Connected: True</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        For more examples, check out the :ref:`V-REP examples page &lt;examples_vrep&gt;`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SUPPORTED_PLANNERS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;bitrrt&#39;</span><span class="p">,</span> <span class="s1">&#39;bkpiece1&#39;</span><span class="p">,</span> <span class="s1">&#39;est&#39;</span><span class="p">,</span> <span class="s1">&#39;kpiece1&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;lazyprmstar&#39;</span><span class="p">,</span> <span class="s1">&#39;lbkpiece1&#39;</span><span class="p">,</span> <span class="s1">&#39;lbtrrt&#39;</span><span class="p">,</span> <span class="s1">&#39;pdst&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;prm&#39;</span><span class="p">,</span> <span class="s1">&#39;prrt&#39;</span><span class="p">,</span> <span class="s1">&#39;rrt&#39;</span><span class="p">,</span> <span class="s1">&#39;rrtconnect&#39;</span><span class="p">,</span> <span class="s1">&#39;rrtstar&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;sbl&#39;</span><span class="p">,</span> <span class="s1">&#39;stride&#39;</span><span class="p">,</span> <span class="s1">&#39;trrt&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VrepClient.__init__"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.__init__.html#compas_fab.backends.VrepClient.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">19997</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">DEFAULT_SCALE</span><span class="p">,</span> <span class="n">lua_script</span><span class="o">=</span><span class="s1">&#39;RFL&#39;</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">VrepClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">resolve_host</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_timeout_in_ms</span> <span class="o">=</span> <span class="o">-</span><span class="mi">50000000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread_cycle_in_ms</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lua_script</span> <span class="o">=</span> <span class="n">lua_script</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_added_handles</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Stop existing simulation, if any</span>
+        <span class="n">vrep</span><span class="o">.</span><span class="n">simxFinish</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Connecting to V-REP on </span><span class="si">%s</span><span class="s1">:</span><span class="si">%d</span><span class="s1">...&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+
+        <span class="c1"># Connect to V-REP, set a very large timeout for blocking commands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">=</span> <span class="n">vrep</span><span class="o">.</span><span class="n">simxStart</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">default_timeout_in_ms</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">thread_cycle_in_ms</span><span class="p">)</span>
+
+        <span class="c1"># Start simulation</span>
+        <span class="n">vrep</span><span class="o">.</span><span class="n">simxStartSimulation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span> <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">VrepError</span><span class="p">(</span><span class="s1">&#39;Unable to connect to V-REP on </span><span class="si">%s</span><span class="s1">:</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="c1"># Stop simulation</span>
+        <span class="n">vrep</span><span class="o">.</span><span class="n">simxStopSimulation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span> <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span>
+
+        <span class="c1"># Close the connection to V-REP</span>
+        <span class="n">vrep</span><span class="o">.</span><span class="n">simxFinish</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Objects are removed by V-REP itself when simulation stops</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_added_handles</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Disconnected from V-REP&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Indicates whether the client has an active connection.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if connected, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
+
+<div class="viewcode-block" id="VrepClient.get_object_handle"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.get_object_handle.html#compas_fab.backends.VrepClient.get_object_handle">[docs]</a>    <span class="k">def</span> <span class="nf">get_object_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the object handle (identifier) for a given object name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            object_name (:obj:`str`): Name of the object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: Object handle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_res</span><span class="p">,</span> <span class="n">handle</span> <span class="o">=</span> <span class="n">vrep</span><span class="o">.</span><span class="n">simxGetObjectHandle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span>
+                                                <span class="n">object_name</span><span class="p">,</span>
+                                                <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">handle</span></div>
+
+<div class="viewcode-block" id="VrepClient.get_object_matrices"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.get_object_matrices.html#compas_fab.backends.VrepClient.get_object_matrices">[docs]</a>    <span class="k">def</span> <span class="nf">get_object_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_handles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets a dictionary of matrices keyed by object handle.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            object_handles (:obj:`list` of :obj:`float`): List of object handles (identifiers)</span>
+<span class="sd">                to retrieve matrices from.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary of matrices represented by a :obj:`list` of 12 :obj:`float` values.</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            &gt;&gt;&gt; from compas_fab.backends import VrepClient</span>
+<span class="sd">            &gt;&gt;&gt; with VrepClient() as client:</span>
+<span class="sd">            ...     matrices = client.get_object_matrices([0])</span>
+<span class="sd">            ...     print([int(i) for i in matrices[0]])   # doctest: +SKIP</span>
+<span class="sd">            [0, 0, 0, 19, 0, 0, 0, 10, 0, 0, 0, 6]         # doctest: +SKIP</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            The resulting dictionary is keyed by object handle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_res</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">matrices</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;getShapeMatrices&#39;</span><span class="p">,</span> <span class="n">object_handles</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[])</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">object_handles</span><span class="p">[</span><span class="n">i</span> <span class="o">//</span> <span class="mi">12</span><span class="p">],</span> <span class="n">floats_from_vrep</span><span class="p">(</span><span class="n">matrices</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">12</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrices</span><span class="p">),</span> <span class="mi">12</span><span class="p">)])</span></div>
+
+<div class="viewcode-block" id="VrepClient.get_all_visible_handles"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.get_all_visible_handles.html#compas_fab.backends.VrepClient.get_all_visible_handles">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_visible_handles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets a list of object handles (identifiers) for all visible</span>
+<span class="sd">        shapes of the 3D model.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of object handles (identifiers) of the 3D model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;getRobotVisibleShapeHandles&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[])[</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="VrepClient.set_robot_metric"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.set_robot_metric.html#compas_fab.backends.VrepClient.set_robot_metric">[docs]</a>    <span class="k">def</span> <span class="nf">set_robot_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">metric_values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Assigns a metric defining relations between axis values of a robot.</span>
+
+<span class="sd">        It takes a list containing one value per configurable joint. Each value</span>
+<span class="sd">        ranges from 0 to 1, where 1 indicates the axis is blocked and cannot</span>
+<span class="sd">        move during inverse kinematic solving. A value of 1 on any of these</span>
+<span class="sd">        effectively removes one degree of freedom (DOF).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`compas_fab.robots.Robot`): Robot instance.</span>
+<span class="sd">            metric_values (:obj:`list` of :obj:`float`): List containing one value</span>
+<span class="sd">                per configurable joint. Each value ranges from 0 to 1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assert_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+
+        <span class="n">vrep</span><span class="o">.</span><span class="n">simxCallScriptFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">lua_script</span><span class="p">,</span>
+                                    <span class="n">CHILD_SCRIPT_TYPE</span><span class="p">,</span> <span class="s1">&#39;setTheMetric&#39;</span><span class="p">,</span>
+                                    <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">attr</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]],</span> <span class="n">metric_values</span><span class="p">,</span> <span class="p">[],</span>
+                                    <span class="nb">bytearray</span><span class="p">(),</span> <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VrepClient.set_robot_pose"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.set_robot_pose.html#compas_fab.backends.VrepClient.set_robot_pose">[docs]</a>    <span class="k">def</span> <span class="nf">set_robot_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Moves the robot to a given pose, specified as a frame.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`compas_fab.robots.Robot`): Robot instance to move.</span>
+<span class="sd">            frame (:class:`Frame`): Target or goal frame.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An instance of :class:`Configuration` found for the given pose.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assert_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+
+        <span class="c1"># First check if the start state is reachable</span>
+        <span class="n">joints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">get_configurable_joints</span><span class="p">())</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse_kinematics</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.</span><span class="p">]</span> <span class="o">*</span> <span class="n">joints</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot find a valid config for the given pose&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_robot_config</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">config</span></div>
+
+<div class="viewcode-block" id="VrepClient.set_robot_config"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.set_robot_config.html#compas_fab.backends.VrepClient.set_robot_config">[docs]</a>    <span class="k">def</span> <span class="nf">set_robot_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Moves the robot to the specified configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`compas_fab.robots.Robot`): Robot instance to move.</span>
+<span class="sd">            config (:class:`Configuration` instance): Describes the position of the</span>
+<span class="sd">                robot as an instance of :class:`Configuration`.</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            &gt;&gt;&gt; from compas_fab.robots import *</span>
+<span class="sd">            &gt;&gt;&gt; with VrepClient() as client:</span>
+<span class="sd">            ...     config = Configuration.from_prismatic_and_revolute_values([7.600, -4.500, -5.500],</span>
+<span class="sd">            ...                                                               to_radians([90, 0, 0, 0, 0, -90]))</span>
+<span class="sd">            ...     client.set_robot_config(rfl.Robot(&#39;A&#39;), config)</span>
+<span class="sd">            ...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assert_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported config value&#39;</span><span class="p">)</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="n">config_to_vrep</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_robot_metric</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;moveRobotFK&#39;</span><span class="p">,</span>
+                              <span class="p">[],</span> <span class="n">values</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;robot&#39;</span> <span class="o">+</span> <span class="n">robot</span><span class="o">.</span><span class="n">name</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="VrepClient.get_robot_config"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.get_robot_config.html#compas_fab.backends.VrepClient.get_robot_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_robot_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the current configuration of the specified robot.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`compas_fab.robots.Robot`): Robot instance.</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            &gt;&gt;&gt; from compas_fab.robots import *</span>
+<span class="sd">            &gt;&gt;&gt; with VrepClient() as client:</span>
+<span class="sd">            ...     config = client.get_robot_config(rfl.Robot(&#39;A&#39;))</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An instance of :class:`.Configuration`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assert_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+
+        <span class="n">_res</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;getRobotState&#39;</span><span class="p">,</span>
+                                                      <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">attr</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]],</span>
+                                                      <span class="p">[],</span> <span class="p">[])</span>
+        <span class="k">return</span> <span class="n">config_from_vrep</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VrepClient.forward_kinematics"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.forward_kinematics.html#compas_fab.backends.VrepClient.forward_kinematics">[docs]</a>    <span class="k">def</span> <span class="nf">forward_kinematics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates forward kinematics to get the current end-effector pose.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`compas_fab.robots.Robot`): Robot instance.</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            &gt;&gt;&gt; from compas_fab.robots import *</span>
+<span class="sd">            &gt;&gt;&gt; with VrepClient() as client:</span>
+<span class="sd">            ...     frame = client.forward_kinematics(rfl.Robot(&#39;A&#39;))</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An instance of :class:`Frame`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assert_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+
+        <span class="n">_res</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">pose</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;getIkTipPose&#39;</span><span class="p">,</span>
+                                                    <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">attr</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]],</span>
+                                                    <span class="p">[],</span> <span class="p">[])</span>
+        <span class="k">return</span> <span class="n">vrep_pose_to_frame</span><span class="p">(</span><span class="n">pose</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VrepClient.inverse_kinematics"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.inverse_kinematics.html#compas_fab.backends.VrepClient.inverse_kinematics">[docs]</a>    <span class="k">def</span> <span class="nf">inverse_kinematics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">goal_frame</span><span class="p">,</span> <span class="n">metric_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gantry_joint_limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_trials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates inverse kinematics to find valid robot configurations for the specified goal frame.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`compas_fab.robots.Robot`): Robot instance.</span>
+<span class="sd">            goal_frame (:class:`Frame`): Target or goal frame.</span>
+<span class="sd">            metric_values (:obj:`list` of :obj:`float`): List containing one value</span>
+<span class="sd">                per configurable joint. Each value ranges from 0 to 1,</span>
+<span class="sd">                where 1 indicates the axis/joint is blocked and cannot</span>
+<span class="sd">                move during inverse kinematic solving.</span>
+<span class="sd">            gantry_joint_limits (:obj:`list` of `float`): List of 6 floats defining the upper/lower limits of</span>
+<span class="sd">                gantry joints. Use this if you want to restrict the area in which to search for states.</span>
+<span class="sd">            arm_joint_limits (:obj:`list` of `float`): List of 12 floats defining the upper/lower limits of</span>
+<span class="sd">                arm joints. Use this if you want to restrict the working area in which to search for states.</span>
+<span class="sd">            max_trials (:obj:`int`): Number of trials to run. Set to ``None``</span>
+<span class="sd">                to retry infinitely.</span>
+<span class="sd">            max_results (:obj:`int`): Maximum number of result states to return.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of :class:`Configuration` objects representing</span>
+<span class="sd">            the collision-free configuration for the ``goal_frame``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assert_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+
+        <span class="n">joints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">get_configurable_joints</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">metric_values</span><span class="p">:</span>
+            <span class="n">metric_values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">]</span> <span class="o">*</span> <span class="n">joints</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_robot_metric</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">metric_values</span><span class="p">)</span>
+
+        <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_raw_robot_states</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">frame_to_vrep_pose</span><span class="p">(</span><span class="n">goal_frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">),</span> <span class="n">gantry_joint_limits</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="p">,</span> <span class="n">max_trials</span><span class="p">,</span> <span class="n">max_results</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">config_from_vrep</span><span class="p">(</span><span class="n">states</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">joints</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">states</span><span class="p">),</span> <span class="n">joints</span><span class="p">)]</span></div>
+
+    <span class="k">def</span> <span class="nf">_find_raw_robot_states</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">goal_vrep_pose</span><span class="p">,</span> <span class="n">gantry_joint_limits</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="p">,</span> <span class="n">max_trials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">final_states</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">retry_until_success</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">max_trials</span> <span class="k">else</span> <span class="kc">False</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">string_param_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">gantry_joint_limits</span> <span class="ow">or</span> <span class="n">arm_joint_limits</span><span class="p">:</span>
+                <span class="n">joint_limits</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">joint_limits</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">floats_to_vrep</span><span class="p">(</span><span class="n">gantry_joint_limits</span> <span class="ow">or</span> <span class="p">[],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span>
+                <span class="n">joint_limits</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">arm_joint_limits</span> <span class="ow">or</span> <span class="p">[])</span>
+                <span class="n">string_param_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">joint_limits</span><span class="p">)))</span>
+
+            <span class="n">res</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;searchRobotStates&#39;</span><span class="p">,</span>
+                                                         <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">attr</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">],</span>
+                                                          <span class="n">max_trials</span> <span class="ow">or</span> <span class="mi">1</span><span class="p">,</span>
+                                                          <span class="n">max_results</span><span class="p">],</span>
+                                                         <span class="n">goal_vrep_pose</span><span class="p">,</span> <span class="n">string_param_list</span><span class="p">)</span>
+
+            <span class="c1"># Even if the retry_until_success is set to True, we short circuit</span>
+            <span class="c1"># at some point to prevent infinite loops caused by misconfiguration</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">20</span> <span class="ow">or</span> <span class="p">(</span><span class="n">res</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">retry_until_success</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">VrepError</span><span class="p">(</span><span class="s1">&#39;Failed to search robot states&#39;</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+
+            <span class="n">final_states</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">final_states</span><span class="p">):</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Found </span><span class="si">%d</span><span class="s1"> valid robot states&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">final_states</span><span class="p">)</span> <span class="o">//</span> <span class="mi">9</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No valid robot states found, will retry.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">final_states</span>
+
+<div class="viewcode-block" id="VrepClient.pick_building_member"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.pick_building_member.html#compas_fab.backends.VrepClient.pick_building_member">[docs]</a>    <span class="k">def</span> <span class="nf">pick_building_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">building_member_mesh</span><span class="p">,</span> <span class="n">pickup_frame</span><span class="p">,</span> <span class="n">metric_values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Picks up a building member and attaches it to the robot.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`compas_fab.robots.Robot`): Robot instance to use for pick up.</span>
+<span class="sd">            building_member_mesh (:class:`compas.datastructures.Mesh`): Mesh</span>
+<span class="sd">                of the building member that will be attached to the robot.</span>
+<span class="sd">            pickup_pose (:class:`Frame`): Pickup frame.</span>
+<span class="sd">            metric_values (:obj:`list` of :obj:`float`): List containing one value</span>
+<span class="sd">                per configurable joint. Each value ranges from 0 to 1,</span>
+<span class="sd">                where 1 indicates the axis/joint is blocked and cannot</span>
+<span class="sd">                move during inverse kinematic solving.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: Object handle (identifier) assigned to the building member.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assert_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+
+        <span class="n">joints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">get_configurable_joints</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">metric_values</span><span class="p">:</span>
+            <span class="n">metric_values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">]</span> <span class="o">*</span> <span class="n">joints</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_robot_pose</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">pickup_frame</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_building_member</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">building_member_mesh</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_find_path_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">goal</span><span class="p">,</span> <span class="n">metric_values</span><span class="p">,</span> <span class="n">collision_meshes</span><span class="p">,</span>
+                        <span class="n">planner_id</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span>
+                        <span class="n">gantry_joint_limits</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="p">,</span> <span class="n">shallow_state_search</span><span class="p">,</span> <span class="n">optimize_path_length</span><span class="p">):</span>
+
+        <span class="n">joints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">get_configurable_joints</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">metric_values</span><span class="p">:</span>
+            <span class="n">metric_values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">]</span> <span class="o">*</span> <span class="n">joints</span>
+
+        <span class="k">if</span> <span class="n">planner_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_PLANNERS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported planner_id. Must be one of: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_PLANNERS</span><span class="p">))</span>
+
+        <span class="n">first_start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">collision_meshes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_meshes</span><span class="p">(</span><span class="n">collision_meshes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: add_meshes=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">first_start</span><span class="p">)</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_robot_metric</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">metric_values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: set_robot_metric=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;target_type&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">goal</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid goal type, you are using an internal function but passed incorrect args&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">goal</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;config&#39;</span><span class="p">:</span>
+            <span class="n">states</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">goal</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]:</span>
+                <span class="n">states</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">config_to_vrep</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">goal</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;pose&#39;</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">max_trials</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">shallow_state_search</span> <span class="k">else</span> <span class="mi">80</span>
+            <span class="n">max_results</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">shallow_state_search</span> <span class="k">else</span> <span class="mi">80</span>
+            <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_raw_robot_states</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">frame_to_vrep_pose</span><span class="p">(</span><span class="n">goal</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">),</span> <span class="n">gantry_joint_limits</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="p">,</span> <span class="n">max_trials</span><span class="p">,</span> <span class="n">max_results</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: search_robot_states=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">string_param_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">planner_id</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">gantry_joint_limits</span> <span class="ow">or</span> <span class="n">arm_joint_limits</span><span class="p">:</span>
+            <span class="n">joint_limits</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">joint_limits</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">floats_to_vrep</span><span class="p">(</span><span class="n">gantry_joint_limits</span> <span class="ow">or</span> <span class="p">[],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span>
+            <span class="n">joint_limits</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">arm_joint_limits</span> <span class="ow">or</span> <span class="p">[])</span>
+            <span class="n">string_param_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">joint_limits</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;About to execute path planner: planner_id=</span><span class="si">%s</span><span class="s1">, trials=</span><span class="si">%d</span><span class="s1">, shallow_state_search=</span><span class="si">%s</span><span class="s1">, optimize_path_length=</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                      <span class="n">planner_id</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="n">shallow_state_search</span><span class="p">,</span> <span class="n">optimize_path_length</span><span class="p">)</span>
+
+        <span class="n">res</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;searchRobotPath&#39;</span><span class="p">,</span>
+                                                   <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">attr</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">],</span>
+                                                    <span class="n">trials</span><span class="p">,</span>
+                                                    <span class="p">(</span><span class="nb">int</span><span class="p">)(</span><span class="n">resolution</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">),</span>
+                                                    <span class="mi">1</span> <span class="k">if</span> <span class="n">optimize_path_length</span> <span class="k">else</span> <span class="mi">0</span><span class="p">],</span>
+                                                   <span class="n">states</span><span class="p">,</span> <span class="n">string_param_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: search_robot_path=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">VrepError</span><span class="p">(</span><span class="s1">&#39;Failed to search robot path&#39;</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: total=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">first_start</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">config_from_vrep</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">joints</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">joints</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="VrepClient.plan_motion_to_config"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.plan_motion_to_config.html#compas_fab.backends.VrepClient.plan_motion_to_config">[docs]</a>    <span class="k">def</span> <span class="nf">plan_motion_to_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">goal_configs</span><span class="p">,</span> <span class="n">metric_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collision_meshes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="n">planner_id</span><span class="o">=</span><span class="s1">&#39;rrtconnect&#39;</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
+                              <span class="n">gantry_joint_limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shallow_state_search</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">optimize_path_length</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find a path plan to move the selected robot from its current position to one of the `goal_configs`.</span>
+
+<span class="sd">        This function is useful when it is required to get a path plan that ends in one</span>
+<span class="sd">        specific goal configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`compas_fab.robots.Robot`): Robot instance to move.</span>
+<span class="sd">            goal_configs (:obj:`list` of :class:`Configuration`): List of target or goal configurations.</span>
+<span class="sd">            metric_values (:obj:`list` of :obj:`float`): List containing one value</span>
+<span class="sd">                per configurable joint. Each value ranges from 0 to 1,</span>
+<span class="sd">                where 1 indicates the axis/joint is blocked and cannot</span>
+<span class="sd">                move during inverse kinematic solving.</span>
+<span class="sd">            collision_meshes (:obj:`list` of :class:`compas.datastructures.Mesh`): Collision meshes</span>
+<span class="sd">                to be taken into account when calculating the motion plan.</span>
+<span class="sd">                Defaults to ``None``.</span>
+<span class="sd">            planner_id (:obj:`str`): Name of the planner to use. Defaults to ``rrtconnect``.</span>
+<span class="sd">            trials (:obj:`int`): Number of search trials to run. Defaults to ``1``.</span>
+<span class="sd">            resolution (:obj:`float`): Validity checking resolution. This value</span>
+<span class="sd">                is specified as a fraction of the space&#39;s extent.</span>
+<span class="sd">                Defaults to ``0.02``.</span>
+<span class="sd">            gantry_joint_limits (:obj:`list` of `float`): List of 6 floats defining the upper/lower limits of</span>
+<span class="sd">                gantry joints. Use this if you want to restrict the working area of the path planner.</span>
+<span class="sd">            arm_joint_limits (:obj:`list` of `float`): List of 12 floats defining the upper/lower limits of</span>
+<span class="sd">                arm joints. Use this if you want to restrict the working area of the path planner.</span>
+<span class="sd">            shallow_state_search (:obj:`bool`): True to search only a minimum of</span>
+<span class="sd">                valid states before searching a path, False to search states intensively.</span>
+<span class="sd">            optimize_path_length (:obj:`bool`): True to search the path with minimal total length among all `trials`,</span>
+<span class="sd">                False to return the first valid path found. It only affects the output if `trials &gt; 1`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of :class:`Configuration` objects representing the</span>
+<span class="sd">            collision-free path to the ``goal_configs``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assert_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_path_plan</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;target_type&#39;</span><span class="p">:</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="n">goal_configs</span><span class="p">},</span>
+                                    <span class="n">metric_values</span><span class="p">,</span> <span class="n">collision_meshes</span><span class="p">,</span> <span class="n">planner_id</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span>
+                                    <span class="n">gantry_joint_limits</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="p">,</span> <span class="n">shallow_state_search</span><span class="p">,</span> <span class="n">optimize_path_length</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VrepClient.plan_motion"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.plan_motion.html#compas_fab.backends.VrepClient.plan_motion">[docs]</a>    <span class="k">def</span> <span class="nf">plan_motion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">goal_frame</span><span class="p">,</span> <span class="n">metric_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collision_meshes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">planner_id</span><span class="o">=</span><span class="s1">&#39;rrtconnect&#39;</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
+                    <span class="n">gantry_joint_limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shallow_state_search</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">optimize_path_length</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find a path plan to move the selected robot from its current position to the `goal_frame`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`compas_fab.robots.Robot`): Robot instance to move.</span>
+<span class="sd">            goal_frame (:class:`Frame`): Target or goal frame.</span>
+<span class="sd">            metric_values (:obj:`list` of :obj:`float`): List containing one value</span>
+<span class="sd">                per configurable joint. Each value ranges from 0 to 1,</span>
+<span class="sd">                where 1 indicates the axis/joint is blocked and cannot</span>
+<span class="sd">                move during inverse kinematic solving.</span>
+<span class="sd">            collision_meshes (:obj:`list` of :class:`compas.datastructures.Mesh`): Collision meshes</span>
+<span class="sd">                to be taken into account when calculating the motion plan.</span>
+<span class="sd">                Defaults to ``None``.</span>
+<span class="sd">            planner_id (:obj:`str`): Name of the planner to use. Defaults to ``rrtconnect``.</span>
+<span class="sd">            trials (:obj:`int`): Number of search trials to run. Defaults to ``1``.</span>
+<span class="sd">            resolution (:obj:`float`): Validity checking resolution. This value</span>
+<span class="sd">                is specified as a fraction of the space&#39;s extent.</span>
+<span class="sd">                Defaults to ``0.02``.</span>
+<span class="sd">            gantry_joint_limits (:obj:`list` of `float`): List of 6 floats defining the upper/lower limits of</span>
+<span class="sd">                gantry joints. Use this if you want to restrict the working area of the path planner.</span>
+<span class="sd">            arm_joint_limits (:obj:`list` of `float`): List of 12 floats defining the upper/lower limits of</span>
+<span class="sd">                arm joints. Use this if you want to restrict the working area of the path planner.</span>
+<span class="sd">            shallow_state_search (:obj:`bool`): True to search only a minimum of</span>
+<span class="sd">                valid states before searching a path, False to search states intensively.</span>
+<span class="sd">            optimize_path_length (:obj:`bool`): True to search the path with minimal total length among all `trials`,</span>
+<span class="sd">                False to return the first valid path found. It only affects the output if `trials &gt; 1`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of :class:`Configuration` objects representing the</span>
+<span class="sd">            collision-free path to the ``goal_frame``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assert_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_path_plan</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;target_type&#39;</span><span class="p">:</span> <span class="s1">&#39;pose&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="n">goal_frame</span><span class="p">},</span>
+                                    <span class="n">metric_values</span><span class="p">,</span> <span class="n">collision_meshes</span><span class="p">,</span> <span class="n">planner_id</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span>
+                                    <span class="n">gantry_joint_limits</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="p">,</span> <span class="n">shallow_state_search</span><span class="p">,</span> <span class="n">optimize_path_length</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VrepClient.add_building_member"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.add_building_member.html#compas_fab.backends.VrepClient.add_building_member">[docs]</a>    <span class="k">def</span> <span class="nf">add_building_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">building_member_mesh</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a building member to the 3D scene and attaches it to the robot.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`compas_fab.robots.Robot`): Robot instance to attach the building member to.</span>
+<span class="sd">            building_member_mesh (:class:`compas.datastructures.Mesh`): Mesh</span>
+<span class="sd">                of the building member that will be attached to the robot.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: Object handle (identifier) assigned to the building member.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            All meshes are automatically removed from the scene when the simulation ends.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assert_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+
+        <span class="n">handles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_meshes</span><span class="p">([</span><span class="n">building_member_mesh</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">handles</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">VrepError</span><span class="p">(</span><span class="s1">&#39;Expected one handle, but multiple found=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">handles</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">handle</span> <span class="o">=</span> <span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">parent_handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object_handle</span><span class="p">(</span><span class="s1">&#39;customGripper&#39;</span> <span class="o">+</span> <span class="n">robot</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_connection&#39;</span><span class="p">)</span>
+        <span class="n">vrep</span><span class="o">.</span><span class="n">simxSetObjectParent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">parent_handle</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">handle</span></div>
+
+<div class="viewcode-block" id="VrepClient.add_meshes"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.add_meshes.html#compas_fab.backends.VrepClient.add_meshes">[docs]</a>    <span class="k">def</span> <span class="nf">add_meshes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meshes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds meshes to the 3D scene.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            meshes (:obj:`list` of :class:`compas.datastructures.Mesh`): List</span>
+<span class="sd">                of meshes to add to the current simulation scene.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of object handles (identifiers) assigned to the meshes.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            All meshes are automatically removed from the scene when the simulation ends.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mesh_handles</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">mesh</span> <span class="ow">in</span> <span class="n">meshes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">mesh</span><span class="o">.</span><span class="n">is_trimesh</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The V-REP client only supports tri-meshes&#39;</span><span class="p">)</span>
+
+            <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">to_vertices_and_faces</span><span class="p">()</span>
+            <span class="n">vrep_packing</span> <span class="o">=</span> <span class="p">(</span><span class="n">floats_to_vrep</span><span class="p">([</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">vertices</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span> <span class="o">+</span>
+                            <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">faces</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">])</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">len</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span><span class="p">],</span> <span class="n">vrep_packing</span><span class="p">]</span>
+            <span class="n">handles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;buildMesh&#39;</span><span class="p">,</span>
+                                            <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                            <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                            <span class="p">[])[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">mesh_handles</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">handles</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_added_handles</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">handles</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mesh_handles</span></div>
+
+<div class="viewcode-block" id="VrepClient.remove_meshes"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.remove_meshes.html#compas_fab.backends.VrepClient.remove_meshes">[docs]</a>    <span class="k">def</span> <span class="nf">remove_meshes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh_handles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes meshes from the 3D scene.</span>
+
+<span class="sd">        This is functionally identical to ``remove_objects``, but it&#39;s here for</span>
+<span class="sd">        symmetry reasons.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mesh_handles (:obj:`list` of :obj:`int`): Object handles to remove.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_objects</span><span class="p">(</span><span class="n">mesh_handles</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VrepClient.remove_objects"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.remove_objects.html#compas_fab.backends.VrepClient.remove_objects">[docs]</a>    <span class="k">def</span> <span class="nf">remove_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_handles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes objects from the 3D scene.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            object_handles (:obj:`list` of :obj:`int`): Object handles to remove.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            Please note there&#39;s no need to clean up objects manually after the simulation</span>
+<span class="sd">            has completed, as those will be reset automatically anyway. This method is</span>
+<span class="sd">            only useful if you need to remove objects *during* a simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">handle</span> <span class="ow">in</span> <span class="n">object_handles</span><span class="p">:</span>
+            <span class="n">vrep</span><span class="o">.</span><span class="n">simxRemoveObject</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_added_handles</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">object_handles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_added_handles</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="VrepClient.run_child_script"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.VrepClient.run_child_script.html#compas_fab.backends.VrepClient.run_child_script">[docs]</a>    <span class="k">def</span> <span class="nf">run_child_script</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">in_ints</span><span class="p">,</span> <span class="n">in_floats</span><span class="p">,</span> <span class="n">in_strings</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">vrep</span><span class="o">.</span><span class="n">simxCallScriptFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">lua_script</span><span class="p">,</span>
+                                           <span class="n">CHILD_SCRIPT_TYPE</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span>
+                                           <span class="n">in_ints</span><span class="p">,</span> <span class="n">in_floats</span><span class="p">,</span> <span class="n">in_strings</span><span class="p">,</span>
+                                           <span class="nb">bytearray</span><span class="p">(),</span> <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">assert_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">robot</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No instance of robot found&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The robot instance has no model information attached&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;index&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">attr</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Robot model needs to define an index as part of the model.attr dictionary&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># NETWORKING HELPERS</span>
+<span class="c1"># A couple of simple networking helpers for host name resolution</span>
+<span class="c1"># --------------------------------------------------------------------------</span>
+
+
+<span class="k">def</span> <span class="nf">is_ipv4_address</span><span class="p">(</span><span class="n">addr</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">socket</span><span class="o">.</span><span class="n">inet_aton</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">resolve_host</span><span class="p">(</span><span class="n">host</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">is_ipv4_address</span><span class="p">(</span><span class="n">host</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">host</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostbyname</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># MAPPINGS</span>
+<span class="c1"># The following mapping functions are only internal to make sure</span>
+<span class="c1"># all transformations from and to V-REP are consistent</span>
+<span class="c1"># --------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">vrep_pose_to_frame</span><span class="p">(</span><span class="n">pose</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Frame</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="n">floats_from_vrep</span><span class="p">(</span><span class="n">pose</span><span class="p">,</span> <span class="n">scale</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">frame_to_vrep_pose</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="c1"># COMPAS FAB uses meters, just like V-REP,</span>
+    <span class="c1"># so in general, scale should always be 1</span>
+    <span class="n">pose</span> <span class="o">=</span> <span class="n">matrix_from_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="n">pose</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="n">scale</span>
+    <span class="n">pose</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="n">scale</span>
+    <span class="n">pose</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="n">scale</span>
+    <span class="k">return</span> <span class="n">pose</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">pose</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">pose</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">pose</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">config_from_vrep</span><span class="p">(</span><span class="n">list_of_floats</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="c1"># COMPAS FAB uses radians and meters, just like V-REP,</span>
+    <span class="c1"># so in general, scale should always be 1</span>
+    <span class="n">radians</span> <span class="o">=</span> <span class="n">list_of_floats</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+    <span class="n">prismatic_values</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span> <span class="n">list_of_floats</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">Configuration</span><span class="o">.</span><span class="n">from_prismatic_and_revolute_values</span><span class="p">(</span><span class="n">prismatic_values</span><span class="p">,</span> <span class="n">radians</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">config_to_vrep</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="c1"># COMPAS FAB uses radians and meters, just like V-REP,</span>
+    <span class="c1"># so in general, scale should always be 1</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span> <span class="o">/</span> <span class="n">scale</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">prismatic_values</span><span class="p">))</span>
+    <span class="n">values</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">revolute_values</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">values</span>
+
+
+<span class="k">def</span> <span class="nf">floats_to_vrep</span><span class="p">(</span><span class="n">list_of_floats</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">v</span> <span class="o">/</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">list_of_floats</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">floats_from_vrep</span><span class="p">(</span><span class="n">list_of_floats</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">v</span> <span class="o">*</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">list_of_floats</span><span class="p">]</span>
+</code></pre></div>
+                    
+                
+                </div>
+            </main>
+
+            <!-- site navigation sidebar -->
+
+            <div class="col-12 col-md-3 col-xl-2 compas-sidebar" role="navigation"> 
+                <div class="navbar-light">
+
+                    <form id="" class="d-flex compas-searchbox" action="../../../../search.html" method="get">
+                        <input class="form-control" type="text" name="q" placeholder="Search docs" />
+                        <input type="hidden" name="check_keywords" value="yes" />
+                        <input type="hidden" name="area" value="default" />
+
+                        <button class="navbar-toggler d-md-none compas-navigation-toggler" type="button" data-toggle="collapse" data-target="#compas-navigation" aria-controls="compas-navigation" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                    </form>
+
+                    
+                    
+
+                        <div class="navbar-expand-md">
+                            <div id="compas-navigation" class="collapse navbar-collapse compas-navigation">
+
+                            <ul class="nav flex-column">
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../overview.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../backends.html">Working with backends</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../examples.html">Examples</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../reference.html">API Reference</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../contributing.html">Contributor’s Guide</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../authors.html">Citing</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../changelog.html">Changelog</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../license.html">License</a></li>
+</ul>
+
+
+                            </div>
+                        </div>
+
+                    
+
+                </div>
+            </div>
+
+            <!-- table of contents of main content -->
+            
+            <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
+
+                
+
+                
+
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="bg-dark pb-5">
+        <div class="container text-center pt-5 pb-5 text-muted">
+            
+                Last updated on Nov 20, 2019.
+            
+
+            
+                Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+            
+        </div>
+    </footer>
+
+    
+        <script type="text/javascript">
+            var DOCUMENTATION_OPTIONS = {
+            URL_ROOT          : '',
+            VERSION           : '0.10.0',
+            COLLAPSE_INDEX    : false,
+            FILE_SUFFIX       : '.html',
+            HAS_SOURCE        : 'false',
+            SOURCELINK_SUFFIX : '.txt'
+            };
+        </script>
+
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.0.0/anchor.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script>
+
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/js/searchtools_.js"></script>
+        <!-- <script src="../../../../_static/js/prism.js"></script> -->
+
+        <script>
+        $(document).ready(function() {
+        $(".language-default code").addClass("python");
+        $(".language-python code").addClass("python");
+        $(".language-bash code").addClass("bash");
+        $(".language-cpp code").addClass("cpp");
+        $(".language-json code").addClass("json");
+        $(".language-none code").addClass("plaintext");
+
+        hljs.initHighlighting();
+        anchors.add();
+        });
+        </script>
+    
+</body>
+</html>

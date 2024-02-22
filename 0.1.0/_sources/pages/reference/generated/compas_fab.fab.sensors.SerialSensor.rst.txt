@@ -1,0 +1,7 @@
+SerialSensor
+===================================
+
+.. currentmodule:: compas_fab.fab.sensors
+
+.. autoclass:: SerialSensor
+   :members:

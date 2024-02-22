@@ -1,0 +1,6 @@
+mesh_from_guid
+=========================================
+
+.. currentmodule:: compas_fab.fab.grasshopper
+
+.. autofunction:: mesh_from_guid

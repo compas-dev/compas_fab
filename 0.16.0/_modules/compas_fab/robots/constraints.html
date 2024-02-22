@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>compas_fab - compas_fab.robots.constraints</title>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <meta name="author" content="" />
+  <meta name="description" content="" />
+
+  <link rel="shortcut icon" href="../../../_static/images/compas.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/default.min.css">
+  <link rel="stylesheet" type="text/css" href="../../../_static/css/compas.css" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/css/compas-reference.css" />
+
+  
+
+  
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body data-spy="scroll" data-target="#compas-toc">
+  <!-- header -->
+  <header id="header" class="compas-header d-flex align-items-center">
+    <nav class="navbar navbar-expand navbar-dark col flex-column flex-md-row text-center">
+      <!-- brand -->
+      <a class="navbar-brand" href="https://compas.dev/compas_fab/">
+        <img src="../../../_static/images/compas_icon_white.png" alt="COMPAS FAB" width="48px" height="48px" />
+      </a>
+      <!-- brand -->
+      <!-- primary -->
+      <ul class="navbar-nav">
+        <li class="nav-item active"><a class="nav-link" href="https://compas.dev/compas_fab/">COMPAS FAB</a></li>
+      </ul>
+      <!-- primary -->
+      <ul class="navbar-nav d-none d-md-flex ml-md-auto">
+        <!-- version -->
+        
+        <meta id="doc_versions" data-url="https://compas.dev/compas_fab/doc_versions.txt" data-docs="https://compas.dev/compas_fab/">
+        <li class="nav-item nav-versions dropdown">
+          <a class="nav-item nav-link dropdown-toggle mr-md-2" href="#" id="bd-versions" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            0.16.0
+          </a>
+          <div id="doc_version_list" class="dropdown-menu dropdown-menu-md-right" aria-labelledby="bd-versions"></div>
+        </li>
+        
+        <!-- version -->
+        <!-- social -->
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/compas-dev/compas_fab" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+        </li>
+        <!-- social -->
+      </ul>
+    </nav>
+  </header>
+  <!-- header -->
+  <!-- main -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- main -->
+      <main class="col-12 col-md-9 col-xl-7 px-2 px-md-5 pt-2 pb-5 compas-content" role="main">
+        
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-3 bg-white px-0">
+            <li class="breadcrumb-item"><a href="../../../index.html">docs</a></li>
+            
+              <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page">compas_fab.robots.constraints</li>
+          </ol>
+        </nav>
+        
+
+        
+        
+        <h1>Source code for compas_fab.robots.constraints</h1><div class="highlight"><pre><code>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Scale</span>
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Rotation</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;BoundingVolume&#39;</span><span class="p">,</span> <span class="s1">&#39;Constraint&#39;</span><span class="p">,</span> <span class="s1">&#39;JointConstraint&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;OrientationConstraint&#39;</span><span class="p">,</span> <span class="s1">&#39;PositionConstraint&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="BoundingVolume"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.BoundingVolume.html#compas_fab.robots.BoundingVolume">[docs]</a><span class="k">class</span> <span class="nc">BoundingVolume</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A container for describing a bounding volume.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    volume_type</span>
+<span class="sd">        The type of bounding volume, one of :attr:`BoundingVolume.VOLUME_TYPES`.</span>
+<span class="sd">    volume : :class:`compas.datastructures.Mesh` or :class:`compas.geometry.Primitive`</span>
+<span class="sd">        The volume can be either a :class:`compas.geometry.Box`, a</span>
+<span class="sd">        :class:`compas.geometry.Sphere`, or a</span>
+<span class="sd">        :class:`compas.datastructures.Mesh`.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    volume_type</span>
+<span class="sd">        The type of bounding volume, one of :attr:`BoundingVolume.VOLUME_TYPES`.</span>
+<span class="sd">    volume : :class:`compas.datastructures.Mesh` or :class:`compas.geometry.Primitive`</span>
+<span class="sd">        The volume can be either a :class:`compas.geometry.Box`, a</span>
+<span class="sd">        :class:`compas.geometry.Sphere`, or a</span>
+<span class="sd">        :class:`compas.datastructures.Mesh`.</span>
+
+<span class="sd">    Class attributes</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    BOX</span>
+<span class="sd">        Box bounding volume type.</span>
+<span class="sd">    SPHERE</span>
+<span class="sd">        Sphere bounding volume type.</span>
+<span class="sd">    MESH</span>
+<span class="sd">        Mesh bounding volume type.</span>
+<span class="sd">    VOLUME_TYPES</span>
+<span class="sd">        List of supported bounding volume types.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: Box bounding volume type</span>
+    <span class="n">BOX</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1">#: Sphere bounding volume type</span>
+    <span class="n">SPHERE</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="c1">#: Mesh bounding volume type</span>
+    <span class="n">MESH</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1">#: List of supported volume types</span>
+    <span class="n">VOLUME_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="n">BOX</span><span class="p">,</span> <span class="n">SPHERE</span><span class="p">,</span> <span class="n">MESH</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BoundingVolume.__init__"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.BoundingVolume.__init__.html#compas_fab.robots.BoundingVolume.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volume_type</span><span class="p">,</span> <span class="n">volume</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">volume_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">VOLUME_TYPES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Type must be one of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">VOLUME_TYPES</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">volume_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">volume</span> <span class="o">=</span> <span class="n">volume</span></div>
+
+<div class="viewcode-block" id="BoundingVolume.from_box"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.BoundingVolume.from_box.html#compas_fab.robots.BoundingVolume.from_box">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_box</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">box</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a :class:`BoundingVolume` from a :class:`compas.geometry.Box`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        box : :class:`compas.geometry.Box`</span>
+<span class="sd">            Box to define :class:`BoundingVolume` with.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`BoundingVolume`</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from compas.geometry import Frame</span>
+<span class="sd">        &gt;&gt;&gt; from compas.geometry import Box</span>
+<span class="sd">        &gt;&gt;&gt; from compas_fab.robots import BoundingVolume</span>
+<span class="sd">        &gt;&gt;&gt; box = Box(Frame.worldXY(), 1., 1., 1.)</span>
+<span class="sd">        &gt;&gt;&gt; bv = BoundingVolume.from_box(box)</span>
+<span class="sd">        &gt;&gt;&gt; bv.type</span>
+<span class="sd">        1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">BOX</span><span class="p">,</span> <span class="n">box</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BoundingVolume.from_sphere"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.BoundingVolume.from_sphere.html#compas_fab.robots.BoundingVolume.from_sphere">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_sphere</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sphere</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a :class:`BoundingVolume` from a :class:`compas.geometry.Sphere`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sphere : :class:`compas.geometry.Sphere`</span>
+<span class="sd">            Sphere to define :class:`BoundingVolume` with.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`BoundingVolume`</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from compas.geometry import Sphere</span>
+<span class="sd">        &gt;&gt;&gt; from compas_fab.robots import BoundingVolume</span>
+<span class="sd">        &gt;&gt;&gt; sphere = Sphere((1., 1., 1.), 5.)</span>
+<span class="sd">        &gt;&gt;&gt; bv = BoundingVolume.from_sphere(sphere)</span>
+<span class="sd">        &gt;&gt;&gt; bv.type</span>
+<span class="sd">        2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">SPHERE</span><span class="p">,</span> <span class="n">sphere</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BoundingVolume.from_mesh"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.BoundingVolume.from_mesh.html#compas_fab.robots.BoundingVolume.from_mesh">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_mesh</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mesh</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a :class:`BoundingVolume` from a :class:`compas.datastructures.Mesh`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mesh : :class:`compas.datastructures.Mesh`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`BoundingVolume`</span>
+<span class="sd">            Mesh to define :class:`BoundingVolume` with.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; import compas</span>
+<span class="sd">        &gt;&gt;&gt; from compas.datastructures import Mesh</span>
+<span class="sd">        &gt;&gt;&gt; from compas_fab.robots import BoundingVolume</span>
+<span class="sd">        &gt;&gt;&gt; mesh = Mesh.from_obj(compas.get(&#39;faces.obj&#39;))</span>
+<span class="sd">        &gt;&gt;&gt; bv = BoundingVolume.from_mesh(Mesh)</span>
+<span class="sd">        &gt;&gt;&gt; bv.type</span>
+<span class="sd">        3</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">MESH</span><span class="p">,</span> <span class="n">mesh</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BoundingVolume.scale"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.BoundingVolume.scale.html#compas_fab.robots.BoundingVolume.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scale the volume uniformly.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scale_factor : :obj:`float`</span>
+<span class="sd">            Scale factor to use in scaling operation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">Scale</span><span class="o">.</span><span class="n">from_factors</span><span class="p">([</span><span class="n">scale_factor</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">S</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BoundingVolume.transform"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.BoundingVolume.transform.html#compas_fab.robots.BoundingVolume.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transformation</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform the volume using a :class:`compas.geometry.Transformation`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        transformation : :class:`compas.geometry.Transformation`</span>
+<span class="sd">            The transformation to apply on the :class:`BoundingVolume`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">transformation</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Printable representation of :class:`BoundingVolume`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;BoundingVolume(</span><span class="si">{0}</span><span class="s2">, </span><span class="si">{1}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BoundingVolume.copy"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.BoundingVolume.copy.html#compas_fab.robots.BoundingVolume.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make a copy of this :class:`BoundingVolume`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`BoundingVolume`</span>
+<span class="sd">            A copy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="Constraint"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.Constraint.html#compas_fab.robots.Constraint">[docs]</a><span class="k">class</span> <span class="nc">Constraint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for robot constraints.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    constraint_type</span>
+<span class="sd">        Constraint type, one of :attr:`Constraint.CONSTRAINT_TYPES`.</span>
+<span class="sd">    weight : :obj:`float`, optional</span>
+<span class="sd">        A weighting factor for this constraint. Denotes relative importance to</span>
+<span class="sd">        other constraints. Closer to zero means less important. Defaults to</span>
+<span class="sd">        ``1``.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    constraint_type</span>
+<span class="sd">        Constraint type, one of :attr:`Constraint.CONSTRAINT_TYPES`.</span>
+<span class="sd">    weight : :obj:`float`</span>
+<span class="sd">        A weighting factor for this constraint. Denotes relative importance to</span>
+<span class="sd">        other constraints. Closer to zero means less important.</span>
+
+<span class="sd">    Class Attributes</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    JOINT</span>
+<span class="sd">        Joint constraint type.</span>
+<span class="sd">    POSITION</span>
+<span class="sd">        Positional constraint type.</span>
+<span class="sd">    ORIENTATION</span>
+<span class="sd">        Orientational constraint type.</span>
+<span class="sd">    CONSTRAINT_TYPES</span>
+<span class="sd">        List of possible constraint types.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: Joint constraint type.</span>
+    <span class="n">JOINT</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1">#: Positional constraint type.</span>
+    <span class="n">POSITION</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="c1">#: Orientational constraint type.</span>
+    <span class="n">ORIENTATION</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1">#:  List of possible constraint types.</span>
+    <span class="n">CONSTRAINT_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="n">JOINT</span><span class="p">,</span> <span class="n">POSITION</span><span class="p">,</span> <span class="n">ORIENTATION</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Constraint.__init__"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.Constraint.__init__.html#compas_fab.robots.Constraint.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraint_type</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">constraint_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONSTRAINT_TYPES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Type must be </span><span class="si">%d</span><span class="s2">, </span><span class="si">%d</span><span class="s2"> or </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">CONSTRAINT_TYPES</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">constraint_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span></div>
+
+<div class="viewcode-block" id="Constraint.transform"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.Constraint.transform.html#compas_fab.robots.Constraint.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transformation</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform the :class:`Constraint`.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Constraint.scale"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.Constraint.scale.html#compas_fab.robots.Constraint.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scale the :class:`Constraint`.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Constraint.scaled"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.Constraint.scaled.html#compas_fab.robots.Constraint.scaled">[docs]</a>    <span class="k">def</span> <span class="nf">scaled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a scaled copy of this :class:`Constraint`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scale_factor : :obj:`float`</span>
+<span class="sd">            Scale factor used to scale the :class:`Constraint`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">scale_factor</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">c</span></div>
+
+<div class="viewcode-block" id="Constraint.copy"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.Constraint.copy.html#compas_fab.robots.Constraint.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a copy of this :class:`Constraint`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`BoundingVolume`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="JointConstraint"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.JointConstraint.html#compas_fab.robots.JointConstraint">[docs]</a><span class="k">class</span> <span class="nc">JointConstraint</span><span class="p">(</span><span class="n">Constraint</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Constrains the value of a joint to be within a certain bound.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    joint_name : :obj:`str`</span>
+<span class="sd">        The name of the joint this contraint refers to.</span>
+<span class="sd">    value : :obj:`float`</span>
+<span class="sd">        The targeted value for that joint.</span>
+<span class="sd">    tolerance_above : :obj:`float`</span>
+<span class="sd">        Tolerance above the targeted joint value, in radians. Defaults to ``0``.</span>
+<span class="sd">    tolerance_below : :obj:`float`</span>
+<span class="sd">        Tolerance below the targeted joint value, in radians. Defaults to ``0``.</span>
+<span class="sd">    weight : :obj:`float`, optional</span>
+<span class="sd">        A weighting factor for this constraint. Denotes relative importance to</span>
+<span class="sd">        other constraints. Closer to zero means less important. Defaults to</span>
+<span class="sd">        ``1``.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    joint_name : :obj:`str`</span>
+<span class="sd">        The name of the joint this contraint refers to.</span>
+<span class="sd">    value : :obj:`float`</span>
+<span class="sd">        The targeted value for that joint.</span>
+<span class="sd">    tolerance_above : :obj:`float`</span>
+<span class="sd">        Tolerance above the targeted joint value, in radians.</span>
+<span class="sd">    tolerance_below : :obj:`float`</span>
+<span class="sd">        Tolerance below the targeted joint value, in radians.</span>
+<span class="sd">    weight : :obj:`float`</span>
+<span class="sd">        A weighting factor for this constraint. Denotes relative importance to</span>
+<span class="sd">        other constraints. Closer to zero means less important.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from compas_fab.robots import JointConstraint</span>
+<span class="sd">    &gt;&gt;&gt; jc = JointConstraint(&quot;joint_0&quot;, 1.4, 0.1, 0.1, 1.0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="JointConstraint.__init__"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.JointConstraint.__init__.html#compas_fab.robots.JointConstraint.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">joint_name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">tolerance_above</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">tolerance_below</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">JointConstraint</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">JOINT</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">joint_name</span> <span class="o">=</span> <span class="n">joint_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tolerance_above</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tolerance_above</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tolerance_below</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tolerance_below</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="JointConstraint.scale"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.JointConstraint.scale.html#compas_fab.robots.JointConstraint.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scale (multiply) the constraint with a factor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scale_factor : :obj:`float`</span>
+<span class="sd">            Factor used to multiply the joint value and tolerance bounds with.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*=</span> <span class="n">scale_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tolerance_above</span> <span class="o">*=</span> <span class="n">scale_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tolerance_below</span> <span class="o">*=</span> <span class="n">scale_factor</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Printable representation of :class:`JointConstraint`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;JointConstraint(&#39;</span><span class="si">{0}</span><span class="s2">&#39;, </span><span class="si">{1}</span><span class="s2">, </span><span class="si">{2}</span><span class="s2">, </span><span class="si">{3}</span><span class="s2">, </span><span class="si">{4}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">joint_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance_above</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance_below</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+
+<div class="viewcode-block" id="JointConstraint.copy"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.JointConstraint.copy.html#compas_fab.robots.JointConstraint.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a copy of this :class:`JointConstraint`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`JointConstraint`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">joint_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance_above</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance_below</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="OrientationConstraint"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.OrientationConstraint.html#compas_fab.robots.OrientationConstraint">[docs]</a><span class="k">class</span> <span class="nc">OrientationConstraint</span><span class="p">(</span><span class="n">Constraint</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Constrains a link to be within a certain orientation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    link_name : :obj:`str`</span>
+<span class="sd">        The name of the link this contraint refers to.</span>
+<span class="sd">    quaternion : :obj:`list` of :obj:`float`</span>
+<span class="sd">        The desired orientation of the link specified by a quaternion in the</span>
+<span class="sd">        order of ``[w, x, y, z]``.</span>
+<span class="sd">    tolerances : :obj:`list` of :obj:`float`, optional</span>
+<span class="sd">        Error tolerances t\ :sub:`i` for each of the frame&#39;s axes. If only one</span>
+<span class="sd">        value is passed it will be used for all 3 axes. The respective bound to</span>
+<span class="sd">        be achieved is :math:`(a_{i} - t_{i}, a_{i} + t_{i})`. Defaults to</span>
+<span class="sd">        ``[0.01, 0.01, 0.01]``.</span>
+<span class="sd">    weight : :obj:`float`, optional</span>
+<span class="sd">        A weighting factor for this constraint. Denotes relative importance to</span>
+<span class="sd">        other constraints. Closer to zero means less important. Defaults to</span>
+<span class="sd">        ``1``.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    link_name : :obj:`str`</span>
+<span class="sd">        The name of the link this contraint refers to.</span>
+<span class="sd">    quaternion : :obj:`list` of :obj:`float`</span>
+<span class="sd">        The desired orientation of the link specified by a quaternion in the</span>
+<span class="sd">        order of ``[w, x, y, z]``.</span>
+<span class="sd">    tolerances : :obj:`list` of :obj:`float`</span>
+<span class="sd">        Error tolerances t\ :sub:`i` for each of the frame&#39;s axes. If only one</span>
+<span class="sd">        value is passed it will be used for all 3 axes. The respective bound to</span>
+<span class="sd">        be achieved is :math:`(a_{i} - t_{i}, a_{i} + t_{i})`.</span>
+<span class="sd">    weight : :obj:`float`</span>
+<span class="sd">        A weighting factor for this constraint. Denotes relative importance to</span>
+<span class="sd">        other constraints. Closer to zero means less important.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The rotation tolerance for an axis is defined by the other vector component</span>
+<span class="sd">    values for rotation around corresponding axis.</span>
+
+<span class="sd">    If you specify the tolerance vector with ``[0.01, 0.01, 6.3]``, it means</span>
+<span class="sd">    that the frame&#39;s x-axis and y-axis are allowed to rotate about the z-axis</span>
+<span class="sd">    by an angle of 6.3 radians, whereas the z-axis can only change 0.01.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from compas.geometry import Frame</span>
+<span class="sd">    &gt;&gt;&gt; from compas_fab.robots import OrientationConstraint</span>
+<span class="sd">    &gt;&gt;&gt; frame = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])</span>
+<span class="sd">    &gt;&gt;&gt; oc = OrientationConstraint(&quot;link_0&quot;, frame.quaternion)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="OrientationConstraint.__init__"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.OrientationConstraint.__init__.html#compas_fab.robots.OrientationConstraint.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link_name</span><span class="p">,</span> <span class="n">quaternion</span><span class="p">,</span> <span class="n">tolerances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OrientationConstraint</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ORIENTATION</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link_name</span> <span class="o">=</span> <span class="n">link_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quaternion</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">quaternion</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tolerances</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">tolerances</span><span class="p">)]</span> <span class="k">if</span> <span class="n">tolerances</span> <span class="k">else</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span></div>
+
+<div class="viewcode-block" id="OrientationConstraint.transform"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.OrientationConstraint.transform.html#compas_fab.robots.OrientationConstraint.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transformation</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform the volume using a :class:`compas.geometry.Transformation`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        transformation : :class:`compas.geometry.Transformation`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">Rotation</span><span class="o">.</span><span class="n">from_quaternion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quaternion</span><span class="p">)</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">transformation</span> <span class="o">*</span> <span class="n">R</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">quaternion</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">rotation</span><span class="o">.</span><span class="n">quaternion</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Printable representation of :class:`OrientationConstraint`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;OrientationConstraint(&#39;</span><span class="si">{0}</span><span class="s2">&#39;, </span><span class="si">{1}</span><span class="s2">, </span><span class="si">{2}</span><span class="s2">, </span><span class="si">{3}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">link_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quaternion</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerances</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OrientationConstraint.copy"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.OrientationConstraint.copy.html#compas_fab.robots.OrientationConstraint.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a copy of this :class:`OrientationConstraint`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`OrientationConstraint`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">link_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quaternion</span><span class="p">[:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerances</span><span class="p">[:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PositionConstraint"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.PositionConstraint.html#compas_fab.robots.PositionConstraint">[docs]</a><span class="k">class</span> <span class="nc">PositionConstraint</span><span class="p">(</span><span class="n">Constraint</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Constrains a link to be within a certain bounding volume.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    link_name : :obj:`str`</span>
+<span class="sd">        The name of the link this contraint refers to.</span>
+<span class="sd">    bounding_volume : :class:`BoundingVolume`</span>
+<span class="sd">        The volume this constraint refers to.</span>
+<span class="sd">    weight : :obj:`float`, optional</span>
+<span class="sd">        A weighting factor for this constraint. Denotes relative importance to</span>
+<span class="sd">        other constraints. Closer to zero means less important. Defaults to</span>
+<span class="sd">        ``1``.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    link_name : :obj:`str`</span>
+<span class="sd">        The name of the link this contraint refers to.</span>
+<span class="sd">    bounding_volume : :class:`BoundingVolume`</span>
+<span class="sd">        The volume this constraint refers to.</span>
+<span class="sd">    weight : :obj:`float`</span>
+<span class="sd">        A weighting factor for this constraint. Denotes relative importance to</span>
+<span class="sd">        other constraints. Closer to zero means less important.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from compas.geometry import Sphere</span>
+<span class="sd">    &gt;&gt;&gt; from compas_fab.robots import PositionConstraint</span>
+<span class="sd">    &gt;&gt;&gt; from compas_fab.robots import BoundingVolume</span>
+<span class="sd">    &gt;&gt;&gt; bv = BoundingVolume.from_sphere(Sphere((3,4,5), 0.5))</span>
+<span class="sd">    &gt;&gt;&gt; pc = PositionConstraint(&#39;link_0&#39;, bv, weight=1.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PositionConstraint.__init__"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.PositionConstraint.__init__.html#compas_fab.robots.PositionConstraint.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link_name</span><span class="p">,</span> <span class="n">bounding_volume</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PositionConstraint</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">POSITION</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link_name</span> <span class="o">=</span> <span class="n">link_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_volume</span> <span class="o">=</span> <span class="n">bounding_volume</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span></div>
+
+<div class="viewcode-block" id="PositionConstraint.from_box"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.PositionConstraint.from_box.html#compas_fab.robots.PositionConstraint.from_box">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_box</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">link_name</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a :class:`PositionConstraint` from a :class:`compas.geometry.Box`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        link_name: :obj:`str`</span>
+<span class="sd">            The name of the link this contraint refers to.</span>
+<span class="sd">        box : :class:`compas.geometry.Box`</span>
+<span class="sd">            Box defining the bounding volume this constraint refers to.</span>
+<span class="sd">        weight : :obj:`float`, optional</span>
+<span class="sd">            A weighting factor for this constraint. Denotes relative importance to</span>
+<span class="sd">            other constraints. Closer to zero means less important. Defaults to ``1``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`PositionConstraint`</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from compas.geometry import Frame</span>
+<span class="sd">        &gt;&gt;&gt; from compas.geometry import Box</span>
+<span class="sd">        &gt;&gt;&gt; box = Box(Frame.worldXY(), 4, 4, 4)</span>
+<span class="sd">        &gt;&gt;&gt; pc = PositionConstraint.from_box(&#39;link_0&#39;, box)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bounding_volume</span> <span class="o">=</span> <span class="n">BoundingVolume</span><span class="o">.</span><span class="n">from_box</span><span class="p">(</span><span class="n">box</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">link_name</span><span class="p">,</span> <span class="n">bounding_volume</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PositionConstraint.from_sphere"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.PositionConstraint.from_sphere.html#compas_fab.robots.PositionConstraint.from_sphere">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_sphere</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">link_name</span><span class="p">,</span> <span class="n">sphere</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a :class:`PositionConstraint` from a :class:`compas.geometry.Sphere`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        link_name : :obj:`str`</span>
+<span class="sd">            The name of the link this contraint refers to.</span>
+<span class="sd">        sphere : :class:`compas.geometry.Sphere`</span>
+<span class="sd">            Sphere defining the bounding volume this constraint refers to.</span>
+<span class="sd">        weight : :obj:`float`</span>
+<span class="sd">            A weighting factor for this constraint. Denotes relative importance to</span>
+<span class="sd">            other constraints. Closer to zero means less important. Defaults to ``1``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`PositionConstraint`</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from compas_fab.robots import PositionConstraint</span>
+<span class="sd">        &gt;&gt;&gt; from compas.geometry import Sphere</span>
+<span class="sd">        &gt;&gt;&gt; sphere = Sphere((3,4,5), 0.5)</span>
+<span class="sd">        &gt;&gt;&gt; pc = PositionConstraint.from_sphere(&#39;link_0&#39;, sphere, weight=1.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bounding_volume</span> <span class="o">=</span> <span class="n">BoundingVolume</span><span class="o">.</span><span class="n">from_sphere</span><span class="p">(</span><span class="n">sphere</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">link_name</span><span class="p">,</span> <span class="n">bounding_volume</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PositionConstraint.from_mesh"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.PositionConstraint.from_mesh.html#compas_fab.robots.PositionConstraint.from_mesh">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_mesh</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">link_name</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a class:`PositionConstraint` from a :class:`compas.datastructures.Mesh`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        link_name : :obj:`str`</span>
+<span class="sd">            The name of the link this contraint refers to.</span>
+<span class="sd">        mesh : :class:`compas.datastructures.Mesh`</span>
+<span class="sd">            Mesh defining the bounding volume this constraint refers to.</span>
+<span class="sd">        weight : :obj:`float`</span>
+<span class="sd">            A weighting factor for this constraint. Denotes relative importance</span>
+<span class="sd">            to other constraints. Closer to zero means less important. Defaults</span>
+<span class="sd">            to ``1``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`PositionConstraint`</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from compas.datastructures import Mesh</span>
+<span class="sd">        &gt;&gt;&gt; import compas</span>
+<span class="sd">        &gt;&gt;&gt; mesh = Mesh.from_obj(compas.get(&#39;faces.obj&#39;))</span>
+<span class="sd">        &gt;&gt;&gt; pc = PositionConstraint.from_mesh(&#39;link_0&#39;, mesh)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bounding_volume</span> <span class="o">=</span> <span class="n">BoundingVolume</span><span class="o">.</span><span class="n">from_mesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">link_name</span><span class="p">,</span> <span class="n">bounding_volume</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PositionConstraint.scale"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.PositionConstraint.scale.html#compas_fab.robots.PositionConstraint.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scale the :attr:`bounding_volume` uniformely.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scale_factor : :obj:`float`</span>
+<span class="sd">            Factor to scale constraining :attr:`bounding_volume`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_volume</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">scale_factor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PositionConstraint.transform"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.PositionConstraint.transform.html#compas_fab.robots.PositionConstraint.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transformation</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform the :attr:`bounding_volume` using a :class:`compas.geometry.Transformation`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        transformation : :class:`compas.geometry.Transformation`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_volume</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">transformation</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Printable representation of :class:`PositionConstraint`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;PositionConstraint(&#39;</span><span class="si">{0}</span><span class="s2">&#39;, </span><span class="si">{1}</span><span class="s2">, </span><span class="si">{2}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">link_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_volume</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PositionConstraint.copy"><a class="viewcode-back" href="../../../reference/generated/compas_fab.robots.PositionConstraint.copy.html#compas_fab.robots.PositionConstraint.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a copy of this :class:`PositionConstraint`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`PositionConstraint`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">link_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_volume</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span></div></div>
+</code></pre></div>
+        
+      </main>
+      <!-- content -->
+      <!-- sidebar -->
+      <div class="col-12 col-md-3 compas-sidebar" role="navigation">
+        <form id="search" class="d-flex align-items-center compas-searchbox" action="../../../search.html" method="get">
+          <input class="form-control" type="text" name="q" placeholder="Search docs" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+          <button class="navbar-toggler d-md-none" type="button" data-toggle="collapse" data-target="#compas-navigation" aria-controls="compas-navigation" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </form>
+        
+        
+          <div id="compas-navigation" class="collapse compas-navigation">
+          <ul class="nav flex-column">
+<li class="nav-item"><a class="nav-link reference internal" href="../../../overview.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../backends.html">Working with backends</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../examples.html">Examples</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../reference.html">API Reference</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../contributing.html">Contributor’s Guide</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../authors.html">Citing</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../license.html">License</a></li>
+</ul>
+
+          </div>
+        
+      </div>
+      <!-- sidebar -->
+      <!-- toc -->
+      <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
+        
+        
+      </div>
+      <!-- toc -->
+    </div>
+  </div>
+  <!-- main -->
+  <!-- footer -->
+  <footer class="compas-footer">
+    <nav class="nav p-2">
+      
+
+      
+    </nav>  
+  </footer>
+  <!-- footer -->
+  <!-- below -->
+  <div class="below py-5" style="background-color: #222;">
+    <div class="container">
+      <div class="row flex-column">
+      <div class="col-12 col-md-6 mx-md-auto text-center">
+        <h4 class="pb-3 below-text">COMPAS</h4>
+        <p class="below-text">
+          A computational framework for collaboration and research
+          in Architecture, Engineering, Fabrication, and Construction.
+        </p>
+        <nav class="nav justify-content-center pb-3">
+          <a class="nav-link mx-2 px-0 below-link" href="http://github.com/compas-dev" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+          <a class="nav-link mx-2 px-0 below-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+          <a class="nav-link mx-2 px-0 below-link" href="https://pypi.org/project/COMPAS/" target="_blank">
+            <span class="fab fa-python fa-1x"></span>
+          </a>
+        </nav>
+      </div>
+      </div>
+      <div class="row">
+      <div class="col text-center">
+        <p class="p-0 m-0 below-text">Copyright &copy; 2017-2021 compas-dev</p>
+      </div>
+      </div>
+    </div>
+  </div>
+  <!-- below -->
+  <!-- scripts -->
+  <script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+  URL_ROOT          : '',
+  VERSION           : '0.16.0',
+  COLLAPSE_INDEX    : false,
+  FILE_SUFFIX       : '.html',
+  HAS_SOURCE        : 'false',
+  SOURCELINK_SUFFIX : '.txt'
+  };
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https:////cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.0.0/anchor.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+
+  <script src="../../../_static/underscore.js"></script>
+  <script src="../../../_static/doctools.js"></script>
+  <script src="../../../_static/js/searchtools_.js"></script>
+
+  <script>
+  $(document).ready(function() {
+    $(".language-default code").addClass("python");
+    $(".language-python code").addClass("python");
+    $(".language-bash code").addClass("bash");
+    $(".language-cpp code").addClass("cpp");
+    $(".language-json code").addClass("json");
+    $(".language-none code").addClass("plaintext");
+
+    hljs.initHighlighting();
+    anchors.add();
+
+    $('.nav-versions .dropdown-item').filter(function(i, ver) {
+      return window.location.href.startsWith(ver.href);
+    }).addClass("active");
+
+  });
+
+
+  var url = $("#doc_versions").data("url");
+  var docs_site = $("#doc_versions").data("docs");
+
+  if (url) {
+    $.get(url, res=>{
+      var lines = res.match(/[^\r\n]+/g);
+      lines.forEach(version => {
+        $("#doc_version_list").append("<a class=\"dropdown-item\" href=\""+ docs_site + version + "\">" + version + "</a>");
+      });
+    })
+  }
+  </script>
+  <!-- scripts -->
+  
+  
+</body>
+</html>

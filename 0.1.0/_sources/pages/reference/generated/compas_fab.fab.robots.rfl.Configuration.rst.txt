@@ -1,0 +1,7 @@
+Configuration
+=======================================
+
+.. currentmodule:: compas_fab.fab.robots.rfl
+
+.. autoclass:: Configuration
+   :members:

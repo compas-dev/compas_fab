@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <title>compas_fab - compas_fab.backends.ros.fileserver_loader</title>
+  
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <meta name="author" content="" />
+  <meta name="description" content="" />
+
+  <link rel="shortcut icon" href="../../../../_static/images/compas.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/default.min.css">
+  <link rel="stylesheet" type="text/css" href="../../../../_static/css/compas.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../_static/css/compas-reference.css" />
+
+  
+
+  
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body data-spy="scroll" data-target="#compas-toc">
+  <!-- header -->
+  <header id="header" class="compas-header d-flex align-items-center">
+    <nav class="navbar navbar-expand navbar-dark col flex-column flex-md-row text-center">
+      <!-- brand -->
+      <a class="navbar-brand" href="https://compas.dev/compas_fab/">
+        <img src="../../../../_static/images/compas_icon_white.png" alt="COMPAS FAB" width="48px" height="48px" />
+      </a>
+      <!-- brand -->
+      <!-- primary -->
+      <ul class="navbar-nav">
+        <li class="nav-item active"><a class="nav-link" href="https://compas.dev/compas_fab/">COMPAS FAB</a></li>
+      </ul>
+      <!-- primary -->
+      <ul class="navbar-nav d-none d-md-flex ml-md-auto">
+        <!-- version -->
+        
+        <meta id="doc_versions" data-url="https://compas.dev/compas_fab/doc_versions.txt" data-docs="https://compas.dev/compas_fab/">
+        <li class="nav-item nav-versions dropdown">
+          <a class="nav-item nav-link dropdown-toggle mr-md-2" href="#" id="bd-versions" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            0.18.0
+          </a>
+          <div id="doc_version_list" class="dropdown-menu dropdown-menu-md-right" aria-labelledby="bd-versions"></div>
+        </li>
+        
+        <!-- version -->
+        <!-- social -->
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/compas-dev/compas_fab" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+        </li>
+        <!-- social -->
+      </ul>
+    </nav>
+  </header>
+  <!-- header -->
+  <!-- main -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- main -->
+      <main class="col-12 col-md-9 col-xl-7 px-2 px-md-5 pt-2 pb-5 compas-content" role="main">
+        
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-3 bg-white px-0">
+            <li class="breadcrumb-item"><a href="../../../../index.html">docs</a></li>
+            
+              <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page">compas_fab.backends.ros.fileserver_loader</li>
+          </ol>
+        </nav>
+        
+
+        
+        
+        <h1>Source code for compas_fab.backends.ros.fileserver_loader</h1><div class="highlight"><pre><code>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">binascii</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">import</span> <span class="nn">roslibpy</span>
+<span class="kn">from</span> <span class="nn">compas.datastructures</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">compas.datastructures</span> <span class="kn">import</span> <span class="n">mesh_transform</span>
+<span class="kn">from</span> <span class="nn">compas.files</span> <span class="kn">import</span> <span class="n">XML</span>
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Transformation</span>
+<span class="kn">from</span> <span class="nn">compas.robots.resources.basic</span> <span class="kn">import</span> <span class="n">_get_file_format</span>
+<span class="kn">from</span> <span class="nn">compas.robots.resources.basic</span> <span class="kn">import</span> <span class="n">_mesh_import</span>
+<span class="kn">from</span> <span class="nn">compas.utilities</span> <span class="kn">import</span> <span class="n">geometric_key</span>
+
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;compas_fab.backends.ros&#39;</span><span class="p">)</span>
+<span class="n">TIMEOUT</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;RosFileServerLoader&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_cache_file_exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">):</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Loading file </span><span class="si">%s</span><span class="s1"> from local cache dir&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_write_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">file_contents</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">):</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Saving file to </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_contents</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RosFileServerLoader"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.RosFileServerLoader.html#compas_fab.backends.RosFileServerLoader">[docs]</a><span class="k">class</span> <span class="nc">RosFileServerLoader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Allows to retrieve the mesh files specified in the robot model from the</span>
+<span class="sd">    ROS File Server. Optionally, it stores them on the local file system,</span>
+<span class="sd">    allowing for faster re-loads as well as enabling them to be loaded by</span>
+<span class="sd">    the local package loaders afterwards.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ros : :class:`compas_fab.backends.RosClient`</span>
+<span class="sd">         The ROS client.</span>
+<span class="sd">    local_cache : bool</span>
+<span class="sd">        ``True`` to store a local copy of the ROS files, otherwise ``False``.</span>
+<span class="sd">        Defaults to ``False``.</span>
+<span class="sd">    local_cache_directory : str, optional</span>
+<span class="sd">        Directory name to store the cached files. Only used if</span>
+<span class="sd">        ``local_cache`` is ``True``. Defaults to ``~/robot_description``.</span>
+<span class="sd">    precision : float</span>
+<span class="sd">        Defines precision for importing/loading meshes. Defaults to ``compas.PRECISION``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RosFileServerLoader.__init__"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.RosFileServerLoader.__init__.html#compas_fab.backends.RosFileServerLoader.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ros</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">local_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">local_cache_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">robot_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema_prefix</span> <span class="o">=</span> <span class="s1">&#39;package://&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ros</span> <span class="o">=</span> <span class="n">ros</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_cache_directory</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_cache_enabled</span> <span class="o">=</span> <span class="n">local_cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precision</span> <span class="o">=</span> <span class="n">precision</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_cache_enabled</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">local_cache_directory</span> <span class="o">=</span> <span class="n">local_cache_directory</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;robot_description&#39;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_robot_resource_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot_name</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Robot name is not assigned, make sure you loaded URDF first&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_cache_directory</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;local_cache_directory not set&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_cache_directory</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot_name</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_urdf_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_robot_resource_path</span><span class="p">,</span> <span class="s1">&#39;urdf&#39;</span><span class="p">,</span> <span class="s1">&#39;robot_description.urdf&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_srdf_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_robot_resource_path</span><span class="p">,</span> <span class="s1">&#39;robot_description_semantic.srdf&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RosFileServerLoader.load_urdf"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.RosFileServerLoader.load_urdf.html#compas_fab.backends.RosFileServerLoader.load_urdf">[docs]</a>    <span class="k">def</span> <span class="nf">load_urdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter_name</span><span class="o">=</span><span class="s1">&#39;/robot_description&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads a URDF model from the specified ROS parameter.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        parameter_name : str, optional</span>
+<span class="sd">            Name of the ROS parameter containing the robot description.</span>
+<span class="sd">            Defaults to ``/robot_description``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            URDF model of the robot currently loaded in ROS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_cache_enabled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot_name</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_urdf_filename</span>
+
+            <span class="k">if</span> <span class="n">_cache_file_exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">_read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="n">param</span> <span class="o">=</span> <span class="n">roslibpy</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ros</span><span class="p">,</span> <span class="n">parameter_name</span><span class="p">)</span>
+        <span class="n">urdf</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">TIMEOUT</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">robot_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_robot_name</span><span class="p">(</span><span class="n">urdf</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_cache_enabled</span><span class="p">:</span>
+            <span class="c1"># Retrieve filename again, now that robot_name</span>
+            <span class="c1"># has been loaded from URDF</span>
+            <span class="n">_write_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_urdf_filename</span><span class="p">,</span> <span class="n">urdf</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">urdf</span></div>
+
+<div class="viewcode-block" id="RosFileServerLoader.load_srdf"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.RosFileServerLoader.load_srdf.html#compas_fab.backends.RosFileServerLoader.load_srdf">[docs]</a>    <span class="k">def</span> <span class="nf">load_srdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter_name</span><span class="o">=</span><span class="s1">&#39;/robot_description_semantic&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads an SRDF model from the specified ROS parameter.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        parameter_name : str, optional</span>
+<span class="sd">            Name of the ROS parameter containing the robot semantics.</span>
+<span class="sd">            Defaults to ``/robot_description_semantic``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            SRDF model of the robot currently loaded in ROS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_cache_enabled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot_name</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_srdf_filename</span>
+
+            <span class="k">if</span> <span class="n">_cache_file_exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">_read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="n">param</span> <span class="o">=</span> <span class="n">roslibpy</span><span class="o">.</span><span class="n">Param</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ros</span><span class="p">,</span> <span class="n">parameter_name</span><span class="p">)</span>
+        <span class="n">srdf</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">TIMEOUT</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_cache_enabled</span><span class="p">:</span>
+            <span class="n">_write_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_srdf_filename</span><span class="p">,</span> <span class="n">srdf</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">srdf</span></div>
+
+    <span class="k">def</span> <span class="nf">_read_robot_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot_description</span><span class="p">):</span>
+        <span class="c1"># TODO: Optimize this. We really don&#39;t need to parse the full URDF</span>
+        <span class="c1"># only to read the robot&#39;s name (only used for local caching)</span>
+        <span class="n">xml</span> <span class="o">=</span> <span class="n">XML</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">robot_description</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">xml</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="RosFileServerLoader.can_load_mesh"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.RosFileServerLoader.can_load_mesh.html#compas_fab.backends.RosFileServerLoader.can_load_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">can_load_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determine whether this loader can load a given mesh URL.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        url : str</span>
+<span class="sd">            Mesh URL.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            ``True`` if the URL uses the ``package://` scheme,</span>
+<span class="sd">            otherwise ``False``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema_prefix</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RosFileServerLoader.load_mesh"><a class="viewcode-back" href="../../../../reference/generated/compas_fab.backends.RosFileServerLoader.load_mesh.html#compas_fab.backends.RosFileServerLoader.load_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">load_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads a mesh from local storage.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        url : str</span>
+<span class="sd">            Mesh location</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`Mesh` or list of :class:`Mesh`</span>
+<span class="sd">            Instance of a mesh.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">use_local_file</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">file_extension</span> <span class="o">=</span> <span class="n">_get_file_format</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_cache_enabled</span><span class="p">:</span>
+            <span class="n">local_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_mesh_filename</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="n">use_local_file</span> <span class="o">=</span> <span class="n">_cache_file_exists</span><span class="p">(</span><span class="n">local_filename</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">local_filename</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkstemp</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">file_extension</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;ros_fileserver_&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">use_local_file</span><span class="p">:</span>
+            <span class="n">service</span> <span class="o">=</span> <span class="n">roslibpy</span><span class="o">.</span><span class="n">Service</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ros</span><span class="p">,</span> <span class="s1">&#39;/file_server/get_file&#39;</span><span class="p">,</span> <span class="s1">&#39;file_server/GetBinaryFile&#39;</span><span class="p">)</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="n">roslibpy</span><span class="o">.</span><span class="n">ServiceRequest</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">url</span><span class="p">))</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">TIMEOUT</span><span class="p">)</span>
+
+            <span class="n">file_content</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">a2b_base64</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+
+            <span class="c1"># Just look away, we&#39;re about to do something nasty!</span>
+            <span class="c1"># namespaces are handled differently between the CLI and CPython</span>
+            <span class="c1"># XML parsers, so, we just get rid of it for DAE files</span>
+            <span class="k">if</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s1">&#39;dae&#39;</span><span class="p">:</span>
+                <span class="n">file_content</span> <span class="o">=</span> <span class="n">file_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;xmlns=&quot;http://www.collada.org/2005/11/COLLADASchema&quot;&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">file_content</span> <span class="o">=</span> <span class="n">file_content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;xmlns=&quot;https://www.collada.org/2005/11/COLLADASchema&quot;&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+            <span class="c1"># compas.files does not support file-like objects so we need to</span>
+            <span class="c1"># save the file to disk always. If local caching is enabled,</span>
+            <span class="c1"># we store it in the cache folder, otherwise, as a temp file.</span>
+            <span class="n">_write_file</span><span class="p">(</span><span class="n">local_filename</span><span class="p">,</span> <span class="n">file_content</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Nothing to do here, the file will be read by the mesh importer</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Loading mesh file </span><span class="si">%s</span><span class="s1"> from local cache dir&#39;</span><span class="p">,</span> <span class="n">local_filename</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_fileserver_mesh_import</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">local_filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_local_mesh_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_robot_resource_path</span><span class="p">,</span> <span class="n">url</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;package://&#39;</span><span class="p">):]))</span></div>
+
+
+<span class="k">def</span> <span class="nf">_dae_mesh_importer</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">precision</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This is a very simple implementation of a DAE/Collada parser.</span>
+
+<span class="sd">    Collada specification: https://www.khronos.org/files/collada_spec_1_5.pdf</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dae</span> <span class="o">=</span> <span class="n">XML</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">meshes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">visual_scenes</span> <span class="o">=</span> <span class="n">dae</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;library_visual_scenes&#39;</span><span class="p">)</span>
+    <span class="n">materials</span> <span class="o">=</span> <span class="n">dae</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;library_materials&#39;</span><span class="p">)</span>
+    <span class="n">effects</span> <span class="o">=</span> <span class="n">dae</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;library_effects&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">geometry</span> <span class="ow">in</span> <span class="n">dae</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;library_geometries/geometry&#39;</span><span class="p">):</span>
+        <span class="n">mesh_xml</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;mesh&#39;</span><span class="p">)</span>
+        <span class="n">mesh_id</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        <span class="n">matrix_node</span> <span class="o">=</span> <span class="n">visual_scenes</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;visual_scene/node/instance_geometry[@url=&quot;#</span><span class="si">{}</span><span class="s1">&quot;]/../matrix&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mesh_id</span><span class="p">))</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">matrix_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">matrix_node</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
+
+            <span class="c1"># If it&#39;s the identity matrix, then ignore, we don&#39;t need to transform it</span>
+            <span class="k">if</span> <span class="n">M</span> <span class="o">!=</span> <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span>
+                     <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span>
+                     <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span>
+                     <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]:</span>
+                <span class="n">M</span> <span class="o">=</span> <span class="n">M</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span> <span class="n">M</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">8</span><span class="p">],</span> <span class="n">M</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">12</span><span class="p">],</span> <span class="n">M</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">16</span><span class="p">]</span>
+                <span class="n">transform</span> <span class="o">=</span> <span class="n">Transformation</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+
+        <span class="c1"># primitive elements can be any combination of:</span>
+        <span class="c1"># lines, linestrips, polygons, polylist, triangles, trifans, tristrips</span>
+        <span class="c1"># The current implementation only supports triangles and polylist of triangular meshes</span>
+        <span class="n">primitive_element_sets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">primitive_element_sets</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">mesh_xml</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;triangles&#39;</span><span class="p">))</span>
+        <span class="n">primitive_element_sets</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">mesh_xml</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;polylist&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">primitive_element_sets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;No primitive elements found (currently only triangles and polylist are supported)&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">primitive_element_set</span> <span class="ow">in</span> <span class="n">primitive_element_sets</span><span class="p">:</span>
+            <span class="n">primitive_tag</span> <span class="o">=</span> <span class="n">primitive_element_set</span><span class="o">.</span><span class="n">tag</span>
+            <span class="n">primitive_set_data</span> <span class="o">=</span> <span class="n">primitive_element_set</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+            <span class="c1"># Try to retrieve mesh colors</span>
+            <span class="n">mesh_colors</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">if</span> <span class="n">materials</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">effects</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">instance_effect</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">material_id</span> <span class="o">=</span> <span class="n">primitive_element_set</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;material&#39;</span><span class="p">)</span>
+                    <span class="n">primitive_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">primitive_element_set</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">])</span>
+
+                    <span class="k">if</span> <span class="n">material_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">instance_effect</span> <span class="o">=</span> <span class="n">materials</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;material[@id=&quot;</span><span class="si">{}</span><span class="s1">&quot;]/instance_effect&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">material_id</span><span class="p">))</span>
+
+                    <span class="k">if</span> <span class="n">instance_effect</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">instance_effect_id</span> <span class="o">=</span> <span class="n">instance_effect</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+                        <span class="n">colors</span> <span class="o">=</span> <span class="n">effects</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;effect[@id=&quot;</span><span class="si">{}</span><span class="s1">&quot;]/profile_COMMON/technique/phong/*/color&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">instance_effect_id</span><span class="p">))</span>
+                        <span class="k">for</span> <span class="n">color_node</span> <span class="ow">in</span> <span class="n">colors</span><span class="p">:</span>
+                            <span class="n">rgba</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">color_node</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
+                            <span class="n">mesh_colors</span><span class="p">[</span><span class="s1">&#39;mesh_color.</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">color_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;sid&#39;</span><span class="p">])]</span> <span class="o">=</span> <span class="n">rgba</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Exception while loading materials, all materials of mesh file </span><span class="si">%s</span><span class="s1"> will be ignored &#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+            <span class="c1"># Parse vertices</span>
+            <span class="n">all_offsets</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">primitive_element_set</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;input[@offset]&#39;</span><span class="p">)])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">all_offsets</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Primitive element node does not contain offset information! Primitive tag=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">primitive_tag</span><span class="p">))</span>
+
+            <span class="n">vertices_input</span> <span class="o">=</span> <span class="n">primitive_element_set</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;input[@semantic=&quot;VERTEX&quot;]&#39;</span><span class="p">)</span>
+            <span class="n">vertices_id</span> <span class="o">=</span> <span class="n">vertices_input</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">vertices_link</span> <span class="o">=</span> <span class="n">mesh_xml</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;vertices[@id=&quot;</span><span class="si">{}</span><span class="s1">&quot;]/input&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vertices_id</span><span class="p">))</span>
+            <span class="n">positions</span> <span class="o">=</span> <span class="n">mesh_xml</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;source[@id=&quot;</span><span class="si">{}</span><span class="s1">&quot;]/float_array&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vertices_link</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">:]))</span>
+            <span class="n">positions</span> <span class="o">=</span> <span class="n">positions</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+            <span class="n">vertices</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">),</span> <span class="mi">3</span><span class="p">)]</span>
+
+            <span class="c1"># Parse faces</span>
+            <span class="c1"># Every nth element is a vertex key, we ignore the rest based on the offsets defined</span>
+            <span class="c1"># Usually, every second item is the normal, but there can be other items offset in there (vertex tangents, etc)</span>
+            <span class="n">skip_step</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">all_offsets</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">primitive_tag</span> <span class="o">==</span> <span class="s1">&#39;triangles&#39;</span><span class="p">:</span>
+                <span class="n">vcount</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">primitive_count</span>
+            <span class="k">elif</span> <span class="n">primitive_tag</span> <span class="o">==</span> <span class="s1">&#39;polylist&#39;</span><span class="p">:</span>
+                <span class="n">vcount</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">primitive_element_set</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;vcount&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vcount</span><span class="p">)</span> <span class="o">!=</span> <span class="n">primitive_count</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Primitive count does not match vertex per face count, vertex input id=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vertices_id</span><span class="p">))</span>
+
+            <span class="n">fkeys</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">primitive_set_data</span><span class="p">[::</span><span class="n">skip_step</span><span class="p">]]</span>
+            <span class="n">faces</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">primitive_count</span><span class="p">):</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">vcount</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">vcount</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fkeys</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">])</span>
+
+            <span class="c1"># Rebuild vertices and faces using the same logic that other importers</span>
+            <span class="c1"># use remapping everything based on a selected precision</span>
+            <span class="n">index_key</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+            <span class="n">vertex</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">xyz</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">geometric_key</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">precision</span><span class="p">)</span>
+                <span class="n">index_key</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+                <span class="n">vertex</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">xyz</span>
+
+            <span class="n">key_index</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">index</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vertex</span><span class="p">)}</span>
+            <span class="n">index_index</span> <span class="o">=</span> <span class="p">{</span><span class="n">index</span><span class="p">:</span> <span class="n">key_index</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="n">index_key</span><span class="o">.</span><span class="n">items</span><span class="p">())}</span>
+            <span class="n">vertices</span> <span class="o">=</span> <span class="p">[</span><span class="n">xyz</span> <span class="k">for</span> <span class="n">xyz</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="n">vertex</span><span class="o">.</span><span class="n">values</span><span class="p">())]</span>
+            <span class="n">faces</span> <span class="o">=</span> <span class="p">[[</span><span class="n">index_index</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">face</span><span class="p">]</span> <span class="k">for</span> <span class="n">face</span> <span class="ow">in</span> <span class="n">faces</span><span class="p">]</span>
+
+            <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_vertices_and_faces</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">mesh_colors</span><span class="p">:</span>
+                <span class="n">mesh</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">mesh_colors</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">transform</span><span class="p">:</span>
+                <span class="n">mesh_transform</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
+
+            <span class="n">meshes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">meshes</span>
+
+
+<span class="k">def</span> <span class="nf">_fileserver_mesh_import</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Internal function that adds primitive support for DAE files</span>
+<span class="sd">    to the _mesh_import function of compas.robots.&quot;&quot;&quot;</span>
+    <span class="n">file_extension</span> <span class="o">=</span> <span class="n">_get_file_format</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s1">&#39;dae&#39;</span><span class="p">:</span>
+        <span class="c1"># Magic!</span>
+        <span class="k">return</span> <span class="n">_dae_mesh_importer</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">precision</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># TODO: This _mesh_import should also add support for precision</span>
+        <span class="k">return</span> <span class="n">_mesh_import</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Start following processes on client side:</span>
+<span class="sd">    roslaunch YOUR_ROBOT_moveit_config demo.launch rviz_tutorial:=true</span>
+<span class="sd">    roslaunch rosbridge_server rosbridge_websocket.launch</span>
+<span class="sd">    roslaunch file_server.launch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">logging</span>
+    <span class="kn">from</span> <span class="nn">compas.robots</span> <span class="kn">import</span> <span class="n">RobotModel</span>
+    <span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">RosClient</span>
+
+    <span class="n">FORMAT</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%(asctime)-15s</span><span class="s1"> [</span><span class="si">%(levelname)s</span><span class="s1">] </span><span class="si">%(message)s</span><span class="s1">&#39;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">FORMAT</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">ros</span><span class="p">:</span>
+        <span class="n">local_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;workspace&#39;</span><span class="p">,</span> <span class="s1">&#39;robot_description&#39;</span><span class="p">)</span>
+        <span class="n">importer</span> <span class="o">=</span> <span class="n">RosFileServerLoader</span><span class="p">(</span><span class="n">ros</span><span class="p">,</span> <span class="n">local_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">local_cache_directory</span><span class="o">=</span><span class="n">local_directory</span><span class="p">)</span>
+        <span class="n">importer</span><span class="o">.</span><span class="n">robot_name</span> <span class="o">=</span> <span class="s1">&#39;abb_irb1600_6_12&#39;</span>
+
+        <span class="n">urdf</span> <span class="o">=</span> <span class="n">importer</span><span class="o">.</span><span class="n">load_urdf</span><span class="p">()</span>
+        <span class="n">srdf</span> <span class="o">=</span> <span class="n">importer</span><span class="o">.</span><span class="n">load_srdf</span><span class="p">()</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="n">RobotModel</span><span class="o">.</span><span class="n">from_urdf_string</span><span class="p">(</span><span class="n">urdf</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">load_geometry</span><span class="p">(</span><span class="n">importer</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</code></pre></div>
+        
+      </main>
+      <!-- content -->
+      <!-- sidebar -->
+      <div class="col-12 col-md-3 compas-sidebar" role="navigation">
+        <form id="search" class="d-flex align-items-center compas-searchbox" action="../../../../search.html" method="get">
+          <input class="form-control" type="text" name="q" placeholder="Search docs" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+          <button class="navbar-toggler d-md-none" type="button" data-toggle="collapse" data-target="#compas-navigation" aria-controls="compas-navigation" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </form>
+        
+        
+          <div id="compas-navigation" class="collapse compas-navigation">
+          <ul class="nav flex-column">
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../overview.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../backends.html">Working with backends</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../examples.html">Examples</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../reference.html">API Reference</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../contributing.html">Contributor’s Guide</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../authors.html">Citing</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../changelog.html">Changelog</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../../../license.html">License</a></li>
+</ul>
+
+          </div>
+        
+      </div>
+      <!-- sidebar -->
+      <!-- toc -->
+      <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
+        
+        
+      </div>
+      <!-- toc -->
+    </div>
+  </div>
+  <!-- main -->
+  <!-- footer -->
+  <footer class="compas-footer">
+    <nav class="nav p-2">
+      
+
+      
+    </nav>  
+  </footer>
+  <!-- footer -->
+  <!-- below -->
+  <div class="below py-5" style="background-color: #222;">
+    <div class="container">
+      <div class="row flex-column">
+      <div class="col-12 col-md-6 mx-md-auto text-center">
+        <h4 class="pb-3 below-text">COMPAS</h4>
+        <p class="below-text">
+          A computational framework for collaboration and research
+          in Architecture, Engineering, Fabrication, and Construction.
+        </p>
+        <nav class="nav justify-content-center pb-3">
+          <a class="nav-link mx-2 px-0 below-link" href="http://github.com/compas-dev" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+          <a class="nav-link mx-2 px-0 below-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+          <a class="nav-link mx-2 px-0 below-link" href="https://pypi.org/project/COMPAS/" target="_blank">
+            <span class="fab fa-python fa-1x"></span>
+          </a>
+        </nav>
+      </div>
+      </div>
+      <div class="row">
+      <div class="col text-center">
+        <p class="p-0 m-0 below-text">Copyright &copy; 2017-2021 compas-dev</p>
+      </div>
+      </div>
+    </div>
+  </div>
+  <!-- below -->
+  <!-- scripts -->
+  <script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+  URL_ROOT          : '',
+  VERSION           : '0.18.0',
+  COLLAPSE_INDEX    : false,
+  FILE_SUFFIX       : '.html',
+  HAS_SOURCE        : 'false',
+  SOURCELINK_SUFFIX : '.txt'
+  };
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https:////cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.0.0/anchor.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+
+  <script src="../../../../_static/underscore.js"></script>
+  <script src="../../../../_static/doctools.js"></script>
+  <script src="../../../../_static/js/searchtools_.js"></script>
+
+  <script>
+  $(document).ready(function() {
+    $(".language-default code").addClass("python");
+    $(".language-python code").addClass("python");
+    $(".language-bash code").addClass("bash");
+    $(".language-cpp code").addClass("cpp");
+    $(".language-json code").addClass("json");
+    $(".language-none code").addClass("plaintext");
+
+    hljs.initHighlighting();
+    anchors.add();
+
+    $('.nav-versions .dropdown-item').filter(function(i, ver) {
+      return window.location.href.startsWith(ver.href);
+    }).addClass("active");
+
+  });
+
+
+  var url = $("#doc_versions").data("url");
+  var docs_site = $("#doc_versions").data("docs");
+
+  if (url) {
+    $.get(url, res=>{
+      var lines = res.match(/[^\r\n]+/g);
+      lines.forEach(version => {
+        $("#doc_version_list").append("<a class=\"dropdown-item\" href=\""+ docs_site + version + "\">" + version + "</a>");
+      });
+    })
+  }
+  </script>
+  <!-- scripts -->
+  
+  
+</body>
+</html>

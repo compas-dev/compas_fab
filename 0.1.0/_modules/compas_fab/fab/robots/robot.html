@@ -1,0 +1,507 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compas_fab.fab.robots.robot &mdash; compas_fab 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../search.html"/>
+    <link rel="top" title="compas_fab 0.0.1 documentation" href="../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../index.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> compas_fab
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/gettingstarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/reference.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">compas_fab</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>compas_fab.fab.robots.robot</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compas_fab.fab.robots.robot</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">compas_fab.fab.geometry</span> <span class="k">import</span> <span class="n">Frame</span><span class="p">,</span> <span class="n">Transformation</span>
+<span class="kn">from</span> <span class="nn">tool</span> <span class="k">import</span> <span class="n">Tool</span>
+
+
+<span class="k">class</span> <span class="nc">Robot</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents the base class for all robots.</span>
+
+<span class="sd">    It consists of:</span>
+<span class="sd">    - a model: meshes</span>
+<span class="sd">    - a base: describes where the robot is attached to. This can be also a movable base: e.g. linear axis</span>
+<span class="sd">    - a basis frame, the frame it resides, e.g. Frame.worldXY()</span>
+<span class="sd">    - a transformation matrix to get coordinated represented in RCS</span>
+<span class="sd">    - a transformation matrix to get coordinated represented in WCS</span>
+<span class="sd">    - a tool, the end-effector</span>
+<span class="sd">    - communication: e.g. delegated by a client instance</span>
+<span class="sd">    - workspace: brep ?</span>
+
+<span class="sd">    self.configuration = [0,0,0,0,0,0]</span>
+<span class="sd">    self.tcp_frame = tcp_frame</span>
+<span class="sd">    self.tool0_frame = tool0_frame</span>
+
+<span class="sd">    # transform world to robot origin</span>
+<span class="sd">    self.T_W_R = rg.Transform.PlaneToPlane(Frame.worldXY, self.basis_frame)</span>
+<span class="sd">    # transform robot to world</span>
+<span class="sd">    self.T_R_W = rg.Transform.PlaneToPlane(self.basis_frame, Frame.worldXY)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># a list of meshes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_loaded</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basis_frame</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># move to UR !!!!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformation_RCS_WCS</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformation_WCS_RCS</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_base</span><span class="p">(</span><span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tool</span> <span class="o">=</span> <span class="n">Tool</span><span class="p">(</span><span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tool0_frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_loaded</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">set_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_frame</span><span class="p">):</span>
+        <span class="c1"># move to UR !!!!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_frame</span> <span class="o">=</span> <span class="n">base_frame</span>
+        <span class="c1"># transformation matrix from world coordinate system to robot coordinate system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformation_WCS_RCS</span> <span class="o">=</span> <span class="n">Transformation</span><span class="o">.</span><span class="n">from_frame_to_frame</span><span class="p">(</span><span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_frame</span><span class="p">)</span>
+        <span class="c1"># transformation matrix from robot coordinate system to world coordinate system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformation_RCS_WCS</span> <span class="o">=</span> <span class="n">Transformation</span><span class="o">.</span><span class="n">from_frame_to_frame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_frame</span><span class="p">,</span> <span class="n">Frame</span><span class="o">.</span><span class="n">worldXY</span><span class="p">())</span>
+        <span class="c1"># modify joint axis !        </span>
+    
+    <span class="k">def</span> <span class="nf">set_tool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tool</span> <span class="o">=</span> <span class="n">tool</span>
+
+    <span class="k">def</span> <span class="nf">get_robot_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tcp_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">tcp_frame</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">transformation_tool0_tcp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">transformation_tool0_tcp</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">transformation_tcp_tool0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">transformation_tcp_tool0</span>
+
+    <span class="k">def</span> <span class="nf">forward_kinematics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the tcp frame according to the joint angles q.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">inverse_kinematics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tcp_frame_RCS</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate solutions (joint angles) according to the queried tcp frame</span>
+<span class="sd">        (in RCS).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">get_frame_in_RCS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_WCS</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform the frame in world coordinate system (WCS) into a frame in</span>
+<span class="sd">        robot coordinate system (RCS), which is defined by the robots&#39; basis frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frame_RCS</span> <span class="o">=</span> <span class="n">frame_WCS</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transformation_WCS_RCS</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1">#frame_RCS = frame_WCS.transform(self.transformation_RCS_WCS)</span>
+        <span class="k">return</span> <span class="n">frame_RCS</span>
+    
+    <span class="k">def</span> <span class="nf">get_frame_in_WCS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_RCS</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform the frame in robot coordinate system (RCS) into a frame in </span>
+<span class="sd">        world coordinate system (WCS), which is defined by the robots&#39; basis frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frame_WCS</span> <span class="o">=</span> <span class="n">frame_RCS</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transformation_RCS_WCS</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">frame_WCS</span>
+    
+            
+    <span class="k">def</span> <span class="nf">get_tool0_frame_from_tcp_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_tcp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the tool0 frame (frame at robot) from the tool frame (frame_tcp).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">Transformation</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="n">frame_tcp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Frame</span><span class="o">.</span><span class="n">from_transformation</span><span class="p">(</span><span class="n">T</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation_tool0_tcp</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">get_tcp_frame_from_tool0_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame_tool0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the tcp frame from the tool0 frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">Transformation</span><span class="o">.</span><span class="n">from_frame</span><span class="p">(</span><span class="n">frame_tool0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Frame</span><span class="o">.</span><span class="n">from_transformation</span><span class="p">(</span><span class="n">T</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation_tcp_tool0</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="BaseConfiguration"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.robots.BaseConfiguration.html#compas_fab.fab.robots.BaseConfiguration">[docs]</a><span class="k">class</span> <span class="nc">BaseConfiguration</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents the configuration of a robot based on its</span>
+<span class="sd">    joint angle values and external axes values (if any).</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        joint_values (:obj:`list` of :obj:`float`): Joint values expressed</span>
+<span class="sd">            in degrees.</span>
+<span class="sd">        external_axes (:obj:`list` of :obj:`float`): Position on the external axis</span>
+<span class="sd">            system (if available).</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; from compas_fab.fab.robots import BaseConfiguration</span>
+<span class="sd">        &gt;&gt;&gt; config = BaseConfiguration.from_data({&#39;joint_values&#39;: [90., 0., 0.]})</span>
+<span class="sd">        &gt;&gt;&gt; config.joint_values</span>
+<span class="sd">        [90.0, 0.0, 0.0]</span>
+
+
+<span class="sd">        &gt;&gt;&gt; from compas_fab.fab.robots import BaseConfiguration</span>
+<span class="sd">        &gt;&gt;&gt; config = BaseConfiguration.from_data({&#39;joint_values&#39;: [90., 0., 0., 0., 180., 45.],\</span>
+<span class="sd">                                                 &#39;external_axes&#39;: [8312.0]})</span>
+<span class="sd">        &gt;&gt;&gt; str(config)</span>
+<span class="sd">        &#39;joints: [90.0, 0.0, 0.0, 0.0, 180.0, 45.0], external_axes: [8312.0]&#39;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">joint_values</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_axes</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;joints: </span><span class="si">%s</span><span class="s2">, external_axes: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">joint_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_axes</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="BaseConfiguration.from_joints"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.robots.BaseConfiguration.html#compas_fab.fab.robots.BaseConfiguration.from_joints">[docs]</a>    <span class="k">def</span> <span class="nf">from_joints</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">joint_values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a configuration from joint values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            joint_values (:obj:`list` of :obj:`float`): Joint values expressed</span>
+<span class="sd">                in degrees.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Configuration: A :class:`.Configuration` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_joints_and_external_axes</span><span class="p">(</span><span class="n">joint_values</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="BaseConfiguration.from_joints_and_external_axes"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.robots.BaseConfiguration.html#compas_fab.fab.robots.BaseConfiguration.from_joints_and_external_axes">[docs]</a>    <span class="k">def</span> <span class="nf">from_joints_and_external_axes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">joint_values</span><span class="p">,</span> <span class="n">external_axes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a configuration from joint values and external axes values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            joint_values (:obj:`list` of :obj:`float`): Joint values expressed</span>
+<span class="sd">                in degrees.</span>
+<span class="sd">            external_axes (:obj:`list` of :obj:`float`): Position on the external axis</span>
+<span class="sd">                system (if available).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Configuration: A :class:`.Configuration` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_data</span><span class="p">({</span><span class="s1">&#39;joint_values&#39;</span><span class="p">:</span> <span class="n">joint_values</span><span class="p">,</span> <span class="s1">&#39;external_axes&#39;</span><span class="p">:</span> <span class="n">external_axes</span><span class="p">})</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="BaseConfiguration.from_data"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.robots.BaseConfiguration.html#compas_fab.fab.robots.BaseConfiguration.from_data">[docs]</a>    <span class="k">def</span> <span class="nf">from_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a configuration from its data representation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (`dict`): The data dictionary.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Configuration: A :class:`.Configuration` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="n">config</span></div>
+
+<div class="viewcode-block" id="BaseConfiguration.to_data"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.robots.BaseConfiguration.html#compas_fab.fab.robots.BaseConfiguration.to_data">[docs]</a>    <span class="k">def</span> <span class="nf">to_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the data dict that represents the configuration, and from which it can</span>
+<span class="sd">        be reconstructed.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;:obj:`dict` : The data representing the configuration.</span>
+
+<span class="sd">        By assigning a data dict to this property, the current data of the configuration</span>
+<span class="sd">        will be replaced by the data in the dict. The data getter and setter should</span>
+<span class="sd">        always be used in combination with each other.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;joint_values&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">joint_values</span><span class="p">,</span>
+            <span class="s1">&#39;external_axes&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_axes</span>
+        <span class="p">}</span>
+
+    <span class="nd">@data</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">joint_values</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;joint_values&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_axes</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;external_axes&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span></div>
+
+
+<span class="c1"># TODO this can merge with Frame, as Frame euler_axis, quaternion, ..</span>
+<div class="viewcode-block" id="Pose"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.robots.Pose.html#compas_fab.fab.robots.Pose">[docs]</a><span class="k">class</span> <span class="nc">Pose</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a robot pose described as a 4x4 transformation matrix.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        values (:obj:`list` of :obj:`float`): list of 12 or 16 values representing a 4x4 matrix.</span>
+<span class="sd">            If 12 values are provided, the last row is assumed to be ``[0 0 0 1]``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">8</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">12</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">16</span><span class="p">])</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Pose.from_list"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.robots.Pose.html#compas_fab.fab.robots.Pose.from_list">[docs]</a>    <span class="k">def</span> <span class="nf">from_list</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a pose from a list of 12 or 16 :obj:`float` values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            list (:obj:`list` of :obj:`float`): list of 12 or 16 values representing a 4x4 matrix.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Pose: A :class:`.Pose` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_data</span><span class="p">({</span><span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">})</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Pose.from_data"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.robots.Pose.html#compas_fab.fab.robots.Pose.from_data">[docs]</a>    <span class="k">def</span> <span class="nf">from_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a pose from its data representation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (`dict`): The data dictionary.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Pose: A :class:`.Pose` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pose</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+        <span class="n">pose</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="n">pose</span></div>
+
+<div class="viewcode-block" id="Pose.to_data"><a class="viewcode-back" href="../../../../pages/reference/generated/compas_fab.fab.robots.Pose.html#compas_fab.fab.robots.Pose.to_data">[docs]</a>    <span class="k">def</span> <span class="nf">to_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the data dict that represents the pose, and from which it can</span>
+<span class="sd">        be reconstructed.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;:obj:`dict` : The data representing the pose.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;values&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">}</span>
+
+    <span class="nd">@data</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;values&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">12</span><span class="p">:</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">16</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Expected 12 or 16 floats but got </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">values</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">base_frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">([</span><span class="o">-</span><span class="mf">636.57</span><span class="p">,</span> <span class="mf">370.83</span><span class="p">,</span> <span class="mf">293.21</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.00000</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.54972</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.83535</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.92022</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.32695</span><span class="p">,</span> <span class="mf">0.21516</span><span class="p">])</span>
+    <span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">()</span>
+    <span class="n">robot</span><span class="o">.</span><span class="n">set_base</span><span class="p">(</span><span class="n">base_frame</span><span class="p">)</span>
+    <span class="n">T1</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">transformation_WCS_RCS</span>
+    <span class="n">T2</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">transformation_RCS_WCS</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">T1</span> <span class="o">*</span> <span class="n">T2</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">transformation_tcp_tool0</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Gramazio Kohler Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

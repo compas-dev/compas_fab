@@ -1,0 +1,7 @@
+PathPlanner
+====================================================
+
+.. currentmodule:: compas_fab.fab.grasshopper.path_planning
+
+.. autoclass:: PathPlanner
+   :members:

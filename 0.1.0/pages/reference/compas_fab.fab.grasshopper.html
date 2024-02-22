@@ -1,0 +1,297 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compas_fab.fab.grasshopper &mdash; compas_fab 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="compas_fab 0.0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="compas_fab" href="compas_fab.html"/>
+        <link rel="next" title="unload_modules" href="generated/compas_fab.fab.grasshopper.unload_modules.html"/>
+        <link rel="prev" title="compas_fab" href="compas_fab.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> compas_fab
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="compas_fab.html">compas_fab</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">compas_fab.fab.grasshopper</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/compas_fab.fab.grasshopper.unload_modules.html">unload_modules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/compas_fab.fab.grasshopper.mesh_from_guid.html">mesh_from_guid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/compas_fab.fab.grasshopper.update_component.html">update_component</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#path-planning">Path planning</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="compas_fab.fab.robots.html">compas_fab.fab.robots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="compas_fab.fab.robots.rfl.html">compas_fab.fab.robots.rfl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="compas_fab.fab.sensors.html">compas_fab.fab.sensors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">compas_fab</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../reference.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="compas_fab.html">compas_fab</a> &raquo;</li>
+        
+      <li>compas_fab.fab.grasshopper</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/pages/reference/compas_fab.fab.grasshopper.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="compas-fab-fab-grasshopper">
+<span id="id1"></span><h1>compas_fab.fab.grasshopper<a class="headerlink" href="#compas-fab-fab-grasshopper" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-compas_fab.fab.grasshopper"></span><p>Utility functions to simplify integration with Grasshopper 3D.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/compas_fab.fab.grasshopper.unload_modules.html#compas_fab.fab.grasshopper.unload_modules" title="compas_fab.fab.grasshopper.unload_modules"><code class="xref py py-obj docutils literal"><span class="pre">unload_modules</span></code></a>(top_level_module_name)</td>
+<td>Unloads all modules named starting with the specified string.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/compas_fab.fab.grasshopper.mesh_from_guid.html#compas_fab.fab.grasshopper.mesh_from_guid" title="compas_fab.fab.grasshopper.mesh_from_guid"><code class="xref py py-obj docutils literal"><span class="pre">mesh_from_guid</span></code></a>(guid,&nbsp;**kwargs)</td>
+<td>Creates an instance of a compAS mesh class from an identifier in Rhino/Grasshopper.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/compas_fab.fab.grasshopper.update_component.html#compas_fab.fab.grasshopper.update_component" title="compas_fab.fab.grasshopper.update_component"><code class="xref py py-obj docutils literal"><span class="pre">update_component</span></code></a>(ghenv,&nbsp;delay)</td>
+<td>Schedule an update of the Grasshopper component.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="path-planning">
+<h2>Path planning<a class="headerlink" href="#path-planning" title="Permalink to this headline">¶</a></h2>
+<p><code class="xref py py-mod docutils literal"><span class="pre">compas_fab.fab.grasshopper.path_planning</span></code></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/compas_fab.fab.grasshopper.path_planning.PathVisualizer.html#compas_fab.fab.grasshopper.path_planning.PathVisualizer" title="compas_fab.fab.grasshopper.path_planning.PathVisualizer"><code class="xref py py-obj docutils literal"><span class="pre">PathVisualizer</span></code></a>(simulator,&nbsp;robot[,&nbsp;...])</td>
+<td>Handles the generation of meshes to visualize a full path plan in Rhino/Grasshopper.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/compas_fab.fab.grasshopper.path_planning.PathPlanner.html#compas_fab.fab.grasshopper.path_planning.PathPlanner" title="compas_fab.fab.grasshopper.path_planning.PathPlanner"><code class="xref py py-obj docutils literal"><span class="pre">PathPlanner</span></code></a></td>
+<td>Provides a simple/compact API to call the path planner from Grasshopper.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/compas_fab.fab.grasshopper.path_planning.InputParameterParser.html#compas_fab.fab.grasshopper.path_planning.InputParameterParser" title="compas_fab.fab.grasshopper.path_planning.InputParameterParser"><code class="xref py py-obj docutils literal"><span class="pre">InputParameterParser</span></code></a></td>
+<td>Simplifies some tasks related to parsing Grasshopper input parameters for path planning.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="generated/compas_fab.fab.grasshopper.unload_modules.html" class="btn btn-neutral float-right" title="unload_modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="compas_fab.html" class="btn btn-neutral" title="compas_fab" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Gramazio Kohler Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,391 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compas_fab.fab.robots.rfl.robots &mdash; compas_fab 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../../search.html"/>
+    <link rel="top" title="compas_fab 0.0.1 documentation" href="../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../index.html"/> 
+
+  
+  <script src="../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> compas_fab
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../pages/gettingstarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../pages/examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../pages/reference.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">compas_fab</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>compas_fab.fab.robots.rfl.robots</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compas_fab.fab.robots.rfl.robots</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">..robot</span> <span class="k">import</span> <span class="n">BaseConfiguration</span>
+
+
+<div class="viewcode-block" id="Configuration"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Configuration.html#compas_fab.fab.robots.rfl.Configuration">[docs]</a><span class="k">class</span> <span class="nc">Configuration</span><span class="p">(</span><span class="n">BaseConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents the configuration of an RFL robot based on its</span>
+<span class="sd">    joint angle values and external axes values in the gantry system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Configuration.from_joints_and_external_axes"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Configuration.html#compas_fab.fab.robots.rfl.Configuration.from_joints_and_external_axes">[docs]</a>    <span class="k">def</span> <span class="nf">from_joints_and_external_axes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">joint_values</span><span class="p">,</span> <span class="n">external_axes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a configuration from a list of joint values and external</span>
+<span class="sd">        axes values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            joint_values (:obj:`list` of :obj:`float`): 6 joint values</span>
+<span class="sd">                expressed in degrees.</span>
+<span class="sd">            external_axes (:obj:`list` of :obj:`float`): Gantry position</span>
+<span class="sd">                in x, y, z in millimeters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_values</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Expected 6 floats expressed in degrees, but got </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_values</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">external_axes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Expected 3 floats: x, y, z but got </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">external_axes</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_data</span><span class="p">({</span><span class="s1">&#39;joint_values&#39;</span><span class="p">:</span> <span class="n">joint_values</span><span class="p">,</span> <span class="s1">&#39;external_axes&#39;</span><span class="p">:</span> <span class="n">external_axes</span><span class="p">})</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Configuration.from_radians_list"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Configuration.html#compas_fab.fab.robots.rfl.Configuration.from_radians_list">[docs]</a>    <span class="k">def</span> <span class="nf">from_radians_list</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">list_of_floats</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a configuration from a flat list of 6 joint values expressed in radians</span>
+<span class="sd">        and 3 axis values in millimeters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            list_of_floats (:obj:`list` of :obj:`float`): 9 joint values where the first 6 are radians</span>
+<span class="sd">                of the joint values, and the last 3 are gantry positions in millimeters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span> <span class="n">list_of_floats</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_joints_and_external_axes</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> <span class="n">list_of_floats</span><span class="p">[</span><span class="mi">6</span><span class="p">:])</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Configuration.from_degrees_list"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Configuration.html#compas_fab.fab.robots.rfl.Configuration.from_degrees_list">[docs]</a>    <span class="k">def</span> <span class="nf">from_degrees_list</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">list_of_floats</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a configuration from a flat list of 6 joint values expressed in degrees</span>
+<span class="sd">        and 3 axis values in millimeters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            list_of_floats (:obj:`list` of :obj:`float`): 9 joint values where the first 6 are degrees</span>
+<span class="sd">                of the joint values, and the last 3 are gantry positions in millimeters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_joints_and_external_axes</span><span class="p">(</span><span class="n">list_of_floats</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span> <span class="n">list_of_floats</span><span class="p">[</span><span class="mi">6</span><span class="p">:])</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">PathPlan</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a complete path planning for one or more robots.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        paths (:obj:`dict`): Dictionary keyed by the robot identifier where the values</span>
+<span class="sd">            are instances of :class:`.Configuration`. Robots that do not move during the</span>
+<span class="sd">            plan only have one configuration in their values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">add_robot_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">path_plan</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a path plan for a specific robot.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`.Robot`): Instance of robot.</span>
+<span class="sd">            path_plan (:obj:`list``or :class:`.`Configuration`): List of configurations</span>
+<span class="sd">                representing a full path.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">id</span><span class="p">)]</span> <span class="o">=</span> <span class="n">path_plan</span>
+
+    <span class="k">def</span> <span class="nf">get_robot_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the path plan for a specific robot.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`.Robot`): Instance of robot.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of configurations representing a full path.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No path plan stored for the specified robot: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">all_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterator over all paths currently defined.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">Robot</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+
+<span class="c1"># TODO: This should inherit from compas_fab.fab.robots.Robot</span>
+<span class="c1"># once that is in place.</span>
+<div class="viewcode-block" id="Robot"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Robot.html#compas_fab.fab.robots.rfl.Robot">[docs]</a><span class="k">class</span> <span class="nc">Robot</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents an instance of the ABB robots of the Robotic Fabrication Lab.</span>
+
+<span class="sd">    Communication to the robot is delegated to the `client` instance</span>
+<span class="sd">    passed when initializing the robot.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        id (:obj:`int`): Robot identifier.</span>
+<span class="sd">        client (:obj:`object`): A client to execute the commands</span>
+<span class="sd">            such as :class:`.Simulator`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        id (:obj:`int`): Robot identifier.</span>
+<span class="sd">        client (:obj:`object`): A client to execute the commands</span>
+<span class="sd">            such as :class:`.Simulator`.</span>
+<span class="sd">        index (:obj:`int`): Robot index (for internal use).</span>
+<span class="sd">        dof (:obj:`int`): Degrees of freedom.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SUPPORTED_ROBOTS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
+    <span class="n">ROBOT_SETTINGS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">11</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;base_external_axes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">7000</span><span class="p">,</span> <span class="o">-</span><span class="mi">2000</span><span class="p">,</span> <span class="o">-</span><span class="mi">4000</span><span class="p">]},</span>
+        <span class="mi">12</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;base_external_axes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">7000</span><span class="p">,</span> <span class="o">-</span><span class="mi">10000</span><span class="p">,</span> <span class="o">-</span><span class="mi">4000</span><span class="p">]},</span>
+        <span class="mi">21</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;base_external_axes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">30000</span><span class="p">,</span> <span class="o">-</span><span class="mi">2000</span><span class="p">,</span> <span class="o">-</span><span class="mi">4000</span><span class="p">]},</span>
+        <span class="mi">22</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;base_external_axes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">30000</span><span class="p">,</span> <span class="o">-</span><span class="mi">10000</span><span class="p">,</span> <span class="o">-</span><span class="mi">4000</span><span class="p">]},</span>
+    <span class="p">}</span>
+    <span class="n">BASE_JOINT_VALUES</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">]</span> <span class="o">*</span> <span class="mi">6</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_ROBOTS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Robot ID is not valid, must be one of: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_ROBOTS</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROBOT_SETTINGS</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_ROBOTS</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dof</span> <span class="o">=</span> <span class="mi">9</span>
+
+<div class="viewcode-block" id="Robot.set_config"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Robot.html#compas_fab.fab.robots.rfl.Robot.set_config">[docs]</a>    <span class="k">def</span> <span class="nf">set_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Moves the robot the the specified configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config (:class:`.Configuration`): Instance of robot&#39;s configuration.</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            &gt;&gt;&gt; from compas_fab.fab.robots.rfl import Simulator</span>
+<span class="sd">            &gt;&gt;&gt; with Simulator() as simulator:</span>
+<span class="sd">            ...     robot = Robot(11, simulator)</span>
+<span class="sd">            ...     robot.set_config(Configuration.from_joints_and_external_axes(</span>
+<span class="sd">            ...                      [90, 0, 0, 0, 0, -90],</span>
+<span class="sd">            ...                      [7600, -4500, -4500]))</span>
+<span class="sd">            ...</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">set_robot_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Robot.get_config"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Robot.html#compas_fab.fab.robots.rfl.Robot.get_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the current configuration of the robot.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            config: Instance of (:class:`.Configuration`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_robot_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Robot.reset_config"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Robot.html#compas_fab.fab.robots.rfl.Robot.reset_config">[docs]</a>    <span class="k">def</span> <span class="nf">reset_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Resets a robot&#39;s configuration to a safe initial position.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">Configuration</span><span class="o">.</span><span class="n">from_joints_and_external_axes</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">BASE_JOINT_VALUES</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">ROBOT_SETTINGS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="s1">&#39;base_external_axes&#39;</span><span class="p">]))</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Gramazio Kohler Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

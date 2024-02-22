@@ -1,0 +1,7 @@
+BaseConfiguration
+=======================================
+
+.. currentmodule:: compas_fab.fab.robots
+
+.. autoclass:: BaseConfiguration
+   :members:

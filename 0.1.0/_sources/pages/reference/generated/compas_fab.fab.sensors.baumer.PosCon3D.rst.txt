@@ -1,0 +1,7 @@
+PosCon3D
+======================================
+
+.. currentmodule:: compas_fab.fab.sensors.baumer
+
+.. autoclass:: PosCon3D
+   :members:

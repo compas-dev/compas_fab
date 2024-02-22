@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <title>compas_fab - Introduction to the Reachability Map</title>
+  
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <meta name="author" content="{{ cookiecutter.author_name }}" />
+  <meta name="description" content="" />
+
+  <link rel="shortcut icon" href="../../_static/images/compas.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/mono-blue.min.css">
+  <link rel="stylesheet" type="text/css" href="../../_static/css/compas.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
+
+  
+  <link rel="next" title="Vector Generators" href="02_vector_generators.html" />
+  
+
+  
+  <link rel="prev" title="Planning: Reachability Map" href="../07_reachability_map.html" />
+  
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body data-spy="scroll" data-target="#compas-toc">
+  <!-- header -->
+  <header id="header" class="compas-header d-flex align-items-center">
+    <nav class="navbar navbar-expand navbar-dark col flex-column flex-md-row text-center">
+      <!-- brand -->
+      <a class="navbar-brand" href="https://compas.dev/compas_fab/">
+        <img src="../../_static/images/compas_icon_white.png" alt="COMPAS FAB" width="48px" height="48px" />
+      </a>
+      <!-- brand -->
+      <!-- primary -->
+      <ul class="navbar-nav">
+        <li class="nav-item active"><a class="nav-link" href="https://compas.dev/compas_fab/">COMPAS FAB</a></li>
+      </ul>
+      <!-- primary -->
+      <ul class="navbar-nav d-none d-md-flex ml-md-auto">
+        <!-- version -->
+        
+        <meta id="doc_versions" data-url="https://compas.dev/compas_fab/doc_versions.txt" data-docs="https://compas.dev/compas_fab/">
+        <li class="nav-item nav-versions dropdown">
+          <a class="nav-item nav-link dropdown-toggle mr-md-2" href="#" id="bd-versions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            0.25.0
+          </a>
+          <div id="doc_version_list" class="dropdown-menu dropdown-menu-md-right" aria-labelledby="bd-versions"></div>
+        </li>
+        
+        <!-- version -->
+        <!-- social -->
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/compas-dev/compas_fab" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+        </li>
+        <!-- social -->
+      </ul>
+    </nav>
+  </header>
+  <!-- header -->
+  <!-- main -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- main -->
+      <main class="col-12 col-md-9 col-xl-7 px-4 px-md-5 pt-2 pb-5 compas-content" role="main">
+        
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-3 bg-white px-0">
+            <li class="breadcrumb-item"><a href="../../index.html">COMPAS FAB</a></li>
+            
+            <li class="breadcrumb-item"><a href="../../examples.html">Examples</a></li>
+            
+            <li class="breadcrumb-item"><a href="../07_reachability_map.html">Planning: Reachability Map</a></li>
+            
+            <!-- <li class="breadcrumb-item active" aria-current="page">Introduction to the Reachability Map</li> -->
+          </ol>
+        </nav>
+        
+
+        
+        
+        <section id="introduction-to-the-reachability-map">
+<h1>Introduction to the Reachability Map</h1>
+<p>For workspace planning or robot path planning, it is useful to calculate and
+visualize the space of the robot’s reachability, depending on its attached tool,
+obstacles in the environment and its own kinematic and geometric constraints.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ReachabilityMap</span></code> is a collection of all valid IK solutions, i.e. poses that the end-effector can reach, at specified locations. The map is built by discretizing the robot’s environment, defining frames to be checked, and calculating the IK solutions for each frame.</p>
+<p>The creation of this map depends on the availability of an analytical inverse
+kinematic solver for the used robot. Please checkout the kinematic backend for
+available robots.</p>
+<section id="links">
+<h2>Links</h2>
+<ul class="simple">
+<li><p><a class="reference external" href="http://wiki.ros.org/reuleaux">Reuleaux (ROS’s reachability map)</a></p></li>
+</ul>
+</section>
+<section id="example-01-reachability-map-1d">
+<h2>Example 01: reachability map 1D</h2>
+<p>Let’s consider the following (abstract) example:</p>
+<p>We have a UR5 and want the TCP of the robot to always orient itself towards a
+defined position in front of the robot. Therefore, we define a (half-)sphere
+with a certain radius and we evaluate points on this sphere. At each point, we then
+create a plane whose normal vector points towards the center of this sphere. From these planes
+we create frames for the robot’s TCP. The function is written as a generator
+because the <code class="docutils literal notranslate"><span class="pre">ReachabilityMap</span></code> takes a <code class="docutils literal notranslate"><span class="pre">Frame</span></code> generator as input.</p>
+<figure class="figure align-default">
+<img alt="../../_images/00_robot_halfsphere.jpg" class="figure-img img-fluid" src="../../_images/00_robot_halfsphere.jpg" />
+</figure>
+<div class="language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Frame</span>
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Plane</span>
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Sphere</span>
+
+<span class="c1"># 1. Define frames on a sphere</span>
+<span class="n">sphere</span> <span class="o">=</span> <span class="n">Sphere</span><span class="p">((</span><span class="mf">0.4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mf">0.15</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">points_on_sphere_generator</span><span class="p">(</span><span class="n">sphere</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">theta_deg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">360</span><span class="p">,</span> <span class="mi">20</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">phi_deg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>  <span class="c1"># only half-sphere</span>
+            <span class="n">theta</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">theta_deg</span><span class="p">)</span>
+            <span class="n">phi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">phi_deg</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">sphere</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">sphere</span><span class="o">.</span><span class="n">radius</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">sphere</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">sphere</span><span class="o">.</span><span class="n">radius</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">sphere</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">z</span> <span class="o">+</span> <span class="n">sphere</span><span class="o">.</span><span class="n">radius</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+            <span class="n">point</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+            <span class="n">axis</span> <span class="o">=</span> <span class="n">sphere</span><span class="o">.</span><span class="n">point</span> <span class="o">-</span> <span class="n">point</span>
+            <span class="n">plane</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="n">axis</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">Frame</span><span class="o">.</span><span class="n">from_plane</span><span class="p">(</span><span class="n">plane</span><span class="p">)</span>
+            <span class="c1"># for the old UR5 model from ROS Kinetic is zaxis the xaxis</span>
+            <span class="k">yield</span> <span class="p">[</span><span class="n">Frame</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">point</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">zaxis</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">yaxis</span><span class="p">)]</span>
+</code></pre></div>
+</div>
+<p>Then we create a <code class="docutils literal notranslate"><span class="pre">PyBulletClient</span></code> (for collision checking), load the UR5 robot,
+set the analytical IK solver and define options for the IK solver.
+For simplicity, we do not add any tool or obstacles in the environment here, but in a
+real robot cell, this will usually be the case.</p>
+<div class="language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="c1"># 2. Set up robot cell</span>
+<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">AnalyticalInverseKinematics</span>
+<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">PyBulletClient</span>
+
+<span class="k">with</span> <span class="n">PyBulletClient</span><span class="p">(</span><span class="n">connection_type</span><span class="o">=</span><span class="s1">&#39;direct&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="c1"># load robot and define settings</span>
+    <span class="n">robot</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">load_ur5</span><span class="p">(</span><span class="n">load_geometry</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ik</span> <span class="o">=</span> <span class="n">AnalyticalInverseKinematics</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+    <span class="n">client</span><span class="o">.</span><span class="n">inverse_kinematics</span> <span class="o">=</span> <span class="n">ik</span><span class="o">.</span><span class="n">inverse_kinematics</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="s2">&quot;ur5&quot;</span><span class="p">,</span> <span class="s2">&quot;check_collision&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;keep_order&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+</code></pre></div>
+</div>
+<p>Now we create a <code class="docutils literal notranslate"><span class="pre">ReachabilityMap</span></code>. We calculate it passing the <code class="docutils literal notranslate"><span class="pre">Frame</span></code>
+generator, the robot and the IK options. After calculation, we save the map as
+json for later visualization in Rhino/GH.</p>
+<div class="doctest language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># 3. Create reachability map 1D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">map</span> <span class="o">=</span> <span class="n">ReachabilityMap</span><span class="p">()</span>                                                 
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">map</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">points_on_sphere_generator</span><span class="p">(</span><span class="n">sphere</span><span class="p">),</span> <span class="n">robot</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>       
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">map</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA</span><span class="p">,</span> <span class="s2">&quot;reachability&quot;</span><span class="p">,</span> <span class="s2">&quot;map1D.json&quot;</span><span class="p">))</span>           
+</code></pre></div>
+</div>
+<p><a class="reference external" href="files/01_example_1D.py">Link to full script</a></p>
+</section>
+<section id="visualization">
+<h2>Visualization</h2>
+<p>We can source the reachability map from the json file and use the <code class="docutils literal notranslate"><span class="pre">Artist</span></code> to
+visualize the saved frames by using the artist’s function <code class="docutils literal notranslate"><span class="pre">draw_frames</span></code>.</p>
+<div class="doctest language-python notranslate"><div class="highlight"><pre><button class="btn copy"><i class="far fa-copy"></i></button><code><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">map</span> <span class="o">=</span> <span class="n">ReachabilityMap</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">artist</span> <span class="o">=</span> <span class="n">Artist</span><span class="p">(</span><span class="nb">map</span><span class="p">)</span>                       
+<span class="gp">&gt;&gt;&gt; </span><span class="n">frames</span> <span class="o">=</span> <span class="n">artist</span><span class="o">.</span><span class="n">draw_frames</span><span class="p">()</span>              
+</code></pre></div>
+</div>
+<figure class="figure align-default">
+<img alt="../../_images/00_robot_halfsphere.jpg" class="figure-img img-fluid" src="../../_images/00_robot_halfsphere.jpg" />
+</figure>
+<p>By default, the <code class="docutils literal notranslate"><span class="pre">artist.draw()</span></code> method returns points and colors for a point cloud,
+where the points are the positions of the frames and the colors are calculated
+from the score at the respective frame. The <code class="docutils literal notranslate"><span class="pre">ReachabilityMap.score</span></code> is
+the number of valid IK solutions for a frame. The default colormap is ‘viridis’.</p>
+<p>In the example below, the highest score is 4 (yellow) and the lowest score is 2 (violet).</p>
+<figure class="figure align-default">
+<img alt="../../_images/01_robot_map1D.jpg" class="figure-img img-fluid" src="../../_images/01_robot_map1D.jpg" />
+</figure>
+<p>If you want to visualize the frames at a specific IK index (= number between 0-7), use the method
+<code class="docutils literal notranslate"><span class="pre">artist.draw_frames(ik_index=ik_index)</span></code>. If you compare the figure below
+with the figure of <code class="docutils literal notranslate"><span class="pre">draw_frames</span></code>, you will see that a certain portion is not
+reachable at the selected IK index.</p>
+<figure class="figure align-default">
+<img alt="../../_images/02_robot_frames_at_ik.jpg" class="figure-img img-fluid" src="../../_images/02_robot_frames_at_ik.jpg" />
+</figure>
+</section>
+<section id="projects-where-the-reachability-map-was-applied">
+<h2>Projects where the reachability map was applied</h2>
+<section id="id1">
+<h3><a class="reference external" href="https://gramaziokohler.arch.ethz.ch/web/forschung/e/0/0/0/361.html">Adaptive Detailing</a></h3>
+<p>In this project, connections between structural elements are 3D printed in place,
+directly on top of parts, i.e. collision objects. A <code class="docutils literal notranslate"><span class="pre">ReachabilityMap</span></code> was created
+to capture the space where connections can be placed and ultimately find connecting
+geometries that the robot can print in between these objects. Printing process
+constraints can be included in the reachability map by choosing a meaningful
+<code class="docutils literal notranslate"><span class="pre">max_alpha</span></code> in the <code class="docutils literal notranslate"><span class="pre">DeviationVectorsGenerator</span></code>.</p>
+<figure class="figure align-default">
+<img alt="../../_images/adaptive_detailing.png" class="figure-img img-fluid" src="../../_images/adaptive_detailing.png" />
+</figure>
+</section>
+<section id="id2">
+<h3><a class="reference external" href="https://gramaziokohler.arch.ethz.ch/web/lehre/e/0/0/0/439.html">Robotic 360° Light Painting Workshop</a></h3>
+<p>This project served as inspiration for the presented examples 01-03. The robot TCP
+had to be oriented towards the 360° camera. The light paths were mapped on a hemisphere
+to maintain equal distance to the camera and little distortion of the designed paths.
+The reachability map was used to determine the best position and radius for the
+sphere with the UR5e robot model, the light tool, and the camera and tripods as
+collision objects.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../_images/workshop_sjsu_1.png"><img alt="logo1" class="align-middle" src="../../_images/workshop_sjsu_1.png" style="width: 306.45px; height: 239.85px;" /></a></p></td>
+<td><p><a class="reference internal" href="../../_images/workshop_sjsu_2.jpg"><img alt="logo2" class="align-middle" src="../../_images/workshop_sjsu_2.jpg" style="width: 360.0px; height: 239.85px;" /></a></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+
+        
+      </main>
+      <!-- content -->
+      <!-- sidebar -->
+      <div class="col-12 col-md-3 compas-sidebar" role="navigation">
+        <form id="search" class="d-flex align-items-center compas-searchbox" action="../../search.html" method="get">
+          <input class="form-control" type="text" name="q" placeholder="Search docs" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+          <button class="navbar-toggler d-md-none" type="button" data-toggle="collapse" data-target="#compas-navigation" aria-controls="compas-navigation" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </form>
+        
+        
+        <div id="compas-navigation" class="collapse compas-navigation">
+          <ul class="nav flex-column collapse show active">
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../../index.html">Introduction</a></li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../../backends.html">Working with backends</a><ul class="nav flex-column collapse">
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../../backends/pybullet.html">PyBullet</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../../backends/ros.html">ROS</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../../backends/vrep.html">V-REP</a></li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../../backends/web_x11_gui.html">Access backend GUI</a></li>
+</ul>
+</li>
+<li class="toctree-l1 nav-item active"><a class="nav-link reference internal" href="../../examples.html">Examples</a><ul class="nav flex-column collapse show active">
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../01_fundamentals.html">Fundamentals</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../01_fundamentals/01_frame_and_transformation.html">Frame and Transformation</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../01_fundamentals/02_coordinate_frames.html">Coordinate frames</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../02_description_models.html">Description Models</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../02_description_models/01_kinematic_model.html">Kinematic model</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../02_description_models/02_robot.html">Robot models</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../03_backends_ros.html">Backends: ROS</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../03_backends_ros/01_ros_examples.html">Using ROS</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../03_backends_ros/02_robot_models.html">Robots in ROS</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../03_backends_ros/03_forward_and_inverse_kinematics.html">Forward and inverse kinematics</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../03_backends_ros/04_plan_motion.html">Plan motion</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../03_backends_ros/05_collision_objects.html">Planning scene and collision objects</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../03_backends_ros/06_ros_in_grasshopper.html">ROS in Grasshopper</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../03_backends_ros/07_ros_create_urdf_ur5_with_measurement_tool.html">Creating a URDF with an UR5 robot and a custom end-effector</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../03_backends_ros/08_ros_create_moveit_package_from_custom_urdf.html">Creating a MoveIt! package from the custom created URDF</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../03_backends_ros/09_ros_create_urdf_ur10_on_tower.html">Creating a URDF of the UR10 on two linear axes</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../04_backends_vrep.html">Backends: V-REP</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../04_backends_vrep/01_simulation_with_vrep.html">Simulation examples with V-REP</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../05_backends_pybullet.html">Backends: PyBullet</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../05_backends_pybullet/01_pybullet_examples.html">Using PyBullet</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../05_backends_pybullet/02_forward_and_inverse_kinematics.html">Forward and inverse kinematics</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../06_backends_kinematics.html">Backends: Analytical Kinematics</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../06_backends_kinematics/01_ik_and_cartesian.html">Analytical kinematics</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item active"><a class="nav-link reference internal" href="../07_reachability_map.html">Planning: Reachability Map</a><ul class="nav flex-column collapse show active">
+<li class="toctree-l3 nav-item active"><a class="nav-link active reference internal" href="#">Introduction to the Reachability Map</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="02_vector_generators.html">Vector Generators</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="03_rp_2D.html">Reachability Map 2D</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../../api.html">API Reference</a><ul class="nav flex-column collapse">
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../../api/compas_fab.html">compas_fab</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../api/compas_fab.robots.html">compas_fab.robots</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../api/compas_fab.backends.html">compas_fab.backends</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../api/compas_fab.blender.html">compas_fab.blender</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../api/compas_fab.ghpython.html">compas_fab.ghpython</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../api/compas_fab.rhino.html">compas_fab.rhino</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../api/compas_fab.sensors.html">compas_fab.sensors</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../api/compas_fab.utilities.html">compas_fab.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../../contributing.html">Contributor’s Guide</a><ul class="nav flex-column collapse">
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../../developer/backends.html">Backend clients</a><ul class="nav flex-column collapse">
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../developer/generated/compas_fab.backends.interfaces.ClientInterface.html">ClientInterface</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../developer/generated/compas_fab.backends.interfaces.PlannerInterface.html">PlannerInterface</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../developer/generated/compas_fab.backends.interfaces.ForwardKinematics.html">ForwardKinematics</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../developer/generated/compas_fab.backends.interfaces.InverseKinematics.html">InverseKinematics</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../developer/generated/compas_fab.backends.interfaces.PlanMotion.html">PlanMotion</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../developer/generated/compas_fab.backends.interfaces.PlanCartesianMotion.html">PlanCartesianMotion</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../developer/generated/compas_fab.backends.interfaces.GetPlanningScene.html">GetPlanningScene</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../developer/generated/compas_fab.backends.interfaces.AddCollisionMesh.html">AddCollisionMesh</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../developer/generated/compas_fab.backends.interfaces.AppendCollisionMesh.html">AppendCollisionMesh</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../developer/generated/compas_fab.backends.interfaces.RemoveCollisionMesh.html">RemoveCollisionMesh</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../developer/generated/compas_fab.backends.interfaces.AddAttachedCollisionMesh.html">AddAttachedCollisionMesh</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../developer/generated/compas_fab.backends.interfaces.RemoveAttachedCollisionMesh.html">RemoveAttachedCollisionMesh</a></li>
+<li class="toctree-l3 nav-item"><a class="nav-link reference internal" href="../../developer/generated/compas_fab.backends.interfaces.ResetPlanningScene.html">ResetPlanningScene</a></li>
+</ul>
+</li>
+<li class="toctree-l2 nav-item"><a class="nav-link reference internal" href="../../developer/grasshopper.html">Grasshopper components</a></li>
+</ul>
+</li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../../authors.html">Citing</a></li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1 nav-item"><a class="nav-link reference internal" href="../../license.html">License</a></li>
+</ul>
+
+        </div>
+        
+      </div>
+      <!-- sidebar -->
+      <!-- toc -->
+      <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
+        
+        <ul class="nav flex-column" id="compas-toc">
+<li class="nav-item"><a class="nav-link reference internal" href="#">Introduction to the Reachability Map</a><ul class="nav flex-column">
+<li class="nav-item"><a class="nav-link reference internal" href="#links">Links</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#example-01-reachability-map-1d">Example 01: reachability map 1D</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#visualization">Visualization</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#projects-where-the-reachability-map-was-applied">Projects where the reachability map was applied</a><ul class="nav flex-column">
+<li class="nav-item"><a class="nav-link reference internal" href="#id1">Adaptive Detailing</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#id2">Robotic 360° Light Painting Workshop</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+      </div>
+      <!-- toc -->
+    </div>
+  </div>
+  <!-- main -->
+  <!-- footer -->
+  <footer class="compas-footer">
+    <nav class="nav p-2">
+      
+      <a href="../07_reachability_map.html" title="Planning: Reachability Map" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+        <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
+        <div class="nav-title flex-grow-1 align-self-center">
+          <div class="nav-direction small font-weight-light">Previous</div>
+          Planning: Reachability Map
+        </div>
+      </a>
+      
+
+      
+      <a href="02_vector_generators.html" title="Vector Generators" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+        <div class="nav-title footer-link flex-grow-1 align-self-center">
+          <div class="nav-direction small font-weight-light">Next</div>
+          Vector Generators
+        </div>
+        <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
+      </a>
+      
+    </nav>
+  </footer>
+  <!-- footer -->
+  <!-- below -->
+  <div class="below py-5" style="background-color: #222;">
+    <div class="container">
+      <div class="row flex-column">
+        <div class="col-12 col-md-6 mx-md-auto text-center">
+          <h4 class="pb-3 below-text">COMPAS</h4>
+          <p class="below-text">
+            A computational framework for collaboration and research
+            in Architecture, Engineering, Fabrication, and Construction.
+          </p>
+          <nav class="nav justify-content-center pb-3">
+            <a class="nav-link mx-2 px-0 below-link" href="http://github.com/compas-dev" target="_blank">
+              <span class="fab fa-github fa-1x"></span>
+            </a>
+            <a class="nav-link mx-2 px-0 below-link" href="http://forum.compas-framework.org" target="_blank">
+              <span class="fab fa-discourse fa-1x"></span>
+            </a>
+            <a class="nav-link mx-2 px-0 below-link" href="https://pypi.org/project/COMPAS/" target="_blank">
+              <span class="fab fa-python fa-1x"></span>
+            </a>
+          </nav>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col text-center">
+          <p class="p-0 m-0 below-text">Copyright &copy; 2017-2021 compas-dev</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- below -->
+  <!-- scripts -->
+  <script id="documentation_options" data-url_root="" src="../../_static/documentation_options.js"></script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.0.0/anchor.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+
+  <script src="../../_static/underscore.js"></script>
+  <script src="../../_static/doctools.js"></script>
+  <script src="../../_static/searchtools.js"></script>
+  <script src="../../_static/language_data.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      $(".language-default code").addClass("python");
+      $(".language-python code").addClass("python");
+      $(".language-bash code").addClass("bash");
+      $(".language-cpp code").addClass("cpp");
+      $(".language-json code").addClass("json");
+      $(".language-none code").addClass("plaintext");
+
+      hljs.initHighlighting();
+      anchors.add();
+
+      new ClipboardJS(".btn.copy", {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+
+      $("#compas-navigation li.active > ul").each(function() {
+        var ul = $(this);
+        if (! ul.hasClass("show")) {
+          ul.addClass("show");
+        }
+      });
+
+      $("#compas-navigation li.toctree-l1").has("ul").each(function() {
+        var li = $(this);
+        li.addClass("has-children");
+        if (li.hasClass("active")) {
+          li.prepend('<span class="menu-toggle"><i class="fas fa-chevron-up"></i></span>');
+        }
+        else {
+          li.prepend('<span class="menu-toggle"><i class="fas fa-chevron-down"></i></span>');
+        }
+      });
+
+      $(".menu-toggle").click(function() {
+        var toggle = $(this);
+        toggle.siblings("ul").toggleClass("show");
+      });
+
+    });
+
+
+    var url = $("#doc_versions").data("url");
+    var docs_site = $("#doc_versions").data("docs");
+
+    if (url) {
+      $.get(url, res => {
+        var lines = res.match(/[^\r\n]+/g);
+        lines.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+        lines.reverse();
+        lines.forEach(version => {
+          $("#doc_version_list").append("<a class=\"dropdown-item\" href=\"" + docs_site + version + "\">" + version + "</a>");
+        });
+
+        var selected_version = $('.nav-versions .dropdown-item').filter(function (i, ver) {
+          return window.location.href.startsWith(ver.href);
+        });
+        selected_version.addClass('active');
+        $("#bd-versions").text(selected_version.text());
+
+      })
+    }
+  </script>
+  <!-- scripts -->
+  
+  
+</body>
+
+</html>

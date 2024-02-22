@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <title>compas_fab - 3.4. Planning scene and collision objects</title>
+  
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <meta name="author" content="" />
+  <meta name="description" content="" />
+
+  <link rel="shortcut icon" href="../../_static/images/compas.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/default.min.css">
+  <link rel="stylesheet" type="text/css" href="../../_static/css/compas.css" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/compas-reference.css" />
+
+  
+    <link rel="next" title="3.5. Plan motion" href="05_plan_motion.html" />
+  
+
+  
+    <link rel="prev" title="3.3. Forward and inverse kinematics" href="03_forward_and_inverse_kinematics.html" />
+  
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body data-spy="scroll" data-target="#compas-toc">
+  <!-- header -->
+  <header id="header" class="compas-header d-flex align-items-center">
+    <nav class="navbar navbar-expand navbar-dark col flex-column flex-md-row text-center">
+      <!-- brand -->
+      <a class="navbar-brand" href="https://compas.dev/compas_fab/">
+        <img src="../../_static/images/compas_icon_white.png" alt="COMPAS FAB" width="48px" height="48px" />
+      </a>
+      <!-- brand -->
+      <!-- primary -->
+      <ul class="navbar-nav">
+        <li class="nav-item active"><a class="nav-link" href="https://compas.dev/compas_fab/">COMPAS FAB</a></li>
+      </ul>
+      <!-- primary -->
+      <ul class="navbar-nav d-none d-md-flex ml-md-auto">
+        <!-- version -->
+        
+        <meta id="doc_versions" data-url="https://compas.dev/compas_fab/doc_versions.txt" data-docs="https://compas.dev/compas_fab/">
+        <li class="nav-item nav-versions dropdown">
+          <a class="nav-item nav-link dropdown-toggle mr-md-2" href="#" id="bd-versions" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            0.17.0
+          </a>
+          <div id="doc_version_list" class="dropdown-menu dropdown-menu-md-right" aria-labelledby="bd-versions"></div>
+        </li>
+        
+        <!-- version -->
+        <!-- social -->
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/compas-dev/compas_fab" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+        </li>
+        <!-- social -->
+      </ul>
+    </nav>
+  </header>
+  <!-- header -->
+  <!-- main -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- main -->
+      <main class="col-12 col-md-9 col-xl-7 px-2 px-md-5 pt-2 pb-5 compas-content" role="main">
+        
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-3 bg-white px-0">
+            <li class="breadcrumb-item"><a href="../../index.html">docs</a></li>
+            
+              <li class="breadcrumb-item"><a href="../../examples.html">Examples</a></li>
+            
+              <li class="breadcrumb-item"><a href="../03_backends_ros.html"><span class="section-number">3. </span>Backends: ROS</a></li>
+            
+            <li class="breadcrumb-item active" aria-current="page"><span class="section-number">3.4. </span>Planning scene and collision objects</li>
+          </ol>
+        </nav>
+        
+
+        
+        
+        <div class="section" id="planning-scene-and-collision-objects">
+<h1><span class="section-number">3.4. </span>Planning scene and collision objects<a class="headerlink" href="#planning-scene-and-collision-objects" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following examples use the <a class="reference external" href="https://www.ros.org/">ROS</a> backend
+and the MoveI! planner for UR5 robots. Before running them, please
+make sure you have the <a class="reference internal" href="../../backends/ros.html#ros-backend"><span class="std std-ref">ROS backend</span></a> correctly
+configured and the <a class="reference internal" href="../../backends/ros.html#ros-bundles-list"><span class="std std-ref">UR5 Demo</span></a> started.</p>
+</div>
+<p>To plan motion paths that avoid collisions with other objects than the robot
+itself, the backend’s planning scene has to be updated.</p>
+<p>This is the representation of the planning scene in RViz with the UR5.</p>
+<div class="figure align-default">
+<img alt="../../_images/04_collision_objects_attached_without.jpg" class="figure-img img-fluid" src="../../_images/04_collision_objects_attached_without.jpg" />
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If using Docker to run ROS, you can open
+<a class="reference external" href="http://localhost:8080/vnc.html?resize=scale&amp;autoconnect=true">RViz on your browser</a>.</p>
+</div>
+<div class="section" id="collision-meshes">
+<h2><span class="section-number">3.4.1. </span>Collision meshes<a class="headerlink" href="#collision-meshes" title="Permalink to this headline">¶</a></h2>
+<p>The following script adds and then removes a floor to the planning scene.</p>
+<div class="language-python notranslate"><div class="highlight"><pre><code><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">compas.datastructures</span> <span class="kn">import</span> <span class="n">Mesh</span>
+
+<span class="kn">import</span> <span class="nn">compas_fab</span>
+<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">RosClient</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">CollisionMesh</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">PlanningScene</span>
+
+<span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="n">robot</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">load_robot</span><span class="p">()</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="n">PlanningScene</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">robot</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;ur5&#39;</span>
+
+    <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_stl</span><span class="p">(</span><span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;planning_scene/floor.stl&#39;</span><span class="p">))</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">CollisionMesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;floor&#39;</span><span class="p">)</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">add_collision_mesh</span><span class="p">(</span><span class="n">cm</span><span class="p">)</span>
+
+    <span class="c1"># sleep a bit before removing the floor</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">scene</span><span class="o">.</span><span class="n">remove_collision_mesh</span><span class="p">(</span><span class="s1">&#39;floor&#39;</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<p>The backend’s updated planning scene while executing the above script.</p>
+<div class="figure align-default">
+<img alt="../../_images/04_collision_objects.jpg" class="figure-img img-fluid" src="../../_images/04_collision_objects.jpg" />
+</div>
+<p>The following script adds several boxes (bricks) to the planning scene. Here,
+we use <code class="docutils literal notranslate"><span class="pre">append</span></code> instead of <code class="docutils literal notranslate"><span class="pre">add</span></code> to have multiple collision objects
+clustered under the same identifier. Like that, we don’t need to keep track of
+all identifiers when we later remove them.</p>
+<div class="language-python notranslate"><div class="highlight"><pre><code><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">compas.datastructures</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Box</span>
+
+<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">RosClient</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">CollisionMesh</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">PlanningScene</span>
+
+<span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="n">robot</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">load_robot</span><span class="p">()</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="n">PlanningScene</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">robot</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;ur5&#39;</span>
+
+    <span class="n">brick</span> <span class="o">=</span> <span class="n">Box</span><span class="o">.</span><span class="n">from_width_height_depth</span><span class="p">(</span><span class="mf">0.11</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_vertices_and_faces</span><span class="p">(</span><span class="n">brick</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">brick</span><span class="o">.</span><span class="n">faces</span><span class="p">)</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">CollisionMesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;brick&#39;</span><span class="p">)</span>
+        <span class="n">cm</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">y</span> <span class="o">+=</span> <span class="mf">0.5</span>
+        <span class="n">cm</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">point</span><span class="o">.</span><span class="n">z</span> <span class="o">+=</span> <span class="n">brick</span><span class="o">.</span><span class="n">zsize</span> <span class="o">*</span> <span class="n">i</span>
+
+        <span class="n">scene</span><span class="o">.</span><span class="n">append_collision_mesh</span><span class="p">(</span><span class="n">cm</span><span class="p">)</span>
+
+    <span class="c1"># sleep a bit before removing the bricks</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">scene</span><span class="o">.</span><span class="n">remove_collision_mesh</span><span class="p">(</span><span class="s1">&#39;brick&#39;</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<p>The backend’s updated planning scene while executing the above script. Note the
+red robot link indicating the collision.</p>
+<div class="figure align-default">
+<img alt="../../_images/04_collision_objects_append.jpg" class="figure-img img-fluid" src="../../_images/04_collision_objects_append.jpg" />
+</div>
+</div>
+<div class="section" id="attach-a-collision-mesh-to-a-robot-s-end-effector">
+<h2><span class="section-number">3.4.2. </span>Attach a collision mesh to a robot’s end-effector<a class="headerlink" href="#attach-a-collision-mesh-to-a-robot-s-end-effector" title="Permalink to this headline">¶</a></h2>
+<p>The following script attaches and removes a collision mesh to the robot’s end-effector.
+Collision objects can be attached to any of the robot’s links.</p>
+<div class="language-python notranslate"><div class="highlight"><pre><code><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">compas.datastructures</span> <span class="kn">import</span> <span class="n">Mesh</span>
+
+<span class="kn">import</span> <span class="nn">compas_fab</span>
+<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">RosClient</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">CollisionMesh</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">PlanningScene</span>
+
+<span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="n">robot</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">load_robot</span><span class="p">()</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="n">PlanningScene</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">robot</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;ur5&#39;</span>
+
+    <span class="c1"># create collision object</span>
+    <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_stl</span><span class="p">(</span><span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;planning_scene/cone.stl&#39;</span><span class="p">))</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">CollisionMesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;tip&#39;</span><span class="p">)</span>
+
+    <span class="c1"># attach it to the end-effector</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">main_group_name</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">attach_collision_mesh_to_robot_end_effector</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+
+    <span class="c1"># sleep a bit before removing the tip</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">scene</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+</code></pre></div>
+</div>
+<p>The backend’s updated planning scene while executing the above script.</p>
+<div class="figure align-default">
+<img alt="../../_images/04_collision_objects_attached.jpg" class="figure-img img-fluid" src="../../_images/04_collision_objects_attached.jpg" />
+</div>
+</div>
+<div class="section" id="plan-motion-with-an-attached-collision-mesh">
+<h2><span class="section-number">3.4.3. </span>Plan motion with an attached collision mesh<a class="headerlink" href="#plan-motion-with-an-attached-collision-mesh" title="Permalink to this headline">¶</a></h2>
+<p>Coming soon…</p>
+</div>
+</div>
+
+        
+      </main>
+      <!-- content -->
+      <!-- sidebar -->
+      <div class="col-12 col-md-3 compas-sidebar" role="navigation">
+        <form id="search" class="d-flex align-items-center compas-searchbox" action="../../search.html" method="get">
+          <input class="form-control" type="text" name="q" placeholder="Search docs" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+          <button class="navbar-toggler d-md-none" type="button" data-toggle="collapse" data-target="#compas-navigation" aria-controls="compas-navigation" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </form>
+        
+        
+          <div id="compas-navigation" class="collapse compas-navigation">
+          <ul class="nav flex-column active">
+<li class="nav-item"><a class="nav-link reference internal" href="../../overview.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../backends.html">Working with backends</a></li>
+<li class="nav-item active"><a class="nav-link reference internal" href="../../examples.html">Examples</a><ul class="nav flex-column active">
+<li class="nav-item"><a class="nav-link reference internal" href="../01_fundamentals.html">1. Fundamentals</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../02_description_models.html">2. Description Models</a></li>
+<li class="nav-item active"><a class="nav-link reference internal" href="../03_backends_ros.html">3. Backends: ROS</a><ul class="nav flex-column active">
+<li class="nav-item"><a class="nav-link reference internal" href="01_ros_examples.html">3.1. Using ROS</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="02_robot_models.html">3.2. Robots in ROS</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="03_forward_and_inverse_kinematics.html">3.3. Forward and inverse kinematics</a></li>
+<li class="nav-item active"><a class="nav-link active current reference internal" href="#">3.4. Planning scene and collision objects</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="05_plan_motion.html">3.5. Plan motion</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="06_ros_in_grasshopper.html">3.6. ROS in Grasshopper</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="07_ros_create_urdf_ur5_with_measurement_tool.html">3.7. Creating a URDF with an UR5 robot and a custom end-effector</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="08_ros_create_moveit_package_from_custom_urdf.html">3.8. Creating a MoveIt! package from the custom created URDF</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="09_ros_create_urdf_ur10_on_tower.html">3.9. Creating a URDF of the UR10 on two linear axes</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link reference internal" href="../04_backends_vrep.html">4. Backends: V-REP</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../05_backends_pybullet.html">5. Backends: PyBullet</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../reference.html">API Reference</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../contributing.html">Contributor’s Guide</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../authors.html">Citing</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="../../license.html">License</a></li>
+</ul>
+
+          </div>
+        
+      </div>
+      <!-- sidebar -->
+      <!-- toc -->
+      <div class="d-none d-xl-block col-xl-2 compas-toc" role="toc">
+        
+        <ul class="nav flex-column" id="compas-toc">
+<li class="nav-item"><a class="nav-link reference internal" href="#">3.4. Planning scene and collision objects</a><ul class="nav flex-column">
+<li class="nav-item"><a class="nav-link reference internal" href="#collision-meshes">3.4.1. Collision meshes</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#attach-a-collision-mesh-to-a-robot-s-end-effector">3.4.2. Attach a collision mesh to a robot’s end-effector</a></li>
+<li class="nav-item"><a class="nav-link reference internal" href="#plan-motion-with-an-attached-collision-mesh">3.4.3. Plan motion with an attached collision mesh</a></li>
+</ul>
+</li>
+</ul>
+
+      </div>
+      <!-- toc -->
+    </div>
+  </div>
+  <!-- main -->
+  <!-- footer -->
+  <footer class="compas-footer">
+    <nav class="nav p-2">
+      
+        <a href="03_forward_and_inverse_kinematics.html" title="<span class="section-number">3.3. </span>Forward and inverse kinematics" class="nav-link footer-link float-start text-left d-flex w-50" rel="prev">
+          <div class="nav-button p-2 m-2"><i class="fas fa-arrow-left"></i></div>
+          <div class="nav-title flex-grow-1 align-self-center">
+            <div class="nav-direction small font-weight-light">Previous</div>
+            <span class="section-number">3.3. </span>Forward and inverse kinematics
+          </div>
+        </a>
+      
+
+      
+        <a href="05_plan_motion.html" title="<span class="section-number">3.5. </span>Plan motion" class="nav-link footer-link float-end text-right d-flex w-50" rel="next">
+          <div class="nav-title footer-link flex-grow-1 align-self-center">
+            <div class="nav-direction small font-weight-light">Next</div>
+            <span class="section-number">3.5. </span>Plan motion
+          </div>
+          <div class="nav-button p-2 m-2"><i class="fas fa-arrow-right"></i></div>
+        </a>
+      
+    </nav>  
+  </footer>
+  <!-- footer -->
+  <!-- below -->
+  <div class="below py-5" style="background-color: #222;">
+    <div class="container">
+      <div class="row flex-column">
+      <div class="col-12 col-md-6 mx-md-auto text-center">
+        <h4 class="pb-3 below-text">COMPAS</h4>
+        <p class="below-text">
+          A computational framework for collaboration and research
+          in Architecture, Engineering, Fabrication, and Construction.
+        </p>
+        <nav class="nav justify-content-center pb-3">
+          <a class="nav-link mx-2 px-0 below-link" href="http://github.com/compas-dev" target="_blank">
+            <span class="fab fa-github fa-1x"></span>
+          </a>
+          <a class="nav-link mx-2 px-0 below-link" href="http://forum.compas-framework.org" target="_blank">
+            <span class="fab fa-discourse fa-1x"></span>
+          </a>
+          <a class="nav-link mx-2 px-0 below-link" href="https://pypi.org/project/COMPAS/" target="_blank">
+            <span class="fab fa-python fa-1x"></span>
+          </a>
+        </nav>
+      </div>
+      </div>
+      <div class="row">
+      <div class="col text-center">
+        <p class="p-0 m-0 below-text">Copyright &copy; 2017-2021 compas-dev</p>
+      </div>
+      </div>
+    </div>
+  </div>
+  <!-- below -->
+  <!-- scripts -->
+  <script type="text/javascript">
+  var DOCUMENTATION_OPTIONS = {
+  URL_ROOT          : '',
+  VERSION           : '0.17.0',
+  COLLAPSE_INDEX    : false,
+  FILE_SUFFIX       : '.html',
+  HAS_SOURCE        : 'false',
+  SOURCELINK_SUFFIX : '.txt'
+  };
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https:////cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.1/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.0.0/anchor.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script>
+
+  <script src="../../_static/underscore.js"></script>
+  <script src="../../_static/doctools.js"></script>
+  <script src="../../_static/js/searchtools_.js"></script>
+
+  <script>
+  $(document).ready(function() {
+    $(".language-default code").addClass("python");
+    $(".language-python code").addClass("python");
+    $(".language-bash code").addClass("bash");
+    $(".language-cpp code").addClass("cpp");
+    $(".language-json code").addClass("json");
+    $(".language-none code").addClass("plaintext");
+
+    hljs.initHighlighting();
+    anchors.add();
+
+    $('.nav-versions .dropdown-item').filter(function(i, ver) {
+      return window.location.href.startsWith(ver.href);
+    }).addClass("active");
+
+  });
+
+
+  var url = $("#doc_versions").data("url");
+  var docs_site = $("#doc_versions").data("docs");
+
+  if (url) {
+    $.get(url, res=>{
+      var lines = res.match(/[^\r\n]+/g);
+      lines.forEach(version => {
+        $("#doc_version_list").append("<a class=\"dropdown-item\" href=\""+ docs_site + version + "\">" + version + "</a>");
+      });
+    })
+  }
+  </script>
+  <!-- scripts -->
+  
+  
+</body>
+</html>

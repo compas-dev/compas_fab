@@ -1,0 +1,7 @@
+Robot
+===============================
+
+.. currentmodule:: compas_fab.fab.robots.rfl
+
+.. autoclass:: Robot
+   :members:

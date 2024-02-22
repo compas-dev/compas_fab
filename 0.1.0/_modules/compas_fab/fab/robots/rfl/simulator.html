@@ -1,0 +1,1003 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compas_fab.fab.robots.rfl.simulator &mdash; compas_fab 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../../search.html"/>
+    <link rel="top" title="compas_fab 0.0.1 documentation" href="../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../index.html"/> 
+
+  
+  <script src="../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> compas_fab
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../pages/gettingstarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../pages/examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../pages/reference.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">compas_fab</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>compas_fab.fab.robots.rfl.simulator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compas_fab.fab.robots.rfl.simulator</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">timeit</span> <span class="k">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
+<span class="kn">from</span> <span class="nn">compas.datastructures.mesh</span> <span class="k">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">compas_fab.fab.robots</span> <span class="k">import</span> <span class="n">Pose</span>
+<span class="kn">from</span> <span class="nn">compas_fab.fab.robots.rfl</span> <span class="k">import</span> <span class="n">Configuration</span><span class="p">,</span> <span class="n">Robot</span>
+<span class="kn">from</span> <span class="nn">compas_fab.fab.robots.rfl.vrep_remote_api</span> <span class="k">import</span> <span class="n">vrep</span>
+
+<span class="n">DEFAULT_SCALE</span> <span class="o">=</span> <span class="mf">1000.</span>
+<span class="n">DEFAULT_OP_MODE</span> <span class="o">=</span> <span class="n">vrep</span><span class="o">.</span><span class="n">simx_opmode_blocking</span>
+<span class="n">CHILD_SCRIPT_TYPE</span> <span class="o">=</span> <span class="n">vrep</span><span class="o">.</span><span class="n">sim_scripttype_childscript</span>
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;compas_fab.simulator&#39;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">SimulationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wraps an exception that occurred inside the simulation engine.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error_code</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SimulationError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">&#39;Error code: &#39;</span> <span class="o">+</span>
+                                              <span class="nb">str</span><span class="p">(</span><span class="n">error_code</span><span class="p">)</span> <span class="o">+</span>
+                                              <span class="s1">&#39;; &#39;</span> <span class="o">+</span> <span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_code</span> <span class="o">=</span> <span class="n">error_code</span>
+
+
+<div class="viewcode-block" id="Simulator"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator">[docs]</a><span class="k">class</span> <span class="nc">Simulator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Interface to run simulations on the RFL using VREP as</span>
+<span class="sd">    the engine for inverse kinematics.</span>
+
+<span class="sd">    :class:`.Simulator` is a context manager type, so it&#39;s best used in combination</span>
+<span class="sd">    with the ``with`` statement to ensure resource deallocation.</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        host (:obj:`str`): IP address or DNS name of the V-REP simulator.</span>
+<span class="sd">        port (:obj:`int`): Port of the simulator.</span>
+<span class="sd">        scale(:obj:`int`): Scaling of the model. Defaults to millimeters (``1000``).</span>
+<span class="sd">        debug (:obj:`bool`): True to enable debug messages, False otherwise.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; from compas_fab.fab.robots.rfl import *</span>
+<span class="sd">        &gt;&gt;&gt; with Simulator() as simulator:</span>
+<span class="sd">        ...     print (&#39;Connected: %s&#39; % simulator.is_connected())</span>
+<span class="sd">        ...</span>
+<span class="sd">        Connected: True</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SUPPORTED_ALGORITHMS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;bitrrt&#39;</span><span class="p">,</span> <span class="s1">&#39;bkpiece1&#39;</span><span class="p">,</span> <span class="s1">&#39;est&#39;</span><span class="p">,</span> <span class="s1">&#39;kpiece1&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;lazyprmstar&#39;</span><span class="p">,</span> <span class="s1">&#39;lbkpiece1&#39;</span><span class="p">,</span> <span class="s1">&#39;lbtrrt&#39;</span><span class="p">,</span> <span class="s1">&#39;pdst&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;prm&#39;</span><span class="p">,</span> <span class="s1">&#39;prrt&#39;</span><span class="p">,</span> <span class="s1">&#39;rrt&#39;</span><span class="p">,</span> <span class="s1">&#39;rrtconnect&#39;</span><span class="p">,</span> <span class="s1">&#39;rrtstar&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;sbl&#39;</span><span class="p">,</span> <span class="s1">&#39;stride&#39;</span><span class="p">,</span> <span class="s1">&#39;trrt&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">19997</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">DEFAULT_SCALE</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">resolve_host</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_timeout_in_ms</span> <span class="o">=</span> <span class="o">-</span><span class="mi">50000000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread_cycle_in_ms</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lua_script_name</span> <span class="o">=</span> <span class="s1">&#39;RFL&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_added_handles</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Stop existing simulation, if any</span>
+        <span class="n">vrep</span><span class="o">.</span><span class="n">simxFinish</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Connecting to V-REP on </span><span class="si">%s</span><span class="s1">:</span><span class="si">%d</span><span class="s1">...&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+
+        <span class="c1"># Connect to V-REP, set a very large timeout for blocking commands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">=</span> <span class="n">vrep</span><span class="o">.</span><span class="n">simxStart</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">default_timeout_in_ms</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">thread_cycle_in_ms</span><span class="p">)</span>
+
+        <span class="c1"># Start simulation</span>
+        <span class="n">vrep</span><span class="o">.</span><span class="n">simxStartSimulation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span> <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s1">&#39;Unable to connect to V-REP on </span><span class="si">%s</span><span class="s1">:</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="c1"># Stop simulation</span>
+        <span class="n">vrep</span><span class="o">.</span><span class="n">simxStopSimulation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span> <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span>
+
+        <span class="c1"># Close the connection to V-REP</span>
+        <span class="n">vrep</span><span class="o">.</span><span class="n">simxFinish</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Objects are removed by V-REP itself when simulation stops</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_added_handles</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Disconnected from V-REP&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Simulator.is_connected"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.is_connected">[docs]</a>    <span class="k">def</span> <span class="nf">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Indicates whether the simulator has an active connection.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if connected, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span></div>
+
+<div class="viewcode-block" id="Simulator.get_object_handle"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.get_object_handle">[docs]</a>    <span class="k">def</span> <span class="nf">get_object_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the object handle (identifier) for a given object name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            object_name (:obj:`str`): Name of the object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: Object handle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_res</span><span class="p">,</span> <span class="n">handle</span> <span class="o">=</span> <span class="n">vrep</span><span class="o">.</span><span class="n">simxGetObjectHandle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span>
+                                                <span class="n">object_name</span><span class="p">,</span>
+                                                <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">handle</span></div>
+
+<div class="viewcode-block" id="Simulator.get_object_matrices"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.get_object_matrices">[docs]</a>    <span class="k">def</span> <span class="nf">get_object_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_handles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets a dictionary of matrices keyed by object handle.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            object_handles (:obj:`list` of :obj:`float`): List of object handles (identifiers)</span>
+<span class="sd">                to retrieve matrices from.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary of matrices represented by a :obj:`list` of 12 :obj:`float` values.</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            &gt;&gt;&gt; from compas_fab.fab.robots.rfl import Simulator</span>
+<span class="sd">            &gt;&gt;&gt; with Simulator() as simulator:</span>
+<span class="sd">            ...     matrices = simulator.get_object_matrices([0])</span>
+<span class="sd">            ...     print(map(int, matrices[0]))</span>
+<span class="sd">            [87, 242, 966, -11851, 996, -21, -85, 6233, 0, 970, -243, 5785]</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            The resulting dictionary is keyed by object handle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_res</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">matrices</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;getShapeMatrices&#39;</span><span class="p">,</span> <span class="n">object_handles</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[])</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">object_handles</span><span class="p">[</span><span class="n">i</span> <span class="o">//</span> <span class="mi">12</span><span class="p">],</span> <span class="n">floats_from_vrep</span><span class="p">(</span><span class="n">matrices</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">12</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrices</span><span class="p">),</span> <span class="mi">12</span><span class="p">)])</span></div>
+
+<div class="viewcode-block" id="Simulator.get_all_visible_handles"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.get_all_visible_handles">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_visible_handles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets a list of object handles (identifiers) for all visible</span>
+<span class="sd">        shapes of the RFL model.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of object handles (identifiers) of the RFL model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;getRobotVisibleShapeHandles&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[])[</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Simulator.set_robot_metric"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.set_robot_metric">[docs]</a>    <span class="k">def</span> <span class="nf">set_robot_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">metric_values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Assigns a metric defining relations between axis values of a robot.</span>
+
+<span class="sd">        It takes a list of 9 :obj:`float` values (3 for gantry + 6 for joints)</span>
+<span class="sd">        ranging from 0 to 1, where 1 indicates the axis is blocked and cannot</span>
+<span class="sd">        move during inverse kinematic solving. A value of 1 on any of these</span>
+<span class="sd">        effectively removes one degree of freedom (DOF).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`.Robot`): Robot instance.</span>
+<span class="sd">            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`</span>
+<span class="sd">                values from 0 to 1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vrep</span><span class="o">.</span><span class="n">simxCallScriptFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">_lua_script_name</span><span class="p">,</span>
+                                    <span class="n">CHILD_SCRIPT_TYPE</span><span class="p">,</span> <span class="s1">&#39;setTheMetric&#39;</span><span class="p">,</span>
+                                    <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">index</span><span class="p">],</span> <span class="n">metric_values</span><span class="p">,</span> <span class="p">[],</span>
+                                    <span class="nb">bytearray</span><span class="p">(),</span> <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Simulator.reset_all_robots"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.reset_all_robots">[docs]</a>    <span class="k">def</span> <span class="nf">reset_all_robots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Resets all robots in the RFL to their base configuration.</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            &gt;&gt;&gt; from compas_fab.fab.robots.rfl import Simulator</span>
+<span class="sd">            &gt;&gt;&gt; with Simulator() as simulator:</span>
+<span class="sd">            ...     simulator.reset_all_robots()</span>
+<span class="sd">            ...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">Robot</span><span class="o">.</span><span class="n">SUPPORTED_ROBOTS</span><span class="p">:</span>
+            <span class="n">Robot</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">reset_config</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Simulator.set_robot_pose"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.set_robot_pose">[docs]</a>    <span class="k">def</span> <span class="nf">set_robot_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">pose</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Moves the robot the the specified pose.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`.Robot`): Robot instance to move.</span>
+<span class="sd">            pose (:class:`.Pose`): Target or goal pose instance.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An instance of :class:`.Configuration` found for the given pose.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># First check if the start state is reachable</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_robot_states</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">pose</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.</span><span class="p">]</span> <span class="o">*</span> <span class="n">robot</span><span class="o">.</span><span class="n">dof</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot find a valid config for the given pose&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_robot_config</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">config</span></div>
+
+<div class="viewcode-block" id="Simulator.set_robot_config"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.set_robot_config">[docs]</a>    <span class="k">def</span> <span class="nf">set_robot_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Moves the robot the the specified configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`.Robot`): Robot instance to move.</span>
+<span class="sd">            config (:class:`Configuration` instance): Describes the position of the</span>
+<span class="sd">                robot as an instance of :class:`Configuration`.</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            &gt;&gt;&gt; from compas_fab.fab.robots.rfl import Robot, Configuration</span>
+<span class="sd">            &gt;&gt;&gt; with Simulator() as simulator:</span>
+<span class="sd">            ...     config = Configuration.from_joints_and_external_axes([90, 0, 0, 0, 0, -90],</span>
+<span class="sd">            ...                                                          [7600, -4500, -4500])</span>
+<span class="sd">            ...     simulator.set_robot_config(Robot(11), config)</span>
+<span class="sd">            ...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported config value&#39;</span><span class="p">)</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="n">config_to_vrep</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_robot_metric</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">robot</span><span class="o">.</span><span class="n">dof</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;moveRobotFK&#39;</span><span class="p">,</span>
+                              <span class="p">[],</span> <span class="n">values</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;robot&#39;</span> <span class="o">+</span> <span class="n">robot</span><span class="o">.</span><span class="n">name</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Simulator.get_robot_config"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.get_robot_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_robot_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the current configuration of the specified robot.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`.Robot`): Robot instance.</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            &gt;&gt;&gt; from compas_fab.fab.robots.rfl import Robot</span>
+<span class="sd">            &gt;&gt;&gt; with Simulator() as simulator:</span>
+<span class="sd">            ...     config = simulator.get_robot_config(Robot(11))</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An instance of :class:`.Configuration`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">res</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;getRobotState&#39;</span><span class="p">,</span>
+                                                     <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">index</span><span class="p">],</span>
+                                                     <span class="p">[],</span> <span class="p">[])</span>
+        <span class="k">return</span> <span class="n">config_from_vrep</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Simulator.find_robot_states"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.find_robot_states">[docs]</a>    <span class="k">def</span> <span class="nf">find_robot_states</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">goal_pose</span><span class="p">,</span> <span class="n">metric_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gantry_joint_limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_trials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Finds valid robot configurations for the specified goal pose.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`.Robot`): Robot instance.</span>
+<span class="sd">            goal_pose (:class:`.Pose`): Target or goal pose instance.</span>
+<span class="sd">            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`</span>
+<span class="sd">                values (3 for gantry + 6 for joints) ranging from 0 to 1,</span>
+<span class="sd">                where 1 indicates the axis is blocked and cannot</span>
+<span class="sd">                move during inverse kinematic solving.</span>
+<span class="sd">            gantry_joint_limits (:obj:`list` of `float`): List of 6 floats defining the upper/lower limits of</span>
+<span class="sd">                gantry joints. Use this if you want to restrict the area in which to search for states.</span>
+<span class="sd">            arm_joint_limits (:obj:`list` of `float`): List of 12 floats defining the upper/lower limits of</span>
+<span class="sd">                arm joints. Use this if you want to restrict the working area in which to search for states.</span>
+<span class="sd">            max_trials (:obj:`int`): Number of trials to run. Set to ``None``</span>
+<span class="sd">                to retry infinitely.</span>
+<span class="sd">            max_results (:obj:`int`): Maximum number of result states to return.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of :class:`Configuration` objects representing</span>
+<span class="sd">            the collision-free configuration for the ``goal_pose``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">metric_values</span><span class="p">:</span>
+            <span class="n">metric_values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">]</span> <span class="o">*</span> <span class="n">robot</span><span class="o">.</span><span class="n">dof</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_robot_metric</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">metric_values</span><span class="p">)</span>
+
+        <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_raw_robot_states</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">pose_to_vrep</span><span class="p">(</span><span class="n">goal_pose</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">),</span> <span class="n">gantry_joint_limits</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="p">,</span> <span class="n">max_trials</span><span class="p">,</span> <span class="n">max_results</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">config_from_vrep</span><span class="p">(</span><span class="n">states</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">robot</span><span class="o">.</span><span class="n">dof</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">states</span><span class="p">),</span> <span class="n">robot</span><span class="o">.</span><span class="n">dof</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="Simulator._find_raw_robot_states"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator._find_raw_robot_states">[docs]</a>    <span class="k">def</span> <span class="nf">_find_raw_robot_states</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">goal_pose</span><span class="p">,</span> <span class="n">gantry_joint_limits</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="p">,</span> <span class="n">max_trials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">final_states</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">retry_until_success</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">max_trials</span> <span class="k">else</span> <span class="kc">False</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">string_param_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">gantry_joint_limits</span> <span class="ow">or</span> <span class="n">arm_joint_limits</span><span class="p">:</span>
+                <span class="n">joint_limits</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">joint_limits</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">floats_to_vrep</span><span class="p">(</span><span class="n">gantry_joint_limits</span> <span class="ow">or</span> <span class="p">[],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span>
+                <span class="n">joint_limits</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">arm_joint_limits</span> <span class="ow">or</span> <span class="p">[])</span>
+                <span class="n">string_param_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">joint_limits</span><span class="p">)))</span>
+
+            <span class="n">res</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;searchRobotStates&#39;</span><span class="p">,</span>
+                                                         <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                                                          <span class="n">max_trials</span> <span class="ow">or</span> <span class="mi">1</span><span class="p">,</span>
+                                                          <span class="n">max_results</span><span class="p">],</span>
+                                                         <span class="n">goal_pose</span><span class="p">,</span> <span class="n">string_param_list</span><span class="p">)</span>
+
+            <span class="c1"># Even if the retry_until_success is set to True, we short circuit</span>
+            <span class="c1"># at some point to prevent infinite loops caused by misconfiguration</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">20</span> <span class="ow">or</span> <span class="p">(</span><span class="n">res</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">retry_until_success</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s1">&#39;Failed to search robot states&#39;</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+
+            <span class="n">final_states</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">final_states</span><span class="p">):</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Found </span><span class="si">%d</span><span class="s1"> valid robot states&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">final_states</span><span class="p">)</span> <span class="o">//</span> <span class="mi">9</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No valid robot states found, will retry.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">final_states</span></div>
+
+<div class="viewcode-block" id="Simulator.pick_building_member"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.pick_building_member">[docs]</a>    <span class="k">def</span> <span class="nf">pick_building_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">building_member_mesh</span><span class="p">,</span> <span class="n">pickup_pose</span><span class="p">,</span> <span class="n">metric_values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Picks up a building member and attaches it to the robot.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`.Robot`): Robot instance to use for pick up.</span>
+<span class="sd">            building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh</span>
+<span class="sd">                of the building member that will be attached to the robot.</span>
+<span class="sd">            pickup_pose (:class:`.Pose`): Pickup pose instance.</span>
+<span class="sd">            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`</span>
+<span class="sd">                values (3 for gantry + 6 for joints) ranging from 0 to 1,</span>
+<span class="sd">                where 1 indicates the axis/joint is blocked and cannot</span>
+<span class="sd">                move during inverse kinematic solving.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: Object handle (identifier) assigned to the building member.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">metric_values</span><span class="p">:</span>
+            <span class="n">metric_values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">]</span> <span class="o">*</span> <span class="n">robot</span><span class="o">.</span><span class="n">dof</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_robot_pose</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">pickup_pose</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_building_member</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">building_member_mesh</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Simulator._find_path_plan"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator._find_path_plan">[docs]</a>    <span class="k">def</span> <span class="nf">_find_path_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">goal</span><span class="p">,</span> <span class="n">metric_values</span><span class="p">,</span> <span class="n">collision_meshes</span><span class="p">,</span>
+                        <span class="n">algorithm</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span>
+                        <span class="n">gantry_joint_limits</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="p">,</span> <span class="n">shallow_state_search</span><span class="p">,</span> <span class="n">optimize_path_length</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">metric_values</span><span class="p">:</span>
+            <span class="n">metric_values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">]</span> <span class="o">*</span> <span class="n">robot</span><span class="o">.</span><span class="n">dof</span>
+
+        <span class="k">if</span> <span class="n">algorithm</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_ALGORITHMS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported algorithm. Must be one of: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_ALGORITHMS</span><span class="p">))</span>
+
+        <span class="n">first_start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">collision_meshes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_meshes</span><span class="p">(</span><span class="n">collision_meshes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: add_meshes=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">first_start</span><span class="p">)</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_robot_metric</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">metric_values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: set_robot_metric=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;target_type&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">goal</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s1">&#39;Invalid goal type, you are using an internal function but passed incorrect args&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">goal</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;config&#39;</span><span class="p">:</span>
+            <span class="n">states</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">goal</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]:</span>
+                <span class="n">states</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">config_to_vrep</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">goal</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;pose&#39;</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">max_trials</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">shallow_state_search</span> <span class="k">else</span> <span class="mi">80</span>
+            <span class="n">max_results</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">shallow_state_search</span> <span class="k">else</span> <span class="mi">80</span>
+            <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_raw_robot_states</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">pose_to_vrep</span><span class="p">(</span><span class="n">goal</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">),</span> <span class="n">gantry_joint_limits</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="p">,</span> <span class="n">max_trials</span><span class="p">,</span> <span class="n">max_results</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: search_robot_states=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">string_param_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">algorithm</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">gantry_joint_limits</span> <span class="ow">or</span> <span class="n">arm_joint_limits</span><span class="p">:</span>
+            <span class="n">joint_limits</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">joint_limits</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">floats_to_vrep</span><span class="p">(</span><span class="n">gantry_joint_limits</span> <span class="ow">or</span> <span class="p">[],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span>
+            <span class="n">joint_limits</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">arm_joint_limits</span> <span class="ow">or</span> <span class="p">[])</span>
+            <span class="n">string_param_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">joint_limits</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;About to execute path planner: algorithm=</span><span class="si">%s</span><span class="s1">, trials=</span><span class="si">%d</span><span class="s1">, shallow_state_search=</span><span class="si">%s</span><span class="s1">, optimize_path_length=</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="n">shallow_state_search</span><span class="p">,</span> <span class="n">optimize_path_length</span><span class="p">)</span>
+
+        <span class="n">res</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;searchRobotPath&#39;</span><span class="p">,</span>
+                                                   <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                                                    <span class="n">trials</span><span class="p">,</span>
+                                                    <span class="p">(</span><span class="nb">int</span><span class="p">)(</span><span class="n">resolution</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">),</span>
+                                                    <span class="mi">1</span> <span class="k">if</span> <span class="n">optimize_path_length</span> <span class="k">else</span> <span class="mi">0</span><span class="p">],</span>
+                                                   <span class="n">states</span><span class="p">,</span> <span class="n">string_param_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: search_robot_path=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s1">&#39;Failed to search robot path&#39;</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Execution time: total=</span><span class="si">%.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">first_start</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">config_from_vrep</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">robot</span><span class="o">.</span><span class="n">dof</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">robot</span><span class="o">.</span><span class="n">dof</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="Simulator.find_path_plan_to_config"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.find_path_plan_to_config">[docs]</a>    <span class="k">def</span> <span class="nf">find_path_plan_to_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">goal_configs</span><span class="p">,</span> <span class="n">metric_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collision_meshes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;rrtconnect&#39;</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
+                                 <span class="n">gantry_joint_limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shallow_state_search</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">optimize_path_length</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find a path plan to move the selected robot from its current position to one of the `goal_configs`.</span>
+
+<span class="sd">        This function is useful when it is required to get a path plan that ends in one</span>
+<span class="sd">        specific goal configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`.Robot`): Robot instance to move.</span>
+<span class="sd">            goal_configs (:obj:`list` of :class:`Configuration`): List of target or goal configurations.</span>
+<span class="sd">            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`</span>
+<span class="sd">                values (3 for gantry + 6 for joints) ranging from 0 to 1,</span>
+<span class="sd">                where 1 indicates the axis/joint is blocked and cannot</span>
+<span class="sd">                move during inverse kinematic solving.</span>
+<span class="sd">            collision_meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): Collision meshes</span>
+<span class="sd">                to be taken into account when calculating the motion plan.</span>
+<span class="sd">                Defaults to ``None``.</span>
+<span class="sd">            algorithm (:obj:`str`): Name of the algorithm to use. Defaults to ``rrtconnect``.</span>
+<span class="sd">            trials (:obj:`int`): Number of search trials to run. Defaults to ``1``.</span>
+<span class="sd">            resolution (:obj:`float`): Validity checking resolution. This value</span>
+<span class="sd">                is specified as a fraction of the space&#39;s extent.</span>
+<span class="sd">                Defaults to ``0.02``.</span>
+<span class="sd">            gantry_joint_limits (:obj:`list` of `float`): List of 6 floats defining the upper/lower limits of</span>
+<span class="sd">                gantry joints. Use this if you want to restrict the working area of the path planner.</span>
+<span class="sd">            arm_joint_limits (:obj:`list` of `float`): List of 12 floats defining the upper/lower limits of</span>
+<span class="sd">                arm joints. Use this if you want to restrict the working area of the path planner.</span>
+<span class="sd">            shallow_state_search (:obj:`bool`): True to search only a minimum of</span>
+<span class="sd">                valid states before searching a path, False to search states intensively.</span>
+<span class="sd">            optimize_path_length (:obj:`bool`): True to search the path with minimal total length among all `trials`,</span>
+<span class="sd">                False to return the first valid path found. It only affects the output if `trials &gt; 1`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of :class:`Configuration` objects representing the</span>
+<span class="sd">            collision-free path to the ``goal_pose``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_path_plan</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;target_type&#39;</span><span class="p">:</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="n">goal_configs</span><span class="p">},</span>
+                                    <span class="n">metric_values</span><span class="p">,</span> <span class="n">collision_meshes</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span>
+                                    <span class="n">gantry_joint_limits</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="p">,</span> <span class="n">shallow_state_search</span><span class="p">,</span> <span class="n">optimize_path_length</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Simulator.find_path_plan"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.find_path_plan">[docs]</a>    <span class="k">def</span> <span class="nf">find_path_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">goal_pose</span><span class="p">,</span> <span class="n">metric_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collision_meshes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;rrtconnect&#39;</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
+                       <span class="n">gantry_joint_limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shallow_state_search</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">optimize_path_length</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find a path plan to move the selected robot from its current position to the `goal_pose`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`.Robot`): Robot instance to move.</span>
+<span class="sd">            goal_pose (:class:`.Pose`): Target or goal pose instance.</span>
+<span class="sd">            metric_values (:obj:`list` of :obj:`float`): 9 :obj:`float`</span>
+<span class="sd">                values (3 for gantry + 6 for joints) ranging from 0 to 1,</span>
+<span class="sd">                where 1 indicates the axis/joint is blocked and cannot</span>
+<span class="sd">                move during inverse kinematic solving.</span>
+<span class="sd">            collision_meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): Collision meshes</span>
+<span class="sd">                to be taken into account when calculating the motion plan.</span>
+<span class="sd">                Defaults to ``None``.</span>
+<span class="sd">            algorithm (:obj:`str`): Name of the algorithm to use. Defaults to ``rrtconnect``.</span>
+<span class="sd">            trials (:obj:`int`): Number of search trials to run. Defaults to ``1``.</span>
+<span class="sd">            resolution (:obj:`float`): Validity checking resolution. This value</span>
+<span class="sd">                is specified as a fraction of the space&#39;s extent.</span>
+<span class="sd">                Defaults to ``0.02``.</span>
+<span class="sd">            gantry_joint_limits (:obj:`list` of `float`): List of 6 floats defining the upper/lower limits of</span>
+<span class="sd">                gantry joints. Use this if you want to restrict the working area of the path planner.</span>
+<span class="sd">            arm_joint_limits (:obj:`list` of `float`): List of 12 floats defining the upper/lower limits of</span>
+<span class="sd">                arm joints. Use this if you want to restrict the working area of the path planner.</span>
+<span class="sd">            shallow_state_search (:obj:`bool`): True to search only a minimum of</span>
+<span class="sd">                valid states before searching a path, False to search states intensively.</span>
+<span class="sd">            optimize_path_length (:obj:`bool`): True to search the path with minimal total length among all `trials`,</span>
+<span class="sd">                False to return the first valid path found. It only affects the output if `trials &gt; 1`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of :class:`Configuration` objects representing the</span>
+<span class="sd">            collision-free path to the ``goal_pose``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_path_plan</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;target_type&#39;</span><span class="p">:</span> <span class="s1">&#39;pose&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="n">goal_pose</span><span class="p">},</span>
+                                    <span class="n">metric_values</span><span class="p">,</span> <span class="n">collision_meshes</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span>
+                                    <span class="n">gantry_joint_limits</span><span class="p">,</span> <span class="n">arm_joint_limits</span><span class="p">,</span> <span class="n">shallow_state_search</span><span class="p">,</span> <span class="n">optimize_path_length</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Simulator.add_building_member"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.add_building_member">[docs]</a>    <span class="k">def</span> <span class="nf">add_building_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">building_member_mesh</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a building member to the RFL scene and attaches it to the robot.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            robot (:class:`.Robot`): Robot instance to attach the building member to.</span>
+<span class="sd">            building_member_mesh (:class:`compas.datastructures.mesh.Mesh`): Mesh</span>
+<span class="sd">                of the building member that will be attached to the robot.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: Object handle (identifier) assigned to the building member.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            All meshes are automatically removed from the scene when the simulation ends.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">handles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_meshes</span><span class="p">([</span><span class="n">building_member_mesh</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">handles</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s1">&#39;Expected one handle, but multiple found=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">handles</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">handle</span> <span class="o">=</span> <span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">parent_handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object_handle</span><span class="p">(</span><span class="s1">&#39;customGripper&#39;</span> <span class="o">+</span> <span class="n">robot</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_connection&#39;</span><span class="p">)</span>
+        <span class="n">vrep</span><span class="o">.</span><span class="n">simxSetObjectParent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">parent_handle</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">handle</span></div>
+
+<div class="viewcode-block" id="Simulator.add_meshes"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.add_meshes">[docs]</a>    <span class="k">def</span> <span class="nf">add_meshes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meshes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds meshes to the RFL scene.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            meshes (:obj:`list` of :class:`compas.datastructures.mesh.Mesh`): List</span>
+<span class="sd">                of meshes to add to the current simulation scene.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of object handles (identifiers) assigned to the meshes.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            All meshes are automatically removed from the scene when the simulation ends.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mesh_handles</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">mesh</span> <span class="ow">in</span> <span class="n">meshes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">mesh</span><span class="o">.</span><span class="n">is_trimesh</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The simulator only supports tri-meshes&#39;</span><span class="p">)</span>
+
+            <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">to_vertices_and_faces</span><span class="p">()</span>
+            <span class="n">vrep_packing</span> <span class="o">=</span> <span class="p">(</span><span class="n">floats_to_vrep</span><span class="p">([</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">vertices</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span> <span class="o">+</span>
+                            <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">faces</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">])</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">len</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span><span class="p">],</span> <span class="n">vrep_packing</span><span class="p">]</span>
+            <span class="n">handles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_child_script</span><span class="p">(</span><span class="s1">&#39;buildMesh&#39;</span><span class="p">,</span>
+                                            <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                            <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                            <span class="p">[])[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">mesh_handles</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">handles</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_added_handles</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">handles</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mesh_handles</span></div>
+
+<div class="viewcode-block" id="Simulator.remove_meshes"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.remove_meshes">[docs]</a>    <span class="k">def</span> <span class="nf">remove_meshes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh_handles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes meshes from the RFL scene.</span>
+
+<span class="sd">        This is functionally identical to ``remove_objects``, but it&#39;s here for</span>
+<span class="sd">        symmetry reasons.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mesh_handles (:obj:`list` of :obj:`int`): Object handles to remove.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_objects</span><span class="p">(</span><span class="n">mesh_handles</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Simulator.remove_objects"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.remove_objects">[docs]</a>    <span class="k">def</span> <span class="nf">remove_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_handles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes objects from the RFL scene.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            object_handles (:obj:`list` of :obj:`int`): Object handles to remove.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            Please note there&#39;s no need to clean up objects manually after the simulation</span>
+<span class="sd">            has completed, as those will be reset automatically anyway. This method is</span>
+<span class="sd">            only useful if you need to remove objects *during* a simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">handle</span> <span class="ow">in</span> <span class="n">object_handles</span><span class="p">:</span>
+            <span class="n">vrep</span><span class="o">.</span><span class="n">simxRemoveObject</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_added_handles</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">object_handles</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_added_handles</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Simulator.run_child_script"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.Simulator.html#compas_fab.fab.robots.rfl.Simulator.run_child_script">[docs]</a>    <span class="k">def</span> <span class="nf">run_child_script</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span> <span class="n">in_ints</span><span class="p">,</span> <span class="n">in_floats</span><span class="p">,</span> <span class="n">in_strings</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">vrep</span><span class="o">.</span><span class="n">simxCallScriptFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">_lua_script_name</span><span class="p">,</span>
+                                           <span class="n">CHILD_SCRIPT_TYPE</span><span class="p">,</span> <span class="n">function_name</span><span class="p">,</span>
+                                           <span class="n">in_ints</span><span class="p">,</span> <span class="n">in_floats</span><span class="p">,</span> <span class="n">in_strings</span><span class="p">,</span>
+                                           <span class="nb">bytearray</span><span class="p">(),</span> <span class="n">DEFAULT_OP_MODE</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SimulationCoordinator"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.SimulationCoordinator.html#compas_fab.fab.robots.rfl.SimulationCoordinator">[docs]</a><span class="k">class</span> <span class="nc">SimulationCoordinator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Coordinates the execution of simulation using different strategies.</span>
+<span class="sd">    For instance, it allows to run a path planning simulation on one node</span>
+<span class="sd">    or distribute it among many nodes and get multiple solutions as result.</span>
+
+<span class="sd">    The coordinator takes as input one large dictionary-like structure with the</span>
+<span class="sd">    entire definition of a path planning job. The following shows an example of</span>
+<span class="sd">    this, exposing all possible configuration values::</span>
+
+<span class="sd">        {</span>
+<span class="sd">            &#39;debug&#39;: True,</span>
+<span class="sd">            &#39;trials&#39;: 1,</span>
+<span class="sd">            &#39;shallow_state_search&#39;: True,</span>
+<span class="sd">            &#39;optimize_path_length&#39;: False,</span>
+<span class="sd">            &#39;algorithm&#39;: &#39;rrtconnect&#39;,</span>
+<span class="sd">            &#39;resolution&#39;: 0.02,</span>
+<span class="sd">            &#39;collision_meshes&#39;: [],</span>
+<span class="sd">            &#39;robots&#39;: [</span>
+<span class="sd">                {</span>
+<span class="sd">                    &#39;robot&#39;: 12,</span>
+<span class="sd">                    &#39;start&#39;: {</span>
+<span class="sd">                        &#39;joint_values&#39;: [90.0, 100.0, -160.0, 180.0, 30.0, -90.0],</span>
+<span class="sd">                        &#39;external_axes&#39;: [9562.26, -2000, -3600]</span>
+<span class="sd">                    },</span>
+<span class="sd">                }</span>
+<span class="sd">                {</span>
+<span class="sd">                    &#39;robot&#39;: 11,</span>
+<span class="sd">                    &#39;start&#39;: {</span>
+<span class="sd">                        &#39;joint_values&#39;: [90.0, 100.0, -160.0, 180.0, 30.0, -90.0],</span>
+<span class="sd">                        &#39;external_axes&#39;: [9562.26, -1000, -4600]</span>
+<span class="sd">                    },</span>
+<span class="sd">                    &#39;goal&#39;: {</span>
+<span class="sd">                        &#39;values&#39;: [-0.98, 0.16, 0.0, 1003, 0.0, 0.0, -1.0, -5870, -0.16, -0.98, 0.0, -1500]</span>
+<span class="sd">                    },</span>
+<span class="sd">                    &#39;building_member&#39;: {</span>
+<span class="sd">                        &#39;attributes&#39;: {</span>
+<span class="sd">                            &#39;name&#39;: &#39;Mesh&#39;,</span>
+<span class="sd">                        }</span>
+<span class="sd">                    },</span>
+<span class="sd">                    &#39;joint_limits&#39;: {</span>
+<span class="sd">                        &#39;gantry&#39;: [</span>
+<span class="sd">                            [0, 20000],</span>
+<span class="sd">                            [-12000, 0],</span>
+<span class="sd">                            [-4600, -1000]</span>
+<span class="sd">                        ],</span>
+<span class="sd">                        &#39;arm&#39;: [</span>
+<span class="sd">                            [-180, 180],</span>
+<span class="sd">                            [-90, 150],</span>
+<span class="sd">                            [-180, 75],</span>
+<span class="sd">                            [-400, 400],</span>
+<span class="sd">                            [-125, 120],</span>
+<span class="sd">                            [-400, 400]</span>
+<span class="sd">                        ]</span>
+<span class="sd">                    },</span>
+<span class="sd">                    &#39;metric_values&#39;: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],</span>
+<span class="sd">                }</span>
+<span class="sd">            ]</span>
+<span class="sd">        }</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="SimulationCoordinator.remote_executor"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.SimulationCoordinator.html#compas_fab.fab.robots.rfl.SimulationCoordinator.remote_executor">[docs]</a>    <span class="k">def</span> <span class="nf">remote_executor</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">executor_host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">7000</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://</span><span class="si">%s</span><span class="s1">:</span><span class="si">%d</span><span class="s1">/path-planner&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">executor_host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span> <span class="s1">&#39;Content-Length&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))})</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># TODO: Do something different here</span>
+        <span class="c1"># Return the ID of the job and poll</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="c1"># TODO: Get DOF from robot instance</span>
+        <span class="k">return</span> <span class="p">[[</span><span class="n">config_from_vrep</span><span class="p">(</span><span class="n">path_list</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">9</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">path_list</span><span class="p">),</span> <span class="mi">9</span><span class="p">)]</span> <span class="k">for</span> <span class="n">path_list</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="SimulationCoordinator.local_executor"><a class="viewcode-back" href="../../../../../pages/reference/generated/compas_fab.fab.robots.rfl.SimulationCoordinator.html#compas_fab.fab.robots.rfl.SimulationCoordinator.local_executor">[docs]</a>    <span class="k">def</span> <span class="nf">local_executor</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">19997</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">Simulator</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">)</span> <span class="k">as</span> <span class="n">simulator</span><span class="p">:</span>
+            <span class="n">active_robot_options</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="c1"># Setup all robots&#39; start state</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;robots&#39;</span><span class="p">]:</span>
+                <span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;robot&#39;</span><span class="p">],</span> <span class="n">simulator</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="s1">&#39;start&#39;</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;joint_values&#39;</span><span class="p">):</span>
+                        <span class="n">start</span> <span class="o">=</span> <span class="n">Configuration</span><span class="o">.</span><span class="n">from_data</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">])</span>
+                    <span class="k">elif</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;values&#39;</span><span class="p">):</span>
+                        <span class="n">start</span> <span class="o">=</span> <span class="n">Pose</span><span class="o">.</span><span class="n">from_data</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">])</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">reachable_state</span> <span class="o">=</span> <span class="n">simulator</span><span class="o">.</span><span class="n">find_robot_states</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">metric_values</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">]</span> <span class="o">*</span> <span class="n">robot</span><span class="o">.</span><span class="n">dof</span><span class="p">,</span> <span class="n">max_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                            <span class="n">start</span> <span class="o">=</span> <span class="n">reachable_state</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Robot state found for start pose. External axes=</span><span class="si">%s</span><span class="s1">, Joint values=</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">start</span><span class="o">.</span><span class="n">external_axes</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">start</span><span class="o">.</span><span class="n">joint_values</span><span class="p">))</span>
+                        <span class="k">except</span> <span class="n">SimulationError</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Start plane is not reachable: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]))</span>
+
+                    <span class="n">simulator</span><span class="o">.</span><span class="n">set_robot_config</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="s1">&#39;building_member&#39;</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+                    <span class="n">simulator</span><span class="o">.</span><span class="n">add_building_member</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_data</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;building_member&#39;</span><span class="p">]))</span>
+
+                <span class="k">if</span> <span class="s1">&#39;goal&#39;</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+                    <span class="n">active_robot_options</span> <span class="o">=</span> <span class="n">r</span>
+
+            <span class="c1"># Set global scene options</span>
+            <span class="k">if</span> <span class="s1">&#39;collision_meshes&#39;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                <span class="n">simulator</span><span class="o">.</span><span class="n">add_meshes</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">Mesh</span><span class="o">.</span><span class="n">from_data</span><span class="p">,</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;collision_meshes&#39;</span><span class="p">]))</span>
+
+            <span class="c1"># Check if there&#39;s at least one active robot (i.e. one with a goal defined)</span>
+            <span class="k">if</span> <span class="n">active_robot_options</span><span class="p">:</span>
+                <span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">active_robot_options</span><span class="p">[</span><span class="s1">&#39;robot&#39;</span><span class="p">],</span> <span class="n">simulator</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">active_robot_options</span><span class="p">[</span><span class="s1">&#39;goal&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;values&#39;</span><span class="p">):</span>
+                    <span class="n">goal</span> <span class="o">=</span> <span class="n">Pose</span><span class="o">.</span><span class="n">from_data</span><span class="p">(</span><span class="n">active_robot_options</span><span class="p">[</span><span class="s1">&#39;goal&#39;</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported goal type: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">active_robot_options</span><span class="p">[</span><span class="s1">&#39;goal&#39;</span><span class="p">]))</span>
+
+                <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;metric_values&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">active_robot_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;metric_values&#39;</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;algorithm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;algorithm&#39;</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;resolution&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;resolution&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="s1">&#39;joint_limits&#39;</span> <span class="ow">in</span> <span class="n">active_robot_options</span><span class="p">:</span>
+                    <span class="n">joint_limits</span> <span class="o">=</span> <span class="n">active_robot_options</span><span class="p">[</span><span class="s1">&#39;joint_limits&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">joint_limits</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;gantry&#39;</span><span class="p">):</span>
+                        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;gantry_joint_limits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">joint_limits</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;gantry&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">joint_limits</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;arm&#39;</span><span class="p">):</span>
+                        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;arm_joint_limits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">joint_limits</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;arm&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;trials&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;trials&#39;</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;shallow_state_search&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shallow_state_search&#39;</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;optimize_path_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;optimize_path_length&#39;</span><span class="p">)</span>
+
+                <span class="c1"># Filter None values</span>
+                <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+                <span class="n">path</span> <span class="o">=</span> <span class="n">simulator</span><span class="o">.</span><span class="n">find_path_plan</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">goal</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Found path of </span><span class="si">%d</span><span class="s1"> steps&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;robots&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;robot&#39;</span><span class="p">],</span> <span class="n">simulator</span><span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="n">simulator</span><span class="o">.</span><span class="n">get_robot_config</span><span class="p">(</span><span class="n">robot</span><span class="p">)]</span>
+
+        <span class="k">return</span> <span class="n">path</span></div></div>
+
+
+<span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># NETWORKING HELPERS</span>
+<span class="c1"># A couple of simple networking helpers for host name resolution</span>
+<span class="c1"># --------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">is_ipv4_address</span><span class="p">(</span><span class="n">addr</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">socket</span><span class="o">.</span><span class="n">inet_aton</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">resolve_host</span><span class="p">(</span><span class="n">host</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">is_ipv4_address</span><span class="p">(</span><span class="n">host</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">host</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostbyname</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------</span>
+<span class="c1"># MAPPINGS</span>
+<span class="c1"># The following mapping functions are only internal to make sure</span>
+<span class="c1"># all transformations from and to V-REP are consistent</span>
+<span class="c1"># --------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">pose_to_vrep</span><span class="p">(</span><span class="n">pose</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="n">pose</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pose</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">pose</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="n">scale</span>
+    <span class="n">pose</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">/</span> <span class="n">scale</span>
+    <span class="n">pose</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="o">/</span> <span class="n">scale</span>
+    <span class="k">return</span> <span class="n">pose</span>
+
+
+<span class="k">def</span> <span class="nf">config_from_vrep</span><span class="p">(</span><span class="n">list_of_floats</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="n">angles</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span> <span class="n">list_of_floats</span><span class="p">[</span><span class="mi">3</span><span class="p">:])</span>
+    <span class="n">external_axes</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span> <span class="n">list_of_floats</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">Configuration</span><span class="o">.</span><span class="n">from_joints_and_external_axes</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> <span class="n">external_axes</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">config_to_vrep</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span> <span class="o">/</span> <span class="n">scale</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">external_axes</span><span class="p">)</span>
+    <span class="n">values</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">joint_values</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">values</span>
+
+
+<span class="k">def</span> <span class="nf">floats_to_vrep</span><span class="p">(</span><span class="n">list_of_floats</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">v</span> <span class="o">/</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">list_of_floats</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">floats_from_vrep</span><span class="p">(</span><span class="n">list_of_floats</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">v</span> <span class="o">*</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">list_of_floats</span><span class="p">]</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Gramazio Kohler Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
