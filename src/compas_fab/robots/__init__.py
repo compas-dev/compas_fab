@@ -46,6 +46,19 @@ Planning scene
     CollisionMesh
     PlanningScene
 
+Targets
+-------
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    Target
+    FrameTarget
+    PointAxisTarget
+    ConfigurationTarget
+    ConstraintSetTarget
+
 Constraints
 -----------
 
@@ -101,6 +114,13 @@ from .robot import (
 from .semantics import (
     RobotSemantics,
 )
+from .targets import (
+    Target,
+    FrameTarget,
+    PointAxisTarget,
+    ConfigurationTarget,
+    ConstraintSetTarget,
+)
 from .time_ import (
     Duration,
 )
@@ -123,20 +143,25 @@ __all__ = [
     "AttachedCollisionMesh",
     "BoundingVolume",
     "CollisionMesh",
+    "ConfigurationTarget",
     "Constraint",
+    "ConstraintSetTarget",
     "Duration",
+    "FrameTarget",
     "Inertia",
     "JointConstraint",
     "JointTrajectory",
     "JointTrajectoryPoint",
     "OrientationConstraint",
     "PlanningScene",
+    "PointAxisTarget",
     "PositionConstraint",
     "ReachabilityMap",
     "DeviationVectorsGenerator",
     "OrthonormalVectorsFromAxisGenerator",
     "Robot",
     "RobotSemantics",
+    "Target",
     "Tool",
     "Trajectory",
     "Wrench",
