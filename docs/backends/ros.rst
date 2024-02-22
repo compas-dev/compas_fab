@@ -158,7 +158,3 @@ Next Steps
 * :ref:`Examples: Description models <examples_description_models>`
 * :ref:`Examples: ROS Backend <examples_ros>`
 * :ref:`COMPAS FAB API Reference <reference>`
-
-..
-  TODO: use intersphinx link for compas robots tutorial when new compas sphinx is settled
-  Something like this: * :ref:`Tutorial: COMPAS Robots <compas:robots>`
