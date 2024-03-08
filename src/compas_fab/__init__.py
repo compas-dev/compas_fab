@@ -12,14 +12,26 @@ environments.
 Robots
 ------
 
-The core features are located in the ``robots`` module with the specific backend
-implementations in the ``backends`` modules:
+Features for modeling robots and methods to perform static inverse kinematics and
+single-action motion planning.
+The user-facing features are located in the ``robots`` module.
+The implementations of planning backends are located in the ``backends`` modules:
 
 .. toctree::
     :maxdepth: 1
 
     compas_fab.robots
     compas_fab.backends
+
+Planning
+--------
+
+Features for modeling multi-action robotic processes and methods for planning them.
+
+.. toctree::
+    :maxdepth: 1
+
+    compas_fab.planning
 
 CAD integration
 ---------------
