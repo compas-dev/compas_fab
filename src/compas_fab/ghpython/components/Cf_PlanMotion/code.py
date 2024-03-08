@@ -28,14 +28,7 @@ class PlanMotion(component):
         attached_collision_meshes = list(attached_collision_meshes) if attached_collision_meshes else None
         planner_id = str(planner_id) if planner_id else "RRTConnect"
 
-        if (
-            robot
-            and robot.client
-            and robot.client.is_connected
-            and start_configuration
-            and target
-            and compute
-        ):
+        if robot and robot.client and robot.client.is_connected and start_configuration and target and compute:
             st[key] = robot.plan_motion(
                 target,
                 start_configuration=start_configuration,

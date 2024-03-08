@@ -14,13 +14,18 @@ from compas_fab.robots import FrameTarget
 
 
 class FrameTargetFromPlaneComponent(component):
-    def RunScript(self, plane, tolerance_position, tolerance_xaxis, tolerance_yaxis, tolerance_zaxis, tool_coordinate_frame):
+    def RunScript(
+        self, plane, tolerance_position, tolerance_xaxis, tolerance_yaxis, tolerance_zaxis, tool_coordinate_frame
+    ):
         target = None
         if plane:
             # Convert Rhino geometry to COMPAS geometry
             frame = plane if isinstance(plane, Frame) else plane_to_compas_frame(plane)
-            tool_coordinate_frame = tool_coordinate_frame if isinstance(
-                tool_coordinate_frame, Frame) else plane_to_compas_frame(tool_coordinate_frame)
+            tool_coordinate_frame = (
+                tool_coordinate_frame
+                if isinstance(tool_coordinate_frame, Frame)
+                else plane_to_compas_frame(tool_coordinate_frame)
+            )
 
             # Tolerance values
             tolerance_position = tolerance_position or 0.001

@@ -58,9 +58,11 @@ def convert_target_to_goal_constraints(target, ee_link_name):
         tcf_frame_in_wcf = target.target_frame
         tool_coordinate_frame = target.tool_coordinate_frame
         pc = CF_PositionConstraint.from_frame(
-            tcf_frame_in_wcf, target.tolerance_position, ee_link_name, tool_coordinate_frame)
+            tcf_frame_in_wcf, target.tolerance_position, ee_link_name, tool_coordinate_frame
+        )
         oc = CF_OrientationConstraint.from_frame(
-            tcf_frame_in_wcf, [target.tolerance_orientation] * 3, ee_link_name, tool_coordinate_frame)
+            tcf_frame_in_wcf, [target.tolerance_orientation] * 3, ee_link_name, tool_coordinate_frame
+        )
         return [pc, oc]
 
     elif type(target) == PointAxisTarget:
@@ -69,12 +71,15 @@ def convert_target_to_goal_constraints(target, ee_link_name):
 
         if tool_coordinate_frame:
             raise NotImplementedError(
-                "Tool coordinate frame is not yet supported when converting PointAxisTarget to ConstraintSetTarget.")
+                "Tool coordinate frame is not yet supported when converting PointAxisTarget to ConstraintSetTarget."
+            )
 
         pc = CF_PositionConstraint.from_point(
-            tcf_point_in_wcf, target.tolerance_position, ee_link_name, tool_coordinate_frame)
+            tcf_point_in_wcf, target.tolerance_position, ee_link_name, tool_coordinate_frame
+        )
         oc = CF_OrientationConstraint.from_frame(
-            tcf_frame_in_wcf, [6.35, 6.35, 0.01], ee_link_name, tool_coordinate_frame)
+            tcf_frame_in_wcf, [6.35, 6.35, 0.01], ee_link_name, tool_coordinate_frame
+        )
         return [pc, oc]
 
 

@@ -22,8 +22,9 @@ class PointAxisTargetComponent(component):
 
             # Convert Rhino geometry to COMPAS geometry
             point = point if isinstance(point, Point) else point_to_compas(point)
-            target_z_vector = target_z_vector if isinstance(
-                target_z_vector, Vector) else vector_to_compas(target_z_vector)
+            target_z_vector = (
+                target_z_vector if isinstance(target_z_vector, Vector) else vector_to_compas(target_z_vector)
+            )
 
             target = PointAxisTarget(point, target_z_vector, tolerance_position, tool_coordinate_frame)
 

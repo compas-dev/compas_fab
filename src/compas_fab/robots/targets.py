@@ -87,7 +87,14 @@ class FrameTarget(Target):
 
     """
 
-    def __init__(self, target_frame, tolerance_position=None, tolerance_orientation=None, tool_coordinate_frame=None, name="Frame Target"):
+    def __init__(
+        self,
+        target_frame,
+        tolerance_position=None,
+        tolerance_orientation=None,
+        tool_coordinate_frame=None,
+        name="Frame Target",
+    ):
         super(FrameTarget, self).__init__(name=name)
         self.target_frame = target_frame
         self.tolerance_position = tolerance_position
@@ -95,7 +102,14 @@ class FrameTarget(Target):
         self.tool_coordinate_frame = tool_coordinate_frame
 
     @classmethod
-    def from_transformation(cls, transformation, tolerance_position=None, tolerance_orientation=None, tool_coordinate_frame=None, name="Frame Target"):
+    def from_transformation(
+        cls,
+        transformation,
+        tolerance_position=None,
+        tolerance_orientation=None,
+        tool_coordinate_frame=None,
+        name="Frame Target",
+    ):
         """Creates a FrameTarget from a transformation matrix.
 
         Parameters
@@ -190,7 +204,14 @@ class PointAxisTarget(Target):
 
     """
 
-    def __init__(self, target_point, target_z_vector, tolerance_position=None, tool_coordinate_frame=None, name="Point-Axis Target"):
+    def __init__(
+        self,
+        target_point,
+        target_z_vector,
+        tolerance_position=None,
+        tool_coordinate_frame=None,
+        name="Point-Axis Target",
+    ):
         super(PointAxisTarget, self).__init__(name=name)
         self.target_point = target_point
         self.target_z_vector = target_z_vector
@@ -246,6 +267,7 @@ class ConfigurationTarget(Target):
         Always use positive values.
         If not specified, the default value from the planner is used.
     """
+
     SUPPORTED_JOINT_TYPES = [Joint.PRISMATIC, Joint.REVOLUTE, Joint.CONTINUOUS]
 
     def __init__(self, target_configuration, tolerance_above=None, tolerance_below=None, name="Configuration Target"):
@@ -261,7 +283,7 @@ class ConfigurationTarget(Target):
 
     @classmethod
     def generate_default_tolerances(cls, configuration, tolerance_prismatic, tolerance_revolute):
-        """ Generates tolerances values for the target configuration based on the joint types.
+        """Generates tolerances values for the target configuration based on the joint types.
 
         The parameters `tolerance_prismatic` and `tolerance_revolute` are used to generate the
         list of values for `tolerances_above`, `tolerances_below`. The length of the list is equal to the
@@ -340,10 +362,12 @@ class ConfigurationTarget(Target):
 
         # We scale only the tolerances for prismatic and planar joints,
         # similar to the Configuration.scale() method
-        tolerance_above = scale_tolerance(
-            self.tolerance_above, target_configuration.joint_types) if self.tolerance_above else None
-        tolerance_below = scale_tolerance(
-            self.tolerance_below, target_configuration.joint_types) if self.tolerance_below else None
+        tolerance_above = (
+            scale_tolerance(self.tolerance_above, target_configuration.joint_types) if self.tolerance_above else None
+        )
+        tolerance_below = (
+            scale_tolerance(self.tolerance_below, target_configuration.joint_types) if self.tolerance_below else None
+        )
 
         return ConfigurationTarget(target_configuration, tolerance_above, tolerance_below, self.name)
 
