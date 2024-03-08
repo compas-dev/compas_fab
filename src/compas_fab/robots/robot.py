@@ -6,16 +6,12 @@ import random
 
 from compas.data import Data
 from compas.geometry import Frame
-from compas.geometry import Sphere
 from compas.geometry import Transformation
 from compas_robots import Configuration
 from compas_robots import RobotModel
 from compas_robots.model import Joint
 
 from compas_fab.robots.constraints import Constraint
-from compas_fab.robots.constraints import JointConstraint
-from compas_fab.robots.constraints import OrientationConstraint
-from compas_fab.robots.constraints import PositionConstraint
 
 __all__ = [
     "Robot",
@@ -1484,7 +1480,8 @@ class Robot(Data):
         #     goal_constraints_WCF_scaled.append(cp)
 
         # Scale Target Definitions
-        target = target.scaled(1.0 / self.scale_factor)
+        if self.scale_factor != 1.0:
+            target = target.scaled(1.0 / self.scale_factor)
 
         # Transform path constraints to RCF and scale
         if path_constraints:

@@ -45,16 +45,16 @@ def convert_target_to_goal_constraints(target, ee_link_name):
         Set of Constraint classes
     """
 
-    if type(target) == ConstraintSetTarget:
+    if isinstance(target, ConstraintSetTarget):
         return target.constraint_set
 
-    elif type(target) == ConfigurationTarget:
+    elif isinstance(target, ConfigurationTarget):
         configuration = target.target_configuration
         tolerance_above = target.tolerance_above
         tolerance_below = target.tolerance_below
         return CF_JointConstraint.joint_constraints_from_configuration(configuration, tolerance_above, tolerance_below)
 
-    elif type(target) == FrameTarget:
+    elif isinstance(target, FrameTarget):
         tcf_frame_in_wcf = target.target_frame
         tool_coordinate_frame = target.tool_coordinate_frame
         pc = CF_PositionConstraint.from_frame(
@@ -65,7 +65,7 @@ def convert_target_to_goal_constraints(target, ee_link_name):
         )
         return [pc, oc]
 
-    elif type(target) == PointAxisTarget:
+    elif isinstance(target, PointAxisTarget):
         tcf_point_in_wcf = target.target_point
         tool_coordinate_frame = target.tool_coordinate_frame
 
@@ -81,6 +81,9 @@ def convert_target_to_goal_constraints(target, ee_link_name):
             tcf_frame_in_wcf, [6.35, 6.35, 0.01], ee_link_name, tool_coordinate_frame
         )
         return [pc, oc]
+
+    else:
+        raise NotImplementedError("Target type {} not supported by ROS planning backend.".format(type(target)))
 
 
 def convert_constraints_to_rosmsg(constraints, header):

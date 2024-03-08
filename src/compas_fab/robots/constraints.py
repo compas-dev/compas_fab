@@ -368,7 +368,7 @@ class JointConstraint(Constraint):
 
         if len(joint_names) != len(configuration.joint_values):
             raise ValueError(
-                "The passed configuration has {} joint_names but {} joint_values: {}".format(
+                "The passed configuration has {} joint_names but {} joint_values".format(
                     len(joint_names), len(joint_values)
                 )
             )

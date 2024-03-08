@@ -4,8 +4,6 @@ Create a position and an orientation constraint from a plane calculated for the 
 COMPAS FAB v1.0.2
 """
 
-import math
-
 from compas_rhino.conversions import point_to_compas
 from compas_rhino.conversions import vector_to_compas
 from ghpythonlib.componentbase import executingcomponent as component

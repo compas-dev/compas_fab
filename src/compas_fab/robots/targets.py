@@ -1,11 +1,14 @@
 from compas.data import Data
 from compas.geometry import Frame
-from compas_robots import Configuration
 from compas_robots.model import Joint
 
-from compas_fab.robots import JointConstraint
-from compas_fab.robots import OrientationConstraint
-from compas_fab.robots import PositionConstraint
+__all__ = [
+    "Target",
+    "FrameTarget",
+    "PointAxisTarget",
+    "ConfigurationTarget",
+    "ConstraintSetTarget",
+]
 
 
 class Target(Data):
