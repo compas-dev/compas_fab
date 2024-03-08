@@ -14,7 +14,7 @@ class PlanMotion(component):
     def RunScript(
         self,
         robot,
-        goal_constraints,
+        target,
         start_configuration,
         group,
         attached_collision_meshes,
@@ -33,11 +33,11 @@ class PlanMotion(component):
             and robot.client
             and robot.client.is_connected
             and start_configuration
-            and goal_constraints
+            and target
             and compute
         ):
             st[key] = robot.plan_motion(
-                goal_constraints,
+                target,
                 start_configuration=start_configuration,
                 group=group,
                 options=dict(

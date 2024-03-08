@@ -1,0 +1,37 @@
+{
+    "name": "Point Axis Target",
+    "nickname": "Point Axis Target",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Create a PointAxisTarget from a Point and a Vector.",
+    "exposure": 8,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "point",
+                "description": "The target point defined relative to the robot's base coordinate frame (RCF). Accepts Rhino / Grasshopper Point or COMPAS Point."
+            },
+            {
+                "name": "target_z_vector",
+                "description": "The target axis is defined by the target_point and pointing towards this vector. The tool tip coordinate frame (TCF)'s Z axis can rotate around this axis. Accepts Rhino / Grasshopper Vector or COMPAS Vector."
+            },
+            {
+                "name": "tolerance_position",
+                "description": "The allowed tolerance of the tool reaching the target point.",
+                "typeHintID": "float"
+            },
+            {
+                "name": "tool_coordinate_frame",
+                "description": "The tool tip coordinate frame relative to the flange coordinate frame of the robot. If not specified, the target point is relative to the robot's flange (T0CF). Accepts Rhino / Grasshopper Frame or COMPAS Frame."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "target",
+                "description": "A FrameTarget."
+            }
+        ]
+    }
+}

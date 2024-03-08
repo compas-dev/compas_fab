@@ -12,15 +12,70 @@ from compas_fab.backends.ros.messages import JointConstraint
 from compas_fab.backends.ros.messages import MoveItErrorCodes
 from compas_fab.backends.ros.messages import OrientationConstraint
 from compas_fab.backends.ros.messages import PositionConstraint
+from compas_fab.robots import ConfigurationTarget
+from compas_fab.robots import ConstraintSetTarget
 from compas_fab.robots import Duration
+from compas_fab.robots import FrameTarget
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
+from compas_fab.robots import PointAxisTarget
+from compas_fab.robots.constraints import JointConstraint as CF_JointConstraint
+from compas_fab.robots.constraints import PositionConstraint as CF_PositionConstraint
+from compas_fab.robots.constraints import OrientationConstraint as CF_OrientationConstraint
 
 
 def validate_response(response):
     """Raise an exception if the response indicates an error condition."""
     if response.error_code != MoveItErrorCodes.SUCCESS:
         raise RosError(response.error_code.human_readable, int(response.error_code))
+
+
+def convert_target_to_goal_constraints(target, ee_link_name):
+    """Convert COMPAS FAB `Target` objects into `Constraint` objects for passing it to MoveIt backend.
+    This function is intended to be called only by MoveIt backend when handeling different Target types.
+
+    Parameters
+    ----------
+    target: :class:`compas_fab.robots.Target`
+        The goal for the robot to achieve.
+
+    Returns
+    -------
+    list of :class:`Constraint`
+        Set of Constraint classes
+    """
+
+    if type(target) == ConstraintSetTarget:
+        return target.constraint_set
+
+    elif type(target) == ConfigurationTarget:
+        configuration = target.target_configuration
+        tolerance_above = target.tolerance_above
+        tolerance_below = target.tolerance_below
+        return CF_JointConstraint.joint_constraints_from_configuration(configuration, tolerance_above, tolerance_below)
+
+    elif type(target) == FrameTarget:
+        tcf_frame_in_wcf = target.target_frame
+        tool_coordinate_frame = target.tool_coordinate_frame
+        pc = CF_PositionConstraint.from_frame(
+            tcf_frame_in_wcf, target.tolerance_position, ee_link_name, tool_coordinate_frame)
+        oc = CF_OrientationConstraint.from_frame(
+            tcf_frame_in_wcf, [target.tolerance_orientation] * 3, ee_link_name, tool_coordinate_frame)
+        return [pc, oc]
+
+    elif type(target) == PointAxisTarget:
+        tcf_point_in_wcf = target.target_point
+        tool_coordinate_frame = target.tool_coordinate_frame
+
+        if tool_coordinate_frame:
+            raise NotImplementedError(
+                "Tool coordinate frame is not yet supported when converting PointAxisTarget to ConstraintSetTarget.")
+
+        pc = CF_PositionConstraint.from_point(
+            tcf_point_in_wcf, target.tolerance_position, ee_link_name, tool_coordinate_frame)
+        oc = CF_OrientationConstraint.from_frame(
+            tcf_frame_in_wcf, [6.35, 6.35, 0.01], ee_link_name, tool_coordinate_frame)
+        return [pc, oc]
 
 
 def convert_constraints_to_rosmsg(constraints, header):

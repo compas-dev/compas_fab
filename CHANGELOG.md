@@ -11,11 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Added `compas_fab.robot.Target` class to represent a motion planning target.
 * Added also child classes `FrameTarget`, `PointAxisTarget`, `ConfigurationTarget`, `ConstraintSetTarget`
+* Unlike previous constraints, `Targets` do not contain `group` as parameter. Instead, group parameter is passed to the planning call.
+* Target scaling function is now embeded in the code for Targets. `scaled()` should be called by the `plan_motion` class and a copy if the target is returned.
+* FrameTarget uses `tolerance_orientation` to specify a orientation tolerance, the values are adopted to become `tolerance_axes` when being converted to `OrientationConstraint`.
 
 ### Changed
 
-### Removed
+* Change the signature of plan_motion() to use `target` (Target class) instead of `goal_constraints`. Only one target is accepted. Users who wish to compose their own constraint sets can still use ConstraintSetTarget
+* Moved `Robot.orientation_constraint_from_frame()` to `OrientationConstraint.from_frame()`, as constraints are no longer intended for users to use directly.
+* Moved `Robot.position_constraint_from_frame()` to `PositionConstraint.from_frame()`, as constraints are no longer intended for users to use directly.
+* Moved `Robot.constraints_from_frame()` to ros.backend_features and is handled by `convert_target_to_goal_constraints()`. Users who wish to use a frame as target should use a `FrameTarget` instead.
 
+* Changed GH Component `ConstraintsFromPlane` to `FrameTargetFromPlane`
+* Changed GH Component `ConstraintsFromTargetConfiguration`
+
+### Removed
+* Removed `plan_cartesian_motion_deprecated` and `plan_motion_deprecated` methods from `Robot` class
+* Removed `forward_kinematics_deprecated` and `inverse_kinematics_deprecated` method from `Robot` class
 
 ## [1.0.2] 2024-02-22
 

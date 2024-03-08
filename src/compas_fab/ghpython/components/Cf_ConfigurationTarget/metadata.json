@@ -1,11 +1,10 @@
 {
-    "name": "Constraints From Target Configuration",
-    "nickname": "Constraints From Configuration",
+    "name": "ConfigurationTarget From Configuration",
+    "nickname": "ConfigurationTarget",
     "category": "COMPAS FAB",
     "subcategory": "Planning",
     "description": "Create joint constraints for each of the robot's configurable joints based on a given target configuration.",
     "exposure": 8,
-
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,
@@ -17,7 +16,7 @@
             },
             {
                 "name": "target_configuration",
-                "description": "The target configuration."
+                "description": "The target configuration, in radians/meters."
             },
             {
                 "name": "tolerance_above",
@@ -28,17 +27,12 @@
                 "name": "tolerance_below",
                 "description": "The tolerances below the targeted joint value of each configurable joint, defining the lower bound in radians/meters to be achieved.",
                 "typeHintID": "float"
-            },
-            {
-                "name": "group",
-                "description": "The planning group for which we specify the constraint. Defaults to the robot's main planning group.",
-                "typeHintID": "str"
             }
         ],
         "outputParameters": [
             {
-                "name": "constraints",
-                "description": "A list joint constraints in radians/meters."
+                "name": "target",
+                "description": "A ConfigurationTarget"
             }
         ]
     }

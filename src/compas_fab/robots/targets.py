@@ -1,4 +1,11 @@
 from compas.data import Data
+from compas.geometry import Frame
+from compas_robots import Configuration
+from compas_robots.model import Joint
+
+from compas_fab.robots import JointConstraint
+from compas_fab.robots import OrientationConstraint
+from compas_fab.robots import PositionConstraint
 
 
 class Target(Data):
@@ -29,6 +36,21 @@ class Target(Data):
         super(Target, self).__init__()
         self.name = name
 
+    def scaled(self, factor):
+        """Returns a scaled copy of the target.
+
+        Parameters
+        ----------
+        factor : float
+            The scaling factor.
+
+        Returns
+        -------
+        :class:`Target`
+            The scaled target.
+        """
+        raise NotImplementedError
+
 
 class FrameTarget(Target):
     """Represents a fully constrained pose target for the robot's end-effector using a :class:`compas.geometry.Frame`.
@@ -45,20 +67,84 @@ class FrameTarget(Target):
     For robots with multiple end effector attachment points, the FCF depends on
     the planning group setting in the planning request, as defined in an SRDF file or
     :class:`compas_fab.robots.RobotSemantics`.
+
     Attributes
     ----------
     target_frame : :class:`compas.geometry.Frame`
         The target frame.
-    F_TtCF : :class:`compas.geometry.Frame`, optional
+    tolerance_position : float, optional
+        The tolerance for the position.
+        If not specified, the default value from the planner is used.
+    tolerance_orientation : float, optional
+        The tolerance for the orientation.
+        If not specified, the default value from the planner is used.
+    tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
         The tool tip coordinate frame relative to the flange of the robot.
         If not specified, the target frame is relative to the robot's flange.
+    name : str, optional
+        The name of the target.
+        Defaults to 'Frame Target'.
 
     """
 
-    def __init__(self, target_frame, F_TtCF=None, name="Frame Target"):
+    def __init__(self, target_frame, tolerance_position=None, tolerance_orientation=None, tool_coordinate_frame=None, name="Frame Target"):
         super(FrameTarget, self).__init__(name=name)
-        self.F_TtCF = F_TtCF
         self.target_frame = target_frame
+        self.tolerance_position = tolerance_position
+        self.tolerance_orientation = tolerance_orientation
+        self.tool_coordinate_frame = tool_coordinate_frame
+
+    @classmethod
+    def from_transformation(cls, transformation, tolerance_position=None, tolerance_orientation=None, tool_coordinate_frame=None, name="Frame Target"):
+        """Creates a FrameTarget from a transformation matrix.
+
+        Parameters
+        ----------
+        transformation : :class
+            The transformation matrix.
+        tolerance_position : float, optional
+            The tolerance for the position.
+            if not specified, the default value from the planner is used.
+        tolerance_orientation : float, optional
+            The tolerance for the orientation.
+            if not specified, the default value from the planner is used.
+        tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
+            The tool tip coordinate frame relative to the flange of the robot.
+            If not specified, the target frame is relative to the robot's flange.
+        name : str, optional
+            The name of the target.
+            Defaults to 'Frame Target'.
+
+        Returns
+        -------
+        :class:`FrameTarget`
+            The frame target.
+        """
+        frame = Frame.from_transformation(transformation)
+        return cls(frame, tolerance_position, tolerance_orientation, tool_coordinate_frame, name)
+
+    def scaled(self, factor):
+        """Returns a copy of the target where the target frame and tolerances are scaled.
+
+        By convention, compas_fab robots use meters as the default unit of measure.
+        If user model is created in millimeters, the FrameTarget should be scaled by a factor
+        of 0.001 before passing to the planner.
+
+        Parameters
+        ----------
+        factor : float
+            The scaling factor.
+
+        Returns
+        -------
+        :class:`FrameTarget`
+            The scaled frame target.
+        """
+        target_frame = self.target_frame.scaled(factor)
+        tolerance_position = self.tolerance_position * factor
+        tolerance_orientation = self.tolerance_orientation * factor
+        tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
+        return FrameTarget(target_frame, tolerance_position, tolerance_orientation, tool_coordinate_frame, self.name)
 
 
 class PointAxisTarget(Target):
@@ -80,8 +166,8 @@ class PointAxisTarget(Target):
     base coordinate frame (RCF).
 
     In addition, it's necessary to define the tool tip coordinate frame (TtCF)
-    relative to the robot's flange frame (FCF). This is labeled as F_TtCF.
-    If F_TtCF is unspecified, the target point and axis will be matched with the robot's flange frame.
+    relative to the robot's flange frame (FCF). This is labeled as tool_coordinate_frame.
+    If tool_coordinate_frame is unspecified, the target point and axis will be matched with the robot's flange frame.
 
     For robots with multiple end effector attachment points, the FCF depends on
     the planning group setting in the planning request, as defined in an SRDF file or
@@ -90,20 +176,45 @@ class PointAxisTarget(Target):
     Attributes
     ----------
     target_point : :class:`compas.geometry.Point`
-        The target point defined in the robot's base coordinate frame (RCF).
+        The target point defined relative to the robot's base coordinate frame (RCF).
     target_z_vector : :class:`compas.geometry.Vector`
-        The target axis defined in the robot's base coordinate frame (RCF).
-    F_TtCF : :class:`compas.geometry.Frame`, optional
+        The target axis is defined by the target_point and pointing towards this vector.
+        The tool tip coordinate frame (TCF)'s Z axis can rotate around this axis.
+    tolerance_position : float, optional
+        The tolerance for the position of the target point.
+        If not specified, the default value from the planner is used.
+    tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
         The tool tip coordinate frame relative to the flange coordinate frame of the robot.
-        If not specified, the target point is relative to the robot's flange.
+        If not specified, the target point is relative to the robot's flange (T0CF) and the
+        Z axis of the flange can rotate around the target axis.
 
     """
 
-    def __init__(self, target_point, target_z_vector, F_TtCF=None, name="Point-Axis Target"):
+    def __init__(self, target_point, target_z_vector, tolerance_position=None, tool_coordinate_frame=None, name="Point-Axis Target"):
         super(PointAxisTarget, self).__init__(name=name)
-        self.F_TtCF = F_TtCF  # type: Frame
-        self.target_point = target_point  # type: Point
-        self.target_z_vector = target_z_vector  # type: Vector
+        self.target_point = target_point
+        self.target_z_vector = target_z_vector
+        self.tolerance_position = tolerance_position
+        self.tool_coordinate_frame = tool_coordinate_frame
+
+    def scaled(self, factor):
+        """Returns a copy of the target where the target point and tolerances are scaled.
+
+        Parameters
+        ----------
+        factor : float
+            The scaling factor.
+
+        Returns
+        -------
+        :class:`PointAxisTarget`
+            The scaled point-axis target.
+        """
+        target_point = self.target_point.scaled(factor)
+        tolerance_position = self.tolerance_position * factor if self.tolerance_position else None
+        target_z_vector = self.target_z_vector.scaled  # Vector is unitized and is not scaled
+        tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
+        return PointAxisTarget(target_point, target_z_vector, tool_coordinate_frame, tolerance_position, self.name)
 
 
 class ConfigurationTarget(Target):
@@ -119,17 +230,122 @@ class ConfigurationTarget(Target):
 
     The number of joints in the target configuration should match the number of joints
     in the robot's planning group. Otherwise the behaviour of the bankend planner may
-    be undefined. See tutorial :ref:`configuration-target` for more details.
+    be undefined. See tutorial :ref:`targets` for more details.
 
     Attributes
     ----------
     target_configuration : :class:`compas_robots.Configuration`
         The target configuration. joint_names and joint_values must be specified.
+        Defaults unit is radians for revolute and continuous joints, and meters for prismatic joints.
+    tolerance_above : :obj:`list` of :obj:`float`, optional
+        Acceptable deviation above the targeted configurations. One for each joint.
+        Always use positive values.
+        If not specified, the default value from the planner is used.
+    tolerance_below : :obj:`list` of :obj:`float`, optional
+        Acceptable deviation below the targeted configurations. One for each joint.
+        Always use positive values.
+        If not specified, the default value from the planner is used.
     """
+    SUPPORTED_JOINT_TYPES = [Joint.PRISMATIC, Joint.REVOLUTE, Joint.CONTINUOUS]
 
-    def __init__(self, target_configuration, name="Configuration Target"):
+    def __init__(self, target_configuration, tolerance_above=None, tolerance_below=None, name="Configuration Target"):
+
         super(ConfigurationTarget, self).__init__(name=name)
         self.target_configuration = target_configuration  # type: Configuration
+        self.tolerance_above = tolerance_above
+        self.tolerance_below = tolerance_below
+
+        # Check to make sure the joint types are supported
+        for joint_type in target_configuration.joint_types:
+            assert joint_type in self.SUPPORTED_JOINT_TYPES, "Unsupported joint type: {}".format(joint_type)
+
+    @classmethod
+    def generate_default_tolerances(cls, configuration, tolerance_prismatic, tolerance_revolute):
+        """ Generates tolerances values for the target configuration based on the joint types.
+
+        The parameters `tolerance_prismatic` and `tolerance_revolute` are used to generate the
+        list of values for `tolerances_above`, `tolerances_below`. The length of the list is equal to the
+        number of joints in the target configuration.
+
+        This function will not override the existing `tolerance_above` and `tolerance_below` values,
+        users should set the values explicitly.
+
+        Parameters
+        ----------
+        tolerance_prismatic : obj:`float`
+            The default tolerance applied to prismatic joints.
+            Defaults unit is meters.
+        tolerance_revolute : obj:`float`
+            The default tolerance applied to revolute and continuous joints.
+            Defaults unit is radians.
+
+        Returns
+        -------
+        :obj:`tuple` of :obj:`list` of :obj:`float`
+            The tolerances_above and tolerances_below lists.
+
+        Examples
+        --------
+        >>> from compas_robots import Configuration
+        >>> from compas_fab.robots import ConfigurationTarget
+        >>> from compas_robots.model import Joint
+        >>> configuration = Configuration.from_revolute_values([0, 3.14, 0, 0, 3.14, 0])
+        >>> tolerance_prismatic = 0.001
+        >>> tolerance_revolute = math.radians(1)
+        >>> tolerances_above, tolerances_below = ConfigurationTarget.generate_default_tolerances(configuration, tolerance_prismatic, tolerance_revolute)
+        >>> target = ConfigurationTarget(configuration, tolerances_above, tolerances_below)
+
+        """
+        tolerances_above = []
+        tolerances_below = []
+        for joint_type in configuration.joint_types:
+            if joint_type in [Joint.PRISMATIC]:
+                tolerances_above.append(tolerance_prismatic)
+                tolerances_below.append(tolerance_prismatic)
+            elif joint_type in [Joint.REVOLUTE, Joint.CONTINUOUS]:
+                tolerances_above.append(tolerance_revolute)
+                tolerances_below.append(tolerance_revolute)
+            else:
+                raise NotImplementedError("Unsupported joint type: {}".format(joint_type))
+        return tolerances_above, tolerances_below
+
+    def scaled(self, factor):
+        """Returns copy of the target where the target configuration and tolerances are scaled.
+
+        This function should only be needed if the ConfigurationTarget was created
+        with a distance unit other than meters.
+
+        Only the values for prismatic and planar joints are scaled. The values for revolute
+        and continuous joints are not scaled, as they must be in radians.
+
+        Parameters
+        ----------
+        factor : float
+            The scaling factor.
+
+        Returns
+        -------
+        :class:`ConfigurationTarget`
+            The scaled configuration target.
+        """
+        target_configuration = self.target_configuration.scaled(factor)
+
+        def scale_tolerance(tolerance, joint_types):
+            scaled_tolerance = []
+            for t, joint_type in zip(tolerance, joint_types):
+                if joint_type in (Joint.PLANAR, Joint.PRISMATIC):
+                    t *= factor
+                scaled_tolerance.append(t)
+            return scaled_tolerance
+
+        # We scale only the tolerances for prismatic and planar joints,
+        # similar to the Configuration.scale() method
+        tolerance_above = scale_tolerance(
+            self.tolerance_above, target_configuration.joint_types) if self.tolerance_above else None
+        tolerance_below = scale_tolerance(
+            self.tolerance_below, target_configuration.joint_types) if self.tolerance_below else None
+
+        return ConfigurationTarget(target_configuration, tolerance_above, tolerance_below, self.name)
 
 
 class ConstraintSetTarget(Target):
@@ -137,23 +353,39 @@ class ConstraintSetTarget(Target):
 
     Given a ConstraintSetTarget, the planner aims to find a path moving
     the robot's end-effector to satisfy ALL the constraints in the constraint set.
+    Constraints can be very specific, for example defining value domains
+    for each joint, such that the goal configuration is included,
+    or defining a volume in space, to which a specific robot link (e.g.
+    the end-effector) is required to move to.
+
     This target cannot be translated into a single pose or configuration target
     except in trivial cases. Therefore the ending pose or configuration of the
     planned path can only be determined after performing the motion planning.
 
-    ConstraintSetTarget cannot be used as a target for Cartesian motion planning.
-
     ConstraintSetTarget is suitable for advanced users who want to specify
     custom constraints for the robot motion planning.
     Different planner backends may support differnt types of Constraints.
-    See tutorial :ref:`constraint-set-target` for more details.
+    See tutorial :ref:`targets` for more details.
+
+    ConstraintSetTarget is only supported by Free motion planning (using the MoveIt Planner),
+    Inverse Kinematics and Cartesian motion planning do not support this target type.
 
     Attributes
     ----------
-    constraint_set : :class:`compas_fab.robots.Constraint`
+    constraint_set : :obj:`list` of :class:`compas_fab.robots.Constraint`
         A list of constraints to be satisfied.
     """
 
     def __init__(self, constraint_set, name="Constraint Set Target"):
         super(ConstraintSetTarget, self).__init__(name=name)
-        self.constraint_set = constraint_set  # type: List[Constraint]
+        self.constraint_set = constraint_set
+
+    def scaled(self, factor):
+        """Returns a scaled copy of the target.
+
+        Raises
+        ------
+        NotImplementedError
+            This target type does not support scaling.
+        """
+        raise NotImplementedError
