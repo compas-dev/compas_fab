@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas.data import Data
 from compas.geometry import Rotation
 from compas.geometry import Scale
 from compas.geometry import Sphere
@@ -11,7 +12,7 @@ from compas_fab.utilities import from_tcf_to_t0cf
 __all__ = ["BoundingVolume", "Constraint", "JointConstraint", "OrientationConstraint", "PositionConstraint"]
 
 
-class BoundingVolume(object):
+class BoundingVolume(Data):
     """A container for describing a bounding volume.
 
     Parameters
@@ -59,6 +60,12 @@ class BoundingVolume(object):
             raise ValueError("Type must be one of {}".format(self.VOLUME_TYPES))
         self.type = volume_type
         self.volume = volume
+
+    def __data__(self):
+        return {
+            "volume_type": self.type,
+            "volume": self.volume,
+        }
 
     @classmethod
     def from_box(cls, box):
@@ -171,7 +178,7 @@ class BoundingVolume(object):
         return cls(self.type, self.volume.copy())
 
 
-class Constraint(object):
+class Constraint(Data):
     """Base class for robot constraints.
 
     Parameters
@@ -218,6 +225,12 @@ class Constraint(object):
             raise ValueError("Type must be %d, %d or %d" % self.CONSTRAINT_TYPES)
         self.type = constraint_type
         self.weight = weight
+
+    def __data__(self):
+        return {
+            "constraint_type": self.type,
+            "weight": self.weight,
+        }
 
     def transform(self, transformation):
         """Transform the :class:`Constraint`."""
@@ -294,6 +307,15 @@ class JointConstraint(Constraint):
         self.value = value
         self.tolerance_above = abs(tolerance_above)
         self.tolerance_below = abs(tolerance_below)
+
+    def __data__(self):
+        return {
+            "joint_name": self.joint_name,
+            "value": self.value,
+            "tolerance_above": self.tolerance_above,
+            "tolerance_below": self.tolerance_below,
+            "weight": self.weight,
+        }
 
     def scale(self, scale_factor):
         """Scale (multiply) the constraint with a factor.
@@ -455,6 +477,14 @@ class OrientationConstraint(Constraint):
         self.quaternion = [float(a) for a in list(quaternion)]
         self.tolerances = [float(a) for a in list(tolerances)] if tolerances else [0.01] * 3
 
+    def __data__(self):
+        return {
+            "link_name": self.link_name,
+            "quaternion": self.quaternion,
+            "tolerances": self.tolerances,
+            "weight": self.weight,
+        }
+
     def transform(self, transformation):
         """Transform the volume using a :class:`compas.geometry.Transformation`.
 
@@ -587,6 +617,13 @@ class PositionConstraint(Constraint):
         self.link_name = link_name
         self.bounding_volume = bounding_volume
         self.weight = weight
+
+    def __data__(self):
+        return {
+            "link_name": self.link_name,
+            "bounding_volume": self.bounding_volume,
+            "weight": self.weight,
+        }
 
     @classmethod
     def from_frame(cls, frame_WCF, tolerance_position, link_name, tool_coordinate_frame=None, weight=1.0):

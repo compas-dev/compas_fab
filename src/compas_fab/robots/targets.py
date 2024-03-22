@@ -39,6 +39,10 @@ class Target(Data):
         super(Target, self).__init__()
         self.name = name
 
+    @property
+    def __data__(self):
+        raise NotImplementedError
+
     def scaled(self, factor):
         """Returns a scaled copy of the target.
 
@@ -103,6 +107,15 @@ class FrameTarget(Target):
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
         self.tool_coordinate_frame = tool_coordinate_frame
+
+    @property
+    def __data__(self):
+        return {
+            "target_frame": self.target_frame,
+            "tolerance_position": self.tolerance_position,
+            "tolerance_orientation": self.tolerance_orientation,
+            "tool_coordinate_frame": self.tool_coordinate_frame,
+        }
 
     @classmethod
     def from_transformation(
@@ -221,6 +234,14 @@ class PointAxisTarget(Target):
         self.tolerance_position = tolerance_position
         self.tool_coordinate_frame = tool_coordinate_frame
 
+    def __data__(self):
+        return {
+            "target_point": self.target_point,
+            "target_z_vector": self.target_z_vector,
+            "tolerance_position": self.tolerance_position,
+            "tool_coordinate_frame": self.tool_coordinate_frame,
+        }
+
     def scaled(self, factor):
         """Returns a copy of the target where the target point and tolerances are scaled.
 
@@ -283,6 +304,13 @@ class ConfigurationTarget(Target):
         # Check to make sure the joint types are supported
         for joint_type in target_configuration.joint_types:
             assert joint_type in self.SUPPORTED_JOINT_TYPES, "Unsupported joint type: {}".format(joint_type)
+
+    def __data__(self):
+        return {
+            "target_configuration": self.target_configuration,
+            "tolerance_above": self.tolerance_above,
+            "tolerance_below": self.tolerance_below,
+        }
 
     @classmethod
     def generate_default_tolerances(cls, configuration, tolerance_prismatic, tolerance_revolute):
@@ -406,6 +434,9 @@ class ConstraintSetTarget(Target):
     def __init__(self, constraint_set, name="Constraint Set Target"):
         super(ConstraintSetTarget, self).__init__(name=name)
         self.constraint_set = constraint_set
+
+    def __data__(self):
+        return {"constraint_set": self.constraint_set}
 
     def scaled(self, factor):
         """Returns a scaled copy of the target.

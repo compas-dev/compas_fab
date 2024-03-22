@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Changed `BoundingVolume`, `Constraint`, `JointConstraint`, `OrientationConstraint`, `PositionConstraint` to inherit from `compas.data.Data` class.
 * Change the signature of plan_motion() to use `target` (Target class) instead of `goal_constraints`. Only one target is accepted. Users who wish to compose their own constraint sets can still use ConstraintSetTarget
 * Moved `Robot.orientation_constraint_from_frame()` to `OrientationConstraint.from_frame()`, as constraints are no longer intended for users to use directly.
 * Moved `Robot.position_constraint_from_frame()` to `PositionConstraint.from_frame()`, as constraints are no longer intended for users to use directly.
