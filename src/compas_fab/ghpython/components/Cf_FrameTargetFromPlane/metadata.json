@@ -1,28 +1,17 @@
 {
-    "name": "Constraints From Plane",
-    "nickname": "Constraints From Plane",
+    "name": "FrameTarget From Plane",
+    "nickname": "FrameTarget",
     "category": "COMPAS FAB",
     "subcategory": "Planning",
     "description": "Create a position and an orientation constraint from a plane calculated for the group's end-effector link.",
     "exposure": 8,
-
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,
         "inputParameters": [
             {
-                "name": "robot",
-                "description": "The robot.",
-                "wireDisplay": "hidden"
-            },
-            {
                 "name": "plane",
-                "description": "The plane or frame from which we create position and orientation constraints."
-            },
-            {
-                "name": "group",
-                "description": "The planning group for which we specify the constraint. Defaults to the robot's main planning group.",
-                "typeHintID": "str"
+                "description": "The Rhino or Grasshopper Plane or COMPAS Frame from which we create position and orientation constraints."
             },
             {
                 "name": "tolerance_position",
@@ -43,12 +32,16 @@
                 "name": "tolerance_zaxis",
                 "description": "The allowed tolerance of the frame's Z-axis in degrees.",
                 "typeHintID": "float"
+            },
+            {
+                "name": "tool_coordinate_frame",
+                "description": "The tool tip coordinate frame relative to the flange coordinate frame of the robot. If not specified, the target point is relative to the robot's flange (T0CF). Accepts Rhino / Grasshopper Frame or COMPAS Frame."
             }
         ],
         "outputParameters": [
             {
-                "name": "constraints",
-                "description": "A list containing a position and an orientation constraint."
+                "name": "target",
+                "description": "A FrameTarget."
             }
         ]
     }

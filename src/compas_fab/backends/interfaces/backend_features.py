@@ -87,22 +87,18 @@ class PlanMotion(object):
     <https://en.wikipedia.org/wiki/Function_object#In_Python>.
     """
 
-    def __call__(self, robot, goal_constraints, start_configuration=None, group=None, options=None):
-        return self.plan_motion(robot, goal_constraints, start_configuration, group, options)
+    def __call__(self, robot, target, start_configuration=None, group=None, options=None):
+        return self.plan_motion(robot, target, start_configuration, group, options)
 
-    def plan_motion(self, robot, goal_constraints, start_configuration=None, group=None, options=None):
+    def plan_motion(self, robot, target, start_configuration=None, group=None, options=None):
         """Calculates a motion path.
 
         Parameters
         ----------
         robot : :class:`compas_fab.robots.Robot`
             The robot instance for which the motion path is being calculated.
-        goal_constraints: list of :class:`compas_fab.robots.Constraint`
-            The goal to be achieved, defined in a set of constraints.
-            Constraints can be very specific, for example defining value domains
-            for each joint, such that the goal configuration is included,
-            or defining a volume in space, to which a specific robot link (e.g.
-            the end-effector) is required to move to.
+        target: :class:`compas_fab.robots.Target`
+            The goal for the robot to achieve.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the starting position.
