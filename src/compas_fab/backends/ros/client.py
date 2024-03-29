@@ -128,6 +128,8 @@ class RosClient(Ros, ClientInterface):
     >>> with RosClient() as client:
     ...     print('Connected: %s' % client.is_connected)
     Connected: True
+    >>> import time
+    >>> time.sleep(1.0)
 
     Notes
     -----
@@ -191,6 +193,8 @@ class RosClient(Ros, ClientInterface):
         ...     robot = client.load_robot()
         ...     print(robot.name)
         ur5_robot
+        >>> import time
+        >>> time.sleep(1.0)
         """
         robot_name = None
 
