@@ -155,7 +155,8 @@ class RosClient(Ros, ClientInterface):
     def close(self, timeout=10):
         """Disconnect from ROS."""
         import threading
-        import time
+
+        # import time
         from roslibpy.core import RosTimeoutError
 
         if self.is_connected:
