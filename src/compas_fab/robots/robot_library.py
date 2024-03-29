@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-class RobotLibrary:
+class RobotLibrary(object):
     """A collection of built-in robots that can be used for testing and example purposes.
     The :class:`compas_fab.robots.Robot` objects created by the factory methods
     can be used to write examples, so that the example code can stay short.
