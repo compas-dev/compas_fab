@@ -165,11 +165,11 @@ class RosClient(Ros, ClientInterface):
                 self.emit("closing")
                 wait_closed = threading.Event()
                 proto.onClose = lambda was_clean, code, reason: wait_closed.set()
-                t1 = time.time()
+                # t1 = time.time()
                 proto.send_close()
                 if not wait_closed.wait(10):
                     raise RosTimeoutError("Failed to wait for ROS to close")
-                t2 = time.time()
+                # t2 = time.time()
                 # print("Time to close: ", t2 - t1)
                 wait_disconnect.set()
                 return proto
