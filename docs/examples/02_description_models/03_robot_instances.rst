@@ -6,7 +6,7 @@ RobotModel Packages
 
 ``COMPAS FAB`` provides several ready-to-use robot packages that can be used for
 demonstrating the capabilities of the package. These packages can be accessed from the
-`compas_fab.robots.RobotLibrary` class. The robot packages are loaded from local data
+:class:`compas_fab.robots.RobotLibrary`. The robot packages are loaded from local data
 files. They contain
 the `robot.model`, `robot.semantics` and meshes associated with the robot links.
 
