@@ -151,6 +151,34 @@ class RosClient(Ros, ClientInterface):
     def __exit__(self, *args):
         self.close()
 
+    # HACK: Testing if we can handle the disconnect/close correctly
+    def close(self, timeout=10):
+        """Disconnect from ROS."""
+        import threading
+        import time
+        from roslibpy.core import RosTimeoutError
+
+        if self.is_connected:
+            wait_disconnect = threading.Event()
+
+            def _wrapper_callback(proto):
+                self.emit("closing")
+                wait_closed = threading.Event()
+                proto.onClose = lambda was_clean, code, reason: wait_closed.set()
+                t1 = time.time()
+                proto.send_close()
+                if not wait_closed.wait(10):
+                    raise RosTimeoutError("Failed to wait for ROS to close")
+                t2 = time.time()
+                # print("Time to close: ", t2 - t1)
+                wait_disconnect.set()
+                return proto
+
+            self.factory.on_ready(_wrapper_callback)
+
+            if not wait_disconnect.wait(timeout):
+                raise RosTimeoutError("Failed to disconnect to ROS")
+
     @property
     def ros_distro(self):
         """Retrieves the ROS version to which the client is connected (eg. kinetic)"""
