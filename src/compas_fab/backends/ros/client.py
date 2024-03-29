@@ -156,7 +156,7 @@ class RosClient(Ros, ClientInterface):
         """Disconnect from ROS."""
         import threading
 
-        # import time
+        import time
         from roslibpy.core import RosTimeoutError
 
         if self.is_connected:
@@ -170,6 +170,7 @@ class RosClient(Ros, ClientInterface):
                 proto.send_close()
                 if not wait_closed.wait(10):
                     raise RosTimeoutError("Failed to wait for ROS to close")
+                time.sleep(0.5)
                 # t2 = time.time()
                 # print("Time to close: ", t2 - t1)
                 wait_disconnect.set()
