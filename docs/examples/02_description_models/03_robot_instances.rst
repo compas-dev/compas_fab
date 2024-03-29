@@ -4,7 +4,7 @@ RobotModel Packages
 
 .. rst-class:: lead
 
-COMPAS Fab provides several ready-to-use Robot packages that can be used for
+``COMPAS FAB`` provides several ready-to-use robot packages that can be used for
 demonstrating the capabilities of the package. These packages can be accessed from the
 `compas_fab.robots.RobotLibrary` class. The robot packages are loaded from local data
 files located in the folder `src/compas_fab/data/robot_library`. They contain
