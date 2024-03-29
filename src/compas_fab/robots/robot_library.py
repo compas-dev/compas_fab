@@ -19,8 +19,8 @@ class RobotLibrary(object):
     The :class:`compas_fab.robots.Robot` objects created by the factory methods
     can be used to write examples, so that the example code can stay short.
 
-    The robots are loaded from URDF, SRDF and mesh files located locally
-    from the folder `src/compas_fab/data/robot_library`. The resulting robot object
+    The robots are loaded from URDF, SRDF and local mesh files.
+    The resulting robot object
     contains the robot model, semantics, visual and collision meshes for the links.
 
     Examples
