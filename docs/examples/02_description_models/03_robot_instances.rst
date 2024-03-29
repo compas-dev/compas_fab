@@ -7,7 +7,7 @@ RobotModel Packages
 ``COMPAS FAB`` provides several ready-to-use robot packages that can be used for
 demonstrating the capabilities of the package. These packages can be accessed from the
 `compas_fab.robots.RobotLibrary` class. The robot packages are loaded from local data
-files located in the folder `src/compas_fab/data/robot_library`. They contain
+files. They contain
 the `robot.model`, `robot.semantics` and meshes associated with the robot links.
 
 The robot packages can be used with the PyBullet Planning backends for planning purpose and
