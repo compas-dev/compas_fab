@@ -170,7 +170,7 @@ class RosClient(Ros, ClientInterface):
                 proto.send_close()
                 if not wait_closed.wait(10):
                     raise RosTimeoutError("Failed to wait for ROS to close")
-                time.sleep(0.5)
+                time.sleep(2)
                 # t2 = time.time()
                 # print("Time to close: ", t2 - t1)
                 wait_disconnect.set()
