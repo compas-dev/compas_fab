@@ -1602,8 +1602,6 @@ class Robot(Data):
         >>> len(trajectory.points) > 1
         True
         >>> ros.close()
-        >>> import time
-        >>> time.sleep(1.0)
         """
         options = options or {}
         max_step = options.get("max_step")
@@ -1747,8 +1745,6 @@ class Robot(Data):
         >>> len(trajectory.points) > 1
         True
         >>> ros.close()
-        >>> import time
-        >>> time.sleep(1.0)
 
         Using joint constraints (to the UP configuration):
 
@@ -1767,8 +1763,6 @@ class Robot(Data):
         >>> len(trajectory.points) > 1
         True
         >>> ros.close()
-        >>> import time
-        >>> time.sleep(1.0)
         """
         options = options or {}
         path_constraints = options.get("path_constraints")

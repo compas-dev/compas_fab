@@ -125,11 +125,11 @@ class RosClient(Ros, ClientInterface):
     --------
 
     >>> from compas_fab.backends import RosClient
-    >>> with RosClient() as client:
-    ...     print('Connected: %s' % client.is_connected)
+    >>> client = RosClient()
+    >>> client.run()
+    >>> print('Connected:', client.is_connected)
     Connected: True
-    >>> import time
-    >>> time.sleep(1.0)
+    >>> client.close()
 
     Notes
     -----
@@ -219,12 +219,13 @@ class RosClient(Ros, ClientInterface):
         --------
 
         >>> from compas_fab.backends import RosClient
-        >>> with RosClient() as client:
-        ...     robot = client.load_robot()
-        ...     print(robot.name)
+        >>> client = RosClient()
+        >>> client.run()
+        >>> robot = client.load_robot()
+        >>> print(robot.name)
         ur5_robot
-        >>> import time
-        >>> time.sleep(1.0)
+        >>> client.close()
+
         """
         robot_name = None
 
