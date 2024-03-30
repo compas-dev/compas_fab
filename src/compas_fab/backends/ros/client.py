@@ -169,7 +169,7 @@ class RosClient(Ros, ClientInterface):
         self.factory.manager.run()
         if not wait_connect.wait(timeout):
             t2 = time.time()
-            raise RosTimeoutError("Failed to connect to ROS. Time elapsed: {}".format(t2 - t1))
+            raise RosTimeoutError("Failed to connect to ROS. Start Time: {}, Time elapsed: {}".format(t1, t2 - t1))
 
     # HACK: Testing if we can handle the disconnect/close correctly
     def close(self, timeout=10):
