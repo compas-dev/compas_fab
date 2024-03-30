@@ -151,6 +151,24 @@ class RosClient(Ros, ClientInterface):
     def __exit__(self, *args):
         self.close()
 
+    # HACK: Testing if the ROS Run is doing the entry point correctly
+    def run(self, timeout=2):
+        """Kick-starts a non-blocking event loop.
+
+        Args:
+            timeout: Timeout to wait until connection is ready.
+        """
+        import threading
+        from roslibpy.core import RosTimeoutError
+
+        wait_connect = threading.Event()
+        self.factory.on_ready(lambda _: wait_connect.set())
+
+        self.factory.manager.run()
+
+        if not wait_connect.wait(timeout):
+            raise RosTimeoutError("Failed to connect to ROS")
+
     # HACK: Testing if we can handle the disconnect/close correctly
     def close(self, timeout=10):
         """Disconnect from ROS."""
