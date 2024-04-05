@@ -12,8 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `compas_fab.robots.Target` class to represent a motion planning target.
 * Added also child classes `FrameTarget`, `PointAxisTarget`, `ConfigurationTarget`, `ConstraintSetTarget`
 * Unlike previous constraints, `Targets` do not contain `group` as parameter. Instead, group parameter is passed to the planning call.
-* Target scaling function is now embeded in the code for Targets. `scaled()` should be called by the `plan_motion` class and a copy of the target is returned.
-* FrameTarget uses `tolerance_orientation` to specify a orientation tolerance, the values are adopted to become `tolerance_axes` when being converted to `OrientationConstraint`.
+* Target scaling function is now embeded in the code for Targets. `scaled()` should be called by the user before passing the target to the `plan_motion` function.
 
 ### Changed
 
