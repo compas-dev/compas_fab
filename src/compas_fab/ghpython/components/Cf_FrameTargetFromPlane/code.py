@@ -22,9 +22,9 @@ class FrameTargetFromPlaneComponent(component):
             # Convert Rhino geometry to COMPAS geometry
             frame = plane
             if not isinstance(frame, Frame):
-               frame = plane_to_compas_frame(frame)
+                frame = plane_to_compas_frame(frame)
             if not isinstance(tool_coordinate_frame, Frame):
-               tool_coordinate_frame = plane_to_compas_frame(tool_coordinate_frame)
+                tool_coordinate_frame = plane_to_compas_frame(tool_coordinate_frame)
 
             # Tolerance values
             tolerance_position = tolerance_position or 0.001
