@@ -274,7 +274,7 @@ class ConfigurationTarget(Target):
     in the actual robot cell, such as a tool changing position.
 
     The number of joints in the target configuration should match the number of joints
-    in the robot's planning group. Otherwise the behaviour of the bankend planner may
+    in the robot's planning group. Otherwise the behavior of the backend planner may
     be undefined. See tutorial :ref:`targets` for more details.
 
     Attributes
