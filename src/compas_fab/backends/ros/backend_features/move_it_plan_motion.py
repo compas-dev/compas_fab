@@ -40,7 +40,7 @@ class MoveItPlanMotion(PlanMotion):
         robot : :class:`compas_fab.robots.Robot`
             The robot instance for which the motion plan is being calculated.
         target: list of :class:`compas_fab.robots.Target`
-            The goal for the robot to achieve.
+            The target for the robot to reach.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the starting position. Defaults to

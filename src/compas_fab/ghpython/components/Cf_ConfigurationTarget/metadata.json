@@ -1,6 +1,6 @@
 {
-    "name": "ConfigurationTarget From Configuration",
-    "nickname": "ConfigurationTarget",
+    "name": "Target from a configuration",
+    "nickname": "Configuration target",
     "category": "COMPAS FAB",
     "subcategory": "Planning",
     "description": "Create joint constraints for each of the robot's configurable joints based on a given target configuration.",
@@ -32,7 +32,7 @@
         "outputParameters": [
             {
                 "name": "target",
-                "description": "A ConfigurationTarget"
+                "description": "A configuration target"
             }
         ]
     }

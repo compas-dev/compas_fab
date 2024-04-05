@@ -32,17 +32,17 @@ def validate_response(response):
 
 def convert_target_to_goal_constraints(target, ee_link_name):
     """Convert COMPAS FAB `Target` objects into `Constraint` objects for passing it to MoveIt backend.
-    This function is intended to be called only by MoveIt backend when handeling different Target types.
+    This function is intended to be called only by MoveIt backend when handling different Target types.
 
     Parameters
     ----------
     target: :class:`compas_fab.robots.Target`
-        The goal for the robot to achieve.
+        The target for the robot to reach.
 
     Returns
     -------
     list of :class:`Constraint`
-        Set of Constraint classes
+        List of constraint objects.
     """
 
     if isinstance(target, ConstraintSetTarget):

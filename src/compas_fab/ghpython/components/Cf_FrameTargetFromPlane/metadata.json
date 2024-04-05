@@ -1,6 +1,6 @@
 {
-    "name": "FrameTarget From Plane",
-    "nickname": "FrameTarget",
+    "name": "Target from a plane/frame",
+    "nickname": "Frame target",
     "category": "COMPAS FAB",
     "subcategory": "Planning",
     "description": "Create a position and an orientation constraint from a plane calculated for the group's end-effector link.",
@@ -11,7 +11,7 @@
         "inputParameters": [
             {
                 "name": "plane",
-                "description": "The Rhino or Grasshopper Plane or COMPAS Frame from which we create position and orientation constraints."
+                "description": "The Rhino plane or COMPAS frame from which we create position and orientation constraints."
             },
             {
                 "name": "tolerance_position",
@@ -41,7 +41,7 @@
         "outputParameters": [
             {
                 "name": "target",
-                "description": "A FrameTarget."
+                "description": "A frame target."
             }
         ]
     }
