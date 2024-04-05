@@ -14,16 +14,16 @@ from compas_fab.robots import PointAxisTarget
 
 
 class PointAxisTargetComponent(component):
-    def RunScript(self, point, target_z_vector, tolerance_position, tool_coordinate_frame):
+    def RunScript(self, point, target_z_axis, tolerance_position, tool_coordinate_frame):
         target = None
         if point:
 
             # Convert Rhino geometry to COMPAS geometry
             point = point if isinstance(point, Point) else point_to_compas(point)
-            target_z_vector = (
-                target_z_vector if isinstance(target_z_vector, Vector) else vector_to_compas(target_z_vector)
+            target_z_axis = (
+                target_z_axis if isinstance(target_z_axis, Vector) else vector_to_compas(target_z_axis)
             )
 
-            target = PointAxisTarget(point, target_z_vector, tolerance_position, tool_coordinate_frame)
+            target = PointAxisTarget(point, target_z_axis, tolerance_position, tool_coordinate_frame)
 
         return target

@@ -207,7 +207,7 @@ class PointAxisTarget(Target):
     ----------
     target_point : :class:`compas.geometry.Point`
         The target point defined relative to the robot's base coordinate frame (RCF).
-    target_z_vector : :class:`compas.geometry.Vector`
+    target_z_axis : :class:`compas.geometry.Vector`
         The target axis is defined by the target_point and pointing towards this vector.
         The tool tip coordinate frame (TCF)'s Z axis can rotate around this axis.
     tolerance_position : float, optional
@@ -223,21 +223,21 @@ class PointAxisTarget(Target):
     def __init__(
         self,
         target_point,
-        target_z_vector,
+        target_z_axis,
         tolerance_position=None,
         tool_coordinate_frame=None,
         name="Point-Axis Target",
     ):
         super(PointAxisTarget, self).__init__(name=name)
         self.target_point = target_point
-        self.target_z_vector = target_z_vector
+        self.target_z_axis = target_z_axis
         self.tolerance_position = tolerance_position
         self.tool_coordinate_frame = tool_coordinate_frame
 
     def __data__(self):
         return {
             "target_point": self.target_point,
-            "target_z_vector": self.target_z_vector,
+            "target_z_axis": self.target_z_axis,
             "tolerance_position": self.tolerance_position,
             "tool_coordinate_frame": self.tool_coordinate_frame,
         }
@@ -257,9 +257,9 @@ class PointAxisTarget(Target):
         """
         target_point = self.target_point.scaled(factor)
         tolerance_position = self.tolerance_position * factor if self.tolerance_position else None
-        target_z_vector = self.target_z_vector.scaled  # Vector is unitized and is not scaled
+        target_z_axis = self.target_z_axis.scaled  # Vector is unitized and is not scaled
         tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
-        return PointAxisTarget(target_point, target_z_vector, tool_coordinate_frame, tolerance_position, self.name)
+        return PointAxisTarget(target_point, target_z_axis, tool_coordinate_frame, tolerance_position, self.name)
 
 
 class ConfigurationTarget(Target):
