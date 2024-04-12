@@ -59,6 +59,15 @@ Constraints
     OrientationConstraint
     PositionConstraint
 
+Built-in robots
+---------------
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    RobotLibrary
+
 Unit conversion
 ---------------
 
@@ -98,6 +107,9 @@ from .reachability_map import (
 from .robot import (
     Robot,
 )
+from .robot_library import (
+    RobotLibrary,
+)
 from .semantics import (
     RobotSemantics,
 )
@@ -136,6 +148,7 @@ __all__ = [
     "DeviationVectorsGenerator",
     "OrthonormalVectorsFromAxisGenerator",
     "Robot",
+    "RobotLibrary",
     "RobotSemantics",
     "Tool",
     "Trajectory",
