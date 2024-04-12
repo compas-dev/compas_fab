@@ -6,7 +6,7 @@ from compas_robots import RobotModel
 from compas_robots.resources import LocalPackageMeshLoader
 
 import compas_fab
-from .robot import Robot as RobotClass
+from .robot import Robot
 from .semantics import RobotSemantics
 
 __all__ = [
@@ -45,7 +45,7 @@ class RobotLibrary(object):
             loader = LocalPackageMeshLoader(compas_fab.get(local_package_mesh_folder), "")
             model.load_geometry(loader)
 
-        robot = RobotClass(model, semantics=semantics)
+        robot = Robot(model, semantics=semantics)
 
         if client:
             robot.client = client
