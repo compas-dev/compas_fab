@@ -1,5 +1,6 @@
 from compas.data import Data
 from compas.geometry import Frame
+from compas.geometry import Transformation
 from compas_robots.model import Joint
 
 __all__ = [
@@ -62,18 +63,20 @@ class Target(Data):
 class FrameTarget(Target):
     """Represents a fully constrained pose target for the robot's end-effector using a :class:`compas.geometry.Frame`.
 
-    The end-effector has no translational or rotational freedom.
+    When using a FrameTarget, the end-effector has no translational or rotational freedom.
+    In another words, the pose of the end-effector is fully defined (constrained).
 
     Given a FrameTarget, the planner aims to find a path moving
-    the robot's flange frame (or tool frame) to the specified `FrameTarget.target_frame`.
-    The default target frame corresponds to the Flange Coordinate Frame (RfCF)
-    of the robot. When using a tool, the target frame can be specified
-    relative to the tool tip coordinate frame (TTCF).
-    The planner will then move the tool tip towards the target frame.
+    the robot's planner coordinate frame (PCF) to the specified `FrameTarget.target_frame`.
+    In many case, the PCF corresponds to the Tool0 Coordinate Frame (T0CF) on the robot controller.
+    See :ref:`coordinate_frames` for more details about the PCF,
+    or if the planning result does not match the pose displayed on the robot controller.
 
-    For robots with multiple end effector attachment points, the FCF depends on
-    the planning group setting in the planning request, as defined in an SRDF file or
-    :class:`compas_fab.robots.RobotSemantics`.
+    If the user wants to plan with a tool (such that the Tool Coordinate Frame (TCF) is matched with the target),
+    the `tool_coordinate_frame` parameter should be provided to define the TCF relative to the PCF of the robot.
+
+    For robots with multiple end effector attachment points (such as the RFL Robot), the PCF depends on
+    the planning group used in the planning request, see :meth:`compas_fab.robots.Robot.plan_motion`.
 
     Attributes
     ----------
@@ -85,7 +88,7 @@ class FrameTarget(Target):
     tolerance_orientation : float, optional
         The tolerance for the orientation.
         If not specified, the default value from the planner is used.
-    tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
+    tool_coordinate_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`, optional
         The tool tip coordinate frame relative to the flange of the robot.
         If not specified, the target frame is relative to the robot's flange.
     name : str, optional
@@ -106,6 +109,8 @@ class FrameTarget(Target):
         self.target_frame = target_frame
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
+        if isinstance(tool_coordinate_frame, Transformation):
+            tool_coordinate_frame = Frame.from_transformation(tool_coordinate_frame)
         self.tool_coordinate_frame = tool_coordinate_frame
 
     @property
@@ -138,7 +143,7 @@ class FrameTarget(Target):
         tolerance_orientation : float, optional
             The tolerance for the orientation.
             if not specified, the default value from the planner is used.
-        tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
+        tool_coordinate_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`, optional
             The tool tip coordinate frame relative to the flange of the robot.
             If not specified, the target frame is relative to the robot's flange.
         name : str, optional
