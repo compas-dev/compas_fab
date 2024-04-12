@@ -6,7 +6,7 @@ from compas_robots import RobotModel
 from compas_robots.resources import LocalPackageMeshLoader
 
 import compas_fab
-from .robot import Robot as RobotClass
+from .robot import Robot
 from .semantics import RobotSemantics
 
 __all__ = [
@@ -14,13 +14,13 @@ __all__ = [
 ]
 
 
-class RobotLibrary:
+class RobotLibrary(object):
     """A collection of built-in robots that can be used for testing and example purposes.
     The :class:`compas_fab.robots.Robot` objects created by the factory methods
     can be used to write examples, so that the example code can stay short.
 
-    The robots are loaded from URDF, SRDF and mesh files located locally
-    from the folder `src/compas_fab/data/robot_library`. The resulting robot object
+    The robots are loaded from URDF, SRDF and local mesh files.
+    The resulting robot object
     contains the robot model, semantics, visual and collision meshes for the links.
 
     Examples
@@ -45,7 +45,7 @@ class RobotLibrary:
             loader = LocalPackageMeshLoader(compas_fab.get(local_package_mesh_folder), "")
             model.load_geometry(loader)
 
-        robot = RobotClass(model, semantics=semantics)
+        robot = Robot(model, semantics=semantics)
 
         if client:
             robot.client = client
