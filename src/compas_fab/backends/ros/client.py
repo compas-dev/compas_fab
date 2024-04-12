@@ -124,12 +124,12 @@ class RosClient(Ros, ClientInterface):
     Examples
     --------
 
-    >>> from compas_fab.backends import RosClient
-    >>> client = RosClient()
-    >>> client.run()
-    >>> print('Connected:', client.is_connected)
-    Connected: True
-    >>> client.close()
+    >>> from compas_fab.backends import RosClient   # doctest: +SKIP
+    >>> client = RosClient()   # doctest: +SKIP
+    >>> client.run()   # doctest: +SKIP
+    >>> print('Connected:', client.is_connected)   # doctest: +SKIP
+    Connected: True   # doctest: +SKIP
+    >>> client.close()   # doctest: +SKIP
 
     Notes
     -----
@@ -265,13 +265,13 @@ class RosClient(Ros, ClientInterface):
         Examples
         --------
 
-        >>> from compas_fab.backends import RosClient
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = client.load_robot()
-        >>> print(robot.name)
-        ur5_robot
-        >>> client.close()
+        >>> from compas_fab.backends import RosClient   # doctest: +SKIP
+        >>> client = RosClient()   # doctest: +SKIP
+        >>> client.run()   # doctest: +SKIP
+        >>> robot = client.load_robot()   # doctest: +SKIP
+        >>> print(robot.name)   # doctest: +SKIP
+        ur5_robot   # doctest: +SKIP
+        >>> client.close()   # doctest: +SKIP
 
         """
         robot_name = None

@@ -1585,23 +1585,23 @@ class Robot(Data):
         --------
 
         >>> from compas_fab.backends import RosClient
-        >>> ros = RosClient()
-        >>> ros.run()
-        >>> robot = ros.load_robot()
+        >>> ros = RosClient()   # doctest: +SKIP
+        >>> ros.run()           # doctest: +SKIP
+        >>> robot = ros.load_robot()    # doctest: +SKIP
         >>> frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\
-                      Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0])]
-        >>> start_configuration = Configuration.from_revolute_values([-0.042, 0.033, -2.174, 5.282, -1.528, 0.000])
-        >>> group = robot.main_group_name
+                      Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0])]   # doctest: +SKIP
+        >>> start_configuration = Configuration.from_revolute_values([-0.042, 0.033, -2.174, 5.282, -1.528, 0.000]) # doctest: +SKIP
+        >>> group = robot.main_group_name   # doctest: +SKIP
         >>> options = {'max_step': 0.01,\
                        'jump_threshold': 1.57,\
-                       'avoid_collisions': True}
+                       'avoid_collisions': True} # doctest: +SKIP
         >>> trajectory = robot.plan_cartesian_motion(frames,\
                                                      start_configuration,\
                                                      group=group,\
-                                                     options=options)
-        >>> len(trajectory.points) > 1
-        True
-        >>> ros.close()
+                                                     options=options) # doctest: +SKIP
+        >>> len(trajectory.points) > 1 # doctest: +SKIP
+        True            # doctest: +SKIP
+        >>> ros.close() # doctest: +SKIP
         """
         options = options or {}
         max_step = options.get("max_step")
@@ -1729,40 +1729,40 @@ class Robot(Data):
 
         Using position and orientation constraints:
 
-        >>> from compas_fab.backends import RosClient
-        >>> ros = RosClient()
-        >>> ros.run()
-        >>> robot = ros.load_robot()
-        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
-        >>> tolerance_position = 0.001
-        >>> tolerances_axes = [math.radians(1)] * 3
-        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.])
-        >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
-        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnect'})
-        >>> trajectory.fraction
-        1.0
-        >>> len(trajectory.points) > 1
-        True
-        >>> ros.close()
+        >>> from compas_fab.backends import RosClient                                                                 # doctest: +SKIP
+        >>> ros = RosClient()                                                                                          # doctest: +SKIP
+        >>> ros.run()                                                                                                  # doctest: +SKIP
+        >>> robot = ros.load_robot()                                                                                   # doctest: +SKIP
+        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])                                                      # doctest: +SKIP
+        >>> tolerance_position = 0.001                                                                                 # doctest: +SKIP
+        >>> tolerances_axes = [math.radians(1)] * 3                                                                    # doctest: +SKIP
+        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.])            # doctest: +SKIP
+        >>> group = robot.main_group_name                                                                              # doctest: +SKIP
+        >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)         # doctest: +SKIP
+        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnect'}) # doctest: +SKIP
+        >>> trajectory.fraction                                                                                        # doctest: +SKIP
+        1.0                                                                                                            # doctest: +SKIP
+        >>> len(trajectory.points) > 1                                                                                 # doctest: +SKIP
+        True                                                                                                           # doctest: +SKIP
+        >>> ros.close()                                                                                                # doctest: +SKIP
 
         Using joint constraints (to the UP configuration):
 
-        >>> from compas_fab.backends import RosClient
-        >>> ros = RosClient()
-        >>> ros.run(timeout=30)
-        >>> robot = ros.load_robot()
-        >>> configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0])
-        >>> tolerances_above = [math.radians(5)] * len(configuration.joint_values)
-        >>> tolerances_below = [math.radians(5)] * len(configuration.joint_values)
-        >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances_above, tolerances_below, group)
-        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnect'})
-        >>> trajectory.fraction
-        1.0
-        >>> len(trajectory.points) > 1
-        True
-        >>> ros.close()
+        >>> from compas_fab.backends import RosClient                                                                 # doctest: +SKIP
+        >>> ros = RosClient()                                                                                         # doctest: +SKIP
+        >>> ros.run(timeout=30)                                                                                       # doctest: +SKIP
+        >>> robot = ros.load_robot()                                                                                  # doctest: +SKIP
+        >>> configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0])                # doctest: +SKIP
+        >>> tolerances_above = [math.radians(5)] * len(configuration.joint_values)                                    # doctest: +SKIP
+        >>> tolerances_below = [math.radians(5)] * len(configuration.joint_values)                                    # doctest: +SKIP
+        >>> group = robot.main_group_name                                                                             # doctest: +SKIP
+        >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances_above, tolerances_below, group) # doctest: +SKIP
+        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnect'}) # doctest: +SKIP
+        >>> trajectory.fraction                                                                                       # doctest: +SKIP
+        1.0                                                                                                           # doctest: +SKIP
+        >>> len(trajectory.points) > 1                                                                                # doctest: +SKIP
+        True                                                                                                          # doctest: +SKIP
+        >>> ros.close()                                                                                               # doctest: +SKIP
         """
         options = options or {}
         path_constraints = options.get("path_constraints")
