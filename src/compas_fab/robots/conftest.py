@@ -31,20 +31,3 @@ def add_imports(doctest_namespace):
     doctest_namespace["RosClient"] = RosClient
     doctest_namespace["Rotation"] = Rotation
     doctest_namespace["Tool"] = Tool
-
-
-# @pytest.fixture(scope="function", autouse=True)
-# def connect_to_ros(request, doctest_namespace):
-#     if request.module.__name__ == "compas_fab.robots.robot":
-#         doctest_namespace["robot"] = RobotLibrary.ur5()
-#         yield
-#     elif request.module.__name__ == "compas_fab.robots.planning_scene":
-#         with RosClient() as client:
-#             robot = RobotLibrary.ur5(client)
-
-#             doctest_namespace["client"] = client
-#             doctest_namespace["robot"] = robot
-
-#             yield
-#     else:
-#         yield

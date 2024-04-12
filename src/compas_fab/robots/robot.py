@@ -1609,7 +1609,8 @@ class Robot(Data):
         Examples
         --------
 
-        >>> with RosClient() as client:
+        >>> with RosClient() as client:             # doctest: +SKIP
+        #: This doctest can pass locally but persistently fails on CI in GitHub. "roslibpy.core.RosTimeoutError: Failed to connect to ROS"
         ...     robot = client.load_robot()
         ...     frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\
                       Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0])]
@@ -1751,7 +1752,8 @@ class Robot(Data):
 
         Using position and orientation constraints:
 
-        >>> with RosClient() as client:
+        >>> with RosClient() as client:             # doctest: +SKIP
+        #: This doctest can pass locally but persistently fails on CI in GitHub. "roslibpy.core.RosTimeoutError: Failed to connect to ROS"
         ...     robot = client.load_robot()
         ...     frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         ...     tolerance_position = 0.001
@@ -1766,7 +1768,8 @@ class Robot(Data):
 
         Using joint constraints (to the UP configuration):
 
-        >>> with RosClient() as client:
+        >>> with RosClient() as client:             # doctest: +SKIP
+        #: This doctest can pass locally but persistently fails on CI in GitHub. "roslibpy.core.RosTimeoutError: Failed to connect to ROS"
         ...     robot = client.load_robot()
         ...     configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0])
         ...     tolerances_above = [math.radians(5)] * len(configuration.joint_values)
