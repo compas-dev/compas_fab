@@ -123,11 +123,9 @@ class RosClient(Ros, ClientInterface):
 
     Examples
     --------
-    >>> client = RosClient()
-    >>> client.run()
-    >>> print('Connected:', client.is_connected)
+    >>> with RosClient() as client:
+    ...     print('Connected:', client.is_connected)
     Connected: True
-    >>> client.close()
 
     Notes
     -----
@@ -262,12 +260,10 @@ class RosClient(Ros, ClientInterface):
 
         Examples
         --------
-        >>> client = RosClient()
-        >>> client.run()
-        >>> robot = client.load_robot()
-        >>> print(robot.name)
+        >>> with RosClient() as client:
+        ...     robot = client.load_robot()
+        ...     print(robot.name)
         ur5_robot
-        >>> client.close()
 
         """
         robot_name = None
