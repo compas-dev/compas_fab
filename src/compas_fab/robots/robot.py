@@ -144,6 +144,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> robot.name
         'ur5_robot'
         """
@@ -155,6 +156,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> robot.group_names
         ['manipulator', 'endeffector']
 
@@ -179,6 +181,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> sorted(robot.group_states['manipulator'].keys())
         ['home', 'up']
 
@@ -210,6 +213,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> robot.get_end_effector_link_name()
         'tool0'
         """
@@ -232,6 +236,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> link = robot.get_end_effector_link()
         >>> link.name
         'tool0'
@@ -272,6 +277,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> robot.get_base_link_name()
         'base_link'
         """
@@ -294,6 +300,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> link = robot.get_base_link()
         >>> link.name
         'base_link'
@@ -334,6 +341,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> robot.get_link_names('manipulator')
         ['base_link', 'base_link_inertia', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link', 'flange', 'tool0']
         """
@@ -353,6 +361,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> robot.get_link_names_with_collision_geometry()
         ['base_link_inertia', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link']
         """
@@ -377,6 +386,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> joints = robot.get_configurable_joints('manipulator')
         >>> [j.name for j in joints]
         ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
@@ -437,6 +447,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> robot.get_configurable_joint_names('manipulator')
         ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', \
         'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
@@ -463,6 +474,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> robot.get_configurable_joint_types('manipulator')
         [0, 0, 0, 0, 0, 0]
         """
@@ -491,6 +503,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> robot.zero_configuration('manipulator')
         Configuration((0.000, 0.000, 0.000, 0.000, 0.000, 0.000), (0, 0, 0, 0, 0, 0), \
             ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))
@@ -769,6 +782,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
         >>> frame_RCF = robot.to_local_coordinates(frame_WCF)
         >>> frame_RCF                                                                                       # doctest: +SKIP
@@ -794,6 +808,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> frame_RCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
         >>> frame_WCF = robot.to_world_coordinates(frame_RCF)
         >>> frame_WCF                                                                                       # doctest: +SKIP
@@ -835,6 +850,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> robot.attach_tool(Tool(mesh, frame))
@@ -871,6 +887,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> robot.attach_tool(Tool(mesh, frame))
@@ -907,6 +924,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> tool = Tool(mesh, frame)
@@ -1024,6 +1042,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerances_axes = [math.radians(1)] * 3
         >>> group = robot.main_group_name
@@ -1083,6 +1102,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
         >>> robot.position_constraint_from_frame(frame, tolerance_position)                                 # doctest: +SKIP
@@ -1142,6 +1162,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
         >>> tolerances_axes = [math.radians(1)]
@@ -1194,6 +1215,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> configuration = Configuration.from_revolute_values([-0.042, 4.295, -4.110, -3.327, 4.755, 0.])
         >>> tolerances_above = [math.radians(1)] * 6
         >>> tolerances_below = [math.radians(1)] * 6
@@ -1298,6 +1320,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
         >>> start_configuration = robot.zero_configuration()
         >>> group = robot.main_group_name
@@ -1373,6 +1396,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
         >>> start_configuration = robot.zero_configuration()
         >>> group = robot.main_group_name
@@ -1494,6 +1518,7 @@ class Robot(Data):
 
         Examples
         --------
+        >>> robot = RobotLibrary.ur5()
         >>> configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
         >>> group = robot.main_group_name
         >>> frame_WCF_c = robot.forward_kinematics(configuration, group)
@@ -1729,6 +1754,7 @@ class Robot(Data):
 
         Using position and orientation constraints:
 
+        >>> robot = RobotLibrary.ur5()                                                                                # doctest: +SKIP
         >>> from compas_fab.backends import RosClient                                                                 # doctest: +SKIP
         >>> ros = RosClient()                                                                                          # doctest: +SKIP
         >>> ros.run()                                                                                                  # doctest: +SKIP
@@ -1748,6 +1774,7 @@ class Robot(Data):
 
         Using joint constraints (to the UP configuration):
 
+        >>> robot = RobotLibrary.ur5()                                                                                # doctest: +SKIP
         >>> from compas_fab.backends import RosClient                                                                 # doctest: +SKIP
         >>> ros = RosClient()                                                                                         # doctest: +SKIP
         >>> ros.run(timeout=30)                                                                                       # doctest: +SKIP
