@@ -1379,16 +1379,18 @@ class Robot(Data):
 
         Parameters
         ----------
-        target : class:`Target`
-            The goal to be achieved by the robot at the end of the motion.
-            See :ref:
-        start_configuration : :class:`.Configuration`, optional
+        target : :class:`compas_fab.robots.Target`
+            The target to be achieved by the robot at the end of the motion.
+            See :ref:`targets`.
+        start_configuration : :class:`compas_robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the starting position. Defaults to
             the all-zero configuration.
         group : :obj:`str`, optional
-            The name of the group to plan for. Defaults to the robot's main
-            planning group.
+            The name of the planning group used to define the movable joints and the Planner Coordinate Frame (PCF).
+            See :ref:`coordinate_frames` for more details about the PCF.
+            The planning group must match with one of the groups defined in the robot's semantics.
+            Defaults to the robot's main planning group.
         options : :obj:`dict`, optional
             Dictionary containing the following key-value pairs:
 

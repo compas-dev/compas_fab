@@ -420,7 +420,7 @@ class JointConstraint(Constraint):
 
 
 class OrientationConstraint(Constraint):
-    r"""Constrains a link to be within a certain orientation.
+    """Constrains a link to be within a certain orientation.
 
     Parameters
     ----------
@@ -430,7 +430,7 @@ class OrientationConstraint(Constraint):
         The desired orientation of the link specified by a quaternion in the
         order of ``[w, x, y, z]``.
     tolerances : :obj:`list` of :obj:`float`, optional
-        Error tolerances t\ :sub:`i` for each of the frame's axes. If only one
+        Error tolerances :math:`t_{i}` for each of the frame's axes. If only one
         value is passed it will be used for all 3 axes. The respective bound to
         be achieved is :math:`(a_{i} - t_{i}, a_{i} + t_{i})`. Defaults to
         ``[0.01, 0.01, 0.01]``.
@@ -447,7 +447,7 @@ class OrientationConstraint(Constraint):
         The desired orientation of the link specified by a quaternion in the
         order of ``[w, x, y, z]``.
     tolerances : :obj:`list` of :obj:`float`
-        Error tolerances t\ :sub:`i` for each of the frame's axes. If only one
+        Error tolerances :math:`t_{i}` for each of the frame's axes. If only one
         value is passed it will be used for all 3 axes. The respective bound to
         be achieved is :math:`(a_{i} - t_{i}, a_{i} + t_{i})`.
     weight : :obj:`float`
@@ -515,7 +515,7 @@ class OrientationConstraint(Constraint):
 
     @classmethod
     def from_frame(cls, frame_WCF, tolerances_orientation, link_name, tool_coordinate_frame=None, weight=1.0):
-        r"""Create an OrientationConstraint from a frame on the group's end-effector link.
+        """Create an :class:`OrientationConstraint` from a frame on the group's end-effector link.
         Only the orientation of the frame is considered for the constraint, expressed
         as a quaternion.
 
@@ -524,7 +524,7 @@ class OrientationConstraint(Constraint):
         frame_WCF: :class:`compas.geometry.Frame`
             The frame from which we create the orientation constraint.
         tolerances_orientation: :obj:`list` of :obj:`float`
-            Error tolerances t\ :sub:`i` for each of the frame's axes in
+            Error tolerances :math:`t_{i}` for each of the frame's axes in
             radians. If only one value is passed in the list it will be uses for all 3 axes.
         link_name : :obj:`str`
             The name of the end-effector link. Necessary for creating the position constraint.
@@ -627,7 +627,7 @@ class PositionConstraint(Constraint):
 
     @classmethod
     def from_frame(cls, frame_WCF, tolerance_position, link_name, tool_coordinate_frame=None, weight=1.0):
-        """Create a PositionConstraint from a frame on the group's end-effector link.
+        """Create a :class:`PositionConstraint` from a frame on the group's end-effector link.
         Only the position of the frame is considered for the constraint.
 
         Parameters
@@ -757,7 +757,7 @@ class PositionConstraint(Constraint):
 
     @classmethod
     def from_mesh(cls, link_name, mesh, weight=1.0):
-        """Create a class:`PositionConstraint` from a :class:`compas.datastructures.Mesh`.
+        """Create a :class:`PositionConstraint` from a :class:`compas.datastructures.Mesh`.
 
         Parameters
         ----------
