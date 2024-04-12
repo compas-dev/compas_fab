@@ -147,25 +147,6 @@ class RosClient(Ros, ClientInterface):
     def __exit__(self, *args):
         self.close()
 
-    def run(self, timeout=2.0):
-        """Kick-starts a non-blocking event loop.
-
-        Args:
-            timeout: Timeout to wait until connection is ready.
-        """
-        import threading
-        import time
-        from roslibpy.core import RosTimeoutError
-
-        t1 = time.time()
-        wait_connect = threading.Event()
-        self.factory.on_ready(lambda _: wait_connect.set())
-
-        self.factory.manager.run()
-        if not wait_connect.wait(timeout):
-            t2 = time.time()
-            raise RosTimeoutError("Failed to connect to ROS. Start Time: {}, Time elapsed: {}".format(t1, t2 - t1))
-
     @property
     def ros_distro(self):
         """Retrieves the ROS version to which the client is connected (eg. kinetic)"""
