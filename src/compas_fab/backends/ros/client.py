@@ -147,35 +147,7 @@ class RosClient(Ros, ClientInterface):
     def __exit__(self, *args):
         self.close()
 
-    # HACK: Testing if the ROS Run is doing the entry point correctly
-    def run(self, timeout=1.0, retries=5):
-        """Kick-starts a non-blocking event loop.
-
-        Args:
-            timeout: Timeout to wait until connection is ready.
-        """
-        # import threading
-        # import time
-        # from roslibpy.core import RosTimeoutError
-
-        # t1 = time.time()
-        # wait_connect = threading.Event()
-        # self.factory.on_ready(lambda _: wait_connect.set())
-
-        # self.factory.manager.run()
-        # if not wait_connect.wait(timeout):
-        #     t2 = time.time()
-        #     raise RosTimeoutError("Failed to connect to ROS. Start Time: {}, Time elapsed: {}".format(t1, t2 - t1))
-
-        for i in range(retries):
-            try:
-                self._run(timeout)
-                break
-            except Exception as e:
-                if i == retries - 1:
-                    raise e
-
-    def _run(self, timeout=1.0):
+    def run(self, timeout=2.0):
         """Kick-starts a non-blocking event loop.
 
         Args:
@@ -193,36 +165,6 @@ class RosClient(Ros, ClientInterface):
         if not wait_connect.wait(timeout):
             t2 = time.time()
             raise RosTimeoutError("Failed to connect to ROS. Start Time: {}, Time elapsed: {}".format(t1, t2 - t1))
-
-    # HACK: Testing if we can handle the disconnect/close correctly
-    def close(self, timeout=10):
-        """Disconnect from ROS."""
-        import threading
-
-        import time
-        from roslibpy.core import RosTimeoutError
-
-        if self.is_connected:
-            wait_disconnect = threading.Event()
-
-            def _wrapper_callback(proto):
-                self.emit("closing")
-                wait_closed = threading.Event()
-                proto.onClose = lambda was_clean, code, reason: wait_closed.set()
-                # t1 = time.time()
-                proto.send_close()
-                if not wait_closed.wait(10):
-                    raise RosTimeoutError("Failed to wait for ROS to close")
-                time.sleep(2)
-                # t2 = time.time()
-                # print("Time to close: ", t2 - t1)
-                wait_disconnect.set()
-                return proto
-
-            self.factory.on_ready(_wrapper_callback)
-
-            if not wait_disconnect.wait(timeout):
-                raise RosTimeoutError("Failed to disconnect to ROS")
 
     @property
     def ros_distro(self):
