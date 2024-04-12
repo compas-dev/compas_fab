@@ -119,7 +119,7 @@ class CollisionMesh(Data):
 
 
 class AttachedCollisionMesh(Data):
-    """Represents a collision mesh that is attached to a :class:`Robot`'s :class:`~compas_robots.model.Link`.
+    """Represents a collision mesh that is attached to a :class:`Robot`'s :class:`compas_robots.model.Link`.
 
     Parameters
     ----------
