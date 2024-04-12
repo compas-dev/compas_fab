@@ -52,6 +52,13 @@ class RobotSemantics(Data):
         - Level 2 keys are group state names : :obj:`str`.
         - Level 3 keys are joint names and values are joint values : :obj:`str`.
 
+    Attributes
+    ----------
+    group_names : :obj:`list` of :obj:`str`, read-only
+        Get the names of all planning groups.
+    unordered_disabled_collisions : :obj:`set` of :obj:`frozenset`, read-only
+        Get the disabled collision pairs as a set of frozensets.
+
     References
     ----------
 
