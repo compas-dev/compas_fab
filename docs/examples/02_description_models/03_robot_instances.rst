@@ -10,9 +10,6 @@ demonstrating the capabilities of the package. These packages can be accessed fr
 files. They contain
 the `robot.model`, `robot.semantics` and meshes associated with the robot links.
 
-The robot packages can be used with the PyBullet Planning backends for planning purpose and
-without backend for visualization purpose. The robot packages will be extended in the future
-to work with the ROS MoveIt planning backend.
 
 The following packages are available:
 
