@@ -688,8 +688,8 @@ class Robot(Data):
         ----------
         group : :obj:`str`
             The name of the planning group.
-        group_state : :obj:`str
-            The name of the ``group_state``.
+        group_state : :obj:`str`
+            The name of the group_state.
 
         Returns
         -------
