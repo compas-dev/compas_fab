@@ -623,7 +623,7 @@ document.write(`
 <h1>Robot.plan_motion</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_fab.robots.Robot.plan_motion">
-<span class="sig-prename descclassname"><span class="pre">Robot.</span></span><span class="sig-name descname"><span class="pre">plan_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">goal_constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d088aee/src/compas_fab/robots/robot.py#L1689"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">Robot.</span></span><span class="sig-name descname"><span class="pre">plan_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">goal_constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/08773ba/src/compas_fab/robots/robot.py#L1713"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Calculate a motion path.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -671,38 +671,32 @@ for more details.</p>
 </dl>
 <p class="rubric">Examples</p>
 <p>Using position and orientation constraints:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ros</span> <span class="o">=</span> <span class="n">RosClient</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ros</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span> <span class="o">=</span> <span class="n">ros</span><span class="o">.</span><span class="n">load_robot</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tolerance_position</span> <span class="o">=</span> <span class="mf">0.001</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tolerances_axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">start_configuration</span> <span class="o">=</span> <span class="n">Configuration</span><span class="o">.</span><span class="n">from_revolute_values</span><span class="p">([</span><span class="o">-</span><span class="mf">0.042</span><span class="p">,</span> <span class="mf">4.295</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.327</span><span class="p">,</span> <span class="mf">4.755</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">main_group_name</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">goal_constraints</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">constraints_from_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">tolerance_position</span><span class="p">,</span> <span class="n">tolerances_axes</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">trajectory</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">plan_motion</span><span class="p">(</span><span class="n">goal_constraints</span><span class="p">,</span> <span class="n">start_configuration</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;planner_id&#39;</span><span class="p">:</span> <span class="s1">&#39;RRTConnect&#39;</span><span class="p">})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">trajectory</span><span class="o">.</span><span class="n">fraction</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>             
+<span class="go">#: This doctest can pass locally but persistently fails on CI in GitHub. &quot;roslibpy.core.RosTimeoutError: Failed to connect to ROS&quot;</span>
+<span class="go">...     robot = client.load_robot()</span>
+<span class="go">...     frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])</span>
+<span class="go">...     tolerance_position = 0.001</span>
+<span class="go">...     tolerances_axes = [math.radians(1)] * 3</span>
+<span class="go">...     start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.])</span>
+<span class="go">...     group = robot.main_group_name</span>
+<span class="go">...     goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)</span>
+<span class="go">...     trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {&#39;planner_id&#39;: &#39;RRTConnect&#39;})</span>
+<span class="go">...     print(trajectory.fraction)</span>
 <span class="go">1.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">trajectory</span><span class="o">.</span><span class="n">points</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ros</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Using joint constraints (to the UP configuration):</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ros</span> <span class="o">=</span> <span class="n">RosClient</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ros</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span> <span class="o">=</span> <span class="n">ros</span><span class="o">.</span><span class="n">load_robot</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">configuration</span> <span class="o">=</span> <span class="n">Configuration</span><span class="o">.</span><span class="n">from_revolute_values</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5707</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5707</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tolerances_above</span> <span class="o">=</span> <span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">configuration</span><span class="o">.</span><span class="n">joint_values</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tolerances_below</span> <span class="o">=</span> <span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">configuration</span><span class="o">.</span><span class="n">joint_values</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">main_group_name</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">goal_constraints</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">constraints_from_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">,</span> <span class="n">tolerances_above</span><span class="p">,</span> <span class="n">tolerances_below</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">trajectory</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">plan_motion</span><span class="p">(</span><span class="n">goal_constraints</span><span class="p">,</span> <span class="n">start_configuration</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;planner_id&#39;</span><span class="p">:</span> <span class="s1">&#39;RRTConnect&#39;</span><span class="p">})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">trajectory</span><span class="o">.</span><span class="n">fraction</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>             
+<span class="go">#: This doctest can pass locally but persistently fails on CI in GitHub. &quot;roslibpy.core.RosTimeoutError: Failed to connect to ROS&quot;</span>
+<span class="go">...     robot = client.load_robot()</span>
+<span class="go">...     configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0])</span>
+<span class="go">...     tolerances_above = [math.radians(5)] * len(configuration.joint_values)</span>
+<span class="go">...     tolerances_below = [math.radians(5)] * len(configuration.joint_values)</span>
+<span class="go">...     group = robot.main_group_name</span>
+<span class="go">...     goal_constraints = robot.constraints_from_configuration(configuration, tolerances_above, tolerances_below, group)</span>
+<span class="go">...     trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {&#39;planner_id&#39;: &#39;RRTConnect&#39;})</span>
+<span class="go">...     print(trajectory.fraction)</span>
 <span class="go">1.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">trajectory</span><span class="o">.</span><span class="n">points</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ros</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
 </dd></dl>

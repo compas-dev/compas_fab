@@ -623,7 +623,7 @@ document.write(`
 <h1>RosClient</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.backends.RosClient">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.backends.</span></span><span class="sig-name descname"><span class="pre">RosClient</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d088aee/src/compas_fab/backends/ros/client.py#L102"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.backends.</span></span><span class="sig-name descname"><span class="pre">RosClient</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/08773ba/src/compas_fab/backends/ros/client.py#L102"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Ros</span></code>, <a class="reference internal" href="../../developer/generated/compas_fab.backends.interfaces.ClientInterface.html" title="compas_fab.backends.interfaces.client.ClientInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClientInterface</span></code></a></p>
 <p>Interface to use ROS as backend via the <strong>rosbridge</strong>.</p>
 <p>The connection is managed by <code class="docutils literal notranslate"><span class="pre">roslibpy</span></code>.</p>
@@ -649,9 +649,8 @@ making use of <a class="reference internal" href="compas_fab.backends.MoveItPlan
 <p class="rubric">Notes</p>
 <p>For more examples, check out the <a class="reference internal" href="../../examples/03_backends_ros/01_ros_examples.html#ros-examples"><span class="std std-ref">ROS examples page</span></a>.</p>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">RosClient</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Connected: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">client</span><span class="o">.</span><span class="n">is_connected</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Connected:&#39;</span><span class="p">,</span> <span class="n">client</span><span class="o">.</span><span class="n">is_connected</span><span class="p">)</span>
 <span class="go">Connected: True</span>
 </pre></div>
 </div>

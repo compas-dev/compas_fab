@@ -623,7 +623,7 @@ document.write(`
 <h1>PlanningScene.remove_attached_collision_mesh</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_fab.robots.PlanningScene.remove_attached_collision_mesh">
-<span class="sig-prename descclassname"><span class="pre">PlanningScene.</span></span><span class="sig-name descname"><span class="pre">remove_attached_collision_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d088aee/src/compas_fab/robots/planning_scene.py#L373"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">PlanningScene.</span></span><span class="sig-name descname"><span class="pre">remove_attached_collision_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/08773ba/src/compas_fab/robots/planning_scene.py#L381"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Remove an attached collision object from the planning scene.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -641,8 +641,10 @@ document.write(`
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">scene</span> <span class="o">=</span> <span class="n">PlanningScene</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">scene</span><span class="o">.</span><span class="n">remove_attached_collision_mesh</span><span class="p">(</span><span class="s1">&#39;tip&#39;</span><span class="p">)</span>   
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">robot</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">load_robot</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">scene</span> <span class="o">=</span> <span class="n">PlanningScene</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">scene</span><span class="o">.</span><span class="n">remove_attached_collision_mesh</span><span class="p">(</span><span class="s1">&#39;tip&#39;</span><span class="p">)</span>   
 </pre></div>
 </div>
 </dd></dl>

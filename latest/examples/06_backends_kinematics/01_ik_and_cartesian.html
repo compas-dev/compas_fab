@@ -663,16 +663,17 @@ boundaries are then not removed from the list of solutions, they are set to
 end-effector to reach a certain target pose.</p>
 <p>Here is an example of using <code class="docutils literal notranslate"><span class="pre">AnalyticalInverseKinematics</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Frame</span>
-<span class="kn">from</span> <span class="nn">compas_fab.robots.ur5</span> <span class="kn">import</span> <span class="n">Robot</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">RobotLibrary</span>
 <span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">AnalyticalInverseKinematics</span>
 
 <span class="n">ik</span> <span class="o">=</span> <span class="n">AnalyticalInverseKinematics</span><span class="p">()</span>
-<span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">()</span>
+<span class="n">robot</span> <span class="o">=</span> <span class="n">RobotLibrary</span><span class="o">.</span><span class="n">ur5</span><span class="p">()</span>
 
 <span class="n">frame_WCF</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">((</span><span class="mf">0.381</span><span class="p">,</span> <span class="mf">0.093</span><span class="p">,</span> <span class="mf">0.382</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.371</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.292</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.882</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.113</span><span class="p">,</span> <span class="mf">0.956</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.269</span><span class="p">))</span>
 
-<span class="k">for</span> <span class="n">jp</span><span class="p">,</span> <span class="n">jn</span> <span class="ow">in</span> <span class="n">ik</span><span class="o">.</span><span class="n">inverse_kinematics</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">frame_WCF</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;solver&#39;</span><span class="p">:</span> <span class="s1">&#39;ur5&#39;</span><span class="p">}):</span>  <span class="c1"># knows that we need the IK for the UR5 robot</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">jp</span><span class="p">)</span>
+<span class="c1"># The solver must be one of the supported PLANNER_BACKENDS</span>
+<span class="k">for</span> <span class="n">joint_positions</span><span class="p">,</span> <span class="n">joint_names</span> <span class="ow">in</span> <span class="n">ik</span><span class="o">.</span><span class="n">inverse_kinematics</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">frame_WCF</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;solver&#39;</span><span class="p">:</span> <span class="s1">&#39;ur5&#39;</span><span class="p">}):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">joint_positions</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The above solutions, could however be in collision. In order to check for collisions,

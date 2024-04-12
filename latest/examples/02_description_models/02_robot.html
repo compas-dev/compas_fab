@@ -630,13 +630,14 @@ to exemplify loading from disk:</p>
 <span class="kn">import</span> <span class="nn">compas_fab</span>
 
 <span class="c1"># Locate the URDF file inside compas fab installation</span>
-<span class="n">urdf</span> <span class="o">=</span> <span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;universal_robot/ur_description/urdf/ur10e.urdf&quot;</span><span class="p">)</span>
+<span class="n">urdf</span> <span class="o">=</span> <span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;robot_library/ur10e_robot/urdf/robot_description.urdf&quot;</span><span class="p">)</span>
 
 <span class="c1"># Create robot model from URDF</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">RobotModel</span><span class="o">.</span><span class="n">from_urdf_file</span><span class="p">(</span><span class="n">urdf</span><span class="p">)</span>
 
 <span class="c1"># Also load geometry</span>
-<span class="n">loader</span> <span class="o">=</span> <span class="n">LocalPackageMeshLoader</span><span class="p">(</span><span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;universal_robot&quot;</span><span class="p">),</span> <span class="s2">&quot;ur_description&quot;</span><span class="p">)</span>
+<span class="n">support_package_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">loader</span> <span class="o">=</span> <span class="n">LocalPackageMeshLoader</span><span class="p">(</span><span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;robot_library/ur10e_robot&quot;</span><span class="p">),</span> <span class="n">support_package_name</span><span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">load_geometry</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>

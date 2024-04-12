@@ -648,7 +648,7 @@ gui from closing this example too quickly.</p>
 <span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">CollisionMesh</span>
 
 <span class="k">with</span> <span class="n">PyBulletClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-    <span class="n">urdf_filepath</span> <span class="o">=</span> <span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;universal_robot/ur_description/urdf/ur5.urdf&#39;</span><span class="p">)</span>
+    <span class="n">urdf_filepath</span> <span class="o">=</span> <span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;robot_library/ur5_robot/urdf/robot_description.urdf&#39;</span><span class="p">)</span>
     <span class="n">robot</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">load_robot</span><span class="p">(</span><span class="n">urdf_filepath</span><span class="p">)</span>
 
     <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_stl</span><span class="p">(</span><span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;planning_scene/floor.stl&#39;</span><span class="p">))</span>
@@ -684,13 +684,13 @@ of the robot before calling methods which add and remove attached collision mesh
 
 
 <span class="k">with</span> <span class="n">PyBulletClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-    <span class="n">urdf_filepath</span> <span class="o">=</span> <span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;universal_robot/ur_description/urdf/ur5.urdf&#39;</span><span class="p">)</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">LocalPackageMeshLoader</span><span class="p">(</span><span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;universal_robot&#39;</span><span class="p">),</span> <span class="s1">&#39;ur_description&#39;</span><span class="p">)</span>
+    <span class="n">urdf_filepath</span> <span class="o">=</span> <span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;robot_library/ur5_robot/urdf/robot_description.urdf&#39;</span><span class="p">)</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">LocalPackageMeshLoader</span><span class="p">(</span><span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;robot_library/ur5_robot&#39;</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
     <span class="n">robot</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">load_robot</span><span class="p">(</span><span class="n">urdf_filepath</span><span class="p">,</span> <span class="p">[</span><span class="n">loader</span><span class="p">])</span>
 
     <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">from_stl</span><span class="p">(</span><span class="n">compas_fab</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;planning_scene/cone.stl&#39;</span><span class="p">))</span>
     <span class="n">cm</span> <span class="o">=</span> <span class="n">CollisionMesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;tip&#39;</span><span class="p">)</span>
-    <span class="n">acm</span> <span class="o">=</span> <span class="n">AttachedCollisionMesh</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="s1">&#39;ee_link&#39;</span><span class="p">)</span>
+    <span class="n">acm</span> <span class="o">=</span> <span class="n">AttachedCollisionMesh</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="s1">&#39;tool0&#39;</span><span class="p">)</span>
     <span class="n">client</span><span class="o">.</span><span class="n">add_attached_collision_mesh</span><span class="p">(</span><span class="n">acm</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;mass&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;robot&#39;</span><span class="p">:</span> <span class="n">robot</span><span class="p">})</span>
 
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>

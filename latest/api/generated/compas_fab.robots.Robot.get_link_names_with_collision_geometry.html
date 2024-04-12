@@ -623,7 +623,7 @@ document.write(`
 <h1>Robot.get_link_names_with_collision_geometry</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_fab.robots.Robot.get_link_names_with_collision_geometry">
-<span class="sig-prename descclassname"><span class="pre">Robot.</span></span><span class="sig-name descname"><span class="pre">get_link_names_with_collision_geometry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d088aee/src/compas_fab/robots/robot.py#L347"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">Robot.</span></span><span class="sig-name descname"><span class="pre">get_link_names_with_collision_geometry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/08773ba/src/compas_fab/robots/robot.py#L355"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Get the names of the links with collision geometry.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -633,8 +633,9 @@ document.write(`
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">get_link_names_with_collision_geometry</span><span class="p">()</span>
-<span class="go">[&#39;base_link&#39;, &#39;shoulder_link&#39;, &#39;upper_arm_link&#39;, &#39;forearm_link&#39;, &#39;wrist_1_link&#39;, &#39;wrist_2_link&#39;, &#39;wrist_3_link&#39;, &#39;ee_link&#39;]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span> <span class="o">=</span> <span class="n">RobotLibrary</span><span class="o">.</span><span class="n">ur5</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">robot</span><span class="o">.</span><span class="n">get_link_names_with_collision_geometry</span><span class="p">()</span>
+<span class="go">[&#39;base_link_inertia&#39;, &#39;shoulder_link&#39;, &#39;upper_arm_link&#39;, &#39;forearm_link&#39;, &#39;wrist_1_link&#39;, &#39;wrist_2_link&#39;, &#39;wrist_3_link&#39;]</span>
 </pre></div>
 </div>
 </dd></dl>

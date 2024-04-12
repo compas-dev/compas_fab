@@ -623,7 +623,7 @@ document.write(`
 <h1>MoveItPlanner.forward_kinematics</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_fab.backends.MoveItPlanner.forward_kinematics">
-<span class="sig-prename descclassname"><span class="pre">MoveItPlanner.</span></span><span class="sig-name descname"><span class="pre">forward_kinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d088aee/src/compas_fab/backends/ros/planner.py#L36"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">MoveItPlanner.</span></span><span class="sig-name descname"><span class="pre">forward_kinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/08773ba/src/compas_fab/backends/ros/planner.py#L36"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Calculate the robot’s forward kinematic.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -644,7 +644,7 @@ Defaults to the model’s root link.</p></li>
 calculate the forward kinematics for. Defaults to the group’s end
 effector link.
 Backwards compatibility note: if there’s no <code class="docutils literal notranslate"><span class="pre">link</span></code> option, the
-planner will try also <code class="docutils literal notranslate"><span class="pre">ee_link</span></code> as fallback before defaulting
+planner will try also <code class="docutils literal notranslate"><span class="pre">tool0</span></code> as fallback before defaulting
 to the end effector’s link.</p></li>
 </ul>
 </dd>
