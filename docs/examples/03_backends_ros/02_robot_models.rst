@@ -21,12 +21,3 @@ request the full model to be loaded from ROS.
 
 .. literalinclude :: files/02_robot_model.py
    :language: python
-
-Load model from URDF
-====================
-
-Alternatively, the URDF model can be loaded from URDF files (stored locally
-or remotely):
-
-.. literalinclude :: files/02_robot_model_urdf.py
-   :language: python

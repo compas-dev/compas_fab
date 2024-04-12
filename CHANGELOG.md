@@ -55,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add `attributes` to `Trajectory` class.
 * Fixed `data` serialization API to comply with `COMPAS 2.0` private data API.
 * Use the tool's `connected_to` link when showing end-effector frames in Grasshopper.
+* Change default end-effector link name from `ee_link` to `tool0`.
 
 ### Removed
 
@@ -62,6 +63,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Removed outdated `PathPlan` class.
 * Removed outdated rfl demo class.
 * Remove deprecated aliases for artists (currently on `compas_robots`).
+* Removed `compas_fab.robots.ur5` because it is now part of `compas_fab.robots.RobotLibrary`.
+* Removed data files of ur5 and ur10e from `src/compas_fab/data/universal_robots` because they are now in of `src/compas_fab/data/robot_library`.
 
 ## [0.28.0] 2023-05-10
 

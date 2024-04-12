@@ -5,18 +5,18 @@ from compas_robots import Configuration
 import compas_fab
 from compas_fab.backends import AnalyticalInverseKinematics
 from compas_fab.robots import Tool
-from compas_fab.robots.ur5 import Robot
+from compas_fab.robots import RobotLibrary
 
 if not compas.IPY:
     from compas_fab.backends import AnalyticalPyBulletClient
 
-urdf_filename = compas_fab.get("universal_robot/ur_description/urdf/ur5.urdf")
-srdf_filename = compas_fab.get("universal_robot/ur5_moveit_config/config/ur5.srdf")
+urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
+srdf_filename = compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf")
 
 
 def test_inverse_kinematics():
     ik = AnalyticalInverseKinematics()
-    robot = Robot()
+    robot = RobotLibrary.ur5()
     frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269))
     # set the solver later
     solutions = list(
@@ -30,7 +30,7 @@ def test_inverse_kinematics():
 
 def test_inverse_kinematics2():
     ik = AnalyticalInverseKinematics(solver="ur5")  # set the solver in the beginning
-    robot = Robot()
+    robot = RobotLibrary.ur5()
     frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269))
     # set the solver later
     solutions = list(ik.inverse_kinematics(robot, frame_WCF, start_configuration=None, group=None))
@@ -92,7 +92,7 @@ def test_kinematics_client_with_attached_tool():
                 frame_WCF, options={"solver": "ur5", "check_collision": True, "keep_order": False}
             )
         )
-        assert len(solutions) == 4
+        assert len(solutions) == 6
 
 
 def test_kinematics_cartesian():
