@@ -238,7 +238,7 @@ class RobotSemantics(Data):
         """Get all configurable :class:`compas_robots.model.Joint` of a planning group.
 
         Configurable joints are joints that can be controlled,
-        aka, not ``Joint.FIXED``, not mimicking another joint and not a passive joint.
+        i.e., not ``Joint.FIXED``, not mimicking another joint and not a passive joint.
         See :meth:`compas_robots.model.Joint.is_configurable` for more details.
 
         Parameters
