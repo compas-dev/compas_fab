@@ -15,20 +15,20 @@ class Duration(Data):
 
     Parameters
     ----------
-    secs: int or float
+    secs : :obj:`int` or :obj:`float`
         Integer representing number of seconds.
         If a float is passed, the integer portion is assigned to secs and
         the decimal portion of the secs variable is converted and added to nsecs.
-    nsecs: int
+    nsecs : :obj:`int`
         Integer representing number of nanoseconds.
 
     Attributes
     ----------
-    seconds: float, read-only
+    seconds : :obj:`float`, read-only
         Returns the total duration as floating-point seconds.
-    secs: int or float
+    secs : :obj:`int` or :obj:`float`
         Float representing number of seconds.
-    nsecs: int
+    nsecs : :obj:`int`
         Integer representing number of nanoseconds.
 
     Examples
