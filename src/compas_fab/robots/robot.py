@@ -34,7 +34,7 @@ class Robot(Data):
     Parameters
     ----------
     model : :class:`compas_robots.RobotModel`
-        The robot model, usually created from an URDF structure.
+        The robot model that describes robot kinematics, typically comes from an URDF structure.
     scene_object : :class:`compas_robots.scene.BaseRobotModelObject`
         Instance of the scene object used to visualize the robot model. Defaults to ``None``.
     semantics : :class:`~compas_fab.robots.RobotSemantics`
@@ -48,8 +48,27 @@ class Robot(Data):
     attributes : :obj:`dict`
         Named attributes related to the robot instance.
     attached_tools : :obj:`dict` of [:obj:`str`, :class:`~compas_fab.robots.Tool`], read-only
-        Dictionary of tools and the planning groups that the tools are currently attached to, if any.
+    attached_tool : :class:`~compas_fab.robots.Tool`, read-only
+    client : :class:`~compas_fab.backends.interfaces.ClientInterface`
+        The backend client to use for communication.
+    group_names : :obj:`list` of :obj:`str`, read-only
+    group_states : :obj:`dict` of :obj:`dict`, read-only
+    scene_object : :class:`~compas_robots.scene.BaseRobotModelObject`
+    main_group_name : :obj:`str`, read-only
+    model : :class:`compas_robots.RobotModel`
+        The robot model that describes robot kinematics, typically comes from an URDF structure.
+    name : :obj:`str`, read-only
+        Name of the robot, as defined by its model.
+    root_name : :obj:`str`, read-only
+    semantics : :class:`~compas_fab.robots.RobotSemantics`
+        The semantic model of the robot. Can be ``None`` if not loaded.
+    scale_factor : :obj:`float`
+
     """
+
+    # NOTE: If the attribute function has a docstring, the first sentence will be used automatically in the class attribute's.
+    #       However, the rest of the docstring, after the first fullstop symbol will be ignored.
+    #       It is futile to add examples to the attribute docstrings, as they will not be rendered in the documentation.
 
     def __init__(self, model=None, scene_object=None, semantics=None, client=None):
         super(Robot, self).__init__()
@@ -95,7 +114,7 @@ class Robot(Data):
 
     @property
     def scene_object(self):
-        """:class:`compas_robots.scene.BaseRobotModelObject`: Scene object used to visualize robot model."""
+        """Scene object used to visualize robot model."""
         return self._scene_object
 
     @scene_object.setter
@@ -143,7 +162,11 @@ class Robot(Data):
 
     @property
     def name(self):
-        """:obj:`str`: Name of the robot, as defined by its model.
+        """Name of the robot, as defined by its model.
+
+        Returns
+        -------
+        :obj:`str`
 
         Examples
         --------
@@ -155,7 +178,11 @@ class Robot(Data):
 
     @property
     def group_names(self):
-        """:obj:`list` of :obj:`str`: All planning groups of the robot.
+        """All planning groups of the robot, only available if semantics is set.
+
+        Returns
+        -------
+        :obj:`list` of :obj:`str`
 
         Examples
         --------
@@ -169,18 +196,29 @@ class Robot(Data):
 
     @property
     def main_group_name(self):
-        """:obj:`str`: Robot's main planning group."""
+        """
+        Robot's main planning group, only available if semantics is set.
+
+        Returns
+        -------
+        :obj:`str`
+
+        """
         self.ensure_semantics()
         return self.semantics.main_group_name
 
     @property
     def root_name(self):
-        """:obj:`str`: Robot's root name."""
+        """Robot's root name."""
         return self.model.root.name
 
     @property
     def group_states(self):
-        """:obj:`dict` of :obj:`dict`: All group states of the robot.
+        """All group states of the robot, only available if semantics is set.
+
+        Returns
+        -------
+        :obj:`dict` of :obj:`dict`
 
         Examples
         --------
@@ -194,12 +232,12 @@ class Robot(Data):
 
     @property
     def attached_tools(self):
-        """:obj:`dict` of :obj:`robot.Tool`: Maps planning group to the tool attached to it"""
+        """Dictionary of tools and the planning groups that the tools are currently attached to, if any."""
         return self._attached_tools
 
     @property
     def attached_tool(self):
-        """:obj:`robot.Tool`: For backwards compatibility. Returns the tool attached to the default group, or None."""
+        """Returns the tool attached to the default main planning group, if any."""
         return self._attached_tools.get(self.main_group_name, None)
 
     def get_end_effector_link_name(self, group=None):
@@ -1986,7 +2024,10 @@ class Robot(Data):
 
     @property
     def scale_factor(self):
-        """:obj:`float`: Robot's scale factor."""
+        """A scale factor affecting planning targets, results and visualizaion; Typically, robot models are defined in meters,
+        if used in CAD environemnt where units is mm, use a scale_factor of 1000.
+
+        """
         if self.scene_object:
             return self.scene_object.scale_factor
         else:

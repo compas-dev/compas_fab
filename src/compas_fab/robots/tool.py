@@ -15,7 +15,7 @@ __all__ = ["Tool"]
 class Tool(Data):
     """Represents a tool to be attached to the robot's flange.
 
-    Properties
+    Parameters
     ----------
     visual : :class:`compas.datastructures.Mesh`
         The visual mesh of the tool.
