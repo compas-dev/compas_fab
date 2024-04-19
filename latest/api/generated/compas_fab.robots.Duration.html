@@ -623,11 +623,27 @@ document.write(`
 <h1>Duration</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.robots.Duration">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">Duration</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/bc243d4/src/compas_fab/robots/time_.py#L12"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">Duration</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/c62c368/src/compas_fab/robots/time_.py#L12"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.data.Data.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></p>
 <p>Duration consists of two values: seconds (float) and nanoseconds (int).
 The total number of seconds is the sum of these values.
 The decimal portion of the secs variable is converted to an integer and added to nsecs.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">5e8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">seconds</span>
+<span class="go">2.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="mf">2.6</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">seconds</span>
+<span class="go">2.6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Duration</span><span class="p">(</span><span class="mf">2.6</span><span class="p">,</span> <span class="mf">5e8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">secs</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">nsecs</span>
+<span class="go">100000000</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">seconds</span>
+<span class="go">3.1</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
