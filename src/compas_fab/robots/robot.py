@@ -2024,7 +2024,7 @@ class Robot(Data):
 
     @property
     def scale_factor(self):
-        """A scale factor affecting planning targets, results and visualizaion; Typically, robot models are defined in meters,
+        """A scale factor affecting planning targets, results and visualization. Typically, robot models are defined in meters,
         if used in CAD environemnt where units is mm, use a scale_factor of 1000.
 
         """
