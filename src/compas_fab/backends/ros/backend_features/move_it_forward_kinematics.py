@@ -51,7 +51,7 @@ class MoveItForwardKinematics(ForwardKinematics):
               calculate the forward kinematics for. Defaults to the group's end
               effector link.
               Backwards compatibility note: if there's no ``link`` option, the
-              planner will try also ``ee_link`` as fallback before defaulting
+              planner will try also ``tool0`` as fallback before defaulting
               to the end effector's link.
 
         Returns
@@ -69,7 +69,7 @@ class MoveItForwardKinematics(ForwardKinematics):
         options["base_link"] = options.get("base_link", robot.model.root.name)
 
         # Use selected link or default to group's end effector
-        options["link"] = options.get("link", options.get("ee_link")) or robot.get_end_effector_link_name(group)
+        options["link"] = options.get("link", options.get("tool0")) or robot.get_end_effector_link_name(group)
         if options["link"] not in robot.get_link_names(group):
             raise ValueError("Link name {} does not exist in planning group".format(options["link"]))
 

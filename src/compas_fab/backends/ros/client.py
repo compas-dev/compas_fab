@@ -123,10 +123,8 @@ class RosClient(Ros, ClientInterface):
 
     Examples
     --------
-
-    >>> from compas_fab.backends import RosClient
     >>> with RosClient() as client:
-    ...     print('Connected: %s' % client.is_connected)
+    ...     print('Connected:', client.is_connected)
     Connected: True
 
     Notes
@@ -185,12 +183,11 @@ class RosClient(Ros, ClientInterface):
 
         Examples
         --------
-
-        >>> from compas_fab.backends import RosClient
         >>> with RosClient() as client:
         ...     robot = client.load_robot()
         ...     print(robot.name)
         ur5_robot
+
         """
         robot_name = None
 

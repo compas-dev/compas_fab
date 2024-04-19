@@ -145,7 +145,7 @@ html_theme_options = {
     "logo": {
         "image_light": "_static/compas_icon_white.png",
         "image_dark": "_static/compas_icon_white.png",
-        "text": "COMPAS docs",
+        "text": "COMPAS FAB",
     },
     "navigation_depth": 2,
 }
