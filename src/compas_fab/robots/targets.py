@@ -198,10 +198,10 @@ class PointAxisTarget(Target):
     The user must define (1) the target point of which the tool tip will reach
     and (2) the target axis where the tool tip coordinate frame (TCF)'s Z axis
     can rotate around. The target point and axis are defined relative to the robot's
-    base coordinate frame (RCF).
+    world coordinate frame (WCF).
 
-    In addition, it's necessary to define the tool tip coordinate frame (TtCF)
-    relative to the robot's flange frame (FCF). This is labeled as tool_coordinate_frame.
+    In addition, it's necessary to define the tool tip coordinate frame (TCF)
+    relative to the robot's flange frame. This is labeled as tool_coordinate_frame.
     If tool_coordinate_frame is unspecified, the target point and axis will be matched with the robot's flange frame.
 
     For robots with multiple end effector attachment points, the FCF depends on
@@ -211,7 +211,7 @@ class PointAxisTarget(Target):
     Attributes
     ----------
     target_point : :class:`compas.geometry.Point`
-        The target point defined relative to the robot's base coordinate frame (RCF).
+        The target point defined relative to the robot's world coordinate frame (WCF).
     target_z_axis : :class:`compas.geometry.Vector`
         The target axis is defined by the target_point and pointing towards this vector.
         The tool tip coordinate frame (TCF)'s Z axis can rotate around this axis.
