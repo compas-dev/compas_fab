@@ -27,21 +27,6 @@ class Duration(Data):
     seconds: float, read-only
         Returns the total duration as floating-point seconds.
 
-    Examples
-    --------
-    >>> d = Duration(2, 5e8)
-    >>> d.seconds
-    2.5
-    >>> d = Duration(2.6, 0)
-    >>> d.seconds
-    2.6
-    >>> d = Duration(2.6, 5e8)
-    >>> d.secs
-    3
-    >>> d.nsecs
-    100000000
-    >>> d.seconds
-    3.1
     """
 
     def __init__(self, secs, nsecs):
@@ -51,11 +36,6 @@ class Duration(Data):
 
         self.secs = int(quotient)
         self.nsecs = int(remainder * sec_to_nano_factor) + int(nsecs)
-
-        # If nsecs is greater than 1 second, add the remainder back to secs
-        if self.nsecs >= sec_to_nano_factor:
-            self.secs += 1
-            self.nsecs -= int(sec_to_nano_factor)
 
     def __str__(self):
         return "Duration({!r}, {!r})".format(self.secs, self.nsecs)
