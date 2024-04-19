@@ -10,15 +10,25 @@ __all__ = [
 
 
 class Duration(Data):
-    """Duration consists of two values: seconds (float) and nanoseconds (int).
-    The total number of seconds is the sum of these values.
-    The decimal portion of the secs variable is converted to an integer and added to nsecs.
+    """Duration is used to accurately describe the passage of time.
+    It consists of seconds and nanoseconds, the total duration is the sum of the two values.
+
+    Parameters
+    ----------
+    secs : :obj:`int` or :obj:`float`
+        Integer representing number of seconds.
+        If a float is passed, the integer portion is assigned to secs and
+        the decimal portion of the secs variable is converted and added to nsecs.
+    nsecs : :obj:`int`
+        Integer representing number of nanoseconds.
 
     Attributes
     ----------
-    secs: float
+    seconds : :obj:`float`, read-only
+        Returns the total duration as floating-point seconds.
+    secs : :obj:`int` or :obj:`float`
         Float representing number of seconds.
-    nsecs: int
+    nsecs : :obj:`int`
         Integer representing number of nanoseconds.
 
     Examples
@@ -69,13 +79,6 @@ class Duration(Data):
 
     @property
     def seconds(self):
-        """Returns the duration as floating-point seconds.
-
-        Returns
-        -------
-        float
-            Floating-point seconds
-        """
         return self.secs + 1e-9 * self.nsecs
 
     @property

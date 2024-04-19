@@ -31,22 +31,44 @@ class Robot(Data):
     upon the model described in the class :class:`compas_robots.RobotModel` of
     the **COMPAS** framework.
 
-    Attributes
+    Parameters
     ----------
-    model : :class:`RobotModel`
-        The robot model, usually created from an URDF structure.
+    model : :class:`compas_robots.RobotModel`
+        The robot model that describes robot kinematics, typically comes from an URDF structure.
     scene_object : :class:`compas_robots.scene.BaseRobotModelObject`
         Instance of the scene object used to visualize the robot model. Defaults to ``None``.
-    semantics : :class:`compas_fab.robots.RobotSemantics`
+    semantics : :class:`~compas_fab.robots.RobotSemantics`
         The semantic model of the robot. Defaults to ``None``.
-    client : :class:`compas_fab.backends.interfaces.ClientInterface`
+    client : :class:`~compas_fab.backends.interfaces.ClientInterface`
         The backend client to use for communication,
-        e.g. :class:`compas_fab.backends.RosClient`
+        e.g. :class:`~compas_fab.backends.RosClient`
+
+    Attributes
+    ----------
     attributes : :obj:`dict`
         Named attributes related to the robot instance.
-    attached_tools : :class:`compas_fab.robots.Tool`
-        Dictionary mapping planning groups to the tool currently attached to them, if any.
+    attached_tools : :obj:`dict` of [:obj:`str`, :class:`~compas_fab.robots.Tool`], read-only
+    attached_tool : :class:`~compas_fab.robots.Tool`, read-only
+    client : :class:`~compas_fab.backends.interfaces.ClientInterface`
+        The backend client to use for communication.
+    group_names : :obj:`list` of :obj:`str`, read-only
+    group_states : :obj:`dict` of :obj:`dict`, read-only
+    scene_object : :class:`compas_robots.scene.BaseRobotModelObject`
+    main_group_name : :obj:`str`, read-only
+    model : :class:`compas_robots.RobotModel`
+        The robot model that describes robot kinematics, typically comes from an URDF structure.
+    name : :obj:`str`, read-only
+        Name of the robot, as defined by its model.
+    root_name : :obj:`str`, read-only
+    semantics : :class:`~compas_fab.robots.RobotSemantics`
+        The semantic model of the robot. Can be ``None`` if not loaded.
+    scale_factor : :obj:`float`
+
     """
+
+    # NOTE: If the attribute function has a docstring, the first sentence will be used automatically in the class attribute's.
+    #       However, the rest of the docstring, after the first fullstop symbol will be ignored.
+    #       It is futile to add examples to the attribute docstrings, as they will not be rendered in the documentation.
 
     def __init__(self, model=None, scene_object=None, semantics=None, client=None):
         super(Robot, self).__init__()
@@ -92,7 +114,7 @@ class Robot(Data):
 
     @property
     def scene_object(self):
-        """:class:`compas_robots.scene.BaseRobotModelObject`: Scene object used to visualize robot model."""
+        """Scene object used to visualize robot model."""
         return self._scene_object
 
     @scene_object.setter
@@ -140,7 +162,11 @@ class Robot(Data):
 
     @property
     def name(self):
-        """:obj:`str`: Name of the robot, as defined by its model.
+        """Name of the robot, as defined by its model.
+
+        Returns
+        -------
+        :obj:`str`
 
         Examples
         --------
@@ -152,7 +178,11 @@ class Robot(Data):
 
     @property
     def group_names(self):
-        """:obj:`list` of :obj:`str`: All planning groups of the robot.
+        """All planning groups of the robot, only available if semantics is set.
+
+        Returns
+        -------
+        :obj:`list` of :obj:`str`
 
         Examples
         --------
@@ -166,18 +196,29 @@ class Robot(Data):
 
     @property
     def main_group_name(self):
-        """:obj:`str`: Robot's main planning group."""
+        """
+        Robot's main planning group, only available if semantics is set.
+
+        Returns
+        -------
+        :obj:`str`
+
+        """
         self.ensure_semantics()
         return self.semantics.main_group_name
 
     @property
     def root_name(self):
-        """:obj:`str`: Robot's root name."""
+        """Robot's root name."""
         return self.model.root.name
 
     @property
     def group_states(self):
-        """:obj:`dict` of :obj:`dict`: All group states of the robot.
+        """All group states of the robot, only available if semantics is set.
+
+        Returns
+        -------
+        :obj:`dict` of :obj:`dict`
 
         Examples
         --------
@@ -191,12 +232,12 @@ class Robot(Data):
 
     @property
     def attached_tools(self):
-        """:obj:`dict` of :obj:`robot.Tool`: Maps planning group to the tool attached to it"""
+        """Dictionary of tools and the planning groups that the tools are currently attached to, if any."""
         return self._attached_tools
 
     @property
     def attached_tool(self):
-        """:obj:`robot.Tool`: For backwards compatibility. Returns the tool attached to the default group, or None."""
+        """Returns the tool attached to the default main planning group, if any."""
         return self._attached_tools.get(self.main_group_name, None)
 
     def get_end_effector_link_name(self, group=None):
@@ -251,7 +292,7 @@ class Robot(Data):
         ----------
         group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
-        full_configuration : :class:`Configuration`, optional
+        full_configuration : :class:`compas_robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot. Defaults to the all-zero configuration.
 
@@ -315,7 +356,7 @@ class Robot(Data):
         ----------
         group : :obj:`str`, optional
             The name of the planning group. Defaults to the main planning group.
-        full_configuration : :class:`Configuration`, optional
+        full_configuration : :class:`compas_robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot. Defaults to the all-zero configuration.
 
@@ -554,12 +595,12 @@ class Robot(Data):
         ----------
         group : :obj:`str`
             The name of the planning group.
-        full_configuration : :class:`Configuration`
+        full_configuration : :class:`compas_robots.Configuration`
             The configuration for all configurable joints of the robot.
 
         Returns
         -------
-        :class:`Configuration`
+        :class:`compas_robots.Configuration`
             The configuration of the group.
         """
         full_configuration = self._check_full_configuration_and_scale(full_configuration)[
@@ -576,16 +617,16 @@ class Robot(Data):
 
         Parameters
         ----------
-        group_configuration : :class:`Configuration`
+        group_configuration : :class:`compas_robots.Configuration`
             The configuration for one of the robot's planning groups.
-        full_configuration : :class:`Configuration`
+        full_configuration : :class:`compas_robots.Configuration`
             The configuration for all configurable joints of the robot.
         group : :obj:`str`
             The name of the planning group.
 
         Returns
         -------
-        :class:`Configuration`
+        :class:`compas_robots.Configuration`
             A full configuration with values for all configurable joints.
 
         Raises
@@ -629,7 +670,7 @@ class Robot(Data):
 
         Parameters
         ----------
-        configuration : :class:`Configuration`
+        configuration : :class:`compas_robots.Configuration`
             The configuration of the configurable joints.
         joint_name : :obj:`str`
             Name of joint.
@@ -657,12 +698,12 @@ class Robot(Data):
 
         Parameters
         ----------
-        full_configuration : :class:`Configuration`, optional
+        full_configuration : :class:`compas_robots.Configuration`, optional
             The full configuration of the whole robot, including values for all configurable joints.
 
         Returns
         -------
-        (:class:`Configuration`, :class:`Configuration`)
+        :obj:`Tuple` of (:class:`compas_robots.Configuration`, :class:`compas_robots.Configuration`)
             The full configuration and the scaled full configuration
         """
         if not full_configuration:
@@ -682,7 +723,7 @@ class Robot(Data):
         return configuration, configuration.scaled(1.0 / self.scale_factor)
 
     def get_configuration_from_group_state(self, group, group_state):
-        """Get a ``Configuration`` from a group's group state.
+        """Get a :class:`compas_robots.Configuration` from a group's group state.
 
         Parameters
         ----------
@@ -693,8 +734,8 @@ class Robot(Data):
 
         Returns
         -------
-        :class:`Configuration`
-            The configuration specified by the ``group_state``.
+        :class:`compas_robots.Configuration`
+            The configuration specified by the :attr:`group_state`.
         """
         joint_dict = self.group_states[group][group_state]
         group_joint_names = self.get_configurable_joint_names(group)
@@ -1180,7 +1221,7 @@ class Robot(Data):
 
         Parameters
         ----------
-        configuration: :class:`Configuration`
+        configuration: :class:`compas_robots.Configuration`
             The target configuration.
         tolerances_above: :obj:`list` of :obj:`float`
             The tolerances above the targeted configuration's joint value on
@@ -1290,7 +1331,7 @@ class Robot(Data):
         ----------
         frame_WCF : :class:`compas.geometry.Frame`
             The frame to calculate the inverse kinematic for.
-        start_configuration : :class:`Configuration`, optional
+        start_configuration : :class:`compas_robots.Configuration`, optional
             If passed, the inverse will be calculated such that the calculated
             joint positions differ the least from the start_configuration.
             Defaults to the zero configuration.
@@ -1315,7 +1356,7 @@ class Robot(Data):
 
         Returns
         -------
-        :class:`Configuration`
+        :class:`compas_robots.Configuration`
             An inverse kinematic solution represented as a configuration.
 
         Examples
@@ -1366,7 +1407,7 @@ class Robot(Data):
         ----------
         frame_WCF : :class:`compas.geometry.Frame`
             The frame to calculate the inverse kinematic for.
-        start_configuration : :class:`Configuration`, optional
+        start_configuration : :class:`compas_robots.Configuration`, optional
             If passed, the inverse will be calculated such that the calculated
             joint positions differ the least from the start_configuration.
             Defaults to the zero configuration.
@@ -1391,7 +1432,7 @@ class Robot(Data):
 
         Yields
         ------
-        :class:`Configuration`
+        :class:`compas_robots.Configuration`
             An inverse kinematic solution represented as a configuration.
 
         Examples
@@ -1574,7 +1615,7 @@ class Robot(Data):
         ----------
         frames_WCF : :obj:`list` of :class:`compas.geometry.Frame`
             The frames through which the path is defined.
-        start_configuration : :class:`Configuration`, optional
+        start_configuration : :class:`compas_robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the starting position. Defaults to
             the all-zero configuration.
@@ -1882,7 +1923,7 @@ class Robot(Data):
 
         Parameters
         ----------
-        configuration : :class:`Configuration`
+        configuration : :class:`compas_robots.Configuration`
             Configuration to compute transformed frames for.
         group : :obj:`str`, optional
             The planning group used for the calculation. Defaults to the robot's
@@ -1902,7 +1943,7 @@ class Robot(Data):
 
         Parameters
         ----------
-        configuration : :class:`Configuration`
+        configuration : :class:`compas_robots.Configuration`
             Configuration to compute transformed axes for.
         group : :obj:`str`, optional
             The planning group used for the calculation. Defaults to the robot's
@@ -1926,7 +1967,7 @@ class Robot(Data):
 
         Parameters
         ----------
-        configuration : :class:`Configuration`
+        configuration : :class:`compas_robots.Configuration`
             Instance of the configuration (joint state) to move to.
         group : :obj:`str`, optional
             The name of the group to plan for. Defaults to the robot's main
@@ -1983,7 +2024,10 @@ class Robot(Data):
 
     @property
     def scale_factor(self):
-        """:obj:`float`: Robot's scale factor."""
+        """A scale factor affecting planning targets, results and visualization. Typically, robot models are defined in meters,
+        if used in CAD environemnt where units is mm, use a scale_factor of 1000.
+
+        """
         if self.scene_object:
             return self.scene_object.scale_factor
         else:

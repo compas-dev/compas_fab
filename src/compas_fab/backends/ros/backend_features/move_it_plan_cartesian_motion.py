@@ -46,7 +46,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
             The robot instance for which the cartesian motion plan is being calculated.
         frames_WCF: list of :class:`compas.geometry.Frame`
             The frames through which the path is defined.
-        start_configuration: :class:`Configuration`, optional
+        start_configuration: :class:`compas_robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the starting position. Defaults to
             the all-zero configuration.
