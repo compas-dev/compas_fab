@@ -126,7 +126,7 @@ class AttachedCollisionMesh(Data):
     collision_mesh : :class:`compas_fab.robots.CollisionMesh`
         The collision mesh to be attached to the robot model.
     link_name : :obj:`str`
-        The name of the :class:`~compas_robots.model.Link` the collision mesh will be
+        The name of the :class:`compas_robots.model.Link` the collision mesh will be
         attached to.
     touch_links : :obj:`list` of :obj:`str`, optional
         The list of link names the collision mesh is allowed to touch. Defaults
@@ -139,7 +139,7 @@ class AttachedCollisionMesh(Data):
     collision_mesh : :class:`compas_fab.robots.CollisionMesh`
         The collision mesh we want to attach.
     link_name : :obj:`str`
-        The name of the :class:`~compas_robots.model.Link` the collision mesh will be
+        The name of the :class:`compas_robots.model.Link` the collision mesh will be
         attached to.
     touch_links : :obj:`list` of :obj:`str`
         The list of link names the collision mesh is allowed to touch. Defaults
@@ -348,7 +348,7 @@ class PlanningScene(object):
         ----------
         attached_collision_mesh : :class:`AttachedCollisionMesh`
             The :class:`AttachedCollisionMesh` (a :class:`CollisionMesh`
-            attached to a :class:`Robot`'s :class:`~compas_robots.model.Link`) that
+            attached to a :class:`Robot`'s :class:`compas_robots.model.Link`) that
             we want to add to the :class:`PlanningScene`.
         scale : :obj:`bool`, optional
             If ``True``, the mesh will be copied and scaled according to

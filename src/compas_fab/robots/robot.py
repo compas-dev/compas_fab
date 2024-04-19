@@ -53,7 +53,7 @@ class Robot(Data):
         The backend client to use for communication.
     group_names : :obj:`list` of :obj:`str`, read-only
     group_states : :obj:`dict` of :obj:`dict`, read-only
-    scene_object : :class:`~compas_robots.scene.BaseRobotModelObject`
+    scene_object : :class:`compas_robots.scene.BaseRobotModelObject`
     main_group_name : :obj:`str`, read-only
     model : :class:`compas_robots.RobotModel`
         The robot model that describes robot kinematics, typically comes from an URDF structure.
@@ -723,7 +723,7 @@ class Robot(Data):
         return configuration, configuration.scaled(1.0 / self.scale_factor)
 
     def get_configuration_from_group_state(self, group, group_state):
-        """Get a :class:`~compas_robots.Configuration` from a group's group state.
+        """Get a :class:`compas_robots.Configuration` from a group's group state.
 
         Parameters
         ----------
