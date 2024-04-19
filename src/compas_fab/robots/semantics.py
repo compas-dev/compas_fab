@@ -14,7 +14,7 @@ class RobotSemantics(Data):
     """Represents semantic information of a robot.
 
     The semantic model is based on the
-    `Semantic Robot Description Format` (`SRDF`_).
+    `Semantic Robot Description Format` (`SRDF <https://wiki.ros.org/srdf>`__).
     Typically, the RobotSemantics objects are created from an SRDF file (using :meth:`from_srdf_file`)
     or loaded by the backend client (using :meth:`compas_fab.backends.PyBulletClient.load_semantics` or
     :meth:`compas_fab.backends.RosClient.load_robot`).
@@ -59,10 +59,7 @@ class RobotSemantics(Data):
     unordered_disabled_collisions : :obj:`set` of :obj:`frozenset`, read-only
         Get the disabled collision pairs as a set of frozensets.
 
-    References
-    ----------
 
-    .. _SRDF: https://wiki.ros.org/srdf
 
     """
 
@@ -143,7 +140,6 @@ class RobotSemantics(Data):
 
         Examples
         --------
-        >>> from compas_fab.robots import RobotSemantics
         >>> from compas_robots import RobotModel
         >>> urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
         >>> srdf_filename = compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf")
@@ -184,7 +180,7 @@ class RobotSemantics(Data):
         )
 
     def get_end_effector_link_name(self, group=None):
-        """Get the :obj:`str` name of the last link (end effector link) in a planning group.
+        """Get the name of the last link (end effector link) in a planning group.
 
         Parameters
         ----------
@@ -202,7 +198,7 @@ class RobotSemantics(Data):
         return self.groups[group]["links"][-1]
 
     def get_base_link_name(self, group=None):
-        """Get the :obj:`str` name of the first link (base link) in a planning group.
+        """Get the name of the first link (base link) in a planning group.
 
         Parameters
         ----------
@@ -222,7 +218,7 @@ class RobotSemantics(Data):
         """Get all configurable :class:`compas_robots.model.Joint` of the robot.
 
         Configurable joints are joints that can be controlled,
-        aka, not ``Joint.Fixed``, not mimicking another joint and not a passive joint.
+        aka, not ``Joint.FIXED``, not mimicking another joint and not a passive joint.
         See :meth:`compas_robots.model.Joint.is_configurable` for more details.
 
         Returns
@@ -242,7 +238,7 @@ class RobotSemantics(Data):
         """Get all configurable :class:`compas_robots.model.Joint` of a planning group.
 
         Configurable joints are joints that can be controlled,
-        aka, not ``Joint.Fixed``, not mimicking another joint and not a passive joint.
+        aka, not ``Joint.FIXED``, not mimicking another joint and not a passive joint.
         See :meth:`compas_robots.model.Joint.is_configurable` for more details.
 
         Parameters
@@ -267,7 +263,7 @@ class RobotSemantics(Data):
         return joints
 
     def get_configurable_joint_names(self, group=None):
-        """Get all the :obj:`str` names of configurable joints of a planning group.
+        """Get all the names of configurable joints of a planning group.
 
         Similar to :meth:`get_configurable_joints` but returning joint names.
 
