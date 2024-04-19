@@ -13,6 +13,8 @@ def test_ctor_takes_sec_as_float():
 
 def test_sec_remainder_add_to_nsec():
     d = Duration(2.6, 5e8)
+    assert d.secs == 3
+    assert d.nsecs == 1e8
     assert d.seconds == 3.1
 
 
