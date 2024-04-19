@@ -427,8 +427,8 @@ class ConstraintSetTarget(Target):
     Different planner backends may support differnt types of Constraints.
     See tutorial :ref:`targets` for more details.
 
-    ConstraintSetTarget is only supported by Free motion planning (using the MoveIt Planner),
-    Inverse Kinematics and Cartesian motion planning do not support this target type.
+    ConstraintSetTarget is only supported by Free motion planning,
+    Cartesian motion planning do not support this target type.
 
     Attributes
     ----------
