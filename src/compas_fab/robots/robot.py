@@ -1485,17 +1485,6 @@ class Robot(Data):
         # that all configurable joints of the whole robot are defined for planning.
         start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
 
-        # goal_constraints_WCF_scaled = []
-        # for c in goal_constraints:
-        #     cp = c.copy()
-        #     if c.type == Constraint.JOINT:
-        #         joint = self.get_joint_by_name(c.joint_name)
-        #         if joint.is_scalable():
-        #             cp.scale(1.0 / self.scale_factor)
-        #     else:
-        #         cp.scale(1.0 / self.scale_factor)
-        #     goal_constraints_WCF_scaled.append(cp)
-
         # Scale Target Definitions
         if self.scale_factor != 1.0:
             target = target.scaled(1.0 / self.scale_factor)
