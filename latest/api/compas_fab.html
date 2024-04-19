@@ -618,17 +618,34 @@ the COMPAS Framework with a special focus on enabling its usage from within CAD
 environments.</p>
 <section id="robots">
 <h2>Robots</h2>
-<p>The core features are located in the <code class="docutils literal notranslate"><span class="pre">robots</span></code> module with the specific backend
-implementations in the <code class="docutils literal notranslate"><span class="pre">backends</span></code> modules:</p>
+<p>The core features are located in the <code class="docutils literal notranslate"><span class="pre">robots</span></code> module.
+The backend implementations for motion planning are located in the <code class="docutils literal notranslate"><span class="pre">backends</span></code> module.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="compas_fab.robots.html">compas_fab.robots</a></li>
-<li class="toctree-l1"><a class="reference internal" href="compas_fab.backends.html">compas_fab.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compas_fab.robots.html">compas_fab.robots</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="compas_fab.robots.html#main-classes">Main classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_fab.robots.html#path-planning">Path planning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_fab.robots.html#planning-scene">Planning scene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_fab.robots.html#constraints">Constraints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_fab.robots.html#built-in-robots">Built-in robots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_fab.robots.html#unit-conversion">Unit conversion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="compas_fab.backends.html">compas_fab.backends</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="compas_fab.backends.html#ros">ROS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_fab.backends.html#pybullet">PyBullet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_fab.backends.html#analytical-kinematics">Analytical Kinematics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_fab.backends.html#long-running-tasks">Long-running tasks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_fab.backends.html#exceptions">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compas_fab.backends.html#interfaces">Interfaces</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
 <section id="cad-integration">
 <h2>CAD integration</h2>
+<p>The following modules provide functions for use within different CAD environments.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compas_fab.blender.html">compas_fab.blender</a></li>

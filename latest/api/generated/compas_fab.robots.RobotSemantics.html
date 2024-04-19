@@ -623,12 +623,63 @@ document.write(`
 <h1>RobotSemantics</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.robots.RobotSemantics">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">RobotSemantics</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/c62c368/src/compas_fab/robots/semantics.py#L13"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">RobotSemantics</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d49db17/src/compas_fab/robots/semantics.py#L13"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.data.Data.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></p>
 <p>Represents semantic information of a robot.</p>
 <p>The semantic model is based on the
-<cite>Semantic Robot Description Format</cite> (<a class="reference external" href="https://wiki.ros.org/srdf">SRDF</a>).</p>
-<p class="rubric">References</p>
+<cite>Semantic Robot Description Format</cite> (<a class="reference external" href="https://wiki.ros.org/srdf">SRDF</a>).
+Typically, the RobotSemantics objects are created from an SRDF file (using <a class="reference internal" href="compas_fab.robots.RobotSemantics.from_srdf_file.html#compas_fab.robots.RobotSemantics.from_srdf_file" title="compas_fab.robots.RobotSemantics.from_srdf_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_srdf_file()</span></code></a>)
+or loaded by the backend client (using <a class="reference internal" href="compas_fab.backends.PyBulletClient.load_semantics.html#compas_fab.backends.PyBulletClient.load_semantics" title="compas_fab.backends.PyBulletClient.load_semantics"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compas_fab.backends.PyBulletClient.load_semantics()</span></code></a> or
+<a class="reference internal" href="compas_fab.backends.RosClient.load_robot.html#compas_fab.backends.RosClient.load_robot" title="compas_fab.backends.RosClient.load_robot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compas_fab.backends.RosClient.load_robot()</span></code></a>).</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>robot_model</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">RobotModel</span></code></span></dt><dd><p>The robot model.</p>
+</dd>
+<dt><strong>groups</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></a> of (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></a> of (<code class="docutils literal notranslate"><span class="pre">links</span></code></span><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <code class="docutils literal notranslate"><span class="pre">joints</span></code></span><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>)), optional</span></dt><dd><p>A nested dictionary defining planning groups.
+The dictionary structure is as follows:</p>
+<ul>
+<li><p>Level 1 keys are planning group names : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>.</p></li>
+<li><p>Level 2 contains only two keys:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">links</span></code> is a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a> containing link names</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">joints</span></code> is a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a> containing joint names.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</dd>
+<dt><strong>main_group_name</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>The name of the main group.</p>
+</dd>
+<dt><strong>passive_joints</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>A list of passive joint names.</p>
+</dd>
+<dt><strong>end_effectors</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>A list of end effector link names.</p>
+</dd>
+<dt><strong>disabled_collisions</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></a> of (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>), optional</span></dt><dd><p>A set of disabled collision pairs.
+The order is not important, i.e. the pair <cite>(‘link1’, ‘link2’)</cite> is the same as <cite>(‘link2’, ‘link1’)</cite>.
+Only one pair is needed.</p>
+</dd>
+<dt><strong>group_states</strong><span class="classifier">dict, optional</span></dt><dd><p>A nested dictionary defining named states for a particular group, in terms of joint values.
+This is useful to define states such as “home” or “folded arms” for the robot.
+The dictionary structure is as follows:</p>
+<ul class="simple">
+<li><p>Level 1 keys are planning group names : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>.</p></li>
+<li><p>Level 2 keys are group state names : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>.</p></li>
+<li><p>Level 3 keys are joint names and values are joint values : <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>group_names</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, read-only</span></dt><dd><p>Get the names of all planning groups.</p>
+</dd>
+<dt><strong>unordered_disabled_collisions</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#frozenset" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frozenset</span></code></a>, read-only</span></dt><dd><p>Get the disabled collision pairs as a set of frozensets.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
@@ -642,19 +693,19 @@ document.write(`
 <td><p>Create an instance of semantics based on an XML object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.RobotSemantics.get_all_configurable_joints.html#compas_fab.robots.RobotSemantics.get_all_configurable_joints" title="compas_fab.robots.RobotSemantics.get_all_configurable_joints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_all_configurable_joints</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Get all configurable <a class="reference external" href="https://compas.dev/compas_robots/latest/api/generated/compas_robots.model.Joint.html" title="(in COMPAS Robots vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_robots.model.Joint</span></code></a> of the robot.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.RobotSemantics.get_base_link_name.html#compas_fab.robots.RobotSemantics.get_base_link_name" title="compas_fab.robots.RobotSemantics.get_base_link_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_base_link_name</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Get the name of the first link (base link) in a planning group.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.RobotSemantics.get_configurable_joint_names.html#compas_fab.robots.RobotSemantics.get_configurable_joint_names" title="compas_fab.robots.RobotSemantics.get_configurable_joint_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_configurable_joint_names</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Get all the names of configurable joints of a planning group.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.RobotSemantics.get_configurable_joints.html#compas_fab.robots.RobotSemantics.get_configurable_joints" title="compas_fab.robots.RobotSemantics.get_configurable_joints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_configurable_joints</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Get all configurable <a class="reference external" href="https://compas.dev/compas_robots/latest/api/generated/compas_robots.model.Joint.html" title="(in COMPAS Robots vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_robots.model.Joint</span></code></a> of a planning group.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.RobotSemantics.get_end_effector_link_name.html#compas_fab.robots.RobotSemantics.get_end_effector_link_name" title="compas_fab.robots.RobotSemantics.get_end_effector_link_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_end_effector_link_name</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Get the name of the last link (end effector link) in a planning group.</p></td>
 </tr>
 </tbody>
 </table>

@@ -623,12 +623,12 @@ document.write(`
 <h1>Robot.constraints_from_configuration</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_fab.robots.Robot.constraints_from_configuration">
-<span class="sig-prename descclassname"><span class="pre">Robot.</span></span><span class="sig-name descname"><span class="pre">constraints_from_configuration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configuration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerances_above</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerances_below</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/c62c368/src/compas_fab/robots/robot.py#L1178"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">Robot.</span></span><span class="sig-name descname"><span class="pre">constraints_from_configuration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configuration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerances_above</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerances_below</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d49db17/src/compas_fab/robots/robot.py#L1219"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Create joint constraints for all joints of the configuration.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>configuration: :class:`Configuration`</strong></dt><dd><p>The target configuration.</p>
+<dt><strong>configuration: :class:`compas_robots.Configuration`</strong></dt><dd><p>The target configuration.</p>
 </dd>
 <dt><strong>tolerances_above: :obj:`list` of :obj:`float`</strong></dt><dd><p>The tolerances above the targeted configuration’s joint value on
 each of the joints, defining the upper bound in radians to be
