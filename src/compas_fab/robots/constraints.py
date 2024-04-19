@@ -557,14 +557,13 @@ class OrientationConstraint(Constraint):
 
         Examples
         --------
-        >>> from compas_fab.robots.ur5 import Robot
-        >>> robot = Robot()
+        >>> robot = RobotLibrary.ur5()
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerances_orientation = [math.radians(1)] * 3
         >>> group = robot.main_group_name
-        >>> ee_link_name = robot.get_end_effector_link_name(group)
-        >>> OrientationConstraint.from_frame(frame, tolerances_orientation, ee_link_name)
-        OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)
+        >>> end_effector_link_name = robot.get_end_effector_link_name(group)
+        >>> OrientationConstraint.from_frame(frame, tolerances_orientation, end_effector_link_name)
+        OrientationConstraint('tool0', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)
         """
 
         if tool_coordinate_frame:
@@ -658,14 +657,13 @@ class PositionConstraint(Constraint):
 
         Examples
         --------
-        >>> from compas_fab.robots.ur5 import Robot
-        >>> robot = Robot()
+        >>> robot = RobotLibrary.ur5()
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
         >>> group = robot.main_group_name
-        >>> ee_link_name = robot.get_end_effector_link_name(group)
-        >>> PositionConstraint.from_frame(frame, tolerance_position, ee_link_name)                                 # doctest: +SKIP
-        PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)    # doctest: +SKIP
+        >>> end_effector_link_name = robot.get_end_effector_link_name(group)
+        >>> PositionConstraint.from_frame(frame, tolerance_position, end_effector_link_name)                                 # doctest: +SKIP
+        PositionConstraint('tool0', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)    # doctest: +SKIP
         """
 
         if tool_coordinate_frame:
