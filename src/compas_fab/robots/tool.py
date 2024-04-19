@@ -20,7 +20,7 @@ class Tool(Data):
     visual : :class:`compas.datastructures.Mesh`
         The visual mesh of the tool.
     frame_in_tool0_frame : :class:`compas.geometry.Frame`
-        The tool coordinate frame (TCF) of the tool relative to the planner coordinate frame (PCF).
+        The tool coordinate frame (TCF) of the tool relative to the tool0 frame (T0CF).
     collision : :class:`compas.datastructures.Mesh`
         The collision mesh representation of the tool.
     name : :obj:`str`
@@ -39,7 +39,7 @@ class Tool(Data):
     connected_to : :obj:`str`
         The name of the `Link` to which the tool is attached.
     frame : :class:`compas.geometry.Frame`
-        The tool coordinate frame (TCF) of the tool relative to the planner coordinate frame (PCF).
+        The tool coordinate frame (TCF) of the tool relative to the tool0 frame (T0CF).
 
     Examples
     --------
