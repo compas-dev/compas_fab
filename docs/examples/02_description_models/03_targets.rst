@@ -29,7 +29,7 @@ Note that the exact orientatio of the TCF is not determined until after the targ
 
 The :class:`compas_fab.robots.ConfigurationTarget` class is used to specify a target
 based on a specific robot configuration (joint values).
-For example, it can be used to move the robot to a taught position aquired by jogging.
+For example, it can be used to move the robot to a taught position acquired by jogging.
 Typically, the ConfigurationTarget should have the same number of joints as the planning group
 of the robot. However, it is possible to specify a subset of the joints, in which
 case the remaining joints are left unspecified.
