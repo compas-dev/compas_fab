@@ -67,16 +67,13 @@ class FrameTarget(Target):
     In another words, the pose of the end-effector is fully defined (constrained).
 
     Given a FrameTarget, the planner aims to find a path moving
-    the robot's planner coordinate frame (PCF) to the specified `FrameTarget.target_frame`.
-    In many case, the PCF corresponds to the Tool0 Coordinate Frame (T0CF) on the robot controller.
-    See :ref:`coordinate_frames` for more details about the PCF,
-    or if the planning result does not match the pose displayed on the robot controller.
+    the robot's Tool0 Coordinate Frame (T0CF) to the specified `FrameTarget.target_frame`.
 
     If the user wants to plan with a tool (such that the Tool Coordinate Frame (TCF) is matched with the target),
-    the `tool_coordinate_frame` parameter should be provided to define the TCF relative to the PCF of the robot.
+    the `tool_coordinate_frame` parameter should be provided to define the TCF relative to the T0CF of the robot.
 
-    For robots with multiple end effector attachment points (such as the RFL Robot), the PCF depends on
-    the planning group used in the planning request, see :meth:`compas_fab.robots.Robot.plan_motion`.
+    For robots with multiple end effector attachment points (such as the RFL Robot), the attachment point depends on
+    the planning group selected in the planning request, see :meth:`compas_fab.robots.Robot.plan_motion`.
 
     Attributes
     ----------

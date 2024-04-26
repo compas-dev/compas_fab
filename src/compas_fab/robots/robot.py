@@ -1407,8 +1407,7 @@ class Robot(Data):
             joints of the entire robot, at the starting position. Defaults to
             the all-zero configuration.
         group : :obj:`str`, optional
-            The name of the planning group used to define the movable joints and the Planner Coordinate Frame (PCF).
-            See :ref:`coordinate_frames` for more details about the PCF.
+            The name of the planning group used to define the movable joints.
             The planning group must match with one of the groups defined in the robot's semantics.
             Defaults to the robot's main planning group.
         options : :obj:`dict`, optional
