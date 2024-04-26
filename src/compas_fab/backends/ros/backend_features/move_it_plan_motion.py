@@ -6,6 +6,7 @@ from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import PlanMotion
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
+from compas_fab.backends.ros.backend_features.helpers import convert_target_to_goal_constraints
 from compas_fab.backends.ros.backend_features.helpers import convert_trajectory
 from compas_fab.backends.ros.backend_features.helpers import validate_response
 from compas_fab.backends.ros.messages import AttachedCollisionObject
@@ -22,7 +23,7 @@ __all__ = ["MoveItPlanMotion"]
 
 
 class MoveItPlanMotion(PlanMotion):
-    """Callable to find a path plan to move the selected robot from its current position within the `goal_constraints`."""
+    """Callable to find a path in joint space for the robot to move from its `start_configuration` to the `target`."""
 
     GET_MOTION_PLAN = ServiceDescription(
         "/plan_kinematic_path", "GetMotionPlan", MotionPlanRequest, MotionPlanResponse, validate_response
@@ -31,19 +32,15 @@ class MoveItPlanMotion(PlanMotion):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def plan_motion(self, robot, goal_constraints, start_configuration=None, group=None, options=None):
+    def plan_motion(self, robot, target, start_configuration=None, group=None, options=None):
         """Calculates a motion path.
 
         Parameters
         ----------
         robot : :class:`compas_fab.robots.Robot`
             The robot instance for which the motion plan is being calculated.
-        goal_constraints: list of :class:`compas_fab.robots.Constraint`
-            The goal to be achieved, defined in a set of constraints.
-            Constraints can be very specific, for example defining value domains
-            for each joint, such that the goal configuration is included,
-            or defining a volume in space, to which a specific robot link (e.g.
-            the end-effector) is required to move to.
+        target: list of :class:`compas_fab.robots.Target`
+            The target for the robot to reach.
         start_configuration: :class:`compas_fab.robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the starting position. Defaults to
@@ -85,7 +82,7 @@ class MoveItPlanMotion(PlanMotion):
         """
         options = options or {}
         kwargs = {}
-        kwargs["goal_constraints"] = goal_constraints
+        kwargs["target"] = target
         kwargs["start_configuration"] = start_configuration
         kwargs["group"] = group
         kwargs["options"] = options
@@ -94,12 +91,11 @@ class MoveItPlanMotion(PlanMotion):
         # Use base_link or fallback to model's root link
         options["base_link"] = options.get("base_link", robot.model.root.name)
         options["joints"] = {j.name: j.type for j in robot.model.joints}
+        options["ee_link_name"] = robot.get_end_effector_link_name(group)
 
         return await_callback(self.plan_motion_async, **kwargs)
 
-    def plan_motion_async(
-        self, callback, errback, goal_constraints, start_configuration=None, group=None, options=None
-    ):
+    def plan_motion_async(self, callback, errback, target, start_configuration=None, group=None, options=None):
         """Asynchronous handler of MoveIt motion planner service."""
         # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
         # TODO: if list of frames (goals) => receive multiple solutions?
@@ -120,6 +116,8 @@ class MoveItPlanMotion(PlanMotion):
         start_state.filter_fields_for_distro(self.ros_client.ros_distro)
 
         # convert constraints
+        ee_link_name = options["ee_link_name"]
+        goal_constraints = convert_target_to_goal_constraints(target, ee_link_name)
         goal_constraints = [convert_constraints_to_rosmsg(goal_constraints, header)]
         path_constraints = convert_constraints_to_rosmsg(options.get("path_constraints"), header)
         trajectory_constraints = options.get("trajectory_constraints")
