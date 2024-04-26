@@ -3,7 +3,7 @@
     "nickname": "Point Axis Target",
     "category": "COMPAS FAB",
     "subcategory": "Planning",
-    "description": "Create a PointAxisTarget from a Point and a Vector.",
+    "description": "Create a point and axis target for the robot's end-effector motion planning.",
     "exposure": 8,
     "ghpython": {
         "isAdvancedMode": true,

@@ -1,5 +1,5 @@
 """
-Create a position and an orientation constraint from a plane calculated for the group's end-effector link.
+Create a point and axis target for the robot's end-effector motion planning.
 
 COMPAS FAB v1.0.2
 """

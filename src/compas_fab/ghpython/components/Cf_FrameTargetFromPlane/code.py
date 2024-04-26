@@ -1,5 +1,5 @@
 """
-Create a position and an orientation constraint from a plane calculated for the group's end-effector link.
+Create a fully constrained pose target for the robot's end-effector using a GH Plane or compas Frame.
 
 COMPAS FAB v1.0.2
 """
@@ -27,14 +27,16 @@ class FrameTargetFromPlaneComponent(component):
                 tool_coordinate_frame = plane_to_compas_frame(tool_coordinate_frame)
 
             # Tolerance values
-            tolerance_position = tolerance_position or 0.001
-            tolerance_xaxis = tolerance_xaxis or 1.0
-            tolerance_yaxis = tolerance_yaxis or 1.0
-            tolerance_zaxis = tolerance_zaxis or 1.0
+            DEFAULT_TOLERANCE_METERS = 0.001
+            DEFAULT_TOLERANCE_RADIANS = math.radians(1)
+            tolerance_position = tolerance_position or DEFAULT_TOLERANCE_METERS
+            tolerance_xaxis = tolerance_xaxis or DEFAULT_TOLERANCE_RADIANS
+            tolerance_yaxis = tolerance_yaxis or DEFAULT_TOLERANCE_RADIANS
+            tolerance_zaxis = tolerance_zaxis or DEFAULT_TOLERANCE_RADIANS
             tolerance_orientation = [
-                math.radians(tolerance_xaxis),
-                math.radians(tolerance_yaxis),
-                math.radians(tolerance_zaxis),
+                (tolerance_xaxis),
+                (tolerance_yaxis),
+                (tolerance_zaxis),
             ]
 
             target = FrameTarget(frame, tolerance_position, tolerance_orientation, tool_coordinate_frame)

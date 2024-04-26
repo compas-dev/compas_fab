@@ -1,5 +1,5 @@
 """
-Create joint constraints for each of the robot's configurable joints based on a given target configuration.
+Create configuration target for the robot's end-effector motion planning.
 
 COMPAS FAB v1.0.2
 """

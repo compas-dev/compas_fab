@@ -3,7 +3,7 @@
     "nickname": "Frame target",
     "category": "COMPAS FAB",
     "subcategory": "Planning",
-    "description": "Create a position and an orientation constraint from a plane calculated for the group's end-effector link.",
+    "description": "Create a fully constrained pose target for the robot's end-effector using a GH Plane or compas Frame.",
     "exposure": 8,
     "ghpython": {
         "isAdvancedMode": true,

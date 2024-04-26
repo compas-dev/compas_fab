@@ -81,9 +81,11 @@ class FrameTarget(Target):
         The target frame.
     tolerance_position : float, optional
         The tolerance for the position.
+        Unit is meters.
         If not specified, the default value from the planner is used.
     tolerance_orientation : float, optional
         The tolerance for the orientation.
+        Unit is radians.
         If not specified, the default value from the planner is used.
     tool_coordinate_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`, optional
         The tool tip coordinate frame relative to the flange of the robot.

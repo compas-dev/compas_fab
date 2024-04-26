@@ -3,7 +3,7 @@
     "nickname": "Configuration target",
     "category": "COMPAS FAB",
     "subcategory": "Planning",
-    "description": "Create joint constraints for each of the robot's configurable joints based on a given target configuration.",
+    "description": "Create configuration target for the robot's end-effector motion planning.",
     "exposure": 8,
     "ghpython": {
         "isAdvancedMode": true,
