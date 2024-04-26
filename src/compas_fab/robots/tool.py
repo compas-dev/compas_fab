@@ -15,18 +15,31 @@ __all__ = ["Tool"]
 class Tool(Data):
     """Represents a tool to be attached to the robot's flange.
 
-    Attributes
+    Parameters
     ----------
     visual : :class:`compas.datastructures.Mesh`
         The visual mesh of the tool.
     frame_in_tool0_frame : :class:`compas.geometry.Frame`
-        The frame of the tool in tool0 frame.
+        The tool coordinate frame (TCF) of the tool relative to the tool0 frame (T0CF).
     collision : :class:`compas.datastructures.Mesh`
         The collision mesh representation of the tool.
     name : :obj:`str`
         The name of the `Tool`. Defaults to 'attached_tool'.
     connected_to : :obj:`str`
         The name of the `Link` to which the tool is attached.  Defaults to ``None``.
+
+    Attributes
+    ----------
+    tool_model : :class:`compas_robots.ToolModel`
+        The tool model.
+    attached_collision_meshes : :obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`, read-only
+        The collision meshes of the tool.
+    name : :obj:`str`, read-only
+        The name of the `Tool`.
+    connected_to : :obj:`str`
+        The name of the `Link` to which the tool is attached.
+    frame : :class:`compas.geometry.Frame`
+        The tool coordinate frame (TCF) of the tool relative to the tool0 frame (T0CF).
 
     Examples
     --------

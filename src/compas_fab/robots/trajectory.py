@@ -20,7 +20,7 @@ __all__ = [
 class JointTrajectoryPoint(Configuration):
     """Defines a point within a trajectory.
 
-    A trajectory point is a sub-class of :class:`Configuration` extended
+    A trajectory point is a sub-class of :class:`compas_robots.Configuration` extended
     with acceleration, effort and time from start information.
 
     Trajectory points are defined either as *joint_values + velocities and
@@ -281,7 +281,7 @@ class JointTrajectory(Trajectory):
         List of points composing the trajectory.
     joint_names : :obj:`list` of :obj:`str`, optional
         List of joint names of the trajectory.
-    start_configuration : :class:`Configuration`, optional
+    start_configuration : :class:`compas_robots.Configuration`, optional
         Start configuration for the trajectory.
     fraction : :obj:`float`, optional
         Indicates the percentage of requested trajectory that was calculated,
@@ -297,7 +297,7 @@ class JointTrajectory(Trajectory):
         List of points composing the trajectory.
     joint_names : :obj:`list` of :obj:`str`
         List of joint names of the trajectory.
-    start_configuration : :class:`Configuration`
+    start_configuration : :class:`compas_robots.Configuration`
         Start configuration for the trajectory.
     fraction : :obj:`float`
         Indicates the percentage of requested trajectory that was calculated,

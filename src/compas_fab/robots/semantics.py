@@ -14,12 +14,52 @@ class RobotSemantics(Data):
     """Represents semantic information of a robot.
 
     The semantic model is based on the
-    `Semantic Robot Description Format` (`SRDF`_).
+    `Semantic Robot Description Format` (`SRDF <https://wiki.ros.org/srdf>`__).
+    Typically, the RobotSemantics objects are created from an SRDF file (using :meth:`from_srdf_file`)
+    or loaded by the backend client (using :meth:`compas_fab.backends.PyBulletClient.load_semantics` or
+    :meth:`compas_fab.backends.RosClient.load_robot`).
 
-    References
+    Parameters
     ----------
+    robot_model : :class:`~compas_fab.robots.RobotModel`
+        The robot model.
+    groups : :obj:`dict` of (:obj:`str`, :obj:`dict` of (``links`` : :obj:`list` of :obj:`str`, ``joints`` : :obj:`list` of :obj:`str`)), optional
+        A nested dictionary defining planning groups.
+        The dictionary structure is as follows:
 
-    .. _SRDF: https://wiki.ros.org/srdf
+        - Level 1 keys are planning group names : :obj:`str`.
+        - Level 2 contains only two keys:
+
+            -   ``links`` is a :obj:`list` of :obj:`str` containing link names
+            -   ``joints`` is a :obj:`list` of :obj:`str` containing joint names.
+
+    main_group_name : :obj:`str`, optional
+        The name of the main group.
+    passive_joints : :obj:`list` of :obj:`str`, optional
+        A list of passive joint names.
+    end_effectors : :obj:`list` of :obj:`str`, optional
+        A list of end effector link names.
+    disabled_collisions : :obj:`tuple` of (:obj:`str`, :obj:`str`), optional
+        A set of disabled collision pairs.
+        The order is not important, i.e. the pair `('link1', 'link2')` is the same as `('link2', 'link1')`.
+        Only one pair is needed.
+    group_states : dict, optional
+        A nested dictionary defining named states for a particular group, in terms of joint values.
+        This is useful to define states such as "home" or "folded arms" for the robot.
+        The dictionary structure is as follows:
+
+        - Level 1 keys are planning group names : :obj:`str`.
+        - Level 2 keys are group state names : :obj:`str`.
+        - Level 3 keys are joint names and values are joint values : :obj:`str`.
+
+    Attributes
+    ----------
+    group_names : :obj:`list` of :obj:`str`, read-only
+        Get the names of all planning groups.
+    unordered_disabled_collisions : :obj:`set` of :obj:`frozenset`, read-only
+        Get the disabled collision pairs as a set of frozensets.
+
+
 
     """
 
@@ -89,7 +129,25 @@ class RobotSemantics(Data):
 
     @classmethod
     def from_srdf_file(cls, file, robot_model):
-        """Create an instance of semantics based on an SRDF file path or file-like object."""
+        """Create an instance of semantics based on an SRDF file path or file-like object.
+
+        Parameters
+        ----------
+        file : :obj:`str`
+            The path to the SRDF file.
+        robot_model : :class:`compas_robots.RobotModel`
+            The robot model is needed when loading the semantics.
+
+        Examples
+        --------
+        >>> from compas_robots import RobotModel
+        >>> urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
+        >>> srdf_filename = compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf")
+        >>> robot_model = RobotModel.from_urdf_file(urdf_filename)
+        >>> semantics = RobotSemantics.from_srdf_file(srdf_filename, robot_model)
+        >>> print(semantics.main_group_name)
+        manipulator
+        """
         xml = XML.from_file(file)
         return cls.from_xml(xml, robot_model)
 
@@ -122,16 +180,54 @@ class RobotSemantics(Data):
         )
 
     def get_end_effector_link_name(self, group=None):
+        """Get the name of the last link (end effector link) in a planning group.
+
+        Parameters
+        ----------
+        group : :obj:`str`, optional
+            The name of the planning group. Defaults to the main planning group.
+
+        Returns
+        -------
+        :obj:`str`
+            The name of the end effector link.
+        """
+
         if not group:
             group = self.main_group_name
         return self.groups[group]["links"][-1]
 
     def get_base_link_name(self, group=None):
+        """Get the name of the first link (base link) in a planning group.
+
+        Parameters
+        ----------
+        group : :obj:`str`, optional
+            The name of the planning group. Defaults to the main planning group.
+
+        Returns
+        -------
+        :obj:`str`
+            The name of the base link.
+        """
         if not group:
             group = self.main_group_name
         return self.groups[group]["links"][0]
 
     def get_all_configurable_joints(self):
+        """Get all configurable :class:`compas_robots.model.Joint` of the robot.
+
+        Configurable joints are joints that can be controlled,
+        i.e., not ``Joint.FIXED``, not mimicking another joint and not a passive joint.
+        See :meth:`compas_robots.model.Joint.is_configurable` for more details.
+
+        Returns
+        -------
+        :obj:`list` of :class:`compas_robots.model.Joint`
+            A list of configurable joints.
+
+        """
+
         joints = []
         for joint in self.robot_model.get_configurable_joints():
             if joint.name not in self.passive_joints:
@@ -139,6 +235,23 @@ class RobotSemantics(Data):
         return joints
 
     def get_configurable_joints(self, group=None):
+        """Get all configurable :class:`compas_robots.model.Joint` of a planning group.
+
+        Configurable joints are joints that can be controlled,
+        i.e., not ``Joint.FIXED``, not mimicking another joint and not a passive joint.
+        See :meth:`compas_robots.model.Joint.is_configurable` for more details.
+
+        Parameters
+        ----------
+        group : :obj:`str`, optional
+            The name of the planning group. Defaults to the main planning group.
+
+        Returns
+        -------
+        :obj:`list` of :class:`compas_robots.model.Joint`
+            A list of configurable joints.
+
+        """
         if not group:
             group = self.main_group_name
         joints = []
@@ -150,6 +263,19 @@ class RobotSemantics(Data):
         return joints
 
     def get_configurable_joint_names(self, group=None):
+        """Get all the names of configurable joints of a planning group.
+
+        Similar to :meth:`get_configurable_joints` but returning joint names.
+
+        Parameters
+        ----------
+        group : :obj:`str`, optional
+            The name of the planning group. Defaults to the main planning group.
+
+        Returns
+        -------
+        :obj:`list` of :obj:`str`
+        """
         return [joint.name for joint in self.get_configurable_joints(group)]
 
 
