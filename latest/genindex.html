@@ -860,8 +860,6 @@ document.write(`
         <li><a href="developer/backends.html#module-compas_fab.backends.interfaces">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     compas_fab.blender
 
@@ -869,6 +867,8 @@ document.write(`
         <li><a href="api/compas_fab.blender.html#module-compas_fab.blender">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     compas_fab.ghpython
 
@@ -906,6 +906,8 @@ document.write(`
       </ul></li>
       <li><a href="api/generated/compas_fab.rhino.ReachabilityMapObject.compile_attributes.html#compas_fab.rhino.ReachabilityMapObject.compile_attributes">compile_attributes() (compas_fab.rhino.ReachabilityMapObject method)</a>
 </li>
+      <li><a href="api/generated/compas_fab.robots.ConfigurationTarget.html#compas_fab.robots.ConfigurationTarget">ConfigurationTarget (class in compas_fab.robots)</a>
+</li>
       <li><a href="api/generated/compas_fab.backends.AnalyticalPyBulletClient.connect.html#compas_fab.backends.AnalyticalPyBulletClient.connect">connect() (compas_fab.backends.AnalyticalPyBulletClient method)</a>
 
       <ul>
@@ -916,9 +918,7 @@ document.write(`
       </ul></li>
       <li><a href="api/generated/compas_fab.robots.Constraint.html#compas_fab.robots.Constraint">Constraint (class in compas_fab.robots)</a>
 </li>
-      <li><a href="api/generated/compas_fab.robots.Robot.constraints_from_configuration.html#compas_fab.robots.Robot.constraints_from_configuration">constraints_from_configuration() (compas_fab.robots.Robot method)</a>
-</li>
-      <li><a href="api/generated/compas_fab.robots.Robot.constraints_from_frame.html#compas_fab.robots.Robot.constraints_from_frame">constraints_from_frame() (compas_fab.robots.Robot method)</a>
+      <li><a href="api/generated/compas_fab.robots.ConstraintSetTarget.html#compas_fab.robots.ConstraintSetTarget">ConstraintSetTarget (class in compas_fab.robots)</a>
 </li>
       <li><a href="api/generated/compas_fab.backends.AnalyticalPyBulletClient.convert_mesh_to_body.html#compas_fab.backends.AnalyticalPyBulletClient.convert_mesh_to_body">convert_mesh_to_body() (compas_fab.backends.AnalyticalPyBulletClient method)</a>
 
@@ -933,9 +933,15 @@ document.write(`
 </li>
         <li><a href="api/generated/compas_fab.robots.CollisionMesh.copy.html#compas_fab.robots.CollisionMesh.copy">(compas_fab.robots.CollisionMesh method)</a>
 </li>
+        <li><a href="api/generated/compas_fab.robots.ConfigurationTarget.copy.html#compas_fab.robots.ConfigurationTarget.copy">(compas_fab.robots.ConfigurationTarget method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.Constraint.copy.html#compas_fab.robots.Constraint.copy">(compas_fab.robots.Constraint method)</a>
 </li>
+        <li><a href="api/generated/compas_fab.robots.ConstraintSetTarget.copy.html#compas_fab.robots.ConstraintSetTarget.copy">(compas_fab.robots.ConstraintSetTarget method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.Duration.copy.html#compas_fab.robots.Duration.copy">(compas_fab.robots.Duration method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.FrameTarget.copy.html#compas_fab.robots.FrameTarget.copy">(compas_fab.robots.FrameTarget method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointConstraint.copy.html#compas_fab.robots.JointConstraint.copy">(compas_fab.robots.JointConstraint method)</a>
 </li>
@@ -945,6 +951,8 @@ document.write(`
 </li>
         <li><a href="api/generated/compas_fab.robots.OrientationConstraint.copy.html#compas_fab.robots.OrientationConstraint.copy">(compas_fab.robots.OrientationConstraint method)</a>
 </li>
+        <li><a href="api/generated/compas_fab.robots.PointAxisTarget.copy.html#compas_fab.robots.PointAxisTarget.copy">(compas_fab.robots.PointAxisTarget method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.PositionConstraint.copy.html#compas_fab.robots.PositionConstraint.copy">(compas_fab.robots.PositionConstraint method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.ReachabilityMap.copy.html#compas_fab.robots.ReachabilityMap.copy">(compas_fab.robots.ReachabilityMap method)</a>
@@ -952,6 +960,8 @@ document.write(`
         <li><a href="api/generated/compas_fab.robots.Robot.copy.html#compas_fab.robots.Robot.copy">(compas_fab.robots.Robot method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.RobotSemantics.copy.html#compas_fab.robots.RobotSemantics.copy">(compas_fab.robots.RobotSemantics method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Target.copy.html#compas_fab.robots.Target.copy">(compas_fab.robots.Target method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Tool.copy.html#compas_fab.robots.Tool.copy">(compas_fab.robots.Tool method)</a>
 </li>
@@ -1118,9 +1128,9 @@ document.write(`
         <li><a href="api/generated/compas_fab.robots.Robot.forward_kinematics.html#compas_fab.robots.Robot.forward_kinematics">(compas_fab.robots.Robot method)</a>
 </li>
       </ul></li>
-      <li><a href="api/generated/compas_fab.robots.Robot.forward_kinematics_deprecated.html#compas_fab.robots.Robot.forward_kinematics_deprecated">forward_kinematics_deprecated() (compas_fab.robots.Robot method)</a>
-</li>
       <li><a href="developer/generated/compas_fab.backends.interfaces.ForwardKinematics.html#compas_fab.backends.interfaces.ForwardKinematics">ForwardKinematics (class in compas_fab.backends.interfaces)</a>
+</li>
+      <li><a href="api/generated/compas_fab.robots.FrameTarget.html#compas_fab.robots.FrameTarget">FrameTarget (class in compas_fab.robots)</a>
 </li>
       <li><a href="api/generated/compas_fab.robots.BoundingVolume.from_box.html#compas_fab.robots.BoundingVolume.from_box">from_box() (compas_fab.robots.BoundingVolume class method)</a>
 
@@ -1128,22 +1138,48 @@ document.write(`
         <li><a href="api/generated/compas_fab.robots.PositionConstraint.from_box.html#compas_fab.robots.PositionConstraint.from_box">(compas_fab.robots.PositionConstraint class method)</a>
 </li>
       </ul></li>
+      <li><a href="api/generated/compas_fab.robots.OrientationConstraint.from_frame.html#compas_fab.robots.OrientationConstraint.from_frame">from_frame() (compas_fab.robots.OrientationConstraint class method)</a>
+
+      <ul>
+        <li><a href="api/generated/compas_fab.robots.PositionConstraint.from_frame.html#compas_fab.robots.PositionConstraint.from_frame">(compas_fab.robots.PositionConstraint class method)</a>
+</li>
+      </ul></li>
       <li><a href="api/generated/compas_fab.robots.AttachedCollisionMesh.from_json.html#compas_fab.robots.AttachedCollisionMesh.from_json">from_json() (compas_fab.robots.AttachedCollisionMesh class method)</a>
 
       <ul>
+        <li><a href="api/generated/compas_fab.robots.BoundingVolume.from_json.html#compas_fab.robots.BoundingVolume.from_json">(compas_fab.robots.BoundingVolume class method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.CollisionMesh.from_json.html#compas_fab.robots.CollisionMesh.from_json">(compas_fab.robots.CollisionMesh class method)</a>
 </li>
+        <li><a href="api/generated/compas_fab.robots.ConfigurationTarget.from_json.html#compas_fab.robots.ConfigurationTarget.from_json">(compas_fab.robots.ConfigurationTarget class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Constraint.from_json.html#compas_fab.robots.Constraint.from_json">(compas_fab.robots.Constraint class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.ConstraintSetTarget.from_json.html#compas_fab.robots.ConstraintSetTarget.from_json">(compas_fab.robots.ConstraintSetTarget class method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.Duration.from_json.html#compas_fab.robots.Duration.from_json">(compas_fab.robots.Duration class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.FrameTarget.from_json.html#compas_fab.robots.FrameTarget.from_json">(compas_fab.robots.FrameTarget class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.JointConstraint.from_json.html#compas_fab.robots.JointConstraint.from_json">(compas_fab.robots.JointConstraint class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectory.from_json.html#compas_fab.robots.JointTrajectory.from_json">(compas_fab.robots.JointTrajectory class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectoryPoint.from_json.html#compas_fab.robots.JointTrajectoryPoint.from_json">(compas_fab.robots.JointTrajectoryPoint class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.OrientationConstraint.from_json.html#compas_fab.robots.OrientationConstraint.from_json">(compas_fab.robots.OrientationConstraint class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PointAxisTarget.from_json.html#compas_fab.robots.PointAxisTarget.from_json">(compas_fab.robots.PointAxisTarget class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PositionConstraint.from_json.html#compas_fab.robots.PositionConstraint.from_json">(compas_fab.robots.PositionConstraint class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.ReachabilityMap.from_json.html#compas_fab.robots.ReachabilityMap.from_json">(compas_fab.robots.ReachabilityMap class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Robot.from_json.html#compas_fab.robots.Robot.from_json">(compas_fab.robots.Robot class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.RobotSemantics.from_json.html#compas_fab.robots.RobotSemantics.from_json">(compas_fab.robots.RobotSemantics class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Target.from_json.html#compas_fab.robots.Target.from_json">(compas_fab.robots.Target class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Tool.from_json.html#compas_fab.robots.Tool.from_json">(compas_fab.robots.Tool class method)</a>
 </li>
@@ -1157,19 +1193,39 @@ document.write(`
       <li><a href="api/generated/compas_fab.robots.AttachedCollisionMesh.from_jsonstring.html#compas_fab.robots.AttachedCollisionMesh.from_jsonstring">from_jsonstring() (compas_fab.robots.AttachedCollisionMesh class method)</a>
 
       <ul>
+        <li><a href="api/generated/compas_fab.robots.BoundingVolume.from_jsonstring.html#compas_fab.robots.BoundingVolume.from_jsonstring">(compas_fab.robots.BoundingVolume class method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.CollisionMesh.from_jsonstring.html#compas_fab.robots.CollisionMesh.from_jsonstring">(compas_fab.robots.CollisionMesh class method)</a>
 </li>
+        <li><a href="api/generated/compas_fab.robots.ConfigurationTarget.from_jsonstring.html#compas_fab.robots.ConfigurationTarget.from_jsonstring">(compas_fab.robots.ConfigurationTarget class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Constraint.from_jsonstring.html#compas_fab.robots.Constraint.from_jsonstring">(compas_fab.robots.Constraint class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.ConstraintSetTarget.from_jsonstring.html#compas_fab.robots.ConstraintSetTarget.from_jsonstring">(compas_fab.robots.ConstraintSetTarget class method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.Duration.from_jsonstring.html#compas_fab.robots.Duration.from_jsonstring">(compas_fab.robots.Duration class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.FrameTarget.from_jsonstring.html#compas_fab.robots.FrameTarget.from_jsonstring">(compas_fab.robots.FrameTarget class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.JointConstraint.from_jsonstring.html#compas_fab.robots.JointConstraint.from_jsonstring">(compas_fab.robots.JointConstraint class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectory.from_jsonstring.html#compas_fab.robots.JointTrajectory.from_jsonstring">(compas_fab.robots.JointTrajectory class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectoryPoint.from_jsonstring.html#compas_fab.robots.JointTrajectoryPoint.from_jsonstring">(compas_fab.robots.JointTrajectoryPoint class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.OrientationConstraint.from_jsonstring.html#compas_fab.robots.OrientationConstraint.from_jsonstring">(compas_fab.robots.OrientationConstraint class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PointAxisTarget.from_jsonstring.html#compas_fab.robots.PointAxisTarget.from_jsonstring">(compas_fab.robots.PointAxisTarget class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PositionConstraint.from_jsonstring.html#compas_fab.robots.PositionConstraint.from_jsonstring">(compas_fab.robots.PositionConstraint class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.ReachabilityMap.from_jsonstring.html#compas_fab.robots.ReachabilityMap.from_jsonstring">(compas_fab.robots.ReachabilityMap class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Robot.from_jsonstring.html#compas_fab.robots.Robot.from_jsonstring">(compas_fab.robots.Robot class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.RobotSemantics.from_jsonstring.html#compas_fab.robots.RobotSemantics.from_jsonstring">(compas_fab.robots.RobotSemantics class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Target.from_jsonstring.html#compas_fab.robots.Target.from_jsonstring">(compas_fab.robots.Target class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Tool.from_jsonstring.html#compas_fab.robots.Tool.from_jsonstring">(compas_fab.robots.Tool class method)</a>
 </li>
@@ -1186,6 +1242,8 @@ document.write(`
         <li><a href="api/generated/compas_fab.robots.PositionConstraint.from_mesh.html#compas_fab.robots.PositionConstraint.from_mesh">(compas_fab.robots.PositionConstraint class method)</a>
 </li>
       </ul></li>
+      <li><a href="api/generated/compas_fab.robots.PositionConstraint.from_point.html#compas_fab.robots.PositionConstraint.from_point">from_point() (compas_fab.robots.PositionConstraint class method)</a>
+</li>
       <li><a href="api/generated/compas_fab.robots.JointTrajectoryPoint.from_prismatic_and_revolute_values.html#compas_fab.robots.JointTrajectoryPoint.from_prismatic_and_revolute_values">from_prismatic_and_revolute_values() (compas_fab.robots.JointTrajectoryPoint class method)</a>
 </li>
       <li><a href="api/generated/compas_fab.robots.JointTrajectoryPoint.from_revolute_values.html#compas_fab.robots.JointTrajectoryPoint.from_revolute_values">from_revolute_values() (compas_fab.robots.JointTrajectoryPoint class method)</a>
@@ -1211,8 +1269,12 @@ document.write(`
       <ul>
         <li><a href="api/generated/compas_fab.robots.Tool.from_tcf_to_t0cf.html#compas_fab.robots.Tool.from_tcf_to_t0cf">(compas_fab.robots.Tool method)</a>
 </li>
+        <li><a href="api/generated/compas_fab.utilities.from_tcf_to_t0cf.html#compas_fab.utilities.from_tcf_to_t0cf">(in module compas_fab.utilities)</a>
+</li>
       </ul></li>
       <li><a href="api/generated/compas_fab.robots.Tool.from_tool_model.html#compas_fab.robots.Tool.from_tool_model">from_tool_model() (compas_fab.robots.Tool class method)</a>
+</li>
+      <li><a href="api/generated/compas_fab.robots.FrameTarget.from_transformation.html#compas_fab.robots.FrameTarget.from_transformation">from_transformation() (compas_fab.robots.FrameTarget class method)</a>
 </li>
       <li><a href="api/generated/compas_fab.robots.RobotSemantics.from_xml.html#compas_fab.robots.RobotSemantics.from_xml">from_xml() (compas_fab.robots.RobotSemantics class method)</a>
 </li>
@@ -1224,6 +1286,8 @@ document.write(`
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_fab.robots.ConfigurationTarget.generate_default_tolerances.html#compas_fab.robots.ConfigurationTarget.generate_default_tolerances">generate_default_tolerances() (compas_fab.robots.ConfigurationTarget class method)</a>
+</li>
       <li><a href="api/generated/compas_fab.robots.JointTrajectoryPoint.get.html#compas_fab.robots.JointTrajectoryPoint.get">get() (compas_fab.robots.JointTrajectoryPoint method)</a>
 </li>
       <li><a href="api/generated/compas_fab.backends.RosClient.get_action_servers.html#compas_fab.backends.RosClient.get_action_servers">get_action_servers() (compas_fab.backends.RosClient method)</a>
@@ -1304,14 +1368,14 @@ document.write(`
 </li>
       <li><a href="api/generated/compas_fab.sensors.PosCon3D.get_live_monitor_data.html#compas_fab.sensors.PosCon3D.get_live_monitor_data">get_live_monitor_data() (compas_fab.sensors.PosCon3D method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/compas_fab.sensors.PosCon3D.get_measurement.html#compas_fab.sensors.PosCon3D.get_measurement">get_measurement() (compas_fab.sensors.PosCon3D method)</a>
 
       <ul>
         <li><a href="api/generated/compas_fab.sensors.PosConCM.get_measurement.html#compas_fab.sensors.PosConCM.get_measurement">(compas_fab.sensors.PosConCM method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/compas_fab.backends.RosClient.get_message_details.html#compas_fab.backends.RosClient.get_message_details">get_message_details() (compas_fab.backends.RosClient method)</a>
 </li>
       <li><a href="api/generated/compas_fab.backends.RosClient.get_node_details.html#compas_fab.backends.RosClient.get_node_details">get_node_details() (compas_fab.backends.RosClient method)</a>
@@ -1442,8 +1506,6 @@ document.write(`
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/generated/compas_fab.robots.Robot.inverse_kinematics_deprecated.html#compas_fab.robots.Robot.inverse_kinematics_deprecated">inverse_kinematics_deprecated() (compas_fab.robots.Robot method)</a>
-</li>
       <li><a href="developer/generated/compas_fab.backends.interfaces.InverseKinematics.html#compas_fab.backends.interfaces.InverseKinematics">InverseKinematics (class in compas_fab.backends.interfaces)</a>
 </li>
       <li><a href="api/generated/compas_fab.backends.InverseKinematicsError.html#compas_fab.backends.InverseKinematicsError">InverseKinematicsError</a>
@@ -1460,6 +1522,8 @@ document.write(`
 <h2 id="J">J</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_fab.robots.JointConstraint.joint_constraints_from_configuration.html#compas_fab.robots.JointConstraint.joint_constraints_from_configuration">joint_constraints_from_configuration() (compas_fab.robots.JointConstraint class method)</a>
+</li>
       <li><a href="api/generated/compas_fab.robots.JointConstraint.html#compas_fab.robots.JointConstraint">JointConstraint (class in compas_fab.robots)</a>
 </li>
   </ul></td>
@@ -1579,8 +1643,6 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/compas_fab.backends.RosClient.on_ready.html#compas_fab.backends.RosClient.on_ready">on_ready() (compas_fab.backends.RosClient method)</a>
 </li>
-      <li><a href="api/generated/compas_fab.robots.Robot.orientation_constraint_from_frame.html#compas_fab.robots.Robot.orientation_constraint_from_frame">orientation_constraint_from_frame() (compas_fab.robots.Robot method)</a>
-</li>
       <li><a href="api/generated/compas_fab.robots.OrientationConstraint.html#compas_fab.robots.OrientationConstraint">OrientationConstraint (class in compas_fab.robots)</a>
 </li>
       <li><a href="api/generated/compas_fab.robots.OrthonormalVectorsFromAxisGenerator.html#compas_fab.robots.OrthonormalVectorsFromAxisGenerator">OrthonormalVectorsFromAxisGenerator (class in compas_fab.robots)</a>
@@ -1613,8 +1675,6 @@ document.write(`
         <li><a href="api/generated/compas_fab.robots.Robot.plan_cartesian_motion.html#compas_fab.robots.Robot.plan_cartesian_motion">(compas_fab.robots.Robot method)</a>
 </li>
       </ul></li>
-      <li><a href="api/generated/compas_fab.robots.Robot.plan_cartesian_motion_deprecated.html#compas_fab.robots.Robot.plan_cartesian_motion_deprecated">plan_cartesian_motion_deprecated() (compas_fab.robots.Robot method)</a>
-</li>
       <li><a href="api/generated/compas_fab.backends.AnalyticalPyBulletClient.plan_motion.html#compas_fab.backends.AnalyticalPyBulletClient.plan_motion">plan_motion() (compas_fab.backends.AnalyticalPyBulletClient method)</a>
 
       <ul>
@@ -1637,8 +1697,6 @@ document.write(`
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/generated/compas_fab.robots.Robot.plan_motion_deprecated.html#compas_fab.robots.Robot.plan_motion_deprecated">plan_motion_deprecated() (compas_fab.robots.Robot method)</a>
-</li>
       <li><a href="developer/generated/compas_fab.backends.interfaces.PlanCartesianMotion.html#compas_fab.backends.interfaces.PlanCartesianMotion">PlanCartesianMotion (class in compas_fab.backends.interfaces)</a>
 </li>
       <li><a href="developer/generated/compas_fab.backends.interfaces.PlanMotion.html#compas_fab.backends.interfaces.PlanMotion">PlanMotion (class in compas_fab.backends.interfaces)</a>
@@ -1647,11 +1705,11 @@ document.write(`
 </li>
       <li><a href="api/generated/compas_fab.robots.PlanningScene.html#compas_fab.robots.PlanningScene">PlanningScene (class in compas_fab.robots)</a>
 </li>
+      <li><a href="api/generated/compas_fab.robots.PointAxisTarget.html#compas_fab.robots.PointAxisTarget">PointAxisTarget (class in compas_fab.robots)</a>
+</li>
       <li><a href="api/generated/compas_fab.sensors.PosCon3D.html#compas_fab.sensors.PosCon3D">PosCon3D (class in compas_fab.sensors)</a>
 </li>
       <li><a href="api/generated/compas_fab.sensors.PosConCM.html#compas_fab.sensors.PosConCM">PosConCM (class in compas_fab.sensors)</a>
-</li>
-      <li><a href="api/generated/compas_fab.robots.Robot.position_constraint_from_frame.html#compas_fab.robots.Robot.position_constraint_from_frame">position_constraint_from_frame() (compas_fab.robots.Robot method)</a>
 </li>
       <li><a href="api/generated/compas_fab.robots.PositionConstraint.html#compas_fab.robots.PositionConstraint">PositionConstraint (class in compas_fab.robots)</a>
 </li>
@@ -1824,7 +1882,13 @@ document.write(`
       <li><a href="api/generated/compas_fab.robots.CollisionMesh.scaled.html#compas_fab.robots.CollisionMesh.scaled">scaled() (compas_fab.robots.CollisionMesh method)</a>
 
       <ul>
+        <li><a href="api/generated/compas_fab.robots.ConfigurationTarget.scaled.html#compas_fab.robots.ConfigurationTarget.scaled">(compas_fab.robots.ConfigurationTarget method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.Constraint.scaled.html#compas_fab.robots.Constraint.scaled">(compas_fab.robots.Constraint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.ConstraintSetTarget.scaled.html#compas_fab.robots.ConstraintSetTarget.scaled">(compas_fab.robots.ConstraintSetTarget method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.FrameTarget.scaled.html#compas_fab.robots.FrameTarget.scaled">(compas_fab.robots.FrameTarget method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointConstraint.scaled.html#compas_fab.robots.JointConstraint.scaled">(compas_fab.robots.JointConstraint method)</a>
 </li>
@@ -1832,7 +1896,11 @@ document.write(`
 </li>
         <li><a href="api/generated/compas_fab.robots.OrientationConstraint.scaled.html#compas_fab.robots.OrientationConstraint.scaled">(compas_fab.robots.OrientationConstraint method)</a>
 </li>
+        <li><a href="api/generated/compas_fab.robots.PointAxisTarget.scaled.html#compas_fab.robots.PointAxisTarget.scaled">(compas_fab.robots.PointAxisTarget method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.PositionConstraint.scaled.html#compas_fab.robots.PositionConstraint.scaled">(compas_fab.robots.PositionConstraint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Target.scaled.html#compas_fab.robots.Target.scaled">(compas_fab.robots.Target method)</a>
 </li>
       </ul></li>
       <li><a href="api/generated/compas_fab.sensors.PosCon3D.send_command.html#compas_fab.sensors.PosCon3D.send_command">send_command() (compas_fab.sensors.PosCon3D method)</a>
@@ -1861,8 +1929,6 @@ document.write(`
         <li><a href="api/generated/compas_fab.sensors.PosConCM.set_measurement_type.html#compas_fab.sensors.PosConCM.set_measurement_type">(compas_fab.sensors.PosConCM method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/compas_fab.backends.RosClient.set_param.html#compas_fab.backends.RosClient.set_param">set_param() (compas_fab.backends.RosClient method)</a>
 </li>
       <li><a href="api/generated/compas_fab.sensors.PosCon3D.set_precision.html#compas_fab.sensors.PosCon3D.set_precision">set_precision() (compas_fab.sensors.PosCon3D method)</a>
@@ -1871,6 +1937,8 @@ document.write(`
         <li><a href="api/generated/compas_fab.sensors.PosConCM.set_precision.html#compas_fab.sensors.PosConCM.set_precision">(compas_fab.sensors.PosConCM method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/compas_fab.robots.Robot.set_RCF.html#compas_fab.robots.Robot.set_RCF">set_RCF() (compas_fab.robots.Robot method)</a>
 </li>
       <li><a href="api/generated/compas_fab.backends.AnalyticalPyBulletClient.set_robot_configuration.html#compas_fab.backends.AnalyticalPyBulletClient.set_robot_configuration">set_robot_configuration() (compas_fab.backends.AnalyticalPyBulletClient method)</a>
@@ -1884,19 +1952,39 @@ document.write(`
       <li><a href="api/generated/compas_fab.robots.AttachedCollisionMesh.sha256.html#compas_fab.robots.AttachedCollisionMesh.sha256">sha256() (compas_fab.robots.AttachedCollisionMesh method)</a>
 
       <ul>
+        <li><a href="api/generated/compas_fab.robots.BoundingVolume.sha256.html#compas_fab.robots.BoundingVolume.sha256">(compas_fab.robots.BoundingVolume method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.CollisionMesh.sha256.html#compas_fab.robots.CollisionMesh.sha256">(compas_fab.robots.CollisionMesh method)</a>
 </li>
+        <li><a href="api/generated/compas_fab.robots.ConfigurationTarget.sha256.html#compas_fab.robots.ConfigurationTarget.sha256">(compas_fab.robots.ConfigurationTarget method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Constraint.sha256.html#compas_fab.robots.Constraint.sha256">(compas_fab.robots.Constraint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.ConstraintSetTarget.sha256.html#compas_fab.robots.ConstraintSetTarget.sha256">(compas_fab.robots.ConstraintSetTarget method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.Duration.sha256.html#compas_fab.robots.Duration.sha256">(compas_fab.robots.Duration method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.FrameTarget.sha256.html#compas_fab.robots.FrameTarget.sha256">(compas_fab.robots.FrameTarget method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.JointConstraint.sha256.html#compas_fab.robots.JointConstraint.sha256">(compas_fab.robots.JointConstraint method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectory.sha256.html#compas_fab.robots.JointTrajectory.sha256">(compas_fab.robots.JointTrajectory method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectoryPoint.sha256.html#compas_fab.robots.JointTrajectoryPoint.sha256">(compas_fab.robots.JointTrajectoryPoint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.OrientationConstraint.sha256.html#compas_fab.robots.OrientationConstraint.sha256">(compas_fab.robots.OrientationConstraint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PointAxisTarget.sha256.html#compas_fab.robots.PointAxisTarget.sha256">(compas_fab.robots.PointAxisTarget method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PositionConstraint.sha256.html#compas_fab.robots.PositionConstraint.sha256">(compas_fab.robots.PositionConstraint method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.ReachabilityMap.sha256.html#compas_fab.robots.ReachabilityMap.sha256">(compas_fab.robots.ReachabilityMap method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Robot.sha256.html#compas_fab.robots.Robot.sha256">(compas_fab.robots.Robot method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.RobotSemantics.sha256.html#compas_fab.robots.RobotSemantics.sha256">(compas_fab.robots.RobotSemantics method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Target.sha256.html#compas_fab.robots.Target.sha256">(compas_fab.robots.Target method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Tool.sha256.html#compas_fab.robots.Tool.sha256">(compas_fab.robots.Tool method)</a>
 </li>
@@ -1925,6 +2013,8 @@ document.write(`
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_fab.robots.Target.html#compas_fab.robots.Target">Target (class in compas_fab.robots)</a>
+</li>
       <li><a href="api/generated/compas_fab.sensors.PosConCM.teach_flex_mount.html#compas_fab.sensors.PosConCM.teach_flex_mount">teach_flex_mount() (compas_fab.sensors.PosConCM method)</a>
 </li>
       <li><a href="api/generated/compas_fab.backends.RosClient.terminate.html#compas_fab.backends.RosClient.terminate">terminate() (compas_fab.backends.RosClient method)</a>
@@ -1934,19 +2024,39 @@ document.write(`
       <li><a href="api/generated/compas_fab.robots.AttachedCollisionMesh.to_json.html#compas_fab.robots.AttachedCollisionMesh.to_json">to_json() (compas_fab.robots.AttachedCollisionMesh method)</a>
 
       <ul>
+        <li><a href="api/generated/compas_fab.robots.BoundingVolume.to_json.html#compas_fab.robots.BoundingVolume.to_json">(compas_fab.robots.BoundingVolume method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.CollisionMesh.to_json.html#compas_fab.robots.CollisionMesh.to_json">(compas_fab.robots.CollisionMesh method)</a>
 </li>
+        <li><a href="api/generated/compas_fab.robots.ConfigurationTarget.to_json.html#compas_fab.robots.ConfigurationTarget.to_json">(compas_fab.robots.ConfigurationTarget method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Constraint.to_json.html#compas_fab.robots.Constraint.to_json">(compas_fab.robots.Constraint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.ConstraintSetTarget.to_json.html#compas_fab.robots.ConstraintSetTarget.to_json">(compas_fab.robots.ConstraintSetTarget method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.Duration.to_json.html#compas_fab.robots.Duration.to_json">(compas_fab.robots.Duration method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.FrameTarget.to_json.html#compas_fab.robots.FrameTarget.to_json">(compas_fab.robots.FrameTarget method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.JointConstraint.to_json.html#compas_fab.robots.JointConstraint.to_json">(compas_fab.robots.JointConstraint method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectory.to_json.html#compas_fab.robots.JointTrajectory.to_json">(compas_fab.robots.JointTrajectory method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectoryPoint.to_json.html#compas_fab.robots.JointTrajectoryPoint.to_json">(compas_fab.robots.JointTrajectoryPoint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.OrientationConstraint.to_json.html#compas_fab.robots.OrientationConstraint.to_json">(compas_fab.robots.OrientationConstraint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PointAxisTarget.to_json.html#compas_fab.robots.PointAxisTarget.to_json">(compas_fab.robots.PointAxisTarget method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PositionConstraint.to_json.html#compas_fab.robots.PositionConstraint.to_json">(compas_fab.robots.PositionConstraint method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.ReachabilityMap.to_json.html#compas_fab.robots.ReachabilityMap.to_json">(compas_fab.robots.ReachabilityMap method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Robot.to_json.html#compas_fab.robots.Robot.to_json">(compas_fab.robots.Robot method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.RobotSemantics.to_json.html#compas_fab.robots.RobotSemantics.to_json">(compas_fab.robots.RobotSemantics method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Target.to_json.html#compas_fab.robots.Target.to_json">(compas_fab.robots.Target method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Tool.to_json.html#compas_fab.robots.Tool.to_json">(compas_fab.robots.Tool method)</a>
 </li>
@@ -1958,19 +2068,39 @@ document.write(`
       <li><a href="api/generated/compas_fab.robots.AttachedCollisionMesh.to_jsonstring.html#compas_fab.robots.AttachedCollisionMesh.to_jsonstring">to_jsonstring() (compas_fab.robots.AttachedCollisionMesh method)</a>
 
       <ul>
+        <li><a href="api/generated/compas_fab.robots.BoundingVolume.to_jsonstring.html#compas_fab.robots.BoundingVolume.to_jsonstring">(compas_fab.robots.BoundingVolume method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.CollisionMesh.to_jsonstring.html#compas_fab.robots.CollisionMesh.to_jsonstring">(compas_fab.robots.CollisionMesh method)</a>
 </li>
+        <li><a href="api/generated/compas_fab.robots.ConfigurationTarget.to_jsonstring.html#compas_fab.robots.ConfigurationTarget.to_jsonstring">(compas_fab.robots.ConfigurationTarget method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Constraint.to_jsonstring.html#compas_fab.robots.Constraint.to_jsonstring">(compas_fab.robots.Constraint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.ConstraintSetTarget.to_jsonstring.html#compas_fab.robots.ConstraintSetTarget.to_jsonstring">(compas_fab.robots.ConstraintSetTarget method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.Duration.to_jsonstring.html#compas_fab.robots.Duration.to_jsonstring">(compas_fab.robots.Duration method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.FrameTarget.to_jsonstring.html#compas_fab.robots.FrameTarget.to_jsonstring">(compas_fab.robots.FrameTarget method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.JointConstraint.to_jsonstring.html#compas_fab.robots.JointConstraint.to_jsonstring">(compas_fab.robots.JointConstraint method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectory.to_jsonstring.html#compas_fab.robots.JointTrajectory.to_jsonstring">(compas_fab.robots.JointTrajectory method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectoryPoint.to_jsonstring.html#compas_fab.robots.JointTrajectoryPoint.to_jsonstring">(compas_fab.robots.JointTrajectoryPoint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.OrientationConstraint.to_jsonstring.html#compas_fab.robots.OrientationConstraint.to_jsonstring">(compas_fab.robots.OrientationConstraint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PointAxisTarget.to_jsonstring.html#compas_fab.robots.PointAxisTarget.to_jsonstring">(compas_fab.robots.PointAxisTarget method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PositionConstraint.to_jsonstring.html#compas_fab.robots.PositionConstraint.to_jsonstring">(compas_fab.robots.PositionConstraint method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.ReachabilityMap.to_jsonstring.html#compas_fab.robots.ReachabilityMap.to_jsonstring">(compas_fab.robots.ReachabilityMap method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Robot.to_jsonstring.html#compas_fab.robots.Robot.to_jsonstring">(compas_fab.robots.Robot method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.RobotSemantics.to_jsonstring.html#compas_fab.robots.RobotSemantics.to_jsonstring">(compas_fab.robots.RobotSemantics method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Target.to_jsonstring.html#compas_fab.robots.Target.to_jsonstring">(compas_fab.robots.Target method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Tool.to_jsonstring.html#compas_fab.robots.Tool.to_jsonstring">(compas_fab.robots.Tool method)</a>
 </li>
@@ -1979,10 +2109,10 @@ document.write(`
         <li><a href="api/generated/compas_fab.robots.Wrench.to_jsonstring.html#compas_fab.robots.Wrench.to_jsonstring">(compas_fab.robots.Wrench method)</a>
 </li>
       </ul></li>
-      <li><a href="api/generated/compas_fab.robots.Robot.to_local_coordinates.html#compas_fab.robots.Robot.to_local_coordinates">to_local_coordinates() (compas_fab.robots.Robot method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/compas_fab.robots.Robot.to_local_coordinates.html#compas_fab.robots.Robot.to_local_coordinates">to_local_coordinates() (compas_fab.robots.Robot method)</a>
+</li>
       <li><a href="api/generated/compas_fab.robots.to_radians.html#compas_fab.robots.to_radians">to_radians() (in module compas_fab.robots)</a>
 </li>
       <li><a href="api/generated/compas_fab.robots.Robot.to_world_coordinates.html#compas_fab.robots.Robot.to_world_coordinates">to_world_coordinates() (compas_fab.robots.Robot method)</a>
@@ -1992,19 +2122,39 @@ document.write(`
       <li><a href="api/generated/compas_fab.robots.AttachedCollisionMesh.ToString.html#compas_fab.robots.AttachedCollisionMesh.ToString">ToString() (compas_fab.robots.AttachedCollisionMesh method)</a>
 
       <ul>
+        <li><a href="api/generated/compas_fab.robots.BoundingVolume.ToString.html#compas_fab.robots.BoundingVolume.ToString">(compas_fab.robots.BoundingVolume method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.CollisionMesh.ToString.html#compas_fab.robots.CollisionMesh.ToString">(compas_fab.robots.CollisionMesh method)</a>
 </li>
+        <li><a href="api/generated/compas_fab.robots.ConfigurationTarget.ToString.html#compas_fab.robots.ConfigurationTarget.ToString">(compas_fab.robots.ConfigurationTarget method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Constraint.ToString.html#compas_fab.robots.Constraint.ToString">(compas_fab.robots.Constraint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.ConstraintSetTarget.ToString.html#compas_fab.robots.ConstraintSetTarget.ToString">(compas_fab.robots.ConstraintSetTarget method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.Duration.ToString.html#compas_fab.robots.Duration.ToString">(compas_fab.robots.Duration method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.FrameTarget.ToString.html#compas_fab.robots.FrameTarget.ToString">(compas_fab.robots.FrameTarget method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.JointConstraint.ToString.html#compas_fab.robots.JointConstraint.ToString">(compas_fab.robots.JointConstraint method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectory.ToString.html#compas_fab.robots.JointTrajectory.ToString">(compas_fab.robots.JointTrajectory method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectoryPoint.ToString.html#compas_fab.robots.JointTrajectoryPoint.ToString">(compas_fab.robots.JointTrajectoryPoint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.OrientationConstraint.ToString.html#compas_fab.robots.OrientationConstraint.ToString">(compas_fab.robots.OrientationConstraint method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PointAxisTarget.ToString.html#compas_fab.robots.PointAxisTarget.ToString">(compas_fab.robots.PointAxisTarget method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PositionConstraint.ToString.html#compas_fab.robots.PositionConstraint.ToString">(compas_fab.robots.PositionConstraint method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.ReachabilityMap.ToString.html#compas_fab.robots.ReachabilityMap.ToString">(compas_fab.robots.ReachabilityMap method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Robot.ToString.html#compas_fab.robots.Robot.ToString">(compas_fab.robots.Robot method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.RobotSemantics.ToString.html#compas_fab.robots.RobotSemantics.ToString">(compas_fab.robots.RobotSemantics method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Target.ToString.html#compas_fab.robots.Target.ToString">(compas_fab.robots.Target method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Tool.ToString.html#compas_fab.robots.Tool.ToString">(compas_fab.robots.Tool method)</a>
 </li>
@@ -2076,19 +2226,39 @@ document.write(`
       <li><a href="api/generated/compas_fab.robots.AttachedCollisionMesh.validate_data.html#compas_fab.robots.AttachedCollisionMesh.validate_data">validate_data() (compas_fab.robots.AttachedCollisionMesh class method)</a>
 
       <ul>
+        <li><a href="api/generated/compas_fab.robots.BoundingVolume.validate_data.html#compas_fab.robots.BoundingVolume.validate_data">(compas_fab.robots.BoundingVolume class method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.CollisionMesh.validate_data.html#compas_fab.robots.CollisionMesh.validate_data">(compas_fab.robots.CollisionMesh class method)</a>
 </li>
+        <li><a href="api/generated/compas_fab.robots.ConfigurationTarget.validate_data.html#compas_fab.robots.ConfigurationTarget.validate_data">(compas_fab.robots.ConfigurationTarget class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Constraint.validate_data.html#compas_fab.robots.Constraint.validate_data">(compas_fab.robots.Constraint class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.ConstraintSetTarget.validate_data.html#compas_fab.robots.ConstraintSetTarget.validate_data">(compas_fab.robots.ConstraintSetTarget class method)</a>
+</li>
         <li><a href="api/generated/compas_fab.robots.Duration.validate_data.html#compas_fab.robots.Duration.validate_data">(compas_fab.robots.Duration class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.FrameTarget.validate_data.html#compas_fab.robots.FrameTarget.validate_data">(compas_fab.robots.FrameTarget class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.JointConstraint.validate_data.html#compas_fab.robots.JointConstraint.validate_data">(compas_fab.robots.JointConstraint class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectory.validate_data.html#compas_fab.robots.JointTrajectory.validate_data">(compas_fab.robots.JointTrajectory class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.JointTrajectoryPoint.validate_data.html#compas_fab.robots.JointTrajectoryPoint.validate_data">(compas_fab.robots.JointTrajectoryPoint class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.OrientationConstraint.validate_data.html#compas_fab.robots.OrientationConstraint.validate_data">(compas_fab.robots.OrientationConstraint class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PointAxisTarget.validate_data.html#compas_fab.robots.PointAxisTarget.validate_data">(compas_fab.robots.PointAxisTarget class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.PositionConstraint.validate_data.html#compas_fab.robots.PositionConstraint.validate_data">(compas_fab.robots.PositionConstraint class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.ReachabilityMap.validate_data.html#compas_fab.robots.ReachabilityMap.validate_data">(compas_fab.robots.ReachabilityMap class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Robot.validate_data.html#compas_fab.robots.Robot.validate_data">(compas_fab.robots.Robot class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.RobotSemantics.validate_data.html#compas_fab.robots.RobotSemantics.validate_data">(compas_fab.robots.RobotSemantics class method)</a>
+</li>
+        <li><a href="api/generated/compas_fab.robots.Target.validate_data.html#compas_fab.robots.Target.validate_data">(compas_fab.robots.Target class method)</a>
 </li>
         <li><a href="api/generated/compas_fab.robots.Tool.validate_data.html#compas_fab.robots.Tool.validate_data">(compas_fab.robots.Tool class method)</a>
 </li>

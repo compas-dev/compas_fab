@@ -59,8 +59,8 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Robot.plan_motion_deprecated" href="compas_fab.robots.Robot.plan_motion_deprecated.html" />
-    <link rel="prev" title="Robot.plan_cartesian_motion_deprecated" href="compas_fab.robots.Robot.plan_cartesian_motion_deprecated.html" />
+    <link rel="next" title="Robot.random_configuration" href="compas_fab.robots.Robot.random_configuration.html" />
+    <link rel="prev" title="Robot.plan_cartesian_motion" href="compas_fab.robots.Robot.plan_cartesian_motion.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -623,23 +623,21 @@ document.write(`
 <h1>Robot.plan_motion</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_fab.robots.Robot.plan_motion">
-<span class="sig-prename descclassname"><span class="pre">Robot.</span></span><span class="sig-name descname"><span class="pre">plan_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">goal_constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d49db17/src/compas_fab/robots/robot.py#L1754"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">Robot.</span></span><span class="sig-name descname"><span class="pre">plan_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/4e5d751/src/compas_fab/robots/robot.py#L1437"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Calculate a motion path.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>goal_constraints</strong><span class="classifier">list of <a class="reference internal" href="compas_fab.robots.Constraint.html#compas_fab.robots.Constraint" title="compas_fab.robots.Constraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constraint</span></code></a></span></dt><dd><p>The goal to be achieved, defined in a set of constraints.
-Constraints can be very specific, for example defining value domains
-for each joint, such that the goal configuration is included,
-or defining a volume in space, to which a specific robot link (e.g.
-the end-effector) is required to move to.</p>
+<dt><strong>target</strong><span class="classifier"><a class="reference internal" href="compas_fab.robots.Target.html#compas_fab.robots.Target" title="compas_fab.robots.Target"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.robots.Target</span></code></a></span></dt><dd><p>The target to be achieved by the robot at the end of the motion.
+See <a class="reference internal" href="../../examples/02_description_models/03_targets.html#targets"><span class="std std-ref">Targets</span></a>.</p>
 </dd>
-<dt><strong>start_configuration</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configuration</span></code>, optional</span></dt><dd><p>The robot’s full configuration, i.e. values for all configurable
+<dt><strong>start_configuration</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas_robots/latest/api/generated/compas_robots.Configuration.html" title="(in COMPAS Robots vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_robots.Configuration</span></code></a>, optional</span></dt><dd><p>The robot’s full configuration, i.e. values for all configurable
 joints of the entire robot, at the starting position. Defaults to
 the all-zero configuration.</p>
 </dd>
-<dt><strong>group</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>The name of the group to plan for. Defaults to the robot’s main
-planning group.</p>
+<dt><strong>group</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>The name of the planning group used to define the movable joints.
+The planning group must match with one of the groups defined in the robot’s semantics.
+Defaults to the robot’s main planning group.</p>
 </dd>
 <dt><strong>options</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></a>, optional</span></dt><dd><p>Dictionary containing the following key-value pairs:</p>
 <ul class="simple">
@@ -670,31 +668,33 @@ for more details.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<p>Using position and orientation constraints:</p>
+<p>Using a <a class="reference internal" href="compas_fab.robots.FrameTarget.html#compas_fab.robots.FrameTarget" title="compas_fab.robots.FrameTarget"><code class="xref py py-class docutils literal notranslate"><span class="pre">FrameTarget</span></code></a> :</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>             
 <span class="go">#: This doctest can pass locally but persistently fails on CI in GitHub. &quot;roslibpy.core.RosTimeoutError: Failed to connect to ROS&quot;</span>
 <span class="go">...     robot = client.load_robot()</span>
 <span class="go">...     frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])</span>
 <span class="go">...     tolerance_position = 0.001</span>
-<span class="go">...     tolerances_axes = [math.radians(1)] * 3</span>
+<span class="go">...     tolerance_orientation = math.radians(1)</span>
 <span class="go">...     start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.])</span>
 <span class="go">...     group = robot.main_group_name</span>
+<span class="go">...     target = FrameTarget(frame, tolerance_position, tolerance_orientation)</span>
 <span class="go">...     goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)</span>
-<span class="go">...     trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {&#39;planner_id&#39;: &#39;RRTConnect&#39;})</span>
+<span class="go">...     trajectory = robot.plan_motion((target, start_configuration, group, {&#39;planner_id&#39;: &#39;RRTConnect&#39;})</span>
 <span class="go">...     print(trajectory.fraction)</span>
 <span class="go">1.0</span>
 </pre></div>
 </div>
-<p>Using joint constraints (to the UP configuration):</p>
+<p>Using a <a class="reference internal" href="compas_fab.robots.ConfigurationTarget.html#compas_fab.robots.ConfigurationTarget" title="compas_fab.robots.ConfigurationTarget"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigurationTarget</span></code></a> :</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>             
 <span class="go">#: This doctest can pass locally but persistently fails on CI in GitHub. &quot;roslibpy.core.RosTimeoutError: Failed to connect to ROS&quot;</span>
 <span class="go">...     robot = client.load_robot()</span>
-<span class="go">...     configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0])</span>
+<span class="go">...     joint_names = robot.get_configurable_joint_names()</span>
+<span class="go">...     configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0], joint_names)</span>
 <span class="go">...     tolerances_above = [math.radians(5)] * len(configuration.joint_values)</span>
 <span class="go">...     tolerances_below = [math.radians(5)] * len(configuration.joint_values)</span>
 <span class="go">...     group = robot.main_group_name</span>
-<span class="go">...     goal_constraints = robot.constraints_from_configuration(configuration, tolerances_above, tolerances_below, group)</span>
-<span class="go">...     trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {&#39;planner_id&#39;: &#39;RRTConnect&#39;})</span>
+<span class="go">...     target = ConfigurationTarget(configuration, tolerances_above, tolerances_below)</span>
+<span class="go">...     trajectory = robot.plan_motion(target, start_configuration, group, {&#39;planner_id&#39;: &#39;RRTConnect&#39;})</span>
 <span class="go">...     print(trajectory.fraction)</span>
 <span class="go">1.0</span>
 </pre></div>

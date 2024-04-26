@@ -60,7 +60,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="PositionConstraint.copy" href="compas_fab.robots.PositionConstraint.copy.html" />
-    <link rel="prev" title="OrientationConstraint.scaled" href="compas_fab.robots.OrientationConstraint.scaled.html" />
+    <link rel="prev" title="OrientationConstraint.validate_data" href="compas_fab.robots.OrientationConstraint.validate_data.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -623,7 +623,7 @@ document.write(`
 <h1>PositionConstraint</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.robots.PositionConstraint">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">PositionConstraint</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d49db17/src/compas_fab/robots/constraints.py#L411"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">PositionConstraint</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/4e5d751/src/compas_fab/robots/constraints.py#L581"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="compas_fab.robots.Constraint.html#compas_fab.robots.Constraint" title="compas_fab.robots.constraints.Constraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constraint</span></code></a></p>
 <p>Constrains a link to be within a certain bounding volume.</p>
 <dl class="field-list">
@@ -670,8 +670,14 @@ other constraints. Closer to zero means less important.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.from_box.html#compas_fab.robots.PositionConstraint.from_box" title="compas_fab.robots.PositionConstraint.from_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_box</span></code></a></p></td>
 <td><p>Create a <a class="reference internal" href="#compas_fab.robots.PositionConstraint" title="compas_fab.robots.PositionConstraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">PositionConstraint</span></code></a> from a <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Box.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Box</span></code></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.from_mesh.html#compas_fab.robots.PositionConstraint.from_mesh" title="compas_fab.robots.PositionConstraint.from_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_mesh</span></code></a></p></td>
-<td><p>Create a class:<cite>PositionConstraint</cite> from a <a class="reference external" href="https://compas.dev/compas/latest/api/compas.datastructures.Mesh.html#compas.datastructures.Mesh" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.datastructures.Mesh</span></code></a>.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.from_frame.html#compas_fab.robots.PositionConstraint.from_frame" title="compas_fab.robots.PositionConstraint.from_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_frame</span></code></a></p></td>
+<td><p>Create a <a class="reference internal" href="#compas_fab.robots.PositionConstraint" title="compas_fab.robots.PositionConstraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">PositionConstraint</span></code></a> from a frame on the group's end-effector link.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.from_mesh.html#compas_fab.robots.PositionConstraint.from_mesh" title="compas_fab.robots.PositionConstraint.from_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_mesh</span></code></a></p></td>
+<td><p>Create a <a class="reference internal" href="#compas_fab.robots.PositionConstraint" title="compas_fab.robots.PositionConstraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">PositionConstraint</span></code></a> from a <a class="reference external" href="https://compas.dev/compas/latest/api/compas.datastructures.Mesh.html#compas.datastructures.Mesh" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.datastructures.Mesh</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.from_point.html#compas_fab.robots.PositionConstraint.from_point" title="compas_fab.robots.PositionConstraint.from_point"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_point</span></code></a></p></td>
+<td><p>Create a <a class="reference internal" href="#compas_fab.robots.PositionConstraint" title="compas_fab.robots.PositionConstraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">PositionConstraint</span></code></a> from a point.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.from_sphere.html#compas_fab.robots.PositionConstraint.from_sphere" title="compas_fab.robots.PositionConstraint.from_sphere"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_sphere</span></code></a></p></td>
 <td><p>Create a <a class="reference internal" href="#compas_fab.robots.PositionConstraint" title="compas_fab.robots.PositionConstraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">PositionConstraint</span></code></a> from a <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Sphere.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Sphere</span></code></a>.</p></td>
@@ -687,8 +693,29 @@ other constraints. Closer to zero means less important.</p>
 <p class="rubric">Inherited Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.scaled.html#compas_fab.robots.PositionConstraint.scaled" title="compas_fab.robots.PositionConstraint.scaled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scaled</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.ToString.html#compas_fab.robots.PositionConstraint.ToString" title="compas_fab.robots.PositionConstraint.ToString"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ToString</span></code></a></p></td>
+<td><p>Converts the instance to a string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.from_json.html#compas_fab.robots.PositionConstraint.from_json" title="compas_fab.robots.PositionConstraint.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a></p></td>
+<td><p>Construct an object of this type from a JSON file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.from_jsonstring.html#compas_fab.robots.PositionConstraint.from_jsonstring" title="compas_fab.robots.PositionConstraint.from_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_jsonstring</span></code></a></p></td>
+<td><p>Construct an object of this type from a JSON string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.scaled.html#compas_fab.robots.PositionConstraint.scaled" title="compas_fab.robots.PositionConstraint.scaled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scaled</span></code></a></p></td>
 <td><p>Get a scaled copy of this <a class="reference internal" href="compas_fab.robots.Constraint.html#compas_fab.robots.Constraint" title="compas_fab.robots.Constraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constraint</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.sha256.html#compas_fab.robots.PositionConstraint.sha256" title="compas_fab.robots.PositionConstraint.sha256"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code></a></p></td>
+<td><p>Compute a hash of the data for comparison during version control using the sha256 algorithm.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.to_json.html#compas_fab.robots.PositionConstraint.to_json" title="compas_fab.robots.PositionConstraint.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
+<td><p>Convert an object to its native data representation and save it to a JSON file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.to_jsonstring.html#compas_fab.robots.PositionConstraint.to_jsonstring" title="compas_fab.robots.PositionConstraint.to_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_jsonstring</span></code></a></p></td>
+<td><p>Convert an object to its native data representation and save it to a JSON string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.PositionConstraint.validate_data.html#compas_fab.robots.PositionConstraint.validate_data" title="compas_fab.robots.PositionConstraint.validate_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_data</span></code></a></p></td>
+<td><p>Validate the data against the object's data schema.</p></td>
 </tr>
 </tbody>
 </table>

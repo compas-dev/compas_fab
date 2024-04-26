@@ -667,6 +667,7 @@ allows to describe the goal with constraints rather than defined frames.</p>
 <span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Frame</span>
 
 <span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">RosClient</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">FrameTarget</span>
 
 <span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
     <span class="n">robot</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">load_robot</span><span class="p">()</span>
@@ -674,19 +675,19 @@ allows to describe the goal with constraints rather than defined frames.</p>
 
     <span class="n">frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="n">tolerance_position</span> <span class="o">=</span> <span class="mf">0.001</span>
-    <span class="n">tolerance_axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">3</span>
+    <span class="n">tolerance_orientation</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="n">start_configuration</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">zero_configuration</span><span class="p">()</span>
     <span class="n">start_configuration</span><span class="o">.</span><span class="n">joint_values</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">3.530</span><span class="p">,</span> <span class="mf">3.830</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.580</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.330</span><span class="p">,</span> <span class="mf">4.760</span><span class="p">,</span> <span class="mf">0.000</span><span class="p">)</span>
     <span class="n">group</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">main_group_name</span>
 
-    <span class="c1"># create goal constraints from frame</span>
-    <span class="n">goal_constraints</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">constraints_from_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span>
-                                                    <span class="n">tolerance_position</span><span class="p">,</span>
-                                                    <span class="n">tolerance_axes</span><span class="p">,</span>
-                                                    <span class="n">group</span><span class="p">)</span>
+    <span class="c1"># create target from frame</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">FrameTarget</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span>
+                         <span class="n">tolerance_position</span><span class="p">,</span>
+                         <span class="n">tolerance_orientation</span><span class="p">,</span>
+                         <span class="p">)</span>
 
-    <span class="n">trajectory</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">plan_motion</span><span class="p">(</span><span class="n">goal_constraints</span><span class="p">,</span>
+    <span class="n">trajectory</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">plan_motion</span><span class="p">(</span><span class="n">target</span><span class="p">,</span>
                                    <span class="n">start_configuration</span><span class="p">,</span>
                                    <span class="n">group</span><span class="p">,</span>
                                    <span class="n">options</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>

@@ -623,18 +623,14 @@ document.write(`
 <h1>PlanMotion.plan_motion</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_fab.backends.interfaces.PlanMotion.plan_motion">
-<span class="sig-prename descclassname"><span class="pre">PlanMotion.</span></span><span class="sig-name descname"><span class="pre">plan_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">goal_constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d49db17/src/compas_fab/backends/interfaces/backend_features.py#L93"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">PlanMotion.</span></span><span class="sig-name descname"><span class="pre">plan_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/4e5d751/src/compas_fab/backends/interfaces/backend_features.py#L93"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Calculates a motion path.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>robot</strong><span class="classifier"><a class="reference internal" href="../../api/generated/compas_fab.robots.Robot.html" title="compas_fab.robots.Robot"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.robots.Robot</span></code></a></span></dt><dd><p>The robot instance for which the motion path is being calculated.</p>
 </dd>
-<dt><strong>goal_constraints: list of :class:`compas_fab.robots.Constraint`</strong></dt><dd><p>The goal to be achieved, defined in a set of constraints.
-Constraints can be very specific, for example defining value domains
-for each joint, such that the goal configuration is included,
-or defining a volume in space, to which a specific robot link (e.g.
-the end-effector) is required to move to.</p>
+<dt><strong>target: :class:`compas_fab.robots.Target`</strong></dt><dd><p>The goal for the robot to achieve.</p>
 </dd>
 <dt><strong>start_configuration: :class:`compas_fab.robots.Configuration`, optional</strong></dt><dd><p>The robot’s full configuration, i.e. values for all configurable
 joints of the entire robot, at the starting position.</p>

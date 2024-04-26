@@ -60,7 +60,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="JointConstraint.copy" href="compas_fab.robots.JointConstraint.copy.html" />
-    <link rel="prev" title="Constraint.transform" href="compas_fab.robots.Constraint.transform.html" />
+    <link rel="prev" title="Constraint.validate_data" href="compas_fab.robots.Constraint.validate_data.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -623,7 +623,7 @@ document.write(`
 <h1>JointConstraint</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.robots.JointConstraint">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">JointConstraint</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d49db17/src/compas_fab/robots/constraints.py#L250"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">JointConstraint</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/4e5d751/src/compas_fab/robots/constraints.py#L266"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="compas_fab.robots.Constraint.html#compas_fab.robots.Constraint" title="compas_fab.robots.constraints.Constraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constraint</span></code></a></p>
 <p>Constrains the value of a joint to be within a certain bound.</p>
 <dl class="field-list">
@@ -672,7 +672,10 @@ other constraints. Closer to zero means less important.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.copy.html#compas_fab.robots.JointConstraint.copy" title="compas_fab.robots.JointConstraint.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a></p></td>
 <td><p>Create a copy of this <a class="reference internal" href="#compas_fab.robots.JointConstraint" title="compas_fab.robots.JointConstraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">JointConstraint</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.scale.html#compas_fab.robots.JointConstraint.scale" title="compas_fab.robots.JointConstraint.scale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.joint_constraints_from_configuration.html#compas_fab.robots.JointConstraint.joint_constraints_from_configuration" title="compas_fab.robots.JointConstraint.joint_constraints_from_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">joint_constraints_from_configuration</span></code></a></p></td>
+<td><p>Create joint constraints for all joints of the configuration.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.scale.html#compas_fab.robots.JointConstraint.scale" title="compas_fab.robots.JointConstraint.scale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale</span></code></a></p></td>
 <td><p>Scale (multiply) the constraint with a factor.</p></td>
 </tr>
 </tbody>
@@ -680,11 +683,32 @@ other constraints. Closer to zero means less important.</p>
 <p class="rubric">Inherited Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.scaled.html#compas_fab.robots.JointConstraint.scaled" title="compas_fab.robots.JointConstraint.scaled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scaled</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.ToString.html#compas_fab.robots.JointConstraint.ToString" title="compas_fab.robots.JointConstraint.ToString"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ToString</span></code></a></p></td>
+<td><p>Converts the instance to a string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.from_json.html#compas_fab.robots.JointConstraint.from_json" title="compas_fab.robots.JointConstraint.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a></p></td>
+<td><p>Construct an object of this type from a JSON file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.from_jsonstring.html#compas_fab.robots.JointConstraint.from_jsonstring" title="compas_fab.robots.JointConstraint.from_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_jsonstring</span></code></a></p></td>
+<td><p>Construct an object of this type from a JSON string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.scaled.html#compas_fab.robots.JointConstraint.scaled" title="compas_fab.robots.JointConstraint.scaled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scaled</span></code></a></p></td>
 <td><p>Get a scaled copy of this <a class="reference internal" href="compas_fab.robots.Constraint.html#compas_fab.robots.Constraint" title="compas_fab.robots.Constraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constraint</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.sha256.html#compas_fab.robots.JointConstraint.sha256" title="compas_fab.robots.JointConstraint.sha256"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code></a></p></td>
+<td><p>Compute a hash of the data for comparison during version control using the sha256 algorithm.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.to_json.html#compas_fab.robots.JointConstraint.to_json" title="compas_fab.robots.JointConstraint.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
+<td><p>Convert an object to its native data representation and save it to a JSON file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.to_jsonstring.html#compas_fab.robots.JointConstraint.to_jsonstring" title="compas_fab.robots.JointConstraint.to_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_jsonstring</span></code></a></p></td>
+<td><p>Convert an object to its native data representation and save it to a JSON string.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.transform.html#compas_fab.robots.JointConstraint.transform" title="compas_fab.robots.JointConstraint.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
 <td><p>Transform the <a class="reference internal" href="compas_fab.robots.Constraint.html#compas_fab.robots.Constraint" title="compas_fab.robots.Constraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constraint</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.robots.JointConstraint.validate_data.html#compas_fab.robots.JointConstraint.validate_data" title="compas_fab.robots.JointConstraint.validate_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_data</span></code></a></p></td>
+<td><p>Validate the data against the object's data schema.</p></td>
 </tr>
 </tbody>
 </table>
