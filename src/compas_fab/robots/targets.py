@@ -208,7 +208,7 @@ class PointAxisTarget(Target):
     Attributes
     ----------
     target_point : :class:`compas.geometry.Point`
-        The target point defined relative to the robot's world coordinate frame (WCF).
+        The target point defined relative to the world coordinate frame (WCF).
     target_z_axis : :class:`compas.geometry.Vector`
         The target axis is defined by the target_point and pointing towards this vector.
         The tool tip coordinate frame (TCF)'s Z axis can rotate around this axis.
