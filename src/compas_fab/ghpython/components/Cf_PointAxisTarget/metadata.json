@@ -11,7 +11,7 @@
         "inputParameters": [
             {
                 "name": "point",
-                "description": "The target point defined relative to the robot's base coordinate frame (RCF). Accepts Rhino / Grasshopper Point or COMPAS Point."
+                "description": "The target point defined relative to the world coordinate frame (WCF). Accepts Rhino / Grasshopper Point or COMPAS Point."
             },
             {
                 "name": "target_z_vector",
@@ -24,7 +24,7 @@
             },
             {
                 "name": "tool_coordinate_frame",
-                "description": "The tool tip coordinate frame relative to the flange coordinate frame of the robot. If not specified, the target point is relative to the robot's flange (T0CF). Accepts Rhino / Grasshopper Frame or COMPAS Frame."
+                "description": "The tool tip coordinate frame relative to the tool0 coordinate frame (T0CF) of the robot. If not specified, the target point is relative to the T0CF directly. Accepts Rhino / Grasshopper Frame or COMPAS Frame."
             }
         ],
         "outputParameters": [
