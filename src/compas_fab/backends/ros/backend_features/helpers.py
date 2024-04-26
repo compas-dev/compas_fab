@@ -77,8 +77,9 @@ def convert_target_to_goal_constraints(target, ee_link_name):
         pc = CF_PositionConstraint.from_point(
             tcf_point_in_wcf, target.tolerance_position, ee_link_name, tool_coordinate_frame
         )
+        OC_TOLERANCE_FOR_FREE_ROTATION = [0.01, 0.01, 6.3]
         oc = CF_OrientationConstraint.from_frame(
-            tcf_frame_in_wcf, [6.35, 6.35, 0.01], ee_link_name, tool_coordinate_frame
+            tcf_frame_in_wcf, OC_TOLERANCE_FOR_FREE_ROTATION, ee_link_name, tool_coordinate_frame
         )
         return [pc, oc]
 
