@@ -124,6 +124,7 @@ class FrameTarget(Target):
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "tool_coordinate_frame": self.tool_coordinate_frame,
+            "name": self.name,
         }
 
     @classmethod
@@ -229,7 +230,9 @@ class PointAxisTarget(Target):
         The tool tip coordinate frame relative to the flange coordinate frame of the robot.
         If not specified, the target point is relative to the robot's flange (T0CF) and the
         Z axis of the flange can rotate around the target axis.
-
+    nane : str, optional
+        The human-readable name of the target.
+        Defaults to 'Point-Axis Target'.
     """
 
     def __init__(
@@ -246,12 +249,14 @@ class PointAxisTarget(Target):
         self.tolerance_position = tolerance_position
         self.tool_coordinate_frame = tool_coordinate_frame
 
+    @property
     def __data__(self):
         return {
             "target_point": self.target_point,
             "target_z_axis": self.target_z_axis,
             "tolerance_position": self.tolerance_position,
             "tool_coordinate_frame": self.tool_coordinate_frame,
+            "name": self.name,
         }
 
     def scaled(self, factor):
@@ -302,6 +307,9 @@ class ConfigurationTarget(Target):
         Acceptable deviation below the targeted configurations. One for each joint.
         Always use positive values.
         If not specified, the default value from the planner is used.
+    name : str, optional
+        The human-readable name of the target.
+        Defaults to 'Configuration Target'.
     """
 
     SUPPORTED_JOINT_TYPES = [Joint.PRISMATIC, Joint.REVOLUTE, Joint.CONTINUOUS]
@@ -317,11 +325,13 @@ class ConfigurationTarget(Target):
         for joint_type in target_configuration.joint_types:
             assert joint_type in self.SUPPORTED_JOINT_TYPES, "Unsupported joint type: {}".format(joint_type)
 
+    @property
     def __data__(self):
         return {
             "target_configuration": self.target_configuration,
             "tolerance_above": self.tolerance_above,
             "tolerance_below": self.tolerance_below,
+            "name": self.name,
         }
 
     @classmethod
@@ -441,14 +451,21 @@ class ConstraintSetTarget(Target):
     ----------
     constraint_set : :obj:`list` of :class:`compas_fab.robots.Constraint`
         A list of constraints to be satisfied.
+    name : str, optional
+        The human-readable name of the target.
+        Defaults to 'Constraint Set Target'.
     """
 
     def __init__(self, constraint_set, name="Constraint Set Target"):
         super(ConstraintSetTarget, self).__init__(name=name)
         self.constraint_set = constraint_set
 
+    @property
     def __data__(self):
-        return {"constraint_set": self.constraint_set}
+        return {
+            "constraint_set": self.constraint_set,
+            "name": self.name,
+        }
 
     def scaled(self, factor):
         """Returns a scaled copy of the target.
@@ -565,6 +582,7 @@ class FrameWaypoints(Waypoints):
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "tool_coordinate_frame": self.tool_coordinate_frame,
+            "name": self.name,
         }
 
     @classmethod
@@ -668,11 +686,13 @@ class PointAxisWaypoints(Waypoints):
         self.tolerance_position = tolerance_position
         self.tool_coordinate_frame = tool_coordinate_frame
 
+    @property
     def __data__(self):
         return {
             "target_points_and_axes": self.target_points_and_axes,
             "tolerance_position": self.tolerance_position,
             "tool_coordinate_frame": self.tool_coordinate_frame,
+            "name": self.name,
         }
 
     def scaled(self, factor):
