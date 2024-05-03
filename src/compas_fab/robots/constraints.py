@@ -669,7 +669,8 @@ class PositionConstraint(Constraint):
         if tool_coordinate_frame:
             frame_WCF = from_tcf_to_t0cf(frame_WCF, tool_coordinate_frame)
 
-        sphere = Sphere(radius=tolerance_position, point=frame_WCF.point)
+        radius = float(tolerance_position)
+        sphere = Sphere(radius, point=frame_WCF.point)
         return cls.from_sphere(link_name, sphere, weight)
 
     @classmethod

@@ -671,6 +671,9 @@ class PointAxisWaypoints(Waypoints):
         The tool tip coordinate frame relative to the flange coordinate frame of the robot.
         If not specified, the target point is relative to the robot's flange (T0CF) and the
         Z axis of the flange can rotate around the target axis.
+    name : str, optional
+        The human-readable name of the target.
+        Defaults to 'Point-Axis Waypoints'.
 
     """
 
