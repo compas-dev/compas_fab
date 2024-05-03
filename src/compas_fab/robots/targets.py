@@ -506,13 +506,10 @@ class Waypoints(Data):
     :class:`FrameWaypoints`
     """
 
-    def __init__(self, name="Generic Waypoints"):
+    def __init__(self, tool_coordinate_frame, name="Generic Waypoints"):
         super(Waypoints, self).__init__()
         self.name = name
-
-    @property
-    def tool_coordinate_frame(self):
-        raise NotImplementedError
+        self.tool_coordinate_frame = tool_coordinate_frame
 
     def scaled(self, factor):
         """Returns a scaled copy of the waypoints.
