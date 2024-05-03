@@ -32,19 +32,17 @@
       "UR5Kinematics",
       "UR5eKinematics"
     ],
-    "compas_fab.ghpython": [
-      "ReachabilityMapObject"
-    ],
-    "compas_fab.rhino": [
-      "ReachabilityMapObject"
-    ],
     "compas_fab.robots": [
       "AttachedCollisionMesh",
       "BoundingVolume",
       "CollisionMesh",
+      "ConfigurationTarget",
       "Constraint",
+      "ConstraintSetTarget",
       "DeviationVectorsGenerator",
       "Duration",
+      "FrameTarget",
+      "FrameWaypoints",
       "Inertia",
       "JointConstraint",
       "JointTrajectory",
@@ -52,12 +50,17 @@
       "OrientationConstraint",
       "OrthonormalVectorsFromAxisGenerator",
       "PlanningScene",
+      "PointAxisTarget",
+      "PointAxisWaypoints",
       "PositionConstraint",
       "ReachabilityMap",
       "Robot",
+      "RobotLibrary",
       "RobotSemantics",
+      "Target",
       "Tool",
       "Trajectory",
+      "Waypoints",
       "Wrench",
       "to_degrees",
       "to_radians"
