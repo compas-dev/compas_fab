@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "compas_fab_version": "1.0.0",
-    "generated_on": "20240220"
+    "compas_fab_version": "1.0.2",
+    "generated_on": "20240503"
   },
   "modules": {
     "compas_fab": [
@@ -13,6 +13,7 @@
       "AnalyticalPlanCartesianMotion",
       "AnalyticalPyBulletClient",
       "BackendError",
+      "BackendFeatureNotSupportedError",
       "CancellableFutureResult",
       "CartesianMotionError",
       "CollisionError",
@@ -41,8 +42,8 @@
       "AttachedCollisionMesh",
       "BoundingVolume",
       "CollisionMesh",
-      "Constraint",
       "ConfigurationTarget",
+      "Constraint",
       "ConstraintSetTarget",
       "DeviationVectorsGenerator",
       "Duration",
@@ -60,6 +61,7 @@
       "PositionConstraint",
       "ReachabilityMap",
       "Robot",
+      "RobotLibrary",
       "RobotSemantics",
       "Target",
       "Tool",
@@ -85,6 +87,7 @@
       "argsort",
       "clamp",
       "diffs",
+      "from_tcf_to_t0cf",
       "list_files_in_directory",
       "map_range",
       "range_geometric_row",
