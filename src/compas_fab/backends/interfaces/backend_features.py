@@ -125,18 +125,18 @@ class PlanCartesianMotion(object):
     <https://en.wikipedia.org/wiki/Function_object#In_Python>.
     """
 
-    def __call__(self, robot, frames_WCF, start_configuration=None, group=None, options=None):
-        return self.plan_cartesian_motion(robot, frames_WCF, start_configuration, group, options)
+    def __call__(self, robot, waypoints, start_configuration=None, group=None, options=None):
+        return self.plan_cartesian_motion(robot, waypoints, start_configuration, group, options)
 
-    def plan_cartesian_motion(self, robot, frames_WCF, start_configuration=None, group=None, options=None):
+    def plan_cartesian_motion(self, robot, waypoints, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
         ----------
         robot : :class:`compas_fab.robots.Robot`
             The robot instance for which the cartesian motion path is being calculated.
-        frames_WCF: list of :class:`compas.geometry.Frame`
-            The frames through which the path is defined.
+        waypoints : :class:`compas_fab.robots.Waypoints`
+            The waypoints for the robot to follow.
         start_configuration: :class:`compas_robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the starting position.
