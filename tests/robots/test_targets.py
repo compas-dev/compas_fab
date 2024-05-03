@@ -62,10 +62,6 @@ def configuration_target(target_configuration):
 
 
 def test_serialization_targets(frame_target, point_axis_target, configuration_target):
-    tolerance_position = 0.001
-    tolerance_orientation = 0.001
-    name = "my testing name"
-
     # FrameTarget
     nt = FrameTarget.__from_data__(frame_target.__data__)
     assert frame_target.target_frame == nt.target_frame
