@@ -58,9 +58,9 @@ Targets and Waypoints
     PointAxisTarget
     ConfigurationTarget
     ConstraintSetTarget
-    Waypoint
-    FrameWaypoint
-    ConfigurationWaypoint
+    Waypoints
+    FrameWaypoints
+    PointAxisWaypoints
 
 Constraints
 -----------
