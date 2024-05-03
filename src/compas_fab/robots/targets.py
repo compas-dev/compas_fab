@@ -598,7 +598,7 @@ class FrameWaypoints(Waypoints):
 
         Parameters
         ----------
-        transformations : :obj:`list` of :class
+        transformations : :obj:`list` of :class: `compas.geometry.Transformation`
         The list of transformation matrices.
         tolerance_position : float, optional
             The tolerance for the position.
@@ -660,7 +660,7 @@ class PointAxisWaypoints(Waypoints):
 
     Attributes
     ----------
-    target_points_and_axes : :obj:`tuple` of (:class:`compas.geometry.Point`, :class:`compas.geometry.Vector`)
+    target_points_and_axes : :obj:`list` of :obj:`tuple` of (:class:`compas.geometry.Point`, :class:`compas.geometry.Vector`)
         The target points and axes.
         Both values are defined relative to the world coordinate frame (WCF).
         Unitized vectors are recommended for the target axes.
