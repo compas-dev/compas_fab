@@ -276,7 +276,7 @@ class PointAxisTarget(Target):
         tolerance_position = self.tolerance_position * factor if self.tolerance_position else None
         target_z_axis = self.target_z_axis  # Vector is unitized and is not scaled
         tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
-        return PointAxisTarget(target_point, target_z_axis, tool_coordinate_frame, tolerance_position, self.name)
+        return PointAxisTarget(target_point, target_z_axis, tolerance_position, tool_coordinate_frame, self.name)
 
 
 class ConfigurationTarget(Target):
@@ -715,4 +715,4 @@ class PointAxisWaypoints(Waypoints):
         target_points_and_axes = [(point.scaled(factor), axis) for point, axis in self.target_points_and_axes]
         tolerance_position = self.tolerance_position * factor if self.tolerance_position else None
         tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
-        return PointAxisWaypoints(target_points_and_axes, tool_coordinate_frame, tolerance_position, self.name)
+        return PointAxisWaypoints(target_points_and_axes, tolerance_position, tool_coordinate_frame, self.name)

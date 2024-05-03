@@ -12,12 +12,11 @@ from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import PointAxisWaypoints
 
 from compas_robots import Configuration
+from compas_robots.model import Joint
 
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Vector
-
-from compas.tolerance import TOL
 
 
 @pytest.fixture
@@ -37,41 +36,58 @@ def target_configuration():
     )
 
 
-def test_serialization_targets(target_frame, tool_coordinate_frame, target_configuration):
+@pytest.fixture
+def frame_target(target_frame, tool_coordinate_frame):
+    tolerance_position = 0.001
+    tolerance_orientation = 0.001
+    name = "my testing name"
+    return FrameTarget(target_frame, tolerance_position, tolerance_orientation, tool_coordinate_frame, name)
+
+
+@pytest.fixture
+def point_axis_target(tool_coordinate_frame):
+    target_point = Point(1.0, -2.0, 3.0)
+    target_vector = Vector(1.0, -1.0, 0.0)
+    tolerance_position = 0.001
+    name = "my testing name"
+    return PointAxisTarget(target_point, target_vector, tolerance_position, tool_coordinate_frame, name)
+
+
+@pytest.fixture
+def configuration_target(target_configuration):
+    tolerance_above = [0.01] * 8
+    tolerance_below = [0.0009] * 8
+    name = "my testing name"
+    return ConfigurationTarget(target_configuration, tolerance_above, tolerance_below, name)
+
+
+def test_serialization_targets(frame_target, point_axis_target, configuration_target):
     tolerance_position = 0.001
     tolerance_orientation = 0.001
     name = "my testing name"
 
     # FrameTarget
-    target = FrameTarget(target_frame, tolerance_position, tolerance_orientation, tool_coordinate_frame, name)
-    nt = FrameTarget.__from_data__(target.__data__)
-    assert target.target_frame == nt.target_frame
-    assert target.tool_coordinate_frame == nt.tool_coordinate_frame
-    assert TOL.is_close(target.tolerance_position, nt.tolerance_position)
-    assert TOL.is_close(target.tolerance_orientation, nt.tolerance_orientation)
-    assert target.name == nt.name
+    nt = FrameTarget.__from_data__(frame_target.__data__)
+    assert frame_target.target_frame == nt.target_frame
+    assert frame_target.tool_coordinate_frame == nt.tool_coordinate_frame
+    assert frame_target.tolerance_position == nt.tolerance_position
+    assert frame_target.tolerance_orientation == nt.tolerance_orientation
+    assert frame_target.name == nt.name
 
     # PointAxisTarget
-    target_point = Point(1.0, -2.0, 3.0)
-    target_vector = Vector(1.0, -1.0, 0.0)
-    target = PointAxisTarget(target_point, target_vector, tolerance_position, tool_coordinate_frame, name)
-    nt = PointAxisTarget.__from_data__(target.__data__)
-    assert target.target_point == nt.target_point
-    assert target.target_z_axis == nt.target_z_axis
-    assert target.tool_coordinate_frame == nt.tool_coordinate_frame
-    assert TOL.is_close(target.tolerance_position, nt.tolerance_position)
-    assert target.name == nt.name
+    nt = PointAxisTarget.__from_data__(point_axis_target.__data__)
+    assert point_axis_target.target_point == nt.target_point
+    assert point_axis_target.target_z_axis == nt.target_z_axis
+    assert point_axis_target.tool_coordinate_frame == nt.tool_coordinate_frame
+    assert point_axis_target.tolerance_position == nt.tolerance_position
+    assert point_axis_target.name == nt.name
 
     # ConfigurationTarget
-
-    tolerance_above = [0.01] * 8
-    tolerance_below = [0.0009] * 8
-    target = ConfigurationTarget(target_configuration, tolerance_above, tolerance_below, name)
-    nt = ConfigurationTarget.__from_data__(target.__data__)
-    assert target.target_configuration.close_to(nt.target_configuration)
-    assert target.tolerance_above == nt.tolerance_above
-    assert target.tolerance_below == nt.tolerance_below
-    assert target.name == nt.name
+    nt = ConfigurationTarget.__from_data__(configuration_target.__data__)
+    assert configuration_target.target_configuration.close_to(nt.target_configuration)
+    assert configuration_target.tolerance_above == nt.tolerance_above
+    assert configuration_target.tolerance_below == nt.tolerance_below
+    assert configuration_target.name == nt.name
 
 
 def test_serialization_constraint_sets(target_frame, tool_coordinate_frame, target_configuration):
@@ -140,8 +156,8 @@ def test_serialization_waypoints(frame_waypoints, point_axis_waypoints):
     nt = FrameWaypoints.__from_data__(frame_waypoints.__data__)
     for f1, f2 in zip(frame_waypoints.target_frames, nt.target_frames):
         assert f1 == f2
-    assert TOL.is_close(frame_waypoints.tolerance_position, nt.tolerance_position)
-    assert TOL.is_close(frame_waypoints.tolerance_orientation, nt.tolerance_orientation)
+    assert frame_waypoints.tolerance_position, nt.tolerance_position
+    assert frame_waypoints.tolerance_orientation, nt.tolerance_orientation
     assert frame_waypoints.tool_coordinate_frame == nt.tool_coordinate_frame
     assert frame_waypoints.name == nt.name
 
@@ -153,3 +169,60 @@ def test_serialization_waypoints(frame_waypoints, point_axis_waypoints):
     assert point_axis_waypoints.tolerance_position == nt.tolerance_position
     assert point_axis_waypoints.tool_coordinate_frame == nt.tool_coordinate_frame
     assert point_axis_waypoints.name == nt.name
+
+
+def test_target_scale(frame_target):
+    scale_factor = 0.001
+    nt = frame_target.scaled(scale_factor)
+    assert nt.target_frame == frame_target.target_frame.scaled(scale_factor)
+    assert nt.tolerance_position == frame_target.tolerance_position * scale_factor
+    assert nt.tolerance_orientation == frame_target.tolerance_orientation * scale_factor
+    assert nt.tool_coordinate_frame == frame_target.tool_coordinate_frame.scaled(scale_factor)
+
+
+def test_point_axis_target_scale(point_axis_target):
+    scale_factor = 0.001
+    nt = point_axis_target.scaled(scale_factor)
+    assert nt.target_point == point_axis_target.target_point.scaled(scale_factor)
+    assert nt.target_z_axis == point_axis_target.target_z_axis
+    assert nt.tolerance_position == point_axis_target.tolerance_position * scale_factor
+    assert nt.tool_coordinate_frame == point_axis_target.tool_coordinate_frame.scaled(scale_factor)
+
+
+def test_configuration_target_scale(configuration_target):
+    scale_factor = 0.001
+    nt = configuration_target.scaled(scale_factor)
+    assert (
+        nt.target_configuration.joint_values
+        == configuration_target.target_configuration.scaled(scale_factor).joint_values
+    )
+    assert nt.target_configuration.joint_types == configuration_target.target_configuration.joint_types
+    assert nt.target_configuration.joint_names == configuration_target.target_configuration.joint_names
+    for i, joint_type in enumerate(configuration_target.target_configuration.joint_types):
+        if joint_type in (Joint.PLANAR, Joint.PRISMATIC):
+            assert (
+                nt.target_configuration.joint_values[i]
+                == configuration_target.target_configuration.joint_values[i] * scale_factor
+            )
+        else:
+            assert nt.target_configuration.joint_values[i] == configuration_target.target_configuration.joint_values[i]
+
+
+def test_frame_waypoints_scale(frame_waypoints):
+    scale_factor = 0.001
+    nt = frame_waypoints.scaled(scale_factor)
+    assert nt.tolerance_position == frame_waypoints.tolerance_position * scale_factor
+    assert nt.tolerance_orientation == frame_waypoints.tolerance_orientation * scale_factor
+    for f1, f2 in zip(frame_waypoints.target_frames, nt.target_frames):
+        assert f1.scaled(scale_factor) == f2
+    assert nt.tool_coordinate_frame == frame_waypoints.tool_coordinate_frame.scaled(scale_factor)
+
+
+def test_point_axis_waypoints_scale(point_axis_waypoints):
+    scale_factor = 0.001
+    nt = point_axis_waypoints.scaled(scale_factor)
+    assert nt.tolerance_position == point_axis_waypoints.tolerance_position * scale_factor
+    for (p1, a1), (p2, a2) in zip(point_axis_waypoints.target_points_and_axes, nt.target_points_and_axes):
+        assert p1.scaled(scale_factor) == p2
+        assert a1 == a2
+    assert nt.tool_coordinate_frame == point_axis_waypoints.tool_coordinate_frame.scaled(scale_factor)
