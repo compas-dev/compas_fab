@@ -13,6 +13,7 @@ from compas_robots.model import Joint
 
 from compas_fab.robots.constraints import Constraint
 
+
 __all__ = [
     "Robot",
 ]
@@ -1313,25 +1314,22 @@ class Robot(Data):
 
         return frame_WCF
 
-    def plan_cartesian_motion(
-        self, frames_WCF, start_configuration=None, group=None, use_attached_tool_frame=True, options=None
-    ):
+    def plan_cartesian_motion(self, waypoints, start_configuration=None, group=None, options=None):
         """Calculate a cartesian motion path (linear in tool space).
 
         Parameters
         ----------
-        frames_WCF : :obj:`list` of :class:`compas.geometry.Frame`
-            The frames through which the path is defined.
+        waypoints : :class:`compas_fab.robots.Waypoints`
+            The waypoints for the robot to follow.
+            If a tool is attached to the robot, the :meth:`~compas_fab.robots.Waypoints.tool_coordinate_frame` parameter
+            should be set.
         start_configuration : :class:`compas_robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
-            joints of the entire robot, at the starting position. Defaults to
-            the all-zero configuration.
+            joints of the entire robot, at the start of the motion.
+            Defaults to the all-zero configuration.
         group : :obj:`str`, optional
-            The planning group used for calculation. Defaults to the robot's
-            main planning group.
-        use_attached_tool_frame : :obj:`bool`, optional
-            If ``True`` and there is a tool attached to the planning group, it will use its TCF
-            instead of the T0CF to calculate cartesian paths. Defaults to ``True``.
+            The name of the planning group used for motion planning.
+            Defaults to the robot's main planning group.
         options : :obj:`dict`, optional
             Dictionary containing the following key-value pairs:
 
@@ -1360,42 +1358,51 @@ class Robot(Data):
         >>> with RosClient() as client:             # doctest: +SKIP
         #: This doctest can pass locally but persistently fails on CI in GitHub. "roslibpy.core.RosTimeoutError: Failed to connect to ROS"
         ...     robot = client.load_robot()
-        ...     frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\
+        ...     target_frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\
                       Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0])]
+        ...     waypoints = FrameWaypoints(target_frames)
         ...     start_configuration = Configuration.from_revolute_values([-0.042, 0.033, -2.174, 5.282, -1.528, 0.000])
         ...     group = robot.main_group_name
         ...     options = {'max_step': 0.01,\
                        'jump_threshold': 1.57,\
                        'avoid_collisions': True}
-        ...     trajectory = robot.plan_cartesian_motion(frames,\
+        ...     trajectory = robot.plan_cartesian_motion(waypoints,\
                                                      start_configuration,\
                                                      group=group,\
                                                      options=options)
         ...     len(trajectory.points) > 1
         True
         """
+        # The plan_cartesian_motion method in the Robot class is a wrapper around planing backend's
+        # plan_cartesian_motion method. This method is responsible for scaling the waypoints, start_configuration,
+        # options and the planned trajectory.
+        # Attached tools are also managed by this function.
+
         options = options or {}
-        max_step = options.get("max_step")
-        path_constraints = options.get("path_constraints")
-        attached_collision_meshes = options.get("attached_collision_meshes") or []
 
         self.ensure_client()
         if not group:
             group = self.main_group_name  # ensure semantics
 
+        # =======
+        # Scaling
+        # =======
+        need_scaling = self.scale_factor != 1.0
+
+        if need_scaling:
+            waypoints = waypoints.scaled(1.0 / self.scale_factor)
+
+        max_step = options.get("max_step")
+        if need_scaling and max_step:
+            options["max_step"] = max_step / self.scale_factor
+
         # NOTE: start_configuration has to be a full robot configuration, such
         # that all configurable joints of the whole robot are defined for planning.
         start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
 
-        attached_tool = self.attached_tools.get(group)
-        if use_attached_tool_frame and attached_tool:
-            frames_WCF = self.from_tcf_to_t0cf(frames_WCF, group)
-
-        frames_WCF_scaled = []
-        for frame in frames_WCF:
-            frames_WCF_scaled.append(Frame(frame.point * 1.0 / self.scale_factor, frame.xaxis, frame.yaxis))
-
-        if path_constraints:
+        # Path constraints are only relevant to ROS Backend
+        path_constraints = options.get("path_constraints")
+        if need_scaling and path_constraints:
             path_constraints_WCF_scaled = []
             for c in path_constraints:
                 cp = c.copy()
@@ -1408,23 +1415,35 @@ class Robot(Data):
                 path_constraints_WCF_scaled.append(cp)
         else:
             path_constraints_WCF_scaled = None
+        options["path_constraints"] = path_constraints_WCF_scaled
 
+        # =====================
+        # Attached CM and Tools
+        # =====================
+
+        attached_collision_meshes = options.get("attached_collision_meshes") or []
+        # Collect attached collision meshes from attached tools
+        # TODO: Discuss why scaling is not happening here?
         for _, tool in self.attached_tools.items():
             if tool:
                 attached_collision_meshes.extend(tool.attached_collision_meshes)
-
         options["attached_collision_meshes"] = attached_collision_meshes
-        options["path_constraints"] = path_constraints
-        if max_step:
-            options["max_step"] = max_step / self.scale_factor
+
+        # ========
+        # Planning
+        # ========
 
         trajectory = self.client.plan_cartesian_motion(
             robot=self,
-            frames_WCF=frames_WCF_scaled,
+            waypoints=waypoints,
             start_configuration=start_configuration_scaled,
             group=group,
             options=options,
         )
+
+        # =========================
+        # Scaling result trajectory
+        # =========================
 
         # Scale everything back to robot's scale
         for pt in trajectory.points:
