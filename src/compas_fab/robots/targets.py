@@ -497,6 +497,8 @@ class Waypoints(Data):
     ----------
     name : str , optional, default = 'target'
         A human-readable name for identifying the target.
+    tool_coordinate_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`
+        The tool tip coordinate frame relative to the flange of the robot.
 
     See Also
     --------
@@ -509,7 +511,7 @@ class Waypoints(Data):
         self.name = name
 
     @property
-    def __data__(self):
+    def tool_coordinate_frame(self):
         raise NotImplementedError
 
     def scaled(self, factor):
@@ -687,6 +689,8 @@ class PointAxisWaypoints(Waypoints):
         super(PointAxisWaypoints, self).__init__(name=name)
         self.target_points_and_axes = target_points_and_axes
         self.tolerance_position = tolerance_position
+        if isinstance(tool_coordinate_frame, Transformation):
+            tool_coordinate_frame = Frame.from_transformation(tool_coordinate_frame)
         self.tool_coordinate_frame = tool_coordinate_frame
 
     @property
