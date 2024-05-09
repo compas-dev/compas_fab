@@ -7,6 +7,10 @@ from compas_fab.backends.kinematics.exceptions import CartesianMotionError
 from compas_fab.backends.kinematics.utils import smallest_joint_angles
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
+from compas_fab.robots import FrameWaypoints
+from compas_fab.robots import PointAxisWaypoints
+
+from compas_fab.utilities import from_tcf_to_t0cf
 
 
 class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
@@ -15,15 +19,15 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
     def __init__(self, client=None):
         self.client = client
 
-    def plan_cartesian_motion(self, robot, frames_WCF, start_configuration=None, group=None, options=None):
+    def plan_cartesian_motion(self, robot, waypoints, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
         ----------
         robot : :class:`compas_fab.robots.Robot`
             The robot instance for which the cartesian motion path is being calculated.
-        frames_WCF : list of :class:`compas.geometry.Frame`
-            The frames through which the path is defined.
+        waypoints : :class:`compas_fab.robots.Waypoints`
+            The waypoints for the robot to follow.
         start_configuration : :class:`compas_robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the starting position.
@@ -42,22 +46,48 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         -----
         This will only work with robots that have 6 revolute joints.
         """
-        # what is the expected behaviour of that function?
-        # - Return all possible paths or select only the one that is closest to the start_configuration?
-        # - Do we use a stepsize to sample in between frames or use only the input frames?
+
+        if isinstance(waypoints, FrameWaypoints):
+            return self._plan_cartesian_motion_with_frame_waypoints(
+                robot, waypoints, start_configuration, group, options
+            )
+        elif isinstance(waypoints, PointAxisWaypoints):
+            return self._plan_cartesian_motion_with_point_axis_waypoints(
+                robot, waypoints, start_configuration, group, options
+            )
+        else:
+            raise TypeError("Unsupported waypoints type {}".format(type(waypoints)))
+
+    def _plan_cartesian_motion_with_frame_waypoints(
+        self, robot, waypoints, start_configuration=None, group=None, options=None
+    ):
+        """Calculates a cartesian motion path with frame waypoints.
+
+        Planner behavior:
+        - If multiple paths are possible (i.e. due to multiple IK results), only the one that is closest to the start_configuration is returned.
+        - The path is checked to ensure that the joint values are continuous and that revolution values are the smallest possible.
+        - 'stepsize' is not used to sample in between frames (i.e. no interpolation), only the input frames are used.
+        """
+        # convert the target frames to the robot's base frame
+        if waypoints.tool_coordinate_frame is not None:
+            frames_WCF = [from_tcf_to_t0cf(frame, waypoints.tool_coordinate_frame) for frame in waypoints.frames]
 
         # convert the frame WCF to RCF
         base_frame = robot.get_base_frame(group=group, full_configuration=start_configuration)
         frames_RCF = [base_frame.to_local_coordinates(frame_WCF) for frame_WCF in frames_WCF]
 
+        # 'keep_order' is set to True, so that iter_inverse_kinematics will return the configurations in the same order across all frames
         options = options or {}
         options.update({"keep_order": True})
 
+        # iterate over all input frames and calculate the inverse kinematics, no interpolation in between frames
         configurations_along_path = []
         for frame in frames_RCF:
             configurations = list(robot.iter_inverse_kinematics(frame, options=options))
             configurations_along_path.append(configurations)
 
+        # There is a maximum of 8 possible paths, corresponding to the 8 possible IK solutions for each frame
+        # The all() function is used to check if all configurations in a path are present.
         paths = []
         for configurations in zip(*configurations_along_path):
             if all(configurations):
@@ -74,11 +104,21 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         path = paths[idx]
         path = self.smooth_configurations(path)
         trajectory = JointTrajectory()
-        trajectory.fraction = len(path) / len(frames_RCF)
+        trajectory.fraction = len(path) / len(
+            frames_RCF
+        )  # Technically this always be 1.0 because otherwise, the path would be rejected earlier
         trajectory.joint_names = path[0].joint_names
         trajectory.points = [JointTrajectoryPoint(config.joint_values, config.joint_types) for config in path]
         trajectory.start_configuration = robot.merge_group_with_full_configuration(path[0], start_configuration, group)
         return trajectory
+
+    def _plan_cartesian_motion_with_point_axis_waypoints(
+        self, robot, waypoints, start_configuration=None, group=None, options=None
+    ):
+
+        raise NotImplementedError(
+            "Planning Cartesian motion with PointAxisWaypoints is not yet implemented in the Analytical backend."
+        )
 
     def smooth_configurations(self, configurations):
         joint_values_corrected = []
