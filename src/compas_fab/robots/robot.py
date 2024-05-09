@@ -1374,8 +1374,9 @@ class Robot(Data):
         True
         """
         # The plan_cartesian_motion method in the Robot class is a wrapper around planing backend's
-        # plan_cartesian_motion method. This method is responsible for scaling the waypoints, start_configuration,
-        # options and the planned trajectory.
+        # plan_cartesian_motion method. This method is responsible for scaling the waypoints, start_configuration and the planned trajectory.
+        # Some options may also need scaling, like max_step. This should be removed in the future.
+        # TODO: Discuss if we can have all options passed with a fixed unit to avoid scaling.
         # Attached tools are also managed by this function.
 
         options = options or {}
