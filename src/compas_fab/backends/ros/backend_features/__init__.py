@@ -1,3 +1,25 @@
+"""
+ROS backend features
+====================
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    MoveItAddAttachedCollisionMesh
+    MoveItAddCollisionMesh
+    MoveItAppendCollisionMesh
+    MoveItForwardKinematics
+    MoveItInverseKinematics
+    MoveItPlanCartesianMotion
+    MoveItPlanMotion
+    MoveItPlanningScene
+    MoveItRemoveAttachedCollisionMesh
+    MoveItRemoveCollisionMesh
+    MoveItResetPlanningScene
+
+"""
+
 from __future__ import absolute_import
 
 from compas_fab.backends.ros.backend_features.move_it_add_attached_collision_mesh import MoveItAddAttachedCollisionMesh
