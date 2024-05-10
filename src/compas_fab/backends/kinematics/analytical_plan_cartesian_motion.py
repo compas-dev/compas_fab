@@ -12,6 +12,13 @@ from compas_fab.robots import PointAxisWaypoints
 
 from compas_fab.utilities import from_tcf_to_t0cf
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Optional  # noqa: F401
+    from compas_fab.robots import Robot  # noqa: F401
+    from compas_robots import Configuration  # noqa: F401
+
 
 class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
     """ """
@@ -60,6 +67,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
     def _plan_cartesian_motion_with_frame_waypoints(
         self, robot, waypoints, start_configuration=None, group=None, options=None
     ):
+        # type: (Robot, FrameWaypoints, Optional[Configuration], Optional[str], Optional[dict]) -> JointTrajectory
         """Calculates a cartesian motion path with frame waypoints.
 
         Planner behavior:
@@ -69,7 +77,9 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         """
         # convert the target frames to the robot's base frame
         if waypoints.tool_coordinate_frame is not None:
-            frames_WCF = [from_tcf_to_t0cf(frame, waypoints.tool_coordinate_frame) for frame in waypoints.frames]
+            frames_WCF = [from_tcf_to_t0cf(frame, waypoints.tool_coordinate_frame) for frame in waypoints.target_frames]
+        else:
+            frames_WCF = waypoints.target_frames
 
         # convert the frame WCF to RCF
         base_frame = robot.get_base_frame(group=group, full_configuration=start_configuration)
@@ -114,7 +124,8 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
     def _plan_cartesian_motion_with_point_axis_waypoints(
         self, robot, waypoints, start_configuration=None, group=None, options=None
     ):
-
+        # type: (Robot, PointAxisWaypoints, Optional[Configuration], Optional[str], Optional[dict]) -> JointTrajectory
+        """Planning Cartesian motion with PointAxisWaypoints is not yet implemented in the Analytical backend."""
         raise NotImplementedError(
             "Planning Cartesian motion with PointAxisWaypoints is not yet implemented in the Analytical backend."
         )
