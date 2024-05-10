@@ -38,3 +38,10 @@ The :class:`compas_fab.robots.ConstraintSetTarget` class is used to specify a li
 constraints as a planning target. This is intended for advanced users who want to create custom
 combination of constraints. See :class:`compas_fab.robots.Constraint` for available
 constraints. At the moment, only the ROS MoveIt planning backend supports this target type.
+
+------------------------------------------
+Waypoints Target (Multiple Point Segments)
+------------------------------------------
+
+The :class:`compas_fab.robots.Waypoint` classes are used to describe a sequence of
+waypoints that the robot should pass through.
