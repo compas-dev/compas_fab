@@ -2,6 +2,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import compas
+
+if not compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import Optional  # noqa: F401
+        from typing import Dict  # noqa: F401
+        from compas_fab.robots import Robot  # noqa: F401
+        from compas_robots import Configuration  # noqa: F401
+        from compas.geometry import Frame  # noqa: F401
+
 
 class ForwardKinematics(object):
     """Interface for a Planner's forward kinematics feature.  Any implementation of
@@ -16,6 +28,7 @@ class ForwardKinematics(object):
         return self.forward_kinematics(robot, configuration, group, options)
 
     def forward_kinematics(self, robot, configuration, group=None, options=None):
+        # type: (Robot, Configuration, Optional[str], Optional[Dict]) -> Frame
         """Calculate the robot's forward kinematic.
 
         Parameters
