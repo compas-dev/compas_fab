@@ -90,8 +90,6 @@ class MoveItPlanMotion(PlanMotion):
         options["joints"] = {j.name: j.type for j in robot.model.joints}
         options["ee_link_name"] = robot.get_end_effector_link_name(group)
 
-        raise TypeError("This method is intentionally broken.")
-
         return await_callback(self.plan_motion_async, **kwargs)
 
     def plan_motion_async(self, callback, errback, target, start_configuration=None, group=None, options=None):
