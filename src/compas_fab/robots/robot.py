@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 import random
+import compas
 
 from compas.data import Data
 from compas.geometry import Frame
@@ -12,6 +13,28 @@ from compas_robots import RobotModel
 from compas_robots.model import Joint
 
 from compas_fab.robots.constraints import Constraint
+
+if not compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import Any  # noqa: F401
+        from typing import Dict  # noqa: F401
+        from typing import Iterator  # noqa: F401
+        from typing import List  # noqa: F401
+        from typing import Optional  # noqa: F401
+        from typing import Tuple  # noqa: F401
+        from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
+        from compas_fab.robots import RobotSemantics  # noqa: F401
+        from compas_fab.robots import Tool  # noqa: F401
+        from compas_fab.robots import Target  # noqa: F401
+        from compas_robots.scene import BaseRobotModelObject  # noqa: F401
+        from compas_robots.model import Link  # noqa: F401
+        from compas_robots.model import Joint  # noqa: F401, F811
+        from compas_robots.model import Material  # noqa: F401
+        from compas_fab.robots import JointTrajectory  # noqa: F401
+        from compas_fab.robots.planning_scene import CollisionMesh  # noqa: F401
+
 
 __all__ = [
     "Robot",
@@ -63,10 +86,11 @@ class Robot(Data):
     """
 
     # NOTE: If the attribute function has a docstring, the first sentence will be used automatically in the class attribute's.
-    #       However, the rest of the docstring, after the first fullstop symbol will be ignored.
-    #       It is futile to add examples to the attribute docstrings, as they will not be rendered in the documentation.
+    #       However, the rest of the docstring, after the first period symbol will be ignored.
+    #       It is futile to add examples to the attribute docstring, as they will not be rendered in the documentation.
 
     def __init__(self, model=None, scene_object=None, semantics=None, client=None):
+        # type: (RobotModel, Optional[BaseRobotModelObject], Optional[RobotSemantics], Optional[ClientInterface]) -> Robot
         super(Robot, self).__init__()
         # These attributes have to be initiated first,
         # because they are used in the setters of the other attributes
@@ -110,6 +134,7 @@ class Robot(Data):
 
     @property
     def scene_object(self):
+        # type: () -> BaseRobotModelObject | None
         """Scene object used to visualize robot model."""
         return self._scene_object
 
@@ -125,6 +150,7 @@ class Robot(Data):
 
     @classmethod
     def basic(cls, name, joints=None, links=None, materials=None, **kwargs):
+        # type: (str, Optional[List[Joint]], Optional[List[Link]], Optional[List[Material]], **Any) -> Robot
         """Create the most basic instance of a robot, based only on name.
 
         Parameters
@@ -158,6 +184,7 @@ class Robot(Data):
 
     @property
     def name(self):
+        # type: () -> str
         """Name of the robot, as defined by its model.
 
         Returns
@@ -174,6 +201,7 @@ class Robot(Data):
 
     @property
     def group_names(self):
+        # type: () -> List[str]
         """All planning groups of the robot, only available if semantics is set.
 
         Returns
@@ -192,6 +220,7 @@ class Robot(Data):
 
     @property
     def main_group_name(self):
+        # type: () -> str
         """
         Robot's main planning group, only available if semantics is set.
 
@@ -210,6 +239,7 @@ class Robot(Data):
 
     @property
     def group_states(self):
+        # type: () -> Dict[str, dict]
         """All group states of the robot, only available if semantics is set.
 
         Returns
@@ -228,15 +258,18 @@ class Robot(Data):
 
     @property
     def attached_tools(self):
+        # type: () -> Dict[str, Tool]
         """Dictionary of tools and the planning groups that the tools are currently attached to, if any."""
         return self._attached_tools
 
     @property
     def attached_tool(self):
+        # type: () -> Tool | None
         """Returns the tool attached to the default main planning group, if any."""
         return self._attached_tools.get(self.main_group_name, None)
 
     def get_end_effector_link_name(self, group=None):
+        # type: (Optional[str]) -> str
         """Get the name of the robot's end effector link.
 
         Parameters
@@ -260,6 +293,7 @@ class Robot(Data):
             return self.semantics.get_end_effector_link_name(group)
 
     def get_end_effector_link(self, group=None):
+        # type: (Optional[str]) -> Link
         """Get the robot's end effector link.
 
         Parameters
@@ -282,6 +316,7 @@ class Robot(Data):
         return self.model.get_link_by_name(name)
 
     def get_end_effector_frame(self, group=None, full_configuration=None):
+        # type: (Optional[str], Optional[Configuration]) -> Frame
         """Get the frame of the robot's end effector.
 
         Parameters
@@ -301,6 +336,7 @@ class Robot(Data):
         return self.model.forward_kinematics(full_configuration, link_name=self.get_end_effector_link_name(group))
 
     def get_base_link_name(self, group=None):
+        # type: (Optional[str]) -> str
         """Get the name of the robot's base link.
 
         Parameters
@@ -324,6 +360,7 @@ class Robot(Data):
             return self.semantics.get_base_link_name(group)
 
     def get_base_link(self, group=None):
+        # type: (Optional[str]) -> Link
         """Get the robot's base link.
 
         Parameters
@@ -346,6 +383,7 @@ class Robot(Data):
         return self.model.get_link_by_name(name)
 
     def get_base_frame(self, group=None, full_configuration=None):
+        # type: (Optional[str], Optional[Configuration]) -> Frame
         """Get the frame of the robot's base link, which is the robot's origin frame.
 
         Parameters
@@ -365,6 +403,7 @@ class Robot(Data):
         return self.model.forward_kinematics(full_configuration, link_name=self.get_base_link_name(group))
 
     def get_link_names(self, group=None):
+        # type: (Optional[str]) -> List[str]
         """Get the names of the links in the kinematic chain.
 
         Parameters
@@ -390,6 +429,7 @@ class Robot(Data):
         return link_names
 
     def get_link_names_with_collision_geometry(self):
+        # type: () -> List[str]
         """Get the names of the links with collision geometry.
 
         Returns
@@ -405,6 +445,7 @@ class Robot(Data):
         return [link.name for link in self.model.iter_links() if link.collision]
 
     def get_configurable_joints(self, group=None):
+        # type: (Optional[str]) -> List[Joint]
         """Get the robot's configurable joints.
 
         Parameters
@@ -437,6 +478,7 @@ class Robot(Data):
             return self.model.get_configurable_joints()
 
     def get_joint_types_by_names(self, names):
+        # type: (List[str]) -> List[int]
         """Get a list of joint types given a list of joint names.
 
         Parameters
@@ -452,6 +494,7 @@ class Robot(Data):
         return self.model.get_joint_types_by_names(names)
 
     def get_joint_by_name(self, name):
+        # type: (str) -> Joint | None
         """RGet the joint in the robot model matching the given name.
 
         Parameters
@@ -466,6 +509,7 @@ class Robot(Data):
         return self.model.get_joint_by_name(name)
 
     def get_configurable_joint_names(self, group=None):
+        # type: (Optional[str]) -> List[str]
         """Get the configurable joint names.
 
         Parameters
@@ -493,6 +537,7 @@ class Robot(Data):
         return [j.name for j in configurable_joints]
 
     def get_configurable_joint_types(self, group=None):
+        # type: (Optional[str]) -> List[int]
         """Get the configurable joint types.
 
         Parameters
@@ -519,6 +564,7 @@ class Robot(Data):
         return [j.type for j in configurable_joints]
 
     def get_attached_tool_collision_meshes(self):
+        # type: () -> List[List[CollisionMesh]]
         """Returns a list of all attached collisions meshes of each of the attached tools, if any.
 
         Returns
@@ -533,6 +579,7 @@ class Robot(Data):
     # ==========================================================================
 
     def zero_configuration(self, group=None):
+        # type: (Optional[str]) -> Configuration
         """Get the zero joint configuration.
 
         If zero is out of joint limits ``(upper, lower)`` then
@@ -558,6 +605,7 @@ class Robot(Data):
         return Configuration(values, joint_types, joint_names)
 
     def random_configuration(self, group=None):
+        # type: (Optional[str]) -> Configuration
         """Get a random configuration.
 
         Parameters
@@ -585,6 +633,7 @@ class Robot(Data):
         return Configuration(values, joint_types, joint_names)
 
     def get_group_configuration(self, group, full_configuration):
+        # type: (str, Configuration) -> Configuration
         """Get the group's configuration.
 
         Parameters
@@ -607,6 +656,7 @@ class Robot(Data):
         return Configuration(values, self.get_configurable_joint_types(group), group_joint_names)
 
     def merge_group_with_full_configuration(self, group_configuration, full_configuration, group):
+        # type: (Configuration, Configuration, str) -> Configuration
         """Get the robot's full configuration by merging a group's configuration with a full configuration.
         The group configuration takes precedence over the full configuration in
         case a joint value is present in both.
@@ -643,6 +693,7 @@ class Robot(Data):
         return full_configuration
 
     def get_group_names_from_link_name(self, link_name):
+        # type: (str) -> List[str]
         """Get the names of the groups `link_name` belongs to.
 
         Parameters
@@ -662,6 +713,7 @@ class Robot(Data):
         return group_names
 
     def get_position_by_joint_name(self, configuration, joint_name, group=None):
+        # type: (Configuration, str, Optional[str]) -> float
         """Get the position of named joint in given configuration.
 
         Parameters
@@ -690,6 +742,7 @@ class Robot(Data):
         return configuration.joint_values[names.index(joint_name)]
 
     def _check_full_configuration_and_scale(self, full_configuration=None):
+        # type: (Optional[Configuration]) -> Tuple[Configuration, Configuration]
         """Either create a full configuration or check if the passed full configuration is valid.
 
         Parameters
@@ -719,6 +772,7 @@ class Robot(Data):
         return configuration, configuration.scaled(1.0 / self.scale_factor)
 
     def get_configuration_from_group_state(self, group, group_state):
+        # type: (str, str) -> Configuration
         """Get a :class:`compas_robots.Configuration` from a group's group state.
 
         Parameters
@@ -744,6 +798,7 @@ class Robot(Data):
     # ==========================================================================
 
     def transformation_RCF_WCF(self, group=None):
+        # type: (Optional[str]) -> Transformation
         """Get the transformation from the robot's coordinate system (RCF) to the world coordinate system (WCF).
 
         Parameters
@@ -760,6 +815,7 @@ class Robot(Data):
         return Transformation.from_change_of_basis(base_frame, Frame.worldXY())
 
     def transformation_WCF_RCF(self, group=None):
+        # type: (Optional[str]) -> Transformation
         """Get the transformation from the world coordinate system (WCF) to the robot's coordinate system (RCF).
 
         Parameters
@@ -776,6 +832,7 @@ class Robot(Data):
         return Transformation.from_change_of_basis(Frame.worldXY(), base_frame)
 
     def set_RCF(self, robot_coordinate_frame, group=None):
+        # type: (Frame, Optional[str]) -> None
         """Move the origin frame of the robot to the robot_coordinate_frame.
 
         Raises
@@ -788,6 +845,7 @@ class Robot(Data):
         raise NotImplementedError
 
     def get_RCF(self, group=None):
+        # type: (Optional[str]) -> Frame
         """Get the origin frame of the robot.
 
         Parameters
@@ -803,6 +861,7 @@ class Robot(Data):
         return self.get_base_frame(group)
 
     def to_local_coordinates(self, frame_WCF, group=None):
+        # type: (Frame, Optional[str]) -> Frame
         """Represent a frame from the world coordinate system (WCF) in the robot's coordinate system (RCF).
 
         Parameters
@@ -829,6 +888,7 @@ class Robot(Data):
         return frame_RCF
 
     def to_world_coordinates(self, frame_RCF, group=None):
+        # type: (Frame, Optional[str]) -> Frame
         """Represent a frame from the robot's coordinate system (RCF) in the world coordinate system (WCF).
 
         Parameters
@@ -855,6 +915,7 @@ class Robot(Data):
         return frame_WCF
 
     def _get_attached_tool_for_group(self, group_name=None):
+        # type: (Optional[str]) -> Tool
         """Get the tool attached to the given planning group. Group name defaults to main_group_name.
         Raises ValueError if group name is unknown or there is no tool currently attached to it"""
         group = group_name or self.main_group_name
@@ -864,6 +925,7 @@ class Robot(Data):
         return self.attached_tools[group]
 
     def from_tcf_to_t0cf(self, frames_tcf, group=None):
+        # type: (List[Frame], Optional[str]) -> List[Frame]
         """Convert a list of frames at the robot's tool tip (tcf frame) to frames at the robot's flange (tool0 frame) using the attached tool.
 
         Parameters
@@ -901,6 +963,7 @@ class Robot(Data):
         return tool.from_tcf_to_t0cf(frames_tcf)
 
     def from_t0cf_to_tcf(self, frames_t0cf, group=None):
+        # type: (List[Frame], Optional[str]) -> List[Frame]
         """Convert frames at the robot's flange (tool0 frame) to frames at the robot's tool tip (tcf frame) using the attached tool.
 
         Parameters
@@ -938,6 +1001,7 @@ class Robot(Data):
         return tool.from_t0cf_to_tcf(frames_t0cf)
 
     def attach_tool(self, tool, group=None, touch_links=None):
+        # type: (Tool, Optional[str], Optional[List[str]]) -> None
         """Attach a tool to the robot independently of the model definition.
 
         Parameters
@@ -980,6 +1044,7 @@ class Robot(Data):
             self.scene_object.attach_tool_model(tool.tool_model)
 
     def detach_tool(self, group=None):
+        # type: (Optional[str]) -> None
         """Detach the attached tool.
 
         Parameters
@@ -1006,6 +1071,7 @@ class Robot(Data):
     # ==========================================================================
 
     def ensure_client(self):
+        # type: () -> None
         """Check if the client is set.
 
         Raises
@@ -1017,6 +1083,7 @@ class Robot(Data):
             raise Exception("This method is only callable once a client is assigned.")
 
     def ensure_semantics(self):
+        # type: () -> None
         """Check if semantics is set.
 
         Raises
@@ -1028,6 +1095,7 @@ class Robot(Data):
             raise Exception("This method is only callable once a semantic model is assigned.")
 
     def ensure_geometry(self):
+        # type: () -> None
         """Check if the model's geometry has been loaded.
 
         Raises
@@ -1050,6 +1118,7 @@ class Robot(Data):
         use_attached_tool_frame=True,
         options=None,
     ):
+        # type: (Frame, Optional[Configuration], Optional[str], Optional[bool], Optional[bool], Optional[Dict[str, Any]]) -> Configuration
         """Calculate the robot's inverse kinematic for a given frame.
 
         The inverse kinematic solvers are implemented as generators in order to fit both analytic
@@ -1102,7 +1171,7 @@ class Robot(Data):
         >>> robot.inverse_kinematics(frame_WCF, start_configuration, group)                 # doctest: +SKIP
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
-        # Pseudo-memoized sequential calls will re-use iterator if not exhaused
+        # Pseudo-memoized sequential calls will re-use iterator if not exhausted
         request_id = "{}-{}-{}-{}-{}".format(
             str(frame_WCF), str(start_configuration), str(group), str(return_full_configuration), str(options)
         )
@@ -1129,6 +1198,7 @@ class Robot(Data):
         use_attached_tool_frame=True,
         options=None,
     ):
+        # type: (Frame, Optional[Configuration], Optional[str], Optional[bool], Optional[bool], Optional[Dict[str, Any]]) -> Iterator[Configuration]
         """Iterate over the inverse kinematic solutions of a robot.
 
         This method exposes the generator-based inverse kinematic solvers. Analytics solvers will return
@@ -1206,9 +1276,10 @@ class Robot(Data):
             if joint_positions:
                 yield self._build_configuration(joint_positions, joint_names, group, return_full_configuration)
             else:
-                yield None  # to accomodate analytic ik with keeping the order of solutions
+                yield None  # to accommodate analytic ik with keeping the order of solutions
 
     def _build_configuration(self, joint_positions, joint_names, group, return_full_configuration):
+        # type: (List[float], List[str], str | None, bool) -> Configuration
         if return_full_configuration:
             # build configuration including passive joints, but no sorting
             joint_types = self.get_joint_types_by_names(joint_names)
@@ -1223,6 +1294,7 @@ class Robot(Data):
         return configuration.scaled(self.scale_factor)
 
     def forward_kinematics(self, configuration, group=None, use_attached_tool_frame=True, options=None):
+        # type: (Configuration, Optional[str], Optional[bool], Optional[Dict[str, Any]]) -> Frame
         """Calculate the robot's forward kinematic.
 
         Parameters
@@ -1316,6 +1388,7 @@ class Robot(Data):
     def plan_cartesian_motion(
         self, frames_WCF, start_configuration=None, group=None, use_attached_tool_frame=True, options=None
     ):
+        # type: (List[Frame], Optional[Configuration], Optional[str], Optional[bool], Optional[Dict[str, Any]]) -> JointTrajectory
         """Calculate a cartesian motion path (linear in tool space).
 
         Parameters
@@ -1435,6 +1508,7 @@ class Robot(Data):
         return trajectory
 
     def plan_motion(self, target, start_configuration=None, group=None, options=None):
+        # type: (Target, Optional[Configuration], Optional[str], Optional[Dict[str, Any]]) -> JointTrajectory
         """Calculate a motion path.
 
         Parameters
@@ -1567,6 +1641,7 @@ class Robot(Data):
         return trajectory
 
     def transformed_frames(self, configuration, group=None):
+        # type: (Configuration, Optional[str]) -> List[Frame]
         """Get the robot's transformed frames.
 
         Parameters
@@ -1587,6 +1662,7 @@ class Robot(Data):
         return self.model.transformed_frames(configuration)
 
     def transformed_axes(self, configuration, group=None):
+        # type: (Configuration, Optional[str]) -> List[Vector]
         """Get the robot's transformed axes.
 
         Parameters
@@ -1611,6 +1687,7 @@ class Robot(Data):
     # ==========================================================================
 
     def update(self, configuration, group=None, visual=True, collision=True):
+        # type: (Configuration, Optional[str], Optional[bool], Optional[bool]) -> None
         """Update the robot's geometry.
 
         Parameters
@@ -1635,14 +1712,17 @@ class Robot(Data):
         self.scene_object.update(configuration, visual, collision)
 
     def draw_visual(self):
+        # type: () -> None
         """Draw the robot's visual geometry using the defined :attr:`Robot.scene_object`."""
         return self.scene_object.draw_visual()
 
     def draw_collision(self):
+        # type: () -> None
         """Draw the robot's collision geometry using the defined :attr:`Robot.scene_object`."""
         return self.scene_object.draw_collision()
 
     def draw(self):
+        # type: () -> None
         """Alias of :meth:`draw_visual`."""
         return self.draw_visual()
 
@@ -1653,6 +1733,7 @@ class Robot(Data):
     #         return self.scene_object.draw_attached_tool()
 
     def scale(self, factor):
+        # type: (float) -> None
         """Scale the robot geometry by a factor (absolute).
 
         Parameters
@@ -1672,8 +1753,9 @@ class Robot(Data):
 
     @property
     def scale_factor(self):
+        # type: () -> float
         """A scale factor affecting planning targets, results and visualization. Typically, robot models are defined in meters,
-        if used in CAD environemnt where units is mm, use a scale_factor of 1000.
+        if used in CAD environment where units is mm, use a scale_factor of 1000.
 
         """
         if self.scene_object:
@@ -1682,6 +1764,7 @@ class Robot(Data):
             return self._scale_factor
 
     def info(self):
+        # type: () -> None
         """Print information about the robot."""
         print("The robot's name is '{}'.".format(self.name))
         if self.semantics:
