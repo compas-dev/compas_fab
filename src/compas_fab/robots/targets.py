@@ -3,6 +3,12 @@ from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_robots.model import Joint
 
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from compas_robots import Configuration  # noqa: F401
+
 __all__ = [
     "Target",
     "FrameTarget",
@@ -230,7 +236,7 @@ class PointAxisTarget(Target):
         The tool tip coordinate frame relative to the flange coordinate frame of the robot.
         If not specified, the target point is relative to the robot's flange (T0CF) and the
         Z axis of the flange can rotate around the target axis.
-    nane : str, optional
+    name : str, optional
         The human-readable name of the target.
         Defaults to 'Point-Axis Target'.
     """
@@ -497,7 +503,7 @@ class Waypoints(Data):
     ----------
     name : str , optional, default = 'target'
         A human-readable name for identifying the target.
-    tool_coordinate_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`
+    tool_coordinate_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`, optional
         The tool tip coordinate frame relative to the flange of the robot.
 
     See Also
@@ -509,6 +515,9 @@ class Waypoints(Data):
     def __init__(self, tool_coordinate_frame, name="Generic Waypoints"):
         super(Waypoints, self).__init__()
         self.name = name
+        # If the user provides a transformation, convert it to a Frame
+        if isinstance(tool_coordinate_frame, Transformation):
+            tool_coordinate_frame = Frame.from_transformation(tool_coordinate_frame)
         self.tool_coordinate_frame = tool_coordinate_frame
 
     def scaled(self, factor):
@@ -566,13 +575,10 @@ class FrameWaypoints(Waypoints):
         tool_coordinate_frame=None,
         name="Frame Waypoints",
     ):
-        super(FrameWaypoints, self).__init__(name=name)
+        super(FrameWaypoints, self).__init__(tool_coordinate_frame=tool_coordinate_frame, name=name)
         self.target_frames = target_frames
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
-        if isinstance(tool_coordinate_frame, Transformation):
-            tool_coordinate_frame = Frame.from_transformation(tool_coordinate_frame)
-        self.tool_coordinate_frame = tool_coordinate_frame
 
     @property
     def __data__(self):
@@ -666,7 +672,7 @@ class PointAxisWaypoints(Waypoints):
     tolerance_position : float, optional
         The tolerance for the position of the target point.
         If not specified, the default value from the planner is used.
-    tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
+    tool_coordinate_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`, optional
         The tool tip coordinate frame relative to the flange coordinate frame of the robot.
         If not specified, the target point is relative to the robot's flange (T0CF) and the
         Z axis of the flange can rotate around the target axis.
@@ -683,12 +689,9 @@ class PointAxisWaypoints(Waypoints):
         tool_coordinate_frame=None,
         name="Point-Axis Waypoints",
     ):
-        super(PointAxisWaypoints, self).__init__(name=name)
+        super(PointAxisWaypoints, self).__init__(tool_coordinate_frame=tool_coordinate_frame, name=name)
         self.target_points_and_axes = target_points_and_axes
         self.tolerance_position = tolerance_position
-        if isinstance(tool_coordinate_frame, Transformation):
-            tool_coordinate_frame = Frame.from_transformation(tool_coordinate_frame)
-        self.tool_coordinate_frame = tool_coordinate_frame
 
     @property
     def __data__(self):
