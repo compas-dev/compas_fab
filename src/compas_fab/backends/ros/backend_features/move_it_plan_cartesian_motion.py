@@ -18,6 +18,9 @@ from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
 
+from compas_fab.robots import FrameWaypoints
+from compas_fab.robots import PointAxisWaypoints
+
 __all__ = [
     "MoveItPlanCartesianMotion",
 ]
@@ -37,15 +40,15 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
     def __init__(self, ros_client):
         self.ros_client = ros_client
 
-    def plan_cartesian_motion(self, robot, frames_WCF, start_configuration=None, group=None, options=None):
+    def plan_cartesian_motion(self, robot, waypoints, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
         ----------
         robot : :class:`compas_fab.robots.Robot`
             The robot instance for which the cartesian motion plan is being calculated.
-        frames_WCF: list of :class:`compas.geometry.Frame`
-            The frames through which the path is defined.
+        waypoints : :class:`compas_fab.robots.Waypoints`
+            The waypoints for the robot to follow.
         start_configuration: :class:`compas_robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the starting position. Defaults to
@@ -85,7 +88,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         options = options or {}
         kwargs = {}
         kwargs["options"] = options
-        kwargs["frames_WCF"] = frames_WCF
+        kwargs["waypoints"] = waypoints
         kwargs["start_configuration"] = start_configuration
         kwargs["group"] = group
 
@@ -99,16 +102,30 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         if options["link"] not in robot.get_link_names(group):
             raise ValueError("Link name {} does not exist in planning group".format(options["link"]))
 
-        return await_callback(self.plan_cartesian_motion_async, **kwargs)
+        # This function wraps multiple implementations depending on the type of waypoints
+        if isinstance(waypoints, FrameWaypoints):
+            return await_callback(self.plan_cartesian_motion_with_frame_waypoints_async, **kwargs)
+        elif isinstance(waypoints, PointAxisWaypoints):
+            return self.plan_cartesian_motion_with_point_axis_waypoints_async(**kwargs)
+        else:
+            raise TypeError("Unsupported waypoints type {} for MoveIt planning backend.".format(type(waypoints)))
 
-    def plan_cartesian_motion_async(
-        self, callback, errback, frames_WCF, start_configuration=None, group=None, options=None
+    def plan_cartesian_motion_with_frame_waypoints_async(
+        self, callback, errback, waypoints, start_configuration=None, group=None, options=None
     ):
-        """Asynchronous handler of MoveIt cartesian motion planner service."""
+        """Asynchronous handler of MoveIt cartesian motion planner service.
+
+        :class:`compas_fab.robots.FrameWaypoints` are converted to :class:`compas_fab.backends.ros.messages.Pose` that is native to ROS communication
+
+        """
+
         joints = options["joints"]
 
         header = Header(frame_id=options["base_link"])
-        waypoints = [Pose.from_frame(frame) for frame in frames_WCF]
+
+        # Convert compas_fab.robots.FrameWaypoints to list of Pose for ROS
+        list_of_pose = [Pose.from_frame(frame) for frame in waypoints.target_frames]
+
         joint_state = JointState(
             header=header, name=start_configuration.joint_names, position=start_configuration.joint_values
         )
@@ -129,7 +146,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
             start_state=start_state,
             group_name=group,
             link_name=options["link"],
-            waypoints=waypoints,
+            waypoints=list_of_pose,
             max_step=float(options.get("max_step", 0.01)),
             jump_threshold=float(options.get("jump_threshold", 1.57)),
             avoid_collisions=bool(options.get("avoid_collisions", True)),
@@ -146,3 +163,12 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
                 errback(e)
 
         self.GET_CARTESIAN_PATH(self.ros_client, request, response_handler, errback)
+
+    def plan_cartesian_motion_with_point_axis_waypoints_async(
+        self, callback, errback, waypoints, start_configuration=None, group=None, options=None
+    ):
+        """Asynchronous handler of MoveIt cartesian motion planner service.
+
+        AFAIK MoveIt does not support planning for a relaxed axis under this
+        """
+        raise NotImplementedError("PointAxisWaypoints are not supported by MoveIt backend")
