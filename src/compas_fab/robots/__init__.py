@@ -46,8 +46,8 @@ Planning scene
     CollisionMesh
     PlanningScene
 
-Targets
--------
+Targets and Waypoints
+---------------------
 
 .. autosummary::
     :toctree: generated/
@@ -58,6 +58,9 @@ Targets
     PointAxisTarget
     ConfigurationTarget
     ConstraintSetTarget
+    Waypoints
+    FrameWaypoints
+    PointAxisWaypoints
 
 Constraints
 -----------
@@ -132,6 +135,9 @@ from .targets import (
     PointAxisTarget,
     ConfigurationTarget,
     ConstraintSetTarget,
+    Waypoints,
+    FrameWaypoints,
+    PointAxisWaypoints,
 )
 from .time_ import (
     Duration,
@@ -160,6 +166,7 @@ __all__ = [
     "ConstraintSetTarget",
     "Duration",
     "FrameTarget",
+    "FrameWaypoints",
     "Inertia",
     "JointConstraint",
     "JointTrajectory",
@@ -167,6 +174,7 @@ __all__ = [
     "OrientationConstraint",
     "PlanningScene",
     "PointAxisTarget",
+    "PointAxisWaypoints",
     "PositionConstraint",
     "ReachabilityMap",
     "DeviationVectorsGenerator",
@@ -177,6 +185,7 @@ __all__ = [
     "Target",
     "Tool",
     "Trajectory",
+    "Waypoints",
     "Wrench",
     "to_degrees",
     "to_radians",
