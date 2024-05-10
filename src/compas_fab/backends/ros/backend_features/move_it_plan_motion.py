@@ -29,9 +29,6 @@ class MoveItPlanMotion(PlanMotion):
         "/plan_kinematic_path", "GetMotionPlan", MotionPlanRequest, MotionPlanResponse, validate_response
     )
 
-    def __init__(self, ros_client):
-        self.ros_client = ros_client
-
     def plan_motion(self, robot, target, start_configuration=None, group=None, options=None):
         """Calculates a motion path.
 
@@ -93,6 +90,8 @@ class MoveItPlanMotion(PlanMotion):
         options["joints"] = {j.name: j.type for j in robot.model.joints}
         options["ee_link_name"] = robot.get_end_effector_link_name(group)
 
+        raise TypeError("This method is intentionally broken.")
+
         return await_callback(self.plan_motion_async, **kwargs)
 
     def plan_motion_async(self, callback, errback, target, start_configuration=None, group=None, options=None):
@@ -113,7 +112,7 @@ class MoveItPlanMotion(PlanMotion):
                 start_state.attached_collision_objects.append(aco)
 
         # Filter needs to happen after all objects have been added
-        start_state.filter_fields_for_distro(self.ros_client.ros_distro)
+        start_state.filter_fields_for_distro(self.client.ros_distro)
 
         # convert constraints
         ee_link_name = options["ee_link_name"]
@@ -150,4 +149,4 @@ class MoveItPlanMotion(PlanMotion):
             except Exception as e:
                 errback(e)
 
-        self.GET_MOTION_PLAN(self.ros_client, request, response_handler, errback)
+        self.GET_MOTION_PLAN(self.client, request, response_handler, errback)

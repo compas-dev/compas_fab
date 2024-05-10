@@ -827,8 +827,15 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
 
 class AnalyticalPyBulletClient(PyBulletClient):
-    def inverse_kinematics(self, *args, **kwargs):
-        return AnalyticalInverseKinematics(self)(*args, **kwargs)
+    """Combination of PyBullet as the client for COllision Detection and Analytical Inverse Kinematics."""
 
-    def plan_cartesian_motion(self, *args, **kwargs):
-        return AnalyticalPlanCartesianMotion(self)(*args, **kwargs)
+    def __init__(self, connection_type="gui", verbose=False):
+        PyBulletClient.__init__(self, connection_type=connection_type, verbose=verbose)
+
+    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
+        planner = AnalyticalInverseKinematics(self)
+        return planner.inverse_kinematics(robot, frame_WCF, start_configuration, group, options)
+
+    def plan_cartesian_motion(self, robot, waypoints, start_configuration=None, group=None, options=None):
+        planner = AnalyticalPlanCartesianMotion(self)
+        return planner.plan_cartesian_motion(robot, waypoints, start_configuration, group, options)

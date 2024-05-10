@@ -3,7 +3,8 @@ from __future__ import division
 from __future__ import print_function
 
 from compas_fab.backends.interfaces.client import PlannerInterface
-from compas_fab.backends.interfaces.client import forward_docstring
+
+# from compas_fab.backends.interfaces.client import forward_docstring
 from compas_fab.backends.pybullet.backend_features.pybullet_add_attached_collision_mesh import (
     PyBulletAddAttachedCollisionMesh,
 )
@@ -21,36 +22,17 @@ __all__ = [
 ]
 
 
-class PyBulletPlanner(PlannerInterface):
+class PyBulletPlanner(
+    PyBulletAddAttachedCollisionMesh,
+    PyBulletAddCollisionMesh,
+    PyBulletAppendCollisionMesh,
+    PyBulletRemoveCollisionMesh,
+    PyBulletRemoveAttachedCollisionMesh,
+    PyBulletForwardKinematics,
+    PyBulletInverseKinematics,
+    PlannerInterface,
+):
     """Implement the planner backend interface for PyBullet."""
 
     def __init__(self, client):
-        super(PyBulletPlanner, self).__init__(client)
-
-    @forward_docstring(PyBulletAddAttachedCollisionMesh)
-    def add_attached_collision_mesh(self, *args, **kwargs):
-        return PyBulletAddAttachedCollisionMesh(self.client)(*args, **kwargs)
-
-    @forward_docstring(PyBulletAddCollisionMesh)
-    def add_collision_mesh(self, *args, **kwargs):
-        return PyBulletAddCollisionMesh(self.client)(*args, **kwargs)
-
-    @forward_docstring(PyBulletAppendCollisionMesh)
-    def append_collision_mesh(self, *args, **kwargs):
-        return PyBulletAppendCollisionMesh(self.client)(*args, **kwargs)
-
-    @forward_docstring(PyBulletRemoveCollisionMesh)
-    def remove_collision_mesh(self, *args, **kwargs):
-        return PyBulletRemoveCollisionMesh(self.client)(*args, **kwargs)
-
-    @forward_docstring(PyBulletRemoveAttachedCollisionMesh)
-    def remove_attached_collision_mesh(self, *args, **kwargs):
-        return PyBulletRemoveAttachedCollisionMesh(self.client)(*args, **kwargs)
-
-    @forward_docstring(PyBulletForwardKinematics)
-    def forward_kinematics(self, *args, **kwargs):
-        return PyBulletForwardKinematics(self.client)(*args, **kwargs)
-
-    @forward_docstring(PyBulletInverseKinematics)
-    def inverse_kinematics(self, *args, **kwargs):
-        return PyBulletInverseKinematics(self.client)(*args, **kwargs)
+        self.client = client

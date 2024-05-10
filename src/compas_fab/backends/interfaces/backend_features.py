@@ -2,18 +2,32 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import compas
 
-class ForwardKinematics(object):
-    """Interface for a Planner's forward kinematics feature.  Any implementation of
-    ``ForwardKinematics`` must define the method ``forward_kinematics``.  The
-    ``__call__`` magic method allows an instance of an implementation of
-    ``ForwardKinematics`` to be treated as its ``forward_kinematics`` method.  See
-    <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
-    <https://en.wikipedia.org/wiki/Function_object#In_Python>.
-    """
+if not compas.IPY:
+    from typing import TYPE_CHECKING
 
-    def __call__(self, robot, configuration, group=None, options=None):
-        return self.forward_kinematics(robot, configuration, group, options)
+    if TYPE_CHECKING:
+        from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
+
+
+class BackendFeature(object):
+    """Base class for all backend features that are implemented by a backend client."""
+
+    def __init__(self, client):
+        # All backend features are assumed to be associated with a backend client.
+        self.client = client  # type: ClientInterface
+
+
+#   The code that contains the actual feature implementation is located in the backend's module.
+#   For example, the features for moveit planner and ros client are located in :
+#   "src/compas_fab/backends/ros/backend_features/"
+#   If you cannot a specific feature in the 'backend_features', it means that the planner
+#   does not support that feature.
+
+
+class ForwardKinematics(BackendFeature):
+    """Mix-in interface for implementing a planner's forward kinematics feature."""
 
     def forward_kinematics(self, robot, configuration, group=None, options=None):
         """Calculate the robot's forward kinematic.
@@ -40,17 +54,8 @@ class ForwardKinematics(object):
         pass
 
 
-class InverseKinematics(object):
-    """Interface for a Planner's inverse kinematics feature.  Any implementation of
-    ``InverseKinematics`` must define the method ``inverse_kinematics``.  The
-    ``__call__`` magic method allows an instance of an implementation of
-    ``InverseKinematics`` to be treated as its ``inverse_kinematics`` method.  See
-    <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
-    <https://en.wikipedia.org/wiki/Function_object#In_Python>.
-    """
-
-    def __call__(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
-        return self.inverse_kinematics(robot, frame_WCF, start_configuration, group, options)
+class InverseKinematics(BackendFeature):
+    """Mix-in interface for implementing a planner's inverse kinematics feature."""
 
     def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
@@ -78,17 +83,8 @@ class InverseKinematics(object):
         pass
 
 
-class PlanMotion(object):
-    """Interface for a Planner's plan motion feature.  Any implementation of
-    ``PlanMotion`` must define the method ``plan_motion``.  The
-    ``__call__`` magic method allows an instance of an implementation of
-    ``PlanMotion`` to be treated as its ``plan_motion`` method.  See
-    <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
-    <https://en.wikipedia.org/wiki/Function_object#In_Python>.
-    """
-
-    def __call__(self, robot, target, start_configuration=None, group=None, options=None):
-        return self.plan_motion(robot, target, start_configuration, group, options)
+class PlanMotion(BackendFeature):
+    """Mix-in interface for implementing a planner's plan motion feature."""
 
     def plan_motion(self, robot, target, start_configuration=None, group=None, options=None):
         """Calculates a motion path.
@@ -116,17 +112,8 @@ class PlanMotion(object):
         pass
 
 
-class PlanCartesianMotion(object):
-    """Interface for a Planner's plan cartesian motion feature.  Any implementation of
-    ``PlanCartesianMotion`` must define the method ``plan_cartesian_motion``.  The
-    ``__call__`` magic method allows an instance of an implementation of
-    ``PlanCartesianMotion`` to be treated as its ``plan_cartesian_motion`` method.  See
-    <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
-    <https://en.wikipedia.org/wiki/Function_object#In_Python>.
-    """
-
-    def __call__(self, robot, waypoints, start_configuration=None, group=None, options=None):
-        return self.plan_cartesian_motion(robot, waypoints, start_configuration, group, options)
+class PlanCartesianMotion(BackendFeature):
+    """Mix-in interface for implementing a planner's plan cartesian motion feature."""
 
     def plan_cartesian_motion(self, robot, waypoints, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
@@ -154,17 +141,8 @@ class PlanCartesianMotion(object):
         pass
 
 
-class GetPlanningScene(object):
-    """Interface for a Planner's get planning scene feature.  Any implementation of
-    ``GetPlanningScene`` must define the method ``get_planning_scene``.  The
-    ``__call__`` magic method allows an instance of an implementation of
-    ``GetPlanningScene`` to be treated as its ``get_planning_scene`` method.  See
-    <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
-    <https://en.wikipedia.org/wiki/Function_object#In_Python>.
-    """
-
-    def __call__(self, options=None):
-        return self.get_planning_scene(options)
+class GetPlanningScene(BackendFeature):
+    """Mix-in interface for implementing a planner's get planning scene feature."""
 
     def get_planning_scene(self, options=None):
         """Retrieve the planning scene.
@@ -182,20 +160,11 @@ class GetPlanningScene(object):
         pass
 
 
-class ResetPlanningScene(object):
-    """Interface for a Planner's reset planning scene feature.  Any implementation of
-    ``ResetPlanningScene`` must define the method ``reset_planning_scene``.  The
-    ``__call__`` magic method allows an instance of an implementation of
-    ``ResetPlanningScene`` to be treated as its ``reset_planning_scene`` method.  See
-    <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
-    <https://en.wikipedia.org/wiki/Function_object#In_Python>.
-    """
-
-    def __call__(self, options=None):
-        return self.reset_planning_scene(options)
+class ResetPlanningScene(BackendFeature):
+    """Mix-in interface for implementing a planner's reset planning scene feature."""
 
     def reset_planning_scene(self, options=None):
-        """Retrieve the planning scene.
+        """Resets the planning scene, removing all added collision meshes.
 
         Parameters
         ----------
@@ -210,17 +179,8 @@ class ResetPlanningScene(object):
         pass
 
 
-class AddCollisionMesh(object):
-    """Interface for a Planner's add collision mesh feature.  Any implementation of
-    ``AddCollisionMesh`` must define the method ``add_collision_mesh``.  The
-    ``__call__`` magic method allows an instance of an implementation of
-    ``AddCollisionMesh`` to be treated as its ``add_collision_mesh`` method.  See
-    <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
-    <https://en.wikipedia.org/wiki/Function_object#In_Python>.
-    """
-
-    def __call__(self, collision_mesh, options=None):
-        return self.add_collision_mesh(collision_mesh, options)
+class AddCollisionMesh(BackendFeature):
+    """Mix-in interface for implementing a planner's add collision mesh feature."""
 
     def add_collision_mesh(self, collision_mesh, options=None):
         """Add a collision mesh to the planning scene.
@@ -240,17 +200,8 @@ class AddCollisionMesh(object):
         pass
 
 
-class RemoveCollisionMesh(object):
-    """Interface for a Planner's remove collision mesh feature.  Any implementation of
-    ``RemoveCollisionMesh`` must define the method ``remove_collision_mesh``.  The
-    ``__call__`` magic method allows an instance of an implementation of
-    ``RemoveCollisionMesh`` to be treated as its ``remove_collision_mesh`` method.  See
-    <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
-    <https://en.wikipedia.org/wiki/Function_object#In_Python>.
-    """
-
-    def __call__(self, id, options=None):
-        return self.remove_collision_mesh(id, options)
+class RemoveCollisionMesh(BackendFeature):
+    """Mix-in interface for implementing a planner's remove collision mesh feature."""
 
     def remove_collision_mesh(self, id, options=None):
         """Remove a collision mesh from the planning scene.
@@ -270,17 +221,8 @@ class RemoveCollisionMesh(object):
         pass
 
 
-class AppendCollisionMesh(object):
-    """Interface for a Planner's append collision mesh feature.  Any implementation of
-    ``AppendCollisionMesh`` must define the method ``append_collision_mesh``.  The
-    ``__call__`` magic method allows an instance of an implementation of
-    ``AppendCollisionMesh`` to be treated as its ``append_collision_mesh`` method.  See
-    <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
-    <https://en.wikipedia.org/wiki/Function_object#In_Python>.
-    """
-
-    def __call__(self, collision_mesh, options=None):
-        return self.append_collision_mesh(collision_mesh, options)
+class AppendCollisionMesh(BackendFeature):
+    """Mix-in interface for implementing a planner's append collision mesh feature."""
 
     def append_collision_mesh(self, collision_mesh, options=None):
         """Append a collision mesh to the planning scene.
@@ -300,17 +242,8 @@ class AppendCollisionMesh(object):
         pass
 
 
-class AddAttachedCollisionMesh(object):
-    """Interface for a Planner's add attached collision mesh feature.  Any implementation of
-    ``AddAttachedCollisionMesh`` must define the method ``add_attached_collision_mesh``.  The
-    ``__call__`` magic method allows an instance of an implementation of
-    ``AddAttachedCollisionMesh`` to be treated as its ``add_attached_collision_mesh`` method.  See
-    <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
-    <https://en.wikipedia.org/wiki/Function_object#In_Python>.
-    """
-
-    def __call__(self, attached_collision_mesh, options=None):
-        return self.add_attached_collision_mesh(attached_collision_mesh, options)
+class AddAttachedCollisionMesh(BackendFeature):
+    """Mix-in interface for implementing a planner's add attached collision mesh feature."""
 
     def add_attached_collision_mesh(self, attached_collision_mesh, options=None):
         """Add a collision mesh and attach it to the robot.
@@ -330,17 +263,8 @@ class AddAttachedCollisionMesh(object):
         pass
 
 
-class RemoveAttachedCollisionMesh(object):
-    """Interface for a Planner's remove attached collision mesh feature.  Any implementation of
-    ``RemoveAttachedCollisionMesh`` must define the method ``remove_attached_collision_mesh``.  The
-    ``__call__`` magic method allows an instance of an implementation of
-    ``RemoveAttachedCollisionMesh`` to be treated as its ``remove_attached_collision_mesh`` method.  See
-    <https://docs.python.org/3/reference/datamodel.html#object.__call__> and
-    <https://en.wikipedia.org/wiki/Function_object#In_Python>.
-    """
-
-    def __call__(self, id, options=None):
-        return self.remove_attached_collision_mesh(id, options)
+class RemoveAttachedCollisionMesh(BackendFeature):
+    """Mix-in interface for implementing a planner's remove attached collision mesh feature."""
 
     def remove_attached_collision_mesh(self, id, options=None):
         """Remove an attached collision mesh from the robot.

@@ -46,6 +46,7 @@ Planning scene interfaces
 from .backend_features import AddAttachedCollisionMesh
 from .backend_features import AddCollisionMesh
 from .backend_features import AppendCollisionMesh
+from .backend_features import BackendFeature
 from .backend_features import ForwardKinematics
 from .backend_features import GetPlanningScene
 from .backend_features import InverseKinematics
@@ -58,17 +59,18 @@ from .client import ClientInterface
 from .client import PlannerInterface
 
 __all__ = [
-    "ForwardKinematics",
-    "InverseKinematics",
-    "PlanMotion",
-    "PlanCartesianMotion",
-    "GetPlanningScene",
+    "AddAttachedCollisionMesh",
     "AddCollisionMesh",
     "AppendCollisionMesh",
+    "BackendFeature",
+    "ClientInterface",
+    "ForwardKinematics",
+    "GetPlanningScene",
+    "InverseKinematics",
+    "PlanCartesianMotion",
+    "PlanMotion",
+    "PlannerInterface",
     "RemoveCollisionMesh",
-    "AddAttachedCollisionMesh",
     "RemoveAttachedCollisionMesh",
     "ResetPlanningScene",
-    "ClientInterface",
-    "PlannerInterface",
 ]

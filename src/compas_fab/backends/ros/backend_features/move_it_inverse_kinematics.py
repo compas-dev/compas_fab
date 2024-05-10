@@ -32,9 +32,6 @@ class MoveItInverseKinematics(InverseKinematics):
         "/compute_ik", "GetPositionIK", GetPositionIKRequest, GetPositionIKResponse, validate_response
     )
 
-    def __init__(self, ros_client):
-        self.ros_client = ros_client
-
     def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
@@ -115,7 +112,7 @@ class MoveItInverseKinematics(InverseKinematics):
                 start_state.attached_collision_objects.append(aco)
 
         # Filter needs to happen after all objects have been added
-        start_state.filter_fields_for_distro(self.ros_client.ros_distro)
+        start_state.filter_fields_for_distro(self.client.ros_distro)
 
         constraints = convert_constraints_to_rosmsg(options.get("constraints"), header)
 
@@ -135,10 +132,10 @@ class MoveItInverseKinematics(InverseKinematics):
         # The field `attempts` was removed in Noetic (and higher)
         # so it needs to be removed from the message otherwise it causes a serialization error
         # https://github.com/ros-planning/moveit/pull/1288
-        if self.ros_client.ros_distro not in (RosDistro.KINETIC, RosDistro.MELODIC):
+        if self.client.ros_distro not in (RosDistro.KINETIC, RosDistro.MELODIC):
             del ik_request.attempts
 
         def convert_to_positions(response):
             callback((response.solution.joint_state.position, response.solution.joint_state.name))
 
-        self.GET_POSITION_IK(self.ros_client, (ik_request,), convert_to_positions, errback)
+        self.GET_POSITION_IK(self.client, (ik_request,), convert_to_positions, errback)
