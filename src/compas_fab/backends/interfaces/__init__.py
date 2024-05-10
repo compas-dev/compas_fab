@@ -21,6 +21,7 @@ Feature interfaces
     :toctree: generated/
     :nosignatures:
 
+    BackendFeature
     ForwardKinematics
     InverseKinematics
     PlanMotion
