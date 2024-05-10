@@ -34,8 +34,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         group : str, optional
             The planning group used for calculation.
         options : dict, optional
-            Dictionary containing kwargs for arguments specific to
-            the client being queried.
+            Dictionary containing the key-value pairs that are passed to :func:`compas_fab.robots.Robot.iter_inverse_kinematics`
 
         Returns
         -------
