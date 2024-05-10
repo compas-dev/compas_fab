@@ -24,6 +24,7 @@ if not compas.IPY:
         from typing import List  # noqa: F401
         from typing import Optional  # noqa: F401
         from typing import Tuple  # noqa: F401
+        from compas.geometry import Vector  # noqa: F401
         from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
         from compas_fab.robots import RobotSemantics  # noqa: F401
         from compas_fab.robots import Tool  # noqa: F401
