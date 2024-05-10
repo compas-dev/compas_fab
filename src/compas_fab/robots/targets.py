@@ -248,7 +248,7 @@ class PointAxisTarget(Target):
         The tool tip coordinate frame relative to the flange of the robot.
         If not specified, the target point is relative to the robot's flange (T0CF) and the
         Z axis of the flange can rotate around the target axis.
-    nane : str, optional
+    name : str, optional
         The human-readable name of the target.
         Defaults to 'Point-Axis Target'.
     """
@@ -533,6 +533,7 @@ class Waypoints(Data):
     """
 
     def __init__(self, name="Generic Waypoints"):
+        # type: (str) -> None
         super(Waypoints, self).__init__()
         self.name = name
 
@@ -541,6 +542,7 @@ class Waypoints(Data):
         raise NotImplementedError
 
     def scaled(self, factor):
+        # type: (float) -> Waypoints
         """Returns a scaled copy of the waypoints.
 
         If the user model is created in millimeters, the target should be scaled by a factor of 0.001 before passing to the planner.
@@ -595,6 +597,7 @@ class FrameWaypoints(Waypoints):
         tool_coordinate_frame=None,
         name="Frame Waypoints",
     ):
+        # type: (list[Frame], Optional[float], Optional[float], Optional[Frame | Transformation], Optional[str]) -> None
         super(FrameWaypoints, self).__init__(name=name)
         self.target_frames = target_frames
         self.tolerance_position = tolerance_position
@@ -622,6 +625,7 @@ class FrameWaypoints(Waypoints):
         tool_coordinate_frame=None,
         name="Frame Waypoints",
     ):
+        # type: (list[Transformation], Optional[float], Optional[float], Optional[Frame | Transformation], Optional[str]) -> FrameWaypoints
         """Creates a FrameWaypoints from a list of transformation matrices.
 
         Parameters
@@ -650,6 +654,7 @@ class FrameWaypoints(Waypoints):
         return cls(frames, tolerance_position, tolerance_orientation, tool_coordinate_frame, name)
 
     def scaled(self, factor):
+        # type: (float) -> FrameWaypoints
         """Returns a copy of the :class:`FrameWaypoints` where the target frames and tolerances are scaled.
 
         By convention, compas_fab robots use meters as the default unit of measure.
@@ -712,6 +717,7 @@ class PointAxisWaypoints(Waypoints):
         tool_coordinate_frame=None,
         name="Point-Axis Waypoints",
     ):
+        # type: (list[Tuple[Point, Vector]], Optional[float], Optional[Frame | Transformation], Optional[str]) -> None
         super(PointAxisWaypoints, self).__init__(name=name)
         self.target_points_and_axes = target_points_and_axes
         self.tolerance_position = tolerance_position
@@ -727,6 +733,7 @@ class PointAxisWaypoints(Waypoints):
         }
 
     def scaled(self, factor):
+        # type: (float) -> PointAxisWaypoints
         """Returns a copy of the target where the target points and tolerances are scaled.
 
         Parameters
