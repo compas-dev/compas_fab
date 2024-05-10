@@ -6,6 +6,11 @@ from __future__ import print_function
 
 import math
 
+import compas
+
+if not compas.IPY:
+    from typing import List  # noqa: F401
+
 __all__ = [
     "to_radians",
     "to_degrees",
@@ -13,6 +18,7 @@ __all__ = [
 
 
 def to_radians(degrees):
+    # type: (List[float]) -> List[float]
     """Convert a list of floats representing degrees to a list of radians.
 
     Parameters
@@ -29,6 +35,7 @@ def to_radians(degrees):
 
 
 def to_degrees(radians):
+    # type: (List[float]) -> List[float]
     """Convert a list of floats representing radians to a list of degrees.
 
     Parameters
@@ -39,6 +46,6 @@ def to_degrees(radians):
     Returns
     -------
     :obj:`list` of :obj:`float`
-        List of degress.
+        List of degrees.
     """
     return [math.degrees(r) for r in radians]

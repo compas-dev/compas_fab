@@ -5,7 +5,7 @@ __all__ = [
 ]
 
 
-class Inertia:
+class Inertia(object):
     """The moments of inertia represent the spatial distribution of mass in a rigid body.
 
     It depends on the mass, size, and shape of a rigid body with units of
@@ -16,16 +16,16 @@ class Inertia:
 
     Attributes
     ----------
-    inertia_tensor : list of float
+    inertia_tensor : :obj:`list` of :obj:`float`
         A symmetric positive-definite 3x3 matrix:
         | ixx ixy ixz |
         | ixy iyy iyz |
         | ixz iyz izz |
         with [ixx, iyy, izz] as the principal moments of inertia and
         [ixy, ixz, iyz] as the products of inertia.
-    mass: float
+    mass: :obj:`float`
         The mass of the object in kg.
-    center_of_mass : :class:`Point`
+    center_of_mass : :class:`compas.geometry.Point`
         The center of mass of the object in meters.
 
     Examples
@@ -39,16 +39,18 @@ class Inertia:
     Notes
     -----
     Assuming uniform mass density, inertial data can be obtained using the
-    free software MeshLab, refering to this great `tutorial <http://gazebosim.org/tutorials?tut=inertia>`_.
+    free software MeshLab, referring to this great `tutorial <http://gazebosim.org/tutorials?tut=inertia>`_.
     """
 
     def __init__(self, inertia_tensor, mass, center_of_mass):
+        # type: (list[float], float, Point) -> None
         self.inertia_tensor = inertia_tensor
         self.mass = mass
         self.center_of_mass = Point(*center_of_mass)
 
     @property
     def principal_moments(self):
+        # type: () -> list[float]
         """Returns the diagonal elements of the inertia tensor [ixx, iyy, izz]"""
         inertia_tensor = self.inertia_tensor
         return [inertia_tensor[0][0], inertia_tensor[1][1], inertia_tensor[2][2]]

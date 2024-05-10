@@ -2,12 +2,23 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import compas
+
 from compas.data import Data
 from compas_robots import ToolModel
 from compas_robots.model import LinkGeometry
 
 from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots import CollisionMesh
+
+if not compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import Optional  # noqa: F401
+        from typing import List  # noqa: F401
+        from compas.geometry import Frame  # noqa: F401
+        from compas.datastructures import Mesh  # noqa: F401
 
 __all__ = ["Tool"]
 
@@ -21,11 +32,11 @@ class Tool(Data):
         The visual mesh of the tool.
     frame_in_tool0_frame : :class:`compas.geometry.Frame`
         The tool coordinate frame (TCF) of the tool relative to the tool0 frame (T0CF).
-    collision : :class:`compas.datastructures.Mesh`
+    collision : :class:`compas.datastructures.Mesh`, optional
         The collision mesh representation of the tool.
-    name : :obj:`str`
+    name : :obj:`str`, optional
         The name of the `Tool`. Defaults to 'attached_tool'.
-    connected_to : :obj:`str`
+    connected_to : :obj:`str`, optional
         The name of the `Link` to which the tool is attached.  Defaults to ``None``.
 
     Attributes
@@ -50,17 +61,21 @@ class Tool(Data):
     """
 
     def __init__(self, visual, frame_in_tool0_frame, collision=None, name="attached_tool", connected_to=None):
+        # type: (Mesh, Frame, Optional[Mesh], Optional[str], Optional[str]) -> None
         super(Tool, self).__init__()
         self.tool_model = ToolModel(visual, frame_in_tool0_frame, collision, name, connected_to)
 
     @classmethod
     def from_tool_model(cls, tool_model):
+        # type: (ToolModel) -> Tool
+        """Creates a `Tool` from a :class:`~compas_robots.ToolModel` instance."""
         tool = cls(None, None)
         tool.tool_model = tool_model
         return tool
 
     @property
     def attached_collision_meshes(self):
+        # type: () -> List[AttachedCollisionMesh]
         # If the tool model is not set, return an empty list
         if not self.tool_model or len(self.tool_model.links) == 0:
             return []
@@ -80,22 +95,27 @@ class Tool(Data):
 
     @property
     def name(self):
+        # type: () -> str
         return self.tool_model.name
 
     @property
     def connected_to(self):
+        # type: () -> str
         return self.tool_model.connected_to
 
     @connected_to.setter
     def connected_to(self, link_name):
+        # type: (str) -> None
         self.tool_model.connected_to = link_name
 
     @property
     def frame(self):
+        # type: () -> Frame
         return self.tool_model.frame
 
     @frame.setter
     def frame(self, frame):
+        # type: (Frame) -> None
         self.tool_model.frame = frame
 
     @property
@@ -113,6 +133,7 @@ class Tool(Data):
 
     @classmethod
     def __from_data__(cls, data):
+        # type: (dict) -> Tool
         """Construct a `Tool` from its data representation.
 
         Parameters
@@ -131,11 +152,14 @@ class Tool(Data):
         return tool
 
     def update_touch_links(self, touch_links=None):
+        # type: (Optional[List[str]]) -> None
+        """Updates the list of names representing the links that the tool is allowed to touch."""
         if touch_links:
             for acm in self.attached_collision_meshes:
                 acm.touch_links = touch_links
 
     def from_tcf_to_t0cf(self, frames_tcf):
+        # type: (List[Frame]) -> List[Frame]
         """Converts a list of frames at the robot's tool tip (tcf frame) to frames at the robot's flange (tool0 frame).
 
         Parameters
@@ -161,6 +185,7 @@ class Tool(Data):
         return self.tool_model.from_tcf_to_t0cf(frames_tcf)
 
     def from_t0cf_to_tcf(self, frames_t0cf):
+        # type: (List[Frame]) -> List[Frame]
         """Converts frames at the robot's flange (tool0 frame) to frames at the robot's tool tip (tcf frame).
 
         Parameters
