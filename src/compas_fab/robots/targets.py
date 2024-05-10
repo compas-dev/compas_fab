@@ -1,13 +1,15 @@
+import compas
+
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_robots.model import Joint
 
+if not compas.IPY:
+    from typing import TYPE_CHECKING
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from compas_robots import Configuration  # noqa: F401
+    if TYPE_CHECKING:
+        from compas_robots import Configuration  # noqa: F401
 
 __all__ = [
     "Target",

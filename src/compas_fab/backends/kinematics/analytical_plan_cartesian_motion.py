@@ -1,5 +1,6 @@
 import math
 
+import compas
 from compas.geometry import argmin
 
 from compas_fab.backends.interfaces import PlanCartesianMotion
@@ -12,12 +13,13 @@ from compas_fab.robots import PointAxisWaypoints
 
 from compas_fab.utilities import from_tcf_to_t0cf
 
-from typing import TYPE_CHECKING
+if not compas.IPY:
+    from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from typing import Optional  # noqa: F401
-    from compas_fab.robots import Robot  # noqa: F401
-    from compas_robots import Configuration  # noqa: F401
+    if TYPE_CHECKING:
+        from typing import Optional  # noqa: F401
+        from compas_fab.robots import Robot  # noqa: F401
+        from compas_robots import Configuration  # noqa: F401
 
 
 class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
