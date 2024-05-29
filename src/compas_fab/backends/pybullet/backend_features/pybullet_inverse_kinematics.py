@@ -74,12 +74,12 @@ class PyBulletInverseKinematics(InverseKinematics):
         high_accuracy = options.get("high_accuracy", True)
         max_results = options.get("max_results", 100)
         link_name = options.get("link_name") or robot.get_end_effector_link_name(group)
-        cached_robot = self.client.get_cached_robot(robot)
-        body_id = self.client.get_uid(cached_robot)
-        link_id = self.client._get_link_id_by_name(link_name, cached_robot)
+        cached_robot_model = self.client.get_cached_robot_model(robot)
+        body_id = self.client.get_uid(cached_robot_model)
+        link_id = self.client._get_link_id_by_name(link_name, cached_robot_model)
         point, orientation = pose_from_frame(frame_WCF)
 
-        joints = cached_robot.get_configurable_joints()
+        joints = cached_robot_model.get_configurable_joints()
         joints.sort(key=lambda j: j.attr["pybullet"]["id"])
         joint_names = [joint.name for joint in joints]
 

@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Renamed `PybulletClient.get_cached_robot` to `PybulletClient.get_cached_robot_model` to avoid confusion between the `RobotModel` and `Robot` class.
+* Renamed `PybulletClient.ensure_cached_robot` to `PybulletClient.ensure_cached_robot_model`.
+* Renamed `PybulletClient.ensure_cached_robot_geometry` to `PybulletClient.ensure_cached_robot_model_geometry`.
+* Renamed `PybulletClient.cache_robot` to `PybulletClient.cache_robot_model`.
 * Backend planners now use multi-inherence instead of `__call__` to include the backend functions. This allows for better generated documentation.
 * `Robot.plan_carteisan_motion()` now accepts `Waypoints` as target. Implementation for `FrameWaypoints` is supported with same functionality as before. Simply wrap `Frame` objects using `FrameWaypoints(frames)`.
 * Changed `BoundingVolume`, `Constraint`, `JointConstraint`, `OrientationConstraint`, `PositionConstraint` to inherit from `compas.data.Data` class.
