@@ -202,8 +202,10 @@ class PyBulletInverseKinematics(InverseKinematics):
                 target_position[1] - new_pose[1],
                 target_position[2] - new_pose[2],
             ]
+            # The distance is squared to avoid a sqrt operation
             distance = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]
-            close_enough = distance < threshold
+            # Therefor, the threshold is squared as well
+            close_enough = distance < threshold * threshold
             kwargs["restPoses"] = joint_poses
             iter += 1
 
