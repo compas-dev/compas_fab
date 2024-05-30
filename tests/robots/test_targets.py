@@ -102,7 +102,7 @@ def test_serialization_constraint_sets(target_frame, tool_coordinate_frame, targ
     for c1, c2 in zip(target.constraint_set, nt.constraint_set):
         assert c1.__data__ == c2.__data__
 
-    # ConstraintSetTarget with OrientationConstraint and Po
+    # ConstraintSetTarget with OrientationConstraint and PositionConstraint
     link_name = "tool0"
     tolerances_orientation = [0.0123] * 3
     orientation_constraint_weight = 0.789
@@ -172,7 +172,8 @@ def test_target_scale(frame_target):
     nt = frame_target.scaled(scale_factor)
     assert nt.target_frame == frame_target.target_frame.scaled(scale_factor)
     assert nt.tolerance_position == frame_target.tolerance_position * scale_factor
-    assert nt.tolerance_orientation == frame_target.tolerance_orientation * scale_factor
+    # orientation doesn't need scale
+    assert nt.tolerance_orientation == frame_target.tolerance_orientation
     assert nt.tool_coordinate_frame == frame_target.tool_coordinate_frame.scaled(scale_factor)
 
 
@@ -208,7 +209,8 @@ def test_frame_waypoints_scale(frame_waypoints):
     scale_factor = 0.001
     nt = frame_waypoints.scaled(scale_factor)
     assert nt.tolerance_position == frame_waypoints.tolerance_position * scale_factor
-    assert nt.tolerance_orientation == frame_waypoints.tolerance_orientation * scale_factor
+    # orientation doesn't need scale
+    assert nt.tolerance_orientation == frame_waypoints.tolerance_orientation
     for f1, f2 in zip(frame_waypoints.target_frames, nt.target_frames):
         assert f1.scaled(scale_factor) == f2
     assert nt.tool_coordinate_frame == frame_waypoints.tool_coordinate_frame.scaled(scale_factor)

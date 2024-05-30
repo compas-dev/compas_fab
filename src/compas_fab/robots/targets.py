@@ -35,8 +35,8 @@ class Target(Data):
     pose, configuration, and joint constraints. Dynamic targets such as
     velocity, acceleration, and jerk are not yet supported.
 
-    Waypoints are intended to be used for motion planning with a planning backend by using :meth:`compas_fab.robot.plan_motion`.
-    Different backends might support different types of
+    Targets are intended to be used as arguments for the Backend's motion
+    planning methods. Different backends might support different types of
     targets.
 
     Attributes
@@ -200,7 +200,8 @@ class FrameTarget(Target):
         """
         target_frame = self.target_frame.scaled(factor)
         tolerance_position = self.tolerance_position * factor
-        tolerance_orientation = self.tolerance_orientation * factor
+        # Orientation tolerance is not scaled
+        tolerance_orientation = self.tolerance_orientation
         tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
         return FrameTarget(target_frame, tolerance_position, tolerance_orientation, tool_coordinate_frame, self.name)
 
@@ -673,7 +674,7 @@ class FrameWaypoints(Waypoints):
         """
         target_frames = [frame.scaled(factor) for frame in self.target_frames]
         tolerance_position = self.tolerance_position * factor
-        tolerance_orientation = self.tolerance_orientation * factor
+        tolerance_orientation = self.tolerance_orientation
         tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
         return FrameWaypoints(
             target_frames, tolerance_position, tolerance_orientation, tool_coordinate_frame, self.name
