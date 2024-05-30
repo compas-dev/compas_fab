@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added `PyBulletClient.load_existing_robot` to load from an existing Robot, such as those in RobotLibrary.
 * Added `compas_fab.robots.Waypoints` class to represent a sequence of targets. It has two child classes: `FrameWaypoints` and `PointAxisWaypoints`.
 * Added `compas_fab.robots.Target` class to represent a motion planning target.
 * Added also child classes `FrameTarget`, `PointAxisTarget`, `ConfigurationTarget`, `ConstraintSetTarget`

@@ -218,8 +218,39 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         return robot
 
+    def load_existing_robot(self, robot):
+        # type: (Robot) -> Robot
+        """Load an existing robot to PyBullet.
+        The robot must have its geometry and semantics loaded.
+
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot to be saved for use with PyBullet.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Robot`
+            A robot instance.
+        """
+        robot.client = self
+        robot.attributes["pybullet"] = {}
+
+        robot.ensure_geometry()
+        robot.ensure_semantics()
+        self.cache_robot_model(robot)
+
+        urdf_fp = robot.attributes["pybullet"]["cached_robot_filepath"]
+        self._load_robot_to_pybullet(urdf_fp, robot)
+        self.disabled_collisions = robot.semantics.disabled_collisions
+
+        return robot
+
     def load_robot(self, urdf_file, resource_loaders=None, concavity=False, precision=None):
-        """Create a pybullet robot using the input urdf file.
+        """Create a robot from URDF and load it into PyBullet.
+
+        Robot geometry of the robot can be loaded using the resource loaders.
+        Robot semantics are loaded separately using the :meth:`load_semantics` method.
 
         Parameters
         ----------
