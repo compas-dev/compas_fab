@@ -182,7 +182,8 @@ class FrameTarget(Target):
         """
         target_frame = self.target_frame.scaled(factor)
         tolerance_position = self.tolerance_position * factor
-        tolerance_orientation = self.tolerance_orientation * factor
+        # Orientation tolerance is not scaled
+        tolerance_orientation = self.tolerance_orientation
         tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
         return FrameTarget(target_frame, tolerance_position, tolerance_orientation, tool_coordinate_frame, self.name)
 
