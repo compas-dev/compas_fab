@@ -393,6 +393,9 @@ class Robot(Data):
     def get_link_names_with_collision_geometry(self):
         """Get the names of the links with collision geometry.
 
+        Note that returned names does not imply that the link has collision geometry loaded.
+        Use :meth:`ensure_geometry()` to ensure that collision geometry is loaded.
+
         Returns
         -------
         :obj:`list` of :obj:`str`
