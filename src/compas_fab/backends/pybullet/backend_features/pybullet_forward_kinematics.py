@@ -36,6 +36,8 @@ class PyBulletForwardKinematics(ForwardKinematics):
         :class:`Frame`
             The frame in the world's coordinate system (WCF).
         """
+        options = options or {"link": None, "check_collision": False}
+
         link_name = options.get("link") or robot.get_end_effector_link_name(group)
         cached_robot_model = self.client.get_cached_robot_model(robot)
         body_id = self.client.get_uid(cached_robot_model)

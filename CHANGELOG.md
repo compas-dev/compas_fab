@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Fixed error in `PyBulletForwardKinematics.forward_kinematics` where function would crash if `options` was not passed.
 * Fixed error in `PyBulletInverseKinematics._accurate_inverse_kinematics` where threshold was not squared for comparison.
 * Renamed `PybulletClient.get_cached_robot` to `PybulletClient.get_cached_robot_model` to avoid confusion between the `RobotModel` and `Robot` class.
 * Renamed `PybulletClient.ensure_cached_robot` to `PybulletClient.ensure_cached_robot_model`.
