@@ -22,8 +22,8 @@ class Target(Data):
     pose, configuration, and joint constraints. Dynamic targets such as
     velocity, acceleration, and jerk are not yet supported.
 
-    Waypoints are intended to be used for motion planning with a planning backend by using :meth:`compas_fab.robot.plan_motion`.
-    Different backends might support different types of
+    Targets are intended to be used as arguments for the Backend's motion
+    planning methods. Different backends might support different types of
     targets.
 
     Attributes
