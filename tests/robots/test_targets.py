@@ -172,7 +172,8 @@ def test_target_scale(frame_target):
     nt = frame_target.scaled(scale_factor)
     assert nt.target_frame == frame_target.target_frame.scaled(scale_factor)
     assert nt.tolerance_position == frame_target.tolerance_position * scale_factor
-    assert nt.tolerance_orientation == frame_target.tolerance_orientation * scale_factor
+    # orientation doesn't need scale
+    assert nt.tolerance_orientation == frame_target.tolerance_orientation
     assert nt.tool_coordinate_frame == frame_target.tool_coordinate_frame.scaled(scale_factor)
 
 
