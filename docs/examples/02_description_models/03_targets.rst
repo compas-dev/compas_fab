@@ -55,7 +55,7 @@ It is created by a list of :class:`compas.geometry.Frame` objects or alternative
 
 The :class:`compas_fab.robots.PointAxisWaypoints` class is used for specifying a list of waypoints based on
 the Point-Axis concept used in the :class:`compas_fab.robots.PointAxisTarget`. Compared to
-:class:`~compas_fab.robots.FrameWaypoints`, this class allows for specifying a targets where the rotation
+:class:`~compas_fab.robots.FrameWaypoints`, this class allows for specifying targets where the rotation
 around the Z-axis is not fixed. This is useful for example when the robot is using a cylindrical tool
 to perform a task, for example 3D printing, welding or drilling. The freely rotating axis is defined relative
 to the Z-axis of the tool coordinate frame (TCF). Note that the orientation of the tool
