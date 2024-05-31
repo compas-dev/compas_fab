@@ -209,7 +209,8 @@ def test_frame_waypoints_scale(frame_waypoints):
     scale_factor = 0.001
     nt = frame_waypoints.scaled(scale_factor)
     assert nt.tolerance_position == frame_waypoints.tolerance_position * scale_factor
-    assert nt.tolerance_orientation == frame_waypoints.tolerance_orientation * scale_factor
+    # orientation doesn't need scale
+    assert nt.tolerance_orientation == frame_waypoints.tolerance_orientation
     for f1, f2 in zip(frame_waypoints.target_frames, nt.target_frames):
         assert f1.scaled(scale_factor) == f2
     assert nt.tool_coordinate_frame == frame_waypoints.tool_coordinate_frame.scaled(scale_factor)
