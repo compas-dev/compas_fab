@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/tabs.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
@@ -623,7 +623,7 @@ document.write(`
 <h1>ReachabilityMapObject</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.ghpython.ReachabilityMapObject">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.ghpython.</span></span><span class="sig-name descname"><span class="pre">ReachabilityMapObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/4e5d751/src/compas_fab/ghpython/reachabilitymapobject.py#L6"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.ghpython.</span></span><span class="sig-name descname"><span class="pre">ReachabilityMapObject</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/17c8801/src/compas_fab/ghpython/reachabilitymapobject.py#L6"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas_ghpython.scene.GHSceneObject.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">GHSceneObject</span></code></a></p>
 <p>Scene object for drawing a reachability map.</p>
 <dl class="field-list">
@@ -653,11 +653,41 @@ document.write(`
 <p class="rubric">Inherited Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.add.html#compas_fab.ghpython.ReachabilityMapObject.add" title="compas_fab.ghpython.ReachabilityMapObject.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.ToString.html#compas_fab.ghpython.ReachabilityMapObject.ToString" title="compas_fab.ghpython.ReachabilityMapObject.ToString"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ToString</span></code></a></p></td>
+<td><p>Converts the instance to a string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.add.html#compas_fab.ghpython.ReachabilityMapObject.add" title="compas_fab.ghpython.ReachabilityMapObject.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a></p></td>
 <td><p>Add a child item to the scene object.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.clear.html#compas_fab.ghpython.ReachabilityMapObject.clear" title="compas_fab.ghpython.ReachabilityMapObject.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.clear.html#compas_fab.ghpython.ReachabilityMapObject.clear" title="compas_fab.ghpython.ReachabilityMapObject.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a></p></td>
 <td><p>The main clearing method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.copy.html#compas_fab.ghpython.ReachabilityMapObject.copy" title="compas_fab.ghpython.ReachabilityMapObject.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a></p></td>
+<td><p>Make an independent copy of the data object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.from_json.html#compas_fab.ghpython.ReachabilityMapObject.from_json" title="compas_fab.ghpython.ReachabilityMapObject.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a></p></td>
+<td><p>Construct an object of this type from a JSON file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.from_jsonstring.html#compas_fab.ghpython.ReachabilityMapObject.from_jsonstring" title="compas_fab.ghpython.ReachabilityMapObject.from_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_jsonstring</span></code></a></p></td>
+<td><p>Construct an object of this type from a JSON string.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.remove.html#compas_fab.ghpython.ReachabilityMapObject.remove" title="compas_fab.ghpython.ReachabilityMapObject.remove"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove</span></code></a></p></td>
+<td><p>Remove a child node from this node.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.sha256.html#compas_fab.ghpython.ReachabilityMapObject.sha256" title="compas_fab.ghpython.ReachabilityMapObject.sha256"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code></a></p></td>
+<td><p>Compute a hash of the data for comparison during version control using the sha256 algorithm.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.to_json.html#compas_fab.ghpython.ReachabilityMapObject.to_json" title="compas_fab.ghpython.ReachabilityMapObject.to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code></a></p></td>
+<td><p>Convert an object to its native data representation and save it to a JSON file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.to_jsonstring.html#compas_fab.ghpython.ReachabilityMapObject.to_jsonstring" title="compas_fab.ghpython.ReachabilityMapObject.to_jsonstring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_jsonstring</span></code></a></p></td>
+<td><p>Convert an object to its native data representation and save it to a JSON string.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.traverse.html#compas_fab.ghpython.ReachabilityMapObject.traverse" title="compas_fab.ghpython.ReachabilityMapObject.traverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">traverse</span></code></a></p></td>
+<td><p>Traverse the tree from this node.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.ghpython.ReachabilityMapObject.validate_data.html#compas_fab.ghpython.ReachabilityMapObject.validate_data" title="compas_fab.ghpython.ReachabilityMapObject.validate_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_data</span></code></a></p></td>
+<td><p>Validate the data against the object's data schema.</p></td>
 </tr>
 </tbody>
 </table>
