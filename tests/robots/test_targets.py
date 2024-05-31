@@ -102,7 +102,7 @@ def test_serialization_constraint_sets(target_frame, tool_coordinate_frame, targ
     for c1, c2 in zip(target.constraint_set, nt.constraint_set):
         assert c1.__data__ == c2.__data__
 
-    # ConstraintSetTarget with OrientationConstraint and Po
+    # ConstraintSetTarget with OrientationConstraint and PositionConstraint
     link_name = "tool0"
     tolerances_orientation = [0.0123] * 3
     orientation_constraint_weight = 0.789
