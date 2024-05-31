@@ -623,7 +623,7 @@ document.write(`
 <h1>ConfigurationTarget</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.robots.ConfigurationTarget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">ConfigurationTarget</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/17c8801/src/compas_fab/robots/targets.py#L269"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">ConfigurationTarget</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/506fd5e/src/compas_fab/robots/targets.py#L283"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="compas_fab.robots.Target.html#compas_fab.robots.Target" title="compas_fab.robots.targets.Target"><code class="xref py py-class docutils literal notranslate"><span class="pre">Target</span></code></a></p>
 <p>Represents a configuration target for the robot’s end-effector motion planning.</p>
 <p>The configuration target is a joint configuration of the robot’s joints.
@@ -648,6 +648,9 @@ If not specified, the default value from the planner is used.</p>
 <dt><strong>tolerance_below</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>Acceptable deviation below the targeted configurations. One for each joint.
 Always use positive values.
 If not specified, the default value from the planner is used.</p>
+</dd>
+<dt><strong>name</strong><span class="classifier">str, optional</span></dt><dd><p>The human-readable name of the target.
+Defaults to ‘Configuration Target’.</p>
 </dd>
 </dl>
 </dd>

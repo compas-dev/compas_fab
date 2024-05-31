@@ -623,7 +623,7 @@ document.write(`
 <h1>ConstraintSetTarget</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.robots.ConstraintSetTarget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">ConstraintSetTarget</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/17c8801/src/compas_fab/robots/targets.py#L410"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">ConstraintSetTarget</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/506fd5e/src/compas_fab/robots/targets.py#L429"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="compas_fab.robots.Target.html#compas_fab.robots.Target" title="compas_fab.robots.targets.Target"><code class="xref py py-class docutils literal notranslate"><span class="pre">Target</span></code></a></p>
 <p>Represents a list of Constraint as the target for motion planning.</p>
 <p>Given a ConstraintSetTarget, the planner aims to find a path moving
@@ -637,7 +637,7 @@ except in trivial cases. Therefore the ending pose or configuration of the
 planned path can only be determined after performing the motion planning.</p>
 <p>ConstraintSetTarget is suitable for advanced users who want to specify
 custom constraints for the robot motion planning.
-Different planner backends may support differnt types of Constraints.
+Different planner backends may support different types of Constraints.
 See tutorial <a class="reference internal" href="../../examples/02_description_models/03_targets.html#targets"><span class="std std-ref">Targets</span></a> for more details.</p>
 <p>ConstraintSetTarget is only supported by Free motion planning,
 Cartesian motion planning do not support this target type.</p>
@@ -645,6 +645,9 @@ Cartesian motion planning do not support this target type.</p>
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>constraint_set</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="compas_fab.robots.Constraint.html#compas_fab.robots.Constraint" title="compas_fab.robots.Constraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.robots.Constraint</span></code></a></span></dt><dd><p>A list of constraints to be satisfied.</p>
+</dd>
+<dt><strong>name</strong><span class="classifier">str, optional</span></dt><dd><p>The human-readable name of the target.
+Defaults to ‘Constraint Set Target’.</p>
 </dd>
 </dl>
 </dd>

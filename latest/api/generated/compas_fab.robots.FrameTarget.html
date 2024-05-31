@@ -623,7 +623,7 @@ document.write(`
 <h1>FrameTarget</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.robots.FrameTarget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">FrameTarget</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/17c8801/src/compas_fab/robots/targets.py#L63"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">FrameTarget</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/506fd5e/src/compas_fab/robots/targets.py#L68"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="compas_fab.robots.Target.html#compas_fab.robots.Target" title="compas_fab.robots.targets.Target"><code class="xref py py-class docutils literal notranslate"><span class="pre">Target</span></code></a></p>
 <p>Represents a fully constrained pose target for the robot’s end-effector using a <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Frame.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Frame</span></code></a>.</p>
 <p>When using a FrameTarget, the end-effector has no translational or rotational freedom.
@@ -650,7 +650,7 @@ If not specified, the default value from the planner is used.</p>
 <dt><strong>tool_coordinate_frame</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Frame.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Frame</span></code></a> or <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Transformation.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Transformation</span></code></a>, optional</span></dt><dd><p>The tool tip coordinate frame relative to the flange of the robot.
 If not specified, the target frame is relative to the robot’s flange.</p>
 </dd>
-<dt><strong>name</strong><span class="classifier">str, optional</span></dt><dd><p>The name of the target.
+<dt><strong>name</strong><span class="classifier">str, optional</span></dt><dd><p>The human-readable name of the target.
 Defaults to ‘Frame Target’.</p>
 </dd>
 </dl>
@@ -663,7 +663,7 @@ Defaults to ‘Frame Target’.</p>
 <td><p>Creates a FrameTarget from a transformation matrix.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_fab.robots.FrameTarget.scaled.html#compas_fab.robots.FrameTarget.scaled" title="compas_fab.robots.FrameTarget.scaled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scaled</span></code></a></p></td>
-<td><p>Returns a copy of the target where the target frame and tolerances are scaled.</p></td>
+<td><p>Returns a copy of the <a class="reference internal" href="#compas_fab.robots.FrameTarget" title="compas_fab.robots.FrameTarget"><code class="xref py py-class docutils literal notranslate"><span class="pre">FrameTarget</span></code></a> where the target frame and tolerances are scaled.</p></td>
 </tr>
 </tbody>
 </table>

@@ -623,7 +623,7 @@ document.write(`
 <h1>PointAxisTarget</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.robots.PointAxisTarget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">PointAxisTarget</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/17c8801/src/compas_fab/robots/targets.py#L184"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">PointAxisTarget</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/506fd5e/src/compas_fab/robots/targets.py#L191"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference internal" href="compas_fab.robots.Target.html#compas_fab.robots.Target" title="compas_fab.robots.targets.Target"><code class="xref py py-class docutils literal notranslate"><span class="pre">Target</span></code></a></p>
 <p>Represents a point and axis target for the robot’s end-effector motion planning.</p>
 <p>This target allows one degree of rotational freedom, enabling the end-effector
@@ -632,7 +632,9 @@ Given a PointAxisTarget, the planner seeks a path to move the robot’s end-effe
 tool tip to the target point and align the tool tip’s Z axis with the specified target axis.</p>
 <p>PointAxisTarget is suitable for tasks like drilling, milling, and 3D printing,
 where aligning the end-effector with a target axis is crucial,
-but the orientation around the axis is not important.</p>
+but the orientation around the axis is not important.
+Note that PointAxisTarget only represents a single target,
+for a sequence of targets, consider using <a class="reference internal" href="compas_fab.robots.PointAxisWaypoints.html#compas_fab.robots.PointAxisWaypoints" title="compas_fab.robots.PointAxisWaypoints"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointAxisWaypoints</span></code></a>.</p>
 <p>The user must define (1) the target point of which the tool tip will reach
 and (2) the target axis where the tool tip coordinate frame (TCF)’s Z axis
 can rotate around. The target point and axis are defined relative to the robot’s
@@ -649,6 +651,7 @@ the planning group setting in the planning request, as defined in an SRDF file o
 <dt><strong>target_point</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Point.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Point</span></code></a></span></dt><dd><p>The target point defined relative to the world coordinate frame (WCF).</p>
 </dd>
 <dt><strong>target_z_axis</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Vector.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Vector</span></code></a></span></dt><dd><p>The target axis is defined by the target_point and pointing towards this vector.
+A unitized vector is recommended.
 The tool tip coordinate frame (TCF)’s Z axis can rotate around this axis.</p>
 </dd>
 <dt><strong>tolerance_position</strong><span class="classifier">float, optional</span></dt><dd><p>The tolerance for the position of the target point.
@@ -657,6 +660,9 @@ If not specified, the default value from the planner is used.</p>
 <dt><strong>tool_coordinate_frame</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Frame.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Frame</span></code></a>, optional</span></dt><dd><p>The tool tip coordinate frame relative to the flange coordinate frame of the robot.
 If not specified, the target point is relative to the robot’s flange (T0CF) and the
 Z axis of the flange can rotate around the target axis.</p>
+</dd>
+<dt><strong>name</strong><span class="classifier">str, optional</span></dt><dd><p>The human-readable name of the target.
+Defaults to ‘Point-Axis Target’.</p>
 </dd>
 </dl>
 </dd>
