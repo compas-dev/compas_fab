@@ -9,6 +9,9 @@ __all__ = [
     "PointAxisTarget",
     "ConfigurationTarget",
     "ConstraintSetTarget",
+    "Waypoints",
+    "FrameWaypoints",
+    "PointAxisWaypoints",
 ]
 
 
@@ -46,6 +49,8 @@ class Target(Data):
 
     def scaled(self, factor):
         """Returns a scaled copy of the target.
+
+        If the user model is created in millimeters, the target should be scaled by a factor of 0.001 before passing to the planner.
 
         Parameters
         ----------
@@ -91,7 +96,7 @@ class FrameTarget(Target):
         The tool tip coordinate frame relative to the flange of the robot.
         If not specified, the target frame is relative to the robot's flange.
     name : str, optional
-        The name of the target.
+        The human-readable name of the target.
         Defaults to 'Frame Target'.
 
     """
@@ -119,6 +124,7 @@ class FrameTarget(Target):
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "tool_coordinate_frame": self.tool_coordinate_frame,
+            "name": self.name,
         }
 
     @classmethod
@@ -146,7 +152,7 @@ class FrameTarget(Target):
             The tool tip coordinate frame relative to the flange of the robot.
             If not specified, the target frame is relative to the robot's flange.
         name : str, optional
-            The name of the target.
+            The human-readable name of the target.
             Defaults to 'Frame Target'.
 
         Returns
@@ -158,7 +164,7 @@ class FrameTarget(Target):
         return cls(frame, tolerance_position, tolerance_orientation, tool_coordinate_frame, name)
 
     def scaled(self, factor):
-        """Returns a copy of the target where the target frame and tolerances are scaled.
+        """Returns a copy of the :class:`FrameTarget` where the target frame and tolerances are scaled.
 
         By convention, compas_fab robots use meters as the default unit of measure.
         If user model is created in millimeters, the FrameTarget should be scaled by a factor
@@ -176,7 +182,8 @@ class FrameTarget(Target):
         """
         target_frame = self.target_frame.scaled(factor)
         tolerance_position = self.tolerance_position * factor
-        tolerance_orientation = self.tolerance_orientation * factor
+        # Orientation tolerance is not scaled
+        tolerance_orientation = self.tolerance_orientation
         tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
         return FrameTarget(target_frame, tolerance_position, tolerance_orientation, tool_coordinate_frame, self.name)
 
@@ -193,6 +200,8 @@ class PointAxisTarget(Target):
     PointAxisTarget is suitable for tasks like drilling, milling, and 3D printing,
     where aligning the end-effector with a target axis is crucial,
     but the orientation around the axis is not important.
+    Note that PointAxisTarget only represents a single target,
+    for a sequence of targets, consider using :class:`PointAxisWaypoints`.
 
     The user must define (1) the target point of which the tool tip will reach
     and (2) the target axis where the tool tip coordinate frame (TCF)'s Z axis
@@ -213,6 +222,7 @@ class PointAxisTarget(Target):
         The target point defined relative to the world coordinate frame (WCF).
     target_z_axis : :class:`compas.geometry.Vector`
         The target axis is defined by the target_point and pointing towards this vector.
+        A unitized vector is recommended.
         The tool tip coordinate frame (TCF)'s Z axis can rotate around this axis.
     tolerance_position : float, optional
         The tolerance for the position of the target point.
@@ -221,7 +231,9 @@ class PointAxisTarget(Target):
         The tool tip coordinate frame relative to the flange coordinate frame of the robot.
         If not specified, the target point is relative to the robot's flange (T0CF) and the
         Z axis of the flange can rotate around the target axis.
-
+    name : str, optional
+        The human-readable name of the target.
+        Defaults to 'Point-Axis Target'.
     """
 
     def __init__(
@@ -238,12 +250,14 @@ class PointAxisTarget(Target):
         self.tolerance_position = tolerance_position
         self.tool_coordinate_frame = tool_coordinate_frame
 
+    @property
     def __data__(self):
         return {
             "target_point": self.target_point,
             "target_z_axis": self.target_z_axis,
             "tolerance_position": self.tolerance_position,
             "tool_coordinate_frame": self.tool_coordinate_frame,
+            "name": self.name,
         }
 
     def scaled(self, factor):
@@ -261,9 +275,9 @@ class PointAxisTarget(Target):
         """
         target_point = self.target_point.scaled(factor)
         tolerance_position = self.tolerance_position * factor if self.tolerance_position else None
-        target_z_axis = self.target_z_axis.scaled  # Vector is unitized and is not scaled
+        target_z_axis = self.target_z_axis  # Vector is unitized and is not scaled
         tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
-        return PointAxisTarget(target_point, target_z_axis, tool_coordinate_frame, tolerance_position, self.name)
+        return PointAxisTarget(target_point, target_z_axis, tolerance_position, tool_coordinate_frame, self.name)
 
 
 class ConfigurationTarget(Target):
@@ -294,6 +308,9 @@ class ConfigurationTarget(Target):
         Acceptable deviation below the targeted configurations. One for each joint.
         Always use positive values.
         If not specified, the default value from the planner is used.
+    name : str, optional
+        The human-readable name of the target.
+        Defaults to 'Configuration Target'.
     """
 
     SUPPORTED_JOINT_TYPES = [Joint.PRISMATIC, Joint.REVOLUTE, Joint.CONTINUOUS]
@@ -309,11 +326,13 @@ class ConfigurationTarget(Target):
         for joint_type in target_configuration.joint_types:
             assert joint_type in self.SUPPORTED_JOINT_TYPES, "Unsupported joint type: {}".format(joint_type)
 
+    @property
     def __data__(self):
         return {
             "target_configuration": self.target_configuration,
             "tolerance_above": self.tolerance_above,
             "tolerance_below": self.tolerance_below,
+            "name": self.name,
         }
 
     @classmethod
@@ -423,7 +442,7 @@ class ConstraintSetTarget(Target):
 
     ConstraintSetTarget is suitable for advanced users who want to specify
     custom constraints for the robot motion planning.
-    Different planner backends may support differnt types of Constraints.
+    Different planner backends may support different types of Constraints.
     See tutorial :ref:`targets` for more details.
 
     ConstraintSetTarget is only supported by Free motion planning,
@@ -433,14 +452,21 @@ class ConstraintSetTarget(Target):
     ----------
     constraint_set : :obj:`list` of :class:`compas_fab.robots.Constraint`
         A list of constraints to be satisfied.
+    name : str, optional
+        The human-readable name of the target.
+        Defaults to 'Constraint Set Target'.
     """
 
     def __init__(self, constraint_set, name="Constraint Set Target"):
         super(ConstraintSetTarget, self).__init__(name=name)
         self.constraint_set = constraint_set
 
+    @property
     def __data__(self):
-        return {"constraint_set": self.constraint_set}
+        return {
+            "constraint_set": self.constraint_set,
+            "name": self.name,
+        }
 
     def scaled(self, factor):
         """Returns a scaled copy of the target.
@@ -451,3 +477,243 @@ class ConstraintSetTarget(Target):
             This target type does not support scaling.
         """
         raise NotImplementedError
+
+
+class Waypoints(Data):
+    """Represents a sequence of kinematic target for motion planning.
+
+    Waypoints represent a sequence of targets the robot should pass through in the order they are defined.
+    This is in contrast to :class:`Target` which represent only a single target.
+    The initial (starting) point should not be included in the waypoints list.
+    It is valid for a Waypoints object to have one target.
+
+    Waypoints are useful for tasks like painting, welding, or 3D printing, where the programmer
+    wants to define the waypoints the robot should pass through.
+
+    Waypoints are intended to be used for motion planning with a planning backend by using :meth:`compas_fab.robot.plan_motion_with_waypoints`.
+    Different backends might support different types of waypoints.
+    The method of interpolation between the waypoints is controlled by the motion planner backend.
+
+    Attributes
+    ----------
+    name : str , optional, default = 'target'
+        A human-readable name for identifying the target.
+
+    See Also
+    --------
+    :class:`PointAxisWaypoints`
+    :class:`FrameWaypoints`
+    """
+
+    def __init__(self, name="Generic Waypoints"):
+        super(Waypoints, self).__init__()
+        self.name = name
+
+    @property
+    def __data__(self):
+        raise NotImplementedError
+
+    def scaled(self, factor):
+        """Returns a scaled copy of the waypoints.
+
+        If the user model is created in millimeters, the target should be scaled by a factor of 0.001 before passing to the planner.
+
+        Parameters
+        ----------
+        factor : float
+            The scaling factor.
+
+        Returns
+        -------
+        :class:`Waypoints`
+            The scaled waypoints.
+        """
+        raise NotImplementedError
+
+
+class FrameWaypoints(Waypoints):
+    """Represents a sequence of fully constrained pose target for the robot's end-effector using a :class:`compas.geometry.Frame`.
+
+    When using a FrameWaypoints, the end-effector has no translational or rotational freedom.
+    In another words, the pose of the end-effector is fully defined (constrained).
+
+    The behavior of FrameWaypoints is similar to :class:`FrameTarget`, but it represents a sequence of targets.
+
+    Attributes
+    ----------
+    target_frames : :obj:`list` of :class:`compas.geometry.Frame`
+        The target frames.
+    tolerance_position : float, optional
+        The tolerance for the position.
+        Unit is meters.
+        If not specified, the default value from the planner is used.
+    tolerance_orientation : float, optional
+        The tolerance for the orientation.
+        Unit is radians.
+        If not specified, the default value from the planner is used.
+    tool_coordinate_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`, optional
+        The tool tip coordinate frame relative to the flange of the robot.
+        If not specified, the target frame is relative to the robot's flange.
+    name : str, optional
+        The human-readable name of the target.
+        Defaults to 'Frame Waypoints'.
+
+    """
+
+    def __init__(
+        self,
+        target_frames,
+        tolerance_position=None,
+        tolerance_orientation=None,
+        tool_coordinate_frame=None,
+        name="Frame Waypoints",
+    ):
+        super(FrameWaypoints, self).__init__(name=name)
+        self.target_frames = target_frames
+        self.tolerance_position = tolerance_position
+        self.tolerance_orientation = tolerance_orientation
+        if isinstance(tool_coordinate_frame, Transformation):
+            tool_coordinate_frame = Frame.from_transformation(tool_coordinate_frame)
+        self.tool_coordinate_frame = tool_coordinate_frame
+
+    @property
+    def __data__(self):
+        return {
+            "target_frames": self.target_frames,
+            "tolerance_position": self.tolerance_position,
+            "tolerance_orientation": self.tolerance_orientation,
+            "tool_coordinate_frame": self.tool_coordinate_frame,
+            "name": self.name,
+        }
+
+    @classmethod
+    def from_transformations(
+        cls,
+        transformations,
+        tolerance_position=None,
+        tolerance_orientation=None,
+        tool_coordinate_frame=None,
+        name="Frame Waypoints",
+    ):
+        """Creates a FrameWaypoints from a list of transformation matrices.
+
+        Parameters
+        ----------
+        transformations : :obj:`list` of :class: `compas.geometry.Transformation`
+        The list of transformation matrices.
+        tolerance_position : float, optional
+            The tolerance for the position.
+            if not specified, the default value from the planner is used.
+        tolerance_orientation : float, optional
+            The tolerance for the orientation.
+            if not specified, the default value from the planner is used.
+        tool_coordinate_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`, optional
+            The tool tip coordinate frame relative to the flange of the robot.
+            If not specified, the target frame is relative to the robot's flange.
+        name : str, optional
+            The human-readable name of the target.
+            Defaults to 'Frame Target'.
+
+        Returns
+        -------
+        :class:`FrameWaypoints`
+            The frame waypoints.
+        """
+        frames = [Frame.from_transformation(transformation) for transformation in transformations]
+        return cls(frames, tolerance_position, tolerance_orientation, tool_coordinate_frame, name)
+
+    def scaled(self, factor):
+        """Returns a copy of the :class:`FrameWaypoints` where the target frames and tolerances are scaled.
+
+        By convention, compas_fab robots use meters as the default unit of measure.
+        If user model is created in millimeters, the FrameWaypoints should be scaled by a factor
+        of 0.001 before passing to the planner.
+
+        Parameters
+        ----------
+        factor : float
+            The scaling factor.
+
+        Returns
+        -------
+        :class:`FrameWaypoints`
+            The scaled frame waypoints.
+        """
+        target_frames = [frame.scaled(factor) for frame in self.target_frames]
+        tolerance_position = self.tolerance_position * factor
+        tolerance_orientation = self.tolerance_orientation
+        tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
+        return FrameWaypoints(
+            target_frames, tolerance_position, tolerance_orientation, tool_coordinate_frame, self.name
+        )
+
+
+class PointAxisWaypoints(Waypoints):
+    """
+    Represents a sequence of point and axis targets for the robot's end-effector motion planning.
+
+    PointAxisTarget is suitable for tasks like drawing, milling, and 3D printing,
+    where aligning the end-effector with a target axis is crucial,
+    but the orientation around the axis is not important.
+
+    The behavior of PointAxisWaypoints is similar to :class:`PointAxisTarget`, but it represents a sequence of targets.
+    See :class:`PointAxisTarget` for more details.
+
+    Attributes
+    ----------
+    target_points_and_axes : :obj:`list` of :obj:`tuple` of (:class:`compas.geometry.Point`, :class:`compas.geometry.Vector`)
+        The target points and axes.
+        Both values are defined relative to the world coordinate frame (WCF).
+        Unitized vectors are recommended for the target axes.
+    tolerance_position : float, optional
+        The tolerance for the position of the target point.
+        If not specified, the default value from the planner is used.
+    tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
+        The tool tip coordinate frame relative to the flange coordinate frame of the robot.
+        If not specified, the target point is relative to the robot's flange (T0CF) and the
+        Z axis of the flange can rotate around the target axis.
+    name : str, optional
+        The human-readable name of the target.
+        Defaults to 'Point-Axis Waypoints'.
+
+    """
+
+    def __init__(
+        self,
+        target_points_and_axes,
+        tolerance_position=None,
+        tool_coordinate_frame=None,
+        name="Point-Axis Waypoints",
+    ):
+        super(PointAxisWaypoints, self).__init__(name=name)
+        self.target_points_and_axes = target_points_and_axes
+        self.tolerance_position = tolerance_position
+        self.tool_coordinate_frame = tool_coordinate_frame
+
+    @property
+    def __data__(self):
+        return {
+            "target_points_and_axes": self.target_points_and_axes,
+            "tolerance_position": self.tolerance_position,
+            "tool_coordinate_frame": self.tool_coordinate_frame,
+            "name": self.name,
+        }
+
+    def scaled(self, factor):
+        """Returns a copy of the target where the target points and tolerances are scaled.
+
+        Parameters
+        ----------
+        factor : float
+            The scaling factor.
+
+        Returns
+        -------
+        :class:`PointAxisWaypoints`
+            The scaled point-axis waypoints.
+        """
+        # Axis is a unitized vector and is not scaled
+        target_points_and_axes = [(point.scaled(factor), axis) for point, axis in self.target_points_and_axes]
+        tolerance_position = self.tolerance_position * factor if self.tolerance_position else None
+        tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
+        return PointAxisWaypoints(target_points_and_axes, tolerance_position, tool_coordinate_frame, self.name)
