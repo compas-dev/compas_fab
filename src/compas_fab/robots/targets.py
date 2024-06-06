@@ -1,5 +1,3 @@
-import compas
-
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Transformation

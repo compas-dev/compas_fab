@@ -1,6 +1,5 @@
 import math
 
-import compas
 from compas.geometry import argmin
 
 from compas_fab.backends.interfaces import PlanCartesianMotion
