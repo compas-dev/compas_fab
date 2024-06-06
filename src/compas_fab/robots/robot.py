@@ -26,15 +26,16 @@ if not compas.IPY:
         from typing import Tuple  # noqa: F401
         from compas.geometry import Vector  # noqa: F401
         from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
+        from compas_fab.robots import JointTrajectory  # noqa: F401
         from compas_fab.robots import RobotSemantics  # noqa: F401
         from compas_fab.robots import Tool  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
-        from compas_robots.scene import BaseRobotModelObject  # noqa: F401
+        from compas_fab.robots import Waypoints  # noqa: F401
+        from compas_fab.robots.planning_scene import CollisionMesh  # noqa: F401
         from compas_robots.model import Link  # noqa: F401
         from compas_robots.model import Joint  # noqa: F401, F811
         from compas_robots.model import Material  # noqa: F401
-        from compas_fab.robots import JointTrajectory  # noqa: F401
-        from compas_fab.robots.planning_scene import CollisionMesh  # noqa: F401
+        from compas_robots.scene import BaseRobotModelObject  # noqa: F401
 
 
 __all__ = [
@@ -1386,10 +1387,8 @@ class Robot(Data):
 
         return frame_WCF
 
-    def plan_cartesian_motion(
-        self, frames_WCF, start_configuration=None, group=None, use_attached_tool_frame=True, options=None
-    ):
-        # type: (List[Frame], Optional[Configuration], Optional[str], Optional[bool], Optional[Dict[str, Any]]) -> JointTrajectory
+    def plan_cartesian_motion(self, waypoints, start_configuration=None, group=None, options=None):
+        # type: (Waypoints, Optional[Configuration], Optional[str], Optional[Dict[str, Any]]) -> JointTrajectory
         """Calculate a cartesian motion path (linear in tool space).
 
         Parameters
