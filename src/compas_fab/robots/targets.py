@@ -535,8 +535,7 @@ class Waypoints(Data):
     :class:`FrameWaypoints`
     """
 
-    def __init__(self, name="Generic Waypoints"):
-        # type: (str) -> None
+    def __init__(self, tool_coordinate_frame, name="Generic Waypoints"):
         super(Waypoints, self).__init__()
         self.name = name
         # If the user provides a transformation, convert it to a Frame
@@ -600,8 +599,7 @@ class FrameWaypoints(Waypoints):
         tool_coordinate_frame=None,
         name="Frame Waypoints",
     ):
-        # type: (list[Frame], Optional[float], Optional[float], Optional[Frame | Transformation], Optional[str]) -> None
-        super(FrameWaypoints, self).__init__(name=name)
+        super(FrameWaypoints, self).__init__(tool_coordinate_frame=tool_coordinate_frame, name=name)
         self.target_frames = target_frames
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
@@ -717,8 +715,7 @@ class PointAxisWaypoints(Waypoints):
         tool_coordinate_frame=None,
         name="Point-Axis Waypoints",
     ):
-        # type: (list[Tuple[Point, Vector]], Optional[float], Optional[Frame | Transformation], Optional[str]) -> None
-        super(PointAxisWaypoints, self).__init__(name=name)
+        super(PointAxisWaypoints, self).__init__(tool_coordinate_frame=tool_coordinate_frame, name=name)
         self.target_points_and_axes = target_points_and_axes
         self.tolerance_position = tolerance_position
 
