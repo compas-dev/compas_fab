@@ -11,16 +11,6 @@ from compas_fab.robots import JointTrajectoryPoint
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import PointAxisWaypoints
 
-from compas_fab.utilities import from_tcf_to_t0cf
-
-if not compas.IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:
-        from typing import Optional  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
-        from compas_robots import Configuration  # noqa: F401
-
 
 class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
     """ """
@@ -69,7 +59,6 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
     def _plan_cartesian_motion_with_frame_waypoints(
         self, robot, waypoints, start_configuration=None, group=None, options=None
     ):
-        # type: (Robot, FrameWaypoints, Optional[Configuration], Optional[str], Optional[dict]) -> JointTrajectory
         """Calculates a cartesian motion path with frame waypoints.
 
         Planner behavior:
@@ -115,9 +104,8 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         path = paths[idx]
         path = self.smooth_configurations(path)
         trajectory = JointTrajectory()
-        trajectory.fraction = len(path) / len(
-            frames_RCF
-        )  # Technically this always be 1.0 because otherwise, the path would be rejected earlier
+        trajectory.fraction = len(path) / len(frames_RCF)
+        # Technically trajectory.fraction should always be 1.0 because otherwise, the path would be rejected earlier
         trajectory.joint_names = path[0].joint_names
         trajectory.points = [JointTrajectoryPoint(config.joint_values, config.joint_types) for config in path]
         trajectory.start_configuration = robot.merge_group_with_full_configuration(path[0], start_configuration, group)
@@ -126,7 +114,6 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
     def _plan_cartesian_motion_with_point_axis_waypoints(
         self, robot, waypoints, start_configuration=None, group=None, options=None
     ):
-        # type: (Robot, PointAxisWaypoints, Optional[Configuration], Optional[str], Optional[dict]) -> JointTrajectory
         """Planning Cartesian motion with PointAxisWaypoints is not yet implemented in the Analytical backend."""
         raise NotImplementedError(
             "Planning Cartesian motion with PointAxisWaypoints is not yet implemented in the Analytical backend."
