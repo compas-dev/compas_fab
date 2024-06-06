@@ -1,3 +1,5 @@
+.. _analytical_kinematics:
+
 *******************************************************************************
 Analytical kinematics
 *******************************************************************************
@@ -41,7 +43,7 @@ Inverse kinematics
 ==================
 
 The inverse kinematics function calculates the joint states required for the
-end-effector to reach a certain target pose. 
+end-effector to reach a certain target pose.
 
 
 Here is an example of using ``AnalyticalInverseKinematics``:
