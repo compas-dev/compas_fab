@@ -10,6 +10,7 @@ from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import PointAxisWaypoints
+from compas_fab.utilities import from_tcf_to_t0cf
 
 
 class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
@@ -64,7 +65,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         Planner behavior:
         - If multiple paths are possible (i.e. due to multiple IK results), only the one that is closest to the start_configuration is returned.
         - The path is checked to ensure that the joint values are continuous and that revolution values are the smallest possible.
-        - 'stepsize' is not used to sample in between frames (i.e. no interpolation), only the input frames are used.
+        - There is no interpolation in between frames (i.e. 'max_step' parameter is not supported), only the input frames are used.
         """
         # convert the target frames to the robot's base frame
         if waypoints.tool_coordinate_frame is not None:
@@ -86,8 +87,13 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
             configurations = list(robot.iter_inverse_kinematics(frame, options=options))
             configurations_along_path.append(configurations)
 
-        # There is a maximum of 8 possible paths, corresponding to the 8 possible IK solutions for each frame
-        # The all() function is used to check if all configurations in a path are present.
+        # Analytical backend only supports robots with finite IK solutions
+        # For 6R articulated robots, there is a maximum of 8 possible paths, corresponding to the 8 possible IK solutions for each frame
+        # The `options.update({"keep_order": True})` ensures that the order of the configurations is the same across all frames
+        # but this also cause some configurations to be None, if no solution was found.
+
+        # The `all(configurations)` below is used to check if all configurations in a path are present.
+        # indicating that a complete trajectory was found.
         paths = []
         for configurations in zip(*configurations_along_path):
             if all(configurations):
