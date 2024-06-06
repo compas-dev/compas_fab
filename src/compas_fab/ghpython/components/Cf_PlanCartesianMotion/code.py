@@ -9,6 +9,7 @@ from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
 
 from compas_fab.ghpython.components import create_id
+from compas_fab.robots import FrameWaypoints
 
 
 class PlanCartesianMotion(component):
@@ -23,8 +24,9 @@ class PlanCartesianMotion(component):
 
         if robot and robot.client and robot.client.is_connected and start_configuration and planes and compute:
             frames = [plane_to_compas_frame(plane) for plane in planes]
+            frame_waypoints = FrameWaypoints(frames)
             st[key] = robot.plan_cartesian_motion(
-                frames,
+                frame_waypoints,
                 start_configuration=start_configuration,
                 group=group,
                 options=dict(

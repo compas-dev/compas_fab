@@ -1,3 +1,5 @@
+import pytest
+
 import compas
 from compas.geometry import Frame
 from compas_robots import Configuration
@@ -6,6 +8,7 @@ import compas_fab
 from compas_fab.backends import AnalyticalInverseKinematics
 from compas_fab.robots import Tool
 from compas_fab.robots import RobotLibrary
+from compas_fab.robots import FrameWaypoints
 
 if not compas.IPY:
     from compas_fab.backends import AnalyticalPyBulletClient
@@ -95,10 +98,10 @@ def test_kinematics_client_with_attached_tool():
         assert len(solutions) == 6
 
 
-def test_kinematics_cartesian():
-    if compas.IPY:
-        return
-    frames_WCF = [
+@pytest.fixture
+def frames_WCF():
+    """A list of frames in the world coordinate frame for planning tests"""
+    return [
         Frame((0.407, 0.073, 0.320), (0.922, 0.000, 0.388), (0.113, 0.956, -0.269)),
         Frame((0.404, 0.057, 0.324), (0.919, 0.000, 0.394), (0.090, 0.974, -0.210)),
         Frame((0.390, 0.064, 0.315), (0.891, 0.000, 0.454), (0.116, 0.967, -0.228)),
@@ -106,11 +109,45 @@ def test_kinematics_cartesian():
         Frame((0.376, 0.087, 0.299), (0.850, 0.000, 0.528), (0.184, 0.937, -0.296)),
     ]
 
+
+@pytest.fixture
+def frame_waypoints(frames_WCF):
+    """A FrameWaypoints Object for planning tests"""
+    return FrameWaypoints(frames_WCF)
+
+
+def test_kinematics_cartesian(frame_waypoints):
+    if compas.IPY:
+        return
+
     with AnalyticalPyBulletClient(connection_type="direct") as client:
         robot = client.load_robot(urdf_filename)
         client.load_semantics(robot, srdf_filename)
 
         options = {"solver": "ur5", "check_collision": True}
-        start_configuration = list(robot.iter_inverse_kinematics(frames_WCF[0], options=options))[-1]
-        trajectory = robot.plan_cartesian_motion(frames_WCF, start_configuration=start_configuration, options=options)
+
+        trajectory = robot.plan_cartesian_motion(frame_waypoints, options=options)
+
+        # Assert that the trajectory is complete
         assert trajectory.fraction == 1.0
+        # Assert that the trajectory has the correct number of points
+        assert len(trajectory.points) == len(frame_waypoints.target_frames)
+
+
+def test_kinematics_cartesian_with_tool_coordinate_frame(frame_waypoints):
+    if compas.IPY:
+        return
+    frame_waypoints.tool_coordinate_frame = Frame([0.01, 0.02, -0.03], [1, 0, 0], [0, 1, 0])
+
+    with AnalyticalPyBulletClient(connection_type="direct") as client:
+        robot = client.load_robot(urdf_filename)
+        client.load_semantics(robot, srdf_filename)
+
+        options = {"solver": "ur5", "check_collision": True}
+
+        trajectory = robot.plan_cartesian_motion(frame_waypoints, options=options)
+
+        # Assert that the trajectory is complete
+        assert trajectory.fraction == 1.0
+        # Assert that the trajectory has the correct number of points
+        assert len(trajectory.points) == len(frame_waypoints.target_frames)

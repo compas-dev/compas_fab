@@ -35,9 +35,9 @@ class Target(Data):
     pose, configuration, and joint constraints. Dynamic targets such as
     velocity, acceleration, and jerk are not yet supported.
 
-    Targets are intended to be used as arguments for the Backend's motion
-    planning methods. Different backends might support different types of
-    targets.
+    Targets are intended to be used for motion planning with a planning backend
+    by using :meth:`compas_fab.robot.plan_motion`.
+    Note that different backends support different types of targets.
 
     Attributes
     ----------
@@ -518,14 +518,16 @@ class Waypoints(Data):
     Waypoints are useful for tasks like painting, welding, or 3D printing, where the programmer
     wants to define the waypoints the robot should pass through.
 
-    Waypoints are intended to be used for motion planning with a planning backend by using :meth:`compas_fab.robot.plan_motion_with_waypoints`.
-    Different backends might support different types of waypoints.
+    Waypoints are intended to be used for motion planning with a planning backend by using :meth:`compas_fab.robot.plan_cartesian_motion`.
+    Note that different backends support different types of waypoints.
     The method of interpolation between the waypoints is controlled by the motion planner backend.
 
     Attributes
     ----------
     name : str , optional, default = 'target'
         A human-readable name for identifying the target.
+    tool_coordinate_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`, optional
+        The tool tip coordinate frame relative to the flange of the robot.
 
     See Also
     --------
@@ -537,10 +539,10 @@ class Waypoints(Data):
         # type: (str) -> None
         super(Waypoints, self).__init__()
         self.name = name
-
-    @property
-    def __data__(self):
-        raise NotImplementedError
+        # If the user provides a transformation, convert it to a Frame
+        if isinstance(tool_coordinate_frame, Transformation):
+            tool_coordinate_frame = Frame.from_transformation(tool_coordinate_frame)
+        self.tool_coordinate_frame = tool_coordinate_frame
 
     def scaled(self, factor):
         # type: (float) -> Waypoints
@@ -603,9 +605,6 @@ class FrameWaypoints(Waypoints):
         self.target_frames = target_frames
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
-        if isinstance(tool_coordinate_frame, Transformation):
-            tool_coordinate_frame = Frame.from_transformation(tool_coordinate_frame)
-        self.tool_coordinate_frame = tool_coordinate_frame
 
     @property
     def __data__(self):
@@ -701,7 +700,7 @@ class PointAxisWaypoints(Waypoints):
     tolerance_position : float, optional
         The tolerance for the position of the target point.
         If not specified, the default value from the planner is used.
-    tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
+    tool_coordinate_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`, optional
         The tool tip coordinate frame relative to the flange coordinate frame of the robot.
         If not specified, the target point is relative to the robot's flange (T0CF) and the
         Z axis of the flange can rotate around the target axis.
@@ -722,7 +721,6 @@ class PointAxisWaypoints(Waypoints):
         super(PointAxisWaypoints, self).__init__(name=name)
         self.target_points_and_axes = target_points_and_axes
         self.tolerance_position = tolerance_position
-        self.tool_coordinate_frame = tool_coordinate_frame
 
     @property
     def __data__(self):
