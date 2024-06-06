@@ -38,6 +38,8 @@ constraints as a planning target. This is intended for advanced users who want t
 combination of constraints. See :class:`compas_fab.robots.Constraint` for available
 constraints. At the moment, only the ROS MoveIt planning backend supports this target type.
 
+.. _waypoints:
+
 ------------------------------------------
 Waypoints (Multiple Points / Segments)
 ------------------------------------------
