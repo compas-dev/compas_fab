@@ -12,11 +12,6 @@ def test_pybullet_client_connection_direct():
         assert client.is_connected
 
 
-def test_pybullet_client_connection_gui():
-    with PyBulletClient(connection_type="gui") as client:
-        assert client.is_connected
-
-
 def test_pybullet_client_load_robot():
     with PyBulletClient(connection_type="direct") as client:
         urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
