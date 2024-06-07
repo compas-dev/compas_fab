@@ -9,7 +9,7 @@ Targets (Single Goal)
 -----------------------
 
 Target classes are used to describe the goal condition (i.e. end condition) of a robot
-for motion planning. They can be used for Free Motion Planning with :meth:`compas_fab.robots.Robot.plan_motion`.
+for motion planning. They can be used for Free-space Motion Planning with :meth:`compas_fab.robots.Robot.plan_motion`.
 
 The :class:`compas_fab.robots.FrameTarget` is the most common target for motion planning.
 It defines the complete pose of the end-effector (or the robot flange, if no tool is attached).
@@ -42,7 +42,7 @@ constraints. At the moment, only the ROS MoveIt planning backend supports this t
 Waypoints (Multiple Points / Segments)
 ------------------------------------------
 
-The :class:`compas_fab.robots.Waypoints` classes are used to describe a sequence of
+Waypoints classes are used to describe a sequence of
 waypoints that the robot should pass through in a planned motion. They are similar to Targets classes
 but contain a list of targets instead of a single target, which is useful for tasks such as
 drawing, welding or 3D printing.
