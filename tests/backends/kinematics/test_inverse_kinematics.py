@@ -150,4 +150,6 @@ def test_kinematics_cartesian_with_tool_coordinate_frame(frame_waypoints):
         # Assert that the trajectory is complete
         assert trajectory.fraction == 1.0
         # Assert that the trajectory has the correct number of points
+        # NOTE: At the moment the AnalyticalPyBulletClient does not perform any interpolation between frames
+        # NOTE: if future implementation fixes this, the following test will not be valid anymore
         assert len(trajectory.points) == len(frame_waypoints.target_frames)
