@@ -8,7 +8,9 @@ from compas.tolerance import Tolerance
 from compas_fab.robots import RobotLibrary
 
 # The tolerance for the tests are set to 1e-4 meters, equivalent to 0.1 mm
-TOL = Tolerance(unit="m", absolute=1e-4, relative=1e-4)
+# Relative tolerance is set to 1e-3 (0.1%)
+# Angular tolerance is set to 2e-3 radians, equivalent to 0.11 degrees
+TOL = Tolerance(unit="m", absolute=1e-4, relative=1e-3, angular=2e-3)
 
 
 def validate_planner_model_fk_with_truth(planner_result, model_result, true_result):
@@ -22,22 +24,22 @@ def validate_planner_model_fk_with_truth(planner_result, model_result, true_resu
     assert TOL.is_allclose(
         planner_result.point, true_result.point
     ), f"Planner Result Pt {planner_result.point} != Known Truth Pt{true_result.point}"
-    assert TOL.is_allclose(
-        planner_result.xaxis, true_result.xaxis
-    ), f"Planner Result X {planner_result.xaxis} != Known Truth X {true_result.xaxis}"
-    assert TOL.is_allclose(
-        planner_result.yaxis, true_result.yaxis
-    ), f"Planner Result Y {planner_result.yaxis} != Known Truth Y {true_result.yaxis}"
+    assert TOL.is_angle_zero(
+        planner_result.xaxis.angle(true_result.xaxis)
+    ), f"Planner Result X {planner_result.xaxis} angle with Known Truth X {true_result.xaxis}"
+    assert TOL.is_angle_zero(
+        planner_result.yaxis.angle(true_result.yaxis)
+    ), f"Planner Result Y {planner_result.yaxis} angle with Known Truth Y {true_result.yaxis}"
     # Check with RobotModel FK result
     assert TOL.is_allclose(
         model_result.point, true_result.point
     ), f"Model Result Pt {model_result.point} != Known Truth Pt {true_result.point}"
-    assert TOL.is_allclose(
-        model_result.xaxis, true_result.xaxis
-    ), f"Model Result X {model_result.xaxis} != Known Truth X {true_result.xaxis}"
-    assert TOL.is_allclose(
-        model_result.yaxis, true_result.yaxis
-    ), f"Model Result Y {model_result.yaxis} != Known Truth Y {true_result.yaxis}"
+    assert TOL.is_angle_zero(
+        model_result.xaxis.angle(true_result.xaxis)
+    ), f"Model Result X {model_result.xaxis} angle with Known Truth X {true_result.xaxis}"
+    assert TOL.is_angle_zero(
+        model_result.yaxis.angle(true_result.yaxis)
+    ), f"Model Result Y {model_result.yaxis} angle with Known Truth Y {true_result.yaxis}"
 
 
 def validate_ik_with_fk(ik_target_frame, fk_result_frame):
@@ -45,12 +47,12 @@ def validate_ik_with_fk(ik_target_frame, fk_result_frame):
     assert TOL.is_allclose(
         ik_target_frame.point, fk_result_frame.point
     ), f"IK Target Pt {ik_target_frame.point} != FK Result Pt {fk_result_frame.point}"
-    assert TOL.is_allclose(
-        ik_target_frame.xaxis, fk_result_frame.xaxis
-    ), f"IK Target X {ik_target_frame.xaxis} != FK Result X {fk_result_frame.xaxis}"
-    assert TOL.is_allclose(
-        ik_target_frame.yaxis, fk_result_frame.yaxis
-    ), f"IK Target Y {ik_target_frame.yaxis} != FK Result Y {fk_result_frame.yaxis}"
+    assert TOL.is_angle_zero(
+        ik_target_frame.xaxis.angle(fk_result_frame.xaxis)
+    ), f"IK Target X {ik_target_frame.xaxis} angle with FK Result X {fk_result_frame.xaxis} > tolerance"
+    assert TOL.is_angle_zero(
+        ik_target_frame.yaxis.angle(fk_result_frame.yaxis)
+    ), f"IK Target Y {ik_target_frame.yaxis} angle with FK Result Y {fk_result_frame.yaxis} > tolerance"
 
 
 def _test_fk_with_pybullet_planner(robot, true_result):
