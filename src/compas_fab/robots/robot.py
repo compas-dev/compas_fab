@@ -1415,9 +1415,7 @@ class Robot(Data):
                 else:
                     cp.scale(1.0 / self.scale_factor)
                 path_constraints_WCF_scaled.append(cp)
-        else:
-            path_constraints_WCF_scaled = None
-        options["path_constraints"] = path_constraints_WCF_scaled
+            options["path_constraints"] = path_constraints_WCF_scaled
 
         # =====================
         # Attached CM and Tools
