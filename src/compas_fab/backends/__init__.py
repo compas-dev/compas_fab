@@ -147,13 +147,16 @@ from .kinematics import (
     Staubli_TX260LKinematics,
     ABB_IRB4600_40_255Kinematics,
 )
-from .pybullet import (
-    PyBulletClient,
-    CollisionError,
-    PyBulletError,
-    PyBulletPlanner,
-    AnalyticalPyBulletClient,
-)
+
+if not compas.IPY:
+    # PyBullet do not work in IronPython
+    from .pybullet import (
+        PyBulletClient,
+        CollisionError,
+        PyBulletError,
+        PyBulletPlanner,
+        AnalyticalPyBulletClient,
+    )
 
 __all__ = [
     # Base
