@@ -183,7 +183,6 @@ class PyBulletInverseKinematics(InverseKinematics):
         # https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/examples/inverse_kinematics_husky_kuka.py#L81
         close_enough = False
         iter = 0
-        distance = None
         joint_ids = [joint.attr["pybullet"]["id"] for joint in joints]
         body_id = kwargs["bodyUniqueId"]
         link_id = kwargs["endEffectorLinkIndex"]
