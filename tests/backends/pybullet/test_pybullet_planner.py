@@ -1,5 +1,9 @@
-from compas_fab.backends import PyBulletClient
-from compas_fab.backends import PyBulletPlanner
+import compas
+
+if not compas.IPY:
+    from compas_fab.backends import PyBulletClient
+    from compas_fab.backends import PyBulletPlanner
+
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas.geometry import Frame
@@ -20,26 +24,27 @@ def validate_planner_model_fk_with_truth(planner_result, model_result, true_resu
     Model result comes from the RobotModel FK calculation.
     True result is the known ground truth result.
     """
+
     # Check with known ground truth result
     assert TOL.is_allclose(
         planner_result.point, true_result.point
     ), f"Planner Result Pt {planner_result.point} != Known Truth Pt{true_result.point}"
     assert TOL.is_angle_zero(
         planner_result.xaxis.angle(true_result.xaxis)
-    ), f"Planner Result X {planner_result.xaxis} angle with Known Truth X {true_result.xaxis}"
+    ), f"Planner Result X {planner_result.xaxis} angle discrepancy with Known Truth X {true_result.xaxis}"
     assert TOL.is_angle_zero(
         planner_result.yaxis.angle(true_result.yaxis)
-    ), f"Planner Result Y {planner_result.yaxis} angle with Known Truth Y {true_result.yaxis}"
+    ), f"Planner Result Y {planner_result.yaxis} angle discrepancy with Known Truth Y {true_result.yaxis}"
     # Check with RobotModel FK result
     assert TOL.is_allclose(
         model_result.point, true_result.point
     ), f"Model Result Pt {model_result.point} != Known Truth Pt {true_result.point}"
     assert TOL.is_angle_zero(
         model_result.xaxis.angle(true_result.xaxis)
-    ), f"Model Result X {model_result.xaxis} angle with Known Truth X {true_result.xaxis}"
+    ), f"Model Result X {model_result.xaxis} angle discrepancy with Known Truth X {true_result.xaxis}"
     assert TOL.is_angle_zero(
         model_result.yaxis.angle(true_result.yaxis)
-    ), f"Model Result Y {model_result.yaxis} angle with Known Truth Y {true_result.yaxis}"
+    ), f"Model Result Y {model_result.yaxis} angle discrepancy with Known Truth Y {true_result.yaxis}"
 
 
 def validate_ik_with_fk(ik_target_frame, fk_result_frame):
@@ -49,10 +54,10 @@ def validate_ik_with_fk(ik_target_frame, fk_result_frame):
     ), f"IK Target Pt {ik_target_frame.point} != FK Result Pt {fk_result_frame.point}"
     assert TOL.is_angle_zero(
         ik_target_frame.xaxis.angle(fk_result_frame.xaxis)
-    ), f"IK Target X {ik_target_frame.xaxis} angle with FK Result X {fk_result_frame.xaxis} > tolerance"
+    ), f"IK Target X {ik_target_frame.xaxis} angle discrepancy with FK Result X {fk_result_frame.xaxis}"
     assert TOL.is_angle_zero(
         ik_target_frame.yaxis.angle(fk_result_frame.yaxis)
-    ), f"IK Target Y {ik_target_frame.yaxis} angle with FK Result Y {fk_result_frame.yaxis} > tolerance"
+    ), f"IK Target Y {ik_target_frame.yaxis} angle discrepancy with FK Result Y {fk_result_frame.yaxis}"
 
 
 def _test_fk_with_pybullet_planner(robot, true_result):
