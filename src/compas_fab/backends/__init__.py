@@ -147,15 +147,13 @@ from .kinematics import (
     Staubli_TX260LKinematics,
     ABB_IRB4600_40_255Kinematics,
 )
-
-if not compas.IPY:
-    from .pybullet import (
-        PyBulletClient,
-        CollisionError,
-        PyBulletError,
-        PyBulletPlanner,
-        AnalyticalPyBulletClient,
-    )
+from .pybullet import (
+    PyBulletClient,
+    CollisionError,
+    PyBulletError,
+    PyBulletPlanner,
+    AnalyticalPyBulletClient,
+)
 
 __all__ = [
     # Base
