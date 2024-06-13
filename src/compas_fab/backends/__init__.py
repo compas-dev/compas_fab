@@ -149,6 +149,7 @@ from .kinematics import (
 )
 
 if not compas.IPY:
+    # PyBullet do not work in IronPython
     from .pybullet import (
         PyBulletClient,
         CollisionError,

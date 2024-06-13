@@ -82,3 +82,15 @@ Backend interfaces
 ==================
 
 .. automodule:: compas_fab.backends.interfaces
+
+Implemented backend features
+============================
+
+The following backend features are implemented for the ROS backend:
+
+.. automodule:: compas_fab.backends.ros.backend_features
+
+The following backend features are implemented for the PyBullet backend:
+
+.. automodule:: compas_fab.backends.pybullet.backend_features
+

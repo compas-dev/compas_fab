@@ -12,9 +12,6 @@ __all__ = [
 class PyBulletAppendCollisionMesh(AppendCollisionMesh):
     """Callable to append a collision mesh to the planning scene."""
 
-    def __init__(self, client):
-        self.client = client
-
     def append_collision_mesh(self, collision_mesh, options=None):
         """Append a collision mesh to the planning scene.
 

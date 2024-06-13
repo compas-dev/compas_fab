@@ -27,9 +27,6 @@ class MoveItRemoveCollisionMesh(RemoveCollisionMesh):
         ApplyPlanningSceneResponse,
     )
 
-    def __init__(self, ros_client):
-        self.ros_client = ros_client
-
     def remove_collision_mesh(self, id, options=None):
         """Remove a collision mesh from the planning scene.
 
@@ -56,5 +53,5 @@ class MoveItRemoveCollisionMesh(RemoveCollisionMesh):
         co.operation = CollisionObject.REMOVE
         world = PlanningSceneWorld(collision_objects=[co])
         scene = PlanningScene(world=world, is_diff=True)
-        request = scene.to_request(self.ros_client.ros_distro)
-        self.APPLY_PLANNING_SCENE(self.ros_client, request, callback, errback)
+        request = scene.to_request(self.client.ros_distro)
+        self.APPLY_PLANNING_SCENE(self.client, request, callback, errback)

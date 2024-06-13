@@ -27,9 +27,6 @@ class MoveItAppendCollisionMesh(AppendCollisionMesh):
         ApplyPlanningSceneResponse,
     )
 
-    def __init__(self, ros_client):
-        self.ros_client = ros_client
-
     def append_collision_mesh(self, collision_mesh, options=None):
         """Append a collision mesh to the planning scene.
 
@@ -55,5 +52,5 @@ class MoveItAppendCollisionMesh(AppendCollisionMesh):
         co.operation = CollisionObject.APPEND
         world = PlanningSceneWorld(collision_objects=[co])
         scene = PlanningScene(world=world, is_diff=True)
-        request = scene.to_request(self.ros_client.ros_distro)
-        self.APPLY_PLANNING_SCENE(self.ros_client, request, callback, errback)
+        request = scene.to_request(self.client.ros_distro)
+        self.APPLY_PLANNING_SCENE(self.client, request, callback, errback)

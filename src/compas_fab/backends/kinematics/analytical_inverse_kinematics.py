@@ -103,7 +103,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         if options.get("check_collision", False) is True:
             acms = options.get("attached_collision_meshes", [])
             for acm in acms:
-                cached_robot_model = self.client.get_cached_robot(robot)
+                cached_robot_model = self.client.get_cached_robot_model(robot)
                 if not cached_robot_model.get_link_by_name(acm.collision_mesh.id):
                     self.client.add_attached_collision_mesh(acm, options={"robot": robot})
                     for touch_link in acm.touch_links:

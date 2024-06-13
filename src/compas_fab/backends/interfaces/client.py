@@ -106,7 +106,7 @@ class PlannerInterface(object):
     """
 
     def __init__(self, client):
-        super(PlannerInterface, self).__init__()
+        # super(PlannerInterface, self).__init__()
         self.client = client
 
     # ==========================================================================

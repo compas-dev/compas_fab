@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added unit test for `PyBulletClient` and `PyBulletPlanner` backend features, including Ik and FK agreement tests.
+* Added `PyBulletClient.load_existing_robot` to load from an existing Robot, such as those in RobotLibrary.
 * Added `compas_fab.robots.Waypoints` class to represent a sequence of targets. It has two child classes: `FrameWaypoints` and `PointAxisWaypoints`.
 * Added `compas_fab.robots.Target` class to represent a motion planning target.
 * Added also child classes `FrameTarget`, `PointAxisTarget`, `ConfigurationTarget`, `ConstraintSetTarget`
@@ -17,6 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Fixed error in `PyBulletForwardKinematics.forward_kinematics` where function would crash if `options` was not passed.
+* Fixed error in `PyBulletInverseKinematics._accurate_inverse_kinematics` where threshold was not squared for comparison.
+* Renamed `PybulletClient.get_cached_robot` to `PybulletClient.get_cached_robot_model` to avoid confusion between the `RobotModel` and `Robot` class.
+* Renamed `PybulletClient.ensure_cached_robot` to `PybulletClient.ensure_cached_robot_model`.
+* Renamed `PybulletClient.ensure_cached_robot_geometry` to `PybulletClient.ensure_cached_robot_model_geometry`.
+* Renamed `PybulletClient.cache_robot` to `PybulletClient.cache_robot_model`.
+* Backend planners now use multi-inherence instead of `__call__` to include the backend functions. This allows for better generated documentation.
 * `Robot.plan_cartesian_motion()` now accepts `Waypoints` as target. Implementation for `FrameWaypoints` is supported with same functionality as before. Simply wrap `Frame` objects using `FrameWaypoints(frames)`.
 * Changed `BoundingVolume`, `Constraint`, `JointConstraint`, `OrientationConstraint`, `PositionConstraint` to inherit from `compas.data.Data` class.
 * Change the signature of `plan_motion()` to use `target` (`Target` class) instead of `goal_constraints`. Only one target is accepted. Users who wish to compose their own constraint sets can still use `ConstraintSetTarget`.

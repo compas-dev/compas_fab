@@ -22,9 +22,6 @@ class MoveItPlanningScene(GetPlanningScene):
         "/get_planning_scene", "GetPlanningScene", GetPlanningSceneRequest, GetPlanningSceneResponse
     )
 
-    def __init__(self, ros_client):
-        self.ros_client = ros_client
-
     def get_planning_scene(self, options=None):
         """Retrieve the planning scene.
 
@@ -54,4 +51,4 @@ class MoveItPlanningScene(GetPlanningScene):
                 | PlanningSceneComponents.OBJECT_COLORS
             )
         )
-        self.GET_PLANNING_SCENE(self.ros_client, request, callback, errback)
+        self.GET_PLANNING_SCENE(self.client, request, callback, errback)

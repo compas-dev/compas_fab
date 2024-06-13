@@ -12,4 +12,10 @@ if __name__ == "__main__":
     pytest.load_fake_module("Rhino")
     pytest.load_fake_module("Rhino.Geometry", fake_types=["RTree", "Sphere", "Point3d"])
 
-    pytest.run(HERE)
+    # Exclude PyBullet tests in Iron Python environment
+    exclude_list = [
+        "tests/backends/pybullet/test_pybullet_client.py",
+        "tests/backends/pybullet/test_pybullet_planner.py",
+    ]
+
+    pytest.run(HERE, exclude_list=exclude_list)

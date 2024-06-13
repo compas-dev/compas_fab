@@ -83,7 +83,7 @@ def ur5_with_fake_ik(ur5_robot_instance, fake_client):
                 yield (ik[0], ik[2])
 
     ur5_robot_instance.client = fake_client
-    ur5_robot_instance.client.inverse_kinematics = FakeInverseKinematics()
+    ur5_robot_instance.client.inverse_kinematics = FakeInverseKinematics(fake_client).inverse_kinematics
 
     return ur5_robot_instance
 
