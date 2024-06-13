@@ -138,7 +138,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 ik_options.update(
                     dict(
                         joints=joints,
-                        threshold=options.get("high_accuracy_threshold", 1e-6),
+                        threshold=options.get("high_accuracy_threshold", 1e-4),
                         max_iter=options.get("high_accuracy_max_iter", 20),
                     )
                 )
@@ -203,9 +203,9 @@ class PyBulletInverseKinematics(InverseKinematics):
                 target_position[2] - new_pose[2],
             ]
             # The distance is squared to avoid a sqrt operation
-            distance = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]
+            distance_squared = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]
             # Therefor, the threshold is squared as well
-            close_enough = distance < threshold * threshold
+            close_enough = distance_squared < threshold * threshold
             kwargs["restPoses"] = joint_poses
             iter += 1
 
