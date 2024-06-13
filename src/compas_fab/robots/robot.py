@@ -1324,8 +1324,9 @@ class Robot(Data):
         ----------
         waypoints : :class:`compas_fab.robots.Waypoints`
             The waypoints for the robot to follow.
-            If a tool is attached to the robot, the :meth:`~compas_fab.robots.Waypoints.tool_coordinate_frame` parameter
-            should be set.
+            For more information on how to define waypoints, see :ref:`waypoints`.
+            In addition, note that not all planning backends support all waypoint types,
+            check documentation of the backend in use for more details.
         start_configuration : :class:`compas_robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the start of the motion.
@@ -1417,9 +1418,7 @@ class Robot(Data):
                 else:
                     cp.scale(1.0 / self.scale_factor)
                 path_constraints_WCF_scaled.append(cp)
-        else:
-            path_constraints_WCF_scaled = None
-        options["path_constraints"] = path_constraints_WCF_scaled
+            options["path_constraints"] = path_constraints_WCF_scaled
 
         # =====================
         # Attached CM and Tools

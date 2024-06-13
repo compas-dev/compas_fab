@@ -1,15 +1,7 @@
-import compas
-
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_robots.model import Joint
-
-if not compas.IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:
-        from compas_robots import Configuration  # noqa: F401
 
 __all__ = [
     "Target",
@@ -30,9 +22,9 @@ class Target(Data):
     pose, configuration, and joint constraints. Dynamic targets such as
     velocity, acceleration, and jerk are not yet supported.
 
-    Waypoints are intended to be used for motion planning with a planning backend by using :meth:`compas_fab.robot.plan_motion`.
-    Different backends might support different types of
-    targets.
+    Targets are intended to be used for motion planning with a planning backend
+    by using :meth:`compas_fab.robot.plan_motion`.
+    Note that different backends support different types of targets.
 
     Attributes
     ----------
@@ -190,7 +182,8 @@ class FrameTarget(Target):
         """
         target_frame = self.target_frame.scaled(factor)
         tolerance_position = self.tolerance_position * factor
-        tolerance_orientation = self.tolerance_orientation * factor
+        # Orientation tolerance is not scaled
+        tolerance_orientation = self.tolerance_orientation
         tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
         return FrameTarget(target_frame, tolerance_position, tolerance_orientation, tool_coordinate_frame, self.name)
 
@@ -497,8 +490,8 @@ class Waypoints(Data):
     Waypoints are useful for tasks like painting, welding, or 3D printing, where the programmer
     wants to define the waypoints the robot should pass through.
 
-    Waypoints are intended to be used for motion planning with a planning backend by using :meth:`compas_fab.robot.plan_motion_with_waypoints`.
-    Different backends might support different types of waypoints.
+    Waypoints are intended to be used for motion planning with a planning backend by using :meth:`compas_fab.robot.plan_cartesian_motion`.
+    Note that different backends support different types of waypoints.
     The method of interpolation between the waypoints is controlled by the motion planner backend.
 
     Attributes
@@ -647,7 +640,7 @@ class FrameWaypoints(Waypoints):
         """
         target_frames = [frame.scaled(factor) for frame in self.target_frames]
         tolerance_position = self.tolerance_position * factor
-        tolerance_orientation = self.tolerance_orientation * factor
+        tolerance_orientation = self.tolerance_orientation
         tool_coordinate_frame = self.tool_coordinate_frame.scaled(factor) if self.tool_coordinate_frame else None
         return FrameWaypoints(
             target_frames, tolerance_position, tolerance_orientation, tool_coordinate_frame, self.name
