@@ -8,6 +8,7 @@ import compas
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Transformation
+from compas.tolerance import TOL
 from compas_robots import Configuration
 from compas_robots import RobotModel
 from compas_robots.model import Joint
@@ -1466,7 +1467,7 @@ class Robot(Data):
         # =======
         # Scaling
         # =======
-        need_scaling = self.scale_factor != 1.0
+        need_scaling = not TOL.is_close(self.scale_factor, 1.0, rtol=1e-8)
 
         if need_scaling:
             waypoints = waypoints.scaled(1.0 / self.scale_factor)
