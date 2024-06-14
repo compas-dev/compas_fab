@@ -163,7 +163,7 @@ class Robot(Data):
 
         """
         # NOTE: This import is here to avoid circular imports
-        from compas_fab.robots import RobotSemantics
+        from compas_fab.robots import RobotSemantics  # noqa: F811
 
         model = RobotModel.from_urdf_file(urdf_filename)
 

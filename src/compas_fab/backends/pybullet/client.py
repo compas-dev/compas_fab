@@ -36,16 +36,16 @@ if not compas.IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
-        from typing import list
-        from typing import Tuple
-        from compas_robots import Configuration
+        from typing import list  # noqa: F401
+        from typing import Tuple  # noqa: F401
+        from compas_robots import Configuration  # noqa: F401
 
         # Load pybullet for type hinting
         import pybullet
 
 # If Pybullet is not defined, load it from LazyLoader
 if "pybullet" not in sys.modules:
-    pybullet = LazyLoader("pybullet", globals(), "pybullet")
+    pybullet = LazyLoader("pybullet", globals(), "pybullet")  # noqa: F811
 
 __all__ = [
     "PyBulletClient",
