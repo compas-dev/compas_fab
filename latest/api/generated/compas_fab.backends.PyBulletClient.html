@@ -623,10 +623,10 @@ document.write(`
 <h1>PyBulletClient</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.backends.PyBulletClient">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.backends.</span></span><span class="sig-name descname"><span class="pre">PyBulletClient</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/74dfc5a/src/compas_fab/backends/pybullet/client.py#L123"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.backends.</span></span><span class="sig-name descname"><span class="pre">PyBulletClient</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/c6ef2c0/src/compas_fab/backends/pybullet/client.py#L128"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyBulletBase</span></code>, <a class="reference internal" href="../../developer/generated/compas_fab.backends.interfaces.ClientInterface.html" title="compas_fab.backends.interfaces.client.ClientInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClientInterface</span></code></a></p>
 <p>Interface to use pybullet as backend.</p>
-<p><code class="xref py py-class docutils literal notranslate"><span class="pre">compasfab.backends.PyBulletClient</span></code> is a context manager type, so it’s best
+<p><a class="reference internal" href="#compas_fab.backends.PyBulletClient" title="compas_fab.backends.PyBulletClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.backends.PyBulletClient</span></code></a> is a context manager type, so it’s best
 used in combination with the <code class="docutils literal notranslate"><span class="pre">with</span></code> statement to ensure
 resource deallocation.</p>
 <p>Thanks to Yijiang Huang and his work in <a class="reference external" href="https://github.com/yijiangh/pybullet_planning">pybullet_planning</a> for much inspiration.</p>
@@ -653,7 +653,7 @@ resource deallocation.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.body_from_obj.html#compas_fab.backends.PyBulletClient.body_from_obj" title="compas_fab.backends.PyBulletClient.body_from_obj"><code class="xref py py-obj docutils literal notranslate"><span class="pre">body_from_obj</span></code></a></p></td>
 <td><p>Create a PyBullet body from an OBJ file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.cache_robot.html#compas_fab.backends.PyBulletClient.cache_robot" title="compas_fab.backends.PyBulletClient.cache_robot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cache_robot</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.cache_robot_model.html#compas_fab.backends.PyBulletClient.cache_robot_model" title="compas_fab.backends.PyBulletClient.cache_robot_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cache_robot_model</span></code></a></p></td>
 <td><p>Saves an editable copy of the robot's model and its meshes for shadowing the state of the robot on the PyBullet server.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.check_collision_objects_for_collision.html#compas_fab.backends.PyBulletClient.check_collision_objects_for_collision" title="compas_fab.backends.PyBulletClient.check_collision_objects_for_collision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_collision_objects_for_collision</span></code></a></p></td>
@@ -671,20 +671,20 @@ resource deallocation.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.convert_mesh_to_body.html#compas_fab.backends.PyBulletClient.convert_mesh_to_body" title="compas_fab.backends.PyBulletClient.convert_mesh_to_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_mesh_to_body</span></code></a></p></td>
 <td><p>Convert compas mesh and its frame to a pybullet body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.ensure_cached_robot.html#compas_fab.backends.PyBulletClient.ensure_cached_robot" title="compas_fab.backends.PyBulletClient.ensure_cached_robot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ensure_cached_robot</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.ensure_cached_robot_model.html#compas_fab.backends.PyBulletClient.ensure_cached_robot_model" title="compas_fab.backends.PyBulletClient.ensure_cached_robot_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ensure_cached_robot_model</span></code></a></p></td>
 <td><p>Checks if a <a class="reference internal" href="compas_fab.robots.Robot.html#compas_fab.robots.Robot" title="compas_fab.robots.Robot"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.robots.Robot</span></code></a> has been cached for use with PyBullet.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.ensure_cached_robot_geometry.html#compas_fab.backends.PyBulletClient.ensure_cached_robot_geometry" title="compas_fab.backends.PyBulletClient.ensure_cached_robot_geometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ensure_cached_robot_geometry</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.ensure_cached_robot_model_geometry.html#compas_fab.backends.PyBulletClient.ensure_cached_robot_model_geometry" title="compas_fab.backends.PyBulletClient.ensure_cached_robot_model_geometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ensure_cached_robot_model_geometry</span></code></a></p></td>
 <td><p>Checks if the geometry of a <a class="reference internal" href="compas_fab.robots.Robot.html#compas_fab.robots.Robot" title="compas_fab.robots.Robot"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.robots.Robot</span></code></a> has been cached for use with PyBullet.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.filter_configurations_in_collision.html#compas_fab.backends.PyBulletClient.filter_configurations_in_collision" title="compas_fab.backends.PyBulletClient.filter_configurations_in_collision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_configurations_in_collision</span></code></a></p></td>
 <td><p>Filters from a list of configurations those which are in collision.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.get_cached_robot.html#compas_fab.backends.PyBulletClient.get_cached_robot" title="compas_fab.backends.PyBulletClient.get_cached_robot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cached_robot</span></code></a></p></td>
-<td><p>Returns the editable copy of the robot's model for shadowing the state of the robot on the PyBullet server.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.get_cached_robot_filepath.html#compas_fab.backends.PyBulletClient.get_cached_robot_filepath" title="compas_fab.backends.PyBulletClient.get_cached_robot_filepath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cached_robot_filepath</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.get_cached_robot_filepath.html#compas_fab.backends.PyBulletClient.get_cached_robot_filepath" title="compas_fab.backends.PyBulletClient.get_cached_robot_filepath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cached_robot_filepath</span></code></a></p></td>
 <td><p>Returns the filepath of the editable copy of the robot's model for shadowing the state of the robot on the PyBullet server.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.get_cached_robot_model.html#compas_fab.backends.PyBulletClient.get_cached_robot_model" title="compas_fab.backends.PyBulletClient.get_cached_robot_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cached_robot_model</span></code></a></p></td>
+<td><p>Returns the editable copy of the robot's model for shadowing the state of the robot on the PyBullet server.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletClient.get_robot_configuration.html#compas_fab.backends.PyBulletClient.get_robot_configuration" title="compas_fab.backends.PyBulletClient.get_robot_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_robot_configuration</span></code></a></p></td>
 <td><p>Gets the robot's current pose.</p></td>
