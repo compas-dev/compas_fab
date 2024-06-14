@@ -1390,7 +1390,7 @@ class Robot(Data):
         # =======
         # Scaling
         # =======
-        need_scaling = TOL.is_close(self.scale_factor, 1.0, rtol=1e-8)
+        need_scaling = not TOL.is_close(self.scale_factor, 1.0, rtol=1e-8)
 
         if need_scaling:
             waypoints = waypoints.scaled(1.0 / self.scale_factor)
