@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 import random
+import compas_fab
 
 from compas.data import Data
 from compas.geometry import Frame

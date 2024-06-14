@@ -2,8 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas
-
 import compas_fab
 from compas_fab.robots import Robot
 
