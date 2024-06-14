@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* `Robot.plan_cartesian_motion()` now accepts `Waypoints` as target. Implementation for `FrameWaypoints` is supported with same functionality as before. Simply wrap `Frame` objects using `FrameWaypoints(frames)`.
 * Changed `BoundingVolume`, `Constraint`, `JointConstraint`, `OrientationConstraint`, `PositionConstraint` to inherit from `compas.data.Data` class.
 * Change the signature of `plan_motion()` to use `target` (`Target` class) instead of `goal_constraints`. Only one target is accepted. Users who wish to compose their own constraint sets can still use `ConstraintSetTarget`.
 * Moved `Robot.orientation_constraint_from_frame()` to `OrientationConstraint.from_frame()`, as constraints are no longer intended for users to use directly.
