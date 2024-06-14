@@ -697,17 +697,20 @@ the simulation, planning and execution pipeline of COMPAS FAB.</p>
 <h3>Feature interfaces</h3>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.ForwardKinematics.html" title="compas_fab.backends.interfaces.ForwardKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ForwardKinematics</span></code></a></p></td>
-<td><p>Interface for a Planner's forward kinematics feature.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.BackendFeature.html" title="compas_fab.backends.interfaces.BackendFeature"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackendFeature</span></code></a></p></td>
+<td><p>Base class for all backend features that are implemented by a backend client.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.InverseKinematics.html" title="compas_fab.backends.interfaces.InverseKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InverseKinematics</span></code></a></p></td>
-<td><p>Interface for a Planner's inverse kinematics feature.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.ForwardKinematics.html" title="compas_fab.backends.interfaces.ForwardKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ForwardKinematics</span></code></a></p></td>
+<td><p>Mix-in interface for implementing a planner's forward kinematics feature.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.PlanMotion.html" title="compas_fab.backends.interfaces.PlanMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PlanMotion</span></code></a></p></td>
-<td><p>Interface for a Planner's plan motion feature.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.InverseKinematics.html" title="compas_fab.backends.interfaces.InverseKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InverseKinematics</span></code></a></p></td>
+<td><p>Mix-in interface for implementing a planner's inverse kinematics feature.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.PlanCartesianMotion.html" title="compas_fab.backends.interfaces.PlanCartesianMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PlanCartesianMotion</span></code></a></p></td>
-<td><p>Interface for a Planner's plan cartesian motion feature.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.PlanMotion.html" title="compas_fab.backends.interfaces.PlanMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PlanMotion</span></code></a></p></td>
+<td><p>Mix-in interface for implementing a planner's plan motion feature.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.PlanCartesianMotion.html" title="compas_fab.backends.interfaces.PlanCartesianMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PlanCartesianMotion</span></code></a></p></td>
+<td><p>Mix-in interface for implementing a planner's plan cartesian motion feature.</p></td>
 </tr>
 </tbody>
 </table>
@@ -717,25 +720,98 @@ the simulation, planning and execution pipeline of COMPAS FAB.</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.GetPlanningScene.html" title="compas_fab.backends.interfaces.GetPlanningScene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GetPlanningScene</span></code></a></p></td>
-<td><p>Interface for a Planner's get planning scene feature.</p></td>
+<td><p>Mix-in interface for implementing a planner's get planning scene feature.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.AddCollisionMesh.html" title="compas_fab.backends.interfaces.AddCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AddCollisionMesh</span></code></a></p></td>
-<td><p>Interface for a Planner's add collision mesh feature.</p></td>
+<td><p>Mix-in interface for implementing a planner's add collision mesh feature.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.AppendCollisionMesh.html" title="compas_fab.backends.interfaces.AppendCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AppendCollisionMesh</span></code></a></p></td>
-<td><p>Interface for a Planner's append collision mesh feature.</p></td>
+<td><p>Mix-in interface for implementing a planner's append collision mesh feature.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.RemoveCollisionMesh.html" title="compas_fab.backends.interfaces.RemoveCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoveCollisionMesh</span></code></a></p></td>
-<td><p>Interface for a Planner's remove collision mesh feature.</p></td>
+<td><p>Mix-in interface for implementing a planner's remove collision mesh feature.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.AddAttachedCollisionMesh.html" title="compas_fab.backends.interfaces.AddAttachedCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AddAttachedCollisionMesh</span></code></a></p></td>
-<td><p>Interface for a Planner's add attached collision mesh feature.</p></td>
+<td><p>Mix-in interface for implementing a planner's add attached collision mesh feature.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.RemoveAttachedCollisionMesh.html" title="compas_fab.backends.interfaces.RemoveAttachedCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoveAttachedCollisionMesh</span></code></a></p></td>
-<td><p>Interface for a Planner's remove attached collision mesh feature.</p></td>
+<td><p>Mix-in interface for implementing a planner's remove attached collision mesh feature.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.ResetPlanningScene.html" title="compas_fab.backends.interfaces.ResetPlanningScene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ResetPlanningScene</span></code></a></p></td>
-<td><p>Interface for a Planner's reset planning scene feature.</p></td>
+<td><p>Mix-in interface for implementing a planner's reset planning scene feature.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="implemented-backend-features">
+<h2>Implemented backend features</h2>
+<p>The following backend features are implemented for the ROS backend:</p>
+<span class="target" id="module-compas_fab.backends.ros.backend_features"></span><section id="ros-backend-features">
+<h3>ROS backend features</h3>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItAddAttachedCollisionMesh.html" title="compas_fab.backends.ros.backend_features.MoveItAddAttachedCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItAddAttachedCollisionMesh</span></code></a></p></td>
+<td><p>Callable to add a collision mesh and attach it to the robot.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItAddCollisionMesh.html" title="compas_fab.backends.ros.backend_features.MoveItAddCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItAddCollisionMesh</span></code></a></p></td>
+<td><p>Callable to add a collision mesh to the planning scene.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItAppendCollisionMesh.html" title="compas_fab.backends.ros.backend_features.MoveItAppendCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItAppendCollisionMesh</span></code></a></p></td>
+<td><p>Callable to append a collision mesh to the planning scene.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItForwardKinematics.html" title="compas_fab.backends.ros.backend_features.MoveItForwardKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItForwardKinematics</span></code></a></p></td>
+<td><p>Callable to calculate the robot's forward kinematic.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItInverseKinematics.html" title="compas_fab.backends.ros.backend_features.MoveItInverseKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItInverseKinematics</span></code></a></p></td>
+<td><p>Callable to calculate the robot's inverse kinematics for a given frame.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.html" title="compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItPlanCartesianMotion</span></code></a></p></td>
+<td><p>Callable to calculate a cartesian motion path (linear in tool space).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItPlanMotion.html" title="compas_fab.backends.ros.backend_features.MoveItPlanMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItPlanMotion</span></code></a></p></td>
+<td><p>Callable to find a path in joint space for the robot to move from its <cite>start_configuration</cite> to the <cite>target</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItPlanningScene.html" title="compas_fab.backends.ros.backend_features.MoveItPlanningScene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItPlanningScene</span></code></a></p></td>
+<td><p>Callable to retrieve the planning scene.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItRemoveAttachedCollisionMesh.html" title="compas_fab.backends.ros.backend_features.MoveItRemoveAttachedCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItRemoveAttachedCollisionMesh</span></code></a></p></td>
+<td><p>Callable to remove an attached collision mesh from the robot.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItRemoveCollisionMesh.html" title="compas_fab.backends.ros.backend_features.MoveItRemoveCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItRemoveCollisionMesh</span></code></a></p></td>
+<td><p>Callable to remove a collision mesh from the planning scene.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItResetPlanningScene.html" title="compas_fab.backends.ros.backend_features.MoveItResetPlanningScene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItResetPlanningScene</span></code></a></p></td>
+<td><p>Callable to add a collision mesh to the planning scene.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<p>The following backend features are implemented for the PyBullet backend:</p>
+<span class="target" id="module-compas_fab.backends.pybullet.backend_features"></span><section id="pybullet-backend-features">
+<h3>PyBullet backend features</h3>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletAddAttachedCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.PyBulletAddAttachedCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletAddAttachedCollisionMesh</span></code></a></p></td>
+<td><p>Callable to add a collision mesh and attach it to the robot.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletAddCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.PyBulletAddCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletAddCollisionMesh</span></code></a></p></td>
+<td><p>Callable to add a collision mesh to the planning scene.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletAppendCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.PyBulletAppendCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletAppendCollisionMesh</span></code></a></p></td>
+<td><p>Callable to append a collision mesh to the planning scene.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletForwardKinematics.html" title="compas_fab.backends.pybullet.backend_features.PyBulletForwardKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletForwardKinematics</span></code></a></p></td>
+<td><p>Callable to calculate the robot's forward kinematic.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletInverseKinematics.html" title="compas_fab.backends.pybullet.backend_features.PyBulletInverseKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletInverseKinematics</span></code></a></p></td>
+<td><p>Callable to calculate the robot's inverse kinematics for a given frame.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletRemoveAttachedCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.PyBulletRemoveAttachedCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletRemoveAttachedCollisionMesh</span></code></a></p></td>
+<td><p>Callable to remove an attached collision mesh from the robot.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletRemoveCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.PyBulletRemoveCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletRemoveCollisionMesh</span></code></a></p></td>
+<td><p>Callable to remove a collision mesh from the planning scene.</p></td>
 </tr>
 </tbody>
 </table>
@@ -768,6 +844,11 @@ the simulation, planning and execution pipeline of COMPAS FAB.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#client-interfaces">Client interfaces</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#feature-interfaces">Feature interfaces</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#planning-scene-interfaces">Planning scene interfaces</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implemented-backend-features">Implemented backend features</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ros-backend-features">ROS backend features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybullet-backend-features">PyBullet backend features</a></li>
 </ul>
 </li>
 </ul>

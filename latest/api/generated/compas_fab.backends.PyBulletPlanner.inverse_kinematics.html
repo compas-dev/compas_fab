@@ -59,8 +59,8 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="PyBulletPlanner.remove_attached_collision_mesh" href="compas_fab.backends.PyBulletPlanner.remove_attached_collision_mesh.html" />
-    <link rel="prev" title="PyBulletPlanner.forward_kinematics" href="compas_fab.backends.PyBulletPlanner.forward_kinematics.html" />
+    <link rel="next" title="PyBulletPlanner.plan_cartesian_motion" href="compas_fab.backends.PyBulletPlanner.plan_cartesian_motion.html" />
+    <link rel="prev" title="PyBulletPlanner.get_planning_scene" href="compas_fab.backends.PyBulletPlanner.get_planning_scene.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -623,7 +623,7 @@ document.write(`
 <h1>PyBulletPlanner.inverse_kinematics</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_fab.backends.PyBulletPlanner.inverse_kinematics">
-<span class="sig-prename descclassname"><span class="pre">PyBulletPlanner.</span></span><span class="sig-name descname"><span class="pre">inverse_kinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d6d080a/src/compas_fab/backends/pybullet/planner.py#L54"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">PyBulletPlanner.</span></span><span class="sig-name descname"><span class="pre">inverse_kinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_WCF</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/74dfc5a/src/compas_fab/backends/pybullet/backend_features/pybullet_inverse_kinematics.py#L26"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Calculate the robot’s inverse kinematic for a given frame.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

@@ -623,10 +623,10 @@ document.write(`
 <h1>PyBulletPlanner</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.backends.PyBulletPlanner">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.backends.</span></span><span class="sig-name descname"><span class="pre">PyBulletPlanner</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d6d080a/src/compas_fab/backends/pybullet/planner.py#L24"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
-<dd><p>Bases: <a class="reference internal" href="../../developer/generated/compas_fab.backends.interfaces.PlannerInterface.html" title="compas_fab.backends.interfaces.client.PlannerInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlannerInterface</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.backends.</span></span><span class="sig-name descname"><span class="pre">PyBulletPlanner</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/74dfc5a/src/compas_fab/backends/pybullet/planner.py#L24"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../developer/generated/compas_fab.backends.pybullet.backend_features.PyBulletAddAttachedCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.pybullet_add_attached_collision_mesh.PyBulletAddAttachedCollisionMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">PyBulletAddAttachedCollisionMesh</span></code></a>, <a class="reference internal" href="../../developer/generated/compas_fab.backends.pybullet.backend_features.PyBulletAddCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.pybullet_add_collision_mesh.PyBulletAddCollisionMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">PyBulletAddCollisionMesh</span></code></a>, <a class="reference internal" href="../../developer/generated/compas_fab.backends.pybullet.backend_features.PyBulletAppendCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.pybullet_append_collision_mesh.PyBulletAppendCollisionMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">PyBulletAppendCollisionMesh</span></code></a>, <a class="reference internal" href="../../developer/generated/compas_fab.backends.pybullet.backend_features.PyBulletRemoveCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.pybullet_remove_collision_mesh.PyBulletRemoveCollisionMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">PyBulletRemoveCollisionMesh</span></code></a>, <a class="reference internal" href="../../developer/generated/compas_fab.backends.pybullet.backend_features.PyBulletRemoveAttachedCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.pybullet_remove_attached_collision_mesh.PyBulletRemoveAttachedCollisionMesh"><code class="xref py py-class docutils literal notranslate"><span class="pre">PyBulletRemoveAttachedCollisionMesh</span></code></a>, <a class="reference internal" href="../../developer/generated/compas_fab.backends.pybullet.backend_features.PyBulletForwardKinematics.html" title="compas_fab.backends.pybullet.backend_features.pybullet_forward_kinematics.PyBulletForwardKinematics"><code class="xref py py-class docutils literal notranslate"><span class="pre">PyBulletForwardKinematics</span></code></a>, <a class="reference internal" href="../../developer/generated/compas_fab.backends.pybullet.backend_features.PyBulletInverseKinematics.html" title="compas_fab.backends.pybullet.backend_features.pybullet_inverse_kinematics.PyBulletInverseKinematics"><code class="xref py py-class docutils literal notranslate"><span class="pre">PyBulletInverseKinematics</span></code></a>, <a class="reference internal" href="../../developer/generated/compas_fab.backends.interfaces.PlannerInterface.html" title="compas_fab.backends.interfaces.client.PlannerInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlannerInterface</span></code></a></p>
 <p>Implement the planner backend interface for PyBullet.</p>
-<p class="rubric">Methods</p>
+<p class="rubric">Inherited Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.add_attached_collision_mesh.html#compas_fab.backends.PyBulletPlanner.add_attached_collision_mesh" title="compas_fab.backends.PyBulletPlanner.add_attached_collision_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_attached_collision_mesh</span></code></a></p></td>
@@ -641,30 +641,25 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.forward_kinematics.html#compas_fab.backends.PyBulletPlanner.forward_kinematics" title="compas_fab.backends.PyBulletPlanner.forward_kinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">forward_kinematics</span></code></a></p></td>
 <td><p>Calculate the robot's forward kinematic.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.inverse_kinematics.html#compas_fab.backends.PyBulletPlanner.inverse_kinematics" title="compas_fab.backends.PyBulletPlanner.inverse_kinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inverse_kinematics</span></code></a></p></td>
-<td><p>Calculate the robot's inverse kinematic for a given frame.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.remove_attached_collision_mesh.html#compas_fab.backends.PyBulletPlanner.remove_attached_collision_mesh" title="compas_fab.backends.PyBulletPlanner.remove_attached_collision_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_attached_collision_mesh</span></code></a></p></td>
-<td><p>Remove an attached collision mesh from the robot.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.remove_collision_mesh.html#compas_fab.backends.PyBulletPlanner.remove_collision_mesh" title="compas_fab.backends.PyBulletPlanner.remove_collision_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_collision_mesh</span></code></a></p></td>
-<td><p>Remove a collision mesh from the planning scene.</p></td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Inherited Methods</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.get_planning_scene.html#compas_fab.backends.PyBulletPlanner.get_planning_scene" title="compas_fab.backends.PyBulletPlanner.get_planning_scene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_planning_scene</span></code></a></p></td>
 <td><p>Default method for planner.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.plan_cartesian_motion.html#compas_fab.backends.PyBulletPlanner.plan_cartesian_motion" title="compas_fab.backends.PyBulletPlanner.plan_cartesian_motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plan_cartesian_motion</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.inverse_kinematics.html#compas_fab.backends.PyBulletPlanner.inverse_kinematics" title="compas_fab.backends.PyBulletPlanner.inverse_kinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inverse_kinematics</span></code></a></p></td>
+<td><p>Calculate the robot's inverse kinematic for a given frame.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.plan_cartesian_motion.html#compas_fab.backends.PyBulletPlanner.plan_cartesian_motion" title="compas_fab.backends.PyBulletPlanner.plan_cartesian_motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plan_cartesian_motion</span></code></a></p></td>
 <td><p>Default method for planner.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.plan_motion.html#compas_fab.backends.PyBulletPlanner.plan_motion" title="compas_fab.backends.PyBulletPlanner.plan_motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plan_motion</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.plan_motion.html#compas_fab.backends.PyBulletPlanner.plan_motion" title="compas_fab.backends.PyBulletPlanner.plan_motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plan_motion</span></code></a></p></td>
 <td><p>Default method for planner.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.reset_planning_scene.html#compas_fab.backends.PyBulletPlanner.reset_planning_scene" title="compas_fab.backends.PyBulletPlanner.reset_planning_scene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_planning_scene</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.remove_attached_collision_mesh.html#compas_fab.backends.PyBulletPlanner.remove_attached_collision_mesh" title="compas_fab.backends.PyBulletPlanner.remove_attached_collision_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_attached_collision_mesh</span></code></a></p></td>
+<td><p>Remove an attached collision mesh from the robot.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.remove_collision_mesh.html#compas_fab.backends.PyBulletPlanner.remove_collision_mesh" title="compas_fab.backends.PyBulletPlanner.remove_collision_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_collision_mesh</span></code></a></p></td>
+<td><p>Remove a collision mesh from the planning scene.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="compas_fab.backends.PyBulletPlanner.reset_planning_scene.html#compas_fab.backends.PyBulletPlanner.reset_planning_scene" title="compas_fab.backends.PyBulletPlanner.reset_planning_scene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_planning_scene</span></code></a></p></td>
 <td><p>Default method for planner.</p></td>
 </tr>
 </tbody>

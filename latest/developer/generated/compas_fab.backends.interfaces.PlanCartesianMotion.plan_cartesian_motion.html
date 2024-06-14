@@ -623,7 +623,7 @@ document.write(`
 <h1>PlanCartesianMotion.plan_cartesian_motion</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_fab.backends.interfaces.PlanCartesianMotion.plan_cartesian_motion">
-<span class="sig-prename descclassname"><span class="pre">PlanCartesianMotion.</span></span><span class="sig-name descname"><span class="pre">plan_cartesian_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">waypoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/d6d080a/src/compas_fab/backends/interfaces/backend_features.py#L131"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">PlanCartesianMotion.</span></span><span class="sig-name descname"><span class="pre">plan_cartesian_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">waypoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/74dfc5a/src/compas_fab/backends/interfaces/backend_features.py#L134"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Calculates a cartesian motion path (linear in tool space).</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -632,12 +632,12 @@ document.write(`
 </dd>
 <dt><strong>waypoints</strong><span class="classifier"><a class="reference internal" href="../../api/generated/compas_fab.robots.Waypoints.html" title="compas_fab.robots.Waypoints"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.robots.Waypoints</span></code></a></span></dt><dd><p>The waypoints for the robot to follow.</p>
 </dd>
-<dt><strong>start_configuration: :class:`compas_robots.Configuration`, optional</strong></dt><dd><p>The robot’s full configuration, i.e. values for all configurable
+<dt><strong>start_configuration</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas_robots/latest/api/generated/compas_robots.Configuration.html" title="(in COMPAS Robots vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_robots.Configuration</span></code></a>, optional</span></dt><dd><p>The robot’s full configuration, i.e. values for all configurable
 joints of the entire robot, at the starting position.</p>
 </dd>
-<dt><strong>group: str, optional</strong></dt><dd><p>The planning group used for calculation.</p>
+<dt><strong>group</strong><span class="classifier">str, optional</span></dt><dd><p>The planning group used for calculation.</p>
 </dd>
-<dt><strong>options: dict, optional</strong></dt><dd><p>Dictionary containing kwargs for arguments specific to
+<dt><strong>options</strong><span class="classifier">dict, optional</span></dt><dd><p>Dictionary containing kwargs for arguments specific to
 the client being queried.</p>
 </dd>
 </dl>
