@@ -31,7 +31,6 @@ from .planner import PyBulletPlanner
 from .utils import LOG
 from .utils import redirect_stdout
 
-pybullet = LazyLoader("pybullet", globals(), "pybullet")
 
 if not compas.IPY:
     from typing import TYPE_CHECKING
@@ -56,10 +55,16 @@ __all__ = [
 
 class PyBulletBase(object):
     def __init__(self, connection_type):
+        # type: (str) -> None
         self.client_id = None
         self.connection_type = connection_type
 
+    # -------------------------------------------------------------------
+    # Functions for connecting and disconnecting from the PyBullet server
+    # -------------------------------------------------------------------
+
     def connect(self, shadows=True, color=None, width=None, height=None):
+        # type: (bool, Tuple[float,float,float], int, int) -> None
         """Connect from the PyBullet server.
 
         Parameters
@@ -79,19 +84,22 @@ class PyBulletBase(object):
         """
         # Shared Memory: execute the physics simulation and rendering in a separate process
         # https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/examples/vrminitaur.py#L7
-        self._detect_display()
+
+        # If connection_type is 'gui' but there is no display detected, switch to 'direct'
+        if self.connection_type == "gui" and not compas.OSX and not compas.WINDOWS and ("DISPLAY" not in os.environ):
+            self.connection_type = "direct"
+            print("No display detected! Continuing without GUI.")
+
+        # Format GUI parameters for launching PyBullet
         options = self._compose_options(color, width, height)
+
         with redirect_stdout():
             self.client_id = pybullet.connect(const.CONNECTION_TYPE[self.connection_type], options=options)
+
         if self.client_id < 0:
             raise Exception("Error in establishing connection with PyBullet.")
         if self.connection_type == "gui":
             self._configure_debug_visualizer(shadows)
-
-    def _detect_display(self):
-        if self.connection_type == "gui" and not compas.OSX and not compas.WINDOWS and ("DISPLAY" not in os.environ):
-            self.connection_type = "direct"
-            print("No display detected! Continuing without GUI.")
 
     @staticmethod
     def _compose_options(color, width, height):
@@ -105,6 +113,7 @@ class PyBulletBase(object):
         return options
 
     def _configure_debug_visualizer(self, shadows):
+        # COV_ENABLE_GUI = False turns off the sidebar and parameter views in the GUI
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_GUI, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_TINY_RENDERER, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_RGB_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
@@ -148,9 +157,26 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     Parameters
     ----------
     connection_type : :obj:`str`
-        Sets the connection type. Defaults to ``'gui'``.
+        Sets the connection type.
+        ``'gui'`` for a graphical user interface (default).
+        ``'direct'`` mode will create a headless physics engine and directly communicates with it.
+        ``'shared_memory'``, ``'udp'``, and ``'tcp'`` are not supported.
+
     verbose : :obj:`bool`
         Use verbose logging. Defaults to ``False``.
+
+    Attributes
+    ----------
+    planner : :class:`compas_fab.backends.PyBulletPlanner`
+        The planner instance for this client.
+    verbose : :obj:`bool`
+        Use verbose logging.
+    collision_objects : :obj:`dict` of (:obj:`str`, :obj:`list` of :obj:`int`)
+        Dictionary of collision objects.
+        Dictionary key is the name of the object and the value is a list of body ids.
+    attached_collision_objects : :obj:`dict` of (:obj:`str`, :obj:`list` of :obj:`int`)
+        Dictionary of attached collision objects.
+        Dictionary key is the name of the object and the value is a list of body ids.
 
     Examples
     --------
@@ -162,10 +188,11 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     """
 
     def __init__(self, connection_type="gui", verbose=False):
+        # type (str, bool) -> None
         super(PyBulletClient, self).__init__(connection_type)
         self.planner = PyBulletPlanner(self)
         self.verbose = verbose
-        self.collision_objects = {}
+        self.collision_objects = {}  # type: dict[str, list[int]]
         self.attached_collision_objects = {}
         self.disabled_collisions = set()
         self._cache_dir = None
@@ -181,6 +208,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     @property
     def unordered_disabled_collisions(self):
+        # type: () -> set
+        """Returns the set of disabled collisions between robot links."""
         return {frozenset(pair) for pair in self.disabled_collisions}
 
     def step_simulation(self):
@@ -193,6 +222,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         pybullet.stepSimulation(physicsClientId=self.client_id)
 
     def load_ur5(self, load_geometry=False, concavity=False):
+        # type: (bool, bool) -> Robot
         """ "Load a UR5 robot to PyBullet.
 
         Parameters
@@ -278,6 +308,11 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         precision : int
             Defines precision for importing/loading meshes. Defaults to ``compas.tolerance.TOL.precision``.
 
+        Returns
+        -------
+        :class:`compas_fab.robots.Robot`
+            The loaded robot instance.
+
         Notes
         -----
         By default, PyBullet will use the convex hull of any mesh loaded from a URDF for collision detection.
@@ -321,6 +356,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             pybullet_uid = pybullet.loadURDF(
                 urdf_file, useFixedBase=True, physicsClientId=self.client_id, flags=pybullet.URDF_USE_SELF_COLLISION
             )
+            # From PyBullet Quickstart Guide:
+            # loadURDF returns a body unique id, a non-negative integer value. If the URDF file cannot be
+            # loaded, this integer will be negative and not a valid body unique id.
             cached_robot_model.attr["uid"] = pybullet_uid
 
         self._add_ids_to_robot_joints(cached_robot_model)
@@ -458,6 +496,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return robot.attributes["pybullet"]["cached_robot_filepath"]
 
     def get_uid(self, cached_robot_model):
+        # type: (RobotModel) -> int
         """Returns the internal PyBullet id of the robot's model for shadowing the state
         of the robot on the PyBullet server.
 
@@ -688,18 +727,27 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return [js.jointPosition for js in joint_states]
 
     def set_robot_configuration(self, robot, configuration, group=None):
-        """Sets the robot's pose to the given configuration. Should be followed by
-        `step_simulation` for visualization purposes.
+        # type: (Robot, Configuration, str) -> Configuration
+        """Sets the robot's pose to the given configuration.
+
+        If visualization is needed, it should be followed by `step_simulation` to update the GUI.
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`  The robot to be configured.
-        configuration : :class:`compas_fab.robots.Configuration`  If a full configuration is not given,
-            the values from :meth:`compas_fab.robots.Robot.zero_configuration` will be used for the
-            missing ones.  Joint names are expected to be supplied in the configuration.
+        robot : :class:`compas_fab.robots.Robot`
+            The robot to be configured.
+        configuration : :class:`compas_fab.robots.Configuration`
+            The configuration to be set, ``joint_names`` must be included in the configuration.
+            If a partial configuration is given (i.e. not all joint values are given),
+            the other joint values are extracted from :meth:`compas_fab.robots.Robot.zero_configuration`.
         group : :obj:`str`, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Configuration`
+            The full configuration of the robot.
         """
         cached_robot_model = self.get_cached_robot_model(robot)
         body_id = self.get_uid(cached_robot_model)
@@ -710,6 +758,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return full_configuration
 
     def get_robot_configuration(self, robot):
+        # type: (Robot) -> Configuration
         """Gets the robot's current pose.
 
         Parameters
@@ -779,6 +828,28 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     @staticmethod
     def _handle_concavity(tmp_obj_path, tmp_dir, concavity, mass, mesh_name=""):
+        """Decompose a mesh into convex parts using v-HACD if concavity is requested.
+
+        Parameters
+        ----------
+        tmp_obj_path : :obj:`str`
+            Path to the OBJ file as input.
+        tmp_dir : :obj:`str`
+            Path to the temporary directory for storing the output.
+        concavity : :obj:`bool`
+            When ``False``, the mesh will not be decomposed and the input path will be returned.
+        mass : :obj:`float`
+            Mass of the body to be created, in kg.  If ``0`` mass is given, the object is static.
+            Static objects will not be decomposed.
+        mesh_name : :obj:`str`, optional
+            A prefix for the temporary mesh file. Typically not required.
+            Defaults to ``""``, which generates a temporary file named ``vhacd_temp.obj``.
+
+        Returns
+        -------
+        :obj:`str`
+            Path to the OBJ file as output.
+        """
         if not concavity or mass == const.STATIC_MASS:
             return tmp_obj_path
         if mesh_name:
@@ -827,6 +898,16 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return body_id
 
     def _create_body(self, collision_id=const.NULL_ID, visual_id=const.NULL_ID, mass=const.STATIC_MASS):
+        # type: (int, int, float) -> int
+        """Create a PyBullet MultiBodies from a collision and visual shape.
+
+        Refer to `btMultiBody` in Bullet documentation and `createMultiBody` in PyBullet documentation.
+
+        Returns
+        -------
+        :obj:`int`
+            A single PyBullet body id for the multi-body object.
+        """
         return pybullet.createMultiBody(
             baseMass=mass,
             baseCollisionShapeIndex=collision_id,
