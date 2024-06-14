@@ -35,7 +35,7 @@ class PyBulletAppendCollisionMesh(AppendCollisionMesh):
         frame = collision_mesh.frame
         concavity = options.get("concavity", False)
         if name in self.client.collision_objects:
-            body_id = self.client.convert_mesh_to_body(mesh, frame, name, concavity)
+            body_id = self.client.convert_mesh_to_body(mesh, frame, concavity)
             self.client.collision_objects[name].append(body_id)
         else:
             self.client.add_collision_mesh(collision_mesh, options)

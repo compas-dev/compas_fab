@@ -45,5 +45,5 @@ class PyBulletAddCollisionMesh(AddCollisionMesh):
         if name in self.client.collision_objects:
             self.client.remove_collision_mesh(name)
 
-        body_id = self.client.convert_mesh_to_body(mesh, frame, name, concavity, mass)
+        body_id = self.client.convert_mesh_to_body(mesh, frame, concavity, mass)
         self.client.collision_objects[name] = [body_id]

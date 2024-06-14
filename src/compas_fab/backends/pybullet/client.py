@@ -718,19 +718,30 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         default_config.joint_values = joint_values
         return default_config
 
-    # =======================================
-    def convert_mesh_to_body(self, mesh, frame, _name=None, concavity=False, mass=const.STATIC_MASS):
-        """Convert compas mesh and its frame to a pybullet body.
+    # ====================================================================================
+    # Helper functions for creating rigid bodies in PyBullet
+    # This includes loading meshes via OBJ files, setting up visual and collision objects
+    # ====================================================================================
+
+    def convert_mesh_to_body(self, mesh, frame, concavity=False, mass=const.STATIC_MASS):
+        """Creates a pybullet body from a compas mesh and attaches it to the scene.
+
+        Useful for static collision meshes and attached collision meshes.
+        The mesh is first exported to an OBJ file and then loaded into PyBullet.
+        When concavity is requested, the mesh will be decomposed into convex parts.
+
+        This function should not be called directly by compas_fab API user because PyBulletClient
+        will otherwise not be able to keep track of the collision objects.
 
         Parameters
         ----------
         mesh : :class:`compas.datastructures.Mesh`
+            The mesh to be converted, modelled relative to its own object coordinate system.
         frame : :class:`compas.geometry.Frame`
-        _name : :obj:`str`, optional
-            Name of the mesh for tagging in PyBullet's GUI
+            The frame to which the mesh should be moved.
         concavity : :obj:`bool`, optional
-            When ``False`` (the default), the mesh will be loaded as its convex hull for collision checking purposes.
-            When ``True``, a non-static mesh will be decomposed into convex parts using v-HACD.
+            When ``False`` (the default), the mesh will be loaded as is and any convex hull will be considered solid during collision checking.
+            When ``True``, the mesh will be decomposed into convex parts using V-HACD within PyBullet.
         mass : :obj:`float`, optional
             Mass of the body to be created, in kg.  If ``0`` mass is given (the default),
             the object is static.
@@ -738,6 +749,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         Returns
         -------
         :obj:`int`
+            The PyBullet body id of the mesh.
 
         Notes
         -----
@@ -752,11 +764,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         tmp_obj_path = self._handle_concavity(tmp_obj_path, self._cache_dir.name, concavity, mass)
         pyb_body_id = self.body_from_obj(tmp_obj_path, concavity=concavity, mass=mass)
         self._set_base_frame(frame, pyb_body_id)
-        # The following lines are for visual debugging purposes
-        # To be deleted or rewritten later.
-        # if name:
-        #     from pybullet_planning import add_body_name
-        #     add_body_name(pyb_body, name)
+
         return pyb_body_id
 
     @staticmethod
