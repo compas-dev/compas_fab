@@ -830,7 +830,7 @@ class AnalyticalPyBulletClient(PyBulletClient):
     """Combination of PyBullet as the client for Collision Detection and Analytical Inverse Kinematics."""
 
     def __init__(self, connection_type="gui", verbose=False):
-        PyBulletClient.__init__(self, connection_type=connection_type, verbose=verbose)
+        super(self, AnalyticalPyBulletClient).__init__(self, connection_type=connection_type, verbose=verbose)
 
     def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         planner = AnalyticalInverseKinematics(self)
