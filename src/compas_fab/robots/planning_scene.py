@@ -2,10 +2,22 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import compas
+
 from compas.data import Data
 from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Scale
+
+if not compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import Optional  # noqa: F401
+        from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
+        from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import Tool  # noqa: F401
+
 
 __all__ = [
     "AttachedCollisionMesh",
@@ -22,13 +34,14 @@ class CollisionMesh(Data):
     mesh : :class:`compas.datastructures.Mesh`
         The collision mesh. Ideally it is as coarse as possible.
     id : :obj:`str`
-        The id of the mesh, used to identify it for later operations
+        The id of the mesh, used for identifying it for later operations
         (:meth:`~PlanningScene.add_collision_mesh`,
         :meth:`~PlanningScene.remove_collision_mesh`,
         :meth:`~PlanningScene.append_collision_mesh` etc.)
     frame : :class:`compas.geometry.Frame`, optional
-        The frame of the mesh. Defaults to :meth:`compas.geometry.Frame.worldXY`.
-    root_name : :obj:`str`
+        The base frame of the mesh.
+        Defaults to :meth:`compas.geometry.Frame.worldXY`.
+    root_name : :obj:`str`, optional
         The name of the root link the collision mesh will be placed in. Defaults
         to ``'world'``.
 
@@ -37,12 +50,13 @@ class CollisionMesh(Data):
     mesh : :class:`compas.datastructures.Mesh`
         The collision mesh. Ideally it is as coarse as possible.
     id : :obj:`str`
-        The id of the mesh, used to identify it for later operations
+        The id of the mesh, used for identifying it for later operations
         (:meth:`~PlanningScene.add_collision_mesh`,
         :meth:`~PlanningScene.remove_collision_mesh`,
         :meth:`~PlanningScene.append_collision_mesh` etc.)
-    frame : :class:`compas.geometry.Frame`, optional
-        The frame of the mesh. Defaults to :meth:`compas.geometry.Frame.worldXY`.
+    frame : :class:`compas.geometry.Frame`
+        The base frame of the mesh.
+        Defaults to :meth:`compas.geometry.Frame.worldXY`.
     root_name : :obj:`str`
         The name of the root link the collision mesh will be placed in. Defaults
         to ``'world'``.
@@ -56,6 +70,7 @@ class CollisionMesh(Data):
     """
 
     def __init__(self, mesh, id, frame=None, root_name=None):
+        # type: (Mesh, str, Optional[Frame], Optional[str]) -> None
         super(CollisionMesh, self).__init__()
         self.id = id
         self.mesh = mesh
@@ -63,6 +78,7 @@ class CollisionMesh(Data):
         self.root_name = root_name or "world"
 
     def scale(self, scale_factor):
+        # type: (float) -> None
         """Scales the collision mesh uniformly.
 
         Parameters
@@ -74,18 +90,23 @@ class CollisionMesh(Data):
         self.mesh.transform(S)
 
     def scaled(self, scale_factor):
+        # type: (float) -> None
         """Copies the collision mesh, and scales the copy uniformly.
 
         Parameters
         ----------
         scale_factor : :obj:`float`
             Scale factor.
+
+        Returns
+        -------
         """
         self.mesh = self.mesh.copy()
         self.scale(scale_factor)
 
     @classmethod
     def __from_data__(cls, data):
+        # type: (dict) -> CollisionMesh
         """Construct a collision mesh from its data representation.
 
         Parameters
@@ -157,6 +178,7 @@ class AttachedCollisionMesh(Data):
     """
 
     def __init__(self, collision_mesh, link_name, touch_links=None, weight=1.0):
+        # type: (CollisionMesh, str, Optional[list[str]], Optional[float]) -> None
         super(AttachedCollisionMesh, self).__init__()
         self.collision_mesh = collision_mesh
         if self.collision_mesh:
@@ -167,6 +189,7 @@ class AttachedCollisionMesh(Data):
 
     @classmethod
     def __from_data__(cls, data):
+        # type: (dict) -> AttachedCollisionMesh
         """Construct an attached collision mesh from its data representation.
 
         Parameters
@@ -204,26 +227,29 @@ class PlanningScene(object):
 
     Parameters
     ----------
-    robot : :class:`Robot`
+    robot : :class:`compas_fab.robots.Robot`
         A reference to the robot in the planning scene.
 
     Attributes
     ----------
-    robot : :class:`Robot`
+    robot : :class:`compas_fab.robots.Robot`
         A reference to the robot in the planning scene.
     client
         A reference to the robot's backend client.
     """
 
     def __init__(self, robot):
+        # type: (Robot) -> None
         self.robot = robot
 
     @property
     def client(self):
-        """:class:`compas_fab.backend.ClientInterface`: The backend client."""
+        # type: () -> ClientInterface
+        """:class:`compas_fab.backends.interfaces.ClientInterface`: The backend client."""
         return self.robot.client
 
     def ensure_client(self):
+        # type: () -> None
         """Ensure that the planning scene's robot has a defined client.
 
         Raises
@@ -235,11 +261,13 @@ class PlanningScene(object):
             raise Exception("This method is only callable once a client is assigned")
 
     def reset(self):
+        # type: () -> None
         """Resets the planning scene, removing all added collision meshes."""
         self.ensure_client()
         self.client.reset_planning_scene()
 
     def add_collision_mesh(self, collision_mesh, scale=False):
+        # type: (CollisionMesh, Optional[bool]) -> None
         """Add a collision mesh to the planning scene.
 
         If there is already a :class:`CollisionMesh` in the
@@ -277,6 +305,7 @@ class PlanningScene(object):
         self.client.add_collision_mesh(collision_mesh)
 
     def remove_collision_mesh(self, id):
+        # type: (str) -> None
         """Remove a collision object from the planning scene.
 
         Parameters
@@ -299,6 +328,7 @@ class PlanningScene(object):
         self.robot.client.remove_collision_mesh(id)
 
     def append_collision_mesh(self, collision_mesh, scale=False):
+        # type: (CollisionMesh, Optional[bool]) -> None
         """Append a collision mesh to the planning scene.
 
         Appends a :class:`CollisionMesh` to the :class:`PlanningScene` using
@@ -342,6 +372,7 @@ class PlanningScene(object):
         self.robot.client.append_collision_mesh(collision_mesh)
 
     def add_attached_collision_mesh(self, attached_collision_mesh, scale=False):
+        # type: (AttachedCollisionMesh, Optional[bool]) -> None
         """Add an attached collision object to the planning scene.
 
         Parameters
@@ -379,6 +410,7 @@ class PlanningScene(object):
         self.client.add_attached_collision_mesh(attached_collision_mesh)
 
     def remove_attached_collision_mesh(self, id):
+        # type: (str) -> None
         """Remove an attached collision object from the planning scene.
 
         Parameters
@@ -403,6 +435,7 @@ class PlanningScene(object):
         self.client.remove_attached_collision_mesh(id)
 
     def attach_collision_mesh_to_robot_end_effector(self, collision_mesh, scale=False, group=None):
+        # type: (CollisionMesh, Optional[bool], Optional[str]) -> None
         """Attaches a collision mesh to the robot's end-effector.
 
         Parameters
@@ -443,6 +476,7 @@ class PlanningScene(object):
         self.add_attached_collision_mesh(acm)
 
     def add_attached_tool(self, tool=None, group=None):
+        # type: (Optional[Tool], Optional[str]) -> None
         """Add the robot's attached tool to the planning scene if tool is set."""
         self.ensure_client()
         if tool:
@@ -454,6 +488,7 @@ class PlanningScene(object):
                 self.add_attached_collision_mesh(attached_collision_mesh)
 
     def remove_attached_tool(self):
+        # type: () -> None
         """Remove the robot's attached tool from the planning scene."""
         self.ensure_client()
 

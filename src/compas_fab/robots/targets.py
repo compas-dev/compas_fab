@@ -1,7 +1,20 @@
+import compas
+
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_robots.model import Joint
+
+if not compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import Optional  # noqa: F401
+        from typing import Tuple  # noqa: F401
+        from compas.geometry import Point  # noqa: F401
+        from compas.geometry import Vector  # noqa: F401
+        from compas_robots import Configuration  # noqa: F401
+        from compas_fab.robots import Constraint  # noqa: F401
 
 __all__ = [
     "Target",
@@ -40,6 +53,7 @@ class Target(Data):
     """
 
     def __init__(self, name="Generic Target"):
+        # type: (str) -> None
         super(Target, self).__init__()
         self.name = name
 
@@ -48,6 +62,7 @@ class Target(Data):
         raise NotImplementedError
 
     def scaled(self, factor):
+        # type: (float) -> Target
         """Returns a scaled copy of the target.
 
         If the user model is created in millimeters, the target should be scaled by a factor of 0.001 before passing to the planner.
@@ -109,6 +124,7 @@ class FrameTarget(Target):
         tool_coordinate_frame=None,
         name="Frame Target",
     ):
+        # type: (Frame, Optional[float], Optional[float], Optional[Frame | Transformation], Optional[str]) -> None
         super(FrameTarget, self).__init__(name=name)
         self.target_frame = target_frame
         self.tolerance_position = tolerance_position
@@ -136,6 +152,7 @@ class FrameTarget(Target):
         tool_coordinate_frame=None,
         name="Frame Target",
     ):
+        # type: (Transformation, Optional[float], Optional[float], Optional[Frame | Transformation], Optional[str]) -> FrameTarget
         """Creates a FrameTarget from a transformation matrix.
 
         Parameters
@@ -164,7 +181,8 @@ class FrameTarget(Target):
         return cls(frame, tolerance_position, tolerance_orientation, tool_coordinate_frame, name)
 
     def scaled(self, factor):
-        """Returns a copy of the :class:`FrameTarget` where the target frame and tolerances are scaled.
+        # type: (float) -> FrameTarget
+        """Returns a copy of the target where the target frame and tolerances are scaled.
 
         By convention, compas_fab robots use meters as the default unit of measure.
         If user model is created in millimeters, the FrameTarget should be scaled by a factor
@@ -227,8 +245,8 @@ class PointAxisTarget(Target):
     tolerance_position : float, optional
         The tolerance for the position of the target point.
         If not specified, the default value from the planner is used.
-    tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
-        The tool tip coordinate frame relative to the flange coordinate frame of the robot.
+    tool_coordinate_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`, optional
+        The tool tip coordinate frame relative to the flange of the robot.
         If not specified, the target point is relative to the robot's flange (T0CF) and the
         Z axis of the flange can rotate around the target axis.
     name : str, optional
@@ -244,10 +262,13 @@ class PointAxisTarget(Target):
         tool_coordinate_frame=None,
         name="Point-Axis Target",
     ):
+        # type: (Point, Vector, Optional[float], Optional[Frame | Transformation], Optional[str]) -> None
         super(PointAxisTarget, self).__init__(name=name)
         self.target_point = target_point
         self.target_z_axis = target_z_axis
         self.tolerance_position = tolerance_position
+        if isinstance(tool_coordinate_frame, Transformation):
+            tool_coordinate_frame = Frame.from_transformation(tool_coordinate_frame)
         self.tool_coordinate_frame = tool_coordinate_frame
 
     @property
@@ -261,6 +282,7 @@ class PointAxisTarget(Target):
         }
 
     def scaled(self, factor):
+        # type: (float) -> PointAxisTarget
         """Returns a copy of the target where the target point and tolerances are scaled.
 
         Parameters
@@ -316,7 +338,7 @@ class ConfigurationTarget(Target):
     SUPPORTED_JOINT_TYPES = [Joint.PRISMATIC, Joint.REVOLUTE, Joint.CONTINUOUS]
 
     def __init__(self, target_configuration, tolerance_above=None, tolerance_below=None, name="Configuration Target"):
-
+        # type: (Configuration, Optional[list[float]], Optional[list[float]], Optional[str]) -> None
         super(ConfigurationTarget, self).__init__(name=name)
         self.target_configuration = target_configuration  # type: Configuration
         self.tolerance_above = tolerance_above
@@ -337,6 +359,7 @@ class ConfigurationTarget(Target):
 
     @classmethod
     def generate_default_tolerances(cls, configuration, tolerance_prismatic, tolerance_revolute):
+        # type: (Configuration, float, float) -> Tuple[list[float], list[float]]
         """Generates tolerances values for the target configuration based on the joint types.
 
         The parameters `tolerance_prismatic` and `tolerance_revolute` are used to generate the
@@ -357,7 +380,7 @@ class ConfigurationTarget(Target):
 
         Returns
         -------
-        :obj:`tuple` of :obj:`list` of :obj:`float`
+        :obj:`tuple` of (:obj:`list` of :obj:`float`, :obj:`list` of :obj:`float`)
             The tolerances_above and tolerances_below lists.
 
         Examples
@@ -386,6 +409,7 @@ class ConfigurationTarget(Target):
         return tolerances_above, tolerances_below
 
     def scaled(self, factor):
+        # type: (float) -> ConfigurationTarget
         """Returns copy of the target where the target configuration and tolerances are scaled.
 
         This function should only be needed if the ConfigurationTarget was created
@@ -407,6 +431,8 @@ class ConfigurationTarget(Target):
         target_configuration = self.target_configuration.scaled(factor)
 
         def scale_tolerance(tolerance, joint_types):
+            # type: (list[float], list[Joint]) -> list[float]
+            """Only scales the tolerances for prismatic and planar joints."""
             scaled_tolerance = []
             for t, joint_type in zip(tolerance, joint_types):
                 if joint_type in (Joint.PLANAR, Joint.PRISMATIC):
@@ -458,6 +484,7 @@ class ConstraintSetTarget(Target):
     """
 
     def __init__(self, constraint_set, name="Constraint Set Target"):
+        # type: (list[Constraint], Optional[str]) -> None
         super(ConstraintSetTarget, self).__init__(name=name)
         self.constraint_set = constraint_set
 
@@ -469,6 +496,7 @@ class ConstraintSetTarget(Target):
         }
 
     def scaled(self, factor):
+        # type: (float) -> ConstraintSetTarget
         """Returns a scaled copy of the target.
 
         Raises
@@ -516,6 +544,7 @@ class Waypoints(Data):
         self.tool_coordinate_frame = tool_coordinate_frame
 
     def scaled(self, factor):
+        # type: (float) -> Waypoints
         """Returns a scaled copy of the waypoints.
 
         If the user model is created in millimeters, the target should be scaled by a factor of 0.001 before passing to the planner.
@@ -594,6 +623,7 @@ class FrameWaypoints(Waypoints):
         tool_coordinate_frame=None,
         name="Frame Waypoints",
     ):
+        # type: (list[Transformation], Optional[float], Optional[float], Optional[Frame | Transformation], Optional[str]) -> FrameWaypoints
         """Creates a FrameWaypoints from a list of transformation matrices.
 
         Parameters
@@ -622,6 +652,7 @@ class FrameWaypoints(Waypoints):
         return cls(frames, tolerance_position, tolerance_orientation, tool_coordinate_frame, name)
 
     def scaled(self, factor):
+        # type: (float) -> FrameWaypoints
         """Returns a copy of the :class:`FrameWaypoints` where the target frames and tolerances are scaled.
 
         By convention, compas_fab robots use meters as the default unit of measure.
@@ -698,6 +729,7 @@ class PointAxisWaypoints(Waypoints):
         }
 
     def scaled(self, factor):
+        # type: (float) -> PointAxisWaypoints
         """Returns a copy of the target where the target points and tolerances are scaled.
 
         Parameters

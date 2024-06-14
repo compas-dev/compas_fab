@@ -50,6 +50,7 @@ class Duration(Data):
     """
 
     def __init__(self, secs, nsecs):
+        # type: (int | float, int) -> None
         super(Duration, self).__init__()
         sec_to_nano_factor = 1e9
         quotient, remainder = divmod(secs, 1)
@@ -79,6 +80,7 @@ class Duration(Data):
 
     @property
     def seconds(self):
+        # type: () -> float
         return self.secs + 1e-9 * self.nsecs
 
     @property

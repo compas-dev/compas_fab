@@ -1,9 +1,19 @@
 import os
+import compas
+
 
 __all__ = ["list_files_in_directory"]
 
+if not compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import List  # noqa: F401
+        from typing import Optional  # noqa: F401
+
 
 def list_files_in_directory(directory, fullpath=False, extensions=None):
+    # type: (str, bool, Optional[List[str]]) -> List[str]
     """This function lists just the files in a directory, not sub-directories.
 
     Parameters
@@ -39,6 +49,9 @@ def list_files_in_directory(directory, fullpath=False, extensions=None):
 
 
 if __name__ == "__main__":
-    path = os.path.join(os.path.dirname(__file__), "..", "robots", "ur", "ur10", "model")
+    path = os.path.join(
+        os.path.dirname(__file__), "..", "data", "robot_library", "rfl", "rfl_description", "meshes", "visual"
+    )
     os.listdir(path)
-    print(list_files_in_directory(path, fullpath=True, extensions=["obj"]))
+    for file in list_files_in_directory(path, fullpath=True, extensions=["stl"]):
+        print(file)

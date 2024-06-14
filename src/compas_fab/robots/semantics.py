@@ -2,8 +2,26 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import compas
+
 from compas.data import Data
 from compas.files import XML
+
+if not compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import Any  # noqa: F401
+        from typing import Optional  # noqa: F401
+        from typing import Dict  # noqa: F401
+        from typing import Tuple  # noqa: F401
+        from typing import List  # noqa: F401
+        from typing import Set  # noqa: F401
+        from compas_robots import RobotModel  # noqa: F401
+        from compas_robots.model import Joint  # noqa: F401
+        from xml.etree.ElementTree import Element  # noqa: F401
+
+        from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
 
 __all__ = [
     "RobotSemantics",
@@ -21,7 +39,7 @@ class RobotSemantics(Data):
 
     Parameters
     ----------
-    robot_model : :class:`~compas_fab.robots.RobotModel`
+    robot_model : :class:`~compas_robots.RobotModel`
         The robot model.
     groups : :obj:`dict` of (:obj:`str`, :obj:`dict` of (``links`` : :obj:`list` of :obj:`str`, ``joints`` : :obj:`list` of :obj:`str`)), optional
         A nested dictionary defining planning groups.
@@ -39,7 +57,7 @@ class RobotSemantics(Data):
         A list of passive joint names.
     end_effectors : :obj:`list` of :obj:`str`, optional
         A list of end effector link names.
-    disabled_collisions : :obj:`tuple` of (:obj:`str`, :obj:`str`), optional
+    disabled_collisions : :obj:`list` of :obj:`tuple` of (:obj:`str`, :obj:`str`), optional
         A set of disabled collision pairs.
         The order is not important, i.e. the pair `('link1', 'link2')` is the same as `('link2', 'link1')`.
         Only one pair is needed.
@@ -50,7 +68,7 @@ class RobotSemantics(Data):
 
         - Level 1 keys are planning group names : :obj:`str`.
         - Level 2 keys are group state names : :obj:`str`.
-        - Level 3 keys are joint names and values are joint values : :obj:`str`.
+        - Level 3 keys are joint names :obj:`str` and values are joint values :obj:`float`.
 
     Attributes
     ----------
@@ -73,6 +91,7 @@ class RobotSemantics(Data):
         disabled_collisions=None,
         group_states=None,
     ):
+        # type: (RobotModel, Optional[Dict[str, Dict[str, List[str]]]], Optional[str], Optional[List[str]], Optional[List[str]], List[Tuple[str,str]], Dict[str, Dict[str, Dict[str,float]]]) -> None
         super(RobotSemantics, self).__init__()
         self.robot_model = robot_model
 
@@ -98,6 +117,7 @@ class RobotSemantics(Data):
 
     @classmethod
     def __from_data__(cls, data):
+        # type: (Dict[str, Any]) -> RobotSemantics
         robot_model = data.get("robot_model")
         groups = data.get("groups", {})
         main_group_name = data.get("main_group_name")
@@ -121,14 +141,17 @@ class RobotSemantics(Data):
 
     @property
     def group_names(self):
+        # type: () -> List[str]
         return list(self.groups.keys())
 
     @property
     def unordered_disabled_collisions(self):
+        # type: () -> Set[frozenset]
         return {frozenset(pair) for pair in self.disabled_collisions}
 
     @classmethod
     def from_srdf_file(cls, file, robot_model):
+        # type: (str, RobotModel) -> RobotSemantics
         """Create an instance of semantics based on an SRDF file path or file-like object.
 
         Parameters
@@ -148,18 +171,40 @@ class RobotSemantics(Data):
         >>> print(semantics.main_group_name)
         manipulator
         """
+
         xml = XML.from_file(file)
         return cls.from_xml(xml, robot_model)
 
     @classmethod
     def from_srdf_string(cls, text, robot_model):
-        """Create an instance of semantics based on an SRDF string."""
+        # type: (str, RobotModel) -> RobotSemantics
+        """Create an instance of semantics based on an SRDF string.
+
+        Parameters
+        ----------
+        text : :obj:`str`
+            The SRDF data as a string.
+        robot_model : :class:`compas_robots.RobotModel`
+            The robot model is needed when loading the semantics.
+        """
+
         xml = XML.from_string(text)
         return cls.from_xml(xml, robot_model)
 
     @classmethod
     def from_xml(cls, xml, robot_model):
-        """Create an instance of semantics based on an XML object."""
+        # type: (XML, RobotModel) -> RobotSemantics
+        """Create an instance of semantics based on an XML object.
+
+        Parameters
+        ----------
+
+        xml : :class:`compas.files.XML`
+            The XML object containing the SRDF data.
+        robot_model : :class:`compas_robots.RobotModel`
+            The robot model is needed when loading the semantics.
+        """
+
         groups = _get_groups(xml.root, robot_model)
         passive_joints = _get_passive_joints(xml.root)
         end_effectors = _get_end_effectors(xml.root)
@@ -180,6 +225,7 @@ class RobotSemantics(Data):
         )
 
     def get_end_effector_link_name(self, group=None):
+        # type: (Optional[str]) -> str
         """Get the name of the last link (end effector link) in a planning group.
 
         Parameters
@@ -198,6 +244,7 @@ class RobotSemantics(Data):
         return self.groups[group]["links"][-1]
 
     def get_base_link_name(self, group=None):
+        # type: (Optional[str]) -> str
         """Get the name of the first link (base link) in a planning group.
 
         Parameters
@@ -215,6 +262,7 @@ class RobotSemantics(Data):
         return self.groups[group]["links"][0]
 
     def get_all_configurable_joints(self):
+        # type: () -> List[Joint]
         """Get all configurable :class:`compas_robots.model.Joint` of the robot.
 
         Configurable joints are joints that can be controlled,
@@ -235,6 +283,7 @@ class RobotSemantics(Data):
         return joints
 
     def get_configurable_joints(self, group=None):
+        # type: (Optional[str]) -> List[Joint]
         """Get all configurable :class:`compas_robots.model.Joint` of a planning group.
 
         Configurable joints are joints that can be controlled,
@@ -263,6 +312,7 @@ class RobotSemantics(Data):
         return joints
 
     def get_configurable_joint_names(self, group=None):
+        # type: (Optional[str]) -> List[str]
         """Get all the names of configurable joints of a planning group.
 
         Similar to :meth:`get_configurable_joints` but returning joint names.
@@ -279,8 +329,13 @@ class RobotSemantics(Data):
         return [joint.name for joint in self.get_configurable_joints(group)]
 
 
+# -------------------
 # XML parsing methods
+# -------------------
+
+
 def _get_groups(root, robot_model):
+    # type: (Element, RobotModel) -> Dict[str, Dict[str, List[str]]]
     groups = {}
 
     for group in root.findall("group"):
@@ -294,6 +349,7 @@ def _get_groups(root, robot_model):
 
 
 def _get_group_states(root):
+    # type: (Element) -> Dict[str, Dict[str, Dict[str, float]]]
     group_states = {}
 
     for group_state in root.findall("group_state"):
@@ -306,6 +362,7 @@ def _get_group_states(root):
 
 
 def _get_group_link_names(group, root, robot_model):
+    # type: (Any, Element, RobotModel) -> List[str]
     link_names = []
     for link in group.findall("link"):
         name = link.attrib["name"]
@@ -337,6 +394,7 @@ def _get_group_link_names(group, root, robot_model):
 
 
 def _get_group_joint_names(group, root, robot_model):
+    # type: (Any, Element, RobotModel) -> List[str]
     joint_names = []
     for link in group.findall("link"):
         link = robot_model.get_link_by_name(link.attrib["name"])
@@ -365,18 +423,22 @@ def _get_group_joint_names(group, root, robot_model):
 
 
 def _get_group_elem_by_name(group_name, root):
+    # type: (str, Element) -> Element
     for group_elem in root.findall("group"):
         if group_elem.attrib["name"] == group_name:
             return group_elem
 
 
 def _get_passive_joints(root):
+    # type: (Element) -> List[str]
     return [joint.attrib["name"] for joint in root.iter("passive_joint")]
 
 
 def _get_end_effectors(root):
+    # type: (Element) -> List[str]
     return [ee.attrib["parent_link"] for ee in root.findall("end_effector")]
 
 
 def _get_disabled_collisions(root):
+    # type: (Element) -> Set[Tuple[str, str]]
     return {tuple([dc.attrib["link1"], dc.attrib["link2"]]) for dc in root.iter("disable_collisions")}

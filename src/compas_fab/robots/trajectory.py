@@ -2,6 +2,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import compas
+
 from compas.data import Data
 from compas.tolerance import TOL
 from compas_robots import Configuration
@@ -9,6 +11,14 @@ from compas_robots.configuration import FixedLengthList
 
 from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots.time_ import Duration
+
+if not compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import Any  # noqa: F401
+        from typing import Dict  # noqa: F401
+        from typing import List  # noqa: F401
 
 __all__ = [
     "JointTrajectory",
@@ -75,6 +85,7 @@ class JointTrajectoryPoint(Configuration):
         time_from_start=None,
         joint_names=None,
     ):
+        # type: (List[float], List[int], List[float], List[float], List[float], Duration, List[str]) -> None
         super(JointTrajectoryPoint, self).__init__(joint_values, joint_types, joint_names)
         self.velocities = velocities or len(self.joint_values) * [0.0]
         self.accelerations = accelerations or len(self.joint_values) * [0.0]
@@ -94,16 +105,19 @@ class JointTrajectoryPoint(Configuration):
 
     @property
     def positions(self):
+        # type: () -> List[float]
         """:obj:`list` of :obj:`float` : Alias of `joint_values`."""
         return self.joint_values
 
     @property
     def velocities(self):
+        # type: () -> List[float]
         """:obj:`list` of :obj:`float` : Velocity of each joint."""
         return self._velocities
 
     @velocities.setter
     def velocities(self, velocities):
+        # type: (List[float]) -> None
         if len(self.joint_values) != len(velocities):
             raise ValueError("Must have {} velocities, but {} given.".format(len(self.joint_values), len(velocities)))
 
@@ -111,11 +125,13 @@ class JointTrajectoryPoint(Configuration):
 
     @property
     def accelerations(self):
+        # type: () -> List[float]
         """:obj:`list` of :obj:`float` : Acceleration of each joint."""
         return self._accelerations
 
     @accelerations.setter
     def accelerations(self, accelerations):
+        # type: (List[float]) -> None
         if len(self.joint_values) != len(accelerations):
             raise ValueError(
                 "Must have {} accelerations, but {} given.".format(len(self.joint_values), len(accelerations))
@@ -125,11 +141,13 @@ class JointTrajectoryPoint(Configuration):
 
     @property
     def effort(self):
+        # type: () -> List[float]
         """:obj:`list` of :obj:`float` : Effort of each joint."""
         return self._effort
 
     @effort.setter
     def effort(self, effort):
+        # type: (List[float]) -> None
         if len(self.joint_values) != len(effort):
             raise ValueError("Must have {} efforts, but {} given.".format(len(self.joint_values), len(effort)))
 
@@ -153,6 +171,7 @@ class JointTrajectoryPoint(Configuration):
 
     @classmethod
     def __from_data__(cls, data):
+        # type: (Dict[str, Any]) -> JointTrajectoryPoint
         joint_values = FixedLengthList(data.get("joint_values") or data.get("values") or [])
         joint_types = FixedLengthList(data.get("joint_types") or data.get("types") or [])
         joint_names = FixedLengthList(data.get("joint_names") or [])
@@ -174,23 +193,27 @@ class JointTrajectoryPoint(Configuration):
 
     @property
     def velocity_dict(self):
+        # type: () -> Dict[str, float]
         """A dictionary of joint velocities by joint name."""
         self.check_joint_names()
         return dict(zip(self.joint_names, self.velocities))
 
     @property
     def acceleration_dict(self):
+        # type: () -> Dict[str, float]
         """A dictionary of joint accelerations by joint name."""
         self.check_joint_names()
         return dict(zip(self.joint_names, self.accelerations))
 
     @property
     def effort_dict(self):
+        # type: () -> Dict[str, float]
         """A dictionary of joint efforts by joint name."""
         self.check_joint_names()
         return dict(zip(self.joint_names, self.effort))
 
     def merged(self, other):
+        # type: (JointTrajectoryPoint) -> JointTrajectoryPoint
         """Get a new ``JointTrajectoryPoint`` with this ``JointTrajectoryPoint`` merged
         with another ``JointTrajectoryPoint``.  The other ``JointTrajectoryPoint``
         takes precedence over this ``JointTrajectoryPoint`` in case a joint value is present in both.
@@ -254,6 +277,7 @@ class Trajectory(Data):
     """
 
     def __init__(self, attributes=None):
+        # type: (Dict[str, Any]) -> None
         super(Trajectory, self).__init__()
         self.attributes = attributes or {}
         self.planning_time = -1
@@ -267,6 +291,7 @@ class Trajectory(Data):
 
     @classmethod
     def __from_data__(cls, data):
+        # type: (Dict[str, Any]) -> Trajectory
         trajectory = cls(attributes=data["attributes"])
         trajectory.planning_time = data["planning_time"]
         return trajectory
@@ -318,6 +343,7 @@ class JointTrajectory(Trajectory):
         attached_collision_meshes=None,
         attributes=None,
     ):
+        # type: (List[JointTrajectoryPoint], List[str], Configuration, float, List[AttachedCollisionMesh], Dict[str, Any]) -> None
         super(JointTrajectory, self).__init__(attributes=attributes)
         self.points = trajectory_points or []
         self.joint_names = joint_names or []
@@ -341,6 +367,7 @@ class JointTrajectory(Trajectory):
 
     @classmethod
     def __from_data__(cls, data):
+        # type: (Dict[str, Any]) -> JointTrajectory
         points = list(map(JointTrajectoryPoint.__from_data__, data.get("points") or []))
         joint_names = data.get("joint_names", [])
         start_configuration = data.get("start_configuration", None)
@@ -364,6 +391,7 @@ class JointTrajectory(Trajectory):
 
     @property
     def time_from_start(self):
+        # type: () -> float
         """:obj:`float` : Effectively, time from start for the last point in the trajectory."""
         if not self.points:
             return 0.0

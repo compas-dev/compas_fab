@@ -8,6 +8,15 @@ from compas.geometry import Vector
 from compas.geometry import cross_vectors
 
 if not compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import List  # noqa: F401
+        from compas.geometry import Transformation  # noqa: F401
+        from compas.geometry import Frame  # noqa: F401
+        from compas.geometry import Point  # noqa: F401
+
+if not compas.IPY:
     from scipy import stats
 else:
     stats = None
@@ -40,6 +49,7 @@ class Wrench(Data):
     """
 
     def __init__(self, force, torque):
+        # type: (Vector, Vector) -> None
         super(Wrench, self).__init__()
         self.force = force
         self.torque = torque
@@ -61,6 +71,7 @@ class Wrench(Data):
 
     @classmethod
     def from_list(cls, values):
+        # type: (List[float]) -> Wrench
         """Construct a wrench from a list of 6 :obj:`float` values.
 
         Parameters
@@ -83,6 +94,7 @@ class Wrench(Data):
 
     @classmethod
     def by_samples(cls, wrenches, proportion_to_cut=0.1):
+        # type: (List[Wrench], float) -> Wrench
         """
         Construct the wrench by sampled data, allowing to filter.
 
@@ -124,19 +136,23 @@ class Wrench(Data):
 
     @property
     def force(self):
+        # type: () -> Vector
         return self._force
 
     @force.setter
     def force(self, vector):
+        # type: (Vector) -> None
         force = Vector(*list(vector))
         self._force = force
 
     @property
     def torque(self):
+        # type: () -> Vector
         return self._torque
 
     @torque.setter
     def torque(self, vector):
+        # type: (Vector) -> None
         torque = Vector(*list(vector))
         self._torque = torque
 
@@ -163,6 +179,7 @@ class Wrench(Data):
     # ==========================================================================
 
     def copy(self):
+        # type: () -> Wrench
         """Make a copy of this ``Wrench``.
 
         Returns
@@ -255,6 +272,7 @@ class Wrench(Data):
     # ==========================================================================
 
     def transform(self, transformation):
+        # type: (Transformation) -> None
         """Transforms a `Wrench` with the transformation.
 
         Parameters
@@ -276,6 +294,7 @@ class Wrench(Data):
         self.torque.transform(transformation)
 
     def transformed(self, transformation):
+        # type: (Transformation) -> Wrench
         """Returns a transformed copy of the `Wrench`.
 
         Parameters
@@ -299,15 +318,16 @@ class Wrench(Data):
         return wrench
 
     def gravity_compensated(self, ft_sensor_frame, mass, center_of_mass):
+        # type: (Frame, float, Point) -> Wrench
         """Removes the force and torque in effect of gravity from the wrench.
 
         Parameters
         ----------
         ft_sensor_frame : :class:`compas.geometry.Frame`
             The coordinate frame of the force torque sensor.
-        mass: float
+        mass : float
             The mass of the object in kg.
-        center_of_mass : :class:`Point`
+        center_of_mass : :class:`compas.geometry.Point`
             The center of mass of the object in meters.
 
         Returns
