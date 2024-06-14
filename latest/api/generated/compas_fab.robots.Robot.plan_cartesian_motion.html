@@ -623,22 +623,22 @@ document.write(`
 <h1>Robot.plan_cartesian_motion</h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="compas_fab.robots.Robot.plan_cartesian_motion">
-<span class="sig-prename descclassname"><span class="pre">Robot.</span></span><span class="sig-name descname"><span class="pre">plan_cartesian_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frames_WCF</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_attached_tool_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/dee68dc/src/compas_fab/robots/robot.py#L1316"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">Robot.</span></span><span class="sig-name descname"><span class="pre">plan_cartesian_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waypoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/9195ee5/src/compas_fab/robots/robot.py#L1317"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Calculate a cartesian motion path (linear in tool space).</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>frames_WCF</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Frame.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Frame</span></code></a></span></dt><dd><p>The frames through which the path is defined.</p>
+<dt><strong>waypoints</strong><span class="classifier"><a class="reference internal" href="compas_fab.robots.Waypoints.html#compas_fab.robots.Waypoints" title="compas_fab.robots.Waypoints"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.robots.Waypoints</span></code></a></span></dt><dd><p>The waypoints for the robot to follow.
+For more information on how to define waypoints, see <a class="reference internal" href="../../examples/02_description_models/03_targets.html#waypoints"><span class="std std-ref">Waypoints (Multiple Points / Segments)</span></a>.
+In addition, note that not all planning backends support all waypoint types,
+check documentation of the backend in use for more details.</p>
 </dd>
 <dt><strong>start_configuration</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas_robots/latest/api/generated/compas_robots.Configuration.html" title="(in COMPAS Robots vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_robots.Configuration</span></code></a>, optional</span></dt><dd><p>The robot’s full configuration, i.e. values for all configurable
-joints of the entire robot, at the starting position. Defaults to
-the all-zero configuration.</p>
+joints of the entire robot, at the start of the motion.
+Defaults to the all-zero configuration.</p>
 </dd>
-<dt><strong>group</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>The planning group used for calculation. Defaults to the robot’s
-main planning group.</p>
-</dd>
-<dt><strong>use_attached_tool_frame</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a>, optional</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> and there is a tool attached to the planning group, it will use its TCF
-instead of the T0CF to calculate cartesian paths. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<dt><strong>group</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>The name of the planning group used for motion planning.
+Defaults to the robot’s main planning group.</p>
 </dd>
 <dt><strong>options</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></a>, optional</span></dt><dd><p>Dictionary containing the following key-value pairs:</p>
 <ul class="simple">
@@ -678,11 +678,12 @@ for more details.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>             
 <span class="go">#: This doctest can pass locally but persistently fails on CI in GitHub. &quot;roslibpy.core.RosTimeoutError: Failed to connect to ROS&quot;</span>
 <span class="go">...     robot = client.load_robot()</span>
-<span class="go">...     frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),                      Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0])]</span>
+<span class="go">...     target_frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),                      Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0])]</span>
+<span class="go">...     waypoints = FrameWaypoints(target_frames)</span>
 <span class="go">...     start_configuration = Configuration.from_revolute_values([-0.042, 0.033, -2.174, 5.282, -1.528, 0.000])</span>
 <span class="go">...     group = robot.main_group_name</span>
 <span class="go">...     options = {&#39;max_step&#39;: 0.01,                       &#39;jump_threshold&#39;: 1.57,                       &#39;avoid_collisions&#39;: True}</span>
-<span class="go">...     trajectory = robot.plan_cartesian_motion(frames,                                                     start_configuration,                                                     group=group,                                                     options=options)</span>
+<span class="go">...     trajectory = robot.plan_cartesian_motion(waypoints,                                                     start_configuration,                                                     group=group,                                                     options=options)</span>
 <span class="go">...     len(trajectory.points) &gt; 1</span>
 <span class="go">True</span>
 </pre></div>

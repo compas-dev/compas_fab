@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
     <link rel="icon" href="../../_static/compas.ico" type="image/x-icon">
-    <title>Targets &#8212; COMPAS FAB</title>
+    <title>Targets and Waypoints &#8212; COMPAS FAB</title>
   
   
   
@@ -597,7 +597,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../02_description_models.html" class="nav-link">Description Models</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Targets</li>
+    <li class="breadcrumb-item active" aria-current="page">Targets and Waypoints</li>
   </ul>
 </nav>
 </div>
@@ -614,13 +614,12 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="targets">
-<span id="id1"></span><h1>Targets</h1>
-<section id="single-targets-static">
-<h2>Single Targets (Static)</h2>
+  <section id="targets-and-waypoints">
+<span id="targets"></span><h1>Targets and Waypoints</h1>
+<section id="targets-single-goal">
+<h2>Targets (Single Goal)</h2>
 <p>Target classes are used to describe the goal condition (i.e. end condition) of a robot
-for motion planning. They can be used for both Free Motion Planning (FMP) and Cartesian
-Motion Planning (CMP).</p>
+for motion planning. They can be used for Free-space Motion Planning with <a class="reference internal" href="../../api/generated/compas_fab.robots.Robot.plan_motion.html" title="compas_fab.robots.Robot.plan_motion"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compas_fab.robots.Robot.plan_motion()</span></code></a>.</p>
 <p>The <a class="reference internal" href="../../api/generated/compas_fab.robots.FrameTarget.html" title="compas_fab.robots.FrameTarget"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.robots.FrameTarget</span></code></a> is the most common target for motion planning.
 It defines the complete pose of the end-effector (or the robot flange, if no tool is attached).
 A frame target is commonly created from a <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Frame.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Frame</span></code></a> object, or alternatively from a <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Transformation.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Transformation</span></code></a> object.</p>
@@ -645,6 +644,25 @@ constraints as a planning target. This is intended for advanced users who want t
 combination of constraints. See <a class="reference internal" href="../../api/generated/compas_fab.robots.Constraint.html" title="compas_fab.robots.Constraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.robots.Constraint</span></code></a> for available
 constraints. At the moment, only the ROS MoveIt planning backend supports this target type.</p>
 </section>
+<section id="waypoints-multiple-points-segments">
+<span id="waypoints"></span><h2>Waypoints (Multiple Points / Segments)</h2>
+<p>Waypoints classes are used to describe a sequence of
+waypoints that the robot should pass through in a planned motion. They are similar to Targets classes
+but contain a list of targets instead of a single target, which is useful for tasks such as
+drawing, welding or 3D printing.
+They can be used for Cartesian Motion Planning with <a class="reference internal" href="../../api/generated/compas_fab.robots.Robot.plan_cartesian_motion.html" title="compas_fab.robots.Robot.plan_cartesian_motion"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compas_fab.robots.Robot.plan_cartesian_motion()</span></code></a>.</p>
+<p>The <a class="reference internal" href="../../api/generated/compas_fab.robots.FrameWaypoints.html" title="compas_fab.robots.FrameWaypoints"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.robots.FrameWaypoints</span></code></a> is the most common waypoint for Cartesian motion planning.
+It defines a list of complete pose for the end-effector (or the robot flange, if no tool is attached).
+It is created by a list of <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Frame.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Frame</span></code></a> objects or alternatively from a list of
+<a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Transformation.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Transformation</span></code></a> objects.</p>
+<p>The <a class="reference internal" href="../../api/generated/compas_fab.robots.PointAxisWaypoints.html" title="compas_fab.robots.PointAxisWaypoints"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.robots.PointAxisWaypoints</span></code></a> class is used for specifying a list of waypoints based on
+the Point-Axis concept used in the <a class="reference internal" href="../../api/generated/compas_fab.robots.PointAxisTarget.html" title="compas_fab.robots.PointAxisTarget"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.robots.PointAxisTarget</span></code></a>. Compared to
+<a class="reference internal" href="../../api/generated/compas_fab.robots.FrameWaypoints.html" title="compas_fab.robots.FrameWaypoints"><code class="xref py py-class docutils literal notranslate"><span class="pre">FrameWaypoints</span></code></a>, this class allows for specifying targets where the rotation
+around the Z-axis is not fixed. This is useful for example when the robot is using a cylindrical tool
+to perform a task, for example 3D printing, welding or drilling. The freely rotating axis is defined relative
+to the Z-axis of the tool coordinate frame (TCF). Note that the orientation of the tool
+at the end of the motion is not determined until after the motion is planned.</p>
+</section>
 </section>
 
 
@@ -668,7 +686,8 @@ constraints. At the moment, only the ROS MoveIt planning backend supports this t
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#single-targets-static">Single Targets (Static)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#targets-single-goal">Targets (Single Goal)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#waypoints-multiple-points-segments">Waypoints (Multiple Points / Segments)</a></li>
 </ul>
   </nav></div>
 

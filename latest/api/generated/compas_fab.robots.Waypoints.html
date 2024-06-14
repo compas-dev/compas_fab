@@ -623,7 +623,7 @@ document.write(`
 <h1>Waypoints</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.robots.Waypoints">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">Waypoints</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/dee68dc/src/compas_fab/robots/targets.py#L482"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">Waypoints</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/9195ee5/src/compas_fab/robots/targets.py#L482"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.data.Data.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></p>
 <p>Represents a sequence of kinematic target for motion planning.</p>
 <p>Waypoints represent a sequence of targets the robot should pass through in the order they are defined.
@@ -632,8 +632,8 @@ The initial (starting) point should not be included in the waypoints list.
 It is valid for a Waypoints object to have one target.</p>
 <p>Waypoints are useful for tasks like painting, welding, or 3D printing, where the programmer
 wants to define the waypoints the robot should pass through.</p>
-<p>Waypoints are intended to be used for motion planning with a planning backend by using <code class="xref py py-meth docutils literal notranslate"><span class="pre">compas_fab.robot.plan_motion_with_waypoints()</span></code>.
-Different backends might support different types of waypoints.
+<p>Waypoints are intended to be used for motion planning with a planning backend by using <code class="xref py py-meth docutils literal notranslate"><span class="pre">compas_fab.robot.plan_cartesian_motion()</span></code>.
+Note that different backends support different types of waypoints.
 The method of interpolation between the waypoints is controlled by the motion planner backend.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -642,10 +642,12 @@ The method of interpolation between the waypoints is controlled by the motion pl
 <dt><a class="reference internal" href="compas_fab.robots.FrameWaypoints.html#compas_fab.robots.FrameWaypoints" title="compas_fab.robots.FrameWaypoints"><code class="xref py py-class docutils literal notranslate"><span class="pre">FrameWaypoints</span></code></a></dt><dd></dd>
 </dl>
 </div>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
+<dd class="field-odd"><dl>
 <dt><strong>name</strong><span class="classifier">str , optional, default = ‘target’</span></dt><dd><p>A human-readable name for identifying the target.</p>
+</dd>
+<dt><strong>tool_coordinate_frame</strong><span class="classifier"><a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Frame.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Frame</span></code></a> or <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.geometry.Transformation.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas.geometry.Transformation</span></code></a>, optional</span></dt><dd><p>The tool tip coordinate frame relative to the flange of the robot.</p>
 </dd>
 </dl>
 </dd>

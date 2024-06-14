@@ -632,25 +632,25 @@ configured and the <a class="reference internal" href="../../backends/ros.html#r
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Frame</span>
 
 <span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">RosClient</span>
+<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">FrameWaypoints</span>
 
 <span class="k">with</span> <span class="n">RosClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
     <span class="n">robot</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">load_robot</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="n">robot</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;ur5_robot&#39;</span>
+    <span class="k">assert</span> <span class="n">robot</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;ur5_robot&quot;</span>
 
     <span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Frame</span><span class="p">([</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
     <span class="n">frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Frame</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+    <span class="n">waypoints</span> <span class="o">=</span> <span class="n">FrameWaypoints</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
 
     <span class="n">start_configuration</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">zero_configuration</span><span class="p">()</span>
     <span class="n">start_configuration</span><span class="o">.</span><span class="n">joint_values</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.042</span><span class="p">,</span> <span class="mf">0.033</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.174</span><span class="p">,</span> <span class="mf">5.282</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.528</span><span class="p">,</span> <span class="mf">0.000</span><span class="p">)</span>
     <span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;max_step&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
-        <span class="s1">&#39;avoid_collisions&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;max_step&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="s2">&quot;avoid_collisions&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">}</span>
 
-    <span class="n">trajectory</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">plan_cartesian_motion</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span>
-                                             <span class="n">start_configuration</span><span class="p">,</span>
-                                             <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+    <span class="n">trajectory</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">plan_cartesian_motion</span><span class="p">(</span><span class="n">waypoints</span><span class="p">,</span> <span class="n">start_configuration</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Computed cartesian path with </span><span class="si">%d</span><span class="s2"> configurations, &quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">trajectory</span><span class="o">.</span><span class="n">points</span><span class="p">))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;following </span><span class="si">%d%%</span><span class="s2"> of requested trajectory.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">trajectory</span><span class="o">.</span><span class="n">fraction</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span>

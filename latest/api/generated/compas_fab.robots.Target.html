@@ -623,15 +623,15 @@ document.write(`
 <h1>Target</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.robots.Target">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">Target</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/dee68dc/src/compas_fab/robots/targets.py#L18"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.robots.</span></span><span class="sig-name descname"><span class="pre">Target</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/9195ee5/src/compas_fab/robots/targets.py#L18"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://compas.dev/compas/latest/api/generated/compas.data.Data.html" title="(in COMPAS vlatest)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></p>
 <p>Represents a kinematic target for motion planning.</p>
 <p>The current implementation supports only static target constraints such as
 pose, configuration, and joint constraints. Dynamic targets such as
 velocity, acceleration, and jerk are not yet supported.</p>
-<p>Targets are intended to be used as arguments for the Backend’s motion
-planning methods. Different backends might support different types of
-targets.</p>
+<p>Targets are intended to be used for motion planning with a planning backend
+by using <code class="xref py py-meth docutils literal notranslate"><span class="pre">compas_fab.robot.plan_motion()</span></code>.
+Note that different backends support different types of targets.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
