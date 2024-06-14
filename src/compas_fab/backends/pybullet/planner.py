@@ -4,7 +4,6 @@ from __future__ import print_function
 
 from compas_fab.backends.interfaces.client import PlannerInterface
 
-# from compas_fab.backends.interfaces.client import forward_docstring
 from compas_fab.backends.pybullet.backend_features.pybullet_add_attached_collision_mesh import (
     PyBulletAddAttachedCollisionMesh,
 )

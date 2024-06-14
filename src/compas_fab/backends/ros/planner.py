@@ -9,7 +9,6 @@ from __future__ import print_function
 
 from compas_fab.backends.interfaces.client import PlannerInterface
 
-# from compas_fab.backends.interfaces.client import forward_docstring
 from compas_fab.backends.ros.backend_features import MoveItResetPlanningScene
 from compas_fab.backends.ros.backend_features.move_it_add_attached_collision_mesh import MoveItAddAttachedCollisionMesh
 from compas_fab.backends.ros.backend_features.move_it_add_collision_mesh import MoveItAddCollisionMesh
