@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import itertools
 import os
+import sys
 import tempfile
 from itertools import combinations
 
@@ -37,6 +38,15 @@ if not compas.IPY:
 
     if TYPE_CHECKING:
         from typing import list
+        from typing import Tuple
+        from compas_robots import Configuration
+
+        # Load pybullet for type hinting
+        import pybullet
+
+# If Pybullet is not defined, load it from LazyLoader
+if "pybullet" not in sys.modules:
+    pybullet = LazyLoader("pybullet", globals(), "pybullet")
 
 __all__ = [
     "PyBulletClient",
