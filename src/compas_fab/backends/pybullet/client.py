@@ -827,7 +827,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
 
 class AnalyticalPyBulletClient(PyBulletClient):
-    """Combination of PyBullet as the client for COllision Detection and Analytical Inverse Kinematics."""
+    """Combination of PyBullet as the client for Collision Detection and Analytical Inverse Kinematics."""
 
     def __init__(self, connection_type="gui", verbose=False):
         PyBulletClient.__init__(self, connection_type=connection_type, verbose=verbose)
