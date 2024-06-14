@@ -25,9 +25,6 @@ __all__ = [
 class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
     """Callable to add a collision mesh and attach it to the robot."""
 
-    def __init__(self, client):
-        self.client = client
-
     def add_attached_collision_mesh(self, attached_collision_mesh, options=None):
         """Add a collision mesh and attach it to the robot.
 
@@ -63,7 +60,7 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         ``None``
         """
         robot = options["robot"]
-        self.client.ensure_cached_robot_geometry(robot)
+        self.client.ensure_cached_robot_model_geometry(robot)
 
         mass = options.get("mass", 1.0)
         concavity = options.get("concavity", False)
@@ -71,7 +68,7 @@ class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
         inertial_origin = options.get("inertial_origin", Frame.worldXY())
         collision_origin = options.get("collision_origin", Frame.worldXY())
 
-        cached_robot_model = self.client.get_cached_robot(robot)
+        cached_robot_model = self.client.get_cached_robot_model(robot)
 
         # add link
         mesh = attached_collision_mesh.collision_mesh.mesh

@@ -16,9 +16,6 @@ __all__ = [
 class PyBulletRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
     """Callable to remove an attached collision mesh from the robot."""
 
-    def __init__(self, client):
-        self.client = client
-
     def remove_attached_collision_mesh(self, id, options=None):
         """Remove an attached collision mesh from the robot.
 
@@ -37,9 +34,9 @@ class PyBulletRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
         ``None``
         """
         robot = options["robot"]
-        self.client.ensure_cached_robot_geometry(robot)
+        self.client.ensure_cached_robot_model_geometry(robot)
 
-        cached_robot_model = self.client.get_cached_robot(robot)
+        cached_robot_model = self.client.get_cached_robot_model(robot)
 
         # remove link and fixed joint
         cached_robot_model.remove_link(id)

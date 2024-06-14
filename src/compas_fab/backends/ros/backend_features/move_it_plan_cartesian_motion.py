@@ -37,9 +37,6 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         validate_response,
     )
 
-    def __init__(self, ros_client):
-        self.ros_client = ros_client
-
     def plan_cartesian_motion(self, robot, waypoints, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
 
@@ -137,7 +134,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
                 start_state.attached_collision_objects.append(aco)
 
         # Filter needs to happen after all objects have been added
-        start_state.filter_fields_for_distro(self.ros_client.ros_distro)
+        start_state.filter_fields_for_distro(self.client.ros_distro)
 
         path_constraints = convert_constraints_to_rosmsg(options.get("path_constraints"), header)
 
@@ -162,7 +159,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
             except Exception as e:
                 errback(e)
 
-        self.GET_CARTESIAN_PATH(self.ros_client, request, response_handler, errback)
+        self.GET_CARTESIAN_PATH(self.client, request, response_handler, errback)
 
     def plan_cartesian_motion_with_point_axis_waypoints_async(
         self, callback, errback, waypoints, start_configuration=None, group=None, options=None

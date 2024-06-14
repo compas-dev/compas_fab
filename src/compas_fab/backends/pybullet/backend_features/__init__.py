@@ -1,4 +1,25 @@
+"""
+PyBullet backend features
+=========================
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    PyBulletAddAttachedCollisionMesh
+    PyBulletAddCollisionMesh
+    PyBulletAppendCollisionMesh
+    PyBulletForwardKinematics
+    PyBulletInverseKinematics
+    PyBulletRemoveAttachedCollisionMesh
+    PyBulletRemoveCollisionMesh
+
+
+
+"""
+
 from __future__ import absolute_import
+
 
 from compas_fab.backends.pybullet.backend_features.pybullet_add_attached_collision_mesh import (
     PyBulletAddAttachedCollisionMesh,
@@ -17,8 +38,8 @@ __all__ = [
     "PyBulletAddAttachedCollisionMesh",
     "PyBulletAddCollisionMesh",
     "PyBulletAppendCollisionMesh",
-    "PyBulletRemoveCollisionMesh",
-    "PyBulletRemoveAttachedCollisionMesh",
     "PyBulletForwardKinematics",
     "PyBulletInverseKinematics",
+    "PyBulletRemoveAttachedCollisionMesh",
+    "PyBulletRemoveCollisionMesh",
 ]

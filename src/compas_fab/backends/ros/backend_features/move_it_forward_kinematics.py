@@ -26,9 +26,6 @@ class MoveItForwardKinematics(ForwardKinematics):
         "/compute_fk", "GetPositionFK", GetPositionFKRequest, GetPositionFKResponse, validate_response
     )
 
-    def __init__(self, ros_client):
-        self.ros_client = ros_client
-
     def forward_kinematics(self, robot, configuration, group=None, options=None):
         """Calculate the robot's forward kinematic.
 
@@ -83,9 +80,9 @@ class MoveItForwardKinematics(ForwardKinematics):
         header = Header(frame_id=base_link)
         joint_state = JointState(name=configuration.joint_names, position=configuration.joint_values, header=header)
         robot_state = RobotState(joint_state, MultiDOFJointState(header=header))
-        robot_state.filter_fields_for_distro(self.ros_client.ros_distro)
+        robot_state.filter_fields_for_distro(self.client.ros_distro)
 
         def convert_to_frame(response):
             callback(response.pose_stamped[0].pose.frame)
 
-        self.GET_POSITION_FK(self.ros_client, (header, fk_link_names, robot_state), convert_to_frame, errback)
+        self.GET_POSITION_FK(self.client, (header, fk_link_names, robot_state), convert_to_frame, errback)
