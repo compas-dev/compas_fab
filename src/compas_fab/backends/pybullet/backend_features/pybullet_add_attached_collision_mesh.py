@@ -25,9 +25,6 @@ __all__ = [
 class PyBulletAddAttachedCollisionMesh(AddAttachedCollisionMesh):
     """Callable to add a collision mesh and attach it to the robot."""
 
-    def __init__(self, client):
-        self.client = client
-
     def add_attached_collision_mesh(self, attached_collision_mesh, options=None):
         """Add a collision mesh and attach it to the robot.
 

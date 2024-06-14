@@ -8,9 +8,6 @@ from compas_fab.backends.interfaces import ForwardKinematics
 class PyBulletForwardKinematics(ForwardKinematics):
     """Callable to calculate the robot's forward kinematic."""
 
-    def __init__(self, client):
-        self.client = client
-
     def forward_kinematics(self, robot, configuration, group=None, options=None):
         """Calculate the robot's forward kinematic.
 

@@ -17,9 +17,6 @@ __all__ = [
 class PyBulletRemoveCollisionMesh(RemoveCollisionMesh):
     """Callable to remove a collision mesh from the planning scene."""
 
-    def __init__(self, client):
-        self.client = client
-
     def remove_collision_mesh(self, id, options=None):
         """Remove a collision mesh from the planning scene.
 

@@ -23,9 +23,6 @@ __all__ = [
 class PyBulletInverseKinematics(InverseKinematics):
     """Callable to calculate the robot's inverse kinematics for a given frame."""
 
-    def __init__(self, client):
-        self.client = client
-
     def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculate the robot's inverse kinematic for a given frame.
 
