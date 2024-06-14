@@ -34,9 +34,9 @@ class PyBulletRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
         ``None``
         """
         robot = options["robot"]
-        self.client.ensure_cached_robot_geometry(robot)
+        self.client.ensure_cached_robot_model_geometry(robot)
 
-        cached_robot_model = self.client.get_cached_robot(robot)
+        cached_robot_model = self.client.get_cached_robot_model(robot)
 
         # remove link and fixed joint
         cached_robot_model.remove_link(id)
