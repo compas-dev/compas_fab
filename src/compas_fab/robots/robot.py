@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import random
 import compas
+import compas_fab
 
 from compas.data import Data
 from compas.geometry import Frame
@@ -12,6 +13,7 @@ from compas.tolerance import TOL
 from compas_robots import Configuration
 from compas_robots import RobotModel
 from compas_robots.model import Joint
+from compas_robots.resources import LocalPackageMeshLoader
 
 from compas_fab.robots.constraints import Constraint
 
@@ -133,6 +135,49 @@ class Robot(Data):
         robot._scale_factor = _scale_factor
         robot._attached_tools = _attached_tools
         robot.attributes = attributes
+        return robot
+
+    @classmethod
+    def from_urdf(cls, urdf_filename, srdf_filename=None, local_package_mesh_folder=None, client=None):
+        # type: (str, Optional[str], Optional[str], Optional[ClientInterface]) -> Robot
+        """Create a robot from URDF.
+        Optionally, SRDF can be provided to load semantics and a local package mesh folder to load mesh geometry.
+
+        Parameters
+        ----------
+        urdf_filename : :obj:`str`
+            Path to the URDF file.
+        srdf_filename : :obj:`str`, optional
+            Path to the SRDF file to load semantics. Default is `None`.
+        local_package_mesh_folder : :obj:`str`, optional
+            Path to the local package mesh folder.
+            If the path is provided, the geometry of the robot is loaded from this folder.
+            Default is `None`, which means that the geometry is not loaded.
+        client : :class:`compas_fab.backends.interfaces.ClientInterface`, optional
+            Backend client provided for the . Default is `None`.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Robot`
+            Newly created instance of the robot.
+
+        """
+        # NOTE: This import is here to avoid circular imports
+        from compas_fab.robots import RobotSemantics
+
+        model = RobotModel.from_urdf_file(urdf_filename)
+
+        if srdf_filename:
+            semantics = RobotSemantics.from_srdf_file(srdf_filename, model)
+        else:
+            semantics = None
+
+        if local_package_mesh_folder:
+            loader = LocalPackageMeshLoader(compas_fab.get(local_package_mesh_folder), "")
+            model.load_geometry(loader)
+
+        robot = cls(model, semantics=semantics, client=client)
+
         return robot
 
     @property
