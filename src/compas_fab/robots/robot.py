@@ -7,6 +7,7 @@ import random
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Transformation
+from compas.tolerance import TOL
 from compas_robots import Configuration
 from compas_robots import RobotModel
 from compas_robots.model import Joint
@@ -1321,8 +1322,9 @@ class Robot(Data):
         ----------
         waypoints : :class:`compas_fab.robots.Waypoints`
             The waypoints for the robot to follow.
-            If a tool is attached to the robot, the :meth:`~compas_fab.robots.Waypoints.tool_coordinate_frame` parameter
-            should be set.
+            For more information on how to define waypoints, see :ref:`waypoints`.
+            In addition, note that not all planning backends support all waypoint types,
+            check documentation of the backend in use for more details.
         start_configuration : :class:`compas_robots.Configuration`, optional
             The robot's full configuration, i.e. values for all configurable
             joints of the entire robot, at the start of the motion.
@@ -1388,7 +1390,7 @@ class Robot(Data):
         # =======
         # Scaling
         # =======
-        need_scaling = self.scale_factor != 1.0
+        need_scaling = not TOL.is_close(self.scale_factor, 1.0, rtol=1e-8)
 
         if need_scaling:
             waypoints = waypoints.scaled(1.0 / self.scale_factor)
@@ -1414,9 +1416,7 @@ class Robot(Data):
                 else:
                     cp.scale(1.0 / self.scale_factor)
                 path_constraints_WCF_scaled.append(cp)
-        else:
-            path_constraints_WCF_scaled = None
-        options["path_constraints"] = path_constraints_WCF_scaled
+            options["path_constraints"] = path_constraints_WCF_scaled
 
         # =====================
         # Attached CM and Tools
