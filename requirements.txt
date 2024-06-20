@@ -1,3 +1,4 @@
+numpy >= 1.15.4, < 2
 compas >= 2.0.4, < 3
 compas_robots >= 0.3, < 1
 roslibpy >= 1.1.0
