@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed the behavior of Duration class when accepting both seconds (float) and nanoseconds (int) where the decimal point of seconds and the nanoseconds add up to more than 1 second.
 * Changed GH Component `ConstraintsFromPlane` to `FrameTargetFromPlane`.
 * Changed GH Component `ConstraintsFromTargetConfiguration` to `ConfigurationTarget`.
-* Changed `RosClient` constructor to take a type for planner backend instead of a string. This also changes the name of the argument from `planner_backend` to `planner_backend_type`.
+* Changed `RosClient` constructor to take a type for planner backend instead of a string. This also changes the name of the argument from `planner_backend` to `planner_type`.
 
 ### Removed
 
