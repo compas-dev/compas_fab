@@ -28,6 +28,7 @@ from compas_fab.backends.ros.planner import MoveItPlanner
 from compas_fab.backends.tasks import CancellableFutureResult
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotSemantics
+from compas_fab.robots import RobotCell
 
 __all__ = [
     "RosClient",
@@ -135,8 +136,8 @@ class RosClient(Ros, ClientInterface):
     def __init__(self, host="localhost", port=9090, is_secure=False, planner_backend="moveit"):
         super(RosClient, self).__init__(host, port, is_secure)
 
-        planner_backend_type = PLANNER_BACKENDS[planner_backend]
-        self.planner = planner_backend_type(self)
+        # planner_backend_type = PLANNER_BACKENDS[planner_backend]
+        # self.planner = planner_backend_type(self)
         self._ros_distro = None
 
     def __enter__(self):
@@ -210,7 +211,9 @@ class RosClient(Ros, ClientInterface):
         if load_geometry:
             model.load_geometry(loader, precision=precision)
 
-        return Robot(model, semantics=semantics, client=self)
+        self._robot = Robot(model, semantics=semantics, client=self)
+        self._robot_cell = RobotCell(self.robot.model)
+        return self._robot
 
     # ==========================================================================
     # executing

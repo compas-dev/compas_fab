@@ -16,6 +16,7 @@ from compas_robots.model import Joint
 from compas_robots.resources import LocalPackageMeshLoader
 
 from compas_fab.robots.constraints import Constraint
+from compas_fab.utilities import from_t0cf_to_tcf
 
 if not compas.IPY:
     from typing import TYPE_CHECKING
@@ -106,7 +107,6 @@ class Robot(Data):
         self.model = model
         self.scene_object = scene_object
         self.semantics = semantics
-        self.client = client
         self.attributes = {}
 
     @property
@@ -1121,18 +1121,6 @@ class Robot(Data):
     # checks
     # ==========================================================================
 
-    def ensure_client(self):
-        # type: () -> None
-        """Check if the client is set.
-
-        Raises
-        ------
-        :exc:`Exception`
-            If :attr:`client` is not set
-        """
-        if not self.client:
-            raise Exception("This method is only callable once a client is assigned.")
-
     def ensure_semantics(self):
         # type: () -> None
         """Check if semantics is set.
@@ -1302,7 +1290,6 @@ class Robot(Data):
         options = options or {}
         attached_collision_meshes = options.get("attached_collision_meshes") or []
 
-        self.ensure_client()
         group = group or self.main_group_name if self.semantics else None
 
         start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
@@ -1344,7 +1331,7 @@ class Robot(Data):
 
         return configuration.scaled(self.scale_factor)
 
-    def forward_kinematics(self, configuration, group=None, use_attached_tool_frame=True, options=None):
+    def forward_kinematics(self, configuration, group=None, tool_coordinate_frame=None, options=None):
         # type: (Configuration, Optional[str], Optional[bool], Optional[Dict[str, Any]]) -> Frame
         """Calculate the robot's forward kinematic.
 
@@ -1357,17 +1344,14 @@ class Robot(Data):
         group: obj:`str`, optional
             The planning group used for the calculation. Defaults to the robot's
             main planning group.
-        use_attached_tool_frame : :obj:`bool`, optional
-            If ``True`` and there is a tool attached to the planning group, FK will return
-            the TCF of the attached tool instead of the T0CF. Defaults to ``True``.
+        tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
+            The tool tip coordinate frame relative to the flange of the robot.
+            Units must be in meters.
+            If set, forward kinematics will return the TCF of the attached tool
+            instead of the T0CF. Defaults to ``None``.
         options: obj:`dict`, optional
             Dictionary containing the following key-value pairs:
 
-            - ``"solver"``: (:obj:`str`, optional) If ``None`` calculates FK
-              with the client if it exists or with the robot model.
-              If ``'model'`` use the robot model to calculate FK.
-              Other values depend on specific backend implementation, some backends might
-              allow selecting different FK solvers dynamically.
             - ``"link"``: (:obj:`str`, optional) The name of the link to
               calculate the forward kinematics for. Defaults to the group's end
               effector link.
@@ -1402,37 +1386,26 @@ class Robot(Data):
         True
         """
         options = options or {}
-        solver = options.get("solver")
 
         group = group or self.main_group_name if self.semantics else None
 
         full_configuration = self.merge_group_with_full_configuration(configuration, self.zero_configuration(), group)
         full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)
 
-        # If there's no client, we default to `model` solver if there is no other assigned.
-        if not self.client:
-            solver = solver or "model"
+        # Calling forward_kinematics from Robot class will use the RobotModel's function to calculate FK
 
-        # Solve with the model
-        if solver == "model":
-            link = options.get("link", options.get("tool0"))
-            link = link or self.get_end_effector_link_name(group)
-            if link not in self.get_link_names(group):
-                raise ValueError("Link name {} does not exist in planning group".format(link))
+        link = options.get("link", options.get("tool0"))
+        link = link or self.get_end_effector_link_name(group)
+        if link not in self.get_link_names(group):
+            raise ValueError("Link name {} does not exist in planning group".format(link))
 
-            frame_WCF = self.model.forward_kinematics(full_configuration, link)
+        frame_WCF = self.model.forward_kinematics(full_configuration, link)
 
-        # Otherwise, pass everything down to the client
-        else:
-            self.ensure_client()
-            frame_WCF = self.client.forward_kinematics(self, full_configuration_scaled, group, options)
+        if tool_coordinate_frame:
+            frame_WCF = from_t0cf_to_tcf(frame_WCF, tool_coordinate_frame)
 
         # Scale and return
         frame_WCF.point *= self.scale_factor
-
-        attached_tool = self.attached_tools.get(group)
-        if use_attached_tool_frame and attached_tool:
-            frame_WCF = self.from_t0cf_to_tcf([frame_WCF], group)[0]
 
         return frame_WCF
 
@@ -1505,7 +1478,6 @@ class Robot(Data):
 
         options = options or {}
 
-        self.ensure_client()
         if not group:
             group = self.main_group_name  # ensure semantics
 
@@ -1659,7 +1631,6 @@ class Robot(Data):
 
         # TODO: add workspace_parameters
 
-        self.ensure_client()
         if not group:
             group = self.main_group_name
 
@@ -1831,6 +1802,12 @@ class Robot(Data):
             return self.scene_object.scale_factor
         else:
             return self._scale_factor
+
+    @property
+    def need_scaling(self):
+        # type: () -> bool
+        """Check if the robot's geometry needs scaling."""
+        return not TOL.is_close(self.scale_factor, 1.0, rtol=1e-8)
 
     def info(self):
         # type: () -> None

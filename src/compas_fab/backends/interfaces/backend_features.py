@@ -10,10 +10,15 @@ if not compas.IPY:
     if TYPE_CHECKING:
         from typing import Optional  # noqa: F401
         from typing import Dict  # noqa: F401
+        from typing import List  # noqa: F401
+        from typing import Tuple  # noqa: F401
+
         from compas_fab.robots import Robot  # noqa: F401
         from compas_robots import Configuration  # noqa: F401
         from compas.geometry import Frame  # noqa: F401
         from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
+        from compas_fab.robots import FrameTarget  # noqa: F401
 
 
 class BackendFeature(object):
@@ -26,9 +31,11 @@ class BackendFeature(object):
 
     """
 
-    def __init__(self, client):
+    def __init__(self, client=None):
         # All backend features are assumed to be associated with a backend client.
-        self.client = client  # type: ClientInterface
+        if client:
+            self.client = client  # type: ClientInterface
+        super(BackendFeature, self).__init__()
 
 
 #   The code that contains the actual feature implementation is located in the backend's module.
@@ -73,23 +80,111 @@ class ForwardKinematics(BackendFeature):
 class InverseKinematics(BackendFeature):
     """Mix-in interface for implementing a planner's inverse kinematics feature."""
 
-    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
+    def __init__(self):
+        # The following fields are used to store the last ik request for iterative calls
+        self._last_ik_request = {"request_hash": None, "solutions": None}
+
+        # Initialize the super class
+        print("InverseKinematics init")
+        super(InverseKinematics, self).__init__()
+
+    def inverse_kinematics(self, target, start_state=None, group=None, options=None):
+        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Tuple[List[float], List[str]]
         """Calculate the robot's inverse kinematic for a given frame.
 
-        Note that unlike other backend features, `inverse_kinematics` produces a generator.
+        The default implementation is based on the iter_inverse_kinematics method.
+        Calling this method will return the first solution found by the iterator,
+        subsequent calls will return the next solution from the iterator. Once
+        all solutions have been exhausted, the iterator will be re-initialized.
+
+        The starting state describes the robot cell's state at the moment of the calculation.
+        The robot's configuration is taken as the starting configuration.
+        If a tool is attached to the planning group, the tool's coordinate frame is used.
+
+        If the backend supports collision checking,
 
         Parameters
         ----------
         robot : :class:`compas_fab.robots.Robot`
             The robot instance for which inverse kinematics is being calculated.
-        frame_WCF : :class:`compas.geometry.Frame`
-            The frame to calculate the inverse for.
-        start_configuration : :class:`compas_robots.Configuration`, optional
+        target : :class:`compas_fab.robots.FrameTarget`
+            The frame target to calculate the inverse kinematics for.
+        start_state : :class:`compas_fab.robots.RobotCellState`, optional
+            The starting state to calculate the inverse kinematics for.
+            The robot's configuration in the scene is taken as the starting configuration.
         group : str, optional
             The planning group used for calculation.
         options : dict, optional
             Dictionary containing kwargs for arguments specific to
             the client being queried.
+            - ``"return_full_configuration"``: (:obj:`bool`) If ``True``, the full configuration
+                will be returned. Defaults to ``False``.
+            - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
+                Defaults to ``100``.
+
+        Raises
+        ------
+        :class: `compas_fab.backends.exceptions.InverseKinematicsError`
+            If no configuration can be found.
+
+        Returns
+        -------
+        :obj:`tuple` of :obj:`list`
+            A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
+        """
+        # This is the default implementation for the inverse kinematics feature to be based on the
+        # iter_inverse_kinematics method. If the planner does not support this feature, it should
+        # override this method and raise a BackendFeatureNotSupportedError.
+
+        # The planner-specific implementation code is located in the backend's module:
+        # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_inverse_kinematics"
+
+        # Pseudo-memoized sequential calls will re-use iterator if not exhausted
+        request_hash = (target.sha256(), start_state.sha256(), str(group), str(options))
+
+        if self._last_ik_request["request_hash"] == request_hash and self._last_ik_request["solutions"] is not None:
+            solution = next(self._last_ik_request["solutions"], None)
+            if solution is not None:
+                return solution
+
+        solutions = self.iter_inverse_kinematics(target, start_state, group, options)
+        self._last_ik_request["request_hash"] = request_hash
+        self._last_ik_request["solutions"] = solutions
+
+        return next(solutions)
+
+    def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
+        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Tuple[List[float], List[str]]
+        """Calculate the robot's inverse kinematic for a given frame.
+
+        This function returns a generator that yields possible solutions for the
+        inverse kinematics problem. The generator will be exhausted after all
+        possible solutions have been returned or when the maximum number of
+        results has been reached.
+
+        Parameters
+        ----------
+        frame_WCF: :class:`compas.geometry.Frame`
+            The frame to calculate the inverse for.
+        start_configuration: :class:`compas_fab.robots.Configuration`, optional
+            If passed, the inverse will be calculated such that the calculated
+            joint positions differ the least from the start_configuration.
+            Defaults to the zero configuration.
+        group: str, optional
+            The planning group used for calculation. Defaults to the robot's
+            main planning group.
+        options: dict, optional
+            Dictionary containing planner-specific arguments.
+            See the planner's documentation for supported options.
+            One of the supported options related to the iterator is:
+
+            - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
+              Defaults to ``100``.
+
+        Raises
+        ------
+        compas_fab.backends.exceptions.InverseKinematicsError
+            If no configuration can be found.
 
         Yields
         ------
@@ -97,9 +192,6 @@ class InverseKinematics(BackendFeature):
             A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
         """
         pass
-
-        # The implementation code is located in the backend's module:
-        # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_inverse_kinematics"
 
 
 class PlanMotion(BackendFeature):

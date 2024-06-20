@@ -21,6 +21,7 @@ from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotLibrary
 from compas_fab.robots import RobotSemantics
+from compas_fab.robots import RobotCell
 from compas_fab.utilities import LazyLoader
 
 from . import const
@@ -351,6 +352,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.disabled_collisions = robot.semantics.disabled_collisions
 
     def _load_robot_to_pybullet(self, urdf_file, robot):
+        """Load a robot to PyBullet via a temp URDF file."""
         cached_robot_model = self.get_cached_robot_model(robot)
         with redirect_stdout(enabled=not self.verbose):
             pybullet_uid = pybullet.loadURDF(
@@ -363,6 +365,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         self._add_ids_to_robot_joints(cached_robot_model)
         self._add_ids_to_robot_links(cached_robot_model)
+
+        self._robot = robot
+        self._robot_cell = RobotCell(robot.model)
 
     def reload_from_cache(self, robot):
         """Reloads the PyBullet server with the robot's cached model.

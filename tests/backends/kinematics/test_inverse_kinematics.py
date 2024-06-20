@@ -51,7 +51,7 @@ def test_kinematics_client():
         robot = client.load_robot(urdf_filename)
         client.load_semantics(robot, srdf_filename)
         solutions = list(
-            robot.iter_inverse_kinematics(
+            client.iter_inverse_kinematics(
                 frame_WCF, options={"solver": "ur5", "check_collision": True, "keep_order": False}
             )
         )

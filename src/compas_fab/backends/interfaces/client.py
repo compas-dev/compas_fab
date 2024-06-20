@@ -1,113 +1,78 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+
+import compas
+
 from compas_fab.backends.exceptions import BackendFeatureNotSupportedError
 
+if compas.IPY:
+    from typing import TYPE_CHECKING
 
-def forward_docstring(backend_feature):
-    def dec(obj):
-        obj.__doc__ = backend_feature.__dict__[obj.__name__].__doc__
-        return obj
-
-    return dec
+    if TYPE_CHECKING:
+        from compas_fab.robots import Robot
+        from compas_fab.robots import RobotCell
 
 
 class ClientInterface(object):
     """Interface for all backend clients.  Forwards all planning services and
     planning scene management to the planner.
+
+    Attributes
+    ----------
+    robot : :class:`compas_fab.robots.Robot`, read-only
+        The robot instance associated with the client.
+        Typically this is set by the backend client after it is initialized, using
+        `client.load_robot()`. It cannot be changed after it is set.
+        Consult the chosen backend client for how to set this attribute.
     """
 
     def __init__(self):
-        self.planner = PlannerInterface(self)
-        # self.control = ControlInterface()
+        self._robot = None  # type: Robot
+        self._robot_cell = None  # type: RobotCell
+        print("ClientInterface init")
 
-    # ==========================================================================
-    # planning services
-    # ==========================================================================
+    @property
+    def robot(self):
+        # type: () -> Robot
+        return self._robot
 
-    def inverse_kinematics(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.inverse_kinematics(*args, **kwargs)
-
-    def forward_kinematics(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.forward_kinematics(*args, **kwargs)
-
-    def plan_cartesian_motion(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.plan_cartesian_motion(*args, **kwargs)
-
-    def plan_motion(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.plan_motion(*args, **kwargs)
-
-    # ==========================================================================
-    # collision objects and planning scene
-    # ==========================================================================
-
-    def get_planning_scene(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.get_planning_scene(*args, **kwargs)
-
-    def reset_planning_scene(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.reset_planning_scene(*args, **kwargs)
-
-    def add_collision_mesh(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.add_collision_mesh(*args, **kwargs)
-
-    def remove_collision_mesh(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.remove_collision_mesh(*args, **kwargs)
-
-    def append_collision_mesh(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.append_collision_mesh(*args, **kwargs)
-
-    def add_attached_collision_mesh(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.add_attached_collision_mesh(*args, **kwargs)
-
-    def remove_attached_collision_mesh(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.remove_attached_collision_mesh(*args, **kwargs)
-
-
-#     # ==========================================================================
-#     # executing
-#     # ==========================================================================
-#
-#     def execute_joint_trajectory(self, *args, **kwargs):
-#         self.control.execute_joint_trajectory(*args, **kwargs)
-#
-#     def follow_joint_trajectory(self, *args, **kwargs):
-#         self.control.follow_joint_trajectory(*args, **kwargs)
-#
-#     def get_configuration(self, *args, **kwargs):
-#         self.control.get_configuration(*args, **kwargs)
-#
-#
-# class ControlInterface(object):
-#     def execute_joint_trajectory(self, *args, **kwargs):
-#         raise NotImplementedError('Assigned control does not have this feature.')
-#
-#     def follow_joint_trajectory(self, *args, **kwargs):
-#         raise NotImplementedError('Assigned control does not have this feature.')
-#
-#     def get_configuration(self, *args, **kwargs):
-#         raise NotImplementedError('Assigned control does not have this feature.')
+    @property
+    def robot_cell(self):
+        # type: () -> RobotCell
+        return self._robot_cell
 
 
 class PlannerInterface(object):
-    """Interface for all planners associated with a backend client.  Provides default
-    behavior for all planning services and planning scene management methods.  To be
-    use in conjunction with backend feature interfaces.
+    """Interface for all backend planners.
+    Planner is connected to a ClientInterface when initiated, and can access
+    the client's robot instance.
+    It is responsible for all planning services for the robot.
+
+    Parameters
+    ----------
+    client : :class:`compas_fab.backends.interfaces.ClientInterface`, optional
+        The client instance associated with the planner.
+        Typically this is set by the backend client during initialization,
+        using `planner = PlannerInterface(client)`.
+        Consult the chosen backend client for how to set this attribute.
+
+    Attributes
+    ----------
+    client : :class:`compas_fab.backends.interfaces.ClientInterface`, read-only
+        The client instance associated with the planner.
+        It cannot be changed after initialization.
     """
 
-    def __init__(self, client):
-        # super(PlannerInterface, self).__init__()
-        self.client = client
+    def __init__(self, client=None):
+        if client:
+            self._client = client
+
+        super(PlannerInterface, self).__init__()
+
+    @property
+    def client(self):
+        return self._client
 
     # ==========================================================================
     # planning services

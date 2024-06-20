@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Calling `forward_kinematics` from the Robot class now uses only the RobotModel to calculate the forward kinematics.
 * Fixed error in `PyBulletForwardKinematics.forward_kinematics` where function would crash if `options` was not passed.
 * Fixed error in `PyBulletInverseKinematics._accurate_inverse_kinematics` where threshold was not squared for comparison.
 * Renamed `PybulletClient.get_cached_robot` to `PybulletClient.get_cached_robot_model` to avoid confusion between the `RobotModel` and `Robot` class.
@@ -39,6 +40,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+* Removed `inverse_kinematics`, `forward_kinematics`, `plan_cartesian_motion`, and `plan_motion` methods from ClientInterface, access them using the planner instead.
+* Removed `inverse_kinematics`, `plan_cartesian_motion`, and `plan_motion` methods from Robot, access them using the planner instead.
+* Removed `Robot.ensure_client` method. Client and planner now exist independently.
+* Removed `Robot.client` attribute. Access the planner functions directly using the planner instead.
 * Removed `plan_cartesian_motion_deprecated` and `plan_motion_deprecated` methods from `Robot` class
 * Removed `forward_kinematics_deprecated` and `inverse_kinematics_deprecated` method from `Robot` class
 

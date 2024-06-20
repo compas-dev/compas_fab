@@ -34,4 +34,7 @@ class PyBulletPlanner(
     """Implement the planner backend interface for PyBullet."""
 
     def __init__(self, client):
-        self.client = client
+        self._client = client
+
+        # Initialize all mixins
+        super(PyBulletPlanner, self).__init__()

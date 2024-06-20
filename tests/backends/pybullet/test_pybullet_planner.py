@@ -10,6 +10,8 @@ from compas.geometry import Frame
 
 from compas.tolerance import Tolerance
 from compas_fab.robots import RobotLibrary
+from compas_fab.robots import FrameTarget
+from compas_fab.robots import RobotCellState
 
 # The tolerance for the tests are set to 1e-4 meters, equivalent to 0.1 mm
 # Relative tolerance is set to 1e-3 (0.1%)
@@ -123,12 +125,11 @@ def _test_pybullet_ik_fk_agreement(robot, ik_target_frames):
         for ik_target_frame in ik_target_frames:
             # IK Query to the planner (Frame to Configuration)
             try:
-                # Note: The inverse_kinematics method returns a generator
+
                 joint_positions, joint_names = next(
-                    planner.inverse_kinematics(
-                        robot,
-                        ik_target_frame,
-                        start_configuration=robot.zero_configuration(),
+                    planner.iter_inverse_kinematics(
+                        FrameTarget(ik_target_frame),
+                        RobotCellState.from_robot_configuration(robot),
                         group=planning_group,
                         options=ik_options,
                     )
@@ -246,9 +247,8 @@ def test_pybullet_ik_out_of_reach_ur5():
                 # Note: The inverse_kinematics method returns a generator
                 joint_positions, joint_names = next(
                     planner.inverse_kinematics(
-                        robot,
-                        ik_target_frame,
-                        start_configuration=robot.zero_configuration(),
+                        FrameTarget(ik_target_frame),
+                        RobotCellState.from_robot_configuration(robot),
                         group=planning_group,
                         options=ik_options,
                     )

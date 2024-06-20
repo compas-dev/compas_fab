@@ -123,6 +123,14 @@ from .reachability_map import (
 from .robot import (
     Robot,
 )
+
+from .robot_cell import (
+    RobotCell,
+    RobotCellState,
+    RigidBody,
+    RigidBodyState,
+    RobotCellState,
+)
 from .robot_library import (
     RobotLibrary,
 )
@@ -189,4 +197,10 @@ __all__ = [
     "Wrench",
     "to_degrees",
     "to_radians",
+    # New
+    "RobotCell",
+    "RobotCellState",
+    "RigidBody",
+    "RigidBodyState",
+    "RobotCellState",
 ]

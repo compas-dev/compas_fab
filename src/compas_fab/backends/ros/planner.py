@@ -45,4 +45,7 @@ class MoveItPlanner(
     """Implement the planner backend interface based on MoveIt!"""
 
     def __init__(self, client):
-        self.client = client
+        self._client = client
+
+        # Initialize all mixins
+        super(MoveItPlanner, self).__init__()

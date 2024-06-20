@@ -84,6 +84,7 @@ from .numbers import (
 )
 from .transformation import (
     from_tcf_to_t0cf,
+    from_t0cf_to_tcf,
 )
 
 __all__ = [
@@ -110,4 +111,5 @@ __all__ = [
     "sign",
     # transformation
     "from_tcf_to_t0cf",
+    "from_t0cf_to_tcf",
 ]

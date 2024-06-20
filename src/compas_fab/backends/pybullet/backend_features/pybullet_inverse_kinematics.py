@@ -2,6 +2,24 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import compas
+
+if not compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from compas_robots import Configuration  # noqa: F401
+        from compas.geometry import Frame  # noqa: F401
+        from typing import Optional  # noqa: F401
+        from typing import Iterator  # noqa: F401
+        from typing import List  # noqa: F401
+        from typing import Tuple  # noqa: F401
+        from typing import Dict  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
+        from compas_fab.robots import FrameTarget  # noqa: F401
+        from compas_fab.robots import AttachedCollisionMesh  # noqa: F401
+
+
 import math
 import random
 
@@ -11,6 +29,7 @@ from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.pybullet.conversions import pose_from_frame
 from compas_fab.utilities import LazyLoader
+from compas_fab.utilities import from_tcf_to_t0cf
 
 pybullet = LazyLoader("pybullet", globals(), "pybullet")
 
@@ -23,19 +42,16 @@ __all__ = [
 class PyBulletInverseKinematics(InverseKinematics):
     """Callable to calculate the robot's inverse kinematics for a given frame."""
 
-    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
+    def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
+        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Iterator[Tuple[List[float], List[str]]]
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which inverse kinematics is being calculated.
-        frame_WCF: :class:`compas.geometry.Frame`
-            The frame to calculate the inverse for.
-        start_configuration: :class:`compas_fab.robots.Configuration`, optional
-            If passed, the inverse will be calculated such that the calculated
-            joint positions differ the least from the start_configuration.
-            Defaults to the zero configuration.
+        target: :class:`compas.geometry.FrameTarget`
+            The Frame Target to calculate the inverse for.
+        start_state : :class:`compas_fab.robots.RobotCellState`, optional
+            The starting state to calculate the inverse kinematics for.
         group: str, optional
             The planning group used for determining the end effector and labeling
             the ``start_configuration``. Defaults to the robot's main planning group.
@@ -46,7 +62,7 @@ class PyBulletInverseKinematics(InverseKinematics):
               to compute the inverse kinematics.  Defaults to the given group's end
               effector.
             - ``"semi-constrained"``: (:obj:`bool`, optional) When ``True``, only the
-              position and not the orientation of ``frame_WCF`` will not be considered
+              position of the target is considered. The orientation of frame will not be considered
               in the calculation.  Defaults to ``False``.
             - ``"enforce_joint_limits"``: (:obj:`bool`, optional) When ``False``, the
               robot's joint limits will be ignored in the calculation.  Defaults to
@@ -55,7 +71,7 @@ class PyBulletInverseKinematics(InverseKinematics):
               solver will iteratively try to approach minimum deviation from the requested
               target frame.  Defaults to ``True``.
             - ``"high_accuracy_threshold"``:  (:obj:`float`, optional) Defines the maximum
-              acceptable distance threshold for the high accuracy solver. Defaults to ``1e-6``.
+              acceptable distance threshold for the high accuracy solver. Defaults to ``1e-4``.
             - ``"high_accuracy_max_iter"``:  (:obj:`float`, optional) Defines the maximum
               number of iterations to use for the high accuracy solver. Defaults to ``20``.
             - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
@@ -71,13 +87,27 @@ class PyBulletInverseKinematics(InverseKinematics):
         :class:`compas_fab.backends.InverseKinematicsError`
         """
         options = options or {}
+        robot = self.client.robot
+
         high_accuracy = options.get("high_accuracy", True)
         max_results = options.get("max_results", 100)
         link_name = options.get("link_name") or robot.get_end_effector_link_name(group)
+
         cached_robot_model = self.client.get_cached_robot_model(robot)
         body_id = self.client.get_uid(cached_robot_model)
         link_id = self.client._get_link_id_by_name(link_name, cached_robot_model)
-        point, orientation = pose_from_frame(frame_WCF)
+
+        # Target frame and Tool Coordinate Frame
+        target_frame = target.target_frame
+        if robot.need_scaling:
+            target_frame = target_frame.scaled(1.0 / robot.scale_factor)
+            # Now target_frame is back in meter scale
+        attached_tool = self.client.robot_cell.get_attached_tool(start_state, group)
+        if attached_tool:
+            target_frame = from_tcf_to_t0cf(target_frame, attached_tool.frame)
+            # Attached tool frames does not need scaling because Tools are modelled in meter scale
+
+        point, orientation = pose_from_frame(target_frame)
 
         joints = cached_robot_model.get_configurable_joints()
         joints.sort(key=lambda j: j.attr["pybullet"]["id"])
@@ -86,62 +116,67 @@ class PyBulletInverseKinematics(InverseKinematics):
         lower_limits = [joint.limit.lower if joint.type != Joint.CONTINUOUS else 0 for joint in joints]
         upper_limits = [joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi for joint in joints]
 
-        start_configuration = start_configuration or robot.zero_configuration(group)
+        start_configuration = start_state.robot_configuration or robot.zero_configuration(group)
         start_configuration = self.client.set_robot_configuration(robot, start_configuration, group)
 
+        # Rest pose is PyBullet's way of defining the initial guess for the IK solver
+        # The order of the values needs to match with pybullet's joint id order
         rest_poses = self._get_rest_poses(joint_names, start_configuration)
 
-        for _ in range(max_results):
-            ik_options = dict(
-                bodyUniqueId=body_id,
-                endEffectorLinkIndex=link_id,
-                targetPosition=point,
-                physicsClientId=self.client.client_id,
-            )
+        # Prepare Parameters for calling pybullet.calculateInverseKinematics
+        ik_options = dict(
+            bodyUniqueId=body_id,
+            endEffectorLinkIndex=link_id,
+            targetPosition=point,
+            physicsClientId=self.client.client_id,
+        )
 
-            if options.get("enforce_joint_limits", True):
-                # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.
-                # https://stackoverflow.com/questions/49674179/understanding-inverse-kinematics-pybullet
-                # https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/preview?pru=AAABc7276PI*zazLer2rlZ8tAUI8lF98Kw#heading=h.9i02ojf4k3ve
-                joint_ranges = [u - l for u, l in zip(upper_limits, lower_limits)]
+        if options.get("enforce_joint_limits", True):
+            # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.
+            # https://stackoverflow.com/questions/49674179/understanding-inverse-kinematics-pybullet
+            # https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/preview?pru=AAABc7276PI*zazLer2rlZ8tAUI8lF98Kw#heading=h.9i02ojf4k3ve
+            joint_ranges = [u - l for u, l in zip(upper_limits, lower_limits)]
 
-                if options.get("semi-constrained"):
-                    ik_options.update(
-                        dict(
-                            lowerLimits=lower_limits,
-                            upperLimits=upper_limits,
-                            jointRanges=joint_ranges,
-                            restPoses=rest_poses,
-                        )
+            if options.get("semi-constrained"):
+                ik_options.update(
+                    dict(
+                        lowerLimits=lower_limits,
+                        upperLimits=upper_limits,
+                        jointRanges=joint_ranges,
+                        restPoses=rest_poses,
                     )
-                else:
-                    ik_options.update(
-                        dict(
-                            targetPosition=point,
-                            targetOrientation=orientation,
-                            lowerLimits=lower_limits,
-                            upperLimits=upper_limits,
-                            jointRanges=joint_ranges,
-                            restPoses=rest_poses,
-                        )
-                    )
+                )
             else:
-                if not options.get("semi-constrained"):
-                    ik_options.update(
-                        dict(
-                            targetOrientation=orientation,
-                        )
+                ik_options.update(
+                    dict(
+                        targetPosition=point,
+                        targetOrientation=orientation,
+                        lowerLimits=lower_limits,
+                        upperLimits=upper_limits,
+                        jointRanges=joint_ranges,
+                        restPoses=rest_poses,
                     )
+                )
+        else:
+            if not options.get("semi-constrained"):
+                ik_options.update(
+                    dict(
+                        targetOrientation=orientation,
+                    )
+                )
+        if high_accuracy:
+            ik_options.update(
+                dict(
+                    joints=joints,
+                    threshold=options.get("high_accuracy_threshold", 1e-4),
+                    max_iter=options.get("high_accuracy_max_iter", 20),
+                )
+            )
+        # Loop to get multiple results
+        for _ in range(max_results):
 
             # Ready to call IK
             if high_accuracy:
-                ik_options.update(
-                    dict(
-                        joints=joints,
-                        threshold=options.get("high_accuracy_threshold", 1e-4),
-                        max_iter=options.get("high_accuracy_max_iter", 20),
-                    )
-                )
                 joint_positions, close_enough = self._accurate_inverse_kinematics(**ik_options)
 
                 # NOTE: In principle, this accurate iter IK should work out of the
@@ -159,8 +194,14 @@ class PyBulletInverseKinematics(InverseKinematics):
                 joint_positions = pybullet.calculateInverseKinematics(**ik_options)
                 close_enough = True  # yeah, let's say we trust it
 
-            if not joint_positions:
-                raise InverseKinematicsError()
+            # if not joint_positions:
+            #     raise InverseKinematicsError()
+
+            # Normally, no results ends the iteration, but if we have no solution
+            # because the accurate IK solving says it's not close enough, we can retry
+            # with a new randomized seed
+            if close_enough:
+                yield joint_positions, joint_names
 
             # Randomize joints to get a different solution on the next iter
             self.client._set_joint_positions(
@@ -168,15 +209,6 @@ class PyBulletInverseKinematics(InverseKinematics):
                 [random.uniform(*limits) for limits in zip(lower_limits, upper_limits)],
                 body_id,
             )
-
-            # Normally, no results ends the iteration, but if we have no solution
-            # because the accurate IK solving says it's not close enough, we can retry
-            # with a new randomized seed
-            if not close_enough and high_accuracy:
-                continue
-
-            rest_poses = joint_positions
-            yield joint_positions, joint_names
 
     def _accurate_inverse_kinematics(self, joints, threshold, max_iter, **kwargs):
         # Based on these examples
@@ -204,6 +236,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             # The distance is squared to avoid a sqrt operation
             distance_squared = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]
             # Therefor, the threshold is squared as well
+            # print("Iter: %d, Distance: %s" % (iter, distance_squared))
             close_enough = distance_squared < threshold * threshold
             kwargs["restPoses"] = joint_poses
             iter += 1
