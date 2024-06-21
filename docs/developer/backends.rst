@@ -38,8 +38,8 @@ For example:
                                start_configuration=None,
                                group=None,
                                options=None):
-            # Access to the Client Interface is available:
-            client = self.client
+            # The backend features have access to the instance of the client
+            print(type(self.client))
             # insert fancy code here
             pass
 
