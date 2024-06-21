@@ -30,7 +30,7 @@ For example:
 
     from compas.geometry import Frame
     from compas_fab.backends.interfaces import InverseKinematics
-    from compas_fab.backends.interfaces.client import PlannerInterface
+    from compas_fab.backends.interfaces import PlannerInterface
 
     class ExampleInverseKinematics(InverseKinematics):
         def inverse_kinematics(self, robot,
