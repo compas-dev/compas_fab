@@ -1,4 +1,4 @@
-.. _architecture:
+.. _backend_architecture:
 
 *******************************************************************************
 Backend clients

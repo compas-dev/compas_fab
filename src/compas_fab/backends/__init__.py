@@ -100,7 +100,7 @@ Interfaces
 ==========
 
 For details about integrating new backends, check
-the :ref:`architecture` documentation.
+the :ref:`backend_architecture` documentation.
 
 """
 
