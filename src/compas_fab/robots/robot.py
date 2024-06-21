@@ -631,10 +631,15 @@ class Robot(Data):
 
     def zero_configuration(self, group=None):
         # type: (Optional[str]) -> Configuration
-        """Get the zero joint configuration.
+        """Get the zero joint configuration of the specified planning group.
 
         If zero is out of joint limits ``(upper, lower)`` then
         ``(upper + lower) / 2`` is used as joint value.
+
+        Parameters
+        ----------
+        group : :obj:`str`, optional
+            The name of the planning group. Defaults to the main planning group.
 
         Examples
         --------
@@ -657,7 +662,7 @@ class Robot(Data):
 
     def random_configuration(self, group=None):
         # type: (Optional[str]) -> Configuration
-        """Get a random configuration.
+        """Get a random configuration for the specified planning group.
 
         Parameters
         ----------
@@ -685,19 +690,20 @@ class Robot(Data):
 
     def get_group_configuration(self, group, full_configuration):
         # type: (str, Configuration) -> Configuration
-        """Get the group's configuration.
+        """Filter a full configuration and return only the joints of the specified group.
 
         Parameters
         ----------
         group : :obj:`str`
             The name of the planning group.
         full_configuration : :class:`compas_robots.Configuration`
-            The configuration for all configurable joints of the robot.
+            A full configuration (with all configurable joints of the robot).
+            Note that this object is not modified.
 
         Returns
         -------
         :class:`compas_robots.Configuration`
-            The configuration of the group.
+            The configuration with only the joints of the specified group.
         """
         full_configuration = self._check_full_configuration_and_scale(full_configuration)[
             0
