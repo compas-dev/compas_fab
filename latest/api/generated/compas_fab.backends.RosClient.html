@@ -623,7 +623,7 @@ document.write(`
 <h1>RosClient</h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="compas_fab.backends.RosClient">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.backends.</span></span><span class="sig-name descname"><span class="pre">RosClient</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/c6ef2c0/src/compas_fab/backends/ros/client.py#L102"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compas_fab.backends.</span></span><span class="sig-name descname"><span class="pre">RosClient</span></span><a class="reference external" href="https://github.com/compas-dev/compas_fab/blob/005e268/src/compas_fab/backends/ros/client.py#L100"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Ros</span></code>, <a class="reference internal" href="../../developer/generated/compas_fab.backends.interfaces.ClientInterface.html" title="compas_fab.backends.interfaces.client.ClientInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClientInterface</span></code></a></p>
 <p>Interface to use ROS as backend via the <strong>rosbridge</strong>.</p>
 <p>The connection is managed by <code class="docutils literal notranslate"><span class="pre">roslibpy</span></code>.</p>
@@ -639,9 +639,9 @@ resource deallocation.</p>
 </dd>
 <dt><strong>is_secure</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></a></span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> to indicate it should use a secure web socket, otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
 </dd>
-<dt><strong>planner_backend: str</strong></dt><dd><p>Name of the planner backend plugin to use. The plugin must be a sub-class of
-<code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.backends.PlannerInterface</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;moveit&quot;</span></code>,
-making use of <a class="reference internal" href="compas_fab.backends.MoveItPlanner.html#compas_fab.backends.MoveItPlanner" title="compas_fab.backends.MoveItPlanner"><code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.backends.MoveItPlanner</span></code></a>.</p>
+<dt><strong>planner_type: type</strong></dt><dd><p>Type the planner backend to use. The backend must be a sub-class of
+<code class="xref py py-class docutils literal notranslate"><span class="pre">compas_fab.backends.PlannerInterface</span></code>.
+Defaults to <a class="reference internal" href="compas_fab.backends.MoveItPlanner.html#compas_fab.backends.MoveItPlanner" title="compas_fab.backends.MoveItPlanner"><code class="xref py py-class docutils literal notranslate"><span class="pre">MoveItPlanner</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
