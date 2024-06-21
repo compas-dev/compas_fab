@@ -43,10 +43,9 @@ For example:
             # insert fancy code here
             pass
 
-    class ExamplePlanner(
-        ExampleInverseKinematics,
-        PlannerInterface,
-    ):
+
+    # Now we can create a custom planner using our newly implemented backend feature
+    class ExamplePlanner(ExampleInverseKinematics, PlannerInterface):
         pass
 
 The planner can be instantiated and called in the following manner:
