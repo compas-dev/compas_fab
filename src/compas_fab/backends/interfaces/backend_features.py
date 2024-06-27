@@ -17,6 +17,7 @@ if not compas.IPY:
         from compas_robots import Configuration  # noqa: F401
         from compas.geometry import Frame  # noqa: F401
         from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import FrameTarget  # noqa: F401
 
@@ -35,6 +36,13 @@ class BackendFeature(object):
         # All backend features are assumed to be associated with a backend client.
         if client:
             self.client = client  # type: ClientInterface
+
+        # The current robot cell last set by user calling Planner.set_robot_cell()
+        self.robot_cell = None  # type: RobotCell
+
+        # The current robot cell state last set by user calling Planner.set_robot_cell_state()
+        self.robot_cell_state = None  # type: RobotCellState
+
         super(BackendFeature, self).__init__()
 
 
@@ -43,6 +51,39 @@ class BackendFeature(object):
 #   "src/compas_fab/backends/ros/backend_features/"
 #   If you cannot a specific feature in the 'backend_features', it means that the planner
 #   does not support that feature.
+
+
+class SetRobotCell(BackendFeature):
+    """Mix-in interface for implementing a planner's set robot cell feature."""
+
+    def set_robot_cell(self, robot_cell, robot_cell_state=None, options=None):
+        # type: (RobotCell, Optional[RobotCellState], Optional[Dict]) -> None
+        """Pass the models in the robot cell to the planning client.
+
+        The client keeps the robot cell models in memory and uses them for planning.
+        Calling this method will override the previous robot cell in the client.
+        It should be called only if the robot cell models have changed.
+
+        """
+        pass
+
+
+class SetRobotCellState(BackendFeature):
+    """Mix-in interface for implementing a planner's set robot cell state feature."""
+
+    def set_robot_cell_state(self, robot_cell_state):
+        # type: (RobotCellState) -> None
+        """Set the robot cell state to the client.
+
+        The client requires a robot cell state at the beginning of each planning request.
+        This cell state must correspond to the robot cell set earlier by :meth:`set_robot_cell`.
+
+        This function is called automatically by planning functions that takes a start_state as input.
+        Therefore it is typically not necessary for the user to call this function,
+        except when used to trigger visualization using native backend canvas.
+
+        """
+        pass
 
 
 class ForwardKinematics(BackendFeature):

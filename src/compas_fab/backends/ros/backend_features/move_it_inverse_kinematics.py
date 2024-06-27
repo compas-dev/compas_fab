@@ -142,6 +142,10 @@ class MoveItInverseKinematics(InverseKinematics):
         ------
         :obj:`tuple` of (:obj:`list` of :obj:`float`, :obj:`list` of :obj:`str`)
             A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
+
+        Examples
+        --------
+
         """
         options = options or {}
         robot = self.client.robot
@@ -151,7 +155,7 @@ class MoveItInverseKinematics(InverseKinematics):
 
         # Set scene
         # TODO: Implement start_state
-        self.client.robot_cell.assert_cell_state_match(start_state)
+        self.robot_cell.assert_cell_state_match(start_state)
         start_state = start_state or RobotCellState.from_robot_configuration(robot)
 
         # Start configuration
@@ -164,15 +168,17 @@ class MoveItInverseKinematics(InverseKinematics):
         if robot.need_scaling:
             target_frame = target_frame.scaled(1.0 / robot.scale_factor)
             # Now target_frame is back in meter scale
-        attached_tool = self.client.robot_cell.get_attached_tool(start_state, group)
+        attached_tool = self.robot_cell.get_attached_tool(start_state, group)
         if attached_tool:
             target_frame = from_tcf_to_t0cf(target_frame, attached_tool.frame)
             # Attached tool frames does not need scaling because Tools are modelled in meter scale
 
         # Scale Attached Collision Meshes
+        attached_collision_meshes = self.robot_cell.get_attached_rigid_bodies_as_attached_collision_meshes(
+            start_state, group
+        )
         if robot.need_scaling:
-            acms = options.get("attached_collision_meshes", [])  # type: List[AttachedCollisionMesh]
-            for acm in acms:
+            for acm in attached_collision_meshes:
                 acm.collision_mesh.scale(1.0 / robot.scale_factor)
 
         # Compose the kwargs for the async function

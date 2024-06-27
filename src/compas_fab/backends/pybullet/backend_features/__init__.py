@@ -32,6 +32,7 @@ from compas_fab.backends.pybullet.backend_features.pybullet_remove_attached_coll
     PyBulletRemoveAttachedCollisionMesh,
 )
 from compas_fab.backends.pybullet.backend_features.pybullet_remove_collision_mesh import PyBulletRemoveCollisionMesh
+from compas_fab.backends.pybullet.backend_features.pybullet_set_robot_cell import PyBulletSetRobotCell
 
 
 __all__ = [
@@ -42,4 +43,5 @@ __all__ = [
     "PyBulletInverseKinematics",
     "PyBulletRemoveAttachedCollisionMesh",
     "PyBulletRemoveCollisionMesh",
+    "PyBulletSetRobotCell",
 ]

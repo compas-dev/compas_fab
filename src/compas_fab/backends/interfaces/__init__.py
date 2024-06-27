@@ -56,6 +56,8 @@ from .backend_features import PlanMotion
 from .backend_features import RemoveAttachedCollisionMesh
 from .backend_features import RemoveCollisionMesh
 from .backend_features import ResetPlanningScene
+from .backend_features import SetRobotCell
+from .backend_features import SetRobotCellState
 from .client import ClientInterface
 from .client import PlannerInterface
 
@@ -74,4 +76,6 @@ __all__ = [
     "RemoveCollisionMesh",
     "RemoveAttachedCollisionMesh",
     "ResetPlanningScene",
+    "SetRobotCell",
+    "SetRobotCellState",
 ]
