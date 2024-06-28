@@ -4,6 +4,14 @@ from __future__ import print_function
 
 from compas_fab.backends.interfaces import ForwardKinematics
 
+import compas
+
+if compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from compas_fab.backends import PyBulletClient  # noqa: F401
+
 
 class PyBulletForwardKinematics(ForwardKinematics):
     """Callable to calculate the robot's forward kinematic."""
@@ -38,12 +46,14 @@ class PyBulletForwardKinematics(ForwardKinematics):
         """
         options = options or {"link": None, "check_collision": False}
 
+        client = self.client  # type: PyBulletClient # Trick to keep intellisense happy
+
         link_name = options.get("link") or robot.get_end_effector_link_name(group)
-        cached_robot_model = self.client.get_cached_robot_model(robot)
-        body_id = self.client.get_uid(cached_robot_model)
-        link_id = self.client._get_link_id_by_name(link_name, cached_robot_model)
-        self.client.set_robot_configuration(robot, configuration, group)
-        frame = self.client._get_link_frame(link_id, body_id)
+        cached_robot_model = client.get_cached_robot_model(robot)
+        body_id = client.get_uid(cached_robot_model)
+        link_id = client._get_link_id_by_name(link_name, cached_robot_model)
+        client.set_robot_configuration(robot, configuration, group)
+        frame = client._get_link_frame(link_id, body_id)
         if options.get("check_collision"):
-            self.client.check_collisions(robot, configuration)
+            client.check_collisions(robot, configuration)
         return frame

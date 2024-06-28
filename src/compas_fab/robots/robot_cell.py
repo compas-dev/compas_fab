@@ -3,6 +3,8 @@ import compas
 from compas.data import Data
 from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots import CollisionMesh
+from compas.geometry import Frame
+from compas.geometry import Transformation
 
 if not compas.IPY:
     from typing import TYPE_CHECKING
@@ -35,7 +37,7 @@ class RobotCell(Data):
     - Static obstacles in the environment
     """
 
-    def __init__(self, robot_model, tool_models={}, rigid_body_models={}):
+    def __init__(self, robot_model=None, tool_models={}, rigid_body_models={}):
         super(RobotCell, self).__init__()
         self.robot_model = robot_model  # type: RobotModel
         self.tool_models = tool_models  # type: Dict[str, ToolModel]
@@ -144,8 +146,8 @@ class RobotCell(Data):
 class RigidBody(Data):
     """Represents a rigid body."""
 
-    def __init__(self, visual_meshes=[], collision_meshes=[]):
-        # type: (List[Mesh] | Mesh, List[Mesh] | Mesh) -> None
+    def __init__(self, visual_meshes=None, collision_meshes=None):
+        # type: (Optional[List[Mesh] | Mesh], Optional[List[Mesh] | Mesh]) -> None
         """Represents a rigid body.
 
         A rigid body can have different visual and collision meshes.
@@ -175,14 +177,24 @@ class RigidBody(Data):
         """
         # type: (str, List[Mesh], List[Mesh]) -> None
         super(RigidBody, self).__init__()
-        self.visual_meshes = visual_meshes  # type: List[Mesh]
-        # Ensure that visual_meshes is a list
-        if not isinstance(visual_meshes, list):
+
+        if not visual_meshes:
+            # Default to an empty list
+            self.visual_meshes = []
+        elif not isinstance(visual_meshes, list):
+            # Ensure that it is a list
             self.visual_meshes = [visual_meshes]
-        self.collision_meshes = collision_meshes  # type: List[Mesh]
-        # Ensure that collision_meshes is a list
-        if not isinstance(collision_meshes, list):
+        else:
+            self.visual_meshes = visual_meshes
+
+        if not collision_meshes:
+            # Default to an empty list
+            self.collision_meshes = []
+        elif not isinstance(collision_meshes, list):
+            # Ensure that it is a list
             self.collision_meshes = [collision_meshes]
+        else:
+            self.collision_meshes = collision_meshes
 
     @property
     def __data__(self):
@@ -190,6 +202,20 @@ class RigidBody(Data):
             "visual_meshes": self.visual_meshes,
             "collision_meshes": self.collision_meshes,
         }
+
+    @property
+    def get_collision_meshes(self):
+        # type: () -> List[Mesh]
+        """Get the collision meshes of the rigid body.
+
+        If the collision meshes are not provided (the list if empty), the visual meshes will be returned.
+
+        Returns
+        -------
+        List[Mesh]
+            The collision meshes of the rigid body.
+        """
+        return self.collision_meshes or self.visual_meshes
 
 
 class RobotCellState(Data):
@@ -230,13 +256,41 @@ class RobotCellState(Data):
         }
 
     @classmethod
+    def from_robot_cell(cls, robot_cell, robot_configuration=None):
+        # type: (RobotCell, Optional[Configuration]) -> RobotCellState
+        """Creates a default `RobotCellState` from a `RobotCell`.
+
+        This function ensures that all the tools and workpieces in the robot cell are represented in the robot cell state.
+        This function should be called after the robot cell is created and all objects are added to it.
+
+        All tools will be assumed to be in their zero configuration and positioned at worldXY frame.
+        All workpieces will be assumed to be in their base frame and not attached to any tool or link.
+        All tools and workpieces are assumed to be visible in the scene (is_hidden=False).
+
+        Parameters
+        ----------
+        robot_cell : :class:`~compas_fab.robots.RobotCell`
+            The robot cell.
+        robot_configuration : :class:`~compas_fab.Configuration`, optional
+            The configuration of the robot. If the configuration is not provided, the robot's zero configuration will be used.
+        """
+        robot_cell_state = cls.from_robot_configuration(robot_cell.robot_model, robot_configuration)
+        for tool_id, tool_model in robot_cell.tool_models.items():
+            tool_state = ToolState(Frame.worldXY(), None, None)
+            robot_cell_state.tool_states[tool_id] = tool_state
+        for rigid_body_id, rigid_body_model in robot_cell.rigid_body_models.items():
+            rigid_body_state = RigidBodyState(Frame.worldXY(), None, None, None)
+            robot_cell_state.rigid_body_states[rigid_body_id] = rigid_body_state
+        return robot_cell_state
+
+    @classmethod
     def from_robot_configuration(cls, robot, configuration=None, group=None):
-        # type: (Robot, Optional[Configuration], Optional[str]) -> RobotCellState
+        # type: (Robot | RobotModel, Optional[Configuration], Optional[str]) -> RobotCellState
         """Creates a `RobotCellState` from a robot and a configuration.
 
         Parameters
         ----------
-        robot : :class:`~compas_robots.Robot`
+        robot : :class:`~compas_fab.robots.Robot` or :class:`~compas_robots.RobotModel`
             The robot.
         configuration : :class:`~compas_fab.Configuration`, optional
             The configuration of the robot. If the configuration is not provided, the robot's zero configuration will be used.
@@ -301,14 +355,94 @@ class RobotCellState(Data):
             if rigid_body_state.attached_to_link:
                 ids.append(rigid_body_id)
 
+    def set_tool_attached_to_group(self, tool_id, group, detach_others=True):
+        # type: (str, str, Optional[bool]) -> None
+        """Sets the tool attached to the planning group.
+
+        Notes
+        -----
+        There can only be a maximum of one tool attached to a planning group.
+
+        Parameters
+        ----------
+        tool_id : str
+            The id of the tool.
+        group : str
+            The name of the planning group to which the tool is attached.
+        detach_others : bool, optional
+            Whether to detach all other tools from the group. Defaults to True.
+        """
+        self.tool_states[tool_id].attached_to_group = group
+        self.tool_states[tool_id].frame = None
+
+        if detach_others:
+            for id, tool_state in self.tool_states.items():
+                if id != tool_id and tool_state.attached_to_group == group:
+                    tool_state.attached_to_group = None
+
+    def set_rigid_body_attached_to_link(self, rigid_body_id, link_name, attachment_frame=None):
+        # type: (str, str, Optional[Frame | Transformation]) -> None
+        """Sets the rigid body attached to the link of the robot.
+
+        Notes
+        -----
+        There can be more than one rigid body attached to a link.
+        A RigidBody cannot be attached to both a link and a tool.
+
+        Parameters
+        ----------
+        rigid_body_id : str
+            The id of the rigid body.
+        link_name : str
+            The name of the link to which the rigid body is attached.
+        attachment_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`, optional
+            The frame of the rigid body relative to the link.
+            Defaults to None, which means that the rigid body is at the base of the link.
+        """
+        if not attachment_frame:
+            attachment_frame = Frame.worldXY()
+
+        self.rigid_body_states[rigid_body_id].attached_to_link = link_name
+        self.rigid_body_states[rigid_body_id].attached_to_tool = None
+        self.rigid_body_states[rigid_body_id].frame = None
+        self.rigid_body_states[rigid_body_id].grasp = attachment_frame
+
+    def set_rigid_body_attached_to_tool(self, rigid_body_id, tool_id, grasp_frame=None):
+        # type: (str, str, Frame) -> None
+        """Sets the rigid body attached to the tool.
+
+        Notes
+        -----
+        There can be more than one rigid body attached to the tip of a tool.
+        A RigidBody cannot be attached to both a link and a tool.
+
+        Parameters
+        ----------
+        rigid_body_id : str
+            The id of the rigid body.
+        tool_id : str
+            The id of the tool to which the rigid body is attached.
+        grasp_frame : :class:`compas.geometry.Frame`, optional
+            The grasp frame of the rigid body relative to the tool.
+            Defaults to None, which means that the rigid body is at the tip of the tool.
+        """
+        if not grasp_frame:
+            grasp_frame = Frame.worldXY()
+
+        self.rigid_body_states[rigid_body_id].attached_to_link = None
+        self.rigid_body_states[rigid_body_id].attached_to_tool = tool_id
+        self.rigid_body_states[rigid_body_id].frame = None
+        self.rigid_body_states[rigid_body_id].grasp = grasp_frame
+
 
 class ToolState(Data):
     """Represents the state of a tool in a RobotCell.
 
     When representing a tool that is attached to a robot, the `attached_to_group`
-    attributes should be set to the planning group name. Otherwise, it should be `None`.
+    attributes should be set to the planning group name and the `frame` attribute
+    is set to 'None'.
     Note that the tool's base frame is attached without any offset to the end of
-    that planning group.
+    that planning group, this behavior is fixed.
 
     When representing a tool that is kinematic (a ToolModel with movable joints), the
     `configuration` attribute should be set. Otherwise, if left at `None`, the tool's
@@ -320,6 +454,8 @@ class ToolState(Data):
     ----------
     frame : :class:`compas.geometry.Frame`
         The base frame of the tool relative to the world coordinate frame.
+        If the tool is attached to a planning group, this frame can be set to None.'
+        In that case, the planner or visualization tool will use the end frame of the planning group.
     attached_to_group : :obj:`str`, optional
         The name of the robot planning group to which the tool is attached. Defaults to ``None``.
     configuration : :class:`compas_robots.Configuration`, optional
@@ -349,13 +485,31 @@ class ToolState(Data):
 class RigidBodyState(Data):
     """Represents the state of a workpiece in a RobotCell.
 
-    When representing a workpiece that is attached to a tool, the `attached_to_tool` attribute should be set.
+    Rigid bodies can be used to represent different types of objects in the robot cell:
+
+    - Workpieces that are attached to the tip of a tool
+    - Robotic backpacks or other accessories that are attached to links of the robot
+    - Workpieces or Static obstacles in the environment
+    - All of the above objects but are currently hidden
+
+    When representing a workpiece that is attached to a tool, the `attached_to_tool` attribute should be
+    set to the name of the tool. The `grasp` attribute should be set to the grasp frame,
+    which represents the position of the workpiece relative to the tool tip frame.
+
     When representing a collision geometry (such as robotic backpacks) that is attached to a link of the robot,
-    the `attached_to_link` attribute should be set. Otherwise, if the rigid body is stationary in the environment,
-    both attributes should be set to `None`.
+    the `attached_to_link` attribute should be set. The `grasp` attribute should be set to the relative position
+    of the rigid body to the base frame of the link.
+
+    In either one of the two attached cases, the `frame` attribute should be set to 'None' as the actual frame
+    is determined automatically by the position of the attached link or tool.
+    Even if the attribute is not set to None, it will be disregarded.
+
+    When representing a stationary object in the environment, such as stationary workpiece or obstacles,
+    both `attached_to_` attributes should be set to `None`. The `frame` attribute should be set to the base frame
+    of the object relative to the world coordinate frame.
 
     When representing a workpiece that is currently not in the scene, the `is_hidden` attribute should be set to True.
-    This will turn off collision checking for the workpiece.
+    This will hide the object from collision checking and visualization.
 
     Attributes
     ----------

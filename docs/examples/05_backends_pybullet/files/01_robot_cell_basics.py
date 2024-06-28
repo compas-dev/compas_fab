@@ -7,13 +7,15 @@ from compas_fab.robots import RobotCell
 from compas_fab.robots import RigidBody
 
 with PyBulletClient() as client:
-    urdf_filepath = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
-    robot = client.load_robot(urdf_filepath)
 
-    robot_cell = RobotCell(robot)
+    # Create a robot cell and add objects to it
+    robot_cell = RobotCell()  # Typically RobotCell is initialed with a RobotModel, but here it is empty for simplicity
     floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
     robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh)
+    cone = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
+    robot_cell.rigid_body_models["cone"] = RigidBody(cone)
 
+    # The planner is used for passing the robot cell into the PyBullet client
     planner = PyBulletPlanner(client)
     planner.set_robot_cell(robot_cell)
     # The floor should appear in the PyBullet's GUI

@@ -1,6 +1,7 @@
 from compas_fab.backends.interfaces import SetRobotCell
 
 import compas
+from compas.geometry import Frame
 
 if not compas.IPY:
     from typing import TYPE_CHECKING
@@ -42,18 +43,18 @@ class PyBulletSetRobotCell(SetRobotCell):
         # and the new robot cell is added to the PyBullet world
 
         # Remove all objects from the PyBullet world
-        client.remove_all_tools()
-        client.remove_all_rigid_bodies()
+        # client.remove_all_tools()
+        # client.remove_all_rigid_bodies()
 
         # Add the robot cell to the PyBullet world
-        for name, tool in robot_cell.tool_models.items():
-            client.add_tool(name, tool.mesh, tool.mass)
+        for name, tool_model in robot_cell.tool_models.items():
+            client.add_tool(name, tool_model)
         for name, rigid_body in robot_cell.rigid_body_models.items():
-            client.add_rigid_body(name, rigid_body.mesh, rigid_body.mass)
-
+            client.add_rigid_body(name, rigid_body)
+            # client.convert_mesh_to_body(rigid_body.visual_meshes[0], Frame.worldXY())
         # Update the robot cell in the client
         self._robot_cell = robot_cell
 
         # If a robot cell state is provided, update the client's robot cell state
-        if robot_cell_state:
-            self.set_robot_cell_state(robot_cell_state, options)
+        # if robot_cell_state:
+        #     self.set_robot_cell_state(robot_cell_state, options)

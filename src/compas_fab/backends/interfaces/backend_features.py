@@ -33,17 +33,23 @@ class BackendFeature(object):
     """
 
     def __init__(self, client=None):
-        # All backend features are assumed to be associated with a backend client.
-        if client:
-            self.client = client  # type: ClientInterface
-
-        # The current robot cell last set by user calling Planner.set_robot_cell()
-        self.robot_cell = None  # type: RobotCell
-
-        # The current robot cell state last set by user calling Planner.set_robot_cell_state()
-        self.robot_cell_state = None  # type: RobotCellState
-
         super(BackendFeature, self).__init__()
+
+    # @property
+    # def client(self):
+    #     # type: () -> ClientInterface
+    #     """Proxy function to access the backend client.
+    #     This function should be overridden by the PlannerInterface default :meth:`PlannerInterface.client` or by the Planner.
+    #     """
+    #     raise NotImplementedError
+
+    # @property
+    # def robot_cell(self):
+    #     # type: () -> RobotCell
+    #     """Proxy function to access the RobotCell object.
+    #     This function should be overridden by the PlannerInterface default :meth:`PlannerInterface.robot_cell` or by the Planner.
+    #     """
+    #     raise NotImplementedError
 
 
 #   The code that contains the actual feature implementation is located in the backend's module.

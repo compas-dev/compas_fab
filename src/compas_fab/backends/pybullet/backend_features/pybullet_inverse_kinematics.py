@@ -102,7 +102,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         if robot.need_scaling:
             target_frame = target_frame.scaled(1.0 / robot.scale_factor)
             # Now target_frame is back in meter scale
-        attached_tool = self.client.robot_cell.get_attached_tool(start_state, group)
+        attached_tool = self.robot_cell.get_attached_tool(start_state, group)
         if attached_tool:
             target_frame = from_tcf_to_t0cf(target_frame, attached_tool.frame)
             # Attached tool frames does not need scaling because Tools are modelled in meter scale
