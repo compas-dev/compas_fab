@@ -18,6 +18,7 @@ if not compas.IPY:
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import FrameTarget  # noqa: F401
         from compas_fab.robots import AttachedCollisionMesh  # noqa: F401
+        from compas_fab.backends import PyBulletClient  # noqa: F401
 
 
 import math
@@ -87,25 +88,30 @@ class PyBulletInverseKinematics(InverseKinematics):
         :class:`compas_fab.backends.InverseKinematicsError`
         """
         options = options or {}
-        robot = self.client.robot
+
+        client = self.client  # type: PyBulletClient # Trick to keep intellisense happy
+        robot = client.robot
 
         high_accuracy = options.get("high_accuracy", True)
         max_results = options.get("max_results", 100)
         link_name = options.get("link_name") or robot.get_end_effector_link_name(group)
 
-        cached_robot_model = self.client.get_cached_robot_model(robot)
-        body_id = self.client.get_uid(cached_robot_model)
-        link_id = self.client._get_link_id_by_name(link_name, cached_robot_model)
+        cached_robot_model = client.get_cached_robot_model(robot)
+        body_id = client.get_uid(cached_robot_model)
+        link_id = client._get_link_id_by_name(link_name, cached_robot_model)
 
-        # Target frame and Tool Coordinate Frame
+        # Target frame
         target_frame = target.target_frame
         if robot.need_scaling:
             target_frame = target_frame.scaled(1.0 / robot.scale_factor)
             # Now target_frame is back in meter scale
-        attached_tool = self.robot_cell.get_attached_tool(start_state, group)
-        if attached_tool:
-            target_frame = from_tcf_to_t0cf(target_frame, attached_tool.frame)
-            # Attached tool frames does not need scaling because Tools are modelled in meter scale
+
+        # Tool Coordinate Frame if there are tools attached
+        if self.robot_cell:
+            attached_tool = self.robot_cell.get_attached_tool(start_state, group)
+            if attached_tool:
+                target_frame = from_tcf_to_t0cf(target_frame, attached_tool.frame)
+                # Attached tool frames does not need scaling because Tools are modelled in meter scale
 
         point, orientation = pose_from_frame(target_frame)
 
@@ -117,7 +123,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         upper_limits = [joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi for joint in joints]
 
         start_configuration = start_state.robot_configuration or robot.zero_configuration(group)
-        start_configuration = self.client.set_robot_configuration(robot, start_configuration, group)
+        start_configuration = client.set_robot_configuration(start_configuration, group)
 
         # Rest pose is PyBullet's way of defining the initial guess for the IK solver
         # The order of the values needs to match with pybullet's joint id order
@@ -128,7 +134,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             bodyUniqueId=body_id,
             endEffectorLinkIndex=link_id,
             targetPosition=point,
-            physicsClientId=self.client.client_id,
+            physicsClientId=client.client_id,
         )
 
         if options.get("enforce_joint_limits", True):
@@ -204,7 +210,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 yield joint_positions, joint_names
 
             # Randomize joints to get a different solution on the next iter
-            self.client._set_joint_positions(
+            client._set_joint_positions(
                 [joint.attr["pybullet"]["id"] for joint in joints],
                 [random.uniform(*limits) for limits in zip(lower_limits, upper_limits)],
                 body_id,

@@ -70,7 +70,7 @@ def _test_fk_with_pybullet_planner(robot, true_result):
         planning_group = robot.main_group_name
         end_effector_link = robot.get_end_effector_link_name(planning_group)
 
-        planner_fk_result = planner.forward_kinematics(robot, robot.zero_configuration(), planning_group)
+        planner_fk_result = planner.forward_kinematics(robot.zero_configuration(), planning_group)
         print(planner_fk_result)
         model_fk_result = robot.model.forward_kinematics(robot.zero_configuration(), end_effector_link)
         print(model_fk_result)
@@ -143,7 +143,7 @@ def _test_pybullet_ik_fk_agreement(robot, ik_target_frames):
                 ik_result[name] = value
 
             # FK Query to the planner (Configuration to Frame)
-            fk_result = planner.forward_kinematics(robot, ik_result, planning_group)
+            fk_result = planner.forward_kinematics(ik_result, planning_group)
 
             # Compare the frames
             validate_ik_with_fk(ik_target_frame, fk_result)

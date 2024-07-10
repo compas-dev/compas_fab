@@ -455,7 +455,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self._load_robot_to_pybullet(cached_robot_filepath, robot)
         pybullet.setPhysicsEngineParameter(enableFileCaching=1)
 
-        self.set_robot_configuration(robot, current_configuration)
+        self.set_robot_configuration(current_configuration)
         self.step_simulation()
 
     def cache_robot(self, robot, concavity=False):
@@ -858,8 +858,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot to be configured.
         configuration : :class:`compas_fab.robots.Configuration`
             The configuration to be set, ``joint_names`` must be included in the configuration.
             If a partial configuration is given (i.e. not all joint values are given),

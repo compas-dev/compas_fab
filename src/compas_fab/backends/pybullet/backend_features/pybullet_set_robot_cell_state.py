@@ -45,7 +45,8 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         # Note robot_cell_state.robot_configuration is a full configuration
         client.set_robot_configuration(robot_cell_state.robot_configuration)
 
-        # Keep track of tool's base_frames
+        # Keep track of tool's base_frames during tool updates
+        # They can be used later to update rigid body base frames that are attached to tools
         tool_base_frames = {}
 
         # Update the position of Tool models
@@ -78,9 +79,9 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 t_tcf_ocf = Transformation.from_frame(rigid_body_state.grasp)
                 # t_t0cf_tcf is Tool Offset, describing Tool Coordinate Frame (TCF) relative to Tool Base Frame (T0CF)
                 t_t0cf_tcf = Transformation.from_frame(tool_model.frame)
-                # t0cf_from_wcf is Tool Base Frame, describing Tool Base Frame (T0CF) relative to World Coordinate Frame (WCF)
+                # t_wcf_t0cf is Tool Base Frame, describing Tool Base Frame (T0CF) relative to World Coordinate Frame (WCF)
                 t_wcf_t0cf = Transformation.from_frame(tool_base_frames[tool_name])
-                # ocf_from_wcf is Object Coordinate Frame (OCF) relative to World Coordinate Frame (WCF)
+                # t_wcf_ocf is Object Coordinate Frame (OCF) relative to World Coordinate Frame (WCF)
                 t_wcf_ocf = t_wcf_t0cf * t_t0cf_tcf * t_tcf_ocf
 
                 rigid_body_base_frame = Frame.from_transformation(t_wcf_ocf)
@@ -88,3 +89,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 # If the rigid body is not attached, update the rigid body's base frame using the frame in rigid body state
                 rigid_body_base_frame = rigid_body_state.frame
             client.set_rigid_body_base_frame(rigid_body_name, rigid_body_base_frame)
+
+        # This function updates the position of all models in the robot cell, technically we could
+        # keep track of the previous state and only update the models that have changed to improve performance.
+        # We can improve when we have proper profiling and performance tests.

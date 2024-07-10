@@ -16,13 +16,11 @@ if compas.IPY:
 class PyBulletForwardKinematics(ForwardKinematics):
     """Callable to calculate the robot's forward kinematic."""
 
-    def forward_kinematics(self, robot, configuration, group=None, options=None):
+    def forward_kinematics(self, configuration, group=None, options=None):
         """Calculate the robot's forward kinematic.
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which inverse kinematics is being calculated.
         configuration : :class:`compas_fab.robots.Configuration`
             The full configuration to calculate the forward kinematic for. If no
             full configuration is passed, the zero-joint state for the other
@@ -47,12 +45,13 @@ class PyBulletForwardKinematics(ForwardKinematics):
         options = options or {"link": None, "check_collision": False}
 
         client = self.client  # type: PyBulletClient # Trick to keep intellisense happy
+        robot = self.client.robot
 
         link_name = options.get("link") or robot.get_end_effector_link_name(group)
         cached_robot_model = client.get_cached_robot_model(robot)
         body_id = client.get_uid(cached_robot_model)
         link_id = client._get_link_id_by_name(link_name, cached_robot_model)
-        client.set_robot_configuration(robot, configuration, group)
+        client.set_robot_configuration(configuration, group)
         frame = client._get_link_frame(link_id, body_id)
         if options.get("check_collision"):
             client.check_collisions(robot, configuration)
