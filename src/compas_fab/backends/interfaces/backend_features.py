@@ -95,8 +95,8 @@ class SetRobotCellState(BackendFeature):
 class ForwardKinematics(BackendFeature):
     """Mix-in interface for implementing a planner's forward kinematics feature."""
 
-    def forward_kinematics(self, robot, configuration, group=None, options=None):
-        # type: (Robot, Configuration, Optional[str], Optional[Dict]) -> Frame
+    def forward_kinematics(self, robot_cell_state, group=None, options=None):
+        # type: (RobotCellState, Optional[str], Optional[Dict]) -> Frame
         """Calculate the robot's forward kinematic.
 
         Parameters

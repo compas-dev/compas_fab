@@ -18,8 +18,7 @@ from compas_robots import ToolModel
 
 import compas_fab
 from compas_fab.backends.interfaces.client import ClientInterface
-from compas_fab.backends.kinematics import AnalyticalInverseKinematics
-from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion
+
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotLibrary
 from compas_fab.robots import RobotSemantics
@@ -30,7 +29,6 @@ from . import const
 from .conversions import frame_from_pose
 from .conversions import pose_from_frame
 from .exceptions import CollisionError
-from .planner import PyBulletPlanner
 from .utils import LOG
 from .utils import redirect_stdout
 
@@ -43,6 +41,8 @@ if not compas.IPY:
         from typing import Tuple  # noqa: F401
         from compas_robots import Configuration  # noqa: F401
         from compas_fab.robots import RigidBody  # noqa: F401
+        from compas_fab.backends.kinematics import AnalyticalInverseKinematics  # noqa: F401
+        from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion  # noqa: F401
 
         # Load pybullet for type hinting
         import pybullet
@@ -171,8 +171,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     Attributes
     ----------
-    planner : :class:`compas_fab.backends.PyBulletPlanner`
-        The planner instance for this client.
     verbose : :obj:`bool`
         Use verbose logging.
     rigid_bodies_puids : :obj:`dict` of (:obj:`str`, :obj:`list` of :obj:`int`)
@@ -196,7 +194,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def __init__(self, connection_type="gui", verbose=False):
         # type (str, bool) -> None
         super(PyBulletClient, self).__init__(connection_type)
-        self.planner = PyBulletPlanner(self)
         self.verbose = verbose
 
         # PyBullet unique id
@@ -395,7 +392,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self._add_ids_to_robot_links(cached_robot_model)
 
         self._robot = robot
-        self._robot_cell = RobotCell(robot.model)
+        self._robot_cell = RobotCell(robot)
 
     def pybullet_load_urdf(self, urdf_file):
         # type: (str) -> int

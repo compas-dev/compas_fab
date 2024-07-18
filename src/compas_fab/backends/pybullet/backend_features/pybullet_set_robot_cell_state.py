@@ -25,8 +25,7 @@ from compas_fab.backends.pybullet.const import STATIC_MASS
 
 
 class PyBulletSetRobotCellState(SetRobotCellState):
-
-    def set_robot_cell_state(self, robot_cell_state):
+    def _set_robot_cell_state(self, robot_cell_state):
         # type: (RobotCellState, RobotCellState) -> None
         """Change the state of the models in the robot cell that have already been set to the Pybullet client.
 
@@ -39,7 +38,12 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         client = self.client  # type: PyBulletClient # Trick to keep intellisense happy
         robot_cell = self.robot_cell  # type: RobotCell
 
-        robot_cell.assert_cell_state_match(robot_cell_state)
+        # Check if the robot cell state matches the robot cell.
+        # However if the robot is the only element in the cell, robot cell can be None and we can skip this check
+        if robot_cell:
+            robot_cell.assert_cell_state_match(robot_cell_state)
+
+        # TODO: Check for modified object states and change those only
 
         # Update the robot configuration
         # Note robot_cell_state.robot_configuration is a full configuration

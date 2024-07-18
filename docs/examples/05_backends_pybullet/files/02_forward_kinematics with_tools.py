@@ -9,9 +9,11 @@ from compas_fab.robots import RigidBody
 from compas_fab.robots import RobotLibrary
 from compas.geometry import Frame
 from compas.geometry import Box
+from compas_robots import Configuration
 from compas_robots import ToolModel
 
 with PyBulletClient() as client:
+    # The robot in this example is loaded from the RobotLibrary
     robot = RobotLibrary.abb_irb4600_40_255()
     robot = client.load_existing_robot(robot)
 
@@ -38,11 +40,6 @@ with PyBulletClient() as client:
     # ------------------------------------------------------------------------
     robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
-    # Change the robot's configuration for demonstration purposes
-    configuration = robot.zero_configuration()
-    configuration.joint_values[1] = 0.5  # Change the second joint angle to 0.5 [rad]
-    robot_cell_state.robot_configuration = configuration
-
     # Attach the tool to the robot's main group
     robot_cell_state.set_tool_attached_to_group("cone", robot.main_group_name)
 
@@ -52,22 +49,23 @@ with PyBulletClient() as client:
 
     # The planner is used for passing the robot cell into the PyBullet client
     planner = PyBulletPlanner(client)
-    planner.set_robot_cell(robot_cell)  # or planner.set_robot_cell(robot_cell, robot_cell_state)
-    planner.set_robot_cell_state(robot_cell_state)
+    planner.set_robot_cell(robot_cell)
 
-    # ------------------------------------------------------------------------
-    # Change the robot_cell_state and observe the effect in the PyBullet GUI
-    # ------------------------------------------------------------------------
+    # ----------------
+    # FK without tools
+    # ----------------
 
-    # Typically the robot_cell_state is passed to the
-    # planning functions such as planner.plan_motion(start_state, target), or
-    # visualization functions such as robot_cell_scene_object.update(robot_cell_state).
-    # In this example, we are directly calling set_robot_cell_state() to see the effect,
-    # which can be seen in the PyBullet GUI.
+    # The input configuration used for the forward kinematics is provided through the RobotCellState
+    robot_cell_state.robot_configuration = Configuration.from_revolute_values(
+        [-2.238, -1.153, -2.174, 0.185, 0.667, 0.0]
+    )
+    # By default, if a tool is attached, the TCF is returned
+    print("Frame of the attached tool TCF in World Coordinate Frame:")
+    frame_WCF = planner.forward_kinematics(robot_cell_state)
+    print(frame_WCF)
 
-    input("Observe the PyBullet GUI, Press Enter to continue...")
-
-    for i in range(10):
-        robot_cell_state.robot_configuration.joint_values[1] += 0.1
-        planner.set_robot_cell_state(robot_cell_state)
-        input("Observe the PyBullet GUI, Press Enter to continue...")
+    # It is possible to retrieve T0CF by requesting with the end effector link name
+    ee_link_name = robot.get_end_effector_link_name()
+    print(f"Frame of the T0CF (also the end effector link {ee_link_name}) in World Coordinate Frame:")
+    frame_WCF = planner.forward_kinematics(robot_cell_state, options={"link": ee_link_name})
+    print(frame_WCF)

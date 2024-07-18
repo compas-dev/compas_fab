@@ -20,11 +20,6 @@ __all__ = [
 
 
 class PyBulletPlanner(
-    PyBulletAddAttachedCollisionMesh,
-    PyBulletAddCollisionMesh,
-    PyBulletAppendCollisionMesh,
-    PyBulletRemoveCollisionMesh,
-    PyBulletRemoveAttachedCollisionMesh,
     PyBulletForwardKinematics,
     PyBulletInverseKinematics,
     PyBulletSetRobotCell,

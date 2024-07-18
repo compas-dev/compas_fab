@@ -9,7 +9,7 @@ from compas_fab.robots import RigidBody
 with PyBulletClient() as client:
 
     # Create a robot cell
-    robot_cell = RobotCell()  # Typically RobotCell is initialed with a RobotModel, but here it is empty for simplicity
+    robot_cell = RobotCell()  # Typically RobotCell is initialed with a Robot, but here it is empty for simplicity
 
     # Add some RigidBodies as stationary obstacles
     floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
