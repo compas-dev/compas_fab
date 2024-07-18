@@ -131,6 +131,8 @@ from .ros import (
 from .kinematics import (
     AnalyticalInverseKinematics,
     AnalyticalPlanCartesianMotion,
+    AnalyticalPyBulletPlanner,
+    AnalyticalKinematicsPlanner,
     OffsetWristKinematics,
     SphericalWristKinematics,
     CartesianMotionError,
@@ -175,6 +177,8 @@ __all__ = [
     # Analytic IK
     "AnalyticalInverseKinematics",
     "AnalyticalPlanCartesianMotion",
+    "AnalyticalPyBulletPlanner",
+    "AnalyticalKinematicsPlanner",
     "OffsetWristKinematics",
     "SphericalWristKinematics",
     "CartesianMotionError",

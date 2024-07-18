@@ -212,7 +212,7 @@ class RosClient(Ros, ClientInterface):
             model.load_geometry(loader, precision=precision)
 
         self._robot = Robot(model, semantics=semantics, client=self)
-        self._robot_cell = RobotCell(self.robot.model)
+        self._robot_cell = RobotCell(self.robot)
         return self._robot
 
     # ==========================================================================
