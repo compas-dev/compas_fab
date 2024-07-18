@@ -5,10 +5,15 @@ from compas.geometry import Frame
 from compas_robots import Configuration
 
 import compas_fab
-from compas_fab.backends import AnalyticalInverseKinematics
+from compas_fab.backends import AnalyticalKinematicsPlanner
+from compas_fab.backends import UR5Kinematics
 from compas_fab.robots import Tool
 from compas_fab.robots import RobotLibrary
 from compas_fab.robots import FrameWaypoints
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import RobotCell
+from compas_fab.robots import FrameTarget
+
 
 if not compas.IPY:
     from compas_fab.backends import AnalyticalPyBulletClient
@@ -17,14 +22,21 @@ urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.u
 srdf_filename = compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf")
 
 
-def test_inverse_kinematics():
-    ik = AnalyticalInverseKinematics()
-    robot = RobotLibrary.ur5()
-    frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269))
-    # set the solver later
-    solutions = list(
-        ik.inverse_kinematics(robot, frame_WCF, start_configuration=None, group=None, options={"solver": "ur5"})
-    )
+def test_iter_inverse_kinematics():
+    solver = UR5Kinematics()
+    planner = AnalyticalKinematicsPlanner(solver)
+
+    # Set up the robot cell
+    robot = RobotLibrary.ur5(load_geometry=False)  # No need to load the geometry because no CC
+    robot_cell = RobotCell(robot)
+    planner.set_robot_cell(robot_cell)
+    start_state = RobotCellState.from_robot_cell(robot_cell)
+
+    # This target has eight solutions (without CC)
+    target = FrameTarget(Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269)))
+
+    # The `iter_inverse_kinematics` method will return an iterator that yields all possible solutions
+    solutions = list(planner.iter_inverse_kinematics(target, start_state, group=None))
     assert len(solutions) == 8
     joint_positions, _ = solutions[0]
     correct = Configuration.from_revolute_values((0.022, 4.827, 1.508, 1.126, 1.876, 3.163))
