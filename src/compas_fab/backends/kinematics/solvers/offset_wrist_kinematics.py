@@ -1,5 +1,9 @@
+from .analytical_kinematics import AnalyticalKinematics
 from .offset_wrist import forward_kinematics_offset_wrist
 from .offset_wrist import inverse_kinematics_offset_wrist
+
+from typing import List
+from compas.geometry import Frame
 
 # The following parameters for UR robots are taken from the following website:
 # https://www.universal-robots.com/articles/ur/application-installation/dh-parameters-for-calculations-of-kinematics-and-dynamics/
@@ -60,16 +64,19 @@ UR3e_PARAMS = {
 }
 
 
-class OffsetWristKinematics(object):
+class OffsetWristKinematics(AnalyticalKinematics):
     """ """
 
     def __init__(self, params):
+        super(OffsetWristKinematics, self).__init__()
         self.params = params
 
     def forward(self, joint_values):
+        # type: (List[float]) -> Frame
         return forward_kinematics_offset_wrist(joint_values, self.params)
 
     def inverse(self, frame_rcf):
+        # type: (Frame) -> List[List[float]]
         return inverse_kinematics_offset_wrist(frame_rcf, self.params)
 
 

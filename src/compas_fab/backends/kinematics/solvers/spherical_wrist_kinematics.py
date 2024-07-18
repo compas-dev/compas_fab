@@ -4,21 +4,28 @@ import math
 
 from compas.geometry import Point
 
+from .analytical_kinematics import AnalyticalKinematics
 from .spherical_wrist import forward_kinematics_spherical_wrist
 from .spherical_wrist import inverse_kinematics_spherical_wrist
 
+from typing import List
+from compas.geometry import Frame
 
-class SphericalWristKinematics(object):
+
+class SphericalWristKinematics(AnalyticalKinematics):
     """ """
 
     def __init__(self, points):
         self.points = points
+        super(SphericalWristKinematics, self).__init__()
 
     def forward(self, joint_values):
+        # type: (List[float]) -> Frame
         joint_values = self._pre_process(joint_values)
         return forward_kinematics_spherical_wrist(joint_values, self.points)
 
     def inverse(self, frame_rcf):
+        # type: (Frame) -> List[List[float]]
         solutions = inverse_kinematics_spherical_wrist(frame_rcf, self.points)
         return list(self._post_process(solutions))
         # return solutions

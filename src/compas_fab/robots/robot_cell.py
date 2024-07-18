@@ -35,13 +35,26 @@ class RobotCell(Data):
     - Workpieces that are placed in the environment and are not attached
     - Robotic backpacks or other accessories that are attached to links of the robot
     - Static obstacles in the environment
+
+
+    Attributes
+    ----------
+    robot : :class:`~compas_fab.robots.Robot`
+        The robot in the robot cell.
+        The robot's semantics is required.
+    tool_models : dict of str and :class:`~compas_robots.ToolModel`
+        The tools in the robot cell.
+        The key is the unique identifier for the tool.
+    rigid_body_models : dict of str and :class:`~compas_fab.robots.RigidBody`
+        The rigid bodies in the robot cell.
+        The key is the unique identifier for the rigid body.
     """
 
-    def __init__(self, robot_model=None, tool_models={}, rigid_body_models={}):
+    def __init__(self, robot=None, tool_models=None, rigid_body_models=None):
         super(RobotCell, self).__init__()
-        self.robot_model = robot_model  # type: RobotModel
-        self.tool_models = tool_models  # type: Dict[str, ToolModel]
-        self.rigid_body_models = rigid_body_models  # type: Dict[str, RigidBody]
+        self.robot = robot  # type: Robot
+        self.tool_models = tool_models or {}  # type: Dict[str, ToolModel]
+        self.rigid_body_models = rigid_body_models or {}  # type: Dict[str, RigidBody]
 
     @property
     def tool_ids(self):
@@ -56,7 +69,7 @@ class RobotCell(Data):
     @property
     def __data__(self):
         return {
-            "robot_model": self.robot_model,
+            "robot": self.robot,
             "tool_models": self.tool_models,
             "rigid_body_models": self.rigid_body_models,
         }
@@ -79,9 +92,19 @@ class RobotCell(Data):
 
     def get_attached_tool(self, robot_cell_state, group):
         # type: (RobotCellState, str) -> Optional[ToolModel]
-        """Returns the tool attached to the group in the robot cell state.
+        """Return the ToolModel of the tool attached to the group in the robot cell state.
 
         There can only be a maximum of one tool attached to a planning group.
+
+        Parameters
+        ----------
+        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+            The state of the robot cell.
+            The tool attachment information is stored in the tool_states attribute.
+        group : str
+            The name of the planning group to which the tool is attached.
+            This is not optional because the robot cell and and the state do not have
+            knowledge of the main group name.
 
         Returns
         -------
@@ -231,6 +254,7 @@ class RobotCellState(Data):
     """
 
     def __init__(self, robot_flange_frame, robot_configuration=None, tool_states={}, rigid_body_states={}):
+        # type: (Frame, Optional[Configuration], Dict[str, ToolState], Dict[str, RigidBodyState]) -> None
         super(RobotCellState, self).__init__()
         self.robot_flange_frame = robot_flange_frame  # type: Frame
         self.robot_configuration = robot_configuration  # type: Optional[Configuration]
@@ -274,7 +298,7 @@ class RobotCellState(Data):
         robot_configuration : :class:`~compas_fab.Configuration`, optional
             The configuration of the robot. If the configuration is not provided, the robot's zero configuration will be used.
         """
-        robot_cell_state = cls.from_robot_configuration(robot_cell.robot_model, robot_configuration)
+        robot_cell_state = cls.from_robot_configuration(robot_cell.robot, robot_configuration)
         for tool_id, tool_model in robot_cell.tool_models.items():
             tool_state = ToolState(Frame.worldXY(), None, None)
             robot_cell_state.tool_states[tool_id] = tool_state
@@ -287,6 +311,9 @@ class RobotCellState(Data):
     def from_robot_configuration(cls, robot, configuration=None, group=None):
         # type: (Robot | RobotModel, Optional[Configuration], Optional[str]) -> RobotCellState
         """Creates a `RobotCellState` from a robot and a configuration.
+
+        This should be used only for robot cells that contain only the robot.
+        The robot_flange_frame will be calculated using the forward kinematics of the robot model.
 
         Parameters
         ----------

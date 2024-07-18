@@ -15,9 +15,6 @@ from compas_fab.utilities import from_tcf_to_t0cf
 class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
     """ """
 
-    def __init__(self, client=None):
-        self.client = client
-
     def plan_cartesian_motion(self, robot, waypoints, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
 

@@ -2,9 +2,19 @@ from compas_fab.backends.exceptions import BackendError
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics
 
-from .solvers import PLANNER_BACKENDS
-from .utils import joint_angles_to_configurations
-from .utils import try_to_fit_configurations_between_bounds
+import compas
+
+if not compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from compas_fab.backends import AnalyticalKinematicsPlanner  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
+        from compas_fab.robots import FrameTarget  # noqa: F401
+        from typing import Dict, List, Optional, Tuple  # noqa: F401
+
+from ..utils import joint_angles_to_configurations
+from ..utils import try_to_fit_configurations_between_bounds
 
 
 class AnalyticalInverseKinematics(InverseKinematics):
@@ -24,11 +34,20 @@ class AnalyticalInverseKinematics(InverseKinematics):
     that supports ``"check_collision"``, so for now only the `PyBulletClient`.
     """
 
-    def __init__(self, client=None, solver=None):
-        self.client = client
-        self.planner = PLANNER_BACKENDS[solver]() if solver else None
+    def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
+        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Tuple[List[float], List[str]]
+        """Calculate the robot's inverse kinematic for a given frame.
 
-    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
+        An iterator is returned that yields the joint positions and joint names
+        """
+        planner = self  # type: AnalyticalKinematicsPlanner
+        frame = target.target_frame
+
+        # If a configuration is provided, use it as the start configuration and return the closest solution first
+        start_configuration = start_state.robot_configuration if start_state else None
+        return self.inverse_kinematics_ordered(frame, start_configuration, group=group, options=options)
+
+    def inverse_kinematics_ordered(self, frame_WCF, start_configuration=None, group=None, options=None):
         """Calculate the robot's inverse kinematic (IK) for a given frame.
 
         The IK for 6-axis industrial robots returns by default 8 possible solutions.
@@ -80,39 +99,24 @@ class AnalyticalInverseKinematics(InverseKinematics):
         """
 
         options = options or {}
-        solver = options.get("solver")
-        if solver:
-            self.planner = PLANNER_BACKENDS[solver]()
-        elif not self.planner:  # no solver, no planner
-            raise ValueError("Please pass an inverse kinematics solver")
+        planner = self  # type: AnalyticalKinematicsPlanner
+        robot = planner.robot_cell.robot  # type: Robot
+        solver = planner.kinematics_solver
 
         keep_order = options.get("keep_order", False)
 
         # convert the frame WCF to RCF
-        base_frame = robot.get_base_frame(group=group, full_configuration=start_configuration)
-        frame_RCF = base_frame.to_local_coordinates(frame_WCF)
+        if solver.base_frame is not None:
+            frame_RCF = solver.base_frame.to_local_coordinates(frame_WCF)
+        else:
+            frame_RCF = frame_WCF
 
         # calculate inverse with 8 solutions
         try:
-            solutions = self.planner.inverse(frame_RCF)
+            solutions = solver.inverse(frame_RCF)
         except ValueError:
             raise InverseKinematicsError()
         configurations = joint_angles_to_configurations(robot, solutions, group=group)
-
-        # check collisions for all configurations (>> sets those to `None` that are not working)
-        if options.get("check_collision", False) is True:
-            acms = options.get("attached_collision_meshes", [])
-            for acm in acms:
-                cached_robot_model = self.client.get_cached_robot_model(robot)
-                if not cached_robot_model.get_link_by_name(acm.collision_mesh.id):
-                    self.client.add_attached_collision_mesh(acm, options={"robot": robot})
-                    for touch_link in acm.touch_links:
-                        self.client.disabled_collisions.add((touch_link, acm.collision_mesh.id))
-            for i, config in enumerate(configurations):
-                try:
-                    self.client.check_collisions(robot, config)
-                except BackendError:
-                    configurations[i] = None
 
         # fit configurations within joint bounds (>> sets those to `None` that are not working)
         configurations = try_to_fit_configurations_between_bounds(robot, configurations, group=group)

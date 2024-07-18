@@ -9,11 +9,14 @@ from compas.geometry import intersection_plane_circle
 from compas.geometry import intersection_sphere_sphere
 from compas.geometry import tangent_points_to_circle_xy
 
+from typing import List
+
 # TODO: This is very slow...
 # can this be improved? for example https://github.com/visose/Robots/blob/master/Robots/Kinematics.cs
 
 
 def forward_kinematics_spherical_wrist(joint_values, points):
+    # type: (List[float], List[Point]) -> Frame
     """Forward kinematics function for spherical wrist robots.
 
     Parameters
@@ -88,6 +91,7 @@ def forward_kinematics_spherical_wrist(joint_values, points):
 
 
 def inverse_kinematics_spherical_wrist(target_frame, points):
+    # type: (Frame, List[Point]) -> List[List[float]]
     """Inverse kinematics function for spherical wrist robots.
 
     Parameters
@@ -169,8 +173,8 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
         Rot1 = Rotation.from_axis_and_angle([0, 0, 1], -1 * axis1_angle, point=[0, 0, 0])
         p1A = p1_proj.transformed(Rot1)
         elbow_dir = Vector(1, 0, 0).transformed(Rot1)
-        sphere1 = Sphere(lower_arm_length, point=p1A)
-        sphere2 = Sphere(upper_arm_length, point=wrist)
+        sphere1 = (p1A, lower_arm_length)  # Sphere class is not necessary to work with compas low-level functions
+        sphere2 = (wrist, upper_arm_length)  # Sphere class is not necessary to work with compas low-level functions
         elbow_frame = Frame(p1A, elbow_dir, [0, 0, 1])
         elbow_plane = (p1A, elbow_frame.normal)
 

@@ -2,8 +2,12 @@ from __future__ import absolute_import
 
 from .exceptions import CartesianMotionError
 
-from .analytical_inverse_kinematics import AnalyticalInverseKinematics
-from .analytical_plan_cartesian_motion import AnalyticalPlanCartesianMotion
+from .backend_features.analytical_inverse_kinematics import AnalyticalInverseKinematics
+from .backend_features.analytical_plan_cartesian_motion import AnalyticalPlanCartesianMotion
+
+from .planner import AnalyticalPyBulletPlanner
+from .planner import AnalyticalKinematicsPlanner
+
 
 from .solvers import (
     OffsetWristKinematics,
@@ -21,9 +25,11 @@ from .solvers import (
 __all__ = [
     # exceptions
     "CartesianMotionError",
-    # clients / backend features
+    # clients / planner / backend features
     "AnalyticalInverseKinematics",
     "AnalyticalPlanCartesianMotion",
+    "AnalyticalPyBulletPlanner",
+    "AnalyticalKinematicsPlanner",
     # solvers
     "OffsetWristKinematics",
     "SphericalWristKinematics",
