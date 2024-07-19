@@ -25,6 +25,7 @@ class AnalyticalForwardKinematics(ForwardKinematics):
 
     def forward_kinematics(self, robot_cell_state, group=None, options=None):
         # type: (RobotCellState, Optional[str], Optional[dict]) -> Frame
+        """Calculate the forward kinematics for a given joint configuration."""
         planner = self  # type: AnalyticalKinematicsPlanner
         robot = self.robot_cell.robot  # type: Robot
 
