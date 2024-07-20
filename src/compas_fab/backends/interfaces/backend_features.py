@@ -20,6 +20,7 @@ if not compas.IPY:
         from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import FrameTarget  # noqa: F401
+        from compas_fab.robots import Target  # noqa: F401
 
 
 class BackendFeature(object):
@@ -34,6 +35,30 @@ class BackendFeature(object):
 
     def __init__(self, client=None):
         super(BackendFeature, self).__init__()
+
+    def _scale_input_target(self, target):
+        # type: (Target) -> Target
+        """Scale the target if the robot has user defined scale."""
+        robot = self.robot_cell.robot  # type: Robot
+
+        # Check `robot.need_scaling` to avoid unnecessary scaling
+        if robot.need_scaling:
+            # Scale input target back to meter scale
+            return target.scaled(1.0 / robot.scale_factor)
+
+        return target
+
+    def _scale_output_frame(self, frame):
+        # type: (Frame) -> Frame
+        """Scale the frame if the robot has user defined scale."""
+        robot = self.robot_cell.robot  # type: Robot
+
+        # Check `robot.need_scaling` to avoid unnecessary scaling
+        if robot.need_scaling:
+            # Scale output frame to user defined scale
+            return frame.scaled(robot.scale_factor)
+
+        return frame
 
     # @property
     # def client(self):
@@ -87,6 +112,49 @@ class SetRobotCellState(BackendFeature):
         This function is called automatically by planning functions that takes a start_state as input.
         Therefore it is typically not necessary for the user to call this function,
         except when used to trigger visualization using native backend canvas.
+
+        """
+        pass
+
+
+class CheckCollision(BackendFeature):
+    """Mix-in interface for implementing a planner's collision check feature."""
+
+    def check_collision(self, robot_cell_state, allowed_collision_pairs=[]):
+        # type: (RobotCellState, List[Tuple[str,str]]) -> None
+        """Check if the robot cell is in collision at the specified state.
+
+
+        Collision checking typically involves checking for collisions between
+        (1) the robot's links, a.k.a. self-collision;
+        (2) the robot's links and the attached objects;
+        (3) the robot's links and stationary objects;
+        (4) the attached objects and the stationary objects.
+        (5) the attached objects and other attached objects.
+        Where the attached and stationary objects refers to environment rigid bodies, tools and workpieces.
+
+        Different planners may have different criteria for collision checking, check the planner's documentation for details.
+
+        Parameters
+        ----------
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+            The robot cell state to check for collision.
+        allowed_collision_pairs : :obj:`list` of :obj:`tuple` of (str, str)
+            Collision pairs that are allowed to collide.
+            The pairs are defined by the names of the collision objects.
+            - For robot links, the names are the link names of the robot prefixed by the robot's name.
+              For example, a robot named "ur5" with a link named "link" will have the name "robot/link".
+
+
+        Returns
+        -------
+        None
+            If there is collision, the function will raise exception, otherwise it will return None.
+
+        Raises
+        ------
+        :class:`compas_fab.backends.exceptions.CollisionCheckError`
+            If collision is detected.
 
         """
         pass

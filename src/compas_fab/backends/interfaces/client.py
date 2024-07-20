@@ -13,6 +13,8 @@ if compas.IPY:
         from compas_fab.robots import Robot
         from compas_fab.robots import RobotCell
         from compas_fab.robots import RobotCellState
+        from typing import List
+        from compas.geometry import Frame
 
 
 class ClientInterface(object):
@@ -240,3 +242,57 @@ class PlannerInterface(object):
             Planner does not have this feature.
         """
         raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
+
+    # ==========================================================================
+    # Tool and Workpiece Functions
+    # ==========================================================================
+
+    def from_tcf_to_t0cf(self, tcf_frames, tool_id):
+        # type: (List[Frame], str) -> List[Frame]
+        """Converts a frame describing the robot's tool coordinate frame (TCF) relative to WCF
+        to a frame describing the planner coordinate frame (PCF) (also T0CF), relative to WCF.
+
+        The tool_id must correspond to a valid tool in `planner.robot_cell.tool_models`.
+
+        Parameters
+        ----------
+        tcf_frames : list of :class:`~compas.geometry.Frame`
+            Tool Coordinate Frames (TCF) relative to the World Coordinate Frame (WCF).
+        tool_id : str
+            The id of the tool attached to the robot.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Frame`
+            Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
+        """
+        if tool_id not in self.robot_cell.tool_models:
+            raise ValueError("Tool with id '{}' not found in robot cell.".format(tool_id))
+
+        tool = self.robot_cell.tool_models[tool_id]
+        return tool.from_tcf_to_t0cf(tcf_frames)
+
+    def from_t0cf_to_tcf(self, t0cf_frames, tool_id):
+        # type: (List[Frame], str) -> List[Frame]
+        """Converts a frame describing the planner coordinate frame (PCF) (also T0CF) relative to WCF
+        to a frame describing the robot's tool coordinate frame (TCF) relative to WCF.
+
+        The tool_id must correspond to a valid tool in `planner.robot_cell.tool_models`.
+
+        Parameters
+        ----------
+        t0cf_frames : list of :class:`~compas.geometry.Frame`
+            Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
+        tool_id : str
+            The id of the tool attached to the robot.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Frame`
+            Tool Coordinate Frames (TCF) relative to the World Coordinate Frame (WCF).
+        """
+        if tool_id not in self.robot_cell.tool_models:
+            raise ValueError("Tool with id '{}' not found in robot cell.".format(tool_id))
+
+        tool = self.robot_cell.tool_models[tool_id]
+        return tool.from_t0cf_to_tcf(t0cf_frames)
