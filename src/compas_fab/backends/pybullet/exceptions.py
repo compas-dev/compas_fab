@@ -10,13 +10,3 @@ class PyBulletError(BackendError):
 
     def __init__(self, message):
         super(PyBulletError, self).__init__(message)
-
-
-class CollisionError(PyBulletError):
-    """Exception raised when two objects have been found to be in collision in PyBullet."""
-
-    def __init__(self, name1, name2):
-        message = "Collision between '{}' and '{}'".format(name1, name2)
-        super(CollisionError, self).__init__(message)
-        self.name1 = name1
-        self.name2 = name2
