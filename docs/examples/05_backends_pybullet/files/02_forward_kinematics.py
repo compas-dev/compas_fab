@@ -4,6 +4,8 @@ from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
+from compas_fab.robots import RobotLibrary
+
 
 # #############################################
 # Headless (no-GUI) forwards kinematics example
@@ -12,8 +14,7 @@ from compas_fab.robots import RobotCellState
 # 'direct' mode
 with PyBulletClient("direct") as client:
     # The robot in this example is loaded from a URDF file
-    urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
-    robot = client.load_robot(urdf_filename)
+    robot = RobotLibrary.ur5()
 
     # The planner object is needed to call the forward kinematics function
     planner = PyBulletPlanner(client)

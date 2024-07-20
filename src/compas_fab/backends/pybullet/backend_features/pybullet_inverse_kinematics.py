@@ -108,9 +108,8 @@ class PyBulletInverseKinematics(InverseKinematics):
         max_results = options.get("max_results", 100)
         link_name = options.get("link_name") or robot.get_end_effector_link_name(group)
 
-        cached_robot_model = client.get_cached_robot_model(robot)
-        body_id = client.get_uid(cached_robot_model)
-        link_id = client._get_link_id_by_name(link_name, cached_robot_model)
+        body_id = client.robot_puid
+        link_id = client.robot_link_puids[link_name]
 
         # Target frame
         target = self._scale_input_target(target)
@@ -123,19 +122,22 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         point, orientation = pose_from_frame(target_frame)
 
-        joints = cached_robot_model.get_configurable_joints()
-        joints.sort(key=lambda j: j.attr["pybullet"]["id"])
-        joint_names = [joint.name for joint in joints]
+        # Get list of keys (joint_name) from the joint_ids dict in the order of its values (puid)
+        joint_names_sorted, joint_ids_sorted = client.get_configurable_joint_names_and_puid()
 
-        lower_limits = [joint.limit.lower if joint.type != Joint.CONTINUOUS else 0 for joint in joints]
-        upper_limits = [joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi for joint in joints]
-
-        start_configuration = start_state.robot_configuration or robot.zero_configuration(group)
-        start_configuration = client.set_robot_configuration(start_configuration, group)
+        # Get joint limits in the same order as the joint_ids
+        lower_limits = []
+        upper_limits = []
+        for joint_name in joint_names_sorted:
+            joint = robot.get_joint_by_name(joint_name)
+            lower_limits.append(joint.limit.lower if joint.type != Joint.CONTINUOUS else 0)
+            upper_limits.append(joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi)
 
         # Rest pose is PyBullet's way of defining the initial guess for the IK solver
+        start_configuration = start_state.robot_configuration or robot.zero_configuration(group)
+        client.set_robot_configuration(start_configuration)  # Not sure if this line is needed.
         # The order of the values needs to match with pybullet's joint id order
-        rest_poses = self._get_rest_poses(joint_names, start_configuration)
+        rest_poses = [start_configuration[joint_name] for joint_name in joint_names_sorted]
 
         # Prepare Parameters for calling pybullet.calculateInverseKinematics
         ik_options = dict(
@@ -181,7 +183,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         if high_accuracy:
             ik_options.update(
                 dict(
-                    joints=joints,
+                    joint_ids_sorted=joint_ids_sorted,
                     threshold=options.get("high_accuracy_threshold", 1e-4),
                     max_iter=options.get("high_accuracy_max_iter", 20),
                 )
@@ -215,29 +217,26 @@ class PyBulletInverseKinematics(InverseKinematics):
             # because the accurate IK solving says it's not close enough, we can retry
             # with a new randomized seed
             if close_enough:
-                yield joint_positions, joint_names
+                yield joint_positions, joint_names_sorted
 
-            # Randomize joints to get a different solution on the next iter
-            client._set_joint_positions(
-                [joint.attr["pybullet"]["id"] for joint in joints],
-                [random.uniform(*limits) for limits in zip(lower_limits, upper_limits)],
-                body_id,
-            )
+            # Randomize joint values to get a different solution on the next iter
+            for lower_limit, upper_limit, joint_id in zip(lower_limits, upper_limits, joint_ids_sorted):
+                random_value = random.uniform(lower_limit, upper_limit)
+                client._set_joint_position(joint_id, random_value, client.robot_puid)
 
-    def _accurate_inverse_kinematics(self, joints, threshold, max_iter, **kwargs):
+    def _accurate_inverse_kinematics(self, joint_ids_sorted, threshold, max_iter, **kwargs):
         # Based on these examples
         # https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/examples/inverse_kinematics_husky_kuka.py#L81
         close_enough = False
         iter = 0
-        joint_ids = [joint.attr["pybullet"]["id"] for joint in joints]
         body_id = kwargs["bodyUniqueId"]
         link_id = kwargs["endEffectorLinkIndex"]
         target_position = kwargs["targetPosition"]
 
         while not close_enough and iter < max_iter:
             joint_poses = pybullet.calculateInverseKinematics(**kwargs)
-            for i in range(len(joint_ids)):
-                pybullet.resetJointState(body_id, joint_ids[i], joint_poses[i])
+            for i in range(len(joint_ids_sorted)):
+                pybullet.resetJointState(body_id, joint_ids_sorted[i], joint_poses[i])
 
             link_state = pybullet.getLinkState(body_id, link_id)
             new_pose = link_state[4]
@@ -256,9 +255,3 @@ class PyBulletInverseKinematics(InverseKinematics):
             iter += 1
 
         return joint_poses, close_enough
-
-    def _get_rest_poses(self, joint_names, configuration):
-        name_value_map = {
-            configuration.joint_names[i]: configuration.joint_values[i] for i in range(len(configuration.joint_names))
-        }
-        return [name_value_map[name] for name in joint_names]

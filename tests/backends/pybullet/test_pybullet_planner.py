@@ -65,7 +65,6 @@ def validate_ik_with_fk(ik_target_frame, fk_result_frame):
 
 def _test_fk_with_pybullet_planner(robot, true_result):
     with PyBulletClient(connection_type="direct") as client:
-        robot = client.load_existing_robot(robot)
         planner = PyBulletPlanner(client)
         planner.set_robot_cell(RobotCell(robot))
 
@@ -122,7 +121,6 @@ def _test_pybullet_ik_fk_agreement(robot, ik_target_frames):
     ik_options = {"high_accuracy_max_iter": 50, "high_accuracy": True, "high_accuracy_threshold": 1e-5}
 
     with PyBulletClient(connection_type="direct") as client:
-        robot = client.load_existing_robot(robot)
         planner = PyBulletPlanner(client)
         planner.set_robot_cell(RobotCell(robot))
         planning_group = robot.main_group_name
@@ -243,7 +241,6 @@ def test_pybullet_ik_out_of_reach_ur5():
     ik_options = {"high_accuracy_max_iter": 20, "high_accuracy": True, "high_accuracy_threshold": 1e-5}
 
     with PyBulletClient(connection_type="direct") as client:
-        robot = client.load_existing_robot(robot)
         planner = PyBulletPlanner(client)
         planner.set_robot_cell(RobotCell(robot))
         planning_group = robot.main_group_name

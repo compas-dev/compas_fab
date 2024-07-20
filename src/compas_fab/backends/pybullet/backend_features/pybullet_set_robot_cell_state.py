@@ -48,9 +48,10 @@ class PyBulletSetRobotCellState(SetRobotCellState):
 
         # TODO: Check for modified object states and change those only
 
-        # Update the robot configuration
+        # Update the robot configuration if it is provided
         # Note robot_cell_state.robot_configuration is a full configuration
-        client.set_robot_configuration(robot_cell_state.robot_configuration)
+        if robot_cell_state.robot_configuration:
+            client.set_robot_configuration(robot_cell_state.robot_configuration)
 
         # Keep track of tool's base_frames during tool updates
         # They can be used later to update rigid body base frames that are attached to tools

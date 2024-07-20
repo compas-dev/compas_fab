@@ -2,6 +2,7 @@ from compas_fab.backends.interfaces import SetRobotCell
 
 import compas
 from compas.geometry import Frame
+from compas_fab.robots import RobotCell
 
 if not compas.IPY:
     from typing import TYPE_CHECKING
@@ -16,7 +17,6 @@ if not compas.IPY:
         from compas_robots import Configuration  # noqa: F401
         from compas.geometry import Frame  # noqa: F401
         from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.backends import PyBulletClient  # noqa: F401
 
@@ -36,6 +36,8 @@ class PyBulletSetRobotCell(SetRobotCell):
         """
         client = self.client  # type: PyBulletClient
 
+        previous_robot_cell = client.robot_cell or RobotCell()
+
         # TODO: Check for new, modified and removed objects compared to the
         # TODO: previous robot cell state and update the PyBullet world accordingly
 
@@ -52,11 +54,15 @@ class PyBulletSetRobotCell(SetRobotCell):
         for name, rigid_body in robot_cell.rigid_body_models.items():
             client.add_rigid_body(name, rigid_body)
             # client.convert_mesh_to_body(rigid_body.visual_meshes[0], Frame.worldXY())
-        # Update the robot cell in the client
-        self._robot_cell = robot_cell
 
+        # Feed the robot to the client
         if robot_cell.robot:
-            client.load_existing_robot(robot_cell.robot)
+            robot_cell.robot.ensure_geometry()
+            robot_cell.robot.ensure_semantics()
+            client.set_robot(robot_cell.robot)
+
+        # Update the robot cell in the planner
+        client._robot_cell = robot_cell
 
         # If a robot cell state is provided, update the client's robot cell state
         if robot_cell_state:

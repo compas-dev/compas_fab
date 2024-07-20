@@ -74,8 +74,6 @@ class PyBulletForwardKinematics(ForwardKinematics):
         planner = self  # type: PyBulletPlanner
         robot = client.robot
         group = group or robot.main_group_name
-        cached_robot_model = client.get_cached_robot_model(robot)
-        robot_body_id = client.get_uid(cached_robot_model)
 
         # Setting the entire robot cell state, including the robot configuration
         planner.set_robot_cell_state(robot_cell_state)
@@ -89,13 +87,13 @@ class PyBulletForwardKinematics(ForwardKinematics):
         if link_name:
             if link_name not in robot.get_link_names(group):
                 raise KeyError("Link name provided is not part of the group")
-            link_id = client._get_link_id_by_name(link_name, cached_robot_model)
-            fk_frame = client._get_link_frame(link_id, robot_body_id)
+            link_id = client.robot_link_puids[link_name]
+            fk_frame = client._get_link_frame(link_id, client.robot_puid)
 
         else:
             link_name = robot.get_end_effector_link_name(group)
-            link_id = client._get_link_id_by_name(link_name, cached_robot_model)
-            fk_frame = client._get_link_frame(link_id, robot_body_id)
+            link_id = client.robot_link_puids[link_name]
+            fk_frame = client._get_link_frame(link_id, client.robot_puid)
 
             # If no link name provided, and a tool is attached to the group, return the tool tip frame of the tool
             robot_cell = planner.robot_cell  # type: RobotCell

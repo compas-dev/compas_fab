@@ -25,9 +25,6 @@ class ClientInterface(object):
     ----------
     robot : :class:`compas_fab.robots.Robot`, read-only
         The robot instance associated with the client.
-        Typically this is set by the backend client after it is initialized, using
-        `client.load_robot()`. It cannot be changed after it is set.
-        Consult the chosen backend client for how to set this attribute.
     """
 
     def __init__(self):
