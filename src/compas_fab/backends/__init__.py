@@ -36,7 +36,6 @@ Classes to interact with `PyBullet <http://pybullet.org/>`_.
     PyBulletClient
     PyBulletPlanner
     PyBulletError
-    CollisionError
 
 
 Analytical Kinematics
@@ -92,6 +91,7 @@ Exceptions
 
     BackendError
     BackendFeatureNotSupportedError
+    CollisionCheckInCollisionError
     CartesianMotionError
     InverseKinematicsError
     KinematicsError
@@ -112,7 +112,9 @@ from .exceptions import (
     BackendFeatureNotSupportedError,
     InverseKinematicsError,
     KinematicsError,
+    CollisionCheckInCollisionError,
 )
+
 from .tasks import (
     FutureResult,
     CancellableFutureResult,
@@ -154,7 +156,6 @@ if not compas.IPY:
     # PyBullet do not work in IronPython
     from .pybullet import (
         PyBulletClient,
-        CollisionError,
         PyBulletError,
         PyBulletPlanner,
         AnalyticalPyBulletClient,
@@ -166,6 +167,7 @@ __all__ = [
     "BackendFeatureNotSupportedError",
     "InverseKinematicsError",
     "KinematicsError",
+    "CollisionCheckInCollisionError",
     "FutureResult",
     "CancellableFutureResult",
     # ROS
@@ -196,7 +198,6 @@ __all__ = [
 if not compas.IPY:
     __all__ += [
         "PyBulletClient",
-        "CollisionError",
         "PyBulletError",
         "PyBulletPlanner",
         "AnalyticalPyBulletClient",

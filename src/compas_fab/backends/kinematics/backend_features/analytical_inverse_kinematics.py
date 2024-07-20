@@ -1,20 +1,27 @@
 from compas_fab.backends.exceptions import BackendError
+from compas_fab.backends.exceptions import BackendTargetNotSupportedError
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics
 
 import compas
 
+
 if not compas.IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
+        from compas.geometry import Frame  # noqa: F401
         from compas_fab.backends import AnalyticalKinematicsPlanner  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import FrameTarget  # noqa: F401
+        from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import Target  # noqa: F401
         from typing import Dict, List, Optional, Tuple  # noqa: F401
+        from typing import Generator  # noqa: F401
 
 from ..utils import joint_angles_to_configurations
 from ..utils import try_to_fit_configurations_between_bounds
+
+from compas_fab.robots import FrameTarget
 
 
 class AnalyticalInverseKinematics(InverseKinematics):
@@ -35,19 +42,52 @@ class AnalyticalInverseKinematics(InverseKinematics):
     """
 
     def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Tuple[List[float], List[str]]
-        """Calculate the robot's inverse kinematic for a given frame.
+        # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
+        """Calculate the robot's inverse kinematic for a given target.
 
         An iterator is returned that yields the joint positions and joint names
         """
+        if isinstance(target, FrameTarget):
+            return self.iter_inverse_kinematics_frame_target(
+                target, start_state=start_state, group=group, options=options
+            )
+        else:
+            raise BackendTargetNotSupportedError()
+
+    def iter_inverse_kinematics_frame_target(self, target, start_state=None, group=None, options=None):
+        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
+        """Calculate the robot's inverse kinematic for a given frame target.
+
+        The IK for 6-axis industrial robots returns by default 8 possible solutions.
+        These solutions have an order. That means that if you call IK on two
+        subsequent frames and compare the 8 configurations of the first frame
+        with the 8 configurations of the second frame at their respective indices,
+        then these configurations are "close" to one another. For this reason,
+        for certain use cases, e.g. for cartesian path planning, it makes sense
+        to keep the order of solutions. This can be achieved by setting the
+        optional parameter ``keep_order`` to ``True``. The configurations that
+        are in collision or outside joint boundaries are then not removed from
+        the list of solutions, they are set to ``None``.
+
+
+
+        This function handles the case where the target is a :class:`compas_fab.robots.FrameTarget`.
+        """
         planner = self  # type: AnalyticalKinematicsPlanner
-        frame = target.target_frame
 
-        # If a configuration is provided, use it as the start configuration and return the closest solution first
-        start_configuration = start_state.robot_configuration if start_state else None
-        return self.inverse_kinematics_ordered(frame, start_configuration, group=group, options=options)
+        # Scale Target and get target frame
+        target = self._scale_input_target(target)
+        target_frame = target.target_frame
 
-    def inverse_kinematics_ordered(self, frame_WCF, start_configuration=None, group=None, options=None):
+        # Tool Coordinate Frame if there are tools attached
+        attached_tool_id = start_state.get_attached_tool_id(group)
+        if attached_tool_id:
+            target_frame = self.from_tcf_to_t0cf([target_frame], attached_tool_id)[0]
+
+        return self.inverse_kinematics_ordered(target_frame, group=group, options=options)
+
+    def inverse_kinematics_ordered(self, frame_WCF, group=None, options=None):
+        # type: (Frame, Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
         """Calculate the robot's inverse kinematic (IK) for a given frame.
 
         The IK for 6-axis industrial robots returns by default 8 possible solutions.
@@ -63,12 +103,8 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which inverse kinematics is being calculated.
         frame_WCF: :class:`compas.geometry.Frame`
             The frame to calculate the inverse for.
-        start_configuration: :class:`compas_fab.robots.Configuration`, optional
-            The start_configuration of the robot.
         group: str, optional
             The planning group used for determining the end effector and labeling
             the ``start_configuration``. Defaults to the robot's main planning group.
@@ -96,6 +132,8 @@ class AnalyticalInverseKinematics(InverseKinematics):
         ------
         ValueError
             If the solver to solve the kinematics has not been passed.
+        InverseKinematicsError
+            If no IK solution could be found by the kinematic solver.
         """
 
         options = options or {}

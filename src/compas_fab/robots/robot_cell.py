@@ -274,6 +274,7 @@ class RobotCellState(Data):
     @property
     def __data__(self):
         return {
+            "robot_flange_frame": self.robot_flange_frame,
             "robot_configuration": self.robot_configuration,
             "tool_states": self.tool_states,
             "rigid_body_states": self.rigid_body_states,
@@ -345,10 +346,22 @@ class RobotCellState(Data):
             if tool_state.attached_to_group == group:
                 return tool_id
 
+    def get_detached_tool_ids(self):
+        # type: () -> List[str]
+        """Returns the ids of the tools that are not attached to any planning group.
+
+        Returns
+        -------
+        List[str]
+            The ids of the tools that are not attached to any planning group.
+        """
+        return [tool_id for tool_id, tool_state in self.tool_states.items() if not tool_state.attached_to_group]
+
     def get_attached_workpiece_ids(self, group):
         # type: (str) -> Optional[str]
         """Returns the id of the workpiece attached to the tool attached to the planning group.
 
+        Workpieces are rigid bodies that are attached to the tip of a tool.
         There can be more than one workpiece attached to a tool.
 
         Returns
@@ -382,8 +395,8 @@ class RobotCellState(Data):
             if rigid_body_state.attached_to_link:
                 ids.append(rigid_body_id)
 
-    def set_tool_attached_to_group(self, tool_id, group, detach_others=True):
-        # type: (str, str, Optional[bool]) -> None
+    def set_tool_attached_to_group(self, tool_id, group, attachment_frame=None, detach_others=True):
+        # type: (str, str, Optional[Frame], Optional[bool]) -> None
         """Sets the tool attached to the planning group.
 
         Notes
@@ -399,8 +412,12 @@ class RobotCellState(Data):
         detach_others : bool, optional
             Whether to detach all other tools from the group. Defaults to True.
         """
+        if not attachment_frame:
+            attachment_frame = Frame.worldXY()
+
         self.tool_states[tool_id].attached_to_group = group
         self.tool_states[tool_id].frame = None
+        self.tool_states[tool_id].attachment_frame = attachment_frame
 
         if detach_others:
             for id, tool_state in self.tool_states.items():
@@ -432,10 +449,10 @@ class RobotCellState(Data):
         self.rigid_body_states[rigid_body_id].attached_to_link = link_name
         self.rigid_body_states[rigid_body_id].attached_to_tool = None
         self.rigid_body_states[rigid_body_id].frame = None
-        self.rigid_body_states[rigid_body_id].grasp = attachment_frame
+        self.rigid_body_states[rigid_body_id].attachment_frame = attachment_frame
 
-    def set_rigid_body_attached_to_tool(self, rigid_body_id, tool_id, grasp_frame=None):
-        # type: (str, str, Frame) -> None
+    def set_rigid_body_attached_to_tool(self, rigid_body_id, tool_id, attachment_frame=None):
+        # type: (str, str, Optional[Frame]) -> None
         """Sets the rigid body attached to the tool.
 
         Notes
@@ -449,17 +466,17 @@ class RobotCellState(Data):
             The id of the rigid body.
         tool_id : str
             The id of the tool to which the rigid body is attached.
-        grasp_frame : :class:`compas.geometry.Frame`, optional
-            The grasp frame of the rigid body relative to the tool.
+        attachment_frame : :class:`compas.geometry.Frame`, optional
+            The attachment (grasp) frame of the rigid body relative to the tool.
             Defaults to None, which means that the rigid body is at the tip of the tool.
         """
-        if not grasp_frame:
-            grasp_frame = Frame.worldXY()
+        if not attachment_frame:
+            attachment_frame = Frame.worldXY()
 
         self.rigid_body_states[rigid_body_id].attached_to_link = None
         self.rigid_body_states[rigid_body_id].attached_to_tool = tool_id
         self.rigid_body_states[rigid_body_id].frame = None
-        self.rigid_body_states[rigid_body_id].grasp = grasp_frame
+        self.rigid_body_states[rigid_body_id].attachment_frame = attachment_frame
 
 
 class ToolState(Data):
@@ -473,9 +490,9 @@ class ToolState(Data):
 
     When representing a tool that is kinematic (a ToolModel with movable joints), the
     `configuration` attribute should be set. Otherwise, if left at `None`, the tool's
-    configuration will be assumed to be at its zero configuration. Note that grasp is
-    relative to the base of the tool, and thus is not affected by the configuration of the tool.
-
+    configuration will be assumed to be at its zero configuration.
+    Note that the attachment location of workpieces (RigidBody) to the tool cannot
+    and will not be changed by the tool's configuration.
 
     Attributes
     ----------
@@ -485,6 +502,8 @@ class ToolState(Data):
         In that case, the planner or visualization tool will use the end frame of the planning group.
     attached_to_group : :obj:`str`, optional
         The name of the robot planning group to which the tool is attached. Defaults to ``None``.
+    attachment_frame : :class:`compas.geometry.Frame`, optional
+        The frame of the tool relative to the frame of the attached link. Defaults to ``None``.
     configuration : :class:`compas_robots.Configuration`, optional
         The configuration of the tool if the tool is kinematic. Defaults to ``None``.
     is_hidden : :obj:`bool`, optional
@@ -492,10 +511,11 @@ class ToolState(Data):
         for hidden objects. Defaults to ``False``.
     """
 
-    def __init__(self, frame, attached_to_group=None, configuration=None, is_hidden=False):
+    def __init__(self, frame, attached_to_group=None, attachment_frame=None, configuration=None, is_hidden=False):
         super(ToolState, self).__init__()
         self.frame = frame  # type: Frame
         self.attached_to_group = attached_to_group  # type: Optional[str]
+        self.attachment_frame = attachment_frame  # type: Optional[Frame]
         self.configuration = configuration  # type: Optional[Configuration]
         self.is_hidden = is_hidden  # type: bool
 
@@ -504,6 +524,7 @@ class ToolState(Data):
         return {
             "frame": self.frame,
             "attached_to_group": self.attached_to_group,
+            "attachment_frame": self.attachment_frame,
             "configuration": self.configuration,
             "is_hidden": self.is_hidden,
         }
@@ -520,11 +541,11 @@ class RigidBodyState(Data):
     - All of the above objects but are currently hidden
 
     When representing a workpiece that is attached to a tool, the `attached_to_tool` attribute should be
-    set to the name of the tool. The `grasp` attribute should be set to the grasp frame,
-    which represents the position of the workpiece relative to the tool tip frame.
+    set to the name of the tool. The `attachment_frame` attribute should be set to the grasp frame,
+    which represents the position of the workpiece relative to the tool coordinate frame (TCF).
 
     When representing a collision geometry (such as robotic backpacks) that is attached to a link of the robot,
-    the `attached_to_link` attribute should be set. The `grasp` attribute should be set to the relative position
+    the `attached_to_link` attribute should be set. The `attachment_frame` attribute should be set to the relative position
     of the rigid body to the base frame of the link.
 
     In either one of the two attached cases, the `frame` attribute should be set to 'None' as the actual frame
@@ -546,25 +567,25 @@ class RigidBodyState(Data):
         The name of the robot link to which the workpiece is attached. Defaults to ``None``.
     attached_to_tool : :obj:`str`, optional
         The id of the tool to which the workpiece is attached. Defaults to ``None``.
-    grasp : :class:`compas.geometry.Frame` | :class:`compas.geometry.Transformation`, optional
-        The grasp frame of the workpiece relative to (the base frame of) the attached link or
+    attachment_frame : :class:`compas.geometry.Frame` | :class:`compas.geometry.Transformation`, optional
+        The attachment (grasp) frame of the workpiece relative to (the base frame of) the attached link or
         (the tool tip frame of) the tool. Defaults to ``None``.
     is_hidden : :obj:`bool`, optional
         Whether the workpiece is hidden in the scene. Collision checking will be turned off
         for hidden objects. Defaults to ``False``.
     """
 
-    def __init__(self, frame, attached_to_link=None, attached_to_tool=None, grasp=None, is_hidden=False):
+    def __init__(self, frame, attached_to_link=None, attached_to_tool=None, attachment_frame=None, is_hidden=False):
         super(RigidBodyState, self).__init__()
         self.frame = frame
         self.attached_to_link = attached_to_link
         self.attached_to_tool = attached_to_tool
         if attached_to_link and attached_to_tool:
             raise ValueError("A RigidBodyState cannot be attached to both a link and a tool.")
-        self.grasp = grasp
-        # Convert grasp to a Frame if it is a Transformation
-        if isinstance(grasp, Transformation):
-            self.grasp = Frame.from_transformation(grasp)
+        self.attachment_frame = attachment_frame
+        # Convert attachment_frame to a Frame if it is a Transformation
+        if isinstance(attachment_frame, Transformation):
+            self.attachment_frame = Frame.from_transformation(attachment_frame)
         self.is_hidden = is_hidden
 
     @property
@@ -573,6 +594,6 @@ class RigidBodyState(Data):
             "frame": self.frame,
             "attached_to_link": self.attached_to_link,
             "attached_to_tool": self.attached_to_tool,
-            "grasp": self.grasp,
+            "attachment_frame": self.attachment_frame,
             "is_hidden": self.is_hidden,
         }

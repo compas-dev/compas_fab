@@ -48,6 +48,7 @@ from .backend_features import AddAttachedCollisionMesh
 from .backend_features import AddCollisionMesh
 from .backend_features import AppendCollisionMesh
 from .backend_features import BackendFeature
+from .backend_features import CheckCollision
 from .backend_features import ForwardKinematics
 from .backend_features import GetPlanningScene
 from .backend_features import InverseKinematics
@@ -67,6 +68,7 @@ __all__ = [
     "AppendCollisionMesh",
     "BackendFeature",
     "ClientInterface",
+    "CheckCollision",
     "ForwardKinematics",
     "GetPlanningScene",
     "InverseKinematics",

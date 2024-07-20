@@ -32,7 +32,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
 
         Collision checking can be enabled by setting ``"check_collision"`` to ``True`` in the options.
         This will cause the backend to perform collision checking on the robot's configuration and raise
-        a :class:`CollisionError` if the robot is in collision. This is equivalent to calling
+        a :class:`CollisionCheckError` if the robot is in collision. This is equivalent to calling
         :meth:`compas_fab.backends.PyBulletClient.check_collisions`.
 
         Parameters
@@ -62,7 +62,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
 
         Raises
         ------
-        CollisionError
+        CollisionCheckError
             If the configuration is in collision. Includes both self-collision and
             collision with the environment.
 
@@ -87,7 +87,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
         # If a link name provided, return the frame of that link
         link_name = options.get("link")
         if link_name:
-            if link_name in robot.get_link_names(group):
+            if link_name not in robot.get_link_names(group):
                 raise KeyError("Link name provided is not part of the group")
             link_id = client._get_link_id_by_name(link_name, cached_robot_model)
             fk_frame = client._get_link_frame(link_id, robot_body_id)
@@ -106,7 +106,6 @@ class PyBulletForwardKinematics(ForwardKinematics):
                     fk_frame = from_tcf_to_t0cf(fk_frame, attached_tool.frame)
 
         # Scale resulting frame to user units
-        if robot.need_scaling:
-            fk_frame = fk_frame.scaled(robot.scale_factor)
+        fk_frame = self._scale_output_frame(fk_frame)
 
         return fk_frame

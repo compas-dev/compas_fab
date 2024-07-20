@@ -15,8 +15,10 @@ if not compas.IPY:
         from typing import List  # noqa: F401
         from typing import Tuple  # noqa: F401
         from typing import Dict  # noqa: F401
+        from typing import Generator  # noqa: F401
+
         from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import FrameTarget  # noqa: F401
+        from compas_fab.robots import Target  # noqa: F401
         from compas_fab.robots import AttachedCollisionMesh  # noqa: F401
         from compas_fab.backends import PyBulletClient  # noqa: F401
 
@@ -32,6 +34,8 @@ from compas_fab.backends.pybullet.conversions import pose_from_frame
 from compas_fab.utilities import LazyLoader
 from compas_fab.utilities import from_tcf_to_t0cf
 
+from compas_fab.robots import FrameTarget
+
 pybullet = LazyLoader("pybullet", globals(), "pybullet")
 
 
@@ -44,7 +48,15 @@ class PyBulletInverseKinematics(InverseKinematics):
     """Callable to calculate the robot's inverse kinematics for a given frame."""
 
     def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Iterator[Tuple[List[float], List[str]]]
+        # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
+
+        if isinstance(target, FrameTarget):
+            return self.iter_inverse_kinematics_frame_target(target, start_state, group, options)
+        else:
+            raise NotImplementedError("{} is not supported by PyBulletInverseKinematics".format(type(target)))
+
+    def iter_inverse_kinematics_frame_target(self, target, start_state=None, group=None, options=None):
+        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters
@@ -101,17 +113,13 @@ class PyBulletInverseKinematics(InverseKinematics):
         link_id = client._get_link_id_by_name(link_name, cached_robot_model)
 
         # Target frame
+        target = self._scale_input_target(target)
         target_frame = target.target_frame
-        if robot.need_scaling:
-            target_frame = target_frame.scaled(1.0 / robot.scale_factor)
-            # Now target_frame is back in meter scale
 
         # Tool Coordinate Frame if there are tools attached
-        if self.robot_cell:
-            attached_tool = self.robot_cell.get_attached_tool(start_state, group)
-            if attached_tool:
-                target_frame = from_tcf_to_t0cf(target_frame, attached_tool.frame)
-                # Attached tool frames does not need scaling because Tools are modelled in meter scale
+        attached_tool_id = start_state.get_attached_tool_id(group)
+        if attached_tool_id:
+            target_frame = self.from_tcf_to_t0cf([target_frame], attached_tool_id)[0]
 
         point, orientation = pose_from_frame(target_frame)
 

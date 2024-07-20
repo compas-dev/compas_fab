@@ -55,6 +55,9 @@ class PyBulletSetRobotCell(SetRobotCell):
         # Update the robot cell in the client
         self._robot_cell = robot_cell
 
+        if robot_cell.robot:
+            client.load_existing_robot(robot_cell.robot)
+
         # If a robot cell state is provided, update the client's robot cell state
-        # if robot_cell_state:
-        #     self.set_robot_cell_state(robot_cell_state, options)
+        if robot_cell_state:
+            self.set_robot_cell_state(robot_cell_state)

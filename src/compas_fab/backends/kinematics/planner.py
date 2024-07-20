@@ -48,7 +48,7 @@ class AnalyticalKinematicsPlanner(
 
 class AnalyticalPyBulletPlanner(
     PyBulletForwardKinematics,
-    AnalyticalInverseKinematics,
+    AnalyticalPybulletInverseKinematics,
     AnalyticalPlanCartesianMotion,
     PyBulletSetRobotCell,
     PyBulletSetRobotCellState,

@@ -17,6 +17,7 @@ from compas_robots.model import MeshDescriptor
 from compas_robots import ToolModel
 
 import compas_fab
+from compas_fab.backends import CollisionCheckInCollisionError
 from compas_fab.backends.interfaces.client import ClientInterface
 
 from compas_fab.robots import Robot
@@ -28,7 +29,6 @@ from compas_fab.utilities import LazyLoader
 from . import const
 from .conversions import frame_from_pose
 from .conversions import pose_from_frame
-from .exceptions import CollisionError
 from .utils import LOG
 from .utils import redirect_stdout
 
@@ -37,7 +37,7 @@ if not compas.IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
-        from typing import list  # noqa: F401
+        from typing import List  # noqa: F401
         from typing import Tuple  # noqa: F401
         from compas_robots import Configuration  # noqa: F401
         from compas_fab.robots import RigidBody  # noqa: F401
@@ -198,11 +198,11 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         # PyBullet unique id
         # Each RigidBody can have multiple meshes, so we store a list of puids
-        self.rigid_bodies_puids = {}  # type: dict[str, list[int]]
+        self.rigid_bodies_puids = {}  # type: dict[str, List[int]]
         # Each ToolModel is a single URDF, so we store a single puid
         self.tools_puids = {}  # type: dict[str, int]
 
-        self.collision_objects = {}  # type: dict[str, list[int]]
+        self.collision_objects = {}  # type: dict[str, List[int]]
         self.attached_collision_objects = {}
         self.disabled_collisions = set()
         self._cache_dir = None
@@ -536,19 +536,36 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             for element in itertools.chain(link.visual, link.collision):
                 shape = element.geometry.shape
                 if isinstance(shape, MeshDescriptor):
-                    for mesh in shape.meshes:
-                        mesh_file_name = str(mesh.guid) + ".obj"
-                        fp = os.path.join(self._cache_dir.name, mesh_file_name)
-                        mesh.to_obj(fp)
-                        fp = self._handle_concavity(fp, self._cache_dir.name, concavity, 1, str(mesh.guid))
-                        address_dict[shape.filename] = fp
+                    # Note: the MeshDescriptor.meshes object supports a list of compas meshes.
+                    #       However URDF `link/mesh` tag only supports one filename to hold all the meshes.
+                    #       Therefore, if there are multiple meshes in one Visual or Collision tag, the meshes
+                    #       will be saved as one mesh file.
+                    #       One the other hand, URDF allows multiple visual and collision tags under the same
+                    #       link object.
+
+                    # Join multiple meshes
+                    if len(shape.meshes) > 1:
+                        joined_mesh = Mesh()
+                        [joined_mesh.update(mesh) for mesh in shape.meshes]
+                    else:
+                        joined_mesh = shape.meshes[0]
+
+                    # Export the joined mesh
+                    mesh_file_name = str(joined_mesh.guid) + ".obj"
+                    fp = os.path.join(self._cache_dir.name, mesh_file_name)
+                    joined_mesh.to_obj(fp)
+                    fp = self._handle_concavity(fp, self._cache_dir.name, concavity, 1, str(joined_mesh.guid))
+                    address_dict[shape.filename] = fp
+                    shape.filename = fp
 
         # create urdf with new mesh locations
         urdf = URDF.from_robot(robot_model)
-        meshes = list(urdf.xml.root.iter("mesh"))
-        for mesh in meshes:
-            filename = mesh.attrib["filename"]
-            mesh.attrib["filename"] = address_dict[filename]
+
+        # Obsolete way to replace mesh filenames in URDF
+        # mesh_tags = list(urdf.xml.root.iter("mesh"))
+        # for mesh in mesh_tags:
+        #     filename = mesh.attrib["filename"]
+        #     mesh.attrib["filename"] = address_dict[filename]
 
         # write urdf
         cached_robot_model_file_name = str(robot_model.guid) + ".urdf"
@@ -663,30 +680,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def _get_link_ids_by_name(self, names, robot_model):
         return tuple(self._get_link_id_by_name(name, robot_model) for name in names)
 
-    def filter_configurations_in_collision(self, robot, configurations):
-        """Filters from a list of configurations those which are in collision.
-        Used for a custom inverse kinematics function.
-
-        Parameters
-        ----------
-        robot : :class:`compas_fab.robots.Robot`
-            Robot whose configurations may be in collision.
-        configurations : :obj:`list` of :class:`compas_fab.robots.Configuration`
-            List of configurations to be checked for collisions.
-
-        Returns
-        -------
-        :obj:`list` of :class:`compas_fab.robots.Configuration`
-            The same list of configurations with those in collision replaced with ``None``.
-        """
-        for i, configuration in enumerate(configurations):
-            if not configuration:  # if an ik solution was already removed
-                continue
-            try:
-                self.check_collisions(robot, configuration)
-            except CollisionError:
-                configurations[i] = None
-
     # =======================================
     def check_collisions(self, robot, configuration=None):
         """Checks whether the current or given configuration is in collision.
@@ -724,13 +717,16 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         ------
         :class:`compas_fab.backends.pybullet.DetectedCollision`
         """
-        for name, body_ids in self.collision_objects.items():
-            for body_id in body_ids:
-                self._check_collision(self.get_uid(self.get_cached_robot_model(robot)), "robot", body_id, name)
+        for body2_name, body_ids in self.collision_objects.items():
+            for body2_id in body_ids:
+                body1_id = self.get_uid(self.get_cached_robot_model(robot))
+                self._check_collision(body1_id, "robot", body2_id, body2_name)
 
     def check_robot_self_collision(self, robot):
         """Checks whether the robot and its attached collision objects with its current
         configuration is colliding with itself.
+
+        This includes checking (1) between robot links and (2) between robot links and attached collision objects.
 
         Parameters
         ----------
@@ -742,22 +738,28 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         :class:`compas_fab.backends.pybullet.DetectedCollision`
         """
         cached_robot_model = self.get_cached_robot_model(robot)
-        body_id = self.get_uid(cached_robot_model)
+        robot_body_id = self.get_uid(cached_robot_model)
         link_names = [link.name for link in cached_robot_model.iter_links() if link.collision]
-        # check for collisions between robot links
+        # Check for collisions between robot links
         for link_1_name, link_2_name in combinations(link_names, 2):
             if {link_1_name, link_2_name} in self.unordered_disabled_collisions:
                 continue
             link_1_id = self._get_link_id_by_name(link_1_name, cached_robot_model)
             link_2_id = self._get_link_id_by_name(link_2_name, cached_robot_model)
-            self._check_collision(body_id, link_1_name, body_id, link_2_name, link_1_id, link_2_id)
+            self._check_collision(robot_body_id, link_1_name, robot_body_id, link_2_name, link_1_id, link_2_id)
+
+        # Check for collisions between robot links and attached collision objects
+        for link_name in link_names:
+            for object_name, object_body_ids in self.attached_collision_objects.items():
+                for object_body_id in object_body_ids:
+                    self._check_collision(robot_body_id, link_name, object_body_id, object_name)
 
     def check_collision_objects_for_collision(self):
         """Checks whether any of the collision objects are colliding.
 
         Raises
         ------
-        :class:`compas_fab.backends.CollisionError`
+        :class:`compas_fab.backends.CollisionCheckInCollisionError`
         """
         names = self.collision_objects.keys()
         for name_1, name_2 in combinations(names, 2):
@@ -766,6 +768,24 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                     self._check_collision(body_1_id, name_1, body_2_id, name_2)
 
     def _check_collision(self, body_1_id, body_1_name, body_2_id, body_2_name, link_index_1=None, link_index_2=None):
+        # type: (int, str, int, str, int, int) -> None
+        """Internal low-level API to interface with Pybullet for collision checking.
+
+        Parameters
+        ----------
+        body_1_id : :obj:`int`
+            The unique id (issued by Pybullet) of the first body.
+        body_1_name : :obj:`str`
+            The name of the first body. Used for logging and error reporting only.
+        body_2_id : :obj:`int`
+            The unique id (issued by Pybullet) of the second body.
+        body_2_name : :obj:`str`
+            The name of the second body. Used for logging and error reporting only.
+        link_index_1 : :obj:`int`, optional
+            The link index if the first body is a robot. Defaults to ``None``.
+        link_index_2 : :obj:`int`, optional
+            The link index if the second body is a robot. Defaults to ``None``.
+        """
         kwargs = {
             "bodyA": body_1_id,
             "bodyB": body_2_id,
@@ -778,7 +798,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         pts = pybullet.getClosestPoints(**kwargs)
         if pts:
             LOG.warning("Collision between '{}' and '{}'".format(body_1_name, body_2_name))
-            raise CollisionError(body_1_name, body_2_name)
+            raise CollisionCheckInCollisionError(body_1_name, body_2_name)
 
     # ======================================
     def _get_base_frame(self, body_id):

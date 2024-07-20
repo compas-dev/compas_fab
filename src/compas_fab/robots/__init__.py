@@ -133,6 +133,8 @@ from .robot_cell import (
 )
 from .robot_library import (
     RobotLibrary,
+    ToolLibrary,
+    RobotCellLibrary,
 )
 from .semantics import (
     RobotSemantics,
@@ -187,20 +189,20 @@ __all__ = [
     "ReachabilityMap",
     "DeviationVectorsGenerator",
     "OrthonormalVectorsFromAxisGenerator",
+    "RigidBody",
+    "RigidBodyState",
     "Robot",
+    "RobotCell",
+    "RobotCellState",
+    "RobotCellLibrary",
     "RobotLibrary",
     "RobotSemantics",
     "Target",
     "Tool",
+    "ToolLibrary",
     "Trajectory",
     "Waypoints",
     "Wrench",
     "to_degrees",
     "to_radians",
-    # New
-    "RobotCell",
-    "RobotCellState",
-    "RigidBody",
-    "RigidBodyState",
-    "RobotCellState",
 ]

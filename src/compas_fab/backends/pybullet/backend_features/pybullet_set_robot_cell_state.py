@@ -25,7 +25,7 @@ from compas_fab.backends.pybullet.const import STATIC_MASS
 
 
 class PyBulletSetRobotCellState(SetRobotCellState):
-    def _set_robot_cell_state(self, robot_cell_state):
+    def set_robot_cell_state(self, robot_cell_state):
         # type: (RobotCellState, RobotCellState) -> None
         """Change the state of the models in the robot cell that have already been set to the Pybullet client.
 
@@ -34,6 +34,9 @@ class PyBulletSetRobotCellState(SetRobotCellState):
 
         The robot cell state must match the robot cell set earlier by :meth:`set_robot_cell`.
 
+        Note
+        ----
+        All the magic for transforming the attached objects happens here.
         """
         client = self.client  # type: PyBulletClient # Trick to keep intellisense happy
         robot_cell = self.robot_cell  # type: RobotCell
@@ -61,8 +64,18 @@ class PyBulletSetRobotCellState(SetRobotCellState):
             if tool_state.attached_to_group:
                 # If tool is attached to a group, update the tool's base frame using the group's FK frame
                 tool_attached_link_name = client.robot.get_link_names(tool_state.attached_to_group)[-1]
-                configuration = robot_cell_state.robot_configuration
-                tool_base_frame = client.robot.model.forward_kinematics(configuration, tool_attached_link_name)
+                robot_configuration = robot_cell_state.robot_configuration
+                robot_tool0_frame = client.robot.model.forward_kinematics(robot_configuration, tool_attached_link_name)
+
+                # Note: The position of the attached tool in the world coordinate frame is given by t_wcf_tbcf
+                # t_wcf_t0cf is Tool0 Frame of the robot obtained from FK, describing Tool Base Frame (T0CF) relative to World Coordinate Frame (WCF)
+                t_wcf_t0cf = Transformation.from_frame(robot_tool0_frame)
+                # t_t0cf_tbcf is Tool Attachment Frame, describing Tool Base Coordinate Frame (TBCF) relative to Tool0 Frame on the Robot (T0CF)
+                t_t0cf_tbcf = Transformation.from_frame(tool_state.attachment_frame)
+
+                # Combined transformation gives the position of the tool in the world coordinate frame
+                t_wcf_tbcf = t_wcf_t0cf * t_t0cf_tbcf
+                tool_base_frame = Frame.from_transformation(t_wcf_tbcf)
             else:
                 # If the tool is not attached, update the tool's base frame using the frame in tool state
                 tool_base_frame = tool_state.frame
@@ -78,15 +91,19 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 # If rigid body is attached to a tool, update the rigid body's base frame using the tool's FK frame
                 tool_name = rigid_body_state.attached_to_tool
                 tool_model = robot_cell.tool_models[tool_name]
+                tool_state = robot_cell_state.tool_states[tool_name]
 
-                # t_tcf_ocf is Grasp, describing Object Coordinate Frame (OCF) relative to Tool Coordinate Frame (TCF)
-                t_tcf_ocf = Transformation.from_frame(rigid_body_state.grasp)
-                # t_t0cf_tcf is Tool Offset, describing Tool Coordinate Frame (TCF) relative to Tool Base Frame (T0CF)
-                t_t0cf_tcf = Transformation.from_frame(tool_model.frame)
-                # t_wcf_t0cf is Tool Base Frame, describing Tool Base Frame (T0CF) relative to World Coordinate Frame (WCF)
-                t_wcf_t0cf = Transformation.from_frame(tool_base_frames[tool_name])
-                # t_wcf_ocf is Object Coordinate Frame (OCF) relative to World Coordinate Frame (WCF)
-                t_wcf_ocf = t_wcf_t0cf * t_t0cf_tcf * t_tcf_ocf
+                # Note: The attachment order from the World to the Workpiece are as follows:
+                # t_wcf_tbcf is Tool Base Frame, describing Tool Base Coordinate Frame (TBCF) relative to World Coordinate Frame (WCF)
+                t_wcf_tbcf = Transformation.from_frame(tool_base_frames[tool_name])
+                # t_t0cf_tcf is Tool Frame or Tool Offset, describing Tool Coordinate Frame (TCF) relative to Tool Base Frame (T0CF)
+                t_tbcf_tcf = Transformation.from_frame(tool_model.frame)
+                # t_tcf_ocf is workpiece's Attachment Frame, describing Object Coordinate Frame (OCF) relative to Tool Coordinate Frame (TCF)
+                t_tcf_ocf = Transformation.from_frame(rigid_body_state.attachment_frame)
+
+                # Note: The combined transformation t_wcf_ocf is the Object Coordinate Frame (OCF) relative to World Coordinate Frame (WCF)
+                # It gives the position of the workpiece in the world coordinate frame
+                t_wcf_ocf = t_wcf_tbcf * t_tbcf_tcf * t_tcf_ocf
 
                 rigid_body_base_frame = Frame.from_transformation(t_wcf_ocf)
             else:

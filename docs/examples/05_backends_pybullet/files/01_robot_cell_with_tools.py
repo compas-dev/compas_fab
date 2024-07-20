@@ -12,12 +12,10 @@ from compas.geometry import Box
 from compas_robots import ToolModel
 
 with PyBulletClient() as client:
-    robot = RobotLibrary.abb_irb4600_40_255()
-    robot = client.load_existing_robot(robot)
-
     # ---------------------------------------------------------------------
     # Create a robot cell and add objects to it
     # ---------------------------------------------------------------------
+    robot = RobotLibrary.abb_irb4600_40_255()
     robot_cell = RobotCell(robot)
 
     # Add Static Collision Geometry

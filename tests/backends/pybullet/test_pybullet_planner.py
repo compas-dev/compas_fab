@@ -11,6 +11,7 @@ from compas.geometry import Frame
 from compas.tolerance import Tolerance
 from compas_fab.robots import RobotLibrary
 from compas_fab.robots import FrameTarget
+from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 
 # The tolerance for the tests are set to 1e-4 meters, equivalent to 0.1 mm
@@ -66,6 +67,7 @@ def _test_fk_with_pybullet_planner(robot, true_result):
     with PyBulletClient(connection_type="direct") as client:
         robot = client.load_existing_robot(robot)
         planner = PyBulletPlanner(client)
+        planner.set_robot_cell(RobotCell(robot))
 
         planning_group = robot.main_group_name
         end_effector_link = robot.get_end_effector_link_name(planning_group)
@@ -122,6 +124,7 @@ def _test_pybullet_ik_fk_agreement(robot, ik_target_frames):
     with PyBulletClient(connection_type="direct") as client:
         robot = client.load_existing_robot(robot)
         planner = PyBulletPlanner(client)
+        planner.set_robot_cell(RobotCell(robot))
         planning_group = robot.main_group_name
         for ik_target_frame in ik_target_frames:
             # IK Query to the planner (Frame to Configuration)
@@ -242,6 +245,7 @@ def test_pybullet_ik_out_of_reach_ur5():
     with PyBulletClient(connection_type="direct") as client:
         robot = client.load_existing_robot(robot)
         planner = PyBulletPlanner(client)
+        planner.set_robot_cell(RobotCell(robot))
         planning_group = robot.main_group_name
         for ik_target_frame in ik_target_frames:
             # IK Query to the planner (Frame to Configuration)
