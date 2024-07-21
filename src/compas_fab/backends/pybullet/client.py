@@ -356,7 +356,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         # If there are problems with this, we can change it to exporting individual obj files per mesh to Pybullet
         mesh = Mesh()
         for m in rigid_body.get_collision_meshes:
-            mesh.join(m)
+            mesh.join(m, precision=12)
         mesh.to_obj(tmp_obj_path)
 
         tmp_obj_path = self._handle_concavity(tmp_obj_path, self._cache_dir.name, concavity, mass)
@@ -758,10 +758,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         (point, quat) = pose_from_frame(frame)
         pybullet.resetBasePositionAndOrientation(body_id, point, quat, physicsClientId=self.client_id)
 
-    # ====================================================================================
+    # ------------------------------------------------------------------------------------
     # Helper functions for creating rigid bodies in PyBullet
     # This includes loading meshes via OBJ files, setting up visual and collision objects
-    # ====================================================================================
+    # ------------------------------------------------------------------------------------
 
     def convert_mesh_to_body(self, mesh, frame, concavity=False, mass=const.STATIC_MASS):
         """Creates a pybullet body from a compas mesh and attaches it to the scene.
