@@ -11,7 +11,9 @@ viewer.renderer.rendermode = "lighted"
 viewer.ui.sidedock.show = True
 
 # Load robot from RobotLibrary
-robot = RobotLibrary.rfl()  # Also works with .ur5(), .ur10e(), abb_irb4600_40_255(), .rfl()
+robot = (
+    RobotLibrary.panda()
+)  # Also works with .ur5(), .ur10e(), abb_irb120_3_58(), abb_irb4600_40_255(), .rfl(), .panda()
 model = robot.model
 
 start_configuration = model.zero_configuration()

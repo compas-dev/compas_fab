@@ -172,6 +172,66 @@ class RobotLibrary(object):
 
         return robot
 
+    @classmethod
+    def abb_irb120_3_58(cls, client=None, load_geometry=True):
+        # type: (Optional[ClientInterface], Optional[bool]) -> Robot
+        """Returns a ABB irb120-3/58 robot.
+
+        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+
+        Parameters
+        ----------
+        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
+            Backend client. Default is `None`.
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the geometry is loaded.
+            `False` can be used to speed up the creation of the robot.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Robot`
+            Newly created instance of the robot.
+        """
+
+        robot = Robot.from_urdf(
+            urdf_filename=compas_fab.get("robot_library/abb_irb120_3_58/urdf/robot_description.urdf"),
+            srdf_filename=compas_fab.get("robot_library/abb_irb120_3_58/robot_description_semantic.srdf"),
+            local_package_mesh_folder="robot_library/abb_irb120_3_58" if load_geometry else None,
+            client=client,
+        )
+
+        return robot
+
+    @classmethod
+    def panda(cls, client=None, load_geometry=True):
+        # type: (Optional[ClientInterface], Optional[bool]) -> Robot
+        """Returns a Panda robot.
+
+        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+
+        Parameters
+        ----------
+        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
+            Backend client. Default is `None`.
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the geometry is loaded.
+            `False` can be used to speed up the creation of the robot.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Robot`
+            Newly created instance of the robot.
+        """
+
+        robot = Robot.from_urdf(
+            urdf_filename=compas_fab.get("robot_library/panda/urdf/robot_description.urdf"),
+            srdf_filename=compas_fab.get("robot_library/panda/robot_description_semantic.srdf"),
+            local_package_mesh_folder="robot_library/panda" if load_geometry else None,
+            client=client,
+        )
+
+        return robot
+
 
 class ToolLibrary(object):
     """A collection of built-in tools that can be used for testing and demonstration.
