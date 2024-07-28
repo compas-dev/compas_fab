@@ -11,9 +11,8 @@ viewer.renderer.rendermode = "lighted"
 viewer.ui.sidedock.show = True
 
 # Load robot from RobotLibrary
-robot = (
-    RobotLibrary.panda()
-)  # Also works with .ur5(), .ur10e(), abb_irb120_3_58(), abb_irb4600_40_255(), .rfl(), .panda()
+# RobotLibrary also contains .ur5(), .ur10e(), abb_irb120_3_58(), abb_irb4600_40_255(), .rfl(), .panda()
+robot = RobotLibrary.ur5()
 model = robot.model
 
 start_configuration = model.zero_configuration()
@@ -32,14 +31,15 @@ def make_rotate_function(joint_name):
 
 # Create one slider for each joint
 for joint in robot.get_configurable_joints():
-    print(joint.name, Joint.SUPPORTED_TYPES[joint.type], joint.limit.lower, joint.limit.upper)
+    starting_val = start_configuration[joint.name]
+    print(joint.name, Joint.SUPPORTED_TYPES[joint.type], joint.limit.lower, joint.limit.upper, starting_val)
     # Units are in radians or meters
     step_size = (joint.limit.upper - joint.limit.lower) / 100
     rotate_function = make_rotate_function(joint.name)
     viewer.ui.sidedock.add(
         Slider(
             title=joint.name + " (" + Joint.SUPPORTED_TYPES[joint.type] + ")",
-            starting_val=start_configuration[joint.name],
+            starting_val=starting_val,
             min_val=joint.limit.lower,
             max_val=joint.limit.upper,
             step=step_size,
