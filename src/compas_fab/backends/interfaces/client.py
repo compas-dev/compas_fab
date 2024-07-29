@@ -29,7 +29,6 @@ class ClientInterface(object):
 
     def __init__(self):
         self._robot = None  # type: Robot
-        print("ClientInterface init")
 
     @property
     def robot(self):
@@ -75,6 +74,7 @@ class PlannerInterface(object):
 
     @property
     def client(self):
+        # type: () -> ClientInterface
         return self._client
 
     @property

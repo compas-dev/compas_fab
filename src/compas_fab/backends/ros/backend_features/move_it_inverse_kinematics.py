@@ -54,7 +54,6 @@ class MoveItInverseKinematics(InverseKinematics):
         # The following fields are used to store the last ik request for iterative calls
         self._last_ik_request = {"request_id": None, "solutions": None}
         # Initialize the super class
-        print("MoveItInverseKinematics init")
         super(MoveItInverseKinematics, self).__init__()
 
     GET_POSITION_IK = ServiceDescription(

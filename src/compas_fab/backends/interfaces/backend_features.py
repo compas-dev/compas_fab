@@ -200,7 +200,6 @@ class InverseKinematics(BackendFeature):
         self._last_ik_request = {"request_hash": None, "solutions": None}
 
         # Initialize the super class
-        print("InverseKinematics init")
         super(InverseKinematics, self).__init__()
 
     def inverse_kinematics(self, target, start_state=None, group=None, options=None):
