@@ -329,6 +329,8 @@ class ToolLibrary(object):
 
         # The following programmatic construction of the gripper assumes the the gripper is
         # opening towards Z axis, this is transformed at the end to match the X axis.
+        # Before the transformation,
+        # X is the direction of the jaw movement, Y direction is the long axis when holding bar materials.
 
         if load_geometry:
             meshes = []
@@ -342,6 +344,56 @@ class ToolLibrary(object):
             meshes.append(Mesh.from_shape(shape).transformed(t))
             # Create the gripper finger
             shape = Box.from_corner_corner_height([0.2, -0.05, 0.1], [0.1, 0.05, 0.1], 0.2)
+            meshes.append(Mesh.from_shape(shape).transformed(t))
+            tool_model.add_link("gripper_body", visual_meshes=meshes, collision_meshes=meshes)
+
+        return tool_model
+
+    @classmethod
+    def static_gripper_small(cls, load_geometry=True):
+        # type: (Optional[bool]) -> ToolModel
+        """Create and return a static gripper ToolModel, useful for simulating a gripper.
+
+        The gripper is 0.05m (5cm) thick from base to its gripping face.
+        The gripper has two jaws that have an opening width of 0.05m (5cm).
+        The tool has three visual meshes representing the gripper body and the jaws.
+        The visual mesh is also used for collision mesh.
+        The tool TCF is located at the gripper face of the gripper,
+        it is a translation offset from T0CF by +0.1 along the X-axis of the T0CF.
+        The tool name is 'gripper'.
+        Bar material can be held with the gripper with the long axis matching the Z axis of the TCF.
+
+        Parameters
+        ----------
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the geometry is loaded.
+            `False` can be used to speed up the creation of the tool.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.ToolModel`
+            Newly created instance of the tool.
+        """
+        tool_frame = Frame([0.05, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
+        tool_model = ToolModel(visual=None, frame_in_tool0_frame=tool_frame, name="gripper")
+
+        # The following programmatic construction of the gripper assumes the the gripper is
+        # opening towards Z axis, this is transformed at the end to match the X axis.
+        # Before the transformation,
+        # X is the direction of the jaw movement, Y direction is the long axis when holding bar materials.
+
+        if load_geometry:
+            meshes = []
+            # Transformation to rotate the gripper to match the X axis
+            t = Frame([0, 0, 0], [0, 0, 1], [1, 0, 0]).to_transformation().inverted()
+            # Create the gripper body
+            shape = Box.from_corner_corner_height([-0.1, -0.05, 0], [0.1, 0.05, 0], 0.05)
+            meshes.append(Mesh.from_shape(shape).transformed(t))
+            # Create the gripper finger
+            shape = Box.from_corner_corner_height([-0.1, -0.05, 0.05], [-0.05, 0.05, 0.05], 0.1)
+            meshes.append(Mesh.from_shape(shape).transformed(t))
+            # Create the gripper finger
+            shape = Box.from_corner_corner_height([0.1, -0.05, 0.05], [0.05, 0.05, 0.05], 0.1)
             meshes.append(Mesh.from_shape(shape).transformed(t))
             tool_model.add_link("gripper_body", visual_meshes=meshes, collision_meshes=meshes)
 
@@ -435,7 +487,7 @@ class RobotCellLibrary(object):
         One beam (a RigidBody) is included and is attached to the gripper.
         A floor is also included.
 
-        See :meth:`compas_fab.robots.RobotLibrary.ur5` and :meth:`compas_fab.robots.ToolLibrary.cone`
+        See :meth:`compas_fab.robots.RobotLibrary.abb_irb4600_40_255` and :meth:`compas_fab.robots.ToolLibrary.static_gripper`
         for details on the robot and tool.
 
         Parameters
@@ -470,7 +522,80 @@ class RobotCellLibrary(object):
         # Load Rigid Bodies
         # ---------------------------------------------------------------------
 
-        beam = Box.from_corner_corner_height([0.0, -0.1, -0.5], [0.2, 0.1, -0.5], 1.0)
+        # Z axis is the length of the beam, X axis points away from the robot
+        beam_length = 1.0
+        beam = Box.from_corner_corner_height(
+            [0.0, -0.1, -beam_length * 0.5], [0.2, 0.1, -beam_length * 0.5], beam_length
+        )
+        robot_cell.rigid_body_models["beam"] = RigidBody(Mesh.from_shape(beam))
+
+        # Static Floor as Collision Geometry
+        floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
+        robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh)
+
+        # ------------------------------------------------------------------------
+        # Create RobotCellState
+        # ------------------------------------------------------------------------
+        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+
+        # Attach the tool to the robot's main group
+        attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
+        robot_cell_state.set_tool_attached_to_group("gripper", robot.main_group_name, attachment_frame)
+        # Note: There is a rotation to match the gripper's orientation because the last link in the abb robot
+        # does not follow the REP 199 convention.
+
+        # Attach the beam to the gripper
+        robot_cell_state.set_rigid_body_attached_to_tool("beam", "gripper")
+
+        return robot_cell, robot_cell_state
+
+    @classmethod
+    def ur10e_gripper_one_beam(cls, client=None, load_geometry=True):
+        # type: (Optional[ClientInterface], Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+        """Create and return the ur10e robot with a gripper tool attached.
+        One beam (a RigidBody) is included and is attached to the gripper.
+        A floor is also included.
+
+        See :meth:`compas_fab.robots.RobotLibrary.ur10e` and :meth:`compas_fab.robots.ToolLibrary.static_gripper_small`
+        for details on the robot and tool.
+
+        Parameters
+        ----------
+        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
+            Backend client. Default is `None`.
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the robot and tool geometry are loaded.
+            `False` can be used to speed up the creation of the robot cell,
+            but without geometry, the robot cell cannot be visualized and backend planners
+            cannot perform collision checking during planning.
+
+        Returns
+        -------
+        Tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
+            Newly created instance of the robot cell and robot cell state.
+        """
+        # ---------------------------------------------------------------------
+        # Load Robot and create RobotCell
+        # ---------------------------------------------------------------------
+        robot = RobotLibrary.ur10e(client, load_geometry=load_geometry)
+        robot_cell = RobotCell(robot)
+
+        # ---------------------------------------------------------------------
+        # Load Tools
+        # ---------------------------------------------------------------------
+
+        gripper = ToolLibrary.static_gripper_small(load_geometry=load_geometry)
+        robot_cell.tool_models["gripper"] = gripper
+
+        # ---------------------------------------------------------------------
+        # Load Rigid Bodies
+        # ---------------------------------------------------------------------
+
+        # Z axis is the length of the beam, X axis points away from the robot
+        beam_length = 0.4
+        beam = Box.from_corner_corner_height(
+            [0.0, -0.05, -beam_length * 0.5], [0.1, 0.05, -beam_length * 0.5], beam_length
+        )
         robot_cell.rigid_body_models["beam"] = RigidBody(Mesh.from_shape(beam))
 
         # Static Floor as Collision Geometry
