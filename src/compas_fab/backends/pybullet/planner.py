@@ -20,8 +20,10 @@ __all__ = [
 
 
 class PyBulletPlanner(
+    PyBulletCheckCollision,
     PyBulletForwardKinematics,
     PyBulletInverseKinematics,
+    PyBulletPlanCartesianMotion,
     PyBulletSetRobotCell,
     PyBulletSetRobotCellState,
     PlannerInterface,

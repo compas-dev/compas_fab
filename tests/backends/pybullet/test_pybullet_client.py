@@ -3,6 +3,7 @@ import pytest
 
 from compas_fab.backends import PyBulletClient
 from compas_robots import RobotModel
+from compas_fab.robots import RobotLibrary
 
 from compas_robots.resources import LocalPackageMeshLoader
 
@@ -63,3 +64,36 @@ def test_pybullet_client_load_robot_with_sementics():
 
 
 # TODO: After implementing the stateless backend, we should test methods related to planning scene and scene state management.
+
+
+def test_pybullet_client_link_names():
+    robot = RobotLibrary.ur5()
+    print("Print tree of Robot Model:")
+    # Start with the root link and iterate through all joints recursively
+    for joint in robot.model.joints:
+        print("Name:{}, Parent:{}, Child:{}".format(joint.name, joint.parent.link, joint.child.link))
+
+    print("Links in Model:")
+    print([l.name for l in robot.model.links])
+    print("Joints in Model:")
+    print([l.name for l in robot.model.joints])
+    print("Base Link in Model:")
+    print(robot.model.get_base_link_name())
+    print("Link name in Robot with main group:")
+    print(robot.get_link_names())
+    print("Base Link Name in Robot with main group:")
+    print(robot.get_base_link_name())
+
+    with PyBulletClient(connection_type="direct") as client:
+        client.set_robot(robot)
+        print("Links in Backend:")
+        print(client.robot_link_puids)
+        print("Joints in Backend:")
+        print(client.robot_joint_puids)
+        # link_names = client._get(robot)
+        # print(link_names)
+        # print(robot.get_link_names())
+
+
+if __name__ == "__main__":
+    test_pybullet_client_link_names()

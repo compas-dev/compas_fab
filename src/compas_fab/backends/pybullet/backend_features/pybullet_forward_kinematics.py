@@ -20,7 +20,7 @@ if compas.IPY:
 
 
 class PyBulletForwardKinematics(ForwardKinematics):
-    """Callable to calculate the robot's forward kinematic."""
+    """Mix-in function to calculate the robot's forward kinematic."""
 
     def forward_kinematics(self, robot_cell_state, group=None, options=None):
         # type: (RobotCellState, Optional[str], Optional[dict]) -> Frame
@@ -80,7 +80,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
 
         # Check for collisions if requested, it will throw an exception if the robot is in collision
         if options.get("check_collision"):
-            client.check_collisions(robot, configuration)
+            client.check_collisions(configuration)
 
         # If a link name provided, return the frame of that link
         link_name = options.get("link")

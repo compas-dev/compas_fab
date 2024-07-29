@@ -7,6 +7,8 @@ __all__ = [
     "BackendFeatureNotSupportedError",
     "InverseKinematicsError",
     "KinematicsError",
+    "CollisionCheckInCollisionError",
+    "CollisionCheckError",
 ]
 
 
@@ -52,6 +54,13 @@ class InverseKinematicsError(KinematicsError):
 # -------------------------
 
 
+class CollisionCheckError(BackendError):
+    """Indicates a collision check exception."""
+
+    def __init__(self, message):
+        super(CollisionCheckError, self).__init__(message)
+
+
 class CollisionCheckInCollisionError(BackendError):
     """Indicates a collision between two objects is detected during a collision check.
 
@@ -74,8 +83,8 @@ class CollisionCheckInCollisionError(BackendError):
         Name of the second object.
     """
 
-    def __init__(self, object1_type, object1_name, object2_type, object2_name):
-        # type(int, str, int, str) -> None
+    def __init__(self, object1_name, object2_name, object1_type=None, object2_type=None):
+        # type(str, str, Optional[int], Optional[int]) -> None
         message = "Collision between '{}' and '{}'".format(object1_name, object2_name)
         super(CollisionCheckInCollisionError, self).__init__(message)
         self.object1_type = object1_type

@@ -113,6 +113,7 @@ from .exceptions import (
     InverseKinematicsError,
     KinematicsError,
     CollisionCheckInCollisionError,
+    CollisionCheckError,
 )
 
 from .tasks import (
@@ -168,6 +169,7 @@ __all__ = [
     "InverseKinematicsError",
     "KinematicsError",
     "CollisionCheckInCollisionError",
+    "CollisionCheckError",
     "FutureResult",
     "CancellableFutureResult",
     # ROS

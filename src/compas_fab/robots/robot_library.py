@@ -607,14 +607,40 @@ class RobotCellLibrary(object):
         # ------------------------------------------------------------------------
         robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
+        # ------------------------------------------------------------------------
+        # Tool Attachment
+        # ------------------------------------------------------------------------
+
         # Attach the tool to the robot's main group
         attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
-        robot_cell_state.set_tool_attached_to_group("gripper", robot.main_group_name, attachment_frame)
+
+        # Gripper is allowed to touch the last link of the robot.
+        # However, do not use the following line to get the end effector link name,
+        # because it is not guaranteed to be the last link that has geometry in the robot chain.
+        # ee_link_name = robot.get_end_effector_link_name(robot.main_group_name)
+
+        # Instead, check the robot model and hard code the actual link name.
+        touch_links = ["wrist_3_link"]
+        # For UR10e, the last logical link is `tool0` (from robot.get_end_effector_link_name)
+        # However the last link with geometry attached is `wrist_3_link`.
+
+        robot_cell_state.set_tool_attached_to_group("gripper", robot.main_group_name, attachment_frame, touch_links)
         # Note: There is a rotation to match the gripper's orientation because the last link in the abb robot
         # does not follow the REP 199 convention.
 
+        # ------------------------------------------------------------------------
+        # Workpiece Attachment
+        # ------------------------------------------------------------------------
+
         # Attach the beam to the gripper
         robot_cell_state.set_rigid_body_attached_to_tool("beam", "gripper")
+
+        # ------------------------------------------------------------------------
+        # Static Rigid Body Touch Links
+        # ------------------------------------------------------------------------
+
+        # The floor is not attached to the robot, but it is allowed to touch the robot's base link.
+        robot_cell_state.rigid_body_states["floor"].touch_links = ["base_link_inertia"]
 
         return robot_cell, robot_cell_state
 

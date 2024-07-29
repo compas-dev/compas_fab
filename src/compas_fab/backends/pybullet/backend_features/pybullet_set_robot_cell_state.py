@@ -112,6 +112,9 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 rigid_body_base_frame = rigid_body_state.frame
             client.set_rigid_body_base_frame(rigid_body_name, rigid_body_base_frame)
 
+        # The client needs to keep track of the latest robot cell state
+        client._robot_cell_state = robot_cell_state
+
         # This function updates the position of all models in the robot cell, technically we could
         # keep track of the previous state and only update the models that have changed to improve performance.
         # We can improve when we have proper profiling and performance tests.

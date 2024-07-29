@@ -35,6 +35,7 @@ with PyBulletClient("direct") as client:
 
     print("Robot flange frame of the default planning group in the world coordinate system:")
     print(frame_WCF)
+    print(" ")
 
     # ---------------------------------
     # FK for all the links in the robot

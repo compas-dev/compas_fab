@@ -79,7 +79,7 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
             if options.get("check_collision", False):
                 try:
                     joint_values, joint_names = solution
-                    client.check_collisions(robot, Configuration.from_revolute_values(joint_values, joint_names))
+                    client.check_collisions(Configuration.from_revolute_values(joint_values, joint_names))
                 except BackendError as e:
                     # If keep order is true, yield (None, None) to keep the order of the solutions
                     if options.get("keep_order", False):

@@ -395,8 +395,8 @@ class RobotCellState(Data):
             if rigid_body_state.attached_to_link:
                 ids.append(rigid_body_id)
 
-    def set_tool_attached_to_group(self, tool_id, group, attachment_frame=None, detach_others=True):
-        # type: (str, str, Optional[Frame], Optional[bool]) -> None
+    def set_tool_attached_to_group(self, tool_id, group, attachment_frame=None, touch_links=[], detach_others=True):
+        # type: (str, str, Optional[Frame], Optional[List[str]], Optional[bool]) -> None
         """Sets the tool attached to the planning group.
 
         Notes
@@ -409,6 +409,11 @@ class RobotCellState(Data):
             The id of the tool.
         group : str
             The name of the planning group to which the tool is attached.
+        attachment_frame : :class:`compas.geometry.Frame`, optional
+            The frame of the tool relative to the end frame of the planning group.
+            Defaults to None, which means that the tool's frame coincides with the end frame of the planning group.
+        touch_links : list of str, optional
+            The names of the robot links that are allowed to collide with the tool.
         detach_others : bool, optional
             Whether to detach all other tools from the group. Defaults to True.
         """
@@ -418,14 +423,15 @@ class RobotCellState(Data):
         self.tool_states[tool_id].attached_to_group = group
         self.tool_states[tool_id].frame = None
         self.tool_states[tool_id].attachment_frame = attachment_frame
+        self.tool_states[tool_id].touch_links = touch_links
 
         if detach_others:
             for id, tool_state in self.tool_states.items():
                 if id != tool_id and tool_state.attached_to_group == group:
                     tool_state.attached_to_group = None
 
-    def set_rigid_body_attached_to_link(self, rigid_body_id, link_name, attachment_frame=None):
-        # type: (str, str, Optional[Frame | Transformation]) -> None
+    def set_rigid_body_attached_to_link(self, rigid_body_id, link_name, attachment_frame=None, touch_links=[]):
+        # type: (str, str, Optional[Frame | Transformation], Optional[List[str]]) -> None
         """Sets the rigid body attached to the link of the robot.
 
         Notes
@@ -442,6 +448,8 @@ class RobotCellState(Data):
         attachment_frame : :class:`compas.geometry.Frame` or :class:`compas.geometry.Transformation`, optional
             The frame of the rigid body relative to the link.
             Defaults to None, which means that the rigid body is at the base of the link.
+        touch_links : list of str, optional
+            The names of the robot links that are allowed to collide with the rigid body.
         """
         if not attachment_frame:
             attachment_frame = Frame.worldXY()
@@ -450,6 +458,7 @@ class RobotCellState(Data):
         self.rigid_body_states[rigid_body_id].attached_to_tool = None
         self.rigid_body_states[rigid_body_id].frame = None
         self.rigid_body_states[rigid_body_id].attachment_frame = attachment_frame
+        self.rigid_body_states[rigid_body_id].touch_links = touch_links
 
     def set_rigid_body_attached_to_tool(self, rigid_body_id, tool_id, attachment_frame=None):
         # type: (str, str, Optional[Frame]) -> None
@@ -504,6 +513,8 @@ class ToolState(Data):
         The name of the robot planning group to which the tool is attached. Defaults to ``None``.
     attachment_frame : :class:`compas.geometry.Frame`, optional
         The frame of the tool relative to the frame of the attached link. Defaults to ``None``.
+    touch_links : :obj:`list` of :obj:`str`
+        The names of the robot links that are allowed to collide with the tool.
     configuration : :class:`compas_robots.Configuration`, optional
         The configuration of the tool if the tool is kinematic. Defaults to ``None``.
     is_hidden : :obj:`bool`, optional
@@ -511,10 +522,20 @@ class ToolState(Data):
         for hidden objects. Defaults to ``False``.
     """
 
-    def __init__(self, frame, attached_to_group=None, attachment_frame=None, configuration=None, is_hidden=False):
+    def __init__(
+        self,
+        frame,
+        attached_to_group=None,
+        touch_links=None,
+        attachment_frame=None,
+        configuration=None,
+        is_hidden=False,
+    ):
+        # type: (Frame, Optional[str], Optional[Frame], Optional[List[str]], Optional[Configuration], Optional[bool]) -> None
         super(ToolState, self).__init__()
         self.frame = frame  # type: Frame
         self.attached_to_group = attached_to_group  # type: Optional[str]
+        self.touch_links = touch_links or []  # type: List[str]
         self.attachment_frame = attachment_frame  # type: Optional[Frame]
         self.configuration = configuration  # type: Optional[Configuration]
         self.is_hidden = is_hidden  # type: bool
@@ -524,6 +545,7 @@ class ToolState(Data):
         return {
             "frame": self.frame,
             "attached_to_group": self.attached_to_group,
+            "touch_links": self.touch_links,
             "attachment_frame": self.attachment_frame,
             "configuration": self.configuration,
             "is_hidden": self.is_hidden,
@@ -547,6 +569,8 @@ class RigidBodyState(Data):
     When representing a collision geometry (such as robotic backpacks) that is attached to a link of the robot,
     the `attached_to_link` attribute should be set. The `attachment_frame` attribute should be set to the relative position
     of the rigid body to the base frame of the link.
+    The `touch_links` attribute should be set to the names of the robot links that are allowed
+    to collide with the object.
 
     In either one of the two attached cases, the `frame` attribute should be set to 'None' as the actual frame
     is determined automatically by the position of the attached link or tool.
@@ -555,6 +579,8 @@ class RigidBodyState(Data):
     When representing a stationary object in the environment, such as stationary workpiece or obstacles,
     both `attached_to_` attributes should be set to `None`. The `frame` attribute should be set to the base frame
     of the object relative to the world coordinate frame.
+    If the stationary object touches the robot, the `touch_links` attribute should be set
+    to the names of the robot links that are allowed to collide with the object.
 
     When representing a workpiece that is currently not in the scene, the `is_hidden` attribute should be set to True.
     This will hide the object from collision checking and visualization.
@@ -562,31 +588,47 @@ class RigidBodyState(Data):
     Attributes
     ----------
     frame : :class:`compas.geometry.Frame`
-        The base frame of the workpiece relative to the world coordinate frame.
+        The base frame of the rigid body relative to the world coordinate frame.
     attached_to_link : :obj:`str`, optional
-        The name of the robot link to which the workpiece is attached. Defaults to ``None``.
+        The name of the robot link to which the rigid body is attached. Defaults to ``None``.
     attached_to_tool : :obj:`str`, optional
-        The id of the tool to which the workpiece is attached. Defaults to ``None``.
+        The id of the tool to which the rigid body is attached. Defaults to ``None``.
+    touch_links : :obj:`list` of :obj:`str`
+        The names of the robot links that are allowed to collide with the rigid body.
+    touch_bodies : :obj:`list` of :obj:`str`
+        The names of other rigid bodies (including tools) that are allowed to collide with the rigid body.
     attachment_frame : :class:`compas.geometry.Frame` | :class:`compas.geometry.Transformation`, optional
-        The attachment (grasp) frame of the workpiece relative to (the base frame of) the attached link or
+        The attachment (grasp) frame of the rigid body relative to (the base frame of) the attached link or
         (the tool tip frame of) the tool. Defaults to ``None``.
     is_hidden : :obj:`bool`, optional
-        Whether the workpiece is hidden in the scene. Collision checking will be turned off
+        Whether the rigid body is hidden in the scene. Collision checking will be turned off
         for hidden objects. Defaults to ``False``.
     """
 
-    def __init__(self, frame, attached_to_link=None, attached_to_tool=None, attachment_frame=None, is_hidden=False):
+    def __init__(
+        self,
+        frame,
+        attached_to_link=None,
+        attached_to_tool=None,
+        touch_links=None,
+        touch_bodies=None,
+        attachment_frame=None,
+        is_hidden=False,
+    ):
+        # type: (Frame, Optional[str], Optional[str], Optional[List[str]], Optional[List[str]], Optional[Frame], Optional[bool]) -> None
         super(RigidBodyState, self).__init__()
-        self.frame = frame
-        self.attached_to_link = attached_to_link
-        self.attached_to_tool = attached_to_tool
+        self.frame = frame  # type: Frame
+        self.attached_to_link = attached_to_link  # type: Optional[str]
+        self.attached_to_tool = attached_to_tool  # type: Optional[str]
+        self.touch_links = touch_links or []  # type: List[str]
+        self.touch_bodies = touch_bodies or []
         if attached_to_link and attached_to_tool:
             raise ValueError("A RigidBodyState cannot be attached to both a link and a tool.")
-        self.attachment_frame = attachment_frame
+        self.attachment_frame = attachment_frame  # type: Optional[Frame]
         # Convert attachment_frame to a Frame if it is a Transformation
         if isinstance(attachment_frame, Transformation):
             self.attachment_frame = Frame.from_transformation(attachment_frame)
-        self.is_hidden = is_hidden
+        self.is_hidden = is_hidden  # type: bool
 
     @property
     def __data__(self):
@@ -594,6 +636,8 @@ class RigidBodyState(Data):
             "frame": self.frame,
             "attached_to_link": self.attached_to_link,
             "attached_to_tool": self.attached_to_tool,
+            "touch_links": self.touch_links,
+            "touch_bodies": self.touch_bodies,
             "attachment_frame": self.attachment_frame,
             "is_hidden": self.is_hidden,
         }

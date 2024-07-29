@@ -45,7 +45,7 @@ __all__ = [
 
 
 class PyBulletInverseKinematics(InverseKinematics):
-    """Callable to calculate the robot's inverse kinematics for a given frame."""
+    """Mix-in functions to calculate the robot's inverse kinematics for a given target."""
 
     def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
         # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
