@@ -299,6 +299,11 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         urdf_fp = self.robot_model_to_urdf(robot.model, concavity=concavity)
         self.robot_puid = robot_puid = self.pybullet_load_urdf(urdf_fp)
 
+        # The root link of the robot have index of `-1` (refer to PyBullet API)
+        self.robot_link_puids[robot.model.root.name] = -1
+
+        # For the rest of the joints and links, their numbers are the same
+        # The id of the joint is the same as the id of its child link
         for id in range(self._get_num_joints(robot_puid)):
             joint_name = self._get_joint_name(id, robot_puid)
             self.robot_joint_puids[joint_name] = id
