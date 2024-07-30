@@ -57,6 +57,8 @@ class InverseKinematicsError(KinematicsError):
 class CollisionCheckError(BackendError):
     """Indicates a collision check exception."""
 
+    # TODO: Rewrite this to be a collection of CC errors
+
     def __init__(self, message):
         super(CollisionCheckError, self).__init__(message)
 
@@ -73,15 +75,17 @@ class CollisionCheckInCollisionError(BackendError):
 
     Attributes
     ----------
-    object1_type : str
+    object1_type : int
         Type of the first object.
     object1_name : str
         Name of the first object.
-    object2_type : str
+    object2_type : int
         Type of the second object.
     object2_name : str
         Name of the second object.
     """
+
+    # TODO: Rename this class, add the type int as constants and add to a string mapping
 
     def __init__(self, object1_name, object2_name, object1_type=None, object2_type=None):
         # type(str, str, Optional[int], Optional[int]) -> None

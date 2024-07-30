@@ -47,13 +47,15 @@ class AnalyticalKinematicsPlanner(
 
 
 class AnalyticalPyBulletPlanner(
-    PyBulletForwardKinematics,
-    AnalyticalPybulletInverseKinematics,
     AnalyticalPlanCartesianMotion,
     PyBulletSetRobotCell,
     PyBulletSetRobotCellState,
+    PyBulletCheckCollision,
+    PyBulletForwardKinematics,
+    AnalyticalPybulletInverseKinematics,
     PlannerInterface,
 ):
+    # TODO: This class need rework
     """Combination of PyBullet as the client for Collision Detection and Analytical Inverse Kinematics.
 
     This planner is based on the the PyBullet client for collision detection and use

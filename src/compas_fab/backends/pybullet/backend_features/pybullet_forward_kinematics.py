@@ -33,7 +33,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
         Collision checking can be enabled by setting ``"check_collision"`` to ``True`` in the options.
         This will cause the backend to perform collision checking on the robot's configuration and raise
         a :class:`CollisionCheckError` if the robot is in collision. This is equivalent to calling
-        :meth:`compas_fab.backends.PyBulletClient.check_collisions`.
+        :meth:`compas_fab.backends.PyBulletCheckCollision.check_collision`.
 
         Parameters
         ----------
@@ -52,7 +52,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
             - ``"link"``: (:obj:`str`, optional) The name of the link to
               calculate the forward kinematics for. Defaults to the end effector.
             - ``"check_collision"``: (:obj:`str`, optional) When ``True``,
-              :meth:`compas_fab.backends.PyBulletClient.check_collisions` will be called.
+              :meth:`compas_fab.backends.PyBulletCheckCollision.check_collision` will be called.
               Defaults to ``False``.
 
         Returns
@@ -80,7 +80,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
 
         # Check for collisions if requested, it will throw an exception if the robot is in collision
         if options.get("check_collision"):
-            client.check_collisions(configuration)
+            planner.check_collision(None, options={"_skip_set_robot_cell_state": True})
 
         # If a link name provided, return the frame of that link
         link_name = options.get("link")
