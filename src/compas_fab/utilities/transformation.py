@@ -6,6 +6,9 @@ def from_tcf_to_t0cf(tcf_frame_in_wcf, tool_coordinate_frame):
     """Converts a frame describing the robot's tool tip (tcf frame) relative to WCF
     to a frame describing the robot's flange (tool0 frame), relative to WCF.
 
+    This is typically used at the beginning of the inverse kinematics calculation to convert
+    the frame of the robot's tool tip (tcf) to the frame of the robot's flange (tool0).
+
     Let: W_TCF = tcf_frame_in_wcf
     Let: T0CF_TCF = tool_coordinate_frame
     And: TCF_T0CF = (T0CF_TCF)^-1
@@ -34,6 +37,9 @@ def from_tcf_to_t0cf(tcf_frame_in_wcf, tool_coordinate_frame):
 def from_t0cf_to_tcf(t0cf_frame_in_wcf, tool_coordinate_frame):
     """Converts a frame describing the robot's flange (tool0 frame) relative to WCF
     to a frame describing the robot's tool tip (tcf frame), relative to WCF.
+
+    This is typically used at the end of the forward kinematics calculation to convert
+    the frame of the robot's flange (tool0) to the frame of the robot's tool tip (tcf).
 
     Let: W_T0CF = t0cf_frame_in_wcf
     Let: T0CF_TCF = tool_coordinate_frame

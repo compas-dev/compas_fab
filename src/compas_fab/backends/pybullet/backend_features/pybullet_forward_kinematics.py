@@ -3,7 +3,6 @@ from __future__ import division
 from __future__ import print_function
 
 from compas_fab.backends.interfaces import ForwardKinematics
-from compas_fab.utilities import from_tcf_to_t0cf
 
 import compas
 
@@ -15,6 +14,7 @@ if compas.IPY:
         from compas_fab.backends import PyBulletPlanner  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
+        from compas_fab.robots import Robot  # noqa: F401
         from compas.geometry import Frame  # noqa: F401
         from typing import Optional  # noqa: F401
 
@@ -70,9 +70,10 @@ class PyBulletForwardKinematics(ForwardKinematics):
         options = options or {"link": None, "check_collision": False}
         configuration = robot_cell_state.robot_configuration
 
-        client = self.client  # type: PyBulletClient # Trick to keep intellisense happy
+        # Housekeeping for intellisense
         planner = self  # type: PyBulletPlanner
-        robot = client.robot
+        client = planner.client  # type: PyBulletClient
+        robot = client.robot  # type: Robot
         group = group or robot.main_group_name
 
         # Setting the entire robot cell state, including the robot configuration
@@ -98,10 +99,10 @@ class PyBulletForwardKinematics(ForwardKinematics):
             # If no link name provided, and a tool is attached to the group, return the tool tip frame of the tool
             robot_cell = planner.robot_cell  # type: RobotCell
             if robot_cell:
-                attached_tool = robot_cell.get_attached_tool(robot_cell_state, group)
-                if attached_tool:
+                attached_tool_id = robot_cell_state.get_attached_tool_id(group)
+                if attached_tool_id:
                     # Do not scaling attached_tool.frame because Tools are modelled in meter scale
-                    fk_frame = from_tcf_to_t0cf(fk_frame, attached_tool.frame)
+                    fk_frame = planner.from_t0cf_to_tcf([fk_frame], attached_tool_id)[0]
 
         # Scale resulting frame to user units
         fk_frame = self._scale_output_frame(fk_frame)

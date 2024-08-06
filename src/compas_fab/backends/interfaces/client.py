@@ -249,6 +249,9 @@ class PlannerInterface(object):
         """Converts a frame describing the robot's tool coordinate frame (TCF) relative to WCF
         to a frame describing the planner coordinate frame (PCF) (also T0CF), relative to WCF.
 
+        This is typically used at the beginning of the inverse kinematics calculation to convert
+        the frame of the robot's tool tip (tcf) to the frame of the robot's flange (tool0).
+
         The tool_id must correspond to a valid tool in `planner.robot_cell.tool_models`.
 
         Parameters
@@ -273,6 +276,9 @@ class PlannerInterface(object):
         # type: (List[Frame], str) -> List[Frame]
         """Converts a frame describing the planner coordinate frame (PCF) (also T0CF) relative to WCF
         to a frame describing the robot's tool coordinate frame (TCF) relative to WCF.
+
+        This is typically used at the end of the forward kinematics calculation to convert
+        the frame of the robot's flange (tool0) to the frame of the robot's tool tip (tcf).
 
         The tool_id must correspond to a valid tool in `planner.robot_cell.tool_models`.
 
