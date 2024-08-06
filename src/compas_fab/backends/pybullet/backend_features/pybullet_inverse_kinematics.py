@@ -19,8 +19,9 @@ if not compas.IPY:
 
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
-        from compas_fab.robots import AttachedCollisionMesh  # noqa: F401
+        from compas_fab.robots import Robot  # noqa: F401
         from compas_fab.backends import PyBulletClient  # noqa: F401
+        from compas_fab.backends import PyBulletPlanner  # noqa: F401
 
 
 import math
@@ -47,15 +48,15 @@ __all__ = [
 class PyBulletInverseKinematics(InverseKinematics):
     """Mix-in functions to calculate the robot's inverse kinematics for a given target."""
 
-    def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
+    def iter_inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
         # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
 
         if isinstance(target, FrameTarget):
-            return self.iter_inverse_kinematics_frame_target(target, start_state, group, options)
+            return self.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
         else:
             raise NotImplementedError("{} is not supported by PyBulletInverseKinematics".format(type(target)))
 
-    def iter_inverse_kinematics_frame_target(self, target, start_state=None, group=None, options=None):
+    def iter_inverse_kinematics_frame_target(self, target, robot_cell_state=None, group=None, options=None):
         # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
         """Calculate the robot's inverse kinematic for a given frame.
 
@@ -63,7 +64,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         ----------
         target: :class:`compas.geometry.FrameTarget`
             The Frame Target to calculate the inverse for.
-        start_state : :class:`compas_fab.robots.RobotCellState`, optional
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`, optional
             The starting state to calculate the inverse kinematics for.
         group: str, optional
             The planning group used for determining the end effector and labeling
@@ -101,12 +102,19 @@ class PyBulletInverseKinematics(InverseKinematics):
         """
         options = options or {}
 
-        client = self.client  # type: PyBulletClient # Trick to keep intellisense happy
-        robot = client.robot
+        # Housekeeping for intellisense
+        planner = self  # type: PyBulletPlanner
+        client = planner.client  # type: PyBulletClient
+        robot = client.robot  # type: Robot
+        group = group or robot.main_group_name
 
         high_accuracy = options.get("high_accuracy", True)
         max_results = options.get("max_results", 100)
         link_name = options.get("link_name") or robot.get_end_effector_link_name(group)
+
+        # Setting the entire robot cell state, including the robot configuration
+        robot_cell_state = robot_cell_state.copy()  # Make a copy to avoid modifying the original
+        planner.set_robot_cell_state(robot_cell_state)
 
         body_id = client.robot_puid
         link_id = client.robot_link_puids[link_name]
@@ -116,9 +124,9 @@ class PyBulletInverseKinematics(InverseKinematics):
         target_frame = target.target_frame
 
         # Tool Coordinate Frame if there are tools attached
-        attached_tool_id = start_state.get_attached_tool_id(group)
+        attached_tool_id = robot_cell_state.get_attached_tool_id(group)
         if attached_tool_id:
-            target_frame = self.from_tcf_to_t0cf([target_frame], attached_tool_id)[0]
+            target_frame = planner.from_tcf_to_t0cf([target_frame], attached_tool_id)[0]
 
         point, orientation = pose_from_frame(target_frame)
 
@@ -134,8 +142,8 @@ class PyBulletInverseKinematics(InverseKinematics):
             upper_limits.append(joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi)
 
         # Rest pose is PyBullet's way of defining the initial guess for the IK solver
-        start_configuration = start_state.robot_configuration or robot.zero_configuration(group)
-        client.set_robot_configuration(start_configuration)  # Not sure if this line is needed.
+        start_configuration = robot_cell_state.robot_configuration or robot.zero_configuration(group)
+
         # The order of the values needs to match with pybullet's joint id order
         rest_poses = [start_configuration[joint_name] for joint_name in joint_names_sorted]
 
@@ -144,42 +152,29 @@ class PyBulletInverseKinematics(InverseKinematics):
             bodyUniqueId=body_id,
             endEffectorLinkIndex=link_id,
             targetPosition=point,
+            targetOrientation=orientation,
             physicsClientId=client.client_id,
         )
 
+        # Options for enforce joint limits mode
         if options.get("enforce_joint_limits", True):
             # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.
             # https://stackoverflow.com/questions/49674179/understanding-inverse-kinematics-pybullet
             # https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/preview?pru=AAABc7276PI*zazLer2rlZ8tAUI8lF98Kw#heading=h.9i02ojf4k3ve
             joint_ranges = [u - l for u, l in zip(upper_limits, lower_limits)]
+            ik_options.update(
+                dict(
+                    lowerLimits=lower_limits,
+                    upperLimits=upper_limits,
+                    jointRanges=joint_ranges,
+                    restPoses=rest_poses,
+                )
+            )
+        # Options for semi-constrained mode, skipping the targetOrientation
+        if options.get("semi-constrained"):
+            ik_options.pop("targetOrientation")
 
-            if options.get("semi-constrained"):
-                ik_options.update(
-                    dict(
-                        lowerLimits=lower_limits,
-                        upperLimits=upper_limits,
-                        jointRanges=joint_ranges,
-                        restPoses=rest_poses,
-                    )
-                )
-            else:
-                ik_options.update(
-                    dict(
-                        targetPosition=point,
-                        targetOrientation=orientation,
-                        lowerLimits=lower_limits,
-                        upperLimits=upper_limits,
-                        jointRanges=joint_ranges,
-                        restPoses=rest_poses,
-                    )
-                )
-        else:
-            if not options.get("semi-constrained"):
-                ik_options.update(
-                    dict(
-                        targetOrientation=orientation,
-                    )
-                )
+        # Options for high accuracy mode
         if high_accuracy:
             ik_options.update(
                 dict(
@@ -188,6 +183,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                     max_iter=options.get("high_accuracy_max_iter", 20),
                 )
             )
+
         # Loop to get multiple results
         for _ in range(max_results):
 
@@ -217,6 +213,13 @@ class PyBulletInverseKinematics(InverseKinematics):
             # because the accurate IK solving says it's not close enough, we can retry
             # with a new randomized seed
             if close_enough:
+                # Setting the robot configuration so we can perform collision checking
+                # This also updates the robot's pose in the client
+                for [joint_name, joint_position] in zip(joint_names_sorted, joint_positions):
+                    robot_cell_state.robot_configuration[joint_name] = joint_position
+                planner.set_robot_cell_state(robot_cell_state)
+                # Collision checking
+                # TODO: Implement collision checking
                 yield joint_positions, joint_names_sorted
 
             # Randomize joint values to get a different solution on the next iter

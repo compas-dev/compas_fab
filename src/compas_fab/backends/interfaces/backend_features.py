@@ -122,7 +122,7 @@ class SetRobotCellState(BackendFeature):
         The client requires a robot cell state at the beginning of each planning request.
         This cell state must correspond to the robot cell set earlier by :meth:`set_robot_cell`.
 
-        This function is called automatically by planning functions that takes a start_state as input.
+        This function is called automatically by planning functions that takes a RobotCellState as input.
         Therefore it is typically not necessary for the user to call this function,
         except when used to trigger visualization using native backend canvas.
 
@@ -203,7 +203,7 @@ class InverseKinematics(BackendFeature):
         # Initialize the super class
         super(InverseKinematics, self).__init__()
 
-    def inverse_kinematics(self, target, start_state=None, group=None, options=None):
+    def inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
         # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Tuple[List[float], List[str]]
         """Calculate the robot's inverse kinematic for a given frame.
 
@@ -224,7 +224,7 @@ class InverseKinematics(BackendFeature):
             The robot instance for which inverse kinematics is being calculated.
         target : :class:`compas_fab.robots.FrameTarget`
             The frame target to calculate the inverse kinematics for.
-        start_state : :class:`compas_fab.robots.RobotCellState`, optional
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`, optional
             The starting state to calculate the inverse kinematics for.
             The robot's configuration in the scene is taken as the starting configuration.
         group : str, optional
@@ -255,20 +255,20 @@ class InverseKinematics(BackendFeature):
         # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_inverse_kinematics"
 
         # Pseudo-memoized sequential calls will re-use iterator if not exhausted
-        request_hash = (target.sha256(), start_state.sha256(), str(group), str(options))
+        request_hash = (target.sha256(), robot_cell_state.sha256(), str(group), str(options))
 
         if self._last_ik_request["request_hash"] == request_hash and self._last_ik_request["solutions"] is not None:
             solution = next(self._last_ik_request["solutions"], None)
             if solution is not None:
                 return solution
 
-        solutions = self.iter_inverse_kinematics(target, start_state, group, options)
+        solutions = self.iter_inverse_kinematics(target, robot_cell_state, group, options)
         self._last_ik_request["request_hash"] = request_hash
         self._last_ik_request["solutions"] = solutions
 
         return next(solutions)
 
-    def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
+    def iter_inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
         # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Tuple[List[float], List[str]]
         """Calculate the robot's inverse kinematic for a given frame.
 
