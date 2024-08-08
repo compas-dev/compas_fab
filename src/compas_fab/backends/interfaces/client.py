@@ -4,6 +4,9 @@ from __future__ import print_function
 
 import compas
 
+from compas.geometry import Frame
+from compas.geometry import Transformation
+
 from compas_fab.backends.exceptions import BackendFeatureNotSupportedError
 
 if compas.IPY:
@@ -244,10 +247,15 @@ class PlannerInterface(object):
     # Tool and Workpiece Functions
     # ==========================================================================
 
-    def from_tcf_to_t0cf(self, tcf_frames, tool_id):
+    def from_tcf_to_pcf(self, tcf_frames, tool_id):
         # type: (List[Frame], str) -> List[Frame]
         """Converts a frame describing the robot's tool coordinate frame (TCF) relative to WCF
-        to a frame describing the planner coordinate frame (PCF) (also T0CF), relative to WCF.
+        to a frame describing the planner coordinate frame (PCF), relative to WCF.
+        The transformation goes through the tool's base frame, which differs from the
+        PCF by the tool's current attachment_frame (in tool_state).
+
+        This function is restricted to be used only with tools that are currently
+        attached to the robot.
 
         This is typically used at the beginning of the inverse kinematics calculation to convert
         the frame of the robot's tool tip (tcf) to the frame of the robot's flange (tool0).
@@ -268,14 +276,42 @@ class PlannerInterface(object):
         """
         if tool_id not in self.robot_cell.tool_models:
             raise ValueError("Tool with id '{}' not found in robot cell.".format(tool_id))
+        tool_model = self.robot_cell.tool_models[tool_id]
+        tool_state = self.robot_cell_state.tool_states[tool_id]
+        if not tool_state.attached_to_group:
+            raise ValueError("Tool with id '{}' is not attached to the robot.".format(tool_id))
 
-        tool = self.robot_cell.tool_models[tool_id]
-        return tool.from_tcf_to_t0cf(tcf_frames)
+        # The following precomputed transformations are used to speed up batch frame conversions.
+        # t_pcf_tbcf is Tool Attachment Frame, describing Tool Base Coordinate Frame (TBCF) relative to PCF Frame on the Robot (PCF)
+        attachment_frame = tool_state.attachment_frame or Frame.worldXY()
+        t_pcf_tbcf = Transformation.from_frame(attachment_frame)
+        t_tbcf_pcf = t_pcf_tbcf.inverse()
+        # t_tbcf_tcf is Tool Frame, a property of the tool model, describing Tool Coordinate Frame (TCF) relative to Tool Base Frame (TBCF)
+        t_tbcf_tcf = Transformation.from_frame(tool_model.frame)
+        t_tcf_tbcf = t_tbcf_tcf.inverse()
 
-    def from_t0cf_to_tcf(self, t0cf_frames, tool_id):
+        # Note: The PCF in the world coordinate frame is given by t_wcf_pcf
+        # t_wcf_t0cf is Tool0 Frame of the robot obtained from FK, describing Tool Base Frame (T0CF) relative to World Coordinate Frame (WCF)
+        planner_coordinate_frames = []
+        for tc_frame in tcf_frames:
+            # Convert input to Transformation
+            t_wcf_tcf = Transformation.from_frame(tc_frame)
+
+            # Combined transformation gives the position of the tool in the world coordinate frame
+            t_wcf_pcf = t_wcf_tcf * t_tcf_tbcf * t_tbcf_pcf
+            planner_coordinate_frames.append(Frame.from_transformation(t_wcf_pcf))
+
+        return planner_coordinate_frames
+
+    def from_pcf_to_tcf(self, pcf_frames, tool_id):
         # type: (List[Frame], str) -> List[Frame]
         """Converts a frame describing the planner coordinate frame (PCF) (also T0CF) relative to WCF
         to a frame describing the robot's tool coordinate frame (TCF) relative to WCF.
+        The transformation goes through the tool's base frame, which differs from the
+        PCF by the tool's current attachment_frame (in tool_state).
+
+        This function is restricted to be used only with tools that are currently
+        attached to the robot.
 
         This is typically used at the end of the forward kinematics calculation to convert
         the frame of the robot's flange (tool0) to the frame of the robot's tool tip (tcf).
@@ -284,7 +320,7 @@ class PlannerInterface(object):
 
         Parameters
         ----------
-        t0cf_frames : list of :class:`~compas.geometry.Frame`
+        pcf_frames : list of :class:`~compas.geometry.Frame`
             Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
         tool_id : str
             The id of the tool attached to the robot.
@@ -296,6 +332,27 @@ class PlannerInterface(object):
         """
         if tool_id not in self.robot_cell.tool_models:
             raise ValueError("Tool with id '{}' not found in robot cell.".format(tool_id))
+        tool_model = self.robot_cell.tool_models[tool_id]
+        tool_state = self.robot_cell_state.tool_states[tool_id]
+        if not tool_state.attached_to_group:
+            raise ValueError("Tool with id '{}' is not attached to the robot.".format(tool_id))
 
-        tool = self.robot_cell.tool_models[tool_id]
-        return tool.from_t0cf_to_tcf(t0cf_frames)
+        # The following precomputed transformations are used to speed up batch frame conversions.
+        # t_pcf_tbcf is Tool Attachment Frame, describing Tool Base Coordinate Frame (TBCF) relative to PCF Frame on the Robot (PCF)
+        attachment_frame = tool_state.attachment_frame or Frame.worldXY()
+        t_pcf_tbcf = Transformation.from_frame(attachment_frame)
+        # t_tbcf_tcf is Tool Frame, a property of the tool model, describing Tool Coordinate Frame (TCF) relative to Tool Base Frame (TBCF)
+        t_tbcf_tcf = Transformation.from_frame(tool_model.frame)
+
+        # Note: The PCF in the world coordinate frame is given by t_wcf_pcf
+        # t_wcf_t0cf is Tool0 Frame of the robot obtained from FK, describing Tool Base Frame (T0CF) relative to World Coordinate Frame (WCF)
+        tool_coordinate_frames = []
+        for pcf in pcf_frames:
+            # Convert input to Transformation
+            t_wcf_pcf = Transformation.from_frame(pcf)
+
+            # Combined transformation gives the position of the tool in the world coordinate frame
+            t_wcf_tcf = t_wcf_pcf * t_pcf_tbcf * t_tbcf_tcf
+            tool_coordinate_frames.append(Frame.from_transformation(t_wcf_tcf))
+
+        return tool_coordinate_frames
