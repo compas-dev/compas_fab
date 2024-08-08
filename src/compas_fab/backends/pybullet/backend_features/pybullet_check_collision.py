@@ -4,7 +4,6 @@ import compas
 
 from compas.geometry import Frame
 from compas_fab.backends.interfaces import CheckCollision
-from compas_fab.backends import CollisionCheckInCollisionError
 from compas_fab.backends import CollisionCheckError
 
 if not compas.IPY:
@@ -118,6 +117,8 @@ class PyBulletCheckCollision(CheckCollision):
 
         # TODO: Investigate whether the following checks can be done in parallel
 
+        collision_pairs = []  # type: List[Tuple]
+
         # CC Step 1: Between each Robot Link
         link_names = list(client.robot_link_puids.keys())
         for link_1_name, link_2_name in combinations(link_names, 2):
@@ -138,11 +139,14 @@ class PyBulletCheckCollision(CheckCollision):
                     link_2_id,
                 )
                 verbose_print(cc_pair_info + " - PASS")
-            except CollisionCheckInCollisionError:
+            except CollisionCheckError:
                 verbose_print(cc_pair_info + " - COLLISION")
                 collision_messages.append(cc_pair_info + " - COLLISION")
+                collision_pairs.append(
+                    (client.robot.model.get_link_by_name(link_1_name), client.robot.model.get_link_by_name(link_2_name))
+                )
                 if not full_report:  # Fail on first error if full_report is not requested
-                    raise CollisionCheckError("\n".join(collision_messages))
+                    raise CollisionCheckError("\n".join(collision_messages), collision_pairs)
 
         # CC Step 2: Between each Robot Link and each of the tools
         for link_name, link_id in client.robot_link_puids.items():
@@ -164,11 +168,14 @@ class PyBulletCheckCollision(CheckCollision):
                     )
                     verbose_print(cc_pair_info + " - PASS")
 
-                except CollisionCheckInCollisionError:
+                except CollisionCheckError:
                     verbose_print(cc_pair_info + " - COLLISION")
                     collision_messages.append(cc_pair_info + " - COLLISION")
+                    collision_pairs.append(
+                        (client.robot.model.get_link_by_name(link_name), client.robot_cell.tool_models[tool_name])
+                    )
                     if not full_report:  # Fail on first error if full_report is not requested
-                        raise CollisionCheckError("\n".join(collision_messages))
+                        raise CollisionCheckError("\n".join(collision_messages), collision_pairs)
 
         # CC Step 3: Between each link and each rigid body
         for link_name, link_id in client.robot_link_puids.items():
@@ -188,11 +195,17 @@ class PyBulletCheckCollision(CheckCollision):
                     try:
                         client._check_collision(client.robot_puid, "robot_" + link_name, body_id, body_name, link_id)
                         verbose_print(cc_pair_info + " (body_id '{}') - PASS".format(body_id))
-                    except CollisionCheckInCollisionError:
+                    except CollisionCheckError:
                         verbose_print(cc_pair_info + " (body_id '{}') - COLLISION".format(body_id))
                         collision_messages.append(cc_pair_info + " (body_id '{}') - COLLISION".format(body_id))
+                        collision_pairs.append(
+                            (
+                                client.robot.model.get_link_by_name(link_name),
+                                client.robot_cell.rigid_body_models[body_name],
+                            )
+                        )
                         if not full_report:  # Fail on first error if full_report is not requested
-                            raise CollisionCheckError("\n".join(collision_messages))
+                            raise CollisionCheckError("\n".join(collision_messages), collision_pairs)
 
         # CC Step 4: Between each attached rigid body and all other rigid body
         for body_name, body_ids in client.rigid_bodies_puids.items():
@@ -231,11 +244,17 @@ class PyBulletCheckCollision(CheckCollision):
                         try:
                             client._check_collision(body_id, body_name, other_body_id, other_body_name)
                             verbose_print(cc_pair_info + " - PASS")
-                        except CollisionCheckInCollisionError:
+                        except CollisionCheckError:
                             verbose_print(cc_pair_info + " - COLLISION")
                             collision_messages.append(cc_pair_info + " - COLLISION")
+                            collision_pairs.append(
+                                (
+                                    client.robot_cell.rigid_body_models[body_name],
+                                    client.robot_cell.rigid_body_models[other_body_name],
+                                )
+                            )
                             if not full_report:  # Fail on first error if full_report is not requested
-                                raise CollisionCheckError("\n".join(collision_messages))
+                                raise CollisionCheckError("\n".join(collision_messages), collision_pairs)
 
         ## CC Step 5: Between each tool and each rigid body
         for tool_name, tool_id in client.tools_puids.items():
@@ -265,11 +284,14 @@ class PyBulletCheckCollision(CheckCollision):
                     try:
                         client._check_collision(tool_id, tool_name, body_id, body_name)
                         verbose_print(cc_pair_info + " (body_id '{}') - PASS".format(body_id))
-                    except CollisionCheckInCollisionError:
+                    except CollisionCheckError:
                         verbose_print(cc_pair_info + " (body_id '{}') - COLLISION".format(body_id))
                         collision_messages.append(cc_pair_info + " (body_id '{}') - COLLISION".format(body_id))
+                        collision_pairs.append(
+                            (client.robot_cell.tool_models[tool_name], client.robot_cell.rigid_body_models[body_name])
+                        )
                         if not full_report:  # Fail on first error if full_report is not requested
-                            raise CollisionCheckError("\n".join(collision_messages))
+                            raise CollisionCheckError("\n".join(collision_messages), collision_pairs)
 
         if collision_messages:
-            raise CollisionCheckError("\n".join(collision_messages))
+            raise CollisionCheckError("\n".join(collision_messages), collision_pairs)

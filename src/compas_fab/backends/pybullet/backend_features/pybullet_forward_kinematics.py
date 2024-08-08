@@ -102,7 +102,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
                 attached_tool_id = robot_cell_state.get_attached_tool_id(group)
                 if attached_tool_id:
                     # Do not scaling attached_tool.frame because Tools are modelled in meter scale
-                    fk_frame = planner.from_t0cf_to_tcf([fk_frame], attached_tool_id)[0]
+                    fk_frame = planner.from_pcf_to_tcf([fk_frame], attached_tool_id)[0]
 
         # Scale resulting frame to user units
         fk_frame = self._scale_output_frame(fk_frame)

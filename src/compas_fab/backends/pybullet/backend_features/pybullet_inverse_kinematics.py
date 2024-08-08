@@ -30,6 +30,7 @@ import random
 from compas_robots.model import Joint
 
 from compas_fab.backends.exceptions import InverseKinematicsError
+from compas_fab.backends.exceptions import CollisionCheckError
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.pybullet.conversions import pose_from_frame
 from compas_fab.utilities import LazyLoader
@@ -60,6 +61,14 @@ class PyBulletInverseKinematics(InverseKinematics):
         # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
         """Calculate the robot's inverse kinematic for a given frame.
 
+        Note
+        ----
+        The planner will make multiple attempts to find a solution.
+        The number of attempts is determined by the ``max_results`` option.
+        The planner is a gradient descent solver, so the initial position of the robot is important.
+        The solver will start the first attempt from the robot's current configuration provided in the ``robot_cell_state``.
+        The subsequent attempts will start from a random configuration, so the results may vary.
+
         Parameters
         ----------
         target: :class:`compas.geometry.FrameTarget`
@@ -82,14 +91,25 @@ class PyBulletInverseKinematics(InverseKinematics):
               robot's joint limits will be ignored in the calculation.  Defaults to
               ``True``.
             - ``"high_accuracy"``:  (:obj:`bool`, optional) When ``True``, the
-              solver will iteratively try to approach minimum deviation from the requested
-              target frame.  Defaults to ``True``.
+              solver will iteratively try to reach the ``high_accuracy_threshold``.
+              Failure to reach the threshold within ``high_accuracy_max_iter`` will raise an exception.
+              When ``False``, the solver will use the default pybullet solver, which does not
+              guarantee any accuracy.
+              Defaults to ``True``.
             - ``"high_accuracy_threshold"``:  (:obj:`float`, optional) Defines the maximum
-              acceptable distance threshold for the high accuracy solver. Defaults to ``1e-4``.
+              acceptable distance threshold for the high accuracy mode. Defaults to ``1e-4``.
             - ``"high_accuracy_max_iter"``:  (:obj:`float`, optional) Defines the maximum
-              number of iterations to use for the high accuracy solver. Defaults to ``20``.
+              number of iterations to use for the high accuracy mode. Defaults to ``20``.
             - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
               Defaults to ``100``.
+            - ``solution_uniqueness_threshold_prismatic``: (:obj:`float`, optional) The minimum
+                distance between two solutions in the prismatic joint space to consider them unique.
+                Units are in meters. Defaults to ``3e-4``.
+            - ``solution_uniqueness_threshold_revolute``: (:obj:`float`, optional) The minimum
+                distance between two solutions in the revolute joint space to consider them unique.
+                Units are in radians. Defaults to ``1e-3``.
+            - ``"check_collision"``: (:obj:`bool`, optional)
+              Whether or not to check for collision. Defaults to ``False``.
 
         Yields
         ------
@@ -99,6 +119,16 @@ class PyBulletInverseKinematics(InverseKinematics):
         Raises
         ------
         :class:`compas_fab.backends.InverseKinematicsError`
+            Indicates that no IK solution could be found by the kinematic solver
+            after the maximum number of attempts (``max_results``). This can be caused by
+            reachability or collision or both.
+
+        :class:`compas_fab.backends.CollisionCheckError`
+            If ``check_collision`` is enabled and the configuration is in collision.
+            This is only raised if ``max_results`` is set to 1. In this case, the solver is
+            deterministic (descending from the initial robot configuration) and this error
+            indicates that the problem is caused by collision and not because of reachability.
+
         """
         options = options or {}
 
@@ -111,6 +141,9 @@ class PyBulletInverseKinematics(InverseKinematics):
         high_accuracy = options.get("high_accuracy", True)
         max_results = options.get("max_results", 100)
         link_name = options.get("link_name") or robot.get_end_effector_link_name(group)
+
+        # Default options
+        options["check_collision"] = options.get("check_collision", False)
 
         # Setting the entire robot cell state, including the robot configuration
         robot_cell_state = robot_cell_state.copy()  # Make a copy to avoid modifying the original
@@ -126,7 +159,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Tool Coordinate Frame if there are tools attached
         attached_tool_id = robot_cell_state.get_attached_tool_id(group)
         if attached_tool_id:
-            target_frame = planner.from_tcf_to_t0cf([target_frame], attached_tool_id)[0]
+            target_frame = planner.from_tcf_to_pcf([target_frame], attached_tool_id)[0]
 
         point, orientation = pose_from_frame(target_frame)
 
@@ -184,10 +217,16 @@ class PyBulletInverseKinematics(InverseKinematics):
                 )
             )
 
+        def set_random_config():
+            for lower_limit, upper_limit, joint_id in zip(lower_limits, upper_limits, joint_ids_sorted):
+                random_value = random.uniform(lower_limit, upper_limit)
+                client._set_joint_position(joint_id, random_value, client.robot_puid)
+
         # Loop to get multiple results
+        solutions = []
         for _ in range(max_results):
 
-            # Ready to call IK
+            # Calling the IK function (High accuracy or not)
             if high_accuracy:
                 joint_positions, close_enough = self._accurate_inverse_kinematics(**ik_options)
 
@@ -196,36 +235,47 @@ class PyBulletInverseKinematics(InverseKinematics):
                 # I'm leaving the legacy iterative accurate ik in python as per
                 # older examples of pybullet, until we figure out why the builtin
                 # one is not cooperating.
-
-                # ik_options.update(dict(
-                #     residualThreshold=options.get('high_accuracy_threshold', 1e-6),
-                #     maxNumIterations=options.get('high_accuracy_max_iter', 20),
-                # ))
-                # joint_positions = pybullet.calculateInverseKinematics(**ik_options)
+                if not close_enough:
+                    # If the solution is not close enough, we retry with a new randomized joint values
+                    set_random_config()
+                    continue
             else:
                 joint_positions = pybullet.calculateInverseKinematics(**ik_options)
-                close_enough = True  # yeah, let's say we trust it
+                # Without the high accuracy mode, there is no guarantee of accuracy
 
-            # if not joint_positions:
-            #     raise InverseKinematicsError()
+            # Setting the robot configuration so we can perform collision checking
+            # This also updates the robot's pose in the client
+            for [joint_name, joint_position] in zip(joint_names_sorted, joint_positions):
+                robot_cell_state.robot_configuration[joint_name] = joint_position
+            planner.set_robot_cell_state(robot_cell_state)
 
-            # Normally, no results ends the iteration, but if we have no solution
-            # because the accurate IK solving says it's not close enough, we can retry
-            # with a new randomized seed
-            if close_enough:
-                # Setting the robot configuration so we can perform collision checking
-                # This also updates the robot's pose in the client
-                for [joint_name, joint_position] in zip(joint_names_sorted, joint_positions):
-                    robot_cell_state.robot_configuration[joint_name] = joint_position
-                planner.set_robot_cell_state(robot_cell_state)
-                # Collision checking
-                # TODO: Implement collision checking
-                yield joint_positions, joint_names_sorted
+            # Collision checking
+            if options.get("check_collision"):
+                try:
+                    planner.check_collision(robot_cell_state, options)
+                except CollisionCheckError as e:
+                    if options.get("verbose", False):
+                        print("Collision detected. Skipping this solution.")
+                        print(e)
+                    # If max_results is 1, he user probably wants to know that the problem is caused by collision
+                    # and not because there is no IK solution. So we re-raise the Collision Error
+                    if max_results == 1:
+                        raise e
+                    # If there is more attempts, we skip this solution and try again with a new randomized joint values
+                    set_random_config()
+                    continue
 
-            # Randomize joint values to get a different solution on the next iter
-            for lower_limit, upper_limit, joint_id in zip(lower_limits, upper_limits, joint_ids_sorted):
-                random_value = random.uniform(lower_limit, upper_limit)
-                client._set_joint_position(joint_id, random_value, client.robot_puid)
+            # Unique solution checking
+            solutions.append(joint_positions)
+            yield joint_positions, joint_names_sorted
+
+            # In order to generate multiple IK results,
+            # we start the next loop iteration with randomized joint values
+            set_random_config()
+
+        # If no solution was found after max_results, raise an error
+        if len(solutions) == 0:
+            raise InverseKinematicsError("No solution found after {} attempts (max_results).".format(max_results))
 
     def _accurate_inverse_kinematics(self, joint_ids_sorted, threshold, max_iter, **kwargs):
         # Based on these examples
