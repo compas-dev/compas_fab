@@ -91,7 +91,7 @@ Exceptions
 
     BackendError
     BackendFeatureNotSupportedError
-    CollisionCheckInCollisionError
+    CollisionCheckError
     CartesianMotionError
     InverseKinematicsError
     KinematicsError
@@ -107,14 +107,7 @@ the :ref:`architecture` documentation.
 import compas
 
 # Base imports
-from .exceptions import (
-    BackendError,
-    BackendFeatureNotSupportedError,
-    InverseKinematicsError,
-    KinematicsError,
-    CollisionCheckInCollisionError,
-    CollisionCheckError,
-)
+from .exceptions import *
 
 from .tasks import (
     FutureResult,
@@ -162,45 +155,45 @@ if not compas.IPY:
         AnalyticalPyBulletClient,
     )
 
-__all__ = [
-    # Base
-    "BackendError",
-    "BackendFeatureNotSupportedError",
-    "InverseKinematicsError",
-    "KinematicsError",
-    "CollisionCheckInCollisionError",
-    "CollisionCheckError",
-    "FutureResult",
-    "CancellableFutureResult",
-    # ROS
-    "RosClient",
-    "RosError",
-    "RosValidationError",
-    "RosFileServerLoader",
-    "MoveItPlanner",
-    # Analytic IK
-    "AnalyticalInverseKinematics",
-    "AnalyticalPlanCartesianMotion",
-    "AnalyticalPyBulletPlanner",
-    "AnalyticalKinematicsPlanner",
-    "OffsetWristKinematics",
-    "SphericalWristKinematics",
-    "CartesianMotionError",
-    # Robot-specific analytic IK
-    "UR3Kinematics",
-    "UR3eKinematics",
-    "UR5Kinematics",
-    "UR5eKinematics",
-    "UR10Kinematics",
-    "UR10eKinematics",
-    "Staubli_TX260LKinematics",
-    "ABB_IRB4600_40_255Kinematics",
-]
+# __all__ = [
+#     # Base
+#     "BackendError",
+#     "BackendFeatureNotSupportedError",
+#     "InverseKinematicsError",
+#     "KinematicsError",
+#     "CollisionCheckError",
+#     "FutureResult",
+#     "CancellableFutureResult",
+#     "MPMaxJumpError",
+#     # ROS
+#     "RosClient",
+#     "RosError",
+#     "RosValidationError",
+#     "RosFileServerLoader",
+#     "MoveItPlanner",
+#     # Analytic IK
+#     "AnalyticalInverseKinematics",
+#     "AnalyticalPlanCartesianMotion",
+#     "AnalyticalPyBulletPlanner",
+#     "AnalyticalKinematicsPlanner",
+#     "OffsetWristKinematics",
+#     "SphericalWristKinematics",
+#     "CartesianMotionError",
+#     # Robot-specific analytic IK
+#     "UR3Kinematics",
+#     "UR3eKinematics",
+#     "UR5Kinematics",
+#     "UR5eKinematics",
+#     "UR10Kinematics",
+#     "UR10eKinematics",
+#     "Staubli_TX260LKinematics",
+#     "ABB_IRB4600_40_255Kinematics",
+# ]
 
-if not compas.IPY:
-    __all__ += [
-        "PyBulletClient",
-        "PyBulletError",
-        "PyBulletPlanner",
-        "AnalyticalPyBulletClient",
-    ]
+# if not compas.IPY:
+#     __all__ += [
+#         "PyBulletClient",
+#         "PyBulletError",
+#         "PyBulletPlanner",
+#         "AnalyticalPyBulletClient",
+#     ]

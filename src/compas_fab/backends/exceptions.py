@@ -7,8 +7,14 @@ __all__ = [
     "BackendFeatureNotSupportedError",
     "InverseKinematicsError",
     "KinematicsError",
-    "CollisionCheckInCollisionError",
     "CollisionCheckError",
+    "MotionPlanningError",
+    "MPStartStateInCollisionError",
+    "MPTargetInCollisionError",
+    "MPInterpolationInCollisionError",
+    "MPSearchTimeOutError",
+    "MPNoIKSolutionError",
+    "MPMaxJumpError",
 ]
 
 
@@ -18,6 +24,7 @@ class BackendError(Exception):
 
     def __init__(self, message):
         super(BackendError, self).__init__(message)
+        self.message = message
 
 
 class BackendFeatureNotSupportedError(Exception):
@@ -45,8 +52,10 @@ class KinematicsError(BackendError):
 class InverseKinematicsError(KinematicsError):
     """Indicates that no IK solution could be found by the kinematic solver."""
 
-    def __init__(self):
+    def __init__(self, message, target_t0cf=None):
         super(InverseKinematicsError, self).__init__("No inverse kinematics solution found.")
+        self.message = message
+        self.target_t0cf = target_t0cf
 
 
 # -------------------------
@@ -55,77 +64,138 @@ class InverseKinematicsError(KinematicsError):
 
 
 class CollisionCheckError(BackendError):
-    """Indicates a collision check exception."""
-
-    # TODO: Rewrite this to be a collection of CC errors
-
-    def __init__(self, message):
-        super(CollisionCheckError, self).__init__(message)
-
-
-class CollisionCheckInCollisionError(BackendError):
-    """Indicates a collision between two objects is detected during a collision check.
-
-    There are different types of objects that can collide.
-    If the backend supports it, the type of object and their names are provided.
-
-    - Type 1: Robot Links - Name: Individual Link Name
-    - Type 2. Tool - Name: Tool Name
-    - Type 3. Rigidbody - Name: Rigidbody Name
+    """Indicates a collision check exception.
 
     Attributes
     ----------
-    object1_type : int
-        Type of the first object.
-    object1_name : str
-        Name of the first object.
-    object2_type : int
-        Type of the second object.
-    object2_name : str
-        Name of the second object.
+    message : str
+        The error message.
+    collision_pairs : list of tuple
+        List of pairs of objects that are in collision.
     """
 
-    # TODO: Rename this class, add the type int as constants and add to a string mapping
-
-    def __init__(self, object1_name, object2_name, object1_type=None, object2_type=None):
-        # type(str, str, Optional[int], Optional[int]) -> None
-        message = "Collision between '{}' and '{}'".format(object1_name, object2_name)
-        super(CollisionCheckInCollisionError, self).__init__(message)
-        self.object1_type = object1_type
-        self.object1_name = object1_name
-        self.object2_type = object2_type
-        self.object2_name = object2_name
+    def __init__(self, message, collision_pairs=None):
+        super(CollisionCheckError, self).__init__(message)
+        self.message = message
+        self.collision_pairs = collision_pairs or []
 
 
-# class RobotSelfCollisionError(CollisionCheckInCollisionError):
-#     """Indicates that the robot is in self-collision."""
+# -------------------------
+# Motion Planning Errors
+# -------------------------
 
-#     def __init__(self, message):
-#         super(RobotSelfCollisionError, self).__init__(message)
-#         self.robot_link_a = None
-#         self.robot_link_b = None
 
-# class RobotToolCollisionError(CollisionCheckInCollisionError):
-#     """Indicates that the robot is in collision with its tool."""
+class MotionPlanningError(BackendError):
+    """Indicates a motion planning exception.
 
-#     def __init__(self, message):
-#         super(RobotToolCollisionError, self).__init__(message)
-#         self.robot_link = None
-#         self.tool_id = None
-#         self.tool_link = None
+    Attributes
+    ----------
+    message : str
+        The error message.
+    """
 
-# class RobotRigidbodyCollisionError(CollisionCheckInCollisionError):
-#     """Indicates that the robot is in collision with a rigid body."""
+    def __init__(self, message):
+        super(MotionPlanningError, self).__init__(message)
 
-#     def __init__(self, message):
-#         super(RobotRigidbodyCollisionError, self).__init__(message)
-#         self.robot_link = None
-#         self.rigidbody_id = None
 
-# class AttachedStationaryRigidbodyCollisionError(CollisionCheckInCollisionError):
-#     """Indicates that an attached rigid body is in collision with a stationary object."""
+class MPStartStateInCollisionError(MotionPlanningError):
+    """Indicates that the start state is in collision.
 
-#     def __init__(self, message):
-#         super(AttachedStationaryRigidbodyCollisionError, self).__init__(message)
-#         self.rigidbody_id = None
-#         self.stationary_id = None
+    Attributes
+    ----------
+    message : str
+        The error message.
+    start_state : compas_fab.robots.RobotCellState
+        The start state that is in collision.
+    collision_pairs : list of tuple
+        List of pairs of objects that are in collision.
+    """
+
+    def __init__(self, message, start_state=None, collision_pairs=None):
+        super(MPStartStateInCollisionError, self).__init__(message)
+        self.start_state = start_state
+        self.collision_pairs = collision_pairs or []
+
+
+class MPTargetInCollisionError(MotionPlanningError):
+    """Indicates that the target (or one of the waypoints) is in a collision state.
+
+    Attributes
+    ----------
+    message : str
+        The error message.
+    target : compas.geometry.Frame
+        The target that is in collision.
+    collision_pairs : list of tuple
+        List of pairs of objects that are in collision.
+    """
+
+    def __init__(self, message, target=None, collision_pairs=None):
+        super(MPTargetInCollisionError, self).__init__(message)
+        self.target = target
+        self.collision_pairs = collision_pairs or []
+
+
+class MPInterpolationInCollisionError(MotionPlanningError):
+    """Indicates that the interpolated trajectory is in collision.
+
+    Attributes
+    ----------
+    message : str
+        The error message.
+    target : compas.geometry.Frame
+        The target that is in collision.
+    collision_pairs : list of tuple
+        List of pairs of objects that are in collision.
+    """
+
+    def __init__(self, message, target=None, collision_pairs=None):
+        super(MPInterpolationInCollisionError, self).__init__(message)
+        self.target = target
+        self.collision_pairs = collision_pairs or []
+
+
+class MPSearchTimeOutError(MotionPlanningError):
+    """Indicates that the motion planning search timed out."""
+
+    def __init__(self, message, time_elapsed=None):
+        super(MPSearchTimeOutError, self).__init__(message)
+        self.time_elapsed = time_elapsed
+
+
+class MPNoIKSolutionError(MotionPlanningError):
+    """Indicates that no IK solution could be found by the motion planner.
+
+    Attributes
+    ----------
+    message : str
+        The error message.
+    target : compas.geometry.Frame
+        The target that could not be reached.
+    """
+
+    def __init__(self, message, target=None):
+        super(MPNoIKSolutionError, self).__init__(message)
+        self.target = target
+
+
+class MPMaxJumpError(MotionPlanningError):
+    """Indicates that the distance between two consecutive JointTrajectoryPoint is too large."""
+
+    def __init__(
+        self,
+        message=None,
+        joint_name=None,
+        joint_type=None,
+        joint_values_a=None,
+        joint_values_b=None,
+        value_difference=None,
+        value_threshold=None,
+    ):
+        super(MPMaxJumpError, self).__init__(message)
+        self.joint_name = joint_name
+        self.joint_type = joint_type
+        self.joint_values_a = joint_values_a
+        self.joint_values_b = joint_values_b
+        self.value_difference = value_difference
+        self.value_threshold = value_threshold
