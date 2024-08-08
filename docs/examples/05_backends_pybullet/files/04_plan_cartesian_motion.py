@@ -1,10 +1,12 @@
 import compas_fab
+
+from compas.geometry import Frame
 from compas_robots import Configuration
 from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
-from compas_fab.robots import RobotCell
+from compas_fab.robots import FrameWaypoints
+from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RobotCellState
-from compas_fab.robots import RobotLibrary
 
 
 # #############################################
@@ -12,31 +14,52 @@ from compas_fab.robots import RobotLibrary
 # #############################################
 
 # 'direct' mode
-with PyBulletClient("direct") as client:
-    # The robot in this example is loaded from a URDF file
-    robot = RobotLibrary.ur5()
+with PyBulletClient("gui") as client:
     planner = PyBulletPlanner(client)
 
-    # This is a simple robot cell with only the robot
-    robot_cell = RobotCell(robot)
+    # The robot cell in this example is loaded from RobotCellLibrary
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5_cone_tool()
     planner.set_robot_cell(robot_cell)
 
-    # Create the starting configuration
-    configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.0])
-    # The `RobotCellState.from_robot_configuration` method can be used when the robot is the only element in the cell
-    robot_cell_state = RobotCellState.from_robot_configuration(robot, configuration)
+    # ==========================================
+    # Plan Cartesian Motion with FrameWaypoints
+    # ==========================================
+
+    # The starting robot configuration is set in the robot cell state
+    robot_cell_state.robot_configuration.joint_values = [-2.238, -1.153, -2.174, 0.185, 0.667, 0.0]
+    # FrameWaypoints can hold more than one target frame
+    target_frames = []
+    # Move to X direction and move back
+    target_frames.append(Frame([0.6, 0.1, 0.5], [1.0, 0.0, 0.0], [0.0, -1.0, 0.0]))
+    target_frames.append(Frame([0.4, 0.1, 0.5], [1.0, 0.0, 0.0], [0.0, -1.0, 0.0]))
+    # Move to Y direction and move back
+    target_frames.append(Frame([0.4, 0.3, 0.5], [1.0, 0.0, 0.0], [0.0, -1.0, 0.0]))
+    target_frames.append(Frame([0.4, 0.1, 0.5], [1.0, 0.0, 0.0], [0.0, -1.0, 0.0]))
+    # Move to Z direction and move back
+    target_frames.append(Frame([0.4, 0.1, 0.7], [1.0, 0.0, 0.0], [0.0, -1.0, 0.0]))
+    target_frames.append(Frame([0.4, 0.1, 0.5], [1.0, 0.0, 0.0], [0.0, -1.0, 0.0]))
+    waypoints = FrameWaypoints(target_frames)
+
     # In this demo, the default planning group is used for the forward kinematics
-    frame_WCF = planner.forward_kinematics(robot_cell_state)
+    trajectory = planner.plan_cartesian_motion(waypoints, robot_cell_state)
 
-# Set the start and goal frames
-start_frame = Frame([0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
-goal_frame = Frame([1.0, 1.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
+    print("Planned trajectory has {} points.".format(len(trajectory.points)))
+    for i, point in enumerate(trajectory.points):
+        print("- JointTrajectoryPoint {}, joint_values: {}".format(i, point.joint_values))
 
-# Create a planner
-planner = client.get_planner()
+    # #############################################
+    # Replay the trajectory in the PyBullet simulation
+    # #############################################
+    # User can step through the trajectory points by pressing 'Enter' key
+    step = 0
+    intermediate_robot_cell_state = robot_cell_state.copy()  # type: RobotCellState
+    while True:
+        if step >= len(trajectory.points):
+            step = 0
 
-# Plan a cartesian motion using the pybullet backend
-trajectory = planner.plan_cartesian_motion(robot, start_frame, goal_frame)
+        print("Step: {} - joint_values = {}".format(step, trajectory.points[step].joint_values))
+        intermediate_robot_cell_state.robot_configuration = trajectory.points[step]
+        planner.set_robot_cell_state(intermediate_robot_cell_state)
 
-# Execute the planned trajectory
-client.execute_trajectory(robot, trajectory)
+        input("Press Enter to continue...")
+        step += 1
