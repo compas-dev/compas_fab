@@ -27,9 +27,7 @@ with PyBulletClient() as client:
     # ---------------------
 
     # The input configuration used for the forward kinematics is provided through the RobotCellState
-    robot_cell_state.robot_configuration = Configuration.from_revolute_values(
-        [-2.238, -1.153, -2.174, 0.185, 0.667, 0.0]
-    )
+    robot_cell_state.robot_configuration.joint_values = [-2.238, -1.153, -2.174, 0.185, 0.667, 0.0]
     # By default, if a tool is attached, the TCF is returned
     print("Frame of the attached tool TCF in World Coordinate Frame:")
     frame_WCF = planner.forward_kinematics(robot_cell_state)
