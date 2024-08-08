@@ -89,6 +89,9 @@ class RobotLibrary(object):
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
 
+        The main planning group of the robot is named 'manipulator'.
+        The first and last link on the 'manipulator' group is named 'base_link' and 'tool0'.
+
         Parameters
         ----------
         client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
@@ -269,14 +272,15 @@ class ToolLibrary(object):
     """
 
     @classmethod
-    def cone(cls, load_geometry=True):
+    def cone(cls, load_geometry=True, radius=0.02, length=0.1):
         # type: (Optional[bool]) -> ToolModel
         """Create and return a cone as ToolModel, useful for simulating a drawing tool.
 
-        The cone is 14cm long pointing towards the positive X-axis of the tool frame.
+        The cone points towards the positive X-axis of the tool frame.
         The tool has only one visual mesh, which is also used for collision mesh.
+
         The tool TCF is located at the tip of the cone,
-        it is a translation offset from T0CF by +0.14 along the X-axis of the T0CF.
+        it is a translation offset from T0CF by its length (default 0.1) along the X-axis of the T0CF.
         The tool name is 'cone'.
 
         Parameters
@@ -284,16 +288,23 @@ class ToolLibrary(object):
         load_geometry: :obj:`bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the tool.
+        radius: :obj:`float`, optional
+            Default is `0.02`, which means that the radius of the cone is 2cm.
+        length: :obj:`float`, optional
+            Default is `0.1`, which means that the length of the cone is 10cm.
 
         Returns
         -------
         :class:`compas_fab.robots.ToolModel`
             Newly created instance of the tool.
         """
-        tool_frame = Frame([0.14, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
+        tool_frame = Frame([length, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
 
         if load_geometry:
-            tool_mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
+            cone = Cone(radius, length, Frame.worldYZ())
+            tool_mesh = Mesh.from_shape(cone)
+            # Do not use the cone.stl because it points towards the Z axis
+            # tool_mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
         else:
             tool_mesh = None
 
@@ -459,7 +470,9 @@ class RobotCellLibrary(object):
         # Load Tools
         # ---------------------------------------------------------------------
 
-        cone = ToolLibrary.cone(load_geometry=load_geometry)
+        cone_radius = 0.02
+        cone_length = 0.1
+        cone = ToolLibrary.cone(load_geometry=load_geometry, radius=cone_radius, length=cone_length)
         robot_cell.tool_models["cone"] = cone
 
         # ---------------------------------------------------------------------
@@ -476,7 +489,20 @@ class RobotCellLibrary(object):
         robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
         # Attach the tool to the robot's main group
-        robot_cell_state.set_tool_attached_to_group("cone", robot.main_group_name)
+        touch_links = ["wrist_3_link"]
+        # UR5 has the last planning link as 'tool0' not 'flange', therefore the cone tool
+        # that is REP 199 compliant is attached with the following rotation to match.
+        attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
+        robot_cell_state.set_tool_attached_to_group(
+            "cone", robot.main_group_name, attachment_frame=attachment_frame, touch_links=touch_links
+        )
+
+        # ------------------------------------------------------------------------
+        # Static Rigid Body Touch Links
+        # ------------------------------------------------------------------------
+
+        # The floor is not attached to the robot, but it is allowed to touch the robot's base link.
+        robot_cell_state.rigid_body_states["floor"].touch_links = ["base_link_inertia"]
 
         return robot_cell, robot_cell_state
 
@@ -657,30 +683,30 @@ if __name__ == "__main__":
     # robot_cell_state.get_attached_tool_id(robot_cell.robot.main_group_name)
 
     # ----------------------------
-    # Visualize with compas_viewer
+    # Visualize Tool with compas_viewer
     # ----------------------------
 
-    # from compas_viewer import Viewer
-    # from compas_robots.viewer.scene.robotmodelobject import RobotModelObject
+    from compas_viewer import Viewer
+    from compas_robots.viewer.scene.robotmodelobject import RobotModelObject
 
-    # viewer = Viewer()
-    # viewer.renderer.rendermode = "lighted"
+    viewer = Viewer()
+    viewer.renderer.rendermode = "lighted"
 
-    # # model = robot.model
-    # model = ToolLibrary.static_gripper(load_geometry=True)
-    # robot_object: RobotModelObject = viewer.scene.add(model, show_lines=False)  # type: ignore
+    # model = robot.model
+    model = ToolLibrary.static_gripper(load_geometry=True)
+    robot_object: RobotModelObject = viewer.scene.add(model, show_lines=False)  # type: ignore
 
-    # viewer.show()
+    viewer.show()
 
     # ----------------------------
     # Visualize with pybullet gui
     # ----------------------------
 
-    from compas_fab.backends.pybullet import PyBulletClient
-    from compas_fab.backends.pybullet import PyBulletPlanner
+    # from compas_fab.backends.pybullet import PyBulletClient
+    # from compas_fab.backends.pybullet import PyBulletPlanner
 
-    with PyBulletClient() as client:
-        planner = PyBulletPlanner(client)
-        robot_cell, robot_cell_state = RobotCellLibrary.abb_irb4600_40_255_gripper_one_beam(client, load_geometry=True)
-        planner.set_robot_cell(robot_cell, robot_cell_state)
-        input("Press Enter to exit...")
+    # with PyBulletClient() as client:
+    #     planner = PyBulletPlanner(client)
+    #     robot_cell, robot_cell_state = RobotCellLibrary.abb_irb4600_40_255_gripper_one_beam(client, load_geometry=True)
+    #     planner.set_robot_cell(robot_cell, robot_cell_state)
+    #     input("Press Enter to exit...")
