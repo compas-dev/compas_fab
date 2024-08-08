@@ -6,7 +6,6 @@ import itertools
 import os
 import sys
 import tempfile
-from itertools import combinations
 
 import compas
 from compas.geometry import Frame
@@ -16,8 +15,6 @@ from compas_robots.files import URDF
 from compas_robots.model import MeshDescriptor
 from compas_robots import ToolModel
 
-import compas_fab
-from compas_fab.backends import CollisionCheckInCollisionError
 from compas_fab.backends import CollisionCheckError
 from compas_fab.backends.interfaces.client import ClientInterface
 
@@ -503,8 +500,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         kwargs = {key: value for key, value in kwargs.items() if value is not None}
         pts = pybullet.getClosestPoints(**kwargs)
         if pts:
-            # LOG.warning("Collision between '{}' and '{}'".format(body_1_name, body_2_name))
-            raise CollisionCheckInCollisionError(body_1_name, body_2_name)
+            message = "Collision between '{}' and '{}'".format(body_1_name, body_2_name)
+            raise CollisionCheckError(message)
 
     # --------------------------------
     # Functions related to puids
