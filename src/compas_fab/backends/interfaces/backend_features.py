@@ -32,6 +32,7 @@ class BackendFeature(object):
     client : :class:`compas_fab.backends.interfaces.ClientInterface`
         The backend client that supports this feature.
 
+
     """
 
     def __init__(self, client=None):
@@ -232,6 +233,7 @@ class InverseKinematics(BackendFeature):
         options : dict, optional
             Dictionary containing kwargs for arguments specific to
             the client being queried.
+
             - ``"return_full_configuration"``: (:obj:`bool`) If ``True``, the full configuration
                 will be returned. Defaults to ``False``.
             - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
@@ -246,6 +248,7 @@ class InverseKinematics(BackendFeature):
         -------
         :obj:`tuple` of :obj:`list`
             A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
+
         """
         # This is the default implementation for the inverse kinematics feature to be based on the
         # iter_inverse_kinematics method. If the planner does not support this feature, it should
