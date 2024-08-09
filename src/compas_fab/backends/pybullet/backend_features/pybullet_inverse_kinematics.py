@@ -101,13 +101,15 @@ class PyBulletInverseKinematics(InverseKinematics):
             - ``"high_accuracy_max_iter"``:  (:obj:`float`, optional) Defines the maximum
               number of iterations to use for the high accuracy mode. Defaults to ``20``.
             - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
+              If set to 1, the solver will be deterministic, descending from the initial
+              robot configuration.
               Defaults to ``100``.
-            - ``solution_uniqueness_threshold_prismatic``: (:obj:`float`, optional) The minimum
-                distance between two solutions in the prismatic joint space to consider them unique.
-                Units are in meters. Defaults to ``3e-4``.
-            - ``solution_uniqueness_threshold_revolute``: (:obj:`float`, optional) The minimum
-                distance between two solutions in the revolute joint space to consider them unique.
-                Units are in radians. Defaults to ``1e-3``.
+            - ``"solution_uniqueness_threshold_prismatic"``: (:obj:`float`, optional) The minimum
+              distance between two solutions in the prismatic joint space to consider them unique.
+              Units are in meters. Defaults to ``3e-4``.
+            - ``"solution_uniqueness_threshold_revolute"``: (:obj:`float`, optional) The minimum
+              distance between two solutions in the revolute joint space to consider them unique.
+              Units are in radians. Defaults to ``1e-3``.
             - ``"check_collision"``: (:obj:`bool`, optional)
               Whether or not to check for collision. Defaults to ``False``.
 
@@ -149,18 +151,20 @@ class PyBulletInverseKinematics(InverseKinematics):
         robot_cell_state = robot_cell_state.copy()  # Make a copy to avoid modifying the original
         planner.set_robot_cell_state(robot_cell_state)
 
-        body_id = client.robot_puid
-        link_id = client.robot_link_puids[link_name]
-
         # Target frame
         target = self._scale_input_target(target)
         target_frame = target.target_frame
+
+        # TODO: Implement a fail fast mechanism to check if the attached tool and objects are in collision
 
         # Tool Coordinate Frame if there are tools attached
         attached_tool_id = robot_cell_state.get_attached_tool_id(group)
         if attached_tool_id:
             target_frame = planner.from_tcf_to_pcf([target_frame], attached_tool_id)[0]
 
+        # Formatting input for PyBullet
+        body_id = client.robot_puid
+        link_id = client.robot_link_puids[link_name]
         point, orientation = pose_from_frame(target_frame)
 
         # Get list of keys (joint_name) from the joint_ids dict in the order of its values (puid)
@@ -275,7 +279,9 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         # If no solution was found after max_results, raise an error
         if len(solutions) == 0:
-            raise InverseKinematicsError("No solution found after {} attempts (max_results).".format(max_results))
+            raise InverseKinematicsError(
+                "No solution found after {} attempts (max_results).".format(max_results), target_pcf=target_frame
+            )
 
     def _accurate_inverse_kinematics(self, joint_ids_sorted, threshold, max_iter, **kwargs):
         # Based on these examples

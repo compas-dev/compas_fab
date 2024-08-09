@@ -6,16 +6,20 @@ from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCellLibrary
 
 with PyBulletClient() as client:
-    planner = PyBulletPlanner(client)
+
+    # Load a pre-made robot cell with one tool from the RobotCellLibrary
     robot_cell, robot_cell_state = RobotCellLibrary.ur5_cone_tool()
+    planner = PyBulletPlanner(client)
     planner.set_robot_cell(robot_cell)
 
+    # The FrameTarget represents the tool's coordinate frame (TCF) when a tool is attached
     target_center_point = [0.0, 0.5, 0.5]
     frame_WCF = Frame(target_center_point, [1, 0, 0], [0, 0, -1])
     target = FrameTarget(frame_WCF)
 
-    # The robot_cell_state from the RobotCellLibrary contains a zero configuration for the robot
-    options = {"check_collision": True}  # check_collision is turned off by default
+    # Enable the check_collision mode in the inverse_kinematics function.
+    # This will force the PyBullet planner to check for collisions during the IK computation
+    options = {"check_collision": True}  #
     joint_positions, joint_names = planner.inverse_kinematics(target, robot_cell_state, options=options)
 
     print("Inverse kinematics result: ", joint_positions, joint_names)

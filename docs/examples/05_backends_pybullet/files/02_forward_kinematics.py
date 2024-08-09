@@ -6,13 +6,9 @@ from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotLibrary
 
-
-# #############################################
-# Headless (no-GUI) forwards kinematics example
-# #############################################
-
-# 'direct' mode
+# Starting the PyBulletClient with the "direct" mode means that the GUI is not shown
 with PyBulletClient("direct") as client:
+
     # The robot in this example is loaded from a URDF file
     robot = RobotLibrary.ur5()
 
@@ -22,7 +18,6 @@ with PyBulletClient("direct") as client:
     # ----------------
     # FK without tools
     # ----------------
-
     # This is a simple robot cell with only the robot
     robot_cell = RobotCell(robot)
     planner.set_robot_cell(robot_cell)
@@ -40,7 +35,6 @@ with PyBulletClient("direct") as client:
     # ---------------------------------
     # FK for all the links in the robot
     # ---------------------------------
-
     for link_name in robot.get_link_names():
         frame_WCF = planner.forward_kinematics(robot_cell_state, options={"link": link_name})
         print(f"Frame of link '{link_name}' : {frame_WCF}")

@@ -8,12 +8,6 @@ from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RobotCellState
 
-
-# #############################################
-# Headless (no-GUI) forwards kinematics example
-# #############################################
-
-# 'direct' mode
 with PyBulletClient("gui") as client:
     planner = PyBulletPlanner(client)
 
@@ -21,9 +15,9 @@ with PyBulletClient("gui") as client:
     robot_cell, robot_cell_state = RobotCellLibrary.ur5_cone_tool()
     planner.set_robot_cell(robot_cell)
 
-    # ==========================================
+    # ---------------------------------------------
     # Plan Cartesian Motion with FrameWaypoints
-    # ==========================================
+    # ---------------------------------------------
 
     # The starting robot configuration is set in the robot cell state
     robot_cell_state.robot_configuration.joint_values = [-2.238, -1.153, -2.174, 0.185, 0.667, 0.0]
@@ -47,9 +41,10 @@ with PyBulletClient("gui") as client:
     for i, point in enumerate(trajectory.points):
         print("- JointTrajectoryPoint {}, joint_values: {}".format(i, point.joint_values))
 
-    # #############################################
+    # ------------------------------------------------
     # Replay the trajectory in the PyBullet simulation
-    # #############################################
+    # ------------------------------------------------
+    # The following code only serves demonstration purposes
     # User can step through the trajectory points by pressing 'Enter' key
     step = 0
     intermediate_robot_cell_state = robot_cell_state.copy()  # type: RobotCellState

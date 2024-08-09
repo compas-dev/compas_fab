@@ -13,7 +13,8 @@ from compas.geometry import Box
 from compas_robots import Configuration
 from compas_robots import ToolModel
 
-with PyBulletClient() as client:
+# Starting the PyBulletClient with the "direct" mode means that the GUI is not shown
+with PyBulletClient("direct") as client:
 
     # Load a pre-made robot cell with one tool from the RobotCellLibrary
     robot_cell, robot_cell_state = RobotCellLibrary.ur5_cone_tool()
@@ -25,7 +26,6 @@ with PyBulletClient() as client:
     # ---------------------
     # Compute FK with tools
     # ---------------------
-
     # The input configuration used for the forward kinematics is provided through the RobotCellState
     robot_cell_state.robot_configuration.joint_values = [-2.238, -1.153, -2.174, 0.185, 0.667, 0.0]
     # By default, if a tool is attached, the TCF is returned

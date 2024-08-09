@@ -52,10 +52,10 @@ class KinematicsError(BackendError):
 class InverseKinematicsError(KinematicsError):
     """Indicates that no IK solution could be found by the kinematic solver."""
 
-    def __init__(self, message, target_t0cf=None):
+    def __init__(self, message, target_pcf=None):
         super(InverseKinematicsError, self).__init__("No inverse kinematics solution found.")
         self.message = message
-        self.target_t0cf = target_t0cf
+        self.target_pcf = target_pcf
 
 
 # -------------------------

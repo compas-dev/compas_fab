@@ -9,12 +9,6 @@ from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.backends import CollisionCheckError
 
-
-# #############################################
-# Pybullet Check Collision Example
-# #############################################
-
-
 with PyBulletClient("gui") as client:
     planner = PyBulletPlanner(client)
     print(f"Observe the Pybullet GUI window to see the robot cell state being checked")
@@ -24,7 +18,7 @@ with PyBulletClient("gui") as client:
     planner.set_robot_cell(robot_cell)
 
     # ---------------------------------------------
-    # Trial 1 - No collision
+    # Example 1 - No collision
     # ---------------------------------------------
 
     # This configuration is not in collision
@@ -37,7 +31,7 @@ with PyBulletClient("gui") as client:
     input("Press Enter to continue...\n")
 
     # ---------------------------------------------
-    # Trial 2 - Collision between beam and floor
+    # Example 2 - Collision between beam and floor
     # ---------------------------------------------
 
     robot_cell_state.robot_configuration.joint_values = [0, -1.0, 2.0, 0, 0, 0]
@@ -50,7 +44,7 @@ with PyBulletClient("gui") as client:
     input("Press Enter to continue...\n")
 
     # ---------------------------------------------
-    # Trial 3 - Multiple Collisions
+    # Example 3 - Multiple Collisions
     # ---------------------------------------------
 
     robot_cell_state.robot_configuration.joint_values = [0, -0.8, 2.0, 0, 0, 0]
@@ -64,7 +58,7 @@ with PyBulletClient("gui") as client:
     input("Press Enter to continue...\n")
 
     # ---------------------------------------------
-    # Trial 4 - Verbose Mode
+    # Example 4 - Verbose Mode
     # ---------------------------------------------
 
     robot_cell_state.robot_configuration.joint_values = [0, -0.7, 2.0, 0, 0, 0]
