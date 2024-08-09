@@ -6,14 +6,12 @@ PyBullet backend features
     :toctree: generated/
     :nosignatures:
 
-    PyBulletAddAttachedCollisionMesh
-    PyBulletAddCollisionMesh
-    PyBulletAppendCollisionMesh
+    PyBulletCheckCollision
     PyBulletForwardKinematics
     PyBulletInverseKinematics
-    PyBulletRemoveAttachedCollisionMesh
-    PyBulletRemoveCollisionMesh
-
+    PyBulletPlanCartesianMotion
+    PyBulletSetRobotCell
+    PyBulletSetRobotCellState
 
 
 """

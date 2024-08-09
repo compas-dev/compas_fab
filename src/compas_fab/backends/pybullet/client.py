@@ -414,8 +414,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             convex hull for collision checking purposes.  When ``True``,
             a non-static mesh will be decomposed into convex parts using v-HACD.
 
-        Return
-        ------
+        Returns
+        -------
         :obj:`str`
             The file path to the robot model URDF package.
 

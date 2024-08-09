@@ -34,8 +34,8 @@ class AnalyticalSetRobotCell(SetRobotCell):
         Note that the Analytical Planner does not support collision checking. Therefore, the
         geometry of the robot, tools and rigid bodies in the robot cell are not checked.
 
-        Note
-        ----
+        Notes
+        -----
         The robot_cell_state and options are not used in this implementation.
 
         """

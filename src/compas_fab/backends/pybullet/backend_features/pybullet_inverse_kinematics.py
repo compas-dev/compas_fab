@@ -61,8 +61,8 @@ class PyBulletInverseKinematics(InverseKinematics):
         # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
         """Calculate the robot's inverse kinematic for a given frame.
 
-        Note
-        ----
+        Notes
+        -----
         The planner will make multiple attempts to find a solution.
         The number of attempts is determined by the ``max_results`` option.
         The planner is a gradient descent solver, so the initial position of the robot is important.

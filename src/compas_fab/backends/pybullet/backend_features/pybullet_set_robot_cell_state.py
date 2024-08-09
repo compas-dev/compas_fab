@@ -34,8 +34,8 @@ class PyBulletSetRobotCellState(SetRobotCellState):
 
         The robot cell state must match the robot cell set earlier by :meth:`set_robot_cell`.
 
-        Note
-        ----
+        Notes
+        -----
         All the magic for transforming the attached objects happens here.
         """
         client = self.client  # type: PyBulletClient # Trick to keep intellisense happy
