@@ -103,11 +103,7 @@ def fake_client():
     class FakeClient(ClientInterface):
         pass
 
-    class FakePlanner(PlannerInterface):
-        pass
-
     client = FakeClient()
-    client.planner = FakePlanner(client)
 
     return client
 

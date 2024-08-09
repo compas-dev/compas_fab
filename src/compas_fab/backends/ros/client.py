@@ -24,7 +24,6 @@ from compas_fab.backends.ros.messages import JointTrajectoryPoint as RosMsgJoint
 from compas_fab.backends.ros.messages import MoveItErrorCodes
 from compas_fab.backends.ros.messages import RobotTrajectory
 from compas_fab.backends.ros.messages import Time
-from compas_fab.backends.ros.planner import MoveItPlanner
 from compas_fab.backends.tasks import CancellableFutureResult
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotSemantics
@@ -33,8 +32,6 @@ from compas_fab.robots import RobotCell
 __all__ = [
     "RosClient",
 ]
-
-PLANNER_BACKENDS = {"moveit": MoveItPlanner}
 
 
 class CancellableRosActionResult(CancellableFutureResult):
@@ -136,8 +133,6 @@ class RosClient(Ros, ClientInterface):
     def __init__(self, host="localhost", port=9090, is_secure=False, planner_backend="moveit"):
         super(RosClient, self).__init__(host, port, is_secure)
 
-        # planner_backend_type = PLANNER_BACKENDS[planner_backend]
-        # self.planner = planner_backend_type(self)
         self._ros_distro = None
 
     def __enter__(self):

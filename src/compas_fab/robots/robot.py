@@ -1216,6 +1216,7 @@ class Robot(Data):
         >>> robot.inverse_kinematics(frame_WCF, start_configuration, group)                 # doctest: +SKIP
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
+        # TODO: Planning function wrappers in Robot class will be removed.
         # Pseudo-memoized sequential calls will re-use iterator if not exhausted
         request_id = "{}-{}-{}-{}-{}".format(
             str(frame_WCF), str(start_configuration), str(group), str(return_full_configuration), str(options)
@@ -1293,6 +1294,7 @@ class Robot(Data):
         >>> next(robot.iter_inverse_kinematics(frame_WCF, start_configuration, group))      # doctest: +SKIP
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
+        # TODO: Planning function wrappers in Robot class will be removed.
         options = options or {}
         attached_collision_meshes = options.get("attached_collision_meshes") or []
 
@@ -1391,6 +1393,7 @@ class Robot(Data):
         >>> frame_WCF_c == frame_WCF_m
         True
         """
+        # TODO: Planning function wrappers in Robot class will be removed.
         options = options or {}
 
         group = group or self.main_group_name if self.semantics else None
@@ -1476,6 +1479,7 @@ class Robot(Data):
         ...     len(trajectory.points) > 1
         True
         """
+        # TODO: Planning function wrappers in Robot class will be removed.
         # The plan_cartesian_motion method in the Robot class is a wrapper around planing backend's
         # plan_cartesian_motion method. This method is responsible for scaling the waypoints, start_configuration and the planned trajectory.
         # Some options may also need scaling, like max_step. This should be removed in the future.
@@ -1626,6 +1630,7 @@ class Robot(Data):
         1.0
 
         """
+        # TODO: Planning function wrappers in Robot class will be removed.
         options = options or {}
         path_constraints = options.get("path_constraints")
         attached_collision_meshes = options.get("attached_collision_meshes") or []

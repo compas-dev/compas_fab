@@ -150,7 +150,7 @@ def test_planner(ur5_planner):
 # def test_kinematics_cartesian_with_tool_coordinate_frame(frame_waypoints):
 #     if compas.IPY:
 #         return
-#     frame_waypoints.tool_coordinate_frame = Frame([0.01, 0.02, -0.03], [1, 0, 0], [0, 1, 0])
+#     tool_coordinate_frame = Frame([0.01, 0.02, -0.03], [1, 0, 0], [0, 1, 0])
 
 #     with AnalyticalPyBulletClient(connection_type="direct") as client:
 #         robot = client.load_robot(urdf_filename)
