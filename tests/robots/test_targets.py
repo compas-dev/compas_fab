@@ -37,20 +37,20 @@ def target_configuration():
 
 
 @pytest.fixture
-def frame_target(target_frame, tool_coordinate_frame):
+def frame_target(target_frame):
     tolerance_position = 0.001
     tolerance_orientation = 0.001
     name = "my testing name"
-    return FrameTarget(target_frame, tolerance_position, tolerance_orientation, tool_coordinate_frame, name)
+    return FrameTarget(target_frame, tolerance_position, tolerance_orientation, name)
 
 
 @pytest.fixture
-def point_axis_target(tool_coordinate_frame):
+def point_axis_target():
     target_point = Point(1.0, -2.0, 3.0)
     target_vector = Vector(1.0, -1.0, 0.0)
     tolerance_position = 0.001
     name = "my testing name"
-    return PointAxisTarget(target_point, target_vector, tolerance_position, tool_coordinate_frame, name)
+    return PointAxisTarget(target_point, target_vector, tolerance_position, name)
 
 
 @pytest.fixture
@@ -65,7 +65,6 @@ def test_serialization_targets(frame_target, point_axis_target, configuration_ta
     # FrameTarget
     nt = FrameTarget.__from_data__(frame_target.__data__)
     assert frame_target.target_frame == nt.target_frame
-    assert frame_target.tool_coordinate_frame == nt.tool_coordinate_frame
     assert frame_target.tolerance_position == nt.tolerance_position
     assert frame_target.tolerance_orientation == nt.tolerance_orientation
     assert frame_target.name == nt.name
@@ -74,7 +73,6 @@ def test_serialization_targets(frame_target, point_axis_target, configuration_ta
     nt = PointAxisTarget.__from_data__(point_axis_target.__data__)
     assert point_axis_target.target_point == nt.target_point
     assert point_axis_target.target_z_axis == nt.target_z_axis
-    assert point_axis_target.tool_coordinate_frame == nt.tool_coordinate_frame
     assert point_axis_target.tolerance_position == nt.tolerance_position
     assert point_axis_target.name == nt.name
 
@@ -86,7 +84,7 @@ def test_serialization_targets(frame_target, point_axis_target, configuration_ta
     assert configuration_target.name == nt.name
 
 
-def test_serialization_constraint_sets(target_frame, tool_coordinate_frame, target_configuration):
+def test_serialization_constraint_sets(target_frame, target_configuration, tool_coordinate_frame):
     tolerance_above = [0.01] * 8
     tolerance_below = [0.0009] * 8
     name = "my testing name"
@@ -130,9 +128,8 @@ def frame_waypoints():
     target_frames.append(Frame(Point(7.0, -8.0, 9.0), Vector(-1.0, 0.0, 0.0), Vector(0.0, 1.0, 0.0)))
     tolerance_position = 0.001
     tolerance_orientation = 0.001
-    tool_coordinate_frame = Frame(Point(0.0, 10.0, 20.0), Vector(1.0, 0.0, 0.0), Vector(0.0, 1.0, 0.0))
     name = "my testing waypoints"
-    return FrameWaypoints(target_frames, tolerance_position, tolerance_orientation, tool_coordinate_frame, name)
+    return FrameWaypoints(target_frames, tolerance_position, tolerance_orientation, name)
 
 
 @pytest.fixture
@@ -142,9 +139,8 @@ def point_axis_waypoints():
     target_points_and_axes.append((Point(4.0, -5.0, 6.0), Vector(1.0, 0.0, 0.0)))
     target_points_and_axes.append((Point(7.0, -8.0, 9.0), Vector(-1.0, 0.0, 0.0)))
     tolerance_position = 0.001
-    tool_coordinate_frame = Frame(Point(0.0, 10.0, 20.0), Vector(1.0, 0.0, 0.0), Vector(0.0, 1.0, 0.0))
     name = "my testing waypoints"
-    return PointAxisWaypoints(target_points_and_axes, tolerance_position, tool_coordinate_frame, name)
+    return PointAxisWaypoints(target_points_and_axes, tolerance_position, name)
 
 
 def test_serialization_waypoints(frame_waypoints, point_axis_waypoints):
@@ -154,7 +150,6 @@ def test_serialization_waypoints(frame_waypoints, point_axis_waypoints):
         assert f1 == f2
     assert frame_waypoints.tolerance_position, nt.tolerance_position
     assert frame_waypoints.tolerance_orientation, nt.tolerance_orientation
-    assert frame_waypoints.tool_coordinate_frame == nt.tool_coordinate_frame
     assert frame_waypoints.name == nt.name
 
     # PointAxisWaypoints
@@ -163,7 +158,6 @@ def test_serialization_waypoints(frame_waypoints, point_axis_waypoints):
         assert p1 == p2
         assert a1 == a2
     assert point_axis_waypoints.tolerance_position == nt.tolerance_position
-    assert point_axis_waypoints.tool_coordinate_frame == nt.tool_coordinate_frame
     assert point_axis_waypoints.name == nt.name
 
 
@@ -174,7 +168,6 @@ def test_target_scale(frame_target):
     assert nt.tolerance_position == frame_target.tolerance_position * scale_factor
     # orientation doesn't need scale
     assert nt.tolerance_orientation == frame_target.tolerance_orientation
-    assert nt.tool_coordinate_frame == frame_target.tool_coordinate_frame.scaled(scale_factor)
 
 
 def test_point_axis_target_scale(point_axis_target):
@@ -183,7 +176,6 @@ def test_point_axis_target_scale(point_axis_target):
     assert nt.target_point == point_axis_target.target_point.scaled(scale_factor)
     assert nt.target_z_axis == point_axis_target.target_z_axis
     assert nt.tolerance_position == point_axis_target.tolerance_position * scale_factor
-    assert nt.tool_coordinate_frame == point_axis_target.tool_coordinate_frame.scaled(scale_factor)
 
 
 def test_configuration_target_scale(configuration_target):
@@ -213,7 +205,6 @@ def test_frame_waypoints_scale(frame_waypoints):
     assert nt.tolerance_orientation == frame_waypoints.tolerance_orientation
     for f1, f2 in zip(frame_waypoints.target_frames, nt.target_frames):
         assert f1.scaled(scale_factor) == f2
-    assert nt.tool_coordinate_frame == frame_waypoints.tool_coordinate_frame.scaled(scale_factor)
 
 
 def test_point_axis_waypoints_scale(point_axis_waypoints):
@@ -223,4 +214,3 @@ def test_point_axis_waypoints_scale(point_axis_waypoints):
     for (p1, a1), (p2, a2) in zip(point_axis_waypoints.target_points_and_axes, nt.target_points_and_axes):
         assert p1.scaled(scale_factor) == p2
         assert a1 == a2
-    assert nt.tool_coordinate_frame == point_axis_waypoints.tool_coordinate_frame.scaled(scale_factor)

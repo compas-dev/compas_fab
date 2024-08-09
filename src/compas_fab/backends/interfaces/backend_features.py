@@ -21,11 +21,14 @@ if not compas.IPY:
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import FrameTarget  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
-        from compas_fab.robots import Waypoint  # noqa: F401
+        from compas_fab.robots import Waypoints  # noqa: F401
 
 
 class BackendFeature(object):
     """Base class for all backend features that are implemented by a backend client.
+
+    Classes that inherit from this class are mixed-in when creating the planner backend interface.
+    Hence the the mixed-in class can access the attributes and other mix-ins functions of planner.
 
     Attributes
     ----------
@@ -40,7 +43,9 @@ class BackendFeature(object):
 
     def _scale_input_target(self, target):
         # type: (Target) -> Target
-        """Scale the target if the robot has user defined scale."""
+        """Returns a copy of the target scaled to the robot's scale factor.
+
+        If the robot has no scale factor, returns the original target."""
         robot = self.robot_cell.robot  # type: Robot
 
         # Check `robot.need_scaling` to avoid unnecessary scaling
@@ -50,21 +55,25 @@ class BackendFeature(object):
 
         return target
 
-    def _scale_input_waypoint(self, waypoint):
-        # type: (Waypoint) -> Waypoint
-        """Scale the waypoint if the robot has user defined scale."""
+    def _scale_input_waypoint(self, waypoints):
+        # type: (Waypoints) -> Waypoints
+        """Returns a copy of the scaled waypoints scaled to the robot's scale factor.
+
+        If the robot has no scale factor, returns the original waypoints."""
         robot = self.robot_cell.robot  # type: Robot
 
         # Check `robot.need_scaling` to avoid unnecessary scaling
         if robot.need_scaling:
             # Scale input target back to meter scale
-            return waypoint.scaled(1.0 / robot.scale_factor)
+            return waypoints.scaled(1.0 / robot.scale_factor)
 
-        return waypoint
+        return waypoints
 
     def _scale_output_frame(self, frame):
         # type: (Frame) -> Frame
-        """Scale the frame if the robot has user defined scale."""
+        """Returns a copy of the frame scaled to the robot's scale factor.
+
+        If the robot has no scale factor, returns the original frame."""
         robot = self.robot_cell.robot  # type: Robot
 
         # Check `robot.need_scaling` to avoid unnecessary scaling

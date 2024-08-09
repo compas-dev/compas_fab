@@ -30,7 +30,7 @@ def validate_response(response):
         raise RosError(response.error_code.human_readable, int(response.error_code))
 
 
-def convert_target_to_goal_constraints(target, ee_link_name):
+def convert_target_to_goal_constraints(target, ee_link_name, tool_coordinate_frame=None):
     """Convert COMPAS FAB `Target` objects into `Constraint` objects for passing it to MoveIt backend.
     This function is intended to be called only by MoveIt backend when handling different Target types.
 
@@ -56,7 +56,6 @@ def convert_target_to_goal_constraints(target, ee_link_name):
 
     elif isinstance(target, FrameTarget):
         tcf_frame_in_wcf = target.target_frame
-        tool_coordinate_frame = target.tool_coordinate_frame
         pc = CF_PositionConstraint.from_frame(
             tcf_frame_in_wcf, target.tolerance_position, ee_link_name, tool_coordinate_frame
         )
@@ -67,7 +66,6 @@ def convert_target_to_goal_constraints(target, ee_link_name):
 
     elif isinstance(target, PointAxisTarget):
         tcf_point_in_wcf = target.target_point
-        tool_coordinate_frame = target.tool_coordinate_frame
 
         if tool_coordinate_frame:
             raise NotImplementedError(

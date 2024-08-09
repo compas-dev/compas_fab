@@ -607,6 +607,7 @@ class OrientationConstraint(Constraint):
         >>> OrientationConstraint.from_frame(frame, tolerances_orientation, end_effector_link_name)
         OrientationConstraint('tool0', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)
         """
+        # TODO: Add support for tool_state.attachment_frame, call from_tcf_to_pcf.
 
         if tool_coordinate_frame:
             frame_WCF = from_tcf_to_t0cf(frame_WCF, tool_coordinate_frame)
@@ -709,6 +710,8 @@ class PositionConstraint(Constraint):
         >>> PositionConstraint.from_frame(frame, tolerance_position, end_effector_link_name)                                 # doctest: +SKIP
         PositionConstraint('tool0', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)    # doctest: +SKIP
         """
+
+        # TODO: Add support for tool_state.attachment_frame, call from_tcf_to_pcf.
 
         if tool_coordinate_frame:
             frame_WCF = from_tcf_to_t0cf(frame_WCF, tool_coordinate_frame)

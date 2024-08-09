@@ -255,7 +255,8 @@ class PlannerInterface(object):
         PCF by the tool's current attachment_frame (in tool_state).
 
         This function is restricted to be used only with tools that are currently
-        attached to the robot.
+        attached to the robot. Before calling this function, make sure the last call to
+        set_robot_cell_state() has the correct tool attachment information.
 
         This is typically used at the beginning of the inverse kinematics calculation to convert
         the frame of the robot's tool tip (tcf) to the frame of the robot's flange (tool0).
@@ -311,7 +312,8 @@ class PlannerInterface(object):
         PCF by the tool's current attachment_frame (in tool_state).
 
         This function is restricted to be used only with tools that are currently
-        attached to the robot.
+        attached to the robot. Before calling this function, make sure the last call to
+        set_robot_cell_state() has the correct tool attachment information.
 
         This is typically used at the end of the forward kinematics calculation to convert
         the frame of the robot's flange (tool0) to the frame of the robot's tool tip (tcf).
