@@ -1,6 +1,7 @@
 """Calculate the robot's inverse kinematic for a given plane.
     Inputs:
-        robot: The robot
+        planner: PlannerInterface
+            A planning backend with inverse kinematics capability.
         group: str, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
@@ -15,24 +16,21 @@
         group_configuration: The group configuration
         full_configuration: The full configuration
 """
+
 from __future__ import print_function
 
 from compas.geometry import Frame
 
-
 frame = Frame(plane.Origin, plane.XAxis, plane.YAxis)
 
-if robot and robot.client:
-    if robot.client.is_connected:
-        options = {
-            'avoid_collisions': avoid_collisions,
-        }
-        full_configuration = robot.inverse_kinematics(frame,
-                                                      start_configuration,
-                                                      group=group,
-                                                      return_full_configuration=True,
-                                                      options=options)
+if planner:
+    robot = planner.robot
+    if planner.client.is_connected:
+        options = {"avoid_collisions": avoid_collisions, "return_full_configuration": True}
+        full_configuration = planner.inverse_kinematics(
+            frame, start_configuration, group=group, return_full_configuration=True, options=options
+        )
         group_configuration = robot.get_group_configuration(group, full_configuration)
         print(group_configuration)
     else:
-        print("Robot client is not connected")
+        print("planner.client is not connected")

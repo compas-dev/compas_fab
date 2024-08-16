@@ -24,7 +24,7 @@ if not compas.IPY:
     if TYPE_CHECKING:
         from typing import Any  # noqa: F401
         from typing import Dict  # noqa: F401
-        from typing import Iterator  # noqa: F401
+        from typing import Generator  # noqa: F401
         from typing import List  # noqa: F401
         from typing import Optional  # noqa: F401
         from typing import Tuple  # noqa: F401
@@ -1244,7 +1244,7 @@ class Robot(Data):
         use_attached_tool_frame=True,
         options=None,
     ):
-        # type: (Frame, Optional[Configuration], Optional[str], Optional[bool], Optional[bool], Optional[Dict[str, Any]]) -> Iterator[Configuration]
+        # type: (Frame, Optional[Configuration], Optional[str], Optional[bool], Optional[bool], Optional[Dict[str, Any]]) -> Generator[Configuration]
         """Iterate over the inverse kinematic solutions of a robot.
 
         This method exposes the generator-based inverse kinematic solvers. Analytics solvers will return
@@ -1326,6 +1326,7 @@ class Robot(Data):
 
     def _build_configuration(self, joint_positions, joint_names, group, return_full_configuration):
         # type: (List[float], List[str], str | None, bool) -> Configuration
+        # TODO: This will go obsolete
         if return_full_configuration:
             # build configuration including passive joints, but no sorting
             joint_types = self.get_joint_types_by_names(joint_names)

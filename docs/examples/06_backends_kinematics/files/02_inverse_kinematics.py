@@ -27,10 +27,10 @@ start_state = RobotCellState.from_robot_cell(robot_cell)
 
 # iter_inverse_kinematics() will return a generator that would yield possible IK solutions
 print("\nResults of iter_inverse_kinematics():")
-for configuration in planner.iter_inverse_kinematics(target, start_state):
+for config in planner.iter_inverse_kinematics(target, start_state):
     # Note that although eight configurations are returned.
     # Some of the configurations may be in self-collision
-    print(configuration)
+    print(config)
 
 # inverse_kinematics() will return each possible IK solutions one at a time.
 print("\nResults of inverse_kinematics():")
@@ -38,5 +38,5 @@ for i in range(9):
     # Note that the last configuration is the same as the first one
     # because the robot has 8 possible solutions for this target
     # and calling the function repeatedly will return the same cycle of results
-    configuration = planner.inverse_kinematics(target, start_state)
-    print(configuration)
+    config = planner.inverse_kinematics(target, start_state)
+    print(config)

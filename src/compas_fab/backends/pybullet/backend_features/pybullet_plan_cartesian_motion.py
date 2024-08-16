@@ -263,15 +263,19 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # max_results = 1 removes the random search of the IK Engine
         options["max_results"] = options.get("max_results", 1)
 
+        # Getting the joint names this way ensures that the joint order is consistent with Semantics
+        # TODO: Discuss whether Plan* and IK should return joint names in the same order
+        joint_names = robot.get_configurable_joint_names(group)
+        joint_types = robot.get_configurable_joint_types(group)
+
         # Iterate over the waypoints as segments
         intermediate_state = start_state.copy()  # type: RobotCellState
-        joint_names = start_state.robot_configuration.joint_names
         start_configuration = start_state.robot_configuration
+        # TODO: We currently trust that the input configuration has a correct joint order, this should be checked
         trajectory = JointTrajectory(joint_names=joint_names, start_configuration=start_configuration)
 
         # Add the start configuration as the first point
-        joint_values = list(start_configuration.joint_values)
-        joint_types = robot.get_configurable_joint_types(group)
+        joint_values = [start_configuration[joint_name] for joint_name in joint_names]
         trajectory.points.append(
             JointTrajectoryPoint(joint_values=joint_values, joint_types=joint_types, joint_names=joint_names)
         )
@@ -326,7 +330,8 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                     )
                 # Try block to catch InverseKinematicsError, if IK failed, planning is stopped
                 try:
-                    new_joint_positions, _ = planner.inverse_kinematics(target, intermediate_state, group, options)
+                    configuration = planner.inverse_kinematics(target, intermediate_state, group, options)
+                    new_joint_positions = [configuration[joint_name] for joint_name in joint_names]
                 except InverseKinematicsError as e:
                     message = "plan_cartesian_motion_frame_waypoints(): Segment {}, Inverse Kinematics failed at t={}.\n".format(
                         i, interpolation_ts[j]

@@ -12,6 +12,7 @@ if not compas.IPY:
     if TYPE_CHECKING:
         from compas.geometry import Frame  # noqa: F401
         from compas_fab.backends import AnalyticalKinematicsPlanner  # noqa: F401
+        from compas_robots import Configuration  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Robot  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
@@ -42,10 +43,12 @@ class AnalyticalInverseKinematics(InverseKinematics):
     """
 
     def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
-        # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
+        # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
         """Calculate the robot's inverse kinematic for a given target.
 
-        An iterator is returned that yields the joint positions and joint names
+        An iterator is returned that yields configurations.
+
+
         """
         if isinstance(target, FrameTarget):
             return self.iter_inverse_kinematics_frame_target(
@@ -55,7 +58,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
             raise BackendTargetNotSupportedError()
 
     def iter_inverse_kinematics_frame_target(self, target, start_state=None, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
+        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
         """Calculate the robot's inverse kinematic for a given frame target.
 
         The IK for 6-axis industrial robots returns by default 8 possible solutions.
@@ -80,6 +83,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         target_frame = target.target_frame
 
         # Tool Coordinate Frame if there are tools attached
+        # TODO: Use the shared method from the planner
         attached_tool_id = start_state.get_attached_tool_id(group)
         if attached_tool_id:
             target_frame = self.from_tcf_to_t0cf([target_frame], attached_tool_id)[0]
@@ -87,7 +91,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         return self.inverse_kinematics_ordered(target_frame, group=group, options=options)
 
     def inverse_kinematics_ordered(self, frame_WCF, group=None, options=None):
-        # type: (Frame, Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
+        # type: (Frame, Optional[str], Optional[Dict]) -> Generator[Configuration | None]
         """Calculate the robot's inverse kinematic (IK) for a given frame.
 
         The IK for 6-axis industrial robots returns by default 8 possible solutions.
@@ -119,14 +123,14 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         Yields
         ------
-        :obj:`tuple` of :obj:`list`
-            A tuple of 2 elements containing a list of joint positions and a list
-            of matching joint names. If ``"keep_order"`` is ``True`` this list
-            contains also ``None``, ``None``
+        :obj:`compas_robots.Configuration`
+            The calculated configuration.
+            If ``"keep_order"`` is ``True`` result may contain ``None``.
 
         Notes
         -----
         This will only work with robots that have 6 revolute joints.
+        This function will yield exactly 8 times, if ``"keep_order"`` is ``True``.
 
         Raises
         ------
@@ -163,7 +167,8 @@ class AnalyticalInverseKinematics(InverseKinematics):
             raise InverseKinematicsError()
 
         for config in configurations:
-            if config:
-                yield config.joint_values, config.joint_names
-            elif keep_order:
-                yield None, None
+            # if keep_order is False, remove None solutions
+            if not keep_order and config is None:
+                continue
+            # otherwise yield also the None solutions
+            yield config

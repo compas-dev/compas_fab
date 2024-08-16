@@ -43,7 +43,7 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
     """
 
     def iter_inverse_kinematics_frame_target(self, target, start_state, group=None, options=None):
-        # type: (FrameTarget, RobotCellState, Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
+        # type: (FrameTarget, RobotCellState, Optional[str], Optional[Dict]) -> Generator[Configuration | None]
         """This function overrides the iter_inverse_kinematics_frame_target function from AnalyticalInverseKinematics
         to include the PyBulletClient for collision checking.
 

@@ -59,8 +59,7 @@ with AnalyticalPyBulletClient(connection_type="gui") as client:
     target = FrameTarget(frame_WCF)
 
     options = {"check_collision": True, "keep_order": False}
-    for joint_values, joint_names in planner.iter_inverse_kinematics(target, robot_cell_state, options=options):
-        config = Configuration.from_revolute_values(joint_values, joint_names)
+    for config in planner.iter_inverse_kinematics(target, robot_cell_state, options=options):
         print(config)
         # Visualize configuration in GUI
         robot_cell_with_config = robot_cell_state.copy()  # type: RobotCellState

@@ -11,11 +11,10 @@ if not compas.IPY:
         from compas_robots import Configuration  # noqa: F401
         from compas.geometry import Frame  # noqa: F401
         from typing import Optional  # noqa: F401
-        from typing import Iterator  # noqa: F401
+        from typing import Generator  # noqa: F401
         from typing import List  # noqa: F401
         from typing import Tuple  # noqa: F401
         from typing import Dict  # noqa: F401
-        from typing import Generator  # noqa: F401
 
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
@@ -50,7 +49,7 @@ class PyBulletInverseKinematics(InverseKinematics):
     """Mix-in functions to calculate the robot's inverse kinematics for a given target."""
 
     def iter_inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
-        # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
+        # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
 
         if isinstance(target, FrameTarget):
             return self.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
@@ -58,7 +57,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             raise NotImplementedError("{} is not supported by PyBulletInverseKinematics".format(type(target)))
 
     def iter_inverse_kinematics_frame_target(self, target, robot_cell_state=None, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Tuple[List[float], List[str]], None, None]
+        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
         """Calculate the robot's inverse kinematic for a given frame.
 
         Notes
@@ -146,6 +145,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         # Default options
         options["check_collision"] = options.get("check_collision", False)
+        options["return_full_configuration"] = options.get("return_full_configuration", False)
 
         # Setting the entire robot cell state, including the robot configuration
         robot_cell_state = robot_cell_state.copy()  # Make a copy to avoid modifying the original
@@ -270,8 +270,15 @@ class PyBulletInverseKinematics(InverseKinematics):
                     continue
 
             # Unique solution checking
+            # TODO: Implement uniqueness checking
+
+            # If we got this far, we have a valid solution to yield
             solutions.append(joint_positions)
-            yield joint_positions, joint_names_sorted
+            return_full_configuration = options.get("return_full_configuration")
+            configuration = self._build_configuration(
+                joint_positions, joint_names_sorted, group, return_full_configuration
+            )
+            yield configuration
 
             # In order to generate multiple IK results,
             # we start the next loop iteration with randomized joint values
@@ -284,6 +291,17 @@ class PyBulletInverseKinematics(InverseKinematics):
             )
 
     def _accurate_inverse_kinematics(self, joint_ids_sorted, threshold, max_iter, **kwargs):
+        """Iterative inverse kinematics solver with a threshold for the distance to the target.
+
+        This functions helps to get a more accurate solution by iterating over the IK solver
+        until the distance to the target is below a certain threshold.
+        This overcomes the limitations of the default pybullet solver, which does not guarantee any accuracy.
+
+        Returns
+        -------
+        tuple of list of float, bool
+            A tuple containing the joint positions and a boolean indicating if the solution is close enough to the target.
+        """
         # Based on these examples
         # https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/examples/inverse_kinematics_husky_kuka.py#L81
         close_enough = False

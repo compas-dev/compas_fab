@@ -118,7 +118,12 @@ def test_pybullet_planner_fk_ur10e():
 def _test_pybullet_ik_fk_agreement(robot, ik_target_frames):
     # These options are set to ensure that the IK solver converges to a high accuracy
     # Threshold is set to 1e-5 meters to be larger than the tolerance used for comparison (1e-4 meters)
-    ik_options = {"high_accuracy_max_iter": 50, "high_accuracy": True, "high_accuracy_threshold": 1e-5}
+    ik_options = {
+        "high_accuracy_max_iter": 50,
+        "high_accuracy": True,
+        "high_accuracy_threshold": 1e-5,
+        "return_full_configuration": True,
+    }
 
     with PyBulletClient(connection_type="direct") as client:
         planner = PyBulletPlanner(client)
@@ -128,7 +133,7 @@ def _test_pybullet_ik_fk_agreement(robot, ik_target_frames):
             # IK Query to the planner (Frame to Configuration)
             try:
 
-                joint_positions, joint_names = next(
+                ik_result = next(
                     planner.iter_inverse_kinematics(
                         FrameTarget(ik_target_frame),
                         RobotCellState.from_robot_configuration(robot),
@@ -138,11 +143,6 @@ def _test_pybullet_ik_fk_agreement(robot, ik_target_frames):
                 )
             except StopIteration:
                 assert False, f"No IK Solution found for frame {ik_target_frame}"
-
-            # Reconstruct the full Configuration from the returned joint positions
-            ik_result = robot.zero_configuration()
-            for name, value in zip(joint_names, joint_positions):
-                ik_result[name] = value
 
             # FK Query to the planner (Configuration to Frame)
             robot_cell_state = RobotCellState.from_robot_configuration(robot, ik_result)
@@ -248,7 +248,7 @@ def test_pybullet_ik_out_of_reach_ur5():
             # IK Query to the planner (Frame to Configuration)
             try:
                 # Note: The inverse_kinematics method returns a generator
-                joint_positions, joint_names = next(
+                ik_result = next(
                     planner.inverse_kinematics(
                         FrameTarget(ik_target_frame),
                         RobotCellState.from_robot_configuration(robot),

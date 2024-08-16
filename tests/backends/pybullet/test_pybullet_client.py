@@ -3,6 +3,7 @@ import pytest
 
 from compas_fab.backends import PyBulletClient
 from compas_robots import RobotModel
+from compas_fab.robots import Robot
 from compas_fab.robots import RobotLibrary
 
 from compas_robots.resources import LocalPackageMeshLoader
@@ -13,27 +14,30 @@ def test_pybullet_client_connection_direct():
         assert client.is_connected
 
 
-def test_pybullet_client_load_robot():
+def test_pybullet_client_set_robot_from_urdf():
+    # Testing workflow of loading robot from URDF
     with PyBulletClient(connection_type="direct") as client:
         urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
-        robot = client.load_robot(urdf_filename)
-        assert robot is not None
+        srdf_filename = compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf")
+        robot = Robot.from_urdf(urdf_filename, srdf_filename)
+        # Assert that set_robot can only be performed with geometry
+        with pytest.raises(Exception):
+            robot = client.set_robot(robot)
+
+        # Load robot with geometry
+        mesh_folder = compas_fab.get("robot_library/ur5_robot")
+        robot = Robot.from_urdf(urdf_filename, srdf_filename, mesh_folder)
+        robot = client.set_robot(robot)
+
+        assert isinstance(robot, Robot)
         assert robot.name == "ur5_robot"
         # Check that the RobotModel is present
         assert isinstance(robot.model, RobotModel)
-        # Check that the robot do not have any geometry
-        with pytest.raises(Exception):
-            robot.ensure_geometry()
+        # Check that the robot have geometry
+        robot.ensure_geometry()
 
-
-def test_pybullet_client_load_robot_with_meshes():
-    with PyBulletClient(connection_type="direct") as client:
-        urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
-        mesh_loader = LocalPackageMeshLoader(compas_fab.get("robot_library/ur5_robot"), "")
-        robot = client.load_robot(urdf_filename, [mesh_loader])
-        assert robot is not None
-        assert robot.name == "ur5_robot"
-        assert isinstance(robot.model, RobotModel)
+        # Check that the robot have semantics
+        robot.ensure_semantics()
         link_names = robot.get_link_names_with_collision_geometry()
         assert set(link_names) == set(
             [
@@ -46,21 +50,108 @@ def test_pybullet_client_load_robot_with_meshes():
                 "wrist_3_link",
             ]
         )
-        # Check that the robot has geometry
-        robot.ensure_geometry()
 
 
-def test_pybullet_client_load_robot_with_sementics():
+def test_pybullet_client_set_robot_from_robot_library():
+    # Testing workflow of using robot from RobotLibrary
     with PyBulletClient(connection_type="direct") as client:
-        urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
-        mesh_loader = LocalPackageMeshLoader(compas_fab.get("robot_library/ur5_robot"), "")
-        robot = client.load_robot(urdf_filename, [mesh_loader])
-        srdf_filename = compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf")
-        client.load_semantics(robot, srdf_filename)
-        # Check that the robot has geometry
+        robot = RobotLibrary.ur5(load_geometry=False)
+        # Assert that set_robot can only be performed with geometry
+        with pytest.raises(Exception):
+            robot = client.set_robot(robot)
+
+        # Load robot with geometry
+        robot = RobotLibrary.ur5(load_geometry=True)
+        robot = client.set_robot(robot)
+
+        assert isinstance(robot, Robot)
+        assert robot.name == "ur5_robot"
+        # Check that the RobotModel is present
+        assert isinstance(robot.model, RobotModel)
+        # Check that the robot have geometry
         robot.ensure_geometry()
-        # Check that the robot has semantics
+        # Check that the robot have semantics
         robot.ensure_semantics()
+
+
+def test_pybullet_client_set_all_robots_from_robot_library():
+    # Testing workflow of using robot from RobotLibrary
+    with PyBulletClient(connection_type="direct") as client:
+
+        def set_and_check_robot(robot):
+            robot = client.set_robot(robot)
+            assert isinstance(robot, Robot)
+            assert isinstance(robot.model, RobotModel)
+            client.remove_robot()
+
+        set_and_check_robot(RobotLibrary.ur5())
+        set_and_check_robot(RobotLibrary.ur10e())
+        set_and_check_robot(RobotLibrary.panda())
+        set_and_check_robot(RobotLibrary.abb_irb120_3_58())
+        set_and_check_robot(RobotLibrary.abb_irb4600_40_255())
+        set_and_check_robot(RobotLibrary.rfl())
+
+
+def test_pybullet_client_internal_puids():
+    with PyBulletClient(connection_type="direct") as client:
+        assert len(client.robot_link_puids) == 0
+        assert len(client.robot_joint_puids) == 0
+
+        robot = RobotLibrary.ur5(load_geometry=True)
+        robot = client.set_robot(robot)
+
+        # Check that all links and joints are loaded
+        link_names_in_model = [l.name for l in robot.model.iter_links()]
+        joint_names_in_model = [j.name for j in robot.model.iter_joints()]
+        assert set(link_names_in_model) == set(client.robot_link_puids.keys())
+        assert set(joint_names_in_model) == set(client.robot_joint_puids.keys())
+        assert len(client.robot_link_puids) == len(client.robot_joint_puids) + 1
+
+        # The first link has a puid of -1
+        links_in_model = list(robot.model.iter_links())
+        first_link_name = links_in_model[0].name
+        assert client.robot_link_puids[first_link_name] == -1
+
+        # In Pybullet a joint and its child link share the same puid
+        # Assert that this is the case for all joints and links in the robot model
+        for link_name, link_puid in client.robot_link_puids.items():
+            if link_puid == -1:
+                # Skip the base link
+                continue
+            link = robot.model.get_link_by_name(link_name)
+            joint = robot.model.find_parent_joint(link)
+            assert client.robot_joint_puids[joint.name] == link_puid
+
+
+def test_pybullet_client_internal_puids_abb():
+    with PyBulletClient(connection_type="direct") as client:
+        assert len(client.robot_link_puids) == 0
+        assert len(client.robot_joint_puids) == 0
+
+        robot = RobotLibrary.abb_irb4600_40_255(load_geometry=True)
+        robot = client.set_robot(robot)
+
+        # Check that all links and joints are loaded
+        link_names_in_model = [l.name for l in robot.model.iter_links()]
+        joint_names_in_model = [j.name for j in robot.model.iter_joints()]
+        assert set(link_names_in_model) == set(client.robot_link_puids.keys())
+        assert set(joint_names_in_model) == set(client.robot_joint_puids.keys())
+        assert len(client.robot_link_puids) == len(client.robot_joint_puids) + 1
+
+        # The first link has a puid of -1
+        links_in_model = list(robot.model.iter_links())
+        first_link_name = links_in_model[0].name
+        assert client.robot_link_puids[first_link_name] == -1
+
+        # In Pybullet a joint and its child link share the same puid
+        # Assert that this is the case for all joints and links in the robot model
+        for link_name, link_puid in client.robot_link_puids.items():
+            if link_puid == -1:
+                # Skip the base link
+                continue
+            link = robot.model.get_link_by_name(link_name)
+            joint = robot.model.find_parent_joint(link)
+            assert client.robot_joint_puids[joint.name] == link_puid
 
 
 # TODO: After implementing the stateless backend, we should test methods related to planning scene and scene state management.
@@ -96,4 +187,4 @@ def test_pybullet_client_link_names():
 
 
 if __name__ == "__main__":
-    test_pybullet_client_link_names()
+    test_pybullet_client_internal_puids()

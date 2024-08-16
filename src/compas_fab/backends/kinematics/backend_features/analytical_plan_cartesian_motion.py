@@ -78,6 +78,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
 
         # iterate over all input frames and calculate the inverse kinematics, no interpolation in between frames
         configurations_along_path = []
+        # TODO: Change to planner.iter_inverse_kinematics
         for frame in frames_RCF:
             configurations = list(robot.iter_inverse_kinematics(frame, options=options))
             configurations_along_path.append(configurations)

@@ -65,9 +65,9 @@ def test_iter_inverse_kinematics(ur5_planner_no_geo):
     start_state = RobotCellState.from_robot_cell(ur5_planner_no_geo.robot_cell)
     solutions = list(ur5_planner_no_geo.iter_inverse_kinematics(target, start_state, group=None))
     assert len(solutions) == 8
-    joint_positions, _ = solutions[0]
+    configuration = solutions[0]
     correct = Configuration.from_revolute_values((0.022, 4.827, 1.508, 1.126, 1.876, 3.163))
-    assert correct.close_to(Configuration.from_revolute_values(joint_positions))
+    assert correct.close_to(configuration)
 
 
 def test_inverse_kinematics(ur5_planner_no_geo):
@@ -75,19 +75,18 @@ def test_inverse_kinematics(ur5_planner_no_geo):
     start_state = RobotCellState.from_robot_cell(ur5_planner_no_geo.robot_cell)
 
     # Test to confirm inverse_kinematics() return one solution at a time
-    solutions = []
+    solutions = []  # type: list[Configuration]
     for i in range(8):
         solutions.append(ur5_planner_no_geo.inverse_kinematics(target, start_state, group=None))
 
     # Check First Solution Correctness
-    first_solution = solutions[0]
-    joint_positions, _ = first_solution
+    first_configuration = solutions[0]
     correct = Configuration.from_revolute_values((0.022, 4.827, 1.508, 1.126, 1.876, 3.163))
-    assert correct.close_to(Configuration.from_revolute_values(joint_positions))
+    assert correct.close_to(first_configuration)
 
     # Check that all solutions are different
     for a, b in combinations(solutions, 2):
-        assert not TOL.is_allclose(a[0], b[0])
+        assert not TOL.is_allclose(a.joint_values, b.joint_values)
 
 
 def forward_inverse_agreement(planner, start_state):
@@ -98,11 +97,10 @@ def forward_inverse_agreement(planner, start_state):
     # Checks if one of the IK results is the same as the original joint configuration
     close_soliution_found = False
     start_state = RobotCellState.from_robot_cell(planner.robot_cell)
-    for solutions in planner.iter_inverse_kinematics(FrameTarget(frame), start_state, group=None):
-        joint_positions, _ = solutions
-        if Configuration.from_revolute_values(joint_positions).close_to(starting_configuration):
+    for configuration in planner.iter_inverse_kinematics(FrameTarget(frame), start_state, group=None):
+        if configuration.close_to(starting_configuration):
             close_soliution_found = True
-            print("Found a close solution: {}".format(joint_positions))
+            print("Found a close solution: {}".format(configuration))
             break
     assert close_soliution_found
 

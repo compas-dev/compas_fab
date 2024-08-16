@@ -11,7 +11,7 @@ if not compas.IPY:
         from compas_robots import Configuration  # noqa: F401
         from compas.geometry import Frame  # noqa: F401
         from typing import Optional  # noqa: F401
-        from typing import Iterator  # noqa: F401
+        from typing import Generator  # noqa: F401
         from typing import List  # noqa: F401
         from typing import Tuple  # noqa: F401
         from typing import Dict  # noqa: F401
@@ -101,7 +101,7 @@ class MoveItInverseKinematics(InverseKinematics):
     #     # return next(solutions)
 
     def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Iterator[Tuple[List[float], List[str]]]
+        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
         """Calculate the robot's inverse kinematic for a given frame.
 
         Parameters

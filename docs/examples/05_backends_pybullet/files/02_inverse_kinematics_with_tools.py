@@ -20,9 +20,9 @@ with PyBulletClient() as client:
     # Enable the check_collision mode in the inverse_kinematics function.
     # This will force the PyBullet planner to check for collisions during the IK computation
     options = {"check_collision": True}  #
-    joint_positions, joint_names = planner.inverse_kinematics(target, robot_cell_state, options=options)
+    config = planner.inverse_kinematics(target, robot_cell_state, options=options)
 
-    print("Inverse kinematics result: ", joint_positions, joint_names)
+    print("Inverse kinematics result: ", config)
 
     input("Observe the IK result in PyBullet's GUI, Press Enter to continue...")
 
@@ -39,6 +39,6 @@ with PyBulletClient() as client:
 
     for frame_WCF in frame_WCFs:
         target = FrameTarget(frame_WCF)
-        joint_positions, joint_names = planner.inverse_kinematics(target, robot_cell_state)
-        print("Inverse kinematics result: ", joint_positions, joint_names)
+        config = planner.inverse_kinematics(target, robot_cell_state)
+        print("Inverse kinematics result: ", config)
         input("Observe the IK result in PyBullet's GUI, Press Enter to continue...")

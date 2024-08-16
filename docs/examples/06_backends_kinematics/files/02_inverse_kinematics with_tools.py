@@ -54,9 +54,9 @@ target = FrameTarget(frame_WCF)
 
 robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 #  This default cell state will not attach the tool to the robot
-configuration = planner.inverse_kinematics(target, robot_cell_state)
+config = planner.inverse_kinematics(target, robot_cell_state)
 print("IK Result (Configuration) without tools and the target represent T0CF:")
-print(configuration)
+print(config)
 
 # ------------------------------------
 # Second demonstrate the IK with tools
@@ -64,6 +64,6 @@ print(configuration)
 #  Modify the cell state to attach the tool to the robot
 robot_cell_state.set_tool_attached_to_group("cone", robot.main_group_name)
 # The same target is reused to demonstrate the difference in the result
-configuration = planner.inverse_kinematics(target, robot_cell_state)
+config = planner.inverse_kinematics(target, robot_cell_state)
 print("IK Result (Configuration) with a tool attached and the target represent TCF of tool:")
-print(configuration)
+print(config)

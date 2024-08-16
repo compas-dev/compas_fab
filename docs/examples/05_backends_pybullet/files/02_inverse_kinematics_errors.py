@@ -22,14 +22,14 @@ with PyBulletClient() as client:
     # Example 1: Default IK without collision checking
     # The target is causing the attached beam to collide with the floor.
     # However, the planner does not check for collisions and returns a solution.
-    joint_positions, joint_names = planner.inverse_kinematics(target, robot_cell_state)
+    config = planner.inverse_kinematics(target, robot_cell_state)
     input("Observe the IK result in PyBullet's GUI, Press Enter to continue...")
 
     # Example 2: Enable collision checking in the IK
     try:
         # Enable the check_collision mode via options
         options = {"check_collision": True}
-        joint_positions, joint_names = planner.inverse_kinematics(target, robot_cell_state, options=options)
+        config = planner.inverse_kinematics(target, robot_cell_state, options=options)
     except InverseKinematicsError as e:
         # The planner will try many times but still unable to find a solution
         # after "max_results", it will return InverseKinematicsError.

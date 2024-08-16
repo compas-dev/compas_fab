@@ -23,14 +23,14 @@ with PyBulletClient() as client:
     # For the UR5 robot, the PCF is equal to the frame of the 'tool0' link
     frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
     target = FrameTarget(frame_WCF)
-    joint_positions, joint_names = planner.inverse_kinematics(target, robot_cell_state)
+    config = planner.inverse_kinematics(target, robot_cell_state)
 
-    print("Inverse kinematics result: ", joint_positions, joint_names)
+    print("Inverse kinematics result: ", config)
 
     input("Observe the IK result in PyBullet's GUI, Press Enter to continue...")
 
     # To verify the IK result, we can compute the FK with the obtained joint positions
-    robot_cell_state.robot_configuration.joint_values = joint_positions
+    robot_cell_state.robot_configuration.merge(config)
     frame_WCF = planner.forward_kinematics(robot_cell_state)
     print("Forward kinematics result (main group): \n ", frame_WCF)
 

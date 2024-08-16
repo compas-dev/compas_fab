@@ -9,6 +9,7 @@ from ghpythonlib.componentbase import executingcomponent as component
 
 
 class InverseKinematics(component):
+    # TODO: Need to call planner functions instead of robot
     def RunScript(self, robot, plane, start_configuration, group):
         configuration = None
         if robot and robot.client and robot.client.is_connected and plane:

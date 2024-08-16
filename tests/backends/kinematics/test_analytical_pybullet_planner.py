@@ -8,7 +8,7 @@ import compas_fab
 from compas_fab.backends import AnalyticalKinematicsPlanner
 from compas_fab.backends import UR5Kinematics
 from compas_fab.robots import Tool
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotCell
@@ -16,30 +16,30 @@ from compas_fab.robots import FrameTarget
 
 
 if not compas.IPY:
+    from compas_fab.backends import AnalyticalPyBulletPlanner
     from compas_fab.backends import AnalyticalPyBulletClient
 
 urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
 srdf_filename = compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf")
 
 
-@pytest.fixture
-def ur5_planner():
-    solver = UR5Kinematics()
-    planner = AnalyticalPyBulletClient(solver)
-
-    # Set up the robot cell
-    robot = RobotLibrary.ur5(load_geometry=True)
-    robot_cell = RobotCell(robot)
-    planner.set_robot_cell(robot_cell)
-    return planner
-
-
-def test_planner(ur5_planner):
+def test_planner():
     if compas.IPY:
         return
-    assert ur5_planner.robot_cell is not None
-    assert ur5_planner.robot is not None
-    assert ur5_planner.kinematics_solver is not None
+
+    with AnalyticalPyBulletClient(connection_type="direct") as client:
+        solver = UR5Kinematics()
+        planner = AnalyticalPyBulletPlanner(client, solver)
+        robot_cell, robot_cell_state = RobotCellLibrary.ur5_cone_tool(load_geometry=False)
+
+        planner.set_robot_cell(robot_cell)
+        planner.set_robot_cell_state(robot_cell_state)
+
+    assert planner.client is not None
+    assert planner.robot_cell is not None
+    assert client.robot_cell is not None
+    assert client.robot is not None
+    assert planner.kinematics_solver is not None
 
 
 # def test_iter_inverse_kinematics(ur5_planner):

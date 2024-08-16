@@ -13,6 +13,8 @@ frames_WCF = [
 ]
 
 with AnalyticalPyBulletClient(connection_type="direct") as client:
+    # TODO: Change to planner.iter_inverse_kinematics
+
     robot = client.load_ur5(load_geometry=True)
 
     options = {"solver": "ur5", "check_collision": True}
