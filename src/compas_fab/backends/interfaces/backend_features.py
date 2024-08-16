@@ -83,6 +83,49 @@ class BackendFeature(object):
 
         return frame
 
+    def _build_configuration(self, joint_positions, joint_names, group, return_full_configuration):
+        # type: (List[float], List[str], str, bool) -> Configuration
+        """This function helps the planner build a standard configuration that can be returned to the user.
+
+        It supports two modes for different use cases:
+
+        - If return_full_configuration is True, it returns a full configuration including all configurable
+          joints in the robot, even if the joint is not in the planning group.
+          See :meth:`compas_robots.model.Joint.is_configurable` for more details.
+        - If return_full_configuration is False, it returns only the joint values for the planning group.
+          The joint values are sorted according to the group's joint order.
+
+
+        Parameters
+        ----------
+        joint_positions : list of float
+            All joint values for the full configuration.
+        joint_names : list of str
+            The joint names corresponding to the joint values.
+        group : str
+            The name of the planning group.
+        return_full_configuration : bool
+            If True, the full configuration is returned, otherwise only the group configuration is returned.
+
+        Notes
+        -----
+        Do not pass None to group when return_full_configuration is False, the behavior is undefined.
+
+        """
+        robot = self.robot_cell.robot  # type: Robot
+        if return_full_configuration:
+            # build configuration including passive joints, but no sorting
+            joint_types = robot.get_joint_types_by_names(joint_names)
+            configuration = Configuration(joint_positions, joint_types, joint_names)
+        else:
+            # sort values for group configuration
+            joint_state = dict(zip(joint_names, joint_positions))
+            group_joint_names = robot.get_configurable_joint_names(group)
+            values = [joint_state[name] for name in group_joint_names]
+            configuration = Configuration(values, robot.get_configurable_joint_types(group), group_joint_names)
+
+        return configuration.scaled(self.scale_factor)
+
     # @property
     # def client(self):
     #     # type: () -> ClientInterface
@@ -214,7 +257,7 @@ class InverseKinematics(BackendFeature):
         super(InverseKinematics, self).__init__()
 
     def inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Tuple[List[float], List[str]]
+        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Configuration
         """Calculate the robot's inverse kinematic for a given frame.
 
         The default implementation is based on the iter_inverse_kinematics method.
@@ -225,8 +268,6 @@ class InverseKinematics(BackendFeature):
         The starting state describes the robot cell's state at the moment of the calculation.
         The robot's configuration is taken as the starting configuration.
         If a tool is attached to the planning group, the tool's coordinate frame is used.
-
-        If the backend supports collision checking,
 
         Parameters
         ----------
@@ -255,8 +296,8 @@ class InverseKinematics(BackendFeature):
 
         Returns
         -------
-        :obj:`tuple` of :obj:`list`
-            A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
+        :obj:`compas_robots.Configuration`
+            The calculated configuration.
 
         """
         # This is the default implementation for the inverse kinematics feature to be based on the
@@ -281,7 +322,7 @@ class InverseKinematics(BackendFeature):
         return next(solutions)
 
     def iter_inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Tuple[List[float], List[str]]
+        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Configuration
         """Calculate the robot's inverse kinematic for a given frame.
 
         This function returns a generator that yields possible solutions for the
@@ -315,8 +356,9 @@ class InverseKinematics(BackendFeature):
 
         Yields
         ------
-        :obj:`tuple` of :obj:`list`
-            A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
+        :class:`compas_robots.Configuration`
+            The calculated configuration.
+
         """
         pass
 
