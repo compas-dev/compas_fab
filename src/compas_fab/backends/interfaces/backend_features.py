@@ -4,6 +4,8 @@ from __future__ import print_function
 
 import compas
 
+from compas_robots import Configuration
+
 if not compas.IPY:
     from typing import TYPE_CHECKING
 
@@ -14,7 +16,7 @@ if not compas.IPY:
         from typing import Tuple  # noqa: F401
 
         from compas_fab.robots import Robot  # noqa: F401
-        from compas_robots import Configuration  # noqa: F401
+
         from compas.geometry import Frame  # noqa: F401
         from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
@@ -124,7 +126,7 @@ class BackendFeature(object):
             values = [joint_state[name] for name in group_joint_names]
             configuration = Configuration(values, robot.get_configurable_joint_types(group), group_joint_names)
 
-        return configuration.scaled(self.scale_factor)
+        return configuration
 
     # @property
     # def client(self):

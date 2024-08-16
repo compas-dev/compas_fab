@@ -13,6 +13,9 @@ from compas_fab.robots import RobotLibrary
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
+from compas_fab.backends import InverseKinematicsError
+
+from compas_robots import Configuration
 
 # The tolerance for the tests are set to 1e-4 meters, equivalent to 0.1 mm
 # Relative tolerance is set to 1e-3 (0.1%)
@@ -116,6 +119,13 @@ def test_pybullet_planner_fk_ur10e():
 
 
 def _test_pybullet_ik_fk_agreement(robot, ik_target_frames):
+    """Helper function to test the IK-FK agreement for the PyBullet backend
+
+    The function takes a robot and a list of target frames for IK and FK queries.
+    IK is first performed by calling iter_inverse_kinematics() and later FK is performed by calling forward_kinematics().
+    The closeness of the starting and ending frames are checked to ensure the IK-FK agreement.
+
+    """
     # These options are set to ensure that the IK solver converges to a high accuracy
     # Threshold is set to 1e-5 meters to be larger than the tolerance used for comparison (1e-4 meters)
     ik_options = {
@@ -248,15 +258,14 @@ def test_pybullet_ik_out_of_reach_ur5():
             # IK Query to the planner (Frame to Configuration)
             try:
                 # Note: The inverse_kinematics method returns a generator
-                ik_result = next(
-                    planner.inverse_kinematics(
-                        FrameTarget(ik_target_frame),
-                        RobotCellState.from_robot_configuration(robot),
-                        group=planning_group,
-                        options=ik_options,
-                    )
+                planner.inverse_kinematics(
+                    FrameTarget(ik_target_frame),
+                    RobotCellState.from_robot_configuration(robot),
+                    group=planning_group,
+                    options=ik_options,
                 )
+
                 # An error should be thrown here because the IK target is out of reach
                 assert False, f"IK Solution found when there should be none: frame {ik_target_frame}"
-            except StopIteration:
+            except InverseKinematicsError:
                 continue
