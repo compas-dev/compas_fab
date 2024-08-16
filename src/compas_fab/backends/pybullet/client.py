@@ -444,13 +444,14 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                         joined_mesh = Mesh()
                         for mesh in shape.meshes:
                             joined_mesh.join(mesh, False, precision=mesh_precision)
+                        print("robot_model_to_urdf(): Joined %i meshes for link: " % len(shape.meshes), link.name)
                     else:
                         joined_mesh = shape.meshes[0]
 
                     # Export the joined mesh
                     mesh_file_name = str(joined_mesh.guid) + ".obj"
                     fp = os.path.join(self._cache_dir.name, mesh_file_name)
-                    joined_mesh.to_obj(fp)
+                    joined_mesh.to_obj(fp, precision=mesh_precision)
                     fp = self._handle_concavity(fp, self._cache_dir.name, concavity, 1, str(joined_mesh.guid))
                     shape.filename = fp
 
@@ -461,8 +462,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         urdf_file_name = str(robot_model.guid) + ".urdf"
         urdf_filepath = os.path.join(self._cache_dir.name, urdf_file_name)
 
-        # Note: Set prettify to True for debug, otherwise filesize is big.
-        urdf.to_file(urdf_filepath, prettify=False)
+        # Note: Set prettify to False will cause some URDF to fail, such as rfl and panda.
+        # Resulting in the non-debuggable "pybullet.error: Cannot load URDF file."
+        # There is probably a bug in the XMLWriter or PyBullet's URDF parser.
+        urdf.to_file(urdf_filepath, prettify=True)
 
         return urdf_filepath
 
@@ -869,6 +872,7 @@ class AnalyticalPyBulletClient(PyBulletClient):
     def __init__(self, connection_type="gui", verbose=False):
         super(AnalyticalPyBulletClient, self).__init__(connection_type=connection_type, verbose=verbose)
 
+    # TODO: Move the following function to AnalyticalPyBulletPlanner
     def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         planner = AnalyticalInverseKinematics(self)
         return planner.inverse_kinematics(robot, frame_WCF, start_configuration, group, options)
