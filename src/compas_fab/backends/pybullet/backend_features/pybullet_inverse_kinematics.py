@@ -26,6 +26,7 @@ if not compas.IPY:
 import math
 import random
 
+from compas.tolerance import TOL
 from compas_robots.model import Joint
 
 from compas_fab.backends.exceptions import InverseKinematicsError
@@ -142,6 +143,10 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Default options
         options["check_collision"] = options.get("check_collision", False)
         options["return_full_configuration"] = options.get("return_full_configuration", False)
+        options["solution_uniqueness_threshold_prismatic"] = options.get(
+            "solution_uniqueness_threshold_prismatic", 3e-4
+        )
+        options["solution_uniqueness_threshold_revolute"] = options.get("solution_uniqueness_threshold_revolute", 1e-3)
 
         # Setting the entire robot cell state, including the robot configuration
         robot_cell_state = robot_cell_state.copy()  # Make a copy to avoid modifying the original
@@ -167,6 +172,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         joint_names_and_puids = client.get_pose_joint_names_and_puids()
         joint_names_sorted = [joint_name for joint_name, _ in joint_names_and_puids]
         joint_ids_sorted = [joint_puid for _, joint_puid in joint_names_and_puids]
+        joint_types_sorted = [robot.get_joint_by_name(joint_name).type for joint_name in joint_names_sorted]
 
         # Prepare `rest_poses` input
         # Rest pose is PyBullet's way of defining the initial guess for the IK solver
@@ -226,8 +232,32 @@ class PyBulletInverseKinematics(InverseKinematics):
                 random_value = random.uniform(lower_limit, upper_limit)
                 client._set_joint_position(joint_id, random_value, client.robot_puid)
 
-        # Loop to get multiple results
+        # Function to keep track of unique solutions
         solutions = []
+        # Each joint has a different threshold for uniqueness
+        uniqueness_thresholds_sorted = [
+            (
+                options["solution_uniqueness_threshold_prismatic"]
+                if joint_type in [Joint.PRISMATIC, Joint.PLANAR]
+                else options["solution_uniqueness_threshold_revolute"]
+            )
+            for joint_type in joint_types_sorted
+        ]
+
+        def solution_is_unique(joint_positions):
+            """Check if the solution is unique by comparing with past solutions."""
+            for past_solution in solutions:
+                # Only if all joints are same, we consider the solution as not unique
+                if all(
+                    TOL.is_close(joint_position, past_joint_position, atol=threshold)
+                    for joint_position, past_joint_position, threshold in zip(
+                        joint_positions, past_solution, uniqueness_thresholds_sorted
+                    )
+                ):
+                    return False
+            return True
+
+        # Loop to get multiple results
         for _ in range(max_results):
 
             # Calling the IK function (High accuracy or not)
@@ -276,7 +306,10 @@ class PyBulletInverseKinematics(InverseKinematics):
                     continue
 
             # Unique solution checking
-            # TODO: Implement uniqueness checking
+            if not solution_is_unique(joint_positions):
+                # If the solution is not unique, we retry with a new randomized joint values
+                set_random_config()
+                continue
 
             # If we got this far, we have a valid solution to yield
             solutions.append(joint_positions)

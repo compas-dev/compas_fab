@@ -304,4 +304,4 @@ def test_pybullet_ik_out_of_reach_ur5():
 
 
 if __name__ == "__main__":
-    test_pybullet_ik_fk_agreement_panda()
+    pass
