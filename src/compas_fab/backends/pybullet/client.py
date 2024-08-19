@@ -14,6 +14,7 @@ from compas_robots import RobotModel
 from compas_robots.files import URDF
 from compas_robots.model import MeshDescriptor
 from compas_robots import ToolModel
+from compas_robots.model import Joint
 
 from compas_fab.backends import CollisionCheckError
 from compas_fab.backends.interfaces.client import ClientInterface
@@ -42,6 +43,7 @@ if not compas.IPY:
         from compas_robots import Configuration  # noqa: F401
         from compas_robots.resources import AbstractMeshLoader  # noqa: F401
         from compas_fab.robots import RigidBody  # noqa: F401
+        from compas_robots.model import Mimic
 
         from compas_fab.backends.kinematics import AnalyticalInverseKinematics  # noqa: F401
         from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion  # noqa: F401
@@ -300,6 +302,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             link_name = self._get_link_name(id, robot_puid)
             self.robot_link_puids[link_name] = id
 
+        # Note: Mimic joints are considered as a DOF in Pybullet and most functions
+        # that accept poses will require passing also the mimic joints.
+        # In compas_fab, mimic joints are not considered as DOF and are not included in get_configurable_joints().
+
         self.disabled_collisions = robot.semantics.disabled_collisions
 
         return robot
@@ -510,25 +516,63 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     # Functions related to puids
     # --------------------------------
 
-    def get_configurable_joint_names_and_puid(self):
-        # type: () -> Tuple[List[str], List[int]]
-        """Returns the names and PyBullet unique ids of the configurable joints of the robot.
+    def get_pose_joint_names_and_puids(self):
+        # type: () -> List[str]
+        """Returns the robot joints names and their puids that are need to create a pose in PyBullet.
+        This include all joints that are not FIXED.
+        Mimic joints are also included.
 
-        The two lists are ordered in the same way using the joint index.
+        The names and puids are ordered by PyBullet's unique ids.
 
         Returns
         -------
-        :obj:`tuple` of [:obj:`list` of :obj:`str`, :obj:`list` of :obj:`int`]
-            The first item is a list of joint names of the configurable joints.
-            The second item is a list of PyBullet unique ids of the configurable joints.
+        :obj:`list` of :obj:`tuple` of :obj:`str`, :obj:`int`
+            A list of tuples containing the joint names and their PyBullet unique ids.
         """
-        configurable_joint_names = self.robot.get_configurable_joint_names()
-        configurable_joint_puids = [self.robot_joint_puids[name] for name in configurable_joint_names]
+        joint_names_and_puids = []
+        robot_puid = self.robot_puid
+        for puid in range(self._get_num_joints(robot_puid)):
+            joint_name = self._get_joint_name(puid, robot_puid)
+            joint_type = self._get_joint_type(puid, robot_puid)
+            if joint_type != const.JOINT_FIXED:
+                joint_names_and_puids.append((joint_name, puid))
+        return joint_names_and_puids
 
-        configurable_joint_names.sort(key=lambda x: self.robot_joint_puids[x])
-        configurable_joint_puids.sort()
+    def build_pose_for_pybullet(self, configuration):
+        # type: (Configuration) -> List[float]
+        """Builds a robot pose (list of joint values) for sending to PyBullet.
 
-        return configurable_joint_names, configurable_joint_puids
+        Parameters
+        ----------
+        configuration : :class:`compas_fab.robots.Configuration`
+            The configuration to be converted.
+
+        Returns
+        -------
+        :obj:`list` of :obj:`float`
+            A list of joint values.
+        """
+        joint_names_and_puids = self.get_pose_joint_names_and_puids()
+
+        joint_values = []
+        for joint_name, joint_puid in joint_names_and_puids:
+            if joint_name in configuration:
+                joint_values.append(configuration[joint_name])
+            else:
+                # Check if this is mimic joint
+                joint = self.robot.model.get_joint_by_name(joint_name)
+                mimic = joint.mimic  # type: Mimic
+                # Get the value of the joint that is being mimicked (works only for non-cascaded mimic)
+                if mimic:
+                    mimicked_joint_position = configuration[mimic.joint]
+                    joint_values.append(mimic.calculate_position(mimicked_joint_position))
+                else:
+                    raise ValueError(
+                        "Joint value for '{}' is needed for Pybullet but not found in the provided configuration.".format(
+                            joint_name
+                        )
+                    )
+        return joint_values
 
     def _get_base_frame(self, body_id):
         pose = pybullet.getBasePositionAndOrientation(body_id, physicsClientId=self.client_id)
@@ -561,6 +605,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def _get_joint_name(self, joint_id, body_id):
         return self._get_joint_info(joint_id, body_id).jointName.decode("UTF-8")
+
+    def _get_joint_type(self, joint_id, body_id):
+        return self._get_joint_info(joint_id, body_id).jointType
 
     def _get_link_name(self, link_id, body_id):
         if link_id == const.BASE_LINK_ID:

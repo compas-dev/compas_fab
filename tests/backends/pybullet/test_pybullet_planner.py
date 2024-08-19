@@ -113,6 +113,16 @@ def test_pybullet_planner_fk_ur10e():
     _test_fk_with_pybullet_planner(robot, true_result)
 
 
+def test_pybullet_planner_fk_panda():
+    robot = RobotLibrary.panda(load_geometry=True)
+    true_result = Frame(
+        point=Point(x=0.256, y=-0.000, z=0.643),
+        xaxis=Vector(x=-0.000, y=0.707, z=-0.707),
+        yaxis=Vector(x=-0.000, y=-0.707, z=-0.707),
+    )
+    _test_fk_with_pybullet_planner(robot, true_result)
+
+
 ######################################################
 # Testing the IK-FK agreement for the PyBullet backend
 ######################################################
@@ -139,6 +149,7 @@ def _test_pybullet_ik_fk_agreement(robot, ik_target_frames):
         planner = PyBulletPlanner(client)
         planner.set_robot_cell(RobotCell(robot))
         planning_group = robot.main_group_name
+
         for ik_target_frame in ik_target_frames:
             # IK Query to the planner (Frame to Configuration)
             try:
@@ -222,6 +233,26 @@ def test_pybullet_ik_fk_agreement_abb_irb4600_40_255():
     _test_pybullet_ik_fk_agreement(robot, ik_target_frames)
 
 
+def test_pybullet_ik_fk_agreement_panda():
+    robot = RobotLibrary.panda(load_geometry=True)
+
+    ik_center_frame = Frame(
+        point=Point(x=0.2, y=-0.0, z=0.6),
+        xaxis=Vector(x=0.0, y=1.0, z=-0.0),
+        yaxis=Vector(x=0.0, y=0.0, z=-1.0),
+    )
+
+    ik_target_frames = []
+    ik_target_frames.append(ik_center_frame)
+    ik_target_frames.append(ik_center_frame.translated(Vector(-0.1, -0.1, -0.1)))
+    ik_target_frames.append(ik_center_frame.translated(Vector(0.0, 0.1, 0.0)))
+    ik_target_frames.append(ik_center_frame.translated(Vector(0.0, 0.0, 0.1)))
+    ik_target_frames.append(ik_center_frame.translated(Vector(0.1, 0.1, -0.2)))
+    ik_target_frames.append(ik_center_frame.translated(Vector(-0.05, -0.05, -0.03)))
+
+    _test_pybullet_ik_fk_agreement(robot, ik_target_frames)
+
+
 ##################################################
 # Testing IK out of reach for the PyBullet backend
 ##################################################
@@ -269,3 +300,7 @@ def test_pybullet_ik_out_of_reach_ur5():
                 assert False, f"IK Solution found when there should be none: frame {ik_target_frame}"
             except InverseKinematicsError:
                 continue
+
+
+if __name__ == "__main__":
+    test_pybullet_ik_fk_agreement_panda()

@@ -80,9 +80,6 @@ class PyBulletInverseKinematics(InverseKinematics):
         options: dict, optional
             Dictionary containing the following key-value pairs:
 
-            - ``"link_name"``: (:obj:`str`, optional ) Name of the link for which
-              to compute the inverse kinematics.  Defaults to the given group's end
-              effector.
             - ``"semi-constrained"``: (:obj:`bool`, optional) When ``True``, only the
               position of the target is considered. The orientation of frame will not be considered
               in the calculation.  Defaults to ``False``.
@@ -141,7 +138,6 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         high_accuracy = options.get("high_accuracy", True)
         max_results = options.get("max_results", 100)
-        link_name = options.get("link_name") or robot.get_end_effector_link_name(group)
 
         # Default options
         options["check_collision"] = options.get("check_collision", False)
@@ -151,38 +147,41 @@ class PyBulletInverseKinematics(InverseKinematics):
         robot_cell_state = robot_cell_state.copy()  # Make a copy to avoid modifying the original
         planner.set_robot_cell_state(robot_cell_state)
 
-        # Target frame
+        # Pre-process target frame
         target = self._scale_input_target(target)
         target_frame = target.target_frame
 
         # TODO: Implement a fail fast mechanism to check if the attached tool and objects are in collision
 
-        # Tool Coordinate Frame if there are tools attached
+        # Transform Tool Coordinate Frame if there are tools attached
         attached_tool_id = robot_cell_state.get_attached_tool_id(group)
         if attached_tool_id:
             target_frame = planner.from_tcf_to_pcf([target_frame], attached_tool_id)[0]
 
         # Formatting input for PyBullet
         body_id = client.robot_puid
-        link_id = client.robot_link_puids[link_name]
+        link_id = client.robot_link_puids[robot.get_end_effector_link_name(group)]
         point, orientation = pose_from_frame(target_frame)
 
-        # Get list of keys (joint_name) from the joint_ids dict in the order of its values (puid)
-        joint_names_sorted, joint_ids_sorted = client.get_configurable_joint_names_and_puid()
+        # Get list of joint_name and puids in order
+        joint_names_and_puids = client.get_pose_joint_names_and_puids()
+        joint_names_sorted = [joint_name for joint_name, _ in joint_names_and_puids]
+        joint_ids_sorted = [joint_puid for _, joint_puid in joint_names_and_puids]
 
+        # Prepare `rest_poses` input
+        # Rest pose is PyBullet's way of defining the initial guess for the IK solver
+        # The order of the values needs to match with pybullet's joint id order
+        start_configuration = robot_cell_state.robot_configuration or robot.zero_configuration(group)
+        rest_poses = client.build_pose_for_pybullet(start_configuration)
+
+        # Prepare `lower_limits`` and `upper_limits` input
         # Get joint limits in the same order as the joint_ids
         lower_limits = []
         upper_limits = []
-        for joint_name in joint_names_sorted:
+        for joint_name, joint_puid in joint_names_and_puids:
             joint = robot.get_joint_by_name(joint_name)
             lower_limits.append(joint.limit.lower if joint.type != Joint.CONTINUOUS else 0)
             upper_limits.append(joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi)
-
-        # Rest pose is PyBullet's way of defining the initial guess for the IK solver
-        start_configuration = robot_cell_state.robot_configuration or robot.zero_configuration(group)
-
-        # The order of the values needs to match with pybullet's joint id order
-        rest_poses = [start_configuration[joint_name] for joint_name in joint_names_sorted]
 
         # Prepare Parameters for calling pybullet.calculateInverseKinematics
         ik_options = dict(
@@ -222,6 +221,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             )
 
         def set_random_config():
+            # Function for setting random joint values for randomized search
             for lower_limit, upper_limit, joint_id in zip(lower_limits, upper_limits, joint_ids_sorted):
                 random_value = random.uniform(lower_limit, upper_limit)
                 client._set_joint_position(joint_id, random_value, client.robot_puid)
@@ -247,10 +247,16 @@ class PyBulletInverseKinematics(InverseKinematics):
                 joint_positions = pybullet.calculateInverseKinematics(**ik_options)
                 # Without the high accuracy mode, there is no guarantee of accuracy
 
+            assert len(joint_positions) == len(
+                joint_names_and_puids
+            ), "Number of returned joint positions from pybullet does not match number of joint ids"
+
             # Setting the robot configuration so we can perform collision checking
             # This also updates the robot's pose in the client
+            # Pybullet may return mimic joints that are not in the robot's compas_fab configuration
             for [joint_name, joint_position] in zip(joint_names_sorted, joint_positions):
-                robot_cell_state.robot_configuration[joint_name] = joint_position
+                if joint_name in robot_cell_state.robot_configuration:
+                    robot_cell_state.robot_configuration[joint_name] = joint_position
             planner.set_robot_cell_state(robot_cell_state)
 
             # Collision checking
