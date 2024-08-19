@@ -85,8 +85,10 @@ class BackendFeature(object):
 
         return frame
 
-    def _build_configuration(self, joint_positions, joint_names, group, return_full_configuration):
-        # type: (List[float], List[str], str, bool) -> Configuration
+    def _build_configuration(
+        self, joint_positions, joint_names, group, return_full_configuration, start_configuration=None
+    ):
+        # type: (List[float], List[str], str, bool, Configuration) -> Configuration
         """This function helps the planner build a standard configuration that can be returned to the user.
 
         It supports two modes for different use cases:
@@ -108,6 +110,8 @@ class BackendFeature(object):
             The name of the planning group.
         return_full_configuration : bool
             If True, the full configuration is returned, otherwise only the group configuration is returned.
+        start_configuration : :class:`compas_robots.Configuration`, optional
+            If return_full_configuration is True, this configuration is used to fill in the missing values.
 
         Notes
         -----
@@ -117,8 +121,13 @@ class BackendFeature(object):
         robot = self.robot_cell.robot  # type: Robot
         if return_full_configuration:
             # build configuration including passive joints, but no sorting
-            joint_types = robot.get_joint_types_by_names(joint_names)
-            configuration = Configuration(joint_positions, joint_types, joint_names)
+            configuration = robot.zero_configuration()
+            value_dict = dict(zip(joint_names, joint_positions))
+            for name in configuration.joint_names:
+                if name in value_dict:
+                    configuration[name] = value_dict[name]
+                elif start_configuration:
+                    configuration[name] = start_configuration[name]
         else:
             # sort values for group configuration
             joint_state = dict(zip(joint_names, joint_positions))

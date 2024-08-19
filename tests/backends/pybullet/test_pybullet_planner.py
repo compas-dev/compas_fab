@@ -303,5 +303,29 @@ def test_pybullet_ik_out_of_reach_ur5():
                 continue
 
 
+def test_pybullet_ik_return_full_configuration():
+    robot = RobotLibrary.panda(load_geometry=True)
+
+    ik_target_frame = Frame(
+        point=Point(x=0.2, y=-0.0, z=0.6),
+        xaxis=Vector(x=0.0, y=1.0, z=-0.0),
+        yaxis=Vector(x=0.0, y=0.0, z=-1.0),
+    )
+    target = FrameTarget(ik_target_frame)
+
+    with PyBulletClient(connection_type="direct") as client:
+        planner = PyBulletPlanner(client)
+        planner.set_robot_cell(RobotCell(robot))
+        robot_cell_state = RobotCellState.from_robot_configuration(robot, robot.zero_configuration())
+        config = planner.inverse_kinematics(target, robot_cell_state)
+        assert "panda_finger_joint1" not in config.joint_names
+        assert len(config.joint_names) == 7
+
+        ik_options = {"return_full_configuration": True}
+        config = planner.inverse_kinematics(target, robot_cell_state, options=ik_options)
+        assert "panda_finger_joint1" in config.joint_names
+        assert len(config.joint_names) == 8
+
+
 if __name__ == "__main__":
     pass

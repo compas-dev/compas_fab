@@ -315,7 +315,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             solutions.append(joint_positions)
             return_full_configuration = options.get("return_full_configuration")
             configuration = self._build_configuration(
-                joint_positions, joint_names_sorted, group, return_full_configuration
+                joint_positions, joint_names_sorted, group, return_full_configuration, start_configuration
             )
             yield configuration
 
