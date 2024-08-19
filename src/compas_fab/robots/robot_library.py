@@ -233,6 +233,16 @@ class RobotLibrary(object):
             client=client,
         )
 
+        # Remove the links with '_sc' suffix, which are collision objects used for
+        # Gazebo simulation. They are not needed for PyBullet and obscure the gui.
+        # They are also not helpful in other viewers.
+        # See https://frankaemika.github.io/docs/franka_ros.html for more details.
+        for link in robot.model.links:
+            if link.name.endswith("_sc"):
+                print("Removing link: %s and joint: %s", (link.name, link.parent_joint.name))
+                robot.model.remove_link(link.name)
+                robot.model.remove_joint(link.parent_joint.name)
+
         return robot
 
 
