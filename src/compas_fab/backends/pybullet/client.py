@@ -8,6 +8,8 @@ import sys
 import tempfile
 
 import compas
+from compas.colors import Color
+
 from compas.geometry import Frame
 from compas.datastructures import Mesh
 from compas_robots import RobotModel
@@ -15,6 +17,7 @@ from compas_robots.files import URDF
 from compas_robots.model import MeshDescriptor
 from compas_robots import ToolModel
 from compas_robots.model import Joint
+from compas_robots.model import Material
 
 from compas_fab.backends import CollisionCheckError
 from compas_fab.backends.interfaces.client import ClientInterface
@@ -435,6 +438,13 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         mesh_precision = 12
 
         for link in robot_model.links:
+            # Assign a default material if none is provided.
+            # Otherwise, the default material in PyBullet is black and is completely illegible.
+            for visual in link.visual:
+                if not visual.material:
+                    visual.material = Material(name="undefined_gray", color=Color(0.7, 0.7, 0.7, alpha=1.0))
+
+            # Export meshes as obj and handle concavity
             for element in itertools.chain(link.visual, link.collision):
                 shape = element.geometry.shape
                 if isinstance(shape, MeshDescriptor):
