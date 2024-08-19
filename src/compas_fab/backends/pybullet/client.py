@@ -669,12 +669,29 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             configuration.joint_names != []
         ), "Joint names must be provided in the configuration passed to set_robot_configuration."
 
-        for joint_name, joint_value in zip(configuration.joint_names, configuration.joint_values):
-            assert joint_name, "Joint name must be provided in the configuration."
-            self._set_joint_position(self.robot_joint_puids[joint_name], joint_value, self.robot_puid)
+        # Iterate through all joints that are considered free by PyBullet
+        for joint_name, joint_puid in self.get_pose_joint_names_and_puids():
+            if joint_name in configuration:
+                self._set_joint_position(joint_puid, configuration[joint_name], self.robot_puid)
+            else:
+                # Check if this is mimic joint
+                joint = self.robot.model.get_joint_by_name(joint_name)
+                mimic = joint.mimic  # type: Mimic
+                # Get the value of the joint that is being mimicked (works only for non-cascaded mimic)
+                if mimic:
+                    mimicked_joint_position = configuration[mimic.joint]
+                    self._set_joint_position(
+                        joint_puid, mimic.calculate_position(mimicked_joint_position), self.robot_puid
+                    )
+                else:
+                    raise ValueError(
+                        "Joint value for '{}' is needed for Pybullet but not found in the provided configuration.".format(
+                            joint_name
+                        )
+                    )
 
-    def get_robot_configuration(self, robot):
-        # type: (Robot) -> Configuration
+    def get_robot_configuration(self):
+        # type: () -> Configuration
         """Gets the robot's current pose.
 
         Parameters
@@ -685,11 +702,12 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         -------
         :class:`compas_robots.Configuration`
         """
+        robot = self.robot_cell.robot
         configuration = robot.zero_configuration()
-
-        joint_ids_ordered = [self.robot_joint_puids[joint_name] for joint_name in configuration.joint_names]
-        joint_values_ordered = self._get_joint_positions(joint_ids_ordered, self.robot_puid)
-        configuration.joint_values = joint_values_ordered
+        for joint_name in configuration.joint_names:
+            joint_id = self.robot_joint_puids[joint_name]
+            joint_value = self._get_joint_positions([joint_id], self.robot_puid)[0]
+            configuration[joint_name] = joint_value
 
         return configuration
 

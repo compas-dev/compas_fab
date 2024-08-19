@@ -234,6 +234,7 @@ def test_pybullet_ik_fk_agreement_abb_irb4600_40_255():
 
 
 def test_pybullet_ik_fk_agreement_panda():
+    # The panda robot has mimic joints for testing purposes
     robot = RobotLibrary.panda(load_geometry=True)
 
     ik_center_frame = Frame(

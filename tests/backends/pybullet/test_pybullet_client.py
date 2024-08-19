@@ -4,6 +4,7 @@ import pytest
 from compas_fab.backends import PyBulletClient
 from compas_robots import RobotModel
 from compas_fab.robots import Robot
+from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotLibrary
 
 from compas_robots.resources import LocalPackageMeshLoader
@@ -90,6 +91,28 @@ def test_pybullet_client_set_all_robots_from_robot_library():
         set_and_check_robot(RobotLibrary.abb_irb120_3_58())
         set_and_check_robot(RobotLibrary.abb_irb4600_40_255())
         set_and_check_robot(RobotLibrary.rfl())
+
+
+def test_pybullet_client_set_robot_configuration():
+    with PyBulletClient(connection_type="direct") as client:
+        robot = RobotLibrary.panda(load_geometry=True)
+        # Typically user would call planner.set_robot_cell() directly
+        robot = client.set_robot(robot)
+        client._robot_cell = RobotCell(robot)
+
+        # Set configuration
+        configuration = robot.model.zero_configuration()
+        client.set_robot_configuration(configuration)
+        # Check that the configuration is set
+        assert client.get_robot_configuration().close_to(configuration)
+
+        # Try to set the finger position
+        configuration["panda_finger_joint1"] = 0.02
+        client.set_robot_configuration(configuration)
+        # Check that the joint and the mimic joint are set
+        joint_ids = [client.robot_joint_puids["panda_finger_joint1"], client.robot_joint_puids["panda_finger_joint2"]]
+        joint_values = client._get_joint_positions(joint_ids, client.robot_puid)
+        assert joint_values == [0.02, 0.02]
 
 
 def test_pybullet_client_internal_puids():
