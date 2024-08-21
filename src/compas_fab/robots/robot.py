@@ -499,10 +499,13 @@ class Robot(Data):
         # type: (Optional[str]) -> List[Joint]
         """Get the robot's configurable joints.
 
+        If group is provided and robot.semantics is set, it returns the configurable joints of the group.
+        If group is None, all configurable joints of the robot are returned.
+
         Parameters
         ----------
         group : :obj:`str`, optional
-            The name of the planning group. Defaults to the main planning group.
+            The name of the planning group.
 
         Returns
         -------
@@ -632,6 +635,7 @@ class Robot(Data):
     def zero_configuration(self, group=None):
         # type: (Optional[str]) -> Configuration
         """Get the zero joint configuration of the specified planning group.
+        If group is None, all configurable joints are returned.
 
         If zero is out of joint limits ``(upper, lower)`` then
         ``(upper + lower) / 2`` is used as joint value.
