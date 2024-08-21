@@ -689,16 +689,13 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                 mimic = joint.mimic  # type: Mimic
                 # Get the value of the joint that is being mimicked (works only for non-cascaded mimic)
                 if mimic:
-                    mimicked_joint_position = configuration[mimic.joint]
-                    self._set_joint_position(
-                        joint_puid, mimic.calculate_position(mimicked_joint_position), self.robot_puid
-                    )
-                else:
-                    raise ValueError(
-                        "Joint value for '{}' is needed for Pybullet but not found in the provided configuration.".format(
-                            joint_name
+                    if mimic.joint in configuration:
+                        mimicked_joint_position = configuration[mimic.joint]
+                        self._set_joint_position(
+                            joint_puid, mimic.calculate_position(mimicked_joint_position), self.robot_puid
                         )
-                    )
+                    # Note: If the joint that is being mimicked is not in the configuration, the mimic joint will not be set.
+                    # This search and replace can be more elaborate in the future if needed.
 
     def get_robot_configuration(self):
         # type: () -> Configuration
