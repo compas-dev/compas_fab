@@ -20,6 +20,9 @@ from compas_fab.backends import MPTargetInCollisionError
 
 import compas
 
+from compas.geometry import axis_angle_from_quaternion
+from compas.geometry import Quaternion
+
 if compas.IPY:
     from typing import TYPE_CHECKING
 
@@ -49,11 +52,29 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         Supports FrameWaypoints and PointAxisWaypoints.
 
-        For more information such as planner specific behaviors, see
+        For more information such as target specific behaviors, see
         :meth:`~compas_fab.backends.PyBulletClient.plan_cartesian_motion_point_axis_waypoints` for
         :class:`~compas_fab.robots.PointAxisWaypoints` and
         :meth:`~compas_fab.backends.PyBulletClient.plan_cartesian_motion_frame_waypoints` for
         :class:`~compas_fab.robots.FrameWaypoints`.
+
+        Note that the starting state of the robot cell must match with the objects in the robot cell
+        previously set using :meth:`compas_fab.backends.PyBulletClient.set_robot_cell`.
+        If tools are attached to the robot, it must be reflected using the starting state.
+        In this case, the waypoints are describing the robot's Tool Coordinate Frame (TCF)
+        instead of the Planner Coordinate Frame (PCF) of the robot.
+
+        The robot's full configuration, i.e. values for all configurable joints of the entire robot,
+        must be provided in the ``start_state.robot_configuration`` parameter.
+        The ``start_state.robot_flange_frame`` parameter is not used by the planning function.
+
+        The ``waypoints`` parameter is used to defined single or multiple segments of path, it is not necessary to include
+        the starting pose in the waypoints, doing so may result in a redundant trajectory point.
+        The waypoints refers to the robot's Tool0 Coordinate Frame (T0CF) when no tools are attached,
+        or the Tool's Coordinate Frame (TCF) when a tool is attached.
+
+        Each path segment is interpolated linearly in Cartesian space, where position is interpolated linearly in Cartesian space
+        and orientation is interpolated spherically using quaternion interpolation.
 
         Parameters
         ----------
@@ -116,13 +137,6 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # type: (FrameWaypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
         """Calculates a cartesian motion path (linear in tool space) for Frame Waypoints.
 
-        The starting state of the robot cell must be provided.
-        It must match with the objects in the robot cell previously set using :meth:`compas_fab.backends.PyBulletClient.set_robot_cell`.
-        If tools are attached to the robot, it must be reflected in the starting state.
-        The robot's full configuration, i.e. values for all configurable joints of the entire robot,
-        must be provided in the ``start_state.robot_configuration`` parameter.
-        The ``start_state.robot_flange_frame`` parameter is not used by this function.
-
         The ``waypoints`` parameter is used to defined single or multiple segments of path, it is not necessary to include
         the starting pose in the waypoints, doing so may result in a redundant trajectory point.
         The waypoints refers to the robot's Tool0 Coordinate Frame (T0CF) when no tools are attached,
@@ -145,14 +159,14 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         The interpolator will respect these parameters and will not exceed them, if the interpolation cannot be done within these limits,
         the planner will raise a JointJumpError.
 
-        - The ``max_step`` parameter, controls the Cartesian distance between the interpolated points (TCF or T0CF).
-          Units are in meters and the default value is 0.01 meters.
+        - The ``max_step_distance`` and ``max_step_angle`` parameters, controls the amount of subdivision by limiting the distance and angle
+          between interpolated points (measured at TCF or PCF).
         - The ``max_jump_prismatic`` and ``max_jump_revolute`` parameters are used to control the maximum allowed joint distance
           between consecutive points. This can prevent the robot from making sudden high speed jumps in joint space.
           This can also avoid large gaps in the collision checking process.
           Units are in meters for prismatic joints and radians for revolute and continuous joints.
-        - The ``min_step`` parameter, controls the minimum allowed Cartesian distance between the interpolated points.
-          This is used to prevent the planner from subdividing the interpolation excessively due to the ``max_jump`` parameters.
+        - The ``min_step_distance`` and ``min_step_angle`` parameter prevents the planner from subdividing
+          the interpolation excessively due to the ``max_jump`` parameters.
 
 
         Notes
@@ -182,10 +196,20 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         options: dict, optional
             Dictionary containing the following key-value pairs:
 
-            - ``"max_step"``: (:obj:`float`, optional)
+            - ``"max_step_distance"``: (:obj:`float`, optional)
               The max Cartesian distance between two consecutive points in the result.
-              calculated points.
               Unit is in meters, defaults to ``0.01``.
+            - ``"max_step_angle"``: (:obj:`float`, optional)
+              The max angular distance between two consecutive points in the result.
+              Unit is in radians, defaults to ``0.1``.
+            - ``"min_step_distance"``: (:obj:`float`, optional)
+              The min Cartesian distance between two consecutive points
+              when the interpolation is subdivided.
+              Unit is in meters, defaults to ``0.0001``.
+            - ``"min_step_angle"``: (:obj:`float`, optional)
+              The min angular distance between two consecutive points
+              when the interpolation is subdivided.
+              Unit is in radians, defaults to ``0.0001``.
             - ``"max_jump_prismatic"``: (:obj:`float`, optional)
               The maximum allowed distance of prismatic joint positions
               between consecutive trajectory points.
@@ -213,15 +237,16 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
             The target frame may be unreachable.
         JointJumpError
             If the joint positions between two consecutive points exceed the maximum allowed distance
-            and the interpolation cannot be subdivided further due to the ``min_step`` parameter.
+            and the interpolation cannot be subdivided further due to the ``min_step_*`` parameter.
 
         """
         # Set default option values
         options = options or {}
         options = options.copy()
-        options["max_step"] = options.get("max_step", 0.01)  # meters
-        options["min_step"] = options.get("min_step", options["max_step"] / 8.01)
-        # default value of min_step allows for 3 subdivisions (2^3)
+        options["max_step_distance"] = options.get("max_step_distance", 0.01)  # meters
+        options["max_step_angle"] = options.get("max_step_angle", 0.1)  # radians
+        options["min_step_distance"] = options.get("min_step_distance", 0.0001)  # meters
+        options["min_step_angle"] = options.get("min_step_angle", 0.0001)  # radians
         options["max_jump_prismatic"] = options.get("max_jump_prismatic", 0.1)
         options["max_jump_revolute"] = options.get("max_jump_revolute", 3.14 / 2)
         options["check_collision"] = options.get("check_collision", True)
@@ -262,9 +287,9 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # Options for Inverse Kinematics
         # max_results = 1 removes the random search of the IK Engine
         options["max_results"] = options.get("max_results", 1)
+        options["return_full_configuration"] = False  # We only need the joint values for the group
 
         # Getting the joint names this way ensures that the joint order is consistent with Semantics
-        # TODO: Discuss whether Plan* and IK should return joint names in the same order
         joint_names = robot.get_configurable_joint_names(group)
         joint_types = robot.get_configurable_joint_types(group)
 
@@ -284,10 +309,15 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         if options["verbose"]:
             print("Start frame: {}".format(start_frame))
         for i in range(len(waypoints.target_frames)):
+            # Calculate interpolation steps based on distance and angle
             # Start frame is the end frame of the previous segment
             end_frame = waypoints.target_frames[i]  # type: Frame
             interpolation_total_distance = start_frame.point.distance_to_point(end_frame.point)
-            interpolation_steps = max(ceil(interpolation_total_distance / options["max_step"]), 1)
+            delta_frame = start_frame.to_local_coordinates(end_frame)
+            _, interpolation_total_angle = axis_angle_from_quaternion(Quaternion.from_frame(delta_frame))
+            steps_by_distance = ceil(interpolation_total_distance / options["max_step_distance"])
+            steps_by_angle = ceil(interpolation_total_angle / options["max_step_angle"])
+            interpolation_steps = max(steps_by_distance, steps_by_angle, 1)
             if options["verbose"]:
                 print(
                     "Segment {} of {}, Interpolating {} steps between {} and {}, distance={} requiring {} steps.".format(
@@ -328,8 +358,10 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                             i + 1, len(waypoints.target_frames), j, interpolation_ts[j], current_frame
                         )
                     )
-                # Try block to catch InverseKinematicsError, if IK failed, planning is stopped
+
+                # Perform Inverse Kinematics
                 try:
+                    # Try block to catch InverseKinematicsError, if IK failed, planning is stopped
                     configuration = planner.inverse_kinematics(target, intermediate_state, group, options)
                     new_joint_positions = [configuration[joint_name] for joint_name in joint_names]
                 except InverseKinematicsError as e:
@@ -347,29 +379,40 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                     raise MPInterpolationInCollisionError(
                         message=message, target=target, collision_pairs=e.collision_pairs
                     )
-                print(
-                    "Segment {} of {}, j={}, t={}, joint_values={}".format(
-                        i + 1, len(waypoints.target_frames), j, interpolation_ts[j], new_joint_positions
+                if options["verbose"]:
+                    print(
+                        "Segment {} of {}, j={}, t={}, joint_values={}".format(
+                            i + 1, len(waypoints.target_frames), j, interpolation_ts[j], new_joint_positions
+                        )
                     )
-                )
 
-                # Check the joint jump between the current and previous point
+                # Check `joint_jump` between the current and previous point's configuration
                 try:
                     self._check_max_jump(
                         joint_names, joint_types, trajectory.points[-1].joint_values, new_joint_positions, options
                     )
                 except MPMaxJumpError as e:
                     # Check if further subdivision is possible
-                    current_distance = current_frame.point.distance_to_point(start_frame.point)
+                    delta_t = interpolation_ts[j] - interpolation_ts[j - 1]
+                    delta_distance = interpolation_total_distance * delta_t
+                    delta_angle = interpolation_total_angle * delta_t
                     #  If it is not possible to subdivide, raise an error and stop planning
-                    if current_distance < options["min_step"] * 2:
+                    if (
+                        delta_distance < options["min_step_distance"] * 2
+                        and delta_angle < options["min_step_angle"] * 2
+                    ):
                         # The subdivision is not possible when the current step's distance is less than min_step
                         # Raise the error with additional information about the interpolation
                         message = "plan_cartesian_motion_frame_waypoints(): Segment {} of {}, Joint jump between t={} and t={} is too large.\n  -  {}".format(
                             i + 1, len(waypoints.target_frames), interpolation_ts[j - 1], interpolation_ts[j], e.message
                         )
-                        message += "\nplan_cartesian_motion_frame_waypoints(): Cannot subdivide further, current Cartesian distance between t={} and t={} is {}, while min_step is {}.".format(
-                            interpolation_ts[j - 1], interpolation_ts[j], current_distance, options["min_step"]
+                        message += "\nplan_cartesian_motion_frame_waypoints(): Cannot subdivide further between t={} and t={}, current delta_distance={} (limit={}), delta_angle={} (limit={}).".format(
+                            interpolation_ts[j - 1],
+                            interpolation_ts[j],
+                            delta_distance,
+                            options["min_step_distance"],
+                            delta_angle,
+                            options["min_step_angle"],
                         )
                         e.message = message
                         raise e

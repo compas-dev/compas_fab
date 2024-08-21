@@ -8,6 +8,8 @@ from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RobotCellState
 
+from _pybullet_demo_helper import trajectory_replay
+
 with PyBulletClient("gui") as client:
     planner = PyBulletPlanner(client)
 
@@ -44,17 +46,4 @@ with PyBulletClient("gui") as client:
     # ------------------------------------------------
     # Replay the trajectory in the PyBullet simulation
     # ------------------------------------------------
-    # The following code only serves demonstration purposes
-    # User can step through the trajectory points by pressing 'Enter' key
-    step = 0
-    intermediate_robot_cell_state = robot_cell_state.copy()  # type: RobotCellState
-    while True:
-        if step >= len(trajectory.points):
-            step = 0
-
-        print("Step: {} - joint_values = {}".format(step, trajectory.points[step].joint_values))
-        intermediate_robot_cell_state.robot_configuration = trajectory.points[step]
-        planner.set_robot_cell_state(intermediate_robot_cell_state)
-
-        input("Press Enter to continue...")
-        step += 1
+    trajectory_replay(planner, robot_cell_state, trajectory)
