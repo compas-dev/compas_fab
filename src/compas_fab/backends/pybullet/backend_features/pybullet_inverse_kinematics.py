@@ -247,11 +247,6 @@ class PyBulletInverseKinematics(InverseKinematics):
         lower_limits = []
         upper_limits = []
         for joint_name, joint_puid in joint_names_and_puids:
-            # Check if the joint is in the planning group
-            if joint_name not in robot.get_configurable_joint_names(group):
-                lower_limits.append(rest_poses_dict[joint_name] - 0.01)
-                upper_limits.append(rest_poses_dict[joint_name] + 0.01)
-                continue
             joint = robot.get_joint_by_name(joint_name)
             lower_limits.append(joint.limit.lower if joint.type != Joint.CONTINUOUS else 0)
             upper_limits.append(joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi)

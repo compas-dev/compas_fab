@@ -327,5 +327,56 @@ def test_pybullet_ik_return_full_configuration():
         assert len(config.joint_names) == 8
 
 
+def test_pybullet_ik_group():
+    # Test the IK solver see if it moved only the joints in the group
+    robot = RobotLibrary.panda(load_geometry=True)
+
+    # Create a custom group with joint 1 locked, `panda_joint1` and `panda_link0` are not included.
+    group = "locked_j1"
+    robot.semantics.groups[group] = {
+        "links": [
+            "panda_link1",
+            "panda_link2",
+            "panda_link3",
+            "panda_link4",
+            "panda_link5",
+            "panda_link6",
+            "panda_link7",
+            "panda_link8",
+            "panda_hand",
+            "panda_hand_tcp",
+        ],
+        "joints": [
+            "panda_joint2",
+            "panda_joint3",
+            "panda_joint4",
+            "panda_joint5",
+            "panda_joint6",
+            "panda_joint7",
+            "panda_hand_joint",
+            "panda_hand_tcp_joint",
+        ],
+    }
+
+    ik_target_frame = Frame(
+        point=Point(x=0.2, y=-0.0, z=0.6),
+        xaxis=Vector(x=0.0, y=1.0, z=-0.0),
+        yaxis=Vector(x=0.0, y=0.0, z=-1.0),
+    )
+    target = FrameTarget(ik_target_frame)
+    options = {"return_full_configuration": True}
+    with PyBulletClient(connection_type="direct") as client:
+        planner = PyBulletPlanner(client)
+        planner.set_robot_cell(RobotCell(robot))
+        initial_configuration = robot.zero_configuration()
+        initial_configuration["panda_joint1"] = 0.123
+        robot_cell_state = RobotCellState.from_robot_configuration(robot, initial_configuration)
+
+        for _ in range(10):
+            config = planner.inverse_kinematics(target, robot_cell_state, group, options=options)
+            print(config)
+            assert config["panda_joint1"] == initial_configuration["panda_joint1"]
+
+
 if __name__ == "__main__":
-    pass
+    test_pybullet_ik_group()
