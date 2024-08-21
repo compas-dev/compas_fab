@@ -17,10 +17,7 @@ with PyBulletClient() as client:
     frame_WCF = Frame(target_center_point, [1, 0, 0], [0, 0, -1])
     target = FrameTarget(frame_WCF)
 
-    # Enable the check_collision mode in the inverse_kinematics function.
-    # This will force the PyBullet planner to check for collisions during the IK computation
-    options = {"check_collision": True}  #
-    config = planner.inverse_kinematics(target, robot_cell_state, options=options)
+    config = planner.inverse_kinematics(target, robot_cell_state)
 
     print("Inverse kinematics result: ", config)
 

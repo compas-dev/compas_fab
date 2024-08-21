@@ -49,6 +49,59 @@ __all__ = [
 class PyBulletInverseKinematics(InverseKinematics):
     """Mix-in functions to calculate the robot's inverse kinematics for a given target."""
 
+    def inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
+        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Configuration
+        """Calculate the robot's inverse kinematic for a given frame.
+
+        The actual implementation can be found in the :meth:`iter_inverse_kinematics` method.
+        Calling `inverse_kinematics()` will return the first solution found by the iterator,
+        subsequent calls will return the next solution from the iterator. Once
+        all solutions have been exhausted, the iterator will be re-initialized.
+
+        Pybullet's inverse kinematics solver accepts FrameTarget and PointAxisTarget as input.
+        The planner is a gradient descent solver, the initial position of the robot
+        (supplied in the robot_cell_state) affects the first search attempt.
+        Subsequent attempts will start from a random configuration, so the results may vary.
+
+        For target-specific implementation details, see
+        :meth:`iter_inverse_kinematics_frame_target` for
+        :class:`compas_fab.robots.FrameTarget` and
+        :meth:`iter_inverse_kinematics_point_axis_target` for
+        :class:`compas_fab.robots.PointAxisTarget`.
+
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which inverse kinematics is being calculated.
+        target : :class:`compas_fab.robots.FrameTarget` or :class:`compas_fab.robots.PointAxisTarget`
+            The target to calculate the inverse kinematics for.
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`, optional
+            The starting state to calculate the inverse kinematics for.
+            The robot's configuration in the scene is taken as the starting configuration.
+        group : str, optional
+            The planning group used for calculation.
+        options : dict, optional
+            Dictionary containing kwargs for arguments specific to
+            the underlying function being called.
+            See the target-specific function's documentation for details.
+
+        Raises
+        ------
+        :class: `compas_fab.backends.exceptions.InverseKinematicsError`
+            If no configuration can be found.
+
+        Returns
+        -------
+        :obj:`compas_robots.Configuration`
+            The calculated configuration.
+
+        """
+        # The caching mechanism is implemented in the iter_inverse_kinematics method
+        # located in InverseKinematics class. This method is just a wrapper around it
+        # so that Intellisense and Docs can point here.
+
+        return super(PyBulletInverseKinematics, self).inverse_kinematics(target, robot_cell_state, group, options)
+
     def iter_inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
         # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
 
@@ -59,15 +112,21 @@ class PyBulletInverseKinematics(InverseKinematics):
 
     def iter_inverse_kinematics_frame_target(self, target, robot_cell_state=None, group=None, options=None):
         # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
-        """Calculate the robot's inverse kinematic for a given frame.
+        """Calculate the robot's inverse kinematic for a given FrameTarget.
+
+        The PyBullet inverse kinematics solver make use of the gradient descent IK solver
+        implemented in PyBullet. The solver is a gradient descent solver, so the initial
+        position of the robot is important.
+
+        This particular function wraps the PyBullet IK solver to provide a generator
+        that can yield multiple IK solutions. The solver will make multiple attempts
+        to find a solution. The first attempt will start from the robot's current configuration
+        provided in the ``robot_cell_state``. The subsequent attempts will start from a random
+        configuration, so the results may vary.
 
         Notes
         -----
-        The planner will make multiple attempts to find a solution.
         The number of attempts is determined by the ``max_results`` option.
-        The planner is a gradient descent solver, so the initial position of the robot is important.
-        The solver will start the first attempt from the robot's current configuration provided in the ``robot_cell_state``.
-        The subsequent attempts will start from a random configuration, so the results may vary.
 
         Parameters
         ----------
@@ -84,9 +143,6 @@ class PyBulletInverseKinematics(InverseKinematics):
             - ``"semi-constrained"``: (:obj:`bool`, optional) When ``True``, only the
               position of the target is considered. The orientation of frame will not be considered
               in the calculation.  Defaults to ``False``.
-            - ``"enforce_joint_limits"``: (:obj:`bool`, optional) When ``False``, the
-              robot's joint limits will be ignored in the calculation.  Defaults to
-              ``True``.
             - ``"high_accuracy"``:  (:obj:`bool`, optional) When ``True``, the
               solver will iteratively try to reach the ``high_accuracy_threshold``.
               Failure to reach the threshold within ``high_accuracy_max_iter`` will raise an exception.
@@ -108,7 +164,9 @@ class PyBulletInverseKinematics(InverseKinematics):
               distance between two solutions in the revolute joint space to consider them unique.
               Units are in radians. Defaults to ``1e-3``.
             - ``"check_collision"``: (:obj:`bool`, optional)
-              Whether or not to check for collision. Defaults to ``False``.
+              Whether or not to check for collision. Defaults to ``True``.
+            - ``"return_full_configuration"``: (:obj:`bool`, optional)
+                Whether or not to return the full configuration. Defaults to ``False``.
 
         Yields
         ------
@@ -141,7 +199,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         max_results = options.get("max_results", 100)
 
         # Default options
-        options["check_collision"] = options.get("check_collision", False)
+        options["check_collision"] = options.get("check_collision", True)
         options["return_full_configuration"] = options.get("return_full_configuration", False)
         options["solution_uniqueness_threshold_prismatic"] = options.get(
             "solution_uniqueness_threshold_prismatic", 3e-4
@@ -177,14 +235,23 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Prepare `rest_poses` input
         # Rest pose is PyBullet's way of defining the initial guess for the IK solver
         # The order of the values needs to match with pybullet's joint id order
-        start_configuration = robot_cell_state.robot_configuration or robot.zero_configuration(group)
+        # Start configuration needs to be a full_configuration, not negotiable.
+        start_configuration = robot_cell_state.robot_configuration
+        all_joint_names = robot.model.get_configurable_joint_names()
+        assert set(all_joint_names) == set(start_configuration.keys()), "Robot configuration is missing some joints"
         rest_poses = client.build_pose_for_pybullet(start_configuration)
+        rest_poses_dict = dict(zip(joint_names_sorted, rest_poses))
 
         # Prepare `lower_limits`` and `upper_limits` input
         # Get joint limits in the same order as the joint_ids
         lower_limits = []
         upper_limits = []
         for joint_name, joint_puid in joint_names_and_puids:
+            # Check if the joint is in the planning group
+            if joint_name not in robot.get_configurable_joint_names(group):
+                lower_limits.append(rest_poses_dict[joint_name] - 0.01)
+                upper_limits.append(rest_poses_dict[joint_name] + 0.01)
+                continue
             joint = robot.get_joint_by_name(joint_name)
             lower_limits.append(joint.limit.lower if joint.type != Joint.CONTINUOUS else 0)
             upper_limits.append(joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi)
@@ -198,20 +265,19 @@ class PyBulletInverseKinematics(InverseKinematics):
             physicsClientId=client.client_id,
         )
 
-        # Options for enforce joint limits mode
-        if options.get("enforce_joint_limits", True):
-            # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.
-            # https://stackoverflow.com/questions/49674179/understanding-inverse-kinematics-pybullet
-            # https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/preview?pru=AAABc7276PI*zazLer2rlZ8tAUI8lF98Kw#heading=h.9i02ojf4k3ve
-            joint_ranges = [u - l for u, l in zip(upper_limits, lower_limits)]
-            ik_options.update(
-                dict(
-                    lowerLimits=lower_limits,
-                    upperLimits=upper_limits,
-                    jointRanges=joint_ranges,
-                    restPoses=rest_poses,
-                )
+        # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.
+        # https://stackoverflow.com/questions/49674179/understanding-inverse-kinematics-pybullet
+        # https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/preview?pru=AAABc7276PI*zazLer2rlZ8tAUI8lF98Kw#heading=h.9i02ojf4k3ve
+        joint_ranges = [u - l for u, l in zip(upper_limits, lower_limits)]
+        ik_options.update(
+            dict(
+                lowerLimits=lower_limits,
+                upperLimits=upper_limits,
+                jointRanges=joint_ranges,
+                restPoses=rest_poses,
             )
+        )
+
         # Options for semi-constrained mode, skipping the targetOrientation
         if options.get("semi-constrained"):
             ik_options.pop("targetOrientation")
@@ -228,9 +294,8 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         def set_random_config():
             # Function for setting random joint values for randomized search
-            for lower_limit, upper_limit, joint_id in zip(lower_limits, upper_limits, joint_ids_sorted):
-                random_value = random.uniform(lower_limit, upper_limit)
-                client._set_joint_position(joint_id, random_value, client.robot_puid)
+            config = robot.random_configuration(group)
+            client.set_robot_configuration(config)
 
         # Function to keep track of unique solutions
         solutions = []
