@@ -449,6 +449,9 @@ class PyBulletInverseKinematics(InverseKinematics):
         # type: (Configuration, Configuration, str) -> None
         """Check if the configuration changed only the joints in the group.
 
+        We assume that if a joint value is changed inadvertently, it is because
+        the planning group is not supported by PyBullet.
+
         Parameters
         ----------
         start_configuration : :class:`compas_robots.Configuration`
