@@ -703,7 +703,7 @@ if __name__ == "__main__":
 
     # model = robot.model
     model = ToolLibrary.static_gripper(load_geometry=True)
-    robot_object: RobotModelObject = viewer.scene.add(model, show_lines=False)  # type: ignore
+    robot_object = viewer.scene.add(model, show_lines=False)  # type: RobotModelObject
 
     viewer.show()
 
