@@ -129,7 +129,35 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
     def plan_cartesian_motion_point_axis_waypoints(self, waypoints, start_state, group=None, options=None):
         # type: (PointAxisWaypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
-        """Calculates a cartesian motion path (linear in tool space) for Point Axis Waypoints."""
+        """Calculates a cartesian motion path (linear in tool space) for Point Axis Waypoints.
+
+        Users can choose to provide a list of high density waypoints or a list of sparse waypoints.
+        High density waypoints will allow the user to control precisely the path of the tool, such as
+        when following a curve. This is because the planner is guaranteed to generate a JointTrajectoryPoint
+        exactly at each waypoint. Sparse waypoints is suitable when the tool traces a straight line, the planner
+        will create interpolated points between the waypoints automatically.
+
+        The interpolated points and axis have regular spacing between each waypoint segment.
+        The interpolation spacing is controlled by the ``max_step_distance`` and ``max_step_angle`` options,
+        they control the distance between points and the angle between axis. This setting affects the smoothness
+        of the trajectory.
+
+        Unlike the Cartesian motion planning with Frame Waypoints, the planner will not perform sub-division
+        of the interpolation when the joint jump is too large. It will simply reject the IK solution and try a different
+        tool orientation. Therefore, the user should not set the ``max_jump`` parameters too low, as it may prevent the
+        planner from finding a solution. For application that are not bounded by the joint speed, the user can set the
+        ``max_jump`` parameters to a high value (e.g. 0.1 meter and 1 pi radian), simply as a means to avoid sudden joint flips.
+
+        For applications that require a specific tool speed, the user can use the max_jump parameters to ensure that the
+        joint speed is within the desired range.
+
+        The planner can be configured to sample the starting configuration to improve the chance of finding a solution,
+        this is controlled by the ``sample_start_configuration`` option. If enabled, the planner will treat the starting
+        configuration as an freely rotatable point-axis target. If a solution is found, the sampled configuration will be
+        returned in trajectory.start_configuration. Users should verify whether the sampled configuration is the same
+        as the robot_configuration in the start_state.
+
+        """
 
         raise NotImplementedError("plan_cartesian_motion_point_axis_waypoints() is not implemented yet.")
 
