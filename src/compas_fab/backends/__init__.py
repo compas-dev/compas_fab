@@ -153,6 +153,7 @@ if not compas.IPY:
         PyBulletError,
         PyBulletPlanner,
         AnalyticalPyBulletClient,
+        PlanningGroupNotSupported,
     )
 
 # __all__ = [

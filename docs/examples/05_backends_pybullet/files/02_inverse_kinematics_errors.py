@@ -19,14 +19,19 @@ with PyBulletClient() as client:
     frame_WCF = Frame(target_center_point, [1, 0, 0], [0, 1, 0])
     target = FrameTarget(frame_WCF)
 
+    # ----------------------------------------------
     # Example 1: IK without collision checking
+    # ----------------------------------------------
+
     # The target is causing the attached beam to collide with the floor.
     # However, if the planner does not check for collisions, it will returns a solution.
     options = {"check_collision": False}
     config = planner.inverse_kinematics(target, robot_cell_state, options=options)
     input("Observe the IK result in PyBullet's GUI, Press Enter to continue...")
 
+    # ----------------------------------------------
     # Example 2: Enable collision checking in the IK
+    # ----------------------------------------------
     try:
         # Enable the check_collision mode via options
         options = {"check_collision": True}  # Default is True

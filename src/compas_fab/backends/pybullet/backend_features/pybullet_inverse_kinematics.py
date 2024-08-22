@@ -33,6 +33,7 @@ from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.exceptions import CollisionCheckError
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.pybullet.conversions import pose_from_frame
+from compas_fab.backends.pybullet.exceptions import PlanningGroupNotSupported
 from compas_fab.utilities import LazyLoader
 from compas_fab.utilities import from_tcf_to_t0cf
 
@@ -99,8 +100,11 @@ class PyBulletInverseKinematics(InverseKinematics):
         # The caching mechanism is implemented in the iter_inverse_kinematics method
         # located in InverseKinematics class. This method is just a wrapper around it
         # so that Intellisense and Docs can point here.
-        self.check_unsupported_group_configurations(group)
-        return super(PyBulletInverseKinematics, self).inverse_kinematics(target, robot_cell_state, group, options)
+        configuration = super(PyBulletInverseKinematics, self).inverse_kinematics(
+            target, robot_cell_state, group, options
+        )
+        self._check_configuration_match_group(robot_cell_state.robot_configuration, configuration, group)
+        return configuration
 
     def iter_inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
         # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
@@ -441,28 +445,38 @@ class PyBulletInverseKinematics(InverseKinematics):
             print("Iterative IK took %d iterations" % iter)
         return joint_poses, close_enough
 
-    def check_unsupported_group_configurations(self, group):
-        # type: (Robot, Optional[str]) -> None
-        """Check if the group definition is unsupported by PyBullet Planner.
+    def _check_configuration_match_group(self, start_configuration, configuration, group):
+        # type: (Configuration, Configuration, str) -> None
+        """Check if the configuration changed only the joints in the group.
 
-        At the moment, PyBullet Planner does not support any planning groups
-        where the list of joints are not equal to all the configurable joints
+        Parameters
         ----------
-        group : str | None
-            The group for which the configurations are being checked.
+        start_configuration : :class:`compas_robots.Configuration`
+            The initial configuration.
+        configuration : :class:`compas_robots.Configuration`
+            The configuration to check.
+        group : str
+            The planning group to check. Not optional, must be specified.
 
         Raises
         ------
-        NotImplementedError
-            If the group has any unsupported configurations.
-
+        KeyError
+            If the configuration has joints that are not in the start configuration.
+        ValueError
+            If the configuration has changed joints that are not in the group.
         """
-        if group is None:
-            return
-        robot = self.client.robot
-        joints_in_group = robot.get_configurable_joint_names(group)
-        all_joints = robot.get_configurable_joint_names()
-        if set(joints_in_group) != set(all_joints):
-            raise NotImplementedError(
-                "PyBullet Planner does not support planning groups where the list of joints are not equal to all the configurable joints."
-            )
+        robot = self.client.robot  # type: Robot
+
+        configurable_joints = robot.get_configurable_joint_names(group)
+        for joint_name, joint_value in configuration.items():
+            if joint_name not in start_configuration:
+                raise KeyError(
+                    "Configuration has joint '{}' that is not in the start configuration.".format(joint_name)
+                )
+            if joint_name in configurable_joints:
+                continue
+            if not TOL.is_close(joint_value, start_configuration[joint_name]):
+                joint_names = robot.semantics.groups[group]["joints"]
+                link_names = robot.semantics.groups[group]["links"]
+                # print("Configuration changed joint '{}' that is not in the group.".format(joint_name))
+                raise PlanningGroupNotSupported(group, joint_names, link_names)

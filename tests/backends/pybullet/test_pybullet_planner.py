@@ -14,7 +14,7 @@ from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.backends import InverseKinematicsError
-
+from compas_fab.backends import PlanningGroupNotSupported
 from compas_robots import Configuration
 
 # The tolerance for the tests are set to 1e-4 meters, equivalent to 0.1 mm
@@ -332,6 +332,7 @@ def test_pybullet_ik_group():
     robot = RobotLibrary.panda(load_geometry=True)
 
     # Create a custom group with joint 1 locked, `panda_joint1` and `panda_link0` are not included.
+    # This is not supported because the starting part of the chain is not included
     robot.semantics.groups["locked_j1"] = {
         "links": [
             "panda_link1",
@@ -357,8 +358,28 @@ def test_pybullet_ik_group():
         ],
     }
 
-    # Create a custom group with joint 7
+    # The following group is supported because only the right side of the chain is cut short
     robot.semantics.groups["locked_j7"] = {
+        "links": [
+            "panda_link0",
+            "panda_link1",
+            "panda_link2",
+            "panda_link3",
+            "panda_link4",
+            "panda_link5",
+            "panda_link6",
+        ],
+        "joints": [
+            "panda_joint1",
+            "panda_joint2",
+            "panda_joint3",
+            "panda_joint4",
+            "panda_joint5",
+            "panda_joint6",
+        ],
+    }
+    # The following group does not work because the links bridged by the joints are not included
+    robot.semantics.groups["locked_j7_further"] = {
         "links": [
             "panda_link0",
             "panda_link1",
@@ -398,21 +419,28 @@ def test_pybullet_ik_group():
         print(initial_configuration)
         robot_cell_state = RobotCellState.from_robot_configuration(robot, initial_configuration)
 
-        # This should raise NotImplementedError because the group is not supported
+        # The main planning group should work as expected
+        config = planner.inverse_kinematics(target, robot_cell_state, options=options)
+        print(config)
+
+        # This group will raise PlanningGroupNotSupported because the group is not supported
         try:
             config = planner.inverse_kinematics(target, robot_cell_state, "locked_j1", options=options)
             assert False, "Should raise NotImplementedError"
-        except NotImplementedError:
+        except PlanningGroupNotSupported:
             pass
-        # This should plan okay
-        config = planner.inverse_kinematics(target, robot_cell_state, options=options)
-        print(config)
+
+        # This should work
         config = planner.inverse_kinematics(target, robot_cell_state, "locked_j7", options=options)
-        print(config)
+        assert config["panda_joint7"] == initial_configuration["panda_joint7"]
+
+        # This should raise PlanningGroupNotSupported
+        try:
+            config = planner.inverse_kinematics(target, robot_cell_state, "locked_j7_further", options=options)
+            assert False, "Should raise NotImplementedError"
+        except PlanningGroupNotSupported:
+            pass
 
 
 if __name__ == "__main__":
     test_pybullet_ik_group()
-    import pybullet as pb
-
-    pb.addUserDebugText("Hello", [0, 0, 0], [1, 0, 0, 1], textSize=1)
