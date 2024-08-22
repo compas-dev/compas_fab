@@ -99,7 +99,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # The caching mechanism is implemented in the iter_inverse_kinematics method
         # located in InverseKinematics class. This method is just a wrapper around it
         # so that Intellisense and Docs can point here.
-
+        self.check_unsupported_group_configurations(group)
         return super(PyBulletInverseKinematics, self).inverse_kinematics(target, robot_cell_state, group, options)
 
     def iter_inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
@@ -199,6 +199,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         max_results = options.get("max_results", 100)
 
         # Default options
+        options["verbose"] = options.get("verbose", False)
         options["check_collision"] = options.get("check_collision", True)
         options["return_full_configuration"] = options.get("return_full_configuration", False)
         options["solution_uniqueness_threshold_prismatic"] = options.get(
@@ -223,6 +224,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         # Formatting input for PyBullet
         body_id = client.robot_puid
+        # Note: The target link is the last link in semantics.groups[group]["links"][-1]
         link_id = client.robot_link_puids[robot.get_end_effector_link_name(group)]
         point, orientation = pose_from_frame(target_frame)
 
@@ -322,7 +324,9 @@ class PyBulletInverseKinematics(InverseKinematics):
 
             # Calling the IK function (High accuracy or not)
             if high_accuracy:
-                joint_positions, close_enough = self._accurate_inverse_kinematics(**ik_options)
+                joint_positions, close_enough = self._accurate_inverse_kinematics(
+                    verbose=options["verbose"], **ik_options
+                )
 
                 # NOTE: In principle, this accurate iter IK should work out of the
                 # pybullet box, but the results seem to be way off target. For now,
@@ -354,7 +358,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 try:
                     planner.check_collision(robot_cell_state, options)
                 except CollisionCheckError as e:
-                    if options.get("verbose", False):
+                    if options["verbose"]:
                         print("Collision detected. Skipping this solution.")
                         print(e)
                     # If max_results is 1, he user probably wants to know that the problem is caused by collision
@@ -389,7 +393,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 "No solution found after {} attempts (max_results).".format(max_results), target_pcf=target_frame
             )
 
-    def _accurate_inverse_kinematics(self, joint_ids_sorted, threshold, max_iter, **kwargs):
+    def _accurate_inverse_kinematics(self, joint_ids_sorted, threshold, max_iter, verbose=False, **kwargs):
         """Iterative inverse kinematics solver with a threshold for the distance to the target.
 
         This functions helps to get a more accurate solution by iterating over the IK solver
@@ -408,6 +412,10 @@ class PyBulletInverseKinematics(InverseKinematics):
         body_id = kwargs["bodyUniqueId"]
         link_id = kwargs["endEffectorLinkIndex"]
         target_position = kwargs["targetPosition"]
+        # Note: the following two options that was present in the PyBullet IK Example does not seem to do anything
+        # https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/examples/inverse_kinematics.py
+        # kwargs["maxNumIterations"] = max_iter
+        # kwargs["residualThreshold"] = threshold
 
         while not close_enough and iter < max_iter:
             joint_poses = pybullet.calculateInverseKinematics(**kwargs)
@@ -429,5 +437,32 @@ class PyBulletInverseKinematics(InverseKinematics):
             close_enough = distance_squared < threshold * threshold
             kwargs["restPoses"] = joint_poses
             iter += 1
-
+        if verbose:
+            print("Iterative IK took %d iterations" % iter)
         return joint_poses, close_enough
+
+    def check_unsupported_group_configurations(self, group):
+        # type: (Robot, Optional[str]) -> None
+        """Check if the group definition is unsupported by PyBullet Planner.
+
+        At the moment, PyBullet Planner does not support any planning groups
+        where the list of joints are not equal to all the configurable joints
+        ----------
+        group : str | None
+            The group for which the configurations are being checked.
+
+        Raises
+        ------
+        NotImplementedError
+            If the group has any unsupported configurations.
+
+        """
+        if group is None:
+            return
+        robot = self.client.robot
+        joints_in_group = robot.get_configurable_joint_names(group)
+        all_joints = robot.get_configurable_joint_names()
+        if set(joints_in_group) != set(all_joints):
+            raise NotImplementedError(
+                "PyBullet Planner does not support planning groups where the list of joints are not equal to all the configurable joints."
+            )

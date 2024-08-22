@@ -332,8 +332,7 @@ def test_pybullet_ik_group():
     robot = RobotLibrary.panda(load_geometry=True)
 
     # Create a custom group with joint 1 locked, `panda_joint1` and `panda_link0` are not included.
-    group = "locked_j1"
-    robot.semantics.groups[group] = {
+    robot.semantics.groups["locked_j1"] = {
         "links": [
             "panda_link1",
             "panda_link2",
@@ -358,6 +357,31 @@ def test_pybullet_ik_group():
         ],
     }
 
+    # Create a custom group with joint 7
+    robot.semantics.groups["locked_j7"] = {
+        "links": [
+            "panda_link0",
+            "panda_link1",
+            "panda_link2",
+            "panda_link3",
+            "panda_link4",
+            "panda_link5",
+            "panda_link6",
+            "panda_link7",
+            "panda_link8",
+            "panda_hand",
+            "panda_hand_tcp",
+        ],
+        "joints": [
+            "panda_joint1",
+            "panda_joint2",
+            "panda_joint3",
+            "panda_joint4",
+            "panda_joint5",
+            "panda_joint6",
+        ],
+    }
+
     ik_target_frame = Frame(
         point=Point(x=0.2, y=-0.0, z=0.6),
         xaxis=Vector(x=0.0, y=1.0, z=-0.0),
@@ -370,13 +394,25 @@ def test_pybullet_ik_group():
         planner.set_robot_cell(RobotCell(robot))
         initial_configuration = robot.zero_configuration()
         initial_configuration["panda_joint1"] = 0.123
+        initial_configuration["panda_joint7"] = 0.123
+        print(initial_configuration)
         robot_cell_state = RobotCellState.from_robot_configuration(robot, initial_configuration)
 
-        for _ in range(10):
-            config = planner.inverse_kinematics(target, robot_cell_state, group, options=options)
-            print(config)
-            assert config["panda_joint1"] == initial_configuration["panda_joint1"]
+        # This should raise NotImplementedError because the group is not supported
+        try:
+            config = planner.inverse_kinematics(target, robot_cell_state, "locked_j1", options=options)
+            assert False, "Should raise NotImplementedError"
+        except NotImplementedError:
+            pass
+        # This should plan okay
+        config = planner.inverse_kinematics(target, robot_cell_state, options=options)
+        print(config)
+        config = planner.inverse_kinematics(target, robot_cell_state, "locked_j7", options=options)
+        print(config)
 
 
 if __name__ == "__main__":
     test_pybullet_ik_group()
+    import pybullet as pb
+
+    pb.addUserDebugText("Hello", [0, 0, 0], [1, 0, 0, 1], textSize=1)

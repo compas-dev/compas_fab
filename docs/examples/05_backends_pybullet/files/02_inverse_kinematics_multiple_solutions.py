@@ -29,7 +29,7 @@ with PyBulletClient() as client:
     # multiple times with exactly the same input will return different solutions
     # This can also be achieved by calling the function iter_inverse_kinematics()
     while True:
-        config = planner.inverse_kinematics(target, robot_cell_state)
+        config = planner.inverse_kinematics(target, robot_cell_state, options={"verbose": True})
         if config is None:
             break
         print("Inverse kinematics result: ", config.joint_values)
