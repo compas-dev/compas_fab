@@ -42,7 +42,7 @@ with PyBulletClient("gui") as client:
     options = {"max_step_angle": 0.017}  # Roughly 1 degree
     trajectory = planner.plan_cartesian_motion(waypoints, robot_cell_state, options=options)
     # The frame is rotated by 90 degrees in total, so the trajectory should have roughly 90 points
-    print("Planned trajectory with max_step_angle=0.01 has {} points.".format(len(trajectory.points)))
+    print("Planned trajectory with max_step_angle=0.017 has {} points.".format(len(trajectory.points)))
 
     # --------------------------------------------------------
     # Example 3 - Controlling max_jump_revolute
