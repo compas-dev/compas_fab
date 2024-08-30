@@ -250,6 +250,13 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
               Setting this to ``0`` will disable this check.
             - ``"check_collision"``: (:obj:`bool`, optional)
               Whether or not to avoid collision. Defaults to ``True``.
+            - ``"verbose"``: (:obj:`bool`, optional)
+                Whether or not to print verbose output. Defaults to ``False``.
+            - ``"skip_preplanning_collision_check"``: (:obj:`bool`, optional)
+                Whether or not to skip the target check before planning. Defaults to ``False``.
+                The preplanning check in intended to provide a fail-fast feedback for the user.
+                However, if there are many targets in the waypoints, the check maybe more
+                time consuming than the benefit it provides.
 
         Returns
         -------
@@ -258,14 +265,22 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         Raises
         ------
-        CollisionCheckError
+        :class:`compas_fab.backends.MPInterpolationInCollisionError`
             If ``check_collision`` is enabled and the configuration is in collision.
-        InverseKinematicsError
+            The partially planned trajectory before the collision is returned.
+            The offending target and collision pairs are also returned.
+        :class:`compas_fab.backends.MPNoIKSolutionError`
             If no IK solution could be found by the kinematic solver.
-            The target frame may be unreachable.
-        JointJumpError
+            The partially planned trajectory before the unreachable target is returned.
+            The unreachable target frame is returned.
+        :class:`compas_fab.backends.MPMaxJumpError`
             If the joint positions between two consecutive points exceed the maximum allowed distance
             and the interpolation cannot be subdivided further due to the ``min_step_*`` parameter.
+            The joint name, type, values, and the difference are returned.
+        :class:`compas_fab.backends.MPStartStateInCollisionError`
+            If the start state is in collision.
+            This is part of a sanity check before the planning process.
+
 
         """
         # Set default option values
@@ -278,6 +293,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         options["max_jump_prismatic"] = options.get("max_jump_prismatic", 0.1)
         options["max_jump_revolute"] = options.get("max_jump_revolute", 3.14 / 2)
         options["check_collision"] = options.get("check_collision", True)
+        options["skip_preplanning_collision_check"] = options.get("skip_preplanning_collision_check", False)
         options["verbose"] = options.get("verbose", False)
 
         # Housekeeping for intellisense
@@ -293,6 +309,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         client.robot_cell.assert_cell_state_match(start_state)
 
         # Get default group name if not provided
+        # Do not skip this line because some functions do not default to main_group_name when group input is None.
         group = group or robot.main_group_name
 
         # Setting robot cell state
@@ -302,6 +319,8 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         if options.get("check_collision"):
             # This allows options such as `full_report` and `verbose` to pass through to the check_collision method
             options.update({"_skip_set_robot_cell_state": True})
+
+            # Check if the start state is in collision
             try:
                 # Note: This is using the CheckCollision Backend Feature
                 planner.check_collision(start_state, options)
@@ -311,6 +330,25 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                     + e.message
                 )
                 raise MPStartStateInCollisionError(message, start_state=start_state, collision_pairs=e.collision_pairs)
+
+        # Checking the attached tool and workpiece for collision at every target
+        if options.get("check_collision") and not options.get("skip_preplanning_collision_check"):
+            intermediate_state = start_state.copy()
+            intermediate_state.robot_configuration = None
+            for target_frame in waypoints.target_frames:
+                try:
+                    planner.check_collision_for_attached_objects_in_planning_group(
+                        intermediate_state,
+                        group,
+                        target_frame,
+                        options,
+                    )
+                except CollisionCheckError as e:
+                    message = (
+                        "plan_cartesian_motion_frame_waypoints: The target frame for plan_cartesian_motion is in collision. \n  - "
+                        + e.message
+                    )
+                    raise MPTargetInCollisionError(message, target=target_frame, collision_pairs=e.collision_pairs)
 
         # Options for Inverse Kinematics
         # max_results = 1 removes the random search of the IK Engine
@@ -397,7 +435,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                         i, interpolation_ts[j]
                     )
                     message = message + e.message
-                    raise MPNoIKSolutionError(message=message, target=target)
+                    raise MPNoIKSolutionError(message=message, target=target, partial_trajectory=trajectory)
 
                 except CollisionCheckError as e:
                     message = "plan_cartesian_motion_frame_waypoints(): Segment {}, Inverse Kinematics failed at t={}.\n".format(
@@ -405,7 +443,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                     )
                     message = message + e.message
                     raise MPInterpolationInCollisionError(
-                        message=message, target=target, collision_pairs=e.collision_pairs
+                        message=message, target=target, collision_pairs=e.collision_pairs, partial_trajectory=trajectory
                     )
                 if options["verbose"]:
                     print(

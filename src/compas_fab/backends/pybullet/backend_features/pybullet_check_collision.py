@@ -319,7 +319,8 @@ class PyBulletCheckCollision(CheckCollision):
         self, state, group, planner_coordinate_frame, options=None
     ):
         # type: (RobotCellState, str, Frame, Optional[Dict]) -> None
-        """A highly specific function for checking whether RigidBodies and Tools that are attached to a planning group is in collision.
+        """A highly specific function for checking whether the attached tool and workpiece(s) for a planning group is in collision
+        with stationary objects.
         This function is typically called by planning functions as part of a input sanity check or for checking whether targets are
         valid before motion planning.
 
