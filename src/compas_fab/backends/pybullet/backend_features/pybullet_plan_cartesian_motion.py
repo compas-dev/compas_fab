@@ -68,13 +68,27 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         must be provided in the ``start_state.robot_configuration`` parameter.
         The ``start_state.robot_flange_frame`` parameter is not used by the planning function.
 
-        The ``waypoints`` parameter is used to defined single or multiple segments of path, it is not necessary to include
-        the starting pose in the waypoints, doing so may result in a redundant trajectory point.
+        The ``waypoints`` parameter is used to defined single or multiple segments of path,
+        it is not necessary to include the starting pose in the waypoints,
+        doing so may result in a redundant trajectory point.
         The waypoints refers to the robot's Tool0 Coordinate Frame (T0CF) when no tools are attached,
         or the Tool's Coordinate Frame (TCF) when a tool is attached.
 
         Each path segment is interpolated linearly in Cartesian space, where position is interpolated linearly in Cartesian space
         and orientation is interpolated spherically using quaternion interpolation.
+
+        If the planning is successful, the function will return a :class:`compas_fab.robots.JointTrajectory` object,
+        which contains the start_configuration (same as input) and a list of :class:`compas_fab.robots.JointTrajectoryPoint`.
+
+        - Note that the first point in the trajectory will not repeat the start_configuration.
+        - Note that there may be one or more trajectory point for each path segment due to interpolation.
+        - Note that the returned trajectory does not separate the trajectory points into segments based on the waypoints.
+          If the user wants to separate the path into segments, they should consider calling this function multiple times.
+
+        The ``check_collision`` parameter can be used to enable or disable collision checking during the planning process.
+        If enabled, the planner will check for collision at each trajectory point
+        similar to the :meth:`compas_fab.backends.PyBulletClient.check_collision` method.
+
 
         Parameters
         ----------
@@ -106,7 +120,11 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         :class:`compas_fab.backends.InverseKinematicsError`
             Indicates that one point along the path has no IK solution.
 
-
+        Notes
+        -----
+        This planning function is synchronous, meaning that it will block the main thread until the planning is complete.
+        If the user wants to run the planning in the background and be able to cancel it, they should consider wrapping
+        this function in a separate thread or process.
 
         """
 
@@ -165,45 +183,45 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # type: (FrameWaypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
         """Calculates a cartesian motion path (linear in tool space) for Frame Waypoints.
 
-        The ``waypoints`` parameter is used to defined single or multiple segments of path, it is not necessary to include
-        the starting pose in the waypoints, doing so may result in a redundant trajectory point.
-        The waypoints refers to the robot's Tool0 Coordinate Frame (T0CF) when no tools are attached,
-        or the Tool's Coordinate Frame (TCF) when a tool is attached.
-        Each path segment is interpolated linearly in Cartesian space, where position is interpolated linearly in Cartesian space
-        and orientation is interpolated spherically using quaternion interpolation.
+        See :meth:`~plan_cartesian_motion` for the generic description of the planning function.
+        The following description is specific for Frame Waypoints.
 
-        If the planning is successful, the function will return a :class:`compas_fab.robots.JointTrajectory` object,
-        which contains the start_configuration (same as input) and a list of :class:`compas_fab.robots.JointTrajectoryPoint`.
+        The interpolation for Frame Waypoints is done in Cartesian space, meaning each
+        segment (between two frames) creates a straight line in Cartesian space.
 
-        - Note that the first point in the trajectory will not repeat the start_configuration.
-        - Note that there may be one or more trajectory point for each path segment due to interpolation.
-        - Note that the returned trajectory does not separate the trajectory points into segments based on the waypoints.
-          If the user wants to separate the path into segments, they should consider calling this function multiple times.
+        The planner will attempt to create equally spaced trajectory points between the waypoints.
+        The spacing is controlled by the ``max_step_distance`` and ``max_step_angle`` parameters.
+        These parameters are useful for controlling the smoothness of the trajectory.
 
-        The ``check_collision`` parameter can be used to enable or disable collision checking during the planning process.
-        If enabled, the planner will check for collision similar to the :meth:`compas_fab.backends.PyBulletClient.check_collision` method.
+        However, even when two points are close in Cartesian space,
+        their joint positions may still be far apart.
+        This can be dangerous for the robot, as it may cause sudden high-speed jumps in
+        joint space, and large gaps in the collision checking process.
+        To prevent this, the planner will check whether the jump between each consecutive
+        joint position is within the maximum allowed distance specified by the
+        ``max_jump_prismatic`` and ``max_jump_revolute`` parameters.
+        If the jump is too large, the planner will subdivide the interpolation until the
+        jump is within the limits.
+        When this happens, the spacing between the interpolated points will no longer be equal.
+
+        The subdivision process have a maximum limit to prevent the planner from
+        subdividing indefinitely, such as the case near singularities.
+        This is controlled by the ``min_step_distance`` and ``min_step_angle`` parameters.
+        Typically, this is set to a small value 8 to 16 times smaller than the ``max_step`` parameters.
+        When the interpolation cannot be subdivided further, it is an indication that the robot
+        cannot reach the next point without making a large jump in joint space.
+        In this case, the planner will raise a JointJumpError and stop the planning process.
 
         The following parameters are used to control the interpolation process.
-        The interpolator will respect these parameters and will not exceed them, if the interpolation cannot be done within these limits,
-        the planner will raise a JointJumpError.
-
-        - The ``max_step_distance`` and ``max_step_angle`` parameters, controls the amount of subdivision by limiting the distance and angle
-          between interpolated points (measured at TCF or PCF).
-        - The ``max_jump_prismatic`` and ``max_jump_revolute`` parameters are used to control the maximum allowed joint distance
-          between consecutive points. This can prevent the robot from making sudden high speed jumps in joint space.
-          This can also avoid large gaps in the collision checking process.
-          Units are in meters for prismatic joints and radians for revolute and continuous joints.
-        - The ``min_step_distance`` and ``min_step_angle`` parameter prevents the planner from subdividing
-          the interpolation excessively due to the ``max_jump`` parameters.
-
+        The interpolator will respect these parameters and will not exceed them,
+        if the interpolation cannot be done within these limits,
+        the planner will raise an error and stop the planning process.
 
         Notes
         -----
-
-        Trajectory points are not guaranteed to be equidistant in Cartesian or Joint space.
-
         This planning function is deterministic, meaning that the same input will always result in the same output.
         If this function fails, retrying with the same input will not change the result.
+        When planning fails, the user can still obtain the partial trajectory by
 
         The planner will not attempt to avoid collision even when ``check_collision`` is enabled.
         It simply check for them and raise an error if a collision is found.
