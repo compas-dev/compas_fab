@@ -94,8 +94,9 @@ class MotionPlanningError(BackendError):
         The error message.
     """
 
-    def __init__(self, message):
+    def __init__(self, message, partial_trajectory=None):
         super(MotionPlanningError, self).__init__(message)
+        self.message = message
 
 
 class MPStartStateInCollisionError(MotionPlanningError):
@@ -147,10 +148,12 @@ class MPInterpolationInCollisionError(MotionPlanningError):
         The target that is in collision.
     collision_pairs : list of tuple
         List of pairs of objects that are in collision.
+    partial_trajectory : compas_fab.robots.JointTrajectory
+        The partial trajectory that was generated before the collision.
     """
 
-    def __init__(self, message, target=None, collision_pairs=None):
-        super(MPInterpolationInCollisionError, self).__init__(message)
+    def __init__(self, message, target=None, collision_pairs=None, partial_trajectory=None):
+        super(MPInterpolationInCollisionError, self).__init__(message, partial_trajectory)
         self.target = target
         self.collision_pairs = collision_pairs or []
 
@@ -174,8 +177,8 @@ class MPNoIKSolutionError(MotionPlanningError):
         The target that could not be reached.
     """
 
-    def __init__(self, message, target=None):
-        super(MPNoIKSolutionError, self).__init__(message)
+    def __init__(self, message, target=None, partial_trajectory=None):
+        super(MPNoIKSolutionError, self).__init__(message, partial_trajectory)
         self.target = target
 
 

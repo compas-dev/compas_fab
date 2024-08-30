@@ -16,9 +16,12 @@ if not compas.IPY:
         from compas_fab.robots import Robot  # noqa: F401
         from compas_robots import Configuration  # noqa: F401
         from compas.geometry import Frame  # noqa: F401
-        from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
+        from compas_fab.backends import PyBulletPlanner  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
+        from compas_robots import ToolModel  # noqa: F401
+        from compas_fab.robots import RigidBodyState  # noqa: F401
+        from compas_fab.robots import ToolState  # noqa: F401
         from compas_fab.backends import PyBulletClient  # noqa: F401
 
 from compas_fab.backends.pybullet.const import STATIC_MASS
@@ -171,6 +174,46 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         # This function updates the position of all models in the robot cell, technically we could
         # keep track of the previous state and only update the models that have changed to improve performance.
         # We can improve when we have proper profiling and performance tests.
+
+    def set_attached_tool_and_rigid_body_state(self, state, group, planner_coordinate_frame):
+        # type: (RobotCellState, str, Frame) -> None
+        """Change the state of the models in the robot cell that have already been set to the Pybullet client.
+
+        Similar to the :meth:`set_robot_cell_state` method, but affects only the tools and rigid bodies
+        that are attached to the specified group.
+
+        """
+
+        # Housekeeping for intellisense
+        planner = self  # type: PyBulletPlanner
+        client = planner.client  # type: PyBulletClient
+        # robot = client.robot  # type: Robot
+        robot_cell = planner.robot_cell  # type: RobotCell
+        robot_cell_state = state.copy()  # type: RobotCellState
+
+        tool_base_frames = {}
+        for tool_name, tool_state in robot_cell_state.tool_states.items():
+            # If the tool is attached to the group, update the tool's base frame using the planner_coordinate_frame
+            if tool_state.attached_to_group == group:
+                tool_base_frame = self._compute_tool_base_frame_from_planner_coordinate_frame(
+                    tool_state, planner_coordinate_frame
+                )
+                tool_base_frames[tool_name] = tool_base_frame
+                client.set_tool_base_frame(tool_name, tool_base_frame)
+
+        for rigid_body_name, rigid_body_state in robot_cell_state.rigid_body_states.items():
+            # Filter only the rigid bodies that are attached to tools that are processed in the previous step
+            if rigid_body_state.attached_to_tool in tool_base_frames:
+                tool_name = rigid_body_state.attached_to_tool
+                tool_base_frame = tool_base_frames[tool_name]
+                tool_model = robot_cell.tool_models[tool_name]
+
+                # The following function computes the rigid body base frame from the tool base frame and attachment frame
+                rigid_body_base_frame = self._compute_workpiece_frame_from_tool_base_frame(
+                    rigid_body_state, tool_model, tool_base_frame
+                )
+
+                client.set_rigid_body_base_frame(rigid_body_name, rigid_body_base_frame)
 
     def _compute_workpiece_frame_from_tool_base_frame(self, rigid_body_state, tool_model, tool_base_frame):
         # type: (RigidBodyState, ToolModel, Frame) -> Frame

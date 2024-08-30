@@ -130,6 +130,7 @@ from .robot_cell import (
     RigidBody,
     RigidBodyState,
     RobotCellState,
+    ToolState,
 )
 from .robot_library import (
     RobotLibrary,
@@ -199,6 +200,7 @@ __all__ = [
     "RobotSemantics",
     "Target",
     "Tool",
+    "ToolState",
     "ToolLibrary",
     "Trajectory",
     "Waypoints",
