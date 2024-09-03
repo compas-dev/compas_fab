@@ -61,6 +61,7 @@ Targets and Waypoints
     Waypoints
     FrameWaypoints
     PointAxisWaypoints
+    TargetMode
 
 Constraints
 -----------
@@ -149,6 +150,7 @@ from .targets import (
     Waypoints,
     FrameWaypoints,
     PointAxisWaypoints,
+    TargetMode,
 )
 from .time_ import (
     Duration,
@@ -199,6 +201,7 @@ __all__ = [
     "RobotLibrary",
     "RobotSemantics",
     "Target",
+    "TargetMode",
     "Tool",
     "ToolState",
     "ToolLibrary",
