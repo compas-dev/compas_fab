@@ -1,3 +1,7 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 from compas_fab.robots import Waypoints
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import PointAxisWaypoints
@@ -60,9 +64,10 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         Note that the starting state of the robot cell must match with the objects in the robot cell
         previously set using :meth:`compas_fab.backends.PyBulletClient.set_robot_cell`.
-        If tools are attached to the robot, it must be reflected using the starting state.
-        In this case, the waypoints are describing the robot's Tool Coordinate Frame (TCF)
-        instead of the Planner Coordinate Frame (PCF) of the robot.
+        When a tool is attached to the planning group (specified in the start_state), it is possible
+        to use `Waypoints.target_mode = TargetMode.TOOL`.
+        When a workpiece is attached to the said tool, it is possible to use
+        `Waypoints.target_mode = TargetMode.WORKPIECE`.
 
         The robot's full configuration, i.e. values for all configurable joints of the entire robot,
         must be provided in the ``start_state.robot_configuration`` parameter.
@@ -71,8 +76,6 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         The ``waypoints`` parameter is used to defined single or multiple segments of path,
         it is not necessary to include the starting pose in the waypoints,
         doing so may result in a redundant trajectory point.
-        The waypoints refers to the robot's Tool0 Coordinate Frame (T0CF) when no tools are attached,
-        or the Tool's Coordinate Frame (TCF) when a tool is attached.
 
         Each path segment is interpolated linearly in Cartesian space, where position is interpolated linearly in Cartesian space
         and orientation is interpolated spherically using quaternion interpolation.
@@ -133,10 +136,22 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # must be able to spin around the TCF Z axis freely.
         # This is not possible anymore if the targets are converted to T0CF representation here.
 
+        # ===================================================================================
+        # The following lines should be typical in all planners' plan_cartesian_motion method
+        # ===================================================================================
+
         # Unit conversion from user scale to meter scale can be done here because they are shared.
         robot = self.client.robot  # type: Robot
         if robot.need_scaling:
             waypoints = waypoints.scaled(1.0 / robot.scale_factor)
+
+        # Check if the robot cell state supports the target mode
+        planner = self  # type: PyBulletPlanner
+        planner.ensure_robot_cell_state_supports_target_mode(start_state, waypoints.target_mode, group)
+
+        # ===================================================================================
+        # End of common lines
+        # ===================================================================================
 
         if isinstance(waypoints, PointAxisWaypoints):
             return self.plan_cartesian_motion_point_axis_waypoints(waypoints, start_state, group, options)
@@ -353,7 +368,11 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         if options.get("check_collision") and not options.get("skip_preplanning_collision_check"):
             intermediate_state = start_state.copy()
             intermediate_state.robot_configuration = None
+            # Convert the targets to PCFs for collision checking
+            pcf_frames = planner.frames_to_pcf(waypoints.target_frames, waypoints.target_mode, group)
+
             for target_frame in waypoints.target_frames:
+
                 try:
                     planner.check_collision_for_attached_objects_in_planning_group(
                         intermediate_state,

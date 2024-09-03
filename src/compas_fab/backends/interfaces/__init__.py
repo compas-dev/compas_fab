@@ -60,7 +60,7 @@ from .backend_features import ResetPlanningScene
 from .backend_features import SetRobotCell
 from .backend_features import SetRobotCellState
 from .client import ClientInterface
-from .client import PlannerInterface
+from .planner import PlannerInterface
 
 __all__ = [
     "AddAttachedCollisionMesh",
