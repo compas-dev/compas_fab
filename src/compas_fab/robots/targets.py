@@ -25,6 +25,7 @@ __all__ = [
     "Waypoints",
     "FrameWaypoints",
     "PointAxisWaypoints",
+    "TargetMode",
 ]
 
 
@@ -43,6 +44,9 @@ class Target(Data):
     ----------
     name : str , optional, default = 'target'
         A human-readable name for identifying the target.
+    target_mode : :class:`TargetMode` or str, optional
+        The target mode specifies which link or frame is referenced when specifying a target.
+        See :class:`TargetMode` for more details.
 
     See Also
     --------
@@ -52,10 +56,11 @@ class Target(Data):
     :class:`ConstraintSetTarget`
     """
 
-    def __init__(self, name="Generic Target"):
-        # type: (str) -> None
+    def __init__(self, target_mode=None, name="Generic Target"):
+        # type: (str, TargetMode|str) -> None
         super(Target, self).__init__()
         self.name = name
+        self.target_mode = target_mode
 
     @property
     def __data__(self):
@@ -96,6 +101,9 @@ class FrameTarget(Target):
     ----------
     target_frame : :class:`compas.geometry.Frame`
         The target frame.
+    target_mode : :class:`TargetMode` or str
+        The target mode specifies which link or frame is referenced when specifying a target.
+        See :class:`TargetMode` for more details.
     tolerance_position : float, optional
         The tolerance for the position.
         Unit is meters.
@@ -113,12 +121,13 @@ class FrameTarget(Target):
     def __init__(
         self,
         target_frame,
+        target_mode,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Frame Target",
     ):
-        # type: (Frame, Optional[float], Optional[float], Optional[Frame | Transformation], Optional[str]) -> None
-        super(FrameTarget, self).__init__(name=name)
+        # type: (Frame, TargetMode | str, Optional[float], Optional[float], Optional[Frame | Transformation], Optional[str]) -> None
+        super(FrameTarget, self).__init__(target_mode=target_mode, name=name)
         self.target_frame = target_frame
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
@@ -127,6 +136,7 @@ class FrameTarget(Target):
     def __data__(self):
         return {
             "target_frame": self.target_frame,
+            "target_mode": self.target_mode,
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
@@ -136,6 +146,7 @@ class FrameTarget(Target):
     def from_transformation(
         cls,
         transformation,
+        target_mode,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Frame Target",
@@ -147,6 +158,9 @@ class FrameTarget(Target):
         ----------
         transformation : :class
             The transformation matrix.
+        target_mode : :class:`TargetMode` or str
+            The target mode specifies which link or frame is referenced when specifying a target.
+            See :class:`TargetMode` for more details.
         tolerance_position : float, optional
             The tolerance for the position.
             if not specified, the default value from the planner is used.
@@ -163,7 +177,7 @@ class FrameTarget(Target):
             The frame target.
         """
         frame = Frame.from_transformation(transformation)
-        return cls(frame, tolerance_position, tolerance_orientation, name)
+        return cls(frame, target_mode, tolerance_position, tolerance_orientation, name)
 
     def scaled(self, factor):
         # type: (float) -> FrameTarget
@@ -187,7 +201,7 @@ class FrameTarget(Target):
         tolerance_position = self.tolerance_position * factor
         # Orientation tolerance is not scaled
         tolerance_orientation = self.tolerance_orientation
-        return FrameTarget(target_frame, tolerance_position, tolerance_orientation, self.name)
+        return FrameTarget(target_frame, self.target_mode, tolerance_position, tolerance_orientation, self.name)
 
 
 class PointAxisTarget(Target):
@@ -222,6 +236,9 @@ class PointAxisTarget(Target):
         The target axis is defined by the target_point and pointing towards this vector.
         A unitized vector is recommended.
         The tool tip coordinate frame (TCF)'s Z axis can rotate around this axis.
+    target_mode : :class:`TargetMode` or str
+        The target mode specifies which link or frame is referenced when specifying a target.
+        See :class:`TargetMode` for more details.
     tolerance_position : float, optional
         The tolerance for the position of the target point.
         If not specified, the default value from the planner is used.
@@ -234,11 +251,12 @@ class PointAxisTarget(Target):
         self,
         target_point,
         target_z_axis,
+        target_mode,
         tolerance_position=None,
         name="Point-Axis Target",
     ):
-        # type: (Point, Vector, Optional[float], Optional[Frame | Transformation], Optional[str]) -> None
-        super(PointAxisTarget, self).__init__(name=name)
+        # type: (Point, Vector, TargetMode | str, Optional[float], Optional[Frame | Transformation], Optional[str]) -> None
+        super(PointAxisTarget, self).__init__(target_mode=target_mode, name=name)
         self.target_point = target_point
         self.target_z_axis = target_z_axis
         self.tolerance_position = tolerance_position
@@ -247,6 +265,7 @@ class PointAxisTarget(Target):
     def __data__(self):
         return {
             "target_point": self.target_point,
+            "target_mode": self.target_mode,
             "target_z_axis": self.target_z_axis,
             "tolerance_position": self.tolerance_position,
             "name": self.name,
@@ -269,7 +288,7 @@ class PointAxisTarget(Target):
         target_point = self.target_point.scaled(factor)
         tolerance_position = self.tolerance_position * factor if self.tolerance_position else None
         target_z_axis = self.target_z_axis  # Vector is unitized and is not scaled
-        return PointAxisTarget(target_point, target_z_axis, tolerance_position, self.name)
+        return PointAxisTarget(target_point, target_z_axis, self.target_mode, tolerance_position, self.name)
 
 
 class ConfigurationTarget(Target):
@@ -477,7 +496,7 @@ class ConstraintSetTarget(Target):
         raise NotImplementedError
 
 
-class Waypoints(Data):
+class Waypoints(Target):
     """Represents a sequence of kinematic target for motion planning.
 
     Waypoints represent a sequence of targets the robot should pass through in the order they are defined.
@@ -494,6 +513,9 @@ class Waypoints(Data):
 
     Attributes
     ----------
+    target_mode : :class:`TargetMode` or str, optional
+        The target mode specifies which link or frame is referenced when specifying a target.
+        See :class:`TargetMode` for more details.
     name : str , optional, default = 'target'
         A human-readable name for identifying the target.
 
@@ -503,9 +525,9 @@ class Waypoints(Data):
     :class:`FrameWaypoints`
     """
 
-    def __init__(self, name="Generic Waypoints"):
-        super(Waypoints, self).__init__()
-        self.name = name
+    def __init__(self, target_mode, name="Generic Waypoints"):
+        # type: (Optional[TargetMode | str], Optional[str]) -> None
+        super(Waypoints, self).__init__(target_mode=target_mode, name=name)
 
     def scaled(self, factor):
         # type: (float) -> Waypoints
@@ -538,6 +560,9 @@ class FrameWaypoints(Waypoints):
     ----------
     target_frames : :obj:`list` of :class:`compas.geometry.Frame`
         The target frames.
+    target_mode : :class:`TargetMode` or str
+        The target mode specifies which link or frame is referenced when specifying a target.
+        See :class:`TargetMode` for more details.
     tolerance_position : float, optional
         The tolerance for the position.
         Unit is meters.
@@ -555,11 +580,12 @@ class FrameWaypoints(Waypoints):
     def __init__(
         self,
         target_frames,
+        target_mode,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Frame Waypoints",
     ):
-        super(FrameWaypoints, self).__init__(name=name)
+        super(FrameWaypoints, self).__init__(target_mode=target_mode, name=name)
         self.target_frames = target_frames
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
@@ -568,6 +594,7 @@ class FrameWaypoints(Waypoints):
     def __data__(self):
         return {
             "target_frames": self.target_frames,
+            "target_mode": self.target_mode,
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
@@ -577,17 +604,21 @@ class FrameWaypoints(Waypoints):
     def from_transformations(
         cls,
         transformations,
+        target_mode,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Frame Waypoints",
     ):
-        # type: (list[Transformation], Optional[float], Optional[float], Optional[Frame | Transformation], Optional[str]) -> FrameWaypoints
+        # type: (list[Transformation], TargetMode | str, Optional[float], Optional[float], Optional[Frame | Transformation], Optional[str]) -> FrameWaypoints
         """Creates a FrameWaypoints from a list of transformation matrices.
 
         Parameters
         ----------
         transformations : :obj:`list` of :class: `compas.geometry.Transformation`
-        The list of transformation matrices.
+            The list of transformation matrices.
+        target_mode : :class:`TargetMode` or str
+            The target mode specifies which link or frame is referenced when specifying a target.
+            See :class:`TargetMode` for more details.
         tolerance_position : float, optional
             The tolerance for the position.
             if not specified, the default value from the planner is used.
@@ -604,7 +635,7 @@ class FrameWaypoints(Waypoints):
             The frame waypoints.
         """
         frames = [Frame.from_transformation(transformation) for transformation in transformations]
-        return cls(frames, tolerance_position, tolerance_orientation, name)
+        return cls(frames, target_mode, tolerance_position, tolerance_orientation, name)
 
     def scaled(self, factor):
         # type: (float) -> FrameWaypoints
@@ -627,7 +658,7 @@ class FrameWaypoints(Waypoints):
         target_frames = [frame.scaled(factor) for frame in self.target_frames]
         tolerance_position = self.tolerance_position * factor
         tolerance_orientation = self.tolerance_orientation
-        return FrameWaypoints(target_frames, tolerance_position, tolerance_orientation, self.name)
+        return FrameWaypoints(target_frames, self.target_mode, tolerance_position, tolerance_orientation, self.name)
 
 
 class PointAxisWaypoints(Waypoints):
@@ -647,6 +678,9 @@ class PointAxisWaypoints(Waypoints):
         The target points and axes.
         Both values are defined relative to the world coordinate frame (WCF).
         Unitized vectors are recommended for the target axes.
+    target_mode : :class:`TargetMode` or str
+        The target mode specifies which link or frame is referenced when specifying a target.
+        See :class:`TargetMode` for more details.
     tolerance_position : float, optional
         The tolerance for the position of the target point.
         If not specified, the default value from the planner is used.
@@ -659,10 +693,11 @@ class PointAxisWaypoints(Waypoints):
     def __init__(
         self,
         target_points_and_axes,
+        target_mode,
         tolerance_position=None,
         name="Point-Axis Waypoints",
     ):
-        super(PointAxisWaypoints, self).__init__(name=name)
+        super(PointAxisWaypoints, self).__init__(target_mode=target_mode, name=name)
         self.target_points_and_axes = target_points_and_axes
         self.tolerance_position = tolerance_position
 
@@ -670,6 +705,7 @@ class PointAxisWaypoints(Waypoints):
     def __data__(self):
         return {
             "target_points_and_axes": self.target_points_and_axes,
+            "target_mode": self.target_mode,
             "tolerance_position": self.tolerance_position,
             "name": self.name,
         }
@@ -691,4 +727,39 @@ class PointAxisWaypoints(Waypoints):
         # Axis is a unitized vector and is not scaled
         target_points_and_axes = [(point.scaled(factor), axis) for point, axis in self.target_points_and_axes]
         tolerance_position = self.tolerance_position * factor if self.tolerance_position else None
-        return PointAxisWaypoints(target_points_and_axes, tolerance_position, self.name)
+        return PointAxisWaypoints(target_points_and_axes, self.target_mode, tolerance_position, self.name)
+
+
+class TargetMode:
+    """Represents different matching mode for `Targets` and `Waypoints`.
+
+    Target modes represent which link or frame is referenced when specifying a target or waypoint.
+    For example, if a target's  `target_mode` is `TargetMode.TCF` (Tool Coordinate Frame),
+    it means that the planner will try to move the robot, such that it's attached TCF
+    matches with the `.frame` specified in the Target or Waypoint.
+
+    Attributes
+    ----------
+    ROBOT : str
+        Refers to the PCF (Planner Coordinate Frame).
+        The frame of the tip link of a planning group.
+    TOOL : str
+        Refers to the TCF (Tool Coordinate Frame) of the tool attached to the robot.
+        Typically this frame is at the tool tip of the tool.
+        A tool must be attached to the robot to use this.
+    WORKPIECE : str
+        Refers to the frame of the workpiece (:class:`~compas_fab.robots.RigidBody`) attached to the robot.
+        There must be one and only one workpiece attached to the robot when using this mode.
+
+    Notes
+    -----
+    The term `workpiece` refers to the RigidBody attached to a tool.
+
+    When using the `WORKPIECE` mode, the user must ensure that only one workpiece is attached to the robot.
+    Otherwise, it is not possible for compas_fab to determine which workpiece is being referred to.
+    If the user has multiple workpieces, they should use the `TOOL` mode instead.
+    """
+
+    ROBOT = "ROBOT"
+    TOOL = "TOOL"
+    WORKPIECE = "WORKPIECE"
