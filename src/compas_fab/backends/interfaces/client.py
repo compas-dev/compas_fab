@@ -16,7 +16,12 @@ if compas.IPY:
         from compas_fab.robots import Robot
         from compas_fab.robots import RobotCell
         from compas_fab.robots import RobotCellState
+        from compas_fab.robots import Target
+        from compas_fab.robots import Waypoints
+        from compas_fab.robots import TargetMode
+
         from typing import List
+        from typing import Optional
         from compas.geometry import Frame
 
 
@@ -271,14 +276,12 @@ class PlannerInterface(object):
         This is typically used at the beginning of the inverse kinematics calculation to convert
         the frame of the robot's tool tip (tcf) to the frame of the robot's flange (tool0).
 
-        The tool_id must correspond to a valid tool in `planner.robot_cell.tool_models`.
-
         Parameters
         ----------
         tcf_frames : list of :class:`~compas.geometry.Frame`
             Tool Coordinate Frames (TCF) relative to the World Coordinate Frame (WCF).
         tool_id : str
-            The id of the tool attached to the robot.
+            The id of a tool found in `planner.robot_cell.tool_models`.
 
         Returns
         -------
@@ -328,14 +331,12 @@ class PlannerInterface(object):
         This is typically used at the end of the forward kinematics calculation to convert
         the frame of the robot's flange (tool0) to the frame of the robot's tool tip (tcf).
 
-        The tool_id must correspond to a valid tool in `planner.robot_cell.tool_models`.
-
         Parameters
         ----------
         pcf_frames : list of :class:`~compas.geometry.Frame`
             Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
         tool_id : str
-            The id of the tool attached to the robot.
+            The id of a tool found in `planner.robot_cell.tool_models`.
 
         Returns
         -------
@@ -368,3 +369,176 @@ class PlannerInterface(object):
             tool_coordinate_frames.append(Frame.from_transformation(t_wcf_tcf))
 
         return tool_coordinate_frames
+
+    def from_ocf_to_pcf(self, ocf_frames, workpiece_id):
+        # type: (List[Frame], str) -> List[Frame]
+        """Converts a frame describing the object coordinate frame (OCF) relative to WCF
+        to a frame describing the planner coordinate frame (PCF) (also T0CF) relative to WCF.
+        The transformation goes from the workpiece's base frame,
+        through the workpiece's attachment frame (in workpiece_state), to the tool's TCF.
+
+        This function is restricted to be used only with workpieces that are currently
+        attached to a tool, and that the tool is attached to the robot.
+        Before calling this function, make sure the last call to
+        set_robot_cell_state() has the correct workpiece attachment information.
+
+        This is typically used at the beginning of the inverse kinematics calculation to convert
+        the frame of the object (ocf) to the frame of the robot's flange (tool0).
+
+        Parameters
+        ----------
+        ocf_frames : list of :class:`~compas.geometry.Frame`
+            Object Coordinate Frames (OCF) relative to the World Coordinate Frame (WCF).
+        workpiece_id : str
+            The id of a workpiece found in `planner.robot_cell.rigid_body_models`.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Frame`
+            Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
+
+        Notes
+        -----
+        This function works correctly even when there are multiple workpieces attached to the robot.
+        Simply pass the correct workpiece_id to the function.
+
+        """
+        if workpiece_id not in self.robot_cell.rigid_body_models:
+            raise ValueError("Workpiece with id '{}' not found in robot cell.".format(workpiece_id))
+        workpiece_state = self.robot_cell_state.rigid_body_states[workpiece_id]
+        if not workpiece_state.attached_to_tool:
+            raise ValueError("Workpiece with id '{}' is not attached to any tool.".format(workpiece_id))
+        tool_id = workpiece_state.attached_to_tool
+        if tool_id not in self.robot_cell.tool_models:
+            raise ValueError(
+                "Workpiece is attached to a Tool with id '{}', but the tool is not found in robot cell.".format(tool_id)
+            )
+        tool_state = self.robot_cell_state.tool_states[tool_id]
+        if not tool_state.attached_to_group:
+            raise ValueError("Tool with id '{}' is not attached to the robot.".format(tool_id))
+
+        # The following precomputed transformations are used to speed up batch frame conversions.
+        # t_pcf_tbcf is Workpiece Attachment Frame, describing Workpiece Base Coordinate Frame (WBCF) relative to PCF Frame on the Robot (PCF)
+        attachment_frame = workpiece_state.attachment_frame or Frame.worldXY()
+        t_tcf_ocf = Transformation.from_frame(attachment_frame)
+        t_ocf_tcf = t_tcf_ocf.inverse()
+
+        tool_coordinate_frames = []
+        for ocf in ocf_frames:
+            # Convert input to Transformation
+            t_wcf_ocf = Transformation.from_frame(ocf)
+
+            # Combined transformation gives the position of the tool in the world coordinate frame
+            t_wcf_tcf = t_wcf_ocf * t_ocf_tcf
+            tool_coordinate_frames.append(Frame.from_transformation(t_wcf_tcf))
+
+        return self.from_tcf_to_pcf(tool_coordinate_frames, tool_id)
+
+    def frames_to_pcf(self, frame_or_frames, target_mode, group):
+        # type: (Frame | List[Frame], TargetMode | str, str) -> Frame | List[Frame]
+        """Converts a Frame or a list of Frames to the PCF (Planner Coordinate Frame) relative to WCF.
+
+        This function assumes the current robot_cell_state in the planner is already set,
+        and that the tool and workpiece attachment supports the target mode.
+
+        This function is intended to be used within the planner, and that
+        :meth:`ensure_robot_cell_state_supports_target_mode` is called before this function.
+
+        Parameters
+        ----------
+        frame_or_frames : :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
+            The frame or frames to convert.
+        target_mode : :class:`~compas_fab.robots.TargetMode` or str
+            The target mode of the frame or frames.
+        group : str
+            The planning group to check. Must be specified.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
+            Planner Coordinate Frame (PCF) relative to the World Coordinate Frame (WCF).
+            If the input is a single frame, the output will also be a single frame.
+            If the input is a list of frames, the output will also be a list of frames.
+        """
+        # Pack a single frame into a list if it is not already a list
+        input_is_not_list = not isinstance(frame_or_frames, list)
+        frames = [frame_or_frames] if input_is_not_list else frame_or_frames
+
+        pcf_frames = None
+        if target_mode == TargetMode.TOOL:
+            tool_id = self.robot_cell_state.get_attached_tool_id(group)
+            pcf_frames = self.from_tcf_to_pcf(frames, tool_id)
+
+        if target_mode == TargetMode.WORKPIECE:
+            workpiece_ids = self.robot_cell_state.get_attached_workpiece_ids(group)
+            assert len(workpiece_ids) == 1, "Only one workpiece should be attached to the robot in group '{}'.".format(
+                group
+            )
+            pcf_frames = self.from_ocf_to_pcf(frames, workpiece_ids[0])
+
+        if target_mode == TargetMode.ROBOT:
+            pcf_frames = frames
+
+        return pcf_frames[0] if input_is_not_list else pcf_frames
+
+    # ==========================================================================
+    # Sanity Check Functions
+    # ==========================================================================
+
+    def ensure_robot_cell_state_supports_target_mode(self, robot_cell_state, target_mode, group):
+        # type: (RobotCellState, TargetMode, str) -> None
+        """Check if the `target_mode` of the given Target or Waypoints agrees with the current attachment state of the robot.
+
+        If the `target_mode` is not specified in the Target or Waypoints,
+        such as the cases for ConfigurationTarget and ConstraintSetTarget,
+        this function will not perform any checks.
+
+        An `robot_cell_state` input is used instead of the `self.robot_cell_state` attribute,
+        to allow the check to be performed before calling `set_robot_cell_state()`.
+
+        If target mode is `TargetMode.TOOL`, the specified planning group must have a tool attached.
+        If target mode is `TargetMode.WORKPIECE`, the specified planning group must have one and only one workpiece attached.
+
+        Parameters
+        ----------
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+            The robot cell state to check.
+        target_or_waypoints : :class:`compas_fab.robots.Target` or :class:`compas_fab.robots.Waypoints`
+            The target or waypoints to check.
+        group : str
+            The planning group to check. Must be specified.
+
+        Raises
+        ------
+        ValueError
+            If the target mode is `TOOL` and no tool is attached to the robot in the specified group.
+            If the target mode is `WORKPIECE` and no (or more than one) workpiece is attached to the specified group.
+        """
+
+        if target_mode is None:
+            return
+
+        assert group is not None, "Planning group must be specified."
+
+        # Checks for Tool Mode
+        tool_id = robot_cell_state.get_attached_tool_id(group)
+        if target_mode == TargetMode.TOOL:
+
+            if tool_id is None:
+                raise ValueError(
+                    "Target mode is 'TOOL', but no tool is attached to the robot in group '{}'.".format(group)
+                )
+
+        # Checks for Workpiece Mode
+        workpiece_ids = robot_cell_state.get_attached_workpiece_ids(group)
+        if target_mode == TargetMode.WORKPIECE:
+            if len(workpiece_ids) == 0:
+                raise ValueError(
+                    "Target mode is 'WORKPIECE', but no workpiece is attached to the robot in group '{}'.".format(group)
+                )
+            if len(workpiece_ids) > 1:
+                raise ValueError(
+                    "Target mode is 'WORKPIECE', but more than one workpiece is attached to the robot in group '{}'.".format(
+                        group
+                    )
+                )
