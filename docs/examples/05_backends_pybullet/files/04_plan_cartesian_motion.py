@@ -6,7 +6,7 @@ from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import RobotCellLibrary
-from compas_fab.robots import RobotCellState
+from compas_fab.robots import TargetMode
 
 from _pybullet_demo_helper import trajectory_replay
 
@@ -34,7 +34,7 @@ with PyBulletClient("gui") as client:
     # Move to Z direction and move back
     target_frames.append(Frame([0.4, 0.1, 0.7], [1.0, 0.0, 0.0], [0.0, -1.0, 0.0]))
     target_frames.append(Frame([0.4, 0.1, 0.5], [1.0, 0.0, 0.0], [0.0, -1.0, 0.0]))
-    waypoints = FrameWaypoints(target_frames)
+    waypoints = FrameWaypoints(target_frames, target_mode=TargetMode.TOOL)
 
     # In this demo, the default planning group is used for the forward kinematics
     trajectory = planner.plan_cartesian_motion(waypoints, robot_cell_state)

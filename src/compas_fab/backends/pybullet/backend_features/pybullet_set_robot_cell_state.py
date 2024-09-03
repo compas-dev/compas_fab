@@ -102,18 +102,10 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 # If tool is attached to a group, update the tool's base frame using the group's FK frame
                 link_name = client.robot.get_link_names(tool_state.attached_to_group)[-1]
                 robot_configuration = robot_cell_state.robot_configuration
-                robot_tool0_frame = client.robot.model.forward_kinematics(robot_configuration, link_name)
+                planner_coordinate_frame = client.robot.model.forward_kinematics(robot_configuration, link_name)
 
-                # Note: The position of the attached tool in the world coordinate frame is given by t_wcf_tbcf
-                # t_wcf_t0cf is Tool0 Frame of the robot obtained from FK, describing Tool Base Frame (T0CF) relative to World Coordinate Frame (WCF)
-                t_wcf_t0cf = Transformation.from_frame(robot_tool0_frame)
-                # t_t0cf_tbcf is Tool Attachment Frame, describing Tool Base Coordinate Frame (TBCF) relative to Tool0 Frame on the Robot (T0CF)
-                t_t0cf_tbcf = Transformation.from_frame(tool_state.attachment_frame)
-
-                # Combined transformation gives the position of the tool in the world coordinate frame
-                t_wcf_tbcf = t_wcf_t0cf * t_t0cf_tbcf
                 tool_base_frame = self._compute_tool_base_frame_from_planner_coordinate_frame(
-                    tool_state, Frame.from_transformation(t_wcf_tbcf)
+                    tool_state, planner_coordinate_frame
                 )
             else:
                 # If the tool is not attached, update the tool's base frame using the frame in tool state
@@ -145,7 +137,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 rigid_body_base_frame = self._compute_workpiece_frame_from_tool_base_frame(
                     rigid_body_state, tool_model, tool_base_frames[tool_name]
                 )
-            if rigid_body_state.attached_to_link:
+            elif rigid_body_state.attached_to_link:
                 # Skip if robot_configuration is not provided
                 if not robot_cell_state.robot_configuration:
                     continue
