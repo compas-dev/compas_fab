@@ -38,6 +38,7 @@ from compas_fab.utilities import LazyLoader
 from compas_fab.utilities import from_tcf_to_t0cf
 
 from compas_fab.robots import FrameTarget
+from compas_fab.robots import PointAxisTarget
 
 pybullet = LazyLoader("pybullet", globals(), "pybullet")
 
@@ -222,8 +223,8 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         Yields
         ------
-        :obj:`tuple` of :obj:`list`
-            A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
+        :obj:`compas_robots.Configuration`
+            The calculated configuration.
 
         Raises
         ------
@@ -439,6 +440,110 @@ class PyBulletInverseKinematics(InverseKinematics):
             raise InverseKinematicsError(
                 "No solution found after {} attempts (max_results).".format(max_results), target_pcf=target_pcf
             )
+
+    def iter_inverse_kinematics_point_axis_target(self, target, robot_cell_state, group, options=None):
+        # type: (PointAxisTarget, RobotCellState, str, Optional[Dict]) -> Generator[Configuration | None]
+        """Calculate the robot's inverse kinematic for a given PointAxisTarget.
+
+        class:`~compas_fab.robots.PointAxisTarget` specify a target point and an axis in 3D space.
+        Depending on setting of `target.target_mode`, the selected reference frame (e.g. TCF)
+        on the robot will be moved such that the `frame.point` is at the target point and the
+        `frame.zaxis` is aligned with the target axis.
+        The reference frame is allowed to rotate around the axis.
+        For a typical 6-DOF robot, a PointAxisTarget will have 1 extra degree of freedom
+        compared to a FrameTarget.
+
+        Similar to the :meth:`iter_inverse_kinematics_frame_target` method, this function
+        will make multiple attempts to find a solution that is reachable and collision free.
+
+        Given the extra degree of freedom, the solver will discretize the rotation around
+        the axis into multiple steps. The number of steps is determined by the ``num_rotation_steps``.
+        The initial rotation (theta = 0) is determined by a minimally rotated frame computed
+        from the robot's starting configuration (``robot_cell_state``).
+        From this initial frame, the solver will test other frames
+        by rotating the frame around the axis in equal steps until a solution is found.
+        The amount of rotation is incremented left and right alternatively from zero (the initial frame).
+        For example, the theta values (in degrees) for a 36-step rotation will be [0, 10, -10, 20, -20, ...].
+
+        When all rotational steps are exhausted. The solver will then restart the entire search
+        from a new random configuration and repeat the process until the maximum number of attempts
+        (``max_random_restart``) is reached.
+        This also means that the generator will behave like a random search after the first round
+        of rotation steps if  ``max_random_restart`` is greater than 1.
+
+        This function internally calls the :meth:`iter_inverse_kinematics_frame_target` method,
+        which is responsible for the actual IK calculation. The rotation around the axis is handled
+        by this function. Some of the options passed to this function will be passed on to the
+        :meth:`iter_inverse_kinematics_frame_target` method, see below for details.
+
+        Parameters
+        ----------
+        target: :class:`compas.geometry.PointAxisTarget`
+            The PointAxis Target to calculate the inverse for.
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+            The starting state to calculate the inverse kinematics for.
+        group: str
+            The planning group used for calculation.
+        options: dict, optional
+            Dictionary containing the following key-value pairs, that are unique to this function:
+
+            - ``"num_rotation_steps"``: (:obj:`int`, optional)
+              Number of steps to rotate the frame around the axis.
+              Defaults to ``20``.
+            - ``"max_random_restart"``: (:obj:`int`, optional)
+              Maximum number of random restarts to find a solution.
+              Defaults to ``5``.
+            - ``"max_results"``: (:obj:`int`)
+              Maximum number of results to return before stopping the search.
+              Defaults to ``100``.
+
+            The following key-value pairs have the same meaning as in the :meth:`iter_inverse_kinematics_frame_target` method:
+
+            - ``"high_accuracy"``:  (:obj:`bool`, optional)
+            - ``"high_accuracy_threshold"``:  (:obj:`float`, optional)
+            - ``"high_accuracy_max_iter"``:  (:obj:`float`, optional)
+            - ``"solution_uniqueness_threshold_prismatic"``: (:obj:`float`, optional)
+            - ``"solution_uniqueness_threshold_revolute"``: (:obj:`float`, optional)
+            - ``"check_collision"``: (:obj:`bool`, optional)
+            - ``"return_full_configuration"``: (:obj:`bool`, optional)
+
+        Notes
+        -----
+
+        The search space for PointAxisTarget is much larger than FrameTarget, so the number of attempts
+        and the number of rotation steps should be kept low to avoid long search times.
+        Be aware that if the target is not reachable or caused collision, the search will iterate through
+        all the steps and restarts before giving up.
+
+        Yields
+        ------
+        :obj:`compas_robots.Configuration`
+            The calculated configuration.
+
+        """
+        # Keep track of the number of results and for uniqueness checking
+        results = []
+
+        # NOTE: The option 'max_results' have a different meaning to the one
+        #       in the iter_inverse_kinematics_frame_target, here we keep a count of the
+        #       number of returned result and use it to determine when to stop the search.
+        #       In the iter_inverse_kinematics_frame_target, it is used to determine the
+        #       maximum number of attempts to find a solution.
+
+        #       In this function, the maximum number of attempts is determined by the
+        #       'num_rotation_steps' and 'max_random_restart' options.
+
+        # Start with the initial configuration as start configuration
+        #  TODO: Implement this
+        # Loop with random restarts
+
+        # Establish the initial frame by doing FK with the initial configuration
+        # Configure ik_options for
+        # Create a generator for getting rotated target frames
+        # Try get IK solution by trying out different rotations
+
+        # If number of results is more than max_results, stop the search
+        # If no solution is found after everything is exhausted, raise an error
 
     def _accurate_inverse_kinematics(self, joint_ids_sorted, threshold, max_iter, verbose=False, **kwargs):
         """Iterative inverse kinematics solver with a threshold for the distance to the target.

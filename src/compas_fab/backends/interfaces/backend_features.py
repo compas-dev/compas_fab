@@ -323,6 +323,7 @@ class InverseKinematics(BackendFeature):
 
         if self._last_ik_request["request_hash"] == request_hash and self._last_ik_request["solutions"] is not None:
             solution = next(self._last_ik_request["solutions"], None)
+            # NOTE: If the iterator is exhausted, solution will be None, subsequent code outside will reset the generator
             if solution is not None:
                 return solution
 
@@ -330,6 +331,7 @@ class InverseKinematics(BackendFeature):
         self._last_ik_request["request_hash"] = request_hash
         self._last_ik_request["solutions"] = solutions
 
+        # NOTE: If the 'solutions' generator cannot yield even one solution, it will raise an exception here:
         return next(solutions)
 
     def iter_inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
