@@ -8,6 +8,7 @@ from compas_fab.robots import PointAxisWaypoints
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
+from compas_fab.robots import TargetMode
 from compas_robots.model import Joint
 
 from math import pi
@@ -142,6 +143,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         # Unit conversion from user scale to meter scale can be done here because they are shared.
         robot = self.client.robot  # type: Robot
+        group = group or robot.main_group_name
         if robot.need_scaling:
             waypoints = waypoints.scaled(1.0 / robot.scale_factor)
 
@@ -202,7 +204,8 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         The following description is specific for Frame Waypoints.
 
         The interpolation for Frame Waypoints is done in Cartesian space, meaning each
-        segment (between two frames) creates a straight line in Cartesian space.
+        segment (between two target_frames) creates a straight line in Cartesian space.
+        The frame being interpolated is specified by the target_mode of the waypoints.
 
         The planner will attempt to create equally spaced trajectory points between the waypoints.
         The spacing is controlled by the ``max_step_distance`` and ``max_step_angle`` parameters.
@@ -371,13 +374,13 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
             # Convert the targets to PCFs for collision checking
             pcf_frames = planner.frames_to_pcf(waypoints.target_frames, waypoints.target_mode, group)
 
-            for target_frame in waypoints.target_frames:
+            for pcf_frame in pcf_frames:
 
                 try:
                     planner.check_collision_for_attached_objects_in_planning_group(
                         intermediate_state,
                         group,
-                        target_frame,
+                        pcf_frame,
                         options,
                     )
                 except CollisionCheckError as e:
@@ -385,12 +388,19 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                         "plan_cartesian_motion_frame_waypoints: The target frame for plan_cartesian_motion is in collision. \n  - "
                         + e.message
                     )
-                    raise MPTargetInCollisionError(message, target=target_frame, collision_pairs=e.collision_pairs)
+                    raise MPTargetInCollisionError(message, target=pcf_frame, collision_pairs=e.collision_pairs)
 
         # Options for Inverse Kinematics
-        # max_results = 1 removes the random search of the IK Engine
-        options["max_results"] = options.get("max_results", 1)
-        options["return_full_configuration"] = False  # We only need the joint values for the group
+        ik_options = options.copy()
+        # NOTE: PyBullet IK is gradient based and will snap to the nearest configuration of the start state
+        # NOTE: We are running this IK solver without random search (by setting max_results = 1) to ensure determinism
+        #       In this mode, planner.inverse_kinematics() will raise an InverseKinematicsError if no IK solution is found,
+        #       or CollisionCheckError if the configuration is found but in collision. We will handle these errors below.
+        ik_options["max_results"] = 1
+        # NOTE: # We only need the joint values for the group to construct the JointTrajectoryPoint
+        ik_options["return_full_configuration"] = False
+        # NOTE: The PyBullet IK function is responsible for performing collision checking for this planning function
+        # The ["check_collision"] in options is passed also to the ik_options
 
         # Getting the joint names this way ensures that the joint order is consistent with Semantics
         joint_names = robot.get_configurable_joint_names(group)
@@ -407,30 +417,52 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         trajectory.points.append(
             JointTrajectoryPoint(joint_values=joint_values, joint_types=joint_types, joint_names=joint_names)
         )
+
+        # Echo target_mode
+        if options["verbose"]:
+            print("Target Mode is: {}. Interpolation will happen with this reference".format(waypoints.target_mode))
+
         # First frame is obtained from the start configuration with forward kinematics
-        start_frame = planner.forward_kinematics(start_state, group, options)  # type: Frame
+        fk_options = options.copy()
+        fk_options["link"] = robot.get_end_effector_link_name(group)
+        start_frame_pcf = planner.forward_kinematics(start_state, group, fk_options)  # type: Frame
+        # This frame reference need to match with the target_mode of the waypoints
+        start_frame = None  # type: Frame
+        if waypoints.target_mode == TargetMode.TOOL:
+            tool_id = start_state.get_attached_tool_id(group)
+            start_frame = planner.from_pcf_to_tcf([start_frame_pcf], tool_id)[0]
+        elif waypoints.target_mode == TargetMode.WORKPIECE:
+            workpiece_id = start_state.get_attached_workpiece_ids(group)[0]
+            start_frame = planner.from_pcf_to_ocf([start_frame_pcf], workpiece_id)[0]
+        elif waypoints.target_mode == TargetMode.ROBOT:
+            start_frame = start_frame_pcf
+        else:
+            raise NotImplementedError(
+                "TargetMode ({}) not supported by PyBulletPlanCartesianMotion".format(waypoints.target_mode)
+            )
         if options["verbose"]:
             print("Start frame: {}".format(start_frame))
+
+        # Begin the interpolation, i iterates over the segments, j iterates over the interpolation steps
+        # NOTE: The interpolation happens with the target_frames (in which ever reference they are specified by waypoint.target_mode)
+        # NOTE: The PyBullet IK function is responsible for converting the target_frames to PCF and solve for that.
         for i in range(len(waypoints.target_frames)):
             # Calculate interpolation steps based on distance and angle
-            # Start frame is the end frame of the previous segment
+            # NOTE: Start frame for this segment is the end frame of the previous segment
             end_frame = waypoints.target_frames[i]  # type: Frame
-            interpolation_total_distance = start_frame.point.distance_to_point(end_frame.point)
-            delta_frame = start_frame.to_local_coordinates(end_frame)
-            _, interpolation_total_angle = axis_angle_from_quaternion(Quaternion.from_frame(delta_frame))
-            steps_by_distance = ceil(interpolation_total_distance / options["max_step_distance"])
-            steps_by_angle = ceil(interpolation_total_angle / options["max_step_angle"])
-            interpolation_steps = max(steps_by_distance, steps_by_angle, 1)
+
+            # Create interpolation helper object
+            interpolator = FrameInterpolator(start_frame, end_frame, options)
+
             if options["verbose"]:
                 print(
-                    "Segment {} of {}, Interpolating {} steps between {} and {}, distance={} requiring {} steps.".format(
+                    "Segment {} of {}, Interpolating between {} and {}, distance={} requiring {} steps.".format(
                         i + 1,
                         len(waypoints.target_frames),
-                        interpolation_steps,
                         start_frame,
                         end_frame,
-                        interpolation_total_distance,
-                        interpolation_steps,
+                        interpolator.total_distance,
+                        interpolator.regular_interpolation_steps,
                     )
                 )
 
@@ -439,22 +471,24 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
             # Intermediary values can be added during interpolation if joint jump is too large
             interpolation_ts = []
             # The first number is zero, which correspond to the starting config
-            for j in range(interpolation_steps + 1):
-                interpolation_ts.append(j / interpolation_steps)
+            # The first IK will skip this value and start from the second value (where j = 1)
+            for j in range(interpolator.regular_interpolation_steps + 1):
+                interpolation_ts.append(j / interpolator.regular_interpolation_steps)
 
             # Iterative IK with sub-division of the interpolation
             j = 1
             while j < len(interpolation_ts):
                 # Compute the interpolated frame
-                current_frame = start_frame.interpolate_frame(end_frame, interpolation_ts[j])
-                # Prepare the input for IK
-                target = FrameTarget(current_frame)
+                current_frame = interpolator.get_interpolated_frame(interpolation_ts[j])
+
+                # Prepare the Intermediate State and Target for IK
+                target = FrameTarget(
+                    current_frame,
+                    target_mode=waypoints.target_mode,
+                    tolerance_position=waypoints.tolerance_orientation,
+                    tolerance_orientation=waypoints.tolerance_orientation,
+                )
                 intermediate_state.robot_configuration.joint_values = trajectory.points[-1].joint_values
-                # Note that the PyBullet IK also performs collision checking
-                # Note that the PyBullet IK is gradient based and will snap to the nearest configuration of the start state
-                # Note that we are running this IK solver without random search (max_results = 1) to ensure determinism
-                # In this mode, planner.inverse_kinematics() will raise an InverseKinematicsError if no IK solution is found,
-                # or CollisionCheckError if the configuration is found but in collision.
                 if options["verbose"]:
                     print(
                         "Segment {} of {}, j={}, t = {}, Interpolated Frame = {}".format(
@@ -462,11 +496,13 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                         )
                     )
 
-                # Perform Inverse Kinematics
+                # Call Inverse Kinematics function from planner
                 try:
                     # Try block to catch InverseKinematicsError, if IK failed, planning is stopped
-                    configuration = planner.inverse_kinematics(target, intermediate_state, group, options)
+                    configuration = planner.inverse_kinematics(target, intermediate_state, group, ik_options)
                     new_joint_positions = [configuration[joint_name] for joint_name in joint_names]
+
+                # Catch the InverseKinematicsError and CollisionCheckError and re-raise them with additional information
                 except InverseKinematicsError as e:
                     message = "plan_cartesian_motion_frame_waypoints(): Segment {}, Inverse Kinematics failed at t={}.\n".format(
                         i, interpolation_ts[j]
@@ -496,15 +532,12 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                     )
                 except MPMaxJumpError as e:
                     # Check if further subdivision is possible
-                    delta_t = interpolation_ts[j] - interpolation_ts[j - 1]
-                    delta_distance = interpolation_total_distance * delta_t
-                    delta_angle = interpolation_total_angle * delta_t
+                    delta_distance, delta_angle, subdivision_possible = interpolator.check_if_subdivision_possible(
+                        interpolation_ts[j - 1], interpolation_ts[j]
+                    )
+
                     #  If it is not possible to subdivide, raise an error and stop planning
-                    if (
-                        delta_distance < options["min_step_distance"] * 2
-                        and delta_angle < options["min_step_angle"] * 2
-                    ):
-                        # The subdivision is not possible when the current step's distance is less than min_step
+                    if not subdivision_possible:
                         # Raise the error with additional information about the interpolation
                         message = "plan_cartesian_motion_frame_waypoints(): Segment {} of {}, Joint jump between t={} and t={} is too large.\n  -  {}".format(
                             i + 1, len(waypoints.target_frames), interpolation_ts[j - 1], interpolation_ts[j], e.message
@@ -641,3 +674,141 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                         value_difference=diff,
                         value_threshold=max_jump_prismatic,
                     )
+
+
+class FrameInterpolator(object):
+    """A helper class to interpolate between two frames
+
+    All the properties are read-only and are computed during initialization.
+
+    Parameters
+    ----------
+    start_frame : :class:`compas.geometry.Frame`
+        The start frame.
+    end_frame : :class:`compas.geometry.Frame`
+        The end frame.
+    options : dict
+        Dictionary should contain the following key-value pairs:
+
+        - ``"max_step_distance"``: (:obj:`float`, optional)
+        - ``"max_step_angle"``: (:obj:`float`, optional)
+        - ``"min_step_distance"``: (:obj:`float`, optional)
+        - ``"min_step_angle"```: (:obj:`float`, optional)
+
+    """
+
+    def __init__(self, start_frame, end_frame, options):
+        # type: (Frame, Frame, Dict) -> None
+        self.start_frame = start_frame
+        self.end_frame = end_frame
+        self.options = options
+
+        # Compute the total distance between the two frames
+        self._total_distance = self.start_frame.point.distance_to_point(self.end_frame.point)
+
+        # Compute the total angle between the two frames
+        delta_frame = self.start_frame.to_local_coordinates(self.end_frame)
+        _, self._total_angle = axis_angle_from_quaternion(Quaternion.from_frame(delta_frame))
+
+        # Compute the number of steps based on max_step_distance and max_step_angle
+        num_steps_by_distance = ceil(self._total_distance / self.options["max_step_distance"])
+        num_steps_by_angle = ceil(self._total_angle / self.options["max_step_angle"])
+        # NOTE: Minimum of 1 step is used, this step is equal to the end_frame itself.
+        self._regular_interpolation_steps = max(num_steps_by_distance, num_steps_by_angle, 1)
+
+    @property
+    def total_distance(self):
+        # type: () -> float
+        """The total distance between the start and end frames.
+
+        Returns
+        -------
+        float
+            The total distance (original unit) between the start and end frames.
+
+        """
+        return self._total_distance
+
+    @property
+    def total_angle(self):
+        # type: () -> float
+        """Tthe total angle between the start and end frames.
+
+        Returns
+        -------
+        float
+            The total angle in radians between the start and end frames.
+
+        """
+        return self._total_angle
+
+    @property
+    def regular_interpolation_steps(self):
+        # type: () -> int
+        """The number of interpolation steps based on max_step_distance and max_step_angle.
+
+        Returns
+        -------
+        int
+            The number of interpolation steps.
+            Minimum is 1.
+
+        """
+
+        return self._regular_interpolation_steps
+
+    def get_interpolated_frame(self, t):
+        # type: (float) -> Frame
+        """Interpolate between two frames using a parameter t.
+
+        Parameters
+        ----------
+        t : float
+            The interpolation parameter, 0 <= t <= 1.
+
+        Returns
+        -------
+        :class:`compas.geometry.Frame`
+            The interpolated frame.
+
+        """
+        # Compute the interpolated frame
+        current_frame = self.start_frame.interpolate_frame(self.end_frame, t)
+        return current_frame
+
+    def check_if_subdivision_possible(self, t1, t2):
+        # type: (float, float) -> bool
+        """Check if the addition of an extra t value between t1 and t2 is possible.
+
+        Two conditions are being checked:
+
+        1. The distance between the two frames is greater than the `min_step_distance`.
+        2. The angle between the two frames is greater than the `min_step_angle`.
+
+        The subdivision is possible if any one of the two conditions is met.
+
+        Parameters
+        ----------
+        t1 : float
+            The start parameter.
+        t2 : float
+            The end parameter.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the following values:
+
+            - ``delta_distance``: (:obj:`float`) The distance between the two frames.
+            - ``delta_angle``: (:obj:`float`) The angle between the two frames.
+            - ``subdivision_possible``: (:obj:`bool`) True if the subdivision is possible
+        """
+        delta_t = abs(t2 - t1)
+
+        delta_distance = self.total_distance * delta_t
+        delta_angle = self.total_angle * delta_t
+
+        if delta_distance < self.options["min_step_distance"] * 2 and delta_angle < self.options["min_step_angle"] * 2:
+            return (delta_distance, delta_angle, False)
+
+        return (delta_distance, delta_angle, True)

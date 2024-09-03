@@ -1,6 +1,6 @@
 import compas
 
-from compas_fab.backends.interfaces.client import PlannerInterface
+from compas_fab.backends.interfaces.planner import PlannerInterface
 
 from compas_fab.backends.pybullet.backend_features import *
 

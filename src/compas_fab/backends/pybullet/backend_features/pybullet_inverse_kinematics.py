@@ -50,7 +50,7 @@ __all__ = [
 class PyBulletInverseKinematics(InverseKinematics):
     """Mix-in functions to calculate the robot's inverse kinematics for a given target."""
 
-    def inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
+    def inverse_kinematics(self, target, robot_cell_state, group=None, options=None):
         # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Configuration
         """Calculate the robot's inverse kinematic for a given frame.
 
@@ -76,11 +76,12 @@ class PyBulletInverseKinematics(InverseKinematics):
             The robot instance for which inverse kinematics is being calculated.
         target : :class:`compas_fab.robots.FrameTarget` or :class:`compas_fab.robots.PointAxisTarget`
             The target to calculate the inverse kinematics for.
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`, optional
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
             The starting state to calculate the inverse kinematics for.
             The robot's configuration in the scene is taken as the starting configuration.
         group : str, optional
             The planning group used for calculation.
+            Defaults to the robot's main planning group.
         options : dict, optional
             Dictionary containing kwargs for arguments specific to
             the underlying function being called.
@@ -97,25 +98,72 @@ class PyBulletInverseKinematics(InverseKinematics):
             The calculated configuration.
 
         """
+        # Set default group name
+        planner = self  # type: PyBulletPlanner
+        group = group or planner.client.robot.main_group_name
+
         # The caching mechanism is implemented in the iter_inverse_kinematics method
         # located in InverseKinematics class. This method is just a wrapper around it
         # so that Intellisense and Docs can point here.
         configuration = super(PyBulletInverseKinematics, self).inverse_kinematics(
             target, robot_cell_state, group, options
         )
-        self._check_configuration_match_group(robot_cell_state.robot_configuration, configuration, group)
+
+        # NOTE: The following check is a workaround to detect planning group that are not supported by PyBullet.
+        #       In those cases, some joints outside of the group will be changed inadvertently.
+        start_configuration = robot_cell_state.robot_configuration
+        self._check_configuration_match_group(start_configuration, configuration, group)
         return configuration
 
-    def iter_inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
+    def iter_inverse_kinematics(self, target, robot_cell_state, group=None, options=None):
         # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
+        """Calculate the robot's inverse kinematic for a given target.
+
+        Parameters
+        ----------
+        target: :class:`compas.geometry.FrameTarget`
+            The Frame Target to calculate the inverse for.
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+            The starting state to calculate the inverse kinematics for.
+        group: str, optional
+            The planning group used for determining the end effector and labeling
+            the ``start_configuration``. Defaults to the robot's main planning group.
+        options: dict, optional
+            Dictionary containing the following key-value pairs:
+
+        """
+        options = options or {}
+
+        # ===================================================================================
+        # The following lines should be typical in all planners' iter_inverse_kinematics method
+        # ===================================================================================
+
+        planner = self  # type: PyBulletPlanner
+        robot = planner.client.robot  # type: Robot
+        group = group or robot.main_group_name
+
+        # Unit conversion from user scale to meter scale can be done here because they are shared.
+        # This will be triggered too, when entering from the inverse_kinematics method.
+
+        # However, if the entry point of this IK function is from a planning function,
+        # the scaling should be done in the entry point function, not here.
+        if not options.get("_skip_ik_input_scaling"):
+            target = self._scale_input_target(target)
+
+        # Check if the robot cell state supports the target mode
+        planner.ensure_robot_cell_state_supports_target_mode(robot_cell_state, target.target_mode, group)
+
+        # ===================================================================================
+        # End of common lines
+        # ===================================================================================
 
         if isinstance(target, FrameTarget):
             return self.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
         else:
             raise NotImplementedError("{} is not supported by PyBulletInverseKinematics".format(type(target)))
 
-    def iter_inverse_kinematics_frame_target(self, target, robot_cell_state=None, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
+    def iter_inverse_kinematics_frame_target(self, target, robot_cell_state, group, options=None):
+        # type: (FrameTarget, RobotCellState, str, Optional[Dict]) -> Generator[Configuration | None]
         """Calculate the robot's inverse kinematic for a given FrameTarget.
 
         The PyBullet inverse kinematics solver make use of the gradient descent IK solver
@@ -136,9 +184,9 @@ class PyBulletInverseKinematics(InverseKinematics):
         ----------
         target: :class:`compas.geometry.FrameTarget`
             The Frame Target to calculate the inverse for.
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`, optional
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
             The starting state to calculate the inverse kinematics for.
-        group: str, optional
+        group: str
             The planning group used for determining the end effector and labeling
             the ``start_configuration``. Defaults to the robot's main planning group.
         options: dict, optional
@@ -197,7 +245,6 @@ class PyBulletInverseKinematics(InverseKinematics):
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
         robot = client.robot  # type: Robot
-        group = group or robot.main_group_name
 
         high_accuracy = options.get("high_accuracy", True)
         max_results = options.get("max_results", 100)
@@ -215,22 +262,18 @@ class PyBulletInverseKinematics(InverseKinematics):
         robot_cell_state = robot_cell_state.copy()  # Make a copy to avoid modifying the original
         planner.set_robot_cell_state(robot_cell_state)
 
-        # Pre-process target frame
-        target = self._scale_input_target(target)
-        target_frame = target.target_frame
-
         # TODO: Implement a fail fast mechanism to check if the attached tool and objects are in collision
 
         # Transform Tool Coordinate Frame if there are tools attached
-        attached_tool_id = robot_cell_state.get_attached_tool_id(group)
-        if attached_tool_id:
-            target_frame = planner.from_tcf_to_pcf([target_frame], attached_tool_id)[0]
+        target_frame = target.target_frame
+        target_mode = target.target_mode
+        target_pcf = planner.frames_to_pcf(target_frame, target_mode, group)
 
         # Formatting input for PyBullet
         body_id = client.robot_puid
         # Note: The target link is the last link in semantics.groups[group]["links"][-1]
         link_id = client.robot_link_puids[robot.get_end_effector_link_name(group)]
-        point, orientation = pose_from_frame(target_frame)
+        point, orientation = pose_from_frame(target_pcf)
 
         # Get list of joint_name and puids in order
         joint_names_and_puids = client.get_pose_joint_names_and_puids()
@@ -394,7 +437,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # If no solution was found after max_results, raise an error
         if len(solutions) == 0:
             raise InverseKinematicsError(
-                "No solution found after {} attempts (max_results).".format(max_results), target_pcf=target_frame
+                "No solution found after {} attempts (max_results).".format(max_results), target_pcf=target_pcf
             )
 
     def _accurate_inverse_kinematics(self, joint_ids_sorted, threshold, max_iter, verbose=False, **kwargs):

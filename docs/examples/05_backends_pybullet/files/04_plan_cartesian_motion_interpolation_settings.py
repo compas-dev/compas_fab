@@ -6,7 +6,7 @@ from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import RobotCellLibrary
-from compas_fab.robots import RobotCellState
+from compas_fab.robots import TargetMode
 
 from _pybullet_demo_helper import trajectory_replay
 
@@ -24,7 +24,7 @@ with PyBulletClient("gui") as client:
     target_frames = []
     target_frames.append(Frame([0.4, 0.1, 0.5], [1.0, 1.0, 0.0], [1.0, -1.0, 0.0]))
     target_frames.append(Frame([0.4, 0.1, 0.5], [1.0, 0.0, 0.0], [0.0, -1.0, 0.0]))
-    waypoints = FrameWaypoints(target_frames)
+    waypoints = FrameWaypoints(target_frames, target_mode=TargetMode.TOOL)
 
     # -------------------------------------------------------
     # Example 1 - Plan Cartesian Motion with default settings
@@ -32,7 +32,7 @@ with PyBulletClient("gui") as client:
     # The following trajectory will have very few points because rotation around Z axis has virtually no distance
     trajectory = planner.plan_cartesian_motion(waypoints, robot_cell_state)
 
-    print("Planned trajectory with default settings has {} points.".format(len(trajectory.points)))
+    print("Example 1: Planned trajectory with default settings has {} points.".format(len(trajectory.points)))
 
     # --------------------------------------------------------
     # Example 2 - Controlling max_step_angle
@@ -42,7 +42,7 @@ with PyBulletClient("gui") as client:
     options = {"max_step_angle": 0.017}  # Roughly 1 degree
     trajectory = planner.plan_cartesian_motion(waypoints, robot_cell_state, options=options)
     # The frame is rotated by 90 degrees in total, so the trajectory should have roughly 90 points
-    print("Planned trajectory with max_step_angle=0.017 has {} points.".format(len(trajectory.points)))
+    print("Example 2: Planned trajectory with max_step_angle=0.017 has {} points.".format(len(trajectory.points)))
 
     # --------------------------------------------------------
     # Example 3 - Controlling max_jump_revolute
@@ -55,7 +55,7 @@ with PyBulletClient("gui") as client:
     options = {"max_jump_revolute": 0.087}  # Roughly 5 degrees
     # This means between each point, no revolute joint will move more than 5 degrees
     trajectory = planner.plan_cartesian_motion(waypoints, robot_cell_state, options=options)
-    print("Planned trajectory with max_jump_revolute=0.1 has {} points.".format(len(trajectory.points)))
+    print("Example 3: Planned trajectory with max_jump_revolute=0.1 has {} points.".format(len(trajectory.points)))
 
     # ------------------------------------------------
     # Replay the trajectory in the PyBullet simulation

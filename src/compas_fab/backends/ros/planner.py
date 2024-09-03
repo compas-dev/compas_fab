@@ -7,7 +7,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas_fab.backends.interfaces.client import PlannerInterface
+from compas_fab.backends.interfaces.planner import PlannerInterface
 
 from compas_fab.backends.ros.backend_features import MoveItResetPlanningScene
 from compas_fab.backends.ros.backend_features.move_it_add_attached_collision_mesh import MoveItAddAttachedCollisionMesh

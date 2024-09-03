@@ -13,6 +13,7 @@ from compas_fab.robots import RobotLibrary
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
+from compas_fab.robots import TargetMode
 from compas_fab.backends import InverseKinematicsError
 from compas_fab.backends import PlanningGroupNotSupported
 from compas_robots import Configuration
@@ -156,7 +157,7 @@ def _test_pybullet_ik_fk_agreement(robot, ik_target_frames):
 
                 ik_result = next(
                     planner.iter_inverse_kinematics(
-                        FrameTarget(ik_target_frame),
+                        FrameTarget(ik_target_frame, target_mode=TargetMode.ROBOT),
                         RobotCellState.from_robot_configuration(robot),
                         group=planning_group,
                         options=ik_options,
@@ -291,7 +292,7 @@ def test_pybullet_ik_out_of_reach_ur5():
             try:
                 # Note: The inverse_kinematics method returns a generator
                 planner.inverse_kinematics(
-                    FrameTarget(ik_target_frame),
+                    FrameTarget(ik_target_frame, target_mode=TargetMode.ROBOT),
                     RobotCellState.from_robot_configuration(robot),
                     group=planning_group,
                     options=ik_options,
@@ -311,7 +312,7 @@ def test_pybullet_ik_return_full_configuration():
         xaxis=Vector(x=0.0, y=1.0, z=-0.0),
         yaxis=Vector(x=0.0, y=0.0, z=-1.0),
     )
-    target = FrameTarget(ik_target_frame)
+    target = FrameTarget(ik_target_frame, TargetMode.ROBOT)
 
     with PyBulletClient(connection_type="direct") as client:
         planner = PyBulletPlanner(client)
@@ -408,7 +409,7 @@ def test_pybullet_ik_group():
         xaxis=Vector(x=0.0, y=1.0, z=-0.0),
         yaxis=Vector(x=0.0, y=0.0, z=-1.0),
     )
-    target = FrameTarget(ik_target_frame)
+    target = FrameTarget(ik_target_frame, TargetMode.ROBOT)
     options = {"return_full_configuration": True}
     with PyBulletClient(connection_type="direct") as client:
         planner = PyBulletPlanner(client)
