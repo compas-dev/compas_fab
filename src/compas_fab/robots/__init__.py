@@ -137,6 +137,7 @@ from .robot_library import (
     RobotLibrary,
     ToolLibrary,
     RobotCellLibrary,
+    RigidBodyLibrary,
 )
 from .semantics import (
     RobotSemantics,
@@ -193,6 +194,7 @@ __all__ = [
     "DeviationVectorsGenerator",
     "OrthonormalVectorsFromAxisGenerator",
     "RigidBody",
+    "RigidBodyLibrary",
     "RigidBodyState",
     "Robot",
     "RobotCell",

@@ -31,6 +31,7 @@ __all__ = [
     "RobotLibrary",
     "ToolLibrary",
     "RobotCellLibrary",
+    "RigidBodyLibrary",
 ]
 
 
@@ -282,7 +283,7 @@ class ToolLibrary(object):
 
     @classmethod
     def cone(cls, load_geometry=True, radius=0.02, length=0.1):
-        # type: (Optional[bool]) -> ToolModel
+        # type: (Optional[bool], Optional[float], Optional[float]) -> ToolModel
         """Create and return a cone as ToolModel, useful for simulating a drawing tool.
 
         The cone points towards the positive X-axis of the tool frame.
@@ -680,6 +681,30 @@ class RobotCellLibrary(object):
         return robot_cell, robot_cell_state
 
 
+class RigidBodyLibrary(object):
+
+    @classmethod
+    def target_marker(cls, size=1.0):
+        # type: (Optional[float]) -> RigidBody
+        """Create and return a target marker as RigidBody, useful for visualizing the target pose.
+
+        The target marker points out the X, Y, Z directions with its shape.
+        It is fully contained within a cube in the positive octant of the target frame.
+        The size of the cube is determined by the input size.
+
+        The marker has only one visual mesh, and no collision mesh.
+        """
+
+        # Load the target marker mesh
+        obj = compas_fab.get("planning_scene/target_marker.obj")
+        mesh = Mesh.from_obj(obj)
+
+        # Scale the target marker to the desired size
+        mesh.scale(size)
+
+        return RigidBody([mesh], [])
+
+
 if __name__ == "__main__":
     # robot = RobotLibrary.rfl(load_geometry=True)
     # robot.info()
@@ -704,6 +729,9 @@ if __name__ == "__main__":
     # model = robot.model
     model = ToolLibrary.static_gripper(load_geometry=True)
     robot_object = viewer.scene.add(model, show_lines=False)  # type: RobotModelObject
+
+    marker = RigidBodyLibrary.target_marker(size=0.5)
+    marker_object = viewer.scene.add(marker.visual_meshes[0], show_lines=False)
 
     viewer.show()
 
