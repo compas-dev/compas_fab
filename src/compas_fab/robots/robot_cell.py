@@ -189,7 +189,7 @@ class RigidBody(Data):
         collision_meshes : list of :class:`compas.datastructures.Mesh` | :class:`compas.datastructures.Mesh`
             The collision meshes of the rigid body used for collision checking.
             They should be less detailed (fewer polygons) for better planning performance.
-            If this list is empty, the visual meshes will be used for collision checking.
+            If `None`, or an empty list is passed, no collision checking will be performed for the rigid body.
 
         Attributes
         ----------
@@ -201,8 +201,9 @@ class RigidBody(Data):
         # type: (str, List[Mesh], List[Mesh]) -> None
         super(RigidBody, self).__init__()
 
+        # If None is provided, we change that to an empty list
         if not visual_meshes:
-            # Default to an empty list
+            # If no input, set it to an empty list
             self.visual_meshes = []
         elif not isinstance(visual_meshes, list):
             # Ensure that it is a list
@@ -211,7 +212,7 @@ class RigidBody(Data):
             self.visual_meshes = visual_meshes
 
         if not collision_meshes:
-            # Default to an empty list
+            # If no input, set it to an empty list
             self.collision_meshes = []
         elif not isinstance(collision_meshes, list):
             # Ensure that it is a list
@@ -225,20 +226,6 @@ class RigidBody(Data):
             "visual_meshes": self.visual_meshes,
             "collision_meshes": self.collision_meshes,
         }
-
-    @property
-    def get_collision_meshes(self):
-        # type: () -> List[Mesh]
-        """Get the collision meshes of the rigid body.
-
-        If the collision meshes are not provided (the list if empty), the visual meshes will be returned.
-
-        Returns
-        -------
-        List[Mesh]
-            The collision meshes of the rigid body.
-        """
-        return self.collision_meshes or self.visual_meshes
 
 
 class RobotCellState(Data):
