@@ -354,17 +354,41 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def add_rigid_body(self, name, rigid_body, concavity=False, mass=const.STATIC_MASS):
         # type: (str, RigidBody, bool, float) -> int
-        tmp_obj_path = os.path.join(self._cache_dir.name, "{}.obj".format(rigid_body.guid))
 
-        # Rigid bodies can have multiple meshes in them, at the moment we join them together as a single mesh
-        # If there are problems with this, we can change it to exporting individual obj files per mesh to Pybullet
-        mesh = Mesh()
-        for m in rigid_body.get_collision_meshes:
-            mesh.join(m, precision=12)
-        mesh.to_obj(tmp_obj_path)
+        # NOTE: Rigid bodies can have multiple meshes in them, at the moment we join them together as a single mesh
+        #       If there are problems with this, we can change it to exporting individual obj files per mesh to Pybullet
 
-        tmp_obj_path = self._handle_concavity(tmp_obj_path, self._cache_dir.name, concavity, mass)
-        pyb_body_id = self.body_from_obj(tmp_obj_path, concavity=concavity, mass=mass)
+        # def meshes_to_exported_obj(meshes, temp_file_suffix):
+        #     mesh = Mesh()
+        #     for m in meshes:
+        #         mesh.join(m, precision=12)
+        #     mesh.to_obj(filename)
+
+        # Visual Meshes
+        if rigid_body.visual_meshes is None or rigid_body.visual_meshes == []:
+            visual_path = None
+        else:
+            visual_mesh = Mesh()
+            for m in rigid_body.visual_meshes:
+                visual_mesh.join(m, precision=12)
+            visual_path = os.path.join(self._cache_dir.name, "{}_visual.obj".format(rigid_body.guid))
+            visual_mesh.to_obj(visual_path)
+
+            visual_path = self._handle_concavity(visual_path, self._cache_dir.name, concavity, mass)
+
+        # Collision Meshes
+        if rigid_body.collision_meshes is None or rigid_body.collision_meshes == []:
+            collision_path = None
+        else:
+            collision_mesh = Mesh()
+            for m in rigid_body.collision_meshes:
+                collision_mesh.join(m, precision=12)
+            collision_path = os.path.join(self._cache_dir.name, "{}_collision.obj".format(rigid_body.guid))
+            collision_mesh.to_obj(collision_path)
+
+            collision_path = self._handle_concavity(collision_path, self._cache_dir.name, concavity, mass)
+
+        pyb_body_id = self.body_from_obj(visual_path, collision_path, concavity=concavity, mass=mass)
 
         # Record the body id in the dictionary
         assert not pyb_body_id == -1, "Error in creating rigid body in PyBullet. Returning ID is -1."
@@ -834,13 +858,24 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             pybullet.vhacd(tmp_obj_path, tmp_vhacd_obj_path, tmp_log_path)
         return tmp_vhacd_obj_path
 
-    def body_from_obj(self, path, scale=1.0, concavity=False, mass=const.STATIC_MASS, collision=True, color=const.GREY):
+    def body_from_obj(
+        self,
+        visual_path=None,
+        collision_path=None,
+        scale=1.0,
+        concavity=False,
+        mass=const.STATIC_MASS,
+        color=const.GREY,
+    ):
         """Create a PyBullet body from an OBJ file.
 
         Parameters
         ----------
-        path : :obj:`str`
-            Path to the OBJ file.
+        visual_path : :obj:`str`
+            Path to the OBJ file for the visual representation.
+        collision_path : :obj:`str`
+            Path to the OBJ file for the collision representation.
+            If None, there will be no collision detection for the object.
         scale : :obj:`float`, optional
             Factor by which to scale the mesh. Defaults to ``1.``
         concavity : :obj:`bool`, optional
@@ -850,8 +885,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         mass : :obj:`float`, optional
             Mass of the body to be created, in kg.  If `0` mass is given (the default),
             the object is static.
-        collision : :obj:`bool`
-            When ``True``, body will be included in collision checking calculations. Defaults to ``True``.
         color : :obj:`tuple` of :obj:`float`
             RGBa color components of the body.
 
@@ -860,13 +893,22 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         :obj:`int`
         """
         concavity &= mass == const.STATIC_MASS
-        geometry_args = self._get_geometry_args(path, concavity=concavity, scale=scale)
 
-        collision_args = self._get_collision_args(geometry_args)
-        collision_id = self._create_collision_shape(collision_args) if collision else const.NULL_ID
+        # Visual Meshes
+        if visual_path:
+            geometry_args = self._get_geometry_args(visual_path, concavity=concavity, scale=scale)
+            visual_args = self._get_visual_args(geometry_args, color=color)
+            visual_id = self._create_visual_shape(visual_args)
+        else:
+            visual_id = const.NULL_ID
 
-        visual_args = self._get_visual_args(geometry_args, color=color)
-        visual_id = self._create_visual_shape(visual_args)
+        # Collision Meshes
+        if collision_path:
+            geometry_args = self._get_geometry_args(collision_path, concavity=concavity, scale=scale)
+            collision_args = self._get_collision_args(geometry_args)
+            collision_id = self._create_collision_shape(collision_args)
+        else:
+            collision_id = const.NULL_ID
 
         body_id = self._create_body(collision_id, visual_id, mass=mass)
         return body_id
