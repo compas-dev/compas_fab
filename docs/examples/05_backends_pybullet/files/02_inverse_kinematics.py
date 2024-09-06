@@ -6,6 +6,7 @@ from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotLibrary
+from compas_fab.robots import TargetMode
 
 with PyBulletClient() as client:
     # Create a robot cell with a UR5 robot
@@ -22,7 +23,7 @@ with PyBulletClient() as client:
     # The FrameTarget represents the robot's planner coordinate frame (PCF)
     # For the UR5 robot, the PCF is equal to the frame of the 'tool0' link
     frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
-    target = FrameTarget(frame_WCF)
+    target = FrameTarget(frame_WCF, TargetMode.ROBOT)
     config = planner.inverse_kinematics(target, robot_cell_state)
 
     print("Inverse kinematics result: ", config)

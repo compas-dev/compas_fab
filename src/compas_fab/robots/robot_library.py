@@ -491,7 +491,7 @@ class RobotCellLibrary(object):
 
         # Static Floor as Collision Geometry
         floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-        robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh)
+        robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh, floor_mesh)
 
         # ------------------------------------------------------------------------
         # Create RobotCellState
@@ -563,11 +563,12 @@ class RobotCellLibrary(object):
         beam = Box.from_corner_corner_height(
             [0.0, -0.1, -beam_length * 0.5], [0.2, 0.1, -beam_length * 0.5], beam_length
         )
-        robot_cell.rigid_body_models["beam"] = RigidBody(Mesh.from_shape(beam))
+        beam_mesh = Mesh.from_shape(beam)
+        robot_cell.rigid_body_models["beam"] = RigidBody(beam_mesh, beam_mesh)
 
         # Static Floor as Collision Geometry
         floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-        robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh)
+        robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh, floor_mesh)
 
         # ------------------------------------------------------------------------
         # Create RobotCellState
@@ -632,11 +633,12 @@ class RobotCellLibrary(object):
         beam = Box.from_corner_corner_height(
             [0.0, -0.05, -beam_length * 0.5], [0.1, 0.05, -beam_length * 0.5], beam_length
         )
-        robot_cell.rigid_body_models["beam"] = RigidBody(Mesh.from_shape(beam))
+        beam_mesh = Mesh.from_shape(beam)
+        robot_cell.rigid_body_models["beam"] = RigidBody(beam_mesh, beam_mesh)
 
         # Static Floor as Collision Geometry
         floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-        robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh)
+        robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh, floor_mesh)
 
         # ------------------------------------------------------------------------
         # Create RobotCellState

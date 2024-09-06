@@ -17,6 +17,9 @@ with PyBulletClient() as client:
     cone = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
     robot_cell.rigid_body_models["cone"] = RigidBody(cone)
 
+    target_marker = Mesh.from_obj(compas_fab.get("planning_scene/target_marker.obj"))
+    robot_cell.rigid_body_models["target_marker"] = RigidBody(target_marker)
+
     # The planner object is needed to pass the robot cell into the PyBullet client
     planner = PyBulletPlanner(client)
     planner.set_robot_cell(robot_cell)

@@ -6,6 +6,7 @@ from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotLibrary
+from compas_fab.robots import TargetMode
 
 with PyBulletClient() as client:
     # This example uses the panda robot, which has 7 joints.
@@ -23,7 +24,7 @@ with PyBulletClient() as client:
 
     # Create target
     frame_WCF = Frame([0.5, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
-    target = FrameTarget(frame_WCF)
+    target = FrameTarget(frame_WCF, TargetMode.ROBOT)
 
     # The following demonstration shows that calling inverse_kinematics()
     # multiple times with exactly the same input will return different solutions
