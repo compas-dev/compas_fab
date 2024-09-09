@@ -142,7 +142,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         options = options or {}
         planner = self  # type: AnalyticalKinematicsPlanner
-        robot = planner.robot_cell.robot  # type: Robot
+        robot = planner.client.robot_cell.robot  # type: Robot
         solver = planner.kinematics_solver
 
         keep_order = options.get("keep_order", False)

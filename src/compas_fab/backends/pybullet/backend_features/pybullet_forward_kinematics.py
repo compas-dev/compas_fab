@@ -97,7 +97,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
             fk_frame = client._get_link_frame(link_id, client.robot_puid)
 
             # If no link name provided, and a tool is attached to the group, return the tool tip frame of the tool
-            robot_cell = planner.robot_cell  # type: RobotCell
+            robot_cell = client.robot_cell  # type: RobotCell
             if robot_cell:
                 attached_tool_id = robot_cell_state.get_attached_tool_id(group)
                 if attached_tool_id:

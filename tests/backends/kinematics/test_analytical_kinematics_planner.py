@@ -17,6 +17,7 @@ from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotCell
 from compas_fab.robots import FrameTarget
+from compas_fab.robots import TargetMode
 
 
 if not compas.IPY:
@@ -59,7 +60,9 @@ def test_forward_kinematics(ur5_planner_no_geo):
 def test_iter_inverse_kinematics(ur5_planner_no_geo):
 
     # This target has eight solutions (without CC)
-    target = FrameTarget(Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269)))
+    target = FrameTarget(
+        Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269)), TargetMode.ROBOT
+    )
 
     # The `iter_inverse_kinematics` method will return an iterator that yields all possible solutions
     start_state = RobotCellState.from_robot_cell(ur5_planner_no_geo.robot_cell)
@@ -71,7 +74,9 @@ def test_iter_inverse_kinematics(ur5_planner_no_geo):
 
 
 def test_inverse_kinematics(ur5_planner_no_geo):
-    target = FrameTarget(Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269)))
+    target = FrameTarget(
+        Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269)), TargetMode.ROBOT
+    )
     start_state = RobotCellState.from_robot_cell(ur5_planner_no_geo.robot_cell)
 
     # Test to confirm inverse_kinematics() return one solution at a time
@@ -97,7 +102,7 @@ def forward_inverse_agreement(planner, start_state):
     # Checks if one of the IK results is the same as the original joint configuration
     close_soliution_found = False
     start_state = RobotCellState.from_robot_cell(planner.robot_cell)
-    for configuration in planner.iter_inverse_kinematics(FrameTarget(frame), start_state, group=None):
+    for configuration in planner.iter_inverse_kinematics(FrameTarget(frame, TargetMode.ROBOT), start_state, group=None):
         if configuration.close_to(starting_configuration):
             close_soliution_found = True
             print("Found a close solution: {}".format(configuration))

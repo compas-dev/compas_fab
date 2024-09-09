@@ -13,6 +13,7 @@ from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotLibrary
 from compas_fab.robots import RobotCell
 from compas_fab.robots import FrameTarget
+from compas_fab.robots import TargetMode
 
 
 with AnalyticalPyBulletClient(connection_type="gui") as client:
@@ -26,7 +27,7 @@ with AnalyticalPyBulletClient(connection_type="gui") as client:
 
     # Add Static Collision Geometry
     floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-    robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh)
+    robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
 
     # Add Tool
     tool_mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
@@ -35,7 +36,7 @@ with AnalyticalPyBulletClient(connection_type="gui") as client:
 
     # Add workpiece at tool tip
     workpiece_mesh = Box(0.5, 0.1, 0.2).to_mesh(triangulated=True)
-    robot_cell.rigid_body_models["workpiece"] = RigidBody(workpiece_mesh)
+    robot_cell.rigid_body_models["workpiece"] = RigidBody.from_mesh(workpiece_mesh)
 
     # ------------------------------------------------------------------------
     # Create a RobotCellState to represent the current state of the robot cell
@@ -56,7 +57,7 @@ with AnalyticalPyBulletClient(connection_type="gui") as client:
     # input("Press Enter to close the GUI...")
 
     frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269))
-    target = FrameTarget(frame_WCF)
+    target = FrameTarget(frame_WCF, TargetMode.TOOL)
 
     options = {"check_collision": True, "keep_order": False}
     for config in planner.iter_inverse_kinematics(target, robot_cell_state, options=options):

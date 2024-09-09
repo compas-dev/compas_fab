@@ -1,6 +1,8 @@
 from compas.geometry import Frame
 from compas_fab.robots import RobotLibrary
 from compas_fab.robots import FrameTarget
+from compas_fab.robots import TargetMode
+
 from compas_fab.backends import AnalyticalInverseKinematics
 from compas_fab.backends import AnalyticalKinematicsPlanner
 from compas_fab.backends.kinematics.solvers import UR5Kinematics
@@ -20,7 +22,7 @@ planner.set_robot_cell(robot_cell)
 
 # IK Target
 frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269))  # Frame(point, xaxis, yaxis)
-target = FrameTarget(frame_WCF)
+target = FrameTarget(frame_WCF, TargetMode.ROBOT)
 
 # The start state is not important here because there is no tools involved
 start_state = RobotCellState.from_robot_cell(robot_cell)

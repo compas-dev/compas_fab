@@ -4,6 +4,7 @@ from compas_fab.backends import PyBulletPlanner
 
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCellLibrary
+from compas_fab.robots import TargetMode
 
 with PyBulletClient() as client:
 
@@ -12,10 +13,10 @@ with PyBulletClient() as client:
     planner = PyBulletPlanner(client)
     planner.set_robot_cell(robot_cell)
 
-    # The FrameTarget represents the tool's coordinate frame (TCF) when a tool is attached
+    # Create a FrameTarget to represents the tool's coordinate frame (TCF)
     target_center_point = [0.0, 0.5, 0.5]
     frame_WCF = Frame(target_center_point, [1, 0, 0], [0, 0, -1])
-    target = FrameTarget(frame_WCF)
+    target = FrameTarget(frame_WCF, TargetMode.TOOL)
 
     config = planner.inverse_kinematics(target, robot_cell_state)
 
@@ -35,7 +36,7 @@ with PyBulletClient() as client:
     frame_WCFs.append(Frame(target_center_point, [0, -1, 0], [0, 0, -1]))
 
     for frame_WCF in frame_WCFs:
-        target = FrameTarget(frame_WCF)
+        target = FrameTarget(frame_WCF, TargetMode.TOOL)
         config = planner.inverse_kinematics(target, robot_cell_state)
         print("Inverse kinematics result: ", config)
         input("Observe the IK result in PyBullet's GUI, Press Enter to continue...")

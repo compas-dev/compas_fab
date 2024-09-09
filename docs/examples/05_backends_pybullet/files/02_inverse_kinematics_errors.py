@@ -4,6 +4,9 @@ from compas_fab.backends import PyBulletPlanner
 
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCellLibrary
+from compas_fab.robots import RigidBodyLibrary
+from compas_fab.robots import RigidBodyState
+from compas_fab.robots import TargetMode
 
 from compas_fab.backends.exceptions import InverseKinematicsError
 
@@ -12,12 +15,17 @@ with PyBulletClient() as client:
     # Load a pre-made robot cell with one tool from the RobotCellLibrary
     robot_cell, robot_cell_state = RobotCellLibrary.ur10e_gripper_one_beam()
     planner = PyBulletPlanner(client)
+
+    # Load a target marker for illustration
+    target_marker = RigidBodyLibrary.target_marker(0.5)
+    robot_cell.rigid_body_models["target_marker"] = target_marker
     planner.set_robot_cell(robot_cell)
 
-    # The FrameTarget represents the tool's coordinate frame (TCF) when a tool is attached
-    target_center_point = [0.0, 0.5, 0.15]
-    frame_WCF = Frame(target_center_point, [1, 0, 0], [0, 1, 0])
-    target = FrameTarget(frame_WCF)
+    # Choose TargetMode.WORKPIECE for the FrameTarget to directly specify the beam's location
+    beam_target_point = [0.0, 0.5, 0.01]
+    frame_WCF = Frame(beam_target_point, [0, 0, -1], [-1, 0, 0])
+    robot_cell_state.rigid_body_states["target_marker"] = RigidBodyState(frame_WCF)
+    target = FrameTarget(frame_WCF, TargetMode.WORKPIECE)
 
     # ----------------------------------------------
     # Example 1: IK without collision checking
@@ -34,7 +42,7 @@ with PyBulletClient() as client:
     # ----------------------------------------------
     try:
         # Enable the check_collision mode via options
-        options = {"check_collision": True}  # Default is True
+        options = {"check_collision": True, "max_results": 1000}  # Default is True
         config = planner.inverse_kinematics(target, robot_cell_state, options=options)
     except InverseKinematicsError as e:
         # The planner will try many times but still unable to find a solution

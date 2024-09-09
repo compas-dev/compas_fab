@@ -1612,7 +1612,7 @@ class Robot(Data):
         ...     tolerance_orientation = math.radians(1)
         ...     start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.])
         ...     group = robot.main_group_name
-        ...     target = FrameTarget(frame, tolerance_position, tolerance_orientation)
+        ...     target = FrameTarget(frame, TargetMode.ROBOT, tolerance_position, tolerance_orientation)
         ...     goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
         ...     trajectory = robot.plan_motion((target, start_configuration, group, {'planner_id': 'RRTConnect'})
         ...     print(trajectory.fraction)

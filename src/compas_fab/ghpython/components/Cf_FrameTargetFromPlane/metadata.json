@@ -14,6 +14,10 @@
                 "description": "The Rhino plane or COMPAS frame from which we create position and orientation constraints."
             },
             {
+                "name": "target_mode",
+                "description": "The target mode. String of 'ROBOT', 'TOOL', or 'WORKPIECE'."
+            },
+            {
                 "name": "tolerance_position",
                 "description": "The allowed tolerance to the frame's position (defined in the robot's units). Defaults to 0.001",
                 "typeHintID": "float"

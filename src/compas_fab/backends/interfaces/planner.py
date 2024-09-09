@@ -595,7 +595,7 @@ class PlannerInterface(object):
         # Checks for Workpiece Mode
         workpiece_ids = robot_cell_state.get_attached_workpiece_ids(group)
         if target_mode == TargetMode.WORKPIECE:
-            if len(workpiece_ids) == 0:
+            if not workpiece_ids:
                 raise ValueError(
                     "Target mode is 'WORKPIECE', but no workpiece is attached to the robot in group '{}'.".format(group)
                 )

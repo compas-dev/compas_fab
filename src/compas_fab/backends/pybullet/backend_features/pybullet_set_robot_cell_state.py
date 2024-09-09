@@ -51,7 +51,8 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         All the magic for transforming the attached objects happens here.
         """
         client = self.client  # type: PyBulletClient # Trick to keep intellisense happy
-        robot_cell = self.robot_cell  # type: RobotCell
+        robot_cell = client.robot_cell  # type: RobotCell
+        planner = self  # type: PyBulletPlanner
 
         # Check if the robot cell state matches the robot cell.
         # However if the robot is the only element in the cell, robot cell can be None and we can skip this check
@@ -102,8 +103,10 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 # If tool is attached to a group, update the tool's base frame using the group's FK frame
                 link_name = client.robot.get_link_names(tool_state.attached_to_group)[-1]
                 robot_configuration = robot_cell_state.robot_configuration
-                planner_coordinate_frame = client.robot.model.forward_kinematics(robot_configuration, link_name)
-
+                # Get PCF of the Robot
+                # planner_coordinate_frame = client.robot.model.forward_kinematics(robot_configuration, link_name)
+                pcf_link_id = client.robot_link_puids[link_name]
+                planner_coordinate_frame = client._get_link_frame(pcf_link_id, client.robot_puid)
                 tool_base_frame = self._compute_tool_base_frame_from_planner_coordinate_frame(
                     tool_state, planner_coordinate_frame
                 )
@@ -180,7 +183,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
         # robot = client.robot  # type: Robot
-        robot_cell = planner.robot_cell  # type: RobotCell
+        robot_cell = client.robot_cell  # type: RobotCell
         robot_cell_state = state.copy()  # type: RobotCellState
 
         tool_base_frames = {}

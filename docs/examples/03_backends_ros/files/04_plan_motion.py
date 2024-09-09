@@ -4,10 +4,11 @@ from compas.geometry import Frame
 
 from compas_fab.backends import RosClient
 from compas_fab.robots import FrameTarget
+from compas_fab.robots import TargetMode
 
 with RosClient() as client:
     robot = client.load_robot()
-    assert robot.name == 'ur5_robot'
+    assert robot.name == "ur5_robot"
 
     frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
     tolerance_position = 0.001
@@ -18,17 +19,14 @@ with RosClient() as client:
     group = robot.main_group_name
 
     # create target from frame
-    target = FrameTarget(frame,
-                         tolerance_position,
-                         tolerance_orientation,
-                         )
+    target = FrameTarget(
+        frame,
+        TargetMode.ROBOT,
+        tolerance_position,
+        tolerance_orientation,
+    )
 
-    trajectory = robot.plan_motion(target,
-                                   start_configuration,
-                                   group,
-                                   options=dict(
-                                       planner_id='RRTConnect'
-                                   ))
+    trajectory = robot.plan_motion(target, start_configuration, group, options=dict(planner_id="RRTConnect"))
 
     print("Computed kinematic path with %d configurations." % len(trajectory.points))
     print("Executing this path at full speed would take approx. %.3f seconds." % trajectory.time_from_start)

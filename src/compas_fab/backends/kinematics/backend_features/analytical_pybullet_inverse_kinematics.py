@@ -54,7 +54,7 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
 
         options = options or {}
         planner = self  # type: AnalyticalPyBulletPlanner
-        robot = planner.robot_cell.robot  # type: Robot
+        robot = planner.client.robot_cell.robot  # type: Robot
         client = self.client  # type: PyBulletClient
 
         # Set robot cell state to start state if provided

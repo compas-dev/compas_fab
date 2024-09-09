@@ -15,7 +15,14 @@ from compas_fab.robots import FrameTarget
 
 class FrameTargetFromPlaneComponent(component):
     def RunScript(
-        self, plane, tolerance_position, tolerance_xaxis, tolerance_yaxis, tolerance_zaxis, tool_coordinate_frame
+        self,
+        plane,
+        target_mode,
+        tolerance_position,
+        tolerance_xaxis,
+        tolerance_yaxis,
+        tolerance_zaxis,
+        tool_coordinate_frame,
     ):
         target = None
         if plane:
@@ -39,6 +46,6 @@ class FrameTargetFromPlaneComponent(component):
                 (tolerance_zaxis),
             ]
 
-            target = FrameTarget(frame, tolerance_position, tolerance_orientation, tool_coordinate_frame)
+            target = FrameTarget(frame, target_mode, tolerance_position, tolerance_orientation, tool_coordinate_frame)
 
         return target
