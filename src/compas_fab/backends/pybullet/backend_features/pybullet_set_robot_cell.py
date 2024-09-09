@@ -45,8 +45,10 @@ class PyBulletSetRobotCell(SetRobotCell):
         # and the new robot cell is added to the PyBullet world
 
         # Remove all objects from the PyBullet world
-        # client.remove_all_tools()
-        # client.remove_all_rigid_bodies()
+        for tool_id in client.tools_puids.keys():
+            client.remove_tool(tool_id)
+        for rigid_body_id in client.rigid_bodies_puids.keys():
+            client.remove_rigid_body(rigid_body_id)
 
         # Add the robot cell to the PyBullet world
         for name, tool_model in robot_cell.tool_models.items():
