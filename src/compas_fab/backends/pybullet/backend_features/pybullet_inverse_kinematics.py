@@ -29,6 +29,8 @@ import random
 from compas.tolerance import TOL
 from compas_robots.model import Joint
 
+from compas.geometry import Frame
+from compas.geometry import is_parallel_vector_vector
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.exceptions import CollisionCheckError
 from compas_fab.backends.interfaces import InverseKinematics
@@ -38,6 +40,7 @@ from compas_fab.utilities import LazyLoader
 from compas_fab.utilities import from_tcf_to_t0cf
 
 from compas_fab.robots import FrameTarget
+from compas_fab.robots import TargetMode
 from compas_fab.robots import PointAxisTarget
 
 pybullet = LazyLoader("pybullet", globals(), "pybullet")
@@ -160,6 +163,8 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         if isinstance(target, FrameTarget):
             return self.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
+        elif isinstance(target, PointAxisTarget):
+            return self.iter_inverse_kinematics_point_axis_target(target, robot_cell_state, group, options)
         else:
             raise NotImplementedError("{} is not supported by PyBulletInverseKinematics".format(type(target)))
 
@@ -347,17 +352,10 @@ class PyBulletInverseKinematics(InverseKinematics):
             config = robot.random_configuration(group)
             client.set_robot_configuration(config)
 
-        # Function to keep track of unique solutions
-        solutions = []
-        # Each joint has a different threshold for uniqueness
-        uniqueness_thresholds_sorted = [
-            (
-                options["solution_uniqueness_threshold_prismatic"]
-                if joint_type in [Joint.PRISMATIC, Joint.PLANAR]
-                else options["solution_uniqueness_threshold_revolute"]
-            )
-            for joint_type in joint_types_sorted
-        ]
+        # The uniqueness checker keep track of past results
+        # Note that it requires the following values in options:
+        # 'solution_uniqueness_threshold_prismatic' and 'solution_uniqueness_threshold_revolute'
+        uniqueness_checker = UniqueResultChecker()
 
         # Loop to get multiple results
         for _ in range(options.get("max_results")):
@@ -408,19 +406,19 @@ class PyBulletInverseKinematics(InverseKinematics):
                     # If there is more attempts, we skip this solution and try again with a new randomized joint values
                     set_random_config()
                     continue
+            # Construct the configuration
+            return_full_configuration = options.get("return_full_configuration")
+            configuration = self._build_configuration(
+                joint_positions, joint_names_sorted, group, return_full_configuration, start_configuration
+            )
 
             # Unique solution checking
-            if not self._check_solution_is_unique(joint_positions, solutions, uniqueness_thresholds_sorted):
+            if not uniqueness_checker.check(configuration, options):
                 # If the solution is not unique, we retry with a new randomized joint values
                 set_random_config()
                 continue
 
             # If we got this far, we have a valid solution to yield
-            solutions.append(joint_positions)
-            return_full_configuration = options.get("return_full_configuration")
-            configuration = self._build_configuration(
-                joint_positions, joint_names_sorted, group, return_full_configuration, start_configuration
-            )
             yield configuration
 
             # In order to generate multiple IK results,
@@ -428,7 +426,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             set_random_config()
 
         # If no solution was found after max_results, raise an error
-        if len(solutions) == 0:
+        if len(uniqueness_checker.results) == 0:
             raise InverseKinematicsError(
                 "No solution found after {} attempts (max_results).".format(options.get("max_results")),
                 target_pcf=target_pcf,
@@ -465,7 +463,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         of rotation steps if  ``max_random_restart`` is greater than 1.
 
         This function internally calls the :meth:`iter_inverse_kinematics_frame_target` method,
-        which is responsible for the actual IK calculation. The rotation around the axis is handled
+        which is responsible for the actual IK calculation after the rotation is fixed
         by this function. Some of the options passed to this function will be passed on to the
         :meth:`iter_inverse_kinematics_frame_target` method, see below for details.
 
@@ -484,11 +482,17 @@ class PyBulletInverseKinematics(InverseKinematics):
               Number of steps to rotate the frame around the axis.
               Defaults to ``20``.
             - ``"max_random_restart"``: (:obj:`int`, optional)
-              Maximum number of random restarts to find a solution.
+              Maximum number of random restarts with random configuration to find a solution.
               Defaults to ``5``.
             - ``"max_results"``: (:obj:`int`)
               Maximum number of results to return before stopping the search.
               Defaults to ``100``.
+            - ``"max_results_per_restart"``: (:obj:`int`, optional)
+              Maximum number of results to return before restarting the search from a new random configuration.
+              This optional control for search behavior is useful when the search space is large.
+              Reducing this value will make the search favor random restarts over exhaustive search.
+              The value should be between 1 and num_rotation_steps.
+              Defaults to the value of ``num_rotation_steps``.
 
             The following key-value pairs have the same meaning as in the :meth:`iter_inverse_kinematics_frame_target` method:
 
@@ -535,12 +539,14 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         #       In this function, the maximum number of attempts is determined by the
         #       'num_rotation_steps' and 'max_random_restart' options.
+        options["max_results_per_restart"] = options.get("max_results_per_restart", options["num_rotation_steps"])
 
         # Default options (for the FrameTarget function)
+        # Later there is a frame_ik_options dict that will be passed to the pybullet IK solver
+        # That one will set the max_results to 1 for the FrameTarget function
         options["high_accuracy"] = options.get("high_accuracy", True)
         options["high_accuracy_threshold"] = options.get("high_accuracy_threshold", 1e-4)
         options["high_accuracy_max_iter"] = options.get("high_accuracy_max_iter", 20)
-        options["max_results"] = options.get("max_results", 100)
 
         options["solution_uniqueness_threshold_prismatic"] = options.get(
             "solution_uniqueness_threshold_prismatic", 3e-4
@@ -554,26 +560,124 @@ class PyBulletInverseKinematics(InverseKinematics):
         robot_cell_state = robot_cell_state.copy()  # Make a copy to avoid modifying the original
         planner.set_robot_cell_state(robot_cell_state)
 
-        # Keep track of the number of results and for uniqueness checking
-        results = []
+        def compute_initial_frame(configuration):
+            """Compute the first target frame guided by FK from initial robot configuration.
+            This function reduces the searching time by prioritizing the first search frame
+            to be close to the initial robot configuration.
+            """
 
-        # Start with the initial configuration as start configuration
+            # Create intermediate state and call FK
+            robot_cell_state.robot_configuration = configuration
+            fk_pcf_frame = planner.forward_kinematics(
+                robot_cell_state, group, {"link": robot.get_end_effector_link_name(group)}
+            )
+
+            # The reference frame for guiding the rotation should match (PCF/TCF/OCF)
+            # with the reference frame specified by the target_mode.
+            if target.target_mode == TargetMode.TOOL:
+                tool_id = robot_cell_state.get_attached_tool_id(group)
+                target_guide_frame = planner.from_pcf_to_tcf([fk_pcf_frame], tool_id)[0]
+            elif target.target_mode == TargetMode.WORKPIECE:
+                workpiece_id = robot_cell_state.get_attached_workpiece_ids(group)[0]
+                target_guide_frame = planner.from_pcf_to_ocf([fk_pcf_frame], workpiece_id)[0]
+            elif target.target_mode == TargetMode.ROBOT:
+                target_guide_frame = fk_pcf_frame
+            else:
+                raise ValueError("Invalid target mode")
+
+            # We need to check if the FK X axis is parallel to the target.axis
+            is_parallel = is_parallel_vector_vector(target_guide_frame.xaxis, target.target_z_axis)
+
+            # If parallel (which should be rare), we use the y-axis of the FK frame as the guide vector
+            # This vector will be the Y direction for the first rotated frame
+            if is_parallel:
+                target_x_axis = target.target_z_axis.cross(target_guide_frame.yaxis).inverted()
+                target_y_axis = target.target_z_axis.cross(target_x_axis)
+            # If not, we use this guide vector as X direction for the first rotated frame
+            else:
+                target_y_axis = target.target_z_axis.cross(target_guide_frame.xaxis)
+                target_x_axis = target.target_z_axis.cross(target_y_axis).inverted()
+
+            # Construct and return the initial frame
+            initial_frame = Frame(target.target_point, target_x_axis, target_y_axis)
+            return initial_frame
+
+        # Extract initial start configuration from the robot cell state
+        # Subsequent configurations will be randomized
         start_configuration = robot_cell_state.robot_configuration
         assert start_configuration, "Robot configuration is missing"
-        starting_frame = planner.forward_kinematics(
-            robot_cell_state, group, {"link": robot.get_end_effector_link_name(group)}
-        )
-        # The initial frame should match with the reference frame specified by the target_mode
 
-        # Loop with random restarts
+        def set_random_config():
+            # Function for setting random joint values for randomized search
+            start_configuration = robot.random_configuration(group)
+            client.set_robot_configuration(start_configuration)
 
-        # Establish the initial frame by doing FK with the initial configuration
-        # Configure ik_options for
-        # Create a generator for getting rotated target frames
-        # Try get IK solution by trying out different rotations
+        # Options dict for passing to the FrameTarget function
+        frame_ik_options = options.copy()
+        # Max result must be 1 for the underlying IK function to not perform random-restart
+        frame_ik_options["max_results"] = 1
+        # Semi-constrained mode does not make any sense in our use case, so we disable it
+        # in case the user has set it to True
+        frame_ik_options["semi-constrained"] = False
 
-        # If number of results is more than max_results, stop the search
+        # The uniqueness checker keep track of past results
+        uniqueness_checker = UniqueResultChecker()
+
+        # Iterate through the number of random restarts
+        for _ in range(options.get("max_random_restart")):
+
+            # If the number of results is more than the max_results, we stop the search
+            if len(uniqueness_checker.results) >= options["max_results"]:
+                break
+
+            # The Initial frame is the 0th rotation frame
+            # Note that the initial frame is generated after some random configuration is set,
+            # there will be some randomness in the initial frame too.
+            initial_frame = compute_initial_frame(start_configuration)
+
+            # The rotation is incremented left and right alternatively from zero
+            # For example, the theta values (in degrees) for a 36-step rotation will be [0, 10, -10, 20, -20, ...]
+            rotation_step_size = 2 * math.pi / options["num_rotation_steps"]
+            for step in range(options["num_rotation_steps"]):
+                # Advanced option to limit the number of results in a single restart
+                results_in_this_restart = 0
+                if results_in_this_restart >= options["max_results_per_restart"]:
+                    break
+
+                theta = rotation_step_size * ((step + 1) // 2) * (-1) ** (step % 2)
+                rotated_frame = initial_frame.rotated(theta, initial_frame.zaxis, initial_frame.point)
+                if options["verbose"]:
+                    print("Rotated Frame: {}, theta: {}".format(rotated_frame, theta))
+                frame_target = FrameTarget(rotated_frame, target.target_mode)
+
+                # Call underlying FrameTarget function to get IK solutions
+                ik_frame_target = self.iter_inverse_kinematics_frame_target(
+                    frame_target, robot_cell_state, group, frame_ik_options
+                )
+                # We will only get one result from the FrameTarget function, if that result is None, we skip to the next rotation
+                try:
+                    configuration = next(ik_frame_target)
+                    # Uniqueness checking
+                    if not uniqueness_checker.check(configuration, options):
+                        continue
+
+                    # If we got this far, we have a valid solution to yield
+                    results_in_this_restart += 1
+                    yield configuration
+                except InverseKinematicsError:
+                    continue
+                except CollisionCheckError:
+                    continue
+
+            # If no solution was found after the rotation steps, we restart the search
+            # by setting a new random configuration
+            set_random_config()
+
         # If no solution is found after everything is exhausted, raise an error
+        if len(uniqueness_checker.results) == 0:
+            raise InverseKinematicsError(
+                "No solution found after {} attempts (max_random_restart).".format(options.get("max_random_restart"))
+            )
 
     def _accurate_inverse_kinematics(self, joint_ids_sorted, threshold, max_iter, verbose=False, **kwargs):
         """Iterative inverse kinematics solver with a threshold for the distance to the target.
@@ -662,33 +766,92 @@ class PyBulletInverseKinematics(InverseKinematics):
                 # print("Configuration changed joint '{}' that is not in the group.".format(joint_name))
                 raise PlanningGroupNotSupported(group, joint_names, link_names)
 
-    def _check_solution_is_unique(self, joint_positions, past_solutions, uniqueness_thresholds_sorted):
-        # type: (List[float], List[List[float]], List[float]) -> bool
+
+class UniqueResultChecker(object):
+    """A class to check if a configuration is unique.
+
+    This class will keep track of past solutions and compare new solutions with them.
+    The values are compared with a threshold that is different for each joint type.
+
+
+    Attributes
+    ----------
+    sorted_uniqueness_thresholds : list of float
+        The thresholds for each joint to consider the solution unique.
+        One value for each joint in the same order as the joint_positions.
+    results : list of :class:`compas_robots.Configuration`
+        The past accepted configurations to compare with.
+        This list will be appended automatically when calling the check method.
+        Only those that passes the check will be added to this list.
+    """
+
+    def __init__(self):
+        self.sorted_uniqueness_thresholds = None  # type: List[float]
+        self.results = []  # type: List[Configuration]
+
+    def check(self, configuration, options):
+        # type: (Configuration, Dict) -> bool
         """Check if the solution is unique by comparing with past solutions.
+
+        Accepted solutions will be added to the `self.results` list.
+        Therefore, this method should be called only once for each solution.
+        Second call with the same solution will certainly return False.
 
         Parameters
         ----------
-        joint_positions : list of float
-            The joint positions of the current solution.
-        past_solutions : list of list of float
-            The past solutions to compare with.
-        uniqueness_thresholds_sorted : list of float
-            The thresholds for each joint type to consider the solution unique.
-            One value for each joint in the same order as the joint_positions.
+        configuration : :class:`compas_robots.Configuration`
+            The configuration to be checked.
+        options : dict
+            The options for the uniqueness thresholds.
+            It should contain the following keys:
 
-        Returns
-        -------
-        bool
-            True if the solution is unique, False if it is not.
+            - ``"solution_uniqueness_threshold_prismatic"``: :obj:`float`
+              The minimum distance between two solutions in the prismatic joint space to consider them unique.
+              Units are in meters.
+            - ``"solution_uniqueness_threshold_revolute"``: :obj:`float`
+              The minimum distance between two solutions in the revolute joint space to consider them unique.
+              Units are in radians.
 
         """
-        for past_solution in past_solutions:
+        # First check is a fast pass to avoid unnecessary calculations
+        if not self.results:
+            self.results.append(configuration)
+            return True
+
+        # From second check onwards, we compare with past solutions
+        # First the uniqueness thresholds are computed
+        if self.sorted_uniqueness_thresholds is None:
+            self.compute_sorted_uniqueness_thresholds(configuration, options)
+
+        # Compare the new solution with past solutions
+        for past_configuration in self.results:
             # Only if all joints are same, we consider the solution as not unique
             if all(
                 TOL.is_close(joint_position, past_joint_position, atol=threshold)
                 for joint_position, past_joint_position, threshold in zip(
-                    joint_positions, past_solution, uniqueness_thresholds_sorted
+                    configuration.joint_values, past_configuration.joint_values, self.sorted_uniqueness_thresholds
                 )
             ):
                 return False
+        self.results.append(configuration)
         return True
+
+    def compute_sorted_uniqueness_thresholds(self, configuration, options):
+        # type: (Configuration, Dict) -> UniqueResultChecker
+        """Create a UniqueResultChecker from a configuration.
+
+        Parameters
+        ----------
+        config : :class:`compas_robots.Configuration`
+            A configuration that contains a ordered list of joints and their types.
+        """
+        joint_types = configuration.joint_types
+        sorted_uniqueness_thresholds = [
+            (
+                options["solution_uniqueness_threshold_prismatic"]
+                if joint_type in [Joint.PRISMATIC, Joint.PLANAR]
+                else options["solution_uniqueness_threshold_revolute"]
+            )
+            for joint_type in joint_types
+        ]
+        self.sorted_uniqueness_thresholds = sorted_uniqueness_thresholds
