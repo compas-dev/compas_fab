@@ -199,7 +199,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             - ``"high_accuracy"``:  (:obj:`bool`, optional) When ``True``, the
               solver will iteratively try to reach the ``high_accuracy_threshold``.
               Failure to reach the threshold within ``high_accuracy_max_iter`` will raise an exception.
-              When ``False``, the solver will use the default pybullet solver, which does not
+              It is uncommon to use ``False``, because the solver will not
               guarantee any accuracy.
               Defaults to ``True``.
             - ``"high_accuracy_threshold"``:  (:obj:`float`, optional) Defines the maximum
@@ -220,6 +220,8 @@ class PyBulletInverseKinematics(InverseKinematics):
               Whether or not to check for collision. Defaults to ``True``.
             - ``"return_full_configuration"``: (:obj:`bool`, optional)
                 Whether or not to return the full configuration. Defaults to ``False``.
+            - ``"verbose"``: (:obj:`bool`, optional)
+                Whether or not to print verbose output. Defaults to ``False``.
 
         Yields
         ------
@@ -246,18 +248,21 @@ class PyBulletInverseKinematics(InverseKinematics):
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
         robot = client.robot  # type: Robot
-
-        high_accuracy = options.get("high_accuracy", True)
-        max_results = options.get("max_results", 100)
+        assert group, "Planning group should not be None at this inner function"
 
         # Default options
-        options["verbose"] = options.get("verbose", False)
+        options["high_accuracy"] = options.get("high_accuracy", True)
+        options["high_accuracy_threshold"] = options.get("high_accuracy_threshold", 1e-4)
+        options["high_accuracy_max_iter"] = options.get("high_accuracy_max_iter", 20)
+        options["max_results"] = options.get("max_results", 100)
+
         options["check_collision"] = options.get("check_collision", True)
         options["return_full_configuration"] = options.get("return_full_configuration", False)
         options["solution_uniqueness_threshold_prismatic"] = options.get(
             "solution_uniqueness_threshold_prismatic", 3e-4
         )
         options["solution_uniqueness_threshold_revolute"] = options.get("solution_uniqueness_threshold_revolute", 1e-3)
+        options["verbose"] = options.get("verbose", False)
 
         # Setting the entire robot cell state, including the robot configuration
         robot_cell_state = robot_cell_state.copy()  # Make a copy to avoid modifying the original
@@ -265,7 +270,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         # TODO: Implement a fail fast mechanism to check if the attached tool and objects are in collision
 
-        # Transform Tool Coordinate Frame if there are tools attached
+        # Transform the Target.target_frame to Planner Coordinate Frame depending on target.target_mode
         target_frame = target.target_frame
         target_mode = target.target_mode
         target_pcf = planner.frames_to_pcf(target_frame, target_mode, group)
@@ -328,12 +333,12 @@ class PyBulletInverseKinematics(InverseKinematics):
             ik_options.pop("targetOrientation")
 
         # Options for high accuracy mode
-        if high_accuracy:
+        if options.get("high_accuracy"):
             ik_options.update(
                 dict(
                     joint_ids_sorted=joint_ids_sorted,
-                    threshold=options.get("high_accuracy_threshold", 1e-4),
-                    max_iter=options.get("high_accuracy_max_iter", 20),
+                    threshold=options.get("high_accuracy_threshold"),
+                    max_iter=options.get("high_accuracy_max_iter"),
                 )
             )
 
@@ -354,24 +359,11 @@ class PyBulletInverseKinematics(InverseKinematics):
             for joint_type in joint_types_sorted
         ]
 
-        def solution_is_unique(joint_positions):
-            """Check if the solution is unique by comparing with past solutions."""
-            for past_solution in solutions:
-                # Only if all joints are same, we consider the solution as not unique
-                if all(
-                    TOL.is_close(joint_position, past_joint_position, atol=threshold)
-                    for joint_position, past_joint_position, threshold in zip(
-                        joint_positions, past_solution, uniqueness_thresholds_sorted
-                    )
-                ):
-                    return False
-            return True
-
         # Loop to get multiple results
-        for _ in range(max_results):
+        for _ in range(options.get("max_results")):
 
             # Calling the IK function (High accuracy or not)
-            if high_accuracy:
+            if options.get("high_accuracy"):
                 joint_positions, close_enough = self._accurate_inverse_kinematics(
                     verbose=options["verbose"], **ik_options
                 )
@@ -411,14 +403,14 @@ class PyBulletInverseKinematics(InverseKinematics):
                         print(e)
                     # If max_results is 1, he user probably wants to know that the problem is caused by collision
                     # and not because there is no IK solution. So we re-raise the Collision Error
-                    if max_results == 1:
+                    if options.get("max_results") == 1:
                         raise e
                     # If there is more attempts, we skip this solution and try again with a new randomized joint values
                     set_random_config()
                     continue
 
             # Unique solution checking
-            if not solution_is_unique(joint_positions):
+            if not self._check_solution_is_unique(joint_positions, solutions, uniqueness_thresholds_sorted):
                 # If the solution is not unique, we retry with a new randomized joint values
                 set_random_config()
                 continue
@@ -438,7 +430,8 @@ class PyBulletInverseKinematics(InverseKinematics):
         # If no solution was found after max_results, raise an error
         if len(solutions) == 0:
             raise InverseKinematicsError(
-                "No solution found after {} attempts (max_results).".format(max_results), target_pcf=target_pcf
+                "No solution found after {} attempts (max_results).".format(options.get("max_results")),
+                target_pcf=target_pcf,
             )
 
     def iter_inverse_kinematics_point_axis_target(self, target, robot_cell_state, group, options=None):
@@ -506,6 +499,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             - ``"solution_uniqueness_threshold_revolute"``: (:obj:`float`, optional)
             - ``"check_collision"``: (:obj:`bool`, optional)
             - ``"return_full_configuration"``: (:obj:`bool`, optional)
+            - ``"verbose"``: (:obj:`bool`, optional)
 
         Notes
         -----
@@ -521,9 +515,18 @@ class PyBulletInverseKinematics(InverseKinematics):
             The calculated configuration.
 
         """
-        # Keep track of the number of results and for uniqueness checking
-        results = []
+        options = options or {}
 
+        # Housekeeping for intellisense
+        planner = self  # type: PyBulletPlanner
+        client = planner.client  # type: PyBulletClient
+        robot = client.robot  # type: Robot
+        assert group, "Planning group should not be None at this inner function"
+
+        # Default options (specific to PointAxisTarget)
+        options["num_rotation_steps"] = options.get("num_rotation_steps", 20)
+        options["max_random_restart"] = options.get("max_random_restart", 5)
+        options["max_results"] = options.get("max_results", 100)
         # NOTE: The option 'max_results' have a different meaning to the one
         #       in the iter_inverse_kinematics_frame_target, here we keep a count of the
         #       number of returned result and use it to determine when to stop the search.
@@ -533,8 +536,35 @@ class PyBulletInverseKinematics(InverseKinematics):
         #       In this function, the maximum number of attempts is determined by the
         #       'num_rotation_steps' and 'max_random_restart' options.
 
+        # Default options (for the FrameTarget function)
+        options["high_accuracy"] = options.get("high_accuracy", True)
+        options["high_accuracy_threshold"] = options.get("high_accuracy_threshold", 1e-4)
+        options["high_accuracy_max_iter"] = options.get("high_accuracy_max_iter", 20)
+        options["max_results"] = options.get("max_results", 100)
+
+        options["solution_uniqueness_threshold_prismatic"] = options.get(
+            "solution_uniqueness_threshold_prismatic", 3e-4
+        )
+        options["solution_uniqueness_threshold_revolute"] = options.get("solution_uniqueness_threshold_revolute", 1e-3)
+        options["check_collision"] = options.get("check_collision", True)
+        options["return_full_configuration"] = options.get("return_full_configuration", False)
+        options["verbose"] = options.get("verbose", False)
+
+        # Setting the entire robot cell state, including the robot configuration
+        robot_cell_state = robot_cell_state.copy()  # Make a copy to avoid modifying the original
+        planner.set_robot_cell_state(robot_cell_state)
+
+        # Keep track of the number of results and for uniqueness checking
+        results = []
+
         # Start with the initial configuration as start configuration
-        #  TODO: Implement this
+        start_configuration = robot_cell_state.robot_configuration
+        assert start_configuration, "Robot configuration is missing"
+        starting_frame = planner.forward_kinematics(
+            robot_cell_state, group, {"link": robot.get_end_effector_link_name(group)}
+        )
+        # The initial frame should match with the reference frame specified by the target_mode
+
         # Loop with random restarts
 
         # Establish the initial frame by doing FK with the initial configuration
@@ -631,3 +661,34 @@ class PyBulletInverseKinematics(InverseKinematics):
                 link_names = robot.semantics.groups[group]["links"]
                 # print("Configuration changed joint '{}' that is not in the group.".format(joint_name))
                 raise PlanningGroupNotSupported(group, joint_names, link_names)
+
+    def _check_solution_is_unique(self, joint_positions, past_solutions, uniqueness_thresholds_sorted):
+        # type: (List[float], List[List[float]], List[float]) -> bool
+        """Check if the solution is unique by comparing with past solutions.
+
+        Parameters
+        ----------
+        joint_positions : list of float
+            The joint positions of the current solution.
+        past_solutions : list of list of float
+            The past solutions to compare with.
+        uniqueness_thresholds_sorted : list of float
+            The thresholds for each joint type to consider the solution unique.
+            One value for each joint in the same order as the joint_positions.
+
+        Returns
+        -------
+        bool
+            True if the solution is unique, False if it is not.
+
+        """
+        for past_solution in past_solutions:
+            # Only if all joints are same, we consider the solution as not unique
+            if all(
+                TOL.is_close(joint_position, past_joint_position, atol=threshold)
+                for joint_position, past_joint_position, threshold in zip(
+                    joint_positions, past_solution, uniqueness_thresholds_sorted
+                )
+            ):
+                return False
+        return True
