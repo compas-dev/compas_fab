@@ -169,8 +169,8 @@ class RobotCell(Data):
 class RigidBody(Data):
     """Represents a rigid body."""
 
-    def __init__(self, visual_meshes=None, collision_meshes=None):
-        # type: (Optional[List[Mesh] | Mesh], Optional[List[Mesh] | Mesh]) -> None
+    def __init__(self, visual_meshes, collision_meshes):
+        # type: (List[Mesh] | Mesh, List[Mesh] | Mesh) -> None
         """Represents a rigid body.
 
         A rigid body can have different visual and collision meshes.
@@ -226,6 +226,59 @@ class RigidBody(Data):
             "visual_meshes": self.visual_meshes,
             "collision_meshes": self.collision_meshes,
         }
+
+    @classmethod
+    def from_mesh(cls, mesh):
+        # type: (Mesh) -> RigidBody
+        """Creates a RigidBody from a single mesh.
+
+        This function is a convenience function for creating a RigidBody from a single mesh.
+        The mesh will be used for both visualization and collision checking.
+
+        Parameters
+        ----------
+        mesh : :class:`compas.datastructures.Mesh`
+            The mesh of the rigid body.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.RigidBody`
+            The rigid body.
+
+        Notes
+        -----
+        If the user would like to use different meshes for visualization and collision checking,
+        consider using the constructor directly: `RigidBody(visual_meshes, collision_meshes)`.
+
+        """
+        return cls([mesh], [mesh])
+
+    @classmethod
+    def from_meshes(cls, meshes):
+        # type: (List[Mesh]) -> RigidBody
+        """Creates a RigidBody from a list of meshes.
+
+        This function is a convenience function for creating a RigidBody from a list of meshes.
+        The first mesh will be used for visualization and collision checking.
+        The rest of the meshes will be used for visualization only.
+
+        Parameters
+        ----------
+        meshes : list of :class:`compas.datastructures.Mesh`
+            The meshes of the rigid body.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.RigidBody`
+            The rigid body.
+
+        Notes
+        -----
+        If the user would like to use different meshes for visualization and collision checking,
+        consider using the constructor directly: `RigidBody(visual_meshes, collision_meshes)`.
+
+        """
+        return cls(meshes, meshes)
 
 
 class RobotCellState(Data):

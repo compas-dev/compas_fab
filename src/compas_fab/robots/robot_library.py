@@ -491,7 +491,7 @@ class RobotCellLibrary(object):
 
         # Static Floor as Collision Geometry
         floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-        robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh, floor_mesh)
+        robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
 
         # ------------------------------------------------------------------------
         # Create RobotCellState
@@ -564,11 +564,11 @@ class RobotCellLibrary(object):
             [0.0, -0.1, -beam_length * 0.5], [0.2, 0.1, -beam_length * 0.5], beam_length
         )
         beam_mesh = Mesh.from_shape(beam)
-        robot_cell.rigid_body_models["beam"] = RigidBody(beam_mesh, beam_mesh)
+        robot_cell.rigid_body_models["beam"] = RigidBody.from_mesh(beam_mesh)
 
         # Static Floor as Collision Geometry
         floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-        robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh, floor_mesh)
+        robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
 
         # ------------------------------------------------------------------------
         # Create RobotCellState
@@ -634,11 +634,11 @@ class RobotCellLibrary(object):
             [0.0, -0.05, -beam_length * 0.5], [0.1, 0.05, -beam_length * 0.5], beam_length
         )
         beam_mesh = Mesh.from_shape(beam)
-        robot_cell.rigid_body_models["beam"] = RigidBody(beam_mesh, beam_mesh)
+        robot_cell.rigid_body_models["beam"] = RigidBody.from_mesh(beam_mesh)
 
         # Static Floor as Collision Geometry
         floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-        robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh, floor_mesh)
+        robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
 
         # ------------------------------------------------------------------------
         # Create RobotCellState
@@ -704,7 +704,7 @@ class RigidBodyLibrary(object):
         # Scale the target marker to the desired size
         mesh.scale(size)
 
-        return RigidBody([mesh], [])
+        return RigidBody(mesh, None)
 
 
 if __name__ == "__main__":

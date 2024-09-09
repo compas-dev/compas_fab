@@ -13,12 +13,13 @@ with PyBulletClient() as client:
 
     # Add some RigidBodies as stationary obstacles
     floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-    robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh)
+    robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
     cone = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
-    robot_cell.rigid_body_models["cone"] = RigidBody(cone)
+    robot_cell.rigid_body_models["cone"] = RigidBody.from_mesh(cone)
 
+    # Add a target marker as a RigidBody with visual mesh but no collision mesh
     target_marker = Mesh.from_obj(compas_fab.get("planning_scene/target_marker.obj"))
-    robot_cell.rigid_body_models["target_marker"] = RigidBody(target_marker)
+    robot_cell.rigid_body_models["target_marker"] = RigidBody(target_marker, None)
 
     # The planner object is needed to pass the robot cell into the PyBullet client
     planner = PyBulletPlanner(client)
