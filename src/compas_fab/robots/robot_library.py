@@ -321,6 +321,42 @@ class ToolLibrary(object):
         return ToolModel(visual=tool_mesh, frame_in_tool0_frame=tool_frame, name="cone")
 
     @classmethod
+    def printing_tool(cls, load_geometry=True, tool_size=1.0):
+        """Create and return a printing tool as ToolModel, useful for simulating a 3D printing tool.
+
+        The Tool Frame is located at the tip of the tool,
+        equal to `Frame([0.2, 0.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])`.
+        It has the same orientation as its base frame.
+        Its Z-axis points out of the printing nozzle into the material being printed.
+        Therefor, the printing targets should be defined with the Z-axis pointing towards the object being printed.
+
+        The tool name is 'printing_tool'.
+
+        Changing the `tool_size` parameter will scale the tool.
+        The default size is 1.0, corresponding to the tool tip being 1m away (Z-direction) from the base frame.
+
+        Parameters
+        ----------
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the geometry is loaded.
+            `False` can be used to speed up the creation of the tool.
+        tool_size: :obj:`float`, optional
+            Default is `1.0`, which means that the tool tip is 1m away from the base frame.
+        """
+
+        tool_frame = Frame([0.2, 0.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
+        tool_frame.scale(tool_size)
+
+        if load_geometry:
+            obj = compas_fab.get("tool_library/printing_tool.obj")
+            tool_mesh = Mesh.from_obj(obj)
+            tool_mesh.scale(tool_size)
+        else:
+            tool_mesh = None
+
+        return ToolModel(visual=tool_mesh, frame_in_tool0_frame=tool_frame, collision=tool_mesh, name="printing_tool")
+
+    @classmethod
     def static_gripper(cls, load_geometry=True):
         # type: (Optional[bool]) -> ToolModel
         """Create and return a static gripper ToolModel, useful for simulating a gripper.
@@ -679,6 +715,76 @@ class RobotCellLibrary(object):
 
         # The floor is not attached to the robot, but it is allowed to touch the robot's base link.
         robot_cell_state.rigid_body_states["floor"].touch_links = ["base_link_inertia"]
+
+        return robot_cell, robot_cell_state
+
+    @classmethod
+    def abb_irb4600_40_255_printing_tool(cls, client=None, load_geometry=True):
+        # type: (Optional[ClientInterface], Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+        """Create and return the ABB irb4600-40-255 robot with a printing tool attached.
+        A floor is also included.
+
+        See :meth:`compas_fab.robots.RobotLibrary.abb_irb4600_40_255` and :meth:`compas_fab.robots.ToolLibrary.printing_tool`
+        for details on the robot and tool.
+
+        Parameters
+        ----------
+        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
+            Backend client. Default is `None`.
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the robot and tool geometry are loaded.
+            `False` can be used to speed up the creation of the robot cell,
+            but without geometry, the robot cell cannot be visualized and backend planners
+            cannot perform collision checking during planning.
+
+        Returns
+        -------
+        Tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
+            Newly created instance of the robot cell and robot cell state.
+        """
+        # ---------------------------------------------------------------------
+        # Load Robot and create RobotCell
+        # ---------------------------------------------------------------------
+        robot = RobotLibrary.abb_irb4600_40_255(client, load_geometry=load_geometry)
+        robot_cell = RobotCell(robot)
+
+        # ---------------------------------------------------------------------
+        # Load Tools
+        # ---------------------------------------------------------------------
+
+        printing_tool = ToolLibrary.printing_tool(load_geometry=load_geometry, tool_size=0.5)
+        robot_cell.tool_models["printing_tool"] = printing_tool
+
+        # ---------------------------------------------------------------------
+        # Load Rigid Bodies
+        # ---------------------------------------------------------------------
+
+        # Static Floor as Collision Geometry
+        floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
+        robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
+
+        # ------------------------------------------------------------------------
+        # Create RobotCellState
+        # ------------------------------------------------------------------------
+        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+
+        # ------------------------------------------------------------------------
+        # Tool Attachment
+        # ------------------------------------------------------------------------
+
+        # Attach the tool to the robot's main group
+        attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
+        touch_links = ["link_6"]
+        robot_cell_state.set_tool_attached_to_group(
+            "printing_tool", robot.main_group_name, attachment_frame, touch_links=touch_links
+        )
+
+        # ------------------------------------------------------------------------
+        # Static Rigid Body Touch Links
+        # ------------------------------------------------------------------------
+
+        # The floor is not attached to the robot, but it is allowed to touch the robot's base link.
+        robot_cell_state.rigid_body_states["floor"].touch_links = ["base_link"]
 
         return robot_cell, robot_cell_state
 
