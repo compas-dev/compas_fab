@@ -3,6 +3,8 @@ import compas
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Transformation
+from compas.geometry import Point
+from compas.geometry import Vector
 from compas_robots.model import Joint
 
 if not compas.IPY:
@@ -11,8 +13,6 @@ if not compas.IPY:
     if TYPE_CHECKING:
         from typing import Optional  # noqa: F401
         from typing import Tuple  # noqa: F401
-        from compas.geometry import Point  # noqa: F401
-        from compas.geometry import Vector  # noqa: F401
         from compas_robots import Configuration  # noqa: F401
         from compas_fab.robots import Constraint  # noqa: F401
 
@@ -255,10 +255,11 @@ class PointAxisTarget(Target):
         tolerance_position=None,
         name="Point-Axis Target",
     ):
-        # type: (Point, Vector, TargetMode | str, Optional[float], Optional[Frame | Transformation], Optional[str]) -> None
+        # type: (Point, Vector, TargetMode | str, Optional[float], Optional[str]) -> None
         super(PointAxisTarget, self).__init__(target_mode=target_mode, name=name)
-        self.target_point = target_point
-        self.target_z_axis = target_z_axis
+        # Note: The following input are converted to class because it can simplify functions that use this class
+        self.target_point = Point(*target_point)
+        self.target_z_axis = Vector(*target_z_axis)
         self.tolerance_position = tolerance_position
 
     @property
