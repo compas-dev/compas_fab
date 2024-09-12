@@ -51,8 +51,8 @@ class Robot(Data):
     """Represents a robot.
 
     This class binds together several building blocks, such as the robot's
-    descriptive model, its semantic information and an instance of a backend
-    client into a cohesive programmable interface. This representation builds
+    descriptive model and its semantic information
+    into a cohesive programmable interface. This representation builds
     upon the model described in the class :class:`compas_robots.RobotModel` of
     the **COMPAS** framework.
 
@@ -64,9 +64,6 @@ class Robot(Data):
         Instance of the scene object used to visualize the robot model. Defaults to ``None``.
     semantics : :class:`~compas_fab.robots.RobotSemantics`
         The semantic model of the robot. Defaults to ``None``.
-    client : :class:`~compas_fab.backends.interfaces.ClientInterface`
-        The backend client to use for communication,
-        e.g. :class:`~compas_fab.backends.RosClient`
 
     Attributes
     ----------
@@ -74,8 +71,6 @@ class Robot(Data):
         Named attributes related to the robot instance.
     attached_tools : :obj:`dict` of [:obj:`str`, :class:`~compas_fab.robots.Tool`], read-only
     attached_tool : :class:`~compas_fab.robots.Tool`, read-only
-    client : :class:`~compas_fab.backends.interfaces.ClientInterface`
-        The backend client to use for communication.
     group_names : :obj:`list` of :obj:`str`, read-only
     group_states : :obj:`dict` of :obj:`dict`, read-only
     scene_object : :class:`compas_robots.scene.BaseRobotModelObject`
@@ -95,7 +90,7 @@ class Robot(Data):
     #       However, the rest of the docstring, after the first period symbol will be ignored.
     #       It is futile to add examples to the attribute docstring, as they will not be rendered in the documentation.
 
-    def __init__(self, model=None, scene_object=None, semantics=None, client=None):
+    def __init__(self, model=None, scene_object=None, semantics=None):
         # type: (RobotModel, Optional[BaseRobotModelObject], Optional[RobotSemantics], Optional[ClientInterface]) -> Robot
         super(Robot, self).__init__()
         # These attributes have to be initiated first,
@@ -119,7 +114,7 @@ class Robot(Data):
             "model": self.model.__data__,
             "semantics": self.semantics,
             "attributes": self.attributes,
-            # The following attributes cannot be serialized: scene_object, client
+            # The following attributes cannot be serialized: scene_object
         }
         return data
 
@@ -138,7 +133,7 @@ class Robot(Data):
         return robot
 
     @classmethod
-    def from_urdf(cls, urdf_filename, srdf_filename=None, local_package_mesh_folder=None, client=None):
+    def from_urdf(cls, urdf_filename, srdf_filename=None, local_package_mesh_folder=None):
         # type: (str, Optional[str], Optional[str], Optional[ClientInterface]) -> Robot
         """Create a robot from URDF.
         Optionally, SRDF can be provided to load semantics and a local package mesh folder to load mesh geometry.
@@ -153,8 +148,6 @@ class Robot(Data):
             Path to the local package mesh folder.
             If the path is provided, the geometry of the robot is loaded from this folder.
             Default is `None`, which means that the geometry is not loaded.
-        client : :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-            Backend client provided for the . Default is `None`.
 
         Returns
         -------
@@ -176,7 +169,7 @@ class Robot(Data):
             loader = LocalPackageMeshLoader(compas_fab.get(local_package_mesh_folder), "")
             model.load_geometry(loader)
 
-        robot = cls(model, semantics=semantics, client=client)
+        robot = cls(model, semantics=semantics)
 
         return robot
 
@@ -1319,6 +1312,7 @@ class Robot(Data):
 
         options["attached_collision_meshes"] = attached_collision_meshes
 
+        # TODO: self.client is removed, the following line needs fixed.
         solutions = self.client.inverse_kinematics(self, frame_WCF_scaled, start_configuration_scaled, group, options)
 
         # The returned joint names might be more than the requested ones if there are passive joints present
@@ -1543,6 +1537,7 @@ class Robot(Data):
         # Planning
         # ========
 
+        # TODO: self.client is removed, the following line needs fixed.
         trajectory = self.client.plan_cartesian_motion(
             robot=self,
             waypoints=waypoints,
@@ -1680,6 +1675,7 @@ class Robot(Data):
         options["attached_collision_meshes"] = attached_collision_meshes
         options["path_constraints"] = path_constraints_WCF_scaled
 
+        # TODO: self.client is removed, the following line needs fixed.
         trajectory = self.client.plan_motion(
             robot=self,
             target=target,
