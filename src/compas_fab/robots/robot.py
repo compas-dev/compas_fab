@@ -29,7 +29,6 @@ if not compas.IPY:
         from typing import Optional  # noqa: F401
         from typing import Tuple  # noqa: F401
         from compas.geometry import Vector  # noqa: F401
-        from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
         from compas_fab.robots import JointTrajectory  # noqa: F401
         from compas_fab.robots import RobotSemantics  # noqa: F401
         from compas_fab.robots import Tool  # noqa: F401
@@ -91,7 +90,7 @@ class Robot(Data):
     #       It is futile to add examples to the attribute docstring, as they will not be rendered in the documentation.
 
     def __init__(self, model=None, scene_object=None, semantics=None):
-        # type: (RobotModel, Optional[BaseRobotModelObject], Optional[RobotSemantics], Optional[ClientInterface]) -> Robot
+        # type: (RobotModel, Optional[BaseRobotModelObject], Optional[RobotSemantics]) -> Robot
         super(Robot, self).__init__()
         # These attributes have to be initiated first,
         # because they are used in the setters of the other attributes
@@ -134,7 +133,7 @@ class Robot(Data):
 
     @classmethod
     def from_urdf(cls, urdf_filename, srdf_filename=None, local_package_mesh_folder=None):
-        # type: (str, Optional[str], Optional[str], Optional[ClientInterface]) -> Robot
+        # type: (str, Optional[str], Optional[str]) -> Robot
         """Create a robot from URDF.
         Optionally, SRDF can be provided to load semantics and a local package mesh folder to load mesh geometry.
 
