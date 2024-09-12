@@ -253,7 +253,10 @@ class PyBulletInverseKinematics(InverseKinematics):
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
         robot = client.robot  # type: Robot
-        assert group, "Planning group should not be None at this inner function"
+
+        # NOTE: group is not optional in this inner function.
+        if group not in robot.semantics.groups:
+            raise ValueError("Planning group '{}' not found in the robot's semantics.".format(group))
 
         # Default options
         options["high_accuracy"] = options.get("high_accuracy", True)
@@ -525,7 +528,10 @@ class PyBulletInverseKinematics(InverseKinematics):
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
         robot = client.robot  # type: Robot
-        assert group, "Planning group should not be None at this inner function"
+
+        # NOTE: group is not optional in this inner function.
+        if group not in robot.semantics.groups:
+            raise ValueError("Planning group '{}' not found in the robot's semantics.".format(group))
 
         # Default options (specific to PointAxisTarget)
         options["num_rotation_steps"] = options.get("num_rotation_steps", 20)
