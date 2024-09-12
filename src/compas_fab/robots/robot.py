@@ -239,6 +239,11 @@ class Robot(Data):
         """
         return self.model.name
 
+    @name.setter
+    def name(self, value):
+        if value != self.model.name:
+            assert False, "Changing the name of the robot is not supported."
+
     @property
     def group_names(self):
         # type: () -> List[str]
