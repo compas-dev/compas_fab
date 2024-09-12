@@ -45,9 +45,10 @@ class PyBulletSetRobotCell(SetRobotCell):
         # and the new robot cell is added to the PyBullet world
 
         # Remove all objects from the PyBullet world
-        for tool_id in client.tools_puids.keys():
+
+        for tool_id in list(client.tools_puids.keys()):
             client.remove_tool(tool_id)
-        for rigid_body_id in client.rigid_bodies_puids.keys():
+        for rigid_body_id in list(client.rigid_bodies_puids.keys()):
             client.remove_rigid_body(rigid_body_id)
 
         # Add the robot cell to the PyBullet world
@@ -63,8 +64,8 @@ class PyBulletSetRobotCell(SetRobotCell):
             robot_cell.robot.ensure_semantics()
             client.set_robot(robot_cell.robot)
 
-        # Update the robot cell in the planner
-        client._robot_cell = robot_cell
+        # Keep a copy of the robot cell in the client
+        client._robot_cell = robot_cell.copy()
 
         # If a robot cell state is provided, update the client's robot cell state
         if robot_cell_state:

@@ -395,7 +395,19 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.rigid_bodies_puids[name] = [pyb_body_id]
 
     def remove_rigid_body(self, name):
-        raise NotImplementedError("remove_rigid_body is not implemented yet.")
+        # type: (str) -> None
+        """Remove a rigid body from the PyBullet server if it exists.
+
+        Parameters
+        ----------
+        name : :obj:`str`
+            The name of the rigid body.
+        """
+        if name not in self.rigid_bodies_puids:
+            return
+        for body_id in self.rigid_bodies_puids[name]:
+            pybullet.removeBody(body_id, physicsClientId=self.client_id)
+        del self.rigid_bodies_puids[name]
 
     def pybullet_load_urdf(self, urdf_file):
         # type: (str) -> int
