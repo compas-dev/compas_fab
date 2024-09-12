@@ -106,6 +106,10 @@ class PyBulletInverseKinematics(InverseKinematics):
         planner = self  # type: PyBulletPlanner
         group = group or planner.client.robot.main_group_name
 
+        # Make a copy of the options because we will modify it
+        # Note: Modifying the options dict accidentally will break the hashing function in the inverse_kinematics()
+        options = options.copy() if options else {}
+
         # The caching mechanism is implemented in the iter_inverse_kinematics method
         # located in InverseKinematics class. This method is just a wrapper around it
         # so that Intellisense and Docs can point here.
