@@ -26,7 +26,7 @@ def test_panda_srdf_file(panda_srdf, panda_urdf):
     assert semantics.main_group_name == "panda_arm_hand"
     assert semantics.get_base_link_name("panda_arm") == "panda_link0"
     assert semantics.get_end_effector_link_name("panda_arm") == "panda_link8"
-    assert semantics.get_configurable_joint_names("panda_arm") == [
+    assert semantics.get_configurable_joint_names(model, "panda_arm") == [
         "panda_joint1",
         "panda_joint2",
         "panda_joint3",
@@ -35,7 +35,7 @@ def test_panda_srdf_file(panda_srdf, panda_urdf):
         "panda_joint6",
         "panda_joint7",
     ]
-    all_configurable_joint_names = [j.name for j in semantics.get_all_configurable_joints()]
+    all_configurable_joint_names = [j.name for j in semantics.get_all_configurable_joints(model)]
     assert all_configurable_joint_names == [
         "panda_joint1",
         "panda_joint2",
@@ -46,7 +46,7 @@ def test_panda_srdf_file(panda_srdf, panda_urdf):
         "panda_joint7",
         "panda_finger_joint1",
     ]
-    configurable_joints = semantics.get_configurable_joints("panda_arm_hand")
+    configurable_joints = semantics.get_configurable_joints(model, "panda_arm_hand")
     assert [j.type for j in configurable_joints] == [0, 0, 0, 0, 0, 0, 0, 2]
     set_joints = set(semantics.group_states["panda_arm"]["ready"].keys())
     assert set_joints == {
@@ -67,7 +67,7 @@ def test_ur5_semantics():
     assert semantics.main_group_name == "manipulator"
     assert semantics.get_base_link_name() == "base_link"
     assert semantics.get_end_effector_link_name() == "tool0"
-    assert semantics.get_configurable_joint_names() == [
+    assert semantics.get_configurable_joint_names(robot.model) == [
         "shoulder_pan_joint",
         "shoulder_lift_joint",
         "elbow_joint",

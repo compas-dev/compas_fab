@@ -522,9 +522,9 @@ class Robot(Data):
         """
         if self.semantics:
             if group:
-                return self.semantics.get_configurable_joints(group)
+                return self.semantics.get_configurable_joints(self.model, group)
             else:
-                return self.semantics.get_all_configurable_joints()
+                return self.semantics.get_all_configurable_joints(self.model)
         else:
             return self.model.get_configurable_joints()
 

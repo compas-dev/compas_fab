@@ -39,8 +39,6 @@ class RobotSemantics(Data):
 
     Parameters
     ----------
-    robot_model : :class:`~compas_robots.RobotModel`
-        The robot model.
     groups : :obj:`dict` of (:obj:`str`, :obj:`dict` of (``links`` : :obj:`list` of :obj:`str`, ``joints`` : :obj:`list` of :obj:`str`)), optional
         A nested dictionary defining planning groups.
         The dictionary structure is as follows:
@@ -83,7 +81,6 @@ class RobotSemantics(Data):
 
     def __init__(
         self,
-        robot_model,
         groups=None,
         main_group_name=None,
         passive_joints=None,
@@ -91,9 +88,8 @@ class RobotSemantics(Data):
         disabled_collisions=None,
         group_states=None,
     ):
-        # type: (RobotModel, Optional[Dict[str, Dict[str, List[str]]]], Optional[str], Optional[List[str]], Optional[List[str]], List[Tuple[str,str]], Dict[str, Dict[str, Dict[str,float]]]) -> None
+        # type: (Optional[Dict[str, Dict[str, List[str]]]], Optional[str], Optional[List[str]], Optional[List[str]], List[Tuple[str,str]], Dict[str, Dict[str, Dict[str,float]]]) -> None
         super(RobotSemantics, self).__init__()
-        self.robot_model = robot_model
 
         self.groups = groups or {}
         self.main_group_name = main_group_name
@@ -105,7 +101,6 @@ class RobotSemantics(Data):
     @property
     def __data__(self):
         data = {
-            "robot_model": self.robot_model,
             "groups": self.groups,
             "main_group_name": self.main_group_name,
             "passive_joints": self.passive_joints,
@@ -118,7 +113,6 @@ class RobotSemantics(Data):
     @classmethod
     def __from_data__(cls, data):
         # type: (Dict[str, Any]) -> RobotSemantics
-        robot_model = data.get("robot_model")
         groups = data.get("groups", {})
         main_group_name = data.get("main_group_name")
         passive_joints = data.get("passive_joints", [])
@@ -129,7 +123,6 @@ class RobotSemantics(Data):
         group_states = data.get("group_states", {})
 
         robot_semantics = cls(
-            robot_model,
             groups=groups,
             main_group_name=main_group_name,
             passive_joints=passive_joints,
@@ -215,7 +208,6 @@ class RobotSemantics(Data):
         main_group_name = groups_by_links_len[-1][0]
 
         return cls(
-            robot_model,
             groups=groups,
             main_group_name=main_group_name,
             passive_joints=passive_joints,
@@ -261,8 +253,8 @@ class RobotSemantics(Data):
             group = self.main_group_name
         return self.groups[group]["links"][0]
 
-    def get_all_configurable_joints(self):
-        # type: () -> List[Joint]
+    def get_all_configurable_joints(self, robot_model):
+        # type: (RobotModel) -> List[Joint]
         """Get all configurable :class:`compas_robots.model.Joint` of the robot.
 
         Configurable joints are joints that can be controlled,
@@ -277,13 +269,13 @@ class RobotSemantics(Data):
         """
 
         joints = []
-        for joint in self.robot_model.get_configurable_joints():
+        for joint in robot_model.get_configurable_joints():
             if joint.name not in self.passive_joints:
                 joints.append(joint)
         return joints
 
-    def get_configurable_joints(self, group=None):
-        # type: (Optional[str]) -> List[Joint]
+    def get_configurable_joints(self, robot_model, group=None):
+        # type: (RobotModel, Optional[str]) -> List[Joint]
         """Get all configurable :class:`compas_robots.model.Joint` of a planning group.
 
         Configurable joints are joints that can be controlled,
@@ -305,14 +297,14 @@ class RobotSemantics(Data):
             group = self.main_group_name
         joints = []
         for name in self.groups[group]["joints"]:
-            joint = self.robot_model.get_joint_by_name(name)
+            joint = robot_model.get_joint_by_name(name)
             if joint:
                 if joint.is_configurable() and name not in self.passive_joints:
                     joints.append(joint)
         return joints
 
-    def get_configurable_joint_names(self, group=None):
-        # type: (Optional[str]) -> List[str]
+    def get_configurable_joint_names(self, robot_model, group=None):
+        # type: (RobotModel, Optional[str]) -> List[str]
         """Get all the names of configurable joints of a planning group.
 
         Similar to :meth:`get_configurable_joints` but returning joint names.
@@ -326,7 +318,7 @@ class RobotSemantics(Data):
         -------
         :obj:`list` of :obj:`str`
         """
-        return [joint.name for joint in self.get_configurable_joints(group)]
+        return [joint.name for joint in self.get_configurable_joints(robot_model, group)]
 
 
 # -------------------
