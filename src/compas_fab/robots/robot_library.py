@@ -54,16 +54,14 @@ class RobotLibrary(object):
     """
 
     @classmethod
-    def rfl(cls, client=None, load_geometry=True):
-        # type: (Optional[ClientInterface], Optional[bool]) -> Robot
+    def rfl(cls, load_geometry=True):
+        # type: (Optional[bool]) -> Robot
         """Create and return the RFL robot with 4 ABB irb 4600 and twin-gantry setup.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
 
         Parameters
         ----------
-        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-            Backend client. Default is `None`.
         load_geometry: :obj:`bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
@@ -78,14 +76,13 @@ class RobotLibrary(object):
             urdf_filename=compas_fab.get("robot_library/rfl/urdf/robot_description.urdf"),
             srdf_filename=compas_fab.get("robot_library/rfl/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/rfl" if load_geometry else None,
-            client=client,
         )
 
         return robot
 
     @classmethod
-    def ur5(cls, client=None, load_geometry=True):
-        # type: (Optional[ClientInterface], Optional[bool]) -> Robot
+    def ur5(cls, load_geometry=True):
+        # type: (Optional[bool]) -> Robot
         """Returns a UR5 robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
@@ -95,8 +92,6 @@ class RobotLibrary(object):
 
         Parameters
         ----------
-        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-            Backend client. Default is `None`.
         load_geometry: :obj:`bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
@@ -111,22 +106,19 @@ class RobotLibrary(object):
             urdf_filename=compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf"),
             srdf_filename=compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/ur5_robot" if load_geometry else None,
-            client=client,
         )
 
         return robot
 
     @classmethod
-    def ur10e(cls, client=None, load_geometry=True):
-        # type: (Optional[ClientInterface], Optional[bool]) -> Robot
+    def ur10e(cls, load_geometry=True):
+        # type: (Optional[bool]) -> Robot
         """Returns a UR10e robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
 
         Parameters
         ----------
-        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-            Backend client. Default is `None`.
         load_geometry: :obj:`bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
@@ -141,22 +133,19 @@ class RobotLibrary(object):
             urdf_filename=compas_fab.get("robot_library/ur10e_robot/urdf/robot_description.urdf"),
             srdf_filename=compas_fab.get("robot_library/ur10e_robot/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/ur10e_robot" if load_geometry else None,
-            client=client,
         )
 
         return robot
 
     @classmethod
-    def abb_irb4600_40_255(cls, client=None, load_geometry=True):
-        # type: (Optional[ClientInterface], Optional[bool]) -> Robot
+    def abb_irb4600_40_255(cls, load_geometry=True):
+        # type: (Optional[bool]) -> Robot
         """Returns a ABB irb4600-40/2.55 robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
 
         Parameters
         ----------
-        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-            Backend client. Default is `None`.
         load_geometry: :obj:`bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
@@ -171,22 +160,19 @@ class RobotLibrary(object):
             urdf_filename=compas_fab.get("robot_library/abb_irb4600_40_255/urdf/robot_description.urdf"),
             srdf_filename=compas_fab.get("robot_library/abb_irb4600_40_255/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/abb_irb4600_40_255" if load_geometry else None,
-            client=client,
         )
 
         return robot
 
     @classmethod
-    def abb_irb120_3_58(cls, client=None, load_geometry=True):
-        # type: (Optional[ClientInterface], Optional[bool]) -> Robot
+    def abb_irb120_3_58(cls, load_geometry=True):
+        # type: (Optional[bool]) -> Robot
         """Returns a ABB irb120-3/58 robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
 
         Parameters
         ----------
-        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-            Backend client. Default is `None`.
         load_geometry: :obj:`bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
@@ -201,22 +187,19 @@ class RobotLibrary(object):
             urdf_filename=compas_fab.get("robot_library/abb_irb120_3_58/urdf/robot_description.urdf"),
             srdf_filename=compas_fab.get("robot_library/abb_irb120_3_58/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/abb_irb120_3_58" if load_geometry else None,
-            client=client,
         )
 
         return robot
 
     @classmethod
-    def panda(cls, client=None, load_geometry=True):
-        # type: (Optional[ClientInterface], Optional[bool]) -> Robot
+    def panda(cls, load_geometry=True):
+        # type: (Optional[bool]) -> Robot
         """Returns a Panda robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
 
         Parameters
         ----------
-        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-            Backend client. Default is `None`.
         load_geometry: :obj:`bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
@@ -231,7 +214,6 @@ class RobotLibrary(object):
             urdf_filename=compas_fab.get("robot_library/panda/urdf/robot_description.urdf"),
             srdf_filename=compas_fab.get("robot_library/panda/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/panda" if load_geometry else None,
-            client=client,
         )
 
         # Remove the links with '_sc' suffix, which are collision objects used for
@@ -484,8 +466,8 @@ class RobotCellLibrary(object):
     """
 
     @classmethod
-    def ur5_cone_tool(cls, client=None, load_geometry=True):
-        # type: (Optional[ClientInterface], Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def ur5_cone_tool(cls, load_geometry=True):
+        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
         """Create and return the UR5 robot with a cone tool attached. A floor is also included.
 
         See :meth:`compas_fab.robots.RobotLibrary.ur5` and :meth:`compas_fab.robots.ToolLibrary.cone`
@@ -493,8 +475,6 @@ class RobotCellLibrary(object):
 
         Parameters
         ----------
-        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-            Backend client. Default is `None`.
         load_geometry: :obj:`bool`, optional
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
@@ -509,7 +489,7 @@ class RobotCellLibrary(object):
         # ---------------------------------------------------------------------
         # Load Robot and create RobotCell
         # ---------------------------------------------------------------------
-        robot = RobotLibrary.ur5(client, load_geometry=load_geometry)
+        robot = RobotLibrary.ur5(load_geometry=load_geometry)
         robot_cell = RobotCell(robot)
 
         # ---------------------------------------------------------------------
@@ -553,8 +533,8 @@ class RobotCellLibrary(object):
         return robot_cell, robot_cell_state
 
     @classmethod
-    def abb_irb4600_40_255_gripper_one_beam(cls, client=None, load_geometry=True):
-        # type: (Optional[ClientInterface], Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def abb_irb4600_40_255_gripper_one_beam(cls, load_geometry=True):
+        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
         """Create and return the ABB irb4600-40-255 robot with a gripper tool attached.
         One beam (a RigidBody) is included and is attached to the gripper.
         A floor is also included.
@@ -564,8 +544,6 @@ class RobotCellLibrary(object):
 
         Parameters
         ----------
-        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-            Backend client. Default is `None`.
         load_geometry: :obj:`bool`, optional
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
@@ -580,7 +558,7 @@ class RobotCellLibrary(object):
         # ---------------------------------------------------------------------
         # Load Robot and create RobotCell
         # ---------------------------------------------------------------------
-        robot = RobotLibrary.abb_irb4600_40_255(client, load_geometry=load_geometry)
+        robot = RobotLibrary.abb_irb4600_40_255(load_geometry=load_geometry)
         robot_cell = RobotCell(robot)
 
         # ---------------------------------------------------------------------
@@ -623,8 +601,8 @@ class RobotCellLibrary(object):
         return robot_cell, robot_cell_state
 
     @classmethod
-    def ur10e_gripper_one_beam(cls, client=None, load_geometry=True):
-        # type: (Optional[ClientInterface], Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def ur10e_gripper_one_beam(cls, load_geometry=True):
+        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
         """Create and return the ur10e robot with a gripper tool attached.
         One beam (a RigidBody) is included and is attached to the gripper.
         A floor is also included.
@@ -634,8 +612,6 @@ class RobotCellLibrary(object):
 
         Parameters
         ----------
-        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-            Backend client. Default is `None`.
         load_geometry: :obj:`bool`, optional
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
@@ -650,7 +626,7 @@ class RobotCellLibrary(object):
         # ---------------------------------------------------------------------
         # Load Robot and create RobotCell
         # ---------------------------------------------------------------------
-        robot = RobotLibrary.ur10e(client, load_geometry=load_geometry)
+        robot = RobotLibrary.ur10e(load_geometry=load_geometry)
         robot_cell = RobotCell(robot)
 
         # ---------------------------------------------------------------------
@@ -719,8 +695,8 @@ class RobotCellLibrary(object):
         return robot_cell, robot_cell_state
 
     @classmethod
-    def abb_irb4600_40_255_printing_tool(cls, client=None, load_geometry=True):
-        # type: (Optional[ClientInterface], Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def abb_irb4600_40_255_printing_tool(cls, load_geometry=True):
+        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
         """Create and return the ABB irb4600-40-255 robot with a printing tool attached.
         A floor is also included.
 
@@ -729,8 +705,6 @@ class RobotCellLibrary(object):
 
         Parameters
         ----------
-        client: :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-            Backend client. Default is `None`.
         load_geometry: :obj:`bool`, optional
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
@@ -745,7 +719,7 @@ class RobotCellLibrary(object):
         # ---------------------------------------------------------------------
         # Load Robot and create RobotCell
         # ---------------------------------------------------------------------
-        robot = RobotLibrary.abb_irb4600_40_255(client, load_geometry=load_geometry)
+        robot = RobotLibrary.abb_irb4600_40_255(load_geometry=load_geometry)
         robot_cell = RobotCell(robot)
 
         # ---------------------------------------------------------------------
