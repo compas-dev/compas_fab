@@ -1,5 +1,6 @@
 import pytest
 import compas
+from compas.tolerance import TOL
 
 if not compas.IPY:
     from compas_fab.backends import PyBulletClient
@@ -73,17 +74,17 @@ def test_inverse_kinematics_frame_target_target_modes(planner_with_test_cell):
     fk_options = {"link": robot_cell.robot.get_end_effector_link_name(group)}
     robot_cell_state.robot_configuration = result_robot
     fk_frame_robot = planner.forward_kinematics(robot_cell_state, group, options=fk_options)
-    assert fk_frame_robot.__eq__(target_frame, tol=1e-3)
+    assert TOL.is_allclose(fk_frame_robot, target_frame, atol=1e-3)
 
     robot_cell_state.robot_configuration = result_tool
     fk_frame_tool = planner.forward_kinematics(robot_cell_state, group, options=fk_options)
     fk_frame_tcf = planner.from_pcf_to_tcf([fk_frame_tool], "gripper")[0]
-    assert fk_frame_tcf.__eq__(target_frame, tol=1e-3)
+    assert TOL.is_allclose(fk_frame_tcf, target_frame, atol=1e-3)
 
     robot_cell_state.robot_configuration = result_workpiece
     fk_frame_workpiece = planner.forward_kinematics(robot_cell_state, group, options=fk_options)
     fk_frame_ocf = planner.from_pcf_to_ocf([fk_frame_workpiece], "beam")[0]
-    assert fk_frame_ocf.__eq__(target_frame, tol=1e-3)
+    assert TOL.is_allclose(fk_frame_tcf, target_frame, atol=1e-3)
 
 
 def test_inverse_kinematics_target_mode_validation(planner_with_test_cell):
