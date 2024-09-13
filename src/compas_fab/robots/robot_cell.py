@@ -5,6 +5,8 @@ from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots import CollisionMesh
 from compas.geometry import Frame
 from compas.geometry import Transformation
+from compas_fab.robots import Robot
+from compas_robots import ToolModel
 
 if not compas.IPY:
     from typing import TYPE_CHECKING
@@ -68,11 +70,46 @@ class RobotCell(Data):
 
     @property
     def __data__(self):
+        tool_models = {id: tool.__data__ for id, tool in self.tool_models.items()}
+        rigid_body_models = {id: rigid_body.__data__ for id, rigid_body in self.rigid_body_models.items()}
         return {
-            "robot": self.robot,
-            "tool_models": self.tool_models,
-            "rigid_body_models": self.rigid_body_models,
+            "robot": self.robot.__data__,
+            "tool_models": tool_models,
+            "rigid_body_models": rigid_body_models,
         }
+
+    # NOTE: The following code is what would be more elegant, but it is not working because of the ProxyObject deepcopy failure problem.
+    #       The __from_data__ method was not even required in the original code.
+
+    # @property
+    # def __data__(self):
+    #     return {
+    #         "robot": self.robot,
+    #         "tool_models": self.tool_models,
+    #         "rigid_body_models": self.rigid_body_models,
+    #     }
+
+    @classmethod
+    def __from_data__(cls, data):
+        # type: (Dict) -> RobotCell
+        """Construct a RobotCell from a data dictionary.
+
+        Parameters
+        ----------
+        data : dict
+            The data dictionary.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.RobotCell`
+            The robot cell.
+        """
+        robot = Robot.__from_data__(data["robot"])
+        tool_models = {id: ToolModel.__from_data__(tool_data) for id, tool_data in data["tool_models"].items()}
+        rigid_body_models = {
+            id: RigidBody.__from_data__(rigid_body_data) for id, rigid_body_data in data["rigid_body_models"].items()
+        }
+        return cls(robot, tool_models, rigid_body_models)
 
     def assert_cell_state_match(self, cell_state):
         # type: (RobotCellState) -> None
