@@ -9,14 +9,14 @@ on:
 
 jobs:
   build:
-    name: ubuntu-py38-integration
+    name: ubuntu-py39-integration
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: '3.9'
       - name: Set up docker containers
         run: |
           docker-compose -f "tests/integration_setup/docker-compose.yml" up -d --build

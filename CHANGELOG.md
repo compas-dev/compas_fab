@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Dropped support for Python 3.8 and updated compas requirements to 2.3
 * Calling `forward_kinematics` from the Robot class now uses only the RobotModel to calculate the forward kinematics.
 * Fixed error in `PyBulletForwardKinematics.forward_kinematics` where function would crash if `options` was not passed.
 * Fixed error in `PyBulletInverseKinematics._accurate_inverse_kinematics` where threshold was not squared for comparison.
