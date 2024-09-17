@@ -6,6 +6,7 @@ from compas_fab.robots import Waypoints
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import PointAxisWaypoints
 from compas_fab.robots import FrameTarget
+from compas_fab.robots import PointAxisTarget
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
 from compas_fab.robots import TargetMode
@@ -13,6 +14,8 @@ from compas_robots.model import Joint
 
 from math import pi
 from math import ceil
+
+from copy import deepcopy
 
 from compas_fab.backends import InverseKinematicsError
 from compas_fab.backends import CollisionCheckError
@@ -27,6 +30,8 @@ import compas
 
 from compas.geometry import axis_angle_from_quaternion
 from compas.geometry import Quaternion
+from compas.geometry import is_parallel_vector_vector
+from compas.geometry import cross_vectors
 
 if compas.IPY:
     from typing import TYPE_CHECKING
@@ -38,9 +43,13 @@ if compas.IPY:
         from compas_fab.robots import Robot  # noqa: F401
         from compas_robots import Configuration  # noqa: F401
         from compas.geometry import Frame  # noqa: F401
+        from compas.geometry import Point  # noqa: F401
+        from compas.geometry import Vector  # noqa: F401
         from typing import Optional  # noqa: F401
         from typing import Dict  # noqa: F401
         from typing import List  # noqa: F401
+        from typing import Tuple  # noqa: F401
+
 
 __all__ = [
     "PyBulletPlanCartesianMotion",
@@ -143,13 +152,27 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         # Unit conversion from user scale to meter scale can be done here because they are shared.
         robot = self.client.robot  # type: Robot
+        client = planner.client  # type: PyBulletClient
         group = group or robot.main_group_name
+
+        # TODO: See if we should move scaling inside the planning functions.
         if robot.need_scaling:
             waypoints = waypoints.scaled(1.0 / robot.scale_factor)
 
         # Check if the robot cell state supports the target mode
         planner = self  # type: PyBulletPlanner
         planner.ensure_robot_cell_state_supports_target_mode(start_state, waypoints.target_mode, group)
+
+        # Check start_state is formatted correctly
+        if not start_state.robot_configuration:
+            raise ValueError("start_state.robot_configuration must be provided.")
+        if not start_state.robot_configuration.joint_names:
+            raise ValueError("start_state.robot_configuration.joint_names must be provided.")
+        client.robot_cell.assert_cell_state_match(start_state)
+
+        # Get default group name if not provided
+        # Do not skip this line because some functions do not default to main_group_name when group input is None.
+        group = group or robot.main_group_name
 
         # ===================================================================================
         # End of common lines
@@ -162,11 +185,21 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         else:
             raise NotImplementedError("Only PointAxisWaypoints and FrameWaypoints are supported.")
 
-    def plan_cartesian_motion_point_axis_waypoints(self, waypoints, start_state, group=None, options=None):
+    def plan_cartesian_motion_point_axis_waypoints(self, waypoints, start_state, group, options=None):
         # type: (PointAxisWaypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
         """Calculates a cartesian motion path (linear in tool space) for Point Axis Waypoints.
 
-        Users can choose to provide a list of high density waypoints or a list of sparse waypoints.
+        Similar to the :meth:`~plan_cartesian_motion_frame_waypoints` method, this method calculates a cartesian motion path
+        (linear in tool space) for Point Axis Waypoints. The main difference is that the interpolation is
+        performed with the point and axis of the target. The main application of this function is
+        for 3D printing, milling, or other applications where the tool is cylindrical and must follow a specific path.
+        Users should select the correct target_mode in the waypoints to ensure that the planner interpolates correctly,
+        It is common to use TargetMode.TOOL for the example applications mentioned above, such that the reference frame
+        is the tool coordinate frame (TCF).
+        Note that the Z axis of the reference frame is aligned with the axis of the target.
+        Users who wish to use other axis should consider redefining the ToolModel.frame in their tools.
+
+        Users can choose to provide waypoints densely or sparsely.
         High density waypoints will allow the user to control precisely the path of the tool, such as
         when following a curve. This is because the planner is guaranteed to generate a JointTrajectoryPoint
         exactly at each waypoint. Sparse waypoints is suitable when the tool traces a straight line, the planner
@@ -189,14 +222,241 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         The planner can be configured to sample the starting configuration to improve the chance of finding a solution,
         this is controlled by the ``sample_start_configuration`` option. If enabled, the planner will treat the starting
         configuration as an freely rotatable point-axis target. If a solution is found, the sampled configuration will be
-        returned in trajectory.start_configuration. Users should verify whether the sampled configuration is the same
-        as the robot_configuration in the start_state.
+        returned in trajectory.start_configuration. In this mode, the start_state.robot_configuration is ignored.
+
+        Notes
+        -----
+        Users should call :meth:`~PyBulletPlanCartesianMotion.plan_cartesian_motion` instead of this method directly.
+        Doing so will ensure that necessary scaling and checks are performed.
+
+        Parameters
+        ----------
+        waypoints : :class:`compas_fab.robots.PointAxisWaypoints`
+            The waypoints for the robot to follow.
+        start_state : :class:`compas_fab.robots.RobotCellState`
+            The starting state of the robot cell at the beginning of the motion.
+            The attribute `robot_configuration`, must be provided.
+        group: str
+            The planning group used for calculation.
+        options: dict, optional
+            Dictionary containing the following key-value pairs:
+
+            - ``"max_step_distance"``: (:obj:`float`, optional)
+              The max Cartesian distance between two consecutive points in the result.
+              Unit is in meters, defaults to ``0.01``.
+            - ``"max_step_angle"``: (:obj:`float`, optional)
+              The max angular distance between two consecutive points in the result.
+              Unit is in radians, defaults to ``0.1``.
+            - ``"sample_start_configuration"``: (:obj:`bool`, optional)
+              Whether or not to sample the start configuration. Defaults to ``False``.
+            - ``"check_collision"``: (:obj:`bool`, optional)
+              Whether or not to avoid collision. Defaults to ``True``.
+            - ``"max_jump_prismatic"``: (:obj:`float`, optional)
+              The maximum allowed distance of prismatic joint positions
+              between consecutive trajectory points.
+              Unit is in meters, defaults to ``0.1``.
+              Setting this to ``0`` will disable this check.
+            - ``"max_jump_revolute"``: (:obj:`float`, optional)
+              The maximum allowed distance of revolute and continuous joint positions
+              between consecutive trajectory points.
+              Unit is in radians, defaults to :math:`\\pi / 2` (90 degrees).
+              Setting this to ``0`` will disable this check.
+            - ``"check_collision"``: (:obj:`bool`, optional)
+              Whether or not to avoid collision. Defaults to ``True``.
+            - ``"verbose"``: (:obj:`bool`, optional)
+                Whether or not to print verbose output. Defaults to ``True``.
+            - ``"skip_preplanning_collision_check"``: (:obj:`bool`, optional)
+                Whether or not to skip the target check before planning. Defaults to ``True``.
+                The preplanning check in intended to provide a fail-fast feedback for the user.
+                However, if there are many targets in the waypoints, the check maybe more
+                time consuming than the benefit it provides.
+                Because this planner is often used for 3D printing, milling, etc. the user is likely
+                to provide dense waypoints, therefore this check is disabled by default.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.JointTrajectory`
+            The calculated trajectory.
+
+        Raises
+        ------
+        :class:`compas_fab.backends.MPNoIKSolutionError`
+            If no IK solution could be found by the kinematic solver.
+            The partially planned trajectory before the unreachable target is returned.
+            The unreachable target frame is returned.
 
         """
 
-        raise NotImplementedError("plan_cartesian_motion_point_axis_waypoints() is not implemented yet.")
+        # Set default option values
+        options = options or {}
+        options = deepcopy(options)
+        options["max_step_distance"] = options.get("max_step_distance", 0.01)  # meters
+        options["max_step_angle"] = options.get("max_step_angle", 0.1)  # radians
+        options["sample_start_configuration"] = options.get("sample_start_configuration", False)
+        options["check_collision"] = options.get("check_collision", True)
+        options["max_jump_prismatic"] = options.get("max_jump_prismatic", 0.1)
+        options["max_jump_revolute"] = options.get("max_jump_revolute", pi / 2)
+        options["skip_preplanning_collision_check"] = options.get("skip_preplanning_collision_check", True)
+        options["verbose"] = options.get("verbose", False)
 
-    def plan_cartesian_motion_frame_waypoints(self, waypoints, start_state, group=None, options=None):
+        # Housekeeping for intellisense
+        planner = self  # type: PyBulletPlanner
+        client = planner.client  # type: PyBulletClient
+        robot = client.robot  # type: Robot
+
+        # Setting robot cell state
+        planner.set_robot_cell_state(start_state)
+
+        # TODO: Check if the start state is in collision
+
+        # TODO: Check if the attached tool and workpiece are in collision at every waypoint
+
+        # Options for Inverse Kinematics
+        ik_options = deepcopy(options)
+
+        ik_options["max_results"] = 1
+        # NOTE: # We only need the joint values for the group to construct the JointTrajectoryPoint
+        ik_options["return_full_configuration"] = False
+        # NOTE: The PyBullet IK function is responsible for performing collision checking for this planning function
+        # The ["check_collision"] in options is passed also to the ik_options
+
+        # Getting the joint names this way ensures that the joint order is consistent with Semantics
+        joint_names = robot.get_configurable_joint_names(group)
+        joint_types = robot.get_configurable_joint_types(group)
+
+        # Iterate over the waypoints as segments
+        intermediate_state = deepcopy(start_state)  # type: RobotCellState
+        start_configuration = start_state.robot_configuration
+        # TODO: We currently trust that the input configuration has a correct joint order, this should be checked
+        trajectory = JointTrajectory(joint_names=joint_names, start_configuration=start_configuration)
+
+        # Recreate the first frame for the beginning of the interpolation
+        fk_options = deepcopy(options)
+        fk_options["link"] = robot.get_end_effector_link_name(group)
+        start_frame_pcf = planner.forward_kinematics(start_state, group, fk_options)  # type: Frame
+        starting_target = PointAxisTarget(
+            start_frame_pcf.point,
+            start_frame_pcf.zaxis,
+            target_mode=waypoints.target_mode,
+            tolerance_position=waypoints.tolerance_position,
+        )
+
+        # Interpolation is performed for all the waypoints before planning.
+        # There will be no further sub-division.
+        # This makes the DFS code easier to implement.
+
+        all_targets = [starting_target]  # type: List[PointAxisTarget]
+        for i in range(len(waypoints.target_points)):
+            start_point_axis = all_targets[-1].target_point, all_targets[-1].target_axis
+            end_point_axis = waypoints.target_points_and_axes[i]
+            interpolator = PointAxisInterpolator(start_point_axis, end_point_axis, options)
+
+            # Compute the number of steps for the interpolation, step == 1 means no interpolation.
+            steps = interpolator.regular_interpolation_steps
+            for j in range(steps):
+                # t == 0 is skipped because it is the same as the last target
+                # t == 1 represent the end target
+                t = (j + 1) / steps
+                interpolated_point, interpolated_axis = interpolator.get_interpolated_point_axis(t)
+                target = PointAxisTarget(
+                    interpolated_point,
+                    interpolated_axis,
+                    target_mode=waypoints.target_mode,
+                    tolerance_position=waypoints.tolerance_position,
+                )
+                all_targets.append(target)
+
+        # Perform Depth First Search (DFS) over the targets to plan the trajectory
+
+        # ===================================================================================
+        # DFS Code without recursion
+        # ===================================================================================
+
+        # TODO: Implement sample_start_configuration
+        current_step = 1  # This is the current step in the DFS
+        planned_configurations = [start_configuration]  # This list holds the planned configurations for each step
+        ik_generators = [zip()]  # This list holds the iterative ik generators for each step
+        ik_option_indices = [0]  # This is only used for debugging
+
+        while True:
+            # Create a generator if the current step does no    t have one
+            if current_step >= len(ik_generators):
+                target = all_targets[current_step]
+                intermediate_state = deepcopy(
+                    start_state
+                )  # Deep copy because we will have multiple generators in the stack
+                intermediate_state.robot_configuration = planned_configurations[-1]
+                ik_generator = planner.iter_inverse_kinematics_point_axis_target(
+                    all_targets[0], intermediate_state, group, ik_options
+                )
+                ik_generators.append(ik_generator)
+                ik_option_indices.append(-1)
+
+            # Check if the IK generator (of current step) has any more options
+            ik_result = next(ik_generators[-1], None)
+            ik_option_indices[-1] += 1
+
+            # Check IK result for max_jump
+            if ik_result is not None:
+                within_max_jump = self._check_max_jump(
+                    joint_names,
+                    joint_types,
+                    planned_configurations[-1],
+                    ik_result,
+                    options,
+                )
+
+            # If valid IK solution found, proceed to the next step
+            if ik_result is not None and within_max_jump:
+
+                print(f"Step: {current_step} Option {ik_option_indices[-1]} is valid")
+                planned_configurations.append(ik_result)
+
+                # If this is the last step, the search is complete
+                if len(planned_configurations) == len(all_targets):
+                    print(f"Search is complete. Returning {len(planned_configurations)} configurations")
+                    break
+
+                # Move to the next step
+                current_step += 1
+
+            # If no more options and at the current step, backtrack
+            else:
+                print("Search Exhausted in Step:{} after {} ik options".format(current_step, ik_option_indices[-1]))
+
+                current_step -= 1
+                # Stop condition is when the current step is less than 0
+                if current_step < 0:
+                    print("Search Failed")
+                    planned_configurations = None
+                    break
+                # When backtracking, remove the last planned configuration and the exhausted generator
+                ik_generators.pop()
+                ik_option_indices.pop()
+                planned_configurations.pop()
+
+            # If no valid IK solution, try the next option
+            continue
+
+        # ===================================================================================
+        # DFS Ends Here
+        # ===================================================================================
+
+        # If the search failed, return None
+        if planned_configurations is None:
+            return None
+
+        # Create the trajectory
+        trajectory = JointTrajectory(joint_names=joint_names, start_configuration=start_configuration)
+        for planned_configuration in planned_configurations:
+            joint_values = [planned_configuration[joint_name] for joint_name in joint_names]
+            trajectory.points.append(
+                JointTrajectoryPoint(joint_values=joint_values, joint_types=joint_types, joint_names=joint_names)
+            )
+
+        return trajectory
+
+    def plan_cartesian_motion_frame_waypoints(self, waypoints, start_state, group, options=None):
         # type: (FrameWaypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
         """Calculates a cartesian motion path (linear in tool space) for Frame Waypoints.
 
@@ -237,6 +497,10 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         Notes
         -----
+
+        Users should call :meth:`~PyBulletPlanCartesianMotion.plan_cartesian_motion` instead of this method directly.
+        Doing so will ensure that necessary scaling and checks are performed.
+
         This planning function is deterministic, meaning that the same input will always result in the same output.
         If this function fails, retrying with the same input will not change the result.
         When planning fails, the user can still obtain the partial trajectory by
@@ -249,14 +513,13 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         Parameters
         ----------
-        waypoints : :class:`compas_fab.robots.Waypoints`
+        waypoints : :class:`compas_fab.robots.FrameWaypoints`
             The waypoints for the robot to follow.
         start_state : :class:`compas_fab.robots.RobotCellState`
             The starting state of the robot cell at the beginning of the motion.
             The attribute `robot_configuration`, must be provided.
-        group: str, optional
-            The planning group used for calculation. Defaults to the robot's
-            main planning group.
+        group: str
+            The planning group used for calculation.
         options: dict, optional
             Dictionary containing the following key-value pairs:
 
@@ -321,13 +584,13 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         """
         # Set default option values
         options = options or {}
-        options = options.copy()
+        options = deepcopy(options)
         options["max_step_distance"] = options.get("max_step_distance", 0.01)  # meters
         options["max_step_angle"] = options.get("max_step_angle", 0.1)  # radians
         options["min_step_distance"] = options.get("min_step_distance", 0.0001)  # meters
         options["min_step_angle"] = options.get("min_step_angle", 0.0001)  # radians
         options["max_jump_prismatic"] = options.get("max_jump_prismatic", 0.1)
-        options["max_jump_revolute"] = options.get("max_jump_revolute", 3.14 / 2)
+        options["max_jump_revolute"] = options.get("max_jump_revolute", pi / 2)
         options["check_collision"] = options.get("check_collision", True)
         options["skip_preplanning_collision_check"] = options.get("skip_preplanning_collision_check", False)
         options["verbose"] = options.get("verbose", False)
@@ -336,17 +599,6 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
         robot = client.robot  # type: Robot
-
-        # Check input sanity
-        if not start_state.robot_configuration:
-            raise ValueError("start_state.robot_configuration must be provided.")
-        if not start_state.robot_configuration.joint_names:
-            raise ValueError("start_state.robot_configuration.joint_names must be provided.")
-        client.robot_cell.assert_cell_state_match(start_state)
-
-        # Get default group name if not provided
-        # Do not skip this line because some functions do not default to main_group_name when group input is None.
-        group = group or robot.main_group_name
 
         # Setting robot cell state
         planner.set_robot_cell_state(start_state)
@@ -369,7 +621,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         # Checking the attached tool and workpiece for collision at every target
         if options.get("check_collision") and not options.get("skip_preplanning_collision_check"):
-            intermediate_state = start_state.copy()
+            intermediate_state = deepcopy(start_state)
             intermediate_state.robot_configuration = None
             # Convert the targets to PCFs for collision checking
             pcf_frames = planner.frames_to_pcf(waypoints.target_frames, waypoints.target_mode, group)
@@ -391,7 +643,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                     raise MPTargetInCollisionError(message, target=pcf_frame, collision_pairs=e.collision_pairs)
 
         # Options for Inverse Kinematics
-        ik_options = options.copy()
+        ik_options = deepcopy(options)
         # NOTE: PyBullet IK is gradient based and will snap to the nearest configuration of the start state
         # NOTE: We are running this IK solver without random search (by setting max_results = 1) to ensure determinism
         #       In this mode, planner.inverse_kinematics() will raise an InverseKinematicsError if no IK solution is found,
@@ -407,7 +659,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         joint_types = robot.get_configurable_joint_types(group)
 
         # Iterate over the waypoints as segments
-        intermediate_state = start_state.copy()  # type: RobotCellState
+        intermediate_state = deepcopy(start_state)  # type: RobotCellState
         start_configuration = start_state.robot_configuration
         # TODO: We currently trust that the input configuration has a correct joint order, this should be checked
         trajectory = JointTrajectory(joint_names=joint_names, start_configuration=start_configuration)
@@ -422,8 +674,9 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         if options["verbose"]:
             print("Target Mode is: {}. Interpolation will happen with this reference".format(waypoints.target_mode))
 
+        # Recreate the first frame for the beginning of the interpolation
         # First frame is obtained from the start configuration with forward kinematics
-        fk_options = options.copy()
+        fk_options = deepcopy(options)
         fk_options["link"] = robot.get_end_effector_link_name(group)
         start_frame_pcf = planner.forward_kinematics(start_state, group, fk_options)  # type: Frame
         # This frame reference need to match with the target_mode of the waypoints
@@ -624,7 +877,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         """
         max_jump_prismatic = options.get("max_jump_prismatic", 0.1)
-        max_jump_revolute = options.get("max_jump_revolute", 3.14 / 2)
+        max_jump_revolute = options.get("max_jump_revolute", pi / 2)
 
         for joint_name, joint_type, v1, v2 in zip(joint_names, joint_types, start_joint_values, end_joint_values):
             # If the joint is REVOLUTE we check the angular difference:
@@ -812,3 +1065,112 @@ class FrameInterpolator(object):
             return (delta_distance, delta_angle, False)
 
         return (delta_distance, delta_angle, True)
+
+
+class PointAxisInterpolator(object):
+    """A helper class to interpolate between two point-axis pairs.
+
+    All the properties are read-only and are computed during initialization.
+
+    Parameters
+    ----------
+    start_point_axis : tuple of :class:`compas.geometry.Point` and :class:`compas.geometry.Vector`
+        The start point-axis pair.
+    end_point_axis : tuple of :class:`compas.geometry.Point` and :class:`compas.geometry.Vector`
+        The end point-axis pair.
+    options : dict
+        Dictionary should contain the following key-value pairs:
+
+        - ``"max_step_distance"``: (:obj:`float`, optional)
+        - ``"max_step_angle"``: (:obj:`float`, optional)
+        - ``"min_step_distance"``: (:obj:`float`, optional)
+        - ``"min_step_angle"```: (:obj:`float`, optional)
+
+    """
+
+    def __init__(self, start_point_axis, end_point_axis, options):
+        # type: (Tuple[Point, Vector], Tuple[Point, Vector], Dict) -> None
+        self.start_point, self.start_axis = start_point_axis
+        self.end_point, self.end_axis = end_point_axis
+        self.options = options
+
+        # Compute the total distance between the two points
+        self._total_distance = self.start_point.distance_to_point(self.end_point)
+
+        # Compute the total angle between the two axes
+        self._total_angle = self.start_axis.angle(self.end_axis)
+
+        # Compute the number of steps based on max_step_distance and max_step_angle
+        num_steps_by_distance = ceil(self._total_distance / self.options["max_step_distance"])
+        num_steps_by_angle = ceil(self._total_angle / self.options["max_step_angle"])
+
+        # NOTE: Minimum of 1 step is used, this step is equal to the end_frame itself.
+        self._regular_interpolation_steps = max(num_steps_by_distance, num_steps_by_angle, 1)
+
+    @property
+    def total_distance(self):
+        # type: () -> float
+        """The total distance between the start and end points.
+
+        Returns
+        -------
+        float
+            The total distance (original unit) between the start and end points.
+
+        """
+        return self._total_distance
+
+    @property
+    def total_angle(self):
+        # type: () -> float
+        """The total angle between the start and end axes.
+
+        Returns
+        -------
+        float
+            The total angle in radians between the start and end axes.
+
+        """
+        return self._total_angle
+
+    @property
+    def regular_interpolation_steps(self):
+        # type: () -> int
+        """The number of interpolation steps based on max_step_distance and max_step_angle.
+
+        Returns
+        -------
+        int
+            The number of interpolation steps.
+            Minimum is 1.
+
+        """
+
+        return self._regular_interpolation_steps
+
+    def get_interpolated_point_axis(self, t):
+        # type: (float) -> Tuple[List[float], Vector]
+        """Interpolate between two point-axis pairs using a parameter t.
+
+        Parameters
+        ----------
+        t : float
+            The interpolation parameter, 0 <= t <= 1.
+
+        Returns
+        -------
+        tuple of :class:`compas.geometry.Point` and :class:`compas.geometry.Vector`
+            The interpolated point-axis pair.
+
+        """
+        # Compute the interpolated point using the parameter t
+        xyz = [a + t * (b - a) for a, b in zip(self.start_point, self.end_point)]
+        point_t = xyz
+        # Compute the interpolated axis by rotation
+        if is_parallel_vector_vector(self.start_axis, self.end_axis):
+            axis_t = self.end_axis
+        else:
+            angle = t * self.total_angle
+            rotation_axis = cross_vectors(self.start_axis, self.end_axis)
+            axis_t = self.start_axis.rotate(angle, axis=rotation_axis)
+        return (point_t, axis_t)
