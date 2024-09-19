@@ -372,6 +372,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
             start_frame.zaxis,
             target_mode=waypoints.target_mode,
             tolerance_position=waypoints.tolerance_position,
+            tolerance_orientation=waypoints.tolerance_orientation,
         )
 
         # Interpolation is performed for all the waypoints before planning.
@@ -398,6 +399,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                     interpolated_axis,
                     target_mode=waypoints.target_mode,
                     tolerance_position=waypoints.tolerance_position,
+                    tolerance_orientation=waypoints.tolerance_orientation,
                 )
                 all_targets.append(target)
 

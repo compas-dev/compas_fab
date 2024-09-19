@@ -18,8 +18,18 @@
                 "description": "The target axis is defined by the target_point and pointing towards this vector. The tool tip coordinate frame (TCF)'s Z axis can rotate around this axis. Accepts Rhino / Grasshopper Vector or COMPAS Vector."
             },
             {
+                "name": "target_mode",
+                "description": "The target mode. Options are: 'ROBOT', 'TOOL' or 'WORKPIECE'",
+                "typeHintID": "str"
+            },
+            {
                 "name": "tolerance_position",
-                "description": "The allowed tolerance of the tool reaching the target point.",
+                "description": "The allowed tolerance when reaching the target point.",
+                "typeHintID": "float"
+            },
+            {
+                "name": "tolerance_orientation",
+                "description": "The allowed tolerance when reaching the target orientation.",
                 "typeHintID": "float"
             },
             {

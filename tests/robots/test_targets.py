@@ -50,8 +50,11 @@ def point_axis_target():
     target_point = Point(1.0, -2.0, 3.0)
     target_vector = Vector(1.0, -1.0, 0.0)
     tolerance_position = 0.001
+    tolerance_orientation = 0.001
     name = "my testing name"
-    return PointAxisTarget(target_point, target_vector, TargetMode.ROBOT, tolerance_position, name)
+    return PointAxisTarget(
+        target_point, target_vector, TargetMode.ROBOT, tolerance_position, tolerance_orientation, name
+    )
 
 
 @pytest.fixture
@@ -77,6 +80,7 @@ def test_serialization_targets(frame_target, point_axis_target, configuration_ta
     assert point_axis_target.target_z_axis == nt.target_z_axis
     assert point_axis_target.target_mode == nt.target_mode
     assert point_axis_target.tolerance_position == nt.tolerance_position
+    assert point_axis_target.tolerance_orientation == nt.tolerance_orientation
     assert point_axis_target.name == nt.name
 
     # ConfigurationTarget

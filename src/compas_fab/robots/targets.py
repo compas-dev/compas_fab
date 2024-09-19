@@ -241,6 +241,11 @@ class PointAxisTarget(Target):
         See :class:`TargetMode` for more details.
     tolerance_position : float, optional
         The tolerance for the position of the target point.
+        Unit is meters.
+        If not specified, the default value from the planner is used.
+    tolerance_orientation : float, optional
+        The tolerance for matching the target axis orientation.
+        Unit is in radians.
         If not specified, the default value from the planner is used.
     name : str, optional
         The human-readable name of the target.
@@ -253,14 +258,16 @@ class PointAxisTarget(Target):
         target_z_axis,
         target_mode,
         tolerance_position=None,
+        tolerance_orientation=None,
         name="Point-Axis Target",
     ):
-        # type: (Point, Vector, TargetMode | str, Optional[float], Optional[str]) -> None
+        # type: (Point, Vector, TargetMode | str, Optional[float], Optional[float], Optional[str]) -> None
         super(PointAxisTarget, self).__init__(target_mode=target_mode, name=name)
         # Note: The following input are converted to class because it can simplify functions that use this class
         self.target_point = Point(*target_point)
         self.target_z_axis = Vector(*target_z_axis)
         self.tolerance_position = tolerance_position
+        self.tolerance_orientation = tolerance_orientation
 
     @property
     def __data__(self):
@@ -269,6 +276,7 @@ class PointAxisTarget(Target):
             "target_mode": self.target_mode,
             "target_z_axis": self.target_z_axis,
             "tolerance_position": self.tolerance_position,
+            "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
         }
 
@@ -289,7 +297,9 @@ class PointAxisTarget(Target):
         target_point = self.target_point.scaled(factor)
         tolerance_position = self.tolerance_position * factor if self.tolerance_position else None
         target_z_axis = self.target_z_axis  # Vector is unitized and is not scaled
-        return PointAxisTarget(target_point, target_z_axis, self.target_mode, tolerance_position, self.name)
+        return PointAxisTarget(
+            target_point, target_z_axis, self.target_mode, tolerance_position, self.tolerance_orientation, self.name
+        )
 
 
 class ConfigurationTarget(Target):
@@ -684,6 +694,11 @@ class PointAxisWaypoints(Waypoints):
         See :class:`TargetMode` for more details.
     tolerance_position : float, optional
         The tolerance for the position of the target point.
+        Unit is meters.
+        If not specified, the default value from the planner is used.
+    tolerance_orientation : float, optional
+        The tolerance for matching the target axis orientation.
+        Unit is in radians.
         If not specified, the default value from the planner is used.
     name : str, optional
         The human-readable name of the target.
@@ -696,11 +711,13 @@ class PointAxisWaypoints(Waypoints):
         target_points_and_axes,
         target_mode,
         tolerance_position=None,
+        tolerance_orientation=None,
         name="Point-Axis Waypoints",
     ):
         super(PointAxisWaypoints, self).__init__(target_mode=target_mode, name=name)
         self.target_points_and_axes = target_points_and_axes
         self.tolerance_position = tolerance_position
+        self.tolerance_orientation = tolerance_orientation
 
     @property
     def __data__(self):
@@ -708,6 +725,7 @@ class PointAxisWaypoints(Waypoints):
             "target_points_and_axes": self.target_points_and_axes,
             "target_mode": self.target_mode,
             "tolerance_position": self.tolerance_position,
+            "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
         }
 
@@ -728,7 +746,9 @@ class PointAxisWaypoints(Waypoints):
         # Axis is a unitized vector and is not scaled
         target_points_and_axes = [(point.scaled(factor), axis) for point, axis in self.target_points_and_axes]
         tolerance_position = self.tolerance_position * factor if self.tolerance_position else None
-        return PointAxisWaypoints(target_points_and_axes, self.target_mode, tolerance_position, self.name)
+        return PointAxisWaypoints(
+            target_points_and_axes, self.target_mode, tolerance_position, self.tolerance_orientation, self.name
+        )
 
 
 class TargetMode:

@@ -665,7 +665,9 @@ class PyBulletInverseKinematics(InverseKinematics):
                 rotated_frame = initial_frame.rotated(theta, initial_frame.zaxis, initial_frame.point)
                 if options["verbose"]:
                     print("Rotated Frame: {}, theta: {}".format(rotated_frame, theta))
-                frame_target = FrameTarget(rotated_frame, target.target_mode)
+                frame_target = FrameTarget(
+                    rotated_frame, target.target_mode, target.tolerance_position, target.tolerance_orientation
+                )
 
                 # Call underlying FrameTarget function to get IK solutions
                 ik_frame_target = self.iter_inverse_kinematics_frame_target(
