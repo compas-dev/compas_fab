@@ -525,6 +525,13 @@ class PyBulletInverseKinematics(InverseKinematics):
         :obj:`compas_robots.Configuration`
             The calculated configuration.
 
+        Raises
+        ------
+        :class:`compas_fab.backends.InverseKinematicsError`
+            Indicates that no IK solution could be found by the kinematic solver
+            after the maximum number of attempts (``max_results``). This can be caused by
+            reachability or collision or both.
+
         """
         options = options or {}
 

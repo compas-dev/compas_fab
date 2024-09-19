@@ -14,6 +14,7 @@ __all__ = [
     "MPInterpolationInCollisionError",
     "MPSearchTimeOutError",
     "MPNoIKSolutionError",
+    "MPNoPlanFoundError",
     "MPMaxJumpError",
 ]
 
@@ -180,6 +181,14 @@ class MPNoIKSolutionError(MotionPlanningError):
     def __init__(self, message, target=None, partial_trajectory=None):
         super(MPNoIKSolutionError, self).__init__(message, partial_trajectory)
         self.target = target
+
+
+class MPNoPlanFoundError(MotionPlanningError):
+    """Indicates that no plan could be found by the motion planner."""
+
+    def __init__(self, message, partial_trajectory=None):
+        super(MPNoPlanFoundError, self).__init__(message)
+        self.partial_trajectory = partial_trajectory
 
 
 class MPMaxJumpError(MotionPlanningError):

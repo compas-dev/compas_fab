@@ -24,6 +24,7 @@ from compas_fab.backends import MPNoIKSolutionError
 from compas_fab.backends import MPInterpolationInCollisionError
 from compas_fab.backends import MPStartStateInCollisionError
 from compas_fab.backends import MPTargetInCollisionError
+from compas_fab.backends import MPNoPlanFoundError
 
 
 import compas
@@ -151,8 +152,9 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # ===================================================================================
 
         # Unit conversion from user scale to meter scale can be done here because they are shared.
-        robot = self.client.robot  # type: Robot
+        planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
+        robot = client.robot  # type: Robot
         group = group or robot.main_group_name
 
         # TODO: See if we should move scaling inside the planning functions.
@@ -216,8 +218,19 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         planner from finding a solution. For application that are not bounded by the joint speed, the user can set the
         ``max_jump`` parameters to a high value (e.g. 0.1 meter and 1 pi radian), simply as a means to avoid sudden joint flips.
 
-        For applications that require a specific tool speed, the user can use the max_jump parameters to ensure that the
-        joint speed is within the desired range.
+        For applications that require a specific tool speed, the user can use the max_jump parameters as a rudimentary way
+        of constraining the maximum difference between two consecutive points, hence keeping speed within the desired range.
+
+        The planning algorithm starts searching from the starting configuration and iteratively tries to find the next IK solution
+        in the forward direction. When searching for the next IK solution, the planner will use the last configuration to perform
+        a gradient decent, this is to ensure that the next configuration is close to the last one. However, this also limits the
+        planner to not be able to jump to another configuration (e.g. from elbow up to elbow down). Users should therefore be
+        aware that the planner is incomplete and may not find certain solutions even if one exists.
+
+        Because of the iterative search, the search space and searching time is highly sensitive to the starting configuration.
+        A good starting configuration can greatly reduce the search time, while a bad starting configuration can make the search
+        impossible. In general the user should provide a starting configuration that is likely to transition smoothly to all the
+        waypoints.
 
         The planner can be configured to sample the starting configuration to improve the chance of finding a solution,
         this is controlled by the ``sample_start_configuration`` option. If enabled, the planner will treat the starting
@@ -314,11 +327,15 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # Options for Inverse Kinematics
         ik_options = deepcopy(options)
 
-        ik_options["max_results"] = 1
         # NOTE: # We only need the joint values for the group to construct the JointTrajectoryPoint
-        ik_options["return_full_configuration"] = False
+        ik_options["max_results"] = 1
         # NOTE: The PyBullet IK function is responsible for performing collision checking for this planning function
         # The ["check_collision"] in options is passed also to the ik_options
+        ik_options["return_full_configuration"] = False
+        # NOTE: Turning max_random_restart to 1 because a random restart is very unlikely to be continuous with the
+        # previous configuration. This will just waste search time for solutions that fail the max_jump check.
+        # In addition, setting this to 1 will make the search deterministic.
+        ik_options["max_random_restart"] = 1
 
         # Getting the joint names this way ensures that the joint order is consistent with Semantics
         joint_names = robot.get_configurable_joint_names(group)
@@ -334,9 +351,26 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         fk_options = deepcopy(options)
         fk_options["link"] = robot.get_end_effector_link_name(group)
         start_frame_pcf = planner.forward_kinematics(start_state, group, fk_options)  # type: Frame
+        # This frame reference need to match with the target_mode of the waypoints
+        start_frame = None  # type: Frame
+        if waypoints.target_mode == TargetMode.TOOL:
+            tool_id = start_state.get_attached_tool_id(group)
+            start_frame = planner.from_pcf_to_tcf([start_frame_pcf], tool_id)[0]
+        elif waypoints.target_mode == TargetMode.WORKPIECE:
+            workpiece_id = start_state.get_attached_workpiece_ids(group)[0]
+            start_frame = planner.from_pcf_to_ocf([start_frame_pcf], workpiece_id)[0]
+        elif waypoints.target_mode == TargetMode.ROBOT:
+            start_frame = start_frame_pcf
+        else:
+            raise NotImplementedError(
+                "TargetMode ({}) not supported by PyBulletPlanCartesianMotion".format(waypoints.target_mode)
+            )
+
+        print("Reconstructed Start Frame:", start_frame)
+
         starting_target = PointAxisTarget(
-            start_frame_pcf.point,
-            start_frame_pcf.zaxis,
+            start_frame.point,
+            start_frame.zaxis,
             target_mode=waypoints.target_mode,
             tolerance_position=waypoints.tolerance_position,
         )
@@ -346,8 +380,10 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # This makes the DFS code easier to implement.
 
         all_targets = [starting_target]  # type: List[PointAxisTarget]
-        for i in range(len(waypoints.target_points)):
-            start_point_axis = all_targets[-1].target_point, all_targets[-1].target_axis
+        for i in range(len(waypoints.target_points_and_axes)):
+            start_point_axis = (
+                waypoints.target_points_and_axes[i - 1] if i > 0 else (start_frame.point, start_frame.zaxis)
+            )
             end_point_axis = waypoints.target_points_and_axes[i]
             interpolator = PointAxisInterpolator(start_point_axis, end_point_axis, options)
 
@@ -366,6 +402,19 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                 )
                 all_targets.append(target)
 
+            # if options["verbose"]:
+            print("Interpolation: {} steps towards Waypoint {}".format(steps, i))
+
+        def _build_return_trajectory(configurations):
+            # Create the trajectory
+            trajectory = JointTrajectory(joint_names=joint_names, start_configuration=start_configuration)
+            for planned_configuration in configurations:
+                joint_values = [planned_configuration[joint_name] for joint_name in joint_names]
+                trajectory.points.append(
+                    JointTrajectoryPoint(joint_values=joint_values, joint_types=joint_types, joint_names=joint_names)
+                )
+            return trajectory
+
         # Perform Depth First Search (DFS) over the targets to plan the trajectory
 
         # ===================================================================================
@@ -377,45 +426,83 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         planned_configurations = [start_configuration]  # This list holds the planned configurations for each step
         ik_generators = [zip()]  # This list holds the iterative ik generators for each step
         ik_option_indices = [0]  # This is only used for debugging
+        longest_list_of_planned_configurations = (
+            []
+        )  # This is used to store the longest trajectory found and return it when search fails
+        comprehensively_checked = []  # This stores the target indices that have been checked for IK solutions
 
         while True:
-            # Create a generator if the current step does no    t have one
+            # Create a generator if the current step does not have one
             if current_step >= len(ik_generators):
-                target = all_targets[current_step]
                 intermediate_state = deepcopy(
                     start_state
                 )  # Deep copy because we will have multiple generators in the stack
                 intermediate_state.robot_configuration = planned_configurations[-1]
                 ik_generator = planner.iter_inverse_kinematics_point_axis_target(
-                    all_targets[0], intermediate_state, group, ik_options
+                    all_targets[current_step], intermediate_state, group, ik_options
                 )
                 ik_generators.append(ik_generator)
                 ik_option_indices.append(-1)
 
+                print("DFS Step: {} of {}. Created IK Generator".format(current_step, len(all_targets) - 1))
+
             # Check if the IK generator (of current step) has any more options
-            ik_result = next(ik_generators[-1], None)
-            ik_option_indices[-1] += 1
+            try:
+                ik_result = next(ik_generators[-1], None)  # type: Configuration | None
+                ik_option_indices[-1] += 1
+            except InverseKinematicsError:
+                # If the generator raises an IK error, it means that there is not even one valid IK solution
+                # If this is the case, backtrack is not going to help solve the problem and we should stop the search
+                ik_result = None
+                ik_option_indices[-1] += 1
+                # In order to save searching time, we perform a more comprehensive check here to determine if this
+                # target is completely unreachable even with random starting configurations.
+                if not current_step in comprehensively_checked:
+                    print("Performing comprehensive IK check for step {}".format(current_step))
+                    checking_ik_options = deepcopy(ik_options)
+                    checking_ik_options["max_random_restart"] = 10
+                    checking_ik_generator = planner.iter_inverse_kinematics_point_axis_target(
+                        all_targets[current_step], intermediate_state, group, ik_options
+                    )
+                    try:
+                        next(checking_ik_generator, None)
+                    except InverseKinematicsError:
+                        raise MPNoIKSolutionError(
+                            "No IK solution found for step {} of {}".format(current_step, len(all_targets) - 1),
+                            all_targets[current_step],
+                            trajectory,
+                        )
+                    comprehensively_checked.append(current_step)
 
             # Check IK result for max_jump
             if ik_result is not None:
-                within_max_jump = self._check_max_jump(
-                    joint_names,
-                    joint_types,
-                    planned_configurations[-1],
-                    ik_result,
-                    options,
-                )
+                try:
+                    self._check_max_jump(
+                        joint_names,
+                        joint_types,
+                        planned_configurations[-1].joint_values,
+                        ik_result.joint_values,
+                        options,
+                    )
+                    within_max_jump = True
+                except MPMaxJumpError as e:
+                    within_max_jump = False
+                    print("Step: {} Option {} violated max_jump".format(current_step, ik_option_indices[-1]))
 
             # If valid IK solution found, proceed to the next step
             if ik_result is not None and within_max_jump:
 
-                print(f"Step: {current_step} Option {ik_option_indices[-1]} is valid")
+                print("Step: {} Option {} is valid".format(current_step, ik_option_indices[-1]))
                 planned_configurations.append(ik_result)
 
                 # If this is the last step, the search is complete
                 if len(planned_configurations) == len(all_targets):
                     print(f"Search is complete. Returning {len(planned_configurations)} configurations")
                     break
+
+                # If this is the longest trajectory found, save it
+                if len(planned_configurations) > len(longest_list_of_planned_configurations):
+                    longest_list_of_planned_configurations = deepcopy(planned_configurations)
 
                 # Move to the next step
                 current_step += 1
@@ -428,8 +515,11 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                 # Stop condition is when the current step is less than 0
                 if current_step < 0:
                     print("Search Failed")
-                    planned_configurations = None
-                    break
+                    message = "No trajectory found for {} interpolated points. The longest planned trajectory covered {} points.".format(
+                        len(all_targets), len(longest_list_of_planned_configurations)
+                    )
+                    longest_trajectory = _build_return_trajectory(longest_list_of_planned_configurations)
+                    raise MPNoPlanFoundError(message, longest_trajectory)
                 # When backtracking, remove the last planned configuration and the exhausted generator
                 ik_generators.pop()
                 ik_option_indices.pop()
@@ -442,19 +532,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # DFS Ends Here
         # ===================================================================================
 
-        # If the search failed, return None
-        if planned_configurations is None:
-            return None
-
-        # Create the trajectory
-        trajectory = JointTrajectory(joint_names=joint_names, start_configuration=start_configuration)
-        for planned_configuration in planned_configurations:
-            joint_values = [planned_configuration[joint_name] for joint_name in joint_names]
-            trajectory.points.append(
-                JointTrajectoryPoint(joint_values=joint_values, joint_types=joint_types, joint_names=joint_names)
-            )
-
-        return trajectory
+        return _build_return_trajectory(planned_configurations)
 
     def plan_cartesian_motion_frame_waypoints(self, waypoints, start_state, group, options=None):
         # type: (FrameWaypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
@@ -1169,8 +1247,12 @@ class PointAxisInterpolator(object):
         # Compute the interpolated axis by rotation
         if is_parallel_vector_vector(self.start_axis, self.end_axis):
             axis_t = self.end_axis
+            # print("Parallel")
         else:
             angle = t * self.total_angle
             rotation_axis = cross_vectors(self.start_axis, self.end_axis)
-            axis_t = self.start_axis.rotate(angle, axis=rotation_axis)
+            axis_t = self.start_axis.rotated(angle, axis=rotation_axis)
+            # print("Not Parallel, rotated by {} degrees".format(angle))
+
+        print("Interpolated t = {}, Point={}, Axis={}".format(t, point_t, axis_t))
         return (point_t, axis_t)
