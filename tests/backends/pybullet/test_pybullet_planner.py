@@ -1,5 +1,7 @@
 import compas
 
+from copy import deepcopy
+
 if not compas.IPY:
     from compas_fab.backends import PyBulletClient
     from compas_fab.backends import PyBulletPlanner
@@ -7,7 +9,6 @@ if not compas.IPY:
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas.geometry import Frame
-
 from compas.tolerance import Tolerance
 from compas_fab.robots import RobotLibrary
 from compas_fab.robots import FrameTarget
@@ -138,11 +139,11 @@ def _test_pybullet_ik_fk_agreement(robot, ik_target_frames):
 
     """
     # These options are set to ensure that the IK solver converges to a high accuracy
-    # Threshold is set to 1e-5 meters to be larger than the tolerance used for comparison (1e-4 meters)
+    # Target.tolerance_orientation is set to 1e-5 meters to be larger than the tolerance used for comparison (1e-4 meters)
+    tolerance_position = 1e-5
+    tolerance_orientation = 1e-2
     ik_options = {
-        "high_accuracy_max_iter": 50,
-        "high_accuracy": True,
-        "high_accuracy_threshold": 1e-5,
+        "max_descend_iterations": 50,
         "return_full_configuration": True,
     }
 
@@ -153,11 +154,17 @@ def _test_pybullet_ik_fk_agreement(robot, ik_target_frames):
 
         for ik_target_frame in ik_target_frames:
             # IK Query to the planner (Frame to Configuration)
+            ik_target_frame = deepcopy(ik_target_frame)  # type: FrameTarget
             try:
 
                 ik_result = next(
                     planner.iter_inverse_kinematics(
-                        FrameTarget(ik_target_frame, target_mode=TargetMode.ROBOT),
+                        FrameTarget(
+                            ik_target_frame,
+                            target_mode=TargetMode.ROBOT,
+                            tolerance_position=tolerance_position,
+                            tolerance_orientation=tolerance_orientation,
+                        ),
                         RobotCellState.from_robot_configuration(robot),
                         group=planning_group,
                         options=ik_options,
@@ -280,8 +287,10 @@ def test_pybullet_ik_out_of_reach_ur5():
         )
     )
 
-    # high_accuracy_max_iter is set to 20 to reduce the number of iterations, faster testing time.
-    ik_options = {"high_accuracy_max_iter": 20, "high_accuracy": True, "high_accuracy_threshold": 1e-5}
+    # max_descend_iterations is set to 20 to reduce the number of iterations, faster testing time.
+    ik_options = {
+        "max_descend_iterations": 20,
+    }
 
     with PyBulletClient(connection_type="direct") as client:
         planner = PyBulletPlanner(client)

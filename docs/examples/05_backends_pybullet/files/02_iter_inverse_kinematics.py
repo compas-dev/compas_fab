@@ -21,7 +21,7 @@ with PyBulletClient(connection_type="direct") as client:
     start_configuration = robot.zero_configuration()
     start_state = RobotCellState.from_robot_configuration(robot, start_configuration)
 
-    options = dict(max_results=20, high_accuracy_threshold=1e-4, high_accuracy_max_iter=20)
+    options = {"max_results": 20}
     result_count = 0
     for config in planner.iter_inverse_kinematics(target, start_state, options=options):
         print("Found configuration", config)

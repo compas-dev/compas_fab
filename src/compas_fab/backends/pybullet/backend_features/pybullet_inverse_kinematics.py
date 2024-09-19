@@ -54,6 +54,9 @@ __all__ = [
 class PyBulletInverseKinematics(InverseKinematics):
     """Mix-in functions to calculate the robot's inverse kinematics for a given target."""
 
+    DEFAULT_TARGET_TOLERANCE_POSITION = 0.001
+    DEFAULT_TARGET_TOLERANCE_ORIENTATION = 0.001
+
     def inverse_kinematics(self, target, robot_cell_state, group=None, options=None):
         # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Configuration
         """Calculate the robot's inverse kinematic for a given frame.
@@ -205,16 +208,12 @@ class PyBulletInverseKinematics(InverseKinematics):
             - ``"semi-constrained"``: (:obj:`bool`, optional) When ``True``, only the
               position of the target is considered. The orientation of frame will not be considered
               in the calculation.  Defaults to ``False``.
-            - ``"high_accuracy"``:  (:obj:`bool`, optional) When ``True``, the
-              solver will iteratively try to reach the ``high_accuracy_threshold``.
-              Failure to reach the threshold within ``high_accuracy_max_iter`` will raise an exception.
-              It is uncommon to use ``False``, because the solver will not
-              guarantee any accuracy.
-              Defaults to ``True``.
-            - ``"high_accuracy_threshold"``:  (:obj:`float`, optional) Defines the maximum
-              acceptable distance threshold for the high accuracy mode. Defaults to ``1e-4``.
-            - ``"high_accuracy_max_iter"``:  (:obj:`float`, optional) Defines the maximum
-              number of iterations to use for the high accuracy mode. Defaults to ``20``.
+            - ``"max_descend_iterations"``:  (:obj:`float`, optional) Defines the maximum
+              number of iterations to use during the gradient descend.
+              If this number of iterations are reached without convergence, the solver will consider
+              the initial guess as a bad starting point and will retry with a new random configuration.
+              Defaults to ``20``.
+              If the target tolerance is increased, this value should be increased as well.
             - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
               If set to 1, the solver will be deterministic, descending from the initial
               robot configuration.
@@ -263,9 +262,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             raise ValueError("Planning group '{}' not found in the robot's semantics.".format(group))
 
         # Default options
-        options["high_accuracy"] = options.get("high_accuracy", True)
-        options["high_accuracy_threshold"] = options.get("high_accuracy_threshold", 1e-4)
-        options["high_accuracy_max_iter"] = options.get("high_accuracy_max_iter", 20)
+        options["max_descend_iterations"] = options.get("max_descend_iterations", 20)
         options["max_results"] = options.get("max_results", 100)
 
         options["check_collision"] = options.get("check_collision", True)
@@ -307,7 +304,6 @@ class PyBulletInverseKinematics(InverseKinematics):
         all_joint_names = robot.model.get_configurable_joint_names()
         assert set(all_joint_names) == set(start_configuration.keys()), "Robot configuration is missing some joints"
         rest_poses = client.build_pose_for_pybullet(start_configuration)
-        rest_poses_dict = dict(zip(joint_names_sorted, rest_poses))
 
         # Prepare `lower_limits`` and `upper_limits` input
         # Get joint limits in the same order as the joint_ids
@@ -318,6 +314,12 @@ class PyBulletInverseKinematics(InverseKinematics):
             lower_limits.append(joint.limit.lower if joint.type != Joint.CONTINUOUS else 0)
             upper_limits.append(joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi)
 
+        # Prepare `jointRanges` input
+        # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.
+        # https://stackoverflow.com/questions/49674179/understanding-inverse-kinematics-pybullet
+        # https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/preview?pru=AAABc7276PI*zazLer2rlZ8tAUI8lF98Kw#heading=h.9i02ojf4k3ve
+        joint_ranges = [u - l for u, l in zip(upper_limits, lower_limits)]
+
         # Prepare Parameters for calling pybullet.calculateInverseKinematics
         ik_options = dict(
             bodyUniqueId=body_id,
@@ -325,34 +327,15 @@ class PyBulletInverseKinematics(InverseKinematics):
             targetPosition=point,
             targetOrientation=orientation,
             physicsClientId=client.client_id,
-        )
-
-        # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.
-        # https://stackoverflow.com/questions/49674179/understanding-inverse-kinematics-pybullet
-        # https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/preview?pru=AAABc7276PI*zazLer2rlZ8tAUI8lF98Kw#heading=h.9i02ojf4k3ve
-        joint_ranges = [u - l for u, l in zip(upper_limits, lower_limits)]
-        ik_options.update(
-            dict(
-                lowerLimits=lower_limits,
-                upperLimits=upper_limits,
-                jointRanges=joint_ranges,
-                restPoses=rest_poses,
-            )
+            lowerLimits=lower_limits,
+            upperLimits=upper_limits,
+            jointRanges=joint_ranges,
+            restPoses=rest_poses,
         )
 
         # Options for semi-constrained mode, skipping the targetOrientation
         if options.get("semi-constrained"):
             ik_options.pop("targetOrientation")
-
-        # Options for high accuracy mode
-        if options.get("high_accuracy"):
-            ik_options.update(
-                dict(
-                    joint_ids_sorted=joint_ids_sorted,
-                    threshold=options.get("high_accuracy_threshold"),
-                    max_iter=options.get("high_accuracy_max_iter"),
-                )
-            )
 
         def set_random_config():
             # Function for setting random joint values for randomized search
@@ -367,24 +350,27 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Loop to get multiple results
         for _ in range(options.get("max_results")):
 
-            # Calling the IK function (High accuracy or not)
-            if options.get("high_accuracy"):
-                joint_positions, close_enough = self._accurate_inverse_kinematics(
-                    verbose=options["verbose"], **ik_options
-                )
+            # Calling the IK function using the helper function that repeatedly
+            # calls the pybullet IK solver until convergence.
 
-                # NOTE: In principle, this accurate iter IK should work out of the
-                # pybullet box, but the results seem to be way off target. For now,
-                # I'm leaving the legacy iterative accurate ik in python as per
-                # older examples of pybullet, until we figure out why the builtin
-                # one is not cooperating.
-                if not close_enough:
-                    # If the solution is not close enough, we retry with a new randomized joint values
-                    set_random_config()
-                    continue
-            else:
-                joint_positions = pybullet.calculateInverseKinematics(**ik_options)
-                # Without the high accuracy mode, there is no guarantee of accuracy
+            joint_positions, close_enough = self._accurate_inverse_kinematics(
+                joint_ids_sorted=joint_ids_sorted,
+                tolerance_position=target.tolerance_position,
+                tolerance_orientation=target.tolerance_orientation,
+                max_iter=options.get("max_descend_iterations"),
+                verbose=options["verbose"],
+                **ik_options
+            )
+
+            # NOTE: In principle, this accurate iter IK should work out of the
+            # pybullet box, but the results seem to be way off target. For now,
+            # I'm leaving the legacy iterative accurate ik in python as per
+            # older examples of pybullet, until we figure out why the builtin
+            # one is not cooperating.
+            if not close_enough:
+                # If the solution is not close enough, we retry with a new randomized joint values
+                set_random_config()
+                continue
 
             assert len(joint_positions) == len(
                 joint_names_and_puids
@@ -503,9 +489,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
             The following key-value pairs have the same meaning as in the :meth:`iter_inverse_kinematics_frame_target` method:
 
-            - ``"high_accuracy"``:  (:obj:`bool`, optional)
-            - ``"high_accuracy_threshold"``:  (:obj:`float`, optional)
-            - ``"high_accuracy_max_iter"``:  (:obj:`float`, optional)
+            - ``"max_descend_iterations"``:  (:obj:`float`, optional)
             - ``"solution_uniqueness_threshold_prismatic"``: (:obj:`float`, optional)
             - ``"solution_uniqueness_threshold_revolute"``: (:obj:`float`, optional)
             - ``"check_collision"``: (:obj:`bool`, optional)
@@ -561,9 +545,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Default options (for the FrameTarget function)
         # Later there is a frame_ik_options dict that will be passed to the pybullet IK solver
         # That one will set the max_results to 1 for the FrameTarget function
-        options["high_accuracy"] = options.get("high_accuracy", True)
-        options["high_accuracy_threshold"] = options.get("high_accuracy_threshold", 1e-4)
-        options["high_accuracy_max_iter"] = options.get("high_accuracy_max_iter", 20)
+        options["max_descend_iterations"] = options.get("max_descend_iterations", 20)
 
         options["solution_uniqueness_threshold_prismatic"] = options.get(
             "solution_uniqueness_threshold_prismatic", 3e-4
@@ -698,7 +680,9 @@ class PyBulletInverseKinematics(InverseKinematics):
                 "No solution found after {} attempts (max_random_restart).".format(options.get("max_random_restart"))
             )
 
-    def _accurate_inverse_kinematics(self, joint_ids_sorted, threshold, max_iter, verbose=False, **kwargs):
+    def _accurate_inverse_kinematics(
+        self, joint_ids_sorted, tolerance_position, tolerance_orientation, max_iter, verbose=False, **kwargs
+    ):
         """Iterative inverse kinematics solver with a threshold for the distance to the target.
 
         This functions helps to get a more accurate solution by iterating over the IK solver
@@ -717,6 +701,8 @@ class PyBulletInverseKinematics(InverseKinematics):
         body_id = kwargs["bodyUniqueId"]
         link_id = kwargs["endEffectorLinkIndex"]
         target_position = kwargs["targetPosition"]
+        tolerance_position = tolerance_position or self.DEFAULT_TARGET_TOLERANCE_POSITION
+        tolerance_orientation = tolerance_orientation or self.DEFAULT_TARGET_TOLERANCE_ORIENTATION
         # Note: the following two options that was present in the PyBullet IK Example does not seem to do anything
         # https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/examples/inverse_kinematics.py
         # kwargs["maxNumIterations"] = max_iter
@@ -735,11 +721,15 @@ class PyBulletInverseKinematics(InverseKinematics):
                 target_position[1] - new_pose[1],
                 target_position[2] - new_pose[2],
             ]
+
             # The distance is squared to avoid a sqrt operation
             distance_squared = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]
             # Therefor, the threshold is squared as well
             # print("Iter: %d, Distance: %s" % (iter, distance_squared))
-            close_enough = distance_squared < threshold * threshold
+            close_enough = distance_squared < tolerance_position * tolerance_position
+
+            # TODO: Check orientation as well
+
             kwargs["restPoses"] = joint_poses
             iter += 1
         if verbose:

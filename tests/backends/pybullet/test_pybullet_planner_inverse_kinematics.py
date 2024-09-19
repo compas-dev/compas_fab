@@ -147,7 +147,6 @@ def test_iter_inverse_kinematics_frame_target(planner_with_test_cell):
 
     options = {
         "max_results": 1,
-        "high_accuracy": True,
         "check_collision": True,
         "verbose": False,
     }
