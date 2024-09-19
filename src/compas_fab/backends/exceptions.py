@@ -98,6 +98,7 @@ class MotionPlanningError(BackendError):
     def __init__(self, message, partial_trajectory=None):
         super(MotionPlanningError, self).__init__(message)
         self.message = message
+        self.partial_trajectory = partial_trajectory
 
 
 class MPStartStateInCollisionError(MotionPlanningError):
@@ -187,8 +188,7 @@ class MPNoPlanFoundError(MotionPlanningError):
     """Indicates that no plan could be found by the motion planner."""
 
     def __init__(self, message, partial_trajectory=None):
-        super(MPNoPlanFoundError, self).__init__(message)
-        self.partial_trajectory = partial_trajectory
+        super(MPNoPlanFoundError, self).__init__(message, partial_trajectory)
 
 
 class MPMaxJumpError(MotionPlanningError):

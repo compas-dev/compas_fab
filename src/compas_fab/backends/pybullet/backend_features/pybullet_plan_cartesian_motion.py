@@ -345,7 +345,6 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         intermediate_state = deepcopy(start_state)  # type: RobotCellState
         start_configuration = start_state.robot_configuration
         # TODO: We currently trust that the input configuration has a correct joint order, this should be checked
-        trajectory = JointTrajectory(joint_names=joint_names, start_configuration=start_configuration)
 
         # Recreate the first frame for the beginning of the interpolation
         fk_options = deepcopy(options)
@@ -470,7 +469,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                         raise MPNoIKSolutionError(
                             "No IK solution found for step {} of {}".format(current_step, len(all_targets) - 1),
                             all_targets[current_step],
-                            trajectory,
+                            _build_return_trajectory(planned_configurations),
                         )
                     comprehensively_checked.append(current_step)
 
