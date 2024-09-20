@@ -1064,7 +1064,7 @@ class FrameInterpolator(object):
     @property
     def total_angle(self):
         # type: () -> float
-        """Tthe total angle between the start and end frames.
+        """Tte total angle between the start and end frames.
 
         Returns
         -------

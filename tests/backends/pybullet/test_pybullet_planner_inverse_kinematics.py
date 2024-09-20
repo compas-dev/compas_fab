@@ -19,6 +19,9 @@ from compas_fab.robots import TargetMode
 from compas_robots import Configuration
 
 from compas.geometry import Frame
+from compas.geometry import Vector
+from compas.geometry import matrix_from_frame
+from compas.geometry import axis_and_angle_from_matrix
 
 
 @pytest.fixture
@@ -41,6 +44,60 @@ def planner_with_test_cell(pybullet_client):
     )
 
     return planner, robot_cell, robot_cell_state
+
+
+def compare_frames(frame1, frame2, tolerance_position, tolerance_orientation):
+    # type: (Frame, Frame, float, float) -> bool
+    delta_frame = frame1.to_local_coordinates(frame2)  # type: Frame
+    if Vector(*delta_frame.point).length > tolerance_position:
+        return False
+    axis, angle = axis_and_angle_from_matrix(matrix_from_frame(delta_frame))
+    if angle > tolerance_orientation:
+        return False
+    return True
+
+
+def test_frame_target_tolerance(planner_with_test_cell):
+    planner, robot_cell, robot_cell_state = planner_with_test_cell
+    group = robot_cell.robot.main_group_name
+    link_name = robot_cell.robot.get_end_effector_link_name(group)
+    result_cell_state = robot_cell_state.copy()  # type: RobotCellState
+
+    target_frame = Frame([0.5, 0.5, 0.5], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
+    options = {
+        "check_collision": False,
+    }
+
+    def test_planning_tolerance(tolerance_position, tolerance_orientation):
+        # Test with a frame target with a different tolerance and we also check that the result does not over achieve
+        target = FrameTarget(
+            target_frame,
+            TargetMode.ROBOT,
+            tolerance_position=tolerance_position,
+            tolerance_orientation=tolerance_orientation,
+        )
+        result = planner.inverse_kinematics(target, robot_cell_state, options=options)
+        result_cell_state.robot_configuration = result
+        result_frame = planner.forward_kinematics(result_cell_state, group, options={"link": link_name})
+        assert isinstance(result, Configuration)
+        assert compare_frames(target_frame, result_frame, tolerance_position, tolerance_orientation)
+        # The result should not be 2 orders of magnitude better than the target tolerance
+        assert not compare_frames(target_frame, result_frame, tolerance_position * 1e-2, tolerance_orientation * 1e-2)
+
+    # Test with unspecified tolerance (default position tolerance is 1e-3, equivalent to 1 mm)
+    test_planning_tolerance(
+        PyBulletPlanner.DEFAULT_TARGET_TOLERANCE_POSITION,
+        PyBulletPlanner.DEFAULT_TARGET_TOLERANCE_ORIENTATION,
+    )
+
+    # Test with a frame target with a different tolerance and we also check that the result does not over achieve
+    test_planning_tolerance(1e-2, 1e-2)
+
+    # Test with higher tolerance
+    test_planning_tolerance(1e-4, 1e-4)
+
+    # Test with even higher tolerance (1e-6 is equivalent to 1 micron)
+    test_planning_tolerance(1e-6, 1e-6)
 
 
 def test_inverse_kinematics_frame_target_target_modes(planner_with_test_cell):

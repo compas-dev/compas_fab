@@ -30,7 +30,9 @@ from compas.tolerance import TOL
 from compas_robots.model import Joint
 
 from compas.geometry import Frame
+from compas.geometry import Quaternion
 from compas.geometry import is_parallel_vector_vector
+from compas.geometry import axis_angle_from_quaternion
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.exceptions import CollisionCheckError
 from compas_fab.backends.interfaces import InverseKinematics
@@ -353,7 +355,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             # Calling the IK function using the helper function that repeatedly
             # calls the pybullet IK solver until convergence.
 
-            joint_positions, close_enough = self._accurate_inverse_kinematics(
+            joint_positions = self._accurate_inverse_kinematics(
                 joint_ids_sorted=joint_ids_sorted,
                 tolerance_position=target.tolerance_position,
                 tolerance_orientation=target.tolerance_orientation,
@@ -362,12 +364,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 **ik_options
             )
 
-            # NOTE: In principle, this accurate iter IK should work out of the
-            # pybullet box, but the results seem to be way off target. For now,
-            # I'm leaving the legacy iterative accurate ik in python as per
-            # older examples of pybullet, until we figure out why the builtin
-            # one is not cooperating.
-            if not close_enough:
+            if not joint_positions:
                 # If the solution is not close enough, we retry with a new randomized joint values
                 set_random_config()
                 continue
@@ -681,7 +678,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             )
 
     def _accurate_inverse_kinematics(
-        self, joint_ids_sorted, tolerance_position, tolerance_orientation, max_iter, verbose=False, **kwargs
+        self, joint_ids_sorted, max_iter, tolerance_position=None, tolerance_orientation=None, verbose=False, **kwargs
     ):
         """Iterative inverse kinematics solver with a threshold for the distance to the target.
 
@@ -694,13 +691,27 @@ class PyBulletInverseKinematics(InverseKinematics):
         tuple of list of float, bool
             A tuple containing the joint positions and a boolean indicating if the solution is close enough to the target.
         """
+        # NOTE: In principle, this accurate iter IK should work out of the
+        # pybullet box, but the results seem to be way off target. For now,
+        # I'm leaving the legacy iterative accurate ik in python as per
+        # older examples of pybullet, until we figure out why the builtin
+        # one is not cooperating.
+
         # Based on these examples
         # https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/examples/inverse_kinematics_husky_kuka.py#L81
-        close_enough = False
-        iter = 0
         body_id = kwargs["bodyUniqueId"]
         link_id = kwargs["endEffectorLinkIndex"]
+
+        # Target position (Point) and orientation (convert to Quaternion)
         target_position = kwargs["targetPosition"]
+        target_orientation_xyzw = kwargs.get("targetOrientation", None)
+        if target_orientation_xyzw:
+            _x, _y, _z, _w = target_orientation_xyzw
+            target_quaternion = Quaternion(_w, _x, _y, _z)
+            target_orientation_frame = Frame.from_quaternion(target_quaternion)
+        else:
+            target_quaternion = None
+
         tolerance_position = tolerance_position or self.DEFAULT_TARGET_TOLERANCE_POSITION
         tolerance_orientation = tolerance_orientation or self.DEFAULT_TARGET_TOLERANCE_ORIENTATION
         # Note: the following two options that was present in the PyBullet IK Example does not seem to do anything
@@ -708,33 +719,47 @@ class PyBulletInverseKinematics(InverseKinematics):
         # kwargs["maxNumIterations"] = max_iter
         # kwargs["residualThreshold"] = threshold
 
-        while not close_enough and iter < max_iter:
+        for i in range(max_iter):
             joint_poses = pybullet.calculateInverseKinematics(**kwargs)
             for i in range(len(joint_ids_sorted)):
                 pybullet.resetJointState(body_id, joint_ids_sorted[i], joint_poses[i])
-
+            # Retrieve the last link state that contains the last link's position (index 4) and orientation (index 5)
             link_state = pybullet.getLinkState(body_id, link_id)
-            new_pose = link_state[4]
 
+            # Check tolerance_position
+            new_position = link_state[4]
             diff = [
-                target_position[0] - new_pose[0],
-                target_position[1] - new_pose[1],
-                target_position[2] - new_pose[2],
+                target_position[0] - new_position[0],
+                target_position[1] - new_position[1],
+                target_position[2] - new_position[2],
             ]
-
             # The distance is squared to avoid a sqrt operation
-            distance_squared = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]
             # Therefor, the threshold is squared as well
-            # print("Iter: %d, Distance: %s" % (iter, distance_squared))
-            close_enough = distance_squared < tolerance_position * tolerance_position
+            distance_squared = diff[0] ** 2 + diff[1] ** 2 + diff[2] ** 2
+            tolerance_position_ok = distance_squared < tolerance_position**2
+            # print("Iter: %d, Distance: %s" % (i, distance_squared))
 
-            # TODO: Check orientation as well
+            # Check tolerance_orientation
+            if target_quaternion:
+                _x, _y, _z, _w = link_state[5]
+                new_quaternion = Quaternion(_w, _x, _y, _z)
+                new_frame = Frame.from_quaternion(new_quaternion)
+                delta_frame = target_orientation_frame.to_local_coordinates(new_frame)
+                _, angle = axis_angle_from_quaternion(Quaternion.from_frame(delta_frame))
 
+                tolerance_orientation_ok = angle < tolerance_orientation
+                # print("Iter: %d, Angle: %s" % (i, angle_squared))
+            else:
+                tolerance_orientation_ok = True
+
+            if tolerance_position_ok and tolerance_orientation_ok:
+                if verbose:
+                    print("Iterative IK took %d iterations" % isinstance)
+                return joint_poses
             kwargs["restPoses"] = joint_poses
-            iter += 1
-        if verbose:
-            print("Iterative IK took %d iterations" % iter)
-        return joint_poses, close_enough
+            i += 1
+
+        return None
 
     def _check_configuration_match_group(self, start_configuration, configuration, group):
         # type: (Configuration, Configuration, str) -> None
