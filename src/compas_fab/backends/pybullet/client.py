@@ -200,8 +200,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         # Robot Cell
         # The Pybullet client will not keep track of the Robot object directly but uses the one embedded in the RobotCell
-        self._robot_cell = None
-        self._robot_cell_state = None
+        # `robot_cell` and `robot_cell_state` are initialized in the ClientInterface
 
         # PyBullet unique id
         self.robot_puid = None
@@ -218,25 +217,38 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.disabled_collisions = set()
         self._cache_dir = None
 
+    # The following properties are overloaded here to provide Pybullet specific docstrings
     @property
     def robot_cell(self):
         # type: () -> RobotCell
-        """The robot cell that is currently loaded in the PyBullet server."""
+        """The robot cell that is currently loaded in the PyBullet server.
+        It represents the last RobotCell that was passed to `planner.set_robot_cell()`.
+
+        In order to avoid side effects, the RobotCell object is a copy of the original object.
+        Do not modify this returned object.
+        """
         return self._robot_cell
 
     @property
     def robot(self):
         # type: () -> Robot
-        """The robot that is currently loaded in the PyBullet server."""
+        """The robot that is currently loaded in the PyBullet server.
+        It represents the robot object that is embedded in the RobotCell object.
+        """
         return self.robot_cell.robot
 
     @property
     def robot_cell_state(self):
         # type: () -> RobotCellState
         """The state of the robot cell that is currently loaded in the PyBullet server.
+        It represents the last RobotCellState that was passed to `planner.set_robot_cell_state()`.
+
+        In order to avoid side effects, the RobotCellState object is a copy of the original object.
+        Do not modify this returned object.
 
         There is typically no reason to access this directly, as the state is managed by the client.
-        However, it can be useful for debugging or introspection.
+        However, it can be useful for debugging.
+        The planner uses this function internally for comparing object states that was changed.
         """
         return self._robot_cell_state
 

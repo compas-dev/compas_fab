@@ -101,7 +101,7 @@ def forward_inverse_agreement(planner, start_state):
 
     # Checks if one of the IK results is the same as the original joint configuration
     close_soliution_found = False
-    start_state = RobotCellState.from_robot_cell(planner.robot_cell)
+    start_state = RobotCellState.from_robot_cell(planner.client.robot_cell)
     for configuration in planner.iter_inverse_kinematics(FrameTarget(frame, TargetMode.ROBOT), start_state, group=None):
         if configuration.close_to(starting_configuration):
             close_soliution_found = True
@@ -114,7 +114,7 @@ def test_forward_inverse_agreement_ur5(ur5_planner_no_geo):
     # Test that the forward and inverse kinematics are in agreement
 
     # This test starts with FK and then uses IK to find the original joint configuration
-    start_state = RobotCellState.from_robot_cell(ur5_planner_no_geo.robot_cell)
+    start_state = RobotCellState.from_robot_cell(ur5_planner_no_geo.client.robot_cell)
 
     # All these joint values should be positive and smaller than 2*pi
     start_state.robot_configuration.joint_values = [0.2, 0.5, 1.4, 1.3, 2.6, 2.3]

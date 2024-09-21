@@ -47,21 +47,13 @@ class PlannerInterface(object):
     client : :class:`compas_fab.backends.interfaces.ClientInterface`, read-only
         The client instance associated with the planner.
         It cannot be changed after initialization.
-
-    robot_cell : :class:`compas_fab.robots.RobotCell`, read-only
-        The robot cell instance previously passed to the client.
-
-    robot_cell_state : :class:`compas_fab.robots.RobotCellState`, read-only
-        The last robot cell state instance passed to the client.
-
+        The client also keeps the `.robot_cell` and `.robot_cell_state` in memory.
 
     """
 
     def __init__(self, client=None):
         if client:
             self._client = client
-        self._robot_cell = None  # type: RobotCell
-        self._robot_cell_state = None  # type: RobotCellState
         super(PlannerInterface, self).__init__()
 
     @property
@@ -69,19 +61,9 @@ class PlannerInterface(object):
         # type: () -> ClientInterface
         return self._client
 
-    @property
-    def robot_cell(self):
-        # type: () -> RobotCell
-        return self._robot_cell
-
-    @property
-    def robot_cell_state(self):
-        # type: () -> RobotCellState
-        return self._robot_cell_state
-
-    # ==========================================================================
-    # collision objects robot cell and cell state
-    # ==========================================================================
+    # ===========================================================================
+    # Below is a list of methods offered by the mixin classes of PlannerInterface
+    # ===========================================================================
 
     def set_robot_cell(self, *args, **kwargs):
         """Pass the models in the robot cell to the planning client.
@@ -115,7 +97,7 @@ class PlannerInterface(object):
         raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
 
     # ==========================================================================
-    # planning services
+    # Planning Services
     # ==========================================================================
 
     def check_collisions(self, *args, **kwargs):
@@ -256,7 +238,7 @@ class PlannerInterface(object):
         Parameters
         ----------
         tool_id : str
-            The id of a tool found in `planner.robot_cell.tool_models`.
+            The id of a tool found in `client.robot_cell.tool_models`.
             The tool must be attached to the robot.
 
         Returns
@@ -264,10 +246,10 @@ class PlannerInterface(object):
         :class:`~compas.geometry.Transformation`
             Transformation from the tool's TCF to TBCF.
         """
-        if tool_id not in self.robot_cell.tool_models:
+        if tool_id not in self.client.robot_cell.tool_models:
             raise ValueError("Tool with id '{}' not found in robot cell.".format(tool_id))
-        tool_model = self.robot_cell.tool_models[tool_id]
-        tool_state = self.robot_cell_state.tool_states[tool_id]
+        tool_model = self.client.robot_cell.tool_models[tool_id]
+        tool_state = self.client.robot_cell_state.tool_states[tool_id]
         if not tool_state.attached_to_group:
             raise ValueError("Tool with id '{}' is not attached to the robot.".format(tool_id))
 
@@ -291,7 +273,7 @@ class PlannerInterface(object):
         Parameters
         ----------
         workpiece_id : str
-            The id of a workpiece found in `planner.robot_cell.rigid_body_models`.
+            The id of a workpiece found in `client.robot_cell.rigid_body_models`.
             The workpiece must be attached to a tool, and the tool must be attached to the robot.
 
         Returns
@@ -300,17 +282,17 @@ class PlannerInterface(object):
             Transformation from the workpiece's OCF to PCF.
         """
 
-        if workpiece_id not in self.robot_cell.rigid_body_models:
+        if workpiece_id not in self.client.robot_cell.rigid_body_models:
             raise ValueError("Workpiece with id '{}' not found in robot cell.".format(workpiece_id))
-        workpiece_state = self.robot_cell_state.rigid_body_states[workpiece_id]
+        workpiece_state = self.client.robot_cell_state.rigid_body_states[workpiece_id]
         if not workpiece_state.attached_to_tool:
             raise ValueError("Workpiece with id '{}' is not attached to any tool.".format(workpiece_id))
         tool_id = workpiece_state.attached_to_tool
-        if tool_id not in self.robot_cell.tool_models:
+        if tool_id not in self.client.robot_cell.tool_models:
             raise ValueError(
                 "Workpiece is attached to a Tool with id '{}', but the tool is not found in robot cell.".format(tool_id)
             )
-        tool_state = self.robot_cell_state.tool_states[tool_id]
+        tool_state = self.client.robot_cell_state.tool_states[tool_id]
         if not tool_state.attached_to_group:
             raise ValueError("Tool with id '{}' is not attached to the robot.".format(tool_id))
 
@@ -341,7 +323,7 @@ class PlannerInterface(object):
         tcf_frames : list of :class:`~compas.geometry.Frame`
             Tool Coordinate Frames (TCF) relative to the World Coordinate Frame (WCF).
         tool_id : str
-            The id of a tool found in `planner.robot_cell.tool_models`.
+            The id of a tool found in `client.robot_cell.tool_models`.
             The tool must be attached to the robot.
 
         Returns
@@ -384,7 +366,7 @@ class PlannerInterface(object):
         pcf_frames : list of :class:`~compas.geometry.Frame`
             Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
         tool_id : str
-            The id of a tool found in `planner.robot_cell.tool_models`.
+            The id of a tool found in `client.robot_cell.tool_models`.
             The tool must be attached to the robot.
 
         Returns
@@ -425,7 +407,7 @@ class PlannerInterface(object):
         ocf_frames : list of :class:`~compas.geometry.Frame`
             Object Coordinate Frames (OCF) relative to the World Coordinate Frame (WCF).
         workpiece_id : str
-            The id of a workpiece found in `planner.robot_cell.rigid_body_models`.
+            The id of a workpiece found in `client.robot_cell.rigid_body_models`.
             The workpiece must be attached to a tool, and the tool must be attached to the robot.
 
         Returns
@@ -475,7 +457,7 @@ class PlannerInterface(object):
         pcf_frames : list of :class:`~compas.geometry.Frame`
             Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
         workpiece_id : str
-            The id of a workpiece found in `planner.robot_cell.rigid_body_models`.
+            The id of a workpiece found in `client.robot_cell.rigid_body_models`.
             The workpiece must be attached to a tool, and the tool must be attached to the robot.
 
         Notes
@@ -529,11 +511,11 @@ class PlannerInterface(object):
 
         pcf_frames = None
         if target_mode == TargetMode.TOOL:
-            tool_id = self.robot_cell_state.get_attached_tool_id(group)
+            tool_id = self.client.robot_cell_state.get_attached_tool_id(group)
             pcf_frames = self.from_tcf_to_pcf(frames, tool_id)
 
         if target_mode == TargetMode.WORKPIECE:
-            workpiece_ids = self.robot_cell_state.get_attached_workpiece_ids(group)
+            workpiece_ids = self.client.robot_cell_state.get_attached_workpiece_ids(group)
             assert len(workpiece_ids) == 1, "Only one workpiece should be attached to the robot in group '{}'.".format(
                 group
             )
@@ -556,7 +538,7 @@ class PlannerInterface(object):
         such as the cases for ConfigurationTarget and ConstraintSetTarget,
         this function will not perform any checks.
 
-        An `robot_cell_state` input is used instead of the `self.robot_cell_state` attribute,
+        An `robot_cell_state` input is used instead of the `self.client.robot_cell_state` attribute,
         to allow the check to be performed before calling `set_robot_cell_state()`.
 
         If target mode is `TargetMode.TOOL`, the specified planning group must have a tool attached.

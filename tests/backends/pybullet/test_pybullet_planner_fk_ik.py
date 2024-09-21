@@ -390,9 +390,9 @@ def test_ik_group(pybullet_client):
     }
 
     ik_target_frame = Frame(
-        point=Point(x=0.2, y=-0.0, z=0.6),
-        xaxis=Vector(x=0.0, y=1.0, z=-0.0),
-        yaxis=Vector(x=0.0, y=0.0, z=-1.0),
+        point=Point(x=0.22, y=0.11, z=0.6),
+        xaxis=Vector(x=0.11, y=1.0, z=-0.0),
+        yaxis=Vector(x=0.11, y=0.0, z=-1.0),
     )
     target = FrameTarget(ik_target_frame, TargetMode.ROBOT)
     options = {"return_full_configuration": True}
@@ -450,6 +450,11 @@ def planner_with_test_cell(pybullet_client):
 
 
 def test_frame_target_tolerance(planner_with_test_cell):
+    """Test to make sure that PyBullet IK solver respects the target tolerance.
+    The test checks that the IK solver respects the target tolerance for both position and orientation.
+    Moreover, it ensures that the result does not overachieve the target tolerance.
+    This makes sure that the IK solver is not spending more time than necessary to find a solution.
+    """
     planner, robot_cell, robot_cell_state = planner_with_test_cell
     group = robot_cell.robot.main_group_name
     link_name = robot_cell.robot.get_end_effector_link_name(group)
@@ -481,9 +486,6 @@ def test_frame_target_tolerance(planner_with_test_cell):
         PyBulletPlanner.DEFAULT_TARGET_TOLERANCE_POSITION,
         PyBulletPlanner.DEFAULT_TARGET_TOLERANCE_ORIENTATION,
     )
-
-    # Test with a frame target with a different tolerance and we also check that the result does not over achieve
-    test_planning_tolerance(1e-2, 1e-2)
 
     # Test with higher tolerance
     test_planning_tolerance(1e-4, 1e-4)

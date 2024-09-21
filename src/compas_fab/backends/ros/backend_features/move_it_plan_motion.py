@@ -130,9 +130,9 @@ class MoveItPlanMotion(PlanMotion):
 
         # Convert targets to constraints, and to ROS message
         ee_link_name = options["ee_link_name"]
-        attached_tool_id = planner.robot_cell_state.get_attached_tool_id(group)
+        attached_tool_id = client.robot_cell_state.get_attached_tool_id(group)
         if attached_tool_id:
-            tool_coordinate_frame = planner.robot_cell_state.tool_states[attached_tool_id].attachment_frame
+            tool_coordinate_frame = client.robot_cell_state.tool_states[attached_tool_id].attachment_frame
         else:
             tool_coordinate_frame = None
         goal_constraints = convert_target_to_goal_constraints(target, ee_link_name, tool_coordinate_frame)

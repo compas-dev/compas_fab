@@ -112,6 +112,12 @@ class PyBulletInverseKinematics(InverseKinematics):
         planner = self  # type: PyBulletPlanner
         group = group or planner.client.robot.main_group_name
 
+        # Make a copy of the options because we will modify it
+        # Note: Modifying the options dict accidentally will break the hashing function in the inverse_kinematics()
+        options = deepcopy(options) if options else {}
+        start_configuration = deepcopy(robot_cell_state.robot_configuration)
+        robot_cell_state = deepcopy(robot_cell_state)
+
         # The caching mechanism is implemented in the iter_inverse_kinematics method
         # located in InverseKinematics class. This method is just a wrapper around it
         # so that Intellisense and Docs can point here.
@@ -119,14 +125,9 @@ class PyBulletInverseKinematics(InverseKinematics):
             target, robot_cell_state, group, options
         )
 
-        # Make a copy of the options because we will modify it
-        # Note: Modifying the options dict accidentally will break the hashing function in the inverse_kinematics()
-        options = deepcopy(options) if options else {}
-        robot_cell_state = deepcopy(robot_cell_state)
-
         # NOTE: The following check is a workaround to detect planning group that are not supported by PyBullet.
         #       In those cases, some joints outside of the group will be changed inadvertently.
-        start_configuration = robot_cell_state.robot_configuration
+
         self._check_configuration_match_group(start_configuration, configuration, group)
         return configuration
 
@@ -793,7 +794,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             if not TOL.is_close(joint_value, start_configuration[joint_name]):
                 joint_names = robot.semantics.groups[group]["joints"]
                 link_names = robot.semantics.groups[group]["links"]
-                # print("Configuration changed joint '{}' that is not in the group.".format(joint_name))
+                print("Configuration changed joint '{}' that is not in the group.".format(joint_name))
                 raise PlanningGroupNotSupported(group, joint_names, link_names)
 
 

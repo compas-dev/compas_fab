@@ -36,7 +36,6 @@ def test_planner():
         planner.set_robot_cell_state(robot_cell_state)
 
     assert planner.client is not None
-    assert planner.robot_cell is not None
     assert client.robot_cell is not None
     assert client.robot is not None
     assert planner.kinematics_solver is not None

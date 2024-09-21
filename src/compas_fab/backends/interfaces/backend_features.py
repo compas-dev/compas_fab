@@ -43,12 +43,13 @@ class BackendFeature(object):
     def __init__(self, client=None):
         super(BackendFeature, self).__init__()
 
+    # TODO: Remove the following method
     def _scale_output_frame(self, frame):
         # type: (Frame) -> Frame
         """Returns a copy of the frame scaled to the robot's scale factor.
 
         If the robot has no scale factor, returns the original frame."""
-        robot = self.robot_cell.robot  # type: Robot
+        robot = self.client.robot  # type: Robot
 
         # Check `robot.need_scaling` to avoid unnecessary scaling
         if robot.need_scaling:
@@ -90,7 +91,7 @@ class BackendFeature(object):
         Do not pass None to group when return_full_configuration is False, the behavior is undefined.
 
         """
-        robot = self.robot_cell.robot  # type: Robot
+        robot = self.client.robot  # type: Robot
         if return_full_configuration:
             # build configuration including passive joints, but no sorting
             configuration = robot.zero_configuration()

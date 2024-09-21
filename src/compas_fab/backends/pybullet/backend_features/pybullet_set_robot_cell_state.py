@@ -59,6 +59,8 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         if robot_cell:
             robot_cell.assert_cell_state_match(robot_cell_state)
 
+        robot_cell_state = robot_cell_state.copy()
+
         # TODO: Check for modified object states and change those only
 
         # Sanity check to ensure that rigid bodies are not attached to hidden tools
