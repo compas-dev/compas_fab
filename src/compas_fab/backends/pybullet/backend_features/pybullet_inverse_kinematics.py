@@ -25,6 +25,7 @@ if not compas.IPY:
 
 import math
 import random
+from copy import deepcopy
 
 from compas.tolerance import TOL
 from compas_robots.model import Joint
@@ -111,16 +112,17 @@ class PyBulletInverseKinematics(InverseKinematics):
         planner = self  # type: PyBulletPlanner
         group = group or planner.client.robot.main_group_name
 
-        # Make a copy of the options because we will modify it
-        # Note: Modifying the options dict accidentally will break the hashing function in the inverse_kinematics()
-        options = options.copy() if options else {}
-
         # The caching mechanism is implemented in the iter_inverse_kinematics method
         # located in InverseKinematics class. This method is just a wrapper around it
         # so that Intellisense and Docs can point here.
         configuration = super(PyBulletInverseKinematics, self).inverse_kinematics(
             target, robot_cell_state, group, options
         )
+
+        # Make a copy of the options because we will modify it
+        # Note: Modifying the options dict accidentally will break the hashing function in the inverse_kinematics()
+        options = deepcopy(options) if options else {}
+        robot_cell_state = deepcopy(robot_cell_state)
 
         # NOTE: The following check is a workaround to detect planning group that are not supported by PyBullet.
         #       In those cases, some joints outside of the group will be changed inadvertently.
@@ -157,11 +159,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         # Unit conversion from user scale to meter scale can be done here because they are shared.
         # This will be triggered too, when entering from the inverse_kinematics method.
-
-        # However, if the entry point of this IK function is from a planning function,
-        # the scaling should be done in the entry point function, not here.
-        if not options.get("_skip_ik_input_scaling"):
-            target = self._scale_input_target(target)
+        target = target.normalized_to_meters()
 
         # Check if the robot cell state supports the target mode
         planner.ensure_robot_cell_state_supports_target_mode(robot_cell_state, target.target_mode, group)
@@ -276,7 +274,6 @@ class PyBulletInverseKinematics(InverseKinematics):
         options["verbose"] = options.get("verbose", False)
 
         # Setting the entire robot cell state, including the robot configuration
-        robot_cell_state = robot_cell_state.copy()  # Make a copy to avoid modifying the original
         planner.set_robot_cell_state(robot_cell_state)
 
         # TODO: Implement a fail fast mechanism to check if the attached tool and objects are in collision
@@ -553,7 +550,6 @@ class PyBulletInverseKinematics(InverseKinematics):
         options["verbose"] = options.get("verbose", False)
 
         # Setting the entire robot cell state, including the robot configuration
-        robot_cell_state = robot_cell_state.copy()  # Make a copy to avoid modifying the original
         planner.set_robot_cell_state(robot_cell_state)
 
         def compute_initial_frame(configuration):

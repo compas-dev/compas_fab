@@ -221,6 +221,10 @@ class FrameTarget(Target):
         `target_scale` is set to 1.0 after the conversion.
 
         """
+        # Skipping the conversion if the target_scale is already 1.0
+        if self.target_scale == 1.0:
+            return
+
         self.target_frame.scale(self.target_scale)
         self.tolerance_position = self.tolerance_position * self.target_scale if self.tolerance_position else None
         # NOTE: tolerance_orientation is not scaled
@@ -320,6 +324,10 @@ class PointAxisTarget(Target):
         `target_scale` is set to 1.0 after the conversion.
 
         """
+        # Skipping the conversion if the target_scale is already 1.0
+        if self.target_scale == 1.0:
+            return
+
         self.target_point.scale(self.target_scale)
         self.tolerance_position = self.tolerance_position * self.target_scale if self.tolerance_position else None
         # NOTE: tolerance_orientation is not scaled
@@ -683,6 +691,10 @@ class FrameWaypoints(Waypoints):
         `target_scale` is set to 1.0 after the conversion.
 
         """
+        # Skipping the conversion if the target_scale is already 1.0
+        if self.target_scale == 1.0:
+            return
+
         for frame in self.target_frames:
             frame.scale(self.target_scale)
         self.tolerance_position = self.tolerance_position * self.target_scale if self.tolerance_position else None
@@ -765,6 +777,10 @@ class PointAxisWaypoints(Waypoints):
         `target_scale` is set to 1.0 after the conversion.
 
         """
+        # Skipping the conversion if the target_scale is already 1.0
+        if self.target_scale == 1.0:
+            return
+
         for point, axis in self.target_points_and_axes:
             point.scale(self.target_scale)
             axis.unitize()

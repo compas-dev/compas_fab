@@ -63,7 +63,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         - The path is checked to ensure that the joint values are continuous and that revolution values are the smallest possible.
         - There is no interpolation in between frames (i.e. 'max_step' parameter is not supported), only the input frames are used.
         """
-        waypoints = self._scale_input_waypoint(waypoints)
+        waypoints = waypoints.normalized_to_meters()
 
         # TODO: Convert the target frames to the robot's base frame using new method in planner class
         frames_WCF = waypoints.target_frames

@@ -43,34 +43,6 @@ class BackendFeature(object):
     def __init__(self, client=None):
         super(BackendFeature, self).__init__()
 
-    def _scale_input_target(self, target):
-        # type: (Target) -> Target
-        """Returns a copy of the target scaled to the robot's scale factor.
-
-        If the robot has no scale factor, returns the original target."""
-        robot = self.robot_cell.robot  # type: Robot
-
-        # Check `robot.need_scaling` to avoid unnecessary scaling
-        if robot.need_scaling:
-            # Scale input target back to meter scale
-            return target.scaled(1.0 / robot.scale_factor)
-
-        return target
-
-    def _scale_input_waypoint(self, waypoints):
-        # type: (Waypoints) -> Waypoints
-        """Returns a copy of the scaled waypoints scaled to the robot's scale factor.
-
-        If the robot has no scale factor, returns the original waypoints."""
-        robot = self.robot_cell.robot  # type: Robot
-
-        # Check `robot.need_scaling` to avoid unnecessary scaling
-        if robot.need_scaling:
-            # Scale input target back to meter scale
-            return waypoints.scaled(1.0 / robot.scale_factor)
-
-        return waypoints
-
     def _scale_output_frame(self, frame):
         # type: (Frame) -> Frame
         """Returns a copy of the frame scaled to the robot's scale factor.

@@ -38,7 +38,6 @@ class AnalyticalForwardKinematics(ForwardKinematics):
         frame = planner.kinematics_solver.forward(joint_values)
 
         # Scale the frame to user units
-        if robot.need_scaling:
-            frame.scale(robot.scale_factor)
+        frame = self._scale_output_frame(frame)
 
         return frame

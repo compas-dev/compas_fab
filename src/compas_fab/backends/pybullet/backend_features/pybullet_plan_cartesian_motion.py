@@ -151,15 +151,13 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # The following lines should be typical in all planners' plan_cartesian_motion method
         # ===================================================================================
 
-        # Unit conversion from user scale to meter scale can be done here because they are shared.
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
         robot = client.robot  # type: Robot
         group = group or robot.main_group_name
 
-        # TODO: See if we should move scaling inside the planning functions.
-        if robot.need_scaling:
-            waypoints = waypoints.scaled(1.0 / robot.scale_factor)
+        # Unit conversion from user scale to meter scale can be done here because they are shared by all planners.
+        waypoints = waypoints.normalized_to_meters()
 
         # Check if the robot cell state supports the target mode
         planner = self  # type: PyBulletPlanner

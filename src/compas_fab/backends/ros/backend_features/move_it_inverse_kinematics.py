@@ -163,19 +163,19 @@ class MoveItInverseKinematics(InverseKinematics):
         start_configuration = robot.zero_configuration(group).merged(start_configuration)
 
         # Target frame and Tool Coordinate Frame
+        target = target.normalized_to_meters()
         target_frame = target.target_frame
-        if robot.need_scaling:
-            target_frame = target_frame.scaled(1.0 / robot.scale_factor)
-            # Now target_frame is back in meter scale
+
+        # Attached tool frames does not need scaling because Tools are modelled in meter scale
         attached_tool = self.robot_cell.get_attached_tool(start_state, group)
         if attached_tool:
             target_frame = from_tcf_to_t0cf(target_frame, attached_tool.frame)
-            # Attached tool frames does not need scaling because Tools are modelled in meter scale
 
         # Scale Attached Collision Meshes
         attached_collision_meshes = self.robot_cell.get_attached_rigid_bodies_as_attached_collision_meshes(
             start_state, group
         )
+        # TODO: ACM will always be modeled in meters too. This is a temporary solution
         if robot.need_scaling:
             for acm in attached_collision_meshes:
                 acm.collision_mesh.scale(1.0 / robot.scale_factor)

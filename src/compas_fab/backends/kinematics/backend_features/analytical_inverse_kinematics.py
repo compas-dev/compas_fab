@@ -79,7 +79,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         planner = self  # type: AnalyticalKinematicsPlanner
 
         # Scale Target and get target frame
-        target = self._scale_input_target(target)
+        target = target.normalized_to_meters()
         target_frame = target.target_frame
 
         # Tool Coordinate Frame if there are tools attached

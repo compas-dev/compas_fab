@@ -62,7 +62,7 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
             planner.set_robot_cell_state(start_state)
 
         # Scale Target and get target frame
-        target = self._scale_input_target(target)
+        target = target.normalized_to_meters()
         target_frame = target.target_frame
 
         # Tool Coordinate Frame if there are tools attached

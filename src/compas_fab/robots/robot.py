@@ -183,6 +183,7 @@ class Robot(Data):
         self._scene_object = value
         if value is None:
             return
+        # TODO: The whole SceneObject needs some refactoring on how to handle scale
         if len(self.model.joints) > 0 and len(self.model.links) > 0:
             self.scale(self._scale_factor)
             for tool in self.attached_tools.values():
@@ -706,9 +707,9 @@ class Robot(Data):
         :class:`compas_robots.Configuration`
             The configuration with only the joints of the specified group.
         """
-        full_configuration = self._check_full_configuration_and_scale(full_configuration)[
-            0
-        ]  # adds joint_names to full_configuration and makes copy
+        # adds joint_names to full_configuration and makes copy
+        full_configuration = self._check_full_configuration(full_configuration)
+
         group_joint_names = self.get_configurable_joint_names(group)
         values = [full_configuration[name] for name in group_joint_names]
         return Configuration(values, self.get_configurable_joint_types(group), group_joint_names)
@@ -743,9 +744,8 @@ class Robot(Data):
         if not group_configuration.joint_names:
             group_configuration.joint_names = self.get_configurable_joint_names(group)
 
-        full_configuration = self._check_full_configuration_and_scale(full_configuration)[
-            0
-        ]  # adds joint_names to full_configuration and makes copy
+        # adds joint_names to full_configuration and makes copy
+        full_configuration = self._check_full_configuration(full_configuration)
 
         full_configuration = full_configuration.merged(group_configuration)
         return full_configuration
@@ -799,9 +799,11 @@ class Robot(Data):
             raise ValueError("Please pass a configuration with {} joint_values or specify group".format(len(names)))
         return configuration.joint_values[names.index(joint_name)]
 
-    def _check_full_configuration_and_scale(self, full_configuration=None):
+    def _check_full_configuration(self, full_configuration=None):
         # type: (Optional[Configuration]) -> Tuple[Configuration, Configuration]
         """Either create a full configuration or check if the passed full configuration is valid.
+
+        Returned Configuration is a new object and contain `.joint_names` attribute.
 
         Parameters
         ----------
@@ -810,8 +812,8 @@ class Robot(Data):
 
         Returns
         -------
-        :obj:`Tuple` of (:class:`compas_robots.Configuration`, :class:`compas_robots.Configuration`)
-            The full configuration and the scaled full configuration
+        ::class:`compas_robots.Configuration`
+            The full configuration
         """
         if not full_configuration:
             configuration = self.zero_configuration()  # with joint_names
@@ -827,7 +829,7 @@ class Robot(Data):
             configuration = full_configuration.copy()
             if not configuration.joint_names:
                 configuration.joint_names = joint_names
-        return configuration, configuration.scaled(1.0 / self.scale_factor)
+        return configuration
 
     def get_configuration_from_group_state(self, group, group_state):
         # type: (str, str) -> Configuration
@@ -1301,7 +1303,7 @@ class Robot(Data):
 
         group = group or self.main_group_name if self.semantics else None
 
-        start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
+        start_configuration = self._check_full_configuration(start_configuration)
 
         attached_tool = self.attached_tools.get(group)
         if use_attached_tool_frame and attached_tool:
@@ -1317,7 +1319,7 @@ class Robot(Data):
         options["attached_collision_meshes"] = attached_collision_meshes
 
         # TODO: self.client is removed, the following line needs fixed.
-        solutions = self.client.inverse_kinematics(self, frame_WCF_scaled, start_configuration_scaled, group, options)
+        solutions = self.client.inverse_kinematics(self, frame_WCF_scaled, start_configuration, group, options)
 
         # The returned joint names might be more than the requested ones if there are passive joints present
         for joint_positions, joint_names in solutions:
@@ -1402,7 +1404,7 @@ class Robot(Data):
         group = group or self.main_group_name if self.semantics else None
 
         full_configuration = self.merge_group_with_full_configuration(configuration, self.zero_configuration(), group)
-        full_configuration, full_configuration_scaled = self._check_full_configuration_and_scale(full_configuration)
+        full_configuration = self._check_full_configuration(full_configuration)
 
         # Calling forward_kinematics from Robot class will use the RobotModel's function to calculate FK
 
@@ -1508,7 +1510,7 @@ class Robot(Data):
 
         # NOTE: start_configuration has to be a full robot configuration, such
         # that all configurable joints of the whole robot are defined for planning.
-        start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
+        start_configuration = self._check_full_configuration(start_configuration)
 
         # Path constraints are only relevant to ROS Backend
         path_constraints = options.get("path_constraints")
@@ -1545,7 +1547,7 @@ class Robot(Data):
         trajectory = self.client.plan_cartesian_motion(
             robot=self,
             waypoints=waypoints,
-            start_configuration=start_configuration_scaled,
+            start_configuration=start_configuration,
             group=group,
             options=options,
         )
@@ -1651,7 +1653,7 @@ class Robot(Data):
 
         # NOTE: start_configuration has to be a full robot configuration, such
         # that all configurable joints of the whole robot are defined for planning.
-        start_configuration, start_configuration_scaled = self._check_full_configuration_and_scale(start_configuration)
+        start_configuration = self._check_full_configuration(start_configuration)
 
         # Scale Target Definitions
         if self.scale_factor != 1.0:
@@ -1683,7 +1685,7 @@ class Robot(Data):
         trajectory = self.client.plan_motion(
             robot=self,
             target=target,
-            start_configuration=start_configuration_scaled,
+            start_configuration=start_configuration,
             group=group,
             options=options,
         )
