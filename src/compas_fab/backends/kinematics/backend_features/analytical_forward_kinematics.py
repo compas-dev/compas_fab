@@ -27,7 +27,7 @@ class AnalyticalForwardKinematics(ForwardKinematics):
         # type: (RobotCellState, Optional[str], Optional[dict]) -> Frame
         """Calculate the forward kinematics for a given joint configuration."""
         planner = self  # type: AnalyticalKinematicsPlanner
-        robot = self.robot_cell.robot  # type: Robot
+        robot = self.client.robot_cell.robot  # type: Robot
 
         if group is not None:
             raise ValueError("AnalyticalKinematicsPlanner does not support groups")

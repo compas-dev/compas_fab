@@ -82,11 +82,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         target = target.normalized_to_meters()
         target_frame = target.target_frame
 
-        # Tool Coordinate Frame if there are tools attached
-        # TODO: Use the shared method from the planner
-        attached_tool_id = start_state.get_attached_tool_id(group)
-        if attached_tool_id:
-            target_frame = self.from_tcf_to_t0cf([target_frame], attached_tool_id)[0]
+        target_frame = planner.frames_to_pcf(target_frame, target.target_mode, group=group)
 
         return self.inverse_kinematics_ordered(target_frame, group=group, options=options)
 

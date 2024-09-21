@@ -1,10 +1,18 @@
+import compas
 from compas_fab.backends.interfaces.planner import PlannerInterface
 
 from compas_fab.backends.pybullet.backend_features import *
 from compas_fab.backends.kinematics.backend_features import *
 from compas_fab.backends.kinematics.solvers import *
 
+from compas_fab.backends.kinematics.client import AnalyticalKinematicsClient  # noqa: F401
 from compas_fab.backends.pybullet.client import PyBulletClient  # noqa: F401
+
+if compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import Optional
 
 __all__ = [
     "AnalyticalPyBulletPlanner",
@@ -16,6 +24,7 @@ class AnalyticalKinematicsPlanner(
     AnalyticalInverseKinematics,
     AnalyticalPlanCartesianMotion,
     AnalyticalSetRobotCell,
+    AnalyticalSetRobotCellState,
     PlannerInterface,
 ):
     """Analytical Inverse Kinematics Planner utilize analytical kinematics to provide fast and accurate FK, IK and Cartesian motion planning.
@@ -38,12 +47,30 @@ class AnalyticalKinematicsPlanner(
 
     """
 
-    def __init__(self, kinematics_solver):
-        # type: (AnalyticalKinematics) -> None
+    def __init__(self, kinematics_solver, verbose=False):
+        # type: (AnalyticalKinematics, Optional[bool]) -> None
         self.kinematics_solver = kinematics_solver  # type: AnalyticalKinematics
 
         # Initialize all mixins
         super(AnalyticalKinematicsPlanner, self).__init__()
+
+        # Initialize the dummy client
+        self._client = AnalyticalKinematicsClient(verbose=verbose)
+
+    # The AnalyticalKinematicsPlanner does not require the user to know about the underlying client
+    # therefore the following properties are provided to access the client's properties
+
+    @property
+    def robot(self):
+        return self._client.robot_cell.robot
+
+    @property
+    def robot_cell(self):
+        return self._client.robot_cell
+
+    @property
+    def robot_cell_state(self):
+        return self._client.robot_cell_state
 
 
 class AnalyticalPyBulletPlanner(

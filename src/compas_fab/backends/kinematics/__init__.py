@@ -5,6 +5,8 @@ from .exceptions import CartesianMotionError
 from .backend_features.analytical_inverse_kinematics import AnalyticalInverseKinematics
 from .backend_features.analytical_plan_cartesian_motion import AnalyticalPlanCartesianMotion
 
+from .client import AnalyticalKinematicsClient
+
 from .planner import AnalyticalPyBulletPlanner
 from .planner import AnalyticalKinematicsPlanner
 
@@ -26,6 +28,7 @@ __all__ = [
     # exceptions
     "CartesianMotionError",
     # clients / planner / backend features
+    "AnalyticalKinematicsClient",
     "AnalyticalInverseKinematics",
     "AnalyticalPlanCartesianMotion",
     "AnalyticalPyBulletPlanner",
