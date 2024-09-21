@@ -1,3 +1,4 @@
+from copy import deepcopy
 import compas
 
 from compas.data import Data
@@ -47,6 +48,9 @@ class Target(Data):
     target_mode : :class:`TargetMode` or str, optional
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
+    target_scale : float, optional
+        The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
+        Defaults to 1.0.
 
     See Also
     --------
@@ -56,33 +60,50 @@ class Target(Data):
     :class:`ConstraintSetTarget`
     """
 
-    def __init__(self, target_mode=None, name="Generic Target"):
-        # type: (str, TargetMode|str) -> None
+    def __init__(self, target_mode=None, target_scale=1.0, name="Generic Target"):
+        # type: (TargetMode|str, float, str) -> None
         super(Target, self).__init__()
         self.name = name
         self.target_mode = target_mode
+        self.target_scale = target_scale
 
     @property
     def __data__(self):
         raise NotImplementedError
 
-    def scaled(self, factor):
-        # type: (float) -> Target
-        """Returns a scaled copy of the target.
+    def normalize_to_meters(self):
+        # type: () -> None
+        """Convert the target into meter scale if `target_scale` is not 1.0.
 
-        If the user model is created in millimeters, the target should be scaled by a factor of 0.001 before passing to the planner.
+        Because all robots and planners in compas_fab use meters as the default unit of measure,
+        user targets that are created in other units (e.g. millimeters) will have a `target_scale`
+        factor such as 0.001 for millimeters.
 
-        Parameters
-        ----------
-        factor : float
-            The scaling factor.
+        This function convert the target and its tolerance into meters scale
+        and setting the `target_scale` attribute to 1.0.
 
-        Returns
-        -------
-        :class:`Target`
-            The scaled target.
+        Notes
+        -----
+
+        This function will modify the target in place.
+        It can only be called once because the target will be in meters scale after the first call.
         """
         raise NotImplementedError
+
+    def normalized_to_meters(
+        self,
+    ):
+        # type: () -> Target
+        """Returns a copy of the target where the target and tolerances are scaled to meters.
+
+        Notes
+        -----
+        `copy.deepcopy` is used, `normalize_to_meters` is then called on the copy.
+        """
+
+        new_target = deepcopy(self)
+        new_target.normalize_to_meters()
+        return new_target
 
 
 class FrameTarget(Target):
@@ -104,6 +125,9 @@ class FrameTarget(Target):
     target_mode : :class:`TargetMode` or str
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
+    target_scale : float, optional
+        The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
+        Defaults to 1.0.
     tolerance_position : float, optional
         The tolerance for the position.
         Unit is meters.
@@ -122,12 +146,13 @@ class FrameTarget(Target):
         self,
         target_frame,
         target_mode,
+        target_scale=1.0,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Frame Target",
     ):
-        # type: (Frame, TargetMode | str, Optional[float], Optional[float], Optional[Frame | Transformation], Optional[str]) -> None
-        super(FrameTarget, self).__init__(target_mode=target_mode, name=name)
+        # type: (Frame, TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> None
+        super(FrameTarget, self).__init__(target_mode=target_mode, target_scale=target_scale, name=name)
         self.target_frame = target_frame
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
@@ -137,6 +162,7 @@ class FrameTarget(Target):
         return {
             "target_frame": self.target_frame,
             "target_mode": self.target_mode,
+            "target_scale": self.target_scale,
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
@@ -147,6 +173,7 @@ class FrameTarget(Target):
         cls,
         transformation,
         target_mode,
+        target_scale=1.0,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Frame Target",
@@ -161,6 +188,9 @@ class FrameTarget(Target):
         target_mode : :class:`TargetMode` or str
             The target mode specifies which link or frame is referenced when specifying a target.
             See :class:`TargetMode` for more details.
+        target_scale : float, optional
+            The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
+            Defaults to 1.0.
         tolerance_position : float, optional
             The tolerance for the position.
             if not specified, the default value from the planner is used.
@@ -177,31 +207,24 @@ class FrameTarget(Target):
             The frame target.
         """
         frame = Frame.from_transformation(transformation)
-        return cls(frame, target_mode, tolerance_position, tolerance_orientation, name)
+        return cls(frame, target_mode, target_scale, tolerance_position, tolerance_orientation, name)
 
-    def scaled(self, factor):
-        # type: (float) -> FrameTarget
-        """Returns a copy of the target where the target frame and tolerances are scaled.
+    def normalize_to_meters(self):
+        # type: () -> None
+        """Convert the target into meter scale if `target_scale` is not 1.0.
 
-        By convention, compas_fab robots use meters as the default unit of measure.
-        If user model is created in millimeters, the FrameTarget should be scaled by a factor
-        of 0.001 before passing to the planner.
+        Because all robots and planners in compas_fab use meters as the default unit of measure,
+        user targets that are created in other units (e.g. millimeters) will have a `target_scale`
+        factor such as 0.001 for millimeters.
 
-        Parameters
-        ----------
-        factor : float
-            The scaling factor.
+        This function convert the `target_frame` and `tolerance_position` into meters scale.
+        `target_scale` is set to 1.0 after the conversion.
 
-        Returns
-        -------
-        :class:`FrameTarget`
-            The scaled frame target.
         """
-        target_frame = self.target_frame.scaled(factor)
-        tolerance_position = self.tolerance_position * factor
-        # Orientation tolerance is not scaled
-        tolerance_orientation = self.tolerance_orientation
-        return FrameTarget(target_frame, self.target_mode, tolerance_position, tolerance_orientation, self.name)
+        self.target_frame.scale(self.target_scale)
+        self.tolerance_position = self.tolerance_position * self.target_scale if self.tolerance_position else None
+        # NOTE: tolerance_orientation is not scaled
+        self.target_scale = 1.0
 
 
 class PointAxisTarget(Target):
@@ -239,6 +262,9 @@ class PointAxisTarget(Target):
     target_mode : :class:`TargetMode` or str
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
+    target_scale : float, optional
+        The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
+        Defaults to 1.0.
     tolerance_position : float, optional
         The tolerance for the position of the target point.
         Unit is meters.
@@ -257,12 +283,13 @@ class PointAxisTarget(Target):
         target_point,
         target_z_axis,
         target_mode,
+        target_scale=1.0,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Point-Axis Target",
     ):
-        # type: (Point, Vector, TargetMode | str, Optional[float], Optional[float], Optional[str]) -> None
-        super(PointAxisTarget, self).__init__(target_mode=target_mode, name=name)
+        # type: (Point, Vector, TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> None
+        super(PointAxisTarget, self).__init__(target_mode=target_mode, target_scale=target_scale, name=name)
         # Note: The following input are converted to class because it can simplify functions that use this class
         self.target_point = Point(*target_point)
         self.target_z_axis = Vector(*target_z_axis)
@@ -274,32 +301,31 @@ class PointAxisTarget(Target):
         return {
             "target_point": self.target_point,
             "target_mode": self.target_mode,
+            "target_scale": self.target_scale,
             "target_z_axis": self.target_z_axis,
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
         }
 
-    def scaled(self, factor):
-        # type: (float) -> PointAxisTarget
-        """Returns a copy of the target where the target point and tolerances are scaled.
+    def normalize_to_meters(self):
+        # type: () -> None
+        """Convert the target into meter scale if `target_scale` is not 1.0.
 
-        Parameters
-        ----------
-        factor : float
-            The scaling factor.
+        Because all robots and planners in compas_fab use meters as the default unit of measure,
+        user targets that are created in other units (e.g. millimeters) will have a `target_scale`
+        factor such as 0.001 for millimeters.
 
-        Returns
-        -------
-        :class:`PointAxisTarget`
-            The scaled point-axis target.
+        This function convert the `target_point`, `target_z_axis` and `tolerance_position` into meters scale.
+        `target_scale` is set to 1.0 after the conversion.
+
         """
-        target_point = self.target_point.scaled(factor)
-        tolerance_position = self.tolerance_position * factor if self.tolerance_position else None
-        target_z_axis = self.target_z_axis  # Vector is unitized and is not scaled
-        return PointAxisTarget(
-            target_point, target_z_axis, self.target_mode, tolerance_position, self.tolerance_orientation, self.name
-        )
+        self.target_point.scale(self.target_scale)
+        self.tolerance_position = self.tolerance_position * self.target_scale if self.tolerance_position else None
+        # NOTE: tolerance_orientation is not scaled
+        self.target_z_axis.unitize()
+        # NOTE: target_z_axis is unitized and is not scaled
+        self.target_scale = 1.0
 
 
 class ConfigurationTarget(Target):
@@ -325,10 +351,12 @@ class ConfigurationTarget(Target):
     tolerance_above : :obj:`list` of :obj:`float`, optional
         Acceptable deviation above the targeted configurations. One for each joint.
         Always use positive values.
+        Units must be in meters for prismatic joints and radians for revolute and continuous joints.
         If not specified, the default value from the planner is used.
     tolerance_below : :obj:`list` of :obj:`float`, optional
         Acceptable deviation below the targeted configurations. One for each joint.
         Always use positive values.
+        Units must be in meters for prismatic joints and radians for revolute and continuous joints.
         If not specified, the default value from the planner is used.
     name : str, optional
         The human-readable name of the target.
@@ -408,48 +436,55 @@ class ConfigurationTarget(Target):
                 raise NotImplementedError("Unsupported joint type: {}".format(joint_type))
         return tolerances_above, tolerances_below
 
-    def scaled(self, factor):
-        # type: (float) -> ConfigurationTarget
-        """Returns copy of the target where the target configuration and tolerances are scaled.
+    # The following function is retired because we no longer support scaling the tolerance of a ConfigurationTarget
+    # Users who use ConfigurationTarget should set the tolerance values using the native units of the robot model.
 
-        This function should only be needed if the ConfigurationTarget was created
-        with a distance unit other than meters.
+    # def scaled(self, factor):
+    #     # type: (float) -> ConfigurationTarget
+    #     """Returns copy of the target where the target configuration and tolerances are scaled.
 
-        Only the values for prismatic and planar joints are scaled. The values for revolute
-        and continuous joints are not scaled, as they must be in radians.
+    #     This function should only be needed if the ConfigurationTarget was created
+    #     with a distance unit other than meters.
 
-        Parameters
-        ----------
-        factor : float
-            The scaling factor.
+    #     Only the values for prismatic and planar joints are scaled. The values for revolute
+    #     and continuous joints are not scaled, as they must be in radians.
 
-        Returns
-        -------
-        :class:`ConfigurationTarget`
-            The scaled configuration target.
-        """
-        target_configuration = self.target_configuration.scaled(factor)
+    #     Parameters
+    #     ----------
+    #     factor : float
+    #         The scaling factor.
 
-        def scale_tolerance(tolerance, joint_types):
-            # type: (list[float], list[Joint]) -> list[float]
-            """Only scales the tolerances for prismatic and planar joints."""
-            scaled_tolerance = []
-            for t, joint_type in zip(tolerance, joint_types):
-                if joint_type in (Joint.PLANAR, Joint.PRISMATIC):
-                    t *= factor
-                scaled_tolerance.append(t)
-            return scaled_tolerance
+    #     Returns
+    #     -------
+    #     :class:`ConfigurationTarget`
+    #         The scaled configuration target.
+    #     """
+    #     target_configuration = self.target_configuration.scaled(factor)
 
-        # We scale only the tolerances for prismatic and planar joints,
-        # similar to the Configuration.scale() method
-        tolerance_above = (
-            scale_tolerance(self.tolerance_above, target_configuration.joint_types) if self.tolerance_above else None
-        )
-        tolerance_below = (
-            scale_tolerance(self.tolerance_below, target_configuration.joint_types) if self.tolerance_below else None
-        )
+    #     def scale_tolerance(tolerance, joint_types):
+    #         # type: (list[float], list[Joint]) -> list[float]
+    #         """Only scales the tolerances for prismatic and planar joints."""
+    #         scaled_tolerance = []
+    #         for t, joint_type in zip(tolerance, joint_types):
+    #             if joint_type in (Joint.PLANAR, Joint.PRISMATIC):
+    #                 t *= factor
+    #             scaled_tolerance.append(t)
+    #         return scaled_tolerance
 
-        return ConfigurationTarget(target_configuration, tolerance_above, tolerance_below, self.name)
+    #     # We scale only the tolerances for prismatic and planar joints,
+    #     # similar to the Configuration.scale() method
+    #     tolerance_above = (
+    #         scale_tolerance(self.tolerance_above, target_configuration.joint_types) if self.tolerance_above else None
+    #     )
+    #     tolerance_below = (
+    #         scale_tolerance(self.tolerance_below, target_configuration.joint_types) if self.tolerance_below else None
+    #     )
+
+    #     return ConfigurationTarget(target_configuration, tolerance_above, tolerance_below, self.name)
+
+    def normalize_to_meters():
+        """ConfigurationTarget does not contain any geometry with configurable units to normalize."""
+        pass
 
 
 class ConstraintSetTarget(Target):
@@ -495,16 +530,9 @@ class ConstraintSetTarget(Target):
             "name": self.name,
         }
 
-    def scaled(self, factor):
-        # type: (float) -> ConstraintSetTarget
-        """Returns a scaled copy of the target.
-
-        Raises
-        ------
-        NotImplementedError
-            This target type does not support scaling.
-        """
-        raise NotImplementedError
+    def normalize_to_meters():
+        """ConstraintSetTarget does not contain any geometry with configurable units to normalize."""
+        pass
 
 
 class Waypoints(Target):
@@ -527,6 +555,9 @@ class Waypoints(Target):
     target_mode : :class:`TargetMode` or str, optional
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
+    target_scale : float, optional
+        The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
+        Defaults to 1.0.
     name : str , optional, default = 'target'
         A human-readable name for identifying the target.
 
@@ -536,27 +567,9 @@ class Waypoints(Target):
     :class:`FrameWaypoints`
     """
 
-    def __init__(self, target_mode, name="Generic Waypoints"):
-        # type: (Optional[TargetMode | str], Optional[str]) -> None
-        super(Waypoints, self).__init__(target_mode=target_mode, name=name)
-
-    def scaled(self, factor):
-        # type: (float) -> Waypoints
-        """Returns a scaled copy of the waypoints.
-
-        If the user model is created in millimeters, the target should be scaled by a factor of 0.001 before passing to the planner.
-
-        Parameters
-        ----------
-        factor : float
-            The scaling factor.
-
-        Returns
-        -------
-        :class:`Waypoints`
-            The scaled waypoints.
-        """
-        raise NotImplementedError
+    def __init__(self, target_mode, target_scale=1.0, name="Generic Waypoints"):
+        # type: (Optional[TargetMode | str], Optional[float], Optional[str]) -> None
+        super(Waypoints, self).__init__(target_mode=target_mode, target_scale=target_scale, name=name)
 
 
 class FrameWaypoints(Waypoints):
@@ -574,6 +587,9 @@ class FrameWaypoints(Waypoints):
     target_mode : :class:`TargetMode` or str
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
+    target_scale : float, optional
+        The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
+        Defaults to 1.0.
     tolerance_position : float, optional
         The tolerance for the position.
         Unit is meters.
@@ -592,11 +608,13 @@ class FrameWaypoints(Waypoints):
         self,
         target_frames,
         target_mode,
+        target_scale=1.0,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Frame Waypoints",
     ):
-        super(FrameWaypoints, self).__init__(target_mode=target_mode, name=name)
+        # type: (list[Frame], TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> None
+        super(FrameWaypoints, self).__init__(target_mode=target_mode, target_scale=target_scale, name=name)
         self.target_frames = target_frames
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
@@ -606,6 +624,7 @@ class FrameWaypoints(Waypoints):
         return {
             "target_frames": self.target_frames,
             "target_mode": self.target_mode,
+            "target_scale": self.target_scale,
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
@@ -616,11 +635,12 @@ class FrameWaypoints(Waypoints):
         cls,
         transformations,
         target_mode,
+        target_scale=1.0,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Frame Waypoints",
     ):
-        # type: (list[Transformation], TargetMode | str, Optional[float], Optional[float], Optional[Frame | Transformation], Optional[str]) -> FrameWaypoints
+        # type: (list[Transformation], TargetMode | str, Optional[float],  Optional[float], Optional[float], Optional[str]) -> FrameWaypoints
         """Creates a FrameWaypoints from a list of transformation matrices.
 
         Parameters
@@ -630,6 +650,9 @@ class FrameWaypoints(Waypoints):
         target_mode : :class:`TargetMode` or str
             The target mode specifies which link or frame is referenced when specifying a target.
             See :class:`TargetMode` for more details.
+        target_scale : float, optional
+            The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
+            Defaults to 1.0.
         tolerance_position : float, optional
             The tolerance for the position.
             if not specified, the default value from the planner is used.
@@ -646,30 +669,25 @@ class FrameWaypoints(Waypoints):
             The frame waypoints.
         """
         frames = [Frame.from_transformation(transformation) for transformation in transformations]
-        return cls(frames, target_mode, tolerance_position, tolerance_orientation, name)
+        return cls(frames, target_mode, target_scale, tolerance_position, tolerance_orientation, name)
 
-    def scaled(self, factor):
-        # type: (float) -> FrameWaypoints
-        """Returns a copy of the :class:`FrameWaypoints` where the target frames and tolerances are scaled.
+    def normalize_to_meters(self):
+        # type: () -> None
+        """Convert the target into meter scale if `target_scale` is not 1.0.
 
-        By convention, compas_fab robots use meters as the default unit of measure.
-        If user model is created in millimeters, the FrameWaypoints should be scaled by a factor
-        of 0.001 before passing to the planner.
+        Because all robots and planners in compas_fab use meters as the default unit of measure,
+        user targets that are created in other units (e.g. millimeters) will have a `target_scale`
+        factor such as 0.001 for millimeters.
 
-        Parameters
-        ----------
-        factor : float
-            The scaling factor.
+        This function convert the `target_frame` and `tolerance_position` into meters scale.
+        `target_scale` is set to 1.0 after the conversion.
 
-        Returns
-        -------
-        :class:`FrameWaypoints`
-            The scaled frame waypoints.
         """
-        target_frames = [frame.scaled(factor) for frame in self.target_frames]
-        tolerance_position = self.tolerance_position * factor
-        tolerance_orientation = self.tolerance_orientation
-        return FrameWaypoints(target_frames, self.target_mode, tolerance_position, tolerance_orientation, self.name)
+        for frame in self.target_frames:
+            frame.scale(self.target_scale)
+        self.tolerance_position = self.tolerance_position * self.target_scale if self.tolerance_position else None
+        # NOTE: tolerance_orientation is not scaled
+        self.target_scale = 1.0
 
 
 class PointAxisWaypoints(Waypoints):
@@ -692,6 +710,9 @@ class PointAxisWaypoints(Waypoints):
     target_mode : :class:`TargetMode` or str
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
+    target_scale : float, optional
+        The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
+        Defaults to 1.0.
     tolerance_position : float, optional
         The tolerance for the position of the target point.
         Unit is meters.
@@ -710,11 +731,13 @@ class PointAxisWaypoints(Waypoints):
         self,
         target_points_and_axes,
         target_mode,
+        target_scale=1.0,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Point-Axis Waypoints",
     ):
-        super(PointAxisWaypoints, self).__init__(target_mode=target_mode, name=name)
+        # type: (list[Tuple[Point, Vector]], TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> None
+        super(PointAxisWaypoints, self).__init__(target_mode=target_mode, target_scale=target_scale, name=name)
         self.target_points_and_axes = target_points_and_axes
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
@@ -724,31 +747,32 @@ class PointAxisWaypoints(Waypoints):
         return {
             "target_points_and_axes": self.target_points_and_axes,
             "target_mode": self.target_mode,
+            "target_scale": self.target_scale,
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
         }
 
-    def scaled(self, factor):
-        # type: (float) -> PointAxisWaypoints
-        """Returns a copy of the target where the target points and tolerances are scaled.
+    def normalize_to_meters(self):
+        # type: () -> None
+        """Convert the target into meter scale if `target_scale` is not 1.0.
 
-        Parameters
-        ----------
-        factor : float
-            The scaling factor.
+        Because all robots and planners in compas_fab use meters as the default unit of measure,
+        user targets that are created in other units (e.g. millimeters) will have a `target_scale`
+        factor such as 0.001 for millimeters.
 
-        Returns
-        -------
-        :class:`PointAxisWaypoints`
-            The scaled point-axis waypoints.
+        This function convert the Points and Vectors in `target_points_and_axes` into meters scale.
+        `target_scale` is set to 1.0 after the conversion.
+
         """
-        # Axis is a unitized vector and is not scaled
-        target_points_and_axes = [(point.scaled(factor), axis) for point, axis in self.target_points_and_axes]
-        tolerance_position = self.tolerance_position * factor if self.tolerance_position else None
-        return PointAxisWaypoints(
-            target_points_and_axes, self.target_mode, tolerance_position, self.tolerance_orientation, self.name
-        )
+        for point, axis in self.target_points_and_axes:
+            point.scale(self.target_scale)
+            axis.unitize()
+            # NOTE: target_z_axis is unitized and is not scaled
+
+        self.tolerance_position = self.tolerance_position * self.target_scale if self.tolerance_position else None
+        # NOTE: tolerance_orientation is not scaled
+        self.target_scale = 1.0
 
 
 class TargetMode:
