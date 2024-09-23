@@ -82,7 +82,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         target = target.normalized_to_meters()
         target_frame = target.target_frame
 
-        target_frame = planner.frames_to_pcf(target_frame, target.target_mode, group=group)
+        target_frame = planner.target_frames_to_pcf(target_frame, target.target_mode, group=group)
 
         return self.inverse_kinematics_ordered(target_frame, group=group, options=options)
 

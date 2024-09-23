@@ -6,6 +6,7 @@ from compas_fab.backends import AnalyticalKinematicsPlanner
 from compas_fab.backends.kinematics.solvers import UR5Kinematics
 
 from compas_fab.robots import RobotCell
+from compas_fab.robots import TargetMode
 from compas_fab.robots import RobotCellState
 
 # Not loading the robot's geometry because AnalyticalKinematicsPlanner does not use it for collision checking
@@ -25,7 +26,7 @@ robot_cell_state = RobotCellState.from_robot_configuration(robot, configuration)
 
 # AnalyticalKinematicsPlanner.forward_kinematics(), do not support `planning_group` parameter, it must be left as None.
 # The `link` option is also not supported and cannot be used.
-frame_WCF = planner.forward_kinematics(robot_cell_state)
+frame_WCF = planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT)
 
 print("Robot flange frame of the default planning group in the world coordinate system:")
 print(frame_WCF)

@@ -3,8 +3,8 @@ from compas.datastructures import Mesh
 import compas_fab
 from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
-from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellLibrary
+from compas_fab.robots import TargetMode
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import RigidBody
 from compas_fab.robots import RobotLibrary
@@ -28,13 +28,16 @@ with PyBulletClient("direct") as client:
     # ---------------------
     # The input configuration used for the forward kinematics is provided through the RobotCellState
     robot_cell_state.robot_configuration.joint_values = [-2.238, -1.153, -2.174, 0.185, 0.667, 0.0]
-    # By default, if a tool is attached, the TCF is returned
-    print("Frame of the attached tool TCF in World Coordinate Frame:")
-    frame_WCF = planner.forward_kinematics(robot_cell_state)
-    print(frame_WCF)
 
-    # It is possible to retrieve T0CF by requesting with the end effector link name
+    # To retrieve the tool frame, the TargetMode.TOOL is used
+    print("Frame of the attached tool TCF in World Coordinate Frame:")
+    print(planner.forward_kinematics(robot_cell_state, TargetMode.TOOL))
+
+    # To retrieve the Planner Coordinate Frame, the TargetMode.ROBOT is used
+    print("Frame of the Planner Coordinate Frame PCF in World Coordinate Frame:")
+    print(planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT))
+
+    # It is also possible to retrieve the PCF  by requesting with the end effector link name
     ee_link_name = robot_cell.robot.get_end_effector_link_name()
     print(f"Frame of the T0CF (name='{ee_link_name}') in World Coordinate Frame:")
-    frame_WCF = planner.forward_kinematics(robot_cell_state, options={"link": ee_link_name})
-    print(frame_WCF)
+    print(planner.forward_kinematics_to_link(robot_cell_state, ee_link_name))

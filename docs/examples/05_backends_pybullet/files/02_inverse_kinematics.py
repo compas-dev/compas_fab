@@ -32,13 +32,13 @@ with PyBulletClient() as client:
 
     # To verify the IK result, we can compute the FK with the obtained joint positions
     robot_cell_state.robot_configuration.merge(config)
-    frame_WCF = planner.forward_kinematics(robot_cell_state)
+    frame_WCF = planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT)
     print("Forward kinematics result (main group): \n ", frame_WCF)
 
     # The result is the same as the 'tool0' link's frame
-    frame_WCF = planner.forward_kinematics(robot_cell_state, options={"link": "tool0"})
+    frame_WCF = planner.forward_kinematics_to_link(robot_cell_state, "tool0")
     print("Forward kinematics result: (tool0 link): \n ", frame_WCF)
 
     # However, note that the 'flange' link's frame has a different orientation
-    frame_WCF = planner.forward_kinematics(robot_cell_state, options={"link": "flange"})
+    frame_WCF = planner.forward_kinematics_to_link(robot_cell_state, "flange")
     print("Forward kinematics result: (flange link): \n ", frame_WCF)

@@ -102,6 +102,9 @@ class PyBulletInverseKinematics(InverseKinematics):
         :class: `compas_fab.backends.exceptions.InverseKinematicsError`
             If no configuration can be found.
 
+        :class:`compas_fab.backends.TargetModeMismatchError`
+            If the selected TargetMode is not possible with the provided robot cell state.
+
         Returns
         -------
         :obj:`compas_robots.Configuration`
@@ -146,6 +149,15 @@ class PyBulletInverseKinematics(InverseKinematics):
             the ``start_configuration``. Defaults to the robot's main planning group.
         options: dict, optional
             Dictionary containing the following key-value pairs:
+
+        Raises
+        ------
+        :class: `compas_fab.backends.exceptions.InverseKinematicsError`
+            If no configuration can be found.
+
+        :class:`compas_fab.backends.TargetModeMismatchError`
+            If the selected TargetMode is not possible with the provided robot cell state.
+
 
         """
         options = options or {}
@@ -250,6 +262,9 @@ class PyBulletInverseKinematics(InverseKinematics):
             deterministic (descending from the initial robot configuration) and this error
             indicates that the problem is caused by collision and not because of reachability.
 
+        :class:`compas_fab.backends.TargetModeMismatchError`
+            If the selected TargetMode is not possible with the provided robot cell state.
+
         """
         options = options or {}
 
@@ -282,7 +297,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Transform the Target.target_frame to Planner Coordinate Frame depending on target.target_mode
         target_frame = target.target_frame
         target_mode = target.target_mode
-        target_pcf = planner.frames_to_pcf(target_frame, target_mode, group)
+        target_pcf = planner.target_frames_to_pcf(target_frame, target_mode, group)
 
         # Formatting input for PyBullet
         body_id = client.robot_puid
@@ -561,22 +576,10 @@ class PyBulletInverseKinematics(InverseKinematics):
 
             # Create intermediate state and call FK
             robot_cell_state.robot_configuration = configuration
-            fk_pcf_frame = planner.forward_kinematics(
-                robot_cell_state, group, {"link": robot.get_end_effector_link_name(group)}
-            )
 
-            # The reference frame for guiding the rotation should match (PCF/TCF/OCF)
+            # The reference frame for guiding the rotation must match (PCF/TCF/OCF)
             # with the reference frame specified by the target_mode.
-            if target.target_mode == TargetMode.TOOL:
-                tool_id = robot_cell_state.get_attached_tool_id(group)
-                target_guide_frame = planner.from_pcf_to_tcf([fk_pcf_frame], tool_id)[0]
-            elif target.target_mode == TargetMode.WORKPIECE:
-                workpiece_id = robot_cell_state.get_attached_workpiece_ids(group)[0]
-                target_guide_frame = planner.from_pcf_to_ocf([fk_pcf_frame], workpiece_id)[0]
-            elif target.target_mode == TargetMode.ROBOT:
-                target_guide_frame = fk_pcf_frame
-            else:
-                raise ValueError("Invalid target mode")
+            target_guide_frame = planner.forward_kinematics(robot_cell_state, target.target_mode, group)
 
             # We need to check if the FK X axis is parallel to the target.axis
             is_parallel = is_parallel_vector_vector(target_guide_frame.xaxis, target.target_z_axis)

@@ -53,7 +53,7 @@ def forward_inverse_agreement(planner, start_state, options=None):
 
     # First perform forward kinematics to find the frame
     starting_configuration = start_state.robot_configuration
-    frame = planner.forward_kinematics(start_state, group=None)
+    frame = planner.forward_kinematics(start_state, TargetMode.ROBOT, group=None)
 
     # Second, perform Inverse Kinematics to see if any of the solutions
     # are the same as the original joint configuration

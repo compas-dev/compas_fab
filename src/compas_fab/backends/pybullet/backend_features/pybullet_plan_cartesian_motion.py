@@ -134,6 +134,9 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         :class:`compas_fab.backends.InverseKinematicsError`
             Indicates that one point along the path has no IK solution.
 
+        :class:`compas_fab.backends.TargetModeMismatchError`
+            If the selected TargetMode is not possible with the provided robot cell state.
+
         Notes
         -----
         This planning function is synchronous, meaning that it will block the main thread until the planning is complete.
@@ -347,22 +350,9 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # Recreate the first frame for the beginning of the interpolation
         fk_options = deepcopy(options)
         fk_options["link"] = robot.get_end_effector_link_name(group)
-        start_frame_pcf = planner.forward_kinematics(start_state, group, fk_options)  # type: Frame
-        # This frame reference need to match with the target_mode of the waypoints
-        start_frame = None  # type: Frame
-        if waypoints.target_mode == TargetMode.TOOL:
-            tool_id = start_state.get_attached_tool_id(group)
-            start_frame = planner.from_pcf_to_tcf([start_frame_pcf], tool_id)[0]
-        elif waypoints.target_mode == TargetMode.WORKPIECE:
-            workpiece_id = start_state.get_attached_workpiece_ids(group)[0]
-            start_frame = planner.from_pcf_to_ocf([start_frame_pcf], workpiece_id)[0]
-        elif waypoints.target_mode == TargetMode.ROBOT:
-            start_frame = start_frame_pcf
-        else:
-            raise NotImplementedError(
-                "TargetMode ({}) not supported by PyBulletPlanCartesianMotion".format(waypoints.target_mode)
-            )
 
+        # This frame reference need to match with the target_mode of the waypoints
+        start_frame = planner.forward_kinematics(start_state, waypoints.target_mode, group=group, options=fk_options)
         print("Reconstructed Start Frame:", start_frame)
 
         starting_target = PointAxisTarget(
@@ -701,7 +691,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
             intermediate_state = deepcopy(start_state)
             intermediate_state.robot_configuration = None
             # Convert the targets to PCFs for collision checking
-            pcf_frames = planner.frames_to_pcf(waypoints.target_frames, waypoints.target_mode, group)
+            pcf_frames = planner.target_frames_to_pcf(waypoints.target_frames, waypoints.target_mode, group)
 
             for pcf_frame in pcf_frames:
 
@@ -755,21 +745,9 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # First frame is obtained from the start configuration with forward kinematics
         fk_options = deepcopy(options)
         fk_options["link"] = robot.get_end_effector_link_name(group)
-        start_frame_pcf = planner.forward_kinematics(start_state, group, fk_options)  # type: Frame
         # This frame reference need to match with the target_mode of the waypoints
-        start_frame = None  # type: Frame
-        if waypoints.target_mode == TargetMode.TOOL:
-            tool_id = start_state.get_attached_tool_id(group)
-            start_frame = planner.from_pcf_to_tcf([start_frame_pcf], tool_id)[0]
-        elif waypoints.target_mode == TargetMode.WORKPIECE:
-            workpiece_id = start_state.get_attached_workpiece_ids(group)[0]
-            start_frame = planner.from_pcf_to_ocf([start_frame_pcf], workpiece_id)[0]
-        elif waypoints.target_mode == TargetMode.ROBOT:
-            start_frame = start_frame_pcf
-        else:
-            raise NotImplementedError(
-                "TargetMode ({}) not supported by PyBulletPlanCartesianMotion".format(waypoints.target_mode)
-            )
+        start_frame = planner.forward_kinematics(start_state, waypoints.target_mode, group=group, options=fk_options)
+
         if options["verbose"]:
             print("Start frame: {}".format(start_frame))
 

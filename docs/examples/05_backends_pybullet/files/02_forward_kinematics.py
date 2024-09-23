@@ -5,6 +5,7 @@ from compas_fab.backends import PyBulletPlanner
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotLibrary
+from compas_fab.robots import TargetMode
 
 # Starting the PyBulletClient with the "direct" mode means that the GUI is not shown
 with PyBulletClient("direct") as client:
@@ -26,7 +27,7 @@ with PyBulletClient("direct") as client:
     # The `RobotCellState.from_robot_configuration` method can be used when the robot is the only element in the cell
     robot_cell_state = RobotCellState.from_robot_configuration(robot, configuration)
     # In this demo, the default planning group is used for the forward kinematics
-    frame_WCF = planner.forward_kinematics(robot_cell_state)
+    frame_WCF = planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT)
 
     print("Robot flange frame of the default planning group in the world coordinate system:")
     print(frame_WCF)
@@ -36,5 +37,5 @@ with PyBulletClient("direct") as client:
     # FK for all the links in the robot
     # ---------------------------------
     for link_name in robot.get_link_names():
-        frame_WCF = planner.forward_kinematics(robot_cell_state, options={"link": link_name})
+        frame_WCF = planner.forward_kinematics_to_link(robot_cell_state, link_name)
         print(f"Frame of link '{link_name}' : {frame_WCF}")

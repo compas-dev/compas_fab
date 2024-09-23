@@ -9,6 +9,8 @@ from compas.geometry import Transformation
 from compas_fab.robots import TargetMode
 
 from compas_fab.backends.exceptions import BackendFeatureNotSupportedError
+from compas_fab.backends.exceptions import BackendTargetNotSupportedError
+from compas_fab.backends.exceptions import TargetModeMismatchError
 
 if compas.IPY:
     from typing import TYPE_CHECKING
@@ -479,15 +481,16 @@ class PlannerInterface(object):
 
         return ocfs
 
-    def frames_to_pcf(self, frame_or_frames, target_mode, group):
+    def target_frames_to_pcf(self, frame_or_frames, target_mode, group):
         # type: (Frame | List[Frame], TargetMode | str, str) -> Frame | List[Frame]
         """Converts a Frame or a list of Frames to the PCF (Planner Coordinate Frame) relative to WCF.
 
         This function assumes the current robot_cell_state in the planner is already set,
         and that the tool and workpiece attachment supports the target mode.
 
-        This function is intended to be used within the planner, and that
-        :meth:`ensure_robot_cell_state_supports_target_mode` is called before this function.
+        This function is intended to be used within the planner.
+        :meth:`ensure_robot_cell_state_supports_target_mode` should be called before this function
+        to raise `TargetModeMismatchError` for unsupported target modes.
 
         Parameters
         ----------
@@ -513,18 +516,71 @@ class PlannerInterface(object):
         if target_mode == TargetMode.TOOL:
             tool_id = self.client.robot_cell_state.get_attached_tool_id(group)
             pcf_frames = self.from_tcf_to_pcf(frames, tool_id)
-
-        if target_mode == TargetMode.WORKPIECE:
+        elif target_mode == TargetMode.WORKPIECE:
             workpiece_ids = self.client.robot_cell_state.get_attached_workpiece_ids(group)
             assert len(workpiece_ids) == 1, "Only one workpiece should be attached to the robot in group '{}'.".format(
                 group
             )
             pcf_frames = self.from_ocf_to_pcf(frames, workpiece_ids[0])
-
-        if target_mode == TargetMode.ROBOT:
+        elif target_mode == TargetMode.ROBOT:
             pcf_frames = frames
+        else:
+            raise BackendTargetNotSupportedError("Unsupported target mode: '{}'.".format(target_mode))
 
         return pcf_frames[0] if input_is_not_list else pcf_frames
+
+    def pcf_to_target_frames(self, frame_or_frames, target_mode, group):
+        # type: (Frame | List[Frame], TargetMode | str, str) -> Frame | List[Frame]
+        """Converts a (or a list of) Planner Coordinate Frame (PCF) to the target frame
+        according to the target mode.
+
+        For example, if the target mode is `TargetMode.TOOL`, the function will convert the PCF to the TCF.
+        If the target mode is `TargetMode.WORKPIECE`, the function will convert the PCF to the workpiece's OCF.
+
+        This function assumes the current robot_cell_state in the planner is already set,
+        and that the tool and workpiece attachment supports the target mode.
+
+        This function is intended to be used within the planner.
+        :meth:`ensure_robot_cell_state_supports_target_mode` should be called before this function
+        to raise `TargetModeMismatchError` for unsupported target modes.
+
+        Parameters
+        ----------
+        frame_or_frames : :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
+            The PCF frame or frames to convert.
+        target_mode : :class:`~compas_fab.robots.TargetMode` or str
+            The target mode of the frame or frames.
+        group : str
+            The planning group to check. Must be specified.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
+            Target Frame relative to the World Coordinate Frame (WCF).
+            If the input is a single frame, the output will also be a single frame.
+            If the input is a list of frames, the output will also be a list of frames.
+        """
+        # Pack a single frame into a list if it is not already a list
+        input_is_not_list = not isinstance(frame_or_frames, list)
+        frames = [frame_or_frames] if input_is_not_list else frame_or_frames
+
+        target_frames = None
+
+        if target_mode == TargetMode.TOOL:
+            tool_id = self.client.robot_cell_state.get_attached_tool_id(group)
+            target_frames = self.from_pcf_to_tcf(frames, tool_id)
+        elif target_mode == TargetMode.WORKPIECE:
+            workpiece_ids = self.client.robot_cell_state.get_attached_workpiece_ids(group)
+            assert len(workpiece_ids) == 1, "Only one workpiece should be attached to the robot in group '{}'.".format(
+                group
+            )
+            target_frames = self.from_pcf_to_ocf(frames, workpiece_ids[0])
+        elif target_mode == TargetMode.ROBOT:
+            target_frames = frames
+        else:
+            raise BackendTargetNotSupportedError("Unsupported target mode: '{}'.".format(target_mode))
+
+        return target_frames[0] if input_is_not_list else target_frames
 
     # ==========================================================================
     # Sanity Check Functions
@@ -555,7 +611,7 @@ class PlannerInterface(object):
 
         Raises
         ------
-        ValueError
+        TargetModeMismatchError
             If the target mode is `TOOL` and no tool is attached to the robot in the specified group.
             If the target mode is `WORKPIECE` and no (or more than one) workpiece is attached to the specified group.
         """
@@ -570,7 +626,7 @@ class PlannerInterface(object):
         if target_mode == TargetMode.TOOL:
 
             if tool_id is None:
-                raise ValueError(
+                raise TargetModeMismatchError(
                     "Target mode is 'TOOL', but no tool is attached to the robot in group '{}'.".format(group)
                 )
 
@@ -578,11 +634,11 @@ class PlannerInterface(object):
         workpiece_ids = robot_cell_state.get_attached_workpiece_ids(group)
         if target_mode == TargetMode.WORKPIECE:
             if not workpiece_ids:
-                raise ValueError(
+                raise TargetModeMismatchError(
                     "Target mode is 'WORKPIECE', but no workpiece is attached to the robot in group '{}'.".format(group)
                 )
             if len(workpiece_ids) > 1:
-                raise ValueError(
+                raise TargetModeMismatchError(
                     "Target mode is 'WORKPIECE', but more than one workpiece is attached to the robot in group '{}'.".format(
                         group
                     )

@@ -84,7 +84,7 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
         target_frame = target.target_frame
 
         # Tool Coordinate Frame if there are tools attached
-        target_pcf_frame = planner.frames_to_pcf(target_frame, target.target_mode, group)
+        target_pcf_frame = planner.target_frames_to_pcf(target_frame, target.target_mode, group)
 
         ik_configurations = self.inverse_kinematics_ordered(target_pcf_frame, group=group, options=options)
         for configuration in ik_configurations:

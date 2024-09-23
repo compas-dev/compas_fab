@@ -54,7 +54,7 @@ def test_forward_kinematics(ur5_planner_robot_only):
 
     # Initial state of the robot cell is the home position
     start_state = RobotCellState.from_robot_cell(planner.robot_cell)
-    frame = planner.forward_kinematics(start_state, group=None)
+    frame = planner.forward_kinematics(start_state, TargetMode.ROBOT, group=None)
 
     correct = Frame(
         Point(x=0.81725, y=0.19145, z=-0.00549),
@@ -108,7 +108,7 @@ def forward_inverse_agreement(planner, start_state):
 
     # First perform forward kinematics to find the frame
     starting_configuration = start_state.robot_configuration
-    frame = planner.forward_kinematics(start_state, group=None)
+    frame = planner.forward_kinematics(start_state, TargetMode.ROBOT, group=None)
 
     # Second, perform Inverse Kinematics to see if any of the solutions
     # are the same as the original joint configuration

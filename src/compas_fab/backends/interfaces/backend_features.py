@@ -22,6 +22,7 @@ if not compas.IPY:
         from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import FrameTarget  # noqa: F401
+        from compas_fab.robots import TargetMode  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
         from compas_fab.robots import Waypoints  # noqa: F401
 
@@ -201,20 +202,34 @@ class CheckCollision(BackendFeature):
 class ForwardKinematics(BackendFeature):
     """Mix-in interface for implementing a planner's forward kinematics feature."""
 
-    def forward_kinematics(self, robot_cell_state, group=None, options=None):
-        # type: (RobotCellState, Optional[str], Optional[Dict]) -> Frame
-        """Calculate the robot's forward kinematic.
+    def forward_kinematics(self, robot_cell_state, target_mode, group=None, scale=None, options=None):
+        # type: (RobotCellState, TargetMode | str, Optional[str], Optional[float], Optional[dict]) -> Frame
+        """Calculate the target frame of the robot from the provided RobotCellState.
+
+        The function can return the planner coordinate frame (PCF), the tool coordinate frame (TCF),
+        or the workpiece's object coordinate frame (OCF) based on the ``target_mode`` provided.
+
+        - ``"Target.ROBOT"`` will return the planner coordinate frame (PCF).
+        - ``"Target.TOOL"`` will return the tool coordinate frame (TCF) if a tool is attached.
+        - ``"Target.WORKPIECE"`` will return the workpiece's object coordinate frame (OCF)
+          if a workpiece is attached.
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which forward kinematics is being calculated.
-        configuration : :class:`compas_robots.Configuration`
-            The full configuration to calculate the forward kinematic for. If no
-            full configuration is passed, the zero-joint state for the other
-            configurable joints is assumed.
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+            The robot cell state describing the robot cell.
+            The attribute `robot_configuration`, must contain the full configuration of the robot corresponding to the planning group.
+            The Configuration object must include ``joint_names``.
+            The robot cell state should also reflect the attachment of tools, if any.
+        target_mode : :class:`compas_fab.robots.TargetMode` or str
+            The target mode to select which frame to return.
         group : str, optional
-            The name of the group to be used in the calculation.
+            The planning group of the robot.
+            Defaults to the robot's main planning group.
+        scale : float, optional
+            The scaling factor to apply to the resulting frame.
+            For example, use ``'1000.0'`` to convert the result to millimeters.
+            Defaults to None, which means no scaling is applied.
         options : dict, optional
             Dictionary containing kwargs for arguments specific to
             the client being queried.
@@ -223,11 +238,42 @@ class ForwardKinematics(BackendFeature):
         -------
         :class:`Frame`
             The frame in the world's coordinate system (WCF).
+
         """
         pass
 
         # The implementation code is located in the backend's module:
         # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_forward_kinematics.py"
+
+    def forward_kinematics_to_link(self, robot_cell_state, link_name=None, group=None, scale=None, options=None):
+        # type: (RobotCellState, Optional[str], Optional[str], Optional[float], Optional[dict]) -> Frame
+        """Calculate the frame of the specified robot link from the provided RobotCellState.
+
+        This function operates similar to :meth:`compas_fab.backends.PyBulletForwardKinematics.forward_kinematics`,
+        but allows the user to specify which link to return. The function will return the frame of the specified
+        link relative to the world coordinate frame (WCF).
+
+        This can be convenient in scenarios where user objects (such as a camera) are attached to one of the
+        robot's links and the user needs to know the position of the object relative to the world coordinate frame.
+
+        Parameters
+        ----------
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+            The robot cell state describing the robot cell.
+        link_name : str, optional
+            The name of the link to calculate the forward kinematics for.
+            Defaults to the last link of the provided planning group.
+        group : str, optional
+            The planning group of the robot.
+            Defaults to the robot's main planning group.
+        scale : float, optional
+            The scaling factor to apply to the resulting frame.
+            For example, use ``'1000.0'`` to convert the result to millimeters.
+            Defaults to None, which means no scaling is applied.
+        options : dict, optional
+            Dictionary for passing planner specific options.
+            Currently unused.
+        """
 
 
 class InverseKinematics(BackendFeature):
@@ -241,7 +287,7 @@ class InverseKinematics(BackendFeature):
         super(InverseKinematics, self).__init__()
 
     def inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Configuration
+        # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Configuration
         """Calculate the robot's inverse kinematic for a given frame.
 
         The default implementation is based on the iter_inverse_kinematics method.
@@ -257,8 +303,8 @@ class InverseKinematics(BackendFeature):
         ----------
         robot : :class:`compas_fab.robots.Robot`
             The robot instance for which inverse kinematics is being calculated.
-        target : :class:`compas_fab.robots.FrameTarget`
-            The frame target to calculate the inverse kinematics for.
+        target : :class:`compas_fab.robots.Target`
+            The target to calculate the inverse kinematics for.
         robot_cell_state : :class:`compas_fab.robots.RobotCellState`, optional
             The starting state to calculate the inverse kinematics for.
             The robot's configuration in the scene is taken as the starting configuration.
@@ -308,7 +354,7 @@ class InverseKinematics(BackendFeature):
         return next(solutions)
 
     def iter_inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Configuration
+        # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Configuration
         """Calculate the robot's inverse kinematic for a given frame.
 
         This function returns a generator that yields possible solutions for the
@@ -318,12 +364,13 @@ class InverseKinematics(BackendFeature):
 
         Parameters
         ----------
-        frame_WCF: :class:`compas.geometry.Frame`
-            The frame to calculate the inverse for.
-        start_configuration: :class:`compas_fab.robots.Configuration`, optional
-            If passed, the inverse will be calculated such that the calculated
-            joint positions differ the least from the start_configuration.
-            Defaults to the zero configuration.
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which inverse kinematics is being calculated.
+        target : :class:`compas_fab.robots.Target`
+            The target to calculate the inverse kinematics for.
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`, optional
+            The starting state to calculate the inverse kinematics for.
+            The robot's configuration in the scene is taken as the starting configuration.
         group: str, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.

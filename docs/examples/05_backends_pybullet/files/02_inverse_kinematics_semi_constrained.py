@@ -3,6 +3,8 @@
 # It is only possible to use a Target with TargetMode.ROBOT in this mode.
 
 from compas.geometry import Frame
+from compas.geometry import distance_point_point
+
 from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
 
@@ -13,6 +15,8 @@ from compas_fab.robots import RigidBodyLibrary
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotLibrary
 from compas_fab.robots import TargetMode
+
+# NOTE: The semi-constrained IK mode cannot be used with tools
 
 with PyBulletClient() as client:
     # Create a robot cell with a UR5 robot
@@ -43,8 +47,7 @@ with PyBulletClient() as client:
     # IK with semi-constrained mode
     # =============================
 
-    options = {"semi-constrained": True}
-    config = planner.inverse_kinematics(target, robot_cell_state, options=options)
+    config = planner.inverse_kinematics(target, robot_cell_state, options={"semi-constrained": True})
 
     print("Inverse kinematics result: ", config)
 
@@ -52,8 +55,15 @@ with PyBulletClient() as client:
     result_state.robot_configuration = config
 
     # Perform forward kinematics to verify the result
-    fk_frame = planner.forward_kinematics(result_state, options={"link": robot.get_end_effector_link_name()})
+    fk_frame = planner.forward_kinematics(result_state, TargetMode.ROBOT)
     print("Forward kinematics frame: \n", fk_frame)
+    distance_to_target = distance_point_point(fk_frame.point, target.target_frame.point)
+    assert distance_to_target < PyBulletPlanner.DEFAULT_TARGET_TOLERANCE_POSITION
+    print(
+        "Distance to target: {} is smaller than DEFAULT_TARGET_TOLERANCE_POSITION({})".format(
+            distance_to_target, PyBulletPlanner.DEFAULT_TARGET_TOLERANCE_POSITION
+        )
+    )
 
     # The FK result above shows that only the position of the frame matches with the target at Point(x=0.300, y=0.100, z=0.500)
     # The orientation of the frame is arbitrary
@@ -73,9 +83,8 @@ with PyBulletClient() as client:
     result_state.robot_configuration = config
 
     # Perform forward kinematics to verify the result
-    fk_frame = planner.forward_kinematics(result_state, options={"link": robot.get_end_effector_link_name()})
+    fk_frame = planner.forward_kinematics(result_state, TargetMode.ROBOT)
     print("Forward kinematics frame: \n", fk_frame)
 
     # The FK result above shows that the position and orientation of the frame matches with the target
-
     input("Observe the IK result in PyBullet's GUI, Press Enter to continue...")

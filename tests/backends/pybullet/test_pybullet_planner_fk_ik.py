@@ -14,6 +14,7 @@ from compas.geometry import matrix_from_frame
 from compas.geometry import axis_and_angle_from_matrix
 
 from compas.tolerance import Tolerance
+from compas_fab.robots import Robot
 from compas_fab.robots import RobotLibrary
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCell
@@ -27,6 +28,7 @@ from compas_robots import Configuration
 from compas_fab.backends import InverseKinematicsError
 from compas_fab.backends import PlanningGroupNotSupported
 from compas_fab.backends import CollisionCheckError
+from compas_fab.backends import TargetModeMismatchError
 
 
 @pytest.fixture
@@ -47,7 +49,9 @@ def compare_frames(frame1, frame2, tolerance_position, tolerance_orientation):
     return True
 
 
-def compare_planner_fk_model_fk(robot, pybullet_client, true_result):
+def compare_planner_fk_model_fk(robot, pybullet_client, known_zero_frame):
+    # type: (Robot, PyBulletClient, Frame) -> None
+    """A test of forward kinematics using the zero configuration of the robot."""
     planner = PyBulletPlanner(pybullet_client)
     planner.set_robot_cell(RobotCell(robot))
 
@@ -55,53 +59,53 @@ def compare_planner_fk_model_fk(robot, pybullet_client, true_result):
     end_effector_link = robot.get_end_effector_link_name(planning_group)
 
     robot_cell_state = RobotCellState.from_robot_configuration(robot, robot.zero_configuration())
-    planner_fk_result = planner.forward_kinematics(robot_cell_state, planning_group)
+    planner_fk_result = planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT, group=planning_group)
     print(planner_fk_result)
     model_fk_result = robot.model.forward_kinematics(robot.zero_configuration(), end_effector_link)
     print(model_fk_result)
 
     assert compare_frames(planner_fk_result, model_fk_result, 1e-3, 1e-3)
-    assert compare_frames(planner_fk_result, true_result, 1e-3, 1e-3)
+    assert compare_frames(planner_fk_result, known_zero_frame, 1e-3, 1e-3)
 
 
 def test_fk_ur5(pybullet_client):
     robot = RobotLibrary.ur5(load_geometry=True)
-    true_result = Frame(
+    known_zero_frame = Frame(
         point=Point(x=0.8172500133514404, y=0.19144999980926514, z=-0.005491000134497881),
         xaxis=Vector(x=-1.0, y=0.0, z=0.0),
         yaxis=Vector(x=0.0, y=0.0, z=1.0),
     )
-    compare_planner_fk_model_fk(robot, pybullet_client, true_result)
+    compare_planner_fk_model_fk(robot, pybullet_client, known_zero_frame)
 
 
 def test_fk_abb_irb4600_40_255(pybullet_client):
     robot = RobotLibrary.abb_irb4600_40_255(load_geometry=True)
-    true_result = Frame(
+    known_zero_frame = Frame(
         point=Point(x=1.58, y=0.0, z=1.765),
         xaxis=Vector(x=0.0, y=0.0, z=-1.0),
         yaxis=Vector(x=0.0, y=1.0, z=0.0),
     )
-    compare_planner_fk_model_fk(robot, pybullet_client, true_result)
+    compare_planner_fk_model_fk(robot, pybullet_client, known_zero_frame)
 
 
 def test_fk_ur10e(pybullet_client):
     robot = RobotLibrary.ur10e(load_geometry=True)
-    true_result = Frame(
+    known_zero_frame = Frame(
         point=Point(x=1.18425, y=0.2907, z=0.0608),
         xaxis=Vector(x=-1.0, y=0.0, z=-0.0),
         yaxis=Vector(x=0.0, y=0.0, z=1.0),
     )
-    compare_planner_fk_model_fk(robot, pybullet_client, true_result)
+    compare_planner_fk_model_fk(robot, pybullet_client, known_zero_frame)
 
 
 def test_fk_panda(pybullet_client):
     robot = RobotLibrary.panda(load_geometry=True)
-    true_result = Frame(
+    known_zero_frame = Frame(
         point=Point(x=0.256, y=-0.000, z=0.643),
         xaxis=Vector(x=-0.000, y=0.707, z=-0.707),
         yaxis=Vector(x=-0.000, y=-0.707, z=-0.707),
     )
-    compare_planner_fk_model_fk(robot, pybullet_client, true_result)
+    compare_planner_fk_model_fk(robot, pybullet_client, known_zero_frame)
 
 
 ######################################################
@@ -153,7 +157,7 @@ def ik_fk_agreement(robot, pybullet_client, ik_target_frames):
 
         # FK Query to the planner (Configuration to Frame)
         robot_cell_state = RobotCellState.from_robot_configuration(robot, ik_result)
-        fk_result = planner.forward_kinematics(robot_cell_state, planning_group)
+        fk_result = planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT, group=planning_group)
 
         # Compare the frames
         assert compare_frames(ik_target_frame, fk_result, tolerance_position, tolerance_orientation)
@@ -457,7 +461,6 @@ def test_frame_target_tolerance(planner_with_test_cell):
     """
     planner, robot_cell, robot_cell_state = planner_with_test_cell
     group = robot_cell.robot.main_group_name
-    link_name = robot_cell.robot.get_end_effector_link_name(group)
     result_cell_state = robot_cell_state.copy()  # type: RobotCellState
 
     target_frame = Frame([0.5, 0.5, 0.5], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
@@ -475,7 +478,7 @@ def test_frame_target_tolerance(planner_with_test_cell):
         )
         result = planner.inverse_kinematics(target, robot_cell_state, options=options)
         result_cell_state.robot_configuration = result
-        result_frame = planner.forward_kinematics(result_cell_state, group, options={"link": link_name})
+        result_frame = planner.forward_kinematics(result_cell_state, TargetMode.ROBOT, group=group)
         assert isinstance(result, Configuration)
         assert compare_frames(target_frame, result_frame, tolerance_position, tolerance_orientation)
         # The result should not be 2 orders of magnitude better than the target tolerance
@@ -497,45 +500,39 @@ def test_frame_target_tolerance(planner_with_test_cell):
 def test_ik_frame_target_target_modes(planner_with_test_cell):
     planner, robot_cell, robot_cell_state = planner_with_test_cell
 
+    # Testing conditions
     group = robot_cell.robot.main_group_name
-    options = {
-        "check_collision": False,
-    }
-
-    # Test with a frame target
     target_frame = Frame([0.5, 0.5, 0.5], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
-    target = FrameTarget(target_frame, TargetMode.ROBOT)
-    result_robot = planner.inverse_kinematics(target, robot_cell_state, options=options)
-    assert isinstance(result_robot, Configuration)
+    options = {"check_collision": False}
+    tolerance_position = 1e-3
+    tolerance_orientation = 1e-3
 
-    target = FrameTarget(target_frame, TargetMode.TOOL)
-    result_tool = planner.inverse_kinematics(target, robot_cell_state, options=options)
-    assert isinstance(result_tool, Configuration)
+    def ik_fk_comparision(target_mode):
+        # Construct the IK target
+        target = FrameTarget(
+            target_frame,
+            target_mode=target_mode,
+            tolerance_position=tolerance_position,
+            tolerance_orientation=tolerance_orientation,
+        )
+        # Plan IK to get configuration
+        configuration = planner.inverse_kinematics(target, robot_cell_state, group=group, options=options)
+        assert isinstance(configuration, Configuration)
+        # Construct new cell state with the planned configuration
+        resulting_cell_state = robot_cell_state.copy()
+        resulting_cell_state.robot_configuration = configuration
+        fk_frame_robot = planner.forward_kinematics(resulting_cell_state, target_mode, group=group)
+        assert compare_frames(fk_frame_robot, target_frame, tolerance_position, tolerance_orientation)
+        return configuration
 
-    target = FrameTarget(target_frame, TargetMode.WORKPIECE)
-    result_workpiece = planner.inverse_kinematics(target, robot_cell_state, options=options)
-    assert isinstance(result_workpiece, Configuration)
+    configuration_robot_mode = ik_fk_comparision(TargetMode.ROBOT)
+    configuration_tool_mode = ik_fk_comparision(TargetMode.TOOL)
+    configuration_workpiece_mode = ik_fk_comparision(TargetMode.WORKPIECE)
 
     # Assert that the results are different
-    assert not result_robot.close_to(result_tool)
-    assert not result_robot.close_to(result_workpiece)
-    assert not result_tool.close_to(result_workpiece)
-
-    #  Assert that when converting the results to frames, they match up with the original target
-    fk_options = {"link": robot_cell.robot.get_end_effector_link_name(group)}
-    robot_cell_state.robot_configuration = result_robot
-    fk_frame_robot = planner.forward_kinematics(robot_cell_state, group, options=fk_options)
-    assert compare_frames(fk_frame_robot, target_frame, 1e-3, 1e-3)
-
-    robot_cell_state.robot_configuration = result_tool
-    fk_frame_tool = planner.forward_kinematics(robot_cell_state, group, options=fk_options)
-    fk_frame_tcf = planner.from_pcf_to_tcf([fk_frame_tool], "gripper")[0]
-    assert compare_frames(fk_frame_tcf, target_frame, 1e-3, 1e-3)
-
-    robot_cell_state.robot_configuration = result_workpiece
-    fk_frame_workpiece = planner.forward_kinematics(robot_cell_state, group, options=fk_options)
-    fk_frame_ocf = planner.from_pcf_to_ocf([fk_frame_workpiece], "beam")[0]
-    assert compare_frames(fk_frame_ocf, target_frame, 1e-3, 1e-3)
+    assert not configuration_robot_mode.close_to(configuration_tool_mode)
+    assert not configuration_tool_mode.close_to(configuration_workpiece_mode)
+    assert not configuration_workpiece_mode.close_to(configuration_robot_mode)
 
 
 def test_ik_target_mode_validation(planner_with_test_cell):
@@ -562,7 +559,7 @@ def test_ik_target_mode_validation(planner_with_test_cell):
 
     # WORKPIECE target mode should not be possible
     target = FrameTarget(target_frame, TargetMode.WORKPIECE)
-    with pytest.raises(ValueError):
+    with pytest.raises(TargetModeMismatchError):
         planner.inverse_kinematics(target, robot_cell_state, options=options)
     # TOOL target mode should be possible
     target = FrameTarget(target_frame, TargetMode.TOOL)
@@ -580,11 +577,11 @@ def test_ik_target_mode_validation(planner_with_test_cell):
 
     # WORKPIECE target mode should not be possible
     target = FrameTarget(target_frame, TargetMode.WORKPIECE)
-    with pytest.raises(ValueError):
+    with pytest.raises(TargetModeMismatchError):
         planner.inverse_kinematics(target, robot_cell_state, options=options)
     # TOOL target mode should not be possible
     target = FrameTarget(target_frame, TargetMode.TOOL)
-    with pytest.raises(ValueError):
+    with pytest.raises(TargetModeMismatchError):
         planner.inverse_kinematics(target, robot_cell_state)
     # ROBOT target mode should be possible
     target = FrameTarget(target_frame, TargetMode.ROBOT)

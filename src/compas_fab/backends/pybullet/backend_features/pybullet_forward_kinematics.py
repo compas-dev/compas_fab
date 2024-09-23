@@ -3,7 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 from compas_fab.backends.interfaces import ForwardKinematics
-
+from compas_fab.robots import TargetMode
 import compas
 
 if compas.IPY:
@@ -22,18 +22,20 @@ if compas.IPY:
 class PyBulletForwardKinematics(ForwardKinematics):
     """Mix-in function to calculate the robot's forward kinematic."""
 
-    def forward_kinematics(self, robot_cell_state, group=None, options=None):
-        # type: (RobotCellState, Optional[str], Optional[dict]) -> Frame
-        """Calculate the robot's forward kinematic (FK).
+    def forward_kinematics(self, robot_cell_state, target_mode, group=None, scale=None, options=None):
+        # type: (RobotCellState, TargetMode | str, Optional[str], Optional[float], Optional[dict]) -> Frame
+        """Calculate the target frame of the robot from the provided RobotCellState.
 
-        If no tool is attached to the robot, the frame of the end effector link (T0CF) will be returned.
-        If a tool is attached to the robot, the frame of the tool tip (TCF) will be returned.
-        If ``"link"`` is provided in the options, the frame of the specified link will be returned.
+        The function can return the planner coordinate frame (PCF), the tool coordinate frame (TCF),
+        or the workpiece's object coordinate frame (OCF) based on the ``target_mode`` provided.
 
-        Collision checking can be enabled by setting ``"check_collision"`` to ``True`` in the options.
-        This will cause the backend to perform collision checking on the robot's configuration and raise
-        a :class:`CollisionCheckError` if the robot is in collision. This is equivalent to calling
-        :meth:`compas_fab.backends.PyBulletCheckCollision.check_collision`.
+        - ``"Target.ROBOT"`` will return the planner coordinate frame (PCF).
+        - ``"Target.TOOL"`` will return the tool coordinate frame (TCF) if a tool is attached.
+        - ``"Target.WORKPIECE"`` will return the workpiece's object coordinate frame (OCF)
+          if a workpiece is attached.
+
+        Collision checking is not performed during the calculation. Consider using the
+        :meth:`compas_fab.backends.PyBulletCheckCollision.check_collision` method to check for collisions.
 
         Parameters
         ----------
@@ -42,18 +44,19 @@ class PyBulletForwardKinematics(ForwardKinematics):
             The attribute `robot_configuration`, must contain the full configuration of the robot corresponding to the planning group.
             The Configuration object must include ``joint_names``.
             The robot cell state should also reflect the attachment of tools, if any.
-            If a tool is attached to the robot, the tool coordinate frame (TCF) will be returned.
+        target_mode : :class:`compas_fab.robots.TargetMode` or str
+            The target mode to select which frame to return.
         group : str, optional
-            The planning group used for determining the end effector and labeling
-            the ``configuration``. Defaults to the robot's main planning group.
+            The planning group of the robot.
+            Defaults to the robot's main planning group.
+        scale : float, optional
+            The scaling factor to apply to the resulting frame.
+            For example, use ``'1000.0'`` to convert the result to millimeters.
+            Defaults to None, which means no scaling is applied.
         options : dict, optional
-            Dictionary containing the following key-value pairs:
+            Dictionary for passing planner specific options.
+            Currently unused.
 
-            - ``"link"``: (:obj:`str`, optional) The name of the link to
-              calculate the forward kinematics for. Defaults to the end effector.
-            - ``"check_collision"``: (:obj:`str`, optional) When ``True``,
-              :meth:`compas_fab.backends.PyBulletCheckCollision.check_collision` will be called.
-              Defaults to ``False``.
 
         Returns
         -------
@@ -62,14 +65,65 @@ class PyBulletForwardKinematics(ForwardKinematics):
 
         Raises
         ------
-        CollisionCheckError
-            If the configuration is in collision. Includes both self-collision and
-            collision with the environment.
+        :class:`compas_fab.backends.TargetModeMismatchError`
+            If the selected TargetMode is not possible with the provided robot cell state.
 
         """
-        options = options or {"link": None, "check_collision": False}
-        configuration = robot_cell_state.robot_configuration
+        # Housekeeping for intellisense
+        planner = self  # type: PyBulletPlanner
+        client = planner.client  # type: PyBulletClient
+        robot = client.robot  # type: Robot
+        group = group or robot.main_group_name
 
+        # Check if the target mode is valid for the robot cell state
+        planner.ensure_robot_cell_state_supports_target_mode(robot_cell_state, target_mode, group)
+
+        # Setting the entire robot cell state, including the robot configuration
+        planner.set_robot_cell_state(robot_cell_state)
+
+        # Retrieve the PCF of the group
+        link_name = robot.get_end_effector_link_name(group)
+        link_id = client.robot_link_puids[link_name]
+        pcf_frame = client._get_link_frame(link_id, client.robot_puid)
+
+        # If no link name provided, and a tool is attached to the group, return the tool tip frame of the tool
+        target_frame = planner.pcf_to_target_frames(pcf_frame, target_mode=target_mode, group=group)
+
+        # Scale resulting frame to user units
+        if scale:
+            target_frame.scale(scale)
+
+        return target_frame
+
+    def forward_kinematics_to_link(self, robot_cell_state, link_name=None, group=None, scale=None, options=None):
+        # type: (RobotCellState, Optional[str], Optional[str], Optional[float], Optional[dict]) -> Frame
+        """Calculate the frame of the specified robot link from the provided RobotCellState.
+
+        This function operates similar to :meth:`compas_fab.backends.PyBulletForwardKinematics.forward_kinematics`,
+        but allows the user to specify which link to return. The function will return the frame of the specified
+        link relative to the world coordinate frame (WCF).
+
+        This can be convenient in scenarios where user objects (such as a camera) are attached to one of the
+        robot's links and the user needs to know the position of the object relative to the world coordinate frame.
+
+        Parameters
+        ----------
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+            The robot cell state describing the robot cell.
+        link_name : str, optional
+            The name of the link to calculate the forward kinematics for.
+            Defaults to the last link of the provided planning group.
+        group : str, optional
+            The planning group of the robot.
+            Defaults to the robot's main planning group.
+        scale : float, optional
+            The scaling factor to apply to the resulting frame.
+            For example, use ``'1000.0'`` to convert the result to millimeters.
+            Defaults to None, which means no scaling is applied.
+        options : dict, optional
+            Dictionary for passing planner specific options.
+            Currently unused.
+        """
         # Housekeeping for intellisense
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
@@ -79,32 +133,12 @@ class PyBulletForwardKinematics(ForwardKinematics):
         # Setting the entire robot cell state, including the robot configuration
         planner.set_robot_cell_state(robot_cell_state)
 
-        # Check for collisions if requested, it will throw an exception if the robot is in collision
-        if options.get("check_collision"):
-            planner.check_collision(None, options={"_skip_set_robot_cell_state": True})
-
-        # If a link name provided, return the frame of that link
-        link_name = options.get("link")
-        if link_name:
-            if link_name not in robot.get_link_names(group):
-                raise KeyError("Link name provided is not part of the group")
-            link_id = client.robot_link_puids[link_name]
-            fk_frame = client._get_link_frame(link_id, client.robot_puid)
-
-        else:
-            link_name = robot.get_end_effector_link_name(group)
-            link_id = client.robot_link_puids[link_name]
-            fk_frame = client._get_link_frame(link_id, client.robot_puid)
-
-            # If no link name provided, and a tool is attached to the group, return the tool tip frame of the tool
-            robot_cell = client.robot_cell  # type: RobotCell
-            if robot_cell:
-                attached_tool_id = robot_cell_state.get_attached_tool_id(group)
-                if attached_tool_id:
-                    # Do not scaling attached_tool.frame because Tools are modelled in meter scale
-                    fk_frame = planner.from_pcf_to_tcf([fk_frame], attached_tool_id)[0]
+        # Retrieve the PCF of the group
+        link_id = client.robot_link_puids[link_name]
+        link_frame = client._get_link_frame(link_id, client.robot_puid)
 
         # Scale resulting frame to user units
-        fk_frame = self._scale_output_frame(fk_frame)
+        if scale:
+            link_frame.scale(scale)
 
-        return fk_frame
+        return link_frame

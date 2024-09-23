@@ -5,6 +5,8 @@ from __future__ import print_function
 __all__ = [
     "BackendError",
     "BackendFeatureNotSupportedError",
+    "BackendTargetNotSupportedError",
+    "TargetModeMismatchError",
     "InverseKinematicsError",
     "KinematicsError",
     "CollisionCheckError",
@@ -36,6 +38,16 @@ class BackendFeatureNotSupportedError(Exception):
 
 class BackendTargetNotSupportedError(Exception):
     """Indicates that the selected backend feature does not support the selected target type."""
+
+    pass
+
+
+class TargetModeMismatchError(Exception):
+    """Indicates that the selected TargetMode is not possible with the provided robot cell state.
+
+    For example, if the robot cell state does not have a tool attached to the robot,
+    but the TargetMode is set to ``Target.TOOL``.
+    """
 
     pass
 
