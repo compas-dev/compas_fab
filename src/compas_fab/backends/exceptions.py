@@ -7,6 +7,7 @@ __all__ = [
     "BackendFeatureNotSupportedError",
     "BackendTargetNotSupportedError",
     "TargetModeMismatchError",
+    "PlanningGroupNotExistsError",
     "InverseKinematicsError",
     "KinematicsError",
     "CollisionCheckError",
@@ -47,6 +48,15 @@ class TargetModeMismatchError(Exception):
 
     For example, if the robot cell state does not have a tool attached to the robot,
     but the TargetMode is set to ``Target.TOOL``.
+    """
+
+    pass
+
+
+class PlanningGroupNotExistsError(Exception):
+    """Indicates that the selected planning group does not exist in the robot model.
+
+    For example, if the robot model does not have a planning group with the name provided.
     """
 
     pass

@@ -48,8 +48,10 @@ class PyBulletSetRobotCell(SetRobotCell):
 
         for tool_id in list(client.tools_puids.keys()):
             client.remove_tool(tool_id)
+        # client.tools_puids = {}
         for rigid_body_id in list(client.rigid_bodies_puids.keys()):
             client.remove_rigid_body(rigid_body_id)
+        # client.rigid_bodies_puids = {}
 
         # Add the robot cell to the PyBullet world
         for name, tool_model in robot_cell.tool_models.items():

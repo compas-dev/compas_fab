@@ -16,7 +16,9 @@ from compas_robots import RobotModel
 from compas_robots.files import URDF
 from compas_robots.model import MeshDescriptor
 from compas_robots import ToolModel
-from compas_robots.model import Joint
+from compas_robots.model import Inertial
+from compas_robots.model import Inertia
+from compas_robots.model import Mass
 from compas_robots.model import Material
 
 from compas_fab.backends import CollisionCheckError
@@ -359,8 +361,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         name : :obj:`str`
             The name of the tool.
         """
-        if name not in self.tools_puids:
-            return
+        assert name in self.tools_puids
+
         pybullet.removeBody(self.tools_puids[name], physicsClientId=self.client_id)
         del self.tools_puids[name]
 
@@ -519,6 +521,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                     fp = self._handle_concavity(fp, self._cache_dir.name, concavity, 1, str(joined_mesh.guid))
                     shape.filename = fp
 
+            if link.inertial is None:
+                link.inertial = self.pybullet_empty_inertial()
+
         # create urdf with new mesh locations
         urdf = URDF.from_robot(robot_model)
 
@@ -532,6 +537,13 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         urdf.to_file(urdf_filepath, prettify=True)
 
         return urdf_filepath
+
+    def pybullet_empty_inertial(self):
+        origin = Frame.worldXY()
+        mass = Mass(0.0)
+        inertia = Inertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        inertial = Inertial(origin, mass, inertia)
+        return inertial
 
     # --------------------------------
     # Functions for collision checking

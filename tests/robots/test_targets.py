@@ -1,4 +1,5 @@
 import pytest
+from copy import deepcopy
 
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import PointAxisTarget
@@ -18,6 +19,7 @@ from compas_robots.model import Joint
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Vector
+from compas.tolerance import TOL
 
 
 @pytest.fixture
@@ -53,7 +55,7 @@ def frame_target(target_frame):
 def point_axis_target():
     return PointAxisTarget(
         target_point=Point(1.0, -2.0, 3.0),
-        target_vector=Vector(1.0, -1.0, 0.0),
+        target_z_axis=Vector(1.0, -1.0, 0.0),
         target_mode=TargetMode.ROBOT,
         target_scale=1.0,
         tolerance_position=0.001,
@@ -81,16 +83,20 @@ def test_serialization_targets(frame_target, point_axis_target, configuration_ta
     assert frame_target.tolerance_position == nt.tolerance_position
     assert frame_target.tolerance_orientation == nt.tolerance_orientation
     assert frame_target.name == nt.name
+    assert frame_target == nt
 
     # PointAxisTarget
     nt = PointAxisTarget.__from_data__(point_axis_target.__data__)
-    assert point_axis_target.target_point == nt.target_point
-    assert point_axis_target.target_z_axis == nt.target_z_axis
+    assert TOL.is_allclose(point_axis_target.target_point, nt.target_point)
+    assert TOL.is_allclose(point_axis_target.target_z_axis, nt.target_z_axis)
+    # assert point_axis_target.target_point == nt.target_point
+    # assert point_axis_target.target_z_axis == nt.target_z_axis
     assert point_axis_target.target_mode == nt.target_mode
     assert point_axis_target.target_scale == nt.target_scale
     assert point_axis_target.tolerance_position == nt.tolerance_position
     assert point_axis_target.tolerance_orientation == nt.tolerance_orientation
     assert point_axis_target.name == nt.name
+    assert point_axis_target == nt
 
     # ConfigurationTarget
     nt = ConfigurationTarget.__from_data__(configuration_target.__data__)
@@ -98,6 +104,60 @@ def test_serialization_targets(frame_target, point_axis_target, configuration_ta
     assert configuration_target.tolerance_above == nt.tolerance_above
     assert configuration_target.tolerance_below == nt.tolerance_below
     assert configuration_target.name == nt.name
+    assert configuration_target == nt
+
+
+def test_deepcopy_targets(frame_target, point_axis_target, configuration_target):
+    # FrameTarget
+    assert frame_target == frame_target.copy()
+    assert frame_target == deepcopy(frame_target)
+
+    # PointAxisTarget
+    assert point_axis_target == point_axis_target.copy()
+    assert point_axis_target == deepcopy(point_axis_target)
+
+    # ConfigurationTarget
+    assert configuration_target == configuration_target.copy()
+    assert configuration_target == deepcopy(configuration_target)
+
+
+def test_empty_parameters_remain_empty(frame_target, point_axis_target, configuration_target):
+    # FrameTarget
+    nt = frame_target.copy()
+    nt.target_scale = None
+    nt.tolerance_position = None
+    nt.tolerance_orientation = None
+    nt.name = None
+    nt_2 = nt.copy()
+    assert nt.target_scale == nt_2.target_scale
+    assert nt.tolerance_position == nt_2.tolerance_position
+    assert nt.tolerance_orientation == nt_2.tolerance_orientation
+    assert nt.name == nt_2.name
+    assert nt == nt_2
+
+    # PointAxisTarget
+    nt = point_axis_target.copy()
+    nt.target_scale = None
+    nt.tolerance_position = None
+    nt.tolerance_orientation = None
+    nt.name = None
+    nt_2 = nt.copy()
+    assert nt.target_scale == nt_2.target_scale
+    assert nt.tolerance_position == nt_2.tolerance_position
+    assert nt.tolerance_orientation == nt_2.tolerance_orientation
+    assert nt.name == nt_2.name
+    assert nt == nt_2
+
+    # ConfigurationTarget
+    nt = configuration_target.copy()
+    nt.tolerance_above = None
+    nt.tolerance_below = None
+    nt.name = None
+    nt_2 = nt.copy()
+    assert nt.tolerance_above == nt_2.tolerance_above
+    assert nt.tolerance_below == nt_2.tolerance_below
+    assert nt.name == nt_2.name
+    assert nt == nt_2
 
 
 def test_serialization_constraint_sets(target_frame, target_configuration, tool_coordinate_frame):
@@ -208,7 +268,7 @@ def test_point_axis_target_scale(point_axis_target):
     scale_factor = 0.001
     target = point_axis_target.copy()
     target.target_scale = scale_factor
-    nt = target.normalized_to_meters()
+    nt = target.normalized_to_meters()  # type: PointAxisTarget
     assert nt.target_point == target.target_point.scaled(scale_factor)
     assert nt.target_z_axis == target.target_z_axis  # No Scaling
     assert nt.tolerance_position == target.tolerance_position * scale_factor

@@ -330,13 +330,13 @@ class RobotCellState(Data):
 
     """
 
-    def __init__(self, robot_flange_frame, robot_configuration=None, tool_states={}, rigid_body_states={}):
+    def __init__(self, robot_flange_frame, robot_configuration=None, tool_states=None, rigid_body_states=None):
         # type: (Frame, Optional[Configuration], Dict[str, ToolState], Dict[str, RigidBodyState]) -> None
         super(RobotCellState, self).__init__()
         self.robot_flange_frame = robot_flange_frame  # type: Frame
         self.robot_configuration = robot_configuration  # type: Optional[Configuration]
-        self.tool_states = tool_states  # type: Dict[str, ToolState]
-        self.rigid_body_states = rigid_body_states  # type: Dict[str, RigidBodyState]
+        self.tool_states = tool_states or {}  # type: Dict[str, ToolState]
+        self.rigid_body_states = rigid_body_states or {}  # type: Dict[str, RigidBodyState]
 
     @property
     def tool_ids(self):
@@ -472,7 +472,7 @@ class RobotCellState(Data):
             if rigid_body_state.attached_to_link:
                 ids.append(rigid_body_id)
 
-    def set_tool_attached_to_group(self, tool_id, group, attachment_frame=None, touch_links=[], detach_others=True):
+    def set_tool_attached_to_group(self, tool_id, group, attachment_frame=None, touch_links=None, detach_others=True):
         # type: (str, str, Optional[Frame], Optional[List[str]], Optional[bool]) -> None
         """Sets the tool attached to the planning group.
 
@@ -500,14 +500,14 @@ class RobotCellState(Data):
         self.tool_states[tool_id].attached_to_group = group
         self.tool_states[tool_id].frame = None
         self.tool_states[tool_id].attachment_frame = attachment_frame
-        self.tool_states[tool_id].touch_links = touch_links
+        self.tool_states[tool_id].touch_links = touch_links or []
 
         if detach_others:
             for id, tool_state in self.tool_states.items():
                 if id != tool_id and tool_state.attached_to_group == group:
                     tool_state.attached_to_group = None
 
-    def set_rigid_body_attached_to_link(self, rigid_body_id, link_name, attachment_frame=None, touch_links=[]):
+    def set_rigid_body_attached_to_link(self, rigid_body_id, link_name, attachment_frame=None, touch_links=None):
         # type: (str, str, Optional[Frame | Transformation], Optional[List[str]]) -> None
         """Sets the rigid body attached to the link of the robot.
 
@@ -535,7 +535,7 @@ class RobotCellState(Data):
         self.rigid_body_states[rigid_body_id].attached_to_tool = None
         self.rigid_body_states[rigid_body_id].frame = None
         self.rigid_body_states[rigid_body_id].attachment_frame = attachment_frame
-        self.rigid_body_states[rigid_body_id].touch_links = touch_links
+        self.rigid_body_states[rigid_body_id].touch_links = touch_links or []
 
     def set_rigid_body_attached_to_tool(self, rigid_body_id, tool_id, attachment_frame=None):
         # type: (str, str, Optional[Frame]) -> None
@@ -666,20 +666,52 @@ class RigidBodyState(Data):
     ----------
     frame : :class:`compas.geometry.Frame`
         The base frame of the rigid body relative to the world coordinate frame.
-    attached_to_link : :obj:`str`, optional
-        The name of the robot link to which the rigid body is attached. Defaults to ``None``.
-    attached_to_tool : :obj:`str`, optional
-        The id of the tool to which the rigid body is attached. Defaults to ``None``.
+    attached_to_link : :obj:`str` | None
+        The name of the robot link to which the rigid body is attached.
+       ``None`` if not attached to a link.
+    attached_to_tool : :obj:`str` | None
+        The id of the tool to which the rigid body is attached.
+        ``None`` if not attached to a tool.
     touch_links : :obj:`list` of :obj:`str`
         The names of the robot links that are allowed to collide with the rigid body.
+        ``[]`` if the rigid body is not allowed to collide with any robot links.
     touch_bodies : :obj:`list` of :obj:`str`
         The names of other rigid bodies (including tools) that are allowed to collide with the rigid body.
+        ``[]`` if the rigid body is not allowed to collide with any other rigid bodies.
     attachment_frame : :class:`compas.geometry.Frame` | :class:`compas.geometry.Transformation`, optional
         The attachment (grasp) frame of the rigid body relative to (the base frame of) the attached link or
-        (the tool tip frame of) the tool. Defaults to ``None``.
+        (the tool tip frame of) the tool.
+        ``None`` if the rigid body is not attached to a link or a tool.
+    is_hidden : :obj:`bool`
+        Whether the rigid body is hidden in the scene. Collision checking will be turned off
+        for hidden objects.
+        Defaults to ``False``.
+
+    Parameters
+    ----------
+    frame : :class:`compas.geometry.Frame`
+        The base frame of the rigid body relative to the world coordinate frame.
+    attached_to_link : :obj:`str` , optional
+        The name of the robot link to which the rigid body is attached.
+        Defaults to ``None``, meaning that the rigid body is not attached to a link.
+    attached_to_tool : :obj:`str` , optional
+        The id of the tool to which the rigid body is attached.
+        Defaults to ``None``, meaning that the rigid body is not attached to a tool.
+    touch_links : :obj:`list` of :obj:`str`, optional
+        The names of the robot links that are allowed to collide with the rigid body.
+        Defaults to ``[]``, meaning that the rigid body is not allowed to collide with any robot links.
+    touch_bodies : :obj:`list` of :obj:`str`, optional
+        The names of other rigid bodies (including tools) that are allowed to collide with the rigid body.
+        Defaults to ``[]``, meaning that the rigid body is not allowed to collide with any other rigid bodies.
+    attachment_frame : :class:`compas.geometry.Frame` | :class:`compas.geometry.Transformation`, optional
+        The attachment (grasp) frame of the rigid body relative to (the base frame of) the attached link or
+        (the tool tip frame of) the tool.
+        Defaults to ``None``, meaning that the rigid body is not attached to a link or a tool.
     is_hidden : :obj:`bool`, optional
         Whether the rigid body is hidden in the scene. Collision checking will be turned off
-        for hidden objects. Defaults to ``False``.
+        for hidden objects.
+        Defaults to ``False``.
+
     """
 
     def __init__(

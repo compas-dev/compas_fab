@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 from compas_fab.backends.interfaces import ForwardKinematics
+from compas_fab.backends.exceptions import PlanningGroupNotExistsError
 from compas_fab.robots import TargetMode
 import compas
 
@@ -78,6 +79,10 @@ class PyBulletForwardKinematics(ForwardKinematics):
         # Check if the target mode is valid for the robot cell state
         planner.ensure_robot_cell_state_supports_target_mode(robot_cell_state, target_mode, group)
 
+        # Check if the planning group is supported by the planner
+        if group not in robot.group_names:
+            raise PlanningGroupNotExistsError("Planning group '{}' is not supported by PyBullet planner.".format(group))
+
         # Setting the entire robot cell state, including the robot configuration
         planner.set_robot_cell_state(robot_cell_state)
 
@@ -129,6 +134,10 @@ class PyBulletForwardKinematics(ForwardKinematics):
         client = planner.client  # type: PyBulletClient
         robot = client.robot  # type: Robot
         group = group or robot.main_group_name
+
+        # Check if the planning group is supported by the planner
+        if group not in robot.group_names:
+            raise PlanningGroupNotExistsError("Planning group '{}' is not supported by PyBullet planner.".format(group))
 
         # Setting the entire robot cell state, including the robot configuration
         planner.set_robot_cell_state(robot_cell_state)

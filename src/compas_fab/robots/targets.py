@@ -6,6 +6,7 @@ from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas.geometry import Point
 from compas.geometry import Vector
+from compas.tolerance import TOL
 from compas_robots.model import Joint
 
 if not compas.IPY:
@@ -47,6 +48,8 @@ class Target(Data):
         A human-readable name for identifying the target.
     target_mode : :class:`TargetMode` or str, optional
         The target mode specifies which link or frame is referenced when specifying a target.
+        This attribute is optional in this base class because some child
+        classes (e.g: ConfigurationTarget) do not require it.
         See :class:`TargetMode` for more details.
     target_scale : float, optional
         The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
@@ -230,6 +233,30 @@ class FrameTarget(Target):
         # NOTE: tolerance_orientation is not scaled
         self.target_scale = 1.0
 
+    def __eq__(self, other):
+        # type: (FrameTarget) -> bool
+        """Check if two FrameTarget objects are equal.
+
+        This function relies on the `is_close` function from the `compas.tolerance` module.
+        Hence, the numerical values of the geometry are compared with the globally defined tolerance.
+        """
+
+        # NOTE: Some attributes are optional, so we need to check if they are equally None
+        return (
+            TOL.is_allclose(other.target_frame, self.target_frame)
+            and self.target_mode == other.target_mode
+            and (self.target_scale == other.target_scale or TOL.is_close(other.target_scale, self.target_scale))
+            and (
+                self.tolerance_position == other.tolerance_position
+                or TOL.is_close(other.tolerance_position, self.tolerance_position)
+            )
+            and (
+                self.tolerance_orientation == other.tolerance_orientation
+                or TOL.is_close(other.tolerance_orientation, self.tolerance_orientation)
+            )
+            and other.name == self.name
+        )
+
 
 class PointAxisTarget(Target):
     """
@@ -296,7 +323,7 @@ class PointAxisTarget(Target):
         super(PointAxisTarget, self).__init__(target_mode=target_mode, target_scale=target_scale, name=name)
         # Note: The following input are converted to class because it can simplify functions that use this class
         self.target_point = Point(*target_point)
-        self.target_z_axis = Vector(*target_z_axis)
+        self.target_z_axis = Vector(*target_z_axis).unitized()
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
 
@@ -334,6 +361,31 @@ class PointAxisTarget(Target):
         self.target_z_axis.unitize()
         # NOTE: target_z_axis is unitized and is not scaled
         self.target_scale = 1.0
+
+    def __eq__(self, other):
+        # type: (PointAxisTarget) -> bool
+        """Check if two PointAxisTarget objects are equal.
+
+        This function relies on the `is_close` function from the `compas.tolerance` module.
+        Hence, the numerical values of the geometry are compared with the globally defined tolerance.
+        """
+
+        # NOTE: Some attributes are optional, so we need to check if they are equally None
+        return (
+            TOL.is_allclose(other.target_point, self.target_point)
+            and TOL.is_allclose(other.target_z_axis, self.target_z_axis)
+            and self.target_mode == other.target_mode
+            and (other.target_scale == self.target_scale or TOL.is_close(other.target_scale, self.target_scale))
+            and (
+                other.tolerance_position == self.tolerance_position
+                or TOL.is_close(other.tolerance_position, self.tolerance_position)
+            )
+            and (
+                other.tolerance_orientation == self.tolerance_orientation
+                or TOL.is_close(other.tolerance_orientation, self.tolerance_orientation)
+            )
+            and other.name == self.name
+        )
 
 
 class ConfigurationTarget(Target):
@@ -493,6 +545,30 @@ class ConfigurationTarget(Target):
     def normalize_to_meters():
         """ConfigurationTarget does not contain any geometry with configurable units to normalize."""
         pass
+
+    def __eq__(self, other):
+        # type: (ConfigurationTarget) -> bool
+        """Check if two ConfigurationTarget objects are equal.
+
+        This function relies on the `is_close` function from the `compas.tolerance` module.
+        Hence, the numerical values of the geometry are compared with the globally defined tolerance.
+
+        Except where the target_configurations are compared with `Configuration.is_close` method.
+        """
+
+        # NOTE: Some attributes are optional, so we need to check if they are equally None
+        return (
+            self.target_configuration.close_to(other.target_configuration)
+            and (
+                other.tolerance_above == self.tolerance_above
+                or TOL.is_allclose(other.tolerance_above, self.tolerance_above)
+            )
+            and (
+                other.tolerance_below == self.tolerance_below
+                or TOL.is_allclose(other.tolerance_below, self.tolerance_below)
+            )
+            and other.name == self.name
+        )
 
 
 class ConstraintSetTarget(Target):
@@ -701,6 +777,26 @@ class FrameWaypoints(Waypoints):
         # NOTE: tolerance_orientation is not scaled
         self.target_scale = 1.0
 
+    def __eq__(self, other):
+        # type: (FrameWaypoints) -> bool
+        """Check if two FrameWaypoints objects are equal.
+
+        This function relies on the `is_close` function from the `compas.tolerance` module.
+        Hence, the numerical values of the geometry are compared with the globally defined tolerance.
+        """
+        return (
+            len(self.target_frames) == len(other.target_frames)
+            and all(
+                TOL.is_allclose(other_frame, self_frame)
+                for other_frame, self_frame in zip(other.target_frames, self.target_frames)
+            )
+            and self.target_mode == other.target_mode
+            and TOL.is_close(other.target_scale, self.target_scale)
+            and TOL.is_close(other.tolerance_position, self.tolerance_position)
+            and TOL.is_close(other.tolerance_orientation, self.tolerance_orientation)
+            and other.name == self.name
+        )
+
 
 class PointAxisWaypoints(Waypoints):
     """
@@ -789,6 +885,28 @@ class PointAxisWaypoints(Waypoints):
         self.tolerance_position = self.tolerance_position * self.target_scale if self.tolerance_position else None
         # NOTE: tolerance_orientation is not scaled
         self.target_scale = 1.0
+
+    def __eq__(self, other):
+        # type: (PointAxisWaypoints) -> bool
+        """Check if two FrameWaypoints objects are equal.
+
+        This function relies on the `is_close` function from the `compas.tolerance` module.
+        Hence, the numerical values of the geometry are compared with the globally defined tolerance.
+        """
+        return (
+            len(self.target_points_and_axes) == len(other.target_points_and_axes)
+            and all(
+                TOL.is_allclose(other_point, self_point) and TOL.is_allclose(other_axis, self_axis)
+                for (other_point, other_axis), (self_point, self_axis) in zip(
+                    other.target_points_and_axes, self.target_points_and_axes
+                )
+            )
+            and self.target_mode == other.target_mode
+            and TOL.is_close(other.target_scale, self.target_scale)
+            and TOL.is_close(other.tolerance_position, self.tolerance_position)
+            and TOL.is_close(other.tolerance_orientation, self.tolerance_orientation)
+            and other.name == self.name
+        )
 
 
 class TargetMode:

@@ -22,6 +22,7 @@ from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import TargetMode
 from compas_fab.robots import PointAxisTarget
+from compas_robots.model import Joint
 
 from compas_robots import Configuration
 
@@ -29,6 +30,7 @@ from compas_fab.backends import InverseKinematicsError
 from compas_fab.backends import PlanningGroupNotSupported
 from compas_fab.backends import CollisionCheckError
 from compas_fab.backends import TargetModeMismatchError
+from compas_fab.backends import PlanningGroupNotExistsError
 
 
 @pytest.fixture
@@ -47,6 +49,37 @@ def compare_frames(frame1, frame2, tolerance_position, tolerance_orientation):
     if angle > tolerance_orientation:
         return False
     return True
+
+
+def compare_configuration(config1, config2, tolerance_linear, tolerance_angular):
+    # type: (Configuration, Configuration, float, float) -> bool
+    """Helper function to compare two configurations in terms of joint values."""
+
+    if config1.joint_names and config2.joint_names:
+        if set(config1.joint_names) != set(config2.joint_names):
+            raise ValueError("Configurations have different joint names.")
+        other_value_by_name = dict(zip(config2.joint_names, config2.joint_values))
+        sorted_other_values = [other_value_by_name[name] for name in config1.joint_names]
+        value_pairs = zip(config1.joint_values, sorted_other_values)
+    else:
+        if len(config1.joint_values) != len(config2.joint_values):
+            raise ValueError("Can't compare configurations with different lengths of joint_values.")
+        value_pairs = zip(config1.joint_values, config2.joint_values)
+
+    for i, (v1, v2) in enumerate(value_pairs):
+        diff = v1 - v2
+        if config1.joint_types[i] in [Joint.REVOLUTE, Joint.CONTINUOUS]:
+            if abs(diff) > tolerance_angular:
+                return False
+        else:
+            if abs(diff) > tolerance_linear:
+                return False
+    return True
+
+
+######################################################
+# Testing FK function with different robots
+######################################################
 
 
 def compare_planner_fk_model_fk(robot, pybullet_client, known_zero_frame):
@@ -317,7 +350,7 @@ def test_ik_return_full_configuration(pybullet_client):
     assert len(config.joint_names) == 8
 
 
-def test_ik_group(pybullet_client):
+def test_ik_modified_only_joints_in_group(pybullet_client):
     # Test the IK solver see if it moved only the joints in the group
     robot = RobotLibrary.panda(load_geometry=True)
 
@@ -432,6 +465,27 @@ def test_ik_group(pybullet_client):
         pass
 
 
+def test_ik_fk_with_wrong_group_name_raises_exception(pybullet_client):
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5_cone_tool()
+    ik_target_frame = Frame(
+        point=Point(x=0.22, y=0.11, z=0.6),
+        xaxis=Vector(x=0.11, y=1.0, z=-0.0),
+        yaxis=Vector(x=0.11, y=0.0, z=-1.0),
+    )
+    target = FrameTarget(ik_target_frame, TargetMode.ROBOT)
+
+    planner = PyBulletPlanner(pybullet_client)
+    planner.set_robot_cell(robot_cell, robot_cell_state)
+    non_existent_group = "non_existent_group"
+    with pytest.raises(PlanningGroupNotExistsError):
+        planner.inverse_kinematics(target, robot_cell_state, group=non_existent_group)
+    with pytest.raises(PlanningGroupNotExistsError):
+        planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT, group=non_existent_group)
+
+    # Planning functions (e.g. plan_motion) rely on these IK and FK functions so they should raise
+    # the same exception
+
+
 ##################################################
 # Testing IK with Targets
 ##################################################
@@ -453,7 +507,7 @@ def planner_with_test_cell(pybullet_client):
     return planner, robot_cell, robot_cell_state
 
 
-def test_frame_target_tolerance(planner_with_test_cell):
+def test_frame_target_ik_tolerance(planner_with_test_cell):
     """Test to make sure that PyBullet IK solver respects the target tolerance.
     The test checks that the IK solver respects the target tolerance for both position and orientation.
     Moreover, it ensures that the result does not overachieve the target tolerance.
@@ -497,7 +551,7 @@ def test_frame_target_tolerance(planner_with_test_cell):
     test_planning_tolerance(1e-6, 1e-6)
 
 
-def test_ik_frame_target_target_modes(planner_with_test_cell):
+def test_frame_target_ik_with_tools_and_workpieces(planner_with_test_cell):
     planner, robot_cell, robot_cell_state = planner_with_test_cell
 
     # Testing conditions
@@ -535,7 +589,7 @@ def test_ik_frame_target_target_modes(planner_with_test_cell):
     assert not configuration_workpiece_mode.close_to(configuration_robot_mode)
 
 
-def test_ik_target_mode_validation(planner_with_test_cell):
+def test_ik_fk_target_mode_mismatch_with_cell_state_raises_exception(planner_with_test_cell):
     """Test that the inverse kinematics function correctly handles the target modes.
 
     The inverse kinematics function should raise an error if the target mode is not possible
@@ -552,7 +606,10 @@ def test_ik_target_mode_validation(planner_with_test_cell):
         "check_collision": False,
     }
 
+    # =================================
     # Test without a workpiece attached
+    # =================================
+
     robot_cell_state.rigid_body_states["beam"].attached_to_tool = False
     robot_cell_state.rigid_body_states["beam"].frame = Frame.worldXY()
     planner.set_robot_cell_state(robot_cell_state)
@@ -561,16 +618,22 @@ def test_ik_target_mode_validation(planner_with_test_cell):
     target = FrameTarget(target_frame, TargetMode.WORKPIECE)
     with pytest.raises(TargetModeMismatchError):
         planner.inverse_kinematics(target, robot_cell_state, options=options)
+    with pytest.raises(TargetModeMismatchError):
+        planner.forward_kinematics(robot_cell_state, TargetMode.WORKPIECE)
+
     # TOOL target mode should be possible
     target = FrameTarget(target_frame, TargetMode.TOOL)
     planner.inverse_kinematics(target, robot_cell_state, options=options)
+    planner.forward_kinematics(robot_cell_state, TargetMode.TOOL)
     # ROBOT target mode should be possible
     target = FrameTarget(target_frame, TargetMode.ROBOT)
     planner.inverse_kinematics(target, robot_cell_state, options=options)
+    planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT)
 
-    #  -----------------------------
-
+    # =============================
     # Test without a tool attached
+    # =============================
+
     robot_cell_state.tool_states["gripper"].attached_to_group = False
     robot_cell_state.tool_states["gripper"].frame = Frame.worldXY()
     planner.set_robot_cell_state(robot_cell_state)
@@ -579,13 +642,18 @@ def test_ik_target_mode_validation(planner_with_test_cell):
     target = FrameTarget(target_frame, TargetMode.WORKPIECE)
     with pytest.raises(TargetModeMismatchError):
         planner.inverse_kinematics(target, robot_cell_state, options=options)
+    with pytest.raises(TargetModeMismatchError):
+        planner.forward_kinematics(robot_cell_state, TargetMode.WORKPIECE)
     # TOOL target mode should not be possible
     target = FrameTarget(target_frame, TargetMode.TOOL)
     with pytest.raises(TargetModeMismatchError):
         planner.inverse_kinematics(target, robot_cell_state)
+    with pytest.raises(TargetModeMismatchError):
+        planner.forward_kinematics(robot_cell_state, TargetMode.TOOL)
     # ROBOT target mode should be possible
     target = FrameTarget(target_frame, TargetMode.ROBOT)
     planner.inverse_kinematics(target, robot_cell_state, options=options)
+    planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT)
 
 
 def test_iter_ik_frame_target(planner_with_test_cell):
@@ -602,7 +670,8 @@ def test_iter_ik_frame_target(planner_with_test_cell):
     # This target is reachable and collision free
     target = FrameTarget(Frame([0.5, 0.5, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]), TargetMode.ROBOT)
 
-    # Assert that if someone forgot to provide a group or an invalid one, it will raise an error
+    # Even this is an internal function:
+    # Test that if someone forgot to provide a group or an invalid one, it will raise an error
     generator = planner.iter_inverse_kinematics_frame_target(target, robot_cell_state, options)
     with pytest.raises(TypeError):
         next(generator)
@@ -643,6 +712,36 @@ def test_iter_ik_frame_target(planner_with_test_cell):
     generator = planner.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
     result = next(generator)  # type: Configuration
     assert isinstance(result, Configuration)
+
+
+def test_iter_ik_returns_different_results(planner_with_test_cell):
+    planner, robot_cell, robot_cell_state = planner_with_test_cell
+
+    # Testing conditions
+    group = robot_cell.robot.main_group_name
+    options = {
+        "check_collision": True,
+        "solution_uniqueness_threshold_prismatic": 1e-3,
+        "solution_uniqueness_threshold_revolute": 1e-3,
+    }
+
+    # Construct the IK target
+    target = FrameTarget(
+        target_frame=Frame([0.5, 0.5, 0.5], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]),
+        target_mode=TargetMode.ROBOT,
+        tolerance_position=1e-3,
+        tolerance_orientation=1e-3,
+    )
+    # Plan IK to get configuration
+    generator = planner.iter_inverse_kinematics(target, robot_cell_state, group=group, options=options)
+    result1 = next(generator)
+    result2 = next(generator)
+    assert isinstance(result1, Configuration)
+    assert isinstance(result2, Configuration)
+    assert not compare_configuration(result1, result2, 1e-3, 1e-3)
+    result3 = next(generator)
+    assert not compare_configuration(result1, result3, 1e-3, 1e-3)
+    assert not compare_configuration(result2, result3, 1e-3, 1e-3)
 
 
 def test_iter_ik_point_axis_target(planner_with_test_cell):

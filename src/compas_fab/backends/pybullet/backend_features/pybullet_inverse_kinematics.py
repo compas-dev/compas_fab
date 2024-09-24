@@ -36,6 +36,7 @@ from compas.geometry import is_parallel_vector_vector
 from compas.geometry import axis_angle_from_quaternion
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.exceptions import CollisionCheckError
+from compas_fab.backends.exceptions import PlanningGroupNotExistsError
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.pybullet.conversions import pose_from_frame
 from compas_fab.backends.pybullet.exceptions import PlanningGroupNotSupported
@@ -176,6 +177,10 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         # Check if the robot cell state supports the target mode
         planner.ensure_robot_cell_state_supports_target_mode(robot_cell_state, target.target_mode, group)
+
+        # Check if the planning group is supported by the planner
+        if group not in robot.group_names:
+            raise PlanningGroupNotExistsError("Planning group '{}' is not supported by PyBullet planner.".format(group))
 
         # ===================================================================================
         # End of common lines
