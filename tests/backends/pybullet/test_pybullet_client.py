@@ -24,7 +24,7 @@ def test_pybullet_client_set_robot_from_urdf():
             robot = client.set_robot(robot)
 
         # Load robot with geometry
-        mesh_folder = compas_fab.get("robot_library/ur5_robot")
+        mesh_folder = "robot_library/ur5_robot"
         robot = Robot.from_urdf(urdf_filename, srdf_filename, mesh_folder)
         robot = client.set_robot(robot)
 
