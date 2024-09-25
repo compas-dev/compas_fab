@@ -11,7 +11,7 @@ from compas_fab.backends import CollisionCheckError
 
 with PyBulletClient("gui") as client:
     planner = PyBulletPlanner(client)
-    print(f"Observe the Pybullet GUI window to see the robot cell state being checked")
+    print("Observe the Pybullet GUI window to see the robot cell state being checked")
 
     # The robot cell is loaded from RobotCellLibrary
     robot_cell, robot_cell_state = RobotCellLibrary.ur10e_gripper_one_beam()
@@ -27,7 +27,7 @@ with PyBulletClient("gui") as client:
     # The following check_collision should pass without raising an exception
     start = time.time()
     planner.check_collision(robot_cell_state)
-    print(f"Time taken for collision check: {time.time() - start}")
+    print("Time taken for collision check: {}".format(time.time() - start))
     input("Press Enter to continue...\n")
 
     # ---------------------------------------------
@@ -40,7 +40,7 @@ with PyBulletClient("gui") as client:
     try:
         planner.check_collision(robot_cell_state)
     except CollisionCheckError as e:
-        print(f"\nCollision detected: \n{e}")
+        print("\nCollision detected: \n{}".format(e))
     input("Press Enter to continue...\n")
 
     # ---------------------------------------------
@@ -54,7 +54,7 @@ with PyBulletClient("gui") as client:
     try:
         planner.check_collision(robot_cell_state, options={"full_report": True})
     except CollisionCheckError as e:
-        print(f"\nCollision detected: \n{e}")
+        print("\nCollision detected: \n{}".format(e))
     input("Press Enter to continue...\n")
 
     # ---------------------------------------------
@@ -68,7 +68,7 @@ with PyBulletClient("gui") as client:
     try:
         planner.check_collision(robot_cell_state, options={"verbose": True, "full_report": True})
     except CollisionCheckError as e:
-        print(f"\nCollision detected: \n{e}")
+        print("\nCollision detected: \n{}".format(e))
     input("Press Enter to continue...\n")
 
     # The verbose action will print all tested collision pairs

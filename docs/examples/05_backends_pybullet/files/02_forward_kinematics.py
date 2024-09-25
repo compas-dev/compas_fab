@@ -38,4 +38,4 @@ with PyBulletClient("direct") as client:
     # ---------------------------------
     for link_name in robot.get_link_names():
         frame_WCF = planner.forward_kinematics_to_link(robot_cell_state, link_name)
-        print(f"Frame of link '{link_name}' : {frame_WCF}")
+        print("Frame of link '{}' : {}".format((link_name, frame_WCF)))

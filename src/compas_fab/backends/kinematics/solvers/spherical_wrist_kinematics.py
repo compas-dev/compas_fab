@@ -2,14 +2,14 @@
 
 import math
 
-import compas
+from compas import IPY
 from compas.geometry import Point
 
 from .analytical_kinematics import AnalyticalKinematics
 from .spherical_wrist import forward_kinematics_spherical_wrist
 from .spherical_wrist import inverse_kinematics_spherical_wrist
 
-if compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

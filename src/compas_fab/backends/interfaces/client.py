@@ -2,10 +2,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas
+from compas import IPY
 
-
-if compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

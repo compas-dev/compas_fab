@@ -1,6 +1,6 @@
 from compas import IPY
 
-if IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

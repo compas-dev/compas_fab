@@ -13,7 +13,7 @@ from compas_fab.backends.pybullet.backend_features import PyBulletForwardKinemat
 from compas_fab.backends.pybullet.backend_features import PyBulletSetRobotCell
 from compas_fab.backends.pybullet.backend_features import PyBulletSetRobotCellState
 
-if IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

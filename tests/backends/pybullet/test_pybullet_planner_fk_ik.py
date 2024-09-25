@@ -183,7 +183,8 @@ def ik_fk_agreement(robot, pybullet_client, ik_target_frames):
                 )
             )
         except StopIteration:
-            assert False, f"No IK Solution found for frame {ik_target_frame}"
+            print("No IK Solution found for frame {}".format(ik_target_frame))
+            assert False, "No IK Solution found for frame"
 
         # FK Query to the planner (Configuration to Frame)
         robot_cell_state = RobotCellState.from_robot_configuration(robot, ik_result)
@@ -319,7 +320,8 @@ def test_ik_out_of_reach_ur5(pybullet_client):
             )
 
             # An error should be thrown here because the IK target is out of reach
-            assert False, f"IK Solution found when there should be none: frame {ik_target_frame}"
+            print("IK Solution found when there should be none: frame {}".format(ik_target_frame))
+            assert False, "IK Solution found when there should be none: frame"
         except InverseKinematicsError:
             continue
 

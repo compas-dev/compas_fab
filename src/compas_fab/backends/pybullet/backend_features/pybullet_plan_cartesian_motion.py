@@ -2,53 +2,51 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas_fab.robots import FrameWaypoints
-from compas_fab.robots import PointAxisWaypoints
-from compas_fab.robots import FrameTarget
-from compas_fab.robots import PointAxisTarget
-from compas_fab.robots import JointTrajectory
-from compas_fab.robots import JointTrajectoryPoint
+from copy import deepcopy
+from math import ceil
+from math import pi
+
+from compas import IPY
+from compas.geometry import Quaternion
+from compas.geometry import axis_angle_from_quaternion
+from compas.geometry import cross_vectors
+from compas.geometry import is_parallel_vector_vector
 from compas_robots.model import Joint
 
-from math import pi
-from math import ceil
-
-from copy import deepcopy
-
-from compas_fab.backends import InverseKinematicsError
 from compas_fab.backends import CollisionCheckError
+from compas_fab.backends import InverseKinematicsError
+from compas_fab.backends import MPInterpolationInCollisionError
 from compas_fab.backends import MPMaxJumpError
 from compas_fab.backends import MPNoIKSolutionError
-from compas_fab.backends import MPInterpolationInCollisionError
+from compas_fab.backends import MPNoPlanFoundError
 from compas_fab.backends import MPStartStateInCollisionError
 from compas_fab.backends import MPTargetInCollisionError
-from compas_fab.backends import MPNoPlanFoundError
+from compas_fab.robots import FrameTarget
+from compas_fab.robots import FrameWaypoints
+from compas_fab.robots import JointTrajectory
+from compas_fab.robots import JointTrajectoryPoint
+from compas_fab.robots import PointAxisTarget
+from compas_fab.robots import PointAxisWaypoints
 
-
-import compas
-
-from compas.geometry import axis_angle_from_quaternion
-from compas.geometry import Quaternion
-from compas.geometry import is_parallel_vector_vector
-from compas.geometry import cross_vectors
-
-if compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
-        from compas_fab.backends import PyBulletClient  # noqa: F401
-        from compas_fab.backends import PyBulletPlanner  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
-        from compas_fab.robots import Waypoints  # noqa: F401
-        from compas_robots import Configuration  # noqa: F401
+        from typing import Dict  # noqa: F401
+        from typing import List  # noqa: F401
+        from typing import Optional  # noqa: F401
+        from typing import Tuple  # noqa: F401
+
         from compas.geometry import Frame  # noqa: F401
         from compas.geometry import Point  # noqa: F401
         from compas.geometry import Vector  # noqa: F401
-        from typing import Optional  # noqa: F401
-        from typing import Dict  # noqa: F401
-        from typing import List  # noqa: F401
-        from typing import Tuple  # noqa: F401
+        from compas_robots import Configuration  # noqa: F401
+
+        from compas_fab.backends import PyBulletClient  # noqa: F401
+        from compas_fab.backends import PyBulletPlanner  # noqa: F401
+        from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
+        from compas_fab.robots import Waypoints  # noqa: F401
 
 
 __all__ = [
@@ -490,7 +488,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                 # If this is the last step, the search is complete
                 if len(planned_configurations) == len(all_targets):
                     if options["verbose"]:
-                        print(f"Search is complete. Returning {len(planned_configurations)} configurations")
+                        print("Search is complete. Returning {} configurations".format(len(planned_configurations)))
                     break
 
                 # If this is the longest trajectory found, save it

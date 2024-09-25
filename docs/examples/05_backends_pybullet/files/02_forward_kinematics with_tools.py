@@ -39,5 +39,5 @@ with PyBulletClient("direct") as client:
 
     # It is also possible to retrieve the PCF  by requesting with the end effector link name
     ee_link_name = robot_cell.robot.get_end_effector_link_name()
-    print(f"Frame of the T0CF (name='{ee_link_name}') in World Coordinate Frame:")
+    print("Frame of the T0CF (name='{}') in World Coordinate Frame:".format(ee_link_name))
     print(planner.forward_kinematics_to_link(robot_cell_state, ee_link_name))

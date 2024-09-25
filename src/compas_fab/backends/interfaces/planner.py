@@ -2,23 +2,23 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas
-
+from compas import IPY
 from compas.geometry import Frame
 from compas.geometry import Transformation
-from compas_fab.robots import TargetMode
 
 from compas_fab.backends.exceptions import BackendFeatureNotSupportedError
 from compas_fab.backends.exceptions import BackendTargetNotSupportedError
 from compas_fab.backends.exceptions import TargetModeMismatchError
+from compas_fab.robots import TargetMode
 
-if compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
         from typing import List  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
+
         from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
 
 
 class PlannerInterface(object):

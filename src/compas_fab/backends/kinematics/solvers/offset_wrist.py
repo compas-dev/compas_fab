@@ -12,7 +12,7 @@ from compas.geometry import Frame
 
 from compas_fab.utilities import sign
 
-if IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

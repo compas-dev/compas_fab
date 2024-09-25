@@ -4,7 +4,7 @@ from .analytical_kinematics import AnalyticalKinematics
 from .offset_wrist import forward_kinematics_offset_wrist
 from .offset_wrist import inverse_kinematics_offset_wrist
 
-if IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
