@@ -16,17 +16,9 @@ if compas.IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
-        from compas_fab.robots import Robot
-        from compas_fab.robots import RobotCell
-        from compas_fab.robots import RobotCellState
-        from compas_fab.robots import Target
-        from compas_fab.robots import Waypoints
-
-        from compas_fab.backends.interfaces import ClientInterface
-
-        from typing import List
-        from typing import Optional
-        from compas.geometry import Frame
+        from typing import List  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
+        from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
 
 
 class PlannerInterface(object):

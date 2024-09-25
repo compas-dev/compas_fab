@@ -1,17 +1,18 @@
 import compas
 
 from compas_fab.backends.interfaces.planner import PlannerInterface
-
-from compas_fab.backends.pybullet.backend_features import *
+from compas_fab.backends.pybullet.backend_features import PyBulletCheckCollision
+from compas_fab.backends.pybullet.backend_features import PyBulletForwardKinematics
+from compas_fab.backends.pybullet.backend_features import PyBulletInverseKinematics
+from compas_fab.backends.pybullet.backend_features import PyBulletPlanCartesianMotion
+from compas_fab.backends.pybullet.backend_features import PyBulletSetRobotCell
+from compas_fab.backends.pybullet.backend_features import PyBulletSetRobotCellState
 
 if not compas.IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
         from compas_fab.backends import PyBulletClient  # noqa: F401
-
-        # Load pybullet for type hinting
-        import pybullet
 
 __all__ = [
     "PyBulletPlanner",

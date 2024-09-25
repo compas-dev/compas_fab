@@ -1,7 +1,5 @@
-import pytest
-
 import compas
-from copy import deepcopy
+import pytest
 
 from compas_fab.robots import RobotCellLibrary
 

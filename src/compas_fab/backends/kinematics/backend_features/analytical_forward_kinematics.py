@@ -1,4 +1,3 @@
-from compas_fab.backends.exceptions import BackendError
 from compas_fab.backends.interfaces import ForwardKinematics
 
 
@@ -12,8 +11,8 @@ if not compas.IPY:
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Robot  # noqa: F401
         from compas_fab.robots import TargetMode  # noqa: F401
-        from compas.geometry import Frame
-        from typing import Dict, List, Optional, Tuple  # noqa: F401
+        from compas.geometry import Frame  # noqa: F401
+        from typing import Optional  # noqa: F401
 
 
 class AnalyticalForwardKinematics(ForwardKinematics):

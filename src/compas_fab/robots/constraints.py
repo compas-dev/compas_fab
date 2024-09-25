@@ -24,7 +24,13 @@ if not compas.IPY:
         from compas.geometry import Transformation  # noqa: F401
         from compas_robots import Configuration  # noqa: F401
 
-__all__ = ["BoundingVolume", "Constraint", "JointConstraint", "OrientationConstraint", "PositionConstraint"]
+__all__ = [
+    "BoundingVolume",
+    "Constraint",
+    "JointConstraint",
+    "OrientationConstraint",
+    "PositionConstraint",
+]
 
 
 class BoundingVolume(Data):

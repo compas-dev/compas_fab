@@ -3,7 +3,6 @@ from __future__ import division
 from __future__ import print_function
 
 import compas
-
 from compas.data import Data
 from compas_robots import ToolModel
 from compas_robots.model import LinkGeometry
@@ -15,10 +14,11 @@ if not compas.IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
-        from typing import Optional  # noqa: F401
         from typing import List  # noqa: F401
-        from compas.geometry import Frame  # noqa: F401
+        from typing import Optional  # noqa: F401
+
         from compas.datastructures import Mesh  # noqa: F401
+        from compas.geometry import Frame  # noqa: F401
 
 __all__ = ["Tool"]
 

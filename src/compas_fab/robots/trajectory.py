@@ -3,7 +3,6 @@ from __future__ import division
 from __future__ import print_function
 
 import compas
-
 from compas.data import Data
 from compas.tolerance import TOL
 from compas_robots import Configuration

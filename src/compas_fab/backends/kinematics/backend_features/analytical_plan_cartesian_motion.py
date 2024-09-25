@@ -9,7 +9,6 @@ from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import PointAxisWaypoints
-from compas_fab.utilities import from_tcf_to_t0cf
 
 
 class AnalyticalPlanCartesianMotion(PlanCartesianMotion):

@@ -1,11 +1,8 @@
-from compas_fab.robots import RobotCell
-from compas_fab.robots import RobotCellLibrary
-from compas_fab.robots import RobotLibrary
-from compas_robots import RobotModel
+from copy import deepcopy
 
 import pytest
 
-from copy import deepcopy
+from compas_fab.robots import RobotCellLibrary
 
 
 @pytest.fixture

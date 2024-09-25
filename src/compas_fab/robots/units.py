@@ -12,8 +12,8 @@ if not compas.IPY:
     from typing import List  # noqa: F401
 
 __all__ = [
-    "to_radians",
     "to_degrees",
+    "to_radians",
 ]
 
 

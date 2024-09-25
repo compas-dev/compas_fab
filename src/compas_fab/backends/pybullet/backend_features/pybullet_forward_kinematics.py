@@ -2,22 +2,24 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas_fab.backends.interfaces import ForwardKinematics
-from compas_fab.backends.exceptions import PlanningGroupNotExistsError
-from compas_fab.robots import TargetMode
 import compas
+
+from compas_fab.backends.exceptions import PlanningGroupNotExistsError
+from compas_fab.backends.interfaces import ForwardKinematics
 
 if compas.IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
+        from typing import Optional  # noqa: F401
+
+        from compas.geometry import Frame  # noqa: F401
+
         from compas_fab.backends import PyBulletClient  # noqa: F401
         from compas_fab.backends import PyBulletPlanner  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import Robot  # noqa: F401
-        from compas.geometry import Frame  # noqa: F401
-        from typing import Optional  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
+        from compas_fab.robots import TargetMode  # noqa: F401
 
 
 class PyBulletForwardKinematics(ForwardKinematics):

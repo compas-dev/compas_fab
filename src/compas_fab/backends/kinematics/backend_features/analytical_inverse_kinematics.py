@@ -1,4 +1,3 @@
-from compas_fab.backends.exceptions import BackendError
 from compas_fab.backends.exceptions import BackendTargetNotSupportedError
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics
@@ -16,7 +15,8 @@ if not compas.IPY:
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Robot  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
-        from typing import Dict, List, Optional, Tuple  # noqa: F401
+        from typing import Dict  # noqa: F401
+        from typing import Optional  # noqa: F401
         from typing import Generator  # noqa: F401
 
 from ..utils import joint_angles_to_configurations

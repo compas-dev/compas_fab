@@ -1,9 +1,8 @@
 from copy import deepcopy
-import compas
 
+import compas
 from compas.data import Data
 from compas.geometry import Frame
-from compas.geometry import Transformation
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas.tolerance import TOL
@@ -15,19 +14,22 @@ if not compas.IPY:
     if TYPE_CHECKING:
         from typing import Optional  # noqa: F401
         from typing import Tuple  # noqa: F401
+
+        from compas.geometry import Transformation  # noqa: F401
         from compas_robots import Configuration  # noqa: F401
+
         from compas_fab.robots import Constraint  # noqa: F401
 
 __all__ = [
-    "Target",
-    "FrameTarget",
-    "PointAxisTarget",
     "ConfigurationTarget",
     "ConstraintSetTarget",
-    "Waypoints",
+    "FrameTarget",
     "FrameWaypoints",
+    "PointAxisTarget",
     "PointAxisWaypoints",
+    "Target",
     "TargetMode",
+    "Waypoints",
 ]
 
 
@@ -181,7 +183,7 @@ class FrameTarget(Target):
         tolerance_orientation=None,
         name="Frame Target",
     ):
-        # type: (Transformation, Optional[float], Optional[float], Optional[Frame | Transformation], Optional[str]) -> FrameTarget
+        # type: (Transformation, TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> FrameTarget
         """Creates a FrameTarget from a transformation matrix.
 
         Parameters

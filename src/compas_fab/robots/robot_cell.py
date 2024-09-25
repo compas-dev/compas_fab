@@ -1,12 +1,11 @@
 import compas
-
 from compas.data import Data
-from compas_fab.robots import AttachedCollisionMesh
-from compas_fab.robots import CollisionMesh
 from compas.geometry import Frame
 from compas.geometry import Transformation
-from compas_fab.robots import Robot
 from compas_robots import ToolModel
+
+from compas_fab.robots import AttachedCollisionMesh
+from compas_fab.robots import Robot
 
 if not compas.IPY:
     from typing import TYPE_CHECKING
@@ -15,13 +14,18 @@ if not compas.IPY:
         from typing import Dict  # noqa: F401
         from typing import List  # noqa: F401
         from typing import Optional  # noqa: F401
+
         from compas.datastructures import Mesh  # noqa: F401
-        from compas.geometry import Frame  # noqa: F401
         from compas_robots import Configuration  # noqa: F401
         from compas_robots import RobotModel  # noqa: F401
-        from compas_robots import ToolModel  # noqa: F401
-        from compas.geometry import Transformation  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
+
+__all__ = [
+    "RigidBody",
+    "RigidBodyState",
+    "RobotCell",
+    "RobotCellState",
+    "ToolState",
+]
 
 
 class RobotCell(Data):
@@ -196,10 +200,16 @@ class RobotCell(Data):
         attached_collision_meshes = []
         for id in rigid_body_ids:
             rb_state = robot_cell_state.rigid_body_states[id]
-            mesh = self.rigid_body_models[id].collision_meshes  # TODO join?
-            collision_mesh = CollisionMesh(mesh, id, rb_state.frame)
-            link_name = rb_state.attached_to_link
-            attached_collision_meshes.append(AttachedCollisionMesh(rigid_body, id))
+            collision_meshes = self.rigid_body_models[id].collision_meshes  # TODO join?
+            joinned_mesh = Mesh()
+            for mesh in collision_meshes:
+                # Non-default, high precision is used to avoid accidentally merging vertices
+                joinned_mesh.join(mesh, weld=False, precision=12)
+            # collision_mesh = CollisionMesh(mesh, id, rb_state.frame)
+            # link_name = rb_state.attached_to_link
+            attached_collision_meshes.append(
+                AttachedCollisionMesh(joinned_mesh, link_name=id, touch_links=rb_state.touch_links)
+            )
         return attached_collision_meshes
 
 
@@ -234,6 +244,11 @@ class RigidBody(Data):
             A list of meshes for visualization purpose.
         collision_meshes : list of :class:`compas.datastructures.Mesh`
             A list of meshes for collision checking.
+
+        Notes
+        -----
+        compas_fab do not support weight and inertia properties for rigid bodies.
+
         """
         # type: (str, List[Mesh], List[Mesh]) -> None
         super(RigidBody, self).__init__()

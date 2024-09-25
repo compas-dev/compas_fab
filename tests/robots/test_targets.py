@@ -1,25 +1,22 @@
-import pytest
 from copy import deepcopy
 
-from compas_fab.robots import FrameTarget
-from compas_fab.robots import PointAxisTarget
-from compas_fab.robots import ConfigurationTarget
-from compas_fab.robots import ConstraintSetTarget
-from compas_fab.robots import JointConstraint
-from compas_fab.robots import OrientationConstraint
-from compas_fab.robots import PositionConstraint
-from compas_fab.robots import TargetMode
-
-from compas_fab.robots import FrameWaypoints
-from compas_fab.robots import PointAxisWaypoints
-
-from compas_robots import Configuration
-from compas_robots.model import Joint
-
+import pytest
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas.tolerance import TOL
+from compas_robots import Configuration
+
+from compas_fab.robots import ConfigurationTarget
+from compas_fab.robots import ConstraintSetTarget
+from compas_fab.robots import FrameTarget
+from compas_fab.robots import FrameWaypoints
+from compas_fab.robots import JointConstraint
+from compas_fab.robots import OrientationConstraint
+from compas_fab.robots import PointAxisTarget
+from compas_fab.robots import PointAxisWaypoints
+from compas_fab.robots import PositionConstraint
+from compas_fab.robots import TargetMode
 
 
 @pytest.fixture
@@ -241,7 +238,7 @@ def test_serialization_frame_waypoints(frame_waypoints):
     assert frame_waypoints.name == nt.name
 
 
-def test_serialization_frame_waypoints(point_axis_waypoints):
+def test_serialization_point_axis_waypoints(point_axis_waypoints):
     # PointAxisWaypoints
     nt = PointAxisWaypoints.__from_data__(point_axis_waypoints.__data__)
     for (p1, a1), (p2, a2) in zip(point_axis_waypoints.target_points_and_axes, nt.target_points_and_axes):

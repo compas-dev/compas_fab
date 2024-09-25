@@ -7,11 +7,16 @@ from math import pi
 from math import sin
 from math import sqrt
 
+from compas import IPY
 from compas.geometry import Frame
 
 from compas_fab.utilities import sign
 
-from typing import List
+if IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import List  # noqa: F401
 
 
 def forward_kinematics_offset_wrist(joint_values, params):

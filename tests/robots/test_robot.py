@@ -6,13 +6,11 @@ from compas.data import json_dumps
 from compas.data import json_loads
 from compas.datastructures import Mesh
 from compas.geometry import Frame
-from compas.tolerance import Tolerance
 from compas_robots import RobotModel
 
 import compas_fab
 from compas_fab.backends.interfaces import ClientInterface
 from compas_fab.backends.interfaces import InverseKinematics
-from compas_fab.backends.interfaces import PlannerInterface
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotLibrary
 from compas_fab.robots import RobotSemantics

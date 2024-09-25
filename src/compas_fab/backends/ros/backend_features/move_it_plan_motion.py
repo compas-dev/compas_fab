@@ -111,7 +111,7 @@ class MoveItPlanMotion(PlanMotion):
         # Housekeeping for intellisense
         planner = self  # type: MoveItPlanner
         client = planner.client  # type: RosClient
-        robot = client.robot  # type: Robot
+        robot = client.robot  # type: Robot # noqa: F841
 
         joints = options["joints"]
         header = Header(frame_id=options["base_link"])

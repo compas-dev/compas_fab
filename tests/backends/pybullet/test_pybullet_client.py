@@ -1,13 +1,11 @@
-import compas_fab
 import pytest
-
-from compas_fab.backends import PyBulletClient
 from compas_robots import RobotModel
+
+import compas_fab
+from compas_fab.backends import PyBulletClient
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotLibrary
-
-from compas_robots.resources import LocalPackageMeshLoader
 
 
 def test_pybullet_client_connection_direct():
@@ -124,8 +122,8 @@ def test_pybullet_client_internal_puids():
         robot = client.set_robot(robot)
 
         # Check that all links and joints are loaded
-        link_names_in_model = [l.name for l in robot.model.iter_links()]
-        joint_names_in_model = [j.name for j in robot.model.iter_joints()]
+        link_names_in_model = [link.name for link in robot.model.iter_links()]
+        joint_names_in_model = [joint.name for joint in robot.model.iter_joints()]
         assert set(link_names_in_model) == set(client.robot_link_puids.keys())
         assert set(joint_names_in_model) == set(client.robot_joint_puids.keys())
         assert len(client.robot_link_puids) == len(client.robot_joint_puids) + 1
@@ -155,8 +153,8 @@ def test_pybullet_client_internal_puids_abb():
         robot = client.set_robot(robot)
 
         # Check that all links and joints are loaded
-        link_names_in_model = [l.name for l in robot.model.iter_links()]
-        joint_names_in_model = [j.name for j in robot.model.iter_joints()]
+        link_names_in_model = [link.name for link in robot.model.iter_links()]
+        joint_names_in_model = [joint.name for joint in robot.model.iter_joints()]
         assert set(link_names_in_model) == set(client.robot_link_puids.keys())
         assert set(joint_names_in_model) == set(client.robot_joint_puids.keys())
         assert len(client.robot_link_puids) == len(client.robot_joint_puids) + 1
@@ -188,9 +186,9 @@ def test_pybullet_client_link_names():
         print("Name:{}, Parent:{}, Child:{}".format(joint.name, joint.parent.link, joint.child.link))
 
     print("Links in Model:")
-    print([l.name for l in robot.model.links])
+    print([link.name for link in robot.model.links])
     print("Joints in Model:")
-    print([l.name for l in robot.model.joints])
+    print([link.name for link in robot.model.joints])
     print("Base Link in Model:")
     print(robot.model.get_base_link_name())
     print("Link name in Robot with main group:")

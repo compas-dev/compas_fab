@@ -107,7 +107,24 @@ the :ref:`architecture` documentation.
 import compas
 
 # Base imports
-from .exceptions import *
+from .exceptions import (
+    BackendError,
+    BackendFeatureNotSupportedError,
+    BackendTargetNotSupportedError,
+    TargetModeMismatchError,
+    PlanningGroupNotExistsError,
+    InverseKinematicsError,
+    KinematicsError,
+    CollisionCheckError,
+    MotionPlanningError,
+    MPStartStateInCollisionError,
+    MPTargetInCollisionError,
+    MPInterpolationInCollisionError,
+    MPSearchTimeOutError,
+    MPNoIKSolutionError,
+    MPNoPlanFoundError,
+    MPMaxJumpError,
+)
 
 from .tasks import (
     FutureResult,
@@ -123,8 +140,9 @@ from .ros import (
     MoveItPlanner,
 )
 
-# Analytic IK
+# Kinematics imports
 from .kinematics import (
+    # Kinematics - Analytic IK
     AnalyticalInverseKinematics,
     AnalyticalPlanCartesianMotion,
     AnalyticalPyBulletPlanner,
@@ -132,10 +150,7 @@ from .kinematics import (
     OffsetWristKinematics,
     SphericalWristKinematics,
     CartesianMotionError,
-)
-
-# Robot-specific analytic IK
-from .kinematics import (
+    # Kinematics - Robot-specific analytic IK
     UR3Kinematics,
     UR3eKinematics,
     UR5Kinematics,
@@ -146,8 +161,9 @@ from .kinematics import (
     ABB_IRB4600_40_255Kinematics,
 )
 
+# NOTE: IPY guard because PyBullet do not work in IronPython
+# PyBullet imports
 if not compas.IPY:
-    # PyBullet do not work in IronPython
     from .pybullet import (
         PyBulletClient,
         PyBulletError,
@@ -156,45 +172,58 @@ if not compas.IPY:
         PlanningGroupNotSupported,
     )
 
-# __all__ = [
-#     # Base
-#     "BackendError",
-#     "BackendFeatureNotSupportedError",
-#     "InverseKinematicsError",
-#     "KinematicsError",
-#     "CollisionCheckError",
-#     "FutureResult",
-#     "CancellableFutureResult",
-#     "MPMaxJumpError",
-#     # ROS
-#     "RosClient",
-#     "RosError",
-#     "RosValidationError",
-#     "RosFileServerLoader",
-#     "MoveItPlanner",
-#     # Analytic IK
-#     "AnalyticalInverseKinematics",
-#     "AnalyticalPlanCartesianMotion",
-#     "AnalyticalPyBulletPlanner",
-#     "AnalyticalKinematicsPlanner",
-#     "OffsetWristKinematics",
-#     "SphericalWristKinematics",
-#     "CartesianMotionError",
-#     # Robot-specific analytic IK
-#     "UR3Kinematics",
-#     "UR3eKinematics",
-#     "UR5Kinematics",
-#     "UR5eKinematics",
-#     "UR10Kinematics",
-#     "UR10eKinematics",
-#     "Staubli_TX260LKinematics",
-#     "ABB_IRB4600_40_255Kinematics",
-# ]
+__all__ = [
+    # Exceptions
+    "BackendError",
+    "BackendFeatureNotSupportedError",
+    "BackendTargetNotSupportedError",
+    "TargetModeMismatchError",
+    "PlanningGroupNotExistsError",
+    "InverseKinematicsError",
+    "KinematicsError",
+    "CollisionCheckError",
+    "MotionPlanningError",
+    "MPStartStateInCollisionError",
+    "MPTargetInCollisionError",
+    "MPInterpolationInCollisionError",
+    "MPSearchTimeOutError",
+    "MPNoIKSolutionError",
+    "MPNoPlanFoundError",
+    "MPMaxJumpError",
+    # Tasks
+    "FutureResult",
+    "CancellableFutureResult",
+    # ROS
+    "RosClient",
+    "RosError",
+    "RosValidationError",
+    "RosFileServerLoader",
+    "MoveItPlanner",
+    # Kinematics
+    "AnalyticalInverseKinematics",
+    "AnalyticalPlanCartesianMotion",
+    "AnalyticalPyBulletPlanner",
+    "AnalyticalKinematicsPlanner",
+    "OffsetWristKinematics",
+    "SphericalWristKinematics",
+    "CartesianMotionError",
+    # Kinematics - Robot-specific analytic IK
+    "UR3Kinematics",
+    "UR3eKinematics",
+    "UR5Kinematics",
+    "UR5eKinematics",
+    "UR10Kinematics",
+    "UR10eKinematics",
+    "Staubli_TX260LKinematics",
+    "ABB_IRB4600_40_255Kinematics",
+]
 
-# if not compas.IPY:
-#     __all__ += [
-#         "PyBulletClient",
-#         "PyBulletError",
-#         "PyBulletPlanner",
-#         "AnalyticalPyBulletClient",
-#     ]
+# PyBullet
+if not compas.IPY:
+    __all__ += [
+        "PyBulletClient",
+        "PyBulletError",
+        "PyBulletPlanner",
+        "AnalyticalPyBulletClient",
+        "PlanningGroupNotSupported",
+    ]

@@ -12,16 +12,14 @@ if not compas.IPY:
         from compas_fab.robots import Robot  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
         from typing import Generator  # noqa: F401
-        from typing import Dict, List, Optional, Tuple  # noqa: F401
+        from compas_robots import Configuration  # noqa: F401
+        from typing import Dict  # noqa: F401
+        from typing import Optional  # noqa: F401
         from compas_fab.backends import PyBulletClient  # noqa: F401
 
-from compas_robots import Configuration
 
 from compas_fab.backends import CollisionCheckError
 from compas_fab.robots import FrameTarget
-
-from ..utils import joint_angles_to_configurations
-from ..utils import try_to_fit_configurations_between_bounds
 
 
 class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
@@ -73,7 +71,7 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
 
         options = options or {}
         planner = self  # type: AnalyticalPyBulletPlanner
-        robot = planner.client.robot_cell.robot  # type: Robot
+        robot = planner.client.robot_cell.robot  # type: Robot  # noqa: F841
         client = self.client  # type: PyBulletClient
 
         # Set robot cell state to start state if provided
@@ -102,7 +100,7 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
                     client.set_robot_configuration(configuration)
                     # Passing the `_skip_set_robot_cell_state` option to the collision check function
                     planner.check_collision(None, options={"_skip_set_robot_cell_state": True})
-                except CollisionCheckError as e:
+                except CollisionCheckError:
                     # If keep order is true, yield a None to keep the order of the solutions
                     if options.get("keep_order", True):
                         yield None

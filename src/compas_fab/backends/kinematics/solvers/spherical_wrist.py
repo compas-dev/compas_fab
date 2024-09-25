@@ -3,13 +3,12 @@ import math
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Rotation
-from compas.geometry import Sphere
 from compas.geometry import Vector
 from compas.geometry import intersection_plane_circle
 from compas.geometry import intersection_sphere_sphere
 from compas.geometry import tangent_points_to_circle_xy
 
-from typing import List
+from typing import List  # noqa: F401
 
 # TODO: This is very slow...
 # can this be improved? for example https://github.com/visose/Robots/blob/master/Robots/Kinematics.cs

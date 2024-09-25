@@ -9,11 +9,9 @@ if not compas.IPY:
 
     if TYPE_CHECKING:
         from compas_robots import Configuration  # noqa: F401
-        from compas.geometry import Frame  # noqa: F401
         from typing import Optional  # noqa: F401
         from typing import Generator  # noqa: F401
         from typing import List  # noqa: F401
-        from typing import Tuple  # noqa: F401
         from typing import Dict  # noqa: F401
 
         from compas_fab.robots import RobotCellState  # noqa: F401
@@ -22,30 +20,25 @@ if not compas.IPY:
         from compas_fab.backends import PyBulletClient  # noqa: F401
         from compas_fab.backends import PyBulletPlanner  # noqa: F401
 
-
 import math
-import random
 from copy import deepcopy
-
-from compas.tolerance import TOL
-from compas_robots.model import Joint
 
 from compas.geometry import Frame
 from compas.geometry import Quaternion
-from compas.geometry import is_parallel_vector_vector
 from compas.geometry import axis_angle_from_quaternion
-from compas_fab.backends.exceptions import InverseKinematicsError
+from compas.geometry import is_parallel_vector_vector
+from compas.tolerance import TOL
+from compas_robots.model import Joint
+
 from compas_fab.backends.exceptions import CollisionCheckError
+from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.exceptions import PlanningGroupNotExistsError
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.pybullet.conversions import pose_from_frame
 from compas_fab.backends.pybullet.exceptions import PlanningGroupNotSupported
-from compas_fab.utilities import LazyLoader
-from compas_fab.utilities import from_tcf_to_t0cf
-
 from compas_fab.robots import FrameTarget
-from compas_fab.robots import TargetMode
 from compas_fab.robots import PointAxisTarget
+from compas_fab.utilities import LazyLoader
 
 pybullet = LazyLoader("pybullet", globals(), "pybullet")
 
@@ -314,7 +307,6 @@ class PyBulletInverseKinematics(InverseKinematics):
         joint_names_and_puids = client.get_pose_joint_names_and_puids()
         joint_names_sorted = [joint_name for joint_name, _ in joint_names_and_puids]
         joint_ids_sorted = [joint_puid for _, joint_puid in joint_names_and_puids]
-        joint_types_sorted = [robot.get_joint_by_name(joint_name).type for joint_name in joint_names_sorted]
 
         # Prepare `rest_poses` input
         # Rest pose is PyBullet's way of defining the initial guess for the IK solver
@@ -329,7 +321,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Get joint limits in the same order as the joint_ids
         lower_limits = []
         upper_limits = []
-        for joint_name, joint_puid in joint_names_and_puids:
+        for joint_name in joint_names_sorted:
             joint = robot.get_joint_by_name(joint_name)
             lower_limits.append(joint.limit.lower if joint.type != Joint.CONTINUOUS else 0)
             upper_limits.append(joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi)

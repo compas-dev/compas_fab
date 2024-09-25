@@ -3,35 +3,33 @@ from __future__ import division
 from __future__ import print_function
 
 import compas
-import compas_fab
+from compas.datastructures import Mesh
+from compas.geometry import Box
+from compas.geometry import Cone
+from compas.geometry import Frame
+from compas_robots import ToolModel
 
+import compas_fab
+from compas_fab.robots import RigidBody
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
-from compas_fab.robots import RigidBody
-from compas_robots import ToolModel
-from compas.geometry import Frame
-from compas.geometry import Cone
-from compas.geometry import Box
-from compas.datastructures import Mesh
-
 
 if not compas.IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
         from typing import Optional  # noqa: F401
-        from typing import Dict
-        from typing import List
-        from typing import Tuple
+        from typing import Tuple  # noqa: F401
+
         from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
 
 
 __all__ = [
-    "RobotLibrary",
-    "ToolLibrary",
-    "RobotCellLibrary",
     "RigidBodyLibrary",
+    "RobotLibrary",
+    "RobotCellLibrary",
+    "ToolLibrary",
 ]
 
 
@@ -788,6 +786,9 @@ class RigidBodyLibrary(object):
 
 
 if __name__ == "__main__":
+
+    # TODO: Clean up the development code below
+
     # robot = RobotLibrary.rfl(load_geometry=True)
     # robot.info()
 
@@ -802,8 +803,8 @@ if __name__ == "__main__":
     # Visualize Tool with compas_viewer
     # ----------------------------
 
+    from compas_robots.viewer.scene.robotmodelobject import RobotModelObject  # noqa: F401
     from compas_viewer import Viewer
-    from compas_robots.viewer.scene.robotmodelobject import RobotModelObject
 
     viewer = Viewer()
     viewer.renderer.rendermode = "lighted"

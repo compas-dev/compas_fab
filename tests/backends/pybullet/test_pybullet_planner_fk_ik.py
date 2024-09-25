@@ -1,36 +1,33 @@
-import pytest
+from copy import deepcopy
 
 import compas
-from copy import deepcopy
+import pytest
 
 if not compas.IPY:
     from compas_fab.backends import PyBulletClient
     from compas_fab.backends import PyBulletPlanner
 
+from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Vector
-from compas.geometry import Frame
-from compas.geometry import matrix_from_frame
 from compas.geometry import axis_and_angle_from_matrix
+from compas.geometry import matrix_from_frame
+from compas_robots import Configuration
+from compas_robots.model import Joint
 
-from compas.tolerance import Tolerance
-from compas_fab.robots import Robot
-from compas_fab.robots import RobotLibrary
+from compas_fab.backends import CollisionCheckError
+from compas_fab.backends import InverseKinematicsError
+from compas_fab.backends import PlanningGroupNotExistsError
+from compas_fab.backends import PlanningGroupNotSupported
+from compas_fab.backends import TargetModeMismatchError
 from compas_fab.robots import FrameTarget
+from compas_fab.robots import PointAxisTarget
+from compas_fab.robots import Robot  # noqa: F401
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RobotCellState
+from compas_fab.robots import RobotLibrary
 from compas_fab.robots import TargetMode
-from compas_fab.robots import PointAxisTarget
-from compas_robots.model import Joint
-
-from compas_robots import Configuration
-
-from compas_fab.backends import InverseKinematicsError
-from compas_fab.backends import PlanningGroupNotSupported
-from compas_fab.backends import CollisionCheckError
-from compas_fab.backends import TargetModeMismatchError
-from compas_fab.backends import PlanningGroupNotExistsError
 
 
 @pytest.fixture

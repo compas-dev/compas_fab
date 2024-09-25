@@ -1,18 +1,26 @@
-import compas
+from compas import IPY
+
 from compas_fab.backends.interfaces.planner import PlannerInterface
+from compas_fab.backends.kinematics.backend_features import AnalyticalForwardKinematics
+from compas_fab.backends.kinematics.backend_features import AnalyticalInverseKinematics
+from compas_fab.backends.kinematics.backend_features import AnalyticalPlanCartesianMotion
+from compas_fab.backends.kinematics.backend_features import AnalyticalPybulletInverseKinematics
+from compas_fab.backends.kinematics.backend_features import AnalyticalSetRobotCell
+from compas_fab.backends.kinematics.backend_features import AnalyticalSetRobotCellState
+from compas_fab.backends.kinematics.client import AnalyticalKinematicsClient
+from compas_fab.backends.pybullet.backend_features import PyBulletCheckCollision
+from compas_fab.backends.pybullet.backend_features import PyBulletForwardKinematics
+from compas_fab.backends.pybullet.backend_features import PyBulletSetRobotCell
+from compas_fab.backends.pybullet.backend_features import PyBulletSetRobotCellState
 
-from compas_fab.backends.pybullet.backend_features import *
-from compas_fab.backends.kinematics.backend_features import *
-from compas_fab.backends.kinematics.solvers import *
-
-from compas_fab.backends.kinematics.client import AnalyticalKinematicsClient  # noqa: F401
-from compas_fab.backends.pybullet.client import PyBulletClient  # noqa: F401
-
-if compas.IPY:
+if IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
-        from typing import Optional
+        from typing import Optional  # noqa: F401
+
+        from compas_fab.backends.kinematics.solvers import AnalyticalKinematics  # noqa: F401
+        from compas_fab.backends.pybullet.client import PyBulletClient  # noqa: F401
 
 __all__ = [
     "AnalyticalPyBulletPlanner",

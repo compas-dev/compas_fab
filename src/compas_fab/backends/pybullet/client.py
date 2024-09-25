@@ -9,52 +9,45 @@ import tempfile
 
 import compas
 from compas.colors import Color
-
-from compas.geometry import Frame
 from compas.datastructures import Mesh
-from compas_robots import RobotModel
+from compas.geometry import Frame
 from compas_robots.files import URDF
-from compas_robots.model import MeshDescriptor
-from compas_robots import ToolModel
-from compas_robots.model import Inertial
 from compas_robots.model import Inertia
+from compas_robots.model import Inertial
 from compas_robots.model import Mass
 from compas_robots.model import Material
+from compas_robots.model import MeshDescriptor
 
 from compas_fab.backends import CollisionCheckError
 from compas_fab.backends.interfaces.client import ClientInterface
-
-from compas_fab.robots import Robot
-from compas_fab.robots import RobotLibrary
-from compas_fab.robots import RobotSemantics
-from compas_fab.robots import RobotCell
-from compas_fab.robots import RobotCellState
 from compas_fab.utilities import LazyLoader
 
 from . import const
 from .conversions import frame_from_pose
 from .conversions import pose_from_frame
-from .utils import LOG
 from .utils import redirect_stdout
-
 
 if not compas.IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
         from typing import List  # noqa: F401
-        from typing import Tuple  # noqa: F401
         from typing import Optional  # noqa: F401
-        from compas_robots import Configuration  # noqa: F401
-        from compas_robots.resources import AbstractMeshLoader  # noqa: F401
-        from compas_fab.robots import RigidBody  # noqa: F401
-        from compas_robots.model import Mimic
-
-        from compas_fab.backends.kinematics import AnalyticalInverseKinematics  # noqa: F401
-        from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion  # noqa: F401
+        from typing import Tuple  # noqa: F401
 
         # Load pybullet for type hinting
         import pybullet
+        from compas_robots import Configuration  # noqa: F401
+        from compas_robots import ToolModel  # noqa: F401
+        from compas_robots.model import Mimic  # noqa: F401
+
+        from compas_fab.backends.kinematics import AnalyticalInverseKinematics  # noqa: F401
+        from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion  # noqa: F401
+        from compas_fab.robots import RigidBody  # noqa: F401
+        from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
+
 
 # If Pybullet is not defined, load it from LazyLoader
 if "pybullet" not in sys.modules:
@@ -219,7 +212,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.disabled_collisions = set()
         self._cache_dir = None
 
-    # The following properties are overloaded here to provide Pybullet specific docstrings
+    # The following properties are overloaded here to provide Pybullet specific docstring
     @property
     def robot_cell(self):
         # type: () -> RobotCell
@@ -372,12 +365,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         # NOTE: Rigid bodies can have multiple meshes in them, at the moment we join them together as a single mesh
         #       If there are problems with this, we can change it to exporting individual obj files per mesh to Pybullet
 
-        # def meshes_to_exported_obj(meshes, temp_file_suffix):
-        #     mesh = Mesh()
-        #     for m in meshes:
-        #         mesh.join(m, precision=12)
-        #     mesh.to_obj(filename)
-
         # Visual Meshes
         if rigid_body.visual_meshes is None or rigid_body.visual_meshes == []:
             visual_path = None
@@ -521,6 +508,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                     fp = self._handle_concavity(fp, self._cache_dir.name, concavity, 1, str(joined_mesh.guid))
                     shape.filename = fp
 
+            # NOTE: PyBullet requires an inertial object to be present in each link or it prints ugly blue warning messages.
+            # We are fine filling some default values for the inertial object because we don't use the dynamics in PyBullet.
             if link.inertial is None:
                 link.inertial = self.pybullet_empty_inertial()
 
@@ -539,8 +528,13 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return urdf_filepath
 
     def pybullet_empty_inertial(self):
+        # type: () -> Inertial
+        """Create an empty inertial object.
+        Useful for virtual links in URDF that does not have mass or inertial information.
+        However, PyBullet requires an inertial object to be present in each link or it prints ugly blue warning messages.
+        """
         origin = Frame.worldXY()
-        mass = Mass(0.0)
+        mass = Mass(const.STATIC_MASS)
         inertia = Inertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
         inertial = Inertial(origin, mass, inertia)
         return inertial

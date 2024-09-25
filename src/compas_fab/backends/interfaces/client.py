@@ -4,14 +4,14 @@ from __future__ import print_function
 
 import compas
 
-from compas_fab.robots import RobotCell
-from compas_fab.robots import RobotCellState
 
 if compas.IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
-        from compas_fab.robots import Robot
+        from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
 
 
 class ClientInterface(object):

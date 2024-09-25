@@ -1,4 +1,3 @@
-from .analytical_kinematics import AnalyticalKinematics  # noqa: F403
 from .spherical_wrist_kinematics import *  # noqa: F403
 from .offset_wrist_kinematics import *  # noqa: F403
 

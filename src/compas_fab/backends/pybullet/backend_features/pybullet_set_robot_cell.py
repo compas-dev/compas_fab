@@ -1,8 +1,7 @@
 from compas_fab.backends.interfaces import SetRobotCell
 
 import compas
-from compas.geometry import Frame
-from compas_fab.robots import RobotCell
+
 
 if not compas.IPY:
     from typing import TYPE_CHECKING
@@ -10,17 +9,10 @@ if not compas.IPY:
     if TYPE_CHECKING:
         from typing import Optional  # noqa: F401
         from typing import Dict  # noqa: F401
-        from typing import List  # noqa: F401
-        from typing import Tuple  # noqa: F401
 
-        from compas_fab.robots import Robot  # noqa: F401
-        from compas_robots import Configuration  # noqa: F401
-        from compas.geometry import Frame  # noqa: F401
-        from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.backends import PyBulletClient  # noqa: F401
-
-from compas_fab.backends.pybullet.const import STATIC_MASS
 
 
 class PyBulletSetRobotCell(SetRobotCell):
@@ -36,10 +28,9 @@ class PyBulletSetRobotCell(SetRobotCell):
         """
         client = self.client  # type: PyBulletClient
 
-        previous_robot_cell = client.robot_cell or RobotCell()
-
         # TODO: Check for new, modified and removed objects compared to the
         # TODO: previous robot cell state and update the PyBullet world accordingly
+        # previous_robot_cell = client.robot_cell or RobotCell()
 
         # At the moment, all previous object in the PyBullet world are removed
         # and the new robot cell is added to the PyBullet world

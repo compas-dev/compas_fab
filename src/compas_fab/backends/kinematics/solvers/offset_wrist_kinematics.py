@@ -1,9 +1,16 @@
+from compas import IPY
+
 from .analytical_kinematics import AnalyticalKinematics
 from .offset_wrist import forward_kinematics_offset_wrist
 from .offset_wrist import inverse_kinematics_offset_wrist
 
-from typing import List
-from compas.geometry import Frame
+if IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import List  # noqa: F401
+
+        from compas.geometry import Frame  # noqa: F401
 
 # The following parameters for UR robots are taken from the following website:
 # https://www.universal-robots.com/articles/ur/application-installation/dh-parameters-for-calculations-of-kinematics-and-dynamics/

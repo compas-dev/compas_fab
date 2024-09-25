@@ -2,14 +2,20 @@
 
 import math
 
+import compas
 from compas.geometry import Point
 
 from .analytical_kinematics import AnalyticalKinematics
 from .spherical_wrist import forward_kinematics_spherical_wrist
 from .spherical_wrist import inverse_kinematics_spherical_wrist
 
-from typing import List
-from compas.geometry import Frame
+if compas.IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import List  # noqa: F401
+
+        from compas.geometry import Frame  # noqa: F401
 
 
 class SphericalWristKinematics(AnalyticalKinematics):

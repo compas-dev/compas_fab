@@ -2,14 +2,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas_fab.robots import Waypoints
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import PointAxisWaypoints
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import PointAxisTarget
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
-from compas_fab.robots import TargetMode
 from compas_robots.model import Joint
 
 from math import pi
@@ -42,6 +40,7 @@ if compas.IPY:
         from compas_fab.backends import PyBulletPlanner  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import Waypoints  # noqa: F401
         from compas_robots import Configuration  # noqa: F401
         from compas.geometry import Frame  # noqa: F401
         from compas.geometry import Point  # noqa: F401
@@ -353,7 +352,8 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         # This frame reference need to match with the target_mode of the waypoints
         start_frame = planner.forward_kinematics(start_state, waypoints.target_mode, group=group, options=fk_options)
-        print("Reconstructed Start Frame:", start_frame)
+        if options["verbose"]:
+            print("Reconstructed Start Frame:", start_frame)
 
         starting_target = PointAxisTarget(
             start_frame.point,
@@ -391,8 +391,8 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                 )
                 all_targets.append(target)
 
-            # if options["verbose"]:
-            print("Interpolation: {} steps towards Waypoint {}".format(steps, i))
+            if options["verbose"]:
+                print("Interpolation: {} steps towards Waypoint {}".format(steps, i))
 
         def _build_return_trajectory(configurations):
             # Create the trajectory
@@ -432,8 +432,8 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                 )
                 ik_generators.append(ik_generator)
                 ik_option_indices.append(-1)
-
-                print("DFS Step: {} of {}. Created IK Generator".format(current_step, len(all_targets) - 1))
+                if options["verbose"]:
+                    print("DFS Step: {} of {}. Created IK Generator".format(current_step, len(all_targets) - 1))
 
             # Check if the IK generator (of current step) has any more options
             try:
@@ -446,8 +446,9 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                 ik_option_indices[-1] += 1
                 # In order to save searching time, we perform a more comprehensive check here to determine if this
                 # target is completely unreachable even with random starting configurations.
-                if not current_step in comprehensively_checked:
-                    print("Performing comprehensive IK check for step {}".format(current_step))
+                if current_step not in comprehensively_checked:
+                    if options["verbose"]:
+                        print("Performing comprehensive IK check for step {}".format(current_step))
                     checking_ik_options = deepcopy(ik_options)
                     checking_ik_options["max_random_restart"] = 10
                     checking_ik_generator = planner.iter_inverse_kinematics_point_axis_target(
@@ -474,19 +475,22 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                         options,
                     )
                     within_max_jump = True
-                except MPMaxJumpError as e:
+                except MPMaxJumpError:
                     within_max_jump = False
-                    print("Step: {} Option {} violated max_jump".format(current_step, ik_option_indices[-1]))
+                    if options["verbose"]:
+                        print("Step: {} Option {} violated max_jump".format(current_step, ik_option_indices[-1]))
 
             # If valid IK solution found, proceed to the next step
             if ik_result is not None and within_max_jump:
 
-                print("Step: {} Option {} is valid".format(current_step, ik_option_indices[-1]))
+                if options["verbose"]:
+                    print("Step: {} Option {} is valid".format(current_step, ik_option_indices[-1]))
                 planned_configurations.append(ik_result)
 
                 # If this is the last step, the search is complete
                 if len(planned_configurations) == len(all_targets):
-                    print(f"Search is complete. Returning {len(planned_configurations)} configurations")
+                    if options["verbose"]:
+                        print(f"Search is complete. Returning {len(planned_configurations)} configurations")
                     break
 
                 # If this is the longest trajectory found, save it
@@ -498,15 +502,18 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
             # If no more options and at the current step, backtrack
             else:
-                print("Search Exhausted in Step:{} after {} ik options".format(current_step, ik_option_indices[-1]))
+                if options["verbose"]:
+                    print("Search Exhausted in Step:{} after {} ik options".format(current_step, ik_option_indices[-1]))
 
                 current_step -= 1
                 # Stop condition is when the current step is less than 0
                 if current_step < 0:
-                    print("Search Failed")
                     message = "No trajectory found for {} interpolated points. The longest planned trajectory covered {} points.".format(
                         len(all_targets), len(longest_list_of_planned_configurations)
                     )
+                    if options["verbose"]:
+                        print("Search Failed")
+                        print(message)
                     longest_trajectory = _build_return_trajectory(longest_list_of_planned_configurations)
                     raise MPNoPlanFoundError(message, longest_trajectory)
                 # When backtracking, remove the last planned configuration and the exhausted generator

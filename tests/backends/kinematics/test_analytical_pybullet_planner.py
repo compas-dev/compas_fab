@@ -1,24 +1,19 @@
+import compas
 import pytest
 
-import compas
-from compas.geometry import Frame
-from compas_robots import Configuration
-
 import compas_fab
-from compas_fab.backends import AnalyticalKinematicsPlanner
 from compas_fab.backends import UR5Kinematics
-from compas_fab.robots import Tool
+from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCellLibrary
-from compas_fab.robots import RobotLibrary
-from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import TargetMode
-from compas_fab.robots import FrameTarget
-
 
 if not compas.IPY:
-    from compas_fab.backends import AnalyticalPyBulletPlanner
     from compas_fab.backends import AnalyticalPyBulletClient
+    from compas_fab.backends import AnalyticalPyBulletPlanner
+
+    from typing import Dict  # noqa: F401
+    from typing import Optional  # noqa: F401
 
 urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
 srdf_filename = compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf")
