@@ -19,7 +19,7 @@ jobs:
           python-version: '3.9'
       - name: Set up docker containers
         run: |
-          docker-compose -f "tests/integration_setup/docker-compose.yml" up -d --build
+          docker compose -f "tests/integration_setup/docker-compose.yml" up -d --build
           docker ps -a
       - name: Install dependencies
         run: |
@@ -34,4 +34,4 @@ jobs:
           pytest docs
       - name: Tear down docker containers
         run: |
-          docker-compose -f "tests/integration_setup/docker-compose.yml" down
+          docker compose -f "tests/integration_setup/docker-compose.yml" down
