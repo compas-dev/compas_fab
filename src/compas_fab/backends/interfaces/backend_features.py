@@ -2,29 +2,24 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas
-
+from compas import IPY
 from compas_robots import Configuration
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
-        from typing import Optional  # noqa: F401
         from typing import Dict  # noqa: F401
         from typing import List  # noqa: F401
-        from typing import Tuple  # noqa: F401
-
-        from compas_fab.robots import Robot  # noqa: F401
+        from typing import Optional  # noqa: F401
 
         from compas.geometry import Frame  # noqa: F401
-        from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
+
+        from compas_fab.robots import Robot  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import FrameTarget  # noqa: F401
-        from compas_fab.robots import TargetMode  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
-        from compas_fab.robots import Waypoints  # noqa: F401
+        from compas_fab.robots import TargetMode  # noqa: F401
 
 
 class BackendFeature(object):

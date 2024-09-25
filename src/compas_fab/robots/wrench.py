@@ -2,21 +2,22 @@ from __future__ import print_function
 
 import math
 
-import compas
+from compas import IPY
 from compas.data import Data
 from compas.geometry import Vector
 from compas.geometry import cross_vectors
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
         from typing import List  # noqa: F401
-        from compas.geometry import Transformation  # noqa: F401
+
         from compas.geometry import Frame  # noqa: F401
         from compas.geometry import Point  # noqa: F401
+        from compas.geometry import Transformation  # noqa: F401
 
-if not compas.IPY:
+if not IPY:
     from scipy import stats
 else:
     stats = None

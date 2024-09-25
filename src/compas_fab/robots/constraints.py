@@ -2,8 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas
-
+from compas import IPY
 from compas.data import Data
 from compas.geometry import Rotation
 from compas.geometry import Scale
@@ -11,12 +10,13 @@ from compas.geometry import Sphere
 
 from compas_fab.utilities import from_tcf_to_t0cf
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
         from typing import Optional  # noqa: F401
         from typing import Union  # noqa: F401
+
         from compas.datastructures import Mesh  # noqa: F401
         from compas.geometry import Box  # noqa: F401
         from compas.geometry import Frame  # noqa: F401

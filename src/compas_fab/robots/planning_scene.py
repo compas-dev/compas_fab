@@ -2,14 +2,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas
+from compas import IPY
 
 from compas.data import Data
 from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Scale
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

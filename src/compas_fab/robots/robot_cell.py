@@ -1,4 +1,4 @@
-import compas
+from compas import IPY
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Transformation
@@ -7,7 +7,7 @@ from compas_robots import ToolModel
 from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots import Robot
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

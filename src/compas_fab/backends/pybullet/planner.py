@@ -1,4 +1,4 @@
-import compas
+from compas import IPY
 
 from compas_fab.backends.interfaces.planner import PlannerInterface
 from compas_fab.backends.pybullet.backend_features import PyBulletCheckCollision
@@ -8,7 +8,7 @@ from compas_fab.backends.pybullet.backend_features import PyBulletPlanCartesianM
 from compas_fab.backends.pybullet.backend_features import PyBulletSetRobotCell
 from compas_fab.backends.pybullet.backend_features import PyBulletSetRobotCellState
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

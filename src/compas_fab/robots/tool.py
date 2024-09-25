@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas
+from compas import IPY
 from compas.data import Data
 from compas_robots import ToolModel
 from compas_robots.model import LinkGeometry
@@ -10,7 +10,7 @@ from compas_robots.model import LinkGeometry
 from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots import CollisionMesh
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

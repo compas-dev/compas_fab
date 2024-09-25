@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas
+from compas import IPY
 from compas.datastructures import Mesh
 from compas.geometry import Box
 from compas.geometry import Cone
@@ -15,7 +15,7 @@ from compas_fab.robots import Robot
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

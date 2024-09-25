@@ -1,10 +1,10 @@
-import compas
+from compas import IPY
 from compas.geometry import Frame
 from compas.geometry import Transformation
 
 from compas_fab.backends.interfaces import SetRobotCellState
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

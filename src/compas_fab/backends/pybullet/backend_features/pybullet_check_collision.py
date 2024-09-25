@@ -1,11 +1,11 @@
 from itertools import combinations
 
-import compas
+from compas import IPY
 
 from compas_fab.backends import CollisionCheckError
 from compas_fab.backends.interfaces import CheckCollision
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

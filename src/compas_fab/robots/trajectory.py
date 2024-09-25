@@ -2,7 +2,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas
+from compas import IPY
+
 from compas.data import Data
 from compas.tolerance import TOL
 from compas_robots import Configuration
@@ -11,7 +12,7 @@ from compas_robots.configuration import FixedLengthList
 from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots.time_ import Duration
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

@@ -7,7 +7,9 @@ import os
 import sys
 import tempfile
 
-import compas
+from compas import IPY
+from compas import OSX
+from compas import WINDOWS
 from compas.colors import Color
 from compas.datastructures import Mesh
 from compas.geometry import Frame
@@ -27,7 +29,7 @@ from .conversions import frame_from_pose
 from .conversions import pose_from_frame
 from .utils import redirect_stdout
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
@@ -93,7 +95,7 @@ class PyBulletBase(object):
         # https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/examples/vrminitaur.py#L7
 
         # If connection_type is 'gui' but there is no display detected, switch to 'direct'
-        if self.connection_type == "gui" and not compas.OSX and not compas.WINDOWS and ("DISPLAY" not in os.environ):
+        if self.connection_type == "gui" and not OSX and not WINDOWS and ("DISPLAY" not in os.environ):
             self.connection_type = "direct"
             print("No display detected! Continuing without GUI.")
 

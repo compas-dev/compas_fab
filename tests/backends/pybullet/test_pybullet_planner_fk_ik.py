@@ -1,9 +1,9 @@
 from copy import deepcopy
 
-import compas
 import pytest
+from compas import IPY
 
-if not compas.IPY:
+if not IPY:
     from compas_fab.backends import PyBulletClient
     from compas_fab.backends import PyBulletPlanner
 

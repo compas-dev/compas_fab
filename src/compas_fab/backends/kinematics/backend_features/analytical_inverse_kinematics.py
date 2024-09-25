@@ -1,11 +1,10 @@
+from compas import IPY
+
 from compas_fab.backends.exceptions import BackendTargetNotSupportedError
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics
 
-import compas
-
-
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
@@ -19,10 +18,10 @@ if not compas.IPY:
         from typing import Optional  # noqa: F401
         from typing import Generator  # noqa: F401
 
+from compas_fab.robots import FrameTarget
+
 from ..utils import joint_angles_to_configurations
 from ..utils import try_to_fit_configurations_between_bounds
-
-from compas_fab.robots import FrameTarget
 
 
 class AnalyticalInverseKinematics(InverseKinematics):

@@ -1,10 +1,9 @@
 import os
-import compas
-
+from compas import IPY
 
 __all__ = ["list_files_in_directory"]
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

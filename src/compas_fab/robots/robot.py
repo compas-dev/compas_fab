@@ -3,9 +3,8 @@ from __future__ import division
 from __future__ import print_function
 
 import random
-import compas
-import compas_fab
 
+from compas import IPY
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Transformation
@@ -15,10 +14,11 @@ from compas_robots import RobotModel
 from compas_robots.model import Joint
 from compas_robots.resources import LocalPackageMeshLoader
 
+import compas_fab
 from compas_fab.robots.constraints import Constraint
 from compas_fab.utilities import from_t0cf_to_tcf
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
@@ -28,17 +28,19 @@ if not compas.IPY:
         from typing import List  # noqa: F401
         from typing import Optional  # noqa: F401
         from typing import Tuple  # noqa: F401
+
         from compas.geometry import Vector  # noqa: F401
-        from compas_fab.robots import JointTrajectory  # noqa: F401
-        from compas_fab.robots import RobotSemantics  # noqa: F401
-        from compas_fab.robots import Tool  # noqa: F401
-        from compas_fab.robots import Target  # noqa: F401
-        from compas_fab.robots import Waypoints  # noqa: F401
-        from compas_fab.robots.planning_scene import CollisionMesh  # noqa: F401
-        from compas_robots.model import Link  # noqa: F401
         from compas_robots.model import Joint  # noqa: F401, F811
+        from compas_robots.model import Link  # noqa: F401
         from compas_robots.model import Material  # noqa: F401
         from compas_robots.scene import BaseRobotModelObject  # noqa: F401
+
+        from compas_fab.robots import JointTrajectory  # noqa: F401
+        from compas_fab.robots import RobotSemantics  # noqa: F401
+        from compas_fab.robots import Target  # noqa: F401
+        from compas_fab.robots import Tool  # noqa: F401
+        from compas_fab.robots import Waypoints  # noqa: F401
+        from compas_fab.robots.planning_scene import CollisionMesh  # noqa: F401
 
 
 __all__ = [

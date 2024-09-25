@@ -1,5 +1,6 @@
 import compas
 import pytest
+from compas import IPY
 
 import compas_fab
 from compas_fab.backends import UR5Kinematics
@@ -8,12 +9,12 @@ from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import TargetMode
 
-if not compas.IPY:
-    from compas_fab.backends import AnalyticalPyBulletClient
-    from compas_fab.backends import AnalyticalPyBulletPlanner
-
+if not IPY:
     from typing import Dict  # noqa: F401
     from typing import Optional  # noqa: F401
+
+    from compas_fab.backends import AnalyticalPyBulletClient
+    from compas_fab.backends import AnalyticalPyBulletPlanner
 
 urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
 srdf_filename = compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf")

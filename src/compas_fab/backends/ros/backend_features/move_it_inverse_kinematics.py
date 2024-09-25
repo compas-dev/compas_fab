@@ -2,9 +2,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas
+from compas import IPY
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
@@ -19,10 +19,8 @@ if not compas.IPY:
         from compas_fab.robots import FrameTarget  # noqa: F401
         from compas_fab.robots import AttachedCollisionMesh  # noqa: F401
 
-
+from compas.tolerance import TOL
 from compas.utilities import await_callback
-from compas_fab.utilities import from_tcf_to_t0cf
-
 
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
@@ -39,8 +37,7 @@ from compas_fab.backends.ros.messages import PositionIKRequest
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import RosDistro
 from compas_fab.backends.ros.service_description import ServiceDescription
-
-from compas.tolerance import TOL
+from compas_fab.utilities import from_tcf_to_t0cf
 
 __all__ = [
     "MoveItInverseKinematics",

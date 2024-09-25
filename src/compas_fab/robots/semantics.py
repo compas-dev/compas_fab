@@ -2,26 +2,24 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import compas
-
+from compas import IPY
 from compas.data import Data
 from compas.files import XML
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
         from typing import Any  # noqa: F401
-        from typing import Optional  # noqa: F401
         from typing import Dict  # noqa: F401
-        from typing import Tuple  # noqa: F401
         from typing import List  # noqa: F401
+        from typing import Optional  # noqa: F401
         from typing import Set  # noqa: F401
-        from compas_robots import RobotModel  # noqa: F401
-        from compas_robots.model import Joint  # noqa: F401
+        from typing import Tuple  # noqa: F401
         from xml.etree.ElementTree import Element  # noqa: F401
 
-        from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
+        from compas_robots import RobotModel  # noqa: F401
+        from compas_robots.model import Joint  # noqa: F401
 
 __all__ = [
     "RobotSemantics",

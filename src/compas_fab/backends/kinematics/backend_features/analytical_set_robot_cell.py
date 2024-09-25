@@ -1,15 +1,15 @@
-import compas
-
 from copy import deepcopy
+
+from compas import IPY
 
 from compas_fab.backends.interfaces import SetRobotCell
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
-        from typing import Optional  # noqa: F401
         from typing import Dict  # noqa: F401
+        from typing import Optional  # noqa: F401
 
         from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401

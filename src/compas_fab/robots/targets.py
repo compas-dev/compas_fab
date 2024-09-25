@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-import compas
+from compas import IPY
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Point
@@ -8,7 +8,7 @@ from compas.geometry import Vector
 from compas.tolerance import TOL
 from compas_robots.model import Joint
 
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

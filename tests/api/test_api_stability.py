@@ -4,8 +4,8 @@ import json
 import os
 from datetime import datetime
 
-import compas
 import pytest
+from compas import IPY
 
 import compas_fab
 
@@ -40,7 +40,7 @@ def compas_fab_api():
 
 
 def compas_fab_api_filename():
-    if compas.IPY:
+    if IPY:
         filename = "compas_fab_api_ipy.json"
     else:
         filename = "compas_fab_api.json"
@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
     compas_fab_version = compas_fab.__version__
     # strip git hash from version
-    if not compas.IPY:
+    if not IPY:
         compas_fab_version = compas_fab_version[:-9]
 
     compas_fab_api = dict(  # noqa: F811

@@ -6,9 +6,9 @@ from __future__ import print_function
 
 import math
 
-import compas
+from compas import IPY
 
-if not compas.IPY:
+if not IPY:
     from typing import List  # noqa: F401
 
 __all__ = [

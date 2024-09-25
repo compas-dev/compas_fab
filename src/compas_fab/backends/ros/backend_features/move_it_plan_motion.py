@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas import IPY
 from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import PlanMotion
@@ -19,9 +20,7 @@ from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import TrajectoryConstraints
 from compas_fab.backends.ros.service_description import ServiceDescription
 
-import compas
-
-if not compas.IPY:
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:

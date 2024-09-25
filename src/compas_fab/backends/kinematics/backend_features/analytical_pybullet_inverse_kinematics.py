@@ -1,9 +1,10 @@
-import compas
+from compas import IPY
 
-from .analytical_inverse_kinematics import AnalyticalInverseKinematics
 from compas_fab.backends.exceptions import BackendTargetNotSupportedError
 
-if not compas.IPY:
+from .analytical_inverse_kinematics import AnalyticalInverseKinematics
+
+if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
@@ -16,7 +17,6 @@ if not compas.IPY:
         from typing import Dict  # noqa: F401
         from typing import Optional  # noqa: F401
         from compas_fab.backends import PyBulletClient  # noqa: F401
-
 
 from compas_fab.backends import CollisionCheckError
 from compas_fab.robots import FrameTarget

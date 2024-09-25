@@ -104,7 +104,7 @@ the :ref:`architecture` documentation.
 
 """
 
-import compas
+from compas import IPY
 
 # Base imports
 from .exceptions import (
@@ -163,7 +163,7 @@ from .kinematics import (
 
 # NOTE: IPY guard because PyBullet do not work in IronPython
 # PyBullet imports
-if not compas.IPY:
+if not IPY:
     from .pybullet import (
         PyBulletClient,
         PyBulletError,
@@ -219,7 +219,7 @@ __all__ = [
 ]
 
 # PyBullet
-if not compas.IPY:
+if not IPY:
     __all__ += [
         "PyBulletClient",
         "PyBulletError",
