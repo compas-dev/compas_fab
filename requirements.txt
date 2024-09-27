@@ -1,3 +1,4 @@
+# NOTE: Remember to also update the .github/workflows/ironpython.yml file
 compas >= 2.3, < 3
 compas_robots @ git+https://github.com/compas-dev/compas_robots@a40673d
 # compas_robots >= 0.5, < 1
