@@ -37,7 +37,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         validate_response,
     )
 
-    def plan_cartesian_motion(self, robot, waypoints, start_configuration=None, group=None, options=None):
+    def plan_cartesian_motion(self, waypoints, start_configuration=None, group=None, options=None):
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
@@ -82,12 +82,14 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
         """
+        robot = self.client.robot
+
         options = options or {}
         kwargs = {}
         kwargs["options"] = options
         kwargs["waypoints"] = waypoints
         kwargs["start_configuration"] = start_configuration
-        kwargs["group"] = group
+        kwargs["group"] = group or robot.main_group_name
 
         kwargs["errback_name"] = "errback"
 
