@@ -28,6 +28,7 @@ from compas_fab.backends.tasks import CancellableFutureResult
 from compas_fab.robots import Robot
 from compas_fab.robots import RobotSemantics
 from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
 
 __all__ = [
     "RosClient",
@@ -206,9 +207,10 @@ class RosClient(Ros, ClientInterface):
         if load_geometry:
             model.load_geometry(loader, precision=precision)
 
-        self._robot = Robot(model, semantics=semantics, client=self)
-        self._robot_cell = RobotCell(self.robot)
-        return self._robot
+        robot = Robot(model, semantics=semantics)
+        self._robot_cell = RobotCell(robot)
+        self._robot_cell_state = RobotCellState.from_robot_cell(self._robot_cell)
+        return robot
 
     # ==========================================================================
     # executing

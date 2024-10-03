@@ -22,6 +22,7 @@ ROS backend features
 
 from __future__ import absolute_import
 
+from compas_fab.backends.ros.backend_features.move_it_set_robot_cell import MoveItSetRobotCell
 from compas_fab.backends.ros.backend_features.move_it_add_attached_collision_mesh import MoveItAddAttachedCollisionMesh
 from compas_fab.backends.ros.backend_features.move_it_add_collision_mesh import MoveItAddCollisionMesh
 from compas_fab.backends.ros.backend_features.move_it_append_collision_mesh import MoveItAppendCollisionMesh
@@ -37,6 +38,7 @@ from compas_fab.backends.ros.backend_features.move_it_remove_collision_mesh impo
 from compas_fab.backends.ros.backend_features.move_it_reset_planning_scene import MoveItResetPlanningScene
 
 __all__ = [
+    "MoveItSetRobotCell",
     "MoveItAddAttachedCollisionMesh",
     "MoveItAddCollisionMesh",
     "MoveItAppendCollisionMesh",

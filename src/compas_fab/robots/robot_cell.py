@@ -197,6 +197,8 @@ class RobotCell(Data):
 
         """
         rigid_body_ids = robot_cell_state.get_attached_rigid_body_ids()
+        if not rigid_body_ids:
+            return []
         attached_collision_meshes = []
         for id in rigid_body_ids:
             rb_state = robot_cell_state.rigid_body_states[id]

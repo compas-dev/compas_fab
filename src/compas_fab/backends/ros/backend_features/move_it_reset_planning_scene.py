@@ -43,7 +43,7 @@ class MoveItResetPlanningScene(ResetPlanningScene):
         return await_callback(self.reset_planning_scene_async, **kwargs)
 
     def reset_planning_scene_async(self, callback, errback):
-        scene = self.client.get_planning_scene()
+        scene = self.get_planning_scene()
         for collision_object in scene.world.collision_objects:
             collision_object.operation = CollisionObject.REMOVE
         for collision_object in scene.robot_state.attached_collision_objects:

@@ -9,6 +9,7 @@ from __future__ import print_function
 
 from compas_fab.backends.interfaces.planner import PlannerInterface
 
+from compas_fab.backends.ros.backend_features import MoveItSetRobotCell
 from compas_fab.backends.ros.backend_features import MoveItResetPlanningScene
 from compas_fab.backends.ros.backend_features.move_it_add_attached_collision_mesh import MoveItAddAttachedCollisionMesh
 from compas_fab.backends.ros.backend_features.move_it_add_collision_mesh import MoveItAddCollisionMesh
@@ -33,13 +34,14 @@ class MoveItPlanner(
     MoveItInverseKinematics,
     MoveItPlanMotion,
     MoveItPlanCartesianMotion,
+    MoveItSetRobotCell,
     MoveItPlanningScene,
     MoveItResetPlanningScene,
     MoveItAddCollisionMesh,
-    MoveItRemoveCollisionMesh,
-    MoveItAppendCollisionMesh,
-    MoveItAddAttachedCollisionMesh,
-    MoveItRemoveAttachedCollisionMesh,
+    # MoveItRemoveCollisionMesh,
+    # MoveItAppendCollisionMesh,
+    # MoveItAddAttachedCollisionMesh,
+    # MoveItRemoveAttachedCollisionMesh,
     PlannerInterface,
 ):
     """Implement the planner backend interface based on MoveIt!"""

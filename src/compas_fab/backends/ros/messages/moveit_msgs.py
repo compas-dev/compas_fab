@@ -21,6 +21,17 @@ from compas_fab.backends.ros.messages.trajectory_msgs import MultiDOFJointTrajec
 from compas_fab.robots import AttachedCollisionMesh
 from compas_fab.robots import CollisionMesh
 
+from compas import IPY
+
+if not IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import Optional  # noqa: F401
+
+        from compas_fab.robots import RigidBody  # noqa: F401
+        from compas_fab.robots import RigidBodyState  # noqa: F401
+
 
 class CollisionObject(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/CollisionObject.html"""
@@ -69,6 +80,7 @@ class CollisionObject(ROSmsg):
 
     @classmethod
     def from_collision_mesh(cls, collision_mesh):
+        # type: (CollisionMesh) -> CollisionObject
         """Creates a collision object from a :class:`compas_fab.robots.CollisionMesh`"""
         kwargs = {}
         kwargs["header"] = Header(frame_id=collision_mesh.root_name)

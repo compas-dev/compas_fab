@@ -242,24 +242,6 @@ class PlanningScene(object):
         # type: (Robot) -> None
         self.robot = robot
 
-    @property
-    def client(self):
-        # type: () -> ClientInterface
-        """:class:`compas_fab.backends.interfaces.ClientInterface`: The backend client."""
-        return self.robot.client
-
-    def ensure_client(self):
-        # type: () -> None
-        """Ensure that the planning scene's robot has a defined client.
-
-        Raises
-        ------
-        :exc:`Exception`
-            If no client is set for planning scene's robot.
-        """
-        if not self.client:
-            raise Exception("This method is only callable once a client is assigned")
-
     def reset(self):
         # type: () -> None
         """Resets the planning scene, removing all added collision meshes."""
@@ -294,7 +276,6 @@ class PlanningScene(object):
         ...     cm = CollisionMesh(mesh, 'floor')
         ...     scene.add_collision_mesh(cm)                   # doctest: +SKIP
         """
-        self.ensure_client()
 
         collision_mesh.root_name = self.robot.root_name
 
