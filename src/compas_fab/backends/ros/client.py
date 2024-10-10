@@ -30,6 +30,7 @@ from compas_fab.robots import RobotSemantics
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 
+
 __all__ = [
     "RosClient",
 ]

@@ -42,3 +42,21 @@ with RosClient() as client:
     # If you are running ROS with UI, you should see a cone in the PyBullet world
     # and the floor should be gone
     input("Press Enter to continue...")
+
+    # =========
+    # Example 3
+    # =========
+
+    # Add the floor mesh to this robot cell
+    # The `cone` rigid body is also in the robot cell
+    robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
+
+    # Calling `set_robot_cell` again will update the robot cell in the planner
+    # Behind the scene, compas_fab will compare the new robot cell with the previous one
+    # Because the cone rigid body is identical to the previous one, the `cone` rigid body
+    # will not be sent again to the PyBullet backend. Only the `floor` rigid body will be sent.
+    result = planner.set_robot_cell(robot_cell)
+    print(result)
+
+    # If you are running ROS with UI, you should see the floor and the cone in the PyBullet world
+    input("Press Enter to continue...")
