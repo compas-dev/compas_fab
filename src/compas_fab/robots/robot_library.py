@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 from compas import IPY
+from compas import json_load
 from compas.datastructures import Mesh
 from compas.geometry import Box
 from compas.geometry import Cone
@@ -434,6 +435,43 @@ class ToolLibrary(object):
             meshes.append(Mesh.from_shape(shape).transformed(t))
             tool_model.add_link("gripper_body", visual_meshes=meshes, collision_meshes=meshes)
 
+        return tool_model
+
+    @classmethod
+    def kinematic_gripper(cls, load_geometry=True):
+        # type: (Optional[bool]) -> ToolModel
+        """Create and return a kinematic gripper ToolModel, useful for simulating a gripper with jaws.
+
+        The gripper is 0.05m (5cm) thick from base to its gripping face.
+        The tool has a total of three links representing the gripper body 'body'
+        and the two jaws `left_finger` and `right_finger`.
+
+        The gripper has two movable fingers that are 0.1m (10cm) long.
+        The fingers can be moved by changing the tool's configuration.
+        They are represented by two joints `'left_finger_joint'` and `'right_finger_joint'` each with limits [0.0, 0.025].
+        The closed state has a position [0,0], and the fingers are 0.05m (5cm) apart.
+        The open state has a position [0.025, 0.025], and the fingers are 0.1m (10cm) apart.
+
+        The tool has the same visual and collision mesh.
+        The tool's TCF is located at the tip of the gripper fingers,
+        which is a translation offset from T0CF by +0.15 along the X-axis of the T0CF.
+        The tool name is 'gripper'.
+        Bar material can be held with the gripper if the long axis of the bar matches the Z axis of the TCF.
+
+        Parameters
+        ----------
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the geometry is loaded.
+            `False` can be used to speed up the creation of the tool.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.ToolModel`
+            Newly created instance of the tool.
+        """
+
+        tool_model = json_load(compas_fab.get("tool_library/kinematic_gripper/gripper.json"))
+        assert isinstance(tool_model, ToolModel)
         return tool_model
 
 
