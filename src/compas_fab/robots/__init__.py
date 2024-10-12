@@ -126,12 +126,17 @@ from .robot import (
 )
 
 from .robot_cell import (
-    RigidBody,
-    RigidBodyState,
     RobotCell,
+)
+from .state import (
+    RigidBodyState,
     RobotCellState,
     ToolState,
 )
+from .rigid_body import (
+    RigidBody,
+)
+
 from .robot_library import (
     RigidBodyLibrary,
     RobotCellLibrary,
@@ -191,9 +196,11 @@ __all__ = [
     # Robot
     "Robot",
     # Robot Cell
-    "RigidBody",
-    "RigidBodyState",
     "RobotCell",
+    # Rigid Body
+    "RigidBody",
+    # State
+    "RigidBodyState",
     "RobotCellState",
     "ToolState",
     # Robot Library
