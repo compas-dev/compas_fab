@@ -56,6 +56,11 @@ class Pose(ROSmsg):
         qw, qx, qy, qz = frame.quaternion
         return cls(Point(*list(point)), Quaternion(qx, qy, qz, qw))
 
+    @classmethod
+    def from_transformation(cls, transformation):
+        frame = Frame.from_transformation(transformation)
+        return cls.from_frame(frame)
+
     @property
     def frame(self):
         point = [self.position.x, self.position.y, self.position.z]
