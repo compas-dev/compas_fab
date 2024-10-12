@@ -170,10 +170,13 @@ class MoveItSetRobotCell(SetRobotCell):
 
         collision_objects = []
 
+        # Step 0 filter Rigid Bodies that has no collision geometry
+        rigid_body_models = {k: v for k, v in robot_cell.rigid_body_models.items() if v.collision_meshes}
+
         # Step 1
         # Remove rigid bodies from the previous planning scene that are not in the new robot cell
         for rigid_body_id in list(planner._current_rigid_body_hashes):
-            if rigid_body_id not in robot_cell.rigid_body_models:
+            if rigid_body_id not in rigid_body_models:
                 co = CollisionObject(
                     id=rigid_body_id,
                     operation=CollisionObject.REMOVE,
@@ -187,7 +190,7 @@ class MoveItSetRobotCell(SetRobotCell):
         # Add / update rigid bodies to the planning scene
         # Skip those that are already in the planning scene
 
-        for rigid_body_id, rigid_body in robot_cell.rigid_body_models.items():
+        for rigid_body_id, rigid_body in rigid_body_models.items():
             rigid_body_hash = rigid_body.sha256()
             # Compare the hash of the rigid body with the previous one
             if rigid_body_id in planner._current_rigid_body_hashes:
