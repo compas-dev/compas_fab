@@ -3,8 +3,6 @@ from __future__ import division
 from __future__ import print_function
 
 from compas import IPY
-from compas.geometry import Frame
-from compas.geometry import Transformation
 
 from compas_fab.backends.exceptions import BackendFeatureNotSupportedError
 from compas_fab.backends.exceptions import TargetModeMismatchError

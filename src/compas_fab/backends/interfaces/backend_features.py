@@ -15,15 +15,13 @@ if not IPY:
 
         from compas.geometry import Frame  # noqa: F401
 
+        from compas_fab.robots import JointTrajectory  # noqa: F401
         from compas_fab.robots import Robot  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
         from compas_fab.robots import TargetMode  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Waypoints  # noqa: F401
-
-        from compas_fab.robots import JointTrajectory
 
 
 class BackendFeature(object):
