@@ -2,24 +2,35 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas import IPY
 from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import PlanCartesianMotion
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
 from compas_fab.backends.ros.backend_features.helpers import convert_trajectory
 from compas_fab.backends.ros.backend_features.helpers import validate_response
-from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import GetCartesianPathRequest
 from compas_fab.backends.ros.messages import GetCartesianPathResponse
 from compas_fab.backends.ros.messages import Header
-from compas_fab.backends.ros.messages import JointState
-from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import Pose
-from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
-
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import PointAxisWaypoints
+
+if not IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import Callable  # noqa: F401
+        from typing import Dict  # noqa: F401
+        from typing import Optional  # noqa: F401
+
+        from compas_fab.backends import MoveItPlanner  # noqa: F401
+        from compas_fab.backends import RosClient  # noqa: F401
+        from compas_fab.backends.ros.messages import PlanningScene  # noqa: F401
+        from compas_fab.robots import JointTrajectory  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
+        from compas_fab.robots import Waypoints  # noqa: F401
 
 __all__ = [
     "MoveItPlanCartesianMotion",
@@ -37,7 +48,8 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         validate_response,
     )
 
-    def plan_cartesian_motion(self, waypoints, start_configuration=None, group=None, options=None):
+    def plan_cartesian_motion(self, waypoints, start_state, group=None, options=None):
+        # type: (Waypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
@@ -46,10 +58,9 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
             The robot instance for which the cartesian motion plan is being calculated.
         waypoints : :class:`compas_fab.robots.Waypoints`
             The waypoints for the robot to follow.
-        start_configuration: :class:`compas_robots.Configuration`, optional
-            The robot's full configuration, i.e. values for all configurable
-            joints of the entire robot, at the starting position. Defaults to
-            the all-zero configuration.
+        start_state : :class:`compas_fab.robots.RobotCellState`
+            The starting state of the robot cell at the beginning of the motion.
+            The attribute `robot_configuration`, must be provided.
         group: str, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
@@ -82,14 +93,17 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
         """
-        robot = self.client.robot
+        planner = self  # type: MoveItPlanner  # noqa: F841
+        client = planner.client  # type: RosClient # noqa: F841
+        robot = client.robot
 
         options = options or {}
         kwargs = {}
         kwargs["options"] = options
         kwargs["waypoints"] = waypoints
-        kwargs["start_configuration"] = start_configuration
-        kwargs["group"] = group or robot.main_group_name
+        kwargs["start_state"] = start_state
+        group = group or robot.main_group_name
+        kwargs["group"] = group
 
         kwargs["errback_name"] = "errback"
 
@@ -110,33 +124,41 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
             raise TypeError("Unsupported waypoints type {} for MoveIt planning backend.".format(type(waypoints)))
 
     def plan_cartesian_motion_with_frame_waypoints_async(
-        self, callback, errback, waypoints, start_configuration=None, group=None, options=None
+        self, callback, errback, waypoints, start_state, group=None, options=None
     ):
+        # type: (Callable, Callable, FrameWaypoints, RobotCellState, Optional[str], Optional[Dict]) -> None
         """Asynchronous handler of MoveIt cartesian motion planner service.
 
         :class:`compas_fab.robots.FrameWaypoints` are converted to :class:`compas_fab.backends.ros.messages.Pose` that is native to ROS communication
 
         """
+        planner = self  # type: MoveItPlanner
+        client = planner.client  # type: RosClient
 
         joints = options["joints"]
 
         header = Header(frame_id=options["base_link"])
 
         # Convert compas_fab.robots.FrameWaypoints to list of Pose for ROS
-        list_of_pose = [Pose.from_frame(frame) for frame in waypoints.target_frames]
+        target_frames = waypoints.target_frames
+        pcf_frames = client.robot_cell.target_frames_to_pcf(start_state, target_frames, waypoints.target_mode, group)
+        list_of_pose = [Pose.from_frame(frame) for frame in pcf_frames]
 
-        joint_state = JointState(
-            header=header, name=start_configuration.joint_names, position=start_configuration.joint_values
-        )
-        start_state = RobotState(joint_state, MultiDOFJointState(header=header), is_diff=True)
+        # We are calling the synchronous function here for simplicity.
+        planner.set_robot_cell_state(start_state)
+        planning_scene = planner.get_planning_scene()  # type: PlanningScene
+        start_state = planning_scene.robot_state
 
-        if options.get("attached_collision_meshes"):
-            for acm in options["attached_collision_meshes"]:
-                aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
-                start_state.attached_collision_objects.append(aco)
+        # start_configuration = start_state.robot_configuration
+        # joint_state = JointState(
+        #     header=header, name=start_configuration.joint_names, position=start_configuration.joint_values
+        # )
+        # start_state = RobotState(joint_state, MultiDOFJointState(header=header), is_diff=True)
 
-        # Filter needs to happen after all objects have been added
-        start_state.filter_fields_for_distro(self.client.ros_distro)
+        # if options.get("attached_collision_meshes"):
+        #     for acm in options["attached_collision_meshes"]:
+        #         aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
+        #         start_state.attached_collision_objects.append(aco)
 
         path_constraints = convert_constraints_to_rosmsg(options.get("path_constraints"), header)
 
@@ -154,6 +176,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
 
         def response_handler(response):
             try:
+                print("Error Code:", response.error_code)
                 trajectory = convert_trajectory(
                     joints, response.solution, response.start_state, response.fraction, None, response
                 )
@@ -161,10 +184,10 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
             except Exception as e:
                 errback(e)
 
-        self.GET_CARTESIAN_PATH(self.client, request, response_handler, errback)
+        self.GET_CARTESIAN_PATH(client, request, response_handler, errback)
 
     def plan_cartesian_motion_with_point_axis_waypoints_async(
-        self, callback, errback, waypoints, start_configuration=None, group=None, options=None
+        self, callback, errback, waypoints, start_state=None, group=None, options=None
     ):
         """Asynchronous handler of MoveIt cartesian motion planner service.
 

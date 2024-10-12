@@ -5,9 +5,11 @@ from compas.geometry import Frame
 from compas_fab.backends import RosClient
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import TargetMode
+from compas_fab.backends import MoveItPlanner
 
 with RosClient() as client:
     robot = client.load_robot()
+    planner = MoveItPlanner(client)
     assert robot.name == "ur5_robot"
 
     frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
@@ -26,7 +28,12 @@ with RosClient() as client:
         tolerance_orientation,
     )
 
-    trajectory = robot.plan_motion(target, start_configuration, group, options=dict(planner_id="RRTConnect"))
+    options = {
+        "planner_id": "RRTConnect",
+        # "max_velocity_scaling_factor": 0.01,
+        # "max_acceleration_scaling_factor": 0.01,
+    }
+    trajectory = planner.plan_motion(target, start_configuration, group, options=options)
 
     print("Computed kinematic path with %d configurations." % len(trajectory.points))
     print("Executing this path at full speed would take approx. %.3f seconds." % trajectory.time_from_start)

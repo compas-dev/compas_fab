@@ -15,6 +15,7 @@ if not IPY:
         from compas_fab.robots import Robot  # noqa: F401
         from compas_robots import Configuration  # noqa: F401
         from compas_robots import RobotModel  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
 
 __all__ = [
     "RigidBodyState",

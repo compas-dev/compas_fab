@@ -8,7 +8,7 @@ from compas_fab.backends.interfaces import ResetPlanningScene
 from compas_fab.backends.ros.messages import ApplyPlanningSceneRequest
 from compas_fab.backends.ros.messages import ApplyPlanningSceneResponse
 from compas_fab.backends.ros.messages import CollisionObject
-from compas_fab.backends.ros.messages import PlanningScene
+from compas_fab.backends.ros.messages import PlanningScene  # noqa: F401
 from compas_fab.backends.ros.service_description import ServiceDescription
 
 __all__ = [

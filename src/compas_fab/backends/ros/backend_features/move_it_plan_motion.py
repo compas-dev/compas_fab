@@ -39,7 +39,7 @@ class MoveItPlanMotion(PlanMotion):
         "/plan_kinematic_path", "GetMotionPlan", MotionPlanRequest, MotionPlanResponse, validate_response
     )
 
-    def plan_motion(self, robot, target, start_configuration=None, group=None, options=None):
+    def plan_motion(self, target, start_configuration=None, group=None, options=None):
         """Calculates a motion path.
 
         Parameters
@@ -87,6 +87,10 @@ class MoveItPlanMotion(PlanMotion):
         :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
         """
+        planner = self  # type: MoveItPlanner
+        client = planner.client  # type: RosClient
+        robot = client.robot  # type: Robot
+
         options = options or {}
         kwargs = {}
         kwargs["target"] = target
