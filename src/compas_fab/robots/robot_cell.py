@@ -4,7 +4,8 @@ from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_robots import ToolModel
 
-from compas_fab.robots import AttachedCollisionMesh
+from compas_fab.backends.exceptions import BackendTargetNotSupportedError
+from compas_fab.robots import TargetMode
 from compas_fab.robots import Robot
 
 if not IPY:
@@ -188,31 +189,363 @@ class RobotCell(Data):
             bodies.append(self.rigid_body_models[id])
         return bodies
 
-    def get_attached_rigid_bodies_as_attached_collision_meshes(self, robot_cell_state, group):
-        # type: (RobotCellState, str) -> List[AttachedCollisionMesh]
-        """Returns the rigid bodies attached to the links of the robot as AttachedCollisionMesh.
+    # ----------------------------------------
+    # Transformation functions
+    # ----------------------------------------
 
-        This does not include the tool and the workpieces attached to the tools.
-        Use `get_attached_tool` and `get_attached_workpieces` to get those.
+    def t_pcf_tcf(self, robot_cell_state, tool_id):
+        # type: (RobotCellState, str) -> Transformation
+        """Returns the transformation from the PCF (Planner Coordinate Frame) to the TCF (Tool Coordinate Frame).
+
+        Parameters
+        ----------
+        tool_id : str
+            The id of a tool found in `self.robot_cell.tool_models`.
+            The tool must be attached to the robot.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Transformation`
+            Transformation from the tool's TCF to TBCF.
+        """
+
+        if tool_id not in self.tool_models:
+            raise ValueError("Tool with id '{}' not found in robot cell.".format(tool_id))
+        tool_model = self.tool_models[tool_id]
+        tool_state = robot_cell_state.tool_states[tool_id]
+        if not tool_state.attached_to_group:
+            raise ValueError("Tool with id '{}' is not attached to the robot.".format(tool_id))
+
+        # The following precomputed transformations are used to speed up batch frame conversions.
+        # t_pcf_tbcf is Tool Attachment Frame, describing Tool Base Coordinate Frame (TBCF) relative to PCF Frame on the Robot (PCF)
+        attachment_frame = tool_state.attachment_frame or Frame.worldXY()
+        t_pcf_tbcf = Transformation.from_frame(attachment_frame)
+        # t_tbcf_tcf is Tool Frame, a property of the tool model, describing Tool Coordinate Frame (TCF) relative to Tool Base Frame (TBCF)
+        t_tbcf_tcf = Transformation.from_frame(tool_model.frame)
+
+        t_pcf_tcf = t_pcf_tbcf * t_tbcf_tcf
+        return t_pcf_tcf
+
+    def t_pcf_ocf(self, robot_cell_state, workpiece_id):
+        # type: (RobotCellState, str) -> Transformation
+        """Returns the transformation from the PCF (Planner Coordinate Frame) to the OCF (Object Coordinate Frame).
+
+        Parameters
+        ----------
+        workpiece_id : str
+            The id of a workpiece found in `self.rigid_body_models`.
+            The workpiece must be attached to a tool, and the tool must be attached to the robot.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Transformation`
+            Transformation from the workpiece's OCF to PCF.
+        """
+
+        if workpiece_id not in self.rigid_body_models:
+            raise ValueError("Workpiece with id '{}' not found in robot cell.".format(workpiece_id))
+        workpiece_state = robot_cell_state.rigid_body_states[workpiece_id]
+        if not workpiece_state.attached_to_tool:
+            raise ValueError("Workpiece with id '{}' is not attached to any tool.".format(workpiece_id))
+        tool_id = workpiece_state.attached_to_tool
+        if tool_id not in self.tool_models:
+            raise ValueError(
+                "Workpiece is attached to a Tool with id '{}', but the tool is not found in robot cell.".format(tool_id)
+            )
+        tool_state = robot_cell_state.tool_states[tool_id]
+        if not tool_state.attached_to_group:
+            raise ValueError("Tool with id '{}' is not attached to the robot.".format(tool_id))
+
+        workpiece_attachment_frame = workpiece_state.attachment_frame or Frame.worldXY()
+        t_tcf_ocf = Transformation.from_frame(workpiece_attachment_frame)
+        t_pcf_tcf = self.t_pcf_tcf(robot_cell_state, tool_id)
+
+        t_pcf_ocf = t_pcf_tcf * t_tcf_ocf
+        return t_pcf_ocf
+
+    def from_tcf_to_pcf(self, robot_cell_state, tcf_frames, tool_id):
+        # type: (RobotCellState, List[Frame], str) -> List[Frame]
+        """Converts a frame describing the robot's tool coordinate frame (TCF) relative to WCF
+        to a frame describing the planner coordinate frame (PCF), relative to WCF.
+        The transformation goes through the tool's base frame, which differs from the
+        PCF by the tool's current attachment_frame (in tool_state).
+
+        This tool specified by the tool_id must be attached to the robot in the robot cell state.
+
+        This function is typically used by the planner
+        at the beginning of the inverse kinematics calculation
+        to convert the frame of the robot's tool tip (tcf) to the frame of the robot's flange (tool0).
+
+        Parameters
+        ----------
+        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+            The state of the robot cell.
+        tcf_frames : list of :class:`~compas.geometry.Frame`
+            Tool Coordinate Frames (TCF) relative to the World Coordinate Frame (WCF).
+        tool_id : str
+            The id of a tool found in `client.robot_cell.tool_models`.
+            The tool must be attached to the robot.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Frame`
+            Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
+        """
+        self.assert_cell_state_match(robot_cell_state)
+
+        t_pcf_tcf = self.t_pcf_tcf(robot_cell_state, tool_id)
+        t_tcf_pcf = t_pcf_tcf.inverse()
+
+        planner_coordinate_frames = []
+        for tc_frame in tcf_frames:
+            # Convert input to Transformation
+            t_wcf_tcf = Transformation.from_frame(tc_frame)
+
+            # Combined transformation gives the PCF relative to the world coordinate frame
+            t_wcf_pcf = t_wcf_tcf * t_tcf_pcf
+            planner_coordinate_frames.append(Frame.from_transformation(t_wcf_pcf))
+
+        return planner_coordinate_frames
+
+    def from_pcf_to_tcf(self, robot_cell_state, pcf_frames, tool_id):
+        # type: (RobotCellState, List[Frame], str) -> List[Frame]
+        """Converts a frame describing the planner coordinate frame (PCF) (also T0CF) relative to WCF
+        to a frame describing the robot's tool coordinate frame (TCF) relative to WCF.
+        The transformation goes through the tool's base frame, which differs from the
+        PCF by the tool's current attachment_frame (in tool_state).
+
+        This tool specified by the tool_id must be attached to the robot in the robot cell state.
+
+        This is typically used by the planner
+        at the end of the forward kinematics calculation
+        to convert the frame of the robot's flange (tool0) to the frame of the robot's tool tip (tcf).
+
+        Parameters
+        ----------
+        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+            The state of the robot cell.
+        pcf_frames : list of :class:`~compas.geometry.Frame`
+            Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
+        tool_id : str
+            The id of a tool found in `client.robot_cell.tool_models`.
+            The tool must be attached to the robot.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Frame`
+            Tool Coordinate Frames (TCF) relative to the World Coordinate Frame (WCF).
+        """
+        self.assert_cell_state_match(robot_cell_state)
+
+        t_pcf_tcf = self.t_pcf_tcf(robot_cell_state, tool_id)
+
+        tool_coordinate_frames = []
+        for pcf in pcf_frames:
+            # Convert input to Transformation
+            t_wcf_pcf = Transformation.from_frame(pcf)
+
+            # Combined transformation gives TCF of the tool relative to the world coordinate frame
+            t_wcf_tcf = t_wcf_pcf * t_pcf_tcf
+            tool_coordinate_frames.append(Frame.from_transformation(t_wcf_tcf))
+
+        return tool_coordinate_frames
+
+    def from_ocf_to_pcf(self, robot_cell_state, ocf_frames, workpiece_id):
+        # type: (RobotCellState, List[Frame], str) -> List[Frame]
+        """Converts a frame describing the object coordinate frame (OCF) relative to WCF
+        to a frame describing the planner coordinate frame (PCF) (also T0CF) relative to WCF.
+        The transformation goes from the workpiece's base frame,
+        through the workpiece's attachment frame (in workpiece_state), to the tool's TCF.
+
+        This workpiece specified by the workpiece_id must be attached to a tool,
+        and the tool must be attached to the robot in the robot cell state.
+
+        This is typically used by the planner at the beginning of the inverse kinematics calculation to convert
+        the frame of the object (ocf) to the frame of the robot's flange (tool0).
+
+        Parameters
+        ----------
+        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+            The state of the robot cell.
+        ocf_frames : list of :class:`~compas.geometry.Frame`
+            Object Coordinate Frames (OCF) relative to the World Coordinate Frame (WCF).
+        workpiece_id : str
+            The id of a workpiece found in `client.robot_cell.rigid_body_models`.
+            The workpiece must be attached to a tool, and the tool must be attached to the robot.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Frame`
+            Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
+
+        Notes
+        -----
+        This function works correctly even when there are multiple workpieces attached to the robot.
+        Simply pass the correct workpiece_id to the function.
 
         """
-        rigid_body_ids = robot_cell_state.get_attached_rigid_body_ids()
-        if not rigid_body_ids:
-            return []
-        attached_collision_meshes = []
-        for id in rigid_body_ids:
-            rb_state = robot_cell_state.rigid_body_states[id]
-            collision_meshes = self.rigid_body_models[id].collision_meshes  # TODO join?
-            joinned_mesh = Mesh()
-            for mesh in collision_meshes:
-                # Non-default, high precision is used to avoid accidentally merging vertices
-                joinned_mesh.join(mesh, weld=False, precision=12)
-            # collision_mesh = CollisionMesh(mesh, id, rb_state.frame)
-            # link_name = rb_state.attached_to_link
-            attached_collision_meshes.append(
-                AttachedCollisionMesh(joinned_mesh, link_name=id, touch_links=rb_state.touch_links)
+        self.assert_cell_state_match(robot_cell_state)
+
+        t_pcf_ocf = self.t_pcf_ocf(robot_cell_state, workpiece_id)
+        t_ocf_pcf = t_pcf_ocf.inverse()
+
+        pcfs = []
+        for ocf in ocf_frames:
+            # Convert input to Transformation
+            t_wcf_ocf = Transformation.from_frame(ocf)
+
+            # Combined transformation gives the PCF relative to the world coordinate frame
+            t_wcf_pcf = t_wcf_ocf * t_ocf_pcf
+            pcfs.append(Frame.from_transformation(t_wcf_pcf))
+
+        return pcfs
+
+    def from_pcf_to_ocf(self, robot_cell_state, pcf_frames, workpiece_id):
+        # type: (RobotCellState, List[Frame], str) -> List[Frame]
+        """Converts a frame describing the planner coordinate frame (PCF) (also T0CF) relative to WCF
+        to a frame describing the object coordinate frame (OCF) relative to WCF.
+
+        The transformation goes from the tool's attachment frame (in ToolState),
+        through the tool's `.frame` (in ToolModel),
+        through the workpiece's attachment frame (in workpiece_state),
+        arriving at the workpiece's base frame.
+
+        This workpiece specified by the workpiece_id must be attached to a tool,
+        and the tool must be attached to the robot in the robot cell state.
+
+        Parameters
+        ----------
+        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+            The state of the robot cell.
+        pcf_frames : list of :class:`~compas.geometry.Frame`
+            Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
+        workpiece_id : str
+            The id of a workpiece found in `client.robot_cell.rigid_body_models`.
+            The workpiece must be attached to a tool, and the tool must be attached to the robot.
+
+        Notes
+        -----
+        This function works correctly even when there are multiple workpieces attached to the robot.
+        Simply pass the correct workpiece_id to the function.
+
+        """
+        self.assert_cell_state_match(robot_cell_state)
+
+        t_pcf_ocf = self.t_pcf_ocf(robot_cell_state, workpiece_id)
+
+        ocfs = []
+        for pcf in pcf_frames:
+            # Convert input to Transformation
+            t_wcf_pcf = Transformation.from_frame(pcf)
+
+            # Combined transformation gives OCF of the workpiece relative to the world coordinate frame
+            t_wcf_ocf = t_wcf_pcf * t_pcf_ocf
+            ocfs.append(Frame.from_transformation(t_wcf_ocf))
+
+        return ocfs
+
+    def target_frames_to_pcf(self, robot_cell_state, frame_or_frames, target_mode, group):
+        # type: (RobotCellState, Frame | List[Frame], TargetMode | str, str) -> Frame | List[Frame]
+        """Converts a Frame or a list of Frames to the PCF (Planner Coordinate Frame) relative to WCF.
+
+        This function is intended to be used by the planner to convert target frames to PCF for planning.
+        The transformation is equivalent to :meth:`from_tcf_to_pcf` when the target mode is `TargetMode.TOOL`,
+        and equivalent to :meth:`from_ocf_to_pcf` when the target mode is `TargetMode.WORKPIECE`.
+        If the target mode is `TargetMode.ROBOT`, the input frames are unchanged.
+
+        Parameters
+        ----------
+        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+            The state of the robot cell.
+        frame_or_frames : :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
+            The frame or frames to convert.
+        target_mode : :class:`~compas_fab.robots.TargetMode` or str
+            The target mode of the frame or frames.
+        group : str
+            The planning group to check. Must be specified.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
+            Planner Coordinate Frame (PCF) relative to the World Coordinate Frame (WCF).
+            If the input is a single frame, the output will also be a single frame.
+            If the input is a list of frames, the output will also be a list of frames.
+        """
+        self.assert_cell_state_match(robot_cell_state)
+
+        # Pack a single frame into a list if it is not already a list
+        input_is_not_list = not isinstance(frame_or_frames, list)
+        frames = [frame_or_frames] if input_is_not_list else frame_or_frames
+
+        pcf_frames = None
+        if target_mode == TargetMode.TOOL:
+            tool_id = robot_cell_state.get_attached_tool_id(group)
+            pcf_frames = self.from_tcf_to_pcf(robot_cell_state, frames, tool_id)
+        elif target_mode == TargetMode.WORKPIECE:
+            workpiece_ids = robot_cell_state.get_attached_workpiece_ids(group)
+            assert len(workpiece_ids) == 1, "Only one workpiece should be attached to the robot in group '{}'.".format(
+                group
             )
-        return attached_collision_meshes
+            pcf_frames = self.from_ocf_to_pcf(robot_cell_state, frames, workpiece_ids[0])
+        elif target_mode == TargetMode.ROBOT:
+            pcf_frames = frames
+        else:
+            raise BackendTargetNotSupportedError("Unsupported target mode: '{}'.".format(target_mode))
+
+        return pcf_frames[0] if input_is_not_list else pcf_frames
+
+    def pcf_to_target_frames(self, robot_cell_state, frame_or_frames, target_mode, group):
+        # type: (RobotCellState, Frame | List[Frame], TargetMode | str, str) -> Frame | List[Frame]
+        """Converts a (or a list of) Planner Coordinate Frame (PCF) to the target frame
+        according to the target mode.
+
+        For example, if the target mode is `TargetMode.TOOL`, the function will convert the PCF to the TCF.
+        If the target mode is `TargetMode.WORKPIECE`, the function will convert the PCF to the workpiece's OCF.
+
+
+        This function is the opposite of :meth:`target_frames_to_pcf`.
+
+        Parameters
+        ----------
+        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+            The state of the robot cell.
+        frame_or_frames : :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
+            The PCF frame or frames to convert.
+        target_mode : :class:`~compas_fab.robots.TargetMode` or str
+            The target mode of the frame or frames.
+        group : str
+            The planning group to check. Must be specified.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
+            Target Frame relative to the World Coordinate Frame (WCF).
+            If the input is a single frame, the output will also be a single frame.
+            If the input is a list of frames, the output will also be a list of frames.
+        """
+        self.assert_cell_state_match(robot_cell_state)
+
+        # Pack a single frame into a list if it is not already a list
+        input_is_not_list = not isinstance(frame_or_frames, list)
+        frames = [frame_or_frames] if input_is_not_list else frame_or_frames
+
+        target_frames = None
+
+        if target_mode == TargetMode.TOOL:
+            tool_id = robot_cell_state.get_attached_tool_id(group)
+            target_frames = self.from_pcf_to_tcf(robot_cell_state, frames, tool_id)
+        elif target_mode == TargetMode.WORKPIECE:
+            workpiece_ids = robot_cell_state.get_attached_workpiece_ids(group)
+            assert len(workpiece_ids) == 1, "Only one workpiece should be attached to the robot in group '{}'.".format(
+                group
+            )
+            target_frames = self.from_pcf_to_ocf(robot_cell_state, frames, workpiece_ids[0])
+        elif target_mode == TargetMode.ROBOT:
+            target_frames = frames
+        else:
+            raise BackendTargetNotSupportedError("Unsupported target mode: '{}'.".format(target_mode))
+
+        return target_frames[0] if input_is_not_list else target_frames
 
 
 class RigidBody(Data):
@@ -396,6 +729,8 @@ class RobotCellState(Data):
         robot_cell_state = cls.from_robot_configuration(robot_cell.robot, robot_configuration)
         for tool_id, tool_model in robot_cell.tool_models.items():
             tool_state = ToolState(Frame.worldXY(), None, None)
+            if len(tool_model.get_configurable_joints()) > 0:
+                tool_state.configuration = tool_model.zero_configuration()
             robot_cell_state.tool_states[tool_id] = tool_state
         for rigid_body_id, rigid_body_model in robot_cell.rigid_body_models.items():
             rigid_body_state = RigidBodyState(Frame.worldXY(), None, None, None)

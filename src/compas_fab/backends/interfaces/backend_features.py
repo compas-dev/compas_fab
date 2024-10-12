@@ -20,6 +20,10 @@ if not IPY:
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
         from compas_fab.robots import TargetMode  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
+        from compas_fab.robots import Waypoints  # noqa: F401
+
+        from compas_fab.robots import JointTrajectory
 
 
 class BackendFeature(object):
@@ -148,8 +152,8 @@ class SetRobotCell(BackendFeature):
 class SetRobotCellState(BackendFeature):
     """Mix-in interface for implementing a planner's set robot cell state feature."""
 
-    def set_robot_cell_state(self, robot_cell_state):
-        # type: (RobotCellState) -> None
+    def set_robot_cell_state(self, robot_cell_state, options=None):
+        # type: (RobotCellState, Optional[dict]) -> None
         """Set the robot cell state to the client.
 
         The client requires a robot cell state at the beginning of each planning request.
@@ -426,7 +430,8 @@ class PlanMotion(BackendFeature):
 class PlanCartesianMotion(BackendFeature):
     """Mix-in interface for implementing a planner's plan cartesian motion feature."""
 
-    def plan_cartesian_motion(self, robot, waypoints, start_configuration=None, group=None, options=None):
+    def plan_cartesian_motion(self, waypoints, start_state, group=None, options=None):
+        # type: (Waypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
@@ -435,9 +440,9 @@ class PlanCartesianMotion(BackendFeature):
             The robot instance for which the cartesian motion path is being calculated.
         waypoints : :class:`compas_fab.robots.Waypoints`
             The waypoints for the robot to follow.
-        start_configuration : :class:`compas_robots.Configuration`, optional
-            The robot's full configuration, i.e. values for all configurable
-            joints of the entire robot, at the starting position.
+        start_state : :class:`compas_fab.robots.RobotCellState`
+            The starting state of the robot cell at the beginning of the motion.
+            The attribute `robot_configuration`, must be provided.
         group : str, optional
             The planning group used for calculation.
         options : dict, optional

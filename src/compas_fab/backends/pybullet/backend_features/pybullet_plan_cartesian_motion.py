@@ -59,7 +59,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
     """Callable to calculate a cartesian motion path (linear in tool space)."""
 
     def plan_cartesian_motion(self, waypoints, start_state, group=None, options=None):
-        # type: (Waypoints, Configuration, RobotCellState, Optional[Dict]) -> JointTrajectory
+        # type: (Waypoints, RobotCellState, RobotCellState, Optional[Dict]) -> JointTrajectory
         """Calculates a cartesian motion path (linear in tool space) for Waypoints.
 
         Supports FrameWaypoints and PointAxisWaypoints.
@@ -696,7 +696,9 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
             intermediate_state = deepcopy(start_state)
             intermediate_state.robot_configuration = None
             # Convert the targets to PCFs for collision checking
-            pcf_frames = planner.target_frames_to_pcf(waypoints.target_frames, waypoints.target_mode, group)
+            pcf_frames = client.robot_cell.target_frames_to_pcf(
+                start_state, waypoints.target_frames, waypoints.target_mode, group
+            )
 
             for pcf_frame in pcf_frames:
 

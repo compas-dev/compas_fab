@@ -23,6 +23,9 @@ from compas_fab.robots.constraints import JointConstraint as CF_JointConstraint
 from compas_fab.robots.constraints import PositionConstraint as CF_PositionConstraint
 from compas_fab.robots.constraints import OrientationConstraint as CF_OrientationConstraint
 
+DEFAULT_TOLERANCE_ORIENTATION = 0.1
+DEFAULT_TOLERANCE_POSITION = 0.01
+
 
 def validate_response(response):
     """Raise an exception if the response indicates an error condition."""
@@ -57,10 +60,16 @@ def convert_target_to_goal_constraints(target, ee_link_name, tool_coordinate_fra
     elif isinstance(target, FrameTarget):
         tcf_frame_in_wcf = target.target_frame
         pc = CF_PositionConstraint.from_frame(
-            tcf_frame_in_wcf, target.tolerance_position, ee_link_name, tool_coordinate_frame
+            tcf_frame_in_wcf,
+            target.tolerance_position or DEFAULT_TOLERANCE_POSITION,
+            ee_link_name,
+            tool_coordinate_frame,
         )
         oc = CF_OrientationConstraint.from_frame(
-            tcf_frame_in_wcf, [target.tolerance_orientation] * 3, ee_link_name, tool_coordinate_frame
+            tcf_frame_in_wcf,
+            [target.tolerance_orientation or DEFAULT_TOLERANCE_ORIENTATION] * 3,
+            ee_link_name,
+            tool_coordinate_frame,
         )
         return [pc, oc]
 
@@ -73,7 +82,10 @@ def convert_target_to_goal_constraints(target, ee_link_name, tool_coordinate_fra
             )
 
         pc = CF_PositionConstraint.from_point(
-            tcf_point_in_wcf, target.tolerance_position, ee_link_name, tool_coordinate_frame
+            tcf_point_in_wcf,
+            target.tolerance_position or DEFAULT_TOLERANCE_POSITION,
+            ee_link_name,
+            tool_coordinate_frame,
         )
         OC_TOLERANCE_FOR_FREE_ROTATION = [0.01, 0.01, 6.3]
         if target.tolerance_orientation:

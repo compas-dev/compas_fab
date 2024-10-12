@@ -12,6 +12,7 @@ if not IPY:
 
         from compas_fab.backends import AnalyticalKinematicsPlanner  # noqa: F401
         from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import TargetMode  # noqa: F401
 
@@ -28,6 +29,7 @@ class AnalyticalForwardKinematics(ForwardKinematics):
         # type: (RobotCellState, TargetMode | str, Optional[float], Optional[str], Optional[dict]) -> Frame
         """Calculate the forward kinematics for a given joint configuration."""
         planner = self  # type: AnalyticalKinematicsPlanner
+        robot_cell = self.client.robot_cell  # type: RobotCell
         robot = self.client.robot_cell.robot  # type: Robot
 
         if group is not None and group != robot.main_group_name:
@@ -42,7 +44,7 @@ class AnalyticalForwardKinematics(ForwardKinematics):
         joint_values = robot_cell_state.robot_configuration.joint_values
         pcf_frame = planner.kinematics_solver.forward(joint_values)
 
-        target_frame = planner.pcf_to_target_frames(pcf_frame, target_mode, group)
+        target_frame = robot_cell.pcf_to_target_frames(robot_cell_state, pcf_frame, target_mode, group)
 
         # Scale the frame to user units
         if scale:

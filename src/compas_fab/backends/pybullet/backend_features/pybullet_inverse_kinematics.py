@@ -295,7 +295,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Transform the Target.target_frame to Planner Coordinate Frame depending on target.target_mode
         target_frame = target.target_frame
         target_mode = target.target_mode
-        target_pcf = planner.target_frames_to_pcf(target_frame, target_mode, group)
+        target_pcf = client.robot_cell.target_frames_to_pcf(robot_cell_state, target_frame, target_mode, group)
 
         # Formatting input for PyBullet
         body_id = client.robot_puid

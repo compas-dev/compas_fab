@@ -40,7 +40,7 @@ if not IPY:
         from compas_fab.robots import Target  # noqa: F401
         from compas_fab.robots import Tool  # noqa: F401
         from compas_fab.robots import Waypoints  # noqa: F401
-        from compas_fab.robots.planning_scene import CollisionMesh  # noqa: F401
+        from compas_fab.robots.planning_scene import AttachedCollisionMesh  # noqa: F401
 
 
 __all__ = [
@@ -618,7 +618,7 @@ class Robot(Data):
         return [j.type for j in configurable_joints]
 
     def get_attached_tool_collision_meshes(self):
-        # type: () -> List[List[CollisionMesh]]
+        # type: () -> List[List[AttachedCollisionMesh]]
         """Returns a list of all attached collisions meshes of each of the attached tools, if any.
 
         Returns

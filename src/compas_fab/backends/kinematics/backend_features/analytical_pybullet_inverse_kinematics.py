@@ -71,7 +71,6 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
 
         options = options or {}
         planner = self  # type: AnalyticalPyBulletPlanner
-        robot = planner.client.robot_cell.robot  # type: Robot  # noqa: F841
         client = self.client  # type: PyBulletClient
 
         # Set robot cell state to start state if provided
@@ -82,7 +81,7 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
         target_frame = target.target_frame
 
         # Tool Coordinate Frame if there are tools attached
-        target_pcf_frame = planner.target_frames_to_pcf(target_frame, target.target_mode, group)
+        target_pcf_frame = client.robot_cell.target_frames_to_pcf(start_state, target_frame, target.target_mode, group)
 
         ik_configurations = self.inverse_kinematics_ordered(target_pcf_frame, group=group, options=options)
         for configuration in ik_configurations:

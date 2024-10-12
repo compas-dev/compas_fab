@@ -94,7 +94,9 @@ class PyBulletForwardKinematics(ForwardKinematics):
         pcf_frame = client._get_link_frame(link_id, client.robot_puid)
 
         # If no link name provided, and a tool is attached to the group, return the tool tip frame of the tool
-        target_frame = planner.pcf_to_target_frames(pcf_frame, target_mode=target_mode, group=group)
+        target_frame = client.robot_cell.pcf_to_target_frames(
+            robot_cell_state, pcf_frame, target_mode=target_mode, group=group
+        )
 
         # Scale resulting frame to user units
         if scale:
