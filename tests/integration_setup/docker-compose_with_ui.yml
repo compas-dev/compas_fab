@@ -1,0 +1,56 @@
+version: '2'
+services:
+  moveit-demo:
+    image: gramaziokohler/ros-noetic-moveit
+    container_name: moveit-demo
+    environment:
+      - ROS_HOSTNAME=moveit-demo
+      - ROS_MASTER_URI=http://ros-core:11311
+      - DISPLAY=host.docker.internal:0.0
+    depends_on:
+      - ros-core
+    command:
+      - roslaunch
+      - --wait
+      - ur5_moveit_config
+      - demo.launch
+      # - use_rviz:=false
+      - use_rviz:=true
+
+  ros-core:
+    image: gramaziokohler/ros-noetic-moveit
+    container_name: ros-core
+    ports:
+      - "11311:11311"
+    command:
+      - roscore
+
+  ros-bridge:
+    image: gramaziokohler/ros-noetic-moveit
+    container_name: ros-bridge
+    environment:
+      - "ROS_HOSTNAME=ros-bridge"
+      - "ROS_MASTER_URI=http://ros-core:11311"
+    ports:
+      - "9090:9090"
+    depends_on:
+      - ros-core
+    command:
+      - roslaunch
+      - --wait
+      - rosbridge_server
+      - rosbridge_websocket.launch
+
+  ros-fileserver:
+    image: gramaziokohler/ros-noetic-moveit
+    container_name: ros-fileserver
+    environment:
+      - ROS_HOSTNAME=ros-fileserver
+      - ROS_MASTER_URI=http://ros-core:11311
+    depends_on:
+      - ros-core
+    command:
+      - roslaunch
+      - --wait
+      - file_server
+      - file_server.launch

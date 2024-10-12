@@ -468,6 +468,7 @@ class RobotCell(Data):
             If the input is a list of frames, the output will also be a list of frames.
         """
         self.assert_cell_state_match(robot_cell_state)
+        assert group, "The group must be specified."
 
         # Pack a single frame into a list if it is not already a list
         input_is_not_list = not isinstance(frame_or_frames, list)
@@ -520,6 +521,7 @@ class RobotCell(Data):
             If the input is a list of frames, the output will also be a list of frames.
         """
         self.assert_cell_state_match(robot_cell_state)
+        assert group, "The group must be specified."
 
         # Pack a single frame into a list if it is not already a list
         input_is_not_list = not isinstance(frame_or_frames, list)
