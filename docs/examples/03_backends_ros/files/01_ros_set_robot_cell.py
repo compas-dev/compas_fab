@@ -49,6 +49,7 @@ with RosClient() as client:
 
     # Add the floor mesh to this robot cell
     # The `cone` rigid body is also in the robot cell
+    floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
     robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
 
     # Calling `set_robot_cell` again will update the robot cell in the planner

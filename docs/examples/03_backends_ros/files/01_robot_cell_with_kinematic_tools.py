@@ -1,14 +1,10 @@
-from compas.datastructures import Mesh
 from compas.geometry import Frame
-from compas.geometry import Box
 
-import compas_fab
-from compas_fab.backends import RosClient
 from compas_fab.backends import MoveItPlanner
+from compas_fab.backends import RosClient
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import ToolLibrary
-from compas_fab.robots import RigidBody
 
 with RosClient() as client:
     robot = client.load_robot()
@@ -33,7 +29,6 @@ with RosClient() as client:
     )
 
     # Move the robot to a different configuration
-    robot_cell_state.robot_configuration = robot.zero_configuration()
     robot_cell_state.robot_configuration._joint_values[1] = -1.0
     robot_cell_state.robot_configuration._joint_values[2] = 0.5
     result = planner.set_robot_cell(robot_cell, robot_cell_state)
@@ -46,8 +41,9 @@ with RosClient() as client:
     # Example 2
     # =========
 
-    # Kinematic tools can be moved with a tool configuration
+    # Kinematic tools can be moved with it's Configuration
     # The gripper tool's zero_configuration is a closed gripper state at [0, 0]
+    print(gripper.zero_configuration)
     # The gripper tool's open gripper state is at [0.025, 0.025]
     robot_cell_state.tool_states[gripper.name].configuration.joint_values = [0.025, 0.025]
 
