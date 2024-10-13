@@ -387,8 +387,14 @@ class Robot(Data):
         base_link_name = self.get_base_link_name(group)
         end_effector_link_name = self.get_end_effector_link_name(group)
         link_names = []
-        for link in self.model.iter_link_chain(base_link_name, end_effector_link_name):
-            link_names.append(link.name)
+        if not base_link_name or not end_effector_link_name:
+            raise ValueError("Invalid base or end effector link name for the specified group.")
+        try:
+            for link in self.model.iter_link_chain(base_link_name, end_effector_link_name):
+                link_names.append(link.name)
+        except Exception as e:
+            raise Exception(f"No chain found between the specified elements: {str(e)}")
+
         return link_names
 
     def get_link_names_with_collision_geometry(self):
