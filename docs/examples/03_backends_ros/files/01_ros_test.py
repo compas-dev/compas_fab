@@ -37,7 +37,6 @@ with RosClient() as client:
     # collision_mesh = CollisionMesh(cone_mesh, rigid_body_name, attachment_frame, robot.root_name)
     # attached_collision_mesh = AttachedCollisionMesh(collision_mesh, link_name, touch_links)
 
-    # planner.add_attached_collision_mesh(attached_collision_mesh)
     # --------------------------------------------------------------
 
     from compas_fab.backends.ros.messages import AttachedCollisionObject

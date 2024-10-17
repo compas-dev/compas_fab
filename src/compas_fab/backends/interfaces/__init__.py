@@ -14,58 +14,51 @@ Client interfaces
     ClientInterface
     PlannerInterface
 
-Feature interfaces
-==================
+RobotCell interfaces
+====================
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+
+    SetRobotCell
+    SetRobotCellState
+
+Planner feature interfaces
+==========================
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
     BackendFeature
+    CheckCollision
     ForwardKinematics
     InverseKinematics
-    PlanMotion
     PlanCartesianMotion
-
-Planning scene interfaces
-=========================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    GetPlanningScene
-    AddCollisionMesh
-    AppendCollisionMesh
-    RemoveCollisionMesh
-    AddAttachedCollisionMesh
-    RemoveAttachedCollisionMesh
-    ResetPlanningScene
+    PlanMotion
 
 """
 
-from .backend_features import AddAttachedCollisionMesh
-from .backend_features import AddCollisionMesh
-from .backend_features import AppendCollisionMesh
 from .backend_features import BackendFeature
 from .backend_features import CheckCollision
 from .backend_features import ForwardKinematics
-from .backend_features import GetPlanningScene
 from .backend_features import InverseKinematics
 from .backend_features import PlanCartesianMotion
 from .backend_features import PlanMotion
-from .backend_features import RemoveAttachedCollisionMesh
-from .backend_features import RemoveCollisionMesh
-from .backend_features import ResetPlanningScene
 from .backend_features import SetRobotCell
 from .backend_features import SetRobotCellState
 from .client import ClientInterface
 from .planner import PlannerInterface
 
+# I believe the following backend features should not be exposed to users
+# They should only be used internally by the planner backend
+# They are included in the __all__ but not in the `autosummary`
+
+from .backend_features import GetPlanningScene
+from .backend_features import ResetPlanningScene
+
 __all__ = [
-    "AddAttachedCollisionMesh",
-    "AddCollisionMesh",
-    "AppendCollisionMesh",
     "BackendFeature",
     "ClientInterface",
     "CheckCollision",
@@ -75,8 +68,6 @@ __all__ = [
     "PlanCartesianMotion",
     "PlanMotion",
     "PlannerInterface",
-    "RemoveCollisionMesh",
-    "RemoveAttachedCollisionMesh",
     "ResetPlanningScene",
     "SetRobotCell",
     "SetRobotCellState",

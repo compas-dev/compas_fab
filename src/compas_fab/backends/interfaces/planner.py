@@ -54,6 +54,9 @@ class PlannerInterface(object):
 
     # ===========================================================================
     # Below is a list of methods offered by the mixin classes of PlannerInterface
+    # The actual implementation of these methods can be found in the backend
+    # specific planner classes. e.g.:
+    # - src/compas_fab/backends/ros/backend_features/move_it_set_robot_cell.py
     # ===========================================================================
 
     def set_robot_cell(self, *args, **kwargs):
@@ -156,56 +159,6 @@ class PlannerInterface(object):
         raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
 
     def reset_planning_scene(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def add_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def remove_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def append_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def add_attached_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def remove_attached_collision_mesh(self, *args, **kwargs):
         """Default method for planner.
 
         Raises
