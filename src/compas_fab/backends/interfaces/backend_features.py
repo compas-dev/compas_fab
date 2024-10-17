@@ -30,6 +30,10 @@ class BackendFeature(object):
     Classes that inherit from this class are mixed-in when creating the planner backend interface.
     Hence the the mixed-in class can access the attributes and other mix-ins functions of planner.
 
+    The implemented feature classes can assume that `self` is an instance of the planner backend interface.
+    IDE code completion and type hints can be activated by adding a line such as
+    `planner = self  # type: MoveItPlanner`.
+
     Attributes
     ----------
     client : :class:`compas_fab.backends.interfaces.ClientInterface`
@@ -108,27 +112,12 @@ class BackendFeature(object):
 
         return configuration
 
-    # @property
-    # def client(self):
-    #     # type: () -> ClientInterface
-    #     """Proxy function to access the backend client.
-    #     This function should be overridden by the PlannerInterface default :meth:`PlannerInterface.client` or by the Planner.
-    #     """
-    #     raise NotImplementedError
-
-    # @property
-    # def robot_cell(self):
-    #     # type: () -> RobotCell
-    #     """Proxy function to access the RobotCell object.
-    #     This function should be overridden by the PlannerInterface default :meth:`PlannerInterface.robot_cell` or by the Planner.
-    #     """
-    #     raise NotImplementedError
-
 
 #   The code that contains the actual feature implementation is located in the backend's module.
 #   For example, the features for moveit planner and ros client are located in :
 #   "src/compas_fab/backends/ros/backend_features/"
-#   If you cannot a specific feature in the 'backend_features', it means that the planner
+#   Only in the case of `inverse_kinematics` feature, the implementation for managing repeated calls is provided in this file.
+#   If you cannot find a specific feature in the 'backend_features', it means that the planner
 #   does not support that feature.
 
 
