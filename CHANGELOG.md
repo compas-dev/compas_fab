@@ -41,6 +41,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+* Removed `Tool` class from `compas_fab.robots` module.
+* Removed Backend Feature `AddCollisionMesh`, `AppendCollisionMesh`, `AddAttachedCollisionMesh`, `RemoveCollisionMesh` and `RemoveAttachedCollisionMesh`.
 * Removed `inverse_kinematics`, `forward_kinematics`, `plan_cartesian_motion`, and `plan_motion` methods from ClientInterface, access them using the planner instead.
 * Removed `inverse_kinematics`, `plan_cartesian_motion`, and `plan_motion` methods from Robot, access them using the planner instead.
 * Removed `Robot.ensure_client` method. Client and planner now exist independently.

@@ -617,17 +617,6 @@ class Robot(Data):
         configurable_joints = self.get_configurable_joints(group)
         return [j.type for j in configurable_joints]
 
-    def get_attached_tool_collision_meshes(self):
-        # type: () -> List[List[AttachedCollisionMesh]]
-        """Returns a list of all attached collisions meshes of each of the attached tools, if any.
-
-        Returns
-        -------
-        A list of lists.
-        List[List[compas_fab.robots.planning_scene.CollisionMesh]]
-        """
-        return [tool.attached_collision_meshes for tool in self.attached_tools.values()]
-
     # ==========================================================================
     # configurations
     # ==========================================================================
