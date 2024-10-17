@@ -432,3 +432,128 @@ def _get_end_effectors(root):
 def _get_disabled_collisions(root):
     # type: (Element) -> Set[Tuple[str, str]]
     return {tuple([dc.attrib["link1"], dc.attrib["link2"]]) for dc in root.iter("disable_collisions")}
+
+
+###############################################################################
+# The content of the RobotSemantics is a little obscure, I hope the following
+# code example helps with understanding it,
+# it prints the data object as a json string using the UR5 robot as example.
+
+if __name__ == "__main__":
+    from compas_fab.robots import RobotLibrary
+
+    robot = RobotLibrary.ur5()
+    semantics = robot.semantics
+    json = semantics.to_jsonstring(pretty=True)
+    print(json)
+
+# {
+#     "data": {
+#         "disabled_collisions": [
+#             [
+#                 "base_link_inertia",
+#                 "shoulder_link"
+#             ],
+#             [
+#                 "base_link_inertia",
+#                 "upper_arm_link"
+#             ],
+#             [
+#                 "base_link_inertia",
+#                 "wrist_1_link"
+#             ],
+#             [
+#                 "forearm_link",
+#                 "upper_arm_link"
+#             ],
+#             [
+#                 "forearm_link",
+#                 "wrist_1_link"
+#             ],
+#             [
+#                 "shoulder_link",
+#                 "upper_arm_link"
+#             ],
+#             [
+#                 "shoulder_link",
+#                 "wrist_1_link"
+#             ],
+#             [
+#                 "shoulder_link",
+#                 "wrist_2_link"
+#             ],
+#             [
+#                 "wrist_1_link",
+#                 "wrist_2_link"
+#             ],
+#             [
+#                 "wrist_1_link",
+#                 "wrist_3_link"
+#             ],
+#             [
+#                 "wrist_2_link",
+#                 "wrist_3_link"
+#             ]
+#         ],
+#         "end_effectors": [
+#             "tool0"
+#         ],
+#         "group_states": {
+#             "manipulator": {
+#                 "home": {
+#                     "elbow_joint": "0",
+#                     "shoulder_lift_joint": "0",
+#                     "shoulder_pan_joint": "0",
+#                     "wrist_1_joint": "0",
+#                     "wrist_2_joint": "0",
+#                     "wrist_3_joint": "0"
+#                 },
+#                 "up": {
+#                     "elbow_joint": "0",
+#                     "shoulder_lift_joint": "-1.5707",
+#                     "shoulder_pan_joint": "0",
+#                     "wrist_1_joint": "-1.5707",
+#                     "wrist_2_joint": "0",
+#                     "wrist_3_joint": "0"
+#                 }
+#             }
+#         },
+#         "groups": {
+#             "endeffector": {
+#                 "joints": [],
+#                 "links": [
+#                     "tool0"
+#                 ]
+#             },
+#             "manipulator": {
+#                 "joints": [
+#                     "base_link-base_link_inertia",
+#                     "shoulder_pan_joint",
+#                     "shoulder_lift_joint",
+#                     "elbow_joint",
+#                     "wrist_1_joint",
+#                     "wrist_2_joint",
+#                     "wrist_3_joint",
+#                     "wrist_3-flange",
+#                     "flange-tool0"
+#                 ],
+#                 "links": [
+#                     "base_link",
+#                     "base_link_inertia",
+#                     "shoulder_link",
+#                     "upper_arm_link",
+#                     "forearm_link",
+#                     "wrist_1_link",
+#                     "wrist_2_link",
+#                     "wrist_3_link",
+#                     "flange",
+#                     "tool0"
+#                 ]
+#             }
+#         },
+#         "main_group_name": "manipulator",
+#         "passive_joints": []
+#     },
+#     "dtype": "compas_fab.robots/RobotSemantics",
+#     "guid": "1f06e4ed-02b7-4d90-a20a-84c6cb869727"
+# }
