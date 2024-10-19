@@ -7,8 +7,6 @@ from compas_fab.backends import MoveItPlanner
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RigidBody
 from compas_fab.robots import RobotCellState
-from compas_fab.robots import AttachedCollisionMesh
-from compas_fab.robots import CollisionMesh
 
 with RosClient() as client:
     robot = client.load_robot()
@@ -34,8 +32,6 @@ with RosClient() as client:
     ground_frame = Frame([1, 1, 0], [1, 0, 0], [0, 1, 0])
     header_frame_id = robot.root_name
     attachment_frame = Frame.worldXY()
-    # collision_mesh = CollisionMesh(cone_mesh, rigid_body_name, attachment_frame, robot.root_name)
-    # attached_collision_mesh = AttachedCollisionMesh(collision_mesh, link_name, touch_links)
 
     # --------------------------------------------------------------
 

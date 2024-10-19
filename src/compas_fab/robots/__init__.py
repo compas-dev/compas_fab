@@ -35,16 +35,6 @@ Path planning
     JointTrajectoryPoint
     Trajectory
 
-Planning scene
---------------
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    AttachedCollisionMesh
-    CollisionMesh
-    PlanningScene
 
 Targets and Waypoints
 ---------------------
@@ -107,11 +97,7 @@ from .constraints import (
     OrientationConstraint,
     PositionConstraint,
 )
-from .planning_scene import (
-    AttachedCollisionMesh,
-    CollisionMesh,
-    PlanningScene,
-)
+
 from .units import (
     to_degrees,
     to_radians,
@@ -182,10 +168,6 @@ __all__ = [
     "JointConstraint",
     "OrientationConstraint",
     "PositionConstraint",
-    # Planning Scene
-    "AttachedCollisionMesh",
-    "CollisionMesh",
-    "PlanningScene",
     # Units
     "to_degrees",
     "to_radians",
