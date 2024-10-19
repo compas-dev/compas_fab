@@ -1,5 +1,5 @@
 from compas.geometry import Frame
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import TargetMode
 
@@ -11,13 +11,12 @@ from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 
 # Not loading the robot's geometry because AnalyticalKinematicsPlanner does not use it for collision checking
-robot = RobotLibrary.ur5(load_geometry=False)
+robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=False)
 
 # The kinematics_solver must match the robot's kinematics
 planner = AnalyticalKinematicsPlanner(UR5Kinematics())
 
 # This is a simple robot cell with only the robot
-robot_cell = RobotCell(robot)
 planner.set_robot_cell(robot_cell)
 
 # IK Target

@@ -8,8 +8,6 @@ from compas.geometry import Rotation
 from compas.geometry import Scale
 from compas.geometry import Sphere
 
-from compas_fab.utilities import from_tcf_to_t0cf
-
 if not IPY:
     from typing import TYPE_CHECKING
 
@@ -605,18 +603,18 @@ class OrientationConstraint(Constraint):
 
         Examples
         --------
-        >>> robot = RobotLibrary.ur5()
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerances_orientation = [math.radians(1)] * 3
-        >>> group = robot.main_group_name
+        >>> group = robot_cell.main_group_name
         >>> end_effector_link_name = robot.get_end_effector_link_name(group)
         >>> OrientationConstraint.from_frame(frame, tolerances_orientation, end_effector_link_name)
         OrientationConstraint('tool0', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)
         """
         # TODO: Add support for tool_state.attachment_frame, call from_tcf_to_pcf.
 
-        if tool_coordinate_frame:
-            frame_WCF = from_tcf_to_t0cf(frame_WCF, tool_coordinate_frame)
+        # if tool_coordinate_frame:
+        #     frame_WCF = from_tcf_to_t0cf(frame_WCF, tool_coordinate_frame)
 
         tolerances_orientation = list(tolerances_orientation)
         if len(tolerances_orientation) == 1:
@@ -708,10 +706,10 @@ class PositionConstraint(Constraint):
 
         Examples
         --------
-        >>> robot = RobotLibrary.ur5()
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
-        >>> group = robot.main_group_name
+        >>> group = robot_cell.main_group_name
         >>> end_effector_link_name = robot.get_end_effector_link_name(group)
         >>> PositionConstraint.from_frame(frame, tolerance_position, end_effector_link_name)                                 # doctest: +SKIP
         PositionConstraint('tool0', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)    # doctest: +SKIP
@@ -719,8 +717,8 @@ class PositionConstraint(Constraint):
 
         # TODO: Add support for tool_state.attachment_frame, call from_tcf_to_pcf.
 
-        if tool_coordinate_frame:
-            frame_WCF = from_tcf_to_t0cf(frame_WCF, tool_coordinate_frame)
+        # if tool_coordinate_frame:
+        #     frame_WCF = from_tcf_to_t0cf(frame_WCF, tool_coordinate_frame)
 
         radius = float(tolerance_position)
         sphere = Sphere(radius, point=frame_WCF.point)

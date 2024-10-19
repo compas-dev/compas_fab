@@ -1,5 +1,5 @@
 # This example does not work with IronPython
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 from compas_robots.viewer.scene.robotmodelobject import RobotModelObject
 from compas_robots.model import Joint
 from compas_viewer.components import Slider
@@ -12,8 +12,8 @@ viewer.ui.sidedock.show = True
 
 # Load robot from RobotLibrary
 # RobotLibrary also contains .ur5(), .ur10e(), abb_irb120_3_58(), abb_irb4600_40_255(), .rfl(), .panda()
-robot = RobotLibrary.ur5()
-model = robot.model
+robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+model = robot_cell.robot_model
 
 start_configuration = model.zero_configuration()
 robot_object: RobotModelObject = viewer.scene.add(model, show_lines=False, configuration=start_configuration)  # type: ignore
@@ -30,7 +30,7 @@ def make_rotate_function(joint_name):
 
 
 # Create one slider for each joint
-for joint in robot.get_configurable_joints():
+for joint in robot_cell.get_configurable_joints():
     starting_val = start_configuration[joint.name]
     print(joint.name, Joint.SUPPORTED_TYPES[joint.type], joint.limit.lower, joint.limit.upper, starting_val)
     # Units are in radians or meters

@@ -16,7 +16,7 @@ if not IPY:
 
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.backends import PyBulletClient  # noqa: F401
         from compas_fab.backends import PyBulletPlanner  # noqa: F401
 
@@ -107,7 +107,8 @@ class PyBulletInverseKinematics(InverseKinematics):
         """
         # Set default group name
         planner = self  # type: PyBulletPlanner
-        group = group or planner.client.robot.main_group_name
+        client = planner.client  # type: PyBulletClient
+        group = group or client.robot_cell.main_group_name
 
         # Make a copy of the options because we will modify it
         # Note: Modifying the options dict accidentally will break the hashing function in the inverse_kinematics()
@@ -161,8 +162,8 @@ class PyBulletInverseKinematics(InverseKinematics):
         # ===================================================================================
 
         planner = self  # type: PyBulletPlanner
-        robot = planner.client.robot  # type: Robot
-        group = group or robot.main_group_name
+        robot_cell = planner.client.robot_cell  # type: RobotCell
+        group = group or robot_cell.main_group_name
 
         # Unit conversion from user scale to meter scale can be done here because they are shared.
         # This will be triggered too, when entering from the inverse_kinematics method.
@@ -172,7 +173,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         planner.ensure_robot_cell_state_supports_target_mode(robot_cell_state, target.target_mode, group)
 
         # Check if the planning group is supported by the planner
-        if group not in robot.group_names:
+        if group not in robot_cell.group_names:
             raise PlanningGroupNotExistsError("Planning group '{}' is not supported by PyBullet planner.".format(group))
 
         # ===================================================================================
@@ -269,10 +270,10 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Housekeeping for intellisense
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
-        robot = client.robot  # type: Robot
+        robot_cell = client.robot_cell  # type: RobotCell
 
         # NOTE: group is not optional in this inner function.
-        if group not in robot.semantics.groups:
+        if group not in robot_cell.robot_semantics.groups:
             raise ValueError("Planning group '{}' not found in the robot's semantics.".format(group))
 
         # Default options
@@ -300,7 +301,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Formatting input for PyBullet
         body_id = client.robot_puid
         # Note: The target link is the last link in semantics.groups[group]["links"][-1]
-        link_id = client.robot_link_puids[robot.get_end_effector_link_name(group)]
+        link_id = client.robot_link_puids[robot_cell.get_end_effector_link_name(group)]
         point, orientation = pose_from_frame(target_pcf)
 
         # Get list of joint_name and puids in order
@@ -313,7 +314,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # The order of the values needs to match with pybullet's joint id order
         # Start configuration needs to be a full_configuration, not negotiable.
         start_configuration = robot_cell_state.robot_configuration
-        all_joint_names = robot.model.get_configurable_joint_names()
+        all_joint_names = robot_cell.get_configurable_joint_names()
         assert set(all_joint_names) == set(start_configuration.keys()), "Robot configuration is missing some joints"
         rest_poses = client.build_pose_for_pybullet(start_configuration)
 
@@ -322,7 +323,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         lower_limits = []
         upper_limits = []
         for joint_name in joint_names_sorted:
-            joint = robot.get_joint_by_name(joint_name)
+            joint = robot_cell.robot_model.get_joint_by_name(joint_name)
             lower_limits.append(joint.limit.lower if joint.type != Joint.CONTINUOUS else 0)
             upper_limits.append(joint.limit.upper if joint.type != Joint.CONTINUOUS else 2 * math.pi)
 
@@ -351,7 +352,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         def set_random_config():
             # Function for setting random joint values for randomized search
-            config = robot.random_configuration(group)
+            config = robot_cell.random_configuration(group)
             client.set_robot_configuration(config)
 
         # The uniqueness checker keep track of past results
@@ -529,10 +530,10 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Housekeeping for intellisense
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
-        robot = client.robot  # type: Robot
+        robot_cell = client.robot_cell  # type: RobotCell
 
         # NOTE: group is not optional in this inner function.
-        if group not in robot.semantics.groups:
+        if group not in robot_cell.robot_semantics.groups:
             raise ValueError("Planning group '{}' not found in the robot's semantics.".format(group))
 
         # Default options (specific to PointAxisTarget)
@@ -602,7 +603,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         def set_random_config():
             # Function for setting random joint values for randomized search
-            start_configuration = robot.random_configuration(group)
+            start_configuration = robot_cell.random_configuration(group)
             client.set_robot_configuration(start_configuration)
 
         # Options dict for passing to the FrameTarget function
@@ -781,9 +782,9 @@ class PyBulletInverseKinematics(InverseKinematics):
         ValueError
             If the configuration has changed joints that are not in the group.
         """
-        robot = self.client.robot  # type: Robot
+        robot_cell = self.client.robot_cell  # type: RobotCell
 
-        configurable_joints = robot.get_configurable_joint_names(group)
+        configurable_joints = robot_cell.get_configurable_joint_names(group)
         for joint_name, joint_value in configuration.items():
             if joint_name not in start_configuration:
                 raise KeyError(
@@ -792,8 +793,8 @@ class PyBulletInverseKinematics(InverseKinematics):
             if joint_name in configurable_joints:
                 continue
             if not TOL.is_close(joint_value, start_configuration[joint_name]):
-                joint_names = robot.semantics.groups[group]["joints"]
-                link_names = robot.semantics.groups[group]["links"]
+                joint_names = robot_cell.robot_semantics.groups[group]["joints"]
+                link_names = robot_cell.robot_semantics.groups[group]["links"]
                 print("Configuration changed joint '{}' that is not in the group.".format(joint_name))
                 raise PlanningGroupNotSupported(group, joint_names, link_names)
 

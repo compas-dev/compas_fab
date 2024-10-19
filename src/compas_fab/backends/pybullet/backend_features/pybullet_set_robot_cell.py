@@ -51,10 +51,13 @@ class PyBulletSetRobotCell(SetRobotCell):
             # client.convert_mesh_to_body(rigid_body.visual_meshes[0], Frame.worldXY())
 
         # Feed the robot to the client
-        if robot_cell.robot:
-            robot_cell.robot.ensure_geometry()
-            robot_cell.robot.ensure_semantics()
-            client.set_robot(robot_cell.robot)
+        if robot_cell.robot_model:
+            robot_cell.ensure_geometry()
+            robot_cell.ensure_semantics()
+            client.set_robot(
+                robot_cell.robot_model,
+                robot_cell.robot_semantics,
+            )
 
         # Keep a copy of the robot cell in the client
         client._robot_cell = robot_cell.copy()

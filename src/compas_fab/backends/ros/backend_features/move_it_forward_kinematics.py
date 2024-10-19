@@ -22,7 +22,7 @@ if not IPY:
     if TYPE_CHECKING:
         from compas_fab.backends.ros.client import RosClient  # noqa: F401
         from compas_fab.backends.ros.planner import MoveItPlanner  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import TargetMode  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas.geometry import Frame  # noqa: F401
@@ -70,7 +70,7 @@ class MoveItForwardKinematics(ForwardKinematics):
         """
         planner = self  # type: MoveItPlanner
         client = planner.client  # type: RosClient
-        robot = client.robot  # type: Robot
+        robot_cell = client.robot_cell  # type: RobotCell
         options = options or {}
 
         planner.set_robot_cell_state(robot_cell_state)
@@ -81,13 +81,13 @@ class MoveItForwardKinematics(ForwardKinematics):
         kwargs["errback_name"] = "errback"
 
         # Use base_link or fallback to model's root link
-        options["base_link"] = options.get("base_link", robot.model.root.name)
+        options["base_link"] = options.get("base_link", robot_cell.root_name)
 
-        group = group or robot.main_group_name
+        group = group or robot_cell.main_group_name
 
         # Use selected link or default to group's end effector
-        options["link"] = options.get("link", options.get("tool0")) or robot.get_end_effector_link_name(group)
-        if options["link"] not in robot.get_link_names(group):
+        options["link"] = options.get("link", options.get("tool0")) or robot_cell.get_end_effector_link_name(group)
+        if options["link"] not in robot_cell.get_link_names(group):
             raise ValueError("Link name {} does not exist in planning group".format(options["link"]))
 
         pcf_frame = await_callback(self.forward_kinematics_async, **kwargs)

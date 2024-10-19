@@ -10,6 +10,14 @@ from compas_fab.robots import JointTrajectoryPoint
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import PointAxisWaypoints
 
+from compas import IPY
+
+if not IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from compas_fab.backends import AnalyticalPyBulletPlanner  # noqa: F401
+
 
 class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
     """ """
@@ -55,6 +63,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
     def _plan_cartesian_motion_with_frame_waypoints(
         self, robot, waypoints, start_configuration=None, group=None, options=None
     ):
+        # type: (Robot, FrameWaypoints, Configuration, str, dict) -> JointTrajectory
         """Calculates a cartesian motion path with frame waypoints.
 
         Planner behavior:
@@ -62,14 +71,18 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         - The path is checked to ensure that the joint values are continuous and that revolution values are the smallest possible.
         - There is no interpolation in between frames (i.e. 'max_step' parameter is not supported), only the input frames are used.
         """
+        planner = self  # type: AnalyticalPyBulletPlanner
+        robot_cell = planner.client.robot_cell
+
         waypoints = waypoints.normalized_to_meters()
 
+        # TODO: This function needs some serious rewrites as the continuity check is a bit flawed.
+
         # TODO: Convert the target frames to the robot's base frame using new method in planner class
-        frames_WCF = waypoints.target_frames
+        target_frames = waypoints.target_frames
 
         # convert the frame WCF to RCF
-        base_frame = robot.get_base_frame(group=group, full_configuration=start_configuration)
-        frames_RCF = [base_frame.to_local_coordinates(frame_WCF) for frame_WCF in frames_WCF]
+        pcf_frames = robot_cell.target_frames_to_pcf(start_configuration, target_frames, waypoints.target_mode, group)
 
         # 'keep_order' is set to True, so that iter_inverse_kinematics will return the configurations in the same order across all frames
         options = options or {}
@@ -78,7 +91,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         # iterate over all input frames and calculate the inverse kinematics, no interpolation in between frames
         configurations_along_path = []
         # TODO: Change to planner.iter_inverse_kinematics
-        for frame in frames_RCF:
+        for frame in pcf_frames:
             configurations = list(robot.iter_inverse_kinematics(frame, options=options))
             configurations_along_path.append(configurations)
 
@@ -105,7 +118,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         path = paths[idx]
         path = self.smooth_configurations(path)
         trajectory = JointTrajectory()
-        trajectory.fraction = len(path) / len(frames_RCF)
+        trajectory.fraction = len(path) / len(pcf_frames)
         # Technically trajectory.fraction should always be 1.0 because otherwise, the path would be rejected earlier
         trajectory.joint_names = path[0].joint_names
         trajectory.points = [JointTrajectoryPoint(config.joint_values, config.joint_types) for config in path]

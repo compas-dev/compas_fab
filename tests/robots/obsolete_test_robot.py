@@ -11,10 +11,7 @@ from compas_robots import RobotModel
 import compas_fab
 from compas_fab.backends.interfaces import ClientInterface
 from compas_fab.backends.interfaces import InverseKinematics
-from compas_fab.robots import Robot
-from compas_fab.robots import RobotLibrary
 from compas_fab.robots import RobotSemantics
-from compas_fab.robots import Tool
 
 BASE_FOLDER = os.path.dirname(__file__)
 
@@ -157,8 +154,8 @@ def test_group_names(ur5_robot_instance):
 
 
 def test_main_group_name(panda_robot_instance):
-    robot = panda_robot_instance
-    assert robot.main_group_name == "panda_arm_hand"
+    robot_cell = panda_robot_instance
+    assert robot_cell.main_group_name == "panda_arm_hand"
 
 
 def test_root_name(ur5_robot_instance):
@@ -477,4 +474,4 @@ def test_attached_tools_no_assigning(ur5_robot_instance, robot_tool1):
 
 def test_print_robot_info(ur5_robot_instance):
     robot = ur5_robot_instance
-    robot.info()
+    robot_cell.print_info()

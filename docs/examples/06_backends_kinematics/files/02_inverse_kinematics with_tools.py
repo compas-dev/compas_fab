@@ -3,7 +3,7 @@ from compas.datastructures import Mesh
 from compas.geometry import Box
 
 import compas_fab
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RigidBody
 from compas_fab.robots import RigidBodyLibrary
@@ -18,7 +18,7 @@ from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 
 # Not loading the robot's geometry because AnalyticalKinematicsPlanner does not use it for collision checking
-robot = RobotLibrary.ur5(load_geometry=False)
+robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=False)
 
 # The kinematics_solver must match the robot's kinematics
 planner = AnalyticalKinematicsPlanner(UR5Kinematics())
@@ -26,7 +26,6 @@ planner = AnalyticalKinematicsPlanner(UR5Kinematics())
 # ---------------------------------------------------------------------
 # Create a robot cell and add objects to it
 # ---------------------------------------------------------------------
-robot_cell = RobotCell(robot)
 
 # Add Static Collision Geometry
 floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
@@ -39,9 +38,6 @@ robot_cell.tool_models["cone"] = ToolModel(tool_mesh, tool_frame)
 
 # The robot cell is passed to the planner
 planner.set_robot_cell(robot_cell)
-
-# Create robot cell state, the default state from (.from_robot_cell) does not attach tools to the robot
-robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
 # -----------------
 # Define the target
@@ -65,7 +61,7 @@ print(config)
 # Second demonstrate the IK with tools
 # ------------------------------------
 #  Modify the cell state to attach the tool to the robot
-robot_cell_state.set_tool_attached_to_group("cone", robot.main_group_name)
+robot_cell_state.set_tool_attached_to_group("cone", robot_cell.main_group_name)
 # Create a target with TargetMode.TOOL
 target = FrameTarget(target_frame, TargetMode.TOOL)
 config = planner.inverse_kinematics(target, robot_cell_state)

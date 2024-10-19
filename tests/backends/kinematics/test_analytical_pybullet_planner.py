@@ -75,9 +75,7 @@ def forward_inverse_agreement(planner, start_state, options=None):
 
 #     client = analytical_pybullet_client
 #     planner = AnalyticalPyBulletPlanner(client, UR5Kinematics())
-#     robot = RobotLibrary.ur5()
-#     robot_cell = RobotCell(robot)
-#     robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+#     robot_cell, robot_cell_state = RobotCellLibrary.ur5()
 #     planner.set_robot_cell(robot_cell, robot_cell_state)
 
 #     # TODO: This problem will be solved after we improved the AnalyticalKinematics class

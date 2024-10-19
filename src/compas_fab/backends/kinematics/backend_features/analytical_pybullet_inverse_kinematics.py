@@ -49,8 +49,9 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
 
 
         """
+        client = self.client  # type: PyBulletClient
 
-        group = group or self.client.robot.main_group_name
+        group = group or client.robot_cell.main_group_name
 
         if isinstance(target, FrameTarget):
             return self.iter_inverse_kinematics_frame_target(

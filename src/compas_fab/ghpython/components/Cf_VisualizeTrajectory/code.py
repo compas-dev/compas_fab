@@ -10,7 +10,7 @@ from ghpythonlib.componentbase import executingcomponent as component
 
 
 class TrajectoryVisualize(component):
-    def RunScript(self, robot, group, trajectory):
+    def RunScript(self, robot_cell, group, trajectory):
         start_configuration = None
         configurations = []
         fraction = 0.0
@@ -21,8 +21,9 @@ class TrajectoryVisualize(component):
         velocities = []
         accelerations = []
 
-        if robot and trajectory:
-            group = group or robot.main_group_name
+        # TODO: Fix this
+        if robot_cell and trajectory:
+            group = group or robot_cell.main_group_name
 
             for c in trajectory.points:
                 configurations.append(

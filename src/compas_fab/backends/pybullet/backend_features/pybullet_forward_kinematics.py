@@ -17,7 +17,7 @@ if not IPY:
 
         from compas_fab.backends import PyBulletClient  # noqa: F401
         from compas_fab.backends import PyBulletPlanner  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import TargetMode  # noqa: F401
 
@@ -75,21 +75,21 @@ class PyBulletForwardKinematics(ForwardKinematics):
         # Housekeeping for intellisense
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
-        robot = client.robot  # type: Robot
-        group = group or robot.main_group_name
+        robot_cell = client.robot_cell  # type: RobotCell
+        group = group or robot_cell.main_group_name
 
         # Check if the target mode is valid for the robot cell state
         planner.ensure_robot_cell_state_supports_target_mode(robot_cell_state, target_mode, group)
 
         # Check if the planning group is supported by the planner
-        if group not in robot.group_names:
+        if group not in robot_cell.group_names:
             raise PlanningGroupNotExistsError("Planning group '{}' is not supported by PyBullet planner.".format(group))
 
         # Setting the entire robot cell state, including the robot configuration
         planner.set_robot_cell_state(robot_cell_state)
 
         # Retrieve the PCF of the group
-        link_name = robot.get_end_effector_link_name(group)
+        link_name = robot_cell.get_end_effector_link_name(group)
         link_id = client.robot_link_puids[link_name]
         pcf_frame = client._get_link_frame(link_id, client.robot_puid)
 
@@ -136,11 +136,11 @@ class PyBulletForwardKinematics(ForwardKinematics):
         # Housekeeping for intellisense
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
-        robot = client.robot  # type: Robot
-        group = group or robot.main_group_name
+        robot_cell = client.robot_cell  # type: RobotCell
+        group = group or robot_cell.main_group_name
 
         # Check if the planning group is supported by the planner
-        if group not in robot.group_names:
+        if group not in robot_cell.group_names:
             raise PlanningGroupNotExistsError("Planning group '{}' is not supported by PyBullet planner.".format(group))
 
         # Setting the entire robot cell state, including the robot configuration

@@ -7,7 +7,7 @@ from compas_fab.robots import RobotCellState
 from compas_fab.robots import TargetMode
 
 with RosClient() as client:
-    robot = client.load_robot()
+    robot_cell = client.load_robot_cell()
     assert robot.name == "ur5_robot"
     planner = MoveItPlanner(client)
 

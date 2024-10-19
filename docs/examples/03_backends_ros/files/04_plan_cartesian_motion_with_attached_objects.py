@@ -21,15 +21,13 @@ target_frames.append(Frame([0.4, -0.4, 0.45], [1, 0, 0], [0, 1, 0]))
 target_frames.append(Frame([0.0, -0.4, 0.45], [1, 0, 0], [0, 1, 0]))
 
 with RosClient() as client:
-    robot = client.load_robot()
+    robot_cell = client.load_robot_cell()
     planner = MoveItPlanner(client)
 
     # =====================================
     # Step 1: Creation of Robot Cell
     # =====================================
 
-    # Create a robot cell using the robot from the client
-    robot_cell = RobotCell(robot)
     # Add a rigid body for the floor
     floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
     robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
@@ -55,7 +53,7 @@ with RosClient() as client:
     robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
     robot_cell_state.set_tool_attached_to_group(
         gripper.name,
-        robot.main_group_name,
+        robot_cell.main_group_name,
         attachment_frame=Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]),
         touch_links=["wrist_3_link"],  # This is the link that the tool is attached to
     )

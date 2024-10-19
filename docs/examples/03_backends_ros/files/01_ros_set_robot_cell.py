@@ -7,15 +7,13 @@ from compas_fab.robots import RobotCell
 from compas_fab.robots import RigidBody
 
 with RosClient() as client:
-    robot = client.load_robot()
+    robot_cell = client.load_robot_cell()
     planner = MoveItPlanner(client)
 
     # =========
     # Example 1
     # =========
 
-    # Create a robot cell with a floor geometry
-    robot_cell = RobotCell(robot)
     floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
     robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
 
@@ -30,7 +28,7 @@ with RosClient() as client:
     # =========
 
     # Create another robot cell with a cone geometry
-    robot_cell = RobotCell(robot)
+    robot_cell = client.load_robot_cell()
     cone = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl")).scaled(5)
     robot_cell.rigid_body_models["cone"] = RigidBody.from_mesh(cone)
 

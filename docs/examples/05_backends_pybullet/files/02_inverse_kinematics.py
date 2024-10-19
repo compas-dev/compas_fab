@@ -5,20 +5,15 @@ from compas_fab.backends import PyBulletPlanner
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
 
 with PyBulletClient() as client:
     # Create a robot cell with a UR5 robot
-    robot = RobotLibrary.ur5()
-    robot_cell = RobotCell(robot)
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5()
 
     planner = PyBulletPlanner(client)
     planner.set_robot_cell(robot_cell)
-
-    # Create a RobotCellState from the robot's zero configuration
-    start_configuration = robot.zero_configuration()
-    robot_cell_state = RobotCellState.from_robot_configuration(robot, start_configuration)
 
     # The FrameTarget represents the robot's planner coordinate frame (PCF)
     # For the UR5 robot, the PCF is equal to the frame of the 'tool0' link

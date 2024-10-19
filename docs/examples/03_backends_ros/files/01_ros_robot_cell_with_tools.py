@@ -11,7 +11,7 @@ from compas_fab.robots import ToolLibrary
 from compas_fab.robots import RigidBody
 
 with RosClient() as client:
-    robot = client.load_robot()
+    robot_cell = client.load_robot_cell()
     planner = MoveItPlanner(client)
 
     # =========
@@ -19,7 +19,6 @@ with RosClient() as client:
     # =========
 
     # Create a robot cell with the robot from the client
-    robot_cell = RobotCell(robot)
     # Add a floor as rigid body to the robot cell, this will be static.
     floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
     robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
@@ -34,7 +33,7 @@ with RosClient() as client:
     # In order to see the tool attached it is necessary to update the robot_cell_state
     robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
     # Modify the tool state to attach the cone to the robot
-    robot_cell_state.tool_states["cone"].attached_to_group = robot.main_group_name
+    robot_cell_state.tool_states["cone"].attached_to_group = robot_cell.main_group_name
     robot_cell_state.tool_states["cone"].attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
     # Specify the link of the robot that the tool is allowed to collide with
     robot_cell_state.tool_states["cone"].touch_links = ["wrist_3_link"]
@@ -54,7 +53,7 @@ with RosClient() as client:
     # Demonstrate that it is possible to have multiple tools in the robot cell
 
     # Create a robot cell with the robot from the client
-    robot_cell = RobotCell(robot)
+    robot_cell = client.load_robot_cell()
     # Add a two tools (gripper and cone) to the robot cell
     gripper = ToolLibrary.static_gripper_small()
     robot_cell.tool_models[gripper.name] = gripper
@@ -65,14 +64,14 @@ with RosClient() as client:
     # It will also ensure that only one tool is attached to the specified group by removing others
     robot_cell_state.set_tool_attached_to_group(
         gripper.name,
-        robot.main_group_name,
+        robot_cell.main_group_name,
         attachment_frame=Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]),
         touch_links=["wrist_3_link"],
     )
     # Specify the location of the detached cone tool
     robot_cell_state.tool_states[cone_tool.name].frame = Frame([1.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
     # Move the robot to a different configuration
-    robot_cell_state.robot_configuration = robot.zero_configuration()
+    robot_cell_state.robot_configuration = robot_cell.zero_configuration()
     robot_cell_state.robot_configuration._joint_values[1] = -0.5
     robot_cell_state.robot_configuration._joint_values[2] = 0.5
     result = planner.set_robot_cell(robot_cell, robot_cell_state)

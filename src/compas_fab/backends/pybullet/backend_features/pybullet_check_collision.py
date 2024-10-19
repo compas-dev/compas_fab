@@ -145,8 +145,8 @@ class PyBulletCheckCollision(CheckCollision):
                     collision_messages.append(cc_pair_info + " - COLLISION")
                     collision_pairs.append(
                         (
-                            client.robot.model.get_link_by_name(link_1_name),
-                            client.robot.model.get_link_by_name(link_2_name),
+                            client.robot_cell.robot_model.get_link_by_name(link_1_name),
+                            client.robot_cell.robot_model.get_link_by_name(link_2_name),
                         )
                     )
                     if not full_report:  # Fail on first error if full_report is not requested
@@ -177,7 +177,10 @@ class PyBulletCheckCollision(CheckCollision):
                         verbose_print(cc_pair_info + " - COLLISION")
                         collision_messages.append(cc_pair_info + " - COLLISION")
                         collision_pairs.append(
-                            (client.robot.model.get_link_by_name(link_name), client.robot_cell.tool_models[tool_name])
+                            (
+                                client.robot_cell.robot_model.get_link_by_name(link_name),
+                                client.robot_cell.tool_models[tool_name],
+                            )
                         )
                         if not full_report:  # Fail on first error if full_report is not requested
                             raise CollisionCheckError("\n".join(collision_messages), collision_pairs)
@@ -208,7 +211,7 @@ class PyBulletCheckCollision(CheckCollision):
                             collision_messages.append(cc_pair_info + " (body_id '{}') - COLLISION".format(body_id))
                             collision_pairs.append(
                                 (
-                                    client.robot.model.get_link_by_name(link_name),
+                                    client.robot_cell.robot_model.get_link_by_name(link_name),
                                     client.robot_cell.rigid_body_models[body_name],
                                 )
                             )

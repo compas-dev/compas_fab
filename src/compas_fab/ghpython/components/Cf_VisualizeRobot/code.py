@@ -15,9 +15,9 @@ from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
 
 from compas_fab.backends import BackendFeatureNotSupportedError
-from compas_fab.robots import PlanningScene
 
 
+# TODO: This component needs to be migrated to visualize RobotCell
 class RobotVisualize(component):
     def RunScript(
         self,

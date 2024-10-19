@@ -373,10 +373,10 @@ def _get_disabled_collisions(root):
 # it prints the data object as a json string using the UR5 robot as example.
 
 if __name__ == "__main__":
-    from compas_fab.robots import RobotLibrary
+    from compas_fab.robots import RobotCellLibrary
 
-    robot = RobotLibrary.ur5()
-    semantics = robot.semantics
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+    semantics = robot_cell.robot_semantics
     json = semantics.to_jsonstring(pretty=True)
     print(json)
 

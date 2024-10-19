@@ -6,7 +6,7 @@ from compas_fab.backends import PyBulletPlanner
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import RigidBody
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 from compas.geometry import Frame
 from compas.geometry import Box
 from compas_robots import ToolModel
@@ -15,8 +15,7 @@ with PyBulletClient() as client:
     # ---------------------------------------------------------------------
     # Create a robot cell and add objects to it
     # ---------------------------------------------------------------------
-    robot = RobotLibrary.abb_irb4600_40_255()
-    robot_cell = RobotCell(robot)
+    robot_cell, robot_cell_state = RobotCellLibrary.abb_irb4600_40_255()
 
     # Add Static Collision Geometry
     floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
@@ -34,15 +33,14 @@ with PyBulletClient() as client:
     # ------------------------------------------------------------------------
     # Create a RobotCellState to represent the current state of the robot cell
     # ------------------------------------------------------------------------
-    robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
     # Change the robot's configuration for demonstration purposes
-    configuration = robot.zero_configuration()
+    configuration = robot_cell.zero_configuration()
     configuration.joint_values[1] = 0.5  # Change the second joint angle to 0.5 [rad]
     robot_cell_state.robot_configuration = configuration
 
     # Attach the tool to the robot's main group
-    robot_cell_state.set_tool_attached_to_group("cone", robot.main_group_name)
+    robot_cell_state.set_tool_attached_to_group("cone", robot_cell.main_group_name)
 
     # Attach the workpiece to the tool
     workpiece_grasp_frame = Frame([0, 0, 0.1], [1, 0, 0], [0, 1, 0])

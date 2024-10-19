@@ -25,11 +25,17 @@ from compas_fab.backends.ros.messages import MoveItErrorCodes
 from compas_fab.backends.ros.messages import RobotTrajectory
 from compas_fab.backends.ros.messages import Time
 from compas_fab.backends.tasks import CancellableFutureResult
-from compas_fab.robots import Robot
 from compas_fab.robots import RobotSemantics
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 
+from compas import IPY
+
+if not IPY:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from typing import Optional
 
 __all__ = [
     "RosClient",
@@ -153,7 +159,7 @@ class RosClient(Ros, ClientInterface):
 
         return self._ros_distro
 
-    def load_robot(
+    def load_robot_cell(
         self,
         load_geometry=False,
         urdf_param_name="/robot_description",
@@ -161,7 +167,9 @@ class RosClient(Ros, ClientInterface):
         precision=None,
         local_cache_directory=None,
     ):
-        """Load an entire robot instance -including model and semantics- directly from ROS.
+        # type: (bool, str, str, int, Optional[str]) -> RobotCell
+        """Load the robot cell (including model and semantics) from ROS.
+        The robot celL is set in `client.robot_cell` and returned.
 
         Parameters
         ----------
@@ -182,8 +190,8 @@ class RosClient(Ros, ClientInterface):
         Examples
         --------
         >>> with RosClient() as client:
-        ...     robot = client.load_robot()
-        ...     print(robot.name)
+        ...     robot_cell = client.load_robot_cell()
+        ...     print(robot_cell.robot_model.name)
         ur5_robot
 
         """
@@ -208,10 +216,10 @@ class RosClient(Ros, ClientInterface):
         if load_geometry:
             model.load_geometry(loader, precision=precision)
 
-        robot = Robot(model, semantics=semantics)
-        self._robot_cell = RobotCell(robot)
+        self._robot_cell = RobotCell(robot_model=model, robot_semantics=semantics)
         self._robot_cell_state = RobotCellState.from_robot_cell(self._robot_cell)
-        return robot
+
+        return self._robot_cell
 
     # ==========================================================================
     # executing

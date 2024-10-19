@@ -10,20 +10,19 @@ from compas_fab.robots import RigidBody
 from compas_robots import ToolModel
 from compas_robots import Configuration
 from compas_fab.robots import RobotCellState
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RobotCell
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import TargetMode
 
 
 with AnalyticalPyBulletClient(connection_type="gui") as client:
-    robot = RobotLibrary.ur5(load_geometry=True)
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=True)
     planner = AnalyticalPyBulletPlanner(client, UR5Kinematics())
 
     # ---------------------------------------------------------------------
     # Create a robot cell and add objects to it
     # ---------------------------------------------------------------------
-    robot_cell = RobotCell(robot)
 
     # Add Static Collision Geometry
     floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
@@ -41,10 +40,9 @@ with AnalyticalPyBulletClient(connection_type="gui") as client:
     # ------------------------------------------------------------------------
     # Create a RobotCellState to represent the current state of the robot cell
     # ------------------------------------------------------------------------
-    robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
     # Attach the tool to the robot's main group
-    robot_cell_state.set_tool_attached_to_group("cone", robot.main_group_name)
+    robot_cell_state.set_tool_attached_to_group("cone", robot_cell.main_group_name)
 
     # Attach the workpiece to the tool
     workpiece_grasp_frame = Frame([0, 0, 0.1], [1, 0, 0], [0, 1, 0])

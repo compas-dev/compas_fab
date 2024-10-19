@@ -10,7 +10,7 @@
 # from compas_fab.backends.exceptions import CollisionCheckError
 
 # from compas_fab.robots import RobotCellLibrary
-# from compas_fab.robots import RobotLibrary
+# from compas_fab.robots import RobotCellLibrary
 # from compas_fab.robots import RobotCellState
 # from compas_fab.robots import FrameTarget
 # from compas_fab.robots import PointAxisTarget

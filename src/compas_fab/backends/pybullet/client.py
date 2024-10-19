@@ -41,6 +41,7 @@ if not IPY:
         import pybullet
         from compas_robots import Configuration  # noqa: F401
         from compas_robots import ToolModel  # noqa: F401
+        from compas_robots import RobotModel  # noqa: F401
         from compas_robots.model import Mimic  # noqa: F401
 
         from compas_fab.backends.kinematics import AnalyticalInverseKinematics  # noqa: F401
@@ -49,6 +50,7 @@ if not IPY:
         from compas_fab.robots import Robot  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
+        from compas_fab.robots import RobotSemantics  # noqa: F401
 
 
 # If Pybullet is not defined, load it from LazyLoader
@@ -277,9 +279,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     # Functions for loading and removing objects
     # ------------------------------------------
 
-    def set_robot(self, robot, concavity=False):
-        # type: (Robot, Optional[bool]) -> Robot
-        """Load an existing robot to PyBullet.
+    def set_robot(self, robot_model, robot_semantics, concavity=False):
+        # type: (RobotModel, RobotSemantics, Optional[bool]) -> Robot
+        """Send a robot to PyBullet.
 
         This function is used by SetRobotCell and should not be called directly by user.
         The robot must contain geometry and semantics.
@@ -288,23 +290,19 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
+        robot_cell : :class:`compas_fab.robots.RobotCell`
             The robot to be saved for use with PyBullet.
         concavity : :obj:`bool`, optional
 
-        Returns
-        -------
-        :class:`compas_fab.robots.Robot`
-            A robot instance.
         """
         if self.robot_puid is not None:
             self.remove_robot()
 
-        urdf_fp = self.robot_model_to_urdf(robot.model, concavity=concavity)
+        urdf_fp = self.robot_model_to_urdf(robot_model, concavity=concavity)
         self.robot_puid = robot_puid = self.pybullet_load_urdf(urdf_fp)
 
         # The root link of the robot have index of `-1` (refer to PyBullet API)
-        self.robot_link_puids[robot.model.root.name] = -1
+        self.robot_link_puids[robot_model.root.name] = -1
 
         # For the rest of the joints and links, their numbers are the same
         # The id of the joint is the same as the id of its child link
@@ -318,9 +316,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         # that accept poses will require passing also the mimic joints.
         # In compas_fab, mimic joints are not considered as DOF and are not included in get_configurable_joints().
 
-        self.disabled_collisions = robot.semantics.disabled_collisions
-
-        return robot
+        self.disabled_collisions = robot_semantics.disabled_collisions
 
     def remove_robot(self):
         """Remove the robot from the PyBullet server if it exists."""
@@ -626,7 +622,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                 joint_values.append(configuration[joint_name])
             else:
                 # Check if this is mimic joint
-                joint = self.robot.model.get_joint_by_name(joint_name)
+                joint = self.robot_cell.robot_model.get_joint_by_name(joint_name)
                 mimic = joint.mimic  # type: Mimic
                 # Get the value of the joint that is being mimicked (works only for non-cascaded mimic)
                 if mimic:
@@ -741,7 +737,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                 self._set_joint_position(joint_puid, configuration[joint_name], self.robot_puid)
             else:
                 # Check if this is mimic joint
-                joint = self.robot.model.get_joint_by_name(joint_name)
+                joint = self.robot_cell.robot_model.get_joint_by_name(joint_name)
                 mimic = joint.mimic  # type: Mimic
                 # Get the value of the joint that is being mimicked (works only for non-cascaded mimic)
                 if mimic:

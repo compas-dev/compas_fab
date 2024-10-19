@@ -30,9 +30,8 @@ class AnalyticalForwardKinematics(ForwardKinematics):
         """Calculate the forward kinematics for a given joint configuration."""
         planner = self  # type: AnalyticalKinematicsPlanner
         robot_cell = self.client.robot_cell  # type: RobotCell
-        robot = self.client.robot_cell.robot  # type: Robot
 
-        if group is not None and group != robot.main_group_name:
+        if group is not None and group != robot_cell.main_group_name:
             # NOTE: Analytical IK must operate on all the joints as defined in the KinematicsSolver
             # There is a chance that the planning group specified by the URDF does not match with these joints
             # At the moment there is no automatic check for this except to assume that the main group

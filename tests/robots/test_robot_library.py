@@ -1,4 +1,4 @@
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 import pytest
 
 
@@ -17,4 +17,4 @@ def test_robot_semantics_and_geometry(all_robots):
         robot.ensure_semantics()
         robot.ensure_geometry()
         assert robot.name
-        robot.info()
+        robot_cell.print_info()

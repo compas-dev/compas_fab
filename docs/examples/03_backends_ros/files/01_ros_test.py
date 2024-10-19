@@ -9,7 +9,7 @@ from compas_fab.robots import RigidBody
 from compas_fab.robots import RobotCellState
 
 with RosClient() as client:
-    robot = client.load_robot()
+    robot_cell = client.load_robot_cell()
     planner = MoveItPlanner(client)
 
     # =========

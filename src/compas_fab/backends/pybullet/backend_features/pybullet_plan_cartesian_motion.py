@@ -44,7 +44,7 @@ if not IPY:
 
         from compas_fab.backends import PyBulletClient  # noqa: F401
         from compas_fab.backends import PyBulletPlanner  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Waypoints  # noqa: F401
 
@@ -153,8 +153,8 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
-        robot = client.robot  # type: Robot
-        group = group or robot.main_group_name
+        robot_cell = client.robot_cell  # type: RobotCell
+        group = group or robot_cell.main_group_name
 
         # Unit conversion from user scale to meter scale can be done here because they are shared by all planners.
         waypoints = waypoints.normalized_to_meters()
@@ -172,7 +172,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         # Get default group name if not provided
         # Do not skip this line because some functions do not default to main_group_name when group input is None.
-        group = group or robot.main_group_name
+        group = group or robot_cell.main_group_name
 
         # ===================================================================================
         # End of common lines
@@ -313,7 +313,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # Housekeeping for intellisense
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
-        robot = client.robot  # type: Robot
+        robot_cell = client.robot_cell  # type: RobotCell
 
         # Setting robot cell state
         planner.set_robot_cell_state(start_state)
@@ -336,8 +336,8 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         ik_options["max_random_restart"] = 1
 
         # Getting the joint names this way ensures that the joint order is consistent with Semantics
-        joint_names = robot.get_configurable_joint_names(group)
-        joint_types = robot.get_configurable_joint_types(group)
+        joint_names = robot_cell.get_configurable_joint_names(group)
+        joint_types = robot_cell.get_configurable_joint_types(group)
 
         # Iterate over the waypoints as segments
         intermediate_state = deepcopy(start_state)  # type: RobotCellState
@@ -346,7 +346,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         # Recreate the first frame for the beginning of the interpolation
         fk_options = deepcopy(options)
-        fk_options["link"] = robot.get_end_effector_link_name(group)
+        fk_options["link"] = robot_cell.get_end_effector_link_name(group)
 
         # This frame reference need to match with the target_mode of the waypoints
         start_frame = planner.forward_kinematics(start_state, waypoints.target_mode, group=group, options=fk_options)
@@ -670,7 +670,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # Housekeeping for intellisense
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
-        robot = client.robot  # type: Robot
+        robot_cell = client.robot_cell  # type: RobotCell
 
         # Setting robot cell state
         planner.set_robot_cell_state(start_state)
@@ -729,8 +729,8 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # The ["check_collision"] in options is passed also to the ik_options
 
         # Getting the joint names this way ensures that the joint order is consistent with Semantics
-        joint_names = robot.get_configurable_joint_names(group)
-        joint_types = robot.get_configurable_joint_types(group)
+        joint_names = robot_cell.get_configurable_joint_names(group)
+        joint_types = robot_cell.get_configurable_joint_types(group)
 
         # Iterate over the waypoints as segments
         intermediate_state = deepcopy(start_state)  # type: RobotCellState
@@ -751,7 +751,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # Recreate the first frame for the beginning of the interpolation
         # First frame is obtained from the start configuration with forward kinematics
         fk_options = deepcopy(options)
-        fk_options["link"] = robot.get_end_effector_link_name(group)
+        fk_options["link"] = robot_cell.get_end_effector_link_name(group)
         # This frame reference need to match with the target_mode of the waypoints
         start_frame = planner.forward_kinematics(start_state, waypoints.target_mode, group=group, options=fk_options)
 

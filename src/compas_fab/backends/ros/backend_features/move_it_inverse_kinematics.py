@@ -17,7 +17,8 @@ if not IPY:
         from typing import Dict  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import FrameTarget  # noqa: F401
-        from compas_fab.robots import AttachedCollisionMesh  # noqa: F401
+        from compas_fab.backends import MoveItPlanner  # noqa: F401
+        from compas_fab.backends import RosClient  # noqa: F401
 
 from compas.tolerance import TOL
 from compas.utilities import await_callback
@@ -37,7 +38,6 @@ from compas_fab.backends.ros.messages import PositionIKRequest
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import RosDistro
 from compas_fab.backends.ros.service_description import ServiceDescription
-from compas_fab.utilities import from_tcf_to_t0cf
 
 __all__ = [
     "MoveItInverseKinematics",
@@ -66,12 +66,12 @@ class MoveItInverseKinematics(InverseKinematics):
     #     kwargs = {}
     #     kwargs["options"] = options
     #     kwargs["frame_WCF"] = frame_WCF
-    #     kwargs["group"] = group or self.client.robot.main_group_name
-    #     kwargs["start_configuration"] = start_configuration or self.client.robot.zero_configuration()
+    #     kwargs["group"] = group or self.client.robot_cell.main_group_name
+    #     kwargs["start_configuration"] = start_configuration or self.client.robot_cell.zero_configuration()
     #     kwargs["errback_name"] = "errback"
 
     #     # Use base_link or fallback to model's root link
-    #     options["base_link"] = options.get("base_link", self.client.robot.model.root.name)
+    #     options["base_link"] = options.get("base_link", self.client.robot_cell.robot_model.root.name)
 
     #     return await_callback(self.inverse_kinematics_async, **kwargs)
     #     # return_full_configuration = options.get("return_full_configuration", False)
@@ -145,51 +145,38 @@ class MoveItInverseKinematics(InverseKinematics):
         """
         options = options or {}
         planner = self  # type: MoveItPlanner
-        robot = planner.client.robot
-        client = planner.client
+        client = planner.client  # type: RosClient
+        robot_cell = client.robot_cell
+
         # Group
-        group = group or robot.main_group_name
+        group = group or robot_cell.main_group_name
 
         # Set scene
-        # TODO: Implement start_state
         client.robot_cell.assert_cell_state_match(start_state)
-        start_state = start_state or RobotCellState.from_robot_configuration(robot)
+        planner.set_robot_cell_state(start_state)
 
         # Start configuration
         start_configuration = start_state.robot_configuration
         # Merge with zero configuration ensure all joints are present
-        start_configuration = robot.zero_configuration(group).merged(start_configuration)
+        start_configuration = robot_cell.zero_configuration(group).merged(start_configuration)
 
         # Target frame and Tool Coordinate Frame
         target = target.normalized_to_meters()
         target_frame = target.target_frame
-
-        # Attached tool frames does not need scaling because Tools are modelled in meter scale
-        attached_tool = client.robot_cell.get_attached_tool(start_state, group)
-        if attached_tool:
-            target_frame = from_tcf_to_t0cf(target_frame, attached_tool.frame)
-
-        # Scale Attached Collision Meshes
-        attached_collision_meshes = client.robot_cell.get_attached_rigid_bodies_as_attached_collision_meshes(
-            start_state, group
-        )
-        # TODO: ACM will always be modeled in meters too. This is a temporary solution
-        if robot.need_scaling:
-            for acm in attached_collision_meshes:
-                acm.collision_mesh.scale(1.0 / robot.scale_factor)
+        planner_frame = client.robot_cell.target_frames_to_pcf(start_state, target_frame, target.target_mode, group)
 
         # Compose the kwargs for the async function
         kwargs = {}
         kwargs["options"] = options
-        kwargs["frame_WCF"] = target_frame
+        kwargs["frame_WCF"] = planner_frame
         kwargs["group"] = group
-        kwargs["start_configuration"] = start_configuration or robot.zero_configuration()
+        kwargs["start_configuration"] = start_configuration
         kwargs["errback_name"] = "errback"
 
         max_results = options.get("max_results", 100)
 
         # Use base_link or fallback to model's root link
-        options["base_link"] = options.get("base_link", self.client.robot.model.root.name)
+        options["base_link"] = options.get("base_link", robot_cell.root_name)
 
         all_yielded_joint_positions = []
         # Yield up to max_results configurations
@@ -209,7 +196,7 @@ class MoveItInverseKinematics(InverseKinematics):
                 all_yielded_joint_positions.append(joint_positions)
 
             # Generate random start configuration for next iteration
-            random_configuration = self.client.robot.random_configuration(kwargs["group"])
+            random_configuration = robot_cell.random_configuration(kwargs["group"])
             kwargs["start_configuration"] = random_configuration
 
     def inverse_kinematics_async(
@@ -223,12 +210,9 @@ class MoveItInverseKinematics(InverseKinematics):
         joint_state = JointState(
             name=start_configuration.joint_names, position=start_configuration.joint_values, header=header
         )
-        start_state = RobotState(joint_state, MultiDOFJointState(header=header))
 
-        if options.get("attached_collision_meshes"):
-            for acm in options["attached_collision_meshes"]:
-                aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
-                start_state.attached_collision_objects.append(aco)
+        # The start state being in diff mode allows it to keep previously set Attached Collision Objects
+        start_state = RobotState(joint_state, MultiDOFJointState(header=header), is_diff=True)
 
         # Filter needs to happen after all objects have been added
         start_state.filter_fields_for_distro(self.client.ros_distro)

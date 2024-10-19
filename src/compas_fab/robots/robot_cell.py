@@ -246,8 +246,8 @@ class RobotCell(Data):
 
         Examples
         --------
-        >>> robot = RobotLibrary.ur5()
-        >>> robot.group_names
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+        >>> robot_cell.group_names
         ['manipulator', 'endeffector']
 
         """
@@ -268,8 +268,8 @@ class RobotCell(Data):
 
         Examples
         --------
-        >>> robot = RobotLibrary.ur5()
-        >>> sorted(robot.group_states['manipulator'].keys())
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+        >>> sorted(robot_cell.group_states['manipulator'].keys())
         ['home', 'up']
 
         """
@@ -291,8 +291,8 @@ class RobotCell(Data):
 
         Examples
         --------
-        >>> robot = RobotLibrary.ur5()
-        >>> robot.get_end_effector_link_name()
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+        >>> robot_cell.get_end_effector_link_name()
         'tool0'
         """
         return self.robot_semantics.get_end_effector_link_name(group or self.main_group_name)
@@ -312,8 +312,8 @@ class RobotCell(Data):
 
         Examples
         --------
-        >>> robot = RobotLibrary.ur5()
-        >>> link = robot.get_end_effector_link()
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+        >>> link = robot_cell.get_end_effector_link()
         >>> link.name
         'tool0'
         """
@@ -335,8 +335,8 @@ class RobotCell(Data):
 
         Examples
         --------
-        >>> robot = RobotLibrary.ur5()
-        >>> robot.get_base_link_name()
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+        >>> robot_cell.get_base_link_name()
         'base_link'
         """
         return self.robot_semantics.get_base_link_name(group or self.main_group_name)
@@ -356,8 +356,8 @@ class RobotCell(Data):
 
         Examples
         --------
-        >>> robot = RobotLibrary.ur5()
-        >>> link = robot.get_base_link()
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+        >>> link = robot_cell.get_base_link()
         >>> link.name
         'base_link'
         """
@@ -379,8 +379,8 @@ class RobotCell(Data):
 
         Examples
         --------
-        >>> robot = RobotLibrary.ur5()
-        >>> robot.get_link_names('manipulator')
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+        >>> robot_cell.get_link_names('manipulator')
         ['base_link', 'base_link_inertia', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link', 'flange', 'tool0']
         """
         group = group or self.main_group_name
@@ -404,8 +404,8 @@ class RobotCell(Data):
 
         Examples
         --------
-        >>> robot = RobotLibrary.ur5()
-        >>> robot.get_link_names_with_collision_geometry()
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+        >>> robot_cell.get_link_names_with_collision_geometry()
         ['base_link_inertia', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link']
         """
         return [link.name for link in self.robot_model.iter_links() if link.collision]
@@ -498,8 +498,8 @@ class RobotCell(Data):
 
         Examples
         --------
-        >>> robot = RobotLibrary.ur5()
-        >>> robot.get_configurable_joint_types('manipulator')
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+        >>> robot_cell.get_configurable_joint_types('manipulator')
         [0, 0, 0, 0, 0, 0]
         """
         group = group or self.main_group_name
@@ -589,8 +589,8 @@ class RobotCell(Data):
 
         Examples
         --------
-        >>> robot = RobotLibrary.ur5()
-        >>> robot.zero_configuration('manipulator')
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+        >>> robot_cell.zero_configuration('manipulator')
         Configuration((0.000, 0.000, 0.000, 0.000, 0.000, 0.000), (0, 0, 0, 0, 0, 0), \
             ('shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'))
         """
@@ -1148,7 +1148,7 @@ class RobotCell(Data):
     # Debug Functions
     # ----------------------------------------
 
-    def info(self):
+    def print_info(self):
         # type: () -> None
         """Print information about the robot."""
         print("The robot's name is '{}'.".format(self.robot_model.name))

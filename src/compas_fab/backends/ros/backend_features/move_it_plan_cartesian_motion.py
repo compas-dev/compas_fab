@@ -31,6 +31,7 @@ if not IPY:
         from compas_fab.robots import JointTrajectory  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Waypoints  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
 
 __all__ = [
     "MoveItPlanCartesianMotion",
@@ -95,24 +96,24 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         """
         planner = self  # type: MoveItPlanner  # noqa: F841
         client = planner.client  # type: RosClient # noqa: F841
-        robot = client.robot
+        robot_cell = client.robot_cell  # type: RobotCell # noqa: F841
 
         options = options or {}
         kwargs = {}
         kwargs["options"] = options
         kwargs["waypoints"] = waypoints
         kwargs["start_state"] = start_state
-        group = group or robot.main_group_name
+        group = group or robot_cell.main_group_name
         kwargs["group"] = group
 
         kwargs["errback_name"] = "errback"
 
         # Use base_link or fallback to model's root link
-        options["base_link"] = options.get("base_link", robot.model.root.name)
-        options["joints"] = {j.name: j.type for j in robot.model.joints}
+        options["base_link"] = options.get("base_link", robot_cell.root_name)
+        options["joints"] = {j.name: j.type for j in robot_cell.robot_model.joints}
 
-        options["link"] = options.get("link") or robot.get_end_effector_link_name(group)
-        if options["link"] not in robot.get_link_names(group):
+        options["link"] = options.get("link") or robot_cell.get_end_effector_link_name(group)
+        if options["link"] not in robot_cell.get_link_names(group):
             raise ValueError("Link name {} does not exist in planning group".format(options["link"]))
 
         # This function wraps multiple implementations depending on the type of waypoints

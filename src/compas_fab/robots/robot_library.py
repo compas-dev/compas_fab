@@ -336,9 +336,13 @@ class RobotCellLibrary(object):
     >>> robot_cell_state.get
     """
 
+    # ---------------------------------------------------------------------
+    # Robot Cells with only Robots
+    # ---------------------------------------------------------------------
+
     @classmethod
     def rfl(cls, load_geometry=True):
-        # type: (Optional[bool]) -> RobotCell
+        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
         """Create and return the RFL robot with 4 ABB irb 4600 and twin-gantry setup.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
@@ -360,12 +364,13 @@ class RobotCellLibrary(object):
             srdf_filename=compas_fab.get("robot_library/rfl/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/rfl" if load_geometry else None,
         )
+        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
-        return robot_cell
+        return robot_cell, robot_cell_state
 
     @classmethod
     def ur5(cls, load_geometry=True):
-        # type: (Optional[bool]) -> RobotCell
+        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
         """Returns a UR5 robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
@@ -390,12 +395,13 @@ class RobotCellLibrary(object):
             srdf_filename=compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/ur5_robot" if load_geometry else None,
         )
+        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
-        return robot_cell
+        return robot_cell, robot_cell_state
 
     @classmethod
     def ur10e(cls, load_geometry=True):
-        # type: (Optional[bool]) -> RobotCell
+        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
         """Returns a UR10e robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
@@ -417,12 +423,13 @@ class RobotCellLibrary(object):
             srdf_filename=compas_fab.get("robot_library/ur10e_robot/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/ur10e_robot" if load_geometry else None,
         )
+        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
-        return robot_cell
+        return robot_cell, robot_cell_state
 
     @classmethod
     def abb_irb4600_40_255(cls, load_geometry=True):
-        # type: (Optional[bool]) -> RobotCell
+        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
         """Returns a ABB irb4600-40/2.55 robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
@@ -444,12 +451,13 @@ class RobotCellLibrary(object):
             srdf_filename=compas_fab.get("robot_library/abb_irb4600_40_255/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/abb_irb4600_40_255" if load_geometry else None,
         )
+        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
-        return robot_cell
+        return robot_cell, robot_cell_state
 
     @classmethod
     def abb_irb120_3_58(cls, load_geometry=True):
-        # type: (Optional[bool]) -> RobotCell
+        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
         """Returns a ABB irb120-3/58 robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
@@ -471,12 +479,13 @@ class RobotCellLibrary(object):
             srdf_filename=compas_fab.get("robot_library/abb_irb120_3_58/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/abb_irb120_3_58" if load_geometry else None,
         )
+        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
-        return robot_cell
+        return robot_cell, robot_cell_state
 
     @classmethod
     def panda(cls, load_geometry=True):
-        # type: (Optional[bool]) -> RobotCell
+        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
         """Returns a Panda robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
@@ -509,7 +518,13 @@ class RobotCellLibrary(object):
                 robot_model.remove_link(link.name)
                 robot_model.remove_joint(link.parent_joint.name)
 
-        return robot_cell
+        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+
+        return robot_cell, robot_cell_state
+
+    # ---------------------------------------------------------------------
+    # Robot Cells with Tools and Rigid Bodies
+    # ---------------------------------------------------------------------
 
     @classmethod
     def ur5_cone_tool(cls, load_geometry=True):
@@ -535,7 +550,7 @@ class RobotCellLibrary(object):
         # ---------------------------------------------------------------------
         # Load Robot and create RobotCell
         # ---------------------------------------------------------------------
-        robot_cell = RobotCellLibrary.ur5(load_geometry=load_geometry)
+        robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=load_geometry)
 
         # ---------------------------------------------------------------------
         # Load Tools
@@ -555,7 +570,7 @@ class RobotCellLibrary(object):
         robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
 
         # ------------------------------------------------------------------------
-        # Create RobotCellState
+        # Re-Create RobotCellState after modifying the RobotCell
         # ------------------------------------------------------------------------
         robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
@@ -603,7 +618,7 @@ class RobotCellLibrary(object):
         # ---------------------------------------------------------------------
         # Load Robot and create RobotCell
         # ---------------------------------------------------------------------
-        robot_cell = RobotCellLibrary.abb_irb4600_40_255(load_geometry=load_geometry)
+        robot_cell, robot_cell_state = RobotCellLibrary.abb_irb4600_40_255(load_geometry=load_geometry)
 
         # ---------------------------------------------------------------------
         # Load Tools
@@ -629,7 +644,7 @@ class RobotCellLibrary(object):
         robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
 
         # ------------------------------------------------------------------------
-        # Create RobotCellState
+        # Re-Create RobotCellState after modifying the RobotCell
         # ------------------------------------------------------------------------
         robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
@@ -670,7 +685,7 @@ class RobotCellLibrary(object):
         # ---------------------------------------------------------------------
         # Load Robot and create RobotCell
         # ---------------------------------------------------------------------
-        robot_cell = RobotCellLibrary.ur10e(load_geometry=load_geometry)
+        robot_cell, robot_cell_state = RobotCellLibrary.ur10e(load_geometry=load_geometry)
 
         # ---------------------------------------------------------------------
         # Load Tools
@@ -696,7 +711,7 @@ class RobotCellLibrary(object):
         robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
 
         # ------------------------------------------------------------------------
-        # Create RobotCellState
+        # Re-Create RobotCellState after modifying the RobotCell
         # ------------------------------------------------------------------------
         robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
@@ -710,7 +725,7 @@ class RobotCellLibrary(object):
         # Gripper is allowed to touch the last link of the robot.
         # However, do not use the following line to get the end effector link name,
         # because it is not guaranteed to be the last link that has geometry in the robot chain.
-        # ee_link_name = robot.get_end_effector_link_name(robot.main_group_name)
+        # ee_link_name = robot.get_end_effector_link_name(robot_cell.main_group_name)
 
         # Instead, check the robot model and hard code the actual link name.
         touch_links = ["wrist_3_link"]
@@ -764,7 +779,7 @@ class RobotCellLibrary(object):
         # ---------------------------------------------------------------------
         # Load Robot and create RobotCell
         # ---------------------------------------------------------------------
-        robot_cell = RobotCellLibrary.abb_irb4600_40_255(load_geometry=load_geometry)
+        robot_cell, robot_cell_state = RobotCellLibrary.abb_irb4600_40_255(load_geometry=load_geometry)
 
         # ---------------------------------------------------------------------
         # Load Tools
@@ -782,7 +797,7 @@ class RobotCellLibrary(object):
         robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
 
         # ------------------------------------------------------------------------
-        # Create RobotCellState
+        # Re-Create RobotCellState after modifying the RobotCell
         # ------------------------------------------------------------------------
         robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
@@ -809,18 +824,6 @@ class RobotCellLibrary(object):
 
 if __name__ == "__main__":
 
-    # TODO: Clean up the development code below
-
-    # robot = RobotLibrary.rfl(load_geometry=True)
-    # robot.info()
-
-    # robot = RobotLibrary.ur5(load_geometry=True)
-    # robot.info()
-
-    # robot_cell, robot_cell_state = RobotCellLibrary.ur5_cone_tool(load_geometry=True)
-    # robot_cell.robot.info()
-    # robot_cell_state.get_attached_tool_id(robot_cell.robot.main_group_name)
-
     # ----------------------------
     # Visualize Tool with compas_viewer
     # ----------------------------
@@ -831,7 +834,6 @@ if __name__ == "__main__":
     viewer = Viewer()
     viewer.renderer.rendermode = "lighted"
 
-    # model = robot.model
     model = ToolLibrary.static_gripper(load_geometry=True)
     robot_object = viewer.scene.add(model, show_lines=False)  # type: RobotModelObject
 

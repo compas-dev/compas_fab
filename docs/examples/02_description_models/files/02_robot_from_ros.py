@@ -1,6 +1,6 @@
 from compas_fab.backends import RosClient
 
 with RosClient() as ros:
-    robot = ros.load_robot(load_geometry=True, precision=12)
+    robot_cell = ros.load_robot_cell(load_geometry=True, precision=12)
 
-    print(robot.model)
+    print(robot_cell.robot_model)

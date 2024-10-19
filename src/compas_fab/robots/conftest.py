@@ -12,8 +12,7 @@ from compas.geometry import allclose
 
 import compas_fab
 from compas_fab.backends import RosClient
-from compas_fab.robots import RobotLibrary
-from compas_fab.robots.tool import Tool
+from compas_fab.robots import RobotCellLibrary
 
 
 @pytest.fixture(autouse=True)
@@ -30,4 +29,3 @@ def add_imports(doctest_namespace):
     doctest_namespace["RobotLibrary"] = RobotLibrary
     doctest_namespace["RosClient"] = RosClient
     doctest_namespace["Rotation"] = Rotation
-    doctest_namespace["Tool"] = Tool

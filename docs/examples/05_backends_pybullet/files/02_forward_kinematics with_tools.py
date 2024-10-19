@@ -7,7 +7,7 @@ from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import RigidBody
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 from compas.geometry import Frame
 from compas.geometry import Box
 from compas_robots import Configuration

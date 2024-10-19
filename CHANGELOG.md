@@ -40,7 +40,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed GH Component `ConstraintsFromTargetConfiguration` to `ConfigurationTarget`.
 
 ### Removed
-
+* Removed `attached_collision_meshes` attribute from `JointTrajectory` class.
+* Removed `Robot.merge_group_with_full_configuration` as it can be covered by `Configuration.merged`.
+* Removed function `Robot.get_group_names_from_link_name` as it is too oddly specific.
+* Removed `Robot.get_position_by_joint_name` as Configuration class can now be directly accessed by joint name.
 * Removed `Tool` class from `compas_fab.robots` module.
 * Removed Backend Feature `AddCollisionMesh`, `AppendCollisionMesh`, `AddAttachedCollisionMesh`, `RemoveCollisionMesh` and `RemoveAttachedCollisionMesh`.
 * Removed `inverse_kinematics`, `forward_kinematics`, `plan_cartesian_motion`, and `plan_motion` methods from ClientInterface, access them using the planner instead.

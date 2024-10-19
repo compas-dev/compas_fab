@@ -11,8 +11,6 @@
            Whether or not to show the robot's collision meshes.
         show_frames: bool
            Whether or not to show the robot's joint frames.
-        show_base_frame: bool
-           Whether or not to show the robot's base frame.
         show_end_effector_frame: bool
             Whether or not to show the robot's end-effector frame.
     Output:
@@ -22,6 +20,7 @@
         base_frame_WCF: The robot's base frame.
         ee_frame_WCF: The robot's end-effector frame.
 """
+
 from __future__ import print_function
 
 if robot and full_configuration:
@@ -40,9 +39,6 @@ if robot and full_configuration:
         axes = robot.transformed_axes(full_configuration, group)
         frames = robot.transformed_frames(full_configuration, group)
 
-    if show_base_frame:
-        base_frame_WCF = robot.get_base_frame(group, full_configuration)
-
     if show_end_effector_frame:
-        ee_frame_WCF = robot.get_end_effector_frame(group, full_configuration)
+        ee_frame_WCF = robot.model.forward_kinematics(full_configuration)
         print("End-effector", ee_frame_WCF)

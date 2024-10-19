@@ -5,22 +5,17 @@ from compas_fab.backends import PyBulletPlanner
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
 
 with PyBulletClient() as client:
     # This example uses the panda robot, which has 7 joints.
     # When given a FrameTarget, the robot will have multiple inverse kinematics solutions.
-    robot = RobotLibrary.panda()
+    robot_cell, robot_cell_state = RobotCellLibrary.panda()
 
     # Set RobotCell using the planner function
-    robot_cell = RobotCell(robot)
     planner = PyBulletPlanner(client)
     planner.set_robot_cell(robot_cell)
-
-    # Create initial state
-    start_configuration = robot.zero_configuration()
-    robot_cell_state = RobotCellState.from_robot_configuration(robot, start_configuration)
 
     # Create target
     frame_WCF = Frame([0.5, 0.1, 0.5], [1, 0, 0], [0, 1, 0])

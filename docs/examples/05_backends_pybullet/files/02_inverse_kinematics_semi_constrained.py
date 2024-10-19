@@ -13,20 +13,17 @@ from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RigidBodyLibrary
 from compas_fab.robots import RobotCellState
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
 
 # NOTE: The semi-constrained IK mode cannot be used with tools
 
 with PyBulletClient() as client:
     # Create a robot cell with a UR5 robot
-    robot = RobotLibrary.ur5()
-    robot_cell = RobotCell(robot)
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5()
 
     # Add a target marker to visualize the target
     robot_cell.rigid_body_models["target_marker"] = RigidBodyLibrary.target_marker(size=0.15)
-
-    robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
     planner = PyBulletPlanner(client)
     planner.set_robot_cell(robot_cell)

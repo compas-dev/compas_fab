@@ -1,12 +1,12 @@
 # This example file demonstrates how to print the chain of links and joints in a robot model.
 
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 from compas_robots.model import Joint
 
 # RobotLibrary also contains .ur5(), .ur10e(), abb_irb120_3_58(), abb_irb4600_40_255(), .rfl(), .panda()
-robot = RobotLibrary.panda(load_geometry=False)
+robot_cell, robot_cell_state = RobotCellLibrary.panda(load_geometry=False)
 
-model = robot.model
+model = robot_cell.robot_model
 print("Robot Model Chain:")
 
 # ----------------------------------------------
@@ -38,12 +38,12 @@ print("")
 
 def print_planning_group_chain(group):
     print("Planning Group: {}".format(group))
-    base_link = robot.get_base_link_name(group)
+    base_link = robot_cell.get_base_link_name(group)
     print("Base Link: {}".format(base_link))
-    tip_link = robot.get_end_effector_link_name(group)
+    tip_link = robot_cell.get_end_effector_link_name(group)
     print("Tip Link: {}".format(tip_link))
     print("--------------------")
-    group_object = robot.semantics.groups[group]
+    group_object = robot_cell.robot_semantics.groups[group]
     joints_in_group = group_object["joints"]
     links_in_group = group_object["links"]
 
@@ -84,5 +84,5 @@ def print_planning_group_chain(group):
     print("")
 
 
-for group in robot.semantics.groups:
+for group in robot_cell.robot_semantics.groups:
     print_planning_group_chain(group)

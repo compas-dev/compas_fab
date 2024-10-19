@@ -8,17 +8,17 @@ from compas_fab.robots import TargetMode
 from compas_fab.backends import MoveItPlanner
 
 with RosClient() as client:
-    robot = client.load_robot()
+    robot_cell = client.load_robot_cell()
     planner = MoveItPlanner(client)
-    assert robot.name == "ur5_robot"
+    assert robot_cell.robot_model.name == "ur5_robot"
 
     frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
     tolerance_position = 0.001
     tolerance_orientation = math.radians(1)
 
-    start_configuration = robot.zero_configuration()
+    start_configuration = robot_cell.zero_configuration()
     start_configuration.joint_values = (-3.530, 3.830, -0.580, -3.330, 4.760, 0.000)
-    group = robot.main_group_name
+    group = robot_cell.main_group_name
 
     # create target from frame
     target = FrameTarget(

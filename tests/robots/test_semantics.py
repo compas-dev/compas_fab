@@ -4,7 +4,7 @@ import pytest
 from compas_robots import RobotModel
 
 from compas_fab.robots import RobotSemantics
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 
 BASE_FOLDER = os.path.dirname(__file__)
 
@@ -61,13 +61,13 @@ def test_panda_srdf_file(panda_srdf, panda_urdf):
 
 
 def test_ur5_semantics():
-    robot = RobotLibrary.ur5(load_geometry=False)
-    semantics = robot.semantics
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=False)
+    semantics = robot_cell.robot_semantics
     assert sorted(semantics.group_names) == sorted(["manipulator", "endeffector"])
     assert semantics.main_group_name == "manipulator"
     assert semantics.get_base_link_name() == "base_link"
     assert semantics.get_end_effector_link_name() == "tool0"
-    assert semantics.get_configurable_joint_names(robot.model) == [
+    assert robot_cell.get_configurable_joint_names() == [
         "shoulder_pan_joint",
         "shoulder_lift_joint",
         "elbow_joint",

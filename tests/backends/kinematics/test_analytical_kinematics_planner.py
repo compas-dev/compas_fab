@@ -14,7 +14,7 @@ from compas_fab.backends import UR5Kinematics
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
 
 if not IPY:
@@ -36,12 +36,11 @@ def ur5_planner_robot_only():
     planner = AnalyticalKinematicsPlanner(solver)
 
     # Set up the robot cell with only the robot
-    robot = RobotLibrary.ur5(load_geometry=False)  # No need to load the geometry because no CC
-    robot_cell = RobotCell(robot)
+    # (No need to load the geometry because no CC)
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=False)
     planner.set_robot_cell(robot_cell)
 
     # Set Initial RobotCellState
-    robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
     planner.set_robot_cell_state(robot_cell_state)
     return planner
 

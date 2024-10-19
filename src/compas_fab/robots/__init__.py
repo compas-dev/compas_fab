@@ -109,9 +109,6 @@ from .reachability_map import (
     DeviationVectorsGenerator,
     OrthonormalVectorsFromAxisGenerator,
 )
-from .robot import (
-    Robot,
-)
 
 from .robot_cell import (
     RobotCell,
@@ -173,8 +170,6 @@ __all__ = [
     "ReachabilityMap",
     "DeviationVectorsGenerator",
     "OrthonormalVectorsFromAxisGenerator",
-    # Robot
-    "Robot",
     # Robot Cell
     "RobotCell",
     # Rigid Body

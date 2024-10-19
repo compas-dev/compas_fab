@@ -7,6 +7,9 @@ if not IPY:
     from compas_fab.backends import PyBulletClient
     from compas_fab.backends import PyBulletPlanner
 
+    from typing import List  # noqa: F401
+    from typing import Tuple  # noqa: F401
+
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Vector
@@ -26,7 +29,7 @@ from compas_fab.robots import Robot  # noqa: F401
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RobotCellState
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
 
 
@@ -79,19 +82,18 @@ def compare_configuration(config1, config2, tolerance_linear, tolerance_angular)
 ######################################################
 
 
-def compare_planner_fk_model_fk(robot, pybullet_client, known_zero_frame):
-    # type: (Robot, PyBulletClient, Frame) -> None
+def compare_planner_fk_model_fk(robot_cell, robot_cell_state, pybullet_client, known_zero_frame):
+    # type: (RobotCell, RobotCellState, PyBulletClient, Frame) -> None
     """A test of forward kinematics using the zero configuration of the robot."""
     planner = PyBulletPlanner(pybullet_client)
-    planner.set_robot_cell(RobotCell(robot))
+    planner.set_robot_cell(robot_cell)
 
-    planning_group = robot.main_group_name
-    end_effector_link = robot.get_end_effector_link_name(planning_group)
+    planning_group = robot_cell.main_group_name
+    end_effector_link = robot_cell.get_end_effector_link_name(planning_group)
 
-    robot_cell_state = RobotCellState.from_robot_configuration(robot, robot.zero_configuration())
     planner_fk_result = planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT, group=planning_group)
     print(planner_fk_result)
-    model_fk_result = robot.model.forward_kinematics(robot.zero_configuration(), end_effector_link)
+    model_fk_result = robot_cell.robot_model.forward_kinematics(robot_cell.zero_configuration(), end_effector_link)
     print(model_fk_result)
 
     assert compare_frames(planner_fk_result, model_fk_result, 1e-3, 1e-3)
@@ -99,43 +101,43 @@ def compare_planner_fk_model_fk(robot, pybullet_client, known_zero_frame):
 
 
 def test_fk_ur5(pybullet_client):
-    robot = RobotLibrary.ur5(load_geometry=True)
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=True)
     known_zero_frame = Frame(
         point=Point(x=0.8172500133514404, y=0.19144999980926514, z=-0.005491000134497881),
         xaxis=Vector(x=-1.0, y=0.0, z=0.0),
         yaxis=Vector(x=0.0, y=0.0, z=1.0),
     )
-    compare_planner_fk_model_fk(robot, pybullet_client, known_zero_frame)
+    compare_planner_fk_model_fk(robot_cell, robot_cell_state, pybullet_client, known_zero_frame)
 
 
 def test_fk_abb_irb4600_40_255(pybullet_client):
-    robot = RobotLibrary.abb_irb4600_40_255(load_geometry=True)
+    robot_cell, robot_cell_state = RobotCellLibrary.abb_irb4600_40_255(load_geometry=True)
     known_zero_frame = Frame(
         point=Point(x=1.58, y=0.0, z=1.765),
         xaxis=Vector(x=0.0, y=0.0, z=-1.0),
         yaxis=Vector(x=0.0, y=1.0, z=0.0),
     )
-    compare_planner_fk_model_fk(robot, pybullet_client, known_zero_frame)
+    compare_planner_fk_model_fk(robot_cell, robot_cell_state, pybullet_client, known_zero_frame)
 
 
 def test_fk_ur10e(pybullet_client):
-    robot = RobotLibrary.ur10e(load_geometry=True)
+    robot_cell, robot_cell_state = RobotCellLibrary.ur10e(load_geometry=True)
     known_zero_frame = Frame(
         point=Point(x=1.18425, y=0.2907, z=0.0608),
         xaxis=Vector(x=-1.0, y=0.0, z=-0.0),
         yaxis=Vector(x=0.0, y=0.0, z=1.0),
     )
-    compare_planner_fk_model_fk(robot, pybullet_client, known_zero_frame)
+    compare_planner_fk_model_fk(robot_cell, robot_cell_state, pybullet_client, known_zero_frame)
 
 
 def test_fk_panda(pybullet_client):
-    robot = RobotLibrary.panda(load_geometry=True)
+    robot_cell, robot_cell_state = RobotCellLibrary.panda(load_geometry=True)
     known_zero_frame = Frame(
         point=Point(x=0.256, y=-0.000, z=0.643),
         xaxis=Vector(x=-0.000, y=0.707, z=-0.707),
         yaxis=Vector(x=-0.000, y=-0.707, z=-0.707),
     )
-    compare_planner_fk_model_fk(robot, pybullet_client, known_zero_frame)
+    compare_planner_fk_model_fk(robot_cell, robot_cell_state, pybullet_client, known_zero_frame)
 
 
 ######################################################
@@ -143,7 +145,8 @@ def test_fk_panda(pybullet_client):
 ######################################################
 
 
-def ik_fk_agreement(robot, pybullet_client, ik_target_frames):
+def ik_fk_agreement(robot_cell, robot_cell_state, pybullet_client, ik_target_frames):
+    # type: (RobotCell, RobotCellState, PyBulletClient, List[Frame]) -> None
     """Helper function to test the IK-FK agreement for the PyBullet backend
 
     The function takes a robot and a list of target frames for IK and FK queries.
@@ -161,8 +164,8 @@ def ik_fk_agreement(robot, pybullet_client, ik_target_frames):
     }
 
     planner = PyBulletPlanner(pybullet_client)
-    planner.set_robot_cell(RobotCell(robot))
-    planning_group = robot.main_group_name
+    planner.set_robot_cell(robot_cell)
+    planning_group = robot_cell.main_group_name
 
     for ik_target_frame in ik_target_frames:
         # IK Query to the planner (Frame to Configuration)
@@ -177,7 +180,7 @@ def ik_fk_agreement(robot, pybullet_client, ik_target_frames):
                         tolerance_position=tolerance_position,
                         tolerance_orientation=tolerance_orientation,
                     ),
-                    RobotCellState.from_robot_configuration(robot),
+                    robot_cell_state,
                     group=planning_group,
                     options=ik_options,
                 )
@@ -187,7 +190,7 @@ def ik_fk_agreement(robot, pybullet_client, ik_target_frames):
             assert False, "No IK Solution found for frame"
 
         # FK Query to the planner (Configuration to Frame)
-        robot_cell_state = RobotCellState.from_robot_configuration(robot, ik_result)
+        robot_cell_state.robot_configuration = ik_result
         fk_result = planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT, group=planning_group)
 
         # Compare the frames
@@ -195,7 +198,7 @@ def ik_fk_agreement(robot, pybullet_client, ik_target_frames):
 
 
 def test_ik_fk_agreement_ur5(pybullet_client):
-    robot = RobotLibrary.ur5(load_geometry=True)
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=True)
 
     ik_center_frame = Frame(
         Point(x=0.4, y=0.1, z=0.3),
@@ -211,11 +214,11 @@ def test_ik_fk_agreement_ur5(pybullet_client):
     ik_target_frames.append(ik_center_frame.translated(Vector(0.1, 0.1, 0.2)))
     ik_target_frames.append(ik_center_frame.translated(Vector(-0.1, -0.1, 0.0)))
 
-    ik_fk_agreement(robot, pybullet_client, ik_target_frames)
+    ik_fk_agreement(robot_cell, robot_cell_state, pybullet_client, ik_target_frames)
 
 
 def test_ik_fk_agreement_ur10e(pybullet_client):
-    robot = RobotLibrary.ur10e(load_geometry=True)
+    robot_cell, robot_cell_state = RobotCellLibrary.ur10e(load_geometry=True)
 
     ik_center_frame = Frame(
         Point(x=0.4, y=0.1, z=0.3),
@@ -231,11 +234,11 @@ def test_ik_fk_agreement_ur10e(pybullet_client):
     ik_target_frames.append(ik_center_frame.translated(Vector(0.1, 0.1, 0.2)))
     ik_target_frames.append(ik_center_frame.translated(Vector(-0.1, -0.1, 0.0)))
 
-    ik_fk_agreement(robot, pybullet_client, ik_target_frames)
+    ik_fk_agreement(robot_cell, robot_cell_state, pybullet_client, ik_target_frames)
 
 
 def test_ik_fk_agreement_abb_irb4600_40_255(pybullet_client):
-    robot = RobotLibrary.abb_irb4600_40_255(load_geometry=True)
+    robot_cell, robot_cell_state = RobotCellLibrary.abb_irb4600_40_255(load_geometry=True)
 
     ik_center_frame = Frame(
         Point(x=1.0, y=0.3, z=1.3),
@@ -251,12 +254,12 @@ def test_ik_fk_agreement_abb_irb4600_40_255(pybullet_client):
     ik_target_frames.append(ik_center_frame.translated(Vector(0.1, 0.1, 0.2)))
     ik_target_frames.append(ik_center_frame.translated(Vector(-0.3, -0.1, -0.3)))
 
-    ik_fk_agreement(robot, pybullet_client, ik_target_frames)
+    ik_fk_agreement(robot_cell, robot_cell_state, pybullet_client, ik_target_frames)
 
 
 def test_ik_fk_agreement_panda(pybullet_client):
     # The panda robot has mimic joints for testing purposes
-    robot = RobotLibrary.panda(load_geometry=True)
+    robot_cell, robot_cell_state = RobotCellLibrary.panda(load_geometry=True)
 
     ik_center_frame = Frame(
         point=Point(x=0.2, y=-0.0, z=0.6),
@@ -272,7 +275,7 @@ def test_ik_fk_agreement_panda(pybullet_client):
     ik_target_frames.append(ik_center_frame.translated(Vector(0.1, 0.1, -0.2)))
     ik_target_frames.append(ik_center_frame.translated(Vector(-0.05, -0.05, -0.03)))
 
-    ik_fk_agreement(robot, pybullet_client, ik_target_frames)
+    ik_fk_agreement(robot_cell, robot_cell_state, pybullet_client, ik_target_frames)
 
 
 ##################################################
@@ -281,7 +284,7 @@ def test_ik_fk_agreement_panda(pybullet_client):
 
 
 def test_ik_out_of_reach_ur5(pybullet_client):
-    robot = RobotLibrary.ur5(load_geometry=True)
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=True)
 
     ik_target_frames = []
 
@@ -306,15 +309,15 @@ def test_ik_out_of_reach_ur5(pybullet_client):
     }
 
     planner = PyBulletPlanner(pybullet_client)
-    planner.set_robot_cell(RobotCell(robot))
-    planning_group = robot.main_group_name
+    planner.set_robot_cell(robot_cell)
+    planning_group = robot_cell.main_group_name
     for ik_target_frame in ik_target_frames:
         # IK Query to the planner (Frame to Configuration)
         try:
             # Note: The inverse_kinematics method returns a generator
             planner.inverse_kinematics(
                 FrameTarget(ik_target_frame, target_mode=TargetMode.ROBOT),
-                RobotCellState.from_robot_configuration(robot),
+                robot_cell_state,
                 group=planning_group,
                 options=ik_options,
             )
@@ -327,7 +330,7 @@ def test_ik_out_of_reach_ur5(pybullet_client):
 
 
 def test_ik_return_full_configuration(pybullet_client):
-    robot = RobotLibrary.panda(load_geometry=True)
+    robot_cell, robot_cell_state = RobotCellLibrary.panda(load_geometry=True)
 
     ik_target_frame = Frame(
         point=Point(x=0.2, y=-0.0, z=0.6),
@@ -337,8 +340,7 @@ def test_ik_return_full_configuration(pybullet_client):
     target = FrameTarget(ik_target_frame, TargetMode.ROBOT)
 
     planner = PyBulletPlanner(pybullet_client)
-    planner.set_robot_cell(RobotCell(robot))
-    robot_cell_state = RobotCellState.from_robot_configuration(robot, robot.zero_configuration())
+    planner.set_robot_cell(robot_cell)
     config = planner.inverse_kinematics(target, robot_cell_state)
     assert "panda_finger_joint1" not in config.joint_names
     assert len(config.joint_names) == 7
@@ -351,11 +353,11 @@ def test_ik_return_full_configuration(pybullet_client):
 
 def test_ik_modified_only_joints_in_group(pybullet_client):
     # Test the IK solver see if it moved only the joints in the group
-    robot = RobotLibrary.panda(load_geometry=True)
+    robot_cell, robot_cell_state = RobotCellLibrary.panda(load_geometry=True)
 
     # Create a custom group with joint 1 locked, `panda_joint1` and `panda_link0` are not included.
     # This is not supported because the starting part of the chain is not included
-    robot.semantics.groups["locked_j1"] = {
+    robot_cell.robot_semantics.groups["locked_j1"] = {
         "links": [
             "panda_link1",
             "panda_link2",
@@ -381,7 +383,7 @@ def test_ik_modified_only_joints_in_group(pybullet_client):
     }
 
     # The following group is supported because only the right side of the chain is cut short
-    robot.semantics.groups["locked_j7"] = {
+    robot_cell.robot_semantics.groups["locked_j7"] = {
         "links": [
             "panda_link0",
             "panda_link1",
@@ -401,7 +403,7 @@ def test_ik_modified_only_joints_in_group(pybullet_client):
         ],
     }
     # The following group does not work because the links bridged by the joints are not included
-    robot.semantics.groups["locked_j7_further"] = {
+    robot_cell.robot_semantics.groups["locked_j7_further"] = {
         "links": [
             "panda_link0",
             "panda_link1",
@@ -434,12 +436,12 @@ def test_ik_modified_only_joints_in_group(pybullet_client):
     options = {"return_full_configuration": True}
 
     planner = PyBulletPlanner(pybullet_client)
-    planner.set_robot_cell(RobotCell(robot))
-    initial_configuration = robot.zero_configuration()
+    planner.set_robot_cell(robot_cell)
+    initial_configuration = robot_cell.zero_configuration()
     initial_configuration["panda_joint1"] = 0.123
     initial_configuration["panda_joint7"] = 0.123
     print(initial_configuration)
-    robot_cell_state = RobotCellState.from_robot_configuration(robot, initial_configuration)
+    robot_cell_state.robot_configuration = initial_configuration
 
     # The main planning group should work as expected
     config = planner.inverse_kinematics(target, robot_cell_state, options=options)
@@ -492,6 +494,7 @@ def test_ik_fk_with_wrong_group_name_raises_exception(pybullet_client):
 
 @pytest.fixture
 def planner_with_test_cell(pybullet_client):
+    # type: (PyBulletClient) -> Tuple[PyBulletPlanner, RobotCell, RobotCellState]
     planner = PyBulletPlanner(pybullet_client)
 
     # Setup the robot cell
@@ -513,7 +516,7 @@ def test_frame_target_ik_tolerance(planner_with_test_cell):
     This makes sure that the IK solver is not spending more time than necessary to find a solution.
     """
     planner, robot_cell, robot_cell_state = planner_with_test_cell
-    group = robot_cell.robot.main_group_name
+    group = robot_cell.main_group_name
     result_cell_state = robot_cell_state.copy()  # type: RobotCellState
 
     target_frame = Frame([0.5, 0.5, 0.5], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
@@ -554,7 +557,7 @@ def test_frame_target_ik_with_tools_and_workpieces(planner_with_test_cell):
     planner, robot_cell, robot_cell_state = planner_with_test_cell
 
     # Testing conditions
-    group = robot_cell.robot.main_group_name
+    group = robot_cell.main_group_name
     target_frame = Frame([0.5, 0.5, 0.5], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
     options = {"check_collision": False}
     tolerance_position = 1e-3
@@ -678,7 +681,7 @@ def test_iter_ik_frame_target(planner_with_test_cell):
     with pytest.raises(ValueError):
         next(generator)
 
-    group = robot_cell.robot.main_group_name
+    group = robot_cell.main_group_name
     generator = planner.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
     result = next(generator)  # type: Configuration
 
@@ -717,7 +720,7 @@ def test_iter_ik_returns_different_results(planner_with_test_cell):
     planner, robot_cell, robot_cell_state = planner_with_test_cell
 
     # Testing conditions
-    group = robot_cell.robot.main_group_name
+    group = robot_cell.main_group_name
     options = {
         "check_collision": True,
         "solution_uniqueness_threshold_prismatic": 1e-3,
@@ -764,7 +767,7 @@ def test_iter_ik_point_axis_target(planner_with_test_cell):
     with pytest.raises(ValueError):
         next(generator)
 
-    group = robot_cell.robot.main_group_name
+    group = robot_cell.main_group_name
     generator = planner.iter_inverse_kinematics_point_axis_target(target, robot_cell_state, group, options)
     result = next(generator)  # type: Configuration
 
