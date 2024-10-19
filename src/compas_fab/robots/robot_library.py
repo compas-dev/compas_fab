@@ -12,7 +12,6 @@ from compas_robots import ToolModel
 
 import compas_fab
 from compas_fab.robots import RigidBody
-from compas_fab.robots import Robot
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 
@@ -28,203 +27,9 @@ if not IPY:
 
 __all__ = [
     "RigidBodyLibrary",
-    "RobotLibrary",
     "RobotCellLibrary",
     "ToolLibrary",
 ]
-
-
-class RobotLibrary(object):
-    """A collection of built-in robots that can be used for testing and demonstration.
-    The :class:`compas_fab.robots.Robot` objects created by the factory methods
-    can be used to write examples, so that the example code can stay short.
-
-    The robots are loaded from URDF, SRDF and local mesh files.
-    The resulting robot object
-    contains the robot model, semantics, visual and collision meshes for the links.
-
-    Examples
-    --------
-
-    >>> from compas_fab.robots import RobotLibrary
-    >>> robot = RobotLibrary.ur5()
-    >>> robot.name
-    'ur5_robot'
-    """
-
-    @classmethod
-    def rfl(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Robot
-        """Create and return the RFL robot with 4 ABB irb 4600 and twin-gantry setup.
-
-        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
-
-        Parameters
-        ----------
-        load_geometry: :obj:`bool`, optional
-            Default is `True`, which means that the geometry is loaded.
-            `False` can be used to speed up the creation of the robot.
-
-        Returns
-        -------
-        :class:`compas_fab.robots.Robot`
-            Newly created instance of the robot.
-        """
-
-        robot = Robot.from_urdf(
-            urdf_filename=compas_fab.get("robot_library/rfl/urdf/robot_description.urdf"),
-            srdf_filename=compas_fab.get("robot_library/rfl/robot_description_semantic.srdf"),
-            local_package_mesh_folder="robot_library/rfl" if load_geometry else None,
-        )
-
-        return robot
-
-    @classmethod
-    def ur5(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Robot
-        """Returns a UR5 robot.
-
-        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
-
-        The main planning group of the robot is named 'manipulator'.
-        The first and last link on the 'manipulator' group is named 'base_link' and 'tool0'.
-
-        Parameters
-        ----------
-        load_geometry: :obj:`bool`, optional
-            Default is `True`, which means that the geometry is loaded.
-            `False` can be used to speed up the creation of the robot.
-
-        Returns
-        -------
-        :class:`compas_fab.robots.Robot`
-            Newly created instance of the robot.
-        """
-
-        robot = Robot.from_urdf(
-            urdf_filename=compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf"),
-            srdf_filename=compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf"),
-            local_package_mesh_folder="robot_library/ur5_robot" if load_geometry else None,
-        )
-
-        return robot
-
-    @classmethod
-    def ur10e(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Robot
-        """Returns a UR10e robot.
-
-        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
-
-        Parameters
-        ----------
-        load_geometry: :obj:`bool`, optional
-            Default is `True`, which means that the geometry is loaded.
-            `False` can be used to speed up the creation of the robot.
-
-        Returns
-        -------
-        :class:`compas_fab.robots.Robot`
-            Newly created instance of the robot.
-        """
-
-        robot = Robot.from_urdf(
-            urdf_filename=compas_fab.get("robot_library/ur10e_robot/urdf/robot_description.urdf"),
-            srdf_filename=compas_fab.get("robot_library/ur10e_robot/robot_description_semantic.srdf"),
-            local_package_mesh_folder="robot_library/ur10e_robot" if load_geometry else None,
-        )
-
-        return robot
-
-    @classmethod
-    def abb_irb4600_40_255(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Robot
-        """Returns a ABB irb4600-40/2.55 robot.
-
-        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
-
-        Parameters
-        ----------
-        load_geometry: :obj:`bool`, optional
-            Default is `True`, which means that the geometry is loaded.
-            `False` can be used to speed up the creation of the robot.
-
-        Returns
-        -------
-        :class:`compas_fab.robots.Robot`
-            Newly created instance of the robot.
-        """
-
-        robot = Robot.from_urdf(
-            urdf_filename=compas_fab.get("robot_library/abb_irb4600_40_255/urdf/robot_description.urdf"),
-            srdf_filename=compas_fab.get("robot_library/abb_irb4600_40_255/robot_description_semantic.srdf"),
-            local_package_mesh_folder="robot_library/abb_irb4600_40_255" if load_geometry else None,
-        )
-
-        return robot
-
-    @classmethod
-    def abb_irb120_3_58(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Robot
-        """Returns a ABB irb120-3/58 robot.
-
-        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
-
-        Parameters
-        ----------
-        load_geometry: :obj:`bool`, optional
-            Default is `True`, which means that the geometry is loaded.
-            `False` can be used to speed up the creation of the robot.
-
-        Returns
-        -------
-        :class:`compas_fab.robots.Robot`
-            Newly created instance of the robot.
-        """
-
-        robot = Robot.from_urdf(
-            urdf_filename=compas_fab.get("robot_library/abb_irb120_3_58/urdf/robot_description.urdf"),
-            srdf_filename=compas_fab.get("robot_library/abb_irb120_3_58/robot_description_semantic.srdf"),
-            local_package_mesh_folder="robot_library/abb_irb120_3_58" if load_geometry else None,
-        )
-
-        return robot
-
-    @classmethod
-    def panda(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Robot
-        """Returns a Panda robot.
-
-        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
-
-        Parameters
-        ----------
-        load_geometry: :obj:`bool`, optional
-            Default is `True`, which means that the geometry is loaded.
-            `False` can be used to speed up the creation of the robot.
-
-        Returns
-        -------
-        :class:`compas_fab.robots.Robot`
-            Newly created instance of the robot.
-        """
-
-        robot = Robot.from_urdf(
-            urdf_filename=compas_fab.get("robot_library/panda/urdf/robot_description.urdf"),
-            srdf_filename=compas_fab.get("robot_library/panda/robot_description_semantic.srdf"),
-            local_package_mesh_folder="robot_library/panda" if load_geometry else None,
-        )
-
-        # Remove the links with '_sc' suffix, which are collision objects used for
-        # Gazebo simulation. They are not needed for PyBullet and obscure the gui.
-        # They are also not helpful in other viewers.
-        # See https://frankaemika.github.io/docs/franka_ros.html for more details.
-        for link in robot.model.links:
-            if link.name.endswith("_sc"):
-                robot.model.remove_link(link.name)
-                robot.model.remove_joint(link.parent_joint.name)
-
-        return robot
 
 
 class ToolLibrary(object):
@@ -475,17 +280,47 @@ class ToolLibrary(object):
         return tool_model
 
 
+class RigidBodyLibrary(object):
+
+    @classmethod
+    def target_marker(cls, size=1.0):
+        # type: (Optional[float]) -> RigidBody
+        """Create and return a target marker as RigidBody, useful for visualizing the target pose.
+
+        The target marker points out the X, Y, Z directions with its shape.
+        It is fully contained within a cube in the positive octant of the target frame.
+        The size of the cube is determined by the input size.
+
+        The marker has only one visual mesh, and no collision mesh.
+        """
+
+        # Load the target marker mesh
+        obj = compas_fab.get("planning_scene/target_marker.obj")
+        mesh = Mesh.from_obj(obj)
+
+        # Scale the target marker to the desired size
+        mesh.scale(size)
+
+        return RigidBody(mesh, None)
+
+
 class RobotCellLibrary(object):
     """A collection of built-in robot cells that can be used for testing and demonstrations.
     The :class:`compas_fab.robots.RobotCell` and :class:`compas_fab.robots.RobotCellState`
     objects created by the factory methods can be used to write examples,
     so that the example code can stay short.
 
-    The Robot object in the RobotCell are loaded by RobotLibrary.
-    It contains the robot model, semantics, visual and collision meshes for the links.
-    The Tool(s) are loaded by ToolLibrary. It contains the tool model, semantics, visual and collision meshes.
+    The robot cells with only a robot name (e.g. 'ur5') contains only the robot model and semantics.
+    Some robot cells contain also Tool(s) and Rigid Body(s).
+    The Tool(s) are often loaded from the ToolLibrary.
     Other collision objects such as robot backpacks, floors, tables, workpieces, etc. may also be included
     depending on the specific robot cell.
+
+    All the robot cells constructors has a `load_geometry` parameter that can be used to
+    decide if the geometry for the robot and the tool(s) should be loaded or not.
+    In order to visualize the robot cell or to perform planning functions, the geometry must be loaded.
+    However, for some tests that may not require geometry, setting `load_geometry` to `'false'`
+    can speed up the test. If in doubt, use the default value `True`.
 
     The RobotCellState object contains a predefined state that match with the robot cell.
     The tool(s) and workpiece(s) may or may not be attached depending on the specific robot cell scenario.
@@ -500,6 +335,181 @@ class RobotCellLibrary(object):
     'ur5_robot'
     >>> robot_cell_state.get
     """
+
+    @classmethod
+    def rfl(cls, load_geometry=True):
+        # type: (Optional[bool]) -> RobotCell
+        """Create and return the RFL robot with 4 ABB irb 4600 and twin-gantry setup.
+
+        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+
+        Parameters
+        ----------
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the geometry is loaded.
+            `False` can be used to speed up the creation of the robot.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Robot`
+            Newly created instance of the robot.
+        """
+
+        robot_cell = RobotCell.from_urdf_and_srdf(
+            urdf_filename=compas_fab.get("robot_library/rfl/urdf/robot_description.urdf"),
+            srdf_filename=compas_fab.get("robot_library/rfl/robot_description_semantic.srdf"),
+            local_package_mesh_folder="robot_library/rfl" if load_geometry else None,
+        )
+
+        return robot_cell
+
+    @classmethod
+    def ur5(cls, load_geometry=True):
+        # type: (Optional[bool]) -> RobotCell
+        """Returns a UR5 robot.
+
+        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+
+        The main planning group of the robot is named 'manipulator'.
+        The first and last link on the 'manipulator' group is named 'base_link' and 'tool0'.
+
+        Parameters
+        ----------
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the geometry is loaded.
+            `False` can be used to speed up the creation of the robot.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Robot`
+            Newly created instance of the robot.
+        """
+
+        robot_cell = RobotCell.from_urdf_and_srdf(
+            urdf_filename=compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf"),
+            srdf_filename=compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf"),
+            local_package_mesh_folder="robot_library/ur5_robot" if load_geometry else None,
+        )
+
+        return robot_cell
+
+    @classmethod
+    def ur10e(cls, load_geometry=True):
+        # type: (Optional[bool]) -> RobotCell
+        """Returns a UR10e robot.
+
+        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+
+        Parameters
+        ----------
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the geometry is loaded.
+            `False` can be used to speed up the creation of the robot.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Robot`
+            Newly created instance of the robot.
+        """
+
+        robot_cell = RobotCell.from_urdf_and_srdf(
+            urdf_filename=compas_fab.get("robot_library/ur10e_robot/urdf/robot_description.urdf"),
+            srdf_filename=compas_fab.get("robot_library/ur10e_robot/robot_description_semantic.srdf"),
+            local_package_mesh_folder="robot_library/ur10e_robot" if load_geometry else None,
+        )
+
+        return robot_cell
+
+    @classmethod
+    def abb_irb4600_40_255(cls, load_geometry=True):
+        # type: (Optional[bool]) -> RobotCell
+        """Returns a ABB irb4600-40/2.55 robot.
+
+        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+
+        Parameters
+        ----------
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the geometry is loaded.
+            `False` can be used to speed up the creation of the robot.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Robot`
+            Newly created instance of the robot.
+        """
+
+        robot_cell = RobotCell.from_urdf_and_srdf(
+            urdf_filename=compas_fab.get("robot_library/abb_irb4600_40_255/urdf/robot_description.urdf"),
+            srdf_filename=compas_fab.get("robot_library/abb_irb4600_40_255/robot_description_semantic.srdf"),
+            local_package_mesh_folder="robot_library/abb_irb4600_40_255" if load_geometry else None,
+        )
+
+        return robot_cell
+
+    @classmethod
+    def abb_irb120_3_58(cls, load_geometry=True):
+        # type: (Optional[bool]) -> RobotCell
+        """Returns a ABB irb120-3/58 robot.
+
+        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+
+        Parameters
+        ----------
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the geometry is loaded.
+            `False` can be used to speed up the creation of the robot.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Robot`
+            Newly created instance of the robot.
+        """
+
+        robot_cell = RobotCell.from_urdf_and_srdf(
+            urdf_filename=compas_fab.get("robot_library/abb_irb120_3_58/urdf/robot_description.urdf"),
+            srdf_filename=compas_fab.get("robot_library/abb_irb120_3_58/robot_description_semantic.srdf"),
+            local_package_mesh_folder="robot_library/abb_irb120_3_58" if load_geometry else None,
+        )
+
+        return robot_cell
+
+    @classmethod
+    def panda(cls, load_geometry=True):
+        # type: (Optional[bool]) -> RobotCell
+        """Returns a Panda robot.
+
+        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+
+        Parameters
+        ----------
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the geometry is loaded.
+            `False` can be used to speed up the creation of the robot.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.Robot`
+            Newly created instance of the robot.
+        """
+
+        robot_cell = RobotCell.from_urdf_and_srdf(
+            urdf_filename=compas_fab.get("robot_library/panda/urdf/robot_description.urdf"),
+            srdf_filename=compas_fab.get("robot_library/panda/robot_description_semantic.srdf"),
+            local_package_mesh_folder="robot_library/panda" if load_geometry else None,
+        )
+
+        # Remove the links with '_sc' suffix, which are collision objects used for
+        # Gazebo simulation. They are not needed for PyBullet and obscure the gui.
+        # They are also not helpful in other viewers.
+        # See https://frankaemika.github.io/docs/franka_ros.html for more details.
+        robot_model = robot_cell.robot_model
+        for link in robot_model.links:
+            if link.name.endswith("_sc"):
+                robot_model.remove_link(link.name)
+                robot_model.remove_joint(link.parent_joint.name)
+
+        return robot_cell
 
     @classmethod
     def ur5_cone_tool(cls, load_geometry=True):
@@ -525,8 +535,7 @@ class RobotCellLibrary(object):
         # ---------------------------------------------------------------------
         # Load Robot and create RobotCell
         # ---------------------------------------------------------------------
-        robot = RobotLibrary.ur5(load_geometry=load_geometry)
-        robot_cell = RobotCell(robot)
+        robot_cell = RobotCellLibrary.ur5(load_geometry=load_geometry)
 
         # ---------------------------------------------------------------------
         # Load Tools
@@ -556,7 +565,7 @@ class RobotCellLibrary(object):
         # that is REP 199 compliant is attached with the following rotation to match.
         attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
         robot_cell_state.set_tool_attached_to_group(
-            "cone", robot.main_group_name, attachment_frame=attachment_frame, touch_links=touch_links
+            "cone", robot_cell.main_group_name, attachment_frame=attachment_frame, touch_links=touch_links
         )
 
         # ------------------------------------------------------------------------
@@ -594,8 +603,7 @@ class RobotCellLibrary(object):
         # ---------------------------------------------------------------------
         # Load Robot and create RobotCell
         # ---------------------------------------------------------------------
-        robot = RobotLibrary.abb_irb4600_40_255(load_geometry=load_geometry)
-        robot_cell = RobotCell(robot)
+        robot_cell = RobotCellLibrary.abb_irb4600_40_255(load_geometry=load_geometry)
 
         # ---------------------------------------------------------------------
         # Load Tools
@@ -627,7 +635,7 @@ class RobotCellLibrary(object):
 
         # Attach the tool to the robot's main group
         attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
-        robot_cell_state.set_tool_attached_to_group("gripper", robot.main_group_name, attachment_frame)
+        robot_cell_state.set_tool_attached_to_group("gripper", robot_cell.main_group_name, attachment_frame)
         # Note: There is a rotation to match the gripper's orientation because the last link in the abb robot
         # does not follow the REP 199 convention.
 
@@ -662,8 +670,7 @@ class RobotCellLibrary(object):
         # ---------------------------------------------------------------------
         # Load Robot and create RobotCell
         # ---------------------------------------------------------------------
-        robot = RobotLibrary.ur10e(load_geometry=load_geometry)
-        robot_cell = RobotCell(robot)
+        robot_cell = RobotCellLibrary.ur10e(load_geometry=load_geometry)
 
         # ---------------------------------------------------------------------
         # Load Tools
@@ -710,7 +717,9 @@ class RobotCellLibrary(object):
         # For UR10e, the last logical link is `tool0` (from robot.get_end_effector_link_name)
         # However the last link with geometry attached is `wrist_3_link`.
 
-        robot_cell_state.set_tool_attached_to_group("gripper", robot.main_group_name, attachment_frame, touch_links)
+        robot_cell_state.set_tool_attached_to_group(
+            "gripper", robot_cell.main_group_name, attachment_frame, touch_links
+        )
         # Note: There is a rotation to match the gripper's orientation because the last link in the abb robot
         # does not follow the REP 199 convention.
 
@@ -755,8 +764,7 @@ class RobotCellLibrary(object):
         # ---------------------------------------------------------------------
         # Load Robot and create RobotCell
         # ---------------------------------------------------------------------
-        robot = RobotLibrary.abb_irb4600_40_255(load_geometry=load_geometry)
-        robot_cell = RobotCell(robot)
+        robot_cell = RobotCellLibrary.abb_irb4600_40_255(load_geometry=load_geometry)
 
         # ---------------------------------------------------------------------
         # Load Tools
@@ -786,7 +794,7 @@ class RobotCellLibrary(object):
         attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
         touch_links = ["link_6"]
         robot_cell_state.set_tool_attached_to_group(
-            "printing_tool", robot.main_group_name, attachment_frame, touch_links=touch_links
+            "printing_tool", robot_cell.main_group_name, attachment_frame, touch_links=touch_links
         )
 
         # ------------------------------------------------------------------------
@@ -797,30 +805,6 @@ class RobotCellLibrary(object):
         robot_cell_state.rigid_body_states["floor"].touch_links = ["base_link"]
 
         return robot_cell, robot_cell_state
-
-
-class RigidBodyLibrary(object):
-
-    @classmethod
-    def target_marker(cls, size=1.0):
-        # type: (Optional[float]) -> RigidBody
-        """Create and return a target marker as RigidBody, useful for visualizing the target pose.
-
-        The target marker points out the X, Y, Z directions with its shape.
-        It is fully contained within a cube in the positive octant of the target frame.
-        The size of the cube is determined by the input size.
-
-        The marker has only one visual mesh, and no collision mesh.
-        """
-
-        # Load the target marker mesh
-        obj = compas_fab.get("planning_scene/target_marker.obj")
-        mesh = Mesh.from_obj(obj)
-
-        # Scale the target marker to the desired size
-        mesh.scale(size)
-
-        return RigidBody(mesh, None)
 
 
 if __name__ == "__main__":

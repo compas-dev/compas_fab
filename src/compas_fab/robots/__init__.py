@@ -66,14 +66,16 @@ Constraints
     OrientationConstraint
     PositionConstraint
 
-Built-in robots
----------------
+Built-in robots and tools
+-------------------------
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
 
-    RobotLibrary
+    ToolLibrary
+    RigidBodyLibrary
+    RobotCellLibrary
 
 Unit conversion
 ---------------
@@ -126,7 +128,6 @@ from .rigid_body import (
 from .robot_library import (
     RigidBodyLibrary,
     RobotCellLibrary,
-    RobotLibrary,
     ToolLibrary,
 )
 from .semantics import (
@@ -145,9 +146,6 @@ from .targets import (
 )
 from .time_ import (
     Duration,
-)
-from .tool import (
-    Tool,
 )
 from .trajectory import (
     JointTrajectory,
@@ -186,10 +184,9 @@ __all__ = [
     "RobotCellState",
     "ToolState",
     # Robot Library
+    "ToolLibrary",
     "RigidBodyLibrary",
     "RobotCellLibrary",
-    "RobotLibrary",
-    "ToolLibrary",
     # Semantics
     "RobotSemantics",
     # Targets
