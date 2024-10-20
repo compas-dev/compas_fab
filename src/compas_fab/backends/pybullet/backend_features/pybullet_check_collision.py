@@ -18,7 +18,7 @@ if not IPY:
 
         from compas_fab.backends import PyBulletClient  # noqa: F401
         from compas_fab.backends import PyBulletPlanner  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
 
 
@@ -96,7 +96,7 @@ class PyBulletCheckCollision(CheckCollision):
         # Housekeeping for intellisense
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
-        robot = client.robot  # type: Robot # noqa: F841
+        robot_cell = client.robot_cell  # type: RobotCell # noqa: F841
 
         # Set the robot cell state
         skip_set_robot_cell_state = options.get("_skip_set_robot_cell_state", False)
@@ -345,7 +345,7 @@ class PyBulletCheckCollision(CheckCollision):
         # Housekeeping for intellisense
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
-        robot = client.robot  # type: Robot
+        robot_cell = client.robot_cell  # type: RobotCell
 
         # Collect options
         options = options or {}
@@ -355,7 +355,7 @@ class PyBulletCheckCollision(CheckCollision):
         state = state.copy()  # type: RobotCellState
 
         # Input sanity check
-        assert group in robot.group_names
+        assert group in robot_cell.group_names
         assert (
             state.robot_flange_frame is not None
         ), "Robot flange frame must be set because this CC will not use the robot configuration."

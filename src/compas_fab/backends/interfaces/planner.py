@@ -114,6 +114,16 @@ class PlannerInterface(object):
         """
         raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
 
+    def iter_inverse_kinematics(self, *args, **kwargs):
+        """Default method for planner.
+
+        Raises
+        ------
+        BackendFeatureNotSupportedError
+            Planner does not have this feature.
+        """
+        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
+
     def forward_kinematics(self, *args, **kwargs):
         """Default method for planner.
 

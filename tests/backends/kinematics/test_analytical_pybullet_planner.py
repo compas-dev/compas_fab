@@ -39,7 +39,6 @@ def test_planner(analytical_pybullet_client):
 
     assert planner.client is not None
     assert client.robot_cell is not None
-    assert client.robot is not None
     assert planner.kinematics_solver is not None
 
 

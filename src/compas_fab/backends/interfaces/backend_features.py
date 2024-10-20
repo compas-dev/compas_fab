@@ -45,21 +45,6 @@ class BackendFeature(object):
     def __init__(self, client=None):
         super(BackendFeature, self).__init__()
 
-    # TODO: Remove the following method
-    def _scale_output_frame(self, frame):
-        # type: (Frame) -> Frame
-        """Returns a copy of the frame scaled to the robot's scale factor.
-
-        If the robot has no scale factor, returns the original frame."""
-        robot = self.client.robot  # type: Robot
-
-        # Check `robot.need_scaling` to avoid unnecessary scaling
-        if robot.need_scaling:
-            # Scale output frame to user defined scale
-            return frame.scaled(robot.scale_factor)
-
-        return frame
-
     def _build_configuration(
         self, joint_positions, joint_names, group, return_full_configuration, start_configuration=None
     ):
@@ -93,10 +78,10 @@ class BackendFeature(object):
         Do not pass None to group when return_full_configuration is False, the behavior is undefined.
 
         """
-        robot = self.client.robot  # type: Robot
+        robot_cell = self.client.robot_cell  # type: Robot
         if return_full_configuration:
             # build configuration including passive joints, but no sorting
-            configuration = robot.zero_configuration()
+            configuration = robot_cell.zero_configuration()
             value_dict = dict(zip(joint_names, joint_positions))
             for name in configuration.joint_names:
                 if name in value_dict:
@@ -106,9 +91,9 @@ class BackendFeature(object):
         else:
             # sort values for group configuration
             joint_state = dict(zip(joint_names, joint_positions))
-            group_joint_names = robot.get_configurable_joint_names(group)
+            group_joint_names = robot_cell.get_configurable_joint_names(group)
             values = [joint_state[name] for name in group_joint_names]
-            configuration = Configuration(values, robot.get_configurable_joint_types(group), group_joint_names)
+            configuration = Configuration(values, robot_cell.get_configurable_joint_types(group), group_joint_names)
 
         return configuration
 
@@ -423,8 +408,6 @@ class PlanCartesianMotion(BackendFeature):
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which the cartesian motion path is being calculated.
         waypoints : :class:`compas_fab.robots.Waypoints`
             The waypoints for the robot to follow.
         start_state : :class:`compas_fab.robots.RobotCellState`

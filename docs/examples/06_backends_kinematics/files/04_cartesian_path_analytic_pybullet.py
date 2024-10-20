@@ -2,7 +2,14 @@ import matplotlib.pyplot as plt
 from compas.geometry import Frame
 
 from compas_fab.backends import AnalyticalPyBulletClient
+from compas_fab.backends import AnalyticalPyBulletPlanner
+from compas_fab.backends import UR5Kinematics
+from compas_fab.robots import RobotCellLibrary
+
 from compas_fab.robots import FrameWaypoints
+from compas_fab.robots import FrameTarget
+from compas_fab.robots import TargetMode
+
 
 frames_WCF = [
     Frame((0.407, 0.073, 0.320), (0.922, 0.000, 0.388), (0.113, 0.956, -0.269)),
@@ -13,14 +20,16 @@ frames_WCF = [
 ]
 
 with AnalyticalPyBulletClient(connection_type="direct") as client:
-    # TODO: Change to planner.iter_inverse_kinematics
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5()
 
-    robot = client.load_ur5(load_geometry=True)
+    kinematics = UR5Kinematics()
+    planner = AnalyticalPyBulletPlanner(client, kinematics)
 
-    options = {"solver": "ur5", "check_collision": True}
-    start_configuration = list(robot.iter_inverse_kinematics(frames_WCF[0], options=options))[-1]
-    waypoints = FrameWaypoints(frames_WCF)
-    trajectory = robot.plan_cartesian_motion(waypoints, start_configuration=start_configuration, options=options)
+    start_configuration = planner.inverse_kinematics(FrameTarget(frames_WCF[0], TargetMode.ROBOT), robot_cell_state)
+    robot_cell_state.robot_configuration = start_configuration
+
+    waypoints = FrameWaypoints(frames_WCF, TargetMode.ROBOT)
+    trajectory = planner.plan_cartesian_motion(waypoints, robot_cell_state)
     assert trajectory.fraction == 1.0
 
     j = [c.joint_values for c in trajectory.points]

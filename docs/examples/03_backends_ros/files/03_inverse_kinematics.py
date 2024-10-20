@@ -8,15 +8,13 @@ from compas_fab.robots import TargetMode
 
 with RosClient() as client:
     robot_cell = client.load_robot_cell()
-    assert robot.name == "ur5_robot"
+    assert robot_cell.robot_model.name == "ur5_robot"
     planner = MoveItPlanner(client)
 
     frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
     target = FrameTarget(frame_WCF, TargetMode.ROBOT)
 
-    start_configuration = robot.zero_configuration()
-    start_state = RobotCellState.from_robot_configuration(robot, start_configuration)
-
+    start_state = RobotCellState.from_robot_cell(robot_cell)
     configuration = planner.inverse_kinematics(target, start_state)
 
     print("Found configuration", configuration)

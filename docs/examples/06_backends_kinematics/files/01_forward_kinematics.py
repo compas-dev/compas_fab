@@ -20,7 +20,6 @@ planner.set_robot_cell(robot_cell)
 
 # Configuration for FK calculation
 configuration = Configuration.from_revolute_values([0.0, 4.8, 1.5, 1.1, 1.9, 3.1])
-# The `RobotCellState.from_robot_configuration` method can be used when the robot is the only element in the cell
 robot_cell_state.robot_configuration = configuration
 
 # AnalyticalKinematicsPlanner.forward_kinematics(), do not support `planning_group` parameter, it must be left as None.

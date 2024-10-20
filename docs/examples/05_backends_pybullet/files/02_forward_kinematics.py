@@ -23,7 +23,6 @@ with PyBulletClient("direct") as client:
     planner.set_robot_cell(robot_cell)
 
     configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.0])
-    # The `RobotCellState.from_robot_configuration` method can be used when the robot is the only element in the cell
     robot_cell_state.robot_configuration = configuration
     # In this demo, the default planning group is used for the forward kinematics
     frame_WCF = planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT)

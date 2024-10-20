@@ -82,38 +82,22 @@ class RobotCellState(Data):
         robot_configuration : :class:`~compas_fab.Configuration`, optional
             The configuration of the robot. If the configuration is not provided, the robot's zero configuration will be used.
         """
-        robot_cell_state = cls.from_robot_configuration(robot_cell.robot, robot_configuration)
+        robot_configuration = robot_configuration or robot_cell.zero_full_configuration()
+        flange_frame = robot_cell.robot_model.forward_kinematics(robot_configuration)
+
+        tool_states = {}
         for tool_id, tool_model in robot_cell.tool_models.items():
             tool_state = ToolState(Frame.worldXY(), None, None)
             if len(tool_model.get_configurable_joints()) > 0:
                 tool_state.configuration = tool_model.zero_configuration()
-            robot_cell_state.tool_states[tool_id] = tool_state
+            tool_states[tool_id] = tool_state
+
+        rigid_body_states = {}
         for rigid_body_id, rigid_body_model in robot_cell.rigid_body_models.items():
             rigid_body_state = RigidBodyState(Frame.worldXY(), None, None, None)
-            robot_cell_state.rigid_body_states[rigid_body_id] = rigid_body_state
-        return robot_cell_state
+            rigid_body_states[rigid_body_id] = rigid_body_state
 
-    @classmethod
-    def from_robot_configuration(cls, robot, configuration=None, group=None):
-        # type: (Robot | RobotModel, Optional[Configuration], Optional[str]) -> RobotCellState
-        """Creates a `RobotCellState` from a robot and a configuration.
-
-        This should be used only for robot cells that contain only the robot.
-        The robot_flange_frame will be calculated using the forward kinematics of the robot model.
-
-        Parameters
-        ----------
-        robot : :class:`~compas_fab.robots.Robot` or :class:`~compas_robots.RobotModel`
-            The robot.
-        configuration : :class:`~compas_fab.Configuration`, optional
-            The configuration of the robot. If the configuration is not provided, the robot's zero configuration will be used.
-        group : str, optional
-            The planning group used for calculation.
-        """
-
-        configuration = configuration or robot.zero_configuration(group)
-        flange_frame = robot.forward_kinematics(configuration, group)
-        return cls(flange_frame, configuration)
+        return cls(flange_frame, robot_configuration, tool_states, rigid_body_states)
 
     def get_attached_tool_id(self, group):
         # type: (str) -> Optional[str]

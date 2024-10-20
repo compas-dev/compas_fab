@@ -17,23 +17,27 @@ if not IPY:
 
     if TYPE_CHECKING:
         from compas_fab.backends import AnalyticalPyBulletPlanner  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
+        from compas_fab.robots import Waypoints  # noqa: F401
+
+        from typing import Optional  # noqa: F401
+        from typing import Dict  # noqa: F401
 
 
 class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
     """ """
 
-    def plan_cartesian_motion(self, robot, waypoints, start_configuration=None, group=None, options=None):
+    def plan_cartesian_motion(self, waypoints, start_state, group=None, options=None):
+        # type: (Waypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which the cartesian motion path is being calculated.
         waypoints : :class:`compas_fab.robots.Waypoints`
             The waypoints for the robot to follow.
-        start_configuration : :class:`compas_robots.Configuration`, optional
-            The robot's full configuration, i.e. values for all configurable
-            joints of the entire robot, at the starting position.
+        start_state : :class:`compas_fab.robots.RobotCellState`
+            The starting state of the robot cell at the beginning of the motion.
+            The attribute `robot_configuration`, must be provided.
         group : str, optional
             The planning group used for calculation.
         options : dict, optional
@@ -50,20 +54,14 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         """
 
         if isinstance(waypoints, FrameWaypoints):
-            return self._plan_cartesian_motion_with_frame_waypoints(
-                robot, waypoints, start_configuration, group, options
-            )
+            return self._plan_cartesian_motion_with_frame_waypoints(waypoints, start_state, group, options)
         elif isinstance(waypoints, PointAxisWaypoints):
-            return self._plan_cartesian_motion_with_point_axis_waypoints(
-                robot, waypoints, start_configuration, group, options
-            )
+            return self._plan_cartesian_motion_with_point_axis_waypoints(waypoints, start_state, group, options)
         else:
             raise TypeError("Unsupported waypoints type {}".format(type(waypoints)))
 
-    def _plan_cartesian_motion_with_frame_waypoints(
-        self, robot, waypoints, start_configuration=None, group=None, options=None
-    ):
-        # type: (Robot, FrameWaypoints, Configuration, str, dict) -> JointTrajectory
+    def _plan_cartesian_motion_with_frame_waypoints(self, waypoints, start_state, group=None, options=None):
+        # type: (Waypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
         """Calculates a cartesian motion path with frame waypoints.
 
         Planner behavior:
@@ -82,7 +80,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         target_frames = waypoints.target_frames
 
         # convert the frame WCF to RCF
-        pcf_frames = robot_cell.target_frames_to_pcf(start_configuration, target_frames, waypoints.target_mode, group)
+        pcf_frames = robot_cell.target_frames_to_pcf(start_state, target_frames, waypoints.target_mode, group)
 
         # 'keep_order' is set to True, so that iter_inverse_kinematics will return the configurations in the same order across all frames
         options = options or {}
@@ -90,9 +88,9 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
 
         # iterate over all input frames and calculate the inverse kinematics, no interpolation in between frames
         configurations_along_path = []
-        # TODO: Change to planner.iter_inverse_kinematics
+        # TODO: Change to planner.iter_inverse_kinematics, should be able to list out all possible
         for frame in pcf_frames:
-            configurations = list(robot.iter_inverse_kinematics(frame, options=options))
+            configurations = list(planner.iter_inverse_kinematics(frame, options=options))
             configurations_along_path.append(configurations)
 
         # Analytical backend only supports robots with finite IK solutions
@@ -112,7 +110,9 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
 
         # now select the path that is closest to the start configuration.
         first_configurations = [path[0] for path in paths]
-        diffs = [sum([abs(d) for d in start_configuration.iter_differences(c)]) for c in first_configurations]
+        diffs = [
+            sum([abs(d) for d in start_state.robot_configuration.iter_differences(c)]) for c in first_configurations
+        ]
         idx = argmin(diffs)
 
         path = paths[idx]
@@ -122,12 +122,12 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         # Technically trajectory.fraction should always be 1.0 because otherwise, the path would be rejected earlier
         trajectory.joint_names = path[0].joint_names
         trajectory.points = [JointTrajectoryPoint(config.joint_values, config.joint_types) for config in path]
-        trajectory.start_configuration = robot.merge_group_with_full_configuration(path[0], start_configuration, group)
+        first_configuration = robot_cell.fill_configuration_with_joint_names(path[0])
+        trajectory.start_configuration = robot_cell.zero_full_configuration().merged(first_configuration)
         return trajectory
 
-    def _plan_cartesian_motion_with_point_axis_waypoints(
-        self, robot, waypoints, start_configuration=None, group=None, options=None
-    ):
+    def _plan_cartesian_motion_with_point_axis_waypoints(self, waypoints, start_state, group=None, options=None):
+        # type: (Waypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
         """Planning Cartesian motion with PointAxisWaypoints is not yet implemented in the Analytical backend."""
         raise NotImplementedError(
             "Planning Cartesian motion with PointAxisWaypoints is not yet implemented in the Analytical backend."

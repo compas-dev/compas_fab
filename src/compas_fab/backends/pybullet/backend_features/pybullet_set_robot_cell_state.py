@@ -175,7 +175,6 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         # Housekeeping for intellisense
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
-        # robot = client.robot  # type: Robot
         robot_cell = client.robot_cell  # type: RobotCell
         robot_cell_state = state.copy()  # type: RobotCellState
 

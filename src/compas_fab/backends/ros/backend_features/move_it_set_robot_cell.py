@@ -160,7 +160,7 @@ class MoveItSetRobotCell(SetRobotCell):
         """
         planner = self  # type: MoveItPlanner  # noqa: F841
         client = planner.client  # type: PyBulletClient
-        robot = client.robot
+        robot_cell = client.robot_cell
 
         assert robot_cell, "Robot cell should not be None"
         assert robot_cell.robot, "Robot cell should have a robot"
@@ -206,7 +206,7 @@ class MoveItSetRobotCell(SetRobotCell):
             ros_meshes = [Mesh.from_mesh(m) for m in rigid_body.collision_meshes]
             collision_object = CollisionObject(
                 # Header is robot.root_name when the object is not attached
-                header=Header(frame_id=robot.root_name),
+                header=Header(frame_id=robot_cell.root_name),
                 # The identifier of the rigid body, matches with the robot_cell rigid_body_id
                 id=rigid_body_id,
                 # List of `compas_fab.backends.ros.messages.shape_msgs.Meshes`
@@ -280,7 +280,7 @@ class MoveItSetRobotCell(SetRobotCell):
                 # For each mesh in the link, create a CollisionMesh
                 kwargs = {}
                 # The frame_id needs be the root name of the robot
-                kwargs["header"] = Header(frame_id=robot.root_name)
+                kwargs["header"] = Header(frame_id=robot_cell.root_name)
                 # id is the identifier of the rigid body
                 kwargs["id"] = collision_object_id
                 # List of `compas_fab.backends.ros.messages.shape_msgs.Meshes`

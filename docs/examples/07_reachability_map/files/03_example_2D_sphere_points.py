@@ -1,15 +1,19 @@
-import os
 import math
-from compas.geometry import Point
-from compas.geometry import Vector
-from compas.geometry import Plane
-from compas.geometry import Frame
-from compas.geometry import Sphere
+import os
 
-from compas_fab.backends import AnalyticalInverseKinematics
-from compas_fab.backends import PyBulletClient
-from compas_fab.robots import ReachabilityMap
+from compas.geometry import Frame
+from compas.geometry import Plane
+from compas.geometry import Point
+from compas.geometry import Sphere
+from compas.geometry import Vector
+
 from compas_fab import DATA
+from compas_fab.backends import AnalyticalPyBulletClient
+from compas_fab.backends import AnalyticalPyBulletPlanner
+from compas_fab.backends import UR5Kinematics
+from compas_fab.robots import ReachabilityMap
+from compas_fab.robots import RobotCellLibrary
+from compas_fab.robots import TargetMode
 
 # 1. Define generators
 
@@ -37,6 +41,7 @@ def sphere_generator():
             center = sphere.point + Vector(x, 0, z) * 0.05
             yield Sphere(center, sphere.radius)
 
+
 # 2. Create 2D generator
 
 
@@ -44,17 +49,18 @@ def generator():
     for sphere in sphere_generator():
         yield points_on_sphere_generator(sphere)
 
+
 # 3. Create reachability map 2D
 
-
-with PyBulletClient(connection_type='direct') as client:
+with AnalyticalPyBulletClient(connection_type="direct") as client:
     # load robot and define settings
-    robot = client.load_ur5(load_geometry=True)
-    ik = AnalyticalInverseKinematics(client)
-    client.inverse_kinematics = ik.inverse_kinematics
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+    planner = AnalyticalPyBulletPlanner(client, UR5Kinematics())
+    planner.set_robot_cell(robot_cell, robot_cell_state)
+
     options = {"solver": "ur5", "check_collision": True, "keep_order": True}
     # calculate reachability map
     map = ReachabilityMap()
-    map.calculate(generator(), robot, options)
+    map.calculate(generator(), planner, robot_cell_state, TargetMode.ROBOT, options)
     # save to json
     map.to_json(os.path.join(DATA, "reachability", "map2D_spheres.json"))

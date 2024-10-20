@@ -1,14 +1,18 @@
-import os
 import math
-from compas.geometry import Point
-from compas.geometry import Plane
+import os
+
 from compas.geometry import Frame
+from compas.geometry import Plane
+from compas.geometry import Point
 from compas.geometry import Sphere
 
-from compas_fab.backends import AnalyticalInverseKinematics
-from compas_fab.backends import PyBulletClient
-from compas_fab.robots import ReachabilityMap
 from compas_fab import DATA
+from compas_fab.backends import AnalyticalPyBulletClient
+from compas_fab.backends import AnalyticalPyBulletPlanner
+from compas_fab.backends import UR5Kinematics
+from compas_fab.robots import ReachabilityMap
+from compas_fab.robots import RobotCellLibrary
+from compas_fab.robots import TargetMode
 
 # 1. Define frames on a sphere
 sphere = Sphere((0.4, 0, 0), 0.15)
@@ -32,14 +36,15 @@ def points_on_sphere_generator(sphere):
 
 # 3. Create reachability map 1D
 
-with PyBulletClient(connection_type='direct') as client:
+with AnalyticalPyBulletClient(connection_type="direct") as client:
     # load robot and define settings
-    robot = client.load_ur5(load_geometry=True)
-    ik = AnalyticalInverseKinematics(client)
-    client.inverse_kinematics = ik.inverse_kinematics
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+    planner = AnalyticalPyBulletPlanner(client, UR5Kinematics())
+    planner.set_robot_cell(robot_cell, robot_cell_state)
+
     options = {"solver": "ur5", "check_collision": True, "keep_order": True}
     # calculate reachability map
     map = ReachabilityMap()
-    map.calculate(points_on_sphere_generator(sphere), robot, options)
+    map.calculate(points_on_sphere_generator(sphere), planner, robot_cell_state, TargetMode.ROBOT, options)
     # save to json
     map.to_json(os.path.join(DATA, "reachability", "map1D.json"))

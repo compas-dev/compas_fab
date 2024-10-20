@@ -531,7 +531,7 @@ class RobotCellLibrary(object):
         # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
         """Create and return the UR5 robot with a cone tool attached. A floor is also included.
 
-        See :meth:`compas_fab.robots.RobotLibrary.ur5` and :meth:`compas_fab.robots.ToolLibrary.cone`
+        See :meth:`compas_fab.robots.RobotCellLibrary.ur5` and :meth:`compas_fab.robots.ToolLibrary.cone`
         for details on the robot and tool.
 
         Parameters
@@ -599,7 +599,7 @@ class RobotCellLibrary(object):
         One beam (a RigidBody) is included and is attached to the gripper.
         A floor is also included.
 
-        See :meth:`compas_fab.robots.RobotLibrary.abb_irb4600_40_255` and :meth:`compas_fab.robots.ToolLibrary.static_gripper`
+        See :meth:`compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255` and :meth:`compas_fab.robots.ToolLibrary.static_gripper`
         for details on the robot and tool.
 
         Parameters
@@ -666,7 +666,7 @@ class RobotCellLibrary(object):
         One beam (a RigidBody) is included and is attached to the gripper.
         A floor is also included.
 
-        See :meth:`compas_fab.robots.RobotLibrary.ur10e` and :meth:`compas_fab.robots.ToolLibrary.static_gripper_small`
+        See :meth:`compas_fab.robots.RobotCellLibrary.ur10e` and :meth:`compas_fab.robots.ToolLibrary.static_gripper_small`
         for details on the robot and tool.
 
         Parameters
@@ -760,7 +760,7 @@ class RobotCellLibrary(object):
         """Create and return the ABB irb4600-40-255 robot with a printing tool attached.
         A floor is also included.
 
-        See :meth:`compas_fab.robots.RobotLibrary.abb_irb4600_40_255` and :meth:`compas_fab.robots.ToolLibrary.printing_tool`
+        See :meth:`compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255` and :meth:`compas_fab.robots.ToolLibrary.printing_tool`
         for details on the robot and tool.
 
         Parameters

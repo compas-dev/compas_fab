@@ -26,7 +26,7 @@ if not IPY:
     if TYPE_CHECKING:
         from compas_fab.backends import MoveItPlanner  # noqa: F401
         from compas_fab.backends import RosClient  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
 
 __all__ = ["MoveItPlanMotion"]
@@ -89,7 +89,7 @@ class MoveItPlanMotion(PlanMotion):
         """
         planner = self  # type: MoveItPlanner
         client = planner.client  # type: RosClient
-        robot = client.robot  # type: Robot
+        robot_cell = client.robot_cell  # type: RobotCell
 
         options = options or {}
         kwargs = {}
@@ -100,9 +100,9 @@ class MoveItPlanMotion(PlanMotion):
         kwargs["errback_name"] = "errback"
 
         # Use base_link or fallback to model's root link
-        options["base_link"] = options.get("base_link", robot.model.root.name)
-        options["joints"] = {j.name: j.type for j in robot.model.joints}
-        options["ee_link_name"] = robot.get_end_effector_link_name(group)
+        options["base_link"] = options.get("base_link", robot_cell.root_name)
+        options["joints"] = {j.name: j.type for j in robot_cell.robot_model.joints}
+        options["ee_link_name"] = robot_cell.get_end_effector_link_name(group)
 
         return await_callback(self.plan_motion_async, **kwargs)
 
@@ -114,7 +114,7 @@ class MoveItPlanMotion(PlanMotion):
         # Housekeeping for intellisense
         planner = self  # type: MoveItPlanner
         client = planner.client  # type: RosClient
-        robot = client.robot  # type: Robot # noqa: F841
+        robot_cell = client.robot_cell  # type: RobotCell # noqa: F841
 
         joints = options["joints"]
         header = Header(frame_id=options["base_link"])

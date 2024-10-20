@@ -31,6 +31,7 @@ if not IPY:
         from compas_fab.backends import MoveItPlanner  # noqa: F401
         from compas_fab.backends import RosClient  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
 
 
 __all__ = [
@@ -74,7 +75,10 @@ class MoveItSetRobotCellState(SetRobotCellState):
         kwargs["options"] = options
         kwargs["errback_name"] = "errback"
 
-        assert self.client.robot is not None, "Robot should not be None"
+        robot_cell = self.client.robot_cell  # type: RobotCell
+        robot_cell.assert_cell_state_match(robot_cell_state)
+
+        assert robot_cell is not None, "Robot should not be None"
         assert robot_cell_state, "Robot cell state should not be None"
 
         # First step is to remove all the ACO attachments, this facilitates moving the position of attached objects
@@ -104,7 +108,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
         """
         planner = self  # type: MoveItPlanner  # noqa: F841
         client = planner.client  # type: RosClient
-        robot = client.robot
+        robot_cell = client.robot_cell
 
         # Get the last robot state
         planning_scene = planner.get_planning_scene()  # type: PlanningScene
@@ -133,7 +137,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
         # Update robot configuration
         configuration = robot_cell_state.robot_configuration
         joint_state = JointState(
-            header=Header(frame_id=robot.model.root.name),
+            header=Header(frame_id=robot_cell.root_name),
             name=configuration.joint_names,
             position=configuration.joint_values,
             # I'm not sure what it means when we don't set the velocity and effort
@@ -166,8 +170,8 @@ class MoveItSetRobotCellState(SetRobotCellState):
         """
         planner = self  # type: MoveItPlanner  # noqa: F841
         client = planner.client  # type: RosClient
-        robot = client.robot
-        root_name = robot.model.root.name
+        robot_cell = client.robot_cell
+        root_name = robot_cell.root_name
 
         # Update pose of all non-attached rigid bodies
         collision_objects = []
@@ -190,7 +194,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
             elif rigid_body_state.attached_to_tool:
                 t_pcf_ocf = client.robot_cell.t_pcf_ocf(robot_cell_state, rb_id)
                 tool_parent_group = robot_cell_state.tool_states[rigid_body_state.attached_to_tool].attached_to_group
-                end_effector_link_name = robot.get_end_effector_link_name(group=tool_parent_group)
+                end_effector_link_name = robot_cell.get_end_effector_link_name(group=tool_parent_group)
                 collision_object = CollisionObject(
                     header=Header(frame_id=end_effector_link_name),
                     id=rb_id,
@@ -220,7 +224,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
             # For tools attached to groups
             if tool_state.attached_to_group:
                 assert tool_state.attachment_frame, "Tool state attachment frame should not be None for attached tools."
-                end_effector_link_name = robot.get_end_effector_link_name(group=tool_state.attached_to_group)
+                end_effector_link_name = robot_cell.get_end_effector_link_name(group=tool_state.attached_to_group)
 
                 # Update the base link of the tool
                 base_link_name = tool_model.root.name
@@ -314,7 +318,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
         """
         planner = self  # type: MoveItPlanner  # noqa: F841
         client = planner.client  # type: RosClient
-        robot = client.robot
+        robot_cell = client.robot_cell
 
         # ACO for attached rigid bodies
         attached_collision_objects = []
@@ -337,7 +341,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
             # For rigid bodies attached to tools
             elif rigid_body_state.attached_to_tool:
                 tool_parent_group = robot_cell_state.tool_states[rigid_body_state.attached_to_tool].attached_to_group
-                link_name = robot.get_end_effector_link_name(group=tool_parent_group)
+                link_name = robot_cell.get_end_effector_link_name(group=tool_parent_group)
                 aco = AttachedCollisionObject(
                     link_name=link_name,
                     object=CollisionObject(
@@ -356,7 +360,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
         for tool_id, tool_state in robot_cell_state.tool_states.items():
             tool_model = client.robot_cell.tool_models[tool_id]
             if tool_state.attached_to_group:
-                end_effector_link_name = robot.get_end_effector_link_name(group=tool_state.attached_to_group)
+                end_effector_link_name = robot_cell.get_end_effector_link_name(group=tool_state.attached_to_group)
                 for link in tool_model.iter_links():
                     collision_object_id = "{}_{}".format(tool_id, link.name)
 

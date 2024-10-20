@@ -40,7 +40,7 @@ def panda_robot_instance_wo_semantics(panda_urdf):
 
 @pytest.fixture
 def ur5_robot_instance():
-    return RobotLibrary.ur5(load_geometry=False)
+    return RobotCellLibrary.ur5(load_geometry=False)
 
 
 @pytest.fixture

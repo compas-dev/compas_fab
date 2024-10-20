@@ -30,7 +30,7 @@ with RosClient() as client:
     touch_links = ["flange", "tool0", "wrist_3_link"]
     rigid_body_name = "cone"
     ground_frame = Frame([1, 1, 0], [1, 0, 0], [0, 1, 0])
-    header_frame_id = robot.root_name
+    header_frame_id = robot_cell.root_name
     attachment_frame = Frame.worldXY()
 
     # --------------------------------------------------------------
@@ -48,7 +48,7 @@ with RosClient() as client:
 
     def _async_add_co(callback, errback):
         collision_object = CollisionObject(
-            header=Header(frame_id=robot.model.root.name),
+            header=Header(frame_id=robot_cell.root_name),
             id=rigid_body_name,
             meshes=[ROSMesh.from_mesh(cone_mesh)],
             mesh_poses=[Pose()],
@@ -122,7 +122,7 @@ with RosClient() as client:
 
         # Sets the position of stationary rigid bodies
         co = CollisionObject(
-            header=Header(frame_id=robot.model.root.name),
+            header=Header(frame_id=robot_cell.root_name),
             id=rigid_body_name,
             pose=Pose.from_frame(ground_frame),
             operation=CollisionObject.MOVE,

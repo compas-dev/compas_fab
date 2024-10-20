@@ -3,7 +3,7 @@
 from compas_fab.robots import RobotCellLibrary
 from compas_robots.model import Joint
 
-# RobotLibrary also contains .ur5(), .ur10e(), abb_irb120_3_58(), abb_irb4600_40_255(), .rfl(), .panda()
+# RobotCellLibrary also contains .ur5(), .ur10e(), abb_irb120_3_58(), abb_irb4600_40_255(), .rfl(), .panda()
 robot_cell, robot_cell_state = RobotCellLibrary.panda(load_geometry=False)
 
 model = robot_cell.robot_model

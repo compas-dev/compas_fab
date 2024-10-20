@@ -26,6 +26,6 @@ def add_imports(doctest_namespace):
     doctest_namespace["compas"] = compas
     doctest_namespace["compas_fab"] = compas_fab
     doctest_namespace["allclose"] = allclose
-    doctest_namespace["RobotLibrary"] = RobotLibrary
+    doctest_namespace["RobotCellLibrary"] = RobotCellLibrary
     doctest_namespace["RosClient"] = RosClient
     doctest_namespace["Rotation"] = Rotation

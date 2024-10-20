@@ -18,12 +18,9 @@ with PyBulletClient(connection_type="direct") as client:
     frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
     target = FrameTarget(frame_WCF, TargetMode.ROBOT)
 
-    start_configuration = robot_cell.zero_configuration()
-    start_state = RobotCellState.from_robot_configuration(robot, start_configuration)
-
     options = {"max_results": 20}
     result_count = 0
-    for config in planner.iter_inverse_kinematics(target, start_state, options=options):
+    for config in planner.iter_inverse_kinematics(target, robot_cell_state, options=options):
         print("Found configuration", config)
         result_count += 1
     print("Found %d configurations" % result_count)

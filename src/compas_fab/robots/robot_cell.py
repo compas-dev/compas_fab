@@ -7,6 +7,7 @@ from compas.geometry import Transformation
 from compas_robots import Configuration
 from compas_robots import RobotModel
 from compas_robots import ToolModel
+from compas_robots.model import Joint
 from compas_robots.resources import LocalPackageMeshLoader
 
 import compas_fab
@@ -24,8 +25,7 @@ if not IPY:
         from typing import Optional  # noqa: F401
 
         from compas.datastructures import Mesh  # noqa: F401
-        from compas_robots.model import Joint
-        from compas_robots.model import Link
+        from compas_robots.model import Link  # noqa: F401
 
         from .state import RobotCellState  # noqa: F401
 __all__ = [
@@ -535,6 +535,7 @@ class RobotCell(Data):
     # --------------------
 
     def zero_full_configuration(self):
+        # type: () -> Configuration
         """Get the zero configuration (all configurable joints) of the robot.
 
         If the joint value `0.0` is outside of joint limits ``(joint.limit.upper, joint.limit.lower)`` then
@@ -1167,7 +1168,7 @@ class RobotCell(Data):
             print(info)
 
         print("The robot's links are:")
-        print([link.name for link in self.model.links])
+        print([link.name for link in self.robot_model.links])
 
         if not self.robot_semantics:
             print("No Semantics is not available. Please set the semantics to enable planning")

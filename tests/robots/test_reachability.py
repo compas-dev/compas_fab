@@ -6,8 +6,12 @@ from compas.geometry import Point
 from compas.geometry import Vector
 from compas.geometry import allclose
 
-from compas_fab.backends import AnalyticalInverseKinematics
+from compas_fab.backends import AnalyticalPyBulletClient
+from compas_fab.backends import AnalyticalPyBulletPlanner
+from compas_fab.backends import UR5Kinematics
 from compas_fab.robots import ReachabilityMap
+from compas_fab.robots import RobotCellLibrary
+from compas_fab.robots import TargetMode
 from compas_fab.robots.reachability_map import DeviationVectorsGenerator
 from compas_fab.robots.reachability_map import OrthonormalVectorsFromAxisGenerator
 
@@ -51,12 +55,15 @@ if __name__ == "__main__":
             pt = Point(0, 0, 0) + Vector(0, i * 0.1, 0)
             yield frame_generator(pt)
 
-    with PyBulletClient(connection_type="direct") as client:
-        robot = client.load_ur5(load_geometry=True)
-        ik = AnalyticalInverseKinematics(client)
-        client.inverse_kinematics = ik.inverse_kinematics
-        options = {"solver": "ur5", "check_collision": True, "keep_order": True}
+    with AnalyticalPyBulletClient(connection_type="direct") as client:
+        # load robot and define settings
+        robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+        planner = AnalyticalPyBulletPlanner(client, UR5Kinematics())
+        planner.set_robot_cell(robot_cell, robot_cell_state)
 
+        options = {"solver": "ur5", "check_collision": True, "keep_order": True}
+        # calculate reachability map
         map = ReachabilityMap()
-        map.calculate(generator(), robot, options)
+        map.calculate(generator(), planner, robot_cell_state, TargetMode.ROBOT, options)
+        # save to json
         map.to_json(filename)
