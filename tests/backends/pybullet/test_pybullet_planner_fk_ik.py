@@ -436,7 +436,7 @@ def test_ik_modified_only_joints_in_group(pybullet_client):
 
     planner = PyBulletPlanner(pybullet_client)
     planner.set_robot_cell(robot_cell)
-    initial_configuration = robot_cell.zero_configuration()
+    initial_configuration = robot_cell.zero_full_configuration()
     initial_configuration["panda_joint1"] = 0.123
     initial_configuration["panda_joint7"] = 0.123
     print(initial_configuration)

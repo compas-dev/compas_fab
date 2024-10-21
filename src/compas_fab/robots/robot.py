@@ -35,7 +35,6 @@ if not IPY:
         from compas_fab.robots import JointTrajectory  # noqa: F401
         from compas_fab.robots import RobotSemantics  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
-        from compas_fab.robots import Tool  # noqa: F401
         from compas_fab.robots import Waypoints  # noqa: F401
 
 

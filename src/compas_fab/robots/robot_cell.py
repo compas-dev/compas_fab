@@ -439,6 +439,9 @@ class RobotCell(Data):
         i.e., not ``Joint.FIXED``, not mimicking another joint and not a passive joint.
         See :meth:`compas_robots.model.Joint.is_configurable` for more details.
 
+        Important: Setting the `group` to None, does not return all configurable joints of the robot.
+        If all configurable joints of the robot are needed, use :meth:`RobotModel.get_configurable_joints()`.
+
         Parameters
         ----------
         group : :obj:`str`, optional
@@ -464,6 +467,8 @@ class RobotCell(Data):
         """Get all the names of configurable joints of a planning group.
 
         Similar to :meth:`get_configurable_joints` but returning joint names.
+
+        If all configurable joints of the robot are needed, use :meth:`RobotModel.get_configurable_joint_names()`.
 
         Parameters
         ----------

@@ -17,7 +17,6 @@ Main classes
 
     Robot
     RobotSemantics
-    Tool
     Duration
     Wrench
     Inertia
@@ -196,8 +195,6 @@ __all__ = [
     "Waypoints",
     # Time
     "Duration",
-    # Tool
-    "Tool",
     # Trajectory
     "JointTrajectory",
     "JointTrajectoryPoint",

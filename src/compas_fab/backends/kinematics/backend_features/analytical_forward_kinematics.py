@@ -42,7 +42,9 @@ class AnalyticalForwardKinematics(ForwardKinematics):
         joint_values = robot_cell_state.robot_configuration.joint_values
         pcf_frame = planner.kinematics_solver.forward(joint_values)
 
-        target_frame = robot_cell.pcf_to_target_frames(robot_cell_state, pcf_frame, target_mode, group)
+        target_frame = robot_cell.pcf_to_target_frames(
+            robot_cell_state, pcf_frame, target_mode, robot_cell.main_group_name
+        )
 
         # Scale the frame to user units
         if scale:

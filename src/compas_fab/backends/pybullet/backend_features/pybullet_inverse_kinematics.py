@@ -314,7 +314,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # The order of the values needs to match with pybullet's joint id order
         # Start configuration needs to be a full_configuration, not negotiable.
         start_configuration = robot_cell_state.robot_configuration
-        all_joint_names = robot_cell.get_configurable_joint_names()
+        all_joint_names = robot_cell.robot_model.get_configurable_joint_names()
         assert set(all_joint_names) == set(start_configuration.keys()), "Robot configuration is missing some joints"
         rest_poses = client.build_pose_for_pybullet(start_configuration)
 

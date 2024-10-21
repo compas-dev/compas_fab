@@ -69,10 +69,6 @@ class AnalyticalKinematicsPlanner(
     # therefore the following properties are provided to access the client's properties
 
     @property
-    def robot(self):
-        return self._client.robot_cell.robot
-
-    @property
     def robot_cell(self):
         return self._client.robot_cell
 

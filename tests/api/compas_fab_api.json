@@ -1,7 +1,7 @@
 {
   "metadata": {
     "compas_fab_version": "1.0.2",
-    "generated_on": "20240503"
+    "generated_on": "20241021"
   },
   "modules": {
     "compas_fab": [
@@ -10,18 +10,31 @@
     "compas_fab.backends": [
       "ABB_IRB4600_40_255Kinematics",
       "AnalyticalInverseKinematics",
+      "AnalyticalKinematicsPlanner",
       "AnalyticalPlanCartesianMotion",
       "AnalyticalPyBulletClient",
+      "AnalyticalPyBulletPlanner",
       "BackendError",
       "BackendFeatureNotSupportedError",
+      "BackendTargetNotSupportedError",
       "CancellableFutureResult",
       "CartesianMotionError",
-      "CollisionError",
+      "CollisionCheckError",
       "FutureResult",
       "InverseKinematicsError",
       "KinematicsError",
+      "MPInterpolationInCollisionError",
+      "MPMaxJumpError",
+      "MPNoIKSolutionError",
+      "MPNoPlanFoundError",
+      "MPSearchTimeOutError",
+      "MPStartStateInCollisionError",
+      "MPTargetInCollisionError",
+      "MotionPlanningError",
       "MoveItPlanner",
       "OffsetWristKinematics",
+      "PlanningGroupNotExistsError",
+      "PlanningGroupNotSupported",
       "PyBulletClient",
       "PyBulletError",
       "PyBulletPlanner",
@@ -31,6 +44,7 @@
       "RosValidationError",
       "SphericalWristKinematics",
       "Staubli_TX260LKinematics",
+      "TargetModeMismatchError",
       "UR10Kinematics",
       "UR10eKinematics",
       "UR3Kinematics",
@@ -39,9 +53,7 @@
       "UR5eKinematics"
     ],
     "compas_fab.robots": [
-      "AttachedCollisionMesh",
       "BoundingVolume",
-      "CollisionMesh",
       "ConfigurationTarget",
       "Constraint",
       "ConstraintSetTarget",
@@ -55,16 +67,21 @@
       "JointTrajectoryPoint",
       "OrientationConstraint",
       "OrthonormalVectorsFromAxisGenerator",
-      "PlanningScene",
       "PointAxisTarget",
       "PointAxisWaypoints",
       "PositionConstraint",
       "ReachabilityMap",
-      "Robot",
-      "RobotLibrary",
+      "RigidBody",
+      "RigidBodyLibrary",
+      "RigidBodyState",
+      "RobotCell",
+      "RobotCellLibrary",
+      "RobotCellState",
       "RobotSemantics",
       "Target",
-      "Tool",
+      "TargetMode",
+      "ToolLibrary",
+      "ToolState",
       "Trajectory",
       "Waypoints",
       "Wrench",
@@ -87,16 +104,10 @@
       "argsort",
       "clamp",
       "diffs",
-      "from_tcf_to_t0cf",
       "list_files_in_directory",
       "map_range",
       "range_geometric_row",
-      "read_csv_to_dictionary",
-      "read_data_from_json",
-      "read_data_from_pickle",
-      "sign",
-      "write_data_to_json",
-      "write_data_to_pickle"
+      "sign"
     ]
   }
 }

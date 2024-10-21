@@ -31,7 +31,7 @@ def test_pybullet_client_set_robot():
         # Check that the RobotModel is present
         assert isinstance(robot_cell.robot_model, RobotModel)
         assert isinstance(robot_cell.robot_semantics, RobotSemantics)
-        assert robot_cell.name == "ur5_robot"
+        assert robot_cell.robot_model.name == "ur5_robot"
         # Check that the robot have geometry
         robot_cell.ensure_geometry()
 
@@ -55,18 +55,18 @@ def test_pybullet_client_set_all_robots_from_robot_library():
     # Testing workflow of using robot from RobotCellLibrary
     with PyBulletClient(connection_type="direct") as client:
 
-        def set_and_check_robot_cell(robot_cell):
+        def set_and_check_robot_cell(robot_cell, robot_cell_state):
             client.set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
             assert isinstance(robot_cell.robot_model, RobotModel)
             assert isinstance(robot_cell.robot_semantics, RobotSemantics)
             client.remove_robot()
 
-        set_and_check_robot_cell(RobotCellLibrary.ur5())
-        set_and_check_robot_cell(RobotCellLibrary.ur10e())
-        set_and_check_robot_cell(RobotCellLibrary.panda())
-        set_and_check_robot_cell(RobotCellLibrary.abb_irb120_3_58())
-        set_and_check_robot_cell(RobotCellLibrary.abb_irb4600_40_255())
-        set_and_check_robot_cell(RobotCellLibrary.rfl())
+        set_and_check_robot_cell(*RobotCellLibrary.ur5())
+        set_and_check_robot_cell(*RobotCellLibrary.ur10e())
+        set_and_check_robot_cell(*RobotCellLibrary.panda())
+        set_and_check_robot_cell(*RobotCellLibrary.abb_irb120_3_58())
+        set_and_check_robot_cell(*RobotCellLibrary.abb_irb4600_40_255())
+        set_and_check_robot_cell(*RobotCellLibrary.rfl())
 
 
 def test_pybullet_client_set_robot_configuration():

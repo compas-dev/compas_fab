@@ -80,7 +80,7 @@ class BackendFeature(object):
         robot_cell = self.client.robot_cell  # type: RobotCell
         if return_full_configuration:
             # build configuration including passive joints, but no sorting
-            configuration = robot_cell.zero_configuration()
+            configuration = robot_cell.zero_full_configuration()
             value_dict = dict(zip(joint_names, joint_positions))
             for name in configuration.joint_names:
                 if name in value_dict:

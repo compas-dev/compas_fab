@@ -94,10 +94,9 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 if not robot_cell_state.robot_configuration:
                     continue
                 # If tool is attached to a group, update the tool's base frame using the group's FK frame
-                link_name = client.robot.get_link_names(tool_state.attached_to_group)[-1]
+                link_name = client.robot_cell.get_link_names(tool_state.attached_to_group)[-1]
                 robot_configuration = robot_cell_state.robot_configuration
                 # Get PCF of the Robot
-                # planner_coordinate_frame = client.robot.model.forward_kinematics(robot_configuration, link_name)
                 pcf_link_id = client.robot_link_puids[link_name]
                 planner_coordinate_frame = client._get_link_frame(pcf_link_id, client.robot_puid)
                 tool_base_frame = self._compute_tool_base_frame_from_planner_coordinate_frame(
@@ -140,7 +139,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 # If rigid body is attached to a link, update the rigid body's base frame using the link's FK frame
                 link_name = rigid_body_state.attached_to_link
                 robot_configuration = robot_cell_state.robot_configuration
-                link_frame = client.robot.model.forward_kinematics(robot_configuration, link_name)
+                link_frame = client.robot_model.forward_kinematics(robot_configuration, link_name)
                 attachment_frame = rigid_body_state.attachment_frame
 
                 # Compute the RB position with its attachment frame relative to the link frame

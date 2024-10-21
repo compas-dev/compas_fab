@@ -3,6 +3,8 @@ from copy import deepcopy
 import pytest
 
 from compas_fab.robots import RobotCellLibrary
+from compas_fab.robots import RobotCell  # noqa: F401
+from compas_fab.robots import RobotCellState  # noqa: F401
 
 
 @pytest.fixture
@@ -24,8 +26,9 @@ def test_robot_cell_copy(ur10e_gripper_one_beam, abb_irb4600_40_255_gripper_one_
     """Test to comply with Data.copy() mechanism"""
 
     def test(robot_cell, robot_cell_state):
-        robot_cell_copy = robot_cell.copy()
-        assert robot_cell.robot.name == robot_cell_copy.robot.name
+        # type: (RobotCell, RobotCellState) -> None
+        robot_cell_copy = robot_cell.copy()  # type: RobotCell
+        assert robot_cell.robot_model.name == robot_cell_copy.robot_model.name
         assert robot_cell.tool_ids == robot_cell_copy.tool_ids
         assert robot_cell.rigid_body_ids == robot_cell_copy.rigid_body_ids
 
@@ -44,9 +47,10 @@ def test_robot_cell_deepcopy(
     """Test to make sure copy.deepcopy works"""
 
     def test(robot_cell, robot_cell_state):
+        # type: (RobotCell, RobotCellState) -> None
 
         robot_cell_copy = deepcopy(robot_cell)
-        assert robot_cell.robot.name == robot_cell_copy.robot.name
+        assert robot_cell.robot_model.name == robot_cell_copy.robot_model.name
         assert robot_cell.tool_ids == robot_cell_copy.tool_ids
         assert robot_cell.rigid_body_ids == robot_cell_copy.rigid_body_ids
 

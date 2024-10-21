@@ -75,13 +75,14 @@ class AnalyticalInverseKinematics(InverseKinematics):
         This function handles the case where the target is a :class:`compas_fab.robots.FrameTarget`.
         """
         planner = self  # type: AnalyticalKinematicsPlanner
+        robot_cell = planner.client.robot_cell  # type: RobotCell
 
         # Scale Target and get target frame
         target = target.normalized_to_meters()
         target_frame = target.target_frame
 
         target_frame = planner.client.robot_cell.target_frames_to_pcf(
-            start_state, target_frame, target.target_mode, group=group
+            start_state, target_frame, target.target_mode, group=robot_cell.main_group_name
         )
 
         return self.inverse_kinematics_ordered(target_frame, group=group, options=options)
