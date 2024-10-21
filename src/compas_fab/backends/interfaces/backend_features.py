@@ -16,7 +16,6 @@ if not IPY:
         from compas.geometry import Frame  # noqa: F401
 
         from compas_fab.robots import JointTrajectory  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
@@ -78,7 +77,7 @@ class BackendFeature(object):
         Do not pass None to group when return_full_configuration is False, the behavior is undefined.
 
         """
-        robot_cell = self.client.robot_cell  # type: Robot
+        robot_cell = self.client.robot_cell  # type: RobotCell
         if return_full_configuration:
             # build configuration including passive joints, but no sorting
             configuration = robot_cell.zero_configuration()

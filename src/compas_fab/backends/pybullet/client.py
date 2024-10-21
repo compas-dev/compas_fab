@@ -40,14 +40,13 @@ if not IPY:
         # Load pybullet for type hinting
         import pybullet
         from compas_robots import Configuration  # noqa: F401
-        from compas_robots import ToolModel  # noqa: F401
         from compas_robots import RobotModel  # noqa: F401
+        from compas_robots import ToolModel  # noqa: F401
         from compas_robots.model import Mimic  # noqa: F401
 
         from compas_fab.backends.kinematics import AnalyticalInverseKinematics  # noqa: F401
         from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion  # noqa: F401
         from compas_fab.robots import RigidBody  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import RobotSemantics  # noqa: F401
@@ -216,26 +215,19 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.disabled_collisions = set()
         self._cache_dir = None
 
-    # The following properties are overloaded here to provide Pybullet specific docstring
+    # NOTE: This function is overloaded from the ClientInterface to provide Pybullet specific docstring
     @property
     def robot_cell(self):
         # type: () -> RobotCell
         """The robot cell that is currently loaded in the PyBullet server.
         It represents the last RobotCell that was passed to `planner.set_robot_cell()`.
 
-        In order to avoid side effects, the RobotCell object is a copy of the original object.
-        Do not modify this returned object.
+        In order to avoid side effects, the RobotCell object is a copy of the original object
+        passed to the client. Do not modify the returned object here.
         """
         return self._robot_cell
 
-    @property
-    def robot(self):
-        # type: () -> Robot
-        """The robot that is currently loaded in the PyBullet server.
-        It represents the robot object that is embedded in the RobotCell object.
-        """
-        return self.robot_cell.robot
-
+    # NOTE: This function is overloaded from the ClientInterface to provide Pybullet specific docstring
     @property
     def robot_cell_state(self):
         # type: () -> RobotCellState
@@ -243,9 +235,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         It represents the last RobotCellState that was passed to `planner.set_robot_cell_state()`.
 
         In order to avoid side effects, the RobotCellState object is a copy of the original object.
-        Do not modify this returned object.
+        passed to the client. Do not modify the returned object here.
 
         There is typically no reason to access this directly, as the state is managed by the client.
+        The state is also updated during the beginning of each CC, FK, IK and planning request.
         However, it can be useful for debugging.
         The planner uses this function internally for comparing object states that was changed.
         """
@@ -279,8 +272,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     # Functions for loading and removing objects
     # ------------------------------------------
 
+    # TODO: Discuss whether the following functions should all have '_' in the beginning of their names
+
     def set_robot(self, robot_model, robot_semantics, concavity=False):
-        # type: (RobotModel, RobotSemantics, Optional[bool]) -> Robot
+        # type: (RobotModel, RobotSemantics, Optional[bool]) -> None
         """Send a robot to PyBullet.
 
         This function is used by SetRobotCell and should not be called directly by user.
@@ -290,9 +285,13 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        robot_cell : :class:`compas_fab.robots.RobotCell`
-            The robot to be saved for use with PyBullet.
-        concavity : :obj:`bool`, optional
+        robot_model : :class:`compas_robots.RobotModel`
+            The robot model to be loaded into PyBullet.
+        robot_semantics : :class:`compas_fab.robots.RobotSemantics`
+            The robot semantics to be loaded into PyBullet.
+        concavity : :obj:`bool`, optional.
+            When ``True``, the mesh will be loaded as its concave hull
+            for collision checking purposes. Defaults to ``False``.
 
         """
         if self.robot_puid is not None:
@@ -328,7 +327,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.robot_link_puids = {}
 
     def add_tool(self, name, tool_model):
-        # type: (str, ToolModel) -> Robot
+        # type: (str, ToolModel) -> None
         """Load a ToolModel object to PyBullet.
 
         Parameters

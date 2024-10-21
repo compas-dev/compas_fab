@@ -25,7 +25,6 @@ from compas_fab.backends import PlanningGroupNotSupported
 from compas_fab.backends import TargetModeMismatchError
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import PointAxisTarget
-from compas_fab.robots import Robot  # noqa: F401
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RobotCellState

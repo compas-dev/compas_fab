@@ -10,7 +10,6 @@ if not IPY:
     if TYPE_CHECKING:
         from compas_fab.backends import AnalyticalPyBulletPlanner  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
         from typing import Generator  # noqa: F401
         from compas_robots import Configuration  # noqa: F401

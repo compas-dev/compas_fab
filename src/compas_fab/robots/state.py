@@ -3,7 +3,6 @@ from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Transformation
 
-
 if not IPY:
     from typing import TYPE_CHECKING
 
@@ -12,9 +11,8 @@ if not IPY:
         from typing import List  # noqa: F401
         from typing import Optional  # noqa: F401
 
-        from compas_fab.robots import Robot  # noqa: F401
         from compas_robots import Configuration  # noqa: F401
-        from compas_robots import RobotModel  # noqa: F401
+
         from compas_fab.robots import RobotCell  # noqa: F401
 
 __all__ = [

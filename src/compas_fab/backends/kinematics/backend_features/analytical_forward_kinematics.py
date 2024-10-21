@@ -11,7 +11,6 @@ if not IPY:
         from compas.geometry import Frame  # noqa: F401
 
         from compas_fab.backends import AnalyticalKinematicsPlanner  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import TargetMode  # noqa: F401
