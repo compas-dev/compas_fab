@@ -122,7 +122,7 @@ class RobotCell(Data):
         :class:`compas_fab.robots.RobotCell`
             The robot cell.
         """
-        robot_model = RobotModel.__from_data__(data["robot"]) if data["robot"] else None
+        robot_model = RobotModel.__from_data__(data["robot_model"]) if data["robot_model"] else None
         robot_semantics = RobotSemantics.__from_data__(data["robot_semantics"]) if data["robot_semantics"] else None
         tool_models = {id: ToolModel.__from_data__(tool_data) for id, tool_data in data["tool_models"].items()}
         rigid_body_models = {

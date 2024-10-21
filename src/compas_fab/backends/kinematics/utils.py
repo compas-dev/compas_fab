@@ -22,13 +22,8 @@ def fit_within_bounds(angle, lower, upper):
     return angle
 
 
-def joint_angles_to_configurations(robot, solutions, group=None):
-    joint_names = robot.get_configurable_joint_names(group=group)
-    return [Configuration.from_revolute_values(q, joint_names=joint_names) if q else None for q in solutions]
-
-
-def try_to_fit_configurations_between_bounds(robot, configurations, group=None):
-    j1, j2, j3, j4, j5, j6 = robot.get_configurable_joints(group=group)
+def try_to_fit_configurations_between_bounds(robot_cell, configurations, group=None):
+    j1, j2, j3, j4, j5, j6 = robot_cell.get_configurable_joints(group=group)
     for i, c in enumerate(configurations):
         if c is None:
             continue

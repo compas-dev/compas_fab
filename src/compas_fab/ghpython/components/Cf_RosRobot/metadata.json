@@ -5,7 +5,6 @@
     "subcategory": "ROS",
     "description": "Load robot directly from ROS.",
     "exposure": 2,
-
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,
@@ -22,8 +21,12 @@
         ],
         "outputParameters": [
             {
-                "name": "robot",
-                "description": "The robot."
+                "name": "robot_cell",
+                "description": "The robot cell."
+            },
+            {
+                "name": "scene_object",
+                "description": "The scene object for the robot cell."
             }
         ]
     }

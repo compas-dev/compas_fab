@@ -12,7 +12,7 @@ if not IPY:
         from compas_fab.backends import AnalyticalKinematicsPlanner  # noqa: F401
         from compas_robots import Configuration  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import Robot  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import Target  # noqa: F401
         from typing import Dict  # noqa: F401
         from typing import Optional  # noqa: F401
@@ -20,7 +20,6 @@ if not IPY:
 
 from compas_fab.robots import FrameTarget
 
-from ..utils import joint_angles_to_configurations
 from ..utils import try_to_fit_configurations_between_bounds
 
 
@@ -139,7 +138,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         options = options or {}
         planner = self  # type: AnalyticalKinematicsPlanner
-        robot = planner.client.robot_cell.robot  # type: Robot
+        robot_cell = planner.client.robot_cell  # type: RobotCell
         solver = planner.kinematics_solver
 
         keep_order = options.get("keep_order", False)
@@ -155,10 +154,17 @@ class AnalyticalInverseKinematics(InverseKinematics):
             solutions = solver.inverse(frame_RCF)
         except ValueError:
             raise InverseKinematicsError()
-        configurations = joint_angles_to_configurations(robot, solutions, group=group)
+        configurations = []
+        for solution in solutions:
+            if solution is not None:
+                configuration = robot_cell.zero_configuration(group=group)
+                configuration.joint_values = solution
+                configurations.append(configuration)
+            else:
+                configurations.append(None)
 
         # fit configurations within joint bounds (>> sets those to `None` that are not working)
-        configurations = try_to_fit_configurations_between_bounds(robot, configurations, group=group)
+        configurations = try_to_fit_configurations_between_bounds(robot_cell, configurations, group=group)
 
         if not any(configurations):
             raise InverseKinematicsError()

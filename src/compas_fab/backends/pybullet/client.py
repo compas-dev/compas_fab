@@ -752,6 +752,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def get_robot_configuration(self):
         # type: () -> Configuration
         """Gets the robot's current pose.
+        A full configuration is returned.
 
         Parameters
         ----------
@@ -761,8 +762,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         -------
         :class:`compas_robots.Configuration`
         """
-        robot = self.robot_cell.robot
-        configuration = robot.zero_configuration()
+        robot_cell = self.robot_cell
+        configuration = robot_cell.zero_full_configuration()
         for joint_name in configuration.joint_names:
             joint_id = self.robot_joint_puids[joint_name]
             joint_value = self._get_joint_positions([joint_id], self.robot_puid)[0]

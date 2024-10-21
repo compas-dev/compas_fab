@@ -17,10 +17,12 @@ class ROSRobot(component):
 
         if ros_client and ros_client.is_connected and load:
             # Load URDF from ROS
-            st[key] = ros_client.load_robot(load_geometry=True, precision=12)
-            st[key].scene_object = SceneObject(st[key].model)
+            robot_cell = ros_client.load_robot_cell(load_geometry=True, precision=12)
+            # TODO: Need to upgrade it to a RobotCellSceneObject
+            robot_cell_scene_object = SceneObject(robot_cell.robot_model)
+            st[key] = (robot_cell, robot_cell_scene_object)
 
-        robot = st.get(key, None)
-        if robot:  # client sometimes need to be restarted, without needing to reload geometry
-            robot.client = ros_client
-        return robot
+        # Retrieve robot from sticky
+        # TODO: We should decide whether we create SceneObject here or in separate component
+        robot_cell, robot_cell_scene_object = st.get(key, (None, None))
+        return robot_cell, robot_cell_scene_object

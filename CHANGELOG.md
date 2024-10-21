@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Changed `avoid_collisions` parameter in `plan_motion` to `allow_collisions` parameter.
 * Dropped support for Python 3.8 and updated compas requirements to 2.3
 * Calling `forward_kinematics` from the Robot class now uses only the RobotModel to calculate the forward kinematics.
 * Fixed error in `PyBulletForwardKinematics.forward_kinematics` where function would crash if `options` was not passed.
@@ -40,6 +41,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed GH Component `ConstraintsFromTargetConfiguration` to `ConfigurationTarget`.
 
 ### Removed
+
+* Removed `RobotLibrary` class. Use `RobotCellLibrary` instead.
+* Removed `Robot` class. Use `RobotCell` instead.
 * Removed `attached_collision_meshes` attribute from `JointTrajectory` class.
 * Removed `Robot.merge_group_with_full_configuration` as it can be covered by `Configuration.merged`.
 * Removed function `Robot.get_group_names_from_link_name` as it is too oddly specific.
