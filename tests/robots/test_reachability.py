@@ -41,7 +41,6 @@ def test_reachability_scores():
 
 
 if __name__ == "__main__":
-    from compas_fab.backends import PyBulletClient
 
     def frame_generator(pt):
         zaxis = Vector(0, 0, 1)

@@ -26,7 +26,6 @@ from compas.utilities import await_callback
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
 from compas_fab.backends.ros.backend_features.helpers import validate_response
-from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import GetPositionIKRequest
 from compas_fab.backends.ros.messages import GetPositionIKResponse
 from compas_fab.backends.ros.messages import Header

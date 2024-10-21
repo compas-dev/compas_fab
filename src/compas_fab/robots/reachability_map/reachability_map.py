@@ -10,10 +10,10 @@ if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
-        from compas_fab.robots import RobotCellState
-        from compas_fab.backends.interfaces import PlannerInterface
-        from compas_fab.robots import TargetMode
-        from typing import Generator
+        from compas_fab.robots import RobotCellState  # noqa: F401
+        from compas_fab.backends.interfaces import PlannerInterface  # noqa: F401
+        from compas_fab.robots import TargetMode  # noqa: F401
+        from typing import Generator  # noqa: F401
 
 
 class ReachabilityMap(Data):

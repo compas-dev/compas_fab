@@ -1,7 +1,6 @@
 from itertools import combinations
 
 import pytest
-from compas import IPY
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Vector
@@ -12,13 +11,9 @@ import compas_fab
 from compas_fab.backends import AnalyticalKinematicsPlanner
 from compas_fab.backends import UR5Kinematics
 from compas_fab.robots import FrameTarget
-from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
-
-if not IPY:
-    from compas_fab.backends import AnalyticalPyBulletClient  # noqa: F401
 
 
 # The tolerance for the tests are set to 1e-4 meters, equivalent to 0.1 mm
