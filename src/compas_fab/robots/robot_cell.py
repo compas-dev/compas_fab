@@ -19,7 +19,7 @@ from .targets import TargetMode
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import Dict  # noqa: F401
         from typing import List  # noqa: F401
         from typing import Optional  # noqa: F401
@@ -78,12 +78,12 @@ class RobotCell(Data):
     @property
     def tool_ids(self):
         # type: () -> List[str]
-        return self.tool_models.keys()
+        return list(self.tool_models.keys())
 
     @property
     def rigid_body_ids(self):
         # type: () -> List[str]
-        return self.rigid_body_models.keys()
+        return list(self.rigid_body_models.keys())
 
     @property
     def __data__(self):
@@ -418,6 +418,9 @@ class RobotCell(Data):
         i.e., not ``Joint.FIXED``, not mimicking another joint and not a passive joint.
         See :meth:`compas_robots.model.Joint.is_configurable` for more details.
 
+        The result of this function is different from :meth:`RobotModel.get_configurable_joints()`
+        as this also filters out passive joints declared in the RobotSemantics.
+
         Returns
         -------
         :obj:`list` of :class:`compas_robots.model.Joint`
@@ -431,6 +434,18 @@ class RobotCell(Data):
                 joints.append(joint)
         return joints
 
+    def get_all_configurable_joint_names(self):
+        # type: () -> List[str]
+        """Get all the names of all configurable joints of a planning group.
+
+        Similar to :meth:`get_all_configurable_joints` but returning joint names.
+
+        Returns
+        -------
+        :obj:`list` of :obj:`str`
+        """
+        return [joint.name for joint in self.get_all_configurable_joints()]
+
     def get_configurable_joints(self, group=None):
         # type: (Optional[str]) -> List[Joint]
         """Get all configurable :class:`compas_robots.model.Joint` of a planning group.
@@ -439,8 +454,8 @@ class RobotCell(Data):
         i.e., not ``Joint.FIXED``, not mimicking another joint and not a passive joint.
         See :meth:`compas_robots.model.Joint.is_configurable` for more details.
 
-        Important: Setting the `group` to None, does not return all configurable joints of the robot.
-        If all configurable joints of the robot are needed, use :meth:`RobotModel.get_configurable_joints()`.
+        Important: Setting the `group` to None, does not return all configurable joints of the robot,
+        but that of the main planning group.
 
         Parameters
         ----------
@@ -452,6 +467,10 @@ class RobotCell(Data):
         :obj:`list` of :class:`compas_robots.model.Joint`
             A list of configurable joints.
 
+        Notes
+        -----
+        This function is different from :meth:`RobotModel.get_configurable_joints()`,
+        as this function filters only the joints of the specified group.
         """
         group = group or self.main_group_name
         joints = []
@@ -463,12 +482,11 @@ class RobotCell(Data):
         return joints
 
     def get_configurable_joint_names(self, group=None):
-        # type: (RobotModel, Optional[str]) -> List[str]
+        # type: (Optional[str]) -> List[str]
         """Get all the names of configurable joints of a planning group.
 
         Similar to :meth:`get_configurable_joints` but returning joint names.
 
-        If all configurable joints of the robot are needed, use :meth:`RobotModel.get_configurable_joint_names()`.
 
         Parameters
         ----------
@@ -478,6 +496,11 @@ class RobotCell(Data):
         Returns
         -------
         :obj:`list` of :obj:`str`
+
+        Notes
+        -----
+        This function is different from :meth:`RobotModel.get_configurable_joint_name()`,
+        as this function filters only the joints of the specified group.
         """
         group = group or self.main_group_name
         configurable_joints = self.get_configurable_joints(group)
@@ -511,7 +534,32 @@ class RobotCell(Data):
         configurable_joints = self.get_configurable_joints(group)
         return [j.type for j in configurable_joints]
 
-    def get_configuration_from_group_state(self, group, group_state):
+    def get_group_states_names(self, group):
+        # type: (str) -> List[str]
+        """Get the names of the group states of a planning group.
+
+        Parameters
+        ----------
+        group : :obj:`str`
+            The name of the planning group.
+
+        Returns
+        -------
+        :obj:`list` of :obj:`str`
+
+        Examples
+        --------
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+        >>> robot_cell.get_group_states_names('manipulator')
+        ['home', 'up']
+        """
+        if group not in self.group_names:
+            raise ValueError("Group '{}' does not exist in the robot cell.".format(group))
+        if group not in self.group_states:
+            return []
+        return list(self.group_states[group].keys())
+
+    def get_configuration_from_group_state(self, group, group_state_name):
         # type: (str, str) -> Configuration
         """Get the :class:`compas_robots.Configuration` from a predefined group state.
 
@@ -521,7 +569,7 @@ class RobotCell(Data):
         ----------
         group : :obj:`str`
             The name of the planning group.
-        group_state : :obj:`str`
+        group_state_name : :obj:`str`
             The name of the group_state.
 
         Returns
@@ -529,7 +577,7 @@ class RobotCell(Data):
         :class:`compas_robots.Configuration`
             The configuration specified by the :attr:`group_state`.
         """
-        joint_dict = self.group_states[group][group_state]
+        joint_dict = self.group_states[group][group_state_name]
         group_joint_names = self.get_configurable_joint_names(group)
         group_joint_types = self.get_configurable_joint_types(group)
         values = [joint_dict[name] for name in group_joint_names]
@@ -542,6 +590,8 @@ class RobotCell(Data):
     def zero_full_configuration(self):
         # type: () -> Configuration
         """Get the zero configuration (all configurable joints) of the robot.
+
+        Does not include passive joints or fixed joints.
 
         If the joint value `0.0` is outside of joint limits ``(joint.limit.upper, joint.limit.lower)`` then
         ``(upper + lower) / 2`` is used as joint value.
@@ -653,17 +703,43 @@ class RobotCell(Data):
 
         return Configuration(joint_values, joint_types, joint_names)
 
-    def get_group_configuration(self, group, full_configuration):
+    def configuration_to_full_configuration(self, configuration, full_configuration=None):
+        # type: (Configuration, Optional[Configuration]) -> Configuration
+        """Create a new Configuration object from a given configuration
+        and fill in the missing joints from a given full_configuration.
+        The joint values in the configuration takes precedence over the full_configuration.
+
+        Parameters
+        ----------
+        configuration : :class:`compas_robots.Configuration`
+            The configuration of the group.
+            The attributes `joint_names` and `joint_types` must be provided.
+        full_configuration : :class:`compas_robots.Configuration`, optional
+            The full configuration of the robot.
+            If not provided, the full configuration is created using :meth:`zero_full_configuration`.
+
+        Returns
+        -------
+        :class:`compas_robots.Configuration`
+            A new  Configuration object with all the joints of the robot.
+        """
+        if not full_configuration:
+            full_configuration = self.zero_full_configuration()
+
+        full_configuration.merged(configuration)
+        return full_configuration
+
+    def full_configuration_to_group_configuration(self, full_configuration, group):
         # type: (str, Configuration) -> Configuration
         """Filter a full configuration and return only the joints of the specified group.
 
         Parameters
         ----------
-        group : :obj:`str`
-            The name of the planning group.
         full_configuration : :class:`compas_robots.Configuration`
             A full configuration (with all configurable joints of the robot).
             Note that this object is not modified.
+        group : :obj:`str`
+            The name of the planning group.
 
         Returns
         -------
@@ -773,7 +849,7 @@ class RobotCell(Data):
         bodies = []
         workpiece_id = robot_cell_state.get_attached_workpiece_ids(group)
         for id in workpiece_id:
-            self.rigid_body_models[id]
+            bodies.append(self.rigid_body_models[id])
         return bodies
 
     def get_attached_rigid_bodies(self, robot_cell_state, group):

@@ -133,14 +133,17 @@ class ToolLibrary(object):
         tool_frame = Frame([0.2, 0.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
         tool_frame.scale(tool_size)
 
+        tool_model = ToolModel(visual=None, frame_in_tool0_frame=tool_frame, name="printing_tool")
+        meshes = []
         if load_geometry:
             obj = compas_fab.get("tool_library/printing_tool.obj")
             tool_mesh = Mesh.from_obj(obj)
             tool_mesh.scale(tool_size)
-        else:
-            tool_mesh = None
+            meshes.append(tool_mesh)
 
-        return ToolModel(visual=tool_mesh, frame_in_tool0_frame=tool_frame, collision=tool_mesh, name="printing_tool")
+        tool_model.add_link("printing_tool_link", visual_mesh=meshes, collision_mesh=meshes)
+
+        return tool_model
 
     @classmethod
     def static_gripper(cls, load_geometry=True):
@@ -175,8 +178,8 @@ class ToolLibrary(object):
         # Before the transformation,
         # X is the direction of the jaw movement, Y direction is the long axis when holding bar materials.
 
+        meshes = []
         if load_geometry:
-            meshes = []
             # Transformation to rotate the gripper to match the X axis
             t = Frame([0, 0, 0], [0, 0, 1], [1, 0, 0]).to_transformation().inverted()
             # Create the gripper body
@@ -188,7 +191,7 @@ class ToolLibrary(object):
             # Create the gripper finger
             shape = Box.from_corner_corner_height([0.2, -0.05, 0.1], [0.1, 0.05, 0.1], 0.2)
             meshes.append(Mesh.from_shape(shape).transformed(t))
-            tool_model.add_link("gripper_body", visual_meshes=meshes, collision_meshes=meshes)
+        tool_model.add_link("gripper_body", visual_meshes=meshes, collision_meshes=meshes)
 
         return tool_model
 
@@ -225,8 +228,8 @@ class ToolLibrary(object):
         # Before the transformation,
         # X is the direction of the jaw movement, Y direction is the long axis when holding bar materials.
 
+        meshes = []
         if load_geometry:
-            meshes = []
             # Transformation to rotate the gripper to match the X axis
             t = Frame([0, 0, 0], [0, 0, 1], [1, 0, 0]).to_transformation().inverted()
             # Create the gripper body
@@ -238,7 +241,7 @@ class ToolLibrary(object):
             # Create the gripper finger
             shape = Box.from_corner_corner_height([0.1, -0.05, 0.05], [0.05, 0.05, 0.05], 0.1)
             meshes.append(Mesh.from_shape(shape).transformed(t))
-            tool_model.add_link("gripper_body", visual_meshes=meshes, collision_meshes=meshes)
+        tool_model.add_link("gripper_body", visual_meshes=meshes, collision_meshes=meshes)
 
         return tool_model
 
