@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 * Removed `RobotLibrary` class. Use `RobotCellLibrary` instead.
+* Functions `Robot.transformed_frames` and `Robot.transformed_axes`are not migrated from `Robot` to `RobotCell`, use the one in `RobotModel` instead.
 * Removed `Robot` class. Use `RobotCell` instead.
 * Removed `attached_collision_meshes` attribute from `JointTrajectory` class.
 * Removed `Robot.merge_group_with_full_configuration` as it can be covered by `Configuration.merged`.

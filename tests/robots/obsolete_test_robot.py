@@ -117,11 +117,6 @@ def robot_tool2():
     return Tool(mesh, frame)
 
 
-def test_basic_name_only():
-    robot = Robot.basic("testbot")
-    assert robot.scene_object is None
-
-
 def test_basic_name_joints_links(ur5_joints, ur5_links):
     robot = Robot.basic("testbot", joints=ur5_joints, links=ur5_links)
     assert len(robot.model.links) == 11
