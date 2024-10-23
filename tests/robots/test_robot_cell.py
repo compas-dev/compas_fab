@@ -2,16 +2,17 @@ from copy import deepcopy
 
 import pytest
 from compas import IPY
+from compas.geometry import Frame
+from compas.geometry import Transformation
+from compas_robots import ToolModel
 
+from compas_fab.robots import RigidBody
+from compas_fab.robots import RigidBodyState
 from compas_fab.robots import RobotCell  # noqa: F401
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RobotCellState  # noqa: F401
-from compas_fab.robots import RigidBodyState
+from compas_fab.robots import TargetMode
 from compas_fab.robots import ToolState
-from compas_fab.robots import RigidBody
-from compas_robots import ToolModel
-from compas.geometry import Frame
-from compas.geometry import Transformation
 
 if not IPY:
     from typing import TYPE_CHECKING
@@ -154,6 +155,37 @@ def test_names(ur10e_gripper_one_beam):
 
     assert rc.group_names == rc.robot_semantics.group_names
     assert rc.get_end_effector_link_name() == rc.get_end_effector_link().name
+
+
+def test_get_link_names(panda, rfl, ur10e_gripper_one_beam, abb_irb4600_40_255_gripper_one_beam):
+    def _test(rc, rcs):
+        # type: (RobotCell, RobotCellState) -> None
+
+        all_link_names = [l.name for l in rc.robot_model.links]
+        for group in rc.group_names:
+            group_link_names = rc.get_link_names(group)
+            assert all(link_name in all_link_names for link_name in group_link_names)
+
+            # Get link names can return more links that that of the configurable joints
+            # because some joints within the group chain may by Fixed
+            # Here we can only check the joints neighboring the configurable joints
+            # is a subset of all link names
+            group_joints = rc.get_configurable_joints(group)
+            group_joints_link_names = []
+            for joint in group_joints:
+                group_joints_link_names.append(str(joint.child.link))
+                group_joints_link_names.append(str(joint.parent.link))
+            if not set(group_joints_link_names).issubset(set(group_link_names)):
+                # NOTE: The following debug code is added during the debug of issue
+                # related to the non-serial chain of panda robot group "panda_hand"
+                print(set(group_joints_link_names))
+                print(set(group_link_names))
+                assert False
+
+    _test(*panda)
+    _test(*rfl)
+    _test(*ur10e_gripper_one_beam)
+    _test(*abb_irb4600_40_255_gripper_one_beam)
 
 
 def test_group_states(rfl):
@@ -310,7 +342,6 @@ def test_transformations(ur10e_gripper_one_beam):
     tool_id = rc.tool_ids[0]
     workpiece_id = rc.rigid_body_ids[0]
 
-    # TODO: Add the t_wcf_rcf implementation here
     # The general FK formula : t_wcf_ocf = t_wcf_pcf * t_pcf_t0cf * t_t0cf_tcf * t_tcf_ocf
 
     # Define the transformations
@@ -331,17 +362,30 @@ def test_transformations(ur10e_gripper_one_beam):
     t_pcf_ocf = rc.t_pcf_ocf(rcs, workpiece_id)
     assert t_pcf_ocf == t_pcf_t0cf * t_t0cf_tcf * t_tcf_ocf
 
-    # Test the functions for transforming targets
+    # Test the functions for transforming Tool targets
     tcf_frame = Frame([4, 5, 6], [0.5, 0.5, 0], [0, 1, 0])
     t_wcf_tcf = Transformation.from_frame(tcf_frame)
     pcf_frame = rc.from_tcf_to_pcf(rcs, [tcf_frame], tool_id)[0]
     t_wcf_pcf = Transformation.from_frame(pcf_frame)
     assert t_wcf_pcf == t_wcf_tcf * (t_pcf_t0cf * t_t0cf_tcf).inverse()
     assert rc.from_pcf_to_tcf(rcs, [pcf_frame], tool_id)[0] == tcf_frame
+    assert rc.target_frames_to_pcf(rcs, tcf_frame, TargetMode.TOOL, rc.main_group_name) == pcf_frame
+    assert rc.target_frames_to_pcf(rcs, [tcf_frame], TargetMode.TOOL, rc.main_group_name) == [pcf_frame]
+    assert rc.pcf_to_target_frames(rcs, pcf_frame, TargetMode.TOOL, rc.main_group_name) == tcf_frame
+    assert rc.pcf_to_target_frames(rcs, [pcf_frame], TargetMode.TOOL, rc.main_group_name) == [tcf_frame]
 
+    # Test the functions for transforming Workpiece targets
     ocf_frame = Frame([5, 6, 7], [-0.5, 0.5, 0], [0, 1, 0])
     t_wcf_ocf = Transformation.from_frame(ocf_frame)
     pcf_frame = rc.from_ocf_to_pcf(rcs, [ocf_frame], workpiece_id)[0]
     t_wcf_pcf = Transformation.from_frame(pcf_frame)
     assert t_wcf_pcf == t_wcf_ocf * (t_pcf_t0cf * t_t0cf_tcf * t_tcf_ocf).inverse()
     assert rc.from_pcf_to_ocf(rcs, [pcf_frame], workpiece_id)[0] == ocf_frame
+    assert rc.target_frames_to_pcf(rcs, ocf_frame, TargetMode.WORKPIECE, rc.main_group_name) == pcf_frame
+    assert rc.target_frames_to_pcf(rcs, [ocf_frame], TargetMode.WORKPIECE, rc.main_group_name) == [pcf_frame]
+    assert rc.pcf_to_target_frames(rcs, pcf_frame, TargetMode.WORKPIECE, rc.main_group_name) == ocf_frame
+    assert rc.pcf_to_target_frames(rcs, [pcf_frame], TargetMode.WORKPIECE, rc.main_group_name) == [ocf_frame]
+
+    # Final test for no transform with a robot target
+    assert rc.target_frames_to_pcf(rcs, tcf_frame, TargetMode.ROBOT, rc.main_group_name) == tcf_frame
+    assert rc.pcf_to_target_frames(rcs, tcf_frame, TargetMode.ROBOT, rc.main_group_name) == tcf_frame

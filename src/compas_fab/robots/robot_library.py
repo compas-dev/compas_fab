@@ -400,6 +400,9 @@ class RobotCellLibrary(object):
         )
         robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
 
+        # Remove the planning group called 'endeffector' because it only has one link and no joints.
+        del robot_cell.robot_semantics.groups["endeffector"]
+
         return robot_cell, robot_cell_state
 
     @classmethod
@@ -427,6 +430,9 @@ class RobotCellLibrary(object):
             local_package_mesh_folder="robot_library/ur10e_robot" if load_geometry else None,
         )
         robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+
+        # Remove the planning group called 'endeffector' because it only has one link and no joints.
+        del robot_cell.robot_semantics.groups["endeffector"]
 
         return robot_cell, robot_cell_state
 
@@ -522,6 +528,11 @@ class RobotCellLibrary(object):
                 robot_model.remove_joint(link.parent_joint.name)
 
         robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+
+        # Remove the planning group called 'panda_hand' because it it not a "serial chain",
+        # the bifurcation of the chain into two fingers is not supported by planning backends.
+        del robot_cell.robot_semantics.groups["panda_hand"]
+        del robot_cell.robot_semantics.group_states["panda_hand"]
 
         return robot_cell, robot_cell_state
 
