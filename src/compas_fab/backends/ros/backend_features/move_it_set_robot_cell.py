@@ -22,7 +22,7 @@ from compas_fab.backends.ros.service_description import ServiceDescription
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import Callable  # noqa: F401
         from typing import Dict  # noqa: F401
         from typing import Optional  # noqa: F401

@@ -16,7 +16,7 @@ from compas.geometry import Transformation
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import Tuple
 
 

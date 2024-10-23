@@ -15,7 +15,7 @@ from compas_fab.utilities import sign
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import List  # noqa: F401
 
 

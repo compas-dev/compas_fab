@@ -5,7 +5,7 @@ from compas_fab.backends.interfaces import SetRobotCellState
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
 
         from compas_fab.robots import RobotCellState  # noqa: F401
 

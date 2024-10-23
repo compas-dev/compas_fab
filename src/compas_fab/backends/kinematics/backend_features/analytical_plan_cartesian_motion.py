@@ -15,7 +15,7 @@ from compas import IPY
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from compas_fab.backends import AnalyticalPyBulletPlanner  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import Waypoints  # noqa: F401

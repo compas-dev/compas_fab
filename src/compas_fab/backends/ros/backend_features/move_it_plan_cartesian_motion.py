@@ -20,7 +20,7 @@ from compas_fab.robots import PointAxisWaypoints
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import Callable  # noqa: F401
         from typing import Dict  # noqa: F401
         from typing import Optional  # noqa: F401

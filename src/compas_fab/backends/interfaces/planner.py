@@ -11,7 +11,7 @@ from compas_fab.robots import TargetMode
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import List  # noqa: F401
 
         from compas_fab.backends.interfaces import ClientInterface  # noqa: F401

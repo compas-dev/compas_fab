@@ -16,7 +16,7 @@ from compas_fab.backends.pybullet.backend_features import PyBulletSetRobotCellSt
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import Optional  # noqa: F401
 
         from compas_fab.backends.kinematics.solvers import AnalyticalKinematics  # noqa: F401

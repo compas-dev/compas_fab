@@ -23,7 +23,7 @@ from compas_fab.backends.ros.messages.trajectory_msgs import MultiDOFJointTrajec
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import Optional  # noqa: F401
 
         from compas_fab.robots import RigidBody  # noqa: F401

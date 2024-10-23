@@ -23,7 +23,7 @@ from compas_fab.backends.ros.service_description import ServiceDescription
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from compas_fab.backends import MoveItPlanner  # noqa: F401
         from compas_fab.backends import RosClient  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401

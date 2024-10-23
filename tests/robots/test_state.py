@@ -11,7 +11,7 @@ from compas.geometry import Transformation
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import Dict  # noqa: F401
         from typing import List  # noqa: F401
         from typing import Tuple  # noqa: F401

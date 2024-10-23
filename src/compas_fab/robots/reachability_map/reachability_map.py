@@ -9,7 +9,7 @@ from compas import IPY
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.backends.interfaces import PlannerInterface  # noqa: F401
         from compas_fab.robots import TargetMode  # noqa: F401

@@ -6,7 +6,7 @@ __all__ = ["list_files_in_directory"]
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import List  # noqa: F401
         from typing import Optional  # noqa: F401
 

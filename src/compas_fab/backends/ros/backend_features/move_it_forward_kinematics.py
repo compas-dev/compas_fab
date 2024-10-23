@@ -19,7 +19,7 @@ from compas import IPY
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from compas_fab.backends.ros.client import RosClient  # noqa: F401
         from compas_fab.backends.ros.planner import MoveItPlanner  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401

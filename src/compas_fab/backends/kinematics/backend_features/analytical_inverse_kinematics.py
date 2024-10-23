@@ -7,7 +7,7 @@ from compas_fab.backends.interfaces import InverseKinematics
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from compas.geometry import Frame  # noqa: F401
         from compas_fab.backends import AnalyticalKinematicsPlanner  # noqa: F401
         from compas_robots import Configuration  # noqa: F401

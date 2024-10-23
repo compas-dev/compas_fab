@@ -4,7 +4,7 @@ from compas.data import Data
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import List  # noqa: F401
 
         from compas.datastructures import Mesh  # noqa: F401

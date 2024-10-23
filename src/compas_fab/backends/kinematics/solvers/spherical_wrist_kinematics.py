@@ -12,7 +12,7 @@ from .spherical_wrist import inverse_kinematics_spherical_wrist
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import List  # noqa: F401
 
         from compas.geometry import Frame  # noqa: F401

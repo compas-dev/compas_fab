@@ -7,7 +7,7 @@ from compas_fab.backends.interfaces import SetRobotCellState
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from compas_robots import ToolModel  # noqa: F401
 
         from compas_fab.backends import PyBulletClient  # noqa: F401

@@ -34,7 +34,7 @@ from compas import IPY
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import Optional  # noqa: F401
 
 __all__ = [

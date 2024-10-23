@@ -11,7 +11,7 @@ from compas.geometry import Sphere
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import Optional  # noqa: F401
         from typing import Union  # noqa: F401
 
