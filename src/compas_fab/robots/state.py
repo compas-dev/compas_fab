@@ -34,10 +34,18 @@ class RobotCellState(Data):
 
     """
 
-    def __init__(self, robot_flange_frame, robot_configuration=None, tool_states=None, rigid_body_states=None):
-        # type: (Frame, Optional[Configuration], Dict[str, ToolState], Dict[str, RigidBodyState]) -> None
+    def __init__(
+        self,
+        robot_base_frame=None,
+        robot_flange_frame=None,
+        robot_configuration=None,
+        tool_states=None,
+        rigid_body_states=None,
+    ):
+        # type: (Optional[Frame], Optional[Frame], Optional[Configuration], Dict[str, ToolState], Dict[str, RigidBodyState]) -> None
         super(RobotCellState, self).__init__()
-        self.robot_flange_frame = robot_flange_frame  # type: Frame
+        self.robot_base_frame = robot_base_frame or Frame.worldXY()  # type: Frame
+        self.robot_flange_frame = robot_flange_frame or Frame.worldXY()  # type: Frame
         self.robot_configuration = robot_configuration  # type: Optional[Configuration]
         self.tool_states = tool_states or {}  # type: Dict[str, ToolState]
         self.rigid_body_states = rigid_body_states or {}  # type: Dict[str, RigidBodyState]
@@ -55,6 +63,7 @@ class RobotCellState(Data):
     @property
     def __data__(self):
         return {
+            "robot_base_frame": self.robot_base_frame,
             "robot_flange_frame": self.robot_flange_frame,
             "robot_configuration": self.robot_configuration,
             "tool_states": self.tool_states,
@@ -64,6 +73,8 @@ class RobotCellState(Data):
     def __eq__(self, value):
         # type: (RobotCellState) -> bool
         if value is None or not isinstance(value, RobotCellState):
+            return False
+        if self.robot_base_frame != value.robot_base_frame:
             return False
         if self.robot_flange_frame != value.robot_flange_frame:
             return False
@@ -100,6 +111,7 @@ class RobotCellState(Data):
         This function ensures that all the tools and workpieces in the robot cell are represented in the robot cell state.
         This function should be called after the robot cell is created and all objects are added to it.
 
+        The robot's base frame will be assumed to be at worldXY frame.
         All tools will be assumed to be in their zero configuration and positioned at worldXY frame.
         All workpieces will be assumed to be in their base frame and not attached to any tool or link.
         All tools and workpieces are assumed to be visible in the scene (is_hidden=False).
@@ -112,6 +124,7 @@ class RobotCellState(Data):
             The configuration of the robot. If the configuration is not provided, the robot's zero configuration will be used.
         """
         robot_configuration = robot_configuration or robot_cell.zero_full_configuration()
+        base_frame = Frame.worldXY()
         flange_frame = robot_cell.robot_model.forward_kinematics(robot_configuration)
 
         tool_states = {}
@@ -126,7 +139,7 @@ class RobotCellState(Data):
             rigid_body_state = RigidBodyState(Frame.worldXY(), None, None, None)
             rigid_body_states[rigid_body_id] = rigid_body_state
 
-        return cls(flange_frame, robot_configuration, tool_states, rigid_body_states)
+        return cls(base_frame, flange_frame, robot_configuration, tool_states, rigid_body_states)
 
     def get_attached_tool_id(self, group):
         # type: (str) -> Optional[str]

@@ -14,6 +14,7 @@ if compas.RHINO:
     from .reachabilitymapobject import ReachabilityMapObject
     from .rigid_body_object import RigidBodyObject
     from .robot_cell_object import RobotCellObject
+    from .robot_model_object import RobotModelObject
 
     @plugin(category="factories", requires=["Rhino"])
     def register_scene_objects():
@@ -29,4 +30,5 @@ __all__ = [
     "ReachabilityMapObject",
     "RobotCellObject",
     "RigidBodyObject",
+    "RobotModelObject",
 ]

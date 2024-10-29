@@ -1,5 +1,6 @@
 from compas import IPY
 from compas.scene import SceneObject
+from compas_fab.robots import RobotCellState
 
 if not IPY:
     from typing import TYPE_CHECKING
@@ -8,13 +9,13 @@ if not IPY:
         from typing import List  # noqa: F401
         from typing import Optional  # noqa: F401
 
-        from compas_robots.scene import BaseRobotModelObject  # noqa: F401
+        from .base_robot_model_object import BaseRobotModelObject  # noqa: F401
 
         # from compas_fab.scene import BaseToolObject
         from compas_fab.robots import RigidBody  # noqa: F401
         from compas_fab.robots import RigidBodyState  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
+
         from compas_fab.scene import BaseRigidBodyObject  # noqa: F401
 
 
@@ -37,7 +38,6 @@ class BaseRobotCellObject(SceneObject):
     If caching function is not desired, simply remove the native geometry and create
     a new instance of the RobotCellObject every time the robot cell is drawn.
 
-
     """
 
     def __init__(self, draw_visual=True, draw_collision=False, scale=1.0, *args, **kwargs):
@@ -47,16 +47,10 @@ class BaseRobotCellObject(SceneObject):
         self._scale = scale
 
         # Native Geometry handles
-
-        self.robot_scene_object = SceneObject(self.robot_cell.robot_model)  # type: BaseRobotModelObject
-
+        # robot_model_object = self._get_robot_model_object()
+        self.robot_model_scene_object = None  # type: BaseRobotModelObject
         self.rigid_body_scene_objects = {}  # type: dict[str, BaseRigidBodyObject]
-        for id, rigid_body in self.robot_cell.rigid_body_models.items():
-            self.rigid_body_scene_objects[id] = SceneObject(rigid_body)
-
-        self.tool_scene_objects = {}  # type: dict[str, BaseToolObject]
-        for id, tool in self.robot_cell.tool_models.items():
-            self.tool_scene_objects[id] = SceneObject(tool)
+        # self.tool_scene_objects = {}  # type: dict[str, BaseToolObject]
 
     @property
     def robot_cell(self):
@@ -70,32 +64,45 @@ class BaseRobotCellObject(SceneObject):
     def draw(self, robot_cell_state=None):
         # type: (Optional[RobotCellState]) -> List[object]
         """Return all native geometry (in the CAD environment) belonging to the robot cell."""
-        native_geometry = []
-        if robot_cell_state:
-            self.update(robot_cell_state)
-        else:
-            self.robot_scene_object.draw()
-            for rigid_body_scene_object in self.rigid_body_scene_objects.values():
-                rigid_body_scene_object.draw()
-            for tool_scene_object in self.tool_scene_objects.values():
-                tool_scene_object.draw()
+        native_geometries = []
 
-    def draw_rigid_bodies(self, robot_cell_state=None):
-        # type: (Optional[RobotCellState]) -> List[object]
-        """Return the native geometry (in the CAD environment) of the rigid bodies of the robot cell."""
-        native_geometry = []
+        # Default robot cell state if not provided
+        robot_cell_state = robot_cell_state if robot_cell_state else RobotCellState.from_robot_cell(self.robot_cell)
+
+        # Draw the robot model
+        native_geometries.extend(
+            self.robot_model_scene_object.draw(robot_cell_state.robot_configuration, robot_cell_state.robot_base_frame)
+        )
+
+        # Draw the rigid bodies
         for id, rigid_body_scene_object in self.rigid_body_scene_objects.items():
             rigid_body_state = robot_cell_state.rigid_body_states[id] if robot_cell_state else None
-            native_geometry += rigid_body_scene_object.draw(rigid_body_state)
-        return native_geometry
+            native_geometries.extend(rigid_body_scene_object.draw(rigid_body_state))
 
-    def update(self, robot_cell_state):
-        # type: (RobotCellState) -> None
-        """Update the robot cell object with the given robot cell state."""
-        # NOTE: All the constituent objects have an update method for transforming the native geometry
-        if robot_cell_state.robot_configuration:
-            self.robot_scene_object.update(robot_cell_state.robot_configuration)
-        for id, rigid_body_state in robot_cell_state.rigid_body_states.items():
-            self.rigid_body_scene_objects[id].update(rigid_body_state)
-        for id, tool_state in robot_cell_state.tool_states.items():
-            self.tool_scene_objects[id].update(tool_state)
+        # Draw the tools
+        # for tool_scene_object in self.tool_scene_objects.values():
+        #     native_geometries.extend(tool_scene_object.draw())
+
+        return native_geometries
+
+    # --------------------------------------------------------------------------
+
+    # def draw_rigid_bodies(self, robot_cell_state=None):
+    #     # type: (Optional[RobotCellState]) -> List[object]
+    #     """Return the native geometry (in the CAD environment) of the rigid bodies of the robot cell."""
+    #     native_geometry = []
+    #     for id, rigid_body_scene_object in self.rigid_body_scene_objects.items():
+    #         rigid_body_state = robot_cell_state.rigid_body_states[id] if robot_cell_state else None
+    #         native_geometry += rigid_body_scene_object.draw(rigid_body_state)
+    #     return native_geometry
+
+    # def update(self, robot_cell_state):
+    #     # type: (RobotCellState) -> None
+    #     """Update the robot cell object with the given robot cell state."""
+    #     # NOTE: All the constituent objects have an update method for transforming the native geometry
+    #     if robot_cell_state.robot_configuration:
+    #         self.robot_scene_object.update(robot_cell_state.robot_configuration)
+    #     for id, rigid_body_state in robot_cell_state.rigid_body_states.items():
+    #         self.rigid_body_scene_objects[id].update(rigid_body_state)
+    #     # for id, tool_state in robot_cell_state.tool_states.items():
+    #     #     self.tool_scene_objects[id].update(tool_state)
