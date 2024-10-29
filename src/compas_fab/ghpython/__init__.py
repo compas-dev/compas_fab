@@ -18,6 +18,8 @@ of the CAD environment.
     :nosignatures:
 
     ReachabilityMapObject
+    RigidBodyObject
+    RobotCellObject
 
 
 """
@@ -27,8 +29,12 @@ import compas
 if compas.RHINO:
     from .scene import (
         ReachabilityMapObject,
+        RigidBodyObject,
+        RobotCellObject,
     )
 
     __all__ = [
         "ReachabilityMapObject",
+        "RigidBodyObject",
+        "RobotCellObject",
     ]
