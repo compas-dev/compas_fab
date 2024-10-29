@@ -367,7 +367,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             visual_path = None
         else:
             visual_mesh = Mesh()
-            for m in rigid_body.visual_meshes:
+            for m in rigid_body.visual_meshes_in_meters:
                 visual_mesh.join(m, precision=12)
             visual_path = os.path.join(self._cache_dir.name, "{}_visual.obj".format(rigid_body.guid))
             visual_mesh.to_obj(visual_path)
@@ -379,7 +379,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             collision_path = None
         else:
             collision_mesh = Mesh()
-            for m in rigid_body.collision_meshes:
+            for m in rigid_body.collision_meshes_in_meters:
                 collision_mesh.join(m, precision=12)
             collision_path = os.path.join(self._cache_dir.name, "{}_collision.obj".format(rigid_body.guid))
             collision_mesh.to_obj(collision_path)

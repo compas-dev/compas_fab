@@ -203,7 +203,7 @@ class MoveItSetRobotCell(SetRobotCell):
                     continue
 
             # Create new CollisionObject to be passed to backend
-            ros_meshes = [Mesh.from_mesh(m) for m in rigid_body.collision_meshes]
+            ros_meshes = [Mesh.from_mesh(m) for m in rigid_body.collision_meshes_in_meters]
             collision_object = CollisionObject(
                 # Header is robot.root_name when the object is not attached
                 header=Header(frame_id=robot_cell.root_name),

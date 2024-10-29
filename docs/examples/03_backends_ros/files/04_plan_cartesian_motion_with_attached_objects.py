@@ -38,12 +38,12 @@ with RosClient() as client:
     bar_mesh = Box(0.05, 0.05, 0.6).to_mesh(triangulated=True)
     robot_cell.rigid_body_models["bar"] = RigidBody.from_mesh(bar_mesh)
     # Add a target marker
-    target = RigidBodyLibrary.target_marker(0.2)
+    target_marker = RigidBodyLibrary.target_marker(0.2)
     # MoveIt RViz GUI typically does not show objects without collision meshes, so
     # we set the collision meshes to be the same as the visual meshes
-    target.collision_meshes = target.visual_meshes
+    target_marker.collision_meshes = target_marker.visual_meshes
     for i, frame in enumerate(target_frames):
-        robot_cell.rigid_body_models["target_%d" % i] = target.copy()
+        robot_cell.rigid_body_models["target_%d" % i] = target_marker.copy()
 
     # =====================================
     # Step 2: Specify the Robot Cell State
