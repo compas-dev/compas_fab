@@ -2,6 +2,7 @@ from compas import IPY
 from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Transformation
+from compas.geometry import Scale
 from compas.scene import SceneObject
 from compas_robots.model import MeshDescriptor
 
@@ -74,10 +75,10 @@ class BaseRobotModelObject(SceneObject):
         return native_geometry
 
     def _initial_draw(self):
-        """Creating the native geometry when `draw()` method is called for the first time.
+        """Creating the native geometry when `draw()` or `update()` method is called for the first time.
 
         This private function is isolated out such that the initial draw does not happen in the __init__
-        method and can be deferred until the `draw()` method is called for the first time.
+        method and can be deferred until  `draw()` or `update()` is called for the first time.
         """
         # Reset the dictionaries
         self.base_native_geometry = None
@@ -127,8 +128,7 @@ class BaseRobotModelObject(SceneObject):
 
         Notes
         -----
-        It is possible to call this method before the `draw()` method, but the native geometry
-
+        It is possible to call this method before the `draw()` method.
         """
 
         # Create the native geometry when the `draw()` or `update()` method is called for the first time
@@ -165,11 +165,13 @@ class BaseRobotModelObject(SceneObject):
                 self.links_collision_mesh_native_geometry[link_name] = new_native_geometry
                 self.links_collision_mesh_transformation[link_name] = new_transformation
 
-        # Use the robot base frame if it is provided
+        # The World Coordinate Frame (WCF) relative to the Visualization Coordinate Frame (VCF)
+        t_vcf_wcf = Scale.from_factors([1 / self._scale] * 3)
+        # The robot base frame relative to the world frame
         t_wcf_rcf = Transformation.from_frame(base_frame) if base_frame else Transformation()
 
         # Update the base link
-        _update_link_meshes(self.robot_model.root.name, t_wcf_rcf)
+        _update_link_meshes(self.robot_model.root.name, t_vcf_wcf * t_wcf_rcf)
 
         # Iterate over the joints (equivalent to all the child links) and update their pose
         # This iteration order is the same as the result from transform_frames()
@@ -178,7 +180,7 @@ class BaseRobotModelObject(SceneObject):
             # From Robot Coordinate Frame to Link Coordinate Frame (Link Frame == Joint Frame)
             t_rcf_lcf = Transformation.from_frame(joint_frame)
             # From World Coordinate Frame to Link Coordinate Frame
-            t_wcf_lcf = t_wcf_rcf * t_rcf_lcf
+            t_wcf_lcf = t_vcf_wcf * t_wcf_rcf * t_rcf_lcf
             _update_link_meshes(joint.child_link.name, t_wcf_lcf)
 
     # --------------------------------------------------------------------------

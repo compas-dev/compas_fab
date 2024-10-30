@@ -50,7 +50,7 @@ class BaseRobotCellObject(SceneObject):
         # robot_model_object = self._get_robot_model_object()
         self.robot_model_scene_object = None  # type: BaseRobotModelObject
         self.rigid_body_scene_objects = {}  # type: dict[str, BaseRigidBodyObject]
-        # self.tool_scene_objects = {}  # type: dict[str, BaseToolObject]
+        self.tool_scene_objects = {}  # type: dict[str, BaseRobotModelObject]
 
     @property
     def robot_cell(self):
@@ -63,46 +63,68 @@ class BaseRobotCellObject(SceneObject):
 
     def draw(self, robot_cell_state=None):
         # type: (Optional[RobotCellState]) -> List[object]
-        """Return all native geometry (in the CAD environment) belonging to the robot cell."""
+        """Return all native geometry (in the CAD environment) belonging to the robot cell.
+
+        The geometry contains the robot model, rigid bodies, and tools.
+
+        Parameters
+        ----------
+        robot_cell_state : RobotCellState, optional
+            The state of the robot cell, containing the configuration of the robot and the state of the rigid bodies and tools.
+
+        Returns
+        -------
+        List[object]
+            A list of native geometry objects representing the robot cell in the CAD environment.
+        """
+        # Create the native geometry when the `draw()` or `update()` method is called for the first time
+        if not self.robot_model_scene_object:
+            self._initial_draw()
+
+        # Update the child scene objects if a configuration is provided
+        if robot_cell_state:
+            self.update(robot_cell_state)
+
+        # The native geometry are collected from the child scene objects .draw() method.
         native_geometries = []
-
-        # Default robot cell state if not provided
-        robot_cell_state = robot_cell_state if robot_cell_state else RobotCellState.from_robot_cell(self.robot_cell)
-
-        # Draw the robot model
         native_geometries.extend(
             self.robot_model_scene_object.draw(robot_cell_state.robot_configuration, robot_cell_state.robot_base_frame)
         )
-
-        # Draw the rigid bodies
-        for id, rigid_body_scene_object in self.rigid_body_scene_objects.items():
-            rigid_body_state = robot_cell_state.rigid_body_states[id] if robot_cell_state else None
-            native_geometries.extend(rigid_body_scene_object.draw(rigid_body_state))
-
-        # Draw the tools
-        # for tool_scene_object in self.tool_scene_objects.values():
-        #     native_geometries.extend(tool_scene_object.draw())
+        for rigid_body_scene_object in self.rigid_body_scene_objects.values():
+            native_geometries.extend(rigid_body_scene_object.draw())
+        for tool_scene_object in self.tool_scene_objects.values():
+            native_geometries.extend(tool_scene_object.draw())
 
         return native_geometries
 
+    def update(self, robot_cell_state):
+        # type: (RobotCellState) -> None
+        """Update the robot cell object with the given robot cell state."""
+        # NOTE: All the constituent objects have an update method for transforming the native geometry
+
+        # Create the native geometry when the `draw()` or `update()` method is called for the first time
+        if not self.robot_model_scene_object:
+            self._initial_draw()
+
+        # Update the child scene objects if a configuration is provided
+        if robot_cell_state:
+            self.robot_model_scene_object.update(
+                robot_cell_state.robot_configuration, robot_cell_state.robot_base_frame
+            )
+            for id, rigid_body_scene_object in self.rigid_body_scene_objects.items():
+                rigid_body_state = robot_cell_state.rigid_body_states[id]
+                rigid_body_scene_object.update(rigid_body_state)
+            for id, tool_scene_object in self.tool_scene_objects.items():
+                tool_state = robot_cell_state.tool_states[id]
+                tool_scene_object.update(tool_state)
+
     # --------------------------------------------------------------------------
 
-    # def draw_rigid_bodies(self, robot_cell_state=None):
-    #     # type: (Optional[RobotCellState]) -> List[object]
-    #     """Return the native geometry (in the CAD environment) of the rigid bodies of the robot cell."""
-    #     native_geometry = []
-    #     for id, rigid_body_scene_object in self.rigid_body_scene_objects.items():
-    #         rigid_body_state = robot_cell_state.rigid_body_states[id] if robot_cell_state else None
-    #         native_geometry += rigid_body_scene_object.draw(rigid_body_state)
-    #     return native_geometry
+    def _initial_draw(self):
+        """Creating the native geometry when `draw()` or `update()` method is called for the first time.
 
-    # def update(self, robot_cell_state):
-    #     # type: (RobotCellState) -> None
-    #     """Update the robot cell object with the given robot cell state."""
-    #     # NOTE: All the constituent objects have an update method for transforming the native geometry
-    #     if robot_cell_state.robot_configuration:
-    #         self.robot_scene_object.update(robot_cell_state.robot_configuration)
-    #     for id, rigid_body_state in robot_cell_state.rigid_body_states.items():
-    #         self.rigid_body_scene_objects[id].update(rigid_body_state)
-    #     # for id, tool_state in robot_cell_state.tool_states.items():
-    #     #     self.tool_scene_objects[id].update(tool_state)
+        This private function is isolated out such that the initial draw does not happen in the __init__
+        method and can be deferred until  `draw()` or `update()` is called for the first time.
+        """
+
+        raise NotImplementedError

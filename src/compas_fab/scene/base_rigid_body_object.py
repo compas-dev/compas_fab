@@ -1,5 +1,6 @@
 from compas.scene import SceneObject
 from compas.geometry import Transformation
+from compas.geometry import Scale
 
 from compas import IPY
 
@@ -27,6 +28,11 @@ class BaseRigidBodyObject(SceneObject):
         self.visual_mesh_native_geometry = []
         self.collision_mesh_native_geometry = []
 
+    @property
+    def rigid_body(self):
+        # type: () -> RigidBody
+        return self.item
+
     # This implements the SceneObject.draw method
     def draw(self, rigid_body_state=None):
         # type: (Optional[RigidBodyState]) -> List[object]
@@ -46,19 +52,9 @@ class BaseRigidBodyObject(SceneObject):
         List[object]
             A list of native geometry objects representing the visual and collision meshes of the rigid body.
         """
-        # The native geometry is created when the `draw()` method is called for the first time
-        # In the Rhino context, this allows the actual drawing to be deferred until the first time the object is drawn.
+        # Create the native geometry when the `draw()` or `update()` method is called for the first time
         if (not self.visual_mesh_native_geometry) and (not self.collision_mesh_native_geometry):
-            self.visual_mesh_native_geometry = []
-            self.collision_mesh_native_geometry = []
-            if self._draw_visual:
-                for visual in self.rigid_body.visual_meshes_in_meters:
-                    name = self.rigid_body.name + "_visual"
-                    self.visual_mesh_native_geometry.append(self._create_geometry(visual, name=name))
-            if self._draw_collision:
-                for collision in self.rigid_body.collision_meshes_in_meters:
-                    name = self.rigid_body.name + "_collision"
-                    self.collision_mesh_native_geometry.append(self._create_geometry(collision, name=name))
+            self._initial_draw()
 
         # If a rigid body state is provided, update the object after drawing.
         # The update function will update the native geometry in place.
@@ -77,8 +73,17 @@ class BaseRigidBodyObject(SceneObject):
         in place, or creating a new object. This is up to the CAD-specific implementation.
         The `._transform` method should return the transformed geometry object, whether it is a new object or the same object.
         """
+
+        # Create the native geometry when the `draw()` or `update()` method is called for the first time
+        if (not self.visual_mesh_native_geometry) and (not self.collision_mesh_native_geometry):
+            self._initial_draw()
+
+        # The World Coordinate Frame (WCF) relative to the Visualization Coordinate Frame (VCF)
+        t_vcf_wcf = Scale.from_factors([1 / self._scale] * 3)
+        t_wcf_ocf = Transformation.from_frame(rigid_body_state.frame)
+
+        new_transformation = t_vcf_wcf * t_wcf_ocf
         previous_transformation = self.transformation or Transformation()
-        new_transformation = Transformation.from_frame(rigid_body_state.frame)
         delta_transformation = new_transformation * previous_transformation.inverse()
 
         if self._draw_visual:
@@ -93,16 +98,33 @@ class BaseRigidBodyObject(SceneObject):
                 self._transform(geo, delta_transformation) for geo in self.collision_mesh_native_geometry
             ]
             # In case the _transform method returns a new object, we need to update the cache
-            assert len(visual_mesh_native_geometry) == len(self.visual_mesh_native_geometry)
+            assert len(collision_mesh_native_geometry) == len(self.collision_mesh_native_geometry)
             self.collision_mesh_native_geometry = collision_mesh_native_geometry
 
         # Update the self.transformation
         self.transformation = new_transformation
 
-    @property
-    def rigid_body(self):
-        # type: () -> RigidBody
-        return self.item
+    def _initial_draw(self):
+        """Creating the native geometry when `draw()` or `update()` method is called for the first time.
+
+        This private function is isolated out such that the initial draw does not happen in the __init__
+        method and can be deferred until  `draw()` or `update()` is called for the first time.
+        """
+        # In the Rhino context, this allows the actual drawing to be deferred until the first time the object is drawn.
+
+        self.visual_mesh_native_geometry = []
+        self.collision_mesh_native_geometry = []
+        if self._draw_visual:
+            # NOTE: The meshes are initially drawn in meters scale and later transformed to
+            #       the visualization scale in the `update()` method. This is to simplify
+            #       the transformation logic in the `update()` method.
+            for visual in self.rigid_body.visual_meshes_in_meters:
+                name = self.rigid_body.name + "_visual"
+                self.visual_mesh_native_geometry.append(self._create_geometry(visual, name=name))
+        if self._draw_collision:
+            for collision in self.rigid_body.collision_meshes_in_meters:
+                name = self.rigid_body.name + "_collision"
+                self.collision_mesh_native_geometry.append(self._create_geometry(collision, name=name))
 
     # --------------------------------------------------------------------------
     # Private methods that need to be implemented by CAD specific classes
