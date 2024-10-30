@@ -44,77 +44,20 @@ class BaseRobotModelObject(SceneObject):
         """The robot model this object is associated with."""
         return self.item
 
-    def _extract_link_geometry(self, link_elements):
-        # type: (List[Visual] | List[Collision]) -> Mesh
-        """Extracts the geometry from a link's Visual or Collision elements and joins them into a single mesh.
-
-        Parameters
-        ----------
-        link_elements : list of :class:`~compas_robots.model.Visual` or :class:`~compas_robots.model.Collision`
-            The list of Visual or Collision elements of a link.
-
-        Returns
-        -------
-        :class:`~compas.datastructures.Mesh` | None
-            The joined mesh of the link elements.
-            None if the link elements do not contain any mesh.
-        """
-        if not link_elements:
-            return None
-
-        joined_mesh = Mesh()
-        # Note: Each Link can have multiple visual nodes
-        for element in link_elements:
-            # Some elements may have a non-identity origin
-            origin = element.origin.to_compas_frame()
-            t_origin = Transformation.from_frame(origin)
-            shape = element.geometry.shape
-            # Note: the MeshDescriptor.meshes object supports a list of compas meshes.
-            if isinstance(shape, MeshDescriptor):
-                # Join multiple meshes
-                for mesh in shape.meshes:
-                    transformed_mesh = mesh.transformed(t_origin) if t_origin != Transformation() else mesh
-                    joined_mesh.join(transformed_mesh, False, precision=self.MESH_JOIN_PRECISION)
-
-        return None if joined_mesh.is_empty() else joined_mesh
-
-    def _initial_draw(self):
-        """Creating the native geometry when `draw()` method is called for the first time"""
-        # Reset the dictionaries
-        self.base_native_geometry = None
-        self.base_transformation = None
-        self.links_visual_mesh_native_geometry = {}  # type: dict[str, Mesh]
-        self.links_collision_mesh_native_geometry = {}  # type: dict[str, Mesh]
-        self.links_visual_mesh_transformation = {}  # type: dict[str, Transformation]
-        self.links_collision_mesh_transformation = {}  # type: dict[str, Transformation]
-
-        # Iterate over the links and create the visual and collision meshes.
-        # Only create the geometry if it exists.
-        for link in self.robot_model.iter_links():
-            link_name = link.name
-            # CREATE VISUAL MESHES
-            if self._draw_visual:
-                visual_mesh = self._extract_link_geometry(link.visual)
-                if visual_mesh:
-                    self.links_visual_mesh_native_geometry[link_name] = self._create_geometry(
-                        visual_mesh, name=link_name + "_visual"
-                    )
-                    self.links_visual_mesh_transformation[link_name] = Transformation()
-            # CREATE COLLISION MESHES
-            if self._draw_collision:
-                collision_mesh = self._extract_link_geometry(link.collision)
-                if collision_mesh:
-                    self.links_collision_mesh_native_geometry[link_name] = self._create_geometry(
-                        collision_mesh, name=link_name + "_collision"
-                    )
-                    self.links_collision_mesh_transformation[link_name] = Transformation()
-
     def draw(self, robot_configuration=None, base_frame=None):
         # type: (Optional[Configuration], Optional[Frame]) -> List[object]
         """Draw the robot model object in the respective CAD environment.
-        It will return the native geometry objects that were created.
+
+        This function conforms to `SceneObject.draw()` Interface and will return
+        the native geometry objects that were created.
+
+        - In the Rhino context where the geometry had been placed in the Rhino document,
+          the native geometry handles are still returned.
+        - In the GHPython context, the native geometry is returned as a list of
+          `Rhino.Geometry.Mesh` objects, which can be used as a GHComponent output.
+
         """
-        # Create the native geometry when the `draw()` method is called for the first time
+        # Create the native geometry when the `draw()` or `update()` method is called for the first time
         if (not self.links_visual_mesh_native_geometry) and (not self.links_collision_mesh_native_geometry):
             self._initial_draw()
 
@@ -130,9 +73,68 @@ class BaseRobotModelObject(SceneObject):
             native_geometry.extend(self.links_collision_mesh_native_geometry.values())
         return native_geometry
 
+    def _initial_draw(self):
+        """Creating the native geometry when `draw()` method is called for the first time.
+
+        This private function is isolated out such that the initial draw does not happen in the __init__
+        method and can be deferred until the `draw()` method is called for the first time.
+        """
+        # Reset the dictionaries
+        self.base_native_geometry = None
+        self.base_transformation = None
+        self.links_visual_mesh_native_geometry = {}  # type: dict[str, Mesh]
+        self.links_collision_mesh_native_geometry = {}  # type: dict[str, Mesh]
+        self.links_visual_mesh_transformation = {}  # type: dict[str, Transformation]
+        self.links_collision_mesh_transformation = {}  # type: dict[str, Transformation]
+
+        # Iterate over the links and create the visual and collision meshes.
+        # Only create the geometry if it exists.
+        for link in self.robot_model.iter_links():
+            link_name = link.name
+            # CREATE VISUAL MESHES
+            if self._draw_visual:
+                visual_mesh = self.robot_model.get_link_visual_meshes_joined(link)
+                if visual_mesh:
+                    self.links_visual_mesh_native_geometry[link_name] = self._create_geometry(
+                        visual_mesh, name=link_name + "_visual"
+                    )
+                    self.links_visual_mesh_transformation[link_name] = Transformation()
+            # CREATE COLLISION MESHES
+            if self._draw_collision:
+                collision_mesh = self.robot_model.get_link_collision_meshes_joined(link)
+                if collision_mesh:
+                    self.links_collision_mesh_native_geometry[link_name] = self._create_geometry(
+                        collision_mesh, name=link_name + "_collision"
+                    )
+                    self.links_collision_mesh_transformation[link_name] = Transformation()
+
     def update(self, robot_configuration, base_frame=None):
         # type: (Configuration, Optional[Frame]) -> None
-        print("Base Frame: ", base_frame)
+        """Updates the native geometry of the robot model according to the given robot
+        configuration and base frame.
+
+        Parameters
+        ----------
+        robot_configuration : :class:`~compas_robots.Configuration`
+            The robot configuration to update the robot model.
+        base_frame : :class:`~compas.geometry.Frame`, optional
+            The frame of the RobotCoordinateFrame relative to the WorldCoordinateFrame.
+            Default is World XY frame at origin.
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        It is possible to call this method before the `draw()` method, but the native geometry
+
+        """
+
+        # Create the native geometry when the `draw()` or `update()` method is called for the first time
+        if (not self.links_visual_mesh_native_geometry) and (not self.links_collision_mesh_native_geometry):
+            self._initial_draw()
+
         if len(self.robot_model.get_configurable_joints()) == 0:
             return
 
