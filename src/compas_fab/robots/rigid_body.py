@@ -45,7 +45,8 @@ class RigidBody(Data):
             They should be less detailed (fewer polygons) for better planning performance.
             If `None`, or an empty list is passed, no collision checking will be performed for the rigid body.
         scale : float, optional
-            The scale of the rigid body.
+            The scale factor of the meshes, such that `mesh.scale(scale)` will convert the input mesh to meters.
+            For example, if the modeling environment is in millimeters, the scale should be set to 0.001.
             Default is 1.0.
 
         Attributes

@@ -38,6 +38,24 @@ class BaseRobotCellObject(SceneObject):
     If caching function is not desired, simply remove the native geometry and create
     a new instance of the RobotCellObject every time the robot cell is drawn.
 
+    Parameters
+    ----------
+    draw_visual : bool, optional
+        If `True`, the visual meshes will be drawn. Default is `True`.
+    draw_collision : bool, optional
+        If `True`, the collision meshes will be drawn. Default is `False`.
+    scale : float, optional
+        The scale factor to visualize the meshes in the robot cell, in case the native CAD environment
+        uses a different unit system other than meters. The scale value should be set such
+        that a `meter_mesh.scale(1/scale)` will create the mesh in the native unit system.
+        For example, if the native unit system is millimeters, the scale should be set to `0.001`.
+        Default is `1.0`.
+
+    Notes
+    -----
+        The initial parameters `draw_visual`, `draw_collision`, and `scale` cannot be changed after initialization.
+
+
     """
 
     def __init__(self, draw_visual=True, draw_collision=False, scale=1.0, *args, **kwargs):
@@ -48,9 +66,9 @@ class BaseRobotCellObject(SceneObject):
 
         # Native Geometry handles
         # robot_model_object = self._get_robot_model_object()
-        self.robot_model_scene_object = None  # type: BaseRobotModelObject
-        self.rigid_body_scene_objects = {}  # type: dict[str, BaseRigidBodyObject]
-        self.tool_scene_objects = {}  # type: dict[str, BaseRobotModelObject]
+        self._robot_model_scene_object = None  # type: BaseRobotModelObject
+        self._rigid_body_scene_objects = {}  # type: dict[str, BaseRigidBodyObject]
+        self._tool_scene_objects = {}  # type: dict[str, BaseRobotModelObject]
 
     @property
     def robot_cell(self):
@@ -78,7 +96,7 @@ class BaseRobotCellObject(SceneObject):
             A list of native geometry objects representing the robot cell in the CAD environment.
         """
         # Create the native geometry when the `draw()` or `update()` method is called for the first time
-        if not self.robot_model_scene_object:
+        if not self._robot_model_scene_object:
             self._initial_draw()
 
         # Update the child scene objects if a configuration is provided
@@ -88,11 +106,11 @@ class BaseRobotCellObject(SceneObject):
         # The native geometry are collected from the child scene objects .draw() method.
         native_geometries = []
         native_geometries.extend(
-            self.robot_model_scene_object.draw(robot_cell_state.robot_configuration, robot_cell_state.robot_base_frame)
+            self._robot_model_scene_object.draw(robot_cell_state.robot_configuration, robot_cell_state.robot_base_frame)
         )
-        for rigid_body_scene_object in self.rigid_body_scene_objects.values():
+        for rigid_body_scene_object in self._rigid_body_scene_objects.values():
             native_geometries.extend(rigid_body_scene_object.draw())
-        for tool_scene_object in self.tool_scene_objects.values():
+        for tool_scene_object in self._tool_scene_objects.values():
             native_geometries.extend(tool_scene_object.draw())
 
         return native_geometries
@@ -103,18 +121,18 @@ class BaseRobotCellObject(SceneObject):
         # NOTE: All the constituent objects have an update method for transforming the native geometry
 
         # Create the native geometry when the `draw()` or `update()` method is called for the first time
-        if not self.robot_model_scene_object:
+        if not self._robot_model_scene_object:
             self._initial_draw()
 
         # Update the child scene objects if a configuration is provided
         if robot_cell_state:
-            self.robot_model_scene_object.update(
+            self._robot_model_scene_object.update(
                 robot_cell_state.robot_configuration, robot_cell_state.robot_base_frame
             )
-            for id, rigid_body_scene_object in self.rigid_body_scene_objects.items():
+            for id, rigid_body_scene_object in self._rigid_body_scene_objects.items():
                 rigid_body_state = robot_cell_state.rigid_body_states[id]
                 rigid_body_scene_object.update(rigid_body_state)
-            for id, tool_scene_object in self.tool_scene_objects.items():
+            for id, tool_scene_object in self._tool_scene_objects.items():
                 tool_state = robot_cell_state.tool_states[id]
                 tool_scene_object.update(tool_state)
 

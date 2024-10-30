@@ -18,17 +18,17 @@ class RobotCellObject(BaseRobotCellObject):
         }
 
         # RobotModel drawn using RobotModelObject from compas_fab.ghpython not compas_robots
-        self.robot_model_scene_object = None  # type: RobotModelObject
-        self.robot_model_scene_object = SceneObject(
+        self._robot_model_scene_object = None  # type: RobotModelObject
+        self._robot_model_scene_object = SceneObject(
             item=self.robot_cell.robot_model,
             sceneobject_type=RobotModelObject,
             **kwargs,
         )
 
         # RigidBodies
-        self.rigid_body_scene_objects = {}  # type: dict[str, RigidBodyObject]
+        self._rigid_body_scene_objects = {}  # type: dict[str, RigidBodyObject]
         for id, rigid_body in self.robot_cell.rigid_body_models.items():
-            self.rigid_body_scene_objects[id] = SceneObject(
+            self._rigid_body_scene_objects[id] = SceneObject(
                 item=rigid_body,
                 sceneobject_type=RigidBodyObject,
                 **kwargs,
@@ -36,9 +36,9 @@ class RobotCellObject(BaseRobotCellObject):
 
         # ToolModels
         # NOTE: Tools are also drawn using a RobotModelObject
-        self.tool_scene_objects = {}  # type: dict[str, RobotModelObject]
+        self._tool_scene_objects = {}  # type: dict[str, RobotModelObject]
         for id, tool in self.robot_cell.tool_models.items():
-            self.tool_scene_objects[id] = SceneObject(
+            self._tool_scene_objects[id] = SceneObject(
                 item=tool,
                 sceneobject_type=RobotModelObject,
                 **kwargs,
