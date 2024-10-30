@@ -254,14 +254,8 @@ class MoveItSetRobotCell(SetRobotCell):
             for link in tool_model.iter_links():
                 # In theory the `tool_id` from the tool_model dictionary is the same as the `tool_model.name`.
                 collision_object_id = "{}_{}".format(tool_id, link.name)
-                link_hash = link.sha256()
 
-                # Skip links that have no collision geometry
-                if not link.collision:
-                    print(
-                        "SET_RC_2: Link '{}' skipped because it has no collision geometry".format(collision_object_id)
-                    )
-                    continue
+                link_hash = link.sha256()
                 # Skip links that are already in the backend
                 if collision_object_id in planner._current_tool_hashes:
                     if link_hash == planner._current_tool_hashes[collision_object_id]:
@@ -272,11 +266,15 @@ class MoveItSetRobotCell(SetRobotCell):
                         )
                         continue
 
-                # Construct a new CollisionObject for the link
-                collision_meshes = []
                 # NOTE: There can be multiple Collision objects in a link, we put them all into the same CollisionObject
-                for collision in link.collision:
-                    collision_meshes += list(LinkGeometry._get_item_meshes(collision))
+                collision_meshes = tool_model.get_link_collision_meshes(link)
+                # Skip links that have no collision geometry
+                if not collision_meshes:
+                    print(
+                        "SET_RC_2: Link '{}' skipped because it has no collision geometry".format(collision_object_id)
+                    )
+                    continue
+
                 # For each mesh in the link, create a CollisionMesh
                 kwargs = {}
                 # The frame_id needs be the root name of the robot
