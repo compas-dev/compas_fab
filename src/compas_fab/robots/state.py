@@ -120,21 +120,20 @@ class RobotCellState(Data):
         """
         robot_configuration = robot_configuration or robot_cell.zero_full_configuration()
         base_frame = Frame.worldXY()
-        flange_frame = robot_cell.robot_model.forward_kinematics(robot_configuration)
 
         tool_states = {}
         for tool_id, tool_model in robot_cell.tool_models.items():
-            tool_state = ToolState(Frame.worldXY(), None, None)
+            tool_state = ToolState(Frame.worldXY())
             if len(tool_model.get_configurable_joints()) > 0:
                 tool_state.configuration = tool_model.zero_configuration()
             tool_states[tool_id] = tool_state
 
         rigid_body_states = {}
         for rigid_body_id, rigid_body_model in robot_cell.rigid_body_models.items():
-            rigid_body_state = RigidBodyState(Frame.worldXY(), None, None, None)
+            rigid_body_state = RigidBodyState(Frame.worldXY())
             rigid_body_states[rigid_body_id] = rigid_body_state
 
-        return cls(base_frame, flange_frame, robot_configuration, tool_states, rigid_body_states)
+        return cls(base_frame, robot_configuration, tool_states, rigid_body_states)
 
     def get_attached_tool_id(self, group):
         # type: (str) -> Optional[str]
