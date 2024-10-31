@@ -79,7 +79,6 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         The robot's full configuration, i.e. values for all configurable joints of the entire robot,
         must be provided in the ``start_state.robot_configuration`` parameter.
-        The ``start_state.robot_flange_frame`` parameter is not used by the planning function.
 
         The ``waypoints`` parameter is used to defined single or multiple segments of path,
         it is not necessary to include the starting pose in the waypoints,

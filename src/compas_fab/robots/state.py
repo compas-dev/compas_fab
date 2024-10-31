@@ -37,7 +37,6 @@ class RobotCellState(Data):
     def __init__(
         self,
         robot_base_frame=None,
-        robot_flange_frame=None,
         robot_configuration=None,
         tool_states=None,
         rigid_body_states=None,
@@ -45,7 +44,6 @@ class RobotCellState(Data):
         # type: (Optional[Frame], Optional[Frame], Optional[Configuration], Dict[str, ToolState], Dict[str, RigidBodyState]) -> None
         super(RobotCellState, self).__init__()
         self.robot_base_frame = robot_base_frame or Frame.worldXY()  # type: Frame
-        self.robot_flange_frame = robot_flange_frame or Frame.worldXY()  # type: Frame
         self.robot_configuration = robot_configuration  # type: Optional[Configuration]
         self.tool_states = tool_states or {}  # type: Dict[str, ToolState]
         self.rigid_body_states = rigid_body_states or {}  # type: Dict[str, RigidBodyState]
@@ -64,7 +62,6 @@ class RobotCellState(Data):
     def __data__(self):
         return {
             "robot_base_frame": self.robot_base_frame,
-            "robot_flange_frame": self.robot_flange_frame,
             "robot_configuration": self.robot_configuration,
             "tool_states": self.tool_states,
             "rigid_body_states": self.rigid_body_states,
@@ -75,8 +72,6 @@ class RobotCellState(Data):
         if value is None or not isinstance(value, RobotCellState):
             return False
         if self.robot_base_frame != value.robot_base_frame:
-            return False
-        if self.robot_flange_frame != value.robot_flange_frame:
             return False
         if self.robot_configuration:
             try:

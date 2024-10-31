@@ -316,20 +316,18 @@ class PyBulletCheckCollision(CheckCollision):
         self, state, group, planner_coordinate_frame, options=None
     ):
         # type: (RobotCellState, str, Frame, Optional[Dict]) -> None
-        """A highly specific function for checking whether the attached tool and workpiece(s) for a planning group is in collision
+        """A highly specific function for checking whether the attached tool and workpiece(s) for a particular target is in collision
         with stationary objects.
         This function is typically called by planning functions as part of a input sanity check or for checking whether targets are
         valid before motion planning.
 
         This function is not a complete collision check but is intended to return quickly for input validation purposes.
-
-        The main difference between this function and the check_collision function is that this function only checks for collision
-        between the attached objects (tools and rigid bodies) and the stationary objects (other rigid bodies and tools) in the robot cell.
-
         Because this function is used before motion planning, the robot configuration is not available.
-        Therefore, the robot is not checked for collision.
-        Tools and rigid bodies that are attached to other planning groups or links are also not checked
-        because the robot configuration is not available.
+
+        The main difference between this function and the typical `check_collision` function is that this function only checks for collision
+        between the attached objects (tools and rigid bodies) and the stationary objects (other rigid bodies and tools) in the robot cell.
+        Only the attached objects that are related to the group and target are checked.
+        The robot is not checked for collision.
 
         Internally this function depends on
         :meth:`~compas_fab.backends.pybullet.backend_features.PyBulletSetRobotCellState.set_robot_cell_state()` and
@@ -340,7 +338,12 @@ class PyBulletCheckCollision(CheckCollision):
         with only the cc4 and cc5 steps enabled.
 
         """
-        # Tweak the robot cell state so that we can call the check collision directly.
+        attached_tool_name = state.get_attached_tool_id(group)
+        attached_workpiece_ids = state.get_attached_workpiece_ids(group)
+
+        # If there is no attached tool or rigid body, return
+        if not attached_tool_name and not attached_workpiece_ids:
+            return
 
         # Housekeeping for intellisense
         planner = self  # type: PyBulletPlanner
@@ -356,9 +359,6 @@ class PyBulletCheckCollision(CheckCollision):
 
         # Input sanity check
         assert group in robot_cell.group_names
-        assert (
-            state.robot_flange_frame is not None
-        ), "Robot flange frame must be set because this CC will not use the robot configuration."
 
         # Update the position of all objects, but practically only the stationary objects matter
         state.robot_configuration = None  # Skips setting the state of the robot and attached objects
@@ -366,8 +366,7 @@ class PyBulletCheckCollision(CheckCollision):
         # Update the position of the attached tools and rigid bodies using the provided planner_coordinate_frame
         planner.set_attached_tool_and_rigid_body_state(state, group, planner_coordinate_frame)
 
-        attached_tool_name = state.get_attached_tool_id(group)
-
+        # Tweak the robot cell state so that we can call the check collision directly.
         # Hide all tools and rigid bodies that are not stationary and not attached to the group
         # If there are no tools attached to the group, all attached tools will be hidden
         hidden_tools = []
