@@ -389,3 +389,43 @@ def test_transformations(ur10e_gripper_one_beam):
     # Final test for no transform with a robot target
     assert rc.target_frames_to_pcf(rcs, tcf_frame, TargetMode.ROBOT, rc.main_group_name) == tcf_frame
     assert rc.pcf_to_target_frames(rcs, tcf_frame, TargetMode.ROBOT, rc.main_group_name) == tcf_frame
+
+
+def test_compute_attach_objects_frames(ur10e_gripper_one_beam):
+    # type: (Tuple[RobotCell, RobotCellState]) -> None
+    """Test to make sure the compute_attach_objects_frames method works"""
+
+    rc, rcs = ur10e_gripper_one_beam
+    tool_id = rc.tool_ids[0]
+    workpiece_id = rc.rigid_body_ids[0]
+
+    # Define a non zero robot_base_frame
+    rcs.robot_base_frame = Frame([0, 1, 2], [0.5, 0.5, 0], [0, 1, 0])
+
+    # Define the tool attachment
+    tool_attachment_frame = Frame([1, 2, 3], [0.5, -0.5, 0], [0, 1, 0])
+    rcs.tool_states[tool_id].attachment_frame = tool_attachment_frame
+    rcs.tool_states[tool_id].attached_to_group = rc.main_group_name
+
+    # Define the workpiece attachment
+    work_attachment_frame = Frame([2, 3, 4], [-0.5, 0.5, 0], [0, 1, 0])
+    rcs.rigid_body_states[workpiece_id].attachment_frame = work_attachment_frame
+
+    # Use the transformation functions for the test
+    t_pcf_tcf = rc.t_pcf_tcf(rcs, tool_id)
+    t_pcf_ocf = rc.t_pcf_ocf(rcs, workpiece_id)
+
+    # Define the expected frames
+    t_wcf_rcf = Transformation.from_frame(rcs.robot_base_frame)
+    ee_link_name = rc.get_end_effector_link_name(group=rc.main_group_name)
+    t_rcf_pcf = Transformation.from_frame(rc.robot_model.forward_kinematics(rcs.robot_configuration, ee_link_name))
+    t_wcf_tcf = t_wcf_rcf * t_rcf_pcf * t_pcf_tcf
+    t_wcf_ocf = t_wcf_rcf * t_rcf_pcf * t_pcf_ocf
+
+    expected_tool_frame = Frame.from_transformation(t_wcf_tcf)
+    expected_workpiece_frame = Frame.from_transformation(t_wcf_ocf)
+
+    # Test the function
+    computed_rcs = rc.compute_attach_objects_frames(rcs)
+    assert computed_rcs.tool_states[tool_id].frame == expected_tool_frame
+    assert computed_rcs.rigid_body_states[workpiece_id].frame == expected_workpiece_frame

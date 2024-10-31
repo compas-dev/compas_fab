@@ -1226,6 +1226,77 @@ class RobotCell(Data):
 
         return target_frames[0] if input_is_not_list else target_frames
 
+    def compute_attach_objects_frames(self, robot_cell_state):
+        # type: (RobotCellState) -> RobotCellState
+        """Compute the frames of the attached objects (tools and workpieces) from a robot cell state with robot configuration.
+
+        The frames of the attached objects (relative to WCF) are computed
+        using the forward kinematics function from the RobotModel.
+        Therefore, the function is available even without any backend planner.
+        A full robot configuration (containing all joints) must be present in the `robot_cell_state` input.
+
+        A new robot cell state is returned, where the attached objects have their `frame` attributes updated.
+
+        Parameters
+        ----------
+        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+            The state of the robot cell.
+            The robot configuration must be set in the robot state.
+
+        Returns
+        -------
+        :class:`~compas_fab.robots.RobotCellState`
+            A new robot cell state with the attached objects' frames updated.
+        """
+        self.assert_cell_state_match(robot_cell_state)
+
+        robot_cell_state = robot_cell_state.copy()
+        robot_configuration = robot_cell_state.robot_configuration
+
+        t_wcf_rcf = Transformation.from_frame(robot_cell_state.robot_base_frame)
+
+        # For attached rigid bodies
+        for rb_id, rb_state in robot_cell_state.rigid_body_states.items():
+            link_name = rb_state.attached_to_link
+            tool_id = rb_state.attached_to_tool
+            if link_name and tool_id:
+                raise ValueError(
+                    "Rigid body '{}' is attached to both a link and a tool. This is not a consistent state.".format(
+                        rb_id
+                    )
+                )
+            if link_name:
+                # RigidBody attached to a link is attached via an `attachment_frame`
+                link_frame = self.robot_model.forward_kinematics(robot_configuration, link_name=link_name)
+                t_rcf_lcf = Transformation.from_frame(link_frame)
+                t_lcf_ocf = Transformation.from_frame(rb_state.attachment_frame)
+                t_wcf_ocf = t_wcf_rcf * t_rcf_lcf * t_lcf_ocf
+                rb_state.frame = Frame.from_transformation(t_wcf_ocf)
+            if tool_id:
+                # Retrieving the `link` where the tool is attached for forward kinematics
+                tool_state = robot_cell_state.tool_states[tool_id]
+                group = tool_state.attached_to_group
+                group_link_name = self.robot_semantics.get_end_effector_link_name(group)
+                link_frame = self.robot_model.forward_kinematics(robot_configuration, link_name=group_link_name)
+                t_rcf_pcf = Transformation.from_frame(link_frame)
+                # Reuse the t_pcf_tcf function to get the transformation from PCF to TCF
+                t_pcf_ocf = self.t_pcf_ocf(robot_cell_state, rb_id)
+                t_wcf_ocf = t_wcf_rcf * t_rcf_pcf * t_pcf_ocf
+                rb_state.frame = Frame.from_transformation(t_wcf_ocf)
+
+        # For attached tools
+        for tool_id, tool_state in robot_cell_state.tool_states.items():
+            group = tool_state.attached_to_group
+            if group:
+                group_link_name = self.robot_semantics.get_end_effector_link_name(group)
+                link_frame = self.robot_model.forward_kinematics(robot_configuration, link_name=group_link_name)
+                t_rcf_pcf = Transformation.from_frame(link_frame)
+                t_pcf_tcf = self.t_pcf_tcf(robot_cell_state, tool_id)
+                t_wcf_tcf = t_wcf_rcf * t_rcf_pcf * t_pcf_tcf
+                tool_state.frame = Frame.from_transformation(t_wcf_tcf)
+
+        return robot_cell_state
+
     # ----------------------------------------
     # Debug Functions
     # ----------------------------------------
