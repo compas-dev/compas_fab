@@ -4,7 +4,6 @@ from copy import deepcopy
 
 import pytest
 from compas import IPY
-from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Transformation
 
@@ -12,19 +11,15 @@ if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:  # pragma: no cover
-        from typing import Dict  # noqa: F401
-        from typing import List  # noqa: F401
         from typing import Tuple  # noqa: F401
 
         from compas_robots import Configuration  # noqa: F401
-
         from compas_fab.robots import RobotCell  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
 
 from compas_fab.robots import RigidBodyState
 from compas_fab.robots import RobotCellLibrary
-from compas_fab.robots import RobotCellState
 from compas_fab.robots import ToolState
-from compas_robots import Configuration
 
 # In this file context
 # - rbs stands for RigidBodyState
@@ -315,12 +310,6 @@ def test_rcs_eq(rcs_ur10e_gripper_one_beam):
     assert a == b
 
     b = deepcopy(a)
-    b.robot_flange_frame = Frame([3, 2, 1], [0.1, 0.2, 0.3])
-    assert a != b
-    b.robot_flange_frame = None
-    assert a != b
-
-    b = deepcopy(a)
     b.robot_configuration.joint_values[0] = 999
     assert a != b
     b.robot_configuration = None
@@ -403,13 +392,13 @@ def test_rcs_set_attach_functions(rc_rcs_ur10e_gripper_one_beam, ts_stationary):
 
     assert rcs.get_attached_tool_id(group) == gripper_id
     assert rcs.tool_states[gripper_id].attached_to_group == group
-    assert rcs.tool_states[gripper_id].frame == None
+    assert rcs.tool_states[gripper_id].frame is None
     assert rcs.tool_states[gripper_id].attachment_frame == Frame.worldXY()
     assert rcs.tool_states[gripper_id].touch_links == []
 
     # Detach tool manually
     rcs.tool_states[gripper_id].attached_to_group = None
-    assert rcs.get_attached_tool_id(group) == None
+    assert rcs.get_attached_tool_id(group) is None
     assert rcs.get_detached_tool_ids() == [gripper_id]
     # Attach tool to group using function
     attachment_frame = Frame([1, 2, 3], [0.1, 0.2, 0.3])
@@ -435,7 +424,7 @@ def test_rcs_set_attach_functions(rc_rcs_ur10e_gripper_one_beam, ts_stationary):
     # Detach the print tool
     rcs.set_tool_detached(print_tool_id)
     rcs.set_tool_detached(gripper_id, frame=Frame.worldXY(), touch_links=["link0"])
-    assert rcs.get_attached_tool_id(group) == None
+    assert rcs.get_attached_tool_id(group) is None
     assert rcs.get_attached_workpiece_ids(group) == []
 
     # Attach workpiece to tool

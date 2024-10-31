@@ -3,9 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 
-from compas_ghpython.drawing import draw_mesh
 from .gh_scene_object import GHSceneObject
-from compas_rhino.conversions import transformation_to_rhino
 
 
 from compas_fab.scene import BaseRigidBodyObject
@@ -14,7 +12,7 @@ from compas import IPY
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import Optional  # noqa: F401
         from typing import List  # noqa: F401
 

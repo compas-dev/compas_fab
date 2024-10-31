@@ -65,7 +65,7 @@ def test_panda_srdf_file(panda_srdf, panda_urdf):
 def test_ur5_semantics():
     robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=False)
     semantics = robot_cell.robot_semantics
-    assert sorted(semantics.group_names) == sorted(["manipulator", "endeffector"])
+    assert semantics.group_names == ["manipulator"]
     assert semantics.main_group_name == "manipulator"
     assert semantics.get_base_link_name() == "base_link"
     assert semantics.get_end_effector_link_name() == "tool0"

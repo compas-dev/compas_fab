@@ -18,7 +18,7 @@ if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:  # pragma: no cover
-        from typing import Tuple
+        from typing import Tuple  # noqa: F401
 
 
 @pytest.fixture
@@ -161,7 +161,7 @@ def test_get_link_names(panda, rfl, ur10e_gripper_one_beam, abb_irb4600_40_255_g
     def _test(rc, rcs):
         # type: (RobotCell, RobotCellState) -> None
 
-        all_link_names = [l.name for l in rc.robot_model.links]
+        all_link_names = [link.name for link in rc.robot_model.links]
         for group in rc.group_names:
             group_link_names = rc.get_link_names(group)
             assert all(link_name in all_link_names for link_name in group_link_names)

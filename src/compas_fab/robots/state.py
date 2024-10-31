@@ -77,7 +77,7 @@ class RobotCellState(Data):
             try:
                 if not self.robot_configuration.close_to(value.robot_configuration):
                     return False
-            except:
+            except Exception:
                 return False
         else:
             if self.robot_configuration != value.robot_configuration:
@@ -396,7 +396,8 @@ class ToolState(Data):
         # type: (ToolState) -> bool
         if value is None:
             return False
-        # Wrap the tests in try block, if any of the attributes cannot be compared,
+        # In order to allow duck typing we do not assert value.__class__ to be equal to self.__class__
+        # Therefore, we wrap the tests in try block, if any of the attributes cannot be compared,
         # it will raise exception and return False
         try:
             if self.frame != value.frame:
@@ -411,14 +412,14 @@ class ToolState(Data):
                 try:
                     if not self.configuration.close_to(value.configuration):
                         return False
-                except:
+                except Exception:
                     return False
             else:
                 if self.configuration != value.configuration:
                     return False
             if self.is_hidden != value.is_hidden:
                 return False
-        except:
+        except Exception:
             return False
         return True
 
@@ -569,6 +570,6 @@ class RigidBodyState(Data):
                 return False
             if self.is_hidden != value.is_hidden:
                 return False
-        except:
+        except Exception:
             return False
         return True

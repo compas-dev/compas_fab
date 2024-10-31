@@ -1,22 +1,19 @@
 from compas import IPY
 from compas.scene import SceneObject
-from compas_fab.robots import RobotCellState
+
 
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import List  # noqa: F401
         from typing import Optional  # noqa: F401
 
-        from .base_robot_model_object import BaseRobotModelObject  # noqa: F401
-
-        # from compas_fab.scene import BaseToolObject
-        from compas_fab.robots import RigidBody  # noqa: F401
-        from compas_fab.robots import RigidBodyState  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
-
+        from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.scene import BaseRigidBodyObject  # noqa: F401
+
+        from .base_robot_model_object import BaseRobotModelObject  # noqa: F401
 
 
 class BaseRobotCellObject(SceneObject):

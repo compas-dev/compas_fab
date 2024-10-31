@@ -1,23 +1,21 @@
 from compas import IPY
-from compas.datastructures import Mesh
-from compas.geometry import Frame
+
 from compas.geometry import Transformation
 from compas.geometry import Scale
 from compas.scene import SceneObject
-from compas_robots.model import MeshDescriptor
 
 if not IPY:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from typing import List  # noqa: F401
         from typing import Optional  # noqa: F401
 
         from compas_robots import Configuration  # noqa: F401
         from compas_robots import RobotModel  # noqa: F401
-        from compas_robots.model import Collision  # noqa: F401
-        from compas_robots.model import Link  # noqa: F401
-        from compas_robots.model import Visual  # noqa: F401
+
+        from compas.datastructures import Mesh  # noqa: F401
+        from compas.geometry import Frame  # noqa: F401
 
 
 class BaseRobotModelObject(SceneObject):

@@ -4,7 +4,6 @@ from __future__ import print_function
 
 from compas import IPY
 from compas.utilities import await_callback
-from compas_robots.model import LinkGeometry
 
 from compas_fab.backends.interfaces import SetRobotCell
 from compas_fab.backends.ros.messages import ApplyPlanningSceneRequest
