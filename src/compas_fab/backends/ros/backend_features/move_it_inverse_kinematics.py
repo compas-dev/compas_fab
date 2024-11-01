@@ -2,6 +2,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from copy import deepcopy
+
 from compas import IPY
 
 if not IPY:
@@ -56,45 +58,80 @@ class MoveItInverseKinematics(InverseKinematics):
         "/compute_ik", "GetPositionIK", GetPositionIKRequest, GetPositionIKResponse, validate_response
     )
 
-    # def inverse_kinematics(self, frame_WCF, start_configuration=None, group=None, options=None):
-    #     """
-    #     Inverse kinematics calculation using MoveIt.
+    def inverse_kinematics(self, target, robot_cell_state, group=None, options=None):
+        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Configuration
+        """Calculate the robot's inverse kinematic for a given target.
 
-    #     """
-    #     options = options or {}
-    #     kwargs = {}
-    #     kwargs["options"] = options
-    #     kwargs["frame_WCF"] = frame_WCF
-    #     kwargs["group"] = group or self.client.robot_cell.main_group_name
-    #     kwargs["start_configuration"] = start_configuration or self.client.robot_cell.zero_configuration()
-    #     kwargs["errback_name"] = "errback"
+        The actual implementation can be found in the :meth:`iter_inverse_kinematics` method.
+        Calling `inverse_kinematics()` will return the first solution found by the iterator,
+        subsequent calls will return the next solution from the iterator. Once
+        all solutions have been exhausted, the iterator will be re-initialized.
 
-    #     # Use base_link or fallback to model's root link
-    #     options["base_link"] = options.get("base_link", self.client.robot_cell.robot_model.root.name)
+        Pybullet's inverse kinematics solver accepts FrameTarget and PointAxisTarget as input.
+        The planner is a gradient descent solver, the initial position of the robot
+        (supplied in the robot_cell_state) affects the first search attempt.
+        Subsequent attempts will start from a random configuration, so the results may vary.
 
-    #     return await_callback(self.inverse_kinematics_async, **kwargs)
-    #     # return_full_configuration = options.get("return_full_configuration", False)
-    #     # use_attached_tool_frame = options.get("use_attached_tool_frame", False)
+        For target-specific implementation details, see
+        :meth:`iter_inverse_kinematics_frame_target` for
+        :class:`compas_fab.robots.FrameTarget` and
+        :meth:`iter_inverse_kinematics_point_axis_target` for
+        :class:`compas_fab.robots.PointAxisTarget`.
 
-    #     # # Pseudo-memoized sequential calls will re-use iterator if not exhausted
-    #     # request_id = "{}-{}-{}-{}-{}".format(
-    #     #     str(frame_WCF), str(start_configuration), str(group), str(return_full_configuration), str(options)
-    #     # )
+        Parameters
+        ----------
+        robot : :class:`compas_fab.robots.Robot`
+            The robot instance for which inverse kinematics is being calculated.
+        target : :class:`compas_fab.robots.FrameTarget` or :class:`compas_fab.robots.PointAxisTarget`
+            The target to calculate the inverse kinematics for.
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+            The starting state to calculate the inverse kinematics for.
+            The robot's configuration in the scene is taken as the starting configuration.
+        group : str, optional
+            The planning group used for calculation.
+            Defaults to the robot's main planning group.
+        options : dict, optional
+            Dictionary containing kwargs for arguments specific to
+            the underlying function being called.
+            See the target-specific function's documentation for details.
 
-    #     # # Re-use last ik request generator if the request is the same
-    #     # if self._last_ik_request["request_id"] == request_id and self._last_ik_request["solutions"] is not None:
-    #     #     solution = next(self._last_ik_request["solutions"], None)
-    #     #     if solution is not None:
-    #     #         return solution
+        Raises
+        ------
+        :class: `compas_fab.backends.exceptions.InverseKinematicsError`
+            If no configuration can be found.
 
-    #     # # Create new ik generator object
-    #     # solutions = self.iter_inverse_kinematics(
-    #     #     frame_WCF, start_configuration, group, return_full_configuration, use_attached_tool_frame, options
-    #     # )
-    #     # self._last_ik_request["request_id"] = request_id
-    #     # self._last_ik_request["solutions"] = solutions
+        :class:`compas_fab.backends.TargetModeMismatchError`
+            If the selected TargetMode is not possible with the provided robot cell state.
 
-    #     # return next(solutions)
+        Returns
+        -------
+        :obj:`compas_robots.Configuration`
+            The calculated configuration.
+
+        """
+        # Set default group name
+        planner = self  # type: PyBulletPlanner
+        client = planner.client  # type: PyBulletClient
+        group = group or client.robot_cell.main_group_name
+
+        # Make a copy of the options because we will modify it
+        # Note: Modifying the options dict accidentally will break the hashing function in the inverse_kinematics()
+        options = deepcopy(options) if options else {}
+        start_configuration = deepcopy(robot_cell_state.robot_configuration)
+        robot_cell_state = deepcopy(robot_cell_state)
+
+        # The caching mechanism is implemented in the iter_inverse_kinematics method
+        # located in InverseKinematics class. This method is just a wrapper around it
+        # so that Intellisense and Docs can point here.
+        configuration = super(PyBulletInverseKinematics, self).inverse_kinematics(
+            target, robot_cell_state, group, options
+        )
+
+        # NOTE: The following check is a workaround to detect planning group that are not supported by PyBullet.
+        #       In those cases, some joints outside of the group will be changed inadvertently.
+
+        self._check_configuration_match_group(start_configuration, configuration, group)
+        return configuration
 
     def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
         # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]

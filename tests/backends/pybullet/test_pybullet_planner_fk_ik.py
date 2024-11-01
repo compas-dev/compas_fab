@@ -765,13 +765,24 @@ def test_iter_ik_point_axis_target(planner_with_test_cell):
     with pytest.raises(ValueError):
         next(generator)
 
+    # Test calling the iterate function two consecutive times and check that the results are different
     group = robot_cell.main_group_name
-    generator = planner.iter_inverse_kinematics_point_axis_target(target, robot_cell_state, group, options)
-    result = next(generator)  # type: Configuration
+    generator = planner.iter_inverse_kinematics(target, robot_cell_state, group, options)
+    result1a = next(generator)  # type: Configuration
+    result2a = next(generator)  # type: Configuration
+    assert not result1a.close_to(result2a)
 
-    # Check that there is a result
-    assert isinstance(result, Configuration)
-    assert len(result.joint_values) == 6
+    # Test calling the normal function two consecutive times and check that the results are different
+    result1b = planner.inverse_kinematics(target, robot_cell_state, group, options)  # type: Configuration
+    result2b = planner.inverse_kinematics(target, robot_cell_state, group, options)  # type: Configuration
+    assert not result1b.close_to(result2b)
+
+    assert result1a.close_to(result1b)
+    assert result2a.close_to(result2b)
+
+    # Check that the result is a valid configuration
+    assert isinstance(result1a, Configuration)
+    assert len(result1a.joint_values) == 6
 
     # Test with a target that is not reachable / very far away
     target = PointAxisTarget([10, 10, 10], [1.0, 0.0, 0.0], TargetMode.ROBOT)

@@ -56,7 +56,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
     def inverse_kinematics(self, target, robot_cell_state, group=None, options=None):
         # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Configuration
-        """Calculate the robot's inverse kinematic for a given frame.
+        """Calculate the robot's inverse kinematic for a given target.
 
         The actual implementation can be found in the :meth:`iter_inverse_kinematics` method.
         Calling `inverse_kinematics()` will return the first solution found by the iterator,
@@ -110,12 +110,6 @@ class PyBulletInverseKinematics(InverseKinematics):
         client = planner.client  # type: PyBulletClient
         group = group or client.robot_cell.main_group_name
 
-        # Make a copy of the options because we will modify it
-        # Note: Modifying the options dict accidentally will break the hashing function in the inverse_kinematics()
-        options = deepcopy(options) if options else {}
-        start_configuration = deepcopy(robot_cell_state.robot_configuration)
-        robot_cell_state = deepcopy(robot_cell_state)
-
         # The caching mechanism is implemented in the iter_inverse_kinematics method
         # located in InverseKinematics class. This method is just a wrapper around it
         # so that Intellisense and Docs can point here.
@@ -123,10 +117,6 @@ class PyBulletInverseKinematics(InverseKinematics):
             target, robot_cell_state, group, options
         )
 
-        # NOTE: The following check is a workaround to detect planning group that are not supported by PyBullet.
-        #       In those cases, some joints outside of the group will be changed inadvertently.
-
-        self._check_configuration_match_group(start_configuration, configuration, group)
         return configuration
 
     def iter_inverse_kinematics(self, target, robot_cell_state, group=None, options=None):
@@ -165,6 +155,11 @@ class PyBulletInverseKinematics(InverseKinematics):
         robot_cell = planner.client.robot_cell  # type: RobotCell
         group = group or robot_cell.main_group_name
 
+        # Make a copy of the options because we will modify it
+        # Note: Without making a copy, the options dict will break the hashing function in the inverse_kinematics()
+        options = deepcopy(options) if options else {}
+        robot_cell_state = deepcopy(robot_cell_state)
+
         # Unit conversion from user scale to meter scale can be done here because they are shared.
         # This will be triggered too, when entering from the inverse_kinematics method.
         target = target.normalized_to_meters()
@@ -172,20 +167,34 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Check if the robot cell state supports the target mode
         planner.ensure_robot_cell_state_supports_target_mode(robot_cell_state, target.target_mode, group)
 
+        # Keep track of user input for checking against the final result
+        initial_start_configuration = deepcopy(robot_cell_state.robot_configuration)
+
         # Check if the planning group is supported by the planner
         if group not in robot_cell.group_names:
             raise PlanningGroupNotExistsError("Planning group '{}' is not supported by PyBullet planner.".format(group))
 
         # ===================================================================================
-        # End of common lines
+        # Different target types have different implementations
         # ===================================================================================
 
         if isinstance(target, FrameTarget):
-            return self.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
+            ik_generator = self.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
         elif isinstance(target, PointAxisTarget):
-            return self.iter_inverse_kinematics_point_axis_target(target, robot_cell_state, group, options)
+            ik_generator = self.iter_inverse_kinematics_point_axis_target(target, robot_cell_state, group, options)
         else:
             raise NotImplementedError("{} is not supported by PyBulletInverseKinematics".format(type(target)))
+
+        # Check the result of the generator to detect for planning groups that are not supported by PyBullet.
+        # In those cases, some joints outside of the group will be changed inadvertently.
+
+        # ===================================================================================
+        # Check output before yielding
+        # ===================================================================================
+
+        for configuration in ik_generator:
+            self._check_configuration_match_group(initial_start_configuration, configuration, group)
+            yield configuration
 
     def iter_inverse_kinematics_frame_target(self, target, robot_cell_state, group, options=None):
         # type: (FrameTarget, RobotCellState, str, Optional[Dict]) -> Generator[Configuration | None]
@@ -752,7 +761,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
             if tolerance_position_ok and tolerance_orientation_ok:
                 if verbose:
-                    print("Iterative IK took %d iterations" % isinstance)
+                    print("Iterative IK took %d iterations" % i)
                 return joint_poses
             kwargs["restPoses"] = joint_poses
             i += 1
