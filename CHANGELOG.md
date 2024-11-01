@@ -9,52 +9,171 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Added `Robot.from_urdf()` method to load a robot from a URDF file, can optionally take SRDF and meshes.
-* Added unit test for `PyBulletClient` and `PyBulletPlanner` backend features, including Ik and FK agreement tests.
-* Added `PyBulletClient.load_existing_robot` to load from an existing Robot, such as those in RobotLibrary.
-* Added `compas_fab.robots.Waypoints` class to represent a sequence of targets. It has two child classes: `FrameWaypoints` and `PointAxisWaypoints`.
-* Added `compas_fab.robots.Target` class to represent a motion planning target.
-* Added also child classes `FrameTarget`, `PointAxisTarget`, `ConfigurationTarget`, `ConstraintSetTarget`
-* Unlike previous constraints, `Targets` do not contain `group` as parameter. Instead, group parameter is passed to the planning call.
-* Target scaling function is now embeded in the code for Targets. `scaled()` should be called by the user before passing the target to the `plan_motion` function.
+* Added `compas_fab.robots.RobotCell` class.
+* Added `compas_fab.robots.RobotCellLibrary` class.
+* Added `compas_fab.backends.BackendTargetNotSupportedError`.
+* Added `compas_fab.backends.TargetModeMismatchError`.
+* Added `compas_fab.backends.PlanningGroupNotExistsError`.
+* Added `compas_fab.backends.CollisionCheckError`.
+* Added `compas_fab.backends.MotionPlanningError`.
+* Added `compas_fab.backends.MPStartStateInCollisionError`.
+* Added `compas_fab.backends.MPTargetInCollisionError`.
+* Added `compas_fab.backends.MPInterpolationInCollisionError`.
+* Added `compas_fab.backends.MPSearchTimeOutError`.
+* Added `compas_fab.backends.MPNoIKSolutionError`.
+* Added `compas_fab.backends.MPNoPlanFoundError`.
+* Added `compas_fab.backends.MPMaxJumpError`.
+* Added `compas_fab.backends.AnalyticalKinematicsClient`.
+* Added `compas_fab.backends.AnalyticalKinematicsPlanner`.
+* Added `compas_fab.backends.AnalyticalPyBulletPlanner`.
+* Added `compas_fab.backends.CollisionCheckError`.
+* Added `compas_fab.backends.PlanningGroupNotSupported`.
+* Added `message` and `target_pcf` attributes to `InverseKinematicsError`.
+* Added `compas_fab.backends.CheckCollision` to backend features.
+* Added `compas_fab.backends.SetRobotCell` to backend features.
+* Added `compas_fab.backends.SetRobotCellState` to backend features.
+* Added `compas_fab.backends.ClientInterface.robot_cell` as read-only property.
+* Added `compas_fab.backends.ClientInterface.robot_cell_state` as read-only property.
+* Added `compas_fab.backends.ClientInterface.robot_model` as read-only property.
+* Added `compas_fab.backends.ClientInterface.robot_semantics` as read-only property.
+* Added `compas_fab.backends.PlannerInterface.set_robot_cell()` as a possible mix-in method.
+* Added `compas_fab.backends.PlannerInterface.set_robot_cell_state()` as a possible mix-in method.
+* Added `compas_fab.backends.PlannerInterface.check_collisions()` as a possible mix-in method.
+* Added `compas_fab.backends.PlannerInterface.iter_inverse_kinematics()` as a possible mix-in method.
+* Added `compas_fab.backends.kinematics.backend_features.AnalyticalPlanCartesianMotion` for `AnalyticalKinematicsPlanner`.
+* Added `compas_fab.backends.kinematics.backend_features.AnalyticalForwardKinematics` for `AnalyticalKinematicsPlanner`.
+* Added `compas_fab.backends.kinematics.backend_features.AnalyticalInverseKinematics` for `AnalyticalKinematicsPlanner`.
+* Added `compas_fab.backends.kinematics.backend_features.AnalyticalSetRobotCell` for `AnalyticalKinematicsPlanner`.
+* Added `compas_fab.backends.kinematics.backend_features.AnalyticalSetRobotCellState` for `AnalyticalKinematicsPlanner`.
+* Added `compas_fab.backends.kinematics.backend_features.AnalyticalPybulletInverseKinematics` for `AnalyticalPyBulletPlanner`.
+* Added `compas_fab.backends.pybullet.backend_features.PyBulletCheckCollision` for `PyBulletPlanner`.
+* Added `compas_fab.backends.pybullet.backend_features.PyBulletPlanCartesianMotion` for `PyBulletPlanner`.
+* Added `compas_fab.backends.pybullet.backend_features.PyBulletSetRobotCell` for `PyBulletPlanner`.
+* Added `compas_fab.backends.pybullet.backend_features.PyBulletSetRobotCellState` for `PyBulletPlanner`.
+* Added `compas_fab.backends.pybullet.backend_features.MoveItSetRobotCell` for `MoveItPlanner`.
+* Added `compas_fab.backends.pybullet.backend_features.MoveItSetRobotCellState` for `MoveItPlanner`.
+* Added `compas_fab.backends.ForwardKinematics.forward_kinematics_to_link()`.
+* Added `compas_fab.robots.ToolLibrary` class.
+* Added `compas_fab.robots.ToolLibrary.cone()`.
+* Added `compas_fab.robots.ToolLibrary.printing_tool()`.
+* Added `compas_fab.robots.ToolLibrary.static_gripper()`.
+* Added `compas_fab.robots.ToolLibrary.static_gripper_small()`.
+* Added `compas_fab.robots.ToolLibrary.kinematic_gripper()`. (example of a kinematic tool)
+* Added `compas_fab.robots.RigidBodyLibrary` class.
+* Added `compas_fab.robots.RigidBodyLibrary.target_marker()`.
+* Added `compas_fab.robots.RobotCellLibrary` class.
+* Added `compas_fab.robots.RobotCellLibrary.rfl()`.
+* Added `compas_fab.robots.RobotCellLibrary.ur5()`.
+* Added `compas_fab.robots.RobotCellLibrary.ur10e()`.
+* Added `compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255()`.
+* Added `compas_fab.robots.RobotCellLibrary.abb_irb120_3_58()`.
+* Added `compas_fab.robots.RobotCellLibrary.panda()`.
+* Added `compas_fab.robots.RobotCellLibrary.ur5_cone_tool()`.
+* Added `compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255_gripper_one_beam()`.
+* Added `compas_fab.robots.RobotCellLibrary.ur10e_gripper_one_beam()`.
+* Added `compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255_printing_tool()`.
+* Added `compas_fab.robots.RigidBody` class.
+* Added `compas_fab.robots.RigidBodyState` class.
+* Added `compas_fab.robots.RobotCell` class.
+* Added `compas_fab.robots.RobotCellState` class.
+* Added `compas_fab.robots.ToolState` class.
+* Added `compas_fab.robots.RobotCell.from_urdf_and_srdf()`
+* Added `compas_fab.robots.Target` class.
+* Added `compas_fab.robots.ConfigurationTarget` class.
+* Added `compas_fab.robots.ConstraintSetTarget` class.
+* Added `compas_fab.robots.FrameTarget` class.
+* Added `compas_fab.robots.PointAxisTarget` class.
+* Added `compas_fab.robots.TargetMode` class.
+* Added `compas_fab.robots.Waypoints` class.
+* Added `compas_fab.robots.FrameWaypoints` class.
+* Added `compas_fab.robots.PointAxisWaypoints` class.
+* Added `compas_fab.robots.FrameWaypoints` class.
+* Added docker file for UR5-demo with GUI turned on by default.
+* Added various example files (detailed list to be added later).
+* Added `pragma: no cover` to all type-checking imports for better coverage report accuracy.
+* Added support for python '3.11'.
+* Added tests for `PyBulletClient` and `PyBulletPlanner` backend features, including Ik and FK agreement tests.
 
 ### Changed
 
+* Changed CI workflow for IronPython.
+* Updated compas requirement to > 2.3
+* Changed `client` parameter in `PlannerInterface(client)` to default to `None`.
+* Changed `PlannerInterface.client` to a read-only property.
+* Moved `PlannerInterface` from `backends/interfaces/client.py` to `backends/interfaces/planner.py`
+* Moved `AnalyticalInverseKinematics` to be a backend feature of `AnalyticalKinematicsPlanner`.
+* Moved `AnalyticalPlanCartesianMotion` to be a backend feature of `AnalyticalKinematicsPlanner`.
+* Change backend features to use multi-inherence instead of `__call__` to include the backend functions.
+* Changed parameters of `compas_fab.backends.SetRobotCell.set_robot_cell()` to accept `RobotCell` and `RobotCellState`.
+* Changed parameters of `compas_fab.backends.SetRobotCellState.set_robot_cell_state()` to accept `RobotCellState`.
+* Changed parameters of `compas_fab.backends.ForwardKinematics.forward_kinematics()` to accept `RobotCellState`, `TargetMode` and `scale`.
+* Changed parameters of `compas_fab.backends.InverseKinematics.inverse_kinematics()` to accept `Target` and `RobotCellState`.
+* Changed parameters of `compas_fab.backends.InverseKinematics.iter_inverse_kinematics()` to accept `Target` and `RobotCellState`.
+* Changed parameters of `compas_fab.backends.PlanMotion.plan_motion()` to accept `Target` and `RobotCellState`.
+* Changed parameters of `compas_fab.backends.PlanCartesianMotion.plan_cartesian_motion()` to accept `Waypoints` and `RobotCellState`.
+* Changed `compas_fab.robots.BoundingVolume` to inherit from `compas.data.Data`.
+* Changed `compas_fab.robots.Constraint` to inherit from `compas.data.Data`.
+* Changed `compas_fab.robots.JointConstraint` to inherit from `compas.data.Data`.
+* Changed `compas_fab.robots.OrientationConstraint` to inherit from `compas.data.Data`.
+* Changed `compas_fab.robots.PositionConstraint` to inherit from `compas.data.Data`.
+* Moved `Robot.orientation_constraint_from_frame()` to `OrientationConstraint.from_frame()`.
+* Moved `Robot.position_constraint_from_frame()` to `PositionConstraint.from_frame()`.
+* Moved `Robot.constraints_from_frame()` to non-exposed `compas_fab.backends.ros.backend_features.convert_target_to_goal_constraints()`.
 * Changed `avoid_collisions` parameter in `plan_motion` to `allow_collisions` parameter.
-* Dropped support for Python 3.8 and updated compas requirements to 2.3
-* Calling `forward_kinematics` from the Robot class now uses only the RobotModel to calculate the forward kinematics.
 * Fixed error in `PyBulletForwardKinematics.forward_kinematics` where function would crash if `options` was not passed.
 * Fixed error in `PyBulletInverseKinematics._accurate_inverse_kinematics` where threshold was not squared for comparison.
-* Renamed `PybulletClient.get_cached_robot` to `PybulletClient.get_cached_robot_model` to avoid confusion between the `RobotModel` and `Robot` class.
-* Renamed `PybulletClient.ensure_cached_robot` to `PybulletClient.ensure_cached_robot_model`.
-* Renamed `PybulletClient.ensure_cached_robot_geometry` to `PybulletClient.ensure_cached_robot_model_geometry`.
-* Renamed `PybulletClient.cache_robot` to `PybulletClient.cache_robot_model`.
-* Backend planners use multi-inherence instead of `__call__` to include the backend functions. This allows for better generated documentation.
-* `Robot.plan_cartesian_motion()` now accepts `Waypoints` as target. Implementation for `FrameWaypoints` is supported with same functionality as before. Simply wrap `Frame` objects using `FrameWaypoints(frames)`.
-* Changed `BoundingVolume`, `Constraint`, `JointConstraint`, `OrientationConstraint`, `PositionConstraint` to inherit from `compas.data.Data` class.
-* Change the signature of `plan_motion()` to use `target` (`Target` class) instead of `goal_constraints`. Only one target is accepted. Users who wish to compose their own constraint sets can still use `ConstraintSetTarget`.
-* Moved `Robot.orientation_constraint_from_frame()` to `OrientationConstraint.from_frame()`, as constraints are no longer intended for users to use directly.
-* Moved `Robot.position_constraint_from_frame()` to `PositionConstraint.from_frame()`, as constraints are no longer intended for users to use directly.
-* Moved `Robot.constraints_from_frame()` to ros.backend_features and is handled by `convert_target_to_goal_constraints()`. Users who wish to use a frame as target should use a `FrameTarget` instead.
-* Changed the behavior of Duration class when accepting both seconds (float) and nanoseconds (int) where the decimal point of seconds and the nanoseconds add up to more than 1 second.
+* Changed the behavior of `Duration` class when accepting both seconds (float) and nanoseconds (int) where the decimal point of seconds and the nanoseconds add up to more than 1 second.
 * Changed GH Component `ConstraintsFromPlane` to `FrameTargetFromPlane`.
 * Changed GH Component `ConstraintsFromTargetConfiguration` to `ConfigurationTarget`.
 
 ### Removed
 
-* Removed `RobotLibrary` class. Use `RobotCellLibrary` instead.
-* Functions `Robot.transformed_frames` and `Robot.transformed_axes`are not migrated from `Robot` to `RobotCell`, use the one in `RobotModel` instead.
-* Removed `Robot` class. Use `RobotCell` instead.
-* Removed `attached_collision_meshes` attribute from `JointTrajectory` class.
-* Removed `Robot.merge_group_with_full_configuration` as it can be covered by `Configuration.merged`.
-* Removed function `Robot.get_group_names_from_link_name` as it is too oddly specific.
-* Removed `Robot.get_position_by_joint_name` as Configuration class can now be directly accessed by joint name.
-* Removed `Tool` class from `compas_fab.robots` module.
-* Removed Backend Feature `AddCollisionMesh`, `AppendCollisionMesh`, `AddAttachedCollisionMesh`, `RemoveCollisionMesh` and `RemoveAttachedCollisionMesh`.
-* Removed `inverse_kinematics`, `forward_kinematics`, `plan_cartesian_motion`, and `plan_motion` methods from ClientInterface, access them using the planner instead.
+* Removed support for Python '3.8'.
+* Removed `compas_fab.backends.CollisionError`.
+* Removed `compas_fab.backends.AddCollisionMesh` from backend features.
+* Removed `compas_fab.backends.AppendCollisionMesh` from backend features.
+* Removed `compas_fab.backends.RemoveCollisionMesh` from backend features.
+* Removed `compas_fab.backends.AddAttachedCollisionMesh` from backend features.
+* Removed `compas_fab.backends.RemoveAttachedCollisionMesh` from backend features.
+* Removed `compas_fab.backends.ClientInterface.planner` attribute.
+* Removed `compas_fab.backends.ClientInterface.inverse_kinematics()`.
+* Removed `compas_fab.backends.ClientInterface.forward_kinematics()`.
+* Removed `compas_fab.backends.ClientInterface.plan_cartesian_motion()`.
+* Removed `compas_fab.backends.ClientInterface.plan_motion()`.
+* Removed `compas_fab.backends.ClientInterface.get_planning_scene()`.
+* Removed `compas_fab.backends.ClientInterface.reset_planning_scene()`.
+* Removed `compas_fab.backends.ClientInterface.add_collision_mesh()`.
+* Removed `compas_fab.backends.ClientInterface.remove_collision_mesh()`.
+* Removed `compas_fab.backends.ClientInterface.append_collision_mesh()`.
+* Removed `compas_fab.backends.ClientInterface.add_attached_collision_mesh()`.
+* Removed `compas_fab.backends.ClientInterface.remove_attached_collision_mesh()`.
+* Removed `compas_fab.backends.pybullet.backend_features.PyBulletAddAttachedCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.PyBulletAddCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.PyBulletAppendCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.PyBulletRemoveAttachedCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.PyBulletRemoveCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.MoveItAddAttachedCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.MoveItAddCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.MoveItAppendCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.MoveItRemoveAttachedCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.MoveItRemoveCollisionMesh`.
+* Removed `compas_fab.backends.PyBulletClient.collision_objects` attribute.
+* Removed `compas_fab.backends.PyBulletClient.attached_collision_objects` attribute.
+* Removed `compas_fab.backends.PyBulletClient.load_ur5()`.
+* Removed `compas_fab.backends.PyBulletClient.load_robot()`.
+* Removed `compas_fab.robots.AttachedCollisionMesh`.
+* Removed `compas_fab.robots.CollisionMesh`.
+* Removed `compas_fab.robots.PlanningScene`.
+* Removed `compas_fab.robots.Robot`. (Use `RobotCell` instead)
+* Removed `compas_fab.robots.RobotLibrary`. (Use `RobotCellLibrary` instead)
+* Removed `compas_fab.robots.Tool`. (Use `ToolModel` directly in `RobotCell` instead)
+* Removed `compas_fab.robots.Robot.transformed_frames`. (use the one in `RobotModel` instead)
+* Removed `compas_fab.robots.Robot.transformed_axes`. (use the one in `RobotModel` instead)
+* Removed `compas_fab.robots.Robot.merge_group_with_full_configuration` as it can be covered by `Configuration.merged`.
+* Removed `compas_fab.robots.Robot.get_position_by_joint_name` as Configuration class can now be directly accessed by joint name.
+* Removed `compas_fab.robots.Robot.get_group_names_from_link_name` as it is too oddly specific.
+* Removed `compas_fab.robots.JointTrajectory.attached_collision_meshes` attribute from `` class.
 * Removed `inverse_kinematics`, `plan_cartesian_motion`, and `plan_motion` methods from Robot, access them using the planner instead.
-* Removed `Robot.ensure_client` method. Client and planner now exist independently.
-* Removed `Robot.client` attribute. Access the planner functions directly using the planner instead.
 * Removed `plan_cartesian_motion_deprecated` and `plan_motion_deprecated` methods from `Robot` class
 * Removed `forward_kinematics_deprecated` and `inverse_kinematics_deprecated` method from `Robot` class
 
