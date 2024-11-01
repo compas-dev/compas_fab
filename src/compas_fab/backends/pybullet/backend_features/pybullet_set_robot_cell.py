@@ -48,7 +48,6 @@ class PyBulletSetRobotCell(SetRobotCell):
             client._add_tool(name, tool_model)
         for name, rigid_body in robot_cell.rigid_body_models.items():
             client._add_rigid_body(name, rigid_body)
-            # client.convert_mesh_to_body(rigid_body.visual_meshes[0], Frame.worldXY())
 
         # Feed the robot to the client
         if robot_cell.robot_model:

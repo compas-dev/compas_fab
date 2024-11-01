@@ -353,7 +353,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         def set_random_config():
             # Function for setting random joint values for randomized search
             config = robot_cell.random_configuration(group)
-            client.set_robot_configuration(config)
+            client._set_robot_configuration(config)
 
         # The uniqueness checker keep track of past results
         # Note that it requires the following values in options:
@@ -604,7 +604,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         def set_random_config():
             # Function for setting random joint values for randomized search
             start_configuration = robot_cell.random_configuration(group)
-            client.set_robot_configuration(start_configuration)
+            client._set_robot_configuration(start_configuration)
 
         # Options dict for passing to the FrameTarget function
         frame_ik_options = options.copy()

@@ -386,7 +386,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
             collision_path = self._handle_concavity(collision_path, self._cache_dir.name, concavity, mass)
 
-        pyb_body_id = self.body_from_obj(visual_path, collision_path, concavity=concavity, mass=mass)
+        pyb_body_id = self._body_from_obj(visual_path, collision_path, concavity=concavity, mass=mass)
 
         # Record the body id in the dictionary
         assert not pyb_body_id == -1, "Error in creating rigid body in PyBullet. Returning ID is -1."
@@ -705,7 +705,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         joint_states = self._get_joint_states(joint_ids, body_id)
         return [js.jointPosition for js in joint_states]
 
-    def set_robot_configuration(self, configuration):
+    def _set_robot_configuration(self, configuration):
         # type: (Configuration) -> None
         """Sets the robot's pose to the given configuration.
 
@@ -748,7 +748,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                     # Note: If the joint that is being mimicked is not in the configuration, the mimic joint will not be set.
                     # This search and replace can be more elaborate in the future if needed.
 
-    def get_robot_configuration(self):
+    def _get_robot_configuration(self):
         # type: () -> Configuration
         """Gets the robot's current pose.
         A full configuration is returned.
@@ -770,7 +770,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         return configuration
 
-    def set_tool_base_frame(self, tool_name, frame):
+    def _set_tool_base_frame(self, tool_name, frame):
         # type: (str, Frame) -> None
         """Sets the base frame of a tool.
 
@@ -782,9 +782,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             The frame to which the tool should be moved.
         """
         tool_id = self.tools_puids[tool_name]
-        self.set_object_frame(tool_id, frame)
+        self._set_object_frame(tool_id, frame)
 
-    def set_rigid_body_base_frame(self, rigid_body_name, frame):
+    def _set_rigid_body_base_frame(self, rigid_body_name, frame):
         # type: (str, Frame) -> None
         """Sets the base frame of a rigid body.
 
@@ -797,9 +797,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """
         body_ids = self.rigid_bodies_puids[rigid_body_name]
         for body_id in body_ids:
-            self.set_object_frame(body_id, frame)
+            self._set_object_frame(body_id, frame)
 
-    def set_object_frame(self, body_id, frame):
+    def _set_object_frame(self, body_id, frame):
         (point, quat) = pose_from_frame(frame)
         pybullet.resetBasePositionAndOrientation(body_id, point, quat, physicsClientId=self.client_id)
 
@@ -807,50 +807,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     # Helper functions for creating rigid bodies in PyBullet
     # This includes loading meshes via OBJ files, setting up visual and collision objects
     # ------------------------------------------------------------------------------------
-
-    def convert_mesh_to_body(self, mesh, frame, concavity=False, mass=const.STATIC_MASS):
-        """Creates a pybullet body from a compas mesh and attaches it to the scene.
-
-        Useful for static collision meshes and attached collision meshes.
-        The mesh is first exported to an OBJ file and then loaded into PyBullet.
-        When concavity is requested, the mesh will be decomposed into convex parts.
-
-        This function should not be called directly by compas_fab API user because PyBulletClient
-        will otherwise not be able to keep track of the collision objects.
-
-        Parameters
-        ----------
-        mesh : :class:`compas.datastructures.Mesh`
-            The mesh to be converted, modelled relative to its own object coordinate system.
-        frame : :class:`compas.geometry.Frame`
-            The frame to which the mesh should be moved.
-        concavity : :obj:`bool`, optional
-            When ``False`` (the default), the mesh will be loaded as is and any convex hull will be considered solid during collision checking.
-            When ``True``, the mesh will be decomposed into convex parts using V-HACD within PyBullet.
-        mass : :obj:`float`, optional
-            Mass of the body to be created, in kg.  If ``0`` mass is given (the default),
-            the object is static.
-
-        Returns
-        -------
-        :obj:`int`
-            The PyBullet body id of the mesh.
-
-        Notes
-        -----
-        If this method is called several times with the same ``mesh`` instance, but the ``mesh`` has been modified
-        in between calls, PyBullet's default caching behavior will prevent it from recognizing these changes.  It
-        is best practice to create a new mesh instance or to make use of the `frame` argument, if applicable.  If
-        this is not possible, PyBullet's caching behavior can be changed with
-        ``pybullet.setPhysicsEngineParameter(enableFileCaching=0)``.
-        """
-        tmp_obj_path = os.path.join(self._cache_dir.name, "{}.obj".format(mesh.guid))
-        mesh.to_obj(tmp_obj_path)
-        tmp_obj_path = self._handle_concavity(tmp_obj_path, self._cache_dir.name, concavity, mass)
-        pyb_body_id = self.body_from_obj(tmp_obj_path, concavity=concavity, mass=mass)
-        self._set_base_frame(frame, pyb_body_id)
-
-        return pyb_body_id
 
     @staticmethod
     def _handle_concavity(tmp_obj_path, tmp_dir, concavity, mass, mesh_name=""):
@@ -886,7 +842,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             pybullet.vhacd(tmp_obj_path, tmp_vhacd_obj_path, tmp_log_path)
         return tmp_vhacd_obj_path
 
-    def body_from_obj(
+    def _body_from_obj(
         self,
         visual_path=None,
         collision_path=None,

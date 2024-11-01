@@ -75,7 +75,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         # Update the robot configuration if it is provided
         # Note robot_cell_state.robot_configuration is a full configuration
         if robot_cell_state.robot_configuration:
-            client.set_robot_configuration(robot_cell_state.robot_configuration)
+            client._set_robot_configuration(robot_cell_state.robot_configuration)
 
         # Keep track of tool's base_frames during tool updates
         # They can be used later to update rigid body base frames that are attached to tools
@@ -109,7 +109,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
             tool_base_frames[tool_name] = tool_base_frame
 
             # Set the frame of the tool
-            client.set_tool_base_frame(tool_name, tool_base_frame)
+            client._set_tool_base_frame(tool_name, tool_base_frame)
 
         # Update the position of RigidBody models
         for rigid_body_name, rigid_body_state in robot_cell_state.rigid_body_states.items():
@@ -153,7 +153,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 rigid_body_base_frame = rigid_body_state.frame
 
             # Set the frame of the rigid body
-            client.set_rigid_body_base_frame(rigid_body_name, rigid_body_base_frame)
+            client._set_rigid_body_base_frame(rigid_body_name, rigid_body_base_frame)
 
         # The client needs to keep track of the latest robot cell state
         client._robot_cell_state = robot_cell_state
@@ -185,7 +185,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                     tool_state, planner_coordinate_frame
                 )
                 tool_base_frames[tool_name] = tool_base_frame
-                client.set_tool_base_frame(tool_name, tool_base_frame)
+                client._set_tool_base_frame(tool_name, tool_base_frame)
 
         for rigid_body_name, rigid_body_state in robot_cell_state.rigid_body_states.items():
             # Filter only the rigid bodies that are attached to tools that are processed in the previous step
@@ -199,7 +199,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                     rigid_body_state, tool_model, tool_base_frame
                 )
 
-                client.set_rigid_body_base_frame(rigid_body_name, rigid_body_base_frame)
+                client._set_rigid_body_base_frame(rigid_body_name, rigid_body_base_frame)
 
     def _compute_workpiece_frame_from_tool_base_frame(self, rigid_body_state, tool_model, tool_base_frame):
         # type: (RigidBodyState, ToolModel, Frame) -> Frame

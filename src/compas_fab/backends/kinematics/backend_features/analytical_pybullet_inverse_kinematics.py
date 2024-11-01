@@ -96,7 +96,7 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
             if options.get("check_collision", True):
                 try:
                     # To save some time, we only set the robot configuration but avoid calling set_robot_cell_states
-                    client.set_robot_configuration(configuration)
+                    client._set_robot_configuration(configuration)
                     # Passing the `_skip_set_robot_cell_state` option to the collision check function
                     planner.check_collision(None, options={"_skip_set_robot_cell_state": True})
                 except CollisionCheckError:

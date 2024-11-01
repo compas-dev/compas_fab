@@ -78,13 +78,13 @@ def test_pybullet_client_set_robot_configuration():
 
         # Set configuration
         configuration = robot_cell.robot_model.zero_configuration()
-        client.set_robot_configuration(configuration)
+        client._set_robot_configuration(configuration)
         # Check that the configuration is set
-        assert client.get_robot_configuration().close_to(configuration)
+        assert client._get_robot_configuration().close_to(configuration)
 
         # Try to set the finger position
         configuration["panda_finger_joint1"] = 0.02
-        client.set_robot_configuration(configuration)
+        client._set_robot_configuration(configuration)
         # Check that the joint and the mimic joint are set
         joint_ids = [client.robot_joint_puids["panda_finger_joint1"], client.robot_joint_puids["panda_finger_joint2"]]
         joint_values = client._get_joint_positions(joint_ids, client.robot_puid)
