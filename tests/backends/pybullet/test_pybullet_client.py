@@ -21,12 +21,12 @@ def test_pybullet_client_set_robot():
         robot_cell = RobotCell.from_urdf_and_srdf(urdf_filename, srdf_filename)
         # Assert that set_robot can only be performed with geometry
         with pytest.raises(Exception):
-            client.set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
+            client._set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
 
         # Load robot with geometry
         mesh_folder = "robot_library/ur5_robot"
         robot_cell = RobotCell.from_urdf_and_srdf(urdf_filename, srdf_filename, mesh_folder)
-        client.set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
+        client._set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
 
         # Check that the RobotModel is present
         assert isinstance(robot_cell.robot_model, RobotModel)
@@ -56,10 +56,10 @@ def test_pybullet_client_set_all_robots_from_robot_library():
     with PyBulletClient(connection_type="direct") as client:
 
         def set_and_check_robot_cell(robot_cell, robot_cell_state):
-            client.set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
+            client._set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
             assert isinstance(robot_cell.robot_model, RobotModel)
             assert isinstance(robot_cell.robot_semantics, RobotSemantics)
-            client.remove_robot()
+            client._remove_robot()
 
         set_and_check_robot_cell(*RobotCellLibrary.ur5())
         set_and_check_robot_cell(*RobotCellLibrary.ur10e())
@@ -73,7 +73,7 @@ def test_pybullet_client_set_robot_configuration():
     with PyBulletClient(connection_type="direct") as client:
         robot_cell, robot_cell_state = RobotCellLibrary.panda(load_geometry=True)
         # Typically user would call planner.set_robot_cell() directly
-        client.set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
+        client._set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
         client._robot_cell = robot_cell
 
         # Set configuration
@@ -97,7 +97,7 @@ def test_pybullet_client_internal_puids():
         assert len(client.robot_joint_puids) == 0
 
         robot_cell, robot_cell_state = RobotCellLibrary.panda(load_geometry=True)
-        client.set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
+        client._set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
 
         # Check that all links and joints are loaded
         link_names_in_model = [link.name for link in robot_cell.robot_model.iter_links()]
@@ -128,7 +128,7 @@ def test_pybullet_client_internal_puids_abb():
         assert len(client.robot_joint_puids) == 0
 
         robot_cell, robot_cell_state = RobotCellLibrary.abb_irb4600_40_255(load_geometry=True)
-        client.set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
+        client._set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
 
         # Check that all links and joints are loaded
         link_names_in_model = [link.name for link in robot_cell.robot_model.iter_links()]
@@ -175,7 +175,7 @@ def test_pybullet_client_link_names():
     print(robot_cell.get_base_link_name())
 
     with PyBulletClient(connection_type="direct") as client:
-        client.set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
+        client._set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
         print("Links in Backend:")
         print(client.robot_link_puids)
         print("Joints in Backend:")

@@ -274,7 +274,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     # TODO: Discuss whether the following functions should all have '_' in the beginning of their names
 
-    def set_robot(self, robot_model, robot_semantics, concavity=False):
+    def _set_robot(self, robot_model, robot_semantics, concavity=False):
         # type: (RobotModel, RobotSemantics, Optional[bool]) -> None
         """Send a robot to PyBullet.
 
@@ -295,10 +295,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         """
         if self.robot_puid is not None:
-            self.remove_robot()
+            self._remove_robot()
 
         urdf_fp = self.robot_model_to_urdf(robot_model, concavity=concavity)
-        self.robot_puid = robot_puid = self.pybullet_load_urdf(urdf_fp)
+        self.robot_puid = robot_puid = self._pybullet_load_urdf(urdf_fp)
 
         # The root link of the robot have index of `-1` (refer to PyBullet API)
         self.robot_link_puids[robot_model.root.name] = -1
@@ -317,7 +317,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         self.disabled_collisions = robot_semantics.disabled_collisions
 
-    def remove_robot(self):
+    def _remove_robot(self):
         """Remove the robot from the PyBullet server if it exists."""
         if self.robot_puid is None:
             return
@@ -326,7 +326,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.robot_joint_puids = {}
         self.robot_link_puids = {}
 
-    def add_tool(self, name, tool_model):
+    def _add_tool(self, name, tool_model):
         # type: (str, ToolModel) -> None
         """Load a ToolModel object to PyBullet.
 
@@ -339,10 +339,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         """
         file_path = self.robot_model_to_urdf(tool_model)
-        pybullet_uid = self.pybullet_load_urdf(file_path)
+        pybullet_uid = self._pybullet_load_urdf(file_path)
         self.tools_puids[name] = pybullet_uid
 
-    def remove_tool(self, name):
+    def _remove_tool(self, name):
         # type: (str) -> None
         """Remove a tool from the PyBullet server if it exists.
 
@@ -356,7 +356,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         pybullet.removeBody(self.tools_puids[name], physicsClientId=self.client_id)
         del self.tools_puids[name]
 
-    def add_rigid_body(self, name, rigid_body, concavity=False, mass=const.STATIC_MASS):
+    def _add_rigid_body(self, name, rigid_body, concavity=False, mass=const.STATIC_MASS):
         # type: (str, RigidBody, bool, float) -> int
 
         # NOTE: Rigid bodies can have multiple meshes in them, at the moment we join them together as a single mesh
@@ -392,7 +392,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         assert not pyb_body_id == -1, "Error in creating rigid body in PyBullet. Returning ID is -1."
         self.rigid_bodies_puids[name] = [pyb_body_id]
 
-    def remove_rigid_body(self, name):
+    def _remove_rigid_body(self, name):
         # type: (str) -> None
         """Remove a rigid body from the PyBullet server if it exists.
 
@@ -407,7 +407,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             pybullet.removeBody(body_id, physicsClientId=self.client_id)
         del self.rigid_bodies_puids[name]
 
-    def pybullet_load_urdf(self, urdf_file):
+    def _pybullet_load_urdf(self, urdf_file):
         # type: (str) -> int
         """Instruct PyBullet to load a URDF file.
 
@@ -508,7 +508,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             # NOTE: PyBullet requires an inertial object to be present in each link or it prints ugly blue warning messages.
             # We are fine filling some default values for the inertial object because we don't use the dynamics in PyBullet.
             if link.inertial is None:
-                link.inertial = self.pybullet_empty_inertial()
+                link.inertial = self._pybullet_empty_inertial()
 
         # create urdf with new mesh locations
         urdf = URDF.from_robot(robot_model)
@@ -524,7 +524,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         return urdf_filepath
 
-    def pybullet_empty_inertial(self):
+    def _pybullet_empty_inertial(self):
         # type: () -> Inertial
         """Create an empty inertial object.
         Useful for virtual links in URDF that does not have mass or inertial information.
@@ -577,7 +577,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     # Functions related to puids
     # --------------------------------
 
-    def get_pose_joint_names_and_puids(self):
+    def _get_pose_joint_names_and_puids(self):
         # type: () -> List[str]
         """Returns the robot joints names and their puids that are need to create a pose in PyBullet.
         This include all joints that are not FIXED.
@@ -599,7 +599,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                 joint_names_and_puids.append((joint_name, puid))
         return joint_names_and_puids
 
-    def build_pose_for_pybullet(self, configuration):
+    def _build_pose_for_pybullet(self, configuration):
         # type: (Configuration) -> List[float]
         """Builds a robot pose (list of joint values) for sending to PyBullet.
 
@@ -613,7 +613,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         :obj:`list` of :obj:`float`
             A list of joint values.
         """
-        joint_names_and_puids = self.get_pose_joint_names_and_puids()
+        joint_names_and_puids = self._get_pose_joint_names_and_puids()
 
         joint_values = []
         for joint_name, joint_puid in joint_names_and_puids:
@@ -731,7 +731,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         ), "Joint names must be provided in the configuration passed to set_robot_configuration."
 
         # Iterate through all joints that are considered free by PyBullet
-        for joint_name, joint_puid in self.get_pose_joint_names_and_puids():
+        for joint_name, joint_puid in self._get_pose_joint_names_and_puids():
             if joint_name in configuration:
                 self._set_joint_position(joint_puid, configuration[joint_name], self.robot_puid)
             else:

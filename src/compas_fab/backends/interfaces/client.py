@@ -19,12 +19,14 @@ class ClientInterface(object):
 
     Attributes
     ----------
-    robot : :class:`compas_fab.robots.Robot`, read-only
-        The robot instance last associated with the client.
     robot_cell : :class:`compas_fab.robots.RobotCell`, read-only
         The robot cell instance last set on the client.
     robot_cell_state : :class:`compas_fab.robots.RobotCellState`, read-only
         The robot cell state instance last set on the client.
+    robot_model : :class:`compas_robots.RobotModel`, read-only
+        Equivalent to `robot_cell.robot_model`.
+    robot_semantics : :class:`compas_fab.robots.RobotSemantics`, read-only
+        Equivalent to `robot_cell.robot_semantics`.
     """
 
     def __init__(self):

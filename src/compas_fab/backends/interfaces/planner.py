@@ -43,8 +43,7 @@ class PlannerInterface(object):
     """
 
     def __init__(self, client=None):
-        if client:
-            self._client = client
+        self._client = client
         super(PlannerInterface, self).__init__()
 
     @property
@@ -93,6 +92,8 @@ class PlannerInterface(object):
     # ==========================================================================
     # Planning Services
     # ==========================================================================
+
+    # TODO: Improve the docstring for the methods below
 
     def check_collisions(self, *args, **kwargs):
         """Default method for planner.

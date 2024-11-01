@@ -305,7 +305,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         point, orientation = pose_from_frame(target_pcf)
 
         # Get list of joint_name and puids in order
-        joint_names_and_puids = client.get_pose_joint_names_and_puids()
+        joint_names_and_puids = client._get_pose_joint_names_and_puids()
         joint_names_sorted = [joint_name for joint_name, _ in joint_names_and_puids]
         joint_ids_sorted = [joint_puid for _, joint_puid in joint_names_and_puids]
 
@@ -316,7 +316,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         start_configuration = robot_cell_state.robot_configuration
         all_joint_names = robot_cell.robot_model.get_configurable_joint_names()
         assert set(all_joint_names) == set(start_configuration.keys()), "Robot configuration is missing some joints"
-        rest_poses = client.build_pose_for_pybullet(start_configuration)
+        rest_poses = client._build_pose_for_pybullet(start_configuration)
 
         # Prepare `lower_limits`` and `upper_limits` input
         # Get joint limits in the same order as the joint_ids

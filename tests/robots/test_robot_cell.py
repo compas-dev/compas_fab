@@ -68,6 +68,7 @@ def test_hash(abb_irb4600_40_255_gripper_one_beam):
     """Test to make sure the RobotCell object is hashable"""
 
     robot_cell, robot_cell_state = abb_irb4600_40_255_gripper_one_beam
+    # NOTE: The hashing function is pretty slow if the robot cell geometry is loaded
     robot_cell.sha256()
 
 

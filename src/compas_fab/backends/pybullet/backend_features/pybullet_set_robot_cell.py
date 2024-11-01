@@ -37,24 +37,24 @@ class PyBulletSetRobotCell(SetRobotCell):
         # Remove all objects from the PyBullet world
 
         for tool_id in list(client.tools_puids.keys()):
-            client.remove_tool(tool_id)
+            client._remove_tool(tool_id)
         # client.tools_puids = {}
         for rigid_body_id in list(client.rigid_bodies_puids.keys()):
-            client.remove_rigid_body(rigid_body_id)
+            client._remove_rigid_body(rigid_body_id)
         # client.rigid_bodies_puids = {}
 
         # Add the robot cell to the PyBullet world
         for name, tool_model in robot_cell.tool_models.items():
-            client.add_tool(name, tool_model)
+            client._add_tool(name, tool_model)
         for name, rigid_body in robot_cell.rigid_body_models.items():
-            client.add_rigid_body(name, rigid_body)
+            client._add_rigid_body(name, rigid_body)
             # client.convert_mesh_to_body(rigid_body.visual_meshes[0], Frame.worldXY())
 
         # Feed the robot to the client
         if robot_cell.robot_model:
             robot_cell.ensure_geometry()
             robot_cell.ensure_semantics()
-            client.set_robot(
+            client._set_robot(
                 robot_cell.robot_model,
                 robot_cell.robot_semantics,
             )
