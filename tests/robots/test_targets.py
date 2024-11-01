@@ -41,7 +41,7 @@ def frame_target(target_frame):
     return FrameTarget(
         target_frame=target_frame,
         target_mode=TargetMode.ROBOT,
-        target_scale=1.0,
+        native_scale=1.0,
         tolerance_position=0.001,
         tolerance_orientation=0.001,
         name="my testing name",
@@ -54,7 +54,7 @@ def point_axis_target():
         target_point=Point(1.0, -2.0, 3.0),
         target_z_axis=Vector(1.0, -1.0, 0.0),
         target_mode=TargetMode.ROBOT,
-        target_scale=1.0,
+        native_scale=1.0,
         tolerance_position=0.001,
         tolerance_orientation=0.001,
         name="my testing name",
@@ -76,7 +76,7 @@ def test_serialization_targets(frame_target, point_axis_target, configuration_ta
     nt = FrameTarget.__from_data__(frame_target.__data__)
     assert frame_target.target_frame == nt.target_frame
     assert frame_target.target_mode == nt.target_mode
-    assert frame_target.target_scale == nt.target_scale
+    assert frame_target.native_scale == nt.native_scale
     assert frame_target.tolerance_position == nt.tolerance_position
     assert frame_target.tolerance_orientation == nt.tolerance_orientation
     assert frame_target.name == nt.name
@@ -89,7 +89,7 @@ def test_serialization_targets(frame_target, point_axis_target, configuration_ta
     # assert point_axis_target.target_point == nt.target_point
     # assert point_axis_target.target_z_axis == nt.target_z_axis
     assert point_axis_target.target_mode == nt.target_mode
-    assert point_axis_target.target_scale == nt.target_scale
+    assert point_axis_target.native_scale == nt.native_scale
     assert point_axis_target.tolerance_position == nt.tolerance_position
     assert point_axis_target.tolerance_orientation == nt.tolerance_orientation
     assert point_axis_target.name == nt.name
@@ -121,12 +121,12 @@ def test_deepcopy_targets(frame_target, point_axis_target, configuration_target)
 def test_empty_parameters_remain_empty(frame_target, point_axis_target, configuration_target):
     # FrameTarget
     nt = frame_target.copy()
-    nt.target_scale = None
+    nt.native_scale = None
     nt.tolerance_position = None
     nt.tolerance_orientation = None
     nt.name = None
     nt_2 = nt.copy()
-    assert nt.target_scale == nt_2.target_scale
+    assert nt.native_scale == nt_2.native_scale
     assert nt.tolerance_position == nt_2.tolerance_position
     assert nt.tolerance_orientation == nt_2.tolerance_orientation
     assert nt.name == nt_2.name
@@ -134,12 +134,12 @@ def test_empty_parameters_remain_empty(frame_target, point_axis_target, configur
 
     # PointAxisTarget
     nt = point_axis_target.copy()
-    nt.target_scale = None
+    nt.native_scale = None
     nt.tolerance_position = None
     nt.tolerance_orientation = None
     nt.name = None
     nt_2 = nt.copy()
-    assert nt.target_scale == nt_2.target_scale
+    assert nt.native_scale == nt_2.native_scale
     assert nt.tolerance_position == nt_2.tolerance_position
     assert nt.tolerance_orientation == nt_2.tolerance_orientation
     assert nt.name == nt_2.name
@@ -203,7 +203,7 @@ def frame_waypoints():
     return FrameWaypoints(
         target_frames=target_frames,
         target_mode=TargetMode.ROBOT,
-        target_scale=1.0,
+        native_scale=1.0,
         tolerance_position=0.001,
         tolerance_orientation=0.001,
         name="my testing waypoints",
@@ -219,7 +219,7 @@ def point_axis_waypoints():
     return PointAxisWaypoints(
         target_points_and_axes=target_points_and_axes,
         target_mode=TargetMode.ROBOT,
-        target_scale=1.0,
+        native_scale=1.0,
         tolerance_position=0.001,
         tolerance_orientation=0.001,
         name="my testing waypoints",
@@ -232,7 +232,7 @@ def test_serialization_frame_waypoints(frame_waypoints):
     for f1, f2 in zip(frame_waypoints.target_frames, nt.target_frames):
         assert f1 == f2
     assert frame_waypoints.target_mode, nt.target_mode
-    assert frame_waypoints.target_scale, nt.target_scale
+    assert frame_waypoints.native_scale, nt.native_scale
     assert frame_waypoints.tolerance_position, nt.tolerance_position
     assert frame_waypoints.tolerance_orientation, nt.tolerance_orientation
     assert frame_waypoints.name == nt.name
@@ -245,39 +245,39 @@ def test_serialization_point_axis_waypoints(point_axis_waypoints):
         assert p1 == p2
         assert a1 == a2
     assert point_axis_waypoints.target_mode, nt.target_mode
-    assert point_axis_waypoints.target_scale, nt.target_scale
+    assert point_axis_waypoints.native_scale, nt.native_scale
     assert point_axis_waypoints.tolerance_position, nt.tolerance_position
     assert point_axis_waypoints.tolerance_orientation, nt.tolerance_orientation
     assert point_axis_waypoints.name == nt.name
 
 
-def test_target_scale(frame_target):
+def test_native_scale(frame_target):
     scale_factor = 0.001
     target = frame_target.copy()
-    target.target_scale = scale_factor
+    target.native_scale = scale_factor
     nt = target.normalized_to_meters()
     assert nt.target_frame == target.target_frame.scaled(scale_factor)
-    assert nt.tolerance_position == target.tolerance_position * scale_factor
+    assert nt.tolerance_position == target.tolerance_position  # No Scaling
     assert nt.tolerance_orientation == target.tolerance_orientation  # No Scaling
 
 
-def test_point_axis_target_scale(point_axis_target):
+def test_point_axis_native_scale(point_axis_target):
     scale_factor = 0.001
     target = point_axis_target.copy()
-    target.target_scale = scale_factor
+    target.native_scale = scale_factor
     nt = target.normalized_to_meters()  # type: PointAxisTarget
     assert nt.target_point == target.target_point.scaled(scale_factor)
     assert nt.target_z_axis == target.target_z_axis  # No Scaling
-    assert nt.tolerance_position == target.tolerance_position * scale_factor
+    assert nt.tolerance_position == target.tolerance_position  # No Scaling
     assert nt.tolerance_orientation == target.tolerance_orientation  # No Scaling
 
 
 def test_frame_waypoints_scale(frame_waypoints):
     scale_factor = 0.001
     waypoint = frame_waypoints.copy()
-    waypoint.target_scale = scale_factor
+    waypoint.native_scale = scale_factor
     nt = waypoint.normalized_to_meters()
-    assert nt.tolerance_position == waypoint.tolerance_position * scale_factor
+    assert nt.tolerance_position == waypoint.tolerance_position  # No Scaling
     assert nt.tolerance_orientation == waypoint.tolerance_orientation  # No Scaling
     for f1, f2 in zip(waypoint.target_frames, nt.target_frames):
         assert f1.scaled(scale_factor) == f2
@@ -286,9 +286,9 @@ def test_frame_waypoints_scale(frame_waypoints):
 def test_point_axis_waypoints_scale(point_axis_waypoints):
     scale_factor = 0.001
     waypoint = point_axis_waypoints.copy()
-    waypoint.target_scale = scale_factor
+    waypoint.native_scale = scale_factor
     nt = waypoint.normalized_to_meters()
-    assert nt.tolerance_position == waypoint.tolerance_position * scale_factor
+    assert nt.tolerance_position == waypoint.tolerance_position  # No Scaling
     for (p1, a1), (p2, a2) in zip(waypoint.target_points_and_axes, nt.target_points_and_axes):
         assert p1.scaled(scale_factor) == p2
         assert a1 == a2

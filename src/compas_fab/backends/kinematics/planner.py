@@ -100,8 +100,9 @@ class AnalyticalPyBulletPlanner(
 
     def __init__(self, client, kinematics_solver):
         # type: (PyBulletClient, AnalyticalKinematics) -> None
-        self._client = client  # type: PyBulletClient
-        self.kinematics_solver = kinematics_solver
 
         # Initialize all mixins
         super(AnalyticalPyBulletPlanner, self).__init__()
+
+        self._client = client  # type: PyBulletClient
+        self.kinematics_solver = kinematics_solver

@@ -14,7 +14,7 @@ class RobotCellObject(BaseRobotCellObject):
         kwargs = {
             "draw_visual": self._draw_visual,
             "draw_collision": self._draw_collision,
-            "scale": self._scale,
+            "native_scale": self._native_scale,
         }
 
         # RobotModel drawn using RobotModelObject from compas_fab.ghpython not compas_robots

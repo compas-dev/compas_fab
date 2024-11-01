@@ -172,7 +172,7 @@ class CheckCollision(BackendFeature):
 class ForwardKinematics(BackendFeature):
     """Mix-in interface for implementing a planner's forward kinematics feature."""
 
-    def forward_kinematics(self, robot_cell_state, target_mode, group=None, scale=None, options=None):
+    def forward_kinematics(self, robot_cell_state, target_mode, group=None, native_scale=None, options=None):
         # type: (RobotCellState, TargetMode | str, Optional[str], Optional[float], Optional[dict]) -> Frame
         """Calculate the target frame of the robot from the provided RobotCellState.
 
@@ -196,9 +196,10 @@ class ForwardKinematics(BackendFeature):
         group : str, optional
             The planning group of the robot.
             Defaults to the robot's main planning group.
-        scale : float, optional
+        native_scale : float, optional
             The scaling factor to apply to the resulting frame.
-            For example, use ``'1000.0'`` to convert the result to millimeters.
+            It is defined as `user_object_value * native_scale = meter_object_value`.
+            For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
             Defaults to None, which means no scaling is applied.
         options : dict, optional
             Dictionary containing kwargs for arguments specific to
@@ -215,7 +216,7 @@ class ForwardKinematics(BackendFeature):
         # The implementation code is located in the backend's module:
         # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_forward_kinematics.py"
 
-    def forward_kinematics_to_link(self, robot_cell_state, link_name=None, group=None, scale=None, options=None):
+    def forward_kinematics_to_link(self, robot_cell_state, link_name=None, group=None, native_scale=None, options=None):
         # type: (RobotCellState, Optional[str], Optional[str], Optional[float], Optional[dict]) -> Frame
         """Calculate the frame of the specified robot link from the provided RobotCellState.
 
@@ -236,9 +237,10 @@ class ForwardKinematics(BackendFeature):
         group : str, optional
             The planning group of the robot.
             Defaults to the robot's main planning group.
-        scale : float, optional
+        native_scale : float, optional
             The scaling factor to apply to the resulting frame.
-            For example, use ``'1000.0'`` to convert the result to millimeters.
+            It is defined as `user_object_value * native_scale = meter_object_value`.
+            For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
             Defaults to None, which means no scaling is applied.
         options : dict, optional
             Dictionary for passing planner specific options.

@@ -41,11 +41,11 @@ class BaseRobotCellObject(SceneObject):
         If `True`, the visual meshes will be drawn. Default is `True`.
     draw_collision : bool, optional
         If `True`, the collision meshes will be drawn. Default is `False`.
-    scale : float, optional
-        The scale factor to visualize the meshes in the robot cell, in case the native CAD environment
-        uses a different unit system other than meters. The scale value should be set such
-        that a `meter_mesh.scale(1/scale)` will create the mesh in the native unit system.
-        For example, if the native unit system is millimeters, the scale should be set to `0.001`.
+    native_scale : float, optional
+        The native scale factor to visualize the meshes in the robot cell, in case the native CAD environment
+        uses a different unit system other than meters. The native scale value should be set such
+        that a `meter_mesh.scale(1/native_scale)` will create the mesh in the native unit system.
+        For example, if the unit system of the visualization environment  is millimeters, `native_scale` should be set to ``'0.001'``.
         Default is `1.0`.
 
     Notes
@@ -55,11 +55,11 @@ class BaseRobotCellObject(SceneObject):
 
     """
 
-    def __init__(self, draw_visual=True, draw_collision=False, scale=1.0, *args, **kwargs):
+    def __init__(self, draw_visual=True, draw_collision=False, native_scale=1.0, *args, **kwargs):
         super(BaseRobotCellObject, self).__init__(*args, **kwargs)
         self._draw_visual = draw_visual
         self._draw_collision = draw_collision
-        self._scale = scale
+        self._native_scale = native_scale
 
         # Native Geometry handles
         # robot_model_object = self._get_robot_model_object()

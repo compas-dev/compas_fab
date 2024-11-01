@@ -19,7 +19,7 @@ with PyBulletClient() as client:
 
     # Add Static Collision Geometry
     floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
-    robot_cell.rigid_body_models["floor"] = RigidBody(floor_mesh)
+    robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
 
     # Add Tool
     tool_mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
@@ -28,7 +28,7 @@ with PyBulletClient() as client:
 
     # Add workpiece at tool tip
     workpiece_mesh = Box(1.0, 0.1, 0.2).to_mesh(triangulated=True)
-    robot_cell.rigid_body_models["workpiece"] = RigidBody(workpiece_mesh)
+    robot_cell.rigid_body_models["workpiece"] = RigidBody.from_mesh(workpiece_mesh)
 
     # ------------------------------------------------------------------------
     # Create a RobotCellState to represent the current state of the robot cell

@@ -53,9 +53,11 @@ class Target(Data):
         This attribute is optional in this base class because some child
         classes (e.g: ConfigurationTarget) do not require it.
         See :class:`TargetMode` for more details.
-    target_scale : float, optional
-        The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
-        Defaults to 1.0.
+    native_scale : float, optional
+        The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
+        In another words, `input_frame.scale(native_scale)` will convert the input frame to meter units.
+        For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+        Default is ``'1.0'``.
 
     See Also
     --------
@@ -65,12 +67,12 @@ class Target(Data):
     :class:`ConstraintSetTarget`
     """
 
-    def __init__(self, target_mode=None, target_scale=1.0, name="Generic Target"):
+    def __init__(self, target_mode=None, native_scale=1.0, name="Generic Target"):
         # type: (TargetMode|str, float, str) -> None
         super(Target, self).__init__()
         self.name = name
         self.target_mode = target_mode
-        self.target_scale = target_scale
+        self.native_scale = native_scale
 
     @property
     def __data__(self):
@@ -78,14 +80,14 @@ class Target(Data):
 
     def normalize_to_meters(self):
         # type: () -> None
-        """Convert the target into meter scale if `target_scale` is not 1.0.
+        """Convert the target into meter scale if `native_scale` is not 1.0.
 
         Because all robots and planners in compas_fab use meters as the default unit of measure,
-        user targets that are created in other units (e.g. millimeters) will have a `target_scale`
+        user targets that are created in other units (e.g. millimeters) will have a `native_scale`
         factor such as 0.001 for millimeters.
 
         This function convert the target and its tolerance into meters scale
-        and setting the `target_scale` attribute to 1.0.
+        and setting the `native_scale` attribute to 1.0.
 
         Notes
         -----
@@ -130,16 +132,18 @@ class FrameTarget(Target):
     target_mode : :class:`TargetMode` or str
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
-    target_scale : float, optional
-        The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
-        Defaults to 1.0.
+    native_scale : float, optional
+        The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
+        In another words, `input_frame.scale(native_scale)` will convert the input frame to meter units.
+        For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+        Default is ``'1.0'``.
     tolerance_position : float, optional
-        The tolerance for the position.
-        Unit is meters.
+        The tolerance for the position of the target point.
+        Unit must be in meters, it is not affected by `native_scale`.
         If not specified, the default value from the planner is used.
     tolerance_orientation : float, optional
-        The tolerance for the orientation.
-        Unit is radians.
+        The tolerance for matching the target axis orientation.
+        Unit must be in radians.
         If not specified, the default value from the planner is used.
     name : str, optional
         The human-readable name of the target.
@@ -151,13 +155,13 @@ class FrameTarget(Target):
         self,
         target_frame,
         target_mode,
-        target_scale=1.0,
+        native_scale=1.0,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Frame Target",
     ):
         # type: (Frame, TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> None
-        super(FrameTarget, self).__init__(target_mode=target_mode, target_scale=target_scale, name=name)
+        super(FrameTarget, self).__init__(target_mode=target_mode, native_scale=native_scale, name=name)
         self.target_frame = target_frame
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
@@ -167,7 +171,7 @@ class FrameTarget(Target):
         return {
             "target_frame": self.target_frame,
             "target_mode": self.target_mode,
-            "target_scale": self.target_scale,
+            "native_scale": self.native_scale,
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
@@ -178,7 +182,7 @@ class FrameTarget(Target):
         cls,
         transformation,
         target_mode,
-        target_scale=1.0,
+        native_scale=1.0,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Frame Target",
@@ -193,15 +197,19 @@ class FrameTarget(Target):
         target_mode : :class:`TargetMode` or str
             The target mode specifies which link or frame is referenced when specifying a target.
             See :class:`TargetMode` for more details.
-        target_scale : float, optional
-            The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
-            Defaults to 1.0.
+        native_scale : float, optional
+            The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
+            In another words, `input_frame.scale(native_scale)` will convert the input frame to meter units.
+            For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+            Default is ``'1.0'``.
         tolerance_position : float, optional
-            The tolerance for the position.
-            if not specified, the default value from the planner is used.
+            The tolerance for the position of the target point.
+            Unit must be in meters, it is not affected by `native_scale`.
+            If not specified, the default value from the planner is used.
         tolerance_orientation : float, optional
-            The tolerance for the orientation.
-            if not specified, the default value from the planner is used.
+            The tolerance for matching the target axis orientation.
+            Unit must be in radians.
+            If not specified, the default value from the planner is used.
         name : str, optional
             The human-readable name of the target.
             Defaults to 'Frame Target'.
@@ -212,28 +220,29 @@ class FrameTarget(Target):
             The frame target.
         """
         frame = Frame.from_transformation(transformation)
-        return cls(frame, target_mode, target_scale, tolerance_position, tolerance_orientation, name)
+        return cls(frame, target_mode, native_scale, tolerance_position, tolerance_orientation, name)
 
     def normalize_to_meters(self):
         # type: () -> None
-        """Convert the target into meter scale if `target_scale` is not 1.0.
+        """Convert the target into meter scale if `native_scale` is not 1.0.
 
         Because all robots and planners in compas_fab use meters as the default unit of measure,
-        user targets that are created in other units (e.g. millimeters) will have a `target_scale`
+        user targets that are created in other units (e.g. millimeters) will have a `native_scale`
         factor such as 0.001 for millimeters.
 
-        This function convert the `target_frame` and `tolerance_position` into meters scale.
-        `target_scale` is set to 1.0 after the conversion.
+        This function convert the `target_frame` into meters scale.
+        `native_scale` is set to 1.0 after the conversion.
 
         """
-        # Skipping the conversion if the target_scale is already 1.0
-        if self.target_scale == 1.0:
+        # Skipping the conversion if the native_scale is already 1.0
+        if self.native_scale == 1.0:
             return
 
-        self.target_frame.scale(self.target_scale)
-        self.tolerance_position = self.tolerance_position * self.target_scale if self.tolerance_position else None
-        # NOTE: tolerance_orientation is not scaled
-        self.target_scale = 1.0
+        self.target_frame.scale(self.native_scale)
+
+        # NOTE: Tolerance values are specified in meters and are not scaled
+
+        self.native_scale = 1.0
 
     def __eq__(self, other):
         # type: (FrameTarget) -> bool
@@ -247,7 +256,7 @@ class FrameTarget(Target):
         return (
             TOL.is_allclose(other.target_frame, self.target_frame)
             and self.target_mode == other.target_mode
-            and (self.target_scale == other.target_scale or TOL.is_close(other.target_scale, self.target_scale))
+            and (self.native_scale == other.native_scale or TOL.is_close(other.native_scale, self.native_scale))
             and (
                 self.tolerance_position == other.tolerance_position
                 or TOL.is_close(other.tolerance_position, self.tolerance_position)
@@ -295,16 +304,18 @@ class PointAxisTarget(Target):
     target_mode : :class:`TargetMode` or str
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
-    target_scale : float, optional
-        The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
-        Defaults to 1.0.
+    native_scale : float, optional
+        The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
+        In another words, `input_point.scale(native_scale)` will convert the input point to meter unit.
+        For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+        Default is ``'1.0'``.
     tolerance_position : float, optional
         The tolerance for the position of the target point.
-        Unit is meters.
+        Unit must be in meters, it is not affected by `native_scale`.
         If not specified, the default value from the planner is used.
     tolerance_orientation : float, optional
         The tolerance for matching the target axis orientation.
-        Unit is in radians.
+        Unit must be in radians.
         If not specified, the default value from the planner is used.
     name : str, optional
         The human-readable name of the target.
@@ -316,13 +327,13 @@ class PointAxisTarget(Target):
         target_point,
         target_z_axis,
         target_mode,
-        target_scale=1.0,
+        native_scale=1.0,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Point-Axis Target",
     ):
         # type: (Point, Vector, TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> None
-        super(PointAxisTarget, self).__init__(target_mode=target_mode, target_scale=target_scale, name=name)
+        super(PointAxisTarget, self).__init__(target_mode=target_mode, native_scale=native_scale, name=name)
         # Note: The following input are converted to class because it can simplify functions that use this class
         self.target_point = Point(*target_point)
         self.target_z_axis = Vector(*target_z_axis).unitized()
@@ -334,7 +345,7 @@ class PointAxisTarget(Target):
         return {
             "target_point": self.target_point,
             "target_mode": self.target_mode,
-            "target_scale": self.target_scale,
+            "native_scale": self.native_scale,
             "target_z_axis": self.target_z_axis,
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
@@ -343,26 +354,28 @@ class PointAxisTarget(Target):
 
     def normalize_to_meters(self):
         # type: () -> None
-        """Convert the target into meter scale if `target_scale` is not 1.0.
+        """Convert the target into meter scale if `native_scale` is not 1.0.
 
         Because all robots and planners in compas_fab use meters as the default unit of measure,
-        user targets that are created in other units (e.g. millimeters) will have a `target_scale`
+        user targets that are created in other units (e.g. millimeters) will have a `native_scale`
         factor such as 0.001 for millimeters.
 
-        This function convert the `target_point`, `target_z_axis` and `tolerance_position` into meters scale.
-        `target_scale` is set to 1.0 after the conversion.
+        This function convert the `target_point` into meters scale,
+        and the `target_z_axis` is unitized.
+        `native_scale` is set to 1.0 after the conversion.
 
         """
-        # Skipping the conversion if the target_scale is already 1.0
-        if self.target_scale == 1.0:
+        # Skipping the conversion if the native_scale is already 1.0
+        if self.native_scale == 1.0:
             return
 
-        self.target_point.scale(self.target_scale)
-        self.tolerance_position = self.tolerance_position * self.target_scale if self.tolerance_position else None
-        # NOTE: tolerance_orientation is not scaled
+        self.target_point.scale(self.native_scale)
+
+        # NOTE: Tolerance values are specified in meters and are not scaled
+
         self.target_z_axis.unitize()
         # NOTE: target_z_axis is unitized and is not scaled
-        self.target_scale = 1.0
+        self.native_scale = 1.0
 
     def __eq__(self, other):
         # type: (PointAxisTarget) -> bool
@@ -377,7 +390,7 @@ class PointAxisTarget(Target):
             TOL.is_allclose(other.target_point, self.target_point)
             and TOL.is_allclose(other.target_z_axis, self.target_z_axis)
             and self.target_mode == other.target_mode
-            and (other.target_scale == self.target_scale or TOL.is_close(other.target_scale, self.target_scale))
+            and (other.native_scale == self.native_scale or TOL.is_close(other.native_scale, self.native_scale))
             and (
                 other.tolerance_position == self.tolerance_position
                 or TOL.is_close(other.tolerance_position, self.tolerance_position)
@@ -641,9 +654,11 @@ class Waypoints(Target):
     target_mode : :class:`TargetMode` or str, optional
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
-    target_scale : float, optional
-        The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
-        Defaults to 1.0.
+    native_scale : float, optional
+        The native scale factor of the waypoint targets defined as `user_object_value * native_scale = meter_object_value`.
+        In another words, `input_frame.scale(native_scale)` will convert the input frame to meter units.
+        For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+        Default is ``'1.0'``.
     name : str , optional, default = 'target'
         A human-readable name for identifying the target.
 
@@ -653,9 +668,9 @@ class Waypoints(Target):
     :class:`FrameWaypoints`
     """
 
-    def __init__(self, target_mode, target_scale=1.0, name="Generic Waypoints"):
+    def __init__(self, target_mode, native_scale=1.0, name="Generic Waypoints"):
         # type: (Optional[TargetMode | str], Optional[float], Optional[str]) -> None
-        super(Waypoints, self).__init__(target_mode=target_mode, target_scale=target_scale, name=name)
+        super(Waypoints, self).__init__(target_mode=target_mode, native_scale=native_scale, name=name)
 
 
 class FrameWaypoints(Waypoints):
@@ -673,16 +688,18 @@ class FrameWaypoints(Waypoints):
     target_mode : :class:`TargetMode` or str
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
-    target_scale : float, optional
-        The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
-        Defaults to 1.0.
+    native_scale : float, optional
+        The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
+        In another words, `input_frame.scale(native_scale)` will convert the input frame to meter unit.
+        For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+        Default is ``'1.0'``.
     tolerance_position : float, optional
-        The tolerance for the position.
-        Unit is meters.
+        The tolerance for the position of the target point.
+        Unit must be in meters, it is not affected by `native_scale`.
         If not specified, the default value from the planner is used.
     tolerance_orientation : float, optional
-        The tolerance for the orientation.
-        Unit is radians.
+        The tolerance for matching the target axis orientation.
+        Unit must be in radians.
         If not specified, the default value from the planner is used.
     name : str, optional
         The human-readable name of the target.
@@ -694,13 +711,13 @@ class FrameWaypoints(Waypoints):
         self,
         target_frames,
         target_mode,
-        target_scale=1.0,
+        native_scale=1.0,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Frame Waypoints",
     ):
         # type: (list[Frame], TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> None
-        super(FrameWaypoints, self).__init__(target_mode=target_mode, target_scale=target_scale, name=name)
+        super(FrameWaypoints, self).__init__(target_mode=target_mode, native_scale=native_scale, name=name)
         self.target_frames = target_frames
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
@@ -710,7 +727,7 @@ class FrameWaypoints(Waypoints):
         return {
             "target_frames": self.target_frames,
             "target_mode": self.target_mode,
-            "target_scale": self.target_scale,
+            "native_scale": self.native_scale,
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
@@ -721,7 +738,7 @@ class FrameWaypoints(Waypoints):
         cls,
         transformations,
         target_mode,
-        target_scale=1.0,
+        native_scale=1.0,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Frame Waypoints",
@@ -736,15 +753,19 @@ class FrameWaypoints(Waypoints):
         target_mode : :class:`TargetMode` or str
             The target mode specifies which link or frame is referenced when specifying a target.
             See :class:`TargetMode` for more details.
-        target_scale : float, optional
-            The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
-            Defaults to 1.0.
+        native_scale : float, optional
+            The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
+            In another words, `input_frame.scale(native_scale)` will convert the input frame to meter unit.
+            For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+            Default is ``'1.0'``.
         tolerance_position : float, optional
-            The tolerance for the position.
-            if not specified, the default value from the planner is used.
+            The tolerance for the position of the target point.
+            Unit must be in meters, it is not affected by `native_scale`.
+            If not specified, the default value from the planner is used.
         tolerance_orientation : float, optional
-            The tolerance for the orientation.
-            if not specified, the default value from the planner is used.
+            The tolerance for matching the target axis orientation.
+            Unit must be in radians.
+            If not specified, the default value from the planner is used.
         name : str, optional
             The human-readable name of the target.
             Defaults to 'Frame Target'.
@@ -755,29 +776,30 @@ class FrameWaypoints(Waypoints):
             The frame waypoints.
         """
         frames = [Frame.from_transformation(transformation) for transformation in transformations]
-        return cls(frames, target_mode, target_scale, tolerance_position, tolerance_orientation, name)
+        return cls(frames, target_mode, native_scale, tolerance_position, tolerance_orientation, name)
 
     def normalize_to_meters(self):
         # type: () -> None
-        """Convert the target into meter scale if `target_scale` is not 1.0.
+        """Convert the target into meter scale if `native_scale` is not 1.0.
 
         Because all robots and planners in compas_fab use meters as the default unit of measure,
-        user targets that are created in other units (e.g. millimeters) will have a `target_scale`
+        user targets that are created in other units (e.g. millimeters) will have a `native_scale`
         factor such as 0.001 for millimeters.
 
-        This function convert the `target_frame` and `tolerance_position` into meters scale.
-        `target_scale` is set to 1.0 after the conversion.
+        This function convert the `target_frame` into meters scale.
+        `native_scale` is set to 1.0 after the conversion.
 
         """
-        # Skipping the conversion if the target_scale is already 1.0
-        if self.target_scale == 1.0:
+        # Skipping the conversion if the native_scale is already 1.0
+        if self.native_scale == 1.0:
             return
 
         for frame in self.target_frames:
-            frame.scale(self.target_scale)
-        self.tolerance_position = self.tolerance_position * self.target_scale if self.tolerance_position else None
-        # NOTE: tolerance_orientation is not scaled
-        self.target_scale = 1.0
+            frame.scale(self.native_scale)
+
+        # NOTE: Tolerance values are specified in meters and are not scaled
+
+        self.native_scale = 1.0
 
     def __eq__(self, other):
         # type: (FrameWaypoints) -> bool
@@ -793,7 +815,7 @@ class FrameWaypoints(Waypoints):
                 for other_frame, self_frame in zip(other.target_frames, self.target_frames)
             )
             and self.target_mode == other.target_mode
-            and TOL.is_close(other.target_scale, self.target_scale)
+            and TOL.is_close(other.native_scale, self.native_scale)
             and TOL.is_close(other.tolerance_position, self.tolerance_position)
             and TOL.is_close(other.tolerance_orientation, self.tolerance_orientation)
             and other.name == self.name
@@ -820,16 +842,18 @@ class PointAxisWaypoints(Waypoints):
     target_mode : :class:`TargetMode` or str
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
-    target_scale : float, optional
-        The scaling factor for the target frame. Use 1.0 for meters, 0.001 for millimeters, etc.
-        Defaults to 1.0.
+    native_scale : float, optional
+        The native scale factor of the target points defined as `user_object_value * native_scale = meter_object_value`.
+        In another words, `input_point.scale(native_scale)` will convert the input point to meter unit.
+        For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+        Default is ``'1.0'``.
     tolerance_position : float, optional
         The tolerance for the position of the target point.
-        Unit is meters.
+        Unit must be in meters, it is not affected by `native_scale`.
         If not specified, the default value from the planner is used.
     tolerance_orientation : float, optional
         The tolerance for matching the target axis orientation.
-        Unit is in radians.
+        Unit must be in radians.
         If not specified, the default value from the planner is used.
     name : str, optional
         The human-readable name of the target.
@@ -841,13 +865,13 @@ class PointAxisWaypoints(Waypoints):
         self,
         target_points_and_axes,
         target_mode,
-        target_scale=1.0,
+        native_scale=1.0,
         tolerance_position=None,
         tolerance_orientation=None,
         name="Point-Axis Waypoints",
     ):
         # type: (list[Tuple[Point, Vector]], TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> None
-        super(PointAxisWaypoints, self).__init__(target_mode=target_mode, target_scale=target_scale, name=name)
+        super(PointAxisWaypoints, self).__init__(target_mode=target_mode, native_scale=native_scale, name=name)
         self.target_points_and_axes = target_points_and_axes
         self.tolerance_position = tolerance_position
         self.tolerance_orientation = tolerance_orientation
@@ -857,7 +881,7 @@ class PointAxisWaypoints(Waypoints):
         return {
             "target_points_and_axes": self.target_points_and_axes,
             "target_mode": self.target_mode,
-            "target_scale": self.target_scale,
+            "native_scale": self.native_scale,
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
@@ -865,28 +889,29 @@ class PointAxisWaypoints(Waypoints):
 
     def normalize_to_meters(self):
         # type: () -> None
-        """Convert the target into meter scale if `target_scale` is not 1.0.
+        """Convert the target into meter scale if `native_scale` is not 1.0.
 
         Because all robots and planners in compas_fab use meters as the default unit of measure,
-        user targets that are created in other units (e.g. millimeters) will have a `target_scale`
+        user targets that are created in other units (e.g. millimeters) will have a `native_scale`
         factor such as 0.001 for millimeters.
 
-        This function convert the Points and Vectors in `target_points_and_axes` into meters scale.
-        `target_scale` is set to 1.0 after the conversion.
+        This function convert the points in `target_points_and_axes` into meters scale,
+        vectors are unitized.
+        `native_scale` is set to 1.0 after the conversion.
 
         """
-        # Skipping the conversion if the target_scale is already 1.0
-        if self.target_scale == 1.0:
+        # Skipping the conversion if the native_scale is already 1.0
+        if self.native_scale == 1.0:
             return
 
         for point, axis in self.target_points_and_axes:
-            point.scale(self.target_scale)
+            point.scale(self.native_scale)
             axis.unitize()
             # NOTE: target_z_axis is unitized and is not scaled
 
-        self.tolerance_position = self.tolerance_position * self.target_scale if self.tolerance_position else None
-        # NOTE: tolerance_orientation is not scaled
-        self.target_scale = 1.0
+        # NOTE: Tolerance values are specified in meters and are not scaled
+
+        self.native_scale = 1.0
 
     def __eq__(self, other):
         # type: (PointAxisWaypoints) -> bool
@@ -904,7 +929,7 @@ class PointAxisWaypoints(Waypoints):
                 )
             )
             and self.target_mode == other.target_mode
-            and TOL.is_close(other.target_scale, self.target_scale)
+            and TOL.is_close(other.native_scale, self.native_scale)
             and TOL.is_close(other.tolerance_position, self.tolerance_position)
             and TOL.is_close(other.tolerance_orientation, self.tolerance_orientation)
             and other.name == self.name

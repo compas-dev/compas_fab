@@ -33,11 +33,11 @@ class BaseRobotModelObject(SceneObject):
         It is possible to turn on both `draw_visual` and `draw_collision`, however both set of meshes
         will be returned as a combined list in the `draw()` method. Consider creating two separate
         RobotModelObjects if you want to draw the visual and collision meshes separately
-    scale : float, optional
-        The scale factor to visualize the robot model, in case the native CAD environment
-        uses a different unit system other than meters. The scale value should be set such
-        that a `meter_mesh.scale(1/scale)` will create the mesh in the native unit system.
-        For example, if the native unit system is millimeters, the scale should be set to `0.001`.
+    native_scale : float, optional
+        The native scale factor to visualize the robot model, in case the native CAD environment
+        uses a different unit system other than meters. The native scale value should be set such
+        that a `meter_mesh.scale(1/native_scale)` will create the mesh in the native unit system.
+        For example, if the unit system of the visualization environment  is millimeters, `native_scale` should be set to ``'0.001'``.
         Default is `1.0`.
 
     Notes
@@ -47,12 +47,12 @@ class BaseRobotModelObject(SceneObject):
 
     MESH_JOIN_PRECISION = 12
 
-    def __init__(self, draw_visual=True, draw_collision=False, scale=1.0, *args, **kwargs):
+    def __init__(self, draw_visual=True, draw_collision=False, native_scale=1.0, *args, **kwargs):
         # type: (Optional[bool], Optional[bool], Optional[float], *object, **object) -> None
         super(BaseRobotModelObject, self).__init__(*args, **kwargs)
         self._draw_visual = draw_visual
         self._draw_collision = draw_collision
-        self._scale = scale
+        self._native_scale = native_scale
 
         # It will be filled when the `draw()` method is called for the first time.
         self._links_visual_mesh_native_geometry = {}
@@ -188,7 +188,7 @@ class BaseRobotModelObject(SceneObject):
                 self._links_collision_mesh_transformation[link_name] = new_transformation
 
         # The World Coordinate Frame (WCF) relative to the Visualization Coordinate Frame (VCF)
-        t_vcf_wcf = Scale.from_factors([1 / self._scale] * 3)
+        t_vcf_wcf = Scale.from_factors([1 / self._native_scale] * 3)
         # The robot base frame relative to the world frame
         t_wcf_rcf = Transformation.from_frame(base_frame) if base_frame else Transformation()
 

@@ -26,25 +26,25 @@ class BaseRigidBodyObject(SceneObject):
         If `True`, the visual meshes will be drawn. Default is `True`.
     draw_collision : bool, optional
         If `True`, the collision meshes will be drawn. Default is `False`.
-    scale : float, optional
-        The scale factor to visualize the rigid body, in case the native CAD environment
-        uses a different unit system other than meters. The scale value should be set such
-        that a `meter_mesh.scale(1/scale)` will create the mesh in the native unit system.
-        For example, if the native unit system is millimeters, the scale should be set to `0.001`.
+    native_scale : float, optional
+        The native scale factor to visualize the rigid body, in case the native CAD environment
+        uses a different unit system other than meters. The native scale value should be set such
+        that a `meter_mesh.scale(1/native_scale)` will create the correct mesh in the native unit system.
+        For example, if the unit system of the visualization environment  is millimeters, `native_scale` should be set to ``'0.001'``.
         Default is `1.0`.
 
     Notes
     -----
-        The initial parameters `draw_visual`, `draw_collision`, and `scale` cannot be changed after initialization.
+        The initial parameters `draw_visual`, `draw_collision`, and `native_scale` cannot be changed after initialization.
 
     """
 
-    def __init__(self, draw_visual=True, draw_collision=False, scale=1.0, *args, **kwargs):
+    def __init__(self, draw_visual=True, draw_collision=False, native_scale=1.0, *args, **kwargs):
         super(BaseRigidBodyObject, self).__init__(*args, **kwargs)
         # These settings must not be changed after initialization
         self._draw_visual = draw_visual
         self._draw_collision = draw_collision
-        self._scale = scale
+        self._native_scale = native_scale
 
         # These variables holds the native geometry
         # They will be filled when the `draw()` method is called for the first time.
@@ -111,7 +111,7 @@ class BaseRigidBodyObject(SceneObject):
             self._initial_draw()
 
         # The World Coordinate Frame (WCF) relative to the Visualization Coordinate Frame (VCF)
-        t_vcf_wcf = Scale.from_factors([1 / self._scale] * 3)
+        t_vcf_wcf = Scale.from_factors([1 / self._native_scale] * 3)
         t_wcf_ocf = Transformation.from_frame(rigid_body_state.frame)
 
         new_transformation = t_vcf_wcf * t_wcf_ocf

@@ -17,15 +17,15 @@ __all__ = [
 class RigidBody(Data):
     """Represents a rigid body."""
 
-    def __init__(self, visual_meshes, collision_meshes, scale=1.0):
+    def __init__(self, visual_meshes, collision_meshes, native_scale=1.0):
         # type: (List[Mesh] | Mesh, List[Mesh] | Mesh, Optional[float]) -> None
         """Represents a rigid body for use in a RobotCell.
 
         A rigid body can have different visual and collision meshes.
 
-        The native unit (in compas_fab and backends) for the meshes is meters `'scale=1.0'`.
+        The native unit (in compas_fab and backends) for the meshes is meters ``'native_scale=1.0'``.
         If the user created the rigid body in a different unit, the scale must be set such that the
-        mesh.scale(scale) will convert the mesh to meters.
+        ``mesh.scale(native_scale)`` will convert the mesh to meters.
         For example, if the modeling environment is in millimeters, the scale should be set to 0.001.
 
         Notes
@@ -44,10 +44,11 @@ class RigidBody(Data):
             The collision meshes of the rigid body used for collision checking.
             They should be less detailed (fewer polygons) for better planning performance.
             If `None`, or an empty list is passed, no collision checking will be performed for the rigid body.
-        scale : float, optional
-            The scale factor of the meshes, such that `mesh.scale(scale)` will convert the input mesh to meters.
-            For example, if the modeling environment is in millimeters, the scale should be set to 0.001.
-            Default is 1.0.
+        native_scale : float, optional
+            The native scale factor of the meshes defined as `user_object_value * native_scale = meter_object_value`.
+            In another words, `mesh.scale(native_scale)` will convert the input mesh to meters.
+            For example, if the modeling environment is in millimeters, `native_scale` should be set to ``'0.001'``.
+            Default is ``'1.0'``.
 
         Attributes
         ----------
@@ -83,14 +84,14 @@ class RigidBody(Data):
         else:
             self.collision_meshes = collision_meshes
 
-        self.scale = scale
+        self.native_scale = native_scale
 
     @property
     def __data__(self):
         return {
             "visual_meshes": self.visual_meshes,
             "collision_meshes": self.collision_meshes,
-            "scale": self.scale,
+            "native_scale": self.native_scale,
         }
 
     @property
@@ -99,7 +100,7 @@ class RigidBody(Data):
         """The visual meshes of the rigid body in meters.
 
         This function returns a list of new meshes, the original meshes are not modified."""
-        return [mesh.scaled(self.scale) for mesh in self.visual_meshes]
+        return [mesh.scaled(self.native_scale) for mesh in self.visual_meshes]
 
     @property
     def collision_meshes_in_meters(self):
@@ -107,10 +108,10 @@ class RigidBody(Data):
         """The collision meshes of the rigid body in meters.
 
         This function returns a list of new meshes, the original meshes are not modified."""
-        return [mesh.scaled(self.scale) for mesh in self.collision_meshes]
+        return [mesh.scaled(self.native_scale) for mesh in self.collision_meshes]
 
     @classmethod
-    def from_mesh(cls, mesh, scale=1.0):
+    def from_mesh(cls, mesh, native_scale=1.0):
         # type: (Mesh, Optional[float]) -> RigidBody
         """Creates a RigidBody from a single mesh.
 
@@ -121,8 +122,8 @@ class RigidBody(Data):
         ----------
         mesh : :class:`compas.datastructures.Mesh`
             The mesh of the rigid body.
-        scale : float, optional
-            The scale of the rigid body. Default is 1.0.
+        native_scale : float, optional
+            The native scale of the rigid body. Default is 1.0.
 
         Returns
         -------
@@ -135,10 +136,10 @@ class RigidBody(Data):
         consider using the constructor directly: `RigidBody(visual_meshes, collision_meshes)`.
 
         """
-        return cls([mesh], [mesh], scale=scale)
+        return cls([mesh], [mesh], native_scale=native_scale)
 
     @classmethod
-    def from_meshes(cls, meshes, scale=1.0):
+    def from_meshes(cls, meshes, native_scale=1.0):
         # type: (List[Mesh], Optional[float]) -> RigidBody
         """Creates a RigidBody from a list of meshes.
 
@@ -150,8 +151,8 @@ class RigidBody(Data):
         ----------
         meshes : list of :class:`compas.datastructures.Mesh`
             The meshes of the rigid body.
-        scale : float, optional
-            The scale of the rigid body. Default is 1.0.
+        native_scale : float, optional
+            The native scale of the rigid body. Default is 1.0.
 
         Returns
         -------
@@ -164,4 +165,4 @@ class RigidBody(Data):
         consider using the constructor directly: `RigidBody(visual_meshes, collision_meshes)`.
 
         """
-        return cls(meshes, meshes, scale=scale)
+        return cls(meshes, meshes, native_scale=native_scale)

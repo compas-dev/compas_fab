@@ -6,6 +6,7 @@ import pytest
 from compas import IPY
 from compas.geometry import Frame
 from compas.geometry import Transformation
+from compas_robots import Configuration
 
 if not IPY:
     from typing import TYPE_CHECKING
@@ -13,7 +14,6 @@ if not IPY:
     if TYPE_CHECKING:  # pragma: no cover
         from typing import Tuple  # noqa: F401
 
-        from compas_robots import Configuration  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
 
