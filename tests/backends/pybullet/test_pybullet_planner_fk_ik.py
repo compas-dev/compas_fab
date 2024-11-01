@@ -672,15 +672,15 @@ def test_iter_ik_frame_target(planner_with_test_cell):
 
     # Even this is an internal function:
     # Test that if someone forgot to provide a group or an invalid one, it will raise an error
-    generator = planner.iter_inverse_kinematics_frame_target(target, robot_cell_state, options)
+    generator = planner._iter_inverse_kinematics_frame_target(target, robot_cell_state, options)
     with pytest.raises(TypeError):
         next(generator)
-    generator = planner.iter_inverse_kinematics_frame_target(target, robot_cell_state, "non-exist-group", options)
+    generator = planner._iter_inverse_kinematics_frame_target(target, robot_cell_state, "non-exist-group", options)
     with pytest.raises(ValueError):
         next(generator)
 
     group = robot_cell.main_group_name
-    generator = planner.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
+    generator = planner._iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
     result = next(generator)  # type: Configuration
 
     # Check that there is a result
@@ -689,27 +689,27 @@ def test_iter_ik_frame_target(planner_with_test_cell):
 
     # Test with a target that is not reachable / very far away
     target = FrameTarget(Frame([10.0, 10.0, 10.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]), TargetMode.ROBOT)
-    generator = planner.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
+    generator = planner._iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
     with pytest.raises(InverseKinematicsError):
         next(generator)
 
     # # Test with a target that will collide with the floor
     options.update({"check_collision": True, "max_results": 1})
     target = FrameTarget(Frame([0.5, 0.5, -0.2], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]), TargetMode.ROBOT)
-    generator = planner.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
+    generator = planner._iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
     # # When the option max_result == 1 , it will return CollisionCheckError when target is still reachable
     with pytest.raises(CollisionCheckError):
         next(generator)
 
     options.update({"check_collision": True, "max_results": 10})
-    generator = planner.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
+    generator = planner._iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
     # # When the option max_result > 1 , it will return InverseKinematicsError after the search
     with pytest.raises(InverseKinematicsError):
         next(generator)
 
     # Test that when collision check is disabled, it will return a result
     options.update({"check_collision": False, "max_results": 10})
-    generator = planner.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
+    generator = planner._iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
     result = next(generator)  # type: Configuration
     assert isinstance(result, Configuration)
 
@@ -758,10 +758,10 @@ def test_iter_ik_point_axis_target(planner_with_test_cell):
     target = PointAxisTarget([0.5, 0.5, 1.0], [1.0, 0.0, 0.0], TargetMode.ROBOT)
 
     # Assert that if someone forgot to provide a group or an invalid one, it will raise an error
-    generator = planner.iter_inverse_kinematics_point_axis_target(target, robot_cell_state, options)
+    generator = planner._iter_inverse_kinematics_point_axis_target(target, robot_cell_state, options)
     with pytest.raises(TypeError):
         next(generator)
-    generator = planner.iter_inverse_kinematics_point_axis_target(target, robot_cell_state, "non-exist-group", options)
+    generator = planner._iter_inverse_kinematics_point_axis_target(target, robot_cell_state, "non-exist-group", options)
     with pytest.raises(ValueError):
         next(generator)
 
@@ -786,20 +786,20 @@ def test_iter_ik_point_axis_target(planner_with_test_cell):
 
     # Test with a target that is not reachable / very far away
     target = PointAxisTarget([10, 10, 10], [1.0, 0.0, 0.0], TargetMode.ROBOT)
-    generator = planner.iter_inverse_kinematics_point_axis_target(target, robot_cell_state, group, options)
+    generator = planner._iter_inverse_kinematics_point_axis_target(target, robot_cell_state, group, options)
     with pytest.raises(InverseKinematicsError):
         next(generator)
 
     # # Test with a target that will collide with the floor
     options.update({"check_collision": True, "max_random_restart": 10})
     target = PointAxisTarget([0.5, 0.5, -0.2], [1.0, 0.0, 0.0], TargetMode.ROBOT)
-    generator = planner.iter_inverse_kinematics_point_axis_target(target, robot_cell_state, group, options)
+    generator = planner._iter_inverse_kinematics_point_axis_target(target, robot_cell_state, group, options)
     # # When the option max_result == 1 , it will return CollisionCheckError when target is still reachable
     with pytest.raises(InverseKinematicsError):
         next(generator)
 
     # Test that when collision check is disabled, it will return a result
     options.update({"check_collision": False, "max_random_restart": 10})
-    generator = planner.iter_inverse_kinematics_point_axis_target(target, robot_cell_state, group, options)
+    generator = planner._iter_inverse_kinematics_point_axis_target(target, robot_cell_state, group, options)
     result = next(generator)  # type: Configuration
     assert isinstance(result, Configuration)

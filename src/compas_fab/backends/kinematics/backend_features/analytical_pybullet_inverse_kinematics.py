@@ -53,15 +53,15 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
         group = group or client.robot_cell.main_group_name
 
         if isinstance(target, FrameTarget):
-            return self.iter_inverse_kinematics_frame_target(
+            return self._iter_inverse_kinematics_frame_target(
                 target, start_state=start_state, group=group, options=options
             )
         else:
             raise BackendTargetNotSupportedError()
 
-    def iter_inverse_kinematics_frame_target(self, target, start_state, group, options=None):
+    def _iter_inverse_kinematics_frame_target(self, target, start_state, group, options=None):
         # type: (FrameTarget, RobotCellState, str, Optional[Dict]) -> Generator[Configuration | None]
-        """This function overrides the iter_inverse_kinematics_frame_target function from AnalyticalInverseKinematics
+        """This function overrides the _iter_inverse_kinematics_frame_target function from AnalyticalInverseKinematics
         to include the PyBulletClient for collision checking.
 
         It depends on the PyBulletClient to be able to check for collisions.

@@ -22,7 +22,7 @@ with PyBulletClient() as client:
     target = PointAxisTarget(target_center_point, target_z_axis, TargetMode.TOOL)
 
     # Options for planning with PointAxisTarget
-    # See documentation of PyBulletInverseKinematics.iter_inverse_kinematics_point_axis_target() for more options
+    # See documentation of PyBulletInverseKinematics._iter_inverse_kinematics_point_axis_target() for more options
     options = {"num_rotation_steps": 20, "max_random_restart": 5}
     config = planner.inverse_kinematics(target, robot_cell_state, options=options)
     print("Inverse kinematics result: ", config)

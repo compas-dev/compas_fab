@@ -69,9 +69,9 @@ class PyBulletInverseKinematics(InverseKinematics):
         Subsequent attempts will start from a random configuration, so the results may vary.
 
         For target-specific implementation details, see
-        :meth:`iter_inverse_kinematics_frame_target` for
+        :meth:`_iter_inverse_kinematics_frame_target` for
         :class:`compas_fab.robots.FrameTarget` and
-        :meth:`iter_inverse_kinematics_point_axis_target` for
+        :meth:`_iter_inverse_kinematics_point_axis_target` for
         :class:`compas_fab.robots.PointAxisTarget`.
 
         Parameters
@@ -102,7 +102,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         Returns
         -------
         :obj:`compas_robots.Configuration`
-            The calculated configuration.
+            One of the possible IK configurations that reaches the target.
 
         """
         # Set default group name
@@ -116,6 +116,8 @@ class PyBulletInverseKinematics(InverseKinematics):
         configuration = super(PyBulletInverseKinematics, self).inverse_kinematics(
             target, robot_cell_state, group, options
         )
+
+        # After the caching, it calls the iter_inverse_kinematics method below.
 
         return configuration
 
@@ -144,8 +146,12 @@ class PyBulletInverseKinematics(InverseKinematics):
             If the selected TargetMode is not possible with the provided robot cell state.
 
 
+        Yields
+        ------
+        :obj:`compas_robots.Configuration`
+            One of the possible IK configurations that reaches the target.
+
         """
-        options = options or {}
 
         # ===================================================================================
         # The following lines should be typical in all planners' iter_inverse_kinematics method
@@ -157,6 +163,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         # Make a copy of the options because we will modify it
         # Note: Without making a copy, the options dict will break the hashing function in the inverse_kinematics()
+        options = options or {}
         options = deepcopy(options) if options else {}
         robot_cell_state = deepcopy(robot_cell_state)
 
@@ -170,7 +177,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Keep track of user input for checking against the final result
         initial_start_configuration = deepcopy(robot_cell_state.robot_configuration)
 
-        # Check if the planning group is supported by the planner
+        # Check if the planning group exist
         if group not in robot_cell.group_names:
             raise PlanningGroupNotExistsError("Planning group '{}' is not supported by PyBullet planner.".format(group))
 
@@ -179,24 +186,25 @@ class PyBulletInverseKinematics(InverseKinematics):
         # ===================================================================================
 
         if isinstance(target, FrameTarget):
-            ik_generator = self.iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
+            ik_generator = self._iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
         elif isinstance(target, PointAxisTarget):
-            ik_generator = self.iter_inverse_kinematics_point_axis_target(target, robot_cell_state, group, options)
+            ik_generator = self._iter_inverse_kinematics_point_axis_target(target, robot_cell_state, group, options)
         else:
             raise NotImplementedError("{} is not supported by PyBulletInverseKinematics".format(type(target)))
-
-        # Check the result of the generator to detect for planning groups that are not supported by PyBullet.
-        # In those cases, some joints outside of the group will be changed inadvertently.
 
         # ===================================================================================
         # Check output before yielding
         # ===================================================================================
 
+        # Check the result of the generator to detect for planning groups that are not supported by PyBullet.
+        # In those cases, some joints outside of the group will be changed inadvertently.
+
         for configuration in ik_generator:
+            # Insert any checks needed here.
             self._check_configuration_match_group(initial_start_configuration, configuration, group)
             yield configuration
 
-    def iter_inverse_kinematics_frame_target(self, target, robot_cell_state, group, options=None):
+    def _iter_inverse_kinematics_frame_target(self, target, robot_cell_state, group, options=None):
         # type: (FrameTarget, RobotCellState, str, Optional[Dict]) -> Generator[Configuration | None]
         """Calculate the robot's inverse kinematic for a given FrameTarget.
 
@@ -255,7 +263,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         Yields
         ------
         :obj:`compas_robots.Configuration`
-            The calculated configuration.
+            One of the possible IK configurations that reaches the target.
 
         Raises
         ------
@@ -442,7 +450,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 target_pcf=target_pcf,
             )
 
-    def iter_inverse_kinematics_point_axis_target(self, target, robot_cell_state, group, options=None):
+    def _iter_inverse_kinematics_point_axis_target(self, target, robot_cell_state, group, options=None):
         # type: (PointAxisTarget, RobotCellState, str, Optional[Dict]) -> Generator[Configuration | None]
         """Calculate the robot's inverse kinematic for a given PointAxisTarget.
 
@@ -454,7 +462,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         For a typical 6-DOF robot, a PointAxisTarget will have 1 extra degree of freedom
         compared to a FrameTarget.
 
-        Similar to the :meth:`iter_inverse_kinematics_frame_target` method, this function
+        Similar to the :meth:`_iter_inverse_kinematics_frame_target` method, this function
         will make multiple attempts to find a solution that is reachable and collision free.
 
         Given the extra degree of freedom, the solver will discretize the rotation around
@@ -472,10 +480,10 @@ class PyBulletInverseKinematics(InverseKinematics):
         This also means that the generator will behave like a random search after the first round
         of rotation steps if  ``max_random_restart`` is greater than 1.
 
-        This function internally calls the :meth:`iter_inverse_kinematics_frame_target` method,
+        This function internally calls the :meth:`_iter_inverse_kinematics_frame_target` method,
         which is responsible for the actual IK calculation after the rotation is fixed
         by this function. Some of the options passed to this function will be passed on to the
-        :meth:`iter_inverse_kinematics_frame_target` method, see below for details.
+        :meth:`_iter_inverse_kinematics_frame_target` method, see below for details.
 
         Parameters
         ----------
@@ -504,7 +512,7 @@ class PyBulletInverseKinematics(InverseKinematics):
               The value should be between 1 and num_rotation_steps.
               Defaults to the value of ``num_rotation_steps``.
 
-            The following key-value pairs have the same meaning as in the :meth:`iter_inverse_kinematics_frame_target` method:
+            The following key-value pairs have the same meaning as in the :meth:`_iter_inverse_kinematics_frame_target` method:
 
             - ``"max_descend_iterations"``:  (:obj:`float`, optional)
             - ``"solution_uniqueness_threshold_prismatic"``: (:obj:`float`, optional)
@@ -524,7 +532,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         Yields
         ------
         :obj:`compas_robots.Configuration`
-            The calculated configuration.
+            One of the possible IK configurations that reaches the target.
 
         Raises
         ------
@@ -550,9 +558,9 @@ class PyBulletInverseKinematics(InverseKinematics):
         options["max_random_restart"] = options.get("max_random_restart", 5)
         options["max_results"] = options.get("max_results", 100)
         # NOTE: The option 'max_results' have a different meaning to the one
-        #       in the iter_inverse_kinematics_frame_target, here we keep a count of the
+        #       in the _iter_inverse_kinematics_frame_target, here we keep a count of the
         #       number of returned result and use it to determine when to stop the search.
-        #       In the iter_inverse_kinematics_frame_target, it is used to determine the
+        #       In the _iter_inverse_kinematics_frame_target, it is used to determine the
         #       maximum number of attempts to find a solution.
 
         #       In this function, the maximum number of attempts is determined by the
@@ -656,7 +664,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 )
 
                 # Call underlying FrameTarget function to get IK solutions
-                ik_frame_target = self.iter_inverse_kinematics_frame_target(
+                ik_frame_target = self._iter_inverse_kinematics_frame_target(
                     frame_target, robot_cell_state, group, frame_ik_options
                 )
                 # We will only get one result from the FrameTarget function, if that result is None, we skip to the next rotation

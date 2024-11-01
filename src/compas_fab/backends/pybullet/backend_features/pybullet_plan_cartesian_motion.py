@@ -424,7 +424,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                     start_state
                 )  # Deep copy because we will have multiple generators in the stack
                 intermediate_state.robot_configuration = planned_configurations[-1]
-                ik_generator = planner.iter_inverse_kinematics_point_axis_target(
+                ik_generator = planner._iter_inverse_kinematics_point_axis_target(
                     all_targets[current_step], intermediate_state, group, ik_options
                 )
                 ik_generators.append(ik_generator)
@@ -448,7 +448,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                         print("Performing comprehensive IK check for step {}".format(current_step))
                     checking_ik_options = deepcopy(ik_options)
                     checking_ik_options["max_random_restart"] = 10
-                    checking_ik_generator = planner.iter_inverse_kinematics_point_axis_target(
+                    checking_ik_generator = planner._iter_inverse_kinematics_point_axis_target(
                         all_targets[current_step], intermediate_state, group, ik_options
                     )
                     try:

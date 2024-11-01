@@ -49,13 +49,13 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         """
         if isinstance(target, FrameTarget):
-            return self.iter_inverse_kinematics_frame_target(
+            return self._iter_inverse_kinematics_frame_target(
                 target, start_state=start_state, group=group, options=options
             )
         else:
             raise BackendTargetNotSupportedError()
 
-    def iter_inverse_kinematics_frame_target(self, target, start_state=None, group=None, options=None):
+    def _iter_inverse_kinematics_frame_target(self, target, start_state=None, group=None, options=None):
         # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
         """Calculate the robot's inverse kinematic for a given frame target.
 
@@ -121,7 +121,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         Yields
         ------
         :obj:`compas_robots.Configuration`
-            The calculated configuration.
+            One of the possible IK configurations that reaches the target.
             If ``"keep_order"`` is ``True`` result may contain ``None``.
 
         Notes
