@@ -160,7 +160,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         # Check if the robot cell state supports the target mode
         planner = self  # type: PyBulletPlanner
-        planner.ensure_robot_cell_state_supports_target_mode(start_state, waypoints.target_mode, group)
+        start_state.assert_target_mode_match(waypoints.target_mode, group)
 
         # Check start_state is formatted correctly
         if not start_state.robot_configuration:

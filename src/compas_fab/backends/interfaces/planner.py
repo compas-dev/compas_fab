@@ -5,8 +5,7 @@ from __future__ import print_function
 from compas import IPY
 
 from compas_fab.backends.exceptions import BackendFeatureNotSupportedError
-from compas_fab.backends.exceptions import TargetModeMismatchError
-from compas_fab.robots import TargetMode
+
 
 if not IPY:
     from typing import TYPE_CHECKING
@@ -183,60 +182,4 @@ class PlannerInterface(object):
     # Sanity Check Functions
     # ==========================================================================
 
-    def ensure_robot_cell_state_supports_target_mode(self, robot_cell_state, target_mode, group):
-        # type: (RobotCellState, TargetMode | None, str) -> None
-        """Check if the `target_mode` agrees with the attachment state as specified in the `robot_cell_state`.
-
-        If the `target_mode` is None,
-        such as the cases for ConfigurationTarget and ConstraintSetTarget,
-        this function will not perform any checks.
-
-        An `robot_cell_state` input is used instead of the `self.client.robot_cell_state` attribute,
-        to allow the check to be performed before calling `set_robot_cell_state()`.
-
-        If target mode is `TargetMode.TOOL`, the specified planning group must have a tool attached.
-        If target mode is `TargetMode.WORKPIECE`, the specified planning group must have one and only one workpiece attached.
-
-        Parameters
-        ----------
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
-            The robot cell state to check.
-        target_mode : :class:`compas_fab.robots.TargetMode` or None
-            The target or waypoints to check.
-        group : str
-            The planning group to check. Must be specified.
-
-        Raises
-        ------
-        TargetModeMismatchError
-            If the target mode is `TOOL` and no tool is attached to the robot in the specified group.
-            If the target mode is `WORKPIECE` and no (or more than one) workpiece is attached to the specified group.
-        """
-
-        if target_mode is None:
-            return
-
-        assert group is not None, "Planning group must be specified."
-
-        # Checks for Tool Mode
-        tool_id = robot_cell_state.get_attached_tool_id(group)
-        if target_mode == TargetMode.TOOL:
-
-            if tool_id is None:
-                raise TargetModeMismatchError(
-                    "Target mode is 'TOOL', but no tool is attached to the robot in group '{}'.".format(group)
-                )
-
-        # Checks for Workpiece Mode
-        workpiece_ids = robot_cell_state.get_attached_workpiece_ids(group)
-        if target_mode == TargetMode.WORKPIECE:
-            if not workpiece_ids:
-                raise TargetModeMismatchError(
-                    "Target mode is 'WORKPIECE', but no workpiece is attached to the robot in group '{}'.".format(group)
-                )
-            if len(workpiece_ids) > 1:
-                raise TargetModeMismatchError(
-                    "Target mode is 'WORKPIECE', but more than one workpiece is attached to the robot in group '{}'.".format(
-                        group
-                    )
-                )
+    # Nothing here yet.

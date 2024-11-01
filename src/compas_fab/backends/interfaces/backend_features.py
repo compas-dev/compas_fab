@@ -2,8 +2,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from copy import deepcopy
 from compas import IPY
 from compas_robots import Configuration
+from compas_fab.backends.exceptions import PlanningGroupNotExistsError
 
 if not IPY:
     from typing import TYPE_CHECKING
@@ -365,7 +367,33 @@ class InverseKinematics(BackendFeature):
             The calculated configuration.
 
         """
-        pass
+        # =====================================================================================
+        # The following lines should be typical in all planners' iter_inverse_kinematics method
+        # =====================================================================================
+
+        planner = self
+        client = planner.client
+        robot_cell = client.robot_cell  # type: RobotCell
+        group = group or robot_cell.main_group_name
+
+        # Make a copy of the options before passing it to the planner's iter_inverse_kinematics method,
+        # which is likely to modify its content.
+        # Note: Without making a copy, the options dict will break the hashing function in the inverse_kinematics()
+        options = options or {}
+        options = deepcopy(options) if options else {}
+        robot_cell_state = deepcopy(robot_cell_state)
+
+        # Unit conversion from user scale to meter scale can be done here because they are shared.
+        # This will be triggered too, when entering from the inverse_kinematics method.
+        target = target.normalized_to_meters()
+
+        # Check if the robot cell state supports the target mode
+        robot_cell.assert_cell_state_match(robot_cell_state)
+        robot_cell_state.assert_target_mode_match(target.target_mode, group)
+
+        # Check if the planning group exist
+        if group not in robot_cell.group_names:
+            raise PlanningGroupNotExistsError("Planning group '{}' is not supported by PyBullet planner.".format(group))
 
 
 class PlanMotion(BackendFeature):

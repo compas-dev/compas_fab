@@ -1,9 +1,6 @@
 from __future__ import absolute_import
 
 from compas.geometry import Frame
-
-import compas_fab.robots
-
 from .std_msgs import Header
 from .std_msgs import ROSmsg
 
@@ -177,9 +174,11 @@ class Wrench(ROSmsg):
 
     @property
     def wrench(self):
+        from compas_fab.robots import Wrench as compas_fab_Wrench
+
         force = [self.force.x, self.force.y, self.force.z]
         torque = [self.torque.x, self.torque.y, self.torque.z]
-        return compas_fab.robots.Wrench(force, torque)
+        return compas_fab_Wrench(force, torque)
 
 
 class WrenchStamped(ROSmsg):
@@ -242,12 +241,14 @@ class Inertia(ROSmsg):
 
     @property
     def inertia(self):
+        from compas_fab.robots import Inertia as compas_fab_Inertia
+
         inertia_tensor = [
             [self.ixx, self.ixy, self.ixz],
             [self.ixy, self.iyy, self.iyz],
             [self.ixz, self.iyz, self.izz],
         ]
-        return compas_fab.robots.Inertia(inertia_tensor, self.m, [self.com.x, self.com.y, self.com.z])
+        return compas_fab_Inertia(inertia_tensor, self.m, [self.com.x, self.com.y, self.com.z])
 
 
 if __name__ == "__main__":

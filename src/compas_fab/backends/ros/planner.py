@@ -46,11 +46,11 @@ class MoveItPlanner(
     """Implement the planner backend interface based on MoveIt!"""
 
     def __init__(self, client):
-        self._client = client
 
         # Initialize all mixins
         super(MoveItPlanner, self).__init__()
 
+        self._client = client
         self._current_rigid_body_hashes = {}  # type: Dict[str, bytes]
         self._current_tool_hashes = {}  # type: Dict[str, bytes]
 

@@ -80,7 +80,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
         group = group or robot_cell.main_group_name
 
         # Check if the target mode is valid for the robot cell state
-        planner.ensure_robot_cell_state_supports_target_mode(robot_cell_state, target_mode, group)
+        robot_cell_state.assert_target_mode_match(target_mode, group)
 
         # Check if the planning group is supported by the planner
         if group not in robot_cell.group_names:

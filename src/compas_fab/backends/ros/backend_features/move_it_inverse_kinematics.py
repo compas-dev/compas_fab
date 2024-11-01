@@ -2,8 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from copy import deepcopy
-
 from compas import IPY
 
 if not IPY:
@@ -14,17 +12,17 @@ if not IPY:
         from compas.geometry import Frame  # noqa: F401
         from typing import Optional  # noqa: F401
         from typing import Generator  # noqa: F401
-        from typing import List  # noqa: F401
-        from typing import Tuple  # noqa: F401
         from typing import Dict  # noqa: F401
+        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import FrameTarget  # noqa: F401
+
         from compas_fab.backends import MoveItPlanner  # noqa: F401
         from compas_fab.backends import RosClient  # noqa: F401
 
 from compas.tolerance import TOL
 from compas.utilities import await_callback
 
+from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
 from compas_fab.backends.ros.backend_features.helpers import validate_response
@@ -39,6 +37,7 @@ from compas_fab.backends.ros.messages import PositionIKRequest
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import RosDistro
 from compas_fab.backends.ros.service_description import ServiceDescription
+from compas_fab.robots import FrameTarget
 
 __all__ = [
     "MoveItInverseKinematics",
@@ -67,16 +66,12 @@ class MoveItInverseKinematics(InverseKinematics):
         subsequent calls will return the next solution from the iterator. Once
         all solutions have been exhausted, the iterator will be re-initialized.
 
-        Pybullet's inverse kinematics solver accepts FrameTarget and PointAxisTarget as input.
-        The planner is a gradient descent solver, the initial position of the robot
-        (supplied in the robot_cell_state) affects the first search attempt.
-        Subsequent attempts will start from a random configuration, so the results may vary.
+        MoveIt's inverse kinematics solver accepts FrameTarget as input.
+        (PointAxisTarget is not yet supported)
 
         For target-specific implementation details, see
-        :meth:`iter_inverse_kinematics_frame_target` for
-        :class:`compas_fab.robots.FrameTarget` and
-        :meth:`iter_inverse_kinematics_point_axis_target` for
-        :class:`compas_fab.robots.PointAxisTarget`.
+        :meth:`_iter_inverse_kinematics_frame_target` for
+        :class:`compas_fab.robots.FrameTarget`.
 
         Parameters
         ----------
@@ -95,6 +90,11 @@ class MoveItInverseKinematics(InverseKinematics):
             the underlying function being called.
             See the target-specific function's documentation for details.
 
+        Returns
+        -------
+        :obj:`compas_robots.Configuration`
+            One of the possible IK configurations that reaches the target.
+
         Raises
         ------
         :class: `compas_fab.backends.exceptions.InverseKinematicsError`
@@ -103,45 +103,33 @@ class MoveItInverseKinematics(InverseKinematics):
         :class:`compas_fab.backends.TargetModeMismatchError`
             If the selected TargetMode is not possible with the provided robot cell state.
 
-        Returns
-        -------
-        :obj:`compas_robots.Configuration`
-            The calculated configuration.
 
         """
         # Set default group name
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
+        planner = self  # type: MoveItPlanner
+        client = planner.client  # type: RosClient
         group = group or client.robot_cell.main_group_name
-
-        # Make a copy of the options because we will modify it
-        # Note: Modifying the options dict accidentally will break the hashing function in the inverse_kinematics()
-        options = deepcopy(options) if options else {}
-        start_configuration = deepcopy(robot_cell_state.robot_configuration)
-        robot_cell_state = deepcopy(robot_cell_state)
 
         # The caching mechanism is implemented in the iter_inverse_kinematics method
         # located in InverseKinematics class. This method is just a wrapper around it
         # so that Intellisense and Docs can point here.
-        configuration = super(PyBulletInverseKinematics, self).inverse_kinematics(
+        configuration = super(MoveItInverseKinematics, self).inverse_kinematics(
             target, robot_cell_state, group, options
         )
 
-        # NOTE: The following check is a workaround to detect planning group that are not supported by PyBullet.
-        #       In those cases, some joints outside of the group will be changed inadvertently.
+        # After the caching, it calls the iter_inverse_kinematics method below.
 
-        self._check_configuration_match_group(start_configuration, configuration, group)
         return configuration
 
-    def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
+    def iter_inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
         # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
-        """Calculate the robot's inverse kinematic for a given frame.
+        """Calculate the robot's inverse kinematic for a given target.
 
         Parameters
         ----------
         target: :class:`compas.geometry.FrameTarget`
             The Frame Target to calculate the inverse for.
-        start_state : :class:`compas_fab.robots.RobotCellState`, optional
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
             The starting state to calculate the inverse kinematics for.
         group: str, optional
             The planning group used for calculation. Defaults to the robot's
@@ -160,62 +148,173 @@ class MoveItInverseKinematics(InverseKinematics):
               Defaults to ``2``. This value supersedes the ``"attempts"`` argument used before ROS Noetic.
             - ``"attached_collision_meshes"``: (:obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`, optional)
               Defaults to ``None``.
-            - ``"attempts"``: (:obj:`int`, optional) The maximum number of inverse kinematic attempts.
-              Defaults to ``8``. This value is ignored on ROS Noetic and newer, use ``"timeout"`` instead.
             - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
               Defaults to ``100``.
 
         Raises
         ------
-        compas_fab.backends.exceptions.BackendError
-            If no configuration can be found.
+        :class:`compas_fab.backends.InverseKinematicsError`
+            Indicates that no IK solution could be found by the kinematic solver
+            after the maximum number of attempts (``max_results``). This can be caused by
+            reachability or collision or both.
+
+        :class:`compas_fab.backends.TargetModeMismatchError`
+            If the selected TargetMode is not possible with the provided robot cell state.
 
         Yields
         ------
         :obj:`tuple` of (:obj:`list` of :obj:`float`, :obj:`list` of :obj:`str`)
             A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
 
-        Examples
-        --------
-
         """
-        options = options or {}
         planner = self  # type: MoveItPlanner
         client = planner.client  # type: RosClient
-        robot_cell = client.robot_cell
-
-        # Group
+        robot_cell = client.robot_cell  # type: RobotCell
         group = group or robot_cell.main_group_name
 
-        # Set scene
-        client.robot_cell.assert_cell_state_match(start_state)
-        planner.set_robot_cell_state(start_state)
+        # Calling the super class method, which contains input sanity checks and scale normalization
+        # Those are common to all planners and should be called first.
+        super(MoveItInverseKinematics, self).iter_inverse_kinematics(target, robot_cell_state, group, options)
+
+        # ===================================================================================
+        # Different target types have different implementations
+        # ===================================================================================
+
+        if isinstance(target, FrameTarget):
+            ik_generator = self._iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
+        else:
+            raise NotImplementedError("{} is not supported by MoveItInverseKinematics".format(type(target)))
+
+        # ===================================================================================
+        # Check output before yielding
+        # ===================================================================================
+
+        for configuration in ik_generator:
+            # Insert any checks needed here. No checks at the moment.
+            yield configuration
+
+    def _iter_inverse_kinematics_frame_target(self, target, robot_cell_state, group, options=None):
+        # type: (FrameTarget, RobotCellState, str, Optional[Dict]) -> Generator[Configuration | None]
+        """Calculate the robot's inverse kinematic for a given FrameTarget.
+
+        The MoveIt inverse kinematics solver make use of the IK solver pre-configured in
+        the MoveIt config file.
+
+        This particular function wraps the MoveIt IK solver to provide a generator
+        that can yield multiple IK solutions. The solver will make multiple attempts
+        to find a solution. The first attempt will start from the robot's current configuration
+        provided in the ``robot_cell_state``. The subsequent attempts will start from a random
+        configuration, so the results may vary.
+
+        Notes
+        -----
+        The number of attempts is determined by the ``max_results`` option.
+
+        Parameters
+        ----------
+        target: :class:`compas.geometry.FrameTarget`
+            The Frame Target to calculate the inverse for.
+        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+            The starting state to calculate the inverse kinematics for.
+        group: str
+            The planning group used for determining the end effector and labeling
+            the ``start_configuration``. Defaults to the robot's main planning group.
+        options: dict, optional
+            Dictionary containing the following key-value pairs:
+
+            - ``"semi-constrained"``: (:obj:`bool`, optional) When ``True``, only the
+              position of the target is considered. The orientation of frame will not be considered
+              in the calculation.  Defaults to ``False``.
+            - ``"max_descend_iterations"``:  (:obj:`float`, optional) Defines the maximum
+              number of iterations to use during the gradient descend.
+              If this number of iterations are reached without convergence, the solver will consider
+              the initial guess as a bad starting point and will retry with a new random configuration.
+              Defaults to ``20``.
+              If the target tolerance is increased, this value should be increased as well.
+            - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
+              If set to 1, the solver will be deterministic, descending from the initial
+              robot configuration.
+              Defaults to ``100``.
+            - ``"solution_uniqueness_threshold_prismatic"``: (:obj:`float`, optional) The minimum
+              distance between two solutions in the prismatic joint space to consider them unique.
+              Units are in meters. Defaults to ``3e-4``.
+            - ``"solution_uniqueness_threshold_revolute"``: (:obj:`float`, optional) The minimum
+              distance between two solutions in the revolute joint space to consider them unique.
+              Units are in radians. Defaults to ``1e-3``.
+            - ``"check_collision"``: (:obj:`bool`, optional)
+              Whether or not to check for collision. Defaults to ``True``.
+            - ``"return_full_configuration"``: (:obj:`bool`, optional)
+                Whether or not to return the full configuration. Defaults to ``False``.
+            - ``"verbose"``: (:obj:`bool`, optional)
+                Whether or not to print verbose output. Defaults to ``False``.
+
+        Yields
+        ------
+        :obj:`compas_robots.Configuration`
+            One of the possible IK configurations that reaches the target.
+
+        Raises
+        ------
+        :class:`compas_fab.backends.InverseKinematicsError`
+            Indicates that no IK solution could be found by the kinematic solver
+            after the maximum number of attempts (``max_results``). This can be caused by
+            reachability or collision or both.
+
+        :class:`compas_fab.backends.CollisionCheckError`
+            If ``check_collision`` is enabled and the configuration is in collision.
+            This is only raised if ``max_results`` is set to 1. In this case, the solver is
+            deterministic (descending from the initial robot configuration) and this error
+            indicates that the problem is caused by collision and not because of reachability.
+
+        :class:`compas_fab.backends.TargetModeMismatchError`
+            If the selected TargetMode is not possible with the provided robot cell state.
+
+        """
+
+        # Housekeeping for intellisense
+        planner = self  # type: MoveItPlanner
+        client = planner.client  # type: RosClient
+        robot_cell = client.robot_cell  # type: RobotCell
+
+        # NOTE: group is not optional in this inner function.
+        if group not in robot_cell.robot_semantics.groups:
+            raise ValueError("Planning group '{}' not found in the robot's semantics.".format(group))
+
+        # Default options
+        options = options or {}
+        options["max_results"] = options.get("max_results", 100)
+        # Use base_link or fallback to model's root link
+        options["base_link"] = options.get("base_link", robot_cell.root_name)
+
+        # Setting the entire robot cell state, including the robot configuration
+        planner.set_robot_cell_state(robot_cell_state)
+
+        # Transform the Target.target_frame to Planner Coordinate Frame depending on target.target_mode
+        target_pcf = client.robot_cell.target_frames_to_pcf(
+            robot_cell_state, target.target_frame, target.target_mode, group
+        )
+
+        # ===================================================================================
+        # Formatting input for ROS MoveIt
+        # ===================================================================================
 
         # Start configuration
-        start_configuration = start_state.robot_configuration
+        start_configuration = robot_cell_state.robot_configuration
         # Merge with zero configuration ensure all joints are present
-        start_configuration = robot_cell.zero_configuration(group).merged(start_configuration)
-
-        # Target frame and Tool Coordinate Frame
-        target = target.normalized_to_meters()
-        target_frame = target.target_frame
-        planner_frame = client.robot_cell.target_frames_to_pcf(start_state, target_frame, target.target_mode, group)
+        start_configuration = robot_cell.zero_full_configuration().merged(start_configuration)
 
         # Compose the kwargs for the async function
         kwargs = {}
         kwargs["options"] = options
-        kwargs["frame_WCF"] = planner_frame
+        kwargs["frame_WCF"] = target_pcf
         kwargs["group"] = group
         kwargs["start_configuration"] = start_configuration
         kwargs["errback_name"] = "errback"
 
-        max_results = options.get("max_results", 100)
-
-        # Use base_link or fallback to model's root link
-        options["base_link"] = options.get("base_link", robot_cell.root_name)
-
+        max_results = options.get("max_results")
         all_yielded_joint_positions = []
-        # Yield up to max_results configurations
+
+        # Loop to get multiple results with random restarts
         for _ in range(max_results):
             # First iteration uses the provided start_configuration
             joint_positions, joint_names = await_callback(self.inverse_kinematics_async, **kwargs)
@@ -235,6 +334,13 @@ class MoveItInverseKinematics(InverseKinematics):
             random_configuration = robot_cell.random_configuration(kwargs["group"])
             kwargs["start_configuration"] = random_configuration
 
+            # If no solution was found after max_results, raise an error
+            if len(all_yielded_joint_positions) == 0:
+                raise InverseKinematicsError(
+                    "No solution found after {} attempts (max_results).".format(options.get("max_results")),
+                    target_pcf=target_pcf,
+                )
+
     def inverse_kinematics_async(
         self, callback, errback, frame_WCF, start_configuration=None, group=None, options=None
     ):
@@ -248,10 +354,10 @@ class MoveItInverseKinematics(InverseKinematics):
         )
 
         # The start state being in diff mode allows it to keep previously set Attached Collision Objects
-        start_state = RobotState(joint_state, MultiDOFJointState(header=header), is_diff=True)
+        robot_state = RobotState(joint_state, MultiDOFJointState(header=header), is_diff=True)
 
         # Filter needs to happen after all objects have been added
-        start_state.filter_fields_for_distro(self.client.ros_distro)
+        robot_state.filter_fields_for_distro(self.client.ros_distro)
 
         constraints = convert_constraints_to_rosmsg(options.get("constraints"), header)
 
@@ -260,7 +366,7 @@ class MoveItInverseKinematics(InverseKinematics):
 
         ik_request = PositionIKRequest(
             group_name=group,
-            robot_state=start_state,
+            robot_state=robot_state,
             constraints=constraints,
             pose_stamped=pose_stamped,
             avoid_collisions=options.get("avoid_collisions", True),

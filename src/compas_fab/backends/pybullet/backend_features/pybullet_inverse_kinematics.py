@@ -32,7 +32,6 @@ from compas_robots.model import Joint
 
 from compas_fab.backends.exceptions import CollisionCheckError
 from compas_fab.backends.exceptions import InverseKinematicsError
-from compas_fab.backends.exceptions import PlanningGroupNotExistsError
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.pybullet.conversions import pose_from_frame
 from compas_fab.backends.pybullet.exceptions import PlanningGroupNotSupported
@@ -153,37 +152,20 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         """
 
-        # ===================================================================================
-        # The following lines should be typical in all planners' iter_inverse_kinematics method
-        # ===================================================================================
-
         planner = self  # type: PyBulletPlanner
         robot_cell = planner.client.robot_cell  # type: RobotCell
         group = group or robot_cell.main_group_name
 
-        # Make a copy of the options because we will modify it
-        # Note: Without making a copy, the options dict will break the hashing function in the inverse_kinematics()
-        options = options or {}
-        options = deepcopy(options) if options else {}
-        robot_cell_state = deepcopy(robot_cell_state)
-
-        # Unit conversion from user scale to meter scale can be done here because they are shared.
-        # This will be triggered too, when entering from the inverse_kinematics method.
-        target = target.normalized_to_meters()
-
-        # Check if the robot cell state supports the target mode
-        planner.ensure_robot_cell_state_supports_target_mode(robot_cell_state, target.target_mode, group)
-
-        # Keep track of user input for checking against the final result
-        initial_start_configuration = deepcopy(robot_cell_state.robot_configuration)
-
-        # Check if the planning group exist
-        if group not in robot_cell.group_names:
-            raise PlanningGroupNotExistsError("Planning group '{}' is not supported by PyBullet planner.".format(group))
+        # Calling the super class method, which contains input sanity checks and scale normalization
+        # Those are common to all planners and should be called first.
+        super(PyBulletInverseKinematics, self).iter_inverse_kinematics(target, robot_cell_state, group, options)
 
         # ===================================================================================
         # Different target types have different implementations
         # ===================================================================================
+
+        # Keep track of user input for checking against the final result
+        initial_start_configuration = deepcopy(robot_cell_state.robot_configuration)
 
         if isinstance(target, FrameTarget):
             ik_generator = self._iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
@@ -311,11 +293,14 @@ class PyBulletInverseKinematics(InverseKinematics):
         # TODO: Implement a fail fast mechanism to check if the attached tool and objects are in collision
 
         # Transform the Target.target_frame to Planner Coordinate Frame depending on target.target_mode
-        target_frame = target.target_frame
-        target_mode = target.target_mode
-        target_pcf = client.robot_cell.target_frames_to_pcf(robot_cell_state, target_frame, target_mode, group)
+        target_pcf = client.robot_cell.target_frames_to_pcf(
+            robot_cell_state, target.target_frame, target.target_mode, group
+        )
 
+        # ===================================================================================
         # Formatting input for PyBullet
+        # ===================================================================================
+
         body_id = client.robot_puid
         # Note: The target link is the last link in semantics.groups[group]["links"][-1]
         link_id = client.robot_link_puids[robot_cell.get_end_effector_link_name(group)]
@@ -377,7 +362,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # 'solution_uniqueness_threshold_prismatic' and 'solution_uniqueness_threshold_revolute'
         uniqueness_checker = UniqueResultChecker()
 
-        # Loop to get multiple results
+        # Loop to get multiple results with random restarts
         for _ in range(options.get("max_results")):
 
             # Calling the IK function using the helper function that repeatedly

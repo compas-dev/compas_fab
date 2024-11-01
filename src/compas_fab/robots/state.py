@@ -3,6 +3,8 @@ from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Transformation
 
+from .targets import TargetMode
+
 if not IPY:
     from typing import TYPE_CHECKING
 
@@ -321,6 +323,71 @@ class RobotCellState(Data):
         self.rigid_body_states[rigid_body_id].attached_to_tool = tool_id
         self.rigid_body_states[rigid_body_id].frame = None
         self.rigid_body_states[rigid_body_id].attachment_frame = attachment_frame
+
+    def assert_target_mode_match(self, target_mode, group):
+        # type: (TargetMode | None, str) -> None
+        """Check if the current tool and workpiece attachment state support the specified TargetMode.
+
+        If the `target_mode` is None,
+        such as the cases for ConfigurationTarget and ConstraintSetTarget,
+        this function will not perform any checks.
+
+        This check is performed automatically by planning functions, it can also be called manually
+        by the user to ensure that the robot cell state is correctly set up.
+
+        Checks are performed as follows:
+
+        - If target mode is `TargetMode.TOOL`, the specified planning group must have a tool attached.
+        - If target mode is `TargetMode.WORKPIECE`, the specified planning group must have one and only one workpiece attached.
+
+        Parameters
+        ----------
+        target_mode : :class:`compas_fab.robots.TargetMode` or None
+            The target or waypoints to check.
+        group : str
+            The planning group to check. Must be specified.
+
+        Raises
+        ------
+        :class:`compas_fab.backends.TargetModeMismatchError`
+            If the target mode is `TOOL` and no tool is attached to the robot in the specified group.
+            If the target mode is `WORKPIECE` and no (or more than one) workpiece is attached to the specified group.
+
+        ValueError
+            If the planning group is not specified.
+
+        """
+        # Import here to avoid circular imports
+        from compas_fab.backends.exceptions import TargetModeMismatchError
+
+        if target_mode is None:
+            return
+
+        if group is None:
+            raise ValueError("Planning group must be specified.")
+
+        # Checks for Tool Mode
+        tool_id = self.get_attached_tool_id(group)
+        if target_mode == TargetMode.TOOL:
+
+            if tool_id is None:
+                raise TargetModeMismatchError(
+                    "Target mode is 'TOOL', but no tool is attached to the robot in group '{}'.".format(group)
+                )
+
+        # Checks for Workpiece Mode
+        workpiece_ids = self.get_attached_workpiece_ids(group)
+        if target_mode == TargetMode.WORKPIECE:
+            if not workpiece_ids:
+                raise TargetModeMismatchError(
+                    "Target mode is 'WORKPIECE', but no workpiece is attached to the robot in group '{}'.".format(group)
+                )
+            if len(workpiece_ids) > 1:
+                raise TargetModeMismatchError(
+                    "Target mode is 'WORKPIECE', but more than one workpiece is attached to the robot in group '{}'.".format(
+                        group
+                    )
+                )
 
 
 class ToolState(Data):
