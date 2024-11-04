@@ -18,6 +18,8 @@ from compas_fab.backends.ros.messages.geometry_msgs import Pose
 from compas_fab.backends.ros.messages.shape_msgs import Mesh
 from compas_fab.backends.ros.service_description import ServiceDescription
 
+from compas_fab.robots import RobotCell
+
 if not IPY:
     from typing import TYPE_CHECKING
 
@@ -29,7 +31,7 @@ if not IPY:
         from compas_fab.backends import MoveItPlanner  # noqa: F401
         from compas_fab.backends import PyBulletClient  # noqa: F401
         from compas_fab.backends import RosClient  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
+
         from compas_fab.robots import RobotCellState  # noqa: F401
 
 
@@ -79,15 +81,20 @@ class MoveItSetRobotCell(SetRobotCell):
         kwargs["options"] = options
         kwargs["errback_name"] = "errback"
 
+        if not isinstance(robot_cell, RobotCell):
+            raise TypeError(
+                "robot_cell should be an instance of RobotCell instead of: {}".format(type(robot_cell).__name__)
+            )
+
         # The first step is to remove all the ACO because we cannot remove a CO if it is attached
-        step_1_result = await_callback(self._remove_aco_async, **kwargs)
+        step_1_result = await_callback(self._set_robot_cell_remove_aco_async, **kwargs)
         assert step_1_result.success, "Failed to remove attached collision objects"
 
         # Second step is to remove the non-existent objects and add the new ones
         # Objects that has the same id and the same object hash will be skipped
         # Objects that has the same id but different object hash will be updated
-        kwargs["robot_cell"] = robot_cell
-        step_2_result = await_callback(self._modify_co_async, **kwargs)
+        kwargs["new_robot_cell"] = robot_cell
+        step_2_result = await_callback(self._set_robot_cell_modify_co_async, **kwargs)
         assert step_2_result.success, "Failed to modify the objects in the robot cell"
 
         # Update the robot cell in the client
@@ -99,7 +106,7 @@ class MoveItSetRobotCell(SetRobotCell):
 
         return (step_1_result, step_2_result)
 
-    def _remove_aco_async(self, callback, errback, options=None):
+    def _set_robot_cell_remove_aco_async(self, callback, errback, options=None):
         # type: (Callable, Callable, RobotCellState, Optional[Dict]) -> None
         """Remove AttachedCollisionObject from the client.
 
@@ -110,6 +117,13 @@ class MoveItSetRobotCell(SetRobotCell):
         """
         planner = self  # type: MoveItPlanner  # noqa: F841
         client = planner.client  # type: RosClient
+
+        options = options or {}
+        verbose = options.get("verbose", False)
+
+        def verbose_print(msg):
+            if verbose:
+                print(msg)
 
         # Get the last robot state
         planning_scene = planner.get_planning_scene()  # type: PlanningScene
@@ -133,7 +147,7 @@ class MoveItSetRobotCell(SetRobotCell):
             )
             link_names.append(link_name)
             attached_collision_objects.append(aco)
-            print("SET_RC_1: Removed all ACOs from link {}".format(link_name))
+            verbose_print("SET_RC_1: Removed all ACOs from link {}".format(link_name))
 
         # NOTE: I'm not sure how we can skip the request if there are no ACOs to remove
         robot_state = RobotState(
@@ -145,7 +159,7 @@ class MoveItSetRobotCell(SetRobotCell):
         request = scene.to_request(client.ros_distro)
         self.APPLY_PLANNING_SCENE(client, request, callback, errback)
 
-    def _modify_co_async(self, callback, errback, robot_cell, options=None):
+    def _set_robot_cell_modify_co_async(self, callback, errback, new_robot_cell, options=None):
         # type: (Callable, Callable, RobotCell, Optional[Dict]) -> None
         """
 
@@ -159,10 +173,16 @@ class MoveItSetRobotCell(SetRobotCell):
         """
         planner = self  # type: MoveItPlanner  # noqa: F841
         client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell
 
-        assert robot_cell, "Robot cell should not be None"
-        assert robot_cell.robot, "Robot cell should have a robot"
+        options = options or {}
+        verbose = options.get("verbose", False)
+
+        def verbose_print(msg):
+            if verbose:
+                print(msg)
+
+        assert new_robot_cell, "Robot cell should not be None"
+        assert new_robot_cell.robot_model, "Robot cell should have a robot model"
 
         # NOTE: This function will only create CollisionObjects (not attached),
         # The `set_robot_cell_state`` is responsible of the creation of AttachedCollisionObjects.
@@ -170,7 +190,7 @@ class MoveItSetRobotCell(SetRobotCell):
         collision_objects = []
 
         # Step 0 filter Rigid Bodies that has no collision geometry
-        rigid_body_models = {k: v for k, v in robot_cell.rigid_body_models.items() if v.collision_meshes}
+        rigid_body_models = {k: v for k, v in new_robot_cell.rigid_body_models.items() if v.collision_meshes}
 
         # Step 1
         # Remove rigid bodies from the previous planning scene that are not in the new robot cell
@@ -183,7 +203,7 @@ class MoveItSetRobotCell(SetRobotCell):
                 collision_objects.append(co)
                 # Remove the hash from the dictionary
                 del planner._current_rigid_body_hashes[rigid_body_id]
-                print("SET_RC_2: Rigid body '{}' removed from the planning scene".format(rigid_body_id))
+                verbose_print("SET_RC_2: Rigid body '{}' removed from the planning scene".format(rigid_body_id))
 
         # Step 2
         # Add / update rigid bodies to the planning scene
@@ -194,7 +214,7 @@ class MoveItSetRobotCell(SetRobotCell):
             # Compare the hash of the rigid body with the previous one
             if rigid_body_id in planner._current_rigid_body_hashes:
                 if rigid_body_hash == planner._current_rigid_body_hashes[rigid_body_id]:
-                    print(
+                    verbose_print(
                         "SET_RC_2: Rigid body '{}' skipped because is already in the planning scene".format(
                             rigid_body_id
                         )
@@ -205,7 +225,7 @@ class MoveItSetRobotCell(SetRobotCell):
             ros_meshes = [Mesh.from_mesh(m) for m in rigid_body.collision_meshes_in_meters]
             collision_object = CollisionObject(
                 # Header is robot.root_name when the object is not attached
-                header=Header(frame_id=robot_cell.root_name),
+                header=Header(frame_id=new_robot_cell.root_name),
                 # The identifier of the rigid body, matches with the robot_cell rigid_body_id
                 id=rigid_body_id,
                 # List of `compas_fab.backends.ros.messages.shape_msgs.Meshes`
@@ -219,7 +239,7 @@ class MoveItSetRobotCell(SetRobotCell):
                 operation=CollisionObject.ADD,
             )
             collision_objects.append(collision_object)
-            print("SET_RC_2: Rigid body '{}' added to the planning scene".format(rigid_body_id))
+            verbose_print("SET_RC_2: Rigid body '{}' added to the planning scene".format(rigid_body_id))
 
             # Update the hash of the rigid body
             planner._current_rigid_body_hashes[rigid_body_id] = rigid_body_hash
@@ -229,7 +249,7 @@ class MoveItSetRobotCell(SetRobotCell):
         # Tool CollisionObjects have an id equal to `tool_id` + "_" + `link_name`
 
         tool_ids = []
-        for tool_id, tool_model in robot_cell.tool_models.items():
+        for tool_id, tool_model in new_robot_cell.tool_models.items():
             for link in tool_model.iter_links():
                 if link.collision:
                     tool_ids.append("{}_{}".format(tool_id, link.name))
@@ -244,11 +264,11 @@ class MoveItSetRobotCell(SetRobotCell):
                 collision_objects.append(co)
                 # Remove the hash from the dictionary
                 del planner._current_tool_hashes[collision_object_id]
-                print("SET_RC_2: Tool Link '{}' removed from the planning scene".format(collision_object_id))
+                verbose_print("SET_RC_2: Tool Link '{}' removed from the planning scene".format(collision_object_id))
 
         # Step 4
         # Add / updated tools to the planning scene
-        for tool_id, tool_model in robot_cell.tool_models.items():
+        for tool_id, tool_model in new_robot_cell.tool_models.items():
             # For each tool, iterate through its links, each link that has geometry(s) will create one collision object
             for link in tool_model.iter_links():
                 # In theory the `tool_id` from the tool_model dictionary is the same as the `tool_model.name`.
@@ -258,7 +278,7 @@ class MoveItSetRobotCell(SetRobotCell):
                 # Skip links that are already in the backend
                 if collision_object_id in planner._current_tool_hashes:
                     if link_hash == planner._current_tool_hashes[collision_object_id]:
-                        print(
+                        verbose_print(
                             "SET_RC_2: Link '{}' skipped because it is already in the planning scene".format(
                                 collision_object_id
                             )
@@ -269,7 +289,7 @@ class MoveItSetRobotCell(SetRobotCell):
                 collision_meshes = tool_model.get_link_collision_meshes(link)
                 # Skip links that have no collision geometry
                 if not collision_meshes:
-                    print(
+                    verbose_print(
                         "SET_RC_2: Link '{}' skipped because it has no collision geometry".format(collision_object_id)
                     )
                     continue
@@ -277,7 +297,7 @@ class MoveItSetRobotCell(SetRobotCell):
                 # For each mesh in the link, create a CollisionMesh
                 kwargs = {}
                 # The frame_id needs be the root name of the robot
-                kwargs["header"] = Header(frame_id=robot_cell.root_name)
+                kwargs["header"] = Header(frame_id=new_robot_cell.root_name)
                 # id is the identifier of the rigid body
                 kwargs["id"] = collision_object_id
                 # List of `compas_fab.backends.ros.messages.shape_msgs.Meshes`
@@ -291,7 +311,7 @@ class MoveItSetRobotCell(SetRobotCell):
                 kwargs["pose"] = Pose()
                 co = CollisionObject(**kwargs)
                 collision_objects.append(co)
-                print("SET_RC_2: Tool Link '{}' added to the planning scene".format(link.name))
+                verbose_print("SET_RC_2: Tool Link '{}' added to the planning scene".format(link.name))
 
                 # Update the hash of the tool
                 planner._current_tool_hashes[collision_object_id] = link_hash

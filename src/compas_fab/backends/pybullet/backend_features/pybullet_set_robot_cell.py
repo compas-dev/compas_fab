@@ -1,6 +1,7 @@
 from compas import IPY
 
 from compas_fab.backends.interfaces import SetRobotCell
+from compas_fab.robots import RobotCell
 
 if not IPY:
     from typing import TYPE_CHECKING
@@ -10,7 +11,6 @@ if not IPY:
         from typing import Optional  # noqa: F401
 
         from compas_fab.backends import PyBulletClient  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
 
 
@@ -25,6 +25,12 @@ class PyBulletSetRobotCell(SetRobotCell):
         It should be called only if the robot cell models have changed.
 
         """
+
+        if not isinstance(robot_cell, RobotCell):
+            raise TypeError(
+                "robot_cell should be an instance of RobotCell instead of: {}".format(type(robot_cell).__name__)
+            )
+
         client = self.client  # type: PyBulletClient
 
         # TODO: Check for new, modified and removed objects compared to the

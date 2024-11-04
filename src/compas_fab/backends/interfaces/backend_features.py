@@ -181,17 +181,16 @@ class ForwardKinematics(BackendFeature):
         The function can return the planner coordinate frame (PCF), the tool coordinate frame (TCF),
         or the workpiece's object coordinate frame (OCF) based on the ``target_mode`` provided.
 
-        - ``"Target.ROBOT"`` will return the planner coordinate frame (PCF).
-        - ``"Target.TOOL"`` will return the tool coordinate frame (TCF) if a tool is attached.
+        - ``"Target.ROBOT"`` will return the planner coordinate frame (PCF) of the planning group.
+        - ``"Target.TOOL"`` will return the tool coordinate frame (TCF) if a tool is attached to the planning group.
         - ``"Target.WORKPIECE"`` will return the workpiece's object coordinate frame (OCF)
-          if a workpiece is attached.
+          if a workpiece is attached to the planning group via a tool.
 
         Parameters
         ----------
         robot_cell_state : :class:`compas_fab.robots.RobotCellState`
             The robot cell state describing the robot cell.
             The attribute `robot_configuration`, must contain the full configuration of the robot corresponding to the planning group.
-            The Configuration object must include ``joint_names``.
             The robot cell state should also reflect the attachment of tools, if any.
         target_mode : :class:`compas_fab.robots.TargetMode` or str
             The target mode to select which frame to return.
@@ -204,8 +203,8 @@ class ForwardKinematics(BackendFeature):
             For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
             Defaults to None, which means no scaling is applied.
         options : dict, optional
-            Dictionary containing kwargs for arguments specific to
-            the client being queried.
+            Dictionary containing planner-specific options.
+            See the planner's `ForwardKinematics` documentation for supported options.
 
         Returns
         -------
@@ -213,13 +212,13 @@ class ForwardKinematics(BackendFeature):
             The frame in the world's coordinate system (WCF).
 
         """
-        pass
+        raise NotImplementedError("This feature is not supported by the planner.")
 
         # The implementation code is located in the backend's module:
         # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_forward_kinematics.py"
 
-    def forward_kinematics_to_link(self, robot_cell_state, link_name=None, group=None, native_scale=None, options=None):
-        # type: (RobotCellState, Optional[str], Optional[str], Optional[float], Optional[dict]) -> Frame
+    def forward_kinematics_to_link(self, robot_cell_state, link_name=None, native_scale=None, options=None):
+        # type: (RobotCellState, Optional[str], Optional[float], Optional[dict]) -> Frame
         """Calculate the frame of the specified robot link from the provided RobotCellState.
 
         This function operates similar to :meth:`compas_fab.backends.PyBulletForwardKinematics.forward_kinematics`,
@@ -236,18 +235,17 @@ class ForwardKinematics(BackendFeature):
         link_name : str, optional
             The name of the link to calculate the forward kinematics for.
             Defaults to the last link of the provided planning group.
-        group : str, optional
-            The planning group of the robot.
-            Defaults to the robot's main planning group.
         native_scale : float, optional
             The scaling factor to apply to the resulting frame.
             It is defined as `user_object_value * native_scale = meter_object_value`.
             For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
             Defaults to None, which means no scaling is applied.
         options : dict, optional
-            Dictionary for passing planner specific options.
-            Currently unused.
+            Dictionary containing planner-specific options.
+            See the planner's `ForwardKinematics` documentation for supported options.
         """
+
+        raise NotImplementedError("This feature is not supported by the planner.")
 
 
 class InverseKinematics(BackendFeature):

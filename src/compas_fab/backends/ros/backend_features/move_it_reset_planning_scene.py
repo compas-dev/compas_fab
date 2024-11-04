@@ -44,14 +44,14 @@ class MoveItResetPlanningScene(ResetPlanningScene):
         # The complete removal of the planning scene is done in two steps because
         # the attached collision objects need to be removed before the collision objects
         # can be removed.
-        step_1_result = await_callback(self._remove_aco_async, **kwargs)
+        step_1_result = await_callback(self._reset_planning_scene_remove_aco_async, **kwargs)
         assert step_1_result.success, "Failed to remove attached collision objects"
-        step_2_result = await_callback(self._remove_co_async, **kwargs)
+        step_2_result = await_callback(self._reset_planning_scene_remove_co_async, **kwargs)
         assert step_2_result.success, "Failed to remove collision objects"
 
         return (step_1_result, step_2_result)
 
-    def _remove_aco_async(self, callback, errback):
+    def _reset_planning_scene_remove_aco_async(self, callback, errback):
         scene = self.get_planning_scene()  # type: PlanningScene
         for attached_collision_object in scene.robot_state.attached_collision_objects:
             attached_collision_object.object["operation"] = CollisionObject.REMOVE
@@ -60,7 +60,7 @@ class MoveItResetPlanningScene(ResetPlanningScene):
         request = scene.to_request(self.client.ros_distro)
         self.APPLY_PLANNING_SCENE(self.client, request, callback, errback)
 
-    def _remove_co_async(self, callback, errback):
+    def _reset_planning_scene_remove_co_async(self, callback, errback):
         scene = self.get_planning_scene()  # type: PlanningScene
         for collision_object in scene.world.collision_objects:
             collision_object.operation = CollisionObject.REMOVE

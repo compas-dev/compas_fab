@@ -72,7 +72,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
         """
         kwargs = {}
         kwargs["robot_cell_state"] = robot_cell_state
-        kwargs["options"] = options
+        kwargs["options"] = options or {}
         kwargs["errback_name"] = "errback"
 
         robot_cell = self.client.robot_cell  # type: RobotCell
@@ -83,16 +83,16 @@ class MoveItSetRobotCellState(SetRobotCellState):
 
         # First step is to remove all the ACO attachments, this facilitates moving the position of attached objects
         # Robot configuration is also updated next step will move objects correctly based on this new configuration
-        step_1_result = await_callback(self.remove_aco_and_update_config_async, **kwargs)
+        step_1_result = await_callback(self._set_rcs_remove_aco_and_update_config_async, **kwargs)
         assert step_1_result.success, "Failed to remove attached collision objects"
         # Second step is to update the position of all tools and rigid bodies in the scene
         # Attached objects positions are updated relative to the links they attached to
         # Non-attached objects positions are relative to the robot base link (aka world)
-        step_2_result = await_callback(self.update_co_async, **kwargs)
+        step_2_result = await_callback(self._set_rcs_update_co_async, **kwargs)
         assert step_2_result.success
         # Third step is to re-create the ACO attachments
         # This will ensure the objects move with the robot when planning
-        step_3_result = await_callback(self.create_aco_async, **kwargs)
+        step_3_result = await_callback(self._set_rcs_create_aco_async, **kwargs)
         assert step_3_result.success
 
         # Update the client's robot cell state
@@ -100,8 +100,8 @@ class MoveItSetRobotCellState(SetRobotCellState):
 
         return (step_1_result, step_2_result, step_3_result)
 
-    def remove_aco_and_update_config_async(self, callback, errback, robot_cell_state, options=None):
-        # type: (Callable, Callable, RobotCellState, Optional[Dict]) -> None
+    def _set_rcs_remove_aco_and_update_config_async(self, callback, errback, robot_cell_state, options):
+        # type: (Callable, Callable, RobotCellState, Dict) -> None
         """Remove AttachedCollisionObject from the client.
 
         All AttachedCollisionObjects are removed, converting them back to CollisionObjects in the PlanningSceneWorld.
@@ -109,6 +109,11 @@ class MoveItSetRobotCellState(SetRobotCellState):
         planner = self  # type: MoveItPlanner  # noqa: F841
         client = planner.client  # type: RosClient
         robot_cell = client.robot_cell
+
+        # Convenience function for printing verbose messages
+        def verbose_print(msg):
+            if options.get("verbose", False):
+                print(msg)
 
         # Get the last robot state
         planning_scene = planner.get_planning_scene()  # type: PlanningScene
@@ -132,7 +137,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
             )
             link_names.append(link_name)
             attached_collision_objects.append(aco)
-            print("SET_RCS_1: Removed all ACOs from link {}".format(link_name))
+            verbose_print("SET_RCS_1: Removed all ACOs from link {}".format(link_name))
 
         # Update robot configuration
         configuration = robot_cell_state.robot_configuration
@@ -159,8 +164,8 @@ class MoveItSetRobotCellState(SetRobotCellState):
         request = scene.to_request(client.ros_distro)
         self.APPLY_PLANNING_SCENE(client, request, callback, errback)
 
-    def update_co_async(self, callback, errback, robot_cell_state, options=None):
-        # type: (Callable, Callable, RobotCellState, Optional[Dict]) -> None
+    def _set_rcs_update_co_async(self, callback, errback, robot_cell_state, options):
+        # type: (Callable, Callable, RobotCellState, Dict) -> None
         """Update the position of CollisionObjects in the client.
 
         Non-attached objects (RigidBody and Tools) are updated in the PlanningSceneWorld.
@@ -172,6 +177,11 @@ class MoveItSetRobotCellState(SetRobotCellState):
         client = planner.client  # type: RosClient
         robot_cell = client.robot_cell
         root_name = robot_cell.root_name
+
+        # Convenience function for printing verbose messages
+        def verbose_print(msg):
+            if options.get("verbose", False):
+                print(msg)
 
         # Update pose of all non-attached rigid bodies
         collision_objects = []
@@ -185,7 +195,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
                     operation=CollisionObject.MOVE,
                 )
                 collision_objects.append(collision_object)
-                print(
+                verbose_print(
                     "SET_RCS_2: Moved CO {} for attachment to position of link {}".format(
                         rb_id, rigid_body_state.attached_to_link
                     )
@@ -202,7 +212,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
                     operation=CollisionObject.MOVE,
                 )
                 collision_objects.append(collision_object)
-                print(
+                verbose_print(
                     "SET_RCS_2: Moved CO {} for attachment to position of tool {}".format(
                         rb_id, rigid_body_state.attached_to_tool
                     )
@@ -216,7 +226,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
                     operation=CollisionObject.MOVE,
                 )
                 collision_objects.append(collision_object)
-                print("SET_RCS_2: Moved CO {} to frame {}".format(rb_id, rigid_body_state.frame))
+                verbose_print("SET_RCS_2: Moved CO {} to frame {}".format(rb_id, rigid_body_state.frame))
 
         # Update the tools
         for tool_id, tool_state in robot_cell_state.tool_states.items():
@@ -236,7 +246,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
                     operation=CollisionObject.MOVE,
                 )
                 collision_objects.append(collision_object)
-                print(
+                verbose_print(
                     "SET_RCS_2: Moved Tool Base Link {} to attachment at Robot Link {}".format(
                         collision_object_id, end_effector_link_name
                     )
@@ -260,7 +270,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
                             operation=CollisionObject.MOVE,
                         )
                         collision_objects.append(collision_object)
-                        print(
+                        verbose_print(
                             "SET_RCS_2: Moved Tool Link {} to attachment at Robot Link {}".format(
                                 collision_object_id, end_effector_link_name
                             )
@@ -279,7 +289,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
                     operation=CollisionObject.MOVE,
                 )
                 collision_objects.append(collision_object)
-                print("SET_RCS_2: Moved Tool Base Link {} to stationary pose".format(collision_object_id))
+                verbose_print("SET_RCS_2: Moved Tool Base Link {} to stationary pose".format(collision_object_id))
 
                 # If the tool is a kinematic tool, it has configurable joints
                 # We need to find the poses of each links
@@ -299,7 +309,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
                             operation=CollisionObject.MOVE,
                         )
                         collision_objects.append(collision_object)
-                        print("SET_RCS_2: Moved Tool Link {} to stationary pose".format(collision_object_id))
+                        verbose_print("SET_RCS_2: Moved Tool Link {} to stationary pose".format(collision_object_id))
 
         # Apply the planning scene to the client
         world = PlanningSceneWorld(collision_objects=collision_objects)
@@ -307,8 +317,8 @@ class MoveItSetRobotCellState(SetRobotCellState):
         request = scene.to_request(client.ros_distro)
         self.APPLY_PLANNING_SCENE(client, request, callback, errback)
 
-    def create_aco_async(self, callback, errback, robot_cell_state, options=None):
-        # type: (Callable, Callable, RobotCellState, Optional[Dict]) -> None
+    def _set_rcs_create_aco_async(self, callback, errback, robot_cell_state, options):
+        # type: (Callable, Callable, RobotCellState, Dict) -> None
         """Update the position of CollisionObjects in the client.
 
         Non-attached objects (RigidBody and Tools) are updated in the PlanningSceneWorld.
@@ -319,6 +329,11 @@ class MoveItSetRobotCellState(SetRobotCellState):
         planner = self  # type: MoveItPlanner  # noqa: F841
         client = planner.client  # type: RosClient
         robot_cell = client.robot_cell
+
+        # Convenience function for printing verbose messages
+        def verbose_print(msg):
+            if options.get("verbose", False):
+                print(msg)
 
         # ACO for attached rigid bodies
         attached_collision_objects = []
@@ -337,7 +352,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
                     weight=1.0,
                 )
                 attached_collision_objects.append(aco)
-                print("SET_RCS_3: Added ACO for RigidBody {} to link {}".format(rb_id, link_name))
+                verbose_print("SET_RCS_3: Added ACO for RigidBody {} to link {}".format(rb_id, link_name))
             # For rigid bodies attached to tools
             elif rigid_body_state.attached_to_tool:
                 tool_parent_group = robot_cell_state.tool_states[rigid_body_state.attached_to_tool].attached_to_group
@@ -353,7 +368,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
                     weight=1.0,
                 )
                 attached_collision_objects.append(aco)
-                print(
+                verbose_print(
                     "SET_RCS_3: Added ACO for RigidBody {} to tool {}".format(rb_id, rigid_body_state.attached_to_tool)
                 )
         # ACO for attached tools
@@ -375,7 +390,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
                         weight=1.0,
                     )
                     attached_collision_objects.append(aco)
-                    print(
+                    verbose_print(
                         "SET_RCS_3: Added ACO for Tool Link {} to Robot Link {}".format(
                             collision_object_id, end_effector_link_name
                         )

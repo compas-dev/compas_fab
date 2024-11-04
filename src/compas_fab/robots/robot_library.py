@@ -607,6 +607,101 @@ class RobotCellLibrary(object):
         return robot_cell, robot_cell_state
 
     @classmethod
+    def ur5_gripper_one_beam(cls, load_geometry=True):
+        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+        """Create and return the ur5 robot with a gripper tool attached.
+        One beam (a RigidBody) is included and is attached to the gripper.
+        A floor is also included.
+
+        See :meth:`compas_fab.robots.RobotCellLibrary.ur5` and :meth:`compas_fab.robots.ToolLibrary.static_gripper_small`
+        for details on the robot and tool.
+
+        Parameters
+        ----------
+        load_geometry: :obj:`bool`, optional
+            Default is `True`, which means that the robot and tool geometry are loaded.
+            `False` can be used to speed up the creation of the robot cell,
+            but without geometry, the robot cell cannot be visualized and backend planners
+            cannot perform collision checking during planning.
+
+        Returns
+        -------
+        Tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
+            Newly created instance of the robot cell and robot cell state.
+        """
+        # ---------------------------------------------------------------------
+        # Load Robot and create RobotCell
+        # ---------------------------------------------------------------------
+        robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=load_geometry)
+
+        # ---------------------------------------------------------------------
+        # Load Tools
+        # ---------------------------------------------------------------------
+
+        gripper = ToolLibrary.static_gripper_small(load_geometry=load_geometry)
+        robot_cell.tool_models["gripper"] = gripper
+
+        # ---------------------------------------------------------------------
+        # Load Rigid Bodies
+        # ---------------------------------------------------------------------
+
+        # Z axis is the length of the beam, X axis points away from the robot
+        beam_length = 0.4
+        beam = Box.from_corner_corner_height(
+            [0.0, -0.05, -beam_length * 0.5], [0.1, 0.05, -beam_length * 0.5], beam_length
+        )
+        beam_mesh = Mesh.from_shape(beam)
+        robot_cell.rigid_body_models["beam"] = RigidBody.from_mesh(beam_mesh)
+
+        # Static Floor as Collision Geometry
+        floor_mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
+        robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
+
+        # ------------------------------------------------------------------------
+        # Re-Create RobotCellState after modifying the RobotCell
+        # ------------------------------------------------------------------------
+        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+
+        # ------------------------------------------------------------------------
+        # Tool Attachment
+        # ------------------------------------------------------------------------
+
+        # Attach the tool to the robot's main group
+        attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
+
+        # Gripper is allowed to touch the last link of the robot.
+        # However, do not use the following line to get the end effector link name,
+        # because it is not guaranteed to be the last link that has geometry in the robot chain.
+        # ee_link_name = robot.get_end_effector_link_name(robot_cell.main_group_name)
+
+        # Instead, check the robot model and hard code the actual link name.
+        touch_links = ["wrist_3_link"]
+        # For UR10e, the last logical link is `tool0` (from robot.get_end_effector_link_name)
+        # However the last link with geometry attached is `wrist_3_link`.
+
+        robot_cell_state.set_tool_attached_to_group(
+            "gripper", robot_cell.main_group_name, attachment_frame, touch_links
+        )
+        # Note: There is a rotation to match the gripper's orientation because the last link in the abb robot
+        # does not follow the REP 199 convention.
+
+        # ------------------------------------------------------------------------
+        # Workpiece Attachment
+        # ------------------------------------------------------------------------
+
+        # Attach the beam to the gripper
+        robot_cell_state.set_rigid_body_attached_to_tool("beam", "gripper")
+
+        # ------------------------------------------------------------------------
+        # Static Rigid Body Touch Links
+        # ------------------------------------------------------------------------
+
+        # The floor is not attached to the robot, but it is allowed to touch the robot's base link.
+        robot_cell_state.rigid_body_states["floor"].touch_links = ["base_link_inertia"]
+
+        return robot_cell, robot_cell_state
+
+    @classmethod
     def abb_irb4600_40_255_gripper_one_beam(cls, load_geometry=True):
         # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
         """Create and return the ABB irb4600-40-255 robot with a gripper tool attached.
