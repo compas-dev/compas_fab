@@ -12,6 +12,7 @@ from compas_fab.robots import ToolLibrary
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import TargetMode
+from compas_fab.robots import FrameTarget
 from compas_fab.robots import RigidBodyLibrary
 
 target_frames = []
@@ -68,13 +69,25 @@ with RosClient() as client:
     # Place target marker at location
     for i, frame in enumerate(target_frames):
         robot_cell_state.rigid_body_states["target_%d" % i].frame = frame
-    # Initial configuration of the robot
-    robot_cell_state.robot_configuration.joint_values = [0, pi / -2, pi / 2, 0, 0, 0]
     result = planner.set_robot_cell(robot_cell, robot_cell_state)
 
-    fk_frame = planner.forward_kinematics(robot_cell_state, TargetMode.WORKPIECE)
-    print(fk_frame)
-    input("Press Enter to continue...")
+    # ===============================================
+    # Step 3: Perform IK to get initial configuration
+    # ===============================================
+
+    # robot_cell_state.robot_configuration.joint_values = [0, pi / -2, pi / 2, 0, 0, 0]
+
+    # fk_frame = planner.forward_kinematics(robot_cell_state, TargetMode.WORKPIECE)
+    # print(fk_frame)
+    # input("Press Enter to continue...")
+
+    # It is a common pattern to find the robot's starting configuration by solving the inverse kinematics
+    # for the first target frame.
+    configuration = planner.inverse_kinematics(
+        FrameTarget(target_frames[0], TargetMode.WORKPIECE), robot_cell_state, options=dict(avoid_collisions=False)
+    )
+    robot_cell_state.robot_configuration = configuration
+    print("Initial configuration: ", configuration)
 
     # =====================================
     # Step 3: Plan Cartesian Motion

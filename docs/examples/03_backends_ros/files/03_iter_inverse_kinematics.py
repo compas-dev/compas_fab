@@ -11,7 +11,7 @@ with RosClient() as client:
     assert robot_cell.robot_model.name == "ur5_robot"
     planner = MoveItPlanner(client)
 
-    frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
+    frame_WCF = Frame([0.3, 0.1, 0.5], [0, -1, 0], [0, 0, -1])
     target = FrameTarget(frame_WCF, TargetMode.ROBOT)
 
     start_state = RobotCellState.from_robot_cell(robot_cell)

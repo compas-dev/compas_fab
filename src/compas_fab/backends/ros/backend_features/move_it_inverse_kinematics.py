@@ -327,7 +327,11 @@ class MoveItInverseKinematics(InverseKinematics):
 
             # If result is unique, we yield it back to the user
             if result_is_unique:
-                yield joint_positions, joint_names
+                return_full_configuration = options.get("return_full_configuration", False)
+                configuration = planner._build_configuration(
+                    joint_positions, joint_names, group, return_full_configuration, start_configuration
+                )
+                yield configuration
                 all_yielded_joint_positions.append(joint_positions)
 
             # Generate random start configuration for next iteration

@@ -177,7 +177,6 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
 
         def response_handler(response):
             try:
-                print("Error Code:", response.error_code)
                 trajectory = convert_trajectory(
                     joints, response.solution, response.start_state, response.fraction, None, response
                 )
