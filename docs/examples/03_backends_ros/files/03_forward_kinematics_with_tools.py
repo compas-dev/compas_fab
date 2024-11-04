@@ -6,13 +6,20 @@ from compas_fab.backends import RosClient
 from compas_fab.backends import MoveItPlanner
 
 with RosClient() as client:
+    planner = MoveItPlanner(client)
+
+    # Loading the robot cell with tool and workpiece from the RobotCellLibrary
     robot_cell, robot_cell_state = RobotCellLibrary.ur5_gripper_one_beam(client)
 
-    planner = MoveItPlanner(client)
+    # Check that the robot in the ROS MoveIt backend is the same as the one in the RobotCellLibrary
+    client.load_robot_cell(False)
+    assert client.robot_cell.root_name == robot_cell.root_name
+
+    # Set the tool and workpiece in the ROS MoveIt backend
     planner.set_robot_cell(robot_cell)
 
+    # Modify the default robot_cell_state to change the robot's configuration and the attachment location of the beam
     robot_cell_state.robot_configuration.joint_values = [-2.238, -1.153, -2.174, 0.185, 0.667, 0.0]
-    # Change the attachment location (grasp) of the beam
     robot_cell_state.rigid_body_states["beam"].attachment_frame = Frame(
         [0.0, 0.0, -0.1], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]
     )

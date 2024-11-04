@@ -11,6 +11,8 @@ with RosClient() as client:
 
     robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
     robot_cell_state.robot_configuration.joint_values = [-2.238, -1.153, -2.174, 0.185, 0.667, 0.0]
+
+    # When using the forward_kinematics() method with TargetMode.ROBOT, the last link of the robot's main group is used.
     frame_WCF = planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT)
 
     print("Frame in the world coordinate system")
