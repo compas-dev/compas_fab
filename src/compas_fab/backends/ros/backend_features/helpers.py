@@ -22,15 +22,41 @@ from compas_fab.robots import PointAxisTarget
 from compas_fab.robots.constraints import JointConstraint as CF_JointConstraint
 from compas_fab.robots.constraints import PositionConstraint as CF_PositionConstraint
 from compas_fab.robots.constraints import OrientationConstraint as CF_OrientationConstraint
+from compas_fab.backends.exceptions import MPStartStateInCollisionError
+from compas_fab.backends.exceptions import MPTargetInCollisionError
+from compas_fab.backends.exceptions import MPSearchTimeOutError
+from compas_fab.backends.exceptions import PlanningGroupNotExistsError
+from compas_fab.backends.exceptions import MPNoPlanFoundError
 
 DEFAULT_TOLERANCE_ORIENTATION = 0.1
 DEFAULT_TOLERANCE_POSITION = 0.01
 
 
 def validate_response(response):
-    """Raise an exception if the response indicates an error condition."""
+    """Raise an exception if the response indicates an error condition.
+    Errors that are covered by compas_fab error classes are raised as such.
+    Otherwise, a generic RosError is raised with the error code.
+    """
     if response.error_code != MoveItErrorCodes.SUCCESS:
-        raise RosError(response.error_code.human_readable, int(response.error_code))
+        if response.error_code == MoveItErrorCodes.PLANNING_FAILED:
+            raise MPNoPlanFoundError("MoveItErrorCodes -1 PLANNING_FAILED")
+        elif response.error_code == MoveItErrorCodes.TIMED_OUT:
+            raise MPSearchTimeOutError("MoveItErrorCodes -6 TIMED_OUT")
+        elif response.error_code == MoveItErrorCodes.START_STATE_IN_COLLISION:
+            raise MPStartStateInCollisionError("MoveItErrorCodes -10 START_STATE_IN_COLLISION")
+        elif response.error_code == MoveItErrorCodes.START_STATE_VIOLATES_PATH_CONSTRAINTS:
+            raise MPStartStateInCollisionError("MoveItErrorCodes -11 START_STATE_VIOLATES_PATH_CONSTRAINTS")
+        elif response.error_code == MoveItErrorCodes.GOAL_IN_COLLISION:
+            raise MPTargetInCollisionError("MoveItErrorCodes -12 GOAL_IN_COLLISION")
+        elif response.error_code == MoveItErrorCodes.GOAL_VIOLATES_PATH_CONSTRAINTS:
+            raise MPTargetInCollisionError("MoveItErrorCodes -13 GOAL_VIOLATES_PATH_CONSTRAINTS")
+        elif response.error_code == MoveItErrorCodes.INVALID_GROUP_NAME:
+            raise PlanningGroupNotExistsError("INVALID_GROUP_NAME -15 INVALID_GROUP_NAME")
+        else:
+            raise RosError(
+                "MoveItErrorCodes {}, {}".format(response.error_code.human_readable, int(response.error_code)),
+                response.error_code,
+            )
 
 
 def convert_target_to_goal_constraints(target, ee_link_name, tool_coordinate_frame=None):
@@ -151,10 +177,6 @@ def convert_trajectory(joints, solution, solution_start_state, fraction, plannin
     start_state = solution_start_state.joint_state
     start_state_types = [joints[name] for name in start_state.name]
     trajectory.start_configuration = Configuration(start_state.position, start_state_types, start_state.name)
-    trajectory.attached_collision_meshes = list(
-        itertools.chain(
-            *[aco.to_attached_collision_meshes() for aco in solution_start_state.attached_collision_objects]
-        )
-    )
 
+    # We no longer return the Attached Collision Meshes in the trajectory object
     return trajectory
