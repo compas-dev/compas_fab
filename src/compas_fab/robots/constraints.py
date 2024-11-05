@@ -101,15 +101,6 @@ class BoundingVolume(Data):
         -------
         :class:`BoundingVolume`
 
-        Examples
-        --------
-        >>> from compas.geometry import Frame
-        >>> from compas.geometry import Box
-        >>> from compas_fab.robots import BoundingVolume
-        >>> box = Box(1., 1., 1.)
-        >>> bv = BoundingVolume.from_box(box)
-        >>> bv.type
-        1
         """
         return cls(cls.BOX, box)
 
@@ -127,14 +118,6 @@ class BoundingVolume(Data):
         -------
         :class:`BoundingVolume`
 
-        Examples
-        --------
-        >>> from compas.geometry import Sphere
-        >>> from compas_fab.robots import BoundingVolume
-        >>> sphere = Sphere(5.0, Frame.worldXY())
-        >>> bv = BoundingVolume.from_sphere(sphere)
-        >>> bv.type
-        2
         """
         return cls(cls.SPHERE, sphere)
 
@@ -152,15 +135,6 @@ class BoundingVolume(Data):
         :class:`BoundingVolume`
             Mesh to define :class:`BoundingVolume` with.
 
-        Examples
-        --------
-        >>> import compas
-        >>> from compas.datastructures import Mesh
-        >>> from compas_fab.robots import BoundingVolume
-        >>> mesh = Mesh.from_obj(compas.get('faces.obj'))
-        >>> bv = BoundingVolume.from_mesh(Mesh)
-        >>> bv.type
-        3
         """
         return cls(cls.MESH, mesh)
 
@@ -326,10 +300,6 @@ class JointConstraint(Constraint):
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important.
 
-    Examples
-    --------
-    >>> from compas_fab.robots import JointConstraint
-    >>> jc = JointConstraint("joint_0", 1.4, 0.1, 0.1, 1.0)
     """
 
     def __init__(self, joint_name, value, tolerance_above=0.0, tolerance_below=0.0, weight=1.0):
@@ -500,12 +470,6 @@ class OrientationConstraint(Constraint):
     that the frame's x-axis and y-axis are allowed to rotate about the z-axis
     by an angle of 6.3 radians, whereas the z-axis can only change 0.01.
 
-    Examples
-    --------
-    >>> from compas.geometry import Frame
-    >>> from compas_fab.robots import OrientationConstraint
-    >>> frame = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
-    >>> oc = OrientationConstraint("link_0", frame.quaternion)
     """
 
     def __init__(self, link_name, quaternion, tolerances=None, weight=1.0):
@@ -559,7 +523,7 @@ class OrientationConstraint(Constraint):
         return cls(self.link_name, self.quaternion[:], self.tolerances[:], self.weight)
 
     @classmethod
-    def from_frame(cls, frame_WCF, tolerances_orientation, link_name, tool_coordinate_frame=None, weight=1.0):
+    def from_frame(cls, pcf_frame, tolerances_orientation, link_name, weight=1.0):
         # type: (Frame, list[float], str, Optional[Frame], Optional[float]) -> OrientationConstraint
         """Create an :class:`OrientationConstraint` from a frame on the group's end-effector link.
         Only the orientation of the frame is considered for the constraint, expressed
@@ -567,16 +531,13 @@ class OrientationConstraint(Constraint):
 
         Parameters
         ----------
-        frame_WCF: :class:`compas.geometry.Frame`
-            The frame from which we create the orientation constraint.
+        pcf_frame : :class:`compas.geometry.Frame`
+            The Planner Coordinate Frame relative to the WCF.
         tolerances_orientation: :obj:`list` of :obj:`float`
             Error tolerances :math:`t_{i}` for each of the frame's axes in
             radians. If only one value is passed in the list it will be uses for all 3 axes.
         link_name : :obj:`str`
             The name of the end-effector link. Necessary for creating the position constraint.
-        tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
-            The tool tip coordinate frame relative to the flange of the robot.
-            If not specified, the target frame is relative to the robot's flange.
         weight : :obj:`float`, optional
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to
@@ -600,21 +561,7 @@ class OrientationConstraint(Constraint):
         z-axis by an angle of 6.3 radians, whereas the z-axis would only rotate
         by 0.01.
 
-
-        Examples
-        --------
-        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
-        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
-        >>> tolerances_orientation = [math.radians(1)] * 3
-        >>> group = robot_cell.main_group_name
-        >>> end_effector_link_name = robot.get_end_effector_link_name(group)
-        >>> OrientationConstraint.from_frame(frame, tolerances_orientation, end_effector_link_name)
-        OrientationConstraint('tool0', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)
         """
-        # TODO: Add support for tool_state.attachment_frame, call from_tcf_to_pcf.
-
-        # if tool_coordinate_frame:
-        #     frame_WCF = from_tcf_to_t0cf(frame_WCF, tool_coordinate_frame)
 
         tolerances_orientation = list(tolerances_orientation)
         if len(tolerances_orientation) == 1:
@@ -622,7 +569,7 @@ class OrientationConstraint(Constraint):
         elif len(tolerances_orientation) != 3:
             raise ValueError("`tolerances_orientation` must be a list with either 1 or 3 values")
 
-        return cls(link_name, frame_WCF.quaternion, tolerances_orientation, weight)
+        return cls(link_name, pcf_frame.quaternion, tolerances_orientation, weight)
 
 
 class PositionConstraint(Constraint):
@@ -649,13 +596,6 @@ class PositionConstraint(Constraint):
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important.
 
-    Examples
-    --------
-    >>> from compas.geometry import Sphere
-    >>> from compas_fab.robots import PositionConstraint
-    >>> from compas_fab.robots import BoundingVolume
-    >>> bv = BoundingVolume.from_sphere(Sphere(0.5, point=[3,4,5]))
-    >>> pc = PositionConstraint('link_0', bv, weight=1.)
     """
 
     def __init__(self, link_name, bounding_volume, weight=1.0):
@@ -673,23 +613,20 @@ class PositionConstraint(Constraint):
         }
 
     @classmethod
-    def from_frame(cls, frame_WCF, tolerance_position, link_name, tool_coordinate_frame=None, weight=1.0):
-        # type: (Frame, float, str, Optional[Frame], Optional[float]) -> PositionConstraint
+    def from_frame(cls, pcf_frame, tolerance_position, link_name, weight=1.0):
+        # type: (Frame, float, str, Optional[float]) -> PositionConstraint
         """Create a :class:`PositionConstraint` from a frame on the group's end-effector link.
         Only the position of the frame is considered for the constraint.
 
         Parameters
         ----------
-        frame_WCF : :class:`compas.geometry.Frame`
-            The frame from which we create position and orientation constraints.
+        pcf_frame : :class:`compas.geometry.Frame`
+            The Planner Coordinate Frame relative to the WCF.
         tolerance_position : :obj:`float`
             The allowed tolerance to the frame's position (defined in the
             robot's units).
         link_name : :obj:`str`
             The name of the end-effector link. Necessary for creating the position constraint.
-        tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
-            The tool tip coordinate frame relative to the flange of the robot.
-            If not specified, the target frame is relative to the robot's flange.
         weight : :obj:`float`
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to ``1``.
@@ -704,24 +641,10 @@ class PositionConstraint(Constraint):
         :meth:`PositionConstraint.from_mesh`
         :meth:`PositionConstraint.from_sphere`
 
-        Examples
-        --------
-        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
-        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
-        >>> tolerance_position = 0.001
-        >>> group = robot_cell.main_group_name
-        >>> end_effector_link_name = robot.get_end_effector_link_name(group)
-        >>> PositionConstraint.from_frame(frame, tolerance_position, end_effector_link_name)                                 # doctest: +SKIP
-        PositionConstraint('tool0', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)    # doctest: +SKIP
         """
 
-        # TODO: Add support for tool_state.attachment_frame, call from_tcf_to_pcf.
-
-        # if tool_coordinate_frame:
-        #     frame_WCF = from_tcf_to_t0cf(frame_WCF, tool_coordinate_frame)
-
         radius = float(tolerance_position)
-        sphere = Sphere(radius, point=frame_WCF.point)
+        sphere = Sphere(radius, point=pcf_frame.point)
         return cls.from_sphere(link_name, sphere, weight)
 
     @classmethod
@@ -743,12 +666,6 @@ class PositionConstraint(Constraint):
         -------
         :class:`PositionConstraint`
 
-        Examples
-        --------
-        >>> from compas.geometry import Frame
-        >>> from compas.geometry import Box
-        >>> box = Box(4, 4, 4, Frame.worldXY())
-        >>> pc = PositionConstraint.from_box('link_0', box)
         """
         bounding_volume = BoundingVolume.from_box(box)
         return cls(link_name, bounding_volume, weight)
@@ -772,12 +689,6 @@ class PositionConstraint(Constraint):
         -------
         :class:`PositionConstraint`
 
-        Examples
-        --------
-        >>> from compas_fab.robots import PositionConstraint
-        >>> from compas.geometry import Sphere
-        >>> sphere = Sphere(radius=0.5, point=[3,4,5])
-        >>> pc = PositionConstraint.from_sphere('link_0', sphere, weight=1.)
         """
         bounding_volume = BoundingVolume.from_sphere(sphere)
         return cls(link_name, bounding_volume, weight)
@@ -828,12 +739,6 @@ class PositionConstraint(Constraint):
         -------
         :class:`PositionConstraint`
 
-        Examples
-        --------
-        >>> from compas.datastructures import Mesh
-        >>> import compas
-        >>> mesh = Mesh.from_obj(compas.get('faces.obj'))
-        >>> pc = PositionConstraint.from_mesh('link_0', mesh)
         """
         bounding_volume = BoundingVolume.from_mesh(mesh)
         return cls(link_name, bounding_volume, weight)

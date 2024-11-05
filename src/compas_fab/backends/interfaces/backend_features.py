@@ -397,7 +397,7 @@ class InverseKinematics(BackendFeature):
 class PlanMotion(BackendFeature):
     """Mix-in interface for implementing a planner's plan motion feature."""
 
-    def plan_motion(self, robot, target, start_configuration=None, group=None, options=None):
+    def plan_motion(self, robot, target, start_state=None, group=None, options=None):
         """Calculates a motion path.
 
         Parameters
@@ -406,11 +406,12 @@ class PlanMotion(BackendFeature):
             The robot instance for which the motion path is being calculated.
         target : :class:`compas_fab.robots.Target`
             The goal for the robot to achieve.
-        start_configuration : :class:`compas_robots.Configuration`, optional
-            The robot's full configuration, i.e. values for all configurable
-            joints of the entire robot, at the starting position.
+        start_state : :class:`compas_fab.robots.RobotCellState`
+            The starting state of the robot cell at the beginning of the motion.
+            The attribute `robot_configuration`, must be provided.
         group : str, optional
-            The name of the group to plan for.
+            The name of the group to plan for. Defaults to the robot's main
+            planning group.
         options : dict, optional
             Dictionary containing kwargs for arguments specific to
             the client being queried.

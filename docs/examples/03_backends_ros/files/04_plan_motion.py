@@ -16,8 +16,8 @@ with RosClient() as client:
     tolerance_position = 0.001
     tolerance_orientation = math.radians(1)
 
-    start_configuration = robot_cell.zero_configuration()
-    start_configuration.joint_values = (-3.530, 3.830, -0.580, -3.330, 4.760, 0.000)
+    start_state = robot_cell.default_cell_state()
+    start_state.robot_configuration.joint_values = [-3.530, 3.830, -0.580, -3.330, 4.760, 0.000]
     group = robot_cell.main_group_name
 
     # create target from frame
@@ -33,7 +33,7 @@ with RosClient() as client:
         # "max_velocity_scaling_factor": 0.01,
         # "max_acceleration_scaling_factor": 0.01,
     }
-    trajectory = planner.plan_motion(target, start_configuration, group, options=options)
+    trajectory = planner.plan_motion(target, start_state, group, options=options)
 
     print("Computed kinematic path with %d configurations." % len(trajectory.points))
     print("Executing this path at full speed would take approx. %.3f seconds." % trajectory.time_from_start)

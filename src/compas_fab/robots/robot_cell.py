@@ -15,6 +15,7 @@ import compas_fab
 from .rigid_body import RigidBody
 from .semantics import RobotSemantics
 from .targets import TargetMode
+from .state import RobotCellState
 
 if not IPY:
     from typing import TYPE_CHECKING
@@ -27,7 +28,7 @@ if not IPY:
         from compas.datastructures import Mesh  # noqa: F401
         from compas_robots.model import Link  # noqa: F401
 
-        from .state import RobotCellState  # noqa: F401
+
 __all__ = [
     "RobotCell",
 ]
@@ -804,6 +805,23 @@ class RobotCell(Data):
         joint_types = [joint.type for joint in configurable_joints]
         joint_names = [joint.name for joint in configurable_joints]
         return Configuration(configuration.joint_values, joint_types, joint_names)
+
+    def default_cell_state(self):
+        """Create a default robot cell state for the robot cell.
+
+        The robot's base frame will be assumed to be at worldXY frame.
+        All tools will be assumed to be in their zero configuration and positioned at worldXY frame.
+        All workpieces will be assumed to be in their base frame and not attached to any tool or link.
+        All tools and workpieces are assumed to be visible in the scene (is_hidden=False).
+
+        Equivalent to :meth:`RobotCellState.from_robot_cell` with the robot cell as input.
+
+        Returns
+        -------
+        :class:`~compas_fab.robots.RobotCellState`
+            The default robot cell state.
+        """
+        return RobotCellState.from_robot_cell(self)
 
     # ----------------------------------------------------------
     # Retrieval Functions related to a specific robot_cell_state
