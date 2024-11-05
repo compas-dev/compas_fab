@@ -13,7 +13,6 @@ from compas_robots import ToolModel
 import compas_fab
 from compas_fab.robots import RigidBody
 from compas_fab.robots import RobotCell
-from compas_fab.robots import RobotCellState
 
 if not IPY:
     from typing import TYPE_CHECKING
@@ -22,7 +21,7 @@ if not IPY:
         from typing import Optional  # noqa: F401
         from typing import Tuple  # noqa: F401
 
-        from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
 
 
 __all__ = [
@@ -367,7 +366,7 @@ class RobotCellLibrary(object):
             srdf_filename=compas_fab.get("robot_library/rfl/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/rfl" if load_geometry else None,
         )
-        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+        robot_cell_state = robot_cell.default_cell_state()
 
         return robot_cell, robot_cell_state
 
@@ -398,7 +397,7 @@ class RobotCellLibrary(object):
             srdf_filename=compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/ur5_robot" if load_geometry else None,
         )
-        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+        robot_cell_state = robot_cell.default_cell_state()
 
         # Remove the planning group called 'endeffector' because it only has one link and no joints.
         del robot_cell.robot_semantics.groups["endeffector"]
@@ -429,7 +428,7 @@ class RobotCellLibrary(object):
             srdf_filename=compas_fab.get("robot_library/ur10e_robot/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/ur10e_robot" if load_geometry else None,
         )
-        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+        robot_cell_state = robot_cell.default_cell_state()
 
         # Remove the planning group called 'endeffector' because it only has one link and no joints.
         del robot_cell.robot_semantics.groups["endeffector"]
@@ -460,7 +459,7 @@ class RobotCellLibrary(object):
             srdf_filename=compas_fab.get("robot_library/abb_irb4600_40_255/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/abb_irb4600_40_255" if load_geometry else None,
         )
-        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+        robot_cell_state = robot_cell.default_cell_state()
 
         return robot_cell, robot_cell_state
 
@@ -488,7 +487,7 @@ class RobotCellLibrary(object):
             srdf_filename=compas_fab.get("robot_library/abb_irb120_3_58/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/abb_irb120_3_58" if load_geometry else None,
         )
-        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+        robot_cell_state = robot_cell.default_cell_state()
 
         return robot_cell, robot_cell_state
 
@@ -527,7 +526,7 @@ class RobotCellLibrary(object):
                 robot_model.remove_link(link.name)
                 robot_model.remove_joint(link.parent_joint.name)
 
-        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+        robot_cell_state = robot_cell.default_cell_state()
 
         # Remove the planning group called 'panda_hand' because it it not a "serial chain",
         # the bifurcation of the chain into two fingers is not supported by planning backends.
@@ -586,7 +585,7 @@ class RobotCellLibrary(object):
         # ------------------------------------------------------------------------
         # Re-Create RobotCellState after modifying the RobotCell
         # ------------------------------------------------------------------------
-        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+        robot_cell_state = robot_cell.default_cell_state()
 
         # Attach the tool to the robot's main group
         touch_links = ["wrist_3_link"]
@@ -660,7 +659,7 @@ class RobotCellLibrary(object):
         # ------------------------------------------------------------------------
         # Re-Create RobotCellState after modifying the RobotCell
         # ------------------------------------------------------------------------
-        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+        robot_cell_state = robot_cell.default_cell_state()
 
         # ------------------------------------------------------------------------
         # Tool Attachment
@@ -755,7 +754,7 @@ class RobotCellLibrary(object):
         # ------------------------------------------------------------------------
         # Re-Create RobotCellState after modifying the RobotCell
         # ------------------------------------------------------------------------
-        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+        robot_cell_state = robot_cell.default_cell_state()
 
         # Attach the tool to the robot's main group
         attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
@@ -822,7 +821,7 @@ class RobotCellLibrary(object):
         # ------------------------------------------------------------------------
         # Re-Create RobotCellState after modifying the RobotCell
         # ------------------------------------------------------------------------
-        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+        robot_cell_state = robot_cell.default_cell_state()
 
         # ------------------------------------------------------------------------
         # Tool Attachment
@@ -908,7 +907,7 @@ class RobotCellLibrary(object):
         # ------------------------------------------------------------------------
         # Re-Create RobotCellState after modifying the RobotCell
         # ------------------------------------------------------------------------
-        robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+        robot_cell_state = robot_cell.default_cell_state()
 
         # ------------------------------------------------------------------------
         # Tool Attachment

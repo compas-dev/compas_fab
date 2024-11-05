@@ -3,7 +3,6 @@ from compas_fab.backends import RosClient
 from compas_fab.backends import MoveItPlanner
 
 from compas_fab.robots import FrameTarget
-from compas_fab.robots import RobotCellState
 from compas_fab.robots import TargetMode
 
 with RosClient() as client:
@@ -12,7 +11,7 @@ with RosClient() as client:
     planner = MoveItPlanner(client)
 
     # Create a default RobotCellState from the RobotCell as the starting state
-    start_state = RobotCellState.from_robot_cell(robot_cell)
+    start_state = robot_cell.default_cell_state()
 
     # Create a target frame with the ROBOT mode
     frame_WCF = Frame([0.3, 0.1, 0.5], [0, -1, 0], [0, 0, -1])

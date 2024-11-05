@@ -2,8 +2,6 @@ from compas.geometry import Frame
 
 from compas_fab.backends import MoveItPlanner
 from compas_fab.backends import RosClient
-from compas_fab.robots import RobotCell
-from compas_fab.robots import RobotCellState
 from compas_fab.robots import ToolLibrary
 
 with RosClient() as client:
@@ -18,7 +16,7 @@ with RosClient() as client:
     gripper = ToolLibrary.kinematic_gripper()
     robot_cell.tool_models[gripper.name] = gripper
     # Attach the gripper to the robot
-    robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+    robot_cell_state = robot_cell.default_cell_state()
     robot_cell_state.set_tool_attached_to_group(
         gripper.name,
         robot_cell.main_group_name,

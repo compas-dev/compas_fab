@@ -4,13 +4,11 @@ from compas_fab.backends import RosClient
 from compas_fab.backends import MoveItPlanner
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import TargetMode
-from compas_fab.robots import RobotCell
-from compas_fab.robots import RobotCellState
 
 with RosClient() as client:
     planner = MoveItPlanner(client)
     robot_cell = client.load_robot_cell()
-    robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+    robot_cell_state = robot_cell.default_cell_state()
 
     assert robot_cell.robot_model.name == "ur5_robot"
 

@@ -5,8 +5,6 @@ from compas.geometry import Box
 import compas_fab
 from compas_fab.backends import RosClient
 from compas_fab.backends import MoveItPlanner
-from compas_fab.robots import RobotCell
-from compas_fab.robots import RobotCellState
 from compas_fab.robots import ToolLibrary
 from compas_fab.robots import RigidBody
 
@@ -31,7 +29,7 @@ with RosClient() as client:
     input("Press Enter to continue...")
 
     # In order to see the tool attached it is necessary to update the robot_cell_state
-    robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+    robot_cell_state = robot_cell.default_cell_state()
     # Modify the tool state to attach the cone to the robot
     robot_cell_state.tool_states["cone"].attached_to_group = robot_cell.main_group_name
     robot_cell_state.tool_states["cone"].attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
@@ -59,7 +57,7 @@ with RosClient() as client:
     robot_cell.tool_models[gripper.name] = gripper
     robot_cell.tool_models[cone_tool.name] = cone_tool
     # Attach the gripper to the robot
-    robot_cell_state = RobotCellState.from_robot_cell(robot_cell)
+    robot_cell_state = robot_cell.default_cell_state()
     # The following function `set_tool_attached_to_group` is an alternative way than that in example 1
     # It will also ensure that only one tool is attached to the specified group by removing others
     robot_cell_state.set_tool_attached_to_group(

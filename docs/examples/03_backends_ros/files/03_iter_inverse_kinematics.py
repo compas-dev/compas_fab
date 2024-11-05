@@ -3,7 +3,6 @@ from compas_fab.backends import RosClient
 from compas_fab.backends import MoveItPlanner
 
 from compas_fab.robots import FrameTarget
-from compas_fab.robots import RobotCellState
 from compas_fab.robots import TargetMode
 
 with RosClient() as client:
@@ -14,7 +13,7 @@ with RosClient() as client:
     frame_WCF = Frame([0.3, 0.1, 0.5], [0, -1, 0], [0, 0, -1])
     target = FrameTarget(frame_WCF, TargetMode.ROBOT)
 
-    start_state = RobotCellState.from_robot_cell(robot_cell)
+    start_state = robot_cell.default_cell_state()
 
     result_count = 0
     for config in planner.iter_inverse_kinematics(target, start_state, options=dict(max_results=10)):

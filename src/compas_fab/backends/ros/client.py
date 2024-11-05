@@ -27,7 +27,6 @@ from compas_fab.backends.ros.messages import Time
 from compas_fab.backends.tasks import CancellableFutureResult
 from compas_fab.robots import RobotSemantics
 from compas_fab.robots import RobotCell
-from compas_fab.robots import RobotCellState
 
 from compas import IPY
 
@@ -217,7 +216,7 @@ class RosClient(Ros, ClientInterface):
             model.load_geometry(loader, precision=precision)
 
         self._robot_cell = RobotCell(robot_model=model, robot_semantics=semantics)
-        self._robot_cell_state = RobotCellState.from_robot_cell(self._robot_cell)
+        self._robot_cell_state = self._robot_cell.default_cell_state()
 
         return self._robot_cell
 

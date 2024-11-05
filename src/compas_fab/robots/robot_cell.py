@@ -809,12 +809,12 @@ class RobotCell(Data):
     def default_cell_state(self):
         """Create a default robot cell state for the robot cell.
 
+        Equivalent to :meth:`RobotCellState.from_robot_cell` with the robot cell as input.
+
         The robot's base frame will be assumed to be at worldXY frame.
         All tools will be assumed to be in their zero configuration and positioned at worldXY frame.
         All workpieces will be assumed to be in their base frame and not attached to any tool or link.
         All tools and workpieces are assumed to be visible in the scene (is_hidden=False).
-
-        Equivalent to :meth:`RobotCellState.from_robot_cell` with the robot cell as input.
 
         Returns
         -------

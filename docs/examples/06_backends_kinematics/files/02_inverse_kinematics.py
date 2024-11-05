@@ -7,9 +7,6 @@ from compas_fab.backends import AnalyticalInverseKinematics
 from compas_fab.backends import AnalyticalKinematicsPlanner
 from compas_fab.backends.kinematics.solvers import UR5Kinematics
 
-from compas_fab.robots import RobotCell
-from compas_fab.robots import RobotCellState
-
 # Not loading the robot's geometry because AnalyticalKinematicsPlanner does not use it for collision checking
 robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=False)
 
@@ -24,7 +21,7 @@ frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956,
 target = FrameTarget(frame_WCF, TargetMode.ROBOT)
 
 # The start state is not important here because there is no tools involved
-start_state = RobotCellState.from_robot_cell(robot_cell)
+start_state = robot_cell.default_cell_state()
 
 # iter_inverse_kinematics() will return a generator that would yield possible IK solutions
 print("\nResults of iter_inverse_kinematics():")

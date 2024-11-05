@@ -44,7 +44,7 @@ def test_forward_kinematics(ur5_planner_robot_only):
     planner = ur5_planner_robot_only  # type: AnalyticalKinematicsPlanner
 
     # Initial state of the robot cell is the home position
-    start_state = RobotCellState.from_robot_cell(planner.robot_cell)
+    start_state = planner.robot_cell.default_cell_state()
     frame = planner.forward_kinematics(start_state, TargetMode.ROBOT, group=None)
 
     correct = Frame(
@@ -64,7 +64,7 @@ def test_iter_inverse_kinematics(ur5_planner_robot_only):
     )
 
     # The `iter_inverse_kinematics` method will return an iterator that yields all possible solutions
-    start_state = RobotCellState.from_robot_cell(planner.robot_cell)
+    start_state = planner.robot_cell.default_cell_state()
     solutions = list(planner.iter_inverse_kinematics(target, start_state, group=None))
     assert len(solutions) == 8
     configuration = solutions[0]
@@ -77,7 +77,7 @@ def test_inverse_kinematics(ur5_planner_robot_only):
     target = FrameTarget(
         Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269)), TargetMode.ROBOT
     )
-    start_state = RobotCellState.from_robot_cell(planner.robot_cell)
+    start_state = planner.robot_cell.default_cell_state()
 
     # Test to confirm inverse_kinematics() return one solution at a time
     solutions = []  # type: list[Configuration]
