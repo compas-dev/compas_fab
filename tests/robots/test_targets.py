@@ -178,12 +178,12 @@ def test_serialization_constraint_sets(target_frame, target_configuration, tool_
     tolerances_orientation = [0.0123] * 3
     orientation_constraint_weight = 0.789
     orientation_constraint = OrientationConstraint.from_frame(
-        target_frame, tolerances_orientation, link_name, tool_coordinate_frame, orientation_constraint_weight
+        target_frame, tolerances_orientation, link_name, orientation_constraint_weight
     )
     position_constraint_weight = 0.456
     tolerances_position = 0.567
     position_constraint = PositionConstraint.from_frame(
-        target_frame, tolerances_position, link_name, tool_coordinate_frame, position_constraint_weight
+        target_frame, tolerances_position, link_name, position_constraint_weight
     )
     target = ConstraintSetTarget([orientation_constraint, position_constraint], name)
     nt = ConstraintSetTarget.__from_data__(target.__data__)

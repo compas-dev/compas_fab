@@ -313,11 +313,14 @@ class InverseKinematics(BackendFeature):
         request_hash = (target.sha256(), robot_cell_state.sha256(), str(group), str(options))
 
         if self._last_ik_request["request_hash"] == request_hash and self._last_ik_request["solutions"] is not None:
+            print("Inverse Kinematics Hash: Last IK Generator reused")
             solution = next(self._last_ik_request["solutions"], None)
             # NOTE: If the iterator is exhausted, solution will be None, subsequent code outside will reset the generator
             if solution is not None:
                 return solution
+            print("- Unfortunately, the last IK generator is exhausted, re-initializing the generator...")
 
+        print("Inverse Kinematics Hash: New IK Generator created")
         solutions = self.iter_inverse_kinematics(target, robot_cell_state, group, options)
         self._last_ik_request["request_hash"] = request_hash
         self._last_ik_request["solutions"] = solutions
@@ -373,13 +376,6 @@ class InverseKinematics(BackendFeature):
         client = planner.client
         robot_cell = client.robot_cell  # type: RobotCell
         group = group or robot_cell.main_group_name
-
-        # Make a copy of the options before passing it to the planner's iter_inverse_kinematics method,
-        # which is likely to modify its content.
-        # Note: Without making a copy, the options dict will break the hashing function in the inverse_kinematics()
-        options = options or {}
-        options = deepcopy(options) if options else {}
-        robot_cell_state = deepcopy(robot_cell_state)
 
         # Unit conversion from user scale to meter scale can be done here because they are shared.
         # This will be triggered too, when entering from the inverse_kinematics method.

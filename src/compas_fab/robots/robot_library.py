@@ -140,7 +140,7 @@ class ToolLibrary(object):
             tool_mesh.scale(tool_size)
             meshes.append(tool_mesh)
 
-        tool_model.add_link("printing_tool_link", visual_mesh=meshes, collision_mesh=meshes)
+        tool_model.add_link("printing_tool_link", visual_meshes=meshes, collision_meshes=meshes)
 
         return tool_model
 

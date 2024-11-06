@@ -755,7 +755,11 @@ def test_iter_ik_point_axis_target(planner_with_test_cell):
     }
 
     # This target is reachable and collision free
-    target = PointAxisTarget([0.5, 0.5, 1.0], [1.0, 0.0, 0.0], TargetMode.ROBOT)
+    target = PointAxisTarget(
+        [0.5, 0.5, 1.0],
+        [1.0, 0.0, 0.0],
+        TargetMode.ROBOT,
+    )
 
     # Assert that if someone forgot to provide a group or an invalid one, it will raise an error
     generator = planner._iter_inverse_kinematics_point_axis_target(target, robot_cell_state, options)

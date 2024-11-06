@@ -167,6 +167,13 @@ class PyBulletInverseKinematics(InverseKinematics):
         # Keep track of user input for checking against the final result
         initial_start_configuration = deepcopy(robot_cell_state.robot_configuration)
 
+        # Make a copy of the options before passing it to the iter_inverse_kinematics method,
+        # which is likely to modify its content.
+        # Note: Without making a copy, the changed `options` and `robot_cell_state` will break the hashing function in the inverse_kinematics()
+        options = options or {}
+        options = deepcopy(options) if options else {}
+        robot_cell_state = deepcopy(robot_cell_state)
+
         if isinstance(target, FrameTarget):
             ik_generator = self._iter_inverse_kinematics_frame_target(target, robot_cell_state, group, options)
         elif isinstance(target, PointAxisTarget):
