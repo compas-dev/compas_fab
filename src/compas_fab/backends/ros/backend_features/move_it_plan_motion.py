@@ -64,8 +64,6 @@ class MoveItPlanMotion(PlanMotion):
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which the motion plan is being calculated.
         target : :class:`compas_fab.robots.Target`
             The goal for the robot to achieve.
         start_state : :class:`compas_fab.robots.RobotCellState`

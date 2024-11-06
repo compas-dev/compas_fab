@@ -393,13 +393,12 @@ class InverseKinematics(BackendFeature):
 class PlanMotion(BackendFeature):
     """Mix-in interface for implementing a planner's plan motion feature."""
 
-    def plan_motion(self, robot, target, start_state=None, group=None, options=None):
+    def plan_motion(self, target, start_state, group=None, options=None):
+        # type: (Target, RobotCellState, Optional[str], Optional[dict]) -> JointTrajectory
         """Calculates a motion path.
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which the motion path is being calculated.
         target : :class:`compas_fab.robots.Target`
             The goal for the robot to achieve.
         start_state : :class:`compas_fab.robots.RobotCellState`
