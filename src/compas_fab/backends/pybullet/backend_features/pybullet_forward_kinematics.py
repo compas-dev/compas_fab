@@ -105,8 +105,8 @@ class PyBulletForwardKinematics(ForwardKinematics):
 
         return target_frame
 
-    def forward_kinematics_to_link(self, robot_cell_state, link_name=None, group=None, native_scale=None, options=None):
-        # type: (RobotCellState, Optional[str], Optional[str], Optional[float], Optional[dict]) -> Frame
+    def forward_kinematics_to_link(self, robot_cell_state, link_name=None, native_scale=None, options=None):
+        # type: (RobotCellState, Optional[str], Optional[float], Optional[dict]) -> Frame
         """Calculate the frame of the specified robot link from the provided RobotCellState.
 
         This function operates similar to :meth:`compas_fab.backends.PyBulletForwardKinematics.forward_kinematics`,
@@ -123,9 +123,6 @@ class PyBulletForwardKinematics(ForwardKinematics):
         link_name : str, optional
             The name of the link to calculate the forward kinematics for.
             Defaults to the last link of the provided planning group.
-        group : str, optional
-            The planning group of the robot.
-            Defaults to the robot's main planning group.
         native_scale : float, optional
             The scaling factor to apply to the resulting frame.
             It is defined as `user_object_value * native_scale = meter_object_value`.
@@ -139,11 +136,6 @@ class PyBulletForwardKinematics(ForwardKinematics):
         planner = self  # type: PyBulletPlanner
         client = planner.client  # type: PyBulletClient
         robot_cell = client.robot_cell  # type: RobotCell
-        group = group or robot_cell.main_group_name
-
-        # Check if the planning group is supported by the planner
-        if group not in robot_cell.group_names:
-            raise PlanningGroupNotExistsError("Planning group '{}' is not supported by PyBullet planner.".format(group))
 
         # Setting the entire robot cell state, including the robot configuration
         planner.set_robot_cell_state(robot_cell_state)

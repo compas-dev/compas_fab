@@ -22,8 +22,8 @@ with PyBulletClient("direct") as client:
     # This is a simple robot cell with only the robot
     planner.set_robot_cell(robot_cell)
 
-    configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.0])
-    robot_cell_state.robot_configuration = configuration
+    robot_cell_state.robot_configuration.joint_values = [-2.238, -1.153, -2.174, 0.185, 0.667, 0.0]
+
     # In this demo, the default planning group is used for the forward kinematics
     frame_WCF = planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT)
 
@@ -36,4 +36,4 @@ with PyBulletClient("direct") as client:
     # ---------------------------------
     for link_name in robot_cell.get_link_names():
         frame_WCF = planner.forward_kinematics_to_link(robot_cell_state, link_name)
-        print("Frame of link '{}' : {}".format((link_name, frame_WCF)))
+        print("Frame of link '{}' : {}".format(link_name, frame_WCF))
