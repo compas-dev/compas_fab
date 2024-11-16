@@ -177,6 +177,9 @@ class FrameTarget(Target):
             "name": self.name,
         }
 
+    def __str__(self):
+        return "FrameTarget({}, {})".format(self.target_frame, self.target_mode)
+
     @classmethod
     def from_transformation(
         cls,
@@ -344,13 +347,16 @@ class PointAxisTarget(Target):
     def __data__(self):
         return {
             "target_point": self.target_point,
+            "target_z_axis": self.target_z_axis,
             "target_mode": self.target_mode,
             "native_scale": self.native_scale,
-            "target_z_axis": self.target_z_axis,
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
         }
+
+    def __str__(self):
+        return "PointAxisTarget({}, {}, {})".format(self.target_point, self.target_z_axis, self.target_mode)
 
     def normalize_to_meters(self):
         # type: () -> None
@@ -459,6 +465,9 @@ class ConfigurationTarget(Target):
             "tolerance_below": self.tolerance_below,
             "name": self.name,
         }
+
+    def __str__(self):
+        return "ConfigurationTarget({})".format(self.target_configuration)
 
     @classmethod
     def generate_default_tolerances(cls, configuration, tolerance_prismatic, tolerance_revolute):
@@ -628,6 +637,9 @@ class ConstraintSetTarget(Target):
             "constraint_set": self.constraint_set,
             "name": self.name,
         }
+
+    def __str__(self):
+        return "ConstraintSetTarget({})".format(self.constraint_set)
 
     def normalize_to_meters():
         """ConstraintSetTarget does not contain any geometry with configurable units to normalize."""
