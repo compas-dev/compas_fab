@@ -38,6 +38,7 @@ from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import RosDistro
 from compas_fab.backends.ros.service_description import ServiceDescription
 from compas_fab.robots import FrameTarget
+from compas_fab.backends.ros.exceptions import RosValidationError
 
 __all__ = [
     "MoveItInverseKinematics",
@@ -86,9 +87,8 @@ class MoveItInverseKinematics(InverseKinematics):
             The planning group used for calculation.
             Defaults to the robot's main planning group.
         options : dict, optional
-            Dictionary containing kwargs for arguments specific to
-            the underlying function being called.
-            See the target-specific function's documentation for details.
+            Dictionary containing arguments specific to the solver.
+            See the `options` parameter in :meth:`iter_inverse_kinematics` for details.
 
         Returns
         -------
@@ -97,10 +97,11 @@ class MoveItInverseKinematics(InverseKinematics):
 
         Raises
         ------
-        :class: `compas_fab.backends.exceptions.InverseKinematicsError`
+
+        :class:`compas_fab.backends.exceptions.InverseKinematicsError`
             If no configuration can be found.
 
-        :class:`compas_fab.backends.TargetModeMismatchError`
+        :class:`compas_fab.backends.exceptions.TargetModeMismatchError`
             If the selected TargetMode is not possible with the provided robot cell state.
 
 
@@ -125,6 +126,16 @@ class MoveItInverseKinematics(InverseKinematics):
         # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
         """Calculate the robot's inverse kinematic for a given target.
 
+        The MoveIt inverse kinematics solver make use of the IK solver pre-configured in
+        the MoveIt config file.
+
+        This particular function wraps the MoveIt IK solver to provide a generator
+        that can yield multiple IK solutions. The solver will make multiple attempts
+        to find a solution. The first attempt will start from the robot's current configuration
+        provided in the ``robot_cell_state``. The subsequent attempts will start from a random
+        configuration, so the results may vary between calls.
+
+
         Parameters
         ----------
         target: :class:`compas.geometry.FrameTarget`
@@ -137,22 +148,34 @@ class MoveItInverseKinematics(InverseKinematics):
         options: dict, optional
             Dictionary containing the following key-value pairs:
 
-            - ``"base_link"``: (:obj:`str`) Name of the base link.
-              Defaults to the model's root link.
-            - ``"avoid_collisions"``: (:obj:`bool`, optional) Whether or not to avoid collisions.
-              Defaults to ``True``.
-            - ``"constraints"``: (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional)
-              A set of constraints that the request must obey.
-              Defaults to ``None``.
-            - ``"timeout"``: (:obj:`int`, optional) Maximum allowed time for inverse kinematic calculation in seconds.
-              Defaults to ``2``. This value supersedes the ``"attempts"`` argument used before ROS Noetic.
-            - ``"attached_collision_meshes"``: (:obj:`list` of :class:`compas_fab.robots.AttachedCollisionMesh`, optional)
-              Defaults to ``None``.
             - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
+              If set to 1, the solver will be deterministic, descending from the initial
+              robot configuration.
               Defaults to ``100``.
+            - ``"solution_uniqueness_threshold_prismatic"``: (:obj:`float`, optional) The minimum
+              distance between two solutions in the prismatic joint space to consider them unique.
+              Units are in meters. Defaults to ``3e-4``.
+            - ``"solution_uniqueness_threshold_revolute"``: (:obj:`float`, optional) The minimum
+              distance between two solutions in the revolute joint space to consider them unique.
+              Units are in radians. Defaults to ``1e-3``.
+            - ``"return_full_configuration"``: (:obj:`bool`, optional)
+                Whether or not to return the full configuration. Defaults to ``False``.
+            - ``"verbose"``: (:obj:`bool`, optional)
+                Whether or not to print verbose output. Defaults to ``False``.
+            - ``"allow_collision"``: (:obj:`bool`, optional) When True, collision checking is disabled.
+              Defaults to ``False``.
+            - ``"constraints"``: (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional)
+              An extra set of MoveIt constraints where the final link of the planning group must satisfy.
+              Defaults to ``None``.
+            - ``"timeout"``: (:obj:`int`, optional) Maximum allowed time for one inverse kinematic
+              calculation by the backend. If ``max_results`` is greater than 1, this timeout is
+              applied to each calculation.
+              Unit is seconds. Defaults to ``2``.
+              This value supersedes the ``"attempts"`` argument used before ROS Noetic.
 
         Raises
         ------
+
         :class:`compas_fab.backends.InverseKinematicsError`
             Indicates that no IK solution could be found by the kinematic solver
             after the maximum number of attempts (``max_results``). This can be caused by
@@ -161,10 +184,16 @@ class MoveItInverseKinematics(InverseKinematics):
         :class:`compas_fab.backends.TargetModeMismatchError`
             If the selected TargetMode is not possible with the provided robot cell state.
 
+        :class:`compas_fab.backends.CollisionCheckError`
+            If ``check_collision`` is enabled and the configuration is in collision.
+            This is only raised if ``max_results`` is set to 1. In this case, the solver is
+            deterministic (descending from the initial robot configuration) and this error
+            indicates that the problem is caused by collision and not because of reachability.
+
         Yields
         ------
-        :obj:`tuple` of (:obj:`list` of :obj:`float`, :obj:`list` of :obj:`str`)
-            A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
+        :obj:`compas_robots.Configuration`
+            One of the possible IK configurations that reaches the target.
 
         """
         planner = self  # type: MoveItPlanner
@@ -195,79 +224,10 @@ class MoveItInverseKinematics(InverseKinematics):
 
     def _iter_inverse_kinematics_frame_target(self, target, robot_cell_state, group, options=None):
         # type: (FrameTarget, RobotCellState, str, Optional[Dict]) -> Generator[Configuration | None]
-        """Calculate the robot's inverse kinematic for a given FrameTarget.
+        """Calculate the robot's inverse kinematic for a given frame target.
 
-        The MoveIt inverse kinematics solver make use of the IK solver pre-configured in
-        the MoveIt config file.
-
-        This particular function wraps the MoveIt IK solver to provide a generator
-        that can yield multiple IK solutions. The solver will make multiple attempts
-        to find a solution. The first attempt will start from the robot's current configuration
-        provided in the ``robot_cell_state``. The subsequent attempts will start from a random
-        configuration, so the results may vary.
-
-        Notes
-        -----
-        The number of attempts is determined by the ``max_results`` option.
-
-        Parameters
-        ----------
-        target: :class:`compas.geometry.FrameTarget`
-            The Frame Target to calculate the inverse for.
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
-            The starting state to calculate the inverse kinematics for.
-        group: str
-            The planning group used for determining the end effector and labeling
-            the ``start_configuration``. Defaults to the robot's main planning group.
-        options: dict, optional
-            Dictionary containing the following key-value pairs:
-
-            - ``"semi-constrained"``: (:obj:`bool`, optional) When ``True``, only the
-              position of the target is considered. The orientation of frame will not be considered
-              in the calculation.  Defaults to ``False``.
-            - ``"max_descend_iterations"``:  (:obj:`float`, optional) Defines the maximum
-              number of iterations to use during the gradient descend.
-              If this number of iterations are reached without convergence, the solver will consider
-              the initial guess as a bad starting point and will retry with a new random configuration.
-              Defaults to ``20``.
-              If the target tolerance is increased, this value should be increased as well.
-            - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
-              If set to 1, the solver will be deterministic, descending from the initial
-              robot configuration.
-              Defaults to ``100``.
-            - ``"solution_uniqueness_threshold_prismatic"``: (:obj:`float`, optional) The minimum
-              distance between two solutions in the prismatic joint space to consider them unique.
-              Units are in meters. Defaults to ``3e-4``.
-            - ``"solution_uniqueness_threshold_revolute"``: (:obj:`float`, optional) The minimum
-              distance between two solutions in the revolute joint space to consider them unique.
-              Units are in radians. Defaults to ``1e-3``.
-            - ``"check_collision"``: (:obj:`bool`, optional)
-              Whether or not to check for collision. Defaults to ``True``.
-            - ``"return_full_configuration"``: (:obj:`bool`, optional)
-                Whether or not to return the full configuration. Defaults to ``False``.
-            - ``"verbose"``: (:obj:`bool`, optional)
-                Whether or not to print verbose output. Defaults to ``False``.
-
-        Yields
-        ------
-        :obj:`compas_robots.Configuration`
-            One of the possible IK configurations that reaches the target.
-
-        Raises
-        ------
-        :class:`compas_fab.backends.InverseKinematicsError`
-            Indicates that no IK solution could be found by the kinematic solver
-            after the maximum number of attempts (``max_results``). This can be caused by
-            reachability or collision or both.
-
-        :class:`compas_fab.backends.CollisionCheckError`
-            If ``check_collision`` is enabled and the configuration is in collision.
-            This is only raised if ``max_results`` is set to 1. In this case, the solver is
-            deterministic (descending from the initial robot configuration) and this error
-            indicates that the problem is caused by collision and not because of reachability.
-
-        :class:`compas_fab.backends.TargetModeMismatchError`
-            If the selected TargetMode is not possible with the provided robot cell state.
+        This function is not exposed to the user and therefore docstrings
+        should be written in iter_inverse_kinematics.
 
         """
 
@@ -283,8 +243,10 @@ class MoveItInverseKinematics(InverseKinematics):
         # Default options
         options = options or {}
         options["max_results"] = options.get("max_results", 100)
+
         # Use base_link or fallback to model's root link
         options["base_link"] = options.get("base_link", robot_cell.root_name)
+        # The exposed "base_link" option is removed from documentation because I don't know what it does.
 
         # Setting the entire robot cell state, including the robot configuration
         planner.set_robot_cell_state(robot_cell_state)
@@ -312,13 +274,25 @@ class MoveItInverseKinematics(InverseKinematics):
         kwargs["errback_name"] = "errback"
 
         max_results = options.get("max_results")
+        if max_results < 1:
+            raise ValueError("max_results must be greater than 0.")
         all_yielded_joint_positions = []
 
         # Loop to get multiple results with random restarts
-        for _ in range(max_results):
-            # First iteration uses the provided start_configuration
-            joint_positions, joint_names = await_callback(self.inverse_kinematics_async, **kwargs)
+        for i in range(max_results):
 
+            # First iteration uses the provided start_configuration
+            # Subsequent iterations use a random configuration
+
+            # Try block to catch backend level exceptions
+            try:
+                joint_positions, joint_names = await_callback(self._inverse_kinematics_async, **kwargs)
+            except RosValidationError as e:
+                if options.get("verbose", False):
+                    print("Failed to find a configuration in iteration {} / {}".format(i, max_results))
+                raise e.original_exception
+
+            # TODO: Implement solution_uniqueness_threshold_prismatic and solution_uniqueness_threshold_revolute
             # Check if the result is the same as any of the previous results
             result_is_unique = True
             for j in all_yielded_joint_positions:
@@ -338,14 +312,14 @@ class MoveItInverseKinematics(InverseKinematics):
             random_configuration = robot_cell.random_configuration(kwargs["group"])
             kwargs["start_configuration"] = random_configuration
 
-            # If no solution was found after max_results, raise an error
-            if len(all_yielded_joint_positions) == 0:
-                raise InverseKinematicsError(
-                    "No solution found after {} attempts (max_results).".format(options.get("max_results")),
-                    target_pcf=target_pcf,
-                )
+        # If no solution was found after max_results, raise an error
+        if len(all_yielded_joint_positions) == 0:
+            raise InverseKinematicsError(
+                "No solution found after {} attempts (max_results).".format(options.get("max_results")),
+                target_pcf=target_pcf,
+            )
 
-    def inverse_kinematics_async(
+    def _inverse_kinematics_async(
         self, callback, errback, frame_WCF, start_configuration=None, group=None, options=None
     ):
         """Asynchronous handler of MoveIt IK service."""
@@ -373,7 +347,7 @@ class MoveItInverseKinematics(InverseKinematics):
             robot_state=robot_state,
             constraints=constraints,
             pose_stamped=pose_stamped,
-            avoid_collisions=options.get("avoid_collisions", True),
+            avoid_collisions=not options.get("allow_collision", False),
             attempts=options.get("attempts", 8),
             timeout=timeout_duration,
         )
