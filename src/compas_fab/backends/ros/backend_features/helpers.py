@@ -27,6 +27,7 @@ from compas_fab.backends.exceptions import MPTargetInCollisionError
 from compas_fab.backends.exceptions import MPSearchTimeOutError
 from compas_fab.backends.exceptions import PlanningGroupNotExistsError
 from compas_fab.backends.exceptions import MPNoPlanFoundError
+from compas_fab.backends.exceptions import InverseKinematicsError
 
 DEFAULT_TOLERANCE_ORIENTATION = 0.1
 DEFAULT_TOLERANCE_POSITION = 0.01
@@ -52,6 +53,10 @@ def validate_response(response):
             raise MPTargetInCollisionError("MoveItErrorCodes -13 GOAL_VIOLATES_PATH_CONSTRAINTS")
         elif response.error_code == MoveItErrorCodes.INVALID_GROUP_NAME:
             raise PlanningGroupNotExistsError("INVALID_GROUP_NAME -15 INVALID_GROUP_NAME")
+        elif response.error_code == MoveItErrorCodes.NO_IK_SOLUTION:
+            raise InverseKinematicsError(
+                "MoveItErrorCodes -31 NO_IK_SOLUTION (Can be caused by reachability or collision issues)"
+            )
         else:
             raise RosError(
                 "MoveItErrorCodes {}, {}".format(response.error_code.human_readable, int(response.error_code)),
