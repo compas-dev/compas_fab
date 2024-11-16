@@ -176,15 +176,14 @@ class ForwardKinematics(BackendFeature):
 
     def forward_kinematics(self, robot_cell_state, target_mode, group=None, native_scale=None, options=None):
         # type: (RobotCellState, TargetMode | str, Optional[str], Optional[float], Optional[dict]) -> Frame
-        """Calculate the target frame of the robot from the provided RobotCellState.
+        """Calculate the target frame of the robot (relative to WCF) from the provided RobotCellState.
 
-        The function can return the planner coordinate frame (PCF), the tool coordinate frame (TCF),
-        or the workpiece's object coordinate frame (OCF) based on the ``target_mode`` provided.
+        The returned coordinate frame is dependent on the chosen ``target_mode``:
 
-        - ``"Target.ROBOT"`` will return the planner coordinate frame (PCF) of the planning group.
-        - ``"Target.TOOL"`` will return the tool coordinate frame (TCF) if a tool is attached to the planning group.
+        - ``"Target.ROBOT"`` will return the planner coordinate frame (PCF).
+        - ``"Target.TOOL"`` will return the tool coordinate frame (TCF) if a tool is attached.
         - ``"Target.WORKPIECE"`` will return the workpiece's object coordinate frame (OCF)
-          if a workpiece is attached to the planning group via a tool.
+          if a workpiece is attached (via an attached tool).
 
         Parameters
         ----------
@@ -286,10 +285,8 @@ class InverseKinematics(BackendFeature):
             Dictionary containing kwargs for arguments specific to
             the client being queried.
 
-            - ``"return_full_configuration"``: (:obj:`bool`) If ``True``, the full configuration
-                will be returned. Defaults to ``False``.
-            - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
-                Defaults to ``100``.
+            - ``"verbose"``: (:obj:`bool`, optional)
+                Whether or not to print verbose output. Defaults to ``False``.
 
         Raises
         ------
@@ -313,14 +310,17 @@ class InverseKinematics(BackendFeature):
         request_hash = (target.sha256(), robot_cell_state.sha256(), str(group), str(options))
 
         if self._last_ik_request["request_hash"] == request_hash and self._last_ik_request["solutions"] is not None:
-            print("Inverse Kinematics Hash: Last IK Generator reused")
+            if options.get("verbose", False):
+                print("Inverse Kinematics Hash: Last IK Generator reused")
             solution = next(self._last_ik_request["solutions"], None)
             # NOTE: If the iterator is exhausted, solution will be None, subsequent code outside will reset the generator
             if solution is not None:
                 return solution
-            print("- Unfortunately, the last IK generator is exhausted, re-initializing the generator...")
+            if options.get("verbose", False):
+                print("- Unfortunately, the last IK generator is exhausted, re-initializing the generator...")
 
-        print("Inverse Kinematics Hash: New IK Generator created")
+        if options and options.get("verbose", False):
+            print("Inverse Kinematics Hash: New IK Generator created")
         solutions = self.iter_inverse_kinematics(target, robot_cell_state, group, options)
         self._last_ik_request["request_hash"] = request_hash
         self._last_ik_request["solutions"] = solutions
@@ -356,6 +356,8 @@ class InverseKinematics(BackendFeature):
 
             - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
               Defaults to ``100``.
+            - ``"verbose"``: (:obj:`bool`, optional)
+                Whether or not to print verbose output. Defaults to ``False``.
 
         Raises
         ------

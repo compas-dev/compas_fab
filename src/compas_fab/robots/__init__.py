@@ -15,8 +15,12 @@ Main classes
     :toctree: generated/
     :nosignatures:
 
-    Robot
+    RobotCell
+    RobotCellState
+    RigidBody
+    RigidBodyState
     RobotSemantics
+    ToolState
     Duration
     Wrench
     Inertia

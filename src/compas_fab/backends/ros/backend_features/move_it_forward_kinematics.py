@@ -2,6 +2,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from compas import IPY
+from compas.geometry import Frame
+from compas.geometry import Transformation
 from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import ForwardKinematics
@@ -14,19 +17,18 @@ from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
 
-from compas import IPY
-
 if not IPY:
     from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:  # pragma: no cover
         from typing import Optional  # noqa: F401
+
         from compas_fab.backends.ros.client import RosClient  # noqa: F401
         from compas_fab.backends.ros.planner import MoveItPlanner  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import TargetMode  # noqa: F401
         from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas.geometry import Frame  # noqa: F401
+        from compas_fab.robots import TargetMode  # noqa: F401
+
 
 __all__ = [
     "MoveItForwardKinematics",
@@ -42,15 +44,14 @@ class MoveItForwardKinematics(ForwardKinematics):
 
     def forward_kinematics(self, robot_cell_state, target_mode, group=None, native_scale=None, options=None):
         # type: (RobotCellState, TargetMode, Optional[str], Optional[float], Optional[dict]) -> Frame
-        """Calculate the target frame of the robot from the provided RobotCellState.
+        """Calculate the target frame of the robot (relative to WCF) from the provided RobotCellState.
 
-        The function can return the planner coordinate frame (PCF), the tool coordinate frame (TCF),
-        or the workpiece's object coordinate frame (OCF) based on the ``target_mode`` provided.
+        The returned coordinate frame is dependent on the chosen ``target_mode``:
 
-        - ``"Target.ROBOT"`` will return the planner coordinate frame (PCF) of the planning group.
-        - ``"Target.TOOL"`` will return the tool coordinate frame (TCF) if a tool is attached to the planning group.
+        - ``"Target.ROBOT"`` will return the planner coordinate frame (PCF).
+        - ``"Target.TOOL"`` will return the tool coordinate frame (TCF) if a tool is attached.
         - ``"Target.WORKPIECE"`` will return the workpiece's object coordinate frame (OCF)
-          if a workpiece is attached to the planning group via a tool.
+          if a workpiece is attached (via an attached tool).
 
         Parameters
         ----------
@@ -88,7 +89,21 @@ class MoveItForwardKinematics(ForwardKinematics):
 
         link_name = robot_cell.get_end_effector_link_name(group)
         pcf_frame = self.forward_kinematics_to_link(robot_cell_state, link_name, native_scale, options)
+
+        # Convert PCF to the target frame
         target_frame = client.robot_cell.pcf_to_target_frames(robot_cell_state, pcf_frame, target_mode, group)
+        t_rcf_target = Transformation.from_frame(target_frame)
+
+        # Convert target frame to WCF
+        t_wcf_rcf = Transformation.from_frame(robot_cell_state.robot_base_frame)
+        t_wcf_target = t_wcf_rcf * t_rcf_target
+        wcf_target_frame = Frame.from_transformation(t_wcf_target)
+
+        # Scale resulting frame to user units
+        if native_scale:
+            wcf_target_frame.scale(1 / native_scale)
+
+        return wcf_target_frame
 
         return target_frame
 

@@ -14,8 +14,8 @@ import compas_fab
 
 from .rigid_body import RigidBody
 from .semantics import RobotSemantics
-from .targets import TargetMode
 from .state import RobotCellState
+from .targets import TargetMode
 
 if not IPY:
     from typing import TYPE_CHECKING
@@ -67,6 +67,23 @@ class RobotCell(Data):
     rigid_body_models : dict of str and :class:`~compas_fab.robots.RigidBody`
         The rigid bodies in the robot cell.
         The key is the unique identifier for the rigid body.
+    root_name : str
+        The name of the robot's root link.
+    main_group_name: str
+        The name of the main planning group of the robot.
+    group_names: list of str
+        The names of all planning groups of the robot.
+    group_states: dict of str and dict of str and dict of str and float
+        The group states of the robot.
+        The first key is the group name, the second key is the group state name.
+        At this level you get a joint dictionary.
+        The third key is the joint name, and the value is the joint value.
+    tool_ids: list of str
+        The ids of the tools in the robot cell.
+    rigid_body_ids: list of str
+        The ids of the rigid bodies in the robot cell.
+
+
     """
 
     def __init__(self, robot_model=None, robot_semantics=None, tool_models=None, rigid_body_models=None):
@@ -219,6 +236,7 @@ class RobotCell(Data):
     # -------------------------------------------------
     @property
     def root_name(self):
+        # type: () -> str
         """Robot's root name."""
         return self.robot_model.root.name
 
@@ -1243,6 +1261,66 @@ class RobotCell(Data):
             raise ValueError("Unsupported target mode: '{}'.".format(target_mode))
 
         return target_frames[0] if input_is_not_list else target_frames
+
+    # ----------------------------------------
+    # Forward Kinematics Functions
+    # ----------------------------------------
+
+    def forward_kinematics_target_frame(self, robot_cell_state, target_mode, group=None, native_scale=None):
+        # type: (RobotCellState, TargetMode, Optional[str], Optional[float]) -> Frame
+        """Compute the target frame of the robot for the specified planning group
+        and target mode.
+
+        #. The Planner Coordinate Frame (PCF) relative to WCF is returned for TargetMode.ROBOT.
+        #. The Tool Coordinate Frame (TCF) relative to WCF is returned for TargetMode.TOOL.
+        #. The Object Coordinate Frame (OCF) relative to WCF is returned for TargetMode.WORKPIECE.
+
+        Forward kinematics function is provided by the RobotModel.
+        Therefore, the function is available even without any backend planner.
+        A full robot configuration (containing all joints) must be present in
+        the `robot_cell_state` input.
+
+        Parameters
+        ----------
+        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+            The state of the robot cell.
+            The robot configuration must be set in the robot state.
+        target_mode : :class:`~compas_fab.robots.TargetMode`
+            The target mode of the frame.
+            The target mode must be supported by the robot cell state.
+        group : str, optional
+            The name of the planning group.
+            Defaults to the main planning group.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Frame`
+            The target frame as interpreted by the target mode,
+            relative to the World Coordinate Frame (WCF).
+
+        """
+        self.assert_cell_state_match(robot_cell_state)
+
+        group = group or self.main_group_name
+
+        # Call forward kinematics with the robot configuration and group
+        link_name = self.get_end_effector_link_name(group)
+        pcf = self.robot_model.forward_kinematics(robot_cell_state.robot_configuration, link_name)
+
+        # Convert to the target frame
+        target_frame = self.pcf_to_target_frames(robot_cell_state, pcf, target_mode, group)
+        t_rcf_target = Transformation.from_frame(target_frame)
+
+        # Convert target frame to WCF
+        t_wcf_rcf = Transformation.from_frame(robot_cell_state.robot_base_frame)
+        t_wcf_target = t_wcf_rcf * t_rcf_target
+        wcf_target_frame = Frame.from_transformation(t_wcf_target)
+
+        # Scale resulting frame to user units
+        if native_scale:
+            wcf_target_frame.scale(1 / native_scale)
+
+        return wcf_target_frame
 
     def compute_attach_objects_frames(self, robot_cell_state):
         # type: (RobotCellState) -> RobotCellState

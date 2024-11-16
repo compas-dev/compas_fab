@@ -3,6 +3,8 @@ from __future__ import division
 from __future__ import print_function
 
 from compas import IPY
+from compas.geometry import Frame
+from compas.geometry import Transformation
 
 from compas_fab.backends.exceptions import PlanningGroupNotExistsError
 from compas_fab.backends.interfaces import ForwardKinematics
@@ -27,15 +29,14 @@ class PyBulletForwardKinematics(ForwardKinematics):
 
     def forward_kinematics(self, robot_cell_state, target_mode, group=None, native_scale=None, options=None):
         # type: (RobotCellState, TargetMode | str, Optional[str], Optional[float], Optional[dict]) -> Frame
-        """Calculate the target frame of the robot from the provided RobotCellState.
+        """Calculate the target frame of the robot (relative to WCF) from the provided RobotCellState.
 
-        The function can return the planner coordinate frame (PCF), the tool coordinate frame (TCF),
-        or the workpiece's object coordinate frame (OCF) based on the ``target_mode`` provided.
+        The returned coordinate frame is dependent on the chosen ``target_mode``:
 
         - ``"Target.ROBOT"`` will return the planner coordinate frame (PCF).
         - ``"Target.TOOL"`` will return the tool coordinate frame (TCF) if a tool is attached.
         - ``"Target.WORKPIECE"`` will return the workpiece's object coordinate frame (OCF)
-          if a workpiece is attached.
+          if a workpiece is attached (via an attached tool).
 
         Collision checking is not performed during the calculation. Consider using the
         :meth:`compas_fab.backends.PyBulletCheckCollision.check_collision` method to check for collisions.
@@ -94,23 +95,27 @@ class PyBulletForwardKinematics(ForwardKinematics):
         link_id = client.robot_link_puids[link_name]
         pcf_frame = client._get_link_frame(link_id, client.robot_puid)
 
-        # If no link name provided, and a tool is attached to the group, return the tool tip frame of the tool
-        target_frame = client.robot_cell.pcf_to_target_frames(
-            robot_cell_state, pcf_frame, target_mode=target_mode, group=group
-        )
+        # Convert PCF to the target frame
+        target_frame = client.robot_cell.pcf_to_target_frames(robot_cell_state, pcf_frame, target_mode, group)
+        t_rcf_target = Transformation.from_frame(target_frame)
+
+        # Convert target frame to WCF
+        t_wcf_rcf = Transformation.from_frame(robot_cell_state.robot_base_frame)
+        t_wcf_target = t_wcf_rcf * t_rcf_target
+        wcf_target_frame = Frame.from_transformation(t_wcf_target)
 
         # Scale resulting frame to user units
         if native_scale:
-            target_frame.scale(1 / native_scale)
+            wcf_target_frame.scale(1 / native_scale)
 
-        return target_frame
+        return wcf_target_frame
 
     def forward_kinematics_to_link(self, robot_cell_state, link_name=None, native_scale=None, options=None):
         # type: (RobotCellState, Optional[str], Optional[float], Optional[dict]) -> Frame
-        """Calculate the frame of the specified robot link from the provided RobotCellState.
+        """Calculate the Link Coordinate Frame (LCF) to return. frame of the specified robot link from the provided RobotCellState.
 
         This function operates similar to :meth:`compas_fab.backends.PyBulletForwardKinematics.forward_kinematics`,
-        but allows the user to specify which link to return. The function will return the frame of the specified
+        but allows the user to specify which link's
         link relative to the world coordinate frame (WCF).
 
         This can be convenient in scenarios where user objects (such as a camera) are attached to one of the
