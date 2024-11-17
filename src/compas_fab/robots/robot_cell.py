@@ -1404,7 +1404,7 @@ class RobotCell(Data):
         print("The robot's joints are:")
         for joint in self.robot_model.iter_joints():
             joint = joint  # type: Joint
-            info = "\t* '{}' is of type '{}'".format(joint.name, list(Joint.SUPPORTED_TYPES)[joint.type])
+            info = "\t- '{}' is of type '{}'".format(joint.name, list(Joint.SUPPORTED_TYPES)[joint.type])
             if joint.limit:
                 info += " and has limits [{:.3f}, {:.3f}]".format(joint.limit.upper, joint.limit.lower)
             if joint.type == Joint.FIXED:
@@ -1423,11 +1423,11 @@ class RobotCell(Data):
         else:
             print("The planning groups are:", self.group_names)
             print("The main planning group is '{}'.".format(self.main_group_name))
-            print("The base link's name is '{}'".format(self.get_base_link_name()))
-            print("The end-effector's link name is '{}'.".format(self.get_end_effector_link_name()))
+            print("\t- base link's name is '{}'".format(self.get_base_link_name()))
+            print("\t- end-effector's link name is '{}'.".format(self.get_end_effector_link_name()))
 
         print("The following tools are present:")
-        print([self.tool_models.keys()])
+        print(list(self.tool_models.keys()))
 
         print("The following rigid bodies are present:")
-        print([self.rigid_body_models.keys()])
+        print(list(self.rigid_body_models.keys()))
