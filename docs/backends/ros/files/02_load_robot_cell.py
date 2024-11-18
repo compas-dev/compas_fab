@@ -26,6 +26,7 @@ Output:
 >>> The main planning group is 'manipulator'.
 >>>        - base link's name is 'base_link'
 >>>        - end-effector's link name is 'tool0'.>>> The following tools are present:
+>>> The following tools are present:
 >>> []
 >>> The following rigid bodies are present:
 >>> []
