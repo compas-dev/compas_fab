@@ -6,7 +6,7 @@ Plan motion
 
    The description on this page is specific to the MoveIt! planner backend,
    see :ref:`Core Concepts: Plan Motion<plan_motion>`
-   for general information on plan _plan_motion.
+   for general information on plan motion.
 
 
 .. currentmodule:: compas_fab.backends
