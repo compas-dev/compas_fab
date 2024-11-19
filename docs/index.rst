@@ -31,13 +31,14 @@ Contents
 ========
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
    :titlesonly:
 
    Introduction <self>
    getting_started
+   concepts
+   frontends
    backends
-   examples
    api
    contributing
    authors

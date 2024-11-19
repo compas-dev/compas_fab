@@ -1,85 +1,52 @@
 .. _backends:
 
 ********************************************************************************
-Working with backends
+Working with Planning Backends
 ********************************************************************************
 
 .. highlight:: bash
 
-One of the driving principles of **COMPAS** framework is to create an ecosystem
-and serve as an interface between different front-ends (e.g. CAD software) and
-back-ends.
+.. currentmodule:: compas_fab
 
-In the case of **COMPAS FAB**, it provides access to multiple robotic platforms
-as backends. This chapter highlights the available ones and explains how to
-obtain them and set them up.
+**COMPAS FAB** provides access to multiple robotic platforms as backends for
+planning motions. As a middle layer between the user and the backend, **COMPAS FAB**
+provides a unified interface to interact with the different backends.
 
+The workflow of using the planning backends are similar across the different backends:
 
-Installing backends
-===================
+#. Create :class:`backends.RosClient` and :class:`backends.MoveItPlanner` instances.
 
-Backends can be installed in different ways. Some backends are very simple to
-install, while others are very complex.
+#. Create a :class:`robots.RobotCell` instance to represent the robot and its environment.
 
-In order to simplify working with these tools and have a consistent way
-to use and test different backends, **COMPAS FAB** provides them as
-`Docker containers`_. Docker containers are a way to bundle systems into
-isolated, standarized software units with full reproducibility. It greatly
-reduces the time it takes to get a backend up and running.
+   #. Include :class:`compas_robots.RobotModel` instance
 
-However, all of them can be installed *without* Docker as well. Please refer
-to the documentation of the respective tool for standard installation
-instructions.
+   #. Include :class:`compas_robots.ToolModel` instance(s) and :class:`robots.RigidBody` instance(s).
 
-Installing Docker
------------------
+#. Construct the planning problem
 
-Download and install `Docker Desktop`_:
+   #. Create :class:`robots.RobotCellState` to model the current state of the robot cell.
 
-* `Docker for Windows`_
-* `Docker for Mac`_
+   #. Create a :class:`robots.Target` or :class:`robots.Waypoints` instance to represent the target pose.
 
-.. note::
+#. Call the corresponding planning method and process the result from the planning method.
 
-    Make sure you have enabled virtualization in your BIOS.
-    Docker will complain if not.
+   #. Serialize the configuration (IK result) or trajectory (Motion Planning result)
 
-.. note::
+   #. Convert the result to a format that can be used by the robot controller.
 
-    If you're a Windows user, you will need at least Windows 10 Pro.
-
-    After installation, make sure Docker runs in Linux containers mode: right-click
-    the docker icon on the tray bar; if there is an option to ``Switch to Linux containers``,
-    **select it** and wait for Docker to switch before moving forward.
-
-Working with containers
------------------------
-
-For Visual Studio Code users, we recommend installing the ``Docker`` extension.
+   #. Visualize the result in a 3D viewer or CAD software.
 
 
-Developing new backends
-=======================
-
-If you are interested in developing/integrating backends to the framework, check
-the :ref:`backend architecture document <architecture>` and the
-:ref:`contributors_guide`.
-
-Next steps
-==========
-
-Check documentation for your backend of choice:
+The following sections provide detailed information on how to work with the different backends.
 
 .. toctree::
     :maxdepth: 2
     :titlesonly:
     :glob:
 
-    backends/*
+    backends/ros
+    backends/pybullet
+    backends/analytical_kinematics
+    backends/analytical_pybullet
 
 
-.. _Docker: https://www.docker.com/
-.. _Docker Desktop: https://www.docker.com/get-started
-.. _Docker containers: https://www.docker.com/resources/what-container
-.. _Docker for Windows: https://hub.docker.com/editions/community/docker-ce-desktop-windows
-.. _Docker for Mac: https://hub.docker.com/editions/community/docker-ce-desktop-mac
