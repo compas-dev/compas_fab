@@ -10,7 +10,7 @@ Inverse Kinematics
    see :ref:`Core Concepts: Inverse Kinematics<inverse_kinematics>`
    for general information on inverse kinematics.
 
-.. currentmodule:: compas_fab.backends.ros
+.. currentmodule:: compas_fab.backends
 
 :class:`MoveItPlanner` works with :class:`RosClient` to provides inverse
 kinematics capability using the MoveIt! planner backend.
@@ -126,4 +126,4 @@ and :ref:`Core Concepts: Coordinate Frame<coordinate_frames>` for more informati
 See also
 ========
 
-- `GetPositionIK Service by MoveIt<https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPositionIK.html>`_
+- `GetPositionIK Service in MoveIt Noetic<https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPositionIK.html>`_
