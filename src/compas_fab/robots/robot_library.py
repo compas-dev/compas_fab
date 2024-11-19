@@ -305,6 +305,27 @@ class RigidBodyLibrary(object):
 
         return RigidBody(mesh, None)
 
+    @classmethod
+    def floor(cls, size=1.0):
+        # type: (Optional[float]) -> RigidBody
+        """Create and return a floor as RigidBody, useful for simulating a floor.
+
+        The floor is square with a default size of 1m x 1m.
+        The floor is centered around the object origin at Z=0.
+        The floor has only one visual mesh, and one collision mesh.
+        """
+
+        # Create a plane mesh
+        vertices = [
+            [-size / 2, -size / 2, 0],
+            [size / 2, -size / 2, 0],
+            [size / 2, size / 2, 0],
+            [-size / 2, size / 2, 0],
+        ]
+        faces = [[0, 1, 2], [0, 2, 3]]
+        mesh = Mesh.from_vertices_and_faces(vertices, faces)
+        return RigidBody(mesh, mesh)
+
 
 class RobotCellLibrary(object):
     """A collection of built-in robot cells that can be used for testing and demonstrations.

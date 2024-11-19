@@ -310,13 +310,13 @@ class InverseKinematics(BackendFeature):
         request_hash = (target.sha256(), robot_cell_state.sha256(), str(group), str(options))
 
         if self._last_ik_request["request_hash"] == request_hash and self._last_ik_request["solutions"] is not None:
-            if options.get("verbose", False):
+            if options and options.get("verbose", False):
                 print("Inverse Kinematics Hash: Last IK Generator reused")
             solution = next(self._last_ik_request["solutions"], None)
             # NOTE: If the iterator is exhausted, solution will be None, subsequent code outside will reset the generator
             if solution is not None:
                 return solution
-            if options.get("verbose", False):
+            if options and options.get("verbose", False):
                 print("- Unfortunately, the last IK generator is exhausted, re-initializing the generator...")
 
         if options and options.get("verbose", False):

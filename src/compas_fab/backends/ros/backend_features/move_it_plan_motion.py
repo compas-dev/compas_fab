@@ -48,9 +48,9 @@ __all__ = ["MoveItPlanMotion"]
 class MoveItPlanMotion(PlanMotion):
     """Callable to find a path in joint space for the robot to move from its `start_configuration` to the `target`."""
 
-    DEFAULT_TOLERANCE_ORIENTATION = 0.1
-    DEFAULT_TOLERANCE_POSITION = 0.01
-    DEFAULT_TOLERANCE_JOINT = 0.1
+    DEFAULT_TOLERANCE_ORIENTATION = 0.01
+    DEFAULT_TOLERANCE_POSITION = 0.001
+    DEFAULT_TOLERANCE_JOINT = 0.01
 
     GET_MOTION_PLAN = ServiceDescription(
         "/plan_kinematic_path", "GetMotionPlan", MotionPlanRequest, MotionPlanResponse, validate_response

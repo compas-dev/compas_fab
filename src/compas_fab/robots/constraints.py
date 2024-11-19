@@ -399,6 +399,11 @@ class JointConstraint(Constraint):
                     len(joint_names), len(joint_values)
                 )
             )
+        if not isinstance(tolerances_above, list):
+            tolerances_above = [tolerances_above]
+        if not isinstance(tolerances_below, list):
+            tolerances_below = [tolerances_below]
+
         if len(tolerances_above) == 1:
             tolerances_above = tolerances_above * len(joint_names)
         elif len(tolerances_above) != len(configuration.joint_values):

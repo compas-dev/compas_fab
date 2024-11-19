@@ -325,7 +325,10 @@ class MoveItInverseKinematics(InverseKinematics):
         """Asynchronous handler of MoveIt IK service."""
         base_link = options["base_link"]
         header = Header(frame_id=base_link)
+        # The pose_stamped does not accept tolerance values
         pose_stamped = PoseStamped(header, Pose.from_frame(frame_WCF))
+        # TODO: Implement support for FrameTarget.tolerance_position and FrameTarget.tolerance_orientation
+        # Probably with constraints
 
         joint_state = JointState(
             name=start_configuration.joint_names, position=start_configuration.joint_values, header=header
