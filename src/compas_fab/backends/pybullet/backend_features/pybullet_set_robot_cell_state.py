@@ -227,7 +227,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         # t_wcf_t0cf is Tool0 Frame of the robot obtained from FK, describing Tool Base Frame (T0CF) relative to World Coordinate Frame (WCF)
         t_wcf_t0cf = Transformation.from_frame(planner_coordinate_frame)
         # t_t0cf_tbcf is Tool Attachment Frame, describing Tool Base Coordinate Frame (TBCF) relative to Tool0 Frame on the Robot (T0CF)
-        t_t0cf_tbcf = Transformation.from_frame(tool_state.attachment_frame)
+        t_t0cf_tbcf = Transformation.from_frame(tool_state.attachment_frame or Frame.worldXY())
 
         # Combined transformation gives the position of the tool in the world coordinate frame
         t_wcf_tbcf = t_wcf_t0cf * t_t0cf_tbcf
