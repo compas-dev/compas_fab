@@ -1387,8 +1387,12 @@ class RobotCell(Data):
                 group_link_name = self.robot_semantics.get_end_effector_link_name(group)
                 link_frame = self.robot_model.forward_kinematics(robot_configuration, link_name=group_link_name)
                 t_rcf_pcf = Transformation.from_frame(link_frame)
-                t_pcf_tcf = self.t_pcf_tcf(robot_cell_state, tool_id)
-                t_wcf_tcf = t_wcf_rcf * t_rcf_pcf * t_pcf_tcf
+                t_pcf_tbcf = (
+                    Transformation.from_frame(tool_state.attachment_frame)
+                    if tool_state.attachment_frame
+                    else Transformation()
+                )
+                t_wcf_tcf = t_wcf_rcf * t_rcf_pcf * t_pcf_tbcf
                 tool_state.frame = Frame.from_transformation(t_wcf_tcf)
 
         return robot_cell_state
