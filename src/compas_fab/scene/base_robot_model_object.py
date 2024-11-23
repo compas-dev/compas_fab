@@ -85,7 +85,7 @@ class BaseRobotModelObject(SceneObject):
             self._initial_draw()
 
         # Update the robot model if a configuration is provided
-        if robot_configuration:
+        if robot_configuration or base_frame:
             self.update(robot_configuration, base_frame)
 
         # Return the native geometry
@@ -138,8 +138,9 @@ class BaseRobotModelObject(SceneObject):
 
         Parameters
         ----------
-        robot_configuration : :class:`~compas_robots.Configuration`
+        robot_configuration : :class:`~compas_robots.Configuration`, optional
             The robot configuration to update the robot model.
+            This is only optional for robot models that do not have any configurable joints.
         base_frame : :class:`~compas.geometry.Frame`, optional
             The frame of the RobotCoordinateFrame relative to the WorldCoordinateFrame.
             Default is World XY frame at origin.
@@ -157,8 +158,7 @@ class BaseRobotModelObject(SceneObject):
         if (not self._links_visual_mesh_native_geometry) and (not self._links_collision_mesh_native_geometry):
             self._initial_draw()
 
-        if len(self.robot_model.get_configurable_joints()) == 0:
-            return
+        # NOTE: This function should still update the base_frame even if there are no configurable joints
 
         def _update_link_meshes(link_name, new_transformation):
             if link_name in self._links_visual_mesh_native_geometry:

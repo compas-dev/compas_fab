@@ -102,9 +102,8 @@ class BaseRobotCellObject(SceneObject):
 
         # The native geometry are collected from the child scene objects .draw() method.
         native_geometries = []
-        native_geometries.extend(
-            self._robot_model_scene_object.draw(robot_cell_state.robot_configuration, robot_cell_state.robot_base_frame)
-        )
+        native_geometries.extend(self._robot_model_scene_object.draw())
+
         for rigid_body_scene_object in self._rigid_body_scene_objects.values():
             native_geometries.extend(rigid_body_scene_object.draw())
         for tool_scene_object in self._tool_scene_objects.values():
@@ -121,6 +120,9 @@ class BaseRobotCellObject(SceneObject):
         if not self._robot_model_scene_object:
             self._initial_draw()
 
+        # Compute the attach objects frames
+        robot_cell_state = self.robot_cell.compute_attach_objects_frames(robot_cell_state)
+
         # Update the child scene objects if a configuration is provided
         if robot_cell_state:
             self._robot_model_scene_object.update(
@@ -129,9 +131,10 @@ class BaseRobotCellObject(SceneObject):
             for id, rigid_body_scene_object in self._rigid_body_scene_objects.items():
                 rigid_body_state = robot_cell_state.rigid_body_states[id]
                 rigid_body_scene_object.update(rigid_body_state)
+            # Tools are drawn by RobotModelObject, so we need to set their base frame with tool frame
             for id, tool_scene_object in self._tool_scene_objects.items():
                 tool_state = robot_cell_state.tool_states[id]
-                tool_scene_object.update(tool_state)
+                tool_scene_object.update(tool_state.configuration, tool_state.frame)
 
     # --------------------------------------------------------------------------
 
