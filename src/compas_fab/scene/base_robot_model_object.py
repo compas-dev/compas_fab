@@ -2,6 +2,7 @@ from compas import IPY
 
 from compas.geometry import Transformation
 from compas.geometry import Scale
+from compas_robots.model import LinkGeometry
 from compas.scene import SceneObject
 
 if not IPY:
@@ -91,9 +92,11 @@ class BaseRobotModelObject(SceneObject):
         # Return the native geometry
         native_geometry = []
         if self._draw_visual:
-            native_geometry.extend(self._links_visual_mesh_native_geometry.values())
+            for meshes in self._links_visual_mesh_native_geometry.values():
+                native_geometry.extend(meshes)
         if self._draw_collision:
-            native_geometry.extend(self._links_collision_mesh_native_geometry.values())
+            for meshes in self._links_collision_mesh_native_geometry.values():
+                native_geometry.extend(meshes)
         return native_geometry
 
     def _initial_draw(self):
@@ -110,25 +113,33 @@ class BaseRobotModelObject(SceneObject):
         self._links_visual_mesh_transformation = {}  # type: dict[str, Transformation]
         self._links_collision_mesh_transformation = {}  # type: dict[str, Transformation]
 
+        # Helper function to get the meshes from the visual or collision elements
+        # NOTE: The meshes are transformed to the base frame of the link using the `self._transform()` method
+        #       instead of using `Mesh.transform()` to have better performance.
+        def create_and_transform_meshes(elements, name):
+            native_geometries = []
+            for element in elements:
+                for mesh in LinkGeometry._get_item_meshes(element):
+                    native_geometry = self._create_geometry(mesh, name)
+                    if element.origin:
+                        native_geometry = self._transform(native_geometry, Transformation.from_frame(element.origin))
+                    native_geometries.append(native_geometry)
+            return native_geometries
+
         # Iterate over the links and create the visual and collision meshes.
         # Only create the geometry if it exists.
         for link in self.robot_model.iter_links():
             link_name = link.name
-            # CREATE VISUAL MESHES
             if self._draw_visual:
-                visual_mesh = self.robot_model.get_link_visual_meshes_joined(link)
-                if visual_mesh:
-                    self._links_visual_mesh_native_geometry[link_name] = self._create_geometry(
-                        visual_mesh, name=link_name + "_visual"
-                    )
+                native_geometries = create_and_transform_meshes(link.visual, name=link_name + "_visual")
+                if native_geometries:
+                    self._links_visual_mesh_native_geometry[link_name] = native_geometries
                     self._links_visual_mesh_transformation[link_name] = Transformation()
-            # CREATE COLLISION MESHES
+
             if self._draw_collision:
-                collision_mesh = self.robot_model.get_link_collision_meshes_joined(link)
-                if collision_mesh:
-                    self._links_collision_mesh_native_geometry[link_name] = self._create_geometry(
-                        collision_mesh, name=link_name + "_collision"
-                    )
+                native_geometries = create_and_transform_meshes(link.collision, name=link_name + "_collision")
+                if native_geometries:
+                    self._links_collision_mesh_native_geometry[link_name] = native_geometries
                     self._links_collision_mesh_transformation[link_name] = Transformation()
 
     def update(self, robot_configuration, base_frame=None):
@@ -166,10 +177,11 @@ class BaseRobotModelObject(SceneObject):
                 previous_transformation = self._links_visual_mesh_transformation[link_name]
                 delta_transformation = new_transformation * previous_transformation.inverse()  # type: Transformation
                 # Transform the native geometry
-                native_geometry = self._links_visual_mesh_native_geometry[link_name]
-                new_native_geometry = self._transform(native_geometry, delta_transformation)
+                new_native_geometries = []
+                for native_geometry in self._links_visual_mesh_native_geometry[link_name]:
+                    new_native_geometries.append(self._transform(native_geometry, delta_transformation))
                 # Update the dictionaries
-                self._links_visual_mesh_native_geometry[link_name] = new_native_geometry
+                self._links_visual_mesh_native_geometry[link_name] = new_native_geometries
                 self._links_visual_mesh_transformation[link_name] = new_transformation
                 print(
                     "Updated visual link '{}' from previous '{}' with delta '{}' to new transformation '{}'.".format(
@@ -181,10 +193,11 @@ class BaseRobotModelObject(SceneObject):
                 previous_transformation = self._links_collision_mesh_transformation[link_name]
                 delta_transformation = new_transformation * previous_transformation.inverse()
                 # Transform the native geometry
-                native_geometry = self._links_collision_mesh_native_geometry[link_name]
-                new_native_geometry = self._transform(native_geometry, delta_transformation)
+                new_native_geometries = []
+                for native_geometry in self._links_collision_mesh_native_geometry[link_name]:
+                    new_native_geometries.append(self._transform(native_geometry, delta_transformation))
                 # Update the dictionaries
-                self._links_collision_mesh_native_geometry[link_name] = new_native_geometry
+                self._links_collision_mesh_native_geometry[link_name] = new_native_geometries
                 self._links_collision_mesh_transformation[link_name] = new_transformation
 
         # The World Coordinate Frame (WCF) relative to the Visualization Coordinate Frame (VCF)
