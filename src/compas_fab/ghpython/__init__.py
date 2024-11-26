@@ -20,6 +20,7 @@ of the CAD environment.
     ReachabilityMapObject
     RigidBodyObject
     RobotCellObject
+    RobotModelObject
 
 
 """
@@ -31,10 +32,14 @@ if compas.RHINO:
         ReachabilityMapObject,
         RigidBodyObject,
         RobotCellObject,
+        RobotModelObject,
     )
+    from .sticky_cache import cache_scene_object
 
     __all__ = [
         "ReachabilityMapObject",
         "RigidBodyObject",
         "RobotCellObject",
+        "RobotModelObject",
+        "cache_scene_object",
     ]
