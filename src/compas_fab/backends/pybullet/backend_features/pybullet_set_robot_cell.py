@@ -24,6 +24,19 @@ class PyBulletSetRobotCell(SetRobotCell):
         Calling this method will override the previous robot cell in the client.
         It should be called only if the robot cell models have changed.
 
+        The RobotCell object passed to this method should not be modified after
+        calling this method, as the client keeps a reference to it.
+
+        Parameters
+        ----------
+        robot_cell : RobotCell
+            The robot cell object containing the robot, tools, and other objects.
+        robot_cell_state : RobotCellState, optional
+            The state of the robot cell, including the robot's configuration.
+        options : dict, optional
+            Dictionary containing additional options.
+            Unused at the moment.
+
         """
 
         if not isinstance(robot_cell, RobotCell):
@@ -65,7 +78,13 @@ class PyBulletSetRobotCell(SetRobotCell):
             )
 
         # Keep a copy of the robot cell in the client
-        client._robot_cell = robot_cell.copy()
+        # from copy import deepcopy
+        # client._robot_cell = deepcopy(robot_cell)
+
+        # NOTE: The current implementation of `compas_robots.RobotModel`` is very slow to
+        #       copy or deepcopy. Making the robot cell also slow to copy or deepcopy.
+        #       It is better to keep a reference to the robot cell.
+        client._robot_cell = robot_cell
 
         # If a robot cell state is provided, update the client's robot cell state
         if robot_cell_state:
