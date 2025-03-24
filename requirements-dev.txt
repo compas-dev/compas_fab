@@ -3,7 +3,7 @@ autopep8
 black
 bump2version >=1.0.1
 check-manifest >=0.36
-compas_invocations
+compas_invocations2
 doc8
 flake8
 importlib_metadata <5.0
