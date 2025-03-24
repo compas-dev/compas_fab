@@ -15,14 +15,15 @@ from scriptcontext import sticky as st
 from compas_fab.backends.ros.messages import ROSmsg
 from compas_fab.ghpython.components import create_id
 from compas_fab.ghpython.components import message
+from compas_fab.ghpython.components import warning
 
 
 class ROSTopicSubscribe(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(self, ros_client, topic_name: str, topic_type: str, interval: int, start: bool, stop: bool):
         if not topic_name:
-            raise ValueError("Please specify the name of the topic")
+            warning(ghenv.Component, "Please specify the name of the topic")  # noqa: F821
         if not topic_type:
-            raise ValueError("Please specify the type of the topic")
+            warning(ghenv.Component, "Please specify the type of the topic")  # noqa: F821
 
         if not hasattr(self, "message_count"):
             self.message_count = 0
