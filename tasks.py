@@ -25,6 +25,7 @@ ns = Collection(
     build.build_ghuser_components,
     build.build_cpython_ghuser_components,
     grasshopper.yakerize,
+    grasshopper.publish_yak,
 )
 ns.configure(
     {
