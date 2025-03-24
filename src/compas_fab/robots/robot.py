@@ -131,7 +131,7 @@ class Robot(Data):
 
         Examples
         --------
-        >>> robot = Robot.basic('A robot')
+        >>> robot = Robot.basic("A robot")
         >>> robot.name
         'A robot'
         """
@@ -179,7 +179,7 @@ class Robot(Data):
 
         Examples
         --------
-        >>> sorted(robot.group_states['manipulator'].keys())
+        >>> sorted(robot.group_states["manipulator"].keys())
         ['home', 'up']
 
         """
@@ -334,7 +334,7 @@ class Robot(Data):
 
         Examples
         --------
-        >>> robot.get_link_names('manipulator')
+        >>> robot.get_link_names("manipulator")
         ['base_link', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link', 'ee_link']
         """
         base_link_name = self.get_base_link_name(group)
@@ -377,7 +377,7 @@ class Robot(Data):
 
         Examples
         --------
-        >>> joints = robot.get_configurable_joints('manipulator')
+        >>> joints = robot.get_configurable_joints("manipulator")
         >>> [j.name for j in joints]
         ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
         """
@@ -463,7 +463,7 @@ class Robot(Data):
 
         Examples
         --------
-        >>> robot.get_configurable_joint_types('manipulator')
+        >>> robot.get_configurable_joint_types("manipulator")
         [0, 0, 0, 0, 0, 0]
         """
         configurable_joints = self.get_configurable_joints(group)
@@ -771,7 +771,7 @@ class Robot(Data):
         --------
         >>> frame_WCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
         >>> frame_RCF = robot.to_local_coordinates(frame_WCF)
-        >>> frame_RCF                                                                                       # doctest: +SKIP
+        >>> frame_RCF  # doctest: +SKIP
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))    # doctest: +SKIP
         """
         frame_RCF = frame_WCF.transformed(self.transformation_WCF_RCF(group))
@@ -796,7 +796,7 @@ class Robot(Data):
         --------
         >>> frame_RCF = Frame([-0.363, 0.003, -0.147], [0.388, -0.351, -0.852], [0.276, 0.926, -0.256])
         >>> frame_WCF = robot.to_world_coordinates(frame_RCF)
-        >>> frame_WCF                                                                                       # doctest: +SKIP
+        >>> frame_WCF  # doctest: +SKIP
         Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))    # doctest: +SKIP
         """
         frame_WCF = frame_RCF.transformed(self.transformation_RCF_WCF(group))
@@ -835,13 +835,13 @@ class Robot(Data):
 
         Examples
         --------
-        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> robot.attach_tool(Tool(mesh, frame))
         >>> frames_tcf = [Frame((-0.309, -0.046, -0.266), (0.276, 0.926, -0.256), (0.879, -0.136, 0.456))]
-        >>> robot.from_tcf_to_t0cf(frames_tcf)                                                              # doctest: +SKIP
+        >>> robot.from_tcf_to_t0cf(frames_tcf)  # doctest: +SKIP
         [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]  # doctest: +SKIP
-        >>> robot.from_tcf_to_t0cf(frames_tcf, group=robot.main_group_name)                                 # doctest: +SKIP
+        >>> robot.from_tcf_to_t0cf(frames_tcf, group=robot.main_group_name)  # doctest: +SKIP
         [Frame(Point(-0.363, 0.003, -0.147), Vector(0.388, -0.351, -0.852), Vector(0.276, 0.926, -0.256))]  # doctest: +SKIP
         """
         tool = self._get_attached_tool_for_group(group_name=group)
@@ -871,13 +871,13 @@ class Robot(Data):
 
         Examples
         --------
-        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> robot.attach_tool(Tool(mesh, frame))
         >>> frames_t0cf = [Frame((-0.363, 0.003, -0.147), (0.388, -0.351, -0.852), (0.276, 0.926, -0.256))]
-        >>> robot.from_t0cf_to_tcf(frames_t0cf)                                                            # doctest: +SKIP
+        >>> robot.from_t0cf_to_tcf(frames_t0cf)  # doctest: +SKIP
         [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))] # doctest: +SKIP
-        >>> robot.from_t0cf_to_tcf(frames_t0cf, group=robot.main_group_name)                               # doctest: +SKIP
+        >>> robot.from_t0cf_to_tcf(frames_t0cf, group=robot.main_group_name)  # doctest: +SKIP
         [Frame(Point(-0.309, -0.046, -0.266), Vector(0.276, 0.926, -0.256), Vector(0.879, -0.136, 0.456))] # doctest: +SKIP
         """
         tool = self._get_attached_tool_for_group(group_name=group)
@@ -907,7 +907,7 @@ class Robot(Data):
 
         Examples
         --------
-        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
+        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
         >>> frame = Frame([0.14, 0, 0], [0, 1, 0], [0, 0, 1])
         >>> tool = Tool(mesh, frame)
         >>> robot.attach_tool(tool)
@@ -1085,7 +1085,7 @@ class Robot(Data):
         --------
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
-        >>> robot.position_constraint_from_frame(frame, tolerance_position)                                 # doctest: +SKIP
+        >>> robot.position_constraint_from_frame(frame, tolerance_position)  # doctest: +SKIP
         PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)    # doctest: +SKIP
         """
 
@@ -1146,7 +1146,7 @@ class Robot(Data):
         >>> tolerance_position = 0.001
         >>> tolerances_axes = [math.radians(1)]
         >>> group = robot.main_group_name
-        >>> robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)                         # doctest: +SKIP
+        >>> robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)  # doctest: +SKIP
         [PositionConstraint('ee_link', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0),          # doctest: +SKIP
         OrientationConstraint('ee_link', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)] # doctest: +SKIP
         """
@@ -1301,7 +1301,7 @@ class Robot(Data):
         >>> frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
         >>> start_configuration = robot.zero_configuration()
         >>> group = robot.main_group_name
-        >>> robot.inverse_kinematics(frame_WCF, start_configuration, group)                 # doctest: +SKIP
+        >>> robot.inverse_kinematics(frame_WCF, start_configuration, group)  # doctest: +SKIP
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
         # Pseudo-memoized sequential calls will re-use iterator if not exhaused
@@ -1376,7 +1376,7 @@ class Robot(Data):
         >>> frame_WCF = Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0])
         >>> start_configuration = robot.zero_configuration()
         >>> group = robot.main_group_name
-        >>> next(robot.iter_inverse_kinematics(frame_WCF, start_configuration, group))      # doctest: +SKIP
+        >>> next(robot.iter_inverse_kinematics(frame_WCF, start_configuration, group))  # doctest: +SKIP
         Configuration((4.045, 5.130, -2.174, -6.098, -5.616, 6.283), (0, 0, 0, 0, 0, 0))    # doctest: +SKIP
         """
         options = options or {}
@@ -1497,7 +1497,7 @@ class Robot(Data):
         >>> configuration = Configuration.from_revolute_values([-2.238, -1.153, -2.174, 0.185, 0.667, 0.000])
         >>> group = robot.main_group_name
         >>> frame_WCF_c = robot.forward_kinematics(configuration, group)
-        >>> options = {'solver': 'model'}
+        >>> options = {"solver": "model"}
         >>> frame_WCF_m = robot.forward_kinematics(configuration, group, options)
         >>> frame_WCF_c == frame_WCF_m
         True
@@ -1734,10 +1734,10 @@ class Robot(Data):
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
         >>> tolerance_position = 0.001
         >>> tolerances_axes = [math.radians(1)] * 3
-        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.])
+        >>> start_configuration = Configuration.from_revolute_values([-0.042, 4.295, 0, -3.327, 4.755, 0.0])
         >>> group = robot.main_group_name
         >>> goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
-        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnect'})
+        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {"planner_id": "RRTConnect"})
         >>> trajectory.fraction
         1.0
         >>> len(trajectory.points) > 1
@@ -1753,8 +1753,10 @@ class Robot(Data):
         >>> tolerances_above = [math.radians(5)] * len(configuration.joint_values)
         >>> tolerances_below = [math.radians(5)] * len(configuration.joint_values)
         >>> group = robot.main_group_name
-        >>> goal_constraints = robot.constraints_from_configuration(configuration, tolerances_above, tolerances_below, group)
-        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {'planner_id': 'RRTConnect'})
+        >>> goal_constraints = robot.constraints_from_configuration(
+        ...     configuration, tolerances_above, tolerances_below, group
+        ... )
+        >>> trajectory = robot.plan_motion(goal_constraints, start_configuration, group, {"planner_id": "RRTConnect"})
         >>> trajectory.fraction
         1.0
         >>> len(trajectory.points) > 1

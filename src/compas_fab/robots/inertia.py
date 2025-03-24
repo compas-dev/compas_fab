@@ -30,7 +30,7 @@ class Inertia:
 
     Examples
     --------
-    >>> inertia = Inertia([[0] * 3] * 3, 1., Point(0.1, 3.1, 4.4))
+    >>> inertia = Inertia([[0] * 3] * 3, 1.0, Point(0.1, 3.1, 4.4))
     >>> inertia
     Inertia([[0, 0, 0], [0, 0, 0], [0, 0, 0]], 1.0, Point(x=0.1, y=3.1, z=4.4))
     >>> inertia.principal_moments

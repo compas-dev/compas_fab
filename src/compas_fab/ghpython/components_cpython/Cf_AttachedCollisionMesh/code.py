@@ -15,7 +15,16 @@ from compas_fab.robots import CollisionMesh
 
 
 class AttachedCollisionMeshComponent(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, scene, mesh: Rhino.Geometry.Mesh, identifier: str, link_name: str, touch_links: System.Collections.Generic.List[str], add: bool, remove: bool):
+    def RunScript(
+        self,
+        scene,
+        mesh: Rhino.Geometry.Mesh,
+        identifier: str,
+        link_name: str,
+        touch_links: System.Collections.Generic.List[str],
+        add: bool,
+        remove: bool,
+    ):
         attached_collision_mesh = None
         if scene and mesh and identifier and link_name:
             compas_mesh = mesh_to_compas(mesh)

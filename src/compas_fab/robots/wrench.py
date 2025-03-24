@@ -100,9 +100,9 @@ class Wrench(Data):
 
         Examples
         --------
-        >>> w1 = Wrench([1, 1, 1], [.1,.1,.1])
-        >>> w2 = Wrench([2, 2, 2], [.2,.2,.2])
-        >>> w3 = Wrench([3, 3, 3], [.3,.3,.3])
+        >>> w1 = Wrench([1, 1, 1], [0.1, 0.1, 0.1])
+        >>> w2 = Wrench([2, 2, 2], [0.2, 0.2, 0.2])
+        >>> w3 = Wrench([3, 3, 3], [0.3, 0.3, 0.3])
         >>> w = Wrench.by_samples([w1, w2, w3])
         >>> print(w.force)
         Vector(x=2.000, y=2.000, z=2.000)

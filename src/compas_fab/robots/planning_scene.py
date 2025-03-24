@@ -49,8 +49,8 @@ class CollisionMesh(Data):
 
     Examples
     --------
-    >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/floor.stl'))
-    >>> cm = CollisionMesh(mesh, 'floor')
+    >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
+    >>> cm = CollisionMesh(mesh, "floor")
     >>> cm.frame
     Frame(point=Point(x=0.0, y=0.0, z=0.0), xaxis=Vector(x=1.0, y=0.0, z=0.0), yaxis=Vector(x=0.0, y=1.0, z=0.0))
     """
@@ -149,10 +149,10 @@ class AttachedCollisionMesh(Data):
 
     Examples
     --------
-    >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
-    >>> cm = CollisionMesh(mesh, 'tip')
-    >>> ee_link_name = 'ee_link'
-    >>> touch_links = ['wrist_3_link', 'ee_link']
+    >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
+    >>> cm = CollisionMesh(mesh, "tip")
+    >>> ee_link_name = "ee_link"
+    >>> touch_links = ["wrist_3_link", "ee_link"]
     >>> acm = AttachedCollisionMesh(cm, ee_link_name, touch_links)
     """
 
@@ -260,9 +260,9 @@ class PlanningScene(object):
         Examples
         --------
         >>> scene = PlanningScene(robot)
-        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/floor.stl'))
-        >>> cm = CollisionMesh(mesh, 'floor')
-        >>> scene.add_collision_mesh(cm)                   # doctest: +SKIP
+        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
+        >>> cm = CollisionMesh(mesh, "floor")
+        >>> scene.add_collision_mesh(cm)  # doctest: +SKIP
         """
         self.ensure_client()
 
@@ -289,7 +289,7 @@ class PlanningScene(object):
         Examples
         --------
         >>> scene = PlanningScene(robot)
-        >>> scene.remove_collision_mesh('floor')           # doctest: +SKIP
+        >>> scene.remove_collision_mesh("floor")  # doctest: +SKIP
         """
         self.ensure_client()
         self.robot.client.remove_collision_mesh(id)
@@ -321,9 +321,9 @@ class PlanningScene(object):
         Examples
         --------
         >>> scene = PlanningScene(robot)
-        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/floor.stl'))
-        >>> cm = CollisionMesh(mesh, 'floor')
-        >>> scene.append_collision_mesh(cm)                # doctest: +SKIP
+        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/floor.stl"))
+        >>> cm = CollisionMesh(mesh, "floor")
+        >>> scene.append_collision_mesh(cm)  # doctest: +SKIP
         """
         self.ensure_client()
 
@@ -355,12 +355,12 @@ class PlanningScene(object):
         Examples
         --------
         >>> scene = PlanningScene(robot)
-        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
-        >>> cm = CollisionMesh(mesh, 'tip')
-        >>> ee_link_name = 'ee_link'
-        >>> touch_links = ['wrist_3_link', 'ee_link']
+        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
+        >>> cm = CollisionMesh(mesh, "tip")
+        >>> ee_link_name = "ee_link"
+        >>> touch_links = ["wrist_3_link", "ee_link"]
         >>> acm = AttachedCollisionMesh(cm, ee_link_name, touch_links)
-        >>> scene.add_attached_collision_mesh(acm)         # doctest: +SKIP
+        >>> scene.add_attached_collision_mesh(acm)  # doctest: +SKIP
         """
         self.ensure_client()
 
@@ -387,7 +387,7 @@ class PlanningScene(object):
         Examples
         --------
         >>> scene = PlanningScene(robot)
-        >>> scene.remove_attached_collision_mesh('tip')   # doctest: +SKIP
+        >>> scene.remove_attached_collision_mesh("tip")  # doctest: +SKIP
         """
         self.ensure_client()
         self.client.remove_attached_collision_mesh(id)
@@ -413,11 +413,11 @@ class PlanningScene(object):
         Examples
         --------
         >>> scene = PlanningScene(robot)
-        >>> mesh = Mesh.from_stl(compas_fab.get('planning_scene/cone.stl'))
-        >>> cm = CollisionMesh(mesh, 'tip')
+        >>> mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
+        >>> cm = CollisionMesh(mesh, "tip")
         >>> group = robot.main_group_name
-        >>> scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)      # attach to ee
-        >>> scene.remove_attached_collision_mesh('tip')                             # now detach
+        >>> scene.attach_collision_mesh_to_robot_end_effector(cm, group=group)  # attach to ee
+        >>> scene.remove_attached_collision_mesh("tip")  # now detach
         """
         self.ensure_client()
 

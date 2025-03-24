@@ -75,7 +75,7 @@ class BoundingVolume(object):
         >>> from compas.geometry import Frame
         >>> from compas.geometry import Box
         >>> from compas_fab.robots import BoundingVolume
-        >>> box = Box(1., 1., 1.)
+        >>> box = Box(1.0, 1.0, 1.0)
         >>> bv = BoundingVolume.from_box(box)
         >>> bv.type
         1
@@ -124,7 +124,7 @@ class BoundingVolume(object):
         >>> import compas
         >>> from compas.datastructures import Mesh
         >>> from compas_fab.robots import BoundingVolume
-        >>> mesh = Mesh.from_obj(compas.get('faces.obj'))
+        >>> mesh = Mesh.from_obj(compas.get("faces.obj"))
         >>> bv = BoundingVolume.from_mesh(Mesh)
         >>> bv.type
         3
@@ -437,8 +437,8 @@ class PositionConstraint(Constraint):
     >>> from compas.geometry import Sphere
     >>> from compas_fab.robots import PositionConstraint
     >>> from compas_fab.robots import BoundingVolume
-    >>> bv = BoundingVolume.from_sphere(Sphere(0.5, point=[3,4,5]))
-    >>> pc = PositionConstraint('link_0', bv, weight=1.)
+    >>> bv = BoundingVolume.from_sphere(Sphere(0.5, point=[3, 4, 5]))
+    >>> pc = PositionConstraint("link_0", bv, weight=1.0)
     """
 
     def __init__(self, link_name, bounding_volume, weight=1.0):
@@ -470,7 +470,7 @@ class PositionConstraint(Constraint):
         >>> from compas.geometry import Frame
         >>> from compas.geometry import Box
         >>> box = Box(4, 4, 4, Frame.worldXY())
-        >>> pc = PositionConstraint.from_box('link_0', box)
+        >>> pc = PositionConstraint.from_box("link_0", box)
         """
         bounding_volume = BoundingVolume.from_box(box)
         return cls(link_name, bounding_volume, weight)
@@ -497,8 +497,8 @@ class PositionConstraint(Constraint):
         --------
         >>> from compas_fab.robots import PositionConstraint
         >>> from compas.geometry import Sphere
-        >>> sphere = Sphere(radius=0.5, point=[3,4,5])
-        >>> pc = PositionConstraint.from_sphere('link_0', sphere, weight=1.)
+        >>> sphere = Sphere(radius=0.5, point=[3, 4, 5])
+        >>> pc = PositionConstraint.from_sphere("link_0", sphere, weight=1.0)
         """
         bounding_volume = BoundingVolume.from_sphere(sphere)
         return cls(link_name, bounding_volume, weight)
@@ -526,8 +526,8 @@ class PositionConstraint(Constraint):
         --------
         >>> from compas.datastructures import Mesh
         >>> import compas
-        >>> mesh = Mesh.from_obj(compas.get('faces.obj'))
-        >>> pc = PositionConstraint.from_mesh('link_0', mesh)
+        >>> mesh = Mesh.from_obj(compas.get("faces.obj"))
+        >>> pc = PositionConstraint.from_mesh("link_0", mesh)
         """
         bounding_volume = BoundingVolume.from_mesh(mesh)
         return cls(link_name, bounding_volume, weight)

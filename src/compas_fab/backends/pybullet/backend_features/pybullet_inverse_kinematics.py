@@ -213,5 +213,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         return joint_poses, close_enough
 
     def _get_rest_poses(self, joint_names, configuration):
-        name_value_map = {configuration.joint_names[i]: configuration.joint_values[i] for i in range(len(configuration.joint_names))}
+        name_value_map = {
+            configuration.joint_names[i]: configuration.joint_values[i] for i in range(len(configuration.joint_names))
+        }
         return [name_value_map[name] for name in joint_names]

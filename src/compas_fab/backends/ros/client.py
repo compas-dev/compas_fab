@@ -82,7 +82,7 @@ class LocalCacheInfo(object):
         False
 
 
-        >>> local_directory = os.path.join(os.path.expanduser('~'), 'robot_description', 'robocop')
+        >>> local_directory = os.path.join(os.path.expanduser("~"), "robot_description", "robocop")
         >>> info = LocalCacheInfo.from_local_cache_directory(local_directory)
         >>> info.use_local_cache
         True
@@ -126,7 +126,7 @@ class RosClient(Ros, ClientInterface):
 
     >>> from compas_fab.backends import RosClient
     >>> with RosClient() as client:
-    ...     print('Connected: %s' % client.is_connected)
+    ...     print("Connected: %s" % client.is_connected)
     Connected: True
 
     Notes

@@ -33,7 +33,7 @@ class PosCon3D(SerialSensor):
 
     Examples
     --------
-    >>> from serial import Serial                                                   # doctest: +SKIP
+    >>> from serial import Serial  # doctest: +SKIP
     >>> with Serial('COM5', 57600, timeout=1) as serial:                            # doctest: +SKIP
     >>>     with PosCon3D(serial, PosCon3D.BROADCAST_ADDRESS) as broadcast_query:   # doctest: +SKIP
     ...         addr = broadcast_query.get_address()                                # doctest: +SKIP
@@ -360,7 +360,7 @@ class PosConCM(SerialSensor):
 
     Examples
     --------
-    >>> from serial import Serial                                                   # doctest: +SKIP
+    >>> from serial import Serial  # doctest: +SKIP
     >>> with Serial('COM5', 57600, parity=PARITY_EVEN, timeout=1) as serial:                            # doctest: +SKIP
     >>>     with PosConCM(serial, PosConCM.BROADCAST_ADDRESS) as broadcast_query:   # doctest: +SKIP
     ...         addr = broadcast_query.get_address()                                # doctest: +SKIP

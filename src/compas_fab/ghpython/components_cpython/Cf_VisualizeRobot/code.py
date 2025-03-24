@@ -94,7 +94,9 @@ class RobotVisualize(Grasshopper.Kernel.GH_ScriptInstance):
                     try:
                         scene = robot.client.get_planning_scene()
                     except BackendFeatureNotSupportedError:
-                        print("The selected backend does not support collision meshes. If you need collision mesh support, use a different backend.")
+                        print(
+                            "The selected backend does not support collision meshes. If you need collision mesh support, use a different backend."
+                        )
                         scene = None
                         show_cm = False
                         show_acm = False

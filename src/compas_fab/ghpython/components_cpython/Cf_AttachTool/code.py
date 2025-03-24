@@ -15,7 +15,15 @@ from compas_fab.robots import Tool
 
 
 class AttachToolComponent(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, robot, visual_mesh: Rhino.Geometry.Mesh, collision_mesh: Rhino.Geometry.Mesh, tcf_plane, group, connected_to):
+    def RunScript(
+        self,
+        robot,
+        visual_mesh: Rhino.Geometry.Mesh,
+        collision_mesh: Rhino.Geometry.Mesh,
+        tcf_plane,
+        group,
+        connected_to,
+    ):
         if robot and robot.client and robot.client.is_connected and visual_mesh:
             if not collision_mesh:
                 collision_mesh = visual_mesh
