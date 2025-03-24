@@ -5,7 +5,10 @@ Add an attached collision mesh to the robot.
 COMPAS FAB v1.0.2
 """
 
+import System
+
 import Grasshopper
+import Rhino
 
 from compas_rhino.conversions import mesh_to_compas
 
@@ -14,7 +17,7 @@ from compas_fab.robots import CollisionMesh
 
 
 class AttachedCollisionMeshComponent(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, scene, mesh, identifier, link_name, touch_links, add, remove):
+    def RunScript(self, scene, mesh: Rhino.Geometry.Mesh, identifier: str, link_name: str, touch_links: System.Collections.Generic.List[str], add: bool, remove: bool):
         attached_collision_mesh = None
         if scene and mesh and identifier and link_name:
             compas_mesh = mesh_to_compas(mesh)

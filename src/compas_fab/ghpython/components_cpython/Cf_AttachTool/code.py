@@ -6,6 +6,7 @@ COMPAS FAB v1.0.2
 """
 
 import Grasshopper
+import Rhino
 
 from compas.geometry import Frame
 from compas_rhino.conversions import mesh_to_compas
@@ -15,7 +16,7 @@ from compas_fab.robots import Tool
 
 
 class AttachToolComponent(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, robot, visual_mesh, collision_mesh, tcf_plane, group, connected_to):
+    def RunScript(self, robot, visual_mesh: Rhino.Geometry.Mesh, collision_mesh: Rhino.Geometry.Mesh, tcf_plane, group, connected_to):
         if robot and robot.client and robot.client.is_connected and visual_mesh:
             if not collision_mesh:
                 collision_mesh = visual_mesh

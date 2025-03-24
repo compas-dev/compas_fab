@@ -8,7 +8,7 @@ COMPAS FAB v1.0.2
 import time
 
 import Grasshopper
-import Grasshopper.Kernel
+
 from roslibpy import Topic
 from scriptcontext import sticky as st
 
@@ -17,7 +17,7 @@ from compas_fab.ghpython.components import create_id
 
 
 class ROSTopicSubscribe(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, ros_client, topic_name, topic_type, interval, start, stop):
+    def RunScript(self, ros_client, topic_name: str, topic_type: str, interval: int, start: bool, stop: bool):
         if not topic_name:
             raise ValueError("Please specify the name of the topic")
         if not topic_type:
