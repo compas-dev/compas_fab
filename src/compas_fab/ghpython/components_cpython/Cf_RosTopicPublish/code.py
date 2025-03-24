@@ -14,14 +14,18 @@ from scriptcontext import sticky as st
 
 from compas_fab.backends.ros.messages import ROSmsg
 from compas_fab.ghpython.components import create_id
+from compas_fab.ghpython.components import warning
+from compas_fab.ghpython.components import message
 
 
 class ROSTopicPublish(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, ros_client, topic_name, topic_type, msg):
+    def RunScript(self, ros_client, topic_name: str, topic_type: str, msg):
         if not topic_name:
-            raise ValueError("Please specify the name of the topic")
+            warning(ghenv.Component, "Please specify the name of the topic")
+            return
         if not topic_type:
-            raise ValueError("Please specify the type of the topic")
+            warning(ghenv.Component, "Please specify the type of the topic")
+            return
 
         key = create_id(ghenv.Component, "topic")  # noqa: F821
 
@@ -40,9 +44,9 @@ class ROSTopicPublish(Grasshopper.Kernel.GH_ScriptInstance):
         if msg:
             msg = ROSmsg.parse(msg, topic_type)
             topic.publish(msg.msg)
-            self.Message = "Message published"
+            message(ghenv.Component, "Message published")
         else:
             if self.is_advertised:
-                self.Message = "Topic advertised"
+                message(ghenv.Component, "Topic advertised")
 
         return (topic, self.is_advertised)

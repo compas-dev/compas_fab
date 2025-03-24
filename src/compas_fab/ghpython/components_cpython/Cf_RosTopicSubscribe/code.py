@@ -14,6 +14,7 @@ from scriptcontext import sticky as st
 
 from compas_fab.backends.ros.messages import ROSmsg
 from compas_fab.ghpython.components import create_id
+from compas_fab.ghpython.components import message
 
 
 class ROSTopicSubscribe(Grasshopper.Kernel.GH_ScriptInstance):
@@ -55,9 +56,9 @@ class ROSTopicSubscribe(Grasshopper.Kernel.GH_ScriptInstance):
             last_msg = ROSmsg.parse(last_msg, topic_type)
 
         if self.is_subscribed:
-            self.Message = "Subscribed, {} messages".format(self.message_count)
+            message(ghenv.Component, f"Subscribed, {self.message_count} messages")  # noqa: F821
         else:
-            self.Message = "Not subscribed"
+            message(ghenv.Component, "Not subscribed")  # noqa: F821
 
         return (topic, last_msg, self.is_subscribed)
 
