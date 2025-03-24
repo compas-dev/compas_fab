@@ -75,7 +75,7 @@ class RobotVisualize(Grasshopper.Kernel.GH_ScriptInstance):
                     frame = frame_to_rhino_plane(compas_frame)
                     frames.append(frame)
 
-            cached_scene_key = create_id(self, "cached_scene")
+            cached_scene_key = create_id(ghenv.Component, "cached_scene")  # noqa: F821
 
             if show_cm or show_acm:
                 cached_scene = st.get(cached_scene_key)

@@ -15,7 +15,7 @@ from compas_fab.robots import PlanningScene
 
 class PlanningSceneComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(self, robot):
-        key = create_id(self, "planning_scene")
+        key = create_id(ghenv.Component, "planning_scene")  # noqa: F821
         if robot:
             st[key] = PlanningScene(robot)
         return st.get(key, None)

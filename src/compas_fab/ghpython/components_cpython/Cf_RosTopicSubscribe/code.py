@@ -30,8 +30,8 @@ class ROSTopicSubscribe(Grasshopper.Kernel.GH_ScriptInstance):
         self.is_updating = False
         self.is_subscribed = False
 
-        self.msg_key = create_id(self, "last_msg")
-        key = create_id(self, "topic")
+        self.msg_key = create_id(ghenv.Component, "last_msg")  # noqa: F821
+        key = create_id(ghenv.Component, "topic")  # noqa: F821
 
         last_msg = st.get(self.msg_key, None)
         topic = st.get(key, None)

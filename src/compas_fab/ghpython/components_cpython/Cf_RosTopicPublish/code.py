@@ -23,7 +23,7 @@ class ROSTopicPublish(Grasshopper.Kernel.GH_ScriptInstance):
         if not topic_type:
             raise ValueError("Please specify the type of the topic")
 
-        key = create_id(self, "topic")
+        key = create_id(ghenv.Component, "topic")  # noqa: F821
 
         topic = st.get(key, None)
 

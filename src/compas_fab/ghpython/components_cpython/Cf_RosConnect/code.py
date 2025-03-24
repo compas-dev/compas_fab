@@ -20,7 +20,7 @@ class ROSConnect(Grasshopper.Kernel.GH_ScriptInstance):
         ip = ip or "127.0.0.1"
         port = port or 9090
 
-        key = create_id(self, "ros_client")
+        key = create_id(ghenv.Component, "ros_client")  # noqa: F821
         ros_client = st.get(key, None)
 
         if ros_client:

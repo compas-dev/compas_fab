@@ -15,7 +15,7 @@ from compas_fab.ghpython.components import create_id
 
 class ROSRobot(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(self, ros_client, load):
-        key = create_id(self, "robot")
+        key = create_id(ghenv.Component, "robot")  # noqa: F821
 
         if ros_client and ros_client.is_connected and load:
             # Load URDF from ROS
