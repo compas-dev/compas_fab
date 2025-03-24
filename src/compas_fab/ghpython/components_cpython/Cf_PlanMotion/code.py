@@ -17,15 +17,15 @@ class PlanMotion(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(
         self,
         robot,
-        goal_constraints,
+        goal_constraints: System.Collections.Generic.List[object],
         start_configuration,
-        group,
-        attached_collision_meshes,
-        path_constraints,
-        planner_id,
-        compute,
+        group: str,
+        attached_collision_meshes: System.Collections.Generic.List[object],
+        path_constraints: System.Collections.Generic.List[object],
+        planner_id: str,
+        compute: bool,
     ):
-        key = create_id(self, "trajectory")
+        key = create_id(ghenv.Component, "trajectory")  # noqa: F821
 
         path_constraints = list(path_constraints) if path_constraints else None
         attached_collision_meshes = list(attached_collision_meshes) if attached_collision_meshes else None
