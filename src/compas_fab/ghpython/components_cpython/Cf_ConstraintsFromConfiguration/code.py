@@ -1,3 +1,4 @@
+# r: compas_fab>=1.0.2
 """
 Create joint constraints for each of the robot's configurable joints based on a given target configuration.
 
@@ -6,10 +7,12 @@ COMPAS FAB v1.0.2
 
 import math
 
-from ghpythonlib.componentbase import executingcomponent as component
+import System
+
+import Grasshopper
 
 
-class ConstraintsFromTargetConfiguration(component):
+class ConstraintsFromTargetConfiguration(Grasshopper.Kernel.GH_ScriptInstance):
     DEFAULT_TOLERANCE_METERS = 0.001
     DEFAULT_TOLERANCE_RADIANS = math.radians(1)
 
