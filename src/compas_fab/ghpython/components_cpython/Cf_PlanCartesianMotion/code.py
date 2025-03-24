@@ -6,13 +6,13 @@ COMPAS FAB v1.0.2
 """
 
 import System
+
 import Grasshopper
 
 from compas_rhino.conversions import plane_to_compas_frame
 from scriptcontext import sticky as st
 
 from compas_fab.ghpython.components import create_id
-from compas_fab.robots import FrameWaypoints
 
 
 class PlanCartesianMotion(Grasshopper.Kernel.GH_ScriptInstance):
@@ -27,7 +27,7 @@ class PlanCartesianMotion(Grasshopper.Kernel.GH_ScriptInstance):
         max_step: float,
         compute: bool,
     ):
-        key = create_id(self, "trajectory")
+        key = create_id(ghenv.Component, "trajectory")  # noqa: F821
 
         max_step = float(max_step) if max_step else 0.01
         path_constraints = list(path_constraints) if path_constraints else None
@@ -35,9 +35,8 @@ class PlanCartesianMotion(Grasshopper.Kernel.GH_ScriptInstance):
 
         if robot and robot.client and robot.client.is_connected and start_configuration and planes and compute:
             frames = [plane_to_compas_frame(plane) for plane in planes]
-            frame_waypoints = FrameWaypoints(frames)
             st[key] = robot.plan_cartesian_motion(
-                frame_waypoints,
+                frames,
                 start_configuration=start_configuration,
                 group=group,
                 options=dict(
