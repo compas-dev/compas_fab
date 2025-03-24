@@ -4,6 +4,7 @@ on:
     types: [assigned, opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - main
+      - LTS-main-1.x
 
 jobs:
   build:
