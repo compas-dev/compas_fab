@@ -174,7 +174,10 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
         elbow_frame = Frame(p1A, elbow_dir, [0, 0, 1])
         elbow_plane = (p1A, elbow_frame.normal)
 
-        _, (center, radius, normal) = intersection_sphere_sphere(sphere1, sphere2)
+        sphere1_prim = (sphere1.base, sphere1.radius)
+        sphere2_prim = (sphere2.base, sphere2.radius)
+
+        _, (center, radius, normal) = intersection_sphere_sphere(sphere1_prim, sphere2_prim)
         circle = ((center, normal), radius)
 
         intersect_pt1, intersect_pt2 = intersection_plane_circle(elbow_plane, circle)
@@ -238,9 +241,4 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
                 axis6_angle = math.atan2(endy, endx)
                 axis6_angles.append(axis6_angle)
 
-    return [
-        [a1, a2, a3, a4, a5, a6]
-        for a1, a2, a3, a4, a5, a6 in zip(
-            axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles
-        )
-    ]
+    return [[a1, a2, a3, a4, a5, a6] for a1, a2, a3, a4, a5, a6 in zip(axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles)]
