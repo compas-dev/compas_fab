@@ -6,7 +6,6 @@ COMPAS FAB v1.0.2
 """
 
 import Grasshopper
-
 from compas_ghpython.drawing import draw_frame
 from compas_ghpython.sets import list_to_ghtree
 

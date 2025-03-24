@@ -6,7 +6,6 @@ COMPAS FAB v1.0.2
 """
 
 import Grasshopper
-
 from scriptcontext import sticky as st
 
 from compas_fab.ghpython.components import create_id

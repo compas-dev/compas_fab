@@ -5,10 +5,8 @@ Calculate a cartesian motion path (linear in tool space).
 COMPAS FAB v1.0.2
 """
 
-import System
-
 import Grasshopper
-
+import System
 from compas_rhino.conversions import plane_to_compas_frame
 from scriptcontext import sticky as st
 

@@ -6,6 +6,7 @@ check-manifest >=0.36
 compas-invocations2
 doc8
 flake8
+ruff
 importlib_metadata <5.0
 invoke>=0.14
 isort

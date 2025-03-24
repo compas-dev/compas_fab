@@ -8,7 +8,6 @@ COMPAS FAB v1.0.2
 import time
 
 import Grasshopper
-
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas.scene import SceneObject

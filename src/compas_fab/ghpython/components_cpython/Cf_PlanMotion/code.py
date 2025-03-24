@@ -5,9 +5,8 @@ Calculate a motion path.
 COMPAS FAB v1.0.2
 """
 
-import System
 import Grasshopper
-
+import System
 from scriptcontext import sticky as st
 
 from compas_fab.ghpython.components import create_id

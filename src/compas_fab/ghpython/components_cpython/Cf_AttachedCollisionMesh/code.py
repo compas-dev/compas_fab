@@ -5,11 +5,9 @@ Add an attached collision mesh to the robot.
 COMPAS FAB v1.0.2
 """
 
-import System
-
 import Grasshopper
 import Rhino
-
+import System
 from compas_rhino.conversions import mesh_to_compas
 
 from compas_fab.robots import AttachedCollisionMesh

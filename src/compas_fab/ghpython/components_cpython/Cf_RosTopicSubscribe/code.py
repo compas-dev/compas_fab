@@ -8,7 +8,6 @@ COMPAS FAB v1.0.2
 import time
 
 import Grasshopper
-
 from roslibpy import Topic
 from scriptcontext import sticky as st
 

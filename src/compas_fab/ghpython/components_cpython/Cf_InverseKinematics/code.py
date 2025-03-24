@@ -6,7 +6,6 @@ COMPAS FAB v1.0.2
 """
 
 import Grasshopper
-
 from compas_rhino.conversions import plane_to_compas_frame
 
 

@@ -7,9 +7,8 @@ COMPAS FAB v1.0.2
 
 import math
 
-import System
-
 import Grasshopper
+import System
 
 
 class ConstraintsFromTargetConfiguration(Grasshopper.Kernel.GH_ScriptInstance):

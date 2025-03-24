@@ -106,7 +106,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.
                 # https://stackoverflow.com/questions/49674179/understanding-inverse-kinematics-pybullet
                 # https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/preview?pru=AAABc7276PI*zazLer2rlZ8tAUI8lF98Kw#heading=h.9i02ojf4k3ve
-                joint_ranges = [u - l for u, l in zip(upper_limits, lower_limits)]
+                joint_ranges = [upper - lower for upper, lower in zip(upper_limits, lower_limits)]
 
                 if options.get("semi-constrained"):
                     ik_options.update(
@@ -213,7 +213,5 @@ class PyBulletInverseKinematics(InverseKinematics):
         return joint_poses, close_enough
 
     def _get_rest_poses(self, joint_names, configuration):
-        name_value_map = {
-            configuration.joint_names[i]: configuration.joint_values[i] for i in range(len(configuration.joint_names))
-        }
+        name_value_map = {configuration.joint_names[i]: configuration.joint_values[i] for i in range(len(configuration.joint_names))}
         return [name_value_map[name] for name in joint_names]

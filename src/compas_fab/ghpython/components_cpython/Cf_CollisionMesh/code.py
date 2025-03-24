@@ -7,12 +7,11 @@ COMPAS FAB v1.0.2
 
 import Grasshopper
 import Rhino
-
 from compas_rhino.conversions import mesh_to_compas
 
-from compas_fab.robots import CollisionMesh
-from compas_fab.ghpython.components import message
 from compas_fab.ghpython.components import error
+from compas_fab.ghpython.components import message
+from compas_fab.robots import CollisionMesh
 
 
 class CollisionMeshComponent(Grasshopper.Kernel.GH_ScriptInstance):

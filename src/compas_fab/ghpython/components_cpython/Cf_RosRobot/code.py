@@ -6,7 +6,6 @@ COMPAS FAB v1.0.2
 """
 
 import Grasshopper
-
 from compas.scene import SceneObject
 from scriptcontext import sticky as st
 
