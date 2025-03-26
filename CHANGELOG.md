@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+* Removed `create_id` from `compas_fab.ghpython.components`, using `compas_ghpython.create_id` instead.
+
 
 ## [1.0.2] 2024-02-22
 
