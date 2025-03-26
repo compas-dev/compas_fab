@@ -6,9 +6,9 @@ COMPAS FAB v1.0.2
 """
 
 import Grasshopper
+from compas_ghpython import create_id
 from scriptcontext import sticky as st
 
-from compas_fab.ghpython.components import create_id
 from compas_fab.robots import PlanningScene
 
 

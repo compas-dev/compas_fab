@@ -8,11 +8,11 @@ COMPAS FAB v1.0.2
 import time
 
 import Grasshopper
+from compas_ghpython import create_id
 from roslibpy import Topic
 from scriptcontext import sticky as st
 
 from compas_fab.backends.ros.messages import ROSmsg
-from compas_fab.ghpython.components import create_id
 from compas_fab.ghpython.components import message
 from compas_fab.ghpython.components import warning
 

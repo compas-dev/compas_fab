@@ -6,10 +6,6 @@ except ImportError:
     pass
 
 
-def create_id(component, name):
-    return "{}_{}".format(name, component.InstanceGuid)
-
-
 def warning(component, message):
     """Add a warning message to the component.
 

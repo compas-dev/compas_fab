@@ -7,9 +7,8 @@ COMPAS FAB v1.0.2
 
 import Grasshopper
 import System
+from compas_ghpython import create_id
 from scriptcontext import sticky as st
-
-from compas_fab.ghpython.components import create_id
 
 
 class PlanMotion(Grasshopper.Kernel.GH_ScriptInstance):
