@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Updated dev dependency to `compas_invocations2`.
 * Fixed `AttributeError` in `inverse_kinematics_spherical_wrist()`.
+* Fixed `AttributeError` in VisualizeRobot GH component.
 
 ### Removed
 

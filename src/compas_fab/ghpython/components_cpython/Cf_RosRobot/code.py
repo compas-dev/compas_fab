@@ -18,7 +18,7 @@ class ROSRobot(Grasshopper.Kernel.GH_ScriptInstance):
         if ros_client and ros_client.is_connected and load:
             # Load URDF from ROS
             st[key] = ros_client.load_robot(load_geometry=True, precision=12)
-            st[key].scene_object = SceneObject(st[key].model)
+            st[key].scene_object = SceneObject(item=st[key].model)
 
         robot = st.get(key, None)
         if robot:  # client sometimes need to be restarted, without needing to reload geometry
