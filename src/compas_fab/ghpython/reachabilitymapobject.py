@@ -34,12 +34,12 @@ class ReachabilityMapObject(GHSceneObject):
             for frames in self.reachability_map.frames:
                 xframes.append([])
                 for frame in frames:
-                    xframes[-1].append(SceneObject(frame).draw())
+                    xframes[-1].append(SceneObject(item=frame).draw())
             xframes = list_to_tree(xframes)
             return xframes
         else:
             frames, _ = self.reachability_map.reachable_frames_and_configurations_at_ik_index(ik_index)
-            return [SceneObject(f).draw() for f in frames]
+            return [SceneObject(item=f).draw() for f in frames]
 
     def draw(self, colormap="viridis"):
         return self.draw_cloud(colormap)
@@ -64,7 +64,7 @@ class ReachabilityMapObject(GHSceneObject):
 
         xpoints = []
         for pt in points:
-            xpoints.extend(SceneObject(pt).draw())
+            xpoints.extend(SceneObject(item=pt).draw())
 
         colors = []
         cmap = ColorMap.from_mpl(colormap)

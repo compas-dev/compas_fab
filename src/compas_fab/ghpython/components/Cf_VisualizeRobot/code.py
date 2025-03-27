@@ -93,9 +93,7 @@ class RobotVisualize(component):
                     try:
                         scene = robot.client.get_planning_scene()
                     except BackendFeatureNotSupportedError:
-                        print(
-                            "The selected backend does not support collision meshes. If you need collision mesh support, use a different backend."
-                        )
+                        print("The selected backend does not support collision meshes. If you need collision mesh support, use a different backend.")
                         scene = None
                         show_cm = False
                         show_acm = False
@@ -115,7 +113,7 @@ class RobotVisualize(component):
                             else:
                                 mesh = cm.mesh
 
-                            collision_meshes.extend(SceneObject(mesh).draw())
+                            collision_meshes.extend(SceneObject(item=mesh).draw())
 
                         cached_scene["cm"] = collision_meshes
 
@@ -136,7 +134,7 @@ class RobotVisualize(component):
 
                             mesh = acm.collision_mesh.mesh.transformed(t)
 
-                            attached_meshes.extend(SceneObject(mesh).draw())
+                            attached_meshes.extend(SceneObject(item=mesh).draw())
 
                     cached_scene["acm"] = attached_meshes
 
