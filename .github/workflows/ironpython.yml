@@ -28,6 +28,11 @@ jobs:
           ipy -X:Frames -m pip install --no-deps compas.tar.gz
           ipy -X:Frames -m pip install --no-deps roslibpy.tar.gz
           ipy -X:Frames -m pip install --no-deps compas_robots.tar.gz
+
+          # untar and rename, these cannot be installed using ironpip because they not longer have a setup.py
+          tar -xf compas.tar.gz && for /d %i in (compas-*) do ren "%i" compas
+          tar -xf compas_robots.tar.gz && for /d %i in (compas_robots-*) do ren "%i" compas_robots
+
       - uses: NuGet/setup-nuget@v1.0.5
       - uses: compas-dev/compas-actions.ghpython_components@v5
         with:
@@ -37,9 +42,9 @@ jobs:
         run: |
           ipy -m compas_fab
         env:
-          IRONPYTHONPATH: ./src
+          IRONPYTHONPATH: ./src;./compas/src;./compas_robots/src
       - name: Run tests
         run: |
           ipy tests/ipy_test_runner.py
         env:
-          IRONPYTHONPATH: ./src
+          IRONPYTHONPATH: ./src;./compas/src;./compas_robots/src
