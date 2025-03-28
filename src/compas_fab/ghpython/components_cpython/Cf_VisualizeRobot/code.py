@@ -8,13 +8,13 @@ COMPAS FAB v1.0.2
 import time
 
 import Grasshopper
-from compas.geometry import Frame
-from compas.geometry import Transformation
-from compas.scene import SceneObject
 from compas_ghpython import create_id
 from compas_rhino.conversions import frame_to_rhino_plane
 from scriptcontext import sticky as st
 
+from compas.geometry import Frame
+from compas.geometry import Transformation
+from compas.scene import SceneObject
 from compas_fab.backends import BackendFeatureNotSupportedError
 from compas_fab.robots import PlanningScene
 
@@ -94,7 +94,9 @@ class RobotVisualize(Grasshopper.Kernel.GH_ScriptInstance):
                     try:
                         scene = robot.client.get_planning_scene()
                     except BackendFeatureNotSupportedError:
-                        print("The selected backend does not support collision meshes. If you need collision mesh support, use a different backend.")
+                        print(
+                            "The selected backend does not support collision meshes. If you need collision mesh support, use a different backend."
+                        )
                         scene = None
                         show_cm = False
                         show_acm = False

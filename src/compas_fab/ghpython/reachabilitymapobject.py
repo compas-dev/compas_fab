@@ -1,6 +1,7 @@
+from compas_ghpython.scene import GHSceneObject
+
 from compas.colors import ColorMap
 from compas.scene import SceneObject
-from compas_ghpython.scene import GHSceneObject
 
 
 class ReachabilityMapObject(GHSceneObject):
