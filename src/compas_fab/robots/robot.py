@@ -1584,13 +1584,13 @@ class Robot(Data):
         Examples
         --------
 
-        >>> ros = RosClient()   # doctest: +SKIP  # doctest: +SKIP
+        >>> ros = RosClient()  # doctest: +SKIP
         >>> ros.run()  # doctest: +SKIP
         >>> robot = ros.load_robot()  # doctest: +SKIP
-        >>> frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\  # doctest: +SKIP
-                      Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0])]
+        >>> frames = [Frame([0.3, 0.1, 0.5], [1, 0, 0], [0, 1, 0]),\
+                      Frame([0.5, 0.1, 0.6], [1, 0, 0], [0, 1, 0])]  # doctest: +SKIP
         >>> start_configuration = Configuration.from_revolute_values([-0.042, 0.033, -2.174, 5.282, -1.528, 0.000])  # doctest: +SKIP
-        >>> group = robot.main_group_name  # doctest: +SKIP
+        >>> group = robot.main_group_name
         >>> options = {'max_step': 0.01,\
                        'jump_threshold': 1.57,\
                        'avoid_collisions': True}  # doctest: +SKIP
@@ -1728,7 +1728,7 @@ class Robot(Data):
 
         Using position and orientation constraints:
 
-        >>> ros = RosClient()  # doctest: +SKIP  # doctest: +SKIP
+        >>> ros = RosClient()  # doctest: +SKIP
         >>> ros.run()  # doctest: +SKIP
         >>> robot = ros.load_robot()  # doctest: +SKIP
         >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])  # doctest: +SKIP
@@ -1752,7 +1752,7 @@ class Robot(Data):
 
         Using joint constraints (to the UP configuration):
 
-        >>> ros = RosClient()  # doctest: +SKIP  # doctest: +SKIP
+        >>> ros = RosClient()  # doctest: +SKIP
         >>> ros.run()  # doctest: +SKIP
         >>> robot = ros.load_robot()  # doctest: +SKIP
         >>> configuration = Configuration.from_revolute_values([0.0, -1.5707, 0.0, -1.5707, 0.0, 0.0])  # doctest: +SKIP
