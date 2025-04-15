@@ -1,0 +1,32 @@
+# r: compas_fab>=1.0.2
+"""
+Create a position and an orientation constraint from a plane calculated for the group's end-effector link.
+
+COMPAS FAB v1.0.2
+"""
+
+import math
+
+import Grasshopper
+import System
+from compas_rhino.conversions import plane_to_compas_frame
+
+
+class ConstraintsFromPlane(Grasshopper.Kernel.GH_ScriptInstance):
+    def RunScript(self, robot, plane, group, tolerance_position, tolerance_xaxis, tolerance_yaxis, tolerance_zaxis):
+        goal_constraints = None
+        if robot and plane:
+            tolerance_position = tolerance_position or 0.001
+            tolerance_xaxis = tolerance_xaxis or 1.0
+            tolerance_yaxis = tolerance_yaxis or 1.0
+            tolerance_zaxis = tolerance_zaxis or 1.0
+
+            frame = plane_to_compas_frame(plane)
+            tolerances_axes = [
+                math.radians(tolerance_xaxis),
+                math.radians(tolerance_yaxis),
+                math.radians(tolerance_zaxis),
+            ]
+            goal_constraints = robot.constraints_from_frame(frame, tolerance_position, tolerances_axes, group)
+
+        return goal_constraints

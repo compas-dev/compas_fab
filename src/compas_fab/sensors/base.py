@@ -7,9 +7,9 @@ class SerialSensor(object):
             port used to communicate with the sensor.
 
     Examples:
-        >>> from serial import Serial                           # doctest: +SKIP
-        >>> with Serial('COM5', 57600, timeout=1) as serial:    # doctest: +SKIP
-        ...     sensor = SerialSensor(serial)                   # doctest: +SKIP
+        >>> from serial import Serial  # doctest: +SKIP
+        >>> with Serial("COM5", 57600, timeout=1) as serial:  # doctest: +SKIP
+        ...     sensor = SerialSensor(serial)  # doctest: +SKIP
     """
 
     def __init__(self, serial):

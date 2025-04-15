@@ -4,10 +4,9 @@ Calculate a motion path.
 COMPAS FAB v1.0.2
 """
 
+from compas_ghpython import create_id
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
-
-from compas_fab.ghpython.components import create_id
 
 
 class PlanMotion(component):

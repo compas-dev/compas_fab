@@ -201,7 +201,7 @@ class Inertia(ROSmsg):
 
     Examples
     --------
-    >>> inertia = compas_fab.robots.Inertia([[0] * 3] * 3, 1., [0.1, 3.1, 4.4])
+    >>> inertia = compas_fab.robots.Inertia([[0] * 3] * 3, 1.0, [0.1, 3.1, 4.4])
     >>> ros_inertia = Inertia.from_inertia(inertia)
     >>> ros_inertia.msg
     {'m': 1.0, 'com': {'x': 0.1, 'y': 3.1, 'z': 4.4}, 'ixx': 0.0, 'ixy': 0.0, 'ixz': 0.0, 'iyy': 0.0, 'iyz': 0.0, 'izz': 0.0}

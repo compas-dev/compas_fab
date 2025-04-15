@@ -1,19 +1,16 @@
 attrs >=19.3.0
-autopep8
 black
 bump2version >=1.0.1
 check-manifest >=0.36
-compas_invocations
-doc8
-flake8
+compas-invocations2
+ruff
 importlib_metadata <5.0
 invoke>=0.14
-isort
-pylint
 pytest
 pytest_mock
 pytest-cov
 sphinx_compas2_theme
-sybil
+sybil~=8.0.1
 twine
+tomlkit
 -e .

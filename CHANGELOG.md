@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+* Added helper function `message` to `compas_fab.ghpython.components`.
+* Added helper function `error` to `compas_fab.ghpython.components`.
+* Added helper function `remark` to `compas_fab.ghpython.components`.
+* Added helper function `warning` to `compas_fab.ghpython.components`.
+* Added GH component definitions compatible with CPython in Rhino8.
+
+### Changed
+
+* Updated dev dependency to `compas_invocations2`.
+* Fixed `AttributeError` in `inverse_kinematics_spherical_wrist()`.
+* Fixed `AttributeError` in VisualizeRobot GH component.
+
+### Removed
+
+* Removed `create_id` from `compas_fab.ghpython.components`, using `compas_ghpython.create_id` instead.
+
+
 ## [1.0.2] 2024-02-22
 
 ### Added

@@ -25,10 +25,10 @@ def redirect_stdout(to=os.devnull, enabled=True):
 
     Examples
     --------
-    >>> import os                                                        # doctest: +SKIP
-    >>> with redirect_stdout(to='filename'):                             # doctest: +SKIP
-    ...     print("from Python")                                         # doctest: +SKIP
-    ...     os.system("echo non-Python applications are also supported") # doctest: +SKIP
+    >>> import os  # doctest: +SKIP
+    >>> with redirect_stdout(to="filename"):  # doctest: +SKIP
+    ...     print("from Python")  # doctest: +SKIP
+    ...     os.system("echo non-Python applications are also supported")  # doctest: +SKIP
     """
 
     def _redirect_stdout(to_):
