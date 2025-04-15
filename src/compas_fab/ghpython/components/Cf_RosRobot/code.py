@@ -1,7 +1,7 @@
 """
 Load robot directly from ROS.
 
-COMPAS FAB v1.0.2
+COMPAS FAB v1.0.3
 """
 
 from compas_ghpython import create_id
