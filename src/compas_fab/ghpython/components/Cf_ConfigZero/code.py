@@ -1,7 +1,7 @@
 """
 Get a zero configuration for a robot.
 
-COMPAS FAB v1.0.3
+COMPAS FAB v1.0.4
 """
 
 from ghpythonlib.componentbase import executingcomponent as component

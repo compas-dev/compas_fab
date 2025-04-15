@@ -1,7 +1,7 @@
 """
 Merge two configurations.
 
-COMPAS FAB v1.0.3
+COMPAS FAB v1.0.4
 """
 
 from ghpythonlib.componentbase import executingcomponent as component
