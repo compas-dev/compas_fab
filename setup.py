@@ -4,6 +4,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import io
+import sys
 from glob import glob
 from os import path
 
@@ -22,6 +23,12 @@ exec(read("src", "compas_fab", "__version__.py"), about)
 
 long_description = read("README.md")
 requirements = read("requirements.txt").split("\n")
+
+# Conditionally exclude pybullet if we're installing inside Rhino
+# because it fails to compile
+if "rhino" in sys.executable.lower():
+    requirements = [r for r in requirements if "pybullet" not in r]
+
 optional_requirements = {}
 
 setup(
