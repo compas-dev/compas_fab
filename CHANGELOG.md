@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Made `pybullet` entirely optional. To install `pybullet`, use `pip install compas_fab.[pybullet]` or install `pybullet` manually.
+
 ### Removed
 
 
