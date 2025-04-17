@@ -18,6 +18,12 @@ planning functionality.  PyBullet is also not compatible with IronPython. Hence 
 it with Rhinoceros and Grasshopper it must be invoked through the
 :mod:`compas.rpc` module.
 
+Pybullet itself is no longer a dependency of ``compas_fab``, instead it is an
+optional requirement.
+
+To install it, using ``pip install compas_fab.[pybullet]`` or install using the
+package manager of your choice.
+
 Next Steps
 ==========
 
