@@ -354,9 +354,8 @@ class RobotCellLibrary(object):
 
     >>> from compas_fab.robots import RobotCellLibrary
     >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5_cone_tool()
-    >>> robot_cell.robot.name
+    >>> robot_cell.robot_model.name
     'ur5_robot'
-    >>> robot_cell_state.get
     """
 
     # ---------------------------------------------------------------------

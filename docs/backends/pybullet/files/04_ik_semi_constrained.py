@@ -28,7 +28,7 @@ with PyBulletClient() as client:
     planner.set_robot_cell(robot_cell)
 
     # The initial configuration changes the IK result
-    start_configuration = robot_cell.robot.zero_configuration()
+    start_configuration = robot_cell.zero_configuration()
 
     # Note that the semi-constrained IK mode only accepts ROBOT mode.
     frame_WCF = Frame([0.3, 0.1, 0.5], [1, 1, 0], [0, 0, 1])
