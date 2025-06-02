@@ -185,8 +185,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     Examples
     --------
     >>> from compas_fab.backends import PyBulletClient
-    >>> with PyBulletClient(connection_type='direct') as client:
-    ...     print('Connected: %s' % client.is_connected)
+    >>> with PyBulletClient(connection_type="direct") as client:
+    ...     print("Connected: %s" % client.is_connected)
     Connected: True
 
     """

@@ -22,7 +22,7 @@ exec(read("src", "compas_fab", "__version__.py"), about)
 
 long_description = read("README.md")
 requirements = read("requirements.txt").split("\n")
-optional_requirements = {}
+optional_requirements = {"pybullet": ["pybullet"]}
 
 setup(
     name=about["__title__"],
@@ -58,6 +58,6 @@ setup(
     ],
     keywords=["robotic fabrication", "digital fabrication", "architecture", "robotics", "ros"],
     install_requires=requirements,
-    extras_require={},
+    extras_require=optional_requirements,
     entry_points={},
 )

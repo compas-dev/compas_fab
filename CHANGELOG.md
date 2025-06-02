@@ -178,6 +178,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Removed `plan_cartesian_motion_deprecated` and `plan_motion_deprecated` methods from `Robot` class
 * Removed `forward_kinematics_deprecated` and `inverse_kinematics_deprecated` method from `Robot` class
 
+
+## [1.1.0] 2025-04-17
+
+### Added
+
+### Changed
+
+* Made `pybullet` entirely optional. To install `pybullet`, use `pip install compas_fab.[pybullet]` or install `pybullet` manually.
+
+### Removed
+
+
+## [1.0.5] 2025-04-17
+
+### Added
+
+### Changed
+
+* Rhino CPython support: change `pybullet` to be optional requirements inside Rhino.
+
+### Removed
+
+
+## [1.0.4] 2025-04-15
+
+### Added
+
+### Changed
+
+### Removed
+
+
+## [[1.0.3] 2025-04-15]
+
+### Added
+
+* Added helper function `message` to `compas_fab.ghpython.components`.
+* Added helper function `error` to `compas_fab.ghpython.components`.
+* Added helper function `remark` to `compas_fab.ghpython.components`.
+* Added helper function `warning` to `compas_fab.ghpython.components`.
+* Added GH component definitions compatible with CPython in Rhino8.
+
+### Changed
+
+* Updated dev dependency to `compas_invocations2`.
+* Fixed `AttributeError` in `inverse_kinematics_spherical_wrist()`.
+* Fixed `AttributeError` in VisualizeRobot GH component.
+
+### Removed
+
+* Removed `create_id` from `compas_fab.ghpython.components`, using `compas_ghpython.create_id` instead.
+
+
 ## [1.0.2] 2024-02-22
 
 ### Added

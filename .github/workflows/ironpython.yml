@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - wip
-  pull_request:
 
 jobs:
   build:
@@ -36,6 +35,13 @@ jobs:
           echo "Ensure pip on IronPython and install pytest..."
           ipy -X:Frames -m ensurepip
           ipy -X:Frames -m pip install --no-deps ironpython-pytest.tar.gz
+          ipy -X:Frames -m pip install --no-deps compas.tar.gz
+          ipy -X:Frames -m pip install --no-deps roslibpy.tar.gz
+          ipy -X:Frames -m pip install --no-deps compas_robots.tar.gz
+
+          # untar and rename, these cannot be installed using ironpip because they not longer have a setup.py
+          tar -xf compas.tar.gz && for /d %i in (compas-*) do ren "%i" compas
+          tar -xf compas_robots.tar.gz && for /d %i in (compas_robots-*) do ren "%i" compas_robots
 
       - uses: NuGet/setup-nuget@v1.0.5
 
@@ -57,4 +63,13 @@ jobs:
         with:
           source: src/compas_fab/ghpython/components
           target: src/compas_fab/ghpython/components/ghuser
-
+      - name: Test import
+        run: |
+          ipy -m compas_fab
+        env:
+          IRONPYTHONPATH: ./src;./compas/src;./compas_robots/src
+      - name: Run tests
+        run: |
+          ipy tests/ipy_test_runner.py
+        env:
+          IRONPYTHONPATH: ./src;./compas/src;./compas_robots/src

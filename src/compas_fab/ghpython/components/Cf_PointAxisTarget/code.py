@@ -1,7 +1,7 @@
 """
 Create a point and axis target for the robot's end-effector motion planning.
 
-COMPAS FAB v1.0.2
+COMPAS FAB v1.1.0
 """
 
 from compas_rhino.conversions import point_to_compas

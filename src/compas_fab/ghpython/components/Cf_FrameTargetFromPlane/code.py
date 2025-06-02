@@ -1,7 +1,7 @@
 """
 Create a fully constrained pose target for the robot's end-effector using a GH Plane or compas Frame.
 
-COMPAS FAB v1.0.2
+COMPAS FAB v1.1.0
 """
 
 import math

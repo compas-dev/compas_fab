@@ -28,6 +28,12 @@ kinematics and collision checking functions offered by PyBullet.
 PyBullet is not compatible with IronPython. Therefor, it is not possible to use
 it with Rhino 7 or its associated Grasshopper.
 
+Pybullet itself is no longer a dependency of ``compas_fab``, instead it is an
+optional requirement.
+
+To install it, using ``pip install compas_fab.[pybullet]`` or install using the
+package manager of your choice.
+
 Next Steps
 ==========
 

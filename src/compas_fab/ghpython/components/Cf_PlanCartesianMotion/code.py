@@ -1,14 +1,13 @@
 """
 Calculate a cartesian motion path (linear in tool space).
 
-COMPAS FAB v1.0.2
+COMPAS FAB v1.1.0
 """
 
+from compas_ghpython import create_id
 from compas_rhino.conversions import plane_to_compas_frame
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
-
-from compas_fab.ghpython.components import create_id
 from compas_fab.robots import FrameWaypoints
 
 

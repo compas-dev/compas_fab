@@ -24,3 +24,34 @@ known_first_party = "compas_fab"
 default_section = "THIRDPARTY"
 forced_separate = "test_compas_fab"
 skip = ["__init__.py"]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["I001"]
+"tests/*" = ["I001"]
+"tasks.py" = ["I001"]
+"src/compas_fab/ghpython/components/*/code.py" = ["F821", "F401"]
+"src/compas_fab/ghpython/components_cpython/*/code.py" = ["F821", "F401"]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+known-first-party = [
+    "compas_fab"
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 179
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = "dynamic"

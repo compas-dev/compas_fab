@@ -340,7 +340,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # I don't know what jointRanges needs to be.  Erwin Coumans knows, but he isn't telling.
         # https://stackoverflow.com/questions/49674179/understanding-inverse-kinematics-pybullet
         # https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/preview?pru=AAABc7276PI*zazLer2rlZ8tAUI8lF98Kw#heading=h.9i02ojf4k3ve
-        joint_ranges = [u - l for u, l in zip(upper_limits, lower_limits)]
+        joint_ranges = [upper - lower for upper, lower in zip(upper_limits, lower_limits)]
 
         # Prepare Parameters for calling pybullet.calculateInverseKinematics
         ik_options = dict(

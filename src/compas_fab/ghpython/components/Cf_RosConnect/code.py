@@ -1,14 +1,14 @@
 """
 Connect or disconnect to ROS.
 
-COMPAS FAB v1.0.2
+COMPAS FAB v1.1.0
 """
 
+from compas_ghpython import create_id
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
 
 from compas_fab.backends import RosClient
-from compas_fab.ghpython.components import create_id
 
 
 class ROSConnect(component):

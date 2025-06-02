@@ -1,7 +1,7 @@
 """
 Create configuration target for the robot's end-effector motion planning.
 
-COMPAS FAB v1.0.2
+COMPAS FAB v1.1.0
 """
 
 import math

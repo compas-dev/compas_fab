@@ -90,7 +90,7 @@ To switch to a specific version
 
 .. code-block:: bash
 
-    conda install compas_fab=1.0.2
+    conda install compas_fab=1.1.0
 
 
 Update with pip
@@ -106,7 +106,7 @@ Or to switch to a specific version
 
 .. code-block:: bash
 
-    pip install compas_fab==1.0.2
+    pip install compas_fab==1.1.0
 
 
 Next Steps
