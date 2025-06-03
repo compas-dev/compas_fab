@@ -1,7 +1,8 @@
 # from compas.colors import ColorMap
 # from compas.scene import SceneObject
-from .gh_scene_object import GHSceneObject
 from compas_fab.scene import BaseRobotModelObject
+
+from .gh_scene_object import GHSceneObject
 
 
 # Overrides the RobotModelObject in compas_robot

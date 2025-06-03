@@ -1,4 +1,3 @@
-import compas
 import pytest
 from compas import IPY
 
@@ -27,9 +26,6 @@ def analytical_pybullet_client():
 
 
 def test_planner(analytical_pybullet_client):
-    if compas.IPY:
-        return
-
     client = analytical_pybullet_client
     planner = AnalyticalPyBulletPlanner(client, UR5Kinematics())
     robot_cell, robot_cell_state = RobotCellLibrary.ur5_cone_tool()

@@ -463,3 +463,8 @@ def test_get_configurable_joints(ur10e_gripper_one_beam : tuple[RobotCell, Robot
     joint_names = ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
     assert set([j.name for j in joints]) == set(joint_names)
     assert len(joints) == 6
+
+
+def test_print_info(ur10e_gripper_one_beam : tuple[RobotCell, RobotCellState]):
+    robot_cell, _ = ur10e_gripper_one_beam
+    robot_cell.print_info()

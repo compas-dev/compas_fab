@@ -1,4 +1,3 @@
-# This example does not work with IronPython
 from compas_fab.robots import RobotCellLibrary
 from compas_robots.viewer.scene.robotmodelobject import RobotModelObject
 from compas_robots.model import Joint

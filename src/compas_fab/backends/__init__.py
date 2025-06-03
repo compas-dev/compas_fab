@@ -104,8 +104,6 @@ the :ref:`architecture` documentation.
 
 """
 
-from compas import IPY
-
 # Base imports
 from .exceptions import (
     BackendError,
@@ -161,16 +159,13 @@ from .kinematics import (
     ABB_IRB4600_40_255Kinematics,
 )
 
-# NOTE: IPY guard because PyBullet do not work in IronPython
-# PyBullet imports
-if not IPY:
-    from .pybullet import (
-        PyBulletClient,
-        PyBulletError,
-        PyBulletPlanner,
-        AnalyticalPyBulletClient,
-        PlanningGroupNotSupported,
-    )
+from .pybullet import (
+    PyBulletClient,
+    PyBulletError,
+    PyBulletPlanner,
+    AnalyticalPyBulletClient,
+    PlanningGroupNotSupported,
+)
 
 __all__ = [
     # Exceptions
@@ -216,14 +211,10 @@ __all__ = [
     "UR10eKinematics",
     "Staubli_TX260LKinematics",
     "ABB_IRB4600_40_255Kinematics",
+    # PyBullet
+    "PyBulletClient",
+    "PyBulletError",
+    "PyBulletPlanner",
+    "AnalyticalPyBulletClient",
+    "PlanningGroupNotSupported",
 ]
-
-# PyBullet
-if not IPY:
-    __all__ += [
-        "PyBulletClient",
-        "PyBulletError",
-        "PyBulletPlanner",
-        "AnalyticalPyBulletClient",
-        "PlanningGroupNotSupported",
-    ]

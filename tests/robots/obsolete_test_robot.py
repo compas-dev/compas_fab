@@ -1,8 +1,6 @@
 import os
-import re
 
 import pytest
-import compas
 from compas.data import json_dumps
 from compas.data import json_loads
 from compas.datastructures import Mesh
@@ -381,7 +379,3 @@ def test_attached_tools_no_assigning(ur5_robot_instance, robot_tool1):
     with pytest.raises(AttributeError):
         robot.attached_tools = None
 
-
-def test_print_robot_info(ur5_robot_instance):
-    robot = ur5_robot_instance
-    robot_cell.print_info()

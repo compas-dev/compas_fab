@@ -1,14 +1,8 @@
+from typing import Optional
 import math
 
-from compas import IPY
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_robots import Configuration  # noqa: F401
-        from typing import List  # noqa: F401
+from compas_robots import Configuration
+from compas_fab.robots import RobotCell
 
 
 def get_smaller_angle(angle):  # delete
@@ -30,8 +24,7 @@ def fit_within_bounds(angle, lower, upper):
     return angle
 
 
-def try_to_fit_configurations_between_bounds(robot_cell, configurations, group=None):
-    # type: (RobotCell, List[Configuration], str) -> List[Configuration]
+def try_to_fit_configurations_between_bounds(robot_cell: RobotCell, configurations: list[Configuration], group: Optional[str] = None) -> list[Configuration]:
     j1, j2, j3, j4, j5, j6 = robot_cell.get_configurable_joints(group=group)
     for i, c in enumerate(configurations):
         if c is None:

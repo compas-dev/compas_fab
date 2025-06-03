@@ -25,9 +25,6 @@ def get_names_in_module(module_name):
 
 @pytest.fixture
 def compas_fab_api():
-    if compas.IPY:
-        return
-
     modules = [
         "compas_fab.backends",
         "compas_fab.robots",
@@ -42,9 +39,6 @@ def compas_fab_api():
 
 @pytest.fixture
 def compas_fab_stubs():
-    if compas.IPY:
-        return
-
     env = compas._os.prepare_environment()
 
     HERE = os.path.dirname(__file__)
@@ -85,9 +79,6 @@ def compas_fab_stubs():
 
 def test_compas_api_stubs(compas_fab_api, compas_fab_stubs):
     return  # Temporary disable due to WIP branch
-
-    if compas.IPY:
-        return
 
     for packmod in compas_fab_api:
         parts = packmod.split(".")

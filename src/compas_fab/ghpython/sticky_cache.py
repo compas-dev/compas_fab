@@ -1,7 +1,6 @@
 import scriptcontext as sc  # type: ignore
-from compas.scene import SceneObject
 from compas.scene import Scene
-
+from compas.scene import SceneObject
 from compas_ghpython import create_id
 
 

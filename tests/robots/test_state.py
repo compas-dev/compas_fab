@@ -3,20 +3,12 @@
 from copy import deepcopy
 
 import pytest
-from compas import IPY
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_robots import Configuration
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Tuple  # noqa: F401
-
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
 from compas_fab.robots import RigidBodyState
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import ToolState
@@ -32,8 +24,7 @@ from compas_fab.robots import ToolState
 
 
 @pytest.fixture
-def rbs_stationary():
-    # type: () -> RigidBodyState
+def rbs_stationary() -> RigidBodyState:
     rbs = RigidBodyState(
         frame=Frame([1, 2, 3], [0.1, 0.2, 0.3]),
     )
@@ -41,8 +32,7 @@ def rbs_stationary():
 
 
 @pytest.fixture
-def rbs_attached_to_tool():
-    # type: () -> RigidBodyState
+def rbs_attached_to_tool() -> RigidBodyState:
     rbs = RigidBodyState(
         frame=None,
         attachment_frame=Frame([1, 2, 3], [0.1, 0.2, 0.3]),
@@ -54,8 +44,7 @@ def rbs_attached_to_tool():
 
 
 @pytest.fixture
-def rbs_attached_to_link():
-    # type: () -> RigidBodyState
+def rbs_attached_to_link() -> RigidBodyState:
     rbs = RigidBodyState(
         frame=None,
         attachment_frame=Frame([1, 2, 3], [0.1, 0.2, 0.3]),
@@ -66,7 +55,7 @@ def rbs_attached_to_link():
     return rbs
 
 
-def test_rbs_eq(rbs_stationary):
+def test_rbs_eq(rbs_stationary: RigidBodyState):
     """Test to make sure the RigidBodyState object is comparable."""
     a = rbs_stationary
     b = deepcopy(rbs_stationary)
@@ -94,7 +83,6 @@ def test_rbs_eq(rbs_stationary):
 
 
 def test_rbs_invalid_init():
-    # type: () -> None
     """Test to make sure the RigidBodyState object is not initialized with invalid parameters."""
     with pytest.raises(ValueError):
         RigidBodyState(
@@ -105,7 +93,6 @@ def test_rbs_invalid_init():
 
 
 def test_rbs_init_with_transformation():
-    # type: () -> None
     """Test to make sure the RigidBodyState object can be initialized with a transformation."""
     frame = Frame([4, 5, 6], [0.1, 0.2, 0.3])
     transformation = Transformation.from_frame(frame)
@@ -117,13 +104,11 @@ def test_rbs_init_with_transformation():
     assert rbs.attachment_frame == frame
 
 
-def test_rbs_copy(rbs_stationary, rbs_attached_to_tool, rbs_attached_to_link):
-    # type: (RigidBodyState, RigidBodyState, RigidBodyState) -> None
+def test_rbs_copy(rbs_stationary: RigidBodyState, rbs_attached_to_tool: RigidBodyState, rbs_attached_to_link: RigidBodyState):
     """Test to make sure the RigidBodyState object is copyable"""
 
-    def _copy_test(rbs):
-        # type: (RigidBodyState) -> None
-        new_rbs = rbs.copy()  # type: RigidBodyState
+    def _copy_test(rbs: RigidBodyState):
+        new_rbs = rbs.copy()
         assert new_rbs is not rbs
         assert new_rbs == rbs
 
@@ -132,13 +117,11 @@ def test_rbs_copy(rbs_stationary, rbs_attached_to_tool, rbs_attached_to_link):
     _copy_test(rbs_attached_to_link)
 
 
-def test_rbs_deepcopy(rbs_stationary, rbs_attached_to_tool, rbs_attached_to_link):
-    # type: (RigidBodyState, RigidBodyState, RigidBodyState) -> None
+def test_rbs_deepcopy(rbs_stationary: RigidBodyState, rbs_attached_to_tool: RigidBodyState, rbs_attached_to_link: RigidBodyState):
     """Test to make sure the RigidBodyState object is copyable"""
 
-    def _copy_test(rbs):
-        # type: (RigidBodyState) -> None
-        new_rbs = deepcopy(rbs)  # type: RigidBodyState
+    def _copy_test(rbs: RigidBodyState):
+        new_rbs = deepcopy(rbs)
         assert new_rbs is not rbs
         assert new_rbs == rbs
 
@@ -156,8 +139,7 @@ def test_rbs_deepcopy(rbs_stationary, rbs_attached_to_tool, rbs_attached_to_link
 
 
 @pytest.fixture
-def ts_stationary():
-    # type: () -> ToolState
+def ts_stationary() -> ToolState:
     ts = ToolState(
         frame=Frame([1, 2, 3], [0.1, 0.2, 0.3]),
     )
@@ -165,8 +147,7 @@ def ts_stationary():
 
 
 @pytest.fixture
-def ts_attached_to_group():
-    # type: () -> ToolState
+def ts_attached_to_group() -> ToolState:
     ts = ToolState(
         frame=None,
         attachment_frame=Frame([1, 2, 3], [0.1, 0.2, 0.3]),
@@ -177,8 +158,7 @@ def ts_attached_to_group():
 
 
 @pytest.fixture
-def ts_with_configuration():
-    # type: () -> ToolState
+def ts_with_configuration() -> ToolState:
     ts = ToolState(
         frame=None,
         attachment_frame=Frame([1, 2, 3], [0.1, 0.2, 0.3]),
@@ -190,8 +170,7 @@ def ts_with_configuration():
     return ts
 
 
-def test_ts_eq(ts_stationary):
-    # type: (ToolState) -> None
+def test_ts_eq(ts_stationary: ToolState):
     """Test to make sure the ToolState object is comparable."""
     a = ts_stationary
     b = deepcopy(ts_stationary)
@@ -223,7 +202,6 @@ def test_ts_eq(ts_stationary):
 
 
 def test_ts_init_with_transformation():
-    # type: () -> None
     """Test to make sure the ToolState object can be initialized with a transformation."""
     frame = Frame([4, 5, 6], [0.1, 0.2, 0.3])
     transformation = Transformation.from_frame(frame)
@@ -235,13 +213,11 @@ def test_ts_init_with_transformation():
     assert ts.attachment_frame == frame
 
 
-def test_ts_copy(ts_stationary, ts_attached_to_group, ts_with_configuration):
-    # type: (ToolState, ToolState, ToolState) -> None
+def test_ts_copy(ts_stationary: ToolState, ts_attached_to_group: ToolState, ts_with_configuration: ToolState):
     """Test to make sure the ToolState object is copyable"""
 
-    def _copy_test(ts):
-        # type: (ToolState) -> None
-        new_ts = ts.copy()  # type: ToolState
+    def _copy_test(ts: ToolState):
+        new_ts = ts.copy()
         assert new_ts is not ts
         assert new_ts == ts
 
@@ -250,13 +226,11 @@ def test_ts_copy(ts_stationary, ts_attached_to_group, ts_with_configuration):
     _copy_test(ts_with_configuration)
 
 
-def test_ts_deepcopy(ts_stationary, ts_attached_to_group, ts_with_configuration):
-    # type: (ToolState, ToolState, ToolState) -> None
+def test_ts_deepcopy(ts_stationary: ToolState, ts_attached_to_group: ToolState, ts_with_configuration: ToolState):
     """Test to make sure the ToolState object is copyable"""
 
-    def _copy_test(ts):
-        # type: (ToolState) -> None
-        new_ts = deepcopy(ts)  # type: ToolState
+    def _copy_test(ts: ToolState):
+        new_ts = deepcopy(ts)
         assert new_ts is not ts
         assert new_ts == ts
 
@@ -274,35 +248,30 @@ def test_ts_deepcopy(ts_stationary, ts_attached_to_group, ts_with_configuration)
 
 
 @pytest.fixture
-def rcs_ur5():
-    # type: () -> RobotCellState
+def rcs_ur5() -> RobotCellState:
     rc, rcs = RobotCellLibrary.ur5()
     return rcs
 
 
 @pytest.fixture
-def rc_rcs_ur10e_gripper_one_beam():
-    # type: () -> Tuple[RobotCell, RobotCellState]
+def rc_rcs_ur10e_gripper_one_beam() -> tuple[RobotCell, RobotCellState]:
     rc, rcs = RobotCellLibrary.ur10e_gripper_one_beam()
     return rc, rcs
 
 
 @pytest.fixture
-def rcs_ur10e_gripper_one_beam(rc_rcs_ur10e_gripper_one_beam):
-    # type: (Tuple[RobotCell, RobotCellState]) -> RobotCellState
+def rcs_ur10e_gripper_one_beam(rc_rcs_ur10e_gripper_one_beam: tuple[RobotCell, RobotCellState]) -> RobotCellState:
     rc, rcs = rc_rcs_ur10e_gripper_one_beam
     return rcs
 
 
 @pytest.fixture
-def rc_ur10e_gripper_one_beam(rc_rcs_ur10e_gripper_one_beam):
-    # type: (Tuple[RobotCell, RobotCellState]) -> RobotCellState
+def rc_ur10e_gripper_one_beam(rc_rcs_ur10e_gripper_one_beam: tuple[RobotCell, RobotCellState]) -> RobotCellState:
     rc, rcs = rc_rcs_ur10e_gripper_one_beam
     return rc
 
 
-def test_rcs_eq(rcs_ur10e_gripper_one_beam):
-    # type: (RobotCellState) -> None
+def test_rcs_eq(rcs_ur10e_gripper_one_beam: RobotCellState) -> None:
     """Test to make sure the RobotCellState object is comparable."""
     a = rcs_ur10e_gripper_one_beam
     b = deepcopy(a)
@@ -334,12 +303,10 @@ def test_rcs_eq(rcs_ur10e_gripper_one_beam):
     assert a != b
 
 
-def test_rcs_copy(rcs_ur5, rcs_ur10e_gripper_one_beam):
-    # type: (RobotCellState, RobotCellState) -> None
+def test_rcs_copy(rcs_ur5: RobotCellState, rcs_ur10e_gripper_one_beam: RobotCellState) -> None:
     """Test to make sure the RobotCellState object is copyable"""
 
-    def _copy_test(rcs):
-        # type: (RobotCellState) -> None
+    def _copy_test(rcs: RobotCellState) -> None:
         new_rcs = rcs.copy()  # type: RobotCellState
         assert new_rcs is not rcs
         assert new_rcs == rcs
@@ -348,12 +315,10 @@ def test_rcs_copy(rcs_ur5, rcs_ur10e_gripper_one_beam):
     _copy_test(rcs_ur10e_gripper_one_beam)
 
 
-def test_rcs_deepcopy(rcs_ur5, rcs_ur10e_gripper_one_beam):
-    # type: (RobotCellState, RobotCellState) -> None
+def test_rcs_deepcopy(rcs_ur5: RobotCellState, rcs_ur10e_gripper_one_beam: RobotCellState) -> None:
     """Test to make sure the RobotCellState object is copyable"""
 
-    def _copy_test(rcs):
-        # type: (RobotCellState) -> None
+    def _copy_test(rcs: RobotCellState) -> None:
         new_rcs = deepcopy(rcs)  # type: RobotCellState
         assert new_rcs is not rcs
         assert new_rcs == rcs
@@ -365,8 +330,7 @@ def test_rcs_deepcopy(rcs_ur5, rcs_ur10e_gripper_one_beam):
     _copy_test(rcs_ur10e_gripper_one_beam)
 
 
-def test_rcs_get_ids(rc_rcs_ur10e_gripper_one_beam):
-    # type: (Tuple[RobotCell, RobotCellState]) -> None
+def test_rcs_get_ids(rc_rcs_ur10e_gripper_one_beam: tuple[RobotCell, RobotCellState]) -> None:
     """Testing the get id functions."""
     rc, rcs = rc_rcs_ur10e_gripper_one_beam
     group = rc.main_group_name
@@ -379,8 +343,7 @@ def test_rcs_get_ids(rc_rcs_ur10e_gripper_one_beam):
     assert rcs.get_attached_workpiece_ids(group) == [beam_id]
 
 
-def test_rcs_set_attach_functions(rc_rcs_ur10e_gripper_one_beam, ts_stationary):
-    # type: (Tuple[RobotCell, RobotCellState], ToolState) -> None
+def test_rcs_set_attach_functions(rc_rcs_ur10e_gripper_one_beam: tuple[RobotCell, RobotCellState], ts_stationary: ToolState) -> None:
     """Testing the set attach functions."""
     rc, rcs = rc_rcs_ur10e_gripper_one_beam
     rcs = deepcopy(rcs)
