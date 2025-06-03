@@ -25,7 +25,7 @@ The **COMPAS FAB** PyBullet backend provides the :class:`PyBulletClient` and the
 functions are implemented by **COMPAS FAB**, building on top of the inverse
 kinematics and collision checking functions offered by PyBullet.
 
-PyBullet is not compatible with IronPython. Therefor, it is not possible to use
+PyBullet is not compatible with IronPython. Therefore, it is not possible to use
 it with Rhino 7 or its associated Grasshopper.
 
 Pybullet itself is no longer a dependency of ``compas_fab``, instead it is an
