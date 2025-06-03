@@ -160,58 +160,12 @@ def test_root_name(ur5_robot_instance):
 
 
 
-def test_get_base_link_name(ur5_robot_instance):
-    robot = ur5_robot_instance
-
-    assert robot.get_base_link_name(group=None) == "base_link"
-    assert robot.get_base_link_name(group="endeffector") == "tool0"
-
-
-def test_get_base_link_name_wo_semantics(panda_robot_instance_wo_semantics):
-    robot = panda_robot_instance_wo_semantics
-
-    assert robot.get_base_link_name(group=None) == "panda_link0"
-    assert robot.get_base_link_name(group="endeffector") == "panda_link0"
-
-
-def test_get_base_link(panda_robot_instance):
-    robot = panda_robot_instance
-
-    link = robot.get_base_link(group=None)
-    assert link.name == "panda_link0"
-
-    link = robot.get_base_link(group="panda_arm")
-    assert link.name == "panda_link0"
-
-    link = robot.get_base_link(group="hand")
-    assert link.name == "panda_hand"
-
-
-def test_get_base_link_wo_semantics(panda_robot_instance_wo_semantics):
-    robot = panda_robot_instance_wo_semantics
-
-    link = robot.get_base_link(group=None)
-    assert link.name == "panda_link0"
-
-    link = robot.get_base_link(group="panda_arm")
-    assert link.name == "panda_link0"
-
-    link = robot.get_base_link(group="hand")
-    assert link.name == "panda_link0"
-
-
 def test_get_base_frame(panda_robot_instance):
     robot = panda_robot_instance
 
     assert robot.get_base_frame(group=None) == Frame.worldXY()
     assert robot.get_base_frame(group="panda_arm") == Frame.worldXY()
 
-
-def test_get_base_frame_w_artist(panda_robot_instance):
-    robot = panda_robot_instance
-
-    assert robot.get_base_frame(group=None) == Frame.worldXY()
-    assert robot.get_base_frame(group="panda_arm") == Frame.worldXY()
 
 
 def test_get_base_frame_when_link_has_parent(ur5_robot_instance):
@@ -223,22 +177,7 @@ def test_get_base_frame_when_link_has_parent(ur5_robot_instance):
     assert [round(v) for v in base_frame.__data__["yaxis"]] == [0, 0, 1]
 
 
-def test_get_configurable_joints(ur5_robot_instance):
-    robot = ur5_robot_instance
-    joints = robot.get_configurable_joints()
 
-    pattern = re.compile(r"(shoulder|wrist|elbow).*_joint")
-    matches = [pattern.match(joint.name) for joint in joints]
-    assert all(matches)
-
-
-def test_get_configurable_joints_wo_semantics(panda_robot_instance_wo_semantics):
-    robot = panda_robot_instance_wo_semantics
-    joints = robot.get_configurable_joints()
-
-    pattern = re.compile(r"panda_.*joint\d")
-    matches = [pattern.match(joint.name) for joint in joints]
-    assert all(matches)
 
 
 def test_semantics_serialization(panda_srdf, panda_urdf):

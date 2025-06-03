@@ -440,3 +440,26 @@ def test_get_end_effector_link(ur10e_gripper_one_beam : tuple[RobotCell, RobotCe
     assert robot_cell.get_end_effector_link(group="endeffector").name == "tool0"
 
 
+def test_get_base_link_name(ur10e_gripper_one_beam : tuple[RobotCell, RobotCellState]):
+    robot_cell = ur10e_gripper_one_beam[0]
+
+    assert robot_cell.get_base_link_name(group=None) == "base_link"
+    assert robot_cell.get_base_link_name(group="endeffector") == "tool0"
+
+
+def test_get_base_link(panda : tuple[RobotCell, RobotCellState]):
+    robot_cell = panda[0]
+
+    link = robot_cell.get_base_link(group=None)
+    assert link.name == "panda_link0"
+
+    link = robot_cell.get_base_link(group="panda_arm")
+    assert link.name == "panda_link0"
+
+
+def test_get_configurable_joints(ur10e_gripper_one_beam : tuple[RobotCell, RobotCellState]):
+    robot_cell = ur10e_gripper_one_beam[0]
+    joints = robot_cell.get_configurable_joints()
+    joint_names = ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+    assert set([j.name for j in joints]) == set(joint_names)
+    assert len(joints) == 6
