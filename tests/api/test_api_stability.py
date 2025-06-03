@@ -76,7 +76,6 @@ if __name__ == "__main__":
         "compas_fab",
         "compas_fab.backends",
         "compas_fab.robots",
-        "compas_fab.sensors",
         "compas_fab.utilities",
     ]
 

@@ -65,13 +65,6 @@
       "to_degrees",
       "to_radians"
     ],
-    "compas_fab.sensors": [
-      "PosCon3D",
-      "PosConCM",
-      "ProtocolError",
-      "SensorTimeoutError",
-      "SerialSensor"
-    ],
     "compas_fab.utilities": [
       "LazyLoader",
       "allclose",

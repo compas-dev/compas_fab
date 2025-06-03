@@ -28,7 +28,6 @@ def compas_fab_api():
     modules = [
         "compas_fab.backends",
         "compas_fab.robots",
-        "compas_fab.sensors",
         "compas_fab.utilities",
     ]
     api = {}

@@ -177,6 +177,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Removed `inverse_kinematics`, `plan_cartesian_motion`, and `plan_motion` methods from Robot, access them using the planner instead.
 * Removed `plan_cartesian_motion_deprecated` and `plan_motion_deprecated` methods from `Robot` class
 * Removed `forward_kinematics_deprecated` and `inverse_kinematics_deprecated` method from `Robot` class
+* Removed `compas_fab.sensors` module.
 
 
 ## [1.1.0] 2025-04-17
