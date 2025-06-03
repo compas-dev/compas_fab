@@ -40,8 +40,13 @@ with RosClient() as client:
     # =========
 
     # Kinematic tools can be moved with it's Configuration
-    # The gripper tool's open gripper state is at [0.025, 0.025]
-    robot_cell_state.tool_states[gripper.name].configuration.joint_values = [0.025, 0.025]
+    # It can be convenient to predefine the open and closed states of a gripper
+    opened_gripper_configuration = gripper.zero_configuration()
+    opened_gripper_configuration.joint_values = [0.025, 0.025]
+    closed_gripper_configuration = gripper.zero_configuration()
+    closed_gripper_configuration.joint_values = [0.0, 0.0]
+
+    robot_cell_state.tool_states[gripper.name].configuration = opened_gripper_configuration
 
     # Calling `set_robot_cell_state` updates the robot cell in the planner
     result = planner.set_robot_cell_state(robot_cell_state)

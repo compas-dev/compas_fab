@@ -45,3 +45,18 @@ It's is defined relative to the TBCF and its transformation is defined in
 The TCF is one of the three target reference that can be used as to create
 :class:`compas_fab.robots.Target` for inverse kinematics calculation and motion planning.
 
+.. _tool_state:
+
+Tool State
+======================
+
+The :class:`compas_fab.robots.ToolState` class is used to represent the state of a
+tool, which includes the tool's configuration and its attachment relationship with the
+robot. The tool's configuration is intended to be changed easily by the user, for visualization
+and during planning of robot motions. For example, a gripper can be attached to the robot
+by setting the :attr:`ToolState.attached_to_group` and the :attr:`ToolState.attachment_frame` 
+attributes. A detached tool is considered to be stationary in the world coordinate frame (WCF)
+and its location is defined by the :attr:`ToolState.frame` attribute.
+
+For planning and collision detection purposes, the :attr:`ToolState.touch_links` attribute 
+is used to define the robot links that are allowed to collide with the tool.
