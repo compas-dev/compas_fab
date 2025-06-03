@@ -159,31 +159,6 @@ def test_root_name(ur5_robot_instance):
     assert robot.root_name == "base_link"
 
 
-def test_get_end_effector_link_name(panda_robot_instance):
-    robot = panda_robot_instance
-    assert robot.get_end_effector_link_name(group=None) == "panda_rightfinger"
-    assert robot.get_end_effector_link_name(group="panda_arm_hand") == "panda_rightfinger"
-    assert robot.get_end_effector_link_name(group="panda_arm") == "panda_link8"
-
-
-def test_get_end_effector_link_name_wrong_group(panda_robot_instance):
-    robot = panda_robot_instance
-    with pytest.raises(KeyError):
-        robot.get_end_effector_link_name(group="panda_leg")
-
-
-def test_get_end_effector_link(ur5_robot_instance):
-    robot = ur5_robot_instance
-
-    assert robot.get_end_effector_link(group=None).name == "tool0"
-    assert robot.get_end_effector_link(group="endeffector").name == "tool0"
-
-
-def test_get_end_effector_frame(panda_robot_instance):
-    robot = panda_robot_instance
-    assert round(robot.get_end_effector_frame(group=None).point.x, 3) == 0.301
-    assert round(robot.get_end_effector_frame(group="panda_arm").point.x, 3) == 0.359
-
 
 def test_get_base_link_name(ur5_robot_instance):
     robot = ur5_robot_instance
@@ -461,13 +436,11 @@ def test_wrong_group_name_raises_exception(ur5_robot_instance, robot_tool1):
         robot.attach_tool(tool, group=wrong_group_name)
 
 
-if not compas.IPY:
-    # this test causes a stack overflow in IronPython for some reason I couldn't track down
-    def test_attached_tools_no_assigning(ur5_robot_instance, robot_tool1):
-        robot = ur5_robot_instance
+def test_attached_tools_no_assigning(ur5_robot_instance, robot_tool1):
+    robot = ur5_robot_instance
 
-        with pytest.raises(AttributeError):
-            robot.attached_tools = None
+    with pytest.raises(AttributeError):
+        robot.attached_tools = None
 
 
 def test_print_robot_info(ur5_robot_instance):

@@ -159,29 +159,30 @@ def test_names(ur10e_gripper_one_beam):
 
 
 def test_get_link_names(panda, rfl, ur10e_gripper_one_beam, abb_irb4600_40_255_gripper_one_beam):
-    def _test(rc, rcs):
-        # type: (RobotCell, RobotCellState) -> None
+    def _test(rc: RobotCell, rcs: RobotCellState):
 
         all_link_names = [link.name for link in rc.robot_model.links]
         for group in rc.group_names:
+            group_joints = rc.get_configurable_joints(group)
+
+            # Ignore groups with no configurable joints, because we can't plan them
+            if not group_joints:
+                continue
+
             group_link_names = rc.get_link_names(group)
-            assert all(link_name in all_link_names for link_name in group_link_names)
+            assert set(group_link_names).issubset(set(all_link_names))
 
             # Get link names can return more links that that of the configurable joints
             # because some joints within the group chain may by Fixed
             # Here we can only check the joints neighboring the configurable joints
             # is a subset of all link names
-            group_joints = rc.get_configurable_joints(group)
             group_joints_link_names = []
             for joint in group_joints:
                 group_joints_link_names.append(str(joint.child.link))
                 group_joints_link_names.append(str(joint.parent.link))
-            if not set(group_joints_link_names).issubset(set(group_link_names)):
-                # NOTE: The following debug code is added during the debug of issue
-                # related to the non-serial chain of panda robot group "panda_hand"
-                print(set(group_joints_link_names))
-                print(set(group_link_names))
-                assert False
+
+            # Ensure consistency between link names returned by get_link_names and configurable joints (parent and child links)
+            assert set(group_joints_link_names).issubset(set(group_link_names))
 
     _test(*panda)
     _test(*rfl)
@@ -189,8 +190,7 @@ def test_get_link_names(panda, rfl, ur10e_gripper_one_beam, abb_irb4600_40_255_g
     _test(*abb_irb4600_40_255_gripper_one_beam)
 
 
-def test_group_states(rfl):
-    # type: (Tuple[RobotCell, RobotCellState]) -> None
+def test_group_states(rfl : tuple[RobotCell, RobotCellState]):
     rc, rcs = rfl
     group_states = rc.group_states
     for group_name in group_states:
@@ -201,8 +201,7 @@ def test_group_states(rfl):
             assert set(configuration.joint_names) == set(rc.get_configurable_joint_names(group_name))
 
 
-def test_ensure(ur10e_gripper_one_beam):
-    # type: (Tuple[RobotCell, RobotCellState]) -> None
+def test_ensure(ur10e_gripper_one_beam : tuple[RobotCell, RobotCellState]):
     """Test to make sure the ensure_* methods work"""
 
     rc, rcs = ur10e_gripper_one_beam
@@ -219,11 +218,10 @@ def test_ensure(ur10e_gripper_one_beam):
         rc.ensure_semantics()
 
 
-def test_zero_configuration(panda, rfl, ur10e_gripper_one_beam):
+def test_zero_configuration(panda : tuple[RobotCell, RobotCellState], rfl : tuple[RobotCell, RobotCellState], ur10e_gripper_one_beam : tuple[RobotCell, RobotCellState]):
     """Test to make sure the zero_configuration method works"""
 
-    def _test(rc):
-        # type: (RobotCell) -> None
+    def _test(rc : RobotCell):
         # Zero Full Configuration is for all the joints
         all_configurable_joint_names = rc.robot_model.get_configurable_joint_names()
         assert all_configurable_joint_names == rc.zero_full_configuration().joint_names
@@ -238,11 +236,10 @@ def test_zero_configuration(panda, rfl, ur10e_gripper_one_beam):
     _test(ur10e_gripper_one_beam[0])
 
 
-def test_random_configuration(panda, rfl, ur10e_gripper_one_beam):
+def test_random_configuration(panda : tuple[RobotCell, RobotCellState], rfl : tuple[RobotCell, RobotCellState], ur10e_gripper_one_beam : tuple[RobotCell, RobotCellState]):
     """Test to make sure the random_configuration method works"""
 
-    def _test(rc):
-        # type: (RobotCell) -> None
+    def _test(rc : RobotCell):
         # Random Full Configuration is for all the joints
         all_configurable_joint_names = [j.name for j in rc.get_all_configurable_joints()]
         assert all_configurable_joint_names == rc.robot_model.random_configuration().joint_names
@@ -257,11 +254,10 @@ def test_random_configuration(panda, rfl, ur10e_gripper_one_beam):
     _test(ur10e_gripper_one_beam[0])
 
 
-def test_full_configuration_to_group_configuration(panda, rfl, ur10e_gripper_one_beam):
+def test_full_configuration_to_group_configuration(panda : tuple[RobotCell, RobotCellState], rfl : tuple[RobotCell, RobotCellState], ur10e_gripper_one_beam : tuple[RobotCell, RobotCellState]):
     """Test to make sure the full_configuration_to_group_configuration method works"""
 
-    def _test(rc):
-        # type: (RobotCell) -> None
+    def _test(rc : RobotCell):
         # Full Configuration includes all the joints but not mimic joints
         full_configuration = rc.zero_full_configuration()
 
@@ -275,11 +271,10 @@ def test_full_configuration_to_group_configuration(panda, rfl, ur10e_gripper_one
     _test(ur10e_gripper_one_beam[0])
 
 
-def test_group_configuration_to_full_configuration(panda, rfl, ur10e_gripper_one_beam):
+def test_group_configuration_to_full_configuration(panda : tuple[RobotCell, RobotCellState], rfl : tuple[RobotCell, RobotCellState], ur10e_gripper_one_beam : tuple[RobotCell, RobotCellState]):
     """Test to make sure the full_configuration_to_group_configuration method works"""
 
-    def _test(rc):
-        # type: (RobotCell) -> None
+    def _test(rc : RobotCell):
         full_joint_names = rc.get_all_configurable_joint_names()
         for group in rc.group_names:
             group_configuration = rc.zero_configuration(group)
@@ -291,17 +286,15 @@ def test_group_configuration_to_full_configuration(panda, rfl, ur10e_gripper_one
     _test(ur10e_gripper_one_beam[0])
 
 
-def test_attached_tool(panda, rfl, ur10e_gripper_one_beam, abb_irb4600_40_255_printing_tool):
+def test_attached_tool(panda : tuple[RobotCell, RobotCellState], rfl : tuple[RobotCell, RobotCellState], ur10e_gripper_one_beam : tuple[RobotCell, RobotCellState], abb_irb4600_40_255_printing_tool : tuple[RobotCell, RobotCellState]):
     """Test to make sure the attached_tool method works"""
 
-    def _test_attached_tool(rc, rcs):
-        # type: (RobotCell, RobotCellState) -> None
+    def _test_attached_tool(rc : RobotCell, rcs : RobotCellState):
         tool = rc.get_attached_tool(rcs, rc.main_group_name)
         assert tool is not None
         assert isinstance(tool, ToolModel)
 
-    def _test_no_attached_tool(rc, rcs):
-        # type: (RobotCell, RobotCellState) -> None
+    def _test_no_attached_tool(rc : RobotCell, rcs : RobotCellState):
         tool = rc.get_attached_tool(rcs, rc.main_group_name)
         assert tool is None
 
@@ -311,18 +304,16 @@ def test_attached_tool(panda, rfl, ur10e_gripper_one_beam, abb_irb4600_40_255_pr
     _test_attached_tool(*abb_irb4600_40_255_printing_tool)
 
 
-def test_attached_workpiece(panda, rfl, ur10e_gripper_one_beam, abb_irb4600_40_255_printing_tool):
+def test_attached_workpiece(panda : tuple[RobotCell, RobotCellState], rfl : tuple[RobotCell, RobotCellState], ur10e_gripper_one_beam : tuple[RobotCell, RobotCellState], abb_irb4600_40_255_printing_tool : tuple[RobotCell, RobotCellState]):
     """Test to make sure the attached_tool method works"""
 
-    def _test_attached_workpiece(rc, rcs):
-        # type: (RobotCell, RobotCellState) -> None
+    def _test_attached_workpiece(rc : RobotCell, rcs : RobotCellState):
         workpieces = rc.get_attached_workpieces(rcs, rc.main_group_name)
         assert workpieces != []
         for workpiece in workpieces:
             assert isinstance(workpiece, RigidBody)
 
-    def _test_no_attached_workpiece(rc, rcs):
-        # type: (RobotCell, RobotCellState) -> None
+    def _test_no_attached_workpiece(rc : RobotCell, rcs : RobotCellState):
         workpieces = rc.get_attached_workpieces(rcs, rc.main_group_name)
         assert workpieces == []
 
@@ -335,8 +326,7 @@ def test_attached_workpiece(panda, rfl, ur10e_gripper_one_beam, abb_irb4600_40_2
 # TODO: Add test for get_attached_rigid_bodies
 
 
-def test_transformations(ur10e_gripper_one_beam):
-    # type: (Tuple[RobotCell, RobotCellState]) -> None
+def test_transformations(ur10e_gripper_one_beam : tuple[RobotCell, RobotCellState]):
     """Test to make sure the transformations method works"""
 
     rc, rcs = ur10e_gripper_one_beam
@@ -392,8 +382,7 @@ def test_transformations(ur10e_gripper_one_beam):
     assert rc.pcf_to_target_frames(rcs, tcf_frame, TargetMode.ROBOT, rc.main_group_name) == tcf_frame
 
 
-def test_compute_attach_objects_frames(ur10e_gripper_one_beam):
-    # type: (Tuple[RobotCell, RobotCellState]) -> None
+def test_compute_attach_objects_frames(ur10e_gripper_one_beam : tuple[RobotCell, RobotCellState]):
     """Test to make sure the compute_attach_objects_frames method works"""
 
     rc, rcs = ur10e_gripper_one_beam
@@ -430,3 +419,24 @@ def test_compute_attach_objects_frames(ur10e_gripper_one_beam):
     computed_rcs = rc.compute_attach_objects_frames(rcs)
     assert computed_rcs.tool_states[tool_id].frame == expected_tool_frame
     assert computed_rcs.rigid_body_states[workpiece_id].frame == expected_workpiece_frame
+
+
+def test_get_end_effector_link_name(panda : tuple[RobotCell, RobotCellState]):
+    robot_cell = panda[0]
+    assert robot_cell.get_end_effector_link_name(group=None) == "panda_hand_tcp"
+    assert robot_cell.get_end_effector_link_name(group="panda_arm") == "panda_link8"
+
+
+def test_get_end_effector_link_name_wrong_group(panda : tuple[RobotCell, RobotCellState]):
+    robot_cell = panda[0]
+    with pytest.raises(KeyError):
+        robot_cell.get_end_effector_link_name(group="panda_leg")
+
+
+def test_get_end_effector_link(ur10e_gripper_one_beam : tuple[RobotCell, RobotCellState]):
+    robot_cell = ur10e_gripper_one_beam[0]
+
+    assert robot_cell.get_end_effector_link(group=None).name == "tool0"
+    assert robot_cell.get_end_effector_link(group="endeffector").name == "tool0"
+
+

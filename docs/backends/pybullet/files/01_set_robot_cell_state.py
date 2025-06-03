@@ -9,6 +9,7 @@ from compas_fab.backends import PyBulletPlanner
 from compas_fab.robots import RigidBody
 from compas_fab.robots import RobotCellLibrary
 
+
 with PyBulletClient() as client:
     # ---------------------------------------------------------------------
     # Create a robot cell and add objects to it
@@ -31,8 +32,12 @@ with PyBulletClient() as client:
     # ------------------------------------------------------------------------
     # Create a RobotCellState to represent the current state of the robot cell
     # ------------------------------------------------------------------------
+    robot_cell_state = robot_cell.default_cell_state()
 
     # Change the robot's configuration for demonstration purposes
+    robot_cell_state.robot_configuration.joint_values[1] = 0.5  # Change the second joint angle to 0.5 [rad]
+
+    # Alternatively, the robot's configuration can be reset to entirely new values
     configuration = robot_cell.zero_configuration()
     configuration.joint_values[1] = 0.5  # Change the second joint angle to 0.5 [rad]
     robot_cell_state.robot_configuration = configuration

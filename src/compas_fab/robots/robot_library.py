@@ -1,8 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-from compas import IPY
 from compas import json_load
 from compas.datastructures import Mesh
 from compas.geometry import Box
@@ -13,15 +8,7 @@ from compas_robots import ToolModel
 import compas_fab
 from compas_fab.robots import RigidBody
 from compas_fab.robots import RobotCell
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Optional  # noqa: F401
-        from typing import Tuple  # noqa: F401
-
-        from compas_fab.robots import RobotCellState  # noqa: F401
+from compas_fab.robots import RobotCellState
 
 
 __all__ = [
@@ -67,8 +54,7 @@ class ToolLibrary(object):
     """
 
     @classmethod
-    def cone(cls, load_geometry=True, radius=0.02, length=0.1):
-        # type: (Optional[bool], Optional[float], Optional[float]) -> ToolModel
+    def cone(cls, load_geometry : bool=True, radius : float=0.02, length : float=0.1) -> ToolModel:
         """Create and return a cone as ToolModel, useful for simulating a drawing tool.
 
         The cone points towards the positive X-axis of the tool frame.
@@ -106,7 +92,7 @@ class ToolLibrary(object):
         return ToolModel(visual=tool_mesh, frame_in_tool0_frame=tool_frame, name="cone")
 
     @classmethod
-    def printing_tool(cls, load_geometry=True, tool_size=1.0):
+    def printing_tool(cls, load_geometry : bool=True, tool_size : float=1.0) -> ToolModel:
         """Create and return a printing tool as ToolModel, useful for simulating a 3D printing tool.
 
         The Tool Frame is located at the tip of the tool,
@@ -145,8 +131,7 @@ class ToolLibrary(object):
         return tool_model
 
     @classmethod
-    def static_gripper(cls, load_geometry=True):
-        # type: (Optional[bool]) -> ToolModel
+    def static_gripper(cls, load_geometry : bool=True) -> ToolModel:
         """Create and return a static gripper ToolModel, useful for simulating a gripper.
 
         The gripper is 0.1m (10cm) thick from base to its gripping face.
@@ -195,8 +180,7 @@ class ToolLibrary(object):
         return tool_model
 
     @classmethod
-    def static_gripper_small(cls, load_geometry=True):
-        # type: (Optional[bool]) -> ToolModel
+    def static_gripper_small(cls, load_geometry : bool=True) -> ToolModel:
         """Create and return a static gripper ToolModel, useful for simulating a gripper.
 
         The gripper is 0.05m (5cm) thick from base to its gripping face.
@@ -245,8 +229,7 @@ class ToolLibrary(object):
         return tool_model
 
     @classmethod
-    def kinematic_gripper(cls, load_geometry=True):
-        # type: (Optional[bool]) -> ToolModel
+    def kinematic_gripper(cls, load_geometry : bool=True) -> ToolModel:
         """Create and return a kinematic gripper ToolModel, useful for simulating a gripper with jaws.
 
         The gripper is 0.05m (5cm) thick from base to its gripping face.
@@ -285,8 +268,7 @@ class ToolLibrary(object):
 class RigidBodyLibrary(object):
 
     @classmethod
-    def target_marker(cls, size=1.0):
-        # type: (Optional[float]) -> RigidBody
+    def target_marker(cls, size : float=1.0) -> RigidBody:
         """Create and return a target marker as RigidBody, useful for visualizing the target pose.
 
         The target marker points out the X, Y, Z directions with its shape.
@@ -306,8 +288,7 @@ class RigidBodyLibrary(object):
         return RigidBody(mesh, None)
 
     @classmethod
-    def floor(cls, size=1.0):
-        # type: (Optional[float]) -> RigidBody
+    def floor(cls, size : float=1.0) -> RigidBody:
         """Create and return a floor as RigidBody, useful for simulating a floor.
 
         The floor is square with a default size of 1m x 1m.
@@ -363,8 +344,7 @@ class RobotCellLibrary(object):
     # ---------------------------------------------------------------------
 
     @classmethod
-    def rfl(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def rfl(cls, load_geometry : bool = True) -> tuple[RobotCell, RobotCellState]:
         """Create and return the RFL robot with 4 ABB irb 4600 and twin-gantry setup.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
@@ -391,8 +371,7 @@ class RobotCellLibrary(object):
         return robot_cell, robot_cell_state
 
     @classmethod
-    def ur5(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def ur5(cls, load_geometry : bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a UR5 robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
@@ -419,14 +398,10 @@ class RobotCellLibrary(object):
         )
         robot_cell_state = robot_cell.default_cell_state()
 
-        # Remove the planning group called 'endeffector' because it only has one link and no joints.
-        del robot_cell.robot_semantics.groups["endeffector"]
-
         return robot_cell, robot_cell_state
 
     @classmethod
-    def ur10e(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def ur10e(cls, load_geometry : bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a UR10e robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
@@ -450,14 +425,10 @@ class RobotCellLibrary(object):
         )
         robot_cell_state = robot_cell.default_cell_state()
 
-        # Remove the planning group called 'endeffector' because it only has one link and no joints.
-        del robot_cell.robot_semantics.groups["endeffector"]
-
         return robot_cell, robot_cell_state
 
     @classmethod
-    def abb_irb4600_40_255(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def abb_irb4600_40_255(cls, load_geometry : bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a ABB irb4600-40/2.55 robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
@@ -484,8 +455,7 @@ class RobotCellLibrary(object):
         return robot_cell, robot_cell_state
 
     @classmethod
-    def abb_irb120_3_58(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def abb_irb120_3_58(cls, load_geometry : bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a ABB irb120-3/58 robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
@@ -512,8 +482,7 @@ class RobotCellLibrary(object):
         return robot_cell, robot_cell_state
 
     @classmethod
-    def panda(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def panda(cls, load_geometry : bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a Panda robot.
 
         The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
@@ -548,8 +517,8 @@ class RobotCellLibrary(object):
 
         robot_cell_state = robot_cell.default_cell_state()
 
-        # Remove the planning group called 'panda_hand' because it it not a "serial chain",
-        # the bifurcation of the chain into two fingers is not supported by planning backends.
+        # Remove the planning group called 'panda_hand' because it contains
+        # mimic/passive joints and they are a royal pain in the ass
         del robot_cell.robot_semantics.groups["panda_hand"]
         del robot_cell.robot_semantics.group_states["panda_hand"]
 
@@ -560,8 +529,7 @@ class RobotCellLibrary(object):
     # ---------------------------------------------------------------------
 
     @classmethod
-    def ur5_cone_tool(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def ur5_cone_tool(cls, load_geometry : bool = True) -> tuple[RobotCell, RobotCellState]:
         """Create and return the UR5 robot with a cone tool attached. A floor is also included.
 
         See :meth:`compas_fab.robots.RobotCellLibrary.ur5` and :meth:`compas_fab.robots.ToolLibrary.cone`
@@ -577,7 +545,7 @@ class RobotCellLibrary(object):
 
         Returns
         -------
-        Tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
+        tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
             Newly created instance of the robot cell and robot cell state.
         """
         # ---------------------------------------------------------------------
@@ -626,8 +594,7 @@ class RobotCellLibrary(object):
         return robot_cell, robot_cell_state
 
     @classmethod
-    def ur5_gripper_one_beam(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def ur5_gripper_one_beam(cls, load_geometry : bool = True) -> tuple[RobotCell, RobotCellState]:
         """Create and return the ur5 robot with a gripper tool attached.
         One beam (a RigidBody) is included and is attached to the gripper.
         A floor is also included.
@@ -645,7 +612,7 @@ class RobotCellLibrary(object):
 
         Returns
         -------
-        Tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
+        tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
             Newly created instance of the robot cell and robot cell state.
         """
         # ---------------------------------------------------------------------
@@ -721,8 +688,7 @@ class RobotCellLibrary(object):
         return robot_cell, robot_cell_state
 
     @classmethod
-    def abb_irb4600_40_255_gripper_one_beam(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def abb_irb4600_40_255_gripper_one_beam(cls, load_geometry : bool = True) -> tuple[RobotCell, RobotCellState]:
         """Create and return the ABB irb4600-40-255 robot with a gripper tool attached.
         One beam (a RigidBody) is included and is attached to the gripper.
         A floor is also included.
@@ -740,7 +706,7 @@ class RobotCellLibrary(object):
 
         Returns
         -------
-        Tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
+        tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
             Newly created instance of the robot cell and robot cell state.
         """
         # ---------------------------------------------------------------------
@@ -788,8 +754,7 @@ class RobotCellLibrary(object):
         return robot_cell, robot_cell_state
 
     @classmethod
-    def ur10e_gripper_one_beam(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def ur10e_gripper_one_beam(cls, load_geometry : bool = True) -> tuple[RobotCell, RobotCellState]:
         """Create and return the ur10e robot with a gripper tool attached.
         One beam (a RigidBody) is included and is attached to the gripper.
         A floor is also included.
@@ -807,7 +772,7 @@ class RobotCellLibrary(object):
 
         Returns
         -------
-        Tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
+        tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
             Newly created instance of the robot cell and robot cell state.
         """
         # ---------------------------------------------------------------------
@@ -883,8 +848,7 @@ class RobotCellLibrary(object):
         return robot_cell, robot_cell_state
 
     @classmethod
-    def abb_irb4600_40_255_printing_tool(cls, load_geometry=True):
-        # type: (Optional[bool]) -> Tuple[RobotCell, RobotCellState]
+    def abb_irb4600_40_255_printing_tool(cls, load_geometry : bool = True) -> tuple[RobotCell, RobotCellState]:
         """Create and return the ABB irb4600-40-255 robot with a printing tool attached.
         A floor is also included.
 
@@ -901,7 +865,7 @@ class RobotCellLibrary(object):
 
         Returns
         -------
-        Tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
+        tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
             Newly created instance of the robot cell and robot cell state.
         """
         # ---------------------------------------------------------------------
