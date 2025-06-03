@@ -906,9 +906,32 @@ class RobotCell(Data):
     # Transformation functions
     # ----------------------------------------
 
-    def t_pcf_tcf(self, robot_cell_state, tool_id):
-        # type: (RobotCellState, str) -> Transformation
+    def t_pcf_tcf(self, robot_cell_state : RobotCellState, tool_id: str) -> Transformation:
         """Returns the transformation from the PCF (Planner Coordinate Frame) to the TCF (Tool Coordinate Frame).
+
+        Parameters
+        ----------
+        tool_id : str
+            The id of a tool found in `self.robot_cell.tool_models`.
+            The tool must be attached to the robot.
+
+        Returns
+        -------
+        :class:`~compas.geometry.Transformation`
+            Transformation from the tool's TCF to TBCF.
+        """
+
+        t_pcf_tbcf = self.t_pcf_tbcf(robot_cell_state, tool_id)
+
+        # t_tbcf_tcf is Tool Frame, a property of the tool model, describing Tool Coordinate Frame (TCF) relative to Tool Base Frame (TBCF)
+        tool_model = self.tool_models[tool_id]
+        t_tbcf_tcf = Transformation.from_frame(tool_model.frame)
+
+        t_pcf_tcf = t_pcf_tbcf * t_tbcf_tcf
+        return t_pcf_tcf
+
+    def t_pcf_tbcf(self, robot_cell_state : RobotCellState, tool_id: str) -> Transformation:
+        """Returns the transformation from the PCF (Planner Coordinate Frame) to the TBCF (Tool Base Coordinate Frame).
 
         Parameters
         ----------
@@ -924,7 +947,7 @@ class RobotCell(Data):
 
         if tool_id not in self.tool_models:
             raise ValueError("Tool with id '{}' not found in robot cell.".format(tool_id))
-        tool_model = self.tool_models[tool_id]
+
         tool_state = robot_cell_state.tool_states[tool_id]
         if not tool_state.attached_to_group:
             raise ValueError("Tool with id '{}' is not attached to the robot.".format(tool_id))
@@ -933,14 +956,10 @@ class RobotCell(Data):
         # t_pcf_tbcf is Tool Attachment Frame, describing Tool Base Coordinate Frame (TBCF) relative to PCF Frame on the Robot (PCF)
         attachment_frame = tool_state.attachment_frame or Frame.worldXY()
         t_pcf_tbcf = Transformation.from_frame(attachment_frame)
-        # t_tbcf_tcf is Tool Frame, a property of the tool model, describing Tool Coordinate Frame (TCF) relative to Tool Base Frame (TBCF)
-        t_tbcf_tcf = Transformation.from_frame(tool_model.frame)
 
-        t_pcf_tcf = t_pcf_tbcf * t_tbcf_tcf
-        return t_pcf_tcf
+        return t_pcf_tbcf
 
-    def t_pcf_ocf(self, robot_cell_state, workpiece_id):
-        # type: (RobotCellState, str) -> Transformation
+    def t_pcf_ocf(self, robot_cell_state : RobotCellState, workpiece_id : str) -> Transformation:
         """Returns the transformation from the PCF (Planner Coordinate Frame) to the OCF (Object Coordinate Frame).
 
         Parameters

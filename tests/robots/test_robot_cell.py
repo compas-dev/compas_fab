@@ -413,17 +413,17 @@ def test_compute_attach_objects_frames(ur10e_gripper_one_beam):
     rcs.rigid_body_states[workpiece_id].attachment_frame = work_attachment_frame
 
     # Use the transformation functions for the test
-    t_pcf_tcf = rc.t_pcf_tcf(rcs, tool_id)
+    t_pcf_tbcf = rc.t_pcf_tbcf(rcs, tool_id)
     t_pcf_ocf = rc.t_pcf_ocf(rcs, workpiece_id)
 
     # Define the expected frames
     t_wcf_rcf = Transformation.from_frame(rcs.robot_base_frame)
     ee_link_name = rc.get_end_effector_link_name(group=rc.main_group_name)
     t_rcf_pcf = Transformation.from_frame(rc.robot_model.forward_kinematics(rcs.robot_configuration, ee_link_name))
-    t_wcf_tcf = t_wcf_rcf * t_rcf_pcf * t_pcf_tcf
+    t_wcf_tbcf = t_wcf_rcf * t_rcf_pcf * t_pcf_tbcf
     t_wcf_ocf = t_wcf_rcf * t_rcf_pcf * t_pcf_ocf
 
-    expected_tool_frame = Frame.from_transformation(t_wcf_tcf)
+    expected_tool_frame = Frame.from_transformation(t_wcf_tbcf)
     expected_workpiece_frame = Frame.from_transformation(t_wcf_ocf)
 
     # Test the function
