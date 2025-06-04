@@ -1,11 +1,9 @@
 import pytest
-from compas import IPY
 
 from compas_fab.robots import RobotCellLibrary
 
-if not IPY:
-    from compas_fab.backends import PyBulletClient
-    from compas_fab.backends import PyBulletPlanner
+from compas_fab.backends import PyBulletClient
+from compas_fab.backends import PyBulletPlanner
 
 
 @pytest.fixture

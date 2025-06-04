@@ -1,14 +1,12 @@
 from copy import deepcopy
 
 import pytest
-from compas import IPY
 
-if not IPY:
-    from compas_fab.backends import PyBulletClient
-    from compas_fab.backends import PyBulletPlanner
+from compas_fab.backends import PyBulletClient
+from compas_fab.backends import PyBulletPlanner
 
-    from typing import List  # noqa: F401
-    from typing import Tuple  # noqa: F401
+from typing import List  # noqa: F401
+from typing import Tuple  # noqa: F401
 
 from compas.geometry import Frame
 from compas.geometry import Point
@@ -143,8 +141,12 @@ def test_fk_panda(pybullet_client):
 ######################################################
 
 
-def ik_fk_agreement(robot_cell, robot_cell_state, pybullet_client, ik_target_frames):
-    # type: (RobotCell, RobotCellState, PyBulletClient, List[Frame]) -> None
+def ik_fk_agreement(
+    robot_cell: RobotCell,
+    robot_cell_state: RobotCellState,
+    pybullet_client: PyBulletClient,
+    ik_target_frames: list[Frame],
+) -> None:
     """Helper function to test the IK-FK agreement for the PyBullet backend
 
     The function takes a robot and a list of target frames for IK and FK queries.

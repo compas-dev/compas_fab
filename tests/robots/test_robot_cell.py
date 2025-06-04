@@ -1,7 +1,6 @@
 from copy import deepcopy
 
 import pytest
-from compas import IPY
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_robots import ToolModel
@@ -13,12 +12,6 @@ from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RobotCellState  # noqa: F401
 from compas_fab.robots import TargetMode
 from compas_fab.robots import ToolState
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Tuple  # noqa: F401
 
 
 @pytest.fixture
@@ -46,8 +39,7 @@ def rfl():
     return RobotCellLibrary.rfl(load_geometry=False)
 
 
-def test_init(abb_irb4600_40_255_gripper_one_beam):
-    # type: (Tuple[RobotCell, RobotCellState]) -> None
+def test_init(abb_irb4600_40_255_gripper_one_beam: tuple[RobotCell, RobotCellState]) -> None:
     """Test to make sure the RobotCell object is initialized correctly"""
 
     robot_cell, robot_cell_state = abb_irb4600_40_255_gripper_one_beam
@@ -63,8 +55,7 @@ def test_init(abb_irb4600_40_255_gripper_one_beam):
     assert new_robot_cell.rigid_body_models == robot_cell.rigid_body_models
 
 
-def test_hash(abb_irb4600_40_255_gripper_one_beam):
-    # type: (Tuple[RobotCell, RobotCellState]) -> None
+def test_hash(abb_irb4600_40_255_gripper_one_beam: tuple[RobotCell, RobotCellState]) -> None:
     """Test to make sure the RobotCell object is hashable"""
 
     robot_cell, robot_cell_state = abb_irb4600_40_255_gripper_one_beam
@@ -75,7 +66,8 @@ def test_hash(abb_irb4600_40_255_gripper_one_beam):
 def test_copy(ur10e_gripper_one_beam, abb_irb4600_40_255_gripper_one_beam, abb_irb4600_40_255_printing_tool, panda):
     """Test to comply with Data.copy() mechanism"""
 
-    def test(robot_cell, robot_cell_state):
+    def test(robot_cell: RobotCell, robot_cell_state: RobotCellState) -> None:
+        """Test to make sure the copy method works"""
         # type: (RobotCell, RobotCellState) -> None
         robot_cell_copy = robot_cell.copy()  # type: RobotCell
         assert robot_cell.robot_model.name == robot_cell_copy.robot_model.name
@@ -144,8 +136,7 @@ def test_state_match(ur10e_gripper_one_beam, abb_irb4600_40_255_gripper_one_beam
     test(*abb_irb4600_40_255_printing_tool)
 
 
-def test_names(ur10e_gripper_one_beam):
-    # type: (Tuple[RobotCell, RobotCellState]) -> None
+def test_names(ur10e_gripper_one_beam: tuple[RobotCell, RobotCellState]) -> None:
     """Test to make sure the names are set correctly"""
 
     rc, rcs = ur10e_gripper_one_beam

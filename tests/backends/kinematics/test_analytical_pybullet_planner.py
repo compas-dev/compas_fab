@@ -1,5 +1,4 @@
 import pytest
-from compas import IPY
 
 import compas_fab
 from compas_fab.backends import UR5Kinematics
@@ -8,12 +7,10 @@ from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import TargetMode
 
-if not IPY:
-    from typing import Dict  # noqa: F401
-    from typing import Optional  # noqa: F401
+from typing import Optional  # noqa: F401
 
-    from compas_fab.backends import AnalyticalPyBulletClient
-    from compas_fab.backends import AnalyticalPyBulletPlanner
+from compas_fab.backends import AnalyticalPyBulletClient
+from compas_fab.backends import AnalyticalPyBulletPlanner
 
 urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
 srdf_filename = compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf")
@@ -38,8 +35,9 @@ def test_planner(analytical_pybullet_client):
     assert planner.kinematics_solver is not None
 
 
-def forward_inverse_agreement(planner, start_state, options=None):
-    # type: (AnalyticalPyBulletPlanner, RobotCellState, Optional[Dict]) -> None
+def forward_inverse_agreement(
+    planner: AnalyticalPyBulletClient, start_state: RobotCellState, options: Optional[dict] = None
+) -> None:
     """Helper function to test forward and inverse kinematics agreement"""
 
     # First perform forward kinematics to find the frame

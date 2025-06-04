@@ -1,9 +1,7 @@
-# from compas import IPY
 # from compas.tolerance import TOL
 
-# if not IPY:
-#     from compas_fab.backends import PyBulletClient
-#     from compas_fab.backends import PyBulletPlanner
+# from compas_fab.backends import PyBulletClient
+# from compas_fab.backends import PyBulletPlanner
 
 # from compas_fab.backends.pybullet import PyBulletClient
 # from compas_fab.backends.exceptions import InverseKinematicsError
