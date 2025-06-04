@@ -7,20 +7,12 @@ from math import pi
 from math import sin
 from math import sqrt
 
-from compas import IPY
 from compas.geometry import Frame
 
 from compas_fab.utilities import sign
 
-if not IPY:
-    from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import List  # noqa: F401
-
-
-def forward_kinematics_offset_wrist(joint_values, params):
-    # type: (List[float], List[float]) -> Frame
+def forward_kinematics_offset_wrist(joint_values : list[float], params : list[float]) -> Frame:
     """Forward kinematics function for offset wrist 6-axis robots.
 
     Parameters
@@ -73,8 +65,7 @@ def forward_kinematics_offset_wrist(joint_values, params):
     return frame
 
 
-def inverse_kinematics_offset_wrist(frame, params, q6_des=0.0):
-    # type: (Frame, List[float], float) -> List[List[float]]
+def inverse_kinematics_offset_wrist(frame : Frame, params : list[float], q6_des : float = 0.0) -> list[list[float]]:
     """Inverse kinematics function for offset wrist 6-axis robots.
 
     Parameters
