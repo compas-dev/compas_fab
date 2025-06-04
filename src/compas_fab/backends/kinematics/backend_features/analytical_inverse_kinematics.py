@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
-from typing import Optional
 from typing import Generator
+from typing import Optional
 
 from compas.geometry import Frame
 from compas_robots import Configuration
@@ -8,7 +8,6 @@ from compas_robots import Configuration
 from compas_fab.backends.exceptions import BackendTargetNotSupportedError
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics
-
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import Target

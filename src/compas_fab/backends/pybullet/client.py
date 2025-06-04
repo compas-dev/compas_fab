@@ -661,6 +661,12 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def _get_joint_info(self, joint_id, body_id):
         return const.JointInfo(*pybullet.getJointInfo(body_id, joint_id, physicsClientId=self.client_id))
 
+    def _is_circular(self, body, joint):
+        joint_info = self._get_joint_info(body, joint)
+        if joint_info.jointType == const.JOINT_FIXED:
+            return False
+        return joint_info.jointUpperLimit < joint_info.jointLowerLimit
+
     def _get_num_joints(self, body_id):
         return pybullet.getNumJoints(body_id, physicsClientId=self.client_id)
 

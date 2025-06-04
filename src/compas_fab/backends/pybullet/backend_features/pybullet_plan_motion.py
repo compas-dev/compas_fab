@@ -1,19 +1,9 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from copy import deepcopy
-from math import ceil
 from math import pi
 from time import time
-from itertools import takewhile
+from typing import TYPE_CHECKING
 
-from compas import IPY
-from compas.geometry import Quaternion
-from compas.geometry import axis_angle_from_quaternion
-from compas.geometry import cross_vectors
-from compas.geometry import is_parallel_vector_vector
-from compas_robots.model import Joint
+import numpy as np
 
 from compas_fab.backends import CollisionCheckError
 from compas_fab.backends import InverseKinematicsError
@@ -23,45 +13,36 @@ from compas_fab.backends import MPNoIKSolutionError
 from compas_fab.backends import MPNoPlanFoundError
 from compas_fab.backends import MPStartStateInCollisionError
 from compas_fab.backends import MPTargetInCollisionError
+from compas_fab.backends.interfaces import PlanMotion
 from compas_fab.robots import FrameTarget
-from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
 from compas_fab.robots import PointAxisTarget
-from compas_fab.robots import PointAxisWaypoints
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import Target
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Dict  # noqa: F401
-        from typing import List  # noqa: F401
-        from typing import Optional  # noqa: F401
-        from typing import Tuple  # noqa: F401
-
-        from compas.geometry import Frame  # noqa: F401
-        from compas.geometry import Point  # noqa: F401
-        from compas.geometry import Vector  # noqa: F401
-        from compas_robots import Configuration  # noqa: F401
-
-        from compas_fab.backends import PyBulletClient  # noqa: F401
-        from compas_fab.backends import PyBulletPlanner  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import Target  # noqa: F401
-
+if TYPE_CHECKING:
+    from compas_fab.backends import PyBulletClient
+    from compas_fab.backends import PyBulletPlanner
 
 __all__ = [
     "PyBulletPlanMotion",
 ]
-from compas_fab.backends.interfaces import PlanMotion
+
+INF = np.inf
+PI = np.pi
+DEFAULT_RESOLUTION = math.radians(3) # 0.05
+UNIT_LIMITS = (0., 1.)
+CIRCULAR_LIMITS = (-PI, PI)
+UNBOUNDED_LIMITS = (-INF, INF)
+RRT_ITERATIONS = 100
 
 
 class PyBulletPlanMotion(PlanMotion):
     """Callable to calculate a cartesian motion path (linear in tool space)."""
 
-    def plan_motion(self, target, start_state, group=None, options=None):
-        # type: (Target, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
+    def plan_motion(self, target : Target, start_state : RobotCellState, group : Optional[str] = None, options : Optional[dict] = None) -> JointTrajectory:
         """Calculates a motion path from the start state to the target.
 
         PyBullet's free motion planner uses a RRT-based algorithm to plan a path from the start state to the target.
@@ -148,16 +129,16 @@ class PyBulletPlanMotion(PlanMotion):
         # The following lines should be typical in all planners' plan_motion method
         # ===================================================================================
 
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner : PyBulletPlanner = self
+        client : PyBulletClient = planner.client
+        robot_cell : RobotCell = client.robot_cell
         group = group or robot_cell.main_group_name
 
         # Unit conversion from user scale to meter scale can be done here because they are shared by all planners.
         target = target.normalized_to_meters()
 
         # Check if the robot cell state supports the target mode
-        planner = self  # type: PyBulletPlanner
+        planner : PyBulletPlanner = self
         start_state.assert_target_mode_match(target.target_mode, group)
 
         # Check start_state is formatted correctly
@@ -186,8 +167,7 @@ class PyBulletPlanMotion(PlanMotion):
                 )
             )
 
-    def plan_motion_point_axis_target(self, target, start_state, group, options=None):
-        # type: (PointAxisTarget, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
+    def plan_motion_point_axis_target(self, target : PointAxisTarget, start_state : RobotCellState, group : Optional[str] = None, options : Optional[dict] = None) -> JointTrajectory:
         """Calculates a cartesian motion path (linear in tool space) for Point Axis Waypoints.
 
         Similar to the :meth:`~plan_cartesian_motion_frame_waypoints` method, this method calculates a cartesian motion path
@@ -312,9 +292,9 @@ class PyBulletPlanMotion(PlanMotion):
         options["verbose"] = options.get("verbose", False)
 
         # Housekeeping for intellisense
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner : PyBulletPlanner = self
+        client : PyBulletClient = planner.client
+        robot_cell : RobotCell = client.robot_cell
 
         # Setting robot cell state
         planner.set_robot_cell_state(start_state)
@@ -481,7 +461,6 @@ class PyBulletPlanMotion(PlanMotion):
 
             # If valid IK solution found, proceed to the next step
             if ik_result is not None and within_max_jump:
-
                 if options["verbose"]:
                     print("Step: {} Option {} is valid".format(current_step, ik_option_indices[-1]))
                 planned_configurations.append(ik_result)
@@ -529,8 +508,7 @@ class PyBulletPlanMotion(PlanMotion):
 
         return _build_return_trajectory(planned_configurations)
 
-    def plan_motion_frame_target(self, target, start_state, group, options=None):
-        # type: (FrameTarget, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
+    def plan_motion_frame_target(self, target : FrameTarget, start_state : RobotCellState, group : Optional[str] = None, options : Optional[dict] = None) -> JointTrajectory:
         """Calculates a cartesian motion path (linear in tool space) for Frame Waypoints.
 
         See :meth:`~plan_cartesian_motion` for the generic description of the planning function.
@@ -669,9 +647,9 @@ class PyBulletPlanMotion(PlanMotion):
         options["verbose"] = options.get("verbose", False)
 
         # Housekeeping for intellisense
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner : PyBulletPlanner = self
+        client : PyBulletClient = planner.client
+        robot_cell : RobotCell = client.robot_cell
 
         # Setting robot cell state
         planner.set_robot_cell_state(start_state)
@@ -702,7 +680,6 @@ class PyBulletPlanMotion(PlanMotion):
             )
 
             for pcf_frame in pcf_frames:
-
                 try:
                     planner.check_collision_for_attached_objects_in_planning_group(
                         intermediate_state,
@@ -982,8 +959,8 @@ class PyBulletPlanMotion(PlanMotion):
 
         # Two sets of nodes are maintained, one for each tree
         # During the Extend operation,
-        nodes1 = [TreeNode(q1)]  # type: List[TreeNode]
-        nodes2 = [TreeNode(q2)]  # type: List[TreeNode]
+        nodes1 = [TreeNode(q1)]
+        nodes2 = [TreeNode(q2)]
         for iteration in range(max_iterations):
             if max_time and (time() - start_time) >= max_time:
                 break
@@ -1015,6 +992,11 @@ class PyBulletPlanMotion(PlanMotion):
                 return self.configs(path1[:-1] + path2[::-1])
         return None
 
+    def asymmetric_extend(self, q1, q2, extend_fn, backward=False):
+        if backward:
+            return reversed(list(extend_fn(q2, q1))) # Forward model
+        return extend_fn(q1, q2)
+
     def extend_towards(
         self, tree, target, distance_fn, extend_fn, collision_fn, swap=False, tree_frequency=1, sweep_collision_fn=None
     ):
@@ -1022,8 +1004,8 @@ class PyBulletPlanMotion(PlanMotion):
         assert tree_frequency >= 1
         # the nearest node in the tree to the target
         # the segments by connecting last to the target using the given extend fn
-        last = argmin(lambda n: distance_fn(n.config, target), tree)
-        extend = list(asymmetric_extend(last.config, target, extend_fn, backward=swap))
+        last = np.argmin(lambda n: distance_fn(n.config, target), tree)
+        extend = list(self.asymmetric_extend(last.config, target, extend_fn, backward=swap))
 
         # check if the extended path collision-free, stop until find a collision
         success = True
@@ -1048,23 +1030,86 @@ class PyBulletPlanMotion(PlanMotion):
             return None
         return list(map(lambda n: n.config, nodes))
 
+    def _uniform_generator(self, d):
+        while True:
+            yield np.random.uniform(size=d)
+
+    def _convex_combination(self, x, y, w=0.5):
+        return (1-w)*np.array(x) + w*np.array(y)
+
+    def _interval_generator(self, lower, upper, **kwargs):
+        assert len(lower) == len(upper)
+        assert np.less_equal(lower, upper).all()
+        if np.equal(lower, upper).all():
+            return iter([lower])
+        return (self._convex_combination(lower, upper, w=weights) for weights in self._uniform_generator(d=len(lower), **kwargs))
+
     def get_sample_fn(self, body, joints, custom_limits={}, **kwargs):
-        lower_limits, upper_limits = get_custom_limits(body, joints, custom_limits, circular_limits=CIRCULAR_LIMITS)
-        generator = interval_generator(lower_limits, upper_limits, **kwargs)
+        lower_limits, upper_limits = self._get_joint_limits(body, joints, custom_limits, circular_limits=CIRCULAR_LIMITS)
+        generator = self._interval_generator(lower_limits, upper_limits, **kwargs)
 
         def fn():
             return tuple(next(generator))
 
         return fn
 
-    def get_difference_fn(self, body, joints):
-        from pybullet_planning.interfaces.robots.joint import is_circular
+    def _get_joint_limits(self, body, joint):
+        # TODO: make a version for several joints?
+        if self.client._is_circular(body, joint):
+            # TODO: return UNBOUNDED_LIMITS
+            return CIRCULAR_LIMITS
+        joint_info = self.client._get_joint_info(body, joint)  # Internal method of the client
+        return joint_info.jointLowerLimit, joint_info.jointUpperLimit
 
-        circular_joints = [is_circular(body, joint) for joint in joints]
+    def _wrap_interval(self, value, interval=UNIT_LIMITS):
+        lower, upper = interval
+        if (lower == -INF) and (+INF == upper):
+            return value
+        assert -INF < lower <= upper < +INF
+        return (value - lower) % (upper - lower) + lower
+
+    def _interval_difference(self, value2, value1, interval=UNIT_LIMITS):
+        value2 = self._wrap_interval(value2, interval)
+        value1 = self._wrap_interval(value1, interval)
+        lower, upper = interval
+        straight_distance = value2 - value1
+        if value2 >= value1:
+            wrap_difference = (lower - value1) + (value2 - upper)
+        else:
+            wrap_difference = (upper - value1) + (value2 - lower)
+        #return [straight_distance, wrap_difference]
+        if abs(wrap_difference) < abs(straight_distance):
+            return wrap_difference
+        return straight_distance
+
+    def _interval_distance(self, value1, value2, **kwargs):
+        return abs(self._interval_difference(value2, value1, **kwargs))
+
+    def _circular_interval(self, lower=-PI): # [-np.pi, np.pi)
+        return (lower, lower + 2*PI)
+
+    def _wrap_angle(self, theta, **kwargs):
+        return self._wrap_interval(theta, interval=self._circular_interval(**kwargs))
+
+    def _circular_difference(self, theta2, theta1, **kwargs):
+        interval = self._circular_interval(**kwargs)
+        #extent = get_interval_extent(interval) # TODO: combine with motion_planners
+        extent = self._get_aabb_extent(interval)
+        diff_interval = (-extent/2, +extent/2)
+        difference = self._wrap_interval(theta2 - theta1, interval=diff_interval)
+        #difference = interval_difference(theta2, theta1, interval=interval)
+        return difference
+
+    def _get_aabb_extent(self, aabb):
+        lower, upper = aabb
+        return np.array(upper) - np.array(lower)
+
+    def get_difference_fn(self, body, joints):
+        circular_joints = [self.client._is_circular(body, joint) for joint in joints]
 
         def fn(q2, q1):
             return tuple(
-                circular_difference(value2, value1) if circular else (value2 - value1)
+                self._circular_difference(value2, value1) if circular else (value2 - value1)
                 for circular, value2, value1 in zip(circular_joints, q2, q1)
             )
 
@@ -1074,7 +1119,7 @@ class PyBulletPlanMotion(PlanMotion):
         # TODO: use the energy resulting from the mass matrix here?
         if weights is None:
             weights = 1 * np.ones(len(joints))  # TODO: use velocities here
-        difference_fn = get_difference_fn(body, joints)
+        difference_fn = self.get_difference_fn(body, joints)
 
         def fn(q1, q2):
             diff = np.array(difference_fn(q2, q1))
@@ -1084,7 +1129,7 @@ class PyBulletPlanMotion(PlanMotion):
         return fn
 
     def get_refine_fn(self, body, joints, num_steps=0):
-        difference_fn = get_difference_fn(body, joints)
+        difference_fn = self.get_difference_fn(body, joints)
         num_steps = num_steps + 1
 
         def fn(q1, q2):
@@ -1102,19 +1147,18 @@ class PyBulletPlanMotion(PlanMotion):
         # norm = 1, 2, INF
         if resolutions is None:
             resolutions = DEFAULT_RESOLUTION * np.ones(len(joints))
-        difference_fn = get_difference_fn(body, joints)
+        difference_fn = self.get_difference_fn(body, joints)
 
         def fn(q1, q2):
             # steps = int(np.max(np.abs(np.divide(difference_fn(q2, q1), resolutions))))
             steps = int(np.ceil(np.linalg.norm(np.divide(difference_fn(q2, q1), resolutions), ord=norm)))
-            refine_fn = get_refine_fn(body, joints, num_steps=steps)
+            refine_fn = self.get_refine_fn(body, joints, num_steps=steps)
             return refine_fn(q1, q2)
 
         return fn
 
 
 class TreeNode(object):
-
     def __init__(self, config, parent=None):
         # type: (List[float], Optional[TreeNode]) -> None
         self.config = config
