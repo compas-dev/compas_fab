@@ -1,22 +1,20 @@
-from compas import IPY
+from typing import TYPE_CHECKING
+from typing import Optional
+from typing import Generator
+
+from compas.geometry import Frame
+from compas_robots import Configuration
 
 from compas_fab.backends.exceptions import BackendTargetNotSupportedError
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics
 
-if not IPY:
-    from typing import TYPE_CHECKING
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import Target
 
-    if TYPE_CHECKING:  # pragma: no cover
-        from compas.geometry import Frame  # noqa: F401
-        from compas_fab.backends import AnalyticalKinematicsPlanner  # noqa: F401
-        from compas_robots import Configuration  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import Target  # noqa: F401
-        from typing import Dict  # noqa: F401
-        from typing import Optional  # noqa: F401
-        from typing import Generator  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.backends import AnalyticalKinematicsPlanner
 
 from compas_fab.robots import FrameTarget
 
@@ -40,8 +38,9 @@ class AnalyticalInverseKinematics(InverseKinematics):
     that supports ``"check_collision"``, so for now only the `PyBulletClient`.
     """
 
-    def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
-        # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
+    def iter_inverse_kinematics(
+        self, target: Target, start_state: RobotCellState, group: Optional[str], options: Optional[dict] = None
+    ) -> Generator[Configuration | None, None, None]:
         """Calculate the robot's inverse kinematic for a given target.
 
         An iterator is returned that yields configurations.
@@ -55,8 +54,9 @@ class AnalyticalInverseKinematics(InverseKinematics):
         else:
             raise BackendTargetNotSupportedError()
 
-    def _iter_inverse_kinematics_frame_target(self, target, start_state=None, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
+    def _iter_inverse_kinematics_frame_target(
+        self, target: FrameTarget, start_state: RobotCellState, group: Optional[str], options: Optional[dict] = None
+    ) -> Generator[Configuration | None, None, None]:
         """Calculate the robot's inverse kinematic for a given frame target.
 
         The IK for 6-axis industrial robots returns by default 8 possible solutions.
@@ -74,8 +74,8 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         This function handles the case where the target is a :class:`compas_fab.robots.FrameTarget`.
         """
-        planner = self  # type: AnalyticalKinematicsPlanner
-        robot_cell = planner.client.robot_cell  # type: RobotCell
+        planner: AnalyticalKinematicsPlanner = self
+        robot_cell: RobotCell = planner.client.robot_cell
 
         # Scale Target and get target frame
         target = target.normalized_to_meters()
@@ -87,8 +87,9 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         return self.inverse_kinematics_ordered(target_frame, group=group, options=options)
 
-    def inverse_kinematics_ordered(self, frame_WCF, group=None, options=None):
-        # type: (Frame, Optional[str], Optional[Dict]) -> Generator[Configuration | None]
+    def inverse_kinematics_ordered(
+        self, frame_WCF: Frame, group: Optional[str] = None, options: Optional[dict] = None
+    ) -> Generator[Configuration | None, None, None]:
         """Calculate the robot's inverse kinematic (IK) for a given frame.
 
         The IK for 6-axis industrial robots returns by default 8 possible solutions.
@@ -138,8 +139,8 @@ class AnalyticalInverseKinematics(InverseKinematics):
         """
 
         options = options or {}
-        planner = self  # type: AnalyticalKinematicsPlanner
-        robot_cell = planner.client.robot_cell  # type: RobotCell
+        planner: AnalyticalKinematicsPlanner = self
+        robot_cell: RobotCell = planner.client.robot_cell
         solver = planner.kinematics_solver
 
         keep_order = options.get("keep_order", False)

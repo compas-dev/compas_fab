@@ -1,5 +1,5 @@
-from typing import Optional
 from typing import TYPE_CHECKING
+from typing import Optional
 
 from compas.utilities import await_callback
 
@@ -10,12 +10,12 @@ from compas_fab.backends.ros.backend_features.helpers import validate_response
 from compas_fab.backends.ros.messages import GetCartesianPathRequest
 from compas_fab.backends.ros.messages import GetCartesianPathResponse
 from compas_fab.backends.ros.messages import Header
+from compas_fab.backends.ros.messages import PlanningScene
 from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.service_description import ServiceDescription
 from compas_fab.robots import FrameWaypoints
-from compas_fab.robots import PointAxisWaypoints
-from compas_fab.backends.ros.messages import PlanningScene
 from compas_fab.robots import JointTrajectory
+from compas_fab.robots import PointAxisWaypoints
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import Waypoints
@@ -40,7 +40,13 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         validate_response,
     )
 
-    def plan_cartesian_motion(self, waypoints : Waypoints, start_state : RobotCellState, group : Optional[str] = None, options : Optional[dict] = None) -> JointTrajectory:
+    def plan_cartesian_motion(
+        self,
+        waypoints: Waypoints,
+        start_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ) -> JointTrajectory:
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
@@ -84,9 +90,9 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
         """
-        planner : MoveItPlanner = self
-        client : RosClient = planner.client
-        robot_cell : RobotCell = client.robot_cell
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
 
         options = options or {}
         kwargs = {}
@@ -115,15 +121,21 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
             raise TypeError("Unsupported waypoints type {} for MoveIt planning backend.".format(type(waypoints)))
 
     def plan_cartesian_motion_with_frame_waypoints_async(
-        self, callback, errback, waypoints : FrameWaypoints, start_state : RobotCellState, group : Optional[str] = None, options : Optional[dict] = None
+        self,
+        callback,
+        errback,
+        waypoints: FrameWaypoints,
+        start_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
     ):
         """Asynchronous handler of MoveIt cartesian motion planner service.
 
         :class:`compas_fab.robots.FrameWaypoints` are converted to :class:`compas_fab.backends.ros.messages.Pose` that is native to ROS communication
 
         """
-        planner : MoveItPlanner = self
-        client : RosClient = planner.client
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
 
         joints = options["joints"]
 
@@ -136,7 +148,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
 
         # We are calling the synchronous function here for simplicity.
         planner.set_robot_cell_state(start_state)
-        planning_scene : PlanningScene = planner.get_planning_scene()
+        planning_scene: PlanningScene = planner.get_planning_scene()
         start_state = planning_scene.robot_state
 
         # start_configuration = start_state.robot_configuration
@@ -176,7 +188,13 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         self.GET_CARTESIAN_PATH(client, request, response_handler, errback)
 
     def plan_cartesian_motion_with_point_axis_waypoints_async(
-        self, callback, errback, waypoints : PointAxisWaypoints, start_state : RobotCellState, group : Optional[str] = None, options : Optional[dict] = None
+        self,
+        callback,
+        errback,
+        waypoints: PointAxisWaypoints,
+        start_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
     ):
         """Asynchronous handler of MoveIt cartesian motion planner service.
 

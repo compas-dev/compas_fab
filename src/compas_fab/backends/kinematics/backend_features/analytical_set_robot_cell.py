@@ -1,6 +1,5 @@
-from typing import Optional
-
 from copy import deepcopy
+from typing import Optional
 
 from compas_fab.backends.interfaces import SetRobotCell
 from compas_fab.robots import RobotCell
@@ -8,7 +7,9 @@ from compas_fab.robots import RobotCellState
 
 
 class AnalyticalSetRobotCell(SetRobotCell):
-    def set_robot_cell(self, robot_cell : RobotCell, robot_cell_state : RobotCellState = None, options : Optional[dict] = None):
+    def set_robot_cell(
+        self, robot_cell: RobotCell, robot_cell_state: RobotCellState = None, options: Optional[dict] = None
+    ):
         """Pass the models in the robot cell to the Analytical Planner.
 
         The planner will use the tool information for frame transformation.

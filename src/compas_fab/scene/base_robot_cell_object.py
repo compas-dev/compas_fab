@@ -1,4 +1,5 @@
 from typing import Optional
+
 from compas.scene import SceneObject
 
 from compas_fab.robots import RobotCell
@@ -54,9 +55,9 @@ class BaseRobotCellObject(SceneObject):
 
         # Native Geometry handles
         # robot_model_object = self._get_robot_model_object()
-        self._robot_model_scene_object : Optional[BaseRobotModelObject] = None
-        self._rigid_body_scene_objects : dict[str, BaseRigidBodyObject] = {}
-        self._tool_scene_objects : dict[str, BaseRobotModelObject] = {}
+        self._robot_model_scene_object: Optional[BaseRobotModelObject] = None
+        self._rigid_body_scene_objects: dict[str, BaseRigidBodyObject] = {}
+        self._tool_scene_objects: dict[str, BaseRobotModelObject] = {}
 
     @property
     def robot_cell(self) -> RobotCell:

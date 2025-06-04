@@ -1,10 +1,11 @@
-from typing import Optional
 from typing import TYPE_CHECKING
+from typing import Optional
 
-from compas_robots import Configuration
+from compas.geometry import Frame
 from compas.tolerance import TOL
 from compas.utilities import await_callback
-from compas.geometry import Frame
+from compas_robots import Configuration
+
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
@@ -48,7 +49,13 @@ class MoveItInverseKinematics(InverseKinematics):
         "/compute_ik", "GetPositionIK", GetPositionIKRequest, GetPositionIKResponse, validate_response
     )
 
-    def inverse_kinematics(self, target : FrameTarget | PointAxisTarget, robot_cell_state : "RobotCellState", group : Optional[str] = None, options : Optional[dict] = None):
+    def inverse_kinematics(
+        self,
+        target: FrameTarget | PointAxisTarget,
+        robot_cell_state: "RobotCellState",
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ):
         """Calculate the robot's inverse kinematic for a given target.
 
         The actual implementation can be found in the :meth:`iter_inverse_kinematics` method.
@@ -96,8 +103,8 @@ class MoveItInverseKinematics(InverseKinematics):
 
         """
         # Set default group name
-        planner : MoveItPlanner = self
-        client : RosClient = planner.client
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
         group = group or client.robot_cell.main_group_name
 
         # The caching mechanism is implemented in the iter_inverse_kinematics method
@@ -111,7 +118,13 @@ class MoveItInverseKinematics(InverseKinematics):
 
         return configuration
 
-    def iter_inverse_kinematics(self, target : FrameTarget | PointAxisTarget, robot_cell_state : "RobotCellState" = None, group : Optional[str] = None, options : Optional[dict] = None):
+    def iter_inverse_kinematics(
+        self,
+        target: FrameTarget | PointAxisTarget,
+        robot_cell_state: "RobotCellState" = None,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ):
         """Calculate the robot's inverse kinematic for a given target.
 
         The MoveIt inverse kinematics solver make use of the IK solver pre-configured in
@@ -184,9 +197,9 @@ class MoveItInverseKinematics(InverseKinematics):
             One of the possible IK configurations that reaches the target.
 
         """
-        planner : MoveItPlanner = self
-        client : RosClient = planner.client
-        robot_cell : RobotCell = client.robot_cell
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
         group = group or robot_cell.main_group_name
 
         # Calling the super class method, which contains input sanity checks and scale normalization
@@ -210,7 +223,9 @@ class MoveItInverseKinematics(InverseKinematics):
             # Insert any checks needed here. No checks at the moment.
             yield configuration
 
-    def _iter_inverse_kinematics_frame_target(self, target : FrameTarget, robot_cell_state : "RobotCellState", group : str, options : Optional[dict] = None):
+    def _iter_inverse_kinematics_frame_target(
+        self, target: FrameTarget, robot_cell_state: "RobotCellState", group: str, options: Optional[dict] = None
+    ):
         """Calculate the robot's inverse kinematic for a given frame target.
 
         This function is not exposed to the user and therefore docstrings
@@ -219,9 +234,9 @@ class MoveItInverseKinematics(InverseKinematics):
         """
 
         # Housekeeping for intellisense
-        planner : MoveItPlanner = self
-        client : RosClient = planner.client
-        robot_cell : RobotCell = client.robot_cell
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
 
         # NOTE: group is not optional in this inner function.
         if group not in robot_cell.robot_semantics.groups:
@@ -306,7 +321,13 @@ class MoveItInverseKinematics(InverseKinematics):
             )
 
     def _inverse_kinematics_async(
-        self, callback, errback, frame_WCF : Frame, start_configuration : Configuration = None, group : str = None, options : Optional[dict] = None
+        self,
+        callback,
+        errback,
+        frame_WCF: Frame,
+        start_configuration: Configuration = None,
+        group: str = None,
+        options: Optional[dict] = None,
     ):
         """Asynchronous handler of MoveIt IK service."""
         base_link = options["base_link"]
