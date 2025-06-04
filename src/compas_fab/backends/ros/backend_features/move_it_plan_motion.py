@@ -9,7 +9,6 @@ from compas_fab.backends.interfaces import PlanMotion
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
 from compas_fab.backends.ros.backend_features.helpers import convert_trajectory
 from compas_fab.backends.ros.backend_features.helpers import validate_response
-from compas_fab.backends.ros.messages import AttachedCollisionObject
 from compas_fab.backends.ros.messages import Header
 from compas_fab.backends.ros.messages import JointState
 from compas_fab.backends.ros.messages import MotionPlanRequest
@@ -18,16 +17,13 @@ from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import TrajectoryConstraints
 from compas_fab.backends.ros.service_description import ServiceDescription
-
-from compas_fab.robots import ConstraintSetTarget
 from compas_fab.robots import ConfigurationTarget
+from compas_fab.robots import ConstraintSetTarget
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import PointAxisTarget
-
 from compas_fab.robots.constraints import JointConstraint
-from compas_fab.robots.constraints import PositionConstraint
 from compas_fab.robots.constraints import OrientationConstraint
-
+from compas_fab.robots.constraints import PositionConstraint
 
 if not IPY:
     from typing import TYPE_CHECKING

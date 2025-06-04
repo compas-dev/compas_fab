@@ -17,7 +17,6 @@ from compas_fab.backends.ros.messages.geometry_msgs import Header
 from compas_fab.backends.ros.messages.geometry_msgs import Pose
 from compas_fab.backends.ros.messages.shape_msgs import Mesh
 from compas_fab.backends.ros.service_description import ServiceDescription
-
 from compas_fab.robots import RobotCell
 
 if not IPY:
@@ -31,7 +30,6 @@ if not IPY:
         from compas_fab.backends import MoveItPlanner  # noqa: F401
         from compas_fab.backends import PyBulletClient  # noqa: F401
         from compas_fab.backends import RosClient  # noqa: F401
-
         from compas_fab.robots import RobotCellState  # noqa: F401
 
 

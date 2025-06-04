@@ -1,4 +1,5 @@
 from compas_robots import RobotModel
+
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotSemantics

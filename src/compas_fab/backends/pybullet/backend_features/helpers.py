@@ -1,34 +1,15 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from math import pi
 
-from compas import IPY
-
 from compas_robots.model import Joint
-
-
 from compas_fab.backends import MPMaxJumpError
-
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Dict  # noqa: F401
-        from typing import List  # noqa: F401
-
 
 __all__ = [
     "check_max_jump",
 ]
 
 
-def check_max_jump(joint_names, joint_types, start_joint_values, end_joint_values, options):
-    # type: (List[str], List[int], List[float], List[float], Dict) -> None
+def check_max_jump(joint_names : list[str], joint_types : list[int], start_joint_values : list[float], end_joint_values : list[float], options : Dict):
     """Check if the joint positions between two configurations exceed the maximum allowed distance.
-
 
     Parameters
     ----------
@@ -54,7 +35,7 @@ def check_max_jump(joint_names, joint_types, start_joint_values, end_joint_value
 
     Raises
     ------
-    MPMaxJumpError
+    :exc:`MPMaxJumpError`
         If the joint positions between two configurations exceed the maximum allowed
         distance specified in the options dictionary.
 

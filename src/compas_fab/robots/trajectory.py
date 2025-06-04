@@ -1,5 +1,6 @@
 from typing import Any
 from typing import Optional
+
 from compas.data import Data
 from compas.tolerance import TOL
 from compas_robots import Configuration

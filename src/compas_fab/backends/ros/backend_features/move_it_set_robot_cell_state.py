@@ -30,8 +30,8 @@ if not IPY:
 
         from compas_fab.backends import MoveItPlanner  # noqa: F401
         from compas_fab.backends import RosClient  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
         from compas_fab.robots import RobotCell  # noqa: F401
+        from compas_fab.robots import RobotCellState  # noqa: F401
 
 
 __all__ = [

@@ -1,23 +1,12 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from typing import Generator
+from typing import Optional
 
-from compas import IPY
+from compas_robots import Configuration
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from compas_robots import Configuration  # noqa: F401
-        from compas.geometry import Frame  # noqa: F401
-        from typing import Optional  # noqa: F401
-        from typing import Generator  # noqa: F401
-        from typing import Dict  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-
-        from compas_fab.backends import MoveItPlanner  # noqa: F401
-        from compas_fab.backends import RosClient  # noqa: F401
+from compas_fab.backends import MoveItPlanner
+from compas_fab.backends import RosClient
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
 
 from compas.tolerance import TOL
 from compas.utilities import await_callback
@@ -26,6 +15,7 @@ from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
 from compas_fab.backends.ros.backend_features.helpers import validate_response
+from compas_fab.backends.ros.exceptions import RosValidationError
 from compas_fab.backends.ros.messages import GetPositionIKRequest
 from compas_fab.backends.ros.messages import GetPositionIKResponse
 from compas_fab.backends.ros.messages import Header
@@ -38,7 +28,7 @@ from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import RosDistro
 from compas_fab.backends.ros.service_description import ServiceDescription
 from compas_fab.robots import FrameTarget
-from compas_fab.backends.ros.exceptions import RosValidationError
+from compas_fab.robots import PointAxisTarget
 
 __all__ = [
     "MoveItInverseKinematics",
@@ -58,8 +48,7 @@ class MoveItInverseKinematics(InverseKinematics):
         "/compute_ik", "GetPositionIK", GetPositionIKRequest, GetPositionIKResponse, validate_response
     )
 
-    def inverse_kinematics(self, target, robot_cell_state, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Configuration
+    def inverse_kinematics(self, target : FrameTarget | PointAxisTarget, robot_cell_state : RobotCellState, group : Optional[str] = None, options : Optional[dict] = None):
         """Calculate the robot's inverse kinematic for a given target.
 
         The actual implementation can be found in the :meth:`iter_inverse_kinematics` method.
@@ -107,8 +96,8 @@ class MoveItInverseKinematics(InverseKinematics):
 
         """
         # Set default group name
-        planner = self  # type: MoveItPlanner
-        client = planner.client  # type: RosClient
+        planner : MoveItPlanner = self
+        client : RosClient = planner.client
         group = group or client.robot_cell.main_group_name
 
         # The caching mechanism is implemented in the iter_inverse_kinematics method
@@ -122,8 +111,7 @@ class MoveItInverseKinematics(InverseKinematics):
 
         return configuration
 
-    def iter_inverse_kinematics(self, target, robot_cell_state=None, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
+    def iter_inverse_kinematics(self, target : FrameTarget | PointAxisTarget, robot_cell_state : RobotCellState = None, group : Optional[str] = None, options : Optional[dict] = None):
         """Calculate the robot's inverse kinematic for a given target.
 
         The MoveIt inverse kinematics solver make use of the IK solver pre-configured in
@@ -138,8 +126,8 @@ class MoveItInverseKinematics(InverseKinematics):
 
         Parameters
         ----------
-        target: :class:`compas.geometry.FrameTarget`
-            The Frame Target to calculate the inverse for.
+        target : :class:`compas_fab.robots.FrameTarget` or :class:`compas_fab.robots.PointAxisTarget`
+            The target to calculate the inverse kinematics for.
         robot_cell_state : :class:`compas_fab.robots.RobotCellState`
             The starting state to calculate the inverse kinematics for.
         group: str, optional
@@ -196,9 +184,9 @@ class MoveItInverseKinematics(InverseKinematics):
             One of the possible IK configurations that reaches the target.
 
         """
-        planner = self  # type: MoveItPlanner
-        client = planner.client  # type: RosClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner : MoveItPlanner = self
+        client : RosClient = planner.client
+        robot_cell : RobotCell = client.robot_cell
         group = group or robot_cell.main_group_name
 
         # Calling the super class method, which contains input sanity checks and scale normalization
@@ -222,8 +210,7 @@ class MoveItInverseKinematics(InverseKinematics):
             # Insert any checks needed here. No checks at the moment.
             yield configuration
 
-    def _iter_inverse_kinematics_frame_target(self, target, robot_cell_state, group, options=None):
-        # type: (FrameTarget, RobotCellState, str, Optional[Dict]) -> Generator[Configuration | None]
+    def _iter_inverse_kinematics_frame_target(self, target : FrameTarget, robot_cell_state : RobotCellState, group : str, options : Optional[dict] = None):
         """Calculate the robot's inverse kinematic for a given frame target.
 
         This function is not exposed to the user and therefore docstrings
@@ -232,9 +219,9 @@ class MoveItInverseKinematics(InverseKinematics):
         """
 
         # Housekeeping for intellisense
-        planner = self  # type: MoveItPlanner
-        client = planner.client  # type: RosClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner : MoveItPlanner = self
+        client : RosClient = planner.client
+        robot_cell : RobotCell = client.robot_cell
 
         # NOTE: group is not optional in this inner function.
         if group not in robot_cell.robot_semantics.groups:
@@ -280,7 +267,6 @@ class MoveItInverseKinematics(InverseKinematics):
 
         # Loop to get multiple results with random restarts
         for i in range(max_results):
-
             # First iteration uses the provided start_configuration
             # Subsequent iterations use a random configuration
 
@@ -320,7 +306,7 @@ class MoveItInverseKinematics(InverseKinematics):
             )
 
     def _inverse_kinematics_async(
-        self, callback, errback, frame_WCF, start_configuration=None, group=None, options=None
+        self, callback, errback, frame_WCF : Frame, start_configuration : Configuration = None, group : str = None, options : Optional[dict] = None
     ):
         """Asynchronous handler of MoveIt IK service."""
         base_link = options["base_link"]

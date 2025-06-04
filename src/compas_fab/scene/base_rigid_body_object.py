@@ -1,17 +1,11 @@
-from compas.scene import SceneObject
-from compas.geometry import Transformation
+from typing import Optional
+
 from compas.geometry import Scale
+from compas.geometry import Transformation
+from compas.scene import SceneObject
 
-from compas import IPY
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Optional  # noqa: F401
-        from typing import List  # noqa: F401
-        from compas_fab.robots import RigidBody  # noqa: F401
-        from compas_fab.robots import RigidBodyState  # noqa: F401
+from compas_fab.robots import RigidBody
+from compas_fab.robots import RigidBodyState
 
 
 class BaseRigidBodyObject(SceneObject):
@@ -56,12 +50,10 @@ class BaseRigidBodyObject(SceneObject):
         self._mesh_current_transformation = Transformation()
 
     @property
-    def rigid_body(self):
-        # type: () -> RigidBody
+    def rigid_body(self) -> RigidBody:
         return self.item
 
-    def draw(self, rigid_body_state=None):
-        # type: (Optional[RigidBodyState]) -> List[object]
+    def draw(self, rigid_body_state: Optional[RigidBodyState] = None):
         """Draw the rigid body object in the respective CAD environment.
         It will return the native geometry objects that were created.
 
@@ -90,8 +82,7 @@ class BaseRigidBodyObject(SceneObject):
         # Return the native geometry from the cache
         return self._visual_mesh_native_geometry + self._collision_mesh_native_geometry
 
-    def update(self, rigid_body_state):
-        # type: (RigidBodyState) -> None
+    def update(self, rigid_body_state: RigidBodyState):
         """Update the rigid body object with the given rigid body state.
 
         Parameters

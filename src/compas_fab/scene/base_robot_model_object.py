@@ -1,22 +1,13 @@
-from compas import IPY
+from typing import Optional
 
-from compas.geometry import Transformation
 from compas.geometry import Scale
-from compas_robots.model import LinkGeometry
+from compas.geometry import Transformation
 from compas.scene import SceneObject
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import List  # noqa: F401
-        from typing import Optional  # noqa: F401
-
-        from compas_robots import Configuration  # noqa: F401
-        from compas_robots import RobotModel  # noqa: F401
-
-        from compas.datastructures import Mesh  # noqa: F401
-        from compas.geometry import Frame  # noqa: F401
+from compas_robots.model import LinkGeometry
+from compas.datastructures import Mesh
+from compas.geometry import Frame
+from compas_robots import Configuration
+from compas_robots import RobotModel
 
 
 class BaseRobotModelObject(SceneObject):
@@ -48,8 +39,7 @@ class BaseRobotModelObject(SceneObject):
 
     MESH_JOIN_PRECISION = 12
 
-    def __init__(self, draw_visual=True, draw_collision=False, native_scale=1.0, *args, **kwargs):
-        # type: (Optional[bool], Optional[bool], Optional[float], *object, **object) -> None
+    def __init__(self, draw_visual: bool = True, draw_collision: bool = False, native_scale: float = 1.0, *args, **kwargs):
         super(BaseRobotModelObject, self).__init__(*args, **kwargs)
         self._draw_visual = draw_visual
         self._draw_collision = draw_collision
@@ -63,13 +53,11 @@ class BaseRobotModelObject(SceneObject):
         self._links_collision_mesh_transformation = {}
 
     @property
-    def robot_model(self):
-        # type: () -> RobotModel
+    def robot_model(self) -> RobotModel:
         """The robot model this object is associated with."""
         return self.item
 
-    def draw(self, robot_configuration=None, base_frame=None):
-        # type: (Optional[Configuration], Optional[Frame]) -> List[object]
+    def draw(self, robot_configuration: Optional[Configuration] = None, base_frame: Optional[Frame] = None) -> list[object]:
         """Draw the robot model object in the respective CAD environment.
 
         This function conforms to `SceneObject.draw()` Interface and will return
@@ -108,10 +96,10 @@ class BaseRobotModelObject(SceneObject):
         # Reset the dictionaries
         self.base_native_geometry = None
         self.base_transformation = None
-        self._links_visual_mesh_native_geometry = {}  # type: dict[str, Mesh]
-        self._links_collision_mesh_native_geometry = {}  # type: dict[str, Mesh]
-        self._links_visual_mesh_transformation = {}  # type: dict[str, Transformation]
-        self._links_collision_mesh_transformation = {}  # type: dict[str, Transformation]
+        self._links_visual_mesh_native_geometry : dict[str, Mesh] = {}
+        self._links_collision_mesh_native_geometry : dict[str, Mesh] = {}
+        self._links_visual_mesh_transformation : dict[str, Transformation] = {}
+        self._links_collision_mesh_transformation : dict[str, Transformation] = {}
 
         # Helper function to get the meshes from the visual or collision elements
         # NOTE: The meshes are transformed to the base frame of the link using the `self._transform()` method
@@ -142,8 +130,7 @@ class BaseRobotModelObject(SceneObject):
                     self._links_collision_mesh_native_geometry[link_name] = native_geometries
                     self._links_collision_mesh_transformation[link_name] = Transformation()
 
-    def update(self, robot_configuration, base_frame=None):
-        # type: (Configuration, Optional[Frame]) -> None
+    def update(self, robot_configuration: Optional[Configuration] = None, base_frame: Optional[Frame] = None):
         """Updates the native geometry of the robot model according to the given robot
         configuration and base frame.
 
@@ -175,7 +162,7 @@ class BaseRobotModelObject(SceneObject):
             if link_name in self._links_visual_mesh_native_geometry:
                 # Compute the delta transformation
                 previous_transformation = self._links_visual_mesh_transformation[link_name]
-                delta_transformation = new_transformation * previous_transformation.inverse()  # type: Transformation
+                delta_transformation : Transformation = new_transformation * previous_transformation.inverse()
                 # Transform the native geometry
                 new_native_geometries = []
                 for native_geometry in self._links_visual_mesh_native_geometry[link_name]:
@@ -222,7 +209,7 @@ class BaseRobotModelObject(SceneObject):
     # Private methods that need to be implemented by CAD specific classes
     # --------------------------------------------------------------------------
 
-    def _transform(self, geometry, transformation):
+    def _transform(self, geometry: object, transformation: Transformation) -> object:
         """Transforms the given native CAD-specific geometry.
 
         Here we do not assume whether that the CAD-specific `._transform` method will operate on the native geometry
@@ -244,7 +231,7 @@ class BaseRobotModelObject(SceneObject):
         """
         raise NotImplementedError
 
-    def _create_geometry(self, geometry, name=None, color=None):
+    def _create_geometry(self, geometry: Mesh, name: Optional[str] = None, color: Optional[Color] = None):
         """Create new native geometry in the respective CAD environment.
 
         Parameters

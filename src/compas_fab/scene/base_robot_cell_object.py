@@ -1,19 +1,10 @@
-from compas import IPY
+from typing import Optional
 from compas.scene import SceneObject
 
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import List  # noqa: F401
-        from typing import Optional  # noqa: F401
-
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.scene import BaseRigidBodyObject  # noqa: F401
-
-        from .base_robot_model_object import BaseRobotModelObject  # noqa: F401
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.scene import BaseRigidBodyObject
+from compas_fab.scene.base_robot_model_object import BaseRobotModelObject
 
 
 class BaseRobotCellObject(SceneObject):
@@ -63,21 +54,19 @@ class BaseRobotCellObject(SceneObject):
 
         # Native Geometry handles
         # robot_model_object = self._get_robot_model_object()
-        self._robot_model_scene_object = None  # type: BaseRobotModelObject
-        self._rigid_body_scene_objects = {}  # type: dict[str, BaseRigidBodyObject]
-        self._tool_scene_objects = {}  # type: dict[str, BaseRobotModelObject]
+        self._robot_model_scene_object : Optional[BaseRobotModelObject] = None
+        self._rigid_body_scene_objects : dict[str, BaseRigidBodyObject] = {}
+        self._tool_scene_objects : dict[str, BaseRobotModelObject] = {}
 
     @property
-    def robot_cell(self):
-        # type: () -> RobotCell
+    def robot_cell(self) -> RobotCell:
         return self.item
 
     # --------------------------------------------------------------------------
     # Draw Functions
     # --------------------------------------------------------------------------
 
-    def draw(self, robot_cell_state=None):
-        # type: (Optional[RobotCellState]) -> List[object]
+    def draw(self, robot_cell_state: Optional[RobotCellState] = None):
         """Return all native geometry (in the CAD environment) belonging to the robot cell.
 
         The geometry contains the robot model, rigid bodies, and tools.
@@ -111,8 +100,7 @@ class BaseRobotCellObject(SceneObject):
 
         return native_geometries
 
-    def update(self, robot_cell_state):
-        # type: (RobotCellState) -> None
+    def update(self, robot_cell_state: RobotCellState):
         """Update the robot cell object with the given robot cell state."""
         # NOTE: All the constituent objects have an update method for transforming the native geometry
 
