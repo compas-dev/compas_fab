@@ -503,7 +503,9 @@ class ConfigurationTarget(Target):
         >>> configuration = Configuration.from_revolute_values([0, 3.14, 0, 0, 3.14, 0])
         >>> tolerance_prismatic = 0.001
         >>> tolerance_revolute = math.radians(1)
-        >>> tolerances_above, tolerances_below = ConfigurationTarget.generate_default_tolerances(configuration, tolerance_prismatic, tolerance_revolute)
+        >>> tolerances_above, tolerances_below = ConfigurationTarget.generate_default_tolerances(
+        ...     configuration, tolerance_prismatic, tolerance_revolute
+        ... )
         >>> target = ConfigurationTarget(configuration, tolerances_above, tolerances_below)
 
         """

@@ -369,7 +369,6 @@ class RobotCellState(Data):
         # Checks for Tool Mode
         tool_id = self.get_attached_tool_id(group)
         if target_mode == TargetMode.TOOL:
-
             if tool_id is None:
                 raise TargetModeMismatchError(
                     "Target mode is 'TOOL', but no tool is attached to the robot in group '{}'.".format(group)

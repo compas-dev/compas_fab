@@ -1,23 +1,11 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-from compas import IPY
-
+from typing import Any
+from typing import Optional
 from compas.data import Data
 from compas.tolerance import TOL
 from compas_robots import Configuration
 from compas_robots.configuration import FixedLengthList
 
 from compas_fab.robots.time_ import Duration
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Any  # noqa: F401
-        from typing import Dict  # noqa: F401
-        from typing import List  # noqa: F401
 
 __all__ = [
     "JointTrajectory",
@@ -76,15 +64,14 @@ class JointTrajectoryPoint(Configuration):
 
     def __init__(
         self,
-        joint_values=None,
-        joint_types=None,
-        velocities=None,
-        accelerations=None,
-        effort=None,
-        time_from_start=None,
-        joint_names=None,
+        joint_values: Optional[list[float]] = None,
+        joint_types: Optional[list[int]] = None,
+        velocities: Optional[list[float]] = None,
+        accelerations: Optional[list[float]] = None,
+        effort: Optional[list[float]] = None,
+        time_from_start: Optional[Duration] = None,
+        joint_names: Optional[list[str]] = None,
     ):
-        # type: (List[float], List[int], List[float], List[float], List[float], Duration, List[str]) -> None
         super(JointTrajectoryPoint, self).__init__(joint_values, joint_types, joint_names)
         self.velocities = velocities or len(self.joint_values) * [0.0]
         self.accelerations = accelerations or len(self.joint_values) * [0.0]
@@ -103,34 +90,29 @@ class JointTrajectoryPoint(Configuration):
         )
 
     @property
-    def positions(self):
-        # type: () -> List[float]
-        """:obj:`list` of :obj:`float` : Alias of `joint_values`."""
+    def positions(self) -> list[float]:
+        """Alias of `joint_values`."""
         return self.joint_values
 
     @property
-    def velocities(self):
-        # type: () -> List[float]
-        """:obj:`list` of :obj:`float` : Velocity of each joint."""
+    def velocities(self) -> list[float]:
+        """Velocity of each joint."""
         return self._velocities
 
     @velocities.setter
-    def velocities(self, velocities):
-        # type: (List[float]) -> None
+    def velocities(self, velocities: list[float]):
         if len(self.joint_values) != len(velocities):
             raise ValueError("Must have {} velocities, but {} given.".format(len(self.joint_values), len(velocities)))
 
         self._velocities = FixedLengthList(velocities)
 
     @property
-    def accelerations(self):
-        # type: () -> List[float]
-        """:obj:`list` of :obj:`float` : Acceleration of each joint."""
+    def accelerations(self) -> list[float]:
+        """Acceleration of each joint."""
         return self._accelerations
 
     @accelerations.setter
-    def accelerations(self, accelerations):
-        # type: (List[float]) -> None
+    def accelerations(self, accelerations: list[float]):
         if len(self.joint_values) != len(accelerations):
             raise ValueError(
                 "Must have {} accelerations, but {} given.".format(len(self.joint_values), len(accelerations))
@@ -139,14 +121,12 @@ class JointTrajectoryPoint(Configuration):
         self._accelerations = FixedLengthList(accelerations)
 
     @property
-    def effort(self):
-        # type: () -> List[float]
-        """:obj:`list` of :obj:`float` : Effort of each joint."""
+    def effort(self) -> list[float]:
+        """Effort of each joint."""
         return self._effort
 
     @effort.setter
-    def effort(self, effort):
-        # type: (List[float]) -> None
+    def effort(self, effort: list[float]):
         if len(self.joint_values) != len(effort):
             raise ValueError("Must have {} efforts, but {} given.".format(len(self.joint_values), len(effort)))
 
@@ -169,8 +149,7 @@ class JointTrajectoryPoint(Configuration):
         return data_obj
 
     @classmethod
-    def __from_data__(cls, data):
-        # type: (Dict[str, Any]) -> JointTrajectoryPoint
+    def __from_data__(cls, data: dict[str, Any]) -> "JointTrajectoryPoint":
         joint_values = FixedLengthList(data.get("joint_values") or data.get("values") or [])
         joint_types = FixedLengthList(data.get("joint_types") or data.get("types") or [])
         joint_names = FixedLengthList(data.get("joint_names") or [])
@@ -191,28 +170,24 @@ class JointTrajectoryPoint(Configuration):
         return tool_trajectory_point
 
     @property
-    def velocity_dict(self):
-        # type: () -> Dict[str, float]
+    def velocity_dict(self) -> dict[str, float]:
         """A dictionary of joint velocities by joint name."""
         self.check_joint_names()
         return dict(zip(self.joint_names, self.velocities))
 
     @property
-    def acceleration_dict(self):
-        # type: () -> Dict[str, float]
+    def acceleration_dict(self) -> dict[str, float]:
         """A dictionary of joint accelerations by joint name."""
         self.check_joint_names()
         return dict(zip(self.joint_names, self.accelerations))
 
     @property
-    def effort_dict(self):
-        # type: () -> Dict[str, float]
+    def effort_dict(self) -> dict[str, float]:
         """A dictionary of joint efforts by joint name."""
         self.check_joint_names()
         return dict(zip(self.joint_names, self.effort))
 
-    def merged(self, other):
-        # type: (JointTrajectoryPoint) -> JointTrajectoryPoint
+    def merged(self, other) -> "JointTrajectoryPoint":
         """Get a new ``JointTrajectoryPoint`` with this ``JointTrajectoryPoint`` merged
         with another ``JointTrajectoryPoint``.  The other ``JointTrajectoryPoint``
         takes precedence over this ``JointTrajectoryPoint`` in case a joint value is present in both.
@@ -275,8 +250,7 @@ class Trajectory(Data):
         Custom attributes of the trajectory.
     """
 
-    def __init__(self, attributes=None):
-        # type: (Dict[str, Any]) -> None
+    def __init__(self, attributes: Optional[dict[str, Any]] = None):
         super(Trajectory, self).__init__()
         self.attributes = attributes or {}
         self.planning_time = -1
@@ -289,8 +263,7 @@ class Trajectory(Data):
         return data_obj
 
     @classmethod
-    def __from_data__(cls, data):
-        # type: (Dict[str, Any]) -> Trajectory
+    def __from_data__(cls, data: dict[str, Any]) -> "Trajectory":
         trajectory = cls(attributes=data["attributes"])
         trajectory.planning_time = data["planning_time"]
         return trajectory
@@ -331,13 +304,12 @@ class JointTrajectory(Trajectory):
 
     def __init__(
         self,
-        trajectory_points=None,
-        joint_names=None,
-        start_configuration=None,
-        fraction=None,
-        attributes=None,
+        trajectory_points: Optional[list[JointTrajectoryPoint]] = None,
+        joint_names: Optional[list[str]] = None,
+        start_configuration: Optional[Configuration] = None,
+        fraction: Optional[float] = None,
+        attributes: Optional[dict[str, Any]] = None,
     ):
-        # type: (List[JointTrajectoryPoint], List[str], Configuration, float, Dict[str, Any]) -> None
         super(JointTrajectory, self).__init__(attributes=attributes)
         self.points = trajectory_points or []
         self.joint_names = joint_names or []
@@ -358,8 +330,7 @@ class JointTrajectory(Trajectory):
         return data_obj
 
     @classmethod
-    def __from_data__(cls, data):
-        # type: (Dict[str, Any]) -> JointTrajectory
+    def __from_data__(cls, data: dict[str, Any]) -> "JointTrajectory":
         points = list(map(JointTrajectoryPoint.__from_data__, data.get("points") or []))
         joint_names = data.get("joint_names", [])
         start_configuration = data.get("start_configuration", None)
@@ -378,9 +349,8 @@ class JointTrajectory(Trajectory):
         return trajectory
 
     @property
-    def time_from_start(self):
-        # type: () -> float
-        """:obj:`float` : Effectively, time from start for the last point in the trajectory."""
+    def time_from_start(self) -> float:
+        """Effectively, time from start for the last point in the trajectory."""
         if not self.points:
             return 0.0
 

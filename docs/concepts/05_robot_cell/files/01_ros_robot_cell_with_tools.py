@@ -81,4 +81,5 @@ with RosClient() as client:
     # =========
 
     # It is possible to remove all tools and objects from the robot cell
-    planner.reset_planning_scene()
+    robot_cell = client.load_robot_cell()
+    result = planner.set_robot_cell(robot_cell)

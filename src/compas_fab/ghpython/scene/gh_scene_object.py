@@ -1,37 +1,22 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from typing import Optional
 
-
+from compas.colors import Color
+from compas.datastructures import Mesh
+from compas.geometry import Transformation
 from compas_ghpython.drawing import draw_mesh
-from compas_rhino.conversions import transformation_to_rhino
-
 from compas_ghpython.scene import GHSceneObject as compas_ghpython_GHSceneObject
-
-from compas import IPY
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Optional  # noqa: F401
-        from typing import List  # noqa: F401
-
-        from compas.datastructures import Mesh  # noqa: F401
-        from compas.geometry import Transformation  # noqa: F401
+from compas_rhino.conversions import transformation_to_rhino
 
 
 class GHSceneObject(compas_ghpython_GHSceneObject):
     """Base class for all GH scene objects."""
 
-    def _transform(self, native_mesh, transformation):
-        # type: (object, Transformation) -> object
+    def _transform(self, native_mesh: object, transformation: Transformation) -> object:
         T = transformation_to_rhino(transformation)
         native_mesh.Transform(T)
         return native_mesh
 
-    def _create_geometry(self, geometry, name=None, color=None):
-        # type: (Mesh, Optional[str], Optional[List[int]]) -> object
+    def _create_geometry(self, geometry: Mesh, name: Optional[str] = None, color: Optional[Color] = None):
         """Create the scene object representing one mesh geometry.
 
         Parameters

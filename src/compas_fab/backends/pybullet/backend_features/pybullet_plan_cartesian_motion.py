@@ -11,7 +11,6 @@ from compas.geometry import Quaternion
 from compas.geometry import axis_angle_from_quaternion
 from compas.geometry import cross_vectors
 from compas.geometry import is_parallel_vector_vector
-from compas_robots.model import Joint
 
 from compas_fab.backends import CollisionCheckError
 from compas_fab.backends import InverseKinematicsError
@@ -481,7 +480,6 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
             # If valid IK solution found, proceed to the next step
             if ik_result is not None and within_max_jump:
-
                 if options["verbose"]:
                     print("Step: {} Option {} is valid".format(current_step, ik_option_indices[-1]))
                 planned_configurations.append(ik_result)
@@ -702,7 +700,6 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
             )
 
             for pcf_frame in pcf_frames:
-
                 try:
                     planner.check_collision_for_attached_objects_in_planning_group(
                         intermediate_state,

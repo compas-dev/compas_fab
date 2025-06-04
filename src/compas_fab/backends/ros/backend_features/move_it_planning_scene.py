@@ -1,10 +1,6 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from compas.utilities import await_callback
 
-from compas_fab.backends.interfaces import GetPlanningScene
+from compas_fab.backends.interfaces import BackendFeature
 from compas_fab.backends.ros.messages import GetPlanningSceneRequest
 from compas_fab.backends.ros.messages import GetPlanningSceneResponse
 from compas_fab.backends.ros.messages import PlanningSceneComponents
@@ -15,7 +11,7 @@ __all__ = [
 ]
 
 
-class MoveItPlanningScene(GetPlanningScene):
+class MoveItPlanningScene(BackendFeature):
     """Callable to retrieve the planning scene."""
 
     GET_PLANNING_SCENE = ServiceDescription(

@@ -169,7 +169,6 @@ def ik_fk_agreement(robot_cell, robot_cell_state, pybullet_client, ik_target_fra
         # IK Query to the planner (Frame to Configuration)
         ik_target_frame = deepcopy(ik_target_frame)  # type: FrameTarget
         try:
-
             ik_result = next(
                 planner.iter_inverse_kinematics(
                     FrameTarget(

@@ -1,13 +1,15 @@
 import random
+from typing import Optional
 
-from compas import IPY
 from compas.data import Data
+from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas_robots import Configuration
 from compas_robots import RobotModel
 from compas_robots import ToolModel
 from compas_robots.model import Joint
+from compas_robots.model import Link
 from compas_robots.resources import LocalPackageMeshLoader
 
 import compas_fab
@@ -16,18 +18,6 @@ from .rigid_body import RigidBody
 from .semantics import RobotSemantics
 from .state import RobotCellState
 from .targets import TargetMode
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Dict  # noqa: F401
-        from typing import List  # noqa: F401
-        from typing import Optional  # noqa: F401
-
-        from compas.datastructures import Mesh  # noqa: F401
-        from compas_robots.model import Link  # noqa: F401
-
 
 __all__ = [
     "RobotCell",
@@ -86,21 +76,25 @@ class RobotCell(Data):
 
     """
 
-    def __init__(self, robot_model=None, robot_semantics=None, tool_models=None, rigid_body_models=None):
+    def __init__(
+        self,
+        robot_model: Optional[RobotModel] = None,
+        robot_semantics: Optional[RobotSemantics] = None,
+        tool_models: Optional[dict[str, ToolModel]] = None,
+        rigid_body_models: Optional[dict[str, RigidBody]] = None,
+    ):
         super(RobotCell, self).__init__()
-        self.robot_model = robot_model  # type: RobotModel
-        self.robot_semantics = robot_semantics  # type: RobotSemantics
-        self.tool_models = tool_models or {}  # type: Dict[str, ToolModel]
-        self.rigid_body_models = rigid_body_models or {}  # type: Dict[str, RigidBody]
+        self.robot_model = robot_model
+        self.robot_semantics = robot_semantics
+        self.tool_models = tool_models or {}
+        self.rigid_body_models = rigid_body_models or {}
 
     @property
-    def tool_ids(self):
-        # type: () -> List[str]
+    def tool_ids(self) -> list[str]:
         return list(self.tool_models.keys())
 
     @property
-    def rigid_body_ids(self):
-        # type: () -> List[str]
+    def rigid_body_ids(self) -> list[str]:
         return list(self.rigid_body_models.keys())
 
     @property
@@ -126,8 +120,7 @@ class RobotCell(Data):
         # but it is not working because of the ProxyObject deepcopy failure problem.
 
     @classmethod
-    def __from_data__(cls, data):
-        # type: (Dict) -> RobotCell
+    def __from_data__(cls, data: dict) -> "RobotCell":
         """Construct a RobotCell from a data dictionary.
 
         Parameters
@@ -149,8 +142,9 @@ class RobotCell(Data):
         return cls(robot_model, robot_semantics, tool_models, rigid_body_models)
 
     @classmethod
-    def from_urdf_and_srdf(cls, urdf_filename, srdf_filename, local_package_mesh_folder=None):
-        # type: (str, Optional[str], Optional[str]) -> RobotCell
+    def from_urdf_and_srdf(
+        cls, urdf_filename: str, srdf_filename: Optional[str], local_package_mesh_folder: Optional[str] = None
+    ) -> "RobotCell":
         """Create a robot cell from URDF and SRDF files.
         Optionally, a local package mesh folder to load mesh geometry.
 
@@ -173,7 +167,7 @@ class RobotCell(Data):
             Newly created instance of the robot.
 
         """
-        robot_model = RobotModel.from_urdf_file(urdf_filename)  # type: RobotModel
+        robot_model: RobotModel = RobotModel.from_urdf_file(urdf_filename)
 
         robot_semantics = RobotSemantics.from_srdf_file(srdf_filename, robot_model)
 
@@ -189,8 +183,7 @@ class RobotCell(Data):
     # Consistency checks
     # ------------------
 
-    def assert_cell_state_match(self, robot_cell_state):
-        # type: (RobotCellState) -> None
+    def assert_cell_state_match(self, robot_cell_state: RobotCellState) -> None:
         """Assert that the number of tools and rigid bodies in the cell state match the number of tools and workpieces in the robot cell."""
         symmetric_difference = set(robot_cell_state.tool_ids) ^ set(self.tool_ids)
         if symmetric_difference != set():
@@ -205,8 +198,7 @@ class RobotCell(Data):
                 % symmetric_difference
             )
 
-    def ensure_semantics(self):
-        # type: () -> None
+    def ensure_semantics(self) -> None:
         """Check if semantics is set.
 
         Raises
@@ -217,8 +209,7 @@ class RobotCell(Data):
         if not self.robot_semantics:
             raise Exception("Robot semantic is not assigned in the RobotCell.")
 
-    def ensure_geometry(self):
-        # type: () -> None
+    def ensure_geometry(self) -> None:
         """Check if the model's geometry has been loaded.
 
         Raises
@@ -235,14 +226,12 @@ class RobotCell(Data):
     # Functions related robot_model and robot_semantics
     # -------------------------------------------------
     @property
-    def root_name(self):
-        # type: () -> str
+    def root_name(self) -> str:
         """Robot's root name."""
         return self.robot_model.root.name
 
     @property
-    def main_group_name(self):
-        # type: () -> str
+    def main_group_name(self) -> str:
         """
         Robot's main planning group, only available if semantics is set.
 
@@ -255,8 +244,7 @@ class RobotCell(Data):
         return self.robot_semantics.main_group_name
 
     @property
-    def group_names(self):
-        # type: () -> List[str]
+    def group_names(self) -> list[str]:
         """All planning groups of the robot, only available if semantics is set.
 
         Returns
@@ -274,8 +262,7 @@ class RobotCell(Data):
         return self.robot_semantics.group_names
 
     @property
-    def group_states(self):
-        # type: () -> Dict[str, dict]
+    def group_states(self) -> dict[str, dict]:
         """All group states of the robot, only available if semantics is set.
 
         Returns
@@ -288,15 +275,14 @@ class RobotCell(Data):
         Examples
         --------
         >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
-        >>> sorted(robot_cell.group_states['manipulator'].keys())
+        >>> sorted(robot_cell.group_states["manipulator"].keys())
         ['home', 'up']
 
         """
         self.ensure_semantics()
         return self.robot_semantics.group_states
 
-    def get_end_effector_link_name(self, group=None):
-        # type: (Optional[str]) -> str
+    def get_end_effector_link_name(self, group: Optional[str] = None) -> str:
         """Get the name of the robot's end effector link.
 
         Parameters
@@ -316,8 +302,7 @@ class RobotCell(Data):
         """
         return self.robot_semantics.get_end_effector_link_name(group or self.main_group_name)
 
-    def get_end_effector_link(self, group=None):
-        # type: (Optional[str]) -> Link
+    def get_end_effector_link(self, group: Optional[str] = None) -> Link:
         """Get the robot's end effector link.
 
         Parameters
@@ -339,8 +324,7 @@ class RobotCell(Data):
         name = self.get_end_effector_link_name(group or self.main_group_name)
         return self.robot_model.get_link_by_name(name)
 
-    def get_base_link_name(self, group=None):
-        # type: (Optional[str]) -> str
+    def get_base_link_name(self, group: Optional[str] = None) -> str:
         """Get the name of the robot's base link.
 
         Parameters
@@ -360,8 +344,7 @@ class RobotCell(Data):
         """
         return self.robot_semantics.get_base_link_name(group or self.main_group_name)
 
-    def get_base_link(self, group=None):
-        # type: (Optional[str]) -> Link
+    def get_base_link(self, group: Optional[str] = None) -> Link:
         """Get the robot's base link.
 
         Parameters
@@ -383,8 +366,7 @@ class RobotCell(Data):
         name = self.get_base_link_name(group or self.main_group_name)
         return self.robot_model.get_link_by_name(name)
 
-    def get_link_names(self, group=None):
-        # type: (Optional[str]) -> List[str]
+    def get_link_names(self, group: Optional[str] = None) -> list[str]:
         """Get the names of the links in the kinematic chain.
 
         Parameters
@@ -399,7 +381,7 @@ class RobotCell(Data):
         Examples
         --------
         >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
-        >>> robot_cell.get_link_names('manipulator')
+        >>> robot_cell.get_link_names("manipulator")
         ['base_link', 'base_link_inertia', 'shoulder_link', 'upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link', 'flange', 'tool0']
         """
         group = group or self.main_group_name
@@ -410,8 +392,7 @@ class RobotCell(Data):
             link_names.append(link.name)
         return link_names
 
-    def get_link_names_with_collision_geometry(self):
-        # type: () -> List[str]
+    def get_link_names_with_collision_geometry(self) -> list[str]:
         """Get the names of the links with collision geometry.
 
         Note that returned names does not imply that the link has collision geometry loaded.
@@ -429,8 +410,7 @@ class RobotCell(Data):
         """
         return [link.name for link in self.robot_model.iter_links() if link.collision]
 
-    def get_all_configurable_joints(self):
-        # type: () -> List[Joint]
+    def get_all_configurable_joints(self) -> list[Joint]:
         """Get all configurable :class:`compas_robots.model.Joint` of the robot.
 
         Configurable joints are joints that can be controlled,
@@ -453,8 +433,7 @@ class RobotCell(Data):
                 joints.append(joint)
         return joints
 
-    def get_all_configurable_joint_names(self):
-        # type: () -> List[str]
+    def get_all_configurable_joint_names(self) -> list[str]:
         """Get all the names of all configurable joints of a planning group.
 
         Similar to :meth:`get_all_configurable_joints` but returning joint names.
@@ -465,8 +444,7 @@ class RobotCell(Data):
         """
         return [joint.name for joint in self.get_all_configurable_joints()]
 
-    def get_configurable_joints(self, group=None):
-        # type: (Optional[str]) -> List[Joint]
+    def get_configurable_joints(self, group: Optional[str] = None) -> list[Joint]:
         """Get all configurable :class:`compas_robots.model.Joint` of a planning group.
 
         Configurable joints are joints that can be controlled,
@@ -494,14 +472,13 @@ class RobotCell(Data):
         group = group or self.main_group_name
         joints = []
         for name in self.robot_semantics.groups[group]["joints"]:
-            joint = self.robot_model.get_joint_by_name(name)  # type: Joint
+            joint: Joint = self.robot_model.get_joint_by_name(name)
             if joint:
                 if joint.is_configurable() and name not in self.robot_semantics.passive_joints:
                     joints.append(joint)
         return joints
 
-    def get_configurable_joint_names(self, group=None):
-        # type: (Optional[str]) -> List[str]
+    def get_configurable_joint_names(self, group: Optional[str] = None) -> list[str]:
         """Get all the names of configurable joints of a planning group.
 
         Similar to :meth:`get_configurable_joints` but returning joint names.
@@ -525,8 +502,7 @@ class RobotCell(Data):
         configurable_joints = self.get_configurable_joints(group)
         return [joint.name for joint in configurable_joints]
 
-    def get_configurable_joint_types(self, group=None):
-        # type: (Optional[str]) -> List[int]
+    def get_configurable_joint_types(self, group: Optional[str] = None) -> list[int]:
         """Get the configurable joint types.
 
         Parameters
@@ -546,15 +522,14 @@ class RobotCell(Data):
         Examples
         --------
         >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
-        >>> robot_cell.get_configurable_joint_types('manipulator')
+        >>> robot_cell.get_configurable_joint_types("manipulator")
         [0, 0, 0, 0, 0, 0]
         """
         group = group or self.main_group_name
         configurable_joints = self.get_configurable_joints(group)
         return [j.type for j in configurable_joints]
 
-    def get_group_states_names(self, group):
-        # type: (str) -> List[str]
+    def get_group_states_names(self, group: str) -> list[str]:
         """Get the names of the group states of a planning group.
 
         Parameters
@@ -569,7 +544,7 @@ class RobotCell(Data):
         Examples
         --------
         >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
-        >>> robot_cell.get_group_states_names('manipulator')
+        >>> robot_cell.get_group_states_names("manipulator")
         ['home', 'up']
         """
         if group not in self.group_names:
@@ -578,8 +553,7 @@ class RobotCell(Data):
             return []
         return list(self.group_states[group].keys())
 
-    def get_configuration_from_group_state(self, group, group_state_name):
-        # type: (str, str) -> Configuration
+    def get_configuration_from_group_state(self, group: str, group_state_name: str) -> Configuration:
         """Get the :class:`compas_robots.Configuration` from a predefined group state.
 
         Group states are predefined configurations of a planning group in the RobotSemantics.
@@ -606,8 +580,7 @@ class RobotCell(Data):
     # Robot Configurations
     # --------------------
 
-    def zero_full_configuration(self):
-        # type: () -> Configuration
+    def zero_full_configuration(self) -> Configuration:
         """Get the zero configuration (all configurable joints) of the robot.
 
         Does not include passive joints or fixed joints.
@@ -636,8 +609,7 @@ class RobotCell(Data):
             joint_types.append(joint.type)
         return Configuration(joint_values, joint_types, joint_names)
 
-    def zero_configuration(self, group=None):
-        # type: (Optional[str]) -> Configuration
+    def zero_configuration(self, group: Optional[str] = None) -> Configuration:
         """Get the zero joint configuration for the specified planning group.
 
         If the joint value `0.0` is outside of joint limits ``(joint.limit.upper, joint.limit.lower)`` then
@@ -685,8 +657,7 @@ class RobotCell(Data):
             joint_types.append(joint.type)
         return Configuration(joint_values, joint_types, joint_names)
 
-    def random_configuration(self, group=None):
-        # type: (Optional[str]) -> Configuration
+    def random_configuration(self, group: Optional[str] = None) -> Configuration:
         """Get a random configuration for the specified planning group.
 
         This is not a full configuration of the robot, if a full configuration is needed,
@@ -722,8 +693,9 @@ class RobotCell(Data):
 
         return Configuration(joint_values, joint_types, joint_names)
 
-    def configuration_to_full_configuration(self, configuration, full_configuration=None):
-        # type: (Configuration, Optional[Configuration]) -> Configuration
+    def configuration_to_full_configuration(
+        self, configuration: Configuration, full_configuration: Optional[Configuration] = None
+    ) -> Configuration:
         """Create a new Configuration object from a given configuration
         and fill in the missing joints from a given full_configuration.
         The joint values in the configuration takes precedence over the full_configuration.
@@ -748,8 +720,7 @@ class RobotCell(Data):
         full_configuration.merged(configuration)
         return full_configuration
 
-    def full_configuration_to_group_configuration(self, full_configuration, group):
-        # type: (str, Configuration) -> Configuration
+    def full_configuration_to_group_configuration(self, full_configuration: Configuration, group: str) -> Configuration:
         """Filter a full configuration and return only the joints of the specified group.
 
         Parameters
@@ -775,8 +746,9 @@ class RobotCell(Data):
 
         return Configuration(joint_values, joint_types, joint_names)
 
-    def fill_configuration_with_joint_names(self, configuration, group=None):
-        # type: (Configuration, Optional[str]) -> Configuration
+    def fill_configuration_with_joint_names(
+        self, configuration: Configuration, group: Optional[str] = None
+    ) -> Configuration:
         """Create a new configuration object from the given configuration and to fill in the joint_types and joint_names if they are missing.
 
         -   If the supplied configuration has joint_names and joint_types,
@@ -824,7 +796,7 @@ class RobotCell(Data):
         joint_names = [joint.name for joint in configurable_joints]
         return Configuration(configuration.joint_values, joint_types, joint_names)
 
-    def default_cell_state(self):
+    def default_cell_state(self) -> RobotCellState:
         """Create a default robot cell state for the robot cell.
 
         Equivalent to :meth:`RobotCellState.from_robot_cell` with the robot cell as input.
@@ -845,8 +817,7 @@ class RobotCell(Data):
     # Retrieval Functions related to a specific robot_cell_state
     # ----------------------------------------------------------
 
-    def get_attached_tool(self, robot_cell_state, group):
-        # type: (RobotCellState, str) -> Optional[ToolModel]
+    def get_attached_tool(self, robot_cell_state: RobotCellState, group: str) -> Optional[ToolModel]:
         """Return the ToolModel of the tool attached to the group in the robot cell state.
 
         There can only be a maximum of one tool attached to a planning group.
@@ -870,8 +841,7 @@ class RobotCell(Data):
         tool_id = robot_cell_state.get_attached_tool_id(group)
         return self.tool_models.get(tool_id)
 
-    def get_attached_workpieces(self, robot_cell_state, group):
-        # type: (RobotCellState, str) -> List[RigidBody]
+    def get_attached_workpieces(self, robot_cell_state: RobotCellState, group: str) -> list[RigidBody]:
         """Returns the workpiece attached to the tool attached to the group in the robot cell state.
 
         There can be more than one workpiece attached to a tool.
@@ -888,8 +858,7 @@ class RobotCell(Data):
             bodies.append(self.rigid_body_models[id])
         return bodies
 
-    def get_attached_rigid_bodies(self, robot_cell_state, group):
-        # type: (RobotCellState, str) -> List[Mesh]
+    def get_attached_rigid_bodies(self, robot_cell_state: RobotCellState, group: str) -> list[Mesh]:
         """Returns the rigid bodies attached to the links of the robot as AttachedCollisionMesh.
 
         This does not include the tool and the workpieces attached to the tools.
@@ -906,7 +875,7 @@ class RobotCell(Data):
     # Transformation functions
     # ----------------------------------------
 
-    def t_pcf_tcf(self, robot_cell_state : RobotCellState, tool_id: str) -> Transformation:
+    def t_pcf_tcf(self, robot_cell_state: RobotCellState, tool_id: str) -> Transformation:
         """Returns the transformation from the PCF (Planner Coordinate Frame) to the TCF (Tool Coordinate Frame).
 
         Parameters
@@ -930,7 +899,7 @@ class RobotCell(Data):
         t_pcf_tcf = t_pcf_tbcf * t_tbcf_tcf
         return t_pcf_tcf
 
-    def t_pcf_tbcf(self, robot_cell_state : RobotCellState, tool_id: str) -> Transformation:
+    def t_pcf_tbcf(self, robot_cell_state: RobotCellState, tool_id: str) -> Transformation:
         """Returns the transformation from the PCF (Planner Coordinate Frame) to the TBCF (Tool Base Coordinate Frame).
 
         Parameters
@@ -959,7 +928,7 @@ class RobotCell(Data):
 
         return t_pcf_tbcf
 
-    def t_pcf_ocf(self, robot_cell_state : RobotCellState, workpiece_id : str) -> Transformation:
+    def t_pcf_ocf(self, robot_cell_state: RobotCellState, workpiece_id: str) -> Transformation:
         """Returns the transformation from the PCF (Planner Coordinate Frame) to the OCF (Object Coordinate Frame).
 
         Parameters
@@ -995,8 +964,7 @@ class RobotCell(Data):
         t_pcf_ocf = t_pcf_tcf * t_tcf_ocf
         return t_pcf_ocf
 
-    def from_tcf_to_pcf(self, robot_cell_state, tcf_frames, tool_id):
-        # type: (RobotCellState, List[Frame], str) -> List[Frame]
+    def from_tcf_to_pcf(self, robot_cell_state: RobotCellState, tcf_frames: list[Frame], tool_id: str) -> list[Frame]:
         """Converts a frame describing the robot's tool coordinate frame (TCF) relative to WCF
         to a frame describing the planner coordinate frame (PCF), relative to WCF.
         The transformation goes through the tool's base frame, which differs from the
@@ -1039,8 +1007,7 @@ class RobotCell(Data):
 
         return planner_coordinate_frames
 
-    def from_pcf_to_tcf(self, robot_cell_state, pcf_frames, tool_id):
-        # type: (RobotCellState, List[Frame], str) -> List[Frame]
+    def from_pcf_to_tcf(self, robot_cell_state: RobotCellState, pcf_frames: list[Frame], tool_id: str) -> list[Frame]:
         """Converts a frame describing the planner coordinate frame (PCF) (also T0CF) relative to WCF
         to a frame describing the robot's tool coordinate frame (TCF) relative to WCF.
         The transformation goes through the tool's base frame, which differs from the
@@ -1082,8 +1049,9 @@ class RobotCell(Data):
 
         return tool_coordinate_frames
 
-    def from_ocf_to_pcf(self, robot_cell_state, ocf_frames, workpiece_id):
-        # type: (RobotCellState, List[Frame], str) -> List[Frame]
+    def from_ocf_to_pcf(
+        self, robot_cell_state: RobotCellState, ocf_frames: list[Frame], workpiece_id: str
+    ) -> list[Frame]:
         """Converts a frame describing the object coordinate frame (OCF) relative to WCF
         to a frame describing the planner coordinate frame (PCF) (also T0CF) relative to WCF.
         The transformation goes from the workpiece's base frame,
@@ -1132,8 +1100,9 @@ class RobotCell(Data):
 
         return pcfs
 
-    def from_pcf_to_ocf(self, robot_cell_state, pcf_frames, workpiece_id):
-        # type: (RobotCellState, List[Frame], str) -> List[Frame]
+    def from_pcf_to_ocf(
+        self, robot_cell_state: RobotCellState, pcf_frames: list[Frame], workpiece_id: str
+    ) -> list[Frame]:
         """Converts a frame describing the planner coordinate frame (PCF) (also T0CF) relative to WCF
         to a frame describing the object coordinate frame (OCF) relative to WCF.
 
@@ -1176,8 +1145,13 @@ class RobotCell(Data):
 
         return ocfs
 
-    def target_frames_to_pcf(self, robot_cell_state, frame_or_frames, target_mode, group):
-        # type: (RobotCellState, Frame | List[Frame], TargetMode | str, str) -> Frame | List[Frame]
+    def target_frames_to_pcf(
+        self,
+        robot_cell_state: RobotCellState,
+        frame_or_frames: Frame | list[Frame],
+        target_mode: TargetMode | str,
+        group: str,
+    ) -> Frame | list[Frame]:
         """Converts a Frame or a list of Frames to the PCF (Planner Coordinate Frame) relative to WCF.
 
         This function is intended to be used by the planner to convert target frames to PCF for planning.
@@ -1227,8 +1201,13 @@ class RobotCell(Data):
 
         return pcf_frames[0] if input_is_not_list else pcf_frames
 
-    def pcf_to_target_frames(self, robot_cell_state, frame_or_frames, target_mode, group):
-        # type: (RobotCellState, Frame | List[Frame], TargetMode | str, str) -> Frame | List[Frame]
+    def pcf_to_target_frames(
+        self,
+        robot_cell_state: RobotCellState,
+        frame_or_frames: Frame | list[Frame],
+        target_mode: TargetMode | str,
+        group: str,
+    ) -> Frame | list[Frame]:
         """Converts a (or a list of) Planner Coordinate Frame (PCF) to the target frame
         according to the target mode.
 
@@ -1281,12 +1260,13 @@ class RobotCell(Data):
 
         return target_frames[0] if input_is_not_list else target_frames
 
-    # ----------------------------------------
-    # Forward Kinematics Functions
-    # ----------------------------------------
-
-    def forward_kinematics_target_frame(self, robot_cell_state, target_mode, group=None, native_scale=None):
-        # type: (RobotCellState, TargetMode, Optional[str], Optional[float]) -> Frame
+    def forward_kinematics_target_frame(
+        self,
+        robot_cell_state: RobotCellState,
+        target_mode: TargetMode,
+        group: Optional[str] = None,
+        native_scale: Optional[float] = None,
+    ) -> Frame:
         """Compute the target frame of the robot for the specified planning group
         and target mode.
 
@@ -1341,8 +1321,7 @@ class RobotCell(Data):
 
         return wcf_target_frame
 
-    def compute_attach_objects_frames(self, robot_cell_state):
-        # type: (RobotCellState) -> RobotCellState
+    def compute_attach_objects_frames(self, robot_cell_state: RobotCellState) -> RobotCellState:
         """Compute the frames of the attached objects (tools and workpieces) from a robot cell state with robot configuration.
 
         The frames of the attached objects (relative to WCF) are computed
@@ -1420,13 +1399,12 @@ class RobotCell(Data):
     # Debug Functions
     # ----------------------------------------
 
-    def print_info(self):
-        # type: () -> None
+    def print_info(self) -> None:
         """Print information about the robot."""
         print("The robot's name is '{}'.".format(self.robot_model.name))
         print("The robot's joints are:")
         for joint in self.robot_model.iter_joints():
-            joint = joint  # type: Joint
+            joint: Joint = joint
             info = "\t- '{}' is of type '{}'".format(joint.name, list(Joint.SUPPORTED_TYPES)[joint.type])
             if joint.limit:
                 info += " and has limits [{:.3f}, {:.3f}]".format(joint.limit.upper, joint.limit.lower)

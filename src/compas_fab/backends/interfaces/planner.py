@@ -1,20 +1,5 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-from compas import IPY
-
 from compas_fab.backends.exceptions import BackendFeatureNotSupportedError
-
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import List  # noqa: F401
-
-        from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
+from compas_fab.backends.interfaces import ClientInterface
 
 
 class PlannerInterface(object):
@@ -46,8 +31,7 @@ class PlannerInterface(object):
         super(PlannerInterface, self).__init__()
 
     @property
-    def client(self):
-        # type: () -> ClientInterface
+    def client(self) -> ClientInterface:
         return self._client
 
     # ===========================================================================
@@ -153,33 +137,3 @@ class PlannerInterface(object):
             Planner does not have this feature.
         """
         raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    # ==========================================================================
-    # collision objects and planning scene
-    # ==========================================================================
-
-    def get_planning_scene(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def reset_planning_scene(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    # ==========================================================================
-    # Sanity Check Functions
-    # ==========================================================================
-
-    # Nothing here yet.

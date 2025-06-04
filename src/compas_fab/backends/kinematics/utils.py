@@ -1,7 +1,8 @@
-from typing import Optional
 import math
+from typing import Optional
 
 from compas_robots import Configuration
+
 from compas_fab.robots import RobotCell
 
 
@@ -24,7 +25,11 @@ def fit_within_bounds(angle, lower, upper):
     return angle
 
 
-def try_to_fit_configurations_between_bounds(robot_cell: RobotCell, configurations: list[Configuration], group: Optional[str] = None) -> list[Configuration]:
+def try_to_fit_configurations_between_bounds(
+    robot_cell: RobotCell,
+    configurations: list[Configuration],
+    group: Optional[str] = None
+) -> list[Configuration]:
     j1, j2, j3, j4, j5, j6 = robot_cell.get_configurable_joints(group=group)
     for i, c in enumerate(configurations):
         if c is None:

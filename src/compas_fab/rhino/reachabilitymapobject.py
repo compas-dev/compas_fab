@@ -1,7 +1,6 @@
-from compas_rhino.scene import RhinoSceneObject
-
 from compas.colors import ColorMap
 from compas.scene import SceneObject
+from compas_rhino.scene import RhinoSceneObject
 
 
 class ReachabilityMapObject(RhinoSceneObject):

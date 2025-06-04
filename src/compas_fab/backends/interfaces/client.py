@@ -1,17 +1,7 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-from compas import IPY
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import RobotSemantics  # noqa: F401
-        from compas_robots import RobotModel  # noqa: F401
+from compas_robots import RobotModel
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import RobotSemantics
 
 
 class ClientInterface(object):
@@ -30,25 +20,21 @@ class ClientInterface(object):
     """
 
     def __init__(self):
-        self._robot_cell = None  # type: RobotCell
-        self._robot_cell_state = None  # type: RobotCellState
+        self._robot_cell = None
+        self._robot_cell_state = None
 
     @property
-    def robot_cell(self):
-        # type: () -> RobotCell
+    def robot_cell(self) -> RobotCell:
         return self._robot_cell
 
     @property
-    def robot_cell_state(self):
-        # type: () -> RobotCellState
+    def robot_cell_state(self) -> RobotCellState:
         return self._robot_cell_state
 
     @property
-    def robot_model(self):
-        # type: () -> RobotModel
+    def robot_model(self) -> RobotModel:
         return self.robot_cell.robot_model
 
     @property
-    def robot_semantics(self):
-        # type: () -> RobotSemantics
+    def robot_semantics(self) -> RobotSemantics:
         return self.robot_cell.robot_semantics

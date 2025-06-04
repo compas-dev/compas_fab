@@ -1,19 +1,12 @@
 import os
-
-from compas import IPY
+from typing import Optional
 
 __all__ = ["list_files_in_directory"]
 
-if not IPY:
-    from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import List  # noqa: F401
-        from typing import Optional  # noqa: F401
-
-
-def list_files_in_directory(directory, fullpath=False, extensions=None):
-    # type: (str, bool, Optional[List[str]]) -> List[str]
+def list_files_in_directory(
+    directory: str, fullpath: bool = False, extensions: Optional[list[str]] = None
+) -> list[str]:
     """This function lists just the files in a directory, not sub-directories.
 
     Parameters

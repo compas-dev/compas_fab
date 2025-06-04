@@ -15,7 +15,6 @@ if not IPY:
 
 
 class PyBulletSetRobotCell(SetRobotCell):
-
     def set_robot_cell(self, robot_cell, robot_cell_state=None, options=None):
         # type: (RobotCell, Optional[RobotCellState], Optional[Dict]) -> None
         """Pass the models in the robot cell to the Pybullet client.

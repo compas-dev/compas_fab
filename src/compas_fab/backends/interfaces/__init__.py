@@ -55,20 +55,15 @@ from .planner import PlannerInterface
 # They should only be used internally by the planner backend
 # They are included in the __all__ but not in the `autosummary`
 
-from .backend_features import GetPlanningScene
-from .backend_features import ResetPlanningScene
-
 __all__ = [
     "BackendFeature",
     "ClientInterface",
     "CheckCollision",
     "ForwardKinematics",
-    "GetPlanningScene",
     "InverseKinematics",
     "PlanCartesianMotion",
     "PlanMotion",
     "PlannerInterface",
-    "ResetPlanningScene",
     "SetRobotCell",
     "SetRobotCellState",
 ]

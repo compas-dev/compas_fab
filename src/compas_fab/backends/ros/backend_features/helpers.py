@@ -1,33 +1,20 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import itertools
-
 from compas_robots import Configuration
 
+from compas_fab.backends.exceptions import InverseKinematicsError
+from compas_fab.backends.exceptions import MPNoPlanFoundError
+from compas_fab.backends.exceptions import MPSearchTimeOutError
+from compas_fab.backends.exceptions import MPStartStateInCollisionError
+from compas_fab.backends.exceptions import MPTargetInCollisionError
+from compas_fab.backends.exceptions import PlanningGroupNotExistsError
 from compas_fab.backends.ros.exceptions import RosError
 from compas_fab.backends.ros.messages import Constraints
 from compas_fab.backends.ros.messages import JointConstraint
 from compas_fab.backends.ros.messages import MoveItErrorCodes
 from compas_fab.backends.ros.messages import OrientationConstraint
 from compas_fab.backends.ros.messages import PositionConstraint
-from compas_fab.robots import ConfigurationTarget
-from compas_fab.robots import ConstraintSetTarget
 from compas_fab.robots import Duration
-from compas_fab.robots import FrameTarget
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
-from compas_fab.robots import PointAxisTarget
-from compas_fab.robots.constraints import JointConstraint as CF_JointConstraint
-from compas_fab.robots.constraints import PositionConstraint as CF_PositionConstraint
-from compas_fab.robots.constraints import OrientationConstraint as CF_OrientationConstraint
-from compas_fab.backends.exceptions import MPStartStateInCollisionError
-from compas_fab.backends.exceptions import MPTargetInCollisionError
-from compas_fab.backends.exceptions import MPSearchTimeOutError
-from compas_fab.backends.exceptions import PlanningGroupNotExistsError
-from compas_fab.backends.exceptions import MPNoPlanFoundError
-from compas_fab.backends.exceptions import InverseKinematicsError
 
 DEFAULT_TOLERANCE_ORIENTATION = 0.1
 DEFAULT_TOLERANCE_POSITION = 0.01

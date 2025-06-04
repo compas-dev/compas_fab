@@ -1,14 +1,5 @@
 import math
 
-from compas import IPY
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import List  # noqa: F401
-        from typing import Optional  # noqa: F401
-
 __all__ = [
     "allclose",
     "arange",
@@ -23,8 +14,7 @@ __all__ = [
 ]
 
 
-def map_range(value, from_min, from_max, to_min, to_max):
-    # type: (float, float, float, float, float) -> float
+def map_range(value: float, from_min: float, from_max: float, to_min: float, to_max: float) -> float:
     """Performs a linear interpolation of a value within the range of [from_min,
     from_max] to another range of [to_min, to_max].
 
@@ -52,8 +42,7 @@ def map_range(value, from_min, from_max, to_min, to_max):
     return to_min + (value_scaled * to_range)
 
 
-def range_geometric_row(number, d, r=1.1):
-    # type: (float, int, float) -> List[float]
+def range_geometric_row(number: float, d: int, r: float = 1.1) -> list[float]:
     """Returns a list of numbers with a certain relation to each other.
 
     The function divides one number into a list of d numbers [n0, n1, ...], such
@@ -86,8 +75,7 @@ def range_geometric_row(number, d, r=1.1):
     return numbers
 
 
-def arange(start, stop, step):
-    # type: (float, float, float) -> List[float]
+def arange(start: float, stop: float, step: float) -> list[float]:
     """Returns evenly spaced values within a given interval.
 
     The function is similar to NumPy's *arange* function.
@@ -113,8 +101,7 @@ def arange(start, stop, step):
     return [start + i * step for i in range(len)]
 
 
-def diffs(l1, l2):
-    # type: (List[float], List[float]) -> List[float]
+def diffs(l1: list[float], l2: list[float]) -> list[float]:
     """Returns the element-wise differences between two lists.
 
     Parameters
@@ -139,8 +126,7 @@ def diffs(l1, l2):
     return [math.fabs(a - b) for a, b in zip(l1, l2)]
 
 
-def allclose(l1, l2, tol=1e-05):
-    # type: (List[float], List[float], Optional[float]) -> bool
+def allclose(l1: list[float], l2: list[float], tol: float = 1e-05) -> bool:
     """Returns True if two lists are element-wise equal within a tolerance.
 
     The function is similar to NumPy's *allclose* function.
@@ -174,8 +160,7 @@ def allclose(l1, l2, tol=1e-05):
     return True
 
 
-def argsort(numbers):
-    # type: (List[float]) -> List[int]
+def argsort(numbers: list[float]) -> list[int]:
     """Returns the indices that would sort an array of numbers.
 
     The function is similar to NumPy's *argsort* function.
@@ -199,8 +184,7 @@ def argsort(numbers):
     return [i[0] for i in sorted(enumerate(numbers), key=lambda x: x[1])]
 
 
-def argmin(numbers):
-    # type: (List[float]) -> int
+def argmin(numbers: list[float]) -> int:
     """Returns the index of the minimum value in numbers.
 
     The function is similar to NumPy's *argmin* function.
@@ -223,8 +207,7 @@ def argmin(numbers):
     return argsort(numbers)[0]
 
 
-def argmax(numbers):
-    # type: (List[float]) -> int
+def argmax(numbers: list[float]) -> int:
     """Returns the index of the maximum value in numbers.
 
     The function is similar to NumPy's *argmax* function.
@@ -247,8 +230,7 @@ def argmax(numbers):
     return argsort(numbers)[-1]
 
 
-def sign(number):
-    # type: (float) -> int
+def sign(number: float) -> int:
     """Returns the sign of a number: +1 or -1.
 
     Parameters
@@ -266,8 +248,7 @@ def sign(number):
     return int(int((number) > 0) - int((number) < 0))
 
 
-def clamp(value, min_value, max_value):
-    # type: (float, float, float) -> float
+def clamp(value: float, min_value: float, max_value: float) -> float:
     """Clamps a value within the bound [min_value, max_value]
 
     Parameters

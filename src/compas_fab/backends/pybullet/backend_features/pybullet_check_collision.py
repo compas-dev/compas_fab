@@ -1,32 +1,21 @@
 from itertools import combinations
+from typing import Optional
+from typing import TYPE_CHECKING
 
-from compas import IPY
+from compas.geometry import Frame
 
 from compas_fab.backends import CollisionCheckError
 from compas_fab.backends.interfaces import CheckCollision
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Dict  # noqa: F401
-        from typing import List  # noqa: F401
-        from typing import Optional  # noqa: F401
-        from typing import Tuple  # noqa: F401
-
-        from compas.geometry import Frame  # noqa: F401
-
-        from compas_fab.backends import PyBulletClient  # noqa: F401
-        from compas_fab.backends import PyBulletPlanner  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-
+if TYPE_CHECKING:
+    from compas_fab.backends import PyBulletClient
+    from compas_fab.backends import PyBulletPlanner
 
 class PyBulletCheckCollision(CheckCollision):
-
     # =======================================
-    def check_collision(self, state, options=None):
-        # type: (RobotCellState, Optional[Dict]) -> None
+    def check_collision(self, state: RobotCellState, options : Optional[dict]=None):
         """Checks whether the current robot cell state with the given configuration is in collision.
 
         The collision check involves the following steps:
@@ -94,9 +83,9 @@ class PyBulletCheckCollision(CheckCollision):
         full_report = options.get("full_report", False)
 
         # Housekeeping for intellisense
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell  # type: RobotCell # noqa: F841
+        planner : PyBulletPlanner = self
+        client : PyBulletClient = planner.client
+        robot_cell : RobotCell = client.robot_cell
 
         # Set the robot cell state
         skip_set_robot_cell_state = options.get("_skip_set_robot_cell_state", False)
@@ -117,7 +106,7 @@ class PyBulletCheckCollision(CheckCollision):
 
         # TODO: Investigate whether the following checks can be done in parallel
 
-        collision_pairs = []  # type: List[Tuple]
+        collision_pairs : list[tuple] = []
 
         # CC Step 1: Between each Robot Link
         if not options["_skip_cc1"]:
@@ -313,9 +302,8 @@ class PyBulletCheckCollision(CheckCollision):
             raise CollisionCheckError("\n".join(collision_messages), collision_pairs)
 
     def check_collision_for_attached_objects_in_planning_group(
-        self, state, group, planner_coordinate_frame, options=None
+        self, state : RobotCellState, group : str, planner_coordinate_frame : Frame, options=None
     ):
-        # type: (RobotCellState, str, Frame, Optional[Dict]) -> None
         """A highly specific function for checking whether the attached tool and workpiece(s) for a particular target is in collision
         with stationary objects.
         This function is typically called by planning functions as part of a input sanity check or for checking whether targets are
@@ -346,16 +334,16 @@ class PyBulletCheckCollision(CheckCollision):
             return
 
         # Housekeeping for intellisense
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner : PyBulletPlanner = self
+        client : PyBulletClient = planner.client
+        robot_cell : RobotCell = client.robot_cell
 
         # Collect options
         options = options or {}
         options = options.copy()
 
         # We must copy the state because we will modify it
-        state = state.copy()  # type: RobotCellState
+        state : RobotCellState = state.copy()
 
         # Input sanity check
         assert group in robot_cell.group_names
