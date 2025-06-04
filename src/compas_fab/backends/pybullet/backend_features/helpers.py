@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 
-def check_max_jump(joint_names : list[str], joint_types : list[int], start_joint_values : list[float], end_joint_values : list[float], options : Dict):
+def check_max_jump(joint_names : list[str], joint_types : list[int], start_joint_values : list[float], end_joint_values : list[float], options : dict):
     """Check if the joint positions between two configurations exceed the maximum allowed distance.
 
     Parameters

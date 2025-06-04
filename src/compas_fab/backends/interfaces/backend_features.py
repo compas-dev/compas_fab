@@ -8,7 +8,6 @@ from compas_fab.robots import JointTrajectory
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import Target
-from compas_fab.robots import TargetMode
 from compas_fab.robots import Waypoints
 
 
@@ -167,7 +166,7 @@ class ForwardKinematics(BackendFeature):
     def forward_kinematics(
         self,
         robot_cell_state: RobotCellState,
-        target_mode: TargetMode | str,
+        target_mode: str,
         group: Optional[str] = None,
         native_scale: Optional[float] = None,
         options: Optional[dict] = None,

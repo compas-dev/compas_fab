@@ -1,19 +1,9 @@
-from compas import IPY
-
 from compas_fab.backends.interfaces import SetRobotCellState
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-
-        from compas_fab.robots import RobotCellState  # noqa: F401
+from compas_fab.robots import RobotCellState
 
 
 class AnalyticalSetRobotCellState(SetRobotCellState):
-
-    def set_robot_cell_state(self, robot_cell_state):
-        # type: (RobotCellState) -> None
+    def set_robot_cell_state(self, robot_cell_state: RobotCellState):
         """The Analytical Planner does not have collision checking ability, therefore it does not really need
         the robot cell state. This function simply serves as the landing point for other BackendFeature to
         safely call `planner.set_robot_cell_state` without having to check if the planner actually supports it.

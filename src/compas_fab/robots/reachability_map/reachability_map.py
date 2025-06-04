@@ -1,14 +1,17 @@
 from typing import Generator
+from typing import Optional
+from typing import TYPE_CHECKING
 
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import argmax
 from compas_robots import Configuration
 from compas_fab.robots.targets import FrameTarget
-from compas_fab.backends.interfaces import PlannerInterface
-from compas_fab.robots import RobotCellState
-from compas_fab.robots import TargetMode
+from compas_fab.robots.robot_cell import RobotCellState
+from compas_fab.robots.targets import TargetMode
 
+if TYPE_CHECKING:
+    from compas_fab.backends.interfaces import PlannerInterface
 
 class ReachabilityMap(Data):
     """The ReachabilityMap describes the reachability of a robot.
@@ -41,7 +44,7 @@ class ReachabilityMap(Data):
         self.frames = frames or []  # 2D
         self.configurations = configurations or []  # 3D
 
-    def calculate(self, frame_generator : Generator, planner : PlannerInterface, robot_cell_state : RobotCellState, target_mode : TargetMode, ik_options : Optional[dict] = None):
+    def calculate(self, frame_generator : Generator, planner : "PlannerInterface", robot_cell_state : RobotCellState, target_mode : TargetMode, ik_options : Optional[dict] = None):
         """Calculates the reachability map for a robot cell.
 
         The robot_cell must be set in the planner before calling this function by calling

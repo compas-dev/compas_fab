@@ -1,24 +1,14 @@
+from typing import Optional
+
 from copy import deepcopy
 
-from compas import IPY
-
 from compas_fab.backends.interfaces import SetRobotCell
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Dict  # noqa: F401
-        from typing import Optional  # noqa: F401
-
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
 
 
 class AnalyticalSetRobotCell(SetRobotCell):
-
-    def set_robot_cell(self, robot_cell, robot_cell_state=None, options=None):
-        # type: (RobotCell, Optional[RobotCellState], Optional[Dict]) -> None
+    def set_robot_cell(self, robot_cell : RobotCell, robot_cell_state : RobotCellState = None, options : Optional[dict] = None):
         """Pass the models in the robot cell to the Analytical Planner.
 
         The planner will use the tool information for frame transformation.

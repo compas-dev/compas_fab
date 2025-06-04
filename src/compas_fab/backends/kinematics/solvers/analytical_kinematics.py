@@ -1,13 +1,5 @@
-from compas import IPY
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import List  # noqa: F401
-        from typing import Optional  # noqa: F401
-
-        from compas.geometry import Frame  # noqa: F401
+from typing import Optional
+from compas.geometry import Frame
 
 
 class AnalyticalKinematics(object):
@@ -40,15 +32,13 @@ class AnalyticalKinematics(object):
         Defaults to no offset.
     """
 
-    def __init__(self, base_frame=None, flange_frame=None, joint_offsets=None):
-        # type: (Optional[Frame], Optional[Frame], Optional[List[float]]) -> None
+    def __init__(self, base_frame : Optional[Frame] = None, flange_frame : Optional[Frame] = None, joint_offsets : Optional[list[float]] = None):
         super(AnalyticalKinematics, self).__init__()
         self.base_frame = base_frame
         self.flange_frame = flange_frame
         self.joint_offsets = joint_offsets
 
-    def forward(self, joint_values):
-        # type: (List[float]) -> Frame
+    def forward(self, joint_values : list[float]) -> Frame:
         """Calculate the forward kinematics for the given joint configuration.
 
         Parameters
@@ -64,8 +54,7 @@ class AnalyticalKinematics(object):
         """
         pass
 
-    def inverse(self, frame_rcf):
-        # type: (Frame) -> List[List[float]]
+    def inverse(self, frame_rcf : Frame) -> list[list[float]]:
         """Calculate the inverse kinematics for the given end-effector frame.
 
         Parameters
