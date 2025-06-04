@@ -14,7 +14,6 @@ from compas_fab.robots import TargetMode
 from compas_fab.robots import ToolState
 
 
-
 @pytest.fixture
 def panda():
     return RobotCellLibrary.panda(load_geometry=False)
