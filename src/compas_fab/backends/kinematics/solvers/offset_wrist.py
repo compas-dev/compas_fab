@@ -12,7 +12,7 @@ from compas.geometry import Frame
 from compas_fab.utilities import sign
 
 
-def forward_kinematics_offset_wrist(joint_values : list[float], params : list[float]) -> Frame:
+def forward_kinematics_offset_wrist(joint_values: list[float], params: list[float]) -> Frame:
     """Forward kinematics function for offset wrist 6-axis robots.
 
     Parameters
@@ -65,7 +65,7 @@ def forward_kinematics_offset_wrist(joint_values : list[float], params : list[fl
     return frame
 
 
-def inverse_kinematics_offset_wrist(frame : Frame, params : list[float], q6_des : float = 0.0) -> list[list[float]]:
+def inverse_kinematics_offset_wrist(frame: Frame, params: list[float], q6_des: float = 0.0) -> list[list[float]]:
     """Inverse kinematics function for offset wrist 6-axis robots.
 
     Parameters

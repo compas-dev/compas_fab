@@ -39,7 +39,9 @@ class BaseRobotModelObject(SceneObject):
 
     MESH_JOIN_PRECISION = 12
 
-    def __init__(self, draw_visual: bool = True, draw_collision: bool = False, native_scale: float = 1.0, *args, **kwargs):
+    def __init__(
+        self, draw_visual: bool = True, draw_collision: bool = False, native_scale: float = 1.0, *args, **kwargs
+    ):
         super(BaseRobotModelObject, self).__init__(*args, **kwargs)
         self._draw_visual = draw_visual
         self._draw_collision = draw_collision
@@ -57,7 +59,9 @@ class BaseRobotModelObject(SceneObject):
         """The robot model this object is associated with."""
         return self.item
 
-    def draw(self, robot_configuration: Optional[Configuration] = None, base_frame: Optional[Frame] = None) -> list[object]:
+    def draw(
+        self, robot_configuration: Optional[Configuration] = None, base_frame: Optional[Frame] = None
+    ) -> list[object]:
         """Draw the robot model object in the respective CAD environment.
 
         This function conforms to `SceneObject.draw()` Interface and will return
@@ -96,10 +100,10 @@ class BaseRobotModelObject(SceneObject):
         # Reset the dictionaries
         self.base_native_geometry = None
         self.base_transformation = None
-        self._links_visual_mesh_native_geometry : dict[str, Mesh] = {}
-        self._links_collision_mesh_native_geometry : dict[str, Mesh] = {}
-        self._links_visual_mesh_transformation : dict[str, Transformation] = {}
-        self._links_collision_mesh_transformation : dict[str, Transformation] = {}
+        self._links_visual_mesh_native_geometry: dict[str, Mesh] = {}
+        self._links_collision_mesh_native_geometry: dict[str, Mesh] = {}
+        self._links_visual_mesh_transformation: dict[str, Transformation] = {}
+        self._links_collision_mesh_transformation: dict[str, Transformation] = {}
 
         # Helper function to get the meshes from the visual or collision elements
         # NOTE: The meshes are transformed to the base frame of the link using the `self._transform()` method
@@ -162,7 +166,7 @@ class BaseRobotModelObject(SceneObject):
             if link_name in self._links_visual_mesh_native_geometry:
                 # Compute the delta transformation
                 previous_transformation = self._links_visual_mesh_transformation[link_name]
-                delta_transformation : Transformation = new_transformation * previous_transformation.inverse()
+                delta_transformation: Transformation = new_transformation * previous_transformation.inverse()
                 # Transform the native geometry
                 new_native_geometries = []
                 for native_geometry in self._links_visual_mesh_native_geometry[link_name]:

@@ -70,10 +70,10 @@ class OffsetWristKinematics(AnalyticalKinematics):
         super(OffsetWristKinematics, self).__init__()
         self.params = params
 
-    def forward(self, joint_values : list[float]) -> Frame:
+    def forward(self, joint_values: list[float]) -> Frame:
         return forward_kinematics_offset_wrist(joint_values, self.params)
 
-    def inverse(self, frame_rcf : Frame) -> list[list[float]]:
+    def inverse(self, frame_rcf: Frame) -> list[list[float]]:
         return inverse_kinematics_offset_wrist(frame_rcf, self.params)
 
 

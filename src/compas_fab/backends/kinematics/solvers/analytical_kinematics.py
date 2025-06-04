@@ -33,13 +33,18 @@ class AnalyticalKinematics(object):
         Defaults to no offset.
     """
 
-    def __init__(self, base_frame : Optional[Frame] = None, flange_frame : Optional[Frame] = None, joint_offsets : Optional[list[float]] = None):
+    def __init__(
+        self,
+        base_frame: Optional[Frame] = None,
+        flange_frame: Optional[Frame] = None,
+        joint_offsets: Optional[list[float]] = None,
+    ):
         super(AnalyticalKinematics, self).__init__()
         self.base_frame = base_frame
         self.flange_frame = flange_frame
         self.joint_offsets = joint_offsets
 
-    def forward(self, joint_values : list[float]) -> Frame:
+    def forward(self, joint_values: list[float]) -> Frame:
         """Calculate the forward kinematics for the given joint configuration.
 
         Parameters
@@ -55,7 +60,7 @@ class AnalyticalKinematics(object):
         """
         pass
 
-    def inverse(self, frame_rcf : Frame) -> list[list[float]]:
+    def inverse(self, frame_rcf: Frame) -> list[list[float]]:
         """Calculate the inverse kinematics for the given end-effector frame.
 
         Parameters
