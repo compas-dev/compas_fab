@@ -39,7 +39,6 @@ Utilities
 .. toctree::
     :maxdepth: 1
 
-    compas_fab.sensors
     compas_fab.utilities
 
 
