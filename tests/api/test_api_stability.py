@@ -5,7 +5,6 @@ import os
 from datetime import datetime
 
 import pytest
-from compas import IPY
 
 import compas_fab
 
@@ -40,10 +39,7 @@ def compas_fab_api():
 
 
 def compas_fab_api_filename():
-    if IPY:
-        filename = "compas_fab_api_ipy.json"
-    else:
-        filename = "compas_fab_api.json"
+    filename = "compas_fab_api.json"
     return os.path.join(os.path.dirname(__file__), filename)
 
 
@@ -81,8 +77,7 @@ if __name__ == "__main__":
 
     compas_fab_version = compas_fab.__version__
     # strip git hash from version
-    if not IPY:
-        compas_fab_version = compas_fab_version[:-9]
+    compas_fab_version = compas_fab_version[:-9]
 
     compas_fab_api = dict(  # noqa: F811
         metadata=dict(
