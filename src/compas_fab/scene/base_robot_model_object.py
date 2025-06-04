@@ -1,13 +1,13 @@
 from typing import Optional
 
+from compas.datastructures import Mesh
+from compas.geometry import Frame
 from compas.geometry import Scale
 from compas.geometry import Transformation
 from compas.scene import SceneObject
-from compas_robots.model import LinkGeometry
-from compas.datastructures import Mesh
-from compas.geometry import Frame
 from compas_robots import Configuration
 from compas_robots import RobotModel
+from compas_robots.model import LinkGeometry
 
 
 class BaseRobotModelObject(SceneObject):

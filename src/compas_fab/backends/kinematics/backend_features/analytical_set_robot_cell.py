@@ -1,6 +1,5 @@
-from typing import Optional
-
 from copy import deepcopy
+from typing import Optional
 
 from compas_fab.backends.interfaces import SetRobotCell
 from compas_fab.robots import RobotCell

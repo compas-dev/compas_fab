@@ -1,4 +1,5 @@
 from typing import Optional
+
 from compas.geometry import Frame
 
 

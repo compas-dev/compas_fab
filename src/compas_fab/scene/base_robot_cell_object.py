@@ -1,4 +1,5 @@
 from typing import Optional
+
 from compas.scene import SceneObject
 
 from compas_fab.robots import RobotCell

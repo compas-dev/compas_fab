@@ -1,13 +1,14 @@
+from typing import TYPE_CHECKING
 from typing import Generator
 from typing import Optional
-from typing import TYPE_CHECKING
 
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import argmax
 from compas_robots import Configuration
-from compas_fab.robots.targets import FrameTarget
+
 from compas_fab.robots.robot_cell import RobotCellState
+from compas_fab.robots.targets import FrameTarget
 from compas_fab.robots.targets import TargetMode
 
 if TYPE_CHECKING:

@@ -1,6 +1,7 @@
 from math import pi
 
 from compas_robots.model import Joint
+
 from compas_fab.backends import MPMaxJumpError
 
 __all__ = [

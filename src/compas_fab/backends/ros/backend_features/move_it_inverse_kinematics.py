@@ -1,10 +1,11 @@
-from typing import Optional
 from typing import TYPE_CHECKING
+from typing import Optional
 
-from compas_robots import Configuration
+from compas.geometry import Frame
 from compas.tolerance import TOL
 from compas.utilities import await_callback
-from compas.geometry import Frame
+from compas_robots import Configuration
+
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.backends.interfaces import InverseKinematics
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg

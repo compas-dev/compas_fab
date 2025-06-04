@@ -1,5 +1,5 @@
-from typing import Optional
 from typing import TYPE_CHECKING
+from typing import Optional
 
 from compas.utilities import await_callback
 
@@ -10,12 +10,12 @@ from compas_fab.backends.ros.backend_features.helpers import validate_response
 from compas_fab.backends.ros.messages import GetCartesianPathRequest
 from compas_fab.backends.ros.messages import GetCartesianPathResponse
 from compas_fab.backends.ros.messages import Header
+from compas_fab.backends.ros.messages import PlanningScene
 from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.service_description import ServiceDescription
 from compas_fab.robots import FrameWaypoints
-from compas_fab.robots import PointAxisWaypoints
-from compas_fab.backends.ros.messages import PlanningScene
 from compas_fab.robots import JointTrajectory
+from compas_fab.robots import PointAxisWaypoints
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import Waypoints
