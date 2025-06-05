@@ -2,19 +2,13 @@
 
 import math
 
-from compas import IPY
-
-if not IPY:
-    from typing import List  # noqa: F401
-
 __all__ = [
     "to_degrees",
     "to_radians",
 ]
 
 
-def to_radians(degrees):
-    # type: (List[float]) -> List[float]
+def to_radians(degrees: list[float]) -> list[float]:
     """Convert a list of floats representing degrees to a list of radians.
 
     Parameters
@@ -30,8 +24,7 @@ def to_radians(degrees):
     return [math.radians(d) for d in degrees]
 
 
-def to_degrees(radians):
-    # type: (List[float]) -> List[float]
+def to_degrees(radians: list[float]) -> list[float]:
     """Convert a list of floats representing radians to a list of degrees.
 
     Parameters
