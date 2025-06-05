@@ -1,4 +1,4 @@
-from compas import IPY
+from typing import Optional
 
 from compas_fab.backends.interfaces.planner import PlannerInterface
 from compas_fab.backends.kinematics.backend_features import AnalyticalForwardKinematics
@@ -8,19 +8,12 @@ from compas_fab.backends.kinematics.backend_features import AnalyticalPybulletIn
 from compas_fab.backends.kinematics.backend_features import AnalyticalSetRobotCell
 from compas_fab.backends.kinematics.backend_features import AnalyticalSetRobotCellState
 from compas_fab.backends.kinematics.client import AnalyticalKinematicsClient
+from compas_fab.backends.kinematics.solvers import AnalyticalKinematics
 from compas_fab.backends.pybullet.backend_features import PyBulletCheckCollision
 from compas_fab.backends.pybullet.backend_features import PyBulletForwardKinematics
 from compas_fab.backends.pybullet.backend_features import PyBulletSetRobotCell
 from compas_fab.backends.pybullet.backend_features import PyBulletSetRobotCellState
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Optional  # noqa: F401
-
-        from compas_fab.backends.kinematics.solvers import AnalyticalKinematics  # noqa: F401
-        from compas_fab.backends.pybullet.client import PyBulletClient  # noqa: F401
+from compas_fab.backends.pybullet.client import PyBulletClient
 
 __all__ = [
     "AnalyticalPyBulletPlanner",
@@ -55,9 +48,8 @@ class AnalyticalKinematicsPlanner(
 
     """
 
-    def __init__(self, kinematics_solver, verbose=False):
-        # type: (AnalyticalKinematics, Optional[bool]) -> None
-        self.kinematics_solver = kinematics_solver  # type: AnalyticalKinematics
+    def __init__(self, kinematics_solver: AnalyticalKinematics, verbose: Optional[bool] = False):
+        self.kinematics_solver = kinematics_solver
 
         # Initialize all mixins
         super(AnalyticalKinematicsPlanner, self).__init__()
@@ -98,11 +90,9 @@ class AnalyticalPyBulletPlanner(
 
     """
 
-    def __init__(self, client, kinematics_solver):
-        # type: (PyBulletClient, AnalyticalKinematics) -> None
-
+    def __init__(self, client: PyBulletClient, kinematics_solver: AnalyticalKinematics):
         # Initialize all mixins
         super(AnalyticalPyBulletPlanner, self).__init__()
 
-        self._client = client  # type: PyBulletClient
+        self._client = client
         self.kinematics_solver = kinematics_solver

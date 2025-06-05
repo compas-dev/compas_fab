@@ -1,6 +1,5 @@
 import math
 
-from compas import IPY
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Rotation
@@ -9,15 +8,8 @@ from compas.geometry import intersection_plane_circle
 from compas.geometry import intersection_sphere_sphere
 from compas.geometry import tangent_points_to_circle_xy
 
-if not IPY:
-    from typing import List  # noqa: F401
 
-# TODO: This is very slow...
-# can this be improved? for example https://github.com/visose/Robots/blob/master/Robots/Kinematics.cs
-
-
-def forward_kinematics_spherical_wrist(joint_values, points):
-    # type: (List[float], List[Point]) -> Frame
+def forward_kinematics_spherical_wrist(joint_values: list[float], points: list[Point]) -> Frame:
     """Forward kinematics function for spherical wrist robots.
 
     Parameters
@@ -91,8 +83,7 @@ def forward_kinematics_spherical_wrist(joint_values, points):
     return axis_frames[5]
 
 
-def inverse_kinematics_spherical_wrist(target_frame, points):
-    # type: (Frame, List[Point]) -> List[List[float]]
+def inverse_kinematics_spherical_wrist(target_frame: Frame, points: list[Point]) -> list[list[float]]:
     """Inverse kinematics function for spherical wrist robots.
 
     Parameters
