@@ -1,11 +1,5 @@
 import json
-
-import compas
-
-if compas.PY3:
-    from collections.abc import Mapping
-else:
-    from collections import Mapping
+from collections.abc import Mapping
 
 _TYPE_MAP = {}
 
