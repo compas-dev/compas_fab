@@ -1,34 +1,34 @@
 import math
+from typing import TYPE_CHECKING
+from typing import Optional
 
 from compas.geometry import argmin
+from compas_robots import Configuration
 
 from compas_fab.backends.interfaces import PlanCartesianMotion
 from compas_fab.backends.kinematics.exceptions import CartesianMotionError
 from compas_fab.backends.kinematics.utils import smallest_joint_angles
+from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
-from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import PointAxisWaypoints
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import Waypoints
 
-from compas import IPY
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from compas_fab.backends import AnalyticalPyBulletPlanner  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import Waypoints  # noqa: F401
-
-        from typing import Optional  # noqa: F401
-        from typing import Dict  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.backends import AnalyticalPyBulletPlanner
 
 
 class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
     """ """
 
-    def plan_cartesian_motion(self, waypoints, start_state, group=None, options=None):
-        # type: (Waypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
+    def plan_cartesian_motion(
+        self,
+        waypoints: Waypoints,
+        start_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ) -> JointTrajectory:
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
@@ -60,8 +60,13 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         else:
             raise TypeError("Unsupported waypoints type {}".format(type(waypoints)))
 
-    def _plan_cartesian_motion_with_frame_waypoints(self, waypoints, start_state, group=None, options=None):
-        # type: (Waypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
+    def _plan_cartesian_motion_with_frame_waypoints(
+        self,
+        waypoints: Waypoints,
+        start_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ) -> JointTrajectory:
         """Calculates a cartesian motion path with frame waypoints.
 
         Planner behavior:
@@ -69,7 +74,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         - The path is checked to ensure that the joint values are continuous and that revolution values are the smallest possible.
         - There is no interpolation in between frames (i.e. 'max_step' parameter is not supported), only the input frames are used.
         """
-        planner = self  # type: AnalyticalPyBulletPlanner
+        planner: AnalyticalPyBulletPlanner = self
         robot_cell = planner.client.robot_cell
 
         waypoints = waypoints.normalized_to_meters()
@@ -126,14 +131,19 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         trajectory.start_configuration = robot_cell.zero_full_configuration().merged(first_configuration)
         return trajectory
 
-    def _plan_cartesian_motion_with_point_axis_waypoints(self, waypoints, start_state, group=None, options=None):
-        # type: (Waypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
+    def _plan_cartesian_motion_with_point_axis_waypoints(
+        self,
+        waypoints: Waypoints,
+        start_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ) -> JointTrajectory:
         """Planning Cartesian motion with PointAxisWaypoints is not yet implemented in the Analytical backend."""
         raise NotImplementedError(
             "Planning Cartesian motion with PointAxisWaypoints is not yet implemented in the Analytical backend."
         )
 
-    def smooth_configurations(self, configurations):
+    def smooth_configurations(self, configurations: list[Configuration]) -> list[Configuration]:
         joint_values_corrected = []
         prev = smallest_joint_angles(configurations[0].joint_values)
         joint_values_corrected.append(prev)

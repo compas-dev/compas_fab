@@ -1,21 +1,18 @@
-from compas import IPY
+from typing import TYPE_CHECKING
+from typing import Generator
+from typing import Optional
+
+from compas_robots import Configuration
 
 from compas_fab.backends.exceptions import BackendTargetNotSupportedError
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import Target
 
 from .analytical_inverse_kinematics import AnalyticalInverseKinematics
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from compas_fab.backends import AnalyticalPyBulletPlanner  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import Target  # noqa: F401
-        from typing import Generator  # noqa: F401
-        from compas_robots import Configuration  # noqa: F401
-        from typing import Dict  # noqa: F401
-        from typing import Optional  # noqa: F401
-        from compas_fab.backends import PyBulletClient  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.backends import AnalyticalPyBulletPlanner
+    from compas_fab.backends import PyBulletClient
 
 from compas_fab.backends import CollisionCheckError
 from compas_fab.robots import FrameTarget
@@ -40,15 +37,20 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
     that supports ``"check_collision"``, so for now only the `PyBulletClient`.
     """
 
-    def iter_inverse_kinematics(self, target, start_state=None, group=None, options=None):
-        # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
+    def iter_inverse_kinematics(
+        self,
+        target: Target,
+        start_state: RobotCellState = None,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ) -> Generator[Configuration | None, None, None]:
         """Calculate the robot's inverse kinematic for a given target.
 
         An iterator is returned that yields configurations.
 
 
         """
-        client = self.client  # type: PyBulletClient
+        client: PyBulletClient = self.client
 
         group = group or client.robot_cell.main_group_name
 
@@ -59,8 +61,9 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
         else:
             raise BackendTargetNotSupportedError()
 
-    def _iter_inverse_kinematics_frame_target(self, target, start_state, group, options=None):
-        # type: (FrameTarget, RobotCellState, str, Optional[Dict]) -> Generator[Configuration | None]
+    def _iter_inverse_kinematics_frame_target(
+        self, target: FrameTarget, start_state: RobotCellState, group: Optional[str], options: Optional[dict] = None
+    ) -> Generator[Configuration | None, None, None]:
         """This function overrides the _iter_inverse_kinematics_frame_target function from AnalyticalInverseKinematics
         to include the PyBulletClient for collision checking.
 
@@ -70,8 +73,8 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
         # TODO: This function is migrated but not finished with new CC functions.
 
         options = options or {}
-        planner = self  # type: AnalyticalPyBulletPlanner
-        client = self.client  # type: PyBulletClient
+        planner: AnalyticalPyBulletPlanner = self
+        client: PyBulletClient = self.client
 
         # Set robot cell state to start state if provided
         planner.set_robot_cell_state(start_state)
