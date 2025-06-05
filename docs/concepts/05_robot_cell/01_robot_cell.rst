@@ -10,32 +10,36 @@ dictionary of tools (ToolModel) and a dictionary of rigid bodies (RigidBody).
 It is the fundamental building block used in simulation, visualization and
 motion planning.
 
-A RobotCell object contains the non-changing information about the robot cell,
-such as the robot model, tool models and rigid bodies. Very often these objects
-are time-consuming to create and are therefore not modified frequently.
+A :class:`compas_fab.robots.RobotCell` object contains the non-changing information
+about the robot cell, such as the :class:`~compas_robots.RobotModel`, 
+:class:`ToolModels<compas_robots.ToolModel>` and 
+:class:`RigidBodies<compas_fab.robots.RigidBody>`. 
+Very often these objects are time-consuming to create and should
+therefore not be modified frequently.
 
 On the other hand, the modifiable information about the robot cell is stored in
-a RobotCellState object. Each model in the robot cell have a corresponding state
+a :class:`compas_fab.robots.RobotCellState` object. Each model in the robot cell have a corresponding state
 object in the RobotCellState object. The following table shows the mapping
 between the model objects and their corresponding state objects.
 
-.. list-table:: Title
+.. list-table:: Robot Cell Model and State Objects
    :widths: 50 50
    :header-rows: 1
 
    * - Model Object
      - State Object(s)
-   * - RobotModel
-     - Configuration,\n robot_base_frame
-   * - ToolModel
-     - ToolState
-   * - RigidBody
-     - RigidBodyState
+   * - :class:`~compas_robots.RobotModel`
+     - :class:`~compas_robots.Configuration`, robot_base_frame (:class:`~compas.geometry.Frame`)
+   * - :class:`~compas_robots.ToolModel`
+     - :class:`~compas_fab.robots.ToolState`
+   * - :class:`~compas_fab.robots.RigidBody`
+     - :class:`~compas_fab.robots.RigidBodyState`
 
 Throughout a fabrication process, the robot cell often undergo changes in its
 state. For example, the robot may move to a different configuration, tools can
 be attached or detached, and rigid bodies can be moved around. These changes
-are reflected (modeled) by modifying the corresponding state object.
+are reflected (modeled) by modifying the corresponding state object, not the
+robot cell.
 
 The RobotCellState object is lightweight and can be easily copied and modified.
 Many RobotCellState objects can be created and stored to represent a sequence
@@ -57,12 +61,32 @@ It is especially useful to store the RobotCell for visualizing planned motions.
 
 Add a RobotModel
 ----------------
-Compas_fab only supports one robot model in a RobotCell.
+Compas_fab only supports one robot model in a RobotCell. The following example
+loads a robot model from a URDF file and adds it to the RobotCell.
 
-Add a robot from URDF packages
+.. code-block:: python
 
+  from compas_fab.robots import RobotCell
 
-Add a robot from a running ROS instance (specific to using with ROS backend)
+  # Create a RobotCell
+  robot_cell = RobotCell.from_urdf_and_srdf(
+      urdf_filename=compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf"),
+      srdf_filename=compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf"),
+      local_package_mesh_folder="robot_library/ur5_robot",
+  )
+  robot_cell.print_info()
+
+If ROS backend is used, the robot cell
+
+.. code-block:: python
+
+  from compas_fab.backends import RosClient
+  from compas_fab.backends import MoveItPlanner
+
+  with RosClient() as client:
+      robot_cell = client.load_robot_cell()
+      robot_cell.print_info()
+
 
 Add ToolModel(s)
 ----------------

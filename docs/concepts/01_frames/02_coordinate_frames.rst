@@ -72,6 +72,10 @@ The RCF is equivalent to the frame of the ``base_link`` in ROS convention, which
 the base of the robot, such as the stationary base of a robot arm.
 In another words, the RCF does not change when moving the robot joints.
 
+The RCF can be modified by the user to 'move' the robot around within the WCF,
+see :ref:`robot_coordinate_frame_in_robot_state<Robot_coordinate_frame_in_robot_state>` for more details.
+
+
 Link coordinate frame (LCF)
 ===========================
 
