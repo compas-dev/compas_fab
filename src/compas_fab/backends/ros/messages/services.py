@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from .geometry_msgs import PoseStamped
 from .moveit_msgs import Constraints
 from .moveit_msgs import MoveItErrorCodes

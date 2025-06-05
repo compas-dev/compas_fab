@@ -13,8 +13,6 @@ Analytical backend features
 
 """
 
-from __future__ import absolute_import
-
 from compas_fab.backends.kinematics.backend_features.analytical_plan_cartesian_motion import (
     AnalyticalPlanCartesianMotion,
 )

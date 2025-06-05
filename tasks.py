@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import os
 
 from compas_invocations2 import build

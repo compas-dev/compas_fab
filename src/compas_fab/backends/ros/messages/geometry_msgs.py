@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from compas.geometry import Frame
 
 from .std_msgs import Header

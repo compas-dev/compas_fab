@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from .client import RosClient
 from .exceptions import RosError
 from .exceptions import RosValidationError

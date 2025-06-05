@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from .exceptions import CartesianMotionError
 
 from .backend_features.analytical_inverse_kinematics import AnalyticalInverseKinematics

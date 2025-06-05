@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from .geometry_msgs import Pose
 from .std_msgs import Header
 from .std_msgs import ROSmsg
