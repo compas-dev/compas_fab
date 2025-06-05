@@ -43,7 +43,7 @@ def _write_file(filename, file_contents, mode="w"):
         f.write(file_contents)
 
 
-class RosFileServerLoader(object):
+class RosFileServerLoader:
     """Allows to retrieve the mesh files specified in the robot model from the
     ROS File Server. Optionally, it stores them on the local file system,
     allowing for faster re-loads as well as enabling them to be loaded by

@@ -56,7 +56,7 @@ class CancellableRosActionResult(CancellableFutureResult):
         return True
 
 
-class LocalCacheInfo(object):
+class LocalCacheInfo:
     def __init__(self, use_local_cache, robot_name=None, local_cache_directory=None):
         self.use_local_cache = use_local_cache
         self.robot_name = robot_name

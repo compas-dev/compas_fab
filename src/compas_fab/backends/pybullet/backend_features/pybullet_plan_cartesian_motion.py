@@ -908,7 +908,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         return trajectory
 
 
-class FrameInterpolator(object):
+class FrameInterpolator:
     """A helper class to interpolate between two frames
 
     All the properties are read-only and are computed during initialization.
@@ -1040,7 +1040,7 @@ class FrameInterpolator(object):
         return (delta_distance, delta_angle, True)
 
 
-class PointAxisInterpolator(object):
+class PointAxisInterpolator:
     """A helper class to interpolate between two point-axis pairs.
 
     All the properties are read-only and are computed during initialization.

@@ -6,7 +6,7 @@ __all__ = [
 ]
 
 
-class FutureResult(object):
+class FutureResult:
     """Represents a future result value.
 
     Futures are the result of asynchronous operations

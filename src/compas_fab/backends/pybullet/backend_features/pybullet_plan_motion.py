@@ -1161,7 +1161,7 @@
 #         return fn
 
 
-# class TreeNode(object):
+# class TreeNode:
 #     def __init__(self, config, parent=None):
 #         # type: (List[float], Optional[TreeNode]) -> None
 #         self.config = config

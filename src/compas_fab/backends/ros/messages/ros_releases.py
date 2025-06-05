@@ -1,4 +1,4 @@
-class RosDistro(object):
+class RosDistro:
     """Supported/recognized ROS distros"""
 
     KINETIC = "kinetic"

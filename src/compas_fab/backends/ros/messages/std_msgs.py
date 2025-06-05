@@ -4,7 +4,7 @@ from collections.abc import Mapping
 _TYPE_MAP = {}
 
 
-class ROSmsg(object):
+class ROSmsg:
     """The base class for ROS messages.
 
     Attributes

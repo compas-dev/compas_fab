@@ -11,7 +11,7 @@ from compas_fab.robots import Target
 from compas_fab.robots import Waypoints
 
 
-class BackendFeature(object):
+class BackendFeature:
     """Base class for all backend features that are implemented by a backend client.
 
     Classes that inherit from this class are mixed-in when creating the planner backend interface.

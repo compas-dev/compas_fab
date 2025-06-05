@@ -2,7 +2,7 @@ from compas_fab.backends.exceptions import BackendFeatureNotSupportedError
 from compas_fab.backends.interfaces import ClientInterface
 
 
-class PlannerInterface(object):
+class PlannerInterface:
     """Interface for implementing backend planners.
 
     Planner is connected to a ClientInterface when initiated, and can access

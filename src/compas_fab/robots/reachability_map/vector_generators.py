@@ -8,7 +8,7 @@ from compas.geometry import Vector
 from compas_fab.utilities import arange
 
 
-class OrthonormalVectorsFromAxisGenerator(object):
+class OrthonormalVectorsFromAxisGenerator:
     """Generate vectors that are orthonormal to an axis.
 
     Parameters
@@ -69,7 +69,7 @@ class OrthonormalVectorsFromAxisGenerator(object):
                 yield f.to_world_coordinates(Vector(x, y, 0))
 
 
-class DeviationVectorsGenerator(object):
+class DeviationVectorsGenerator:
     """Calculates equally distributed vectors that deviate from the specified one by a maximal angle of `max_alpha`.
 
     Parameters

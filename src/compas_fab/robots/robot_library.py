@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-class ToolLibrary(object):
+class ToolLibrary:
     """A collection of built-in tools that can be used for testing and demonstration.
     The :class:`compas_robot.ToolModel` objects created by the factory methods
     can be used to write examples, so that the example code can stay short.
@@ -264,7 +264,7 @@ class ToolLibrary(object):
         return tool_model
 
 
-class RigidBodyLibrary(object):
+class RigidBodyLibrary:
     @classmethod
     def target_marker(cls, size: float = 1.0) -> RigidBody:
         """Create and return a target marker as RigidBody, useful for visualizing the target pose.
@@ -306,7 +306,7 @@ class RigidBodyLibrary(object):
         return RigidBody(mesh, mesh)
 
 
-class RobotCellLibrary(object):
+class RobotCellLibrary:
     """A collection of built-in robot cells that can be used for testing and demonstrations.
     The :class:`compas_fab.robots.RobotCell` and :class:`compas_fab.robots.RobotCellState`
     objects created by the factory methods can be used to write examples,

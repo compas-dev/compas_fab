@@ -5,7 +5,7 @@ __all__ = [
 ]
 
 
-class Inertia(object):
+class Inertia:
     """The moments of inertia represent the spatial distribution of mass in a rigid body.
 
     It depends on the mass, size, and shape of a rigid body with units of

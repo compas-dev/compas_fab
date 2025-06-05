@@ -13,7 +13,7 @@ from compas_fab.backends.ros.exceptions import RosValidationError
 __all__ = ["ServiceDescription"]
 
 
-class ServiceDescription(object):
+class ServiceDescription:
     """Internal class to simplify service call code."""
 
     def __init__(self, name, service_type, request_class=None, response_class=None, validator=None):

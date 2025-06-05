@@ -813,7 +813,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 raise PlanningGroupNotSupported(group, joint_names, link_names)
 
 
-class UniqueResultChecker(object):
+class UniqueResultChecker:
     """A class to check if a configuration is unique.
 
     This class will keep track of past solutions and compare new solutions with them.

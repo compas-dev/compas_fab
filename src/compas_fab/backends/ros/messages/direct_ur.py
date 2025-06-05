@@ -1,4 +1,4 @@
-class URmsg(object):
+class URmsg:
     """ """
 
     def __init__(self, **kwargs):

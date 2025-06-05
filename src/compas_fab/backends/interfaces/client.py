@@ -5,7 +5,7 @@ from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotSemantics
 
 
-class ClientInterface(object):
+class ClientInterface:
     """Interface for implementing backend clients.
 
     Attributes

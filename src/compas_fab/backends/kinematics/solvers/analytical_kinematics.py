@@ -3,7 +3,7 @@ from typing import Optional
 from compas.geometry import Frame
 
 
-class AnalyticalKinematics(object):
+class AnalyticalKinematics:
     """Base class for analytical kinematics solvers.
 
     This class is meant to be subclassed by kinematics solvers specific to a robot.

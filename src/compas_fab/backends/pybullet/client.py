@@ -51,7 +51,7 @@ __all__ = [
 ]
 
 
-class PyBulletBase(object):
+class PyBulletBase:
     def __init__(self, connection_type: str):
         self.client_id = None
         self.connection_type = connection_type
