@@ -1,24 +1,17 @@
 from copy import deepcopy
+from typing import Optional
+from typing import Union
 
-from compas import IPY
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Point
+from compas.geometry import Transformation
 from compas.geometry import Vector
 from compas.tolerance import TOL
+from compas_robots import Configuration
 from compas_robots.model import Joint
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Optional  # noqa: F401
-        from typing import Tuple  # noqa: F401
-
-        from compas.geometry import Transformation  # noqa: F401
-        from compas_robots import Configuration  # noqa: F401
-
-        from compas_fab.robots import Constraint  # noqa: F401
+from compas_fab.robots import Constraint
 
 __all__ = [
     "ConfigurationTarget",
@@ -67,8 +60,9 @@ class Target(Data):
     :class:`ConstraintSetTarget`
     """
 
-    def __init__(self, target_mode=None, native_scale=1.0, name="Generic Target"):
-        # type: (TargetMode|str, float, str) -> None
+    def __init__(
+        self, target_mode: Union["TargetMode", str] = None, native_scale: float = 1.0, name: str = "Generic Target"
+    ):
         super(Target, self).__init__()
         self.name = name
         self.target_mode = target_mode
@@ -79,7 +73,6 @@ class Target(Data):
         raise NotImplementedError
 
     def normalize_to_meters(self):
-        # type: () -> None
         """Convert the target into meter scale if `native_scale` is not 1.0.
 
         Because all robots and planners in compas_fab use meters as the default unit of measure,
@@ -150,14 +143,13 @@ class FrameTarget(Target):
 
     def __init__(
         self,
-        target_frame,
-        target_mode,
-        native_scale=1.0,
-        tolerance_position=None,
-        tolerance_orientation=None,
-        name="Frame Target",
+        target_frame: Frame,
+        target_mode: Union["TargetMode", str],
+        native_scale: float = 1.0,
+        tolerance_position: Optional[float] = None,
+        tolerance_orientation: Optional[float] = None,
+        name: str = "Frame Target",
     ):
-        # type: (Frame, TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> None
         super(FrameTarget, self).__init__(target_mode=target_mode, native_scale=native_scale, name=name)
         self.target_frame = target_frame
         self.tolerance_position = tolerance_position
@@ -180,19 +172,18 @@ class FrameTarget(Target):
     @classmethod
     def from_transformation(
         cls,
-        transformation,
-        target_mode,
-        native_scale=1.0,
-        tolerance_position=None,
-        tolerance_orientation=None,
-        name="Frame Target",
+        transformation: Transformation,
+        target_mode: Union["TargetMode", str],
+        native_scale: float = 1.0,
+        tolerance_position: Optional[float] = None,
+        tolerance_orientation: Optional[float] = None,
+        name: str = "Frame Target",
     ):
-        # type: (Transformation, TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> FrameTarget
         """Creates a FrameTarget from a transformation matrix.
 
         Parameters
         ----------
-        transformation : :class
+        transformation : :class:`compas.geometry.Transformation`
             The transformation matrix.
         target_mode : :class:`TargetMode` or str
             The target mode specifies which link or frame is referenced when specifying a target.
@@ -223,7 +214,6 @@ class FrameTarget(Target):
         return cls(frame, target_mode, native_scale, tolerance_position, tolerance_orientation, name)
 
     def normalize_to_meters(self):
-        # type: () -> None
         """Convert the target into meter scale if `native_scale` is not 1.0.
 
         Because all robots and planners in compas_fab use meters as the default unit of measure,
@@ -244,8 +234,7 @@ class FrameTarget(Target):
 
         self.native_scale = 1.0
 
-    def __eq__(self, other):
-        # type: (FrameTarget) -> bool
+    def __eq__(self, other) -> bool:
         """Check if two FrameTarget objects are equal.
 
         This function relies on the `is_close` function from the `compas.tolerance` module.
@@ -324,15 +313,14 @@ class PointAxisTarget(Target):
 
     def __init__(
         self,
-        target_point,
-        target_z_axis,
-        target_mode,
-        native_scale=1.0,
-        tolerance_position=None,
-        tolerance_orientation=None,
-        name="Point-Axis Target",
+        target_point: Point,
+        target_z_axis: Vector,
+        target_mode: Union["TargetMode", str],
+        native_scale: float = 1.0,
+        tolerance_position: Optional[float] = None,
+        tolerance_orientation: Optional[float] = None,
+        name: str = "Point-Axis Target",
     ):
-        # type: (Point, Vector, TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> None
         super(PointAxisTarget, self).__init__(target_mode=target_mode, native_scale=native_scale, name=name)
         # Note: The following input are converted to class because it can simplify functions that use this class
         self.target_point = Point(*target_point)
@@ -356,7 +344,6 @@ class PointAxisTarget(Target):
         return "PointAxisTarget({}, {}, {})".format(self.target_point, self.target_z_axis, self.target_mode)
 
     def normalize_to_meters(self):
-        # type: () -> None
         """Convert the target into meter scale if `native_scale` is not 1.0.
 
         Because all robots and planners in compas_fab use meters as the default unit of measure,
@@ -381,7 +368,6 @@ class PointAxisTarget(Target):
         self.native_scale = 1.0
 
     def __eq__(self, other):
-        # type: (PointAxisTarget) -> bool
         """Check if two PointAxisTarget objects are equal.
 
         This function relies on the `is_close` function from the `compas.tolerance` module.
@@ -443,10 +429,15 @@ class ConfigurationTarget(Target):
 
     SUPPORTED_JOINT_TYPES = [Joint.PRISMATIC, Joint.REVOLUTE, Joint.CONTINUOUS]
 
-    def __init__(self, target_configuration, tolerance_above=None, tolerance_below=None, name="Configuration Target"):
-        # type: (Configuration, Optional[list[float]], Optional[list[float]], Optional[str]) -> None
+    def __init__(
+        self,
+        target_configuration: Configuration,
+        tolerance_above: Optional[list[float]] = None,
+        tolerance_below: Optional[list[float]] = None,
+        name: str = "Configuration Target",
+    ):
         super(ConfigurationTarget, self).__init__(name=name)
-        self.target_configuration = target_configuration  # type: Configuration
+        self.target_configuration = target_configuration
         self.tolerance_above = tolerance_above
         self.tolerance_below = tolerance_below
 
@@ -467,8 +458,9 @@ class ConfigurationTarget(Target):
         return "ConfigurationTarget({})".format(self.target_configuration)
 
     @classmethod
-    def generate_default_tolerances(cls, configuration, tolerance_prismatic, tolerance_revolute):
-        # type: (Configuration, float, float) -> Tuple[list[float], list[float]]
+    def generate_default_tolerances(
+        cls, configuration: Configuration, tolerance_prismatic: float, tolerance_revolute: float
+    ) -> tuple[list[float], list[float]]:
         """Generates tolerances values for the target configuration based on the joint types.
 
         The parameters `tolerance_prismatic` and `tolerance_revolute` are used to generate the
@@ -522,8 +514,7 @@ class ConfigurationTarget(Target):
     # The following function is retired because we no longer support scaling the tolerance of a ConfigurationTarget
     # Users who use ConfigurationTarget should set the tolerance values using the native units of the robot model.
 
-    # def scaled(self, factor):
-    #     # type: (float) -> ConfigurationTarget
+    # def scaled(self, factor : float) -> ConfigurationTarget:
     #     """Returns copy of the target where the target configuration and tolerances are scaled.
 
     #     This function should only be needed if the ConfigurationTarget was created
@@ -544,8 +535,7 @@ class ConfigurationTarget(Target):
     #     """
     #     target_configuration = self.target_configuration.scaled(factor)
 
-    #     def scale_tolerance(tolerance, joint_types):
-    #         # type: (list[float], list[Joint]) -> list[float]
+    #     def scale_tolerance(tolerance: list[float], joint_types: list[Joint]) -> list[float]:
     #         """Only scales the tolerances for prismatic and planar joints."""
     #         scaled_tolerance = []
     #         for t, joint_type in zip(tolerance, joint_types):
@@ -565,12 +555,11 @@ class ConfigurationTarget(Target):
 
     #     return ConfigurationTarget(target_configuration, tolerance_above, tolerance_below, self.name)
 
-    def normalize_to_meters():
+    def normalize_to_meters(self):
         """ConfigurationTarget does not contain any geometry with configurable units to normalize."""
         pass
 
     def __eq__(self, other):
-        # type: (ConfigurationTarget) -> bool
         """Check if two ConfigurationTarget objects are equal.
 
         This function relies on the `is_close` function from the `compas.tolerance` module.
@@ -625,8 +614,7 @@ class ConstraintSetTarget(Target):
         Defaults to 'Constraint Set Target'.
     """
 
-    def __init__(self, constraint_set, name="Constraint Set Target"):
-        # type: (list[Constraint], Optional[str]) -> None
+    def __init__(self, constraint_set: list[Constraint], name: str = "Constraint Set Target"):
         super(ConstraintSetTarget, self).__init__(name=name)
         self.constraint_set = constraint_set
 
@@ -679,8 +667,9 @@ class Waypoints(Target):
     :class:`FrameWaypoints`
     """
 
-    def __init__(self, target_mode, native_scale=1.0, name="Generic Waypoints"):
-        # type: (Optional[TargetMode | str], Optional[float], Optional[str]) -> None
+    def __init__(
+        self, target_mode: Union["TargetMode", str] = None, native_scale: float = 1.0, name: str = "Generic Waypoints"
+    ):
         super(Waypoints, self).__init__(target_mode=target_mode, native_scale=native_scale, name=name)
 
 
@@ -720,14 +709,13 @@ class FrameWaypoints(Waypoints):
 
     def __init__(
         self,
-        target_frames,
-        target_mode,
-        native_scale=1.0,
-        tolerance_position=None,
-        tolerance_orientation=None,
-        name="Frame Waypoints",
+        target_frames: list[Frame],
+        target_mode: Union["TargetMode", str],
+        native_scale: float = 1.0,
+        tolerance_position: Optional[float] = None,
+        tolerance_orientation: Optional[float] = None,
+        name: str = "Frame Waypoints",
     ):
-        # type: (list[Frame], TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> None
         super(FrameWaypoints, self).__init__(target_mode=target_mode, native_scale=native_scale, name=name)
         self.target_frames = target_frames
         self.tolerance_position = tolerance_position
@@ -747,14 +735,13 @@ class FrameWaypoints(Waypoints):
     @classmethod
     def from_transformations(
         cls,
-        transformations,
-        target_mode,
-        native_scale=1.0,
-        tolerance_position=None,
-        tolerance_orientation=None,
-        name="Frame Waypoints",
+        transformations: list[Transformation],
+        target_mode: Union["TargetMode", str],
+        native_scale: float = 1.0,
+        tolerance_position: Optional[float] = None,
+        tolerance_orientation: Optional[float] = None,
+        name: str = "Frame Waypoints",
     ):
-        # type: (list[Transformation], TargetMode | str, Optional[float],  Optional[float], Optional[float], Optional[str]) -> FrameWaypoints
         """Creates a FrameWaypoints from a list of transformation matrices.
 
         Parameters
@@ -790,7 +777,6 @@ class FrameWaypoints(Waypoints):
         return cls(frames, target_mode, native_scale, tolerance_position, tolerance_orientation, name)
 
     def normalize_to_meters(self):
-        # type: () -> None
         """Convert the target into meter scale if `native_scale` is not 1.0.
 
         Because all robots and planners in compas_fab use meters as the default unit of measure,
@@ -813,7 +799,6 @@ class FrameWaypoints(Waypoints):
         self.native_scale = 1.0
 
     def __eq__(self, other):
-        # type: (FrameWaypoints) -> bool
         """Check if two FrameWaypoints objects are equal.
 
         This function relies on the `is_close` function from the `compas.tolerance` module.
@@ -874,14 +859,13 @@ class PointAxisWaypoints(Waypoints):
 
     def __init__(
         self,
-        target_points_and_axes,
-        target_mode,
-        native_scale=1.0,
-        tolerance_position=None,
-        tolerance_orientation=None,
-        name="Point-Axis Waypoints",
+        target_points_and_axes: list[tuple[Point, Vector]],
+        target_mode: Union["TargetMode", str],
+        native_scale: float = 1.0,
+        tolerance_position: Optional[float] = None,
+        tolerance_orientation: Optional[float] = None,
+        name: str = "Point-Axis Waypoints",
     ):
-        # type: (list[Tuple[Point, Vector]], TargetMode | str, Optional[float], Optional[float], Optional[float], Optional[str]) -> None
         super(PointAxisWaypoints, self).__init__(target_mode=target_mode, native_scale=native_scale, name=name)
         self.target_points_and_axes = target_points_and_axes
         self.tolerance_position = tolerance_position
@@ -899,7 +883,6 @@ class PointAxisWaypoints(Waypoints):
         }
 
     def normalize_to_meters(self):
-        # type: () -> None
         """Convert the target into meter scale if `native_scale` is not 1.0.
 
         Because all robots and planners in compas_fab use meters as the default unit of measure,
@@ -925,8 +908,7 @@ class PointAxisWaypoints(Waypoints):
         self.native_scale = 1.0
 
     def __eq__(self, other):
-        # type: (PointAxisWaypoints) -> bool
-        """Check if two FrameWaypoints objects are equal.
+        """Check if two PointAxisWaypoints objects are equal.
 
         This function relies on the `is_close` function from the `compas.tolerance` module.
         Hence, the numerical values of the geometry are compared with the globally defined tolerance.
