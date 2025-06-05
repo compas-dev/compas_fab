@@ -1,19 +1,16 @@
-from compas import IPY
+from typing import TYPE_CHECKING
+from typing import Optional
+from typing import Union
+
+from compas.geometry import Frame
 
 from compas_fab.backends.interfaces import ForwardKinematics
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import TargetMode
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Optional  # noqa: F401
-
-        from compas.geometry import Frame  # noqa: F401
-
-        from compas_fab.backends import AnalyticalKinematicsPlanner  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import TargetMode  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.backends import AnalyticalKinematicsPlanner
 
 
 class AnalyticalForwardKinematics(ForwardKinematics):
@@ -24,11 +21,17 @@ class AnalyticalForwardKinematics(ForwardKinematics):
 
     """
 
-    def forward_kinematics(self, robot_cell_state, target_mode, scale=None, group=None, options=None):
-        # type: (RobotCellState, TargetMode | str, Optional[float], Optional[str], Optional[dict]) -> Frame
+    def forward_kinematics(
+        self,
+        robot_cell_state: RobotCellState,
+        target_mode: Union["TargetMode", str],
+        scale: Optional[float] = None,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ) -> Frame:
         """Calculate the forward kinematics for a given joint configuration."""
-        planner = self  # type: AnalyticalKinematicsPlanner
-        robot_cell = self.client.robot_cell  # type: RobotCell
+        planner: AnalyticalKinematicsPlanner = self
+        robot_cell: RobotCell = self.client.robot_cell
 
         if group is not None and group != robot_cell.main_group_name:
             # NOTE: Analytical IK must operate on all the joints as defined in the KinematicsSolver
@@ -52,8 +55,14 @@ class AnalyticalForwardKinematics(ForwardKinematics):
 
         return target_frame
 
-    def forward_kinematics_to_link(self, robot_cell_state, link_name, scale=None, group=None, options=None):
-        # type: (RobotCellState, str, Optional[float], Optional[str], Optional[dict]) -> Frame
+    def forward_kinematics_to_link(
+        self,
+        robot_cell_state: RobotCellState,
+        link_name: str,
+        scale: Optional[float] = None,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ) -> Frame:
         """Calculate the forward kinematics for a given joint configuration to a specific link.
 
         This method is not supported by AnalyticalKinematicsPlanner.
