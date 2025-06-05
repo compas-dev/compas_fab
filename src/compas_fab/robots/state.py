@@ -323,7 +323,7 @@ class RobotCellState(Data):
         self.rigid_body_states[rigid_body_id].frame = None
         self.rigid_body_states[rigid_body_id].attachment_frame = attachment_frame
 
-    def assert_target_mode_match(self, target_mode: Optional["TargetMode"], group: str) -> None:
+    def assert_target_mode_match(self, target_mode: Optional[TargetMode], group: str) -> None:
         """Check if the current tool and workpiece attachment state support the specified TargetMode.
 
         If the `target_mode` is None,

@@ -6,6 +6,7 @@ from compas.geometry import Transformation
 
 from compas_fab.backends.exceptions import PlanningGroupNotExistsError
 from compas_fab.backends.interfaces import ForwardKinematics
+from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import TargetMode
 
@@ -20,7 +21,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
     def forward_kinematics(
         self,
         robot_cell_state: RobotCellState,
-        target_mode: TargetMode | str,
+        target_mode: TargetMode,
         group: Optional[str] = None,
         native_scale: Optional[float] = None,
         options: Optional[dict] = None,
@@ -44,7 +45,7 @@ class PyBulletForwardKinematics(ForwardKinematics):
             The attribute `robot_configuration`, must contain the full configuration of the robot corresponding to the planning group.
             The Configuration object must include ``joint_names``.
             The robot cell state should also reflect the attachment of tools, if any.
-        target_mode : :class:`compas_fab.robots.TargetMode` or str
+        target_mode : :class:`compas_fab.robots.TargetMode`
             The target mode to select which frame to return.
         group : str, optional
             The planning group of the robot.
@@ -71,9 +72,9 @@ class PyBulletForwardKinematics(ForwardKinematics):
 
         """
         # Housekeeping for intellisense
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner: PyBulletPlanner = self
+        client: PyBulletClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
         group = group or robot_cell.main_group_name
 
         # Check if the target mode is valid for the robot cell state

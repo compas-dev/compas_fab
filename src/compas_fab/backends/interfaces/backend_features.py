@@ -8,6 +8,7 @@ from compas_fab.robots import JointTrajectory
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import Target
+from compas_fab.robots import TargetMode
 from compas_fab.robots import Waypoints
 
 
@@ -166,7 +167,7 @@ class ForwardKinematics(BackendFeature):
     def forward_kinematics(
         self,
         robot_cell_state: RobotCellState,
-        target_mode: str,
+        target_mode: TargetMode,
         group: Optional[str] = None,
         native_scale: Optional[float] = None,
         options: Optional[dict] = None,
@@ -186,7 +187,7 @@ class ForwardKinematics(BackendFeature):
             The robot cell state describing the robot cell.
             The attribute `robot_configuration`, must contain the full configuration of the robot corresponding to the planning group.
             The robot cell state should also reflect the attachment of tools, if any.
-        target_mode : :class:`compas_fab.robots.TargetMode` or str
+        target_mode : :class:`compas_fab.robots.TargetMode`
             The target mode to select which frame to return.
         group : str, optional
             The planning group of the robot.

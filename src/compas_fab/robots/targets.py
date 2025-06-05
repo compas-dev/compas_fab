@@ -1,6 +1,6 @@
 from copy import deepcopy
+from enum import Enum
 from typing import Optional
-from typing import Union
 
 from compas.data import Data
 from compas.geometry import Frame
@@ -26,6 +26,41 @@ __all__ = [
 ]
 
 
+class TargetMode(Enum):
+    """Represents different matching mode for `Targets` and `Waypoints`.
+
+    Target modes represent which link or frame is referenced when specifying a target or waypoint.
+    For example, if a target's  `target_mode` is `TargetMode.TCF` (Tool Coordinate Frame),
+    it means that the planner will try to move the robot, such that it's attached TCF
+    matches with the `.frame` specified in the Target or Waypoint.
+
+    Attributes
+    ----------
+    ROBOT : str
+        Refers to the PCF (Planner Coordinate Frame).
+        The frame of the tip link of a planning group.
+    TOOL : str
+        Refers to the TCF (Tool Coordinate Frame) of the tool attached to the robot.
+        Typically this frame is at the tool tip of the tool.
+        A tool must be attached to the robot to use this.
+    WORKPIECE : str
+        Refers to the frame of the workpiece (:class:`~compas_fab.robots.RigidBody`) attached to the robot.
+        There must be one and only one workpiece attached to the robot when using this mode.
+
+    Notes
+    -----
+    The term `workpiece` refers to the RigidBody attached to a tool.
+
+    When using the `WORKPIECE` mode, the user must ensure that only one workpiece is attached to the robot.
+    Otherwise, it is not possible for compas_fab to determine which workpiece is being referred to.
+    If the user has multiple workpieces, they should use the `TOOL` mode instead.
+    """
+
+    ROBOT = "ROBOT"
+    TOOL = "TOOL"
+    WORKPIECE = "WORKPIECE"
+
+
 class Target(Data):
     """Represents a kinematic target for motion planning.
 
@@ -41,7 +76,7 @@ class Target(Data):
     ----------
     name : str , optional, default = 'target'
         A human-readable name for identifying the target.
-    target_mode : :class:`TargetMode` or str, optional
+    target_mode : :class:`TargetMode`, optional
         The target mode specifies which link or frame is referenced when specifying a target.
         This attribute is optional in this base class because some child
         classes (e.g: ConfigurationTarget) do not require it.
@@ -60,9 +95,7 @@ class Target(Data):
     :class:`ConstraintSetTarget`
     """
 
-    def __init__(
-        self, target_mode: Union["TargetMode", str] = None, native_scale: float = 1.0, name: str = "Generic Target"
-    ):
+    def __init__(self, target_mode: TargetMode = None, native_scale: float = 1.0, name: str = "Generic Target"):
         super(Target, self).__init__()
         self.name = name
         self.target_mode = target_mode
@@ -119,7 +152,7 @@ class FrameTarget(Target):
     ----------
     target_frame : :class:`compas.geometry.Frame`
         The target frame.
-    target_mode : :class:`TargetMode` or str
+    target_mode : :class:`TargetMode`
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
     native_scale : float, optional
@@ -144,7 +177,7 @@ class FrameTarget(Target):
     def __init__(
         self,
         target_frame: Frame,
-        target_mode: Union["TargetMode", str],
+        target_mode: TargetMode,
         native_scale: float = 1.0,
         tolerance_position: Optional[float] = None,
         tolerance_orientation: Optional[float] = None,
@@ -159,12 +192,35 @@ class FrameTarget(Target):
     def __data__(self):
         return {
             "target_frame": self.target_frame,
-            "target_mode": self.target_mode,
+            "target_mode": self.target_mode.value,
             "native_scale": self.native_scale,
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
         }
+
+    @classmethod
+    def __from_data__(cls, data: dict) -> "FrameTarget":
+        """Construct a FrameTarget from a data dictionary.
+
+        Parameters
+        ----------
+        data : dict
+            The data dictionary.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.FrameTarget`
+            The frame target.
+        """
+        return cls(
+            target_frame=data["target_frame"],
+            target_mode=TargetMode(data["target_mode"]),
+            native_scale=data["native_scale"],
+            tolerance_position=data["tolerance_position"],
+            tolerance_orientation=data["tolerance_orientation"],
+            name=data["name"],
+        )
 
     def __str__(self):
         return "FrameTarget({}, {})".format(self.target_frame, self.target_mode)
@@ -173,7 +229,7 @@ class FrameTarget(Target):
     def from_transformation(
         cls,
         transformation: Transformation,
-        target_mode: Union["TargetMode", str],
+        target_mode: TargetMode,
         native_scale: float = 1.0,
         tolerance_position: Optional[float] = None,
         tolerance_orientation: Optional[float] = None,
@@ -185,7 +241,7 @@ class FrameTarget(Target):
         ----------
         transformation : :class:`compas.geometry.Transformation`
             The transformation matrix.
-        target_mode : :class:`TargetMode` or str
+        target_mode : :class:`TargetMode`
             The target mode specifies which link or frame is referenced when specifying a target.
             See :class:`TargetMode` for more details.
         native_scale : float, optional
@@ -290,7 +346,7 @@ class PointAxisTarget(Target):
         The target axis is defined by the target_point and pointing towards this vector.
         A unitized vector is recommended.
         The tool tip coordinate frame (TCF)'s Z axis can rotate around this axis.
-    target_mode : :class:`TargetMode` or str
+    target_mode : :class:`TargetMode`
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
     native_scale : float, optional
@@ -315,7 +371,7 @@ class PointAxisTarget(Target):
         self,
         target_point: Point,
         target_z_axis: Vector,
-        target_mode: Union["TargetMode", str],
+        target_mode: TargetMode,
         native_scale: float = 1.0,
         tolerance_position: Optional[float] = None,
         tolerance_orientation: Optional[float] = None,
@@ -333,12 +389,36 @@ class PointAxisTarget(Target):
         return {
             "target_point": self.target_point,
             "target_z_axis": self.target_z_axis,
-            "target_mode": self.target_mode,
+            "target_mode": self.target_mode.value,
             "native_scale": self.native_scale,
             "tolerance_position": self.tolerance_position,
             "tolerance_orientation": self.tolerance_orientation,
             "name": self.name,
         }
+
+    @classmethod
+    def __from_data__(cls, data: dict) -> "PointAxisTarget":
+        """Construct a PointAxisTarget from a data dictionary.
+
+        Parameters
+        ----------
+        data : dict
+            The data dictionary.
+
+        Returns
+        -------
+        :class:`compas_fab.robots.PointAxisTarget`
+            The point axis target.
+        """
+        return cls(
+            target_point=data["target_point"],
+            target_z_axis=data["target_z_axis"],
+            target_mode=TargetMode(data["target_mode"]),
+            native_scale=data["native_scale"],
+            tolerance_position=data["tolerance_position"],
+            tolerance_orientation=data["tolerance_orientation"],
+            name=data["name"],
+        )
 
     def __str__(self):
         return "PointAxisTarget({}, {}, {})".format(self.target_point, self.target_z_axis, self.target_mode)
@@ -650,7 +730,7 @@ class Waypoints(Target):
 
     Attributes
     ----------
-    target_mode : :class:`TargetMode` or str, optional
+    target_mode : :class:`TargetMode`, optional
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
     native_scale : float, optional
@@ -667,9 +747,7 @@ class Waypoints(Target):
     :class:`FrameWaypoints`
     """
 
-    def __init__(
-        self, target_mode: Union["TargetMode", str] = None, native_scale: float = 1.0, name: str = "Generic Waypoints"
-    ):
+    def __init__(self, target_mode: TargetMode = None, native_scale: float = 1.0, name: str = "Generic Waypoints"):
         super(Waypoints, self).__init__(target_mode=target_mode, native_scale=native_scale, name=name)
 
 
@@ -685,7 +763,7 @@ class FrameWaypoints(Waypoints):
     ----------
     target_frames : :obj:`list` of :class:`compas.geometry.Frame`
         The target frames.
-    target_mode : :class:`TargetMode` or str
+    target_mode : :class:`TargetMode`
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
     native_scale : float, optional
@@ -710,7 +788,7 @@ class FrameWaypoints(Waypoints):
     def __init__(
         self,
         target_frames: list[Frame],
-        target_mode: Union["TargetMode", str],
+        target_mode: TargetMode,
         native_scale: float = 1.0,
         tolerance_position: Optional[float] = None,
         tolerance_orientation: Optional[float] = None,
@@ -736,7 +814,7 @@ class FrameWaypoints(Waypoints):
     def from_transformations(
         cls,
         transformations: list[Transformation],
-        target_mode: Union["TargetMode", str],
+        target_mode: TargetMode,
         native_scale: float = 1.0,
         tolerance_position: Optional[float] = None,
         tolerance_orientation: Optional[float] = None,
@@ -748,7 +826,7 @@ class FrameWaypoints(Waypoints):
         ----------
         transformations : :obj:`list` of :class: `compas.geometry.Transformation`
             The list of transformation matrices.
-        target_mode : :class:`TargetMode` or str
+        target_mode : :class:`TargetMode`
             The target mode specifies which link or frame is referenced when specifying a target.
             See :class:`TargetMode` for more details.
         native_scale : float, optional
@@ -835,7 +913,7 @@ class PointAxisWaypoints(Waypoints):
         The target points and axes.
         Both values are defined relative to the world coordinate frame (WCF).
         Unitized vectors are recommended for the target axes.
-    target_mode : :class:`TargetMode` or str
+    target_mode : :class:`TargetMode`
         The target mode specifies which link or frame is referenced when specifying a target.
         See :class:`TargetMode` for more details.
     native_scale : float, optional
@@ -860,7 +938,7 @@ class PointAxisWaypoints(Waypoints):
     def __init__(
         self,
         target_points_and_axes: list[tuple[Point, Vector]],
-        target_mode: Union["TargetMode", str],
+        target_mode: TargetMode,
         native_scale: float = 1.0,
         tolerance_position: Optional[float] = None,
         tolerance_orientation: Optional[float] = None,
@@ -927,38 +1005,3 @@ class PointAxisWaypoints(Waypoints):
             and TOL.is_close(other.tolerance_orientation, self.tolerance_orientation)
             and other.name == self.name
         )
-
-
-class TargetMode:
-    """Represents different matching mode for `Targets` and `Waypoints`.
-
-    Target modes represent which link or frame is referenced when specifying a target or waypoint.
-    For example, if a target's  `target_mode` is `TargetMode.TCF` (Tool Coordinate Frame),
-    it means that the planner will try to move the robot, such that it's attached TCF
-    matches with the `.frame` specified in the Target or Waypoint.
-
-    Attributes
-    ----------
-    ROBOT : str
-        Refers to the PCF (Planner Coordinate Frame).
-        The frame of the tip link of a planning group.
-    TOOL : str
-        Refers to the TCF (Tool Coordinate Frame) of the tool attached to the robot.
-        Typically this frame is at the tool tip of the tool.
-        A tool must be attached to the robot to use this.
-    WORKPIECE : str
-        Refers to the frame of the workpiece (:class:`~compas_fab.robots.RigidBody`) attached to the robot.
-        There must be one and only one workpiece attached to the robot when using this mode.
-
-    Notes
-    -----
-    The term `workpiece` refers to the RigidBody attached to a tool.
-
-    When using the `WORKPIECE` mode, the user must ensure that only one workpiece is attached to the robot.
-    Otherwise, it is not possible for compas_fab to determine which workpiece is being referred to.
-    If the user has multiple workpieces, they should use the `TOOL` mode instead.
-    """
-
-    ROBOT = "ROBOT"
-    TOOL = "TOOL"
-    WORKPIECE = "WORKPIECE"

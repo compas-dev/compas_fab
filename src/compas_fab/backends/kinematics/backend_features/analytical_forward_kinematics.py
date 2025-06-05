@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
 from typing import Optional
-from typing import Union
 
 from compas.geometry import Frame
 
@@ -24,7 +23,7 @@ class AnalyticalForwardKinematics(ForwardKinematics):
     def forward_kinematics(
         self,
         robot_cell_state: RobotCellState,
-        target_mode: Union["TargetMode", str],
+        target_mode: TargetMode,
         scale: Optional[float] = None,
         group: Optional[str] = None,
         options: Optional[dict] = None,

@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
 from typing import Optional
-from typing import Union
 
 from compas.geometry import Frame
 from compas.geometry import Transformation
@@ -39,7 +38,7 @@ class MoveItForwardKinematics(ForwardKinematics):
     def forward_kinematics(
         self,
         robot_cell_state: RobotCellState,
-        target_mode: Union[TargetMode, str],
+        target_mode: TargetMode,
         group: Optional[str] = None,
         native_scale: Optional[float] = None,
         options: Optional[dict] = None,
@@ -59,7 +58,7 @@ class MoveItForwardKinematics(ForwardKinematics):
             The robot cell state describing the robot cell.
             The attribute `robot_configuration`, must contain the full configuration of the robot corresponding to the planning group.
             The robot cell state should also reflect the attachment of tools, if any.
-        target_mode : :class:`compas_fab.robots.TargetMode` or str
+        target_mode : :class:`compas_fab.robots.TargetMode`
             The target mode to select which frame to return.
         group : str, optional
             The planning group of the robot.
@@ -105,7 +104,7 @@ class MoveItForwardKinematics(ForwardKinematics):
 
         return wcf_target_frame
 
-        return target_frame
+        # return target_frame
 
     def forward_kinematics_to_link(
         self,

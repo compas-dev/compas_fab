@@ -128,6 +128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed `RosClient` constructor to take a type for planner backend instead of a string. This also changes the name of the argument from `planner_backend` to `planner_type`.
 * Changed type-hints from comment-style to standard Python 3.x type-hints
 * Changed `RosDistro` to be an enum instead of string.
+* Changed `TargetMode` to be an enum instead of string.
 
 ### Removed
 

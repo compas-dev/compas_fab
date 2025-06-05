@@ -1149,7 +1149,7 @@ class RobotCell(Data):
         self,
         robot_cell_state: RobotCellState,
         frame_or_frames: Frame | list[Frame],
-        target_mode: TargetMode | str,
+        target_mode: TargetMode,
         group: str,
     ) -> Frame | list[Frame]:
         """Converts a Frame or a list of Frames to the PCF (Planner Coordinate Frame) relative to WCF.
@@ -1165,7 +1165,7 @@ class RobotCell(Data):
             The state of the robot cell.
         frame_or_frames : :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
             The frame or frames to convert.
-        target_mode : :class:`~compas_fab.robots.TargetMode` or str
+        target_mode : :class:`~compas_fab.robots.TargetMode`
             The target mode of the frame or frames.
         group : str
             The planning group to check. Must be specified.
@@ -1205,7 +1205,7 @@ class RobotCell(Data):
         self,
         robot_cell_state: RobotCellState,
         frame_or_frames: Frame | list[Frame],
-        target_mode: TargetMode | str,
+        target_mode: TargetMode,
         group: str,
     ) -> Frame | list[Frame]:
         """Converts a (or a list of) Planner Coordinate Frame (PCF) to the target frame
@@ -1223,7 +1223,7 @@ class RobotCell(Data):
             The state of the robot cell.
         frame_or_frames : :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
             The PCF frame or frames to convert.
-        target_mode : :class:`~compas_fab.robots.TargetMode` or str
+        target_mode : :class:`~compas_fab.robots.TargetMode`
             The target mode of the frame or frames.
         group : str
             The planning group to check. Must be specified.

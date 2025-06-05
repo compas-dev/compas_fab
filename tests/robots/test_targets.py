@@ -6,6 +6,8 @@ from compas.geometry import Point
 from compas.geometry import Vector
 from compas.tolerance import TOL
 from compas_robots import Configuration
+from compas.data import json_dumps
+from compas.data import json_loads
 
 from compas_fab.robots import ConfigurationTarget
 from compas_fab.robots import ConstraintSetTarget
@@ -71,37 +73,49 @@ def configuration_target(target_configuration):
     )
 
 
-def test_serialization_targets(frame_target, point_axis_target, configuration_target):
+def test_frame_targetserialization(frame_target):
     # FrameTarget
-    nt = FrameTarget.__from_data__(frame_target.__data__)
-    assert frame_target.target_frame == nt.target_frame
-    assert frame_target.target_mode == nt.target_mode
-    assert frame_target.native_scale == nt.native_scale
-    assert frame_target.tolerance_position == nt.tolerance_position
-    assert frame_target.tolerance_orientation == nt.tolerance_orientation
-    assert frame_target.name == nt.name
-    assert frame_target == nt
+    new_targets = []
+    new_targets.append(json_loads(json_dumps(frame_target)))
+    new_targets.append(FrameTarget.__from_data__(frame_target.__data__))
+    for nt in new_targets:
+        assert frame_target.target_frame == nt.target_frame
+        assert frame_target.target_mode == nt.target_mode
+        assert frame_target.native_scale == nt.native_scale
+        assert frame_target.tolerance_position == nt.tolerance_position
+        assert frame_target.tolerance_orientation == nt.tolerance_orientation
+        assert frame_target.name == nt.name
+        assert frame_target == nt
 
+
+def test_point_axis_targetserialization(point_axis_target):
     # PointAxisTarget
-    nt = PointAxisTarget.__from_data__(point_axis_target.__data__)
-    assert TOL.is_allclose(point_axis_target.target_point, nt.target_point)
-    assert TOL.is_allclose(point_axis_target.target_z_axis, nt.target_z_axis)
-    # assert point_axis_target.target_point == nt.target_point
-    # assert point_axis_target.target_z_axis == nt.target_z_axis
-    assert point_axis_target.target_mode == nt.target_mode
-    assert point_axis_target.native_scale == nt.native_scale
-    assert point_axis_target.tolerance_position == nt.tolerance_position
-    assert point_axis_target.tolerance_orientation == nt.tolerance_orientation
-    assert point_axis_target.name == nt.name
-    assert point_axis_target == nt
+    new_targets = []
+    new_targets.append(json_loads(json_dumps(point_axis_target)))
+    new_targets.append(PointAxisTarget.__from_data__(point_axis_target.__data__))
 
+    for nt in new_targets:
+        assert TOL.is_allclose(point_axis_target.target_point, nt.target_point)
+        assert TOL.is_allclose(point_axis_target.target_z_axis, nt.target_z_axis)
+        assert point_axis_target.target_mode == nt.target_mode
+        assert point_axis_target.native_scale == nt.native_scale
+        assert point_axis_target.tolerance_position == nt.tolerance_position
+        assert point_axis_target.tolerance_orientation == nt.tolerance_orientation
+        assert point_axis_target.name == nt.name
+        assert point_axis_target == nt
+
+
+def test_configuration_target_serialization(configuration_target):
     # ConfigurationTarget
-    nt = ConfigurationTarget.__from_data__(configuration_target.__data__)
-    assert configuration_target.target_configuration.close_to(nt.target_configuration)
-    assert configuration_target.tolerance_above == nt.tolerance_above
-    assert configuration_target.tolerance_below == nt.tolerance_below
-    assert configuration_target.name == nt.name
-    assert configuration_target == nt
+    new_targets = []
+    new_targets.append(json_loads(json_dumps(configuration_target)))
+    new_targets.append(ConfigurationTarget.__from_data__(configuration_target.__data__))
+    for nt in new_targets:
+        assert configuration_target.target_configuration.close_to(nt.target_configuration)
+        assert configuration_target.tolerance_above == nt.tolerance_above
+        assert configuration_target.tolerance_below == nt.tolerance_below
+        assert configuration_target.name == nt.name
+        assert configuration_target == nt
 
 
 def test_deepcopy_targets(frame_target, point_axis_target, configuration_target):
