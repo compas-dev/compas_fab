@@ -1,21 +1,15 @@
-from compas import IPY
+from typing import TYPE_CHECKING
+from typing import Optional
+
 from compas.data import Data
 from compas.geometry import Frame
 from compas.geometry import Transformation
+from compas_robots import Configuration
 
 from .targets import TargetMode
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Dict  # noqa: F401
-        from typing import List  # noqa: F401
-        from typing import Optional  # noqa: F401
-
-        from compas_robots import Configuration  # noqa: F401
-
-        from compas_fab.robots import RobotCell  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.robots import RobotCell
 
 __all__ = [
     "RigidBodyState",
@@ -38,26 +32,23 @@ class RobotCellState(Data):
 
     def __init__(
         self,
-        robot_base_frame=None,
-        robot_configuration=None,
-        tool_states=None,
-        rigid_body_states=None,
+        robot_base_frame: Optional[Frame] = None,
+        robot_configuration: Optional[Configuration] = None,
+        tool_states: Optional[dict[str, "ToolState"]] = None,
+        rigid_body_states: Optional[dict[str, "RigidBodyState"]] = None,
     ):
-        # type: (Optional[Frame], Optional[Frame], Optional[Configuration], Dict[str, ToolState], Dict[str, RigidBodyState]) -> None
         super(RobotCellState, self).__init__()
-        self.robot_base_frame = robot_base_frame or Frame.worldXY()  # type: Frame
-        self.robot_configuration = robot_configuration  # type: Optional[Configuration]
-        self.tool_states = tool_states or {}  # type: Dict[str, ToolState]
-        self.rigid_body_states = rigid_body_states or {}  # type: Dict[str, RigidBodyState]
+        self.robot_base_frame = robot_base_frame or Frame.worldXY()
+        self.robot_configuration = robot_configuration
+        self.tool_states = tool_states or {}
+        self.rigid_body_states = rigid_body_states or {}
 
     @property
-    def tool_ids(self):
-        # type: () -> List[str]
+    def tool_ids(self) -> list[str]:
         return list(self.tool_states.keys())
 
     @property
-    def rigid_body_ids(self):
-        # type: () -> List[str]
+    def rigid_body_ids(self) -> list[str]:
         return list(self.rigid_body_states.keys())
 
     @property
@@ -69,8 +60,7 @@ class RobotCellState(Data):
             "rigid_body_states": self.rigid_body_states,
         }
 
-    def __eq__(self, value):
-        # type: (RobotCellState) -> bool
+    def __eq__(self, value: "RobotCellState") -> bool:
         if value is None or not isinstance(value, RobotCellState):
             return False
         if self.robot_base_frame != value.robot_base_frame:
@@ -101,8 +91,9 @@ class RobotCellState(Data):
         return True
 
     @classmethod
-    def from_robot_cell(cls, robot_cell, robot_configuration=None):
-        # type: (RobotCell, Optional[Configuration]) -> RobotCellState
+    def from_robot_cell(
+        cls, robot_cell: "RobotCell", robot_configuration: Optional[Configuration] = None
+    ) -> "RobotCellState":
         """Creates a default `RobotCellState` from a `RobotCell`.
 
         This function ensures that all the tools and workpieces in the robot cell are represented in the robot cell state.
@@ -137,8 +128,7 @@ class RobotCellState(Data):
 
         return cls(base_frame, robot_configuration, tool_states, rigid_body_states)
 
-    def get_attached_tool_id(self, group):
-        # type: (str) -> Optional[str]
+    def get_attached_tool_id(self, group: str) -> Optional[str]:
         """Returns the id of the tool attached to the planning group.
 
         There can only be a maximum of one tool attached to a planning group.
@@ -153,8 +143,7 @@ class RobotCellState(Data):
             if tool_state.attached_to_group == group:
                 return tool_id
 
-    def get_detached_tool_ids(self):
-        # type: () -> List[str]
+    def get_detached_tool_ids(self) -> list[str]:
         """Returns the ids of the tools that are not attached to any planning group.
 
         Returns
@@ -164,8 +153,7 @@ class RobotCellState(Data):
         """
         return [tool_id for tool_id, tool_state in self.tool_states.items() if not tool_state.attached_to_group]
 
-    def get_attached_workpiece_ids(self, group):
-        # type: (str) -> Optional[str]
+    def get_attached_workpiece_ids(self, group: str) -> list[str]:
         """Returns the id of the workpiece attached to the tool attached to the planning group.
 
         Workpieces are rigid bodies that are attached to the tip of a tool.
@@ -186,8 +174,7 @@ class RobotCellState(Data):
                 ids.append(rigid_body_id)
         return ids
 
-    def get_attached_rigid_body_ids(self):
-        # type: () -> List[str]
+    def get_attached_rigid_body_ids(self) -> list[str]:
         """Returns the ids of the rigid bodies attached to links of the robot and to tools.
 
         Returns
@@ -201,8 +188,13 @@ class RobotCellState(Data):
                 ids.append(rigid_body_id)
         return ids
 
-    def set_tool_attached_to_group(self, tool_id, group, attachment_frame=None, touch_links=None):
-        # type: (str, str, Optional[Frame], Optional[List[str]]) -> None
+    def set_tool_attached_to_group(
+        self,
+        tool_id: str,
+        group: str,
+        attachment_frame: Optional[Frame] = None,
+        touch_links: Optional[list[str]] = None,
+    ) -> None:
         """Sets the tool attached to the planning group.
 
         Any other tools that is attached to the specified planning group will be detached.
@@ -237,8 +229,9 @@ class RobotCellState(Data):
             if id != tool_id and tool_state.attached_to_group == group:
                 self.set_tool_detached(id)
 
-    def set_tool_detached(self, tool_id, frame=None, touch_links=None):
-        # type: (str, Optional[Frame], Optional[List[str]]) -> None
+    def set_tool_detached(
+        self, tool_id: str, frame: Optional[Frame] = None, touch_links: Optional[list[str]] = None
+    ) -> None:
         """Sets the tool to be detached from the planning group.
 
         Parameters
@@ -267,8 +260,13 @@ class RobotCellState(Data):
         else:
             self.tool_states[tool_id].touch_links = touch_links
 
-    def set_rigid_body_attached_to_link(self, rigid_body_id, link_name, attachment_frame=None, touch_links=None):
-        # type: (str, str, Optional[Frame | Transformation], Optional[List[str]]) -> None
+    def set_rigid_body_attached_to_link(
+        self,
+        rigid_body_id: str,
+        link_name: str,
+        attachment_frame: Optional[Frame | Transformation] = None,
+        touch_links: Optional[list[str]] = None,
+    ) -> None:
         """Sets the rigid body attached to the link of the robot.
 
         Notes
@@ -297,8 +295,9 @@ class RobotCellState(Data):
         self.rigid_body_states[rigid_body_id].attachment_frame = attachment_frame
         self.rigid_body_states[rigid_body_id].touch_links = touch_links or []
 
-    def set_rigid_body_attached_to_tool(self, rigid_body_id, tool_id, attachment_frame=None):
-        # type: (str, str, Optional[Frame]) -> None
+    def set_rigid_body_attached_to_tool(
+        self, rigid_body_id: str, tool_id: str, attachment_frame: Optional[Frame] = None
+    ):
         """Sets the rigid body attached to the tool.
 
         Notes
@@ -324,8 +323,7 @@ class RobotCellState(Data):
         self.rigid_body_states[rigid_body_id].frame = None
         self.rigid_body_states[rigid_body_id].attachment_frame = attachment_frame
 
-    def assert_target_mode_match(self, target_mode, group):
-        # type: (TargetMode | None, str) -> None
+    def assert_target_mode_match(self, target_mode: Optional["TargetMode"], group: str) -> None:
         """Check if the current tool and workpiece attachment state support the specified TargetMode.
 
         If the `target_mode` is None,
@@ -425,27 +423,26 @@ class ToolState(Data):
 
     def __init__(
         self,
-        frame,
-        attached_to_group=None,
-        touch_links=None,
-        attachment_frame=None,
-        configuration=None,
-        is_hidden=False,
+        frame: Frame | Transformation,
+        attached_to_group: Optional[str] = None,
+        touch_links: Optional[list[str]] = None,
+        attachment_frame: Optional[Frame | Transformation] = None,
+        configuration: Optional[Configuration] = None,
+        is_hidden: bool = False,
     ):
-        # type: (Frame | Transformation, Optional[str], Optional[Frame| Transformation], Optional[List[str]], Optional[Configuration], Optional[bool]) -> None
         super(ToolState, self).__init__()
-        self.frame = frame  # type: Frame
+        self.frame = frame
         # Convert frame to a Frame if it is a Transformation
         if isinstance(frame, Transformation):
             self.frame = Frame.from_transformation(frame)
-        self.attached_to_group = attached_to_group  # type: Optional[str]
-        self.touch_links = touch_links or []  # type: List[str]
-        self.attachment_frame = attachment_frame  # type: Optional[Frame]
+        self.attached_to_group = attached_to_group
+        self.touch_links = touch_links or []
+        self.attachment_frame = attachment_frame
         # Convert frame to a Frame if it is a Transformation
         if isinstance(attachment_frame, Transformation):
             self.attachment_frame = Frame.from_transformation(attachment_frame)
-        self.configuration = configuration  # type: Optional[Configuration]
-        self.is_hidden = is_hidden  # type: bool
+        self.configuration = configuration
+        self.is_hidden = is_hidden
 
     @property
     def __data__(self):
@@ -459,7 +456,6 @@ class ToolState(Data):
         }
 
     def __eq__(self, value):
-        # type: (ToolState) -> bool
         if value is None:
             return False
         # In order to allow duck typing we do not assert value.__class__ to be equal to self.__class__
@@ -577,31 +573,30 @@ class RigidBodyState(Data):
 
     def __init__(
         self,
-        frame,
-        attached_to_link=None,
-        attached_to_tool=None,
-        touch_links=None,
-        touch_bodies=None,
-        attachment_frame=None,
-        is_hidden=False,
+        frame: Frame,
+        attached_to_link: Optional[str] = None,
+        attached_to_tool: Optional[str] = None,
+        touch_links: Optional[list[str]] = None,
+        touch_bodies: Optional[list[str]] = None,
+        attachment_frame: Optional[Frame] = None,
+        is_hidden: bool = False,
     ):
-        # type: (Frame, Optional[str], Optional[str], Optional[List[str]], Optional[List[str]], Optional[Frame], Optional[bool]) -> None
         super(RigidBodyState, self).__init__()
-        self.frame = frame  # type: Frame
+        self.frame = frame
         # Convert frame to a Frame if it is a Transformation
         if isinstance(frame, Transformation):
             self.frame = Frame.from_transformation(frame)
-        self.attached_to_link = attached_to_link  # type: Optional[str]
-        self.attached_to_tool = attached_to_tool  # type: Optional[str]
-        self.touch_links = touch_links or []  # type: List[str]
+        self.attached_to_link = attached_to_link
+        self.attached_to_tool = attached_to_tool
+        self.touch_links = touch_links or []
         self.touch_bodies = touch_bodies or []
         if attached_to_link and attached_to_tool:
             raise ValueError("A RigidBodyState cannot be attached to both a link and a tool.")
-        self.attachment_frame = attachment_frame  # type: Optional[Frame]
+        self.attachment_frame = attachment_frame
         # Convert attachment_frame to a Frame if it is a Transformation
         if isinstance(attachment_frame, Transformation):
             self.attachment_frame = Frame.from_transformation(attachment_frame)
-        self.is_hidden = is_hidden  # type: bool
+        self.is_hidden = is_hidden
 
     @property
     def __data__(self):
@@ -616,7 +611,6 @@ class RigidBodyState(Data):
         }
 
     def __eq__(self, value):
-        # type: (RigidBodyState) -> bool
         if value is None:
             return False
         # Wrap the tests in try block, if any of the attributes cannot be compared,
