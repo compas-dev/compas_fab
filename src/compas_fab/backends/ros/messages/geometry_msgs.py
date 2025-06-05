@@ -145,6 +145,7 @@ class Wrench(ROSmsg):
 
     Examples
     --------
+    >>> import compas_fab.robots
     >>> wrench = compas_fab.robots.Wrench([0, 0, -98], [0, 0, 0])
     >>> ros_wrench = Wrench.from_wrench(wrench)
     >>> ros_wrench.msg
@@ -204,6 +205,8 @@ class Inertia(ROSmsg):
 
     Examples
     --------
+    
+    >>> import compas_fab.robots
     >>> inertia = compas_fab.robots.Inertia([[0] * 3] * 3, 1.0, [0.1, 3.1, 4.4])
     >>> ros_inertia = Inertia.from_inertia(inertia)
     >>> ros_inertia.msg
