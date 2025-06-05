@@ -104,8 +104,6 @@ class MoveItForwardKinematics(ForwardKinematics):
 
         return wcf_target_frame
 
-        # return target_frame
-
     def forward_kinematics_to_link(
         self,
         robot_cell_state: RobotCellState,
