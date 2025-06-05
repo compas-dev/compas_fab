@@ -39,7 +39,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
     def iter_inverse_kinematics(
         self, target: Target, start_state: RobotCellState, group: Optional[str], options: Optional[dict] = None
-    ) -> Generator[Configuration | None, None, None]:
+    ) -> Generator[Optional[Configuration], None, None]:
         """Calculate the robot's inverse kinematic for a given target.
 
         An iterator is returned that yields configurations.
@@ -55,7 +55,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
     def _iter_inverse_kinematics_frame_target(
         self, target: FrameTarget, start_state: RobotCellState, group: Optional[str], options: Optional[dict] = None
-    ) -> Generator[Configuration | None, None, None]:
+    ) -> Generator[Optional[Configuration], None, None]:
         """Calculate the robot's inverse kinematic for a given frame target.
 
         The IK for 6-axis industrial robots returns by default 8 possible solutions.
@@ -88,7 +88,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
     def inverse_kinematics_ordered(
         self, frame_WCF: Frame, group: Optional[str] = None, options: Optional[dict] = None
-    ) -> Generator[Configuration | None, None, None]:
+    ) -> Generator[Optional[Configuration], None, None]:
         """Calculate the robot's inverse kinematic (IK) for a given frame.
 
         The IK for 6-axis industrial robots returns by default 8 possible solutions.

@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 from typing import Optional
+from typing import Union
 
 from compas.data import Data
 from compas.geometry import Frame
@@ -135,7 +136,7 @@ class RobotCellState(Data):
 
         Returns
         -------
-        str | None
+        str
             The id of the tool attached to the planning group.
             None if no tool is attached.
         """
@@ -264,7 +265,7 @@ class RobotCellState(Data):
         self,
         rigid_body_id: str,
         link_name: str,
-        attachment_frame: Optional[Frame | Transformation] = None,
+        attachment_frame: Optional[Union[Frame, Transformation]] = None,
         touch_links: Optional[list[str]] = None,
     ) -> None:
         """Sets the rigid body attached to the link of the robot.
@@ -423,10 +424,10 @@ class ToolState(Data):
 
     def __init__(
         self,
-        frame: Frame | Transformation,
+        frame: Union[Frame, Transformation],
         attached_to_group: Optional[str] = None,
         touch_links: Optional[list[str]] = None,
-        attachment_frame: Optional[Frame | Transformation] = None,
+        attachment_frame: Optional[Union[Frame, Transformation]] = None,
         configuration: Optional[Configuration] = None,
         is_hidden: bool = False,
     ):
@@ -523,10 +524,10 @@ class RigidBodyState(Data):
     ----------
     frame : :class:`compas.geometry.Frame`
         The base frame of the rigid body relative to the world coordinate frame.
-    attached_to_link : :obj:`str` | None
+    attached_to_link : :obj:`str`, optional
         The name of the robot link to which the rigid body is attached.
        ``None`` if not attached to a link.
-    attached_to_tool : :obj:`str` | None
+    attached_to_tool : :obj:`str`, optional
         The id of the tool to which the rigid body is attached.
         ``None`` if not attached to a tool.
     touch_links : :obj:`list` of :obj:`str`

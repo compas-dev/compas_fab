@@ -43,7 +43,7 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
         start_state: RobotCellState = None,
         group: Optional[str] = None,
         options: Optional[dict] = None,
-    ) -> Generator[Configuration | None, None, None]:
+    ) -> Generator[Optional[Configuration], None, None]:
         """Calculate the robot's inverse kinematic for a given target.
 
         An iterator is returned that yields configurations.
@@ -63,7 +63,7 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
 
     def _iter_inverse_kinematics_frame_target(
         self, target: FrameTarget, start_state: RobotCellState, group: Optional[str], options: Optional[dict] = None
-    ) -> Generator[Configuration | None, None, None]:
+    ) -> Generator[Optional[Configuration], None, None]:
         """This function overrides the _iter_inverse_kinematics_frame_target function from AnalyticalInverseKinematics
         to include the PyBulletClient for collision checking.
 

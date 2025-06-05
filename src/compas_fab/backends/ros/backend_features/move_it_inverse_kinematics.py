@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 from typing import Optional
+from typing import Union
 
 from compas.geometry import Frame
 from compas.tolerance import TOL
@@ -51,7 +52,7 @@ class MoveItInverseKinematics(InverseKinematics):
 
     def inverse_kinematics(
         self,
-        target: FrameTarget | PointAxisTarget,
+        target: Union[FrameTarget, PointAxisTarget],
         robot_cell_state: "RobotCellState",
         group: Optional[str] = None,
         options: Optional[dict] = None,
@@ -120,7 +121,7 @@ class MoveItInverseKinematics(InverseKinematics):
 
     def iter_inverse_kinematics(
         self,
-        target: FrameTarget | PointAxisTarget,
+        target: Union[FrameTarget, PointAxisTarget],
         robot_cell_state: "RobotCellState" = None,
         group: Optional[str] = None,
         options: Optional[dict] = None,

@@ -1,3 +1,5 @@
+from typing import Union
+
 from compas.data import Data
 from compas.datastructures import Mesh
 
@@ -10,7 +12,10 @@ class RigidBody(Data):
     """Represents a rigid body."""
 
     def __init__(
-        self, visual_meshes: list[Mesh] | Mesh, collision_meshes: list[Mesh] | Mesh, native_scale: float = 1.0
+        self,
+        visual_meshes: Union[list[Mesh], Mesh],
+        collision_meshes: Union[list[Mesh], Mesh],
+        native_scale: float = 1.0,
     ):
         """Represents a rigid body for use in a RobotCell.
 

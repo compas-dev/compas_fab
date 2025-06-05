@@ -1,5 +1,6 @@
 import random
 from typing import Optional
+from typing import Union
 
 from compas.data import Data
 from compas.datastructures import Mesh
@@ -834,7 +835,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :class:`compas_robots.ToolModel` | None
+        :class:`compas_robots.ToolModel`
             The tool attached to the group in the robot cell state.
             None if no tool is attached.
         """
@@ -848,9 +849,9 @@ class RobotCell(Data):
 
         Returns
         -------
-        :class:`compas_fab.robots.RigidBody` | None
-            The workpiece attached to the tool attached to the group in the robot cell state.
-            None if no workpiece is attached or no tool is attached.
+        list of :class:`compas_fab.robots.RigidBody`
+            The workpieces attached to the tool attached to the group in the robot cell state.
+            Empty list if no workpiece is attached or no tool is attached.
         """
         bodies = []
         workpiece_id = robot_cell_state.get_attached_workpiece_ids(group)
@@ -1148,10 +1149,10 @@ class RobotCell(Data):
     def target_frames_to_pcf(
         self,
         robot_cell_state: RobotCellState,
-        frame_or_frames: Frame | list[Frame],
+        frame_or_frames: Union[Frame, list[Frame]],
         target_mode: TargetMode,
         group: str,
-    ) -> Frame | list[Frame]:
+    ) -> Union[Frame, list[Frame]]:
         """Converts a Frame or a list of Frames to the PCF (Planner Coordinate Frame) relative to WCF.
 
         This function is intended to be used by the planner to convert target frames to PCF for planning.
@@ -1204,10 +1205,10 @@ class RobotCell(Data):
     def pcf_to_target_frames(
         self,
         robot_cell_state: RobotCellState,
-        frame_or_frames: Frame | list[Frame],
+        frame_or_frames: Union[Frame, list[Frame]],
         target_mode: TargetMode,
         group: str,
-    ) -> Frame | list[Frame]:
+    ) -> Union[Frame, list[Frame]]:
         """Converts a (or a list of) Planner Coordinate Frame (PCF) to the target frame
         according to the target mode.
 
