@@ -1,4 +1,7 @@
-from compas import IPY
+from typing import TYPE_CHECKING
+from typing import Callable
+from typing import Optional
+
 from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import SetRobotCell
@@ -14,19 +17,11 @@ from compas_fab.backends.ros.messages.geometry_msgs import Pose
 from compas_fab.backends.ros.messages.shape_msgs import Mesh
 from compas_fab.backends.ros.service_description import ServiceDescription
 from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Callable  # noqa: F401
-        from typing import Dict  # noqa: F401
-        from typing import Optional  # noqa: F401
-
-        from compas_fab.backends import MoveItPlanner  # noqa: F401
-        from compas_fab.backends import PyBulletClient  # noqa: F401
-        from compas_fab.backends import RosClient  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.backends import MoveItPlanner
+    from compas_fab.backends import RosClient
 
 
 __all__ = [
@@ -45,8 +40,9 @@ class MoveItSetRobotCell(SetRobotCell):
     )
     ATTACHED_OBJECTS_WEIGHT = 1.0
 
-    def set_robot_cell(self, robot_cell, robot_cell_state=None, options=None):
-        # type: (RobotCell, Optional[RobotCellState], Optional[Dict]) -> None
+    def set_robot_cell(
+        self, robot_cell: RobotCell, robot_cell_state: RobotCellState = None, options: Optional[dict] = None
+    ):
         """Pass the models in the robot cell to the planning client.
 
         The client keeps the robot cell models in memory and uses them for planning.
@@ -69,7 +65,7 @@ class MoveItSetRobotCell(SetRobotCell):
         options : dict, optional
             Unused.
         """
-        planner = self  # type: MoveItPlanner  # noqa: F841
+        planner: MoveItPlanner = self
 
         kwargs = {}
         kwargs["options"] = options
@@ -101,7 +97,6 @@ class MoveItSetRobotCell(SetRobotCell):
         return (step_1_result, step_2_result)
 
     def _set_robot_cell_remove_aco_async(self, callback, errback, options=None):
-        # type: (Callable, Callable, RobotCellState, Optional[Dict]) -> None
         """Remove AttachedCollisionObject from the client.
 
         All AttachedCollisionObjects are removed,
@@ -109,8 +104,8 @@ class MoveItSetRobotCell(SetRobotCell):
 
         This is necessary because Attached CollisionObjects cannot be removed.
         """
-        planner = self  # type: MoveItPlanner  # noqa: F841
-        client = planner.client  # type: RosClient
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
 
         options = options or {}
         verbose = options.get("verbose", False)
@@ -120,7 +115,7 @@ class MoveItSetRobotCell(SetRobotCell):
                 print(msg)
 
         # Get the last robot state
-        planning_scene = planner.get_planning_scene()  # type: PlanningScene
+        planning_scene: PlanningScene = planner.get_planning_scene()
         robot_state = planning_scene.robot_state
 
         # Remove all attached collision objects
@@ -153,10 +148,10 @@ class MoveItSetRobotCell(SetRobotCell):
         request = scene.to_request(client.ros_distro)
         self.APPLY_PLANNING_SCENE(client, request, callback, errback)
 
-    def _set_robot_cell_modify_co_async(self, callback, errback, new_robot_cell, options=None):
-        # type: (Callable, Callable, RobotCell, Optional[Dict]) -> None
+    def _set_robot_cell_modify_co_async(
+        self, callback: Callable, errback: Callable, new_robot_cell: RobotCell, options: Optional[dict] = None
+    ):
         """
-
         This function is responsible for creating moveit_msgs/CollisionObject messages
         for each RigidBody in the robot cell with the ADD operation.
 
@@ -165,8 +160,8 @@ class MoveItSetRobotCell(SetRobotCell):
         each link is exported as a separate CollisionObject so that they can be attached differently later.
 
         """
-        planner = self  # type: MoveItPlanner  # noqa: F841
-        client = planner.client  # type: PyBulletClient
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
 
         options = options or {}
         verbose = options.get("verbose", False)

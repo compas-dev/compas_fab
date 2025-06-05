@@ -1,4 +1,7 @@
-from compas import IPY
+from typing import TYPE_CHECKING
+from typing import Callable
+from typing import Optional
+
 from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import PlanMotion
@@ -17,22 +20,16 @@ from compas_fab.robots import ConfigurationTarget
 from compas_fab.robots import ConstraintSetTarget
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import PointAxisTarget
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import Target
 from compas_fab.robots.constraints import JointConstraint
 from compas_fab.robots.constraints import OrientationConstraint
 from compas_fab.robots.constraints import PositionConstraint
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Optional  # noqa: F401
-
-        from compas_fab.backends import MoveItPlanner  # noqa: F401
-        from compas_fab.backends import RosClient  # noqa: F401
-        from compas_fab.robots import JointTrajectory  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import Target  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.backends import MoveItPlanner
+    from compas_fab.backends import RosClient
 
 __all__ = ["MoveItPlanMotion"]
 
@@ -48,8 +45,9 @@ class MoveItPlanMotion(PlanMotion):
         "/plan_kinematic_path", "GetMotionPlan", MotionPlanRequest, MotionPlanResponse, validate_response
     )
 
-    def plan_motion(self, target, start_state, group=None, options=None):
-        # type: (Target, RobotCellState, Optional[str], Optional[dict]) -> JointTrajectory
+    def plan_motion(
+        self, target: Target, start_state: RobotCellState, group: Optional[str] = None, options: Optional[dict] = None
+    ):
         """Calculates a motion path.
 
         The PyBullet Planner supports ConstraintSetTarget, ConfigurationTarget and FrameTarget.
@@ -95,9 +93,9 @@ class MoveItPlanMotion(PlanMotion):
         :class:`compas_fab.robots.JointTrajectory`
             The calculated trajectory.
         """
-        planner = self  # type: MoveItPlanner
-        client = planner.client  # type: RosClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
 
         # Default Options
         options = options or {}
@@ -122,16 +120,23 @@ class MoveItPlanMotion(PlanMotion):
 
         return await_callback(self._plan_motion_async, **kwargs)
 
-    def _plan_motion_async(self, callback, errback, target, start_state, group, options):
-        # type: (callable, callable, Target, RobotCellState, str, dict) -> JointTrajectory
+    def _plan_motion_async(
+        self,
+        callback: Callable,
+        errback: Callable,
+        target: Target,
+        start_state: RobotCellState,
+        group: str,
+        options: dict,
+    ):
         """Asynchronous handler of MoveIt motion planner service."""
         # http://docs.ros.org/jade/api/moveit_core/html/utils_8cpp_source.html
         # TODO: if list of frames (goals) => receive multiple solutions?
 
         # Housekeeping for intellisense
-        planner = self  # type: MoveItPlanner
-        client = planner.client  # type: RosClient
-        robot_cell = client.robot_cell  # type: RobotCell # noqa: F841
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
 
         ee_link_name = robot_cell.get_end_effector_link_name(group)
 

@@ -1,14 +1,6 @@
-from compas import IPY
 from compas.data import Data
+from compas.datastructures import Mesh
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import List  # noqa: F401
-        from typing import Optional  # noqa: F401
-
-        from compas.datastructures import Mesh  # noqa: F401
 __all__ = [
     "RigidBody",
 ]
@@ -17,8 +9,9 @@ __all__ = [
 class RigidBody(Data):
     """Represents a rigid body."""
 
-    def __init__(self, visual_meshes, collision_meshes, native_scale=1.0):
-        # type: (List[Mesh] | Mesh, List[Mesh] | Mesh, Optional[float]) -> None
+    def __init__(
+        self, visual_meshes: list[Mesh] | Mesh, collision_meshes: list[Mesh] | Mesh, native_scale: float = 1.0
+    ):
         """Represents a rigid body for use in a RobotCell.
 
         A rigid body can have different visual and collision meshes.
@@ -62,7 +55,6 @@ class RigidBody(Data):
         compas_fab do not support weight and inertia properties for rigid bodies.
 
         """
-        # type: (str, List[Mesh], List[Mesh]) -> None
         super(RigidBody, self).__init__()
 
         # If None is provided, we change that to an empty list
@@ -95,24 +87,21 @@ class RigidBody(Data):
         }
 
     @property
-    def visual_meshes_in_meters(self):
-        # type: () -> List[Mesh]
+    def visual_meshes_in_meters(self) -> list[Mesh]:
         """The visual meshes of the rigid body in meters.
 
         This function returns a list of new meshes, the original meshes are not modified."""
         return [mesh.scaled(self.native_scale) for mesh in self.visual_meshes]
 
     @property
-    def collision_meshes_in_meters(self):
-        # type: () -> List[Mesh]
+    def collision_meshes_in_meters(self) -> list[Mesh]:
         """The collision meshes of the rigid body in meters.
 
         This function returns a list of new meshes, the original meshes are not modified."""
         return [mesh.scaled(self.native_scale) for mesh in self.collision_meshes]
 
     @classmethod
-    def from_mesh(cls, mesh, native_scale=1.0):
-        # type: (Mesh, Optional[float]) -> RigidBody
+    def from_mesh(cls, mesh: Mesh, native_scale: float = 1.0) -> "RigidBody":
         """Creates a RigidBody from a single mesh.
 
         This function is a convenience function for creating a RigidBody from a single mesh.
@@ -139,8 +128,7 @@ class RigidBody(Data):
         return cls([mesh], [mesh], native_scale=native_scale)
 
     @classmethod
-    def from_meshes(cls, meshes, native_scale=1.0):
-        # type: (List[Mesh], Optional[float]) -> RigidBody
+    def from_meshes(cls, meshes: list[Mesh], native_scale: float = 1.0) -> "RigidBody":
         """Creates a RigidBody from a list of meshes.
 
         This function is a convenience function for creating a RigidBody from a list of meshes.

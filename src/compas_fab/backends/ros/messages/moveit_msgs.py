@@ -1,5 +1,3 @@
-from compas import IPY
-
 from compas_fab.backends.ros.messages.geometry_msgs import Point
 from compas_fab.backends.ros.messages.geometry_msgs import Pose
 from compas_fab.backends.ros.messages.geometry_msgs import PoseStamped
@@ -17,15 +15,6 @@ from compas_fab.backends.ros.messages.std_msgs import Header
 from compas_fab.backends.ros.messages.std_msgs import ROSmsg
 from compas_fab.backends.ros.messages.trajectory_msgs import JointTrajectory
 from compas_fab.backends.ros.messages.trajectory_msgs import MultiDOFJointTrajectory
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Optional  # noqa: F401
-
-        from compas_fab.robots import RigidBody  # noqa: F401
-        from compas_fab.robots import RigidBodyState  # noqa: F401
 
 
 class CollisionObject(ROSmsg):

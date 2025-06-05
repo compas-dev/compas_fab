@@ -1,26 +1,22 @@
-from compas import IPY
+from typing import TYPE_CHECKING
+
 from compas.geometry import Frame
 from compas.geometry import Transformation
+from compas_robots import ToolModel
 
 from compas_fab.backends.interfaces import SetRobotCellState
+from compas_fab.robots import RigidBodyState
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import ToolState
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from compas_robots import ToolModel  # noqa: F401
-
-        from compas_fab.backends import PyBulletClient  # noqa: F401
-        from compas_fab.backends import PyBulletPlanner  # noqa: F401
-        from compas_fab.robots import RigidBodyState  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import ToolState  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.backends import PyBulletClient
+    from compas_fab.backends import PyBulletPlanner
 
 
 class PyBulletSetRobotCellState(SetRobotCellState):
-    def set_robot_cell_state(self, robot_cell_state):
-        # type: (RobotCellState) -> None
+    def set_robot_cell_state(self, robot_cell_state: RobotCellState):
         """Change the state of the models in the robot cell that have already been set to the Pybullet client.
 
         This function is typically called by planning functions that accepts a start state as input.
@@ -41,9 +37,8 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         -----
         All the magic for transforming the attached objects happens here.
         """
-        client = self.client  # type: PyBulletClient # Trick to keep intellisense happy
-        robot_cell = client.robot_cell  # type: RobotCell
-        planner = self  # type: PyBulletPlanner # noqa: F841
+        client: PyBulletClient = self.client
+        robot_cell: RobotCell = client.robot_cell
 
         # Check if the robot cell state matches the robot cell.
         # However if the robot is the only element in the cell, robot cell can be None and we can skip this check
@@ -162,8 +157,9 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         # keep track of the previous state and only update the models that have changed to improve performance.
         # We can improve when we have proper profiling and performance tests.
 
-    def set_attached_tool_and_rigid_body_state(self, state, group, planner_coordinate_frame):
-        # type: (RobotCellState, str, Frame) -> None
+    def set_attached_tool_and_rigid_body_state(
+        self, state: RobotCellState, group: str, planner_coordinate_frame: Frame
+    ):
         """Change the state of the models in the robot cell that have already been set to the Pybullet client.
 
         Similar to the :meth:`set_robot_cell_state` method, but affects only the tools and rigid bodies
@@ -172,10 +168,10 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         """
 
         # Housekeeping for intellisense
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell  # type: RobotCell
-        robot_cell_state = state.copy()  # type: RobotCellState
+        planner: PyBulletPlanner = self
+        client: PyBulletClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
+        robot_cell_state: RobotCellState = state.copy()
 
         tool_base_frames = {}
         for tool_name, tool_state in robot_cell_state.tool_states.items():
@@ -201,8 +197,9 @@ class PyBulletSetRobotCellState(SetRobotCellState):
 
                 client._set_rigid_body_base_frame(rigid_body_name, rigid_body_base_frame)
 
-    def _compute_workpiece_frame_from_tool_base_frame(self, rigid_body_state, tool_model, tool_base_frame):
-        # type: (RigidBodyState, ToolModel, Frame) -> Frame
+    def _compute_workpiece_frame_from_tool_base_frame(
+        self, rigid_body_state: RigidBodyState, tool_model: ToolModel, tool_base_frame: Frame
+    ):
         """Compute the rigid body base frame from the tool base frame and attachment frame."""
         # Note: The attachment order from the World to the Workpiece are as follows:
         # t_wcf_tbcf is Tool Base Frame, describing Tool Base Coordinate Frame (TBCF) relative to World Coordinate Frame (WCF)
@@ -219,8 +216,9 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         rigid_body_base_frame = Frame.from_transformation(t_wcf_ocf)
         return rigid_body_base_frame
 
-    def _compute_tool_base_frame_from_planner_coordinate_frame(self, tool_state, planner_coordinate_frame):
-        # type: (ToolState, Frame) -> Frame
+    def _compute_tool_base_frame_from_planner_coordinate_frame(
+        self, tool_state: ToolState, planner_coordinate_frame: Frame
+    ):
         """Compute the tool base frame from the planner coordinate frame."""
 
         # Note: The position of the attached tool in the world coordinate frame is given by t_wcf_tbcf

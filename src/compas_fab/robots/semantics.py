@@ -1,21 +1,9 @@
-from compas import IPY
+from typing import Optional
+from xml.etree.ElementTree import Element
+
 from compas.data import Data
 from compas.files import XML
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Any  # noqa: F401
-        from typing import Dict  # noqa: F401
-        from typing import List  # noqa: F401
-        from typing import Optional  # noqa: F401
-        from typing import Set  # noqa: F401
-        from typing import Tuple  # noqa: F401
-        from xml.etree.ElementTree import Element  # noqa: F401
-
-        from compas_robots import RobotModel  # noqa: F401
-        from compas_robots.model import Joint  # noqa: F401
+from compas_robots import RobotModel
 
 __all__ = [
     "RobotSemantics",
@@ -75,14 +63,13 @@ class RobotSemantics(Data):
 
     def __init__(
         self,
-        groups=None,
-        main_group_name=None,
-        passive_joints=None,
-        end_effectors=None,
-        disabled_collisions=None,
-        group_states=None,
+        groups: Optional[dict[str, dict[str, list[str]]]] = None,
+        main_group_name: Optional[str] = None,
+        passive_joints: Optional[list[str]] = None,
+        end_effectors: Optional[list[str]] = None,
+        disabled_collisions: Optional[set[tuple[str, str]]] = None,
+        group_states: Optional[dict[str, dict[str, dict[str, float]]]] = None,
     ):
-        # type: (Optional[Dict[str, Dict[str, List[str]]]], Optional[str], Optional[List[str]], Optional[List[str]], List[Tuple[str,str]], Dict[str, Dict[str, Dict[str,float]]]) -> None
         super(RobotSemantics, self).__init__()
 
         self.groups = groups or {}
@@ -106,7 +93,6 @@ class RobotSemantics(Data):
 
     @classmethod
     def __from_data__(cls, data):
-        # type: (Dict[str, Any]) -> RobotSemantics
         groups = data.get("groups", {})
         main_group_name = data.get("main_group_name")
         passive_joints = data.get("passive_joints", [])
@@ -127,18 +113,15 @@ class RobotSemantics(Data):
         return robot_semantics
 
     @property
-    def group_names(self):
-        # type: () -> List[str]
+    def group_names(self) -> list[str]:
         return list(self.groups.keys())
 
     @property
-    def unordered_disabled_collisions(self):
-        # type: () -> Set[frozenset]
+    def unordered_disabled_collisions(self) -> set[frozenset]:
         return {frozenset(pair) for pair in self.disabled_collisions}
 
     @classmethod
-    def from_srdf_file(cls, file, robot_model):
-        # type: (str, RobotModel) -> RobotSemantics
+    def from_srdf_file(cls, file: str, robot_model: RobotModel) -> "RobotSemantics":
         """Create an instance of semantics based on an SRDF file path or file-like object.
 
         Parameters
@@ -163,8 +146,7 @@ class RobotSemantics(Data):
         return cls.from_xml(xml, robot_model)
 
     @classmethod
-    def from_srdf_string(cls, text, robot_model):
-        # type: (str, RobotModel) -> RobotSemantics
+    def from_srdf_string(cls, text: str, robot_model: RobotModel) -> "RobotSemantics":
         """Create an instance of semantics based on an SRDF string.
 
         Parameters
@@ -179,8 +161,7 @@ class RobotSemantics(Data):
         return cls.from_xml(xml, robot_model)
 
     @classmethod
-    def from_xml(cls, xml, robot_model):
-        # type: (XML, RobotModel) -> RobotSemantics
+    def from_xml(cls, xml: XML, robot_model: RobotModel) -> "RobotSemantics":
         """Create an instance of semantics based on an XML object.
 
         Parameters
@@ -210,8 +191,7 @@ class RobotSemantics(Data):
             group_states=group_states,
         )
 
-    def get_end_effector_link_name(self, group=None):
-        # type: (Optional[str]) -> str
+    def get_end_effector_link_name(self, group: Optional[str] = None) -> str:
         """Get the name of the last link (end effector link) in a planning group.
 
         Parameters
@@ -229,8 +209,7 @@ class RobotSemantics(Data):
             group = self.main_group_name
         return self.groups[group]["links"][-1]
 
-    def get_base_link_name(self, group=None):
-        # type: (Optional[str]) -> str
+    def get_base_link_name(self, group: Optional[str] = None) -> str:
         """Get the name of the first link (base link) in a planning group.
 
         Parameters
@@ -253,8 +232,7 @@ class RobotSemantics(Data):
 # -------------------
 
 
-def _get_groups(root, robot_model):
-    # type: (Element, RobotModel) -> Dict[str, Dict[str, List[str]]]
+def _get_groups(root: Element, robot_model: RobotModel) -> dict[str, dict[str, list[str]]]:
     groups = {}
 
     for group in root.findall("group"):
@@ -267,8 +245,7 @@ def _get_groups(root, robot_model):
     return groups
 
 
-def _get_group_states(root):
-    # type: (Element) -> Dict[str, Dict[str, Dict[str, float]]]
+def _get_group_states(root: Element) -> dict[str, dict[str, dict[str, float]]]:
     group_states = {}
 
     for group_state in root.findall("group_state"):
@@ -280,8 +257,7 @@ def _get_group_states(root):
     return group_states
 
 
-def _get_group_link_names(group, root, robot_model):
-    # type: (Any, Element, RobotModel) -> List[str]
+def _get_group_link_names(group, root, robot_model) -> list[str]:
     link_names = []
     for link in group.findall("link"):
         name = link.attrib["name"]
@@ -313,7 +289,6 @@ def _get_group_link_names(group, root, robot_model):
 
 
 def _get_group_joint_names(group, root, robot_model):
-    # type: (Any, Element, RobotModel) -> List[str]
     joint_names = []
     for link in group.findall("link"):
         link = robot_model.get_link_by_name(link.attrib["name"])
@@ -341,25 +316,21 @@ def _get_group_joint_names(group, root, robot_model):
     return joint_names
 
 
-def _get_group_elem_by_name(group_name, root):
-    # type: (str, Element) -> Element
+def _get_group_elem_by_name(group_name: str, root: Element) -> Element:
     for group_elem in root.findall("group"):
         if group_elem.attrib["name"] == group_name:
             return group_elem
 
 
-def _get_passive_joints(root):
-    # type: (Element) -> List[str]
+def _get_passive_joints(root: Element) -> list[str]:
     return [joint.attrib["name"] for joint in root.iter("passive_joint")]
 
 
-def _get_end_effectors(root):
-    # type: (Element) -> List[str]
+def _get_end_effectors(root: Element) -> list[str]:
     return [ee.attrib["parent_link"] for ee in root.findall("end_effector")]
 
 
-def _get_disabled_collisions(root):
-    # type: (Element) -> Set[Tuple[str, str]]
+def _get_disabled_collisions(root: Element) -> set[tuple[str, str]]:
     return {tuple([dc.attrib["link1"], dc.attrib["link2"]]) for dc in root.iter("disable_collisions")}
 
 
@@ -376,113 +347,113 @@ if __name__ == "__main__":
     json = semantics.to_jsonstring(pretty=True)
     print(json)
 
-# {
-#     "data": {
-#         "disabled_collisions": [
-#             [
-#                 "base_link_inertia",
-#                 "shoulder_link"
-#             ],
-#             [
-#                 "base_link_inertia",
-#                 "upper_arm_link"
-#             ],
-#             [
-#                 "base_link_inertia",
-#                 "wrist_1_link"
-#             ],
-#             [
-#                 "forearm_link",
-#                 "upper_arm_link"
-#             ],
-#             [
-#                 "forearm_link",
-#                 "wrist_1_link"
-#             ],
-#             [
-#                 "shoulder_link",
-#                 "upper_arm_link"
-#             ],
-#             [
-#                 "shoulder_link",
-#                 "wrist_1_link"
-#             ],
-#             [
-#                 "shoulder_link",
-#                 "wrist_2_link"
-#             ],
-#             [
-#                 "wrist_1_link",
-#                 "wrist_2_link"
-#             ],
-#             [
-#                 "wrist_1_link",
-#                 "wrist_3_link"
-#             ],
-#             [
-#                 "wrist_2_link",
-#                 "wrist_3_link"
-#             ]
-#         ],
-#         "end_effectors": [
-#             "tool0"
-#         ],
-#         "group_states": {
-#             "manipulator": {
-#                 "home": {
-#                     "elbow_joint": "0",
-#                     "shoulder_lift_joint": "0",
-#                     "shoulder_pan_joint": "0",
-#                     "wrist_1_joint": "0",
-#                     "wrist_2_joint": "0",
-#                     "wrist_3_joint": "0"
-#                 },
-#                 "up": {
-#                     "elbow_joint": "0",
-#                     "shoulder_lift_joint": "-1.5707",
-#                     "shoulder_pan_joint": "0",
-#                     "wrist_1_joint": "-1.5707",
-#                     "wrist_2_joint": "0",
-#                     "wrist_3_joint": "0"
-#                 }
-#             }
-#         },
-#         "groups": {
-#             "endeffector": {
-#                 "joints": [],
-#                 "links": [
-#                     "tool0"
-#                 ]
-#             },
-#             "manipulator": {
-#                 "joints": [
-#                     "base_link-base_link_inertia",
-#                     "shoulder_pan_joint",
-#                     "shoulder_lift_joint",
-#                     "elbow_joint",
-#                     "wrist_1_joint",
-#                     "wrist_2_joint",
-#                     "wrist_3_joint",
-#                     "wrist_3-flange",
-#                     "flange-tool0"
-#                 ],
-#                 "links": [
-#                     "base_link",
-#                     "base_link_inertia",
-#                     "shoulder_link",
-#                     "upper_arm_link",
-#                     "forearm_link",
-#                     "wrist_1_link",
-#                     "wrist_2_link",
-#                     "wrist_3_link",
-#                     "flange",
-#                     "tool0"
-#                 ]
-#             }
-#         },
-#         "main_group_name": "manipulator",
-#         "passive_joints": []
-#     },
-#     "dtype": "compas_fab.robots/RobotSemantics",
-#     "guid": "1f06e4ed-02b7-4d90-a20a-84c6cb869727"
-# }
+    # {
+    #     "data": {
+    #         "disabled_collisions": [
+    #             [
+    #                 "base_link_inertia",
+    #                 "shoulder_link"
+    #             ],
+    #             [
+    #                 "base_link_inertia",
+    #                 "upper_arm_link"
+    #             ],
+    #             [
+    #                 "base_link_inertia",
+    #                 "wrist_1_link"
+    #             ],
+    #             [
+    #                 "forearm_link",
+    #                 "upper_arm_link"
+    #             ],
+    #             [
+    #                 "forearm_link",
+    #                 "wrist_1_link"
+    #             ],
+    #             [
+    #                 "shoulder_link",
+    #                 "upper_arm_link"
+    #             ],
+    #             [
+    #                 "shoulder_link",
+    #                 "wrist_1_link"
+    #             ],
+    #             [
+    #                 "shoulder_link",
+    #                 "wrist_2_link"
+    #             ],
+    #             [
+    #                 "wrist_1_link",
+    #                 "wrist_2_link"
+    #             ],
+    #             [
+    #                 "wrist_1_link",
+    #                 "wrist_3_link"
+    #             ],
+    #             [
+    #                 "wrist_2_link",
+    #                 "wrist_3_link"
+    #             ]
+    #         ],
+    #         "end_effectors": [
+    #             "tool0"
+    #         ],
+    #         "group_states": {
+    #             "manipulator": {
+    #                 "home": {
+    #                     "elbow_joint": "0",
+    #                     "shoulder_lift_joint": "0",
+    #                     "shoulder_pan_joint": "0",
+    #                     "wrist_1_joint": "0",
+    #                     "wrist_2_joint": "0",
+    #                     "wrist_3_joint": "0"
+    #                 },
+    #                 "up": {
+    #                     "elbow_joint": "0",
+    #                     "shoulder_lift_joint": "-1.5707",
+    #                     "shoulder_pan_joint": "0",
+    #                     "wrist_1_joint": "-1.5707",
+    #                     "wrist_2_joint": "0",
+    #                     "wrist_3_joint": "0"
+    #                 }
+    #             }
+    #         },
+    #         "groups": {
+    #             "endeffector": {
+    #                 "joints": [],
+    #                 "links": [
+    #                     "tool0"
+    #                 ]
+    #             },
+    #             "manipulator": {
+    #                 "joints": [
+    #                     "base_link-base_link_inertia",
+    #                     "shoulder_pan_joint",
+    #                     "shoulder_lift_joint",
+    #                     "elbow_joint",
+    #                     "wrist_1_joint",
+    #                     "wrist_2_joint",
+    #                     "wrist_3_joint",
+    #                     "wrist_3-flange",
+    #                     "flange-tool0"
+    #                 ],
+    #                 "links": [
+    #                     "base_link",
+    #                     "base_link_inertia",
+    #                     "shoulder_link",
+    #                     "upper_arm_link",
+    #                     "forearm_link",
+    #                     "wrist_1_link",
+    #                     "wrist_2_link",
+    #                     "wrist_3_link",
+    #                     "flange",
+    #                     "tool0"
+    #                 ]
+    #             }
+    #         },
+    #         "main_group_name": "manipulator",
+    #         "passive_joints": []
+    #     },
+    #     "dtype": "compas_fab.robots/RobotSemantics",
+    #     "guid": "1f06e4ed-02b7-4d90-a20a-84c6cb869727"
+    # }

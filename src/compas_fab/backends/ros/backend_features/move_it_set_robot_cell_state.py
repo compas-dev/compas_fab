@@ -1,4 +1,7 @@
-from compas import IPY
+from typing import TYPE_CHECKING
+from typing import Callable
+from typing import Optional
+
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas.utilities import await_callback
@@ -15,19 +18,12 @@ from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages.geometry_msgs import Header
 from compas_fab.backends.ros.messages.geometry_msgs import Pose
 from compas_fab.backends.ros.service_description import ServiceDescription
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Callable  # noqa: F401
-        from typing import Dict  # noqa: F401
-        from typing import Optional  # noqa: F401
-
-        from compas_fab.backends import MoveItPlanner  # noqa: F401
-        from compas_fab.backends import RosClient  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.backends import MoveItPlanner
+    from compas_fab.backends import RosClient
 
 
 __all__ = [
@@ -45,8 +41,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
         ApplyPlanningSceneResponse,
     )
 
-    def set_robot_cell_state(self, robot_cell_state, options=None):
-        # type: (RobotCellState, Optional[Dict]) -> None
+    def set_robot_cell_state(self, robot_cell_state: RobotCellState, options: Optional[dict] = None):
         """Set the robot cell state to the client.
 
         This function is called automatically by planning functions that takes a RobotCellState as input.
@@ -71,7 +66,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
         kwargs["options"] = options or {}
         kwargs["errback_name"] = "errback"
 
-        robot_cell = self.client.robot_cell  # type: RobotCell
+        robot_cell: RobotCell = self.client.robot_cell
         robot_cell.assert_cell_state_match(robot_cell_state)
 
         assert robot_cell is not None, "Robot should not be None"
@@ -96,15 +91,16 @@ class MoveItSetRobotCellState(SetRobotCellState):
 
         return (step_1_result, step_2_result, step_3_result)
 
-    def _set_rcs_remove_aco_and_update_config_async(self, callback, errback, robot_cell_state, options):
-        # type: (Callable, Callable, RobotCellState, Dict) -> None
+    def _set_rcs_remove_aco_and_update_config_async(
+        self, callback, errback, robot_cell_state: RobotCellState, options: Optional[dict] = None
+    ):
         """Remove AttachedCollisionObject from the client.
 
         All AttachedCollisionObjects are removed, converting them back to CollisionObjects in the PlanningSceneWorld.
         """
-        planner = self  # type: MoveItPlanner  # noqa: F841
-        client = planner.client  # type: RosClient
-        robot_cell = client.robot_cell
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
 
         # Convenience function for printing verbose messages
         def verbose_print(msg):
@@ -112,7 +108,7 @@ class MoveItSetRobotCellState(SetRobotCellState):
                 print(msg)
 
         # Get the last robot state
-        planning_scene = planner.get_planning_scene()  # type: PlanningScene
+        planning_scene: PlanningScene = planner.get_planning_scene()
         robot_state = planning_scene.robot_state
 
         # Remove all attached collision objects
@@ -160,8 +156,9 @@ class MoveItSetRobotCellState(SetRobotCellState):
         request = scene.to_request(client.ros_distro)
         self.APPLY_PLANNING_SCENE(client, request, callback, errback)
 
-    def _set_rcs_update_co_async(self, callback, errback, robot_cell_state, options):
-        # type: (Callable, Callable, RobotCellState, Dict) -> None
+    def _set_rcs_update_co_async(
+        self, callback: Callable, errback: Callable, robot_cell_state: RobotCellState, options: Optional[dict] = None
+    ):
         """Update the position of CollisionObjects in the client.
 
         Non-attached objects (RigidBody and Tools) are updated in the PlanningSceneWorld.
@@ -169,9 +166,9 @@ class MoveItSetRobotCellState(SetRobotCellState):
         This function is called automatically by planning functions that takes a RobotCellState as input.
 
         """
-        planner = self  # type: MoveItPlanner  # noqa: F841
-        client = planner.client  # type: RosClient
-        robot_cell = client.robot_cell
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
         root_name = robot_cell.root_name
 
         # Convenience function for printing verbose messages
@@ -313,8 +310,9 @@ class MoveItSetRobotCellState(SetRobotCellState):
         request = scene.to_request(client.ros_distro)
         self.APPLY_PLANNING_SCENE(client, request, callback, errback)
 
-    def _set_rcs_create_aco_async(self, callback, errback, robot_cell_state, options):
-        # type: (Callable, Callable, RobotCellState, Dict) -> None
+    def _set_rcs_create_aco_async(
+        self, callback: Callable, errback: Callable, robot_cell_state: RobotCellState, options: Optional[dict] = None
+    ):
         """Update the position of CollisionObjects in the client.
 
         Non-attached objects (RigidBody and Tools) are updated in the PlanningSceneWorld.
@@ -322,9 +320,9 @@ class MoveItSetRobotCellState(SetRobotCellState):
         This function is called automatically by planning functions that takes a RobotCellState as input.
 
         """
-        planner = self  # type: MoveItPlanner  # noqa: F841
-        client = planner.client  # type: RosClient
-        robot_cell = client.robot_cell
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
 
         # Convenience function for printing verbose messages
         def verbose_print(msg):

@@ -1,4 +1,7 @@
-from compas import IPY
+from typing import TYPE_CHECKING
+from typing import Optional
+from typing import Union
+
 from compas.geometry import Frame
 from compas.geometry import Transformation
 from compas.utilities import await_callback
@@ -12,18 +15,13 @@ from compas_fab.backends.ros.messages import JointState
 from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import TargetMode
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Optional  # noqa: F401
-
-        from compas_fab.backends.ros.client import RosClient  # noqa: F401
-        from compas_fab.backends.ros.planner import MoveItPlanner  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import TargetMode  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.backends import MoveItPlanner
+    from compas_fab.backends import RosClient
 
 
 __all__ = [
@@ -38,8 +36,14 @@ class MoveItForwardKinematics(ForwardKinematics):
         "/compute_fk", "GetPositionFK", GetPositionFKRequest, GetPositionFKResponse, validate_response
     )
 
-    def forward_kinematics(self, robot_cell_state, target_mode, group=None, native_scale=None, options=None):
-        # type: (RobotCellState, TargetMode, Optional[str], Optional[float], Optional[dict]) -> Frame
+    def forward_kinematics(
+        self,
+        robot_cell_state: RobotCellState,
+        target_mode: Union[TargetMode, str],
+        group: Optional[str] = None,
+        native_scale: Optional[float] = None,
+        options: Optional[dict] = None,
+    ):
         """Calculate the target frame of the robot (relative to WCF) from the provided RobotCellState.
 
         The returned coordinate frame is dependent on the chosen ``target_mode``:
@@ -76,9 +80,9 @@ class MoveItForwardKinematics(ForwardKinematics):
         :class:`Frame`
             The frame in the world's coordinate system (WCF).
         """
-        planner = self  # type: MoveItPlanner
-        client = planner.client  # type: RosClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
         options = options or {}
 
         group = group or robot_cell.main_group_name
@@ -103,8 +107,13 @@ class MoveItForwardKinematics(ForwardKinematics):
 
         return target_frame
 
-    def forward_kinematics_to_link(self, robot_cell_state, link_name=None, native_scale=None, options=None):
-        # type: (RobotCellState, Optional[str], Optional[float], Optional[dict]) -> Frame
+    def forward_kinematics_to_link(
+        self,
+        robot_cell_state: RobotCellState,
+        link_name: Optional[str] = None,
+        native_scale: Optional[float] = None,
+        options: Optional[dict] = None,
+    ):
         """Calculate the frame of the specified robot link from the provided RobotCellState.
 
         This function operates similar to :meth:`compas_fab.backends.PyBulletForwardKinematics.forward_kinematics`,
@@ -132,9 +141,9 @@ class MoveItForwardKinematics(ForwardKinematics):
             - ``"base_link"``: (:obj:`str`) Name of the base link.
               Defaults to the model's root link.
         """
-        planner = self  # type: MoveItPlanner
-        client = planner.client  # type: RosClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
         options = options or {}
 
         if robot_cell.robot_model.get_link_by_name(link_name) is None:

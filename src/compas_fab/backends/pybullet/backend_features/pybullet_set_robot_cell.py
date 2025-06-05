@@ -1,22 +1,18 @@
-from compas import IPY
+from typing import TYPE_CHECKING
+from typing import Optional
 
 from compas_fab.backends.interfaces import SetRobotCell
 from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Dict  # noqa: F401
-        from typing import Optional  # noqa: F401
-
-        from compas_fab.backends import PyBulletClient  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.backends import PyBulletClient
 
 
 class PyBulletSetRobotCell(SetRobotCell):
-    def set_robot_cell(self, robot_cell, robot_cell_state=None, options=None):
-        # type: (RobotCell, Optional[RobotCellState], Optional[Dict]) -> None
+    def set_robot_cell(
+        self, robot_cell: RobotCell, robot_cell_state: RobotCellState = None, options: Optional[dict] = None
+    ):
         """Pass the models in the robot cell to the Pybullet client.
 
         The client keeps the robot cell models in memory and uses them for planning.
@@ -43,7 +39,7 @@ class PyBulletSetRobotCell(SetRobotCell):
                 "robot_cell should be an instance of RobotCell instead of: {}".format(type(robot_cell).__name__)
             )
 
-        client = self.client  # type: PyBulletClient
+        client: PyBulletClient = self.client
 
         # TODO: Check for new, modified and removed objects compared to the
         # TODO: previous robot cell state and update the PyBullet world accordingly

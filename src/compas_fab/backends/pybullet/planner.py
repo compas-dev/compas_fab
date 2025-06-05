@@ -1,4 +1,4 @@
-from compas import IPY
+from typing import TYPE_CHECKING
 
 from compas_fab.backends.interfaces.planner import PlannerInterface
 from compas_fab.backends.pybullet.backend_features import PyBulletCheckCollision
@@ -8,11 +8,8 @@ from compas_fab.backends.pybullet.backend_features import PyBulletPlanCartesianM
 from compas_fab.backends.pybullet.backend_features import PyBulletSetRobotCell
 from compas_fab.backends.pybullet.backend_features import PyBulletSetRobotCellState
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from compas_fab.backends import PyBulletClient  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.backends import PyBulletClient
 
 __all__ = [
     "PyBulletPlanner",
@@ -34,4 +31,4 @@ class PyBulletPlanner(
         # Initialize all mixins
         super(PyBulletPlanner, self).__init__()
 
-        self._client = client  # type: PyBulletClient
+        self._client: PyBulletClient = client
