@@ -22,6 +22,7 @@ from compas_fab.backends.ros.messages import JointTrajectory as RosMsgJointTraje
 from compas_fab.backends.ros.messages import JointTrajectoryPoint as RosMsgJointTrajectoryPoint
 from compas_fab.backends.ros.messages import MoveItErrorCodes
 from compas_fab.backends.ros.messages import RobotTrajectory
+from compas_fab.backends.ros.messages import RosDistro
 from compas_fab.backends.ros.messages import Time
 from compas_fab.backends.tasks import CancellableFutureResult
 from compas_fab.robots import RobotCell
@@ -141,10 +142,10 @@ class RosClient(Ros, ClientInterface):
         self.close()
 
     @property
-    def ros_distro(self):
+    def ros_distro(self) -> RosDistro:
         """Retrieves the ROS version to which the client is connected (eg. kinetic)"""
         if not self._ros_distro:
-            self._ros_distro = Param(self, "/rosdistro").get(timeout=1).strip()
+            self._ros_distro = RosDistro(Param(self, "/rosdistro").get(timeout=1).strip())
 
         return self._ros_distro
 

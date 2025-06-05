@@ -1,4 +1,7 @@
-class RosDistro:
+from enum import Enum
+
+
+class RosDistro(Enum):
     """Supported/recognized ROS distros"""
 
     KINETIC = "kinetic"

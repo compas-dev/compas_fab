@@ -126,6 +126,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed GH Component `ConstraintsFromPlane` to `FrameTargetFromPlane`.
 * Changed GH Component `ConstraintsFromTargetConfiguration` to `ConfigurationTarget`.
 * Changed `RosClient` constructor to take a type for planner backend instead of a string. This also changes the name of the argument from `planner_backend` to `planner_type`.
+* Changed type-hints from comment-style to standard Python 3.x type-hints
+* Changed `RosDistro` to be an enum instead of string.
 
 ### Removed
 
@@ -178,7 +180,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Removed `plan_cartesian_motion_deprecated` and `plan_motion_deprecated` methods from `Robot` class
 * Removed `forward_kinematics_deprecated` and `inverse_kinematics_deprecated` method from `Robot` class
 * Removed `compas_fab.sensors` module.
-* Removed support for IronPython and changed type-hints from comment-style to standard Python 3.x type-hints.
+* Removed support for IronPython.
 
 ## [1.1.0] 2025-04-17
 
