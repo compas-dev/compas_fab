@@ -11,6 +11,7 @@ from compas.geometry import Vector
 from compas.geometry import axis_angle_from_quaternion
 from compas.geometry import cross_vectors
 from compas.geometry import is_parallel_vector_vector
+from compas_robots import Configuration
 
 from compas_fab.backends import CollisionCheckError
 from compas_fab.backends import InverseKinematicsError
@@ -432,7 +433,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
             # Check if the IK generator (of current step) has any more options
             try:
-                ik_result = next(ik_generators[-1], None)  # type: Configuration | None
+                ik_result: Optional[Configuration] = next(ik_generators[-1], None)
                 ik_option_indices[-1] += 1
             except InverseKinematicsError:
                 # If the generator raises an IK error, it means that there is not even one valid IK solution
@@ -733,7 +734,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         joint_types = robot_cell.get_configurable_joint_types(group)
 
         # Iterate over the waypoints as segments
-        intermediate_state = deepcopy(start_state)  # type: RobotCellState
+        intermediate_state: RobotCellState = deepcopy(start_state)
         start_configuration = start_state.robot_configuration
         # TODO: We currently trust that the input configuration has a correct joint order, this should be checked
         trajectory = JointTrajectory(joint_names=joint_names, start_configuration=start_configuration)
@@ -764,7 +765,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         for i in range(len(waypoints.target_frames)):
             # Calculate interpolation steps based on distance and angle
             # NOTE: Start frame for this segment is the end frame of the previous segment
-            end_frame = waypoints.target_frames[i]  # type: Frame
+            end_frame: Frame = waypoints.target_frames[i]
 
             # Create interpolation helper object
             interpolator = FrameInterpolator(start_frame, end_frame, options)
@@ -928,8 +929,7 @@ class FrameInterpolator(object):
 
     """
 
-    def __init__(self, start_frame, end_frame, options):
-        # type: (Frame, Frame, Dict) -> None
+    def __init__(self, start_frame: Frame, end_frame: Frame, options: dict):
         self.start_frame = start_frame
         self.end_frame = end_frame
         self.options = options
@@ -948,8 +948,7 @@ class FrameInterpolator(object):
         self._regular_interpolation_steps = max(num_steps_by_distance, num_steps_by_angle, 1)
 
     @property
-    def total_distance(self):
-        # type: () -> float
+    def total_distance(self) -> float:
         """The total distance between the start and end frames.
 
         Returns
@@ -986,7 +985,7 @@ class FrameInterpolator(object):
 
         return self._regular_interpolation_steps
 
-    def get_interpolated_frame(self, t) -> Frame:
+    def get_interpolated_frame(self, t: float) -> Frame:
         """Interpolate between two frames using a parameter t.
 
         Parameters
@@ -1081,8 +1080,7 @@ class PointAxisInterpolator(object):
         self._regular_interpolation_steps = max(num_steps_by_distance, num_steps_by_angle, 1)
 
     @property
-    def total_distance(self):
-        # type: () -> float
+    def total_distance(self) -> float:
         """The total distance between the start and end points.
 
         Returns
@@ -1094,8 +1092,7 @@ class PointAxisInterpolator(object):
         return self._total_distance
 
     @property
-    def total_angle(self):
-        # type: () -> float
+    def total_angle(self) -> float:
         """The total angle between the start and end axes.
 
         Returns
@@ -1107,8 +1104,7 @@ class PointAxisInterpolator(object):
         return self._total_angle
 
     @property
-    def regular_interpolation_steps(self):
-        # type: () -> int
+    def regular_interpolation_steps(self) -> int:
         """The number of interpolation steps based on max_step_distance and max_step_angle.
 
         Returns
@@ -1121,8 +1117,7 @@ class PointAxisInterpolator(object):
 
         return self._regular_interpolation_steps
 
-    def get_interpolated_point_axis(self, t):
-        # type: (float) -> Tuple[List[float], Vector]
+    def get_interpolated_point_axis(self, t: float) -> tuple[list[float], Vector]:
         """Interpolate between two point-axis pairs using a parameter t.
 
         Parameters
