@@ -1,23 +1,15 @@
 import math
 
-from compas import IPY
 from compas.data import Data
+from compas.geometry import Frame
+from compas.geometry import Point
+from compas.geometry import Transformation
 from compas.geometry import Vector
 from compas.geometry import cross_vectors
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import List  # noqa: F401
-
-        from compas.geometry import Frame  # noqa: F401
-        from compas.geometry import Point  # noqa: F401
-        from compas.geometry import Transformation  # noqa: F401
-
-if not IPY:
+try:
     from scipy import stats
-else:
+except ImportError:
     stats = None
 
 # TODO: move to some constants file? g is also defined in scipy.constants
@@ -47,8 +39,7 @@ class Wrench(Data):
 
     """
 
-    def __init__(self, force, torque):
-        # type: (Vector, Vector) -> None
+    def __init__(self, force: Vector, torque: Vector):
         super(Wrench, self).__init__()
         self.force = force
         self.torque = torque
@@ -69,8 +60,7 @@ class Wrench(Data):
     # ==========================================================================
 
     @classmethod
-    def from_list(cls, values):
-        # type: (List[float]) -> Wrench
+    def from_list(cls, values: list[float]) -> "Wrench":
         """Construct a wrench from a list of 6 :obj:`float` values.
 
         Parameters
@@ -92,8 +82,7 @@ class Wrench(Data):
         return cls(force, torque)
 
     @classmethod
-    def by_samples(cls, wrenches, proportion_to_cut=0.1):
-        # type: (List[Wrench], float) -> Wrench
+    def by_samples(cls, wrenches: list["Wrench"], proportion_to_cut: float = 0.1) -> "Wrench":
         """
         Construct the wrench by sampled data, allowing to filter.
 
@@ -134,24 +123,20 @@ class Wrench(Data):
     # ==========================================================================
 
     @property
-    def force(self):
-        # type: () -> Vector
+    def force(self) -> Vector:
         return self._force
 
     @force.setter
-    def force(self, vector):
-        # type: (Vector) -> None
+    def force(self, vector: Vector):
         force = Vector(*list(vector))
         self._force = force
 
     @property
-    def torque(self):
-        # type: () -> Vector
+    def torque(self) -> Vector:
         return self._torque
 
     @torque.setter
-    def torque(self, vector):
-        # type: (Vector) -> None
+    def torque(self, vector: Vector):
         torque = Vector(*list(vector))
         self._torque = torque
 
@@ -177,8 +162,7 @@ class Wrench(Data):
     # helpers
     # ==========================================================================
 
-    def copy(self):
-        # type: () -> Wrench
+    def copy(self) -> "Wrench":
         """Make a copy of this ``Wrench``.
 
         Returns
@@ -193,7 +177,7 @@ class Wrench(Data):
     # operators
     # ==========================================================================
 
-    def __mul__(self, n):
+    def __mul__(self, n: float) -> "Wrench":
         """Create a ``Wrench`` multiplied by the given factor.
 
         Parameters
@@ -209,7 +193,7 @@ class Wrench(Data):
         """
         return Wrench(self.force * n, self.torque * n)
 
-    def __add__(self, other):
+    def __add__(self, other: "Wrench") -> "Wrench":
         """Return a ``Wrench`` that is the the sum of this ``Wrench`` and another wrench.
 
         Parameters
@@ -225,7 +209,7 @@ class Wrench(Data):
         """
         return Wrench(self.force + other.force, self.torque + other.torque)
 
-    def __sub__(self, other):
+    def __sub__(self, other: "Wrench") -> "Wrench":
         """Return a ``Wrench`` that is the the difference between this ``Wrench`` and another wrench.
 
         Parameters
@@ -240,7 +224,7 @@ class Wrench(Data):
         """
         return Wrench(self.force - other.force, self.torque - other.torque)
 
-    def __neg__(self):
+    def __neg__(self) -> "Wrench":
         """Return the negated ``Wrench``.
 
         Returns
@@ -250,28 +234,27 @@ class Wrench(Data):
         """
         return Wrench(self.force * -1.0, self.torque * -1.0)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return 6
 
     # ==========================================================================
     # comparison
     # ==========================================================================
 
-    def __eq__(self, other, tol=1e-05):
+    def __eq__(self, other: "Wrench", tol: float = 1e-05) -> bool:
         for a, b in zip(list(self), list(other)):
             if math.fabs(a - b) > tol:
                 return False
         return True
 
-    def __ne__(self, other, tol=1e-05):
+    def __ne__(self, other: "Wrench", tol: float = 1e-05) -> bool:
         return not self.__eq__(other, tol)
 
     # ==========================================================================
     # transformations
     # ==========================================================================
 
-    def transform(self, transformation):
-        # type: (Transformation) -> None
+    def transform(self, transformation: Transformation) -> None:
         """Transforms a `Wrench` with the transformation.
 
         Parameters
@@ -292,8 +275,7 @@ class Wrench(Data):
         self.force.transform(transformation)
         self.torque.transform(transformation)
 
-    def transformed(self, transformation):
-        # type: (Transformation) -> Wrench
+    def transformed(self, transformation: Transformation) -> "Wrench":
         """Returns a transformed copy of the `Wrench`.
 
         Parameters
@@ -316,8 +298,7 @@ class Wrench(Data):
         wrench.transform(transformation)
         return wrench
 
-    def gravity_compensated(self, ft_sensor_frame, mass, center_of_mass):
-        # type: (Frame, float, Point) -> Wrench
+    def gravity_compensated(self, ft_sensor_frame: Frame, mass: float, center_of_mass: Point) -> "Wrench":
         """Removes the force and torque in effect of gravity from the wrench.
 
         Parameters
