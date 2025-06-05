@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import math
 
 from compas import IPY

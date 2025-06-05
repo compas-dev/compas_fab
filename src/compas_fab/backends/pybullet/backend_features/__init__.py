@@ -16,8 +16,6 @@ PyBullet backend features
 
 """
 
-from __future__ import absolute_import
-
 from compas_fab.backends.pybullet.backend_features.pybullet_check_collision import PyBulletCheckCollision
 from compas_fab.backends.pybullet.backend_features.pybullet_forward_kinematics import PyBulletForwardKinematics
 from compas_fab.backends.pybullet.backend_features.pybullet_inverse_kinematics import PyBulletInverseKinematics

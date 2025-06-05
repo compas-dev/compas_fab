@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from .actionlib_msgs import *  # noqa: F401,F403
 from .control_msgs import *  # noqa: F401,F403
 from .geometry_msgs import *  # noqa: F401,F403

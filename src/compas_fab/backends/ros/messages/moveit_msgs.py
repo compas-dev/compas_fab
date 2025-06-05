@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from compas import IPY
 
 from compas_fab.backends.ros.messages.geometry_msgs import Point
