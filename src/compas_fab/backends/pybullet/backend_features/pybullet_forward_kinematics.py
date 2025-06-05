@@ -1,34 +1,30 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from typing import TYPE_CHECKING
+from typing import Optional
 
-from compas import IPY
 from compas.geometry import Frame
 from compas.geometry import Transformation
 
 from compas_fab.backends.exceptions import PlanningGroupNotExistsError
 from compas_fab.backends.interfaces import ForwardKinematics
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import TargetMode
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Optional  # noqa: F401
-
-        from compas.geometry import Frame  # noqa: F401
-
-        from compas_fab.backends import PyBulletClient  # noqa: F401
-        from compas_fab.backends import PyBulletPlanner  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import TargetMode  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.backends import PyBulletClient
+    from compas_fab.backends import PyBulletPlanner
 
 
 class PyBulletForwardKinematics(ForwardKinematics):
     """Mix-in function to calculate the robot's forward kinematic."""
 
-    def forward_kinematics(self, robot_cell_state, target_mode, group=None, native_scale=None, options=None):
-        # type: (RobotCellState, TargetMode | str, Optional[str], Optional[float], Optional[dict]) -> Frame
+    def forward_kinematics(
+        self,
+        robot_cell_state: RobotCellState,
+        target_mode: TargetMode | str,
+        group: Optional[str] = None,
+        native_scale: Optional[float] = None,
+        options: Optional[dict] = None,
+    ) -> Frame:
         """Calculate the target frame of the robot (relative to WCF) from the provided RobotCellState.
 
         The returned coordinate frame is dependent on the chosen ``target_mode``:
@@ -110,8 +106,13 @@ class PyBulletForwardKinematics(ForwardKinematics):
 
         return wcf_target_frame
 
-    def forward_kinematics_to_link(self, robot_cell_state, link_name=None, native_scale=None, options=None):
-        # type: (RobotCellState, Optional[str], Optional[float], Optional[dict]) -> Frame
+    def forward_kinematics_to_link(
+        self,
+        robot_cell_state: RobotCellState,
+        link_name: Optional[str] = None,
+        native_scale: Optional[float] = None,
+        options: Optional[dict] = None,
+    ):
         """Calculate the Link Coordinate Frame (LCF) to return. frame of the specified robot link from the provided RobotCellState.
 
         This function operates similar to :meth:`compas_fab.backends.PyBulletForwardKinematics.forward_kinematics`,
@@ -138,9 +139,8 @@ class PyBulletForwardKinematics(ForwardKinematics):
             Currently unused.
         """
         # Housekeeping for intellisense
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner: PyBulletPlanner = self
+        client: PyBulletClient = planner.client
 
         # Setting the entire robot cell state, including the robot configuration
         planner.set_robot_cell_state(robot_cell_state)

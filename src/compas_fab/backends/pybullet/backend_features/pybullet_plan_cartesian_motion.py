@@ -527,8 +527,13 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         return _build_return_trajectory(planned_configurations)
 
-    def plan_cartesian_motion_frame_waypoints(self, waypoints, start_state, group, options=None):
-        # type: (FrameWaypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
+    def plan_cartesian_motion_frame_waypoints(
+        self,
+        waypoints: FrameWaypoints,
+        start_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ) -> JointTrajectory:
         """Calculates a cartesian motion path (linear in tool space) for Frame Waypoints.
 
         See :meth:`~plan_cartesian_motion` for the generic description of the planning function.
@@ -667,9 +672,9 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         options["verbose"] = options.get("verbose", False)
 
         # Housekeeping for intellisense
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner: PyBulletPlanner = self
+        client: PyBulletClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
 
         # Setting robot cell state
         planner.set_robot_cell_state(start_state)
@@ -855,9 +860,11 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                         message = "plan_cartesian_motion_frame_waypoints(): Segment {} of {}, Joint jump between t={} and t={} is too large.\n  -  {}".format(
                             i + 1, len(waypoints.target_frames), interpolation_ts[j - 1], interpolation_ts[j], e.message
                         )
-                        message += "\nplan_cartesian_motion_frame_waypoints(): Cannot subdivide further between t={} and t={}, current delta_distance={} (limit={}), delta_angle={} (limit={}).".format(
+                        message += "\nplan_cartesian_motion_frame_waypoints(): Cannot subdivide further between t={} and t={}".format(
                             interpolation_ts[j - 1],
                             interpolation_ts[j],
+                        )
+                        message += ", current delta_distance={} (limit={}), delta_angle={} (limit={}).".format(
                             delta_distance,
                             options["min_step_distance"],
                             delta_angle,

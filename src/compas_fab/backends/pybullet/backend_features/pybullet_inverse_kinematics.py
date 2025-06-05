@@ -1,33 +1,14 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-from compas import IPY
-
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from compas_robots import Configuration  # noqa: F401
-        from typing import Optional  # noqa: F401
-        from typing import Generator  # noqa: F401
-        from typing import List  # noqa: F401
-        from typing import Dict  # noqa: F401
-
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import Target  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.backends import PyBulletClient  # noqa: F401
-        from compas_fab.backends import PyBulletPlanner  # noqa: F401
-
 import math
 from copy import deepcopy
+from typing import TYPE_CHECKING
+from typing import Optional
 
 from compas.geometry import Frame
 from compas.geometry import Quaternion
 from compas.geometry import axis_angle_from_quaternion
 from compas.geometry import is_parallel_vector_vector
 from compas.tolerance import TOL
+from compas_robots import Configuration
 from compas_robots.model import Joint
 
 from compas_fab.backends.exceptions import CollisionCheckError
@@ -37,7 +18,14 @@ from compas_fab.backends.pybullet.conversions import pose_from_frame
 from compas_fab.backends.pybullet.exceptions import PlanningGroupNotSupported
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import PointAxisTarget
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import Target
 from compas_fab.utilities import LazyLoader
+
+if TYPE_CHECKING:
+    from compas_fab.backends import PyBulletClient
+    from compas_fab.backends import PyBulletPlanner
 
 pybullet = LazyLoader("pybullet", globals(), "pybullet")
 
@@ -53,8 +41,13 @@ class PyBulletInverseKinematics(InverseKinematics):
     DEFAULT_TARGET_TOLERANCE_POSITION = 0.001
     DEFAULT_TARGET_TOLERANCE_ORIENTATION = 0.001
 
-    def inverse_kinematics(self, target, robot_cell_state, group=None, options=None):
-        # type: (FrameTarget, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Configuration
+    def inverse_kinematics(
+        self,
+        target: FrameTarget,
+        robot_cell_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ):
         """Calculate the robot's inverse kinematic for a given target.
 
         The actual implementation can be found in the :meth:`iter_inverse_kinematics` method.
@@ -105,8 +98,8 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         """
         # Set default group name
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
+        planner: PyBulletPlanner = self
+        client: PyBulletClient = planner.client
         group = group or client.robot_cell.main_group_name
 
         # The caching mechanism is implemented in the iter_inverse_kinematics method
@@ -120,8 +113,13 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         return configuration
 
-    def iter_inverse_kinematics(self, target, robot_cell_state, group=None, options=None):
-        # type: (Target, Optional[RobotCellState], Optional[str], Optional[Dict]) -> Generator[Configuration | None]
+    def iter_inverse_kinematics(
+        self,
+        target: Target,
+        robot_cell_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ):
         """Calculate the robot's inverse kinematic for a given target.
 
         Parameters
@@ -152,8 +150,8 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         """
 
-        planner = self  # type: PyBulletPlanner
-        robot_cell = planner.client.robot_cell  # type: RobotCell
+        planner: PyBulletPlanner = self
+        robot_cell: RobotCell = planner.client.robot_cell
         group = group or robot_cell.main_group_name
 
         # Calling the super class method, which contains input sanity checks and scale normalization
@@ -193,8 +191,9 @@ class PyBulletInverseKinematics(InverseKinematics):
             self._check_configuration_match_group(initial_start_configuration, configuration, group)
             yield configuration
 
-    def _iter_inverse_kinematics_frame_target(self, target, robot_cell_state, group, options=None):
-        # type: (FrameTarget, RobotCellState, str, Optional[Dict]) -> Generator[Configuration | None]
+    def _iter_inverse_kinematics_frame_target(
+        self, target: FrameTarget, robot_cell_state: RobotCellState, group: str, options: Optional[dict] = None
+    ):
         """Calculate the robot's inverse kinematic for a given FrameTarget.
 
         The PyBullet inverse kinematics solver make use of the gradient descent IK solver
@@ -274,9 +273,9 @@ class PyBulletInverseKinematics(InverseKinematics):
         options = options or {}
 
         # Housekeeping for intellisense
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner: PyBulletPlanner = self
+        client: PyBulletClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
 
         # NOTE: group is not optional in this inner function.
         if group not in robot_cell.robot_semantics.groups:
@@ -371,7 +370,6 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         # Loop to get multiple results with random restarts
         for _ in range(options.get("max_results")):
-
             # Calling the IK function using the helper function that repeatedly
             # calls the pybullet IK solver until convergence.
 
@@ -381,7 +379,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 tolerance_orientation=target.tolerance_orientation,
                 max_iter=options.get("max_descend_iterations"),
                 verbose=options["verbose"],
-                **ik_options
+                **ik_options,
             )
 
             if not joint_positions:
@@ -442,8 +440,9 @@ class PyBulletInverseKinematics(InverseKinematics):
                 target_pcf=target_pcf,
             )
 
-    def _iter_inverse_kinematics_point_axis_target(self, target, robot_cell_state, group, options=None):
-        # type: (PointAxisTarget, RobotCellState, str, Optional[Dict]) -> Generator[Configuration | None]
+    def _iter_inverse_kinematics_point_axis_target(
+        self, target: PointAxisTarget, robot_cell_state: RobotCellState, group: str, options: Optional[dict] = None
+    ):
         """Calculate the robot's inverse kinematic for a given PointAxisTarget.
 
         class:`~compas_fab.robots.PointAxisTarget` specify a target point and an axis in 3D space.
@@ -537,9 +536,9 @@ class PyBulletInverseKinematics(InverseKinematics):
         options = options or {}
 
         # Housekeeping for intellisense
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner: PyBulletPlanner = self
+        client: PyBulletClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
 
         # NOTE: group is not optional in this inner function.
         if group not in robot_cell.robot_semantics.groups:
@@ -628,7 +627,6 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         # Iterate through the number of random restarts
         for _ in range(options.get("max_random_restart")):
-
             # If the number of results is more than the max_results, we stop the search
             if len(uniqueness_checker.results) >= options["max_results"]:
                 break
@@ -685,7 +683,13 @@ class PyBulletInverseKinematics(InverseKinematics):
             )
 
     def _accurate_inverse_kinematics(
-        self, joint_ids_sorted, max_iter, tolerance_position=None, tolerance_orientation=None, verbose=False, **kwargs
+        self,
+        joint_ids_sorted: list[int],
+        max_iter: int,
+        tolerance_position: Optional[float] = None,
+        tolerance_orientation: Optional[float] = None,
+        verbose: bool = False,
+        **kwargs,
     ):
         """Iterative inverse kinematics solver with a threshold for the distance to the target.
 
@@ -768,8 +772,9 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         return None
 
-    def _check_configuration_match_group(self, start_configuration, configuration, group):
-        # type: (Configuration, Configuration, str) -> None
+    def _check_configuration_match_group(
+        self, start_configuration: Configuration, configuration: Configuration, group: str
+    ):
         """Check if the configuration changed only the joints in the group.
 
         We assume that if a joint value is changed inadvertently, it is because
@@ -791,7 +796,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         ValueError
             If the configuration has changed joints that are not in the group.
         """
-        robot_cell = self.client.robot_cell  # type: RobotCell
+        robot_cell: RobotCell = self.client.robot_cell
 
         configurable_joints = robot_cell.get_configurable_joint_names(group)
         for joint_name, joint_value in configuration.items():
@@ -827,11 +832,10 @@ class UniqueResultChecker(object):
     """
 
     def __init__(self):
-        self.sorted_uniqueness_thresholds = None  # type: List[float]
-        self.results = []  # type: List[Configuration]
+        self.sorted_uniqueness_thresholds: list[float] = None
+        self.results: list[Configuration] = []
 
-    def check(self, configuration, options):
-        # type: (Configuration, Dict) -> bool
+    def check(self, configuration: Configuration, options: dict):
         """Check if the solution is unique by comparing with past solutions.
 
         Accepted solutions will be added to the `self.results` list.
@@ -877,13 +881,12 @@ class UniqueResultChecker(object):
         self.results.append(configuration)
         return True
 
-    def compute_sorted_uniqueness_thresholds(self, configuration, options):
-        # type: (Configuration, Dict) -> UniqueResultChecker
+    def compute_sorted_uniqueness_thresholds(self, configuration: Configuration, options: dict):
         """Create a UniqueResultChecker from a configuration.
 
         Parameters
         ----------
-        config : :class:`compas_robots.Configuration`
+        configuration : :class:`compas_robots.Configuration`
             A configuration that contains a ordered list of joints and their types.
         """
         joint_types = configuration.joint_types

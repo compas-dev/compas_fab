@@ -265,7 +265,7 @@ def test_point_axis_native_scale(point_axis_target):
     scale_factor = 0.001
     target = point_axis_target.copy()
     target.native_scale = scale_factor
-    nt = target.normalized_to_meters()  # type: PointAxisTarget
+    nt: PointAxisTarget = target.normalized_to_meters()
     assert nt.target_point == target.target_point.scaled(scale_factor)
     assert nt.target_z_axis == target.target_z_axis  # No Scaling
     assert nt.tolerance_position == target.tolerance_position  # No Scaling

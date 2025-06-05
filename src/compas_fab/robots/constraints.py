@@ -1,23 +1,16 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from typing import Optional
+from typing import Union
 
 from compas.data import Data
+from compas.datastructures import Mesh
+from compas.geometry import Box
+from compas.geometry import Frame
+from compas.geometry import Point
 from compas.geometry import Rotation
 from compas.geometry import Scale
 from compas.geometry import Sphere
-from compas.datastructures import Mesh  # noqa: F401
-from compas.geometry import Box  # noqa: F401
-from compas.geometry import Frame  # noqa: F401
-from compas.geometry import Point  # noqa: F401
-from compas.geometry import Transformation  # noqa: F401
-from compas_robots import Configuration  # noqa: F401
-
-from typing import TYPE_CHECKING
-
-from typing import Optional  # noqa: F401
-from typing import Union  # noqa: F401
-
+from compas.geometry import Transformation
+from compas_robots import Configuration
 
 __all__ = [
     "BoundingVolume",
@@ -71,14 +64,13 @@ class BoundingVolume(Data):
     #: List of supported volume types
     VOLUME_TYPES = (BOX, SPHERE, MESH)
 
-    def __init__(self, volume_type, volume):
-        # type: (int, Union[Box, Sphere, Mesh]) -> None
+    def __init__(self, volume_type: int, volume: Union[Box, Sphere, Mesh]):
         if volume_type not in self.VOLUME_TYPES:
             raise ValueError("Type must be one of {}".format(self.VOLUME_TYPES))
         self.type = volume_type
         self.volume = volume
 
-    def __data__(self):
+    def __data__(self) -> dict:
         return {
             "volume_type": self.type,
             "volume": self.volume,

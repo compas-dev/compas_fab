@@ -97,10 +97,7 @@ class Target(Data):
         """
         raise NotImplementedError
 
-    def normalized_to_meters(
-        self,
-    ):
-        # type: () -> Target
+    def normalized_to_meters(self) -> "Target":
         """Returns a copy of the target where the target and tolerances are scaled to meters.
 
         Notes

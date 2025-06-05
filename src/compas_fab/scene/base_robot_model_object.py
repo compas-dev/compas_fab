@@ -1,5 +1,6 @@
 from typing import Optional
 
+from compas.colors import Color
 from compas.datastructures import Mesh
 from compas.geometry import Frame
 from compas.geometry import Scale
