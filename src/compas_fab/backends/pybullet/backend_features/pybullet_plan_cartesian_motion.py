@@ -1,13 +1,13 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from copy import deepcopy
 from math import ceil
 from math import pi
+from typing import TYPE_CHECKING
+from typing import Optional
 
-from compas import IPY
+from compas.geometry import Frame
+from compas.geometry import Point
 from compas.geometry import Quaternion
+from compas.geometry import Vector
 from compas.geometry import axis_angle_from_quaternion
 from compas.geometry import cross_vectors
 from compas.geometry import is_parallel_vector_vector
@@ -20,47 +20,39 @@ from compas_fab.backends import MPNoIKSolutionError
 from compas_fab.backends import MPNoPlanFoundError
 from compas_fab.backends import MPStartStateInCollisionError
 from compas_fab.backends import MPTargetInCollisionError
+from compas_fab.backends.interfaces import PlanCartesianMotion
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
 from compas_fab.robots import PointAxisTarget
 from compas_fab.robots import PointAxisWaypoints
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import Waypoints
 
 from .helpers import check_max_jump
 
-if not IPY:
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:  # pragma: no cover
-        from typing import Dict  # noqa: F401
-        from typing import List  # noqa: F401
-        from typing import Optional  # noqa: F401
-        from typing import Tuple  # noqa: F401
-
-        from compas.geometry import Frame  # noqa: F401
-        from compas.geometry import Point  # noqa: F401
-        from compas.geometry import Vector  # noqa: F401
-        from compas_robots import Configuration  # noqa: F401
-
-        from compas_fab.backends import PyBulletClient  # noqa: F401
-        from compas_fab.backends import PyBulletPlanner  # noqa: F401
-        from compas_fab.robots import RobotCell  # noqa: F401
-        from compas_fab.robots import RobotCellState  # noqa: F401
-        from compas_fab.robots import Waypoints  # noqa: F401
+if TYPE_CHECKING:
+    from compas_fab.backends import PyBulletClient
+    from compas_fab.backends import PyBulletPlanner
 
 
 __all__ = [
     "PyBulletPlanCartesianMotion",
 ]
-from compas_fab.backends.interfaces import PlanCartesianMotion
 
 
 class PyBulletPlanCartesianMotion(PlanCartesianMotion):
     """Callable to calculate a cartesian motion path (linear in tool space)."""
 
-    def plan_cartesian_motion(self, waypoints, start_state, group=None, options=None):
-        # type: (Waypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
+    def plan_cartesian_motion(
+        self,
+        waypoints: Waypoints,
+        start_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ) -> JointTrajectory:
         """Calculates a cartesian motion path (linear in tool space) for Waypoints.
 
         Supports FrameWaypoints and PointAxisWaypoints.
@@ -151,16 +143,16 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # The following lines should be typical in all planners' plan_cartesian_motion method
         # ===================================================================================
 
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner: PyBulletPlanner = self
+        client: PyBulletClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
         group = group or robot_cell.main_group_name
 
         # Unit conversion from user scale to meter scale can be done here because they are shared by all planners.
         waypoints = waypoints.normalized_to_meters()
 
         # Check if the robot cell state supports the target mode
-        planner = self  # type: PyBulletPlanner
+        planner: PyBulletPlanner = self
         start_state.assert_target_mode_match(waypoints.target_mode, group)
 
         # Check start_state is formatted correctly
@@ -185,8 +177,13 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         else:
             raise NotImplementedError("Only PointAxisWaypoints and FrameWaypoints are supported.")
 
-    def plan_cartesian_motion_point_axis_waypoints(self, waypoints, start_state, group, options=None):
-        # type: (PointAxisWaypoints, RobotCellState, Optional[str], Optional[Dict]) -> JointTrajectory
+    def plan_cartesian_motion_point_axis_waypoints(
+        self,
+        waypoints: PointAxisWaypoints,
+        start_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ) -> JointTrajectory:
         """Calculates a cartesian motion path (linear in tool space) for Point Axis Waypoints.
 
         Similar to the :meth:`~plan_cartesian_motion_frame_waypoints` method, this method calculates a cartesian motion path
@@ -311,9 +308,9 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         options["verbose"] = options.get("verbose", False)
 
         # Housekeeping for intellisense
-        planner = self  # type: PyBulletPlanner
-        client = planner.client  # type: PyBulletClient
-        robot_cell = client.robot_cell  # type: RobotCell
+        planner: PyBulletPlanner = self
+        client: PyBulletClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
 
         # Setting robot cell state
         planner.set_robot_cell_state(start_state)
@@ -340,7 +337,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         joint_types = robot_cell.get_configurable_joint_types(group)
 
         # Iterate over the waypoints as segments
-        intermediate_state = deepcopy(start_state)  # type: RobotCellState
+        intermediate_state: RobotCellState = deepcopy(start_state)
         start_configuration = start_state.robot_configuration
         # TODO: We currently trust that the input configuration has a correct joint order, this should be checked
 
@@ -365,7 +362,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         # There will be no further sub-division.
         # This makes the DFS code easier to implement.
 
-        all_targets = [starting_target]  # type: List[PointAxisTarget]
+        all_targets: list[PointAxisTarget] = [starting_target]
         for i in range(len(waypoints.target_points_and_axes)):
             start_point_axis = (
                 waypoints.target_points_and_axes[i - 1] if i > 0 else (start_frame.point, start_frame.zaxis)
@@ -964,8 +961,7 @@ class FrameInterpolator(object):
         return self._total_distance
 
     @property
-    def total_angle(self):
-        # type: () -> float
+    def total_angle(self) -> float:
         """Tte total angle between the start and end frames.
 
         Returns
@@ -977,8 +973,7 @@ class FrameInterpolator(object):
         return self._total_angle
 
     @property
-    def regular_interpolation_steps(self):
-        # type: () -> int
+    def regular_interpolation_steps(self) -> int:
         """The number of interpolation steps based on max_step_distance and max_step_angle.
 
         Returns
@@ -991,8 +986,7 @@ class FrameInterpolator(object):
 
         return self._regular_interpolation_steps
 
-    def get_interpolated_frame(self, t):
-        # type: (float) -> Frame
+    def get_interpolated_frame(self, t) -> Frame:
         """Interpolate between two frames using a parameter t.
 
         Parameters
@@ -1010,8 +1004,7 @@ class FrameInterpolator(object):
         current_frame = self.start_frame.interpolate_frame(self.end_frame, t)
         return current_frame
 
-    def check_if_subdivision_possible(self, t1, t2):
-        # type: (float, float) -> bool
+    def check_if_subdivision_possible(self, t1: float, t2: float) -> bool:
         """Check if the addition of an extra t value between t1 and t2 is possible.
 
         Two conditions are being checked:
@@ -1069,8 +1062,7 @@ class PointAxisInterpolator(object):
 
     """
 
-    def __init__(self, start_point_axis, end_point_axis, options):
-        # type: (Tuple[Point, Vector], Tuple[Point, Vector], Dict) -> None
+    def __init__(self, start_point_axis: tuple[Point, Vector], end_point_axis: tuple[Point, Vector], options: dict):
         self.start_point, self.start_axis = start_point_axis
         self.end_point, self.end_axis = end_point_axis
         self.options = options
