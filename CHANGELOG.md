@@ -129,6 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed type-hints from comment-style to standard Python 3.x type-hints
 * Changed `RosDistro` to be an enum instead of string.
 * Changed `TargetMode` to be an enum instead of string.
+* Changed default values for number of planning attempts in MoveIt to 5, and the allowed planning time to 1 second.
 
 ### Removed
 

@@ -102,8 +102,8 @@ class MoveItPlanMotion(PlanMotion):
         options["base_link"] = options.get("base_link", robot_cell.root_name)
         options["path_constraints"] = options.get("path_constraints", None)
         options["planner_id"] = options.get("planner_id", "RRTConnect")
-        options["num_planning_attempts"] = options.get("num_planning_attempts", 1)
-        options["allowed_planning_time"] = options.get("allowed_planning_time", 2.0)
+        options["num_planning_attempts"] = options.get("num_planning_attempts", 5)
+        options["allowed_planning_time"] = options.get("allowed_planning_time", 1.0)
         options["max_velocity_scaling_factor"] = options.get("max_velocity_scaling_factor", 1.0)
         options["max_acceleration_scaling_factor"] = options.get("max_acceleration_scaling_factor", 1.0)
 
