@@ -130,6 +130,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed `RosDistro` to be an enum instead of string.
 * Changed `TargetMode` to be an enum instead of string.
 * Changed default values for number of planning attempts in MoveIt to 5, and the allowed planning time to 1 second.
+* Changed cartesian motion planner of MoveIt to raise an exception (including the partial trajectory) if fraction is below 1.0 (ie. the trajectory is not possible).
 
 ### Removed
 

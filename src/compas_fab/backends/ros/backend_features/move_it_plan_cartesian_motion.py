@@ -3,6 +3,7 @@ from typing import Optional
 
 from compas.utilities import await_callback
 
+from compas_fab.backends.exceptions import MotionPlanningError
 from compas_fab.backends.interfaces import PlanCartesianMotion
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
 from compas_fab.backends.ros.backend_features.helpers import convert_trajectory
@@ -181,6 +182,8 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
                 trajectory = convert_trajectory(
                     joints, response.solution, response.start_state, response.fraction, None, response
                 )
+                if response.fraction < 1:
+                    errback(MotionPlanningError("Motion planning failed", trajectory))
                 callback(trajectory)
             except Exception as e:
                 errback(e)
