@@ -5,8 +5,8 @@ Working without backend
 *******************************************************************************
 
 Without a planning backend, the user can still use the core functionality of
-**COMPAS FAB** to create and visualize robots. The following functions are
-available:
+**COMPAS FAB** to create robots and to visualize robots with a CAD environment.
+The following functions are still available:
 
 .. currentmodule:: compas_fab
 
@@ -28,6 +28,6 @@ available:
 #. Compute forward kinematics using the :meth:`compas_robots.RobotModel.forward_kinematics`
    method.
 
-#. Compute forward and inverse kinematics using the :class:`backends.AnalyticalKinematics`
+#. Compute forward and inverse kinematics using the :class:`compas_fab.backends.AnalyticalInverseKinematics`
    backend. (This backend does not have collision checking capabilities.)
 

@@ -17,11 +17,11 @@ It would be a good idea even for experienced ROS users to read through this sect
     :maxdepth: 2
     :glob:
 
-    concepts/01_frames/*
-    concepts/02_robot_model/*
-    concepts/03_tool_model/*
-    concepts/04_rigid_body/*
-    concepts/05_robot_cell/*
-    concepts/06_planning/*
-    concepts/07_custom_setup/*
+    concepts/01_frames/index
+    concepts/02_robot_model/index
+    concepts/03_tool_model/index
+    concepts/04_rigid_body/index
+    concepts/05_robot_cell/index
+    concepts/06_planning/index
+    concepts/07_custom_setup/index
 

@@ -80,6 +80,7 @@ plot_formats = ["png"]
 intersphinx_mapping = {
     "python": ("https://docs.python.org/", None),
     "compas": ("https://compas.dev/compas/latest/", None),
+    "compas_viewer": ("https://compas.dev/compas_viewer/latest/", None),
     "compas_robots": ("https://compas.dev/compas_robots/latest/", None),
     "roslibpy": ("https://roslibpy.readthedocs.io/en/latest/", None),
 }
@@ -147,7 +148,7 @@ html_theme_options = {
         "image_dark": "_static/compas_icon_white.png",
         "text": "COMPAS FAB",
     },
-    "navigation_depth": 2,
+    "navigation_depth": 3,
 }
 
 html_context = {

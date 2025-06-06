@@ -1,14 +1,16 @@
-.. _backends_pybullet:
+.. _analysis:
 
 ********************************************************************************
-PyBullet Planning Backend
+Analysis Methods
 ********************************************************************************
 
+**COMPAS FAB** provides advanced functions for analyzing a robot's workspace, reachability, and
+kinematics.
 
 .. toctree::
     :maxdepth: 2
     :titlesonly:
     :glob:
 
-    pybullet/*
+    analysis/reachability_map
 

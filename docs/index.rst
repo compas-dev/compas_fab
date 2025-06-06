@@ -27,11 +27,27 @@ Main features
 
 **COMPAS FAB** runs on Python 3.x.
 
-Contents
-========
+Learn to use COMPAS FAB
+=======================
+
+The :ref:`getting_started` section details how to install and set up 
+the framework, depending on the front-end (CAD Environment) and back-end
+(motion planner) you want to use.
+The :ref:`concepts` section provides an overview of the main concepts
+used in the framework.
+The :ref:`frontends` section contains examples of how to use interact
+with the framework from different front-ends, such as Rhino, Grasshopper,
+and COMPAS Viewer.
+The :ref:`backends` section describes the different back-ends available
+for motion planning and execution, such as ROS and PyBullet.
+
+The :ref:`analysis` section provides advanced functions for analyzing a
+robot's workspace, reachability, and kinematics. 
+The :ref:`api` section contains all the functions and classes
+available in the framework, including their documentation and usage examples.
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
    :titlesonly:
 
    Introduction <self>
@@ -39,6 +55,7 @@ Contents
    concepts
    frontends
    backends
+   analysis
    api
    contributing
    authors
