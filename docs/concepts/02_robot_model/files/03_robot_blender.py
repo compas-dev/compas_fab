@@ -1,6 +1,6 @@
 from compas_robots import RobotModel
-from compas_robots.resources import GithubPackageMeshLoader
 from compas_robots.blender import RobotModelArtist
+from compas_robots.resources import GithubPackageMeshLoader
 
 r = "ros-industrial/abb"
 p = "abb_irb6600_support"

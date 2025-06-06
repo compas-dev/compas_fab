@@ -1,8 +1,6 @@
 from _pybullet_demo_helper import trajectory_replay
 from compas.geometry import Box
 from compas.geometry import Frame
-from compas.geometry import Point
-from compas.geometry import Vector
 
 from compas_fab.backends import MPNoIKSolutionError
 from compas_fab.backends import MPNoPlanFoundError
@@ -12,7 +10,6 @@ from compas_fab.robots import ConfigurationTarget
 from compas_fab.robots import RigidBody
 from compas_fab.robots import RigidBodyState
 from compas_fab.robots import RobotCellLibrary
-from compas_fab.robots import RobotCellState
 
 with PyBulletClient("gui") as client:
     planner = PyBulletPlanner(client)

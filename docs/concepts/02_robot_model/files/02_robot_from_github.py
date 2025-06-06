@@ -1,5 +1,5 @@
-from compas_robots.resources import GithubPackageMeshLoader
 from compas_robots import RobotModel
+from compas_robots.resources import GithubPackageMeshLoader
 
 # Select Github repository, package and branch where the model is stored
 repository = "ros-industrial/abb"

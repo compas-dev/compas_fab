@@ -4,12 +4,10 @@ from compas.geometry import Frame
 from compas_fab.backends import AnalyticalPyBulletClient
 from compas_fab.backends import AnalyticalPyBulletPlanner
 from compas_fab.backends import UR5Kinematics
-from compas_fab.robots import RobotCellLibrary
-
-from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import FrameTarget
+from compas_fab.robots import FrameWaypoints
+from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
-
 
 frames_WCF = [
     Frame((0.407, 0.073, 0.320), (0.922, 0.000, 0.388), (0.113, 0.956, -0.269)),

@@ -1,21 +1,14 @@
-from compas.geometry import Frame
 from compas.datastructures import Mesh
-from compas.geometry import Box
-
-import compas_fab
-from compas_fab.robots import RobotCellLibrary
-from compas_fab.robots import FrameTarget
-from compas_fab.robots import RigidBody
-from compas_fab.robots import RigidBodyLibrary
-from compas_fab.robots import TargetMode
+from compas.geometry import Frame
 from compas_robots import ToolModel
 
-from compas_fab.backends import AnalyticalInverseKinematics
+import compas_fab
 from compas_fab.backends import AnalyticalKinematicsPlanner
 from compas_fab.backends.kinematics.solvers import UR5Kinematics
-
-from compas_fab.robots import RobotCell
-from compas_fab.robots import RobotCellState
+from compas_fab.robots import FrameTarget
+from compas_fab.robots import RigidBody
+from compas_fab.robots import RobotCellLibrary
+from compas_fab.robots import TargetMode
 
 # Not loading the robot's geometry because AnalyticalKinematicsPlanner does not use it for collision checking
 robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=False)

@@ -1,14 +1,13 @@
 from compas.geometry import Frame
+
 from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
-
+from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.robots import FrameTarget
-from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RigidBodyLibrary
 from compas_fab.robots import RigidBodyState
+from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
-
-from compas_fab.backends.exceptions import InverseKinematicsError
 
 with PyBulletClient() as client:
 

@@ -1,9 +1,8 @@
 from compas.datastructures import Mesh
 
 import compas_fab
-from compas_fab.backends import RosClient
 from compas_fab.backends import MoveItPlanner
-from compas_fab.robots import RobotCell
+from compas_fab.backends import RosClient
 from compas_fab.robots import RigidBody
 
 with RosClient() as client:

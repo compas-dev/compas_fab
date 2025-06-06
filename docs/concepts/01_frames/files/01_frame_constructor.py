@@ -1,6 +1,6 @@
+from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Vector
-from compas.geometry import Frame
 
 point = Point(10.0, 20.0, 30.0)
 xaxis = Vector(1, 0, 0)

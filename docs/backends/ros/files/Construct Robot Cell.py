@@ -1,17 +1,17 @@
+
 from compas.datastructures import Mesh
-from compas.geometry import Frame
 from compas.geometry import Box
+from compas.geometry import Frame
 
 import compas_fab
-from math import pi
-from compas_fab.backends import RosClient
 from compas_fab.backends import MoveItPlanner
-from compas_fab.robots import RigidBody
-from compas_fab.robots import ToolLibrary
-from compas_fab.robots import FrameWaypoints
-from compas_fab.robots import TargetMode
+from compas_fab.backends import RosClient
 from compas_fab.robots import FrameTarget
+from compas_fab.robots import FrameWaypoints
+from compas_fab.robots import RigidBody
 from compas_fab.robots import RigidBodyLibrary
+from compas_fab.robots import TargetMode
+from compas_fab.robots import ToolLibrary
 
 target_frames = []
 target_frames.append(Frame([0.4, 0.3, 0.45], [0, 1, 0], [-1, 0, 0]))

@@ -1,11 +1,9 @@
-import Rhino
-import Eto
 import Eto.Drawing as drawing
 import Eto.Forms as forms
-
-from compas_fab.robots import RobotCellLibrary
+import Rhino
 from compas.scene import Scene
 
+from compas_fab.robots import RobotCellLibrary
 
 
 class EtoFormSliderTest(forms.Dialog[bool]):

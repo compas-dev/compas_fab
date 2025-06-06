@@ -1,7 +1,7 @@
 from compas.geometry import Frame
+
 from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
-
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode

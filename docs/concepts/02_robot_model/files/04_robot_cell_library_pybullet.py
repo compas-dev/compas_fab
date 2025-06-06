@@ -1,6 +1,5 @@
 from compas_fab.backends.pybullet import PyBulletClient
 from compas_fab.backends.pybullet import PyBulletPlanner
-
 from compas_fab.robots import RobotCellLibrary
 
 with PyBulletClient() as client:

@@ -1,16 +1,16 @@
 # This example demonstrates the ability of PointAxisTarget to search a valid
 # configuration around collision objects
 
-from compas.geometry import Frame
 from compas.geometry import Box
+from compas.geometry import Frame
+
 from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
-
 from compas_fab.robots import PointAxisTarget
+from compas_fab.robots import RigidBody
+from compas_fab.robots import RigidBodyState
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
-from compas_fab.robots import RigidBodyState
-from compas_fab.robots import RigidBody
 
 with PyBulletClient() as client:
 

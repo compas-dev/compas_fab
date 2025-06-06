@@ -24,9 +24,10 @@
 """
 
 from __future__ import print_function
-import scriptcontext as sc
 
+import scriptcontext as sc
 from compas.geometry import Frame
+
 from compas_fab.robots import FrameWaypoints
 
 guid = str(ghenv.Component.InstanceGuid)

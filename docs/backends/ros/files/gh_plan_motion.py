@@ -26,6 +26,7 @@
             The calculated trajectory.
 """
 from __future__ import print_function
+
 import scriptcontext as sc
 
 guid = str(ghenv.Component.InstanceGuid)

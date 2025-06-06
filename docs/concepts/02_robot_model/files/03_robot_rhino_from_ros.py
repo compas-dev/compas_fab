@@ -1,5 +1,6 @@
-from compas_fab.backends import RosClient
 from compas.scene import Scene
+
+from compas_fab.backends import RosClient
 
 with RosClient() as ros:
     # Load complete model from ROS

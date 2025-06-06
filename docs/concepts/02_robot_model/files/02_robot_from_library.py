@@ -1,4 +1,3 @@
-from compas_robots.resources import GithubPackageMeshLoader
 from compas_fab.robots import RobotCellLibrary
 
 # Load robot from RobotCellLibrary

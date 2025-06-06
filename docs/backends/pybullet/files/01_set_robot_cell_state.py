@@ -9,7 +9,6 @@ from compas_fab.backends import PyBulletPlanner
 from compas_fab.robots import RigidBody
 from compas_fab.robots import RobotCellLibrary
 
-
 with PyBulletClient() as client:
     # ---------------------------------------------------------------------
     # Create a robot cell and add objects to it

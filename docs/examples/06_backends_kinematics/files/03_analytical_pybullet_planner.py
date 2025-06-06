@@ -1,20 +1,16 @@
-from compas.geometry import Frame
-from compas.geometry import Box
 from compas.datastructures import Mesh
+from compas.geometry import Box
+from compas.geometry import Frame
+from compas_robots import ToolModel
 
 import compas_fab
 from compas_fab.backends import AnalyticalPyBulletClient
 from compas_fab.backends import AnalyticalPyBulletPlanner
 from compas_fab.backends.kinematics.solvers import UR5Kinematics
-from compas_fab.robots import RigidBody
-from compas_robots import ToolModel
-from compas_robots import Configuration
-from compas_fab.robots import RobotCellState
-from compas_fab.robots import RobotCellLibrary
-from compas_fab.robots import RobotCell
 from compas_fab.robots import FrameTarget
+from compas_fab.robots import RigidBody
+from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
-
 
 with AnalyticalPyBulletClient(connection_type="gui") as client:
     robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=True)

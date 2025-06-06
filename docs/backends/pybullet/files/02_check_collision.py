@@ -1,13 +1,9 @@
 import time
 
-import compas_fab
-from compas_robots import Configuration
+from compas_fab.backends import CollisionCheckError
 from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
-from compas_fab.robots import RobotCell
-from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotCellLibrary
-from compas_fab.backends import CollisionCheckError
 
 with PyBulletClient("gui") as client:
     planner = PyBulletPlanner(client)

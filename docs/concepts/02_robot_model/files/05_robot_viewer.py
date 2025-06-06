@@ -1,8 +1,9 @@
-from compas_fab.robots import RobotCellLibrary
-from compas_robots.viewer.scene.robotmodelobject import RobotModelObject
 from compas_robots.model import Joint
-from compas_viewer.components import Slider
+from compas_robots.viewer.scene.robotmodelobject import RobotModelObject
 from compas_viewer import Viewer
+from compas_viewer.components import Slider
+
+from compas_fab.robots import RobotCellLibrary
 
 # Initialize the viewer
 viewer = Viewer()

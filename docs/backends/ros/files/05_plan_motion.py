@@ -1,11 +1,10 @@
-import math
 
 from compas.geometry import Frame
 
+from compas_fab.backends import MoveItPlanner
 from compas_fab.backends import RosClient
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import TargetMode
-from compas_fab.backends import MoveItPlanner
 
 with RosClient() as client:
     robot_cell = client.load_robot_cell()

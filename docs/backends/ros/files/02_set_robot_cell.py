@@ -1,11 +1,10 @@
-from compas_fab.backends import RosClient
-from compas_fab.backends import MoveItPlanner
+from compas.geometry import Box
 
-from compas_fab.robots import ToolLibrary
+from compas_fab.backends import MoveItPlanner
+from compas_fab.backends import RosClient
 from compas_fab.robots import RigidBody
 from compas_fab.robots import RigidBodyLibrary
-
-from compas.geometry import Box
+from compas_fab.robots import ToolLibrary
 
 with RosClient() as client:
     robot_cell = client.load_robot_cell()

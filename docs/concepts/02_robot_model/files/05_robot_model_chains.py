@@ -1,7 +1,8 @@
 # This example file demonstrates how to print the chain of links and joints in a robot model.
 
-from compas_fab.robots import RobotCellLibrary
 from compas_robots.model import Joint
+
+from compas_fab.robots import RobotCellLibrary
 
 # RobotCellLibrary also contains .ur5(), .ur10e(), abb_irb120_3_58(), abb_irb4600_40_255(), .rfl(), .panda()
 robot_cell, robot_cell_state = RobotCellLibrary.panda(load_geometry=False)

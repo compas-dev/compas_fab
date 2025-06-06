@@ -1,6 +1,7 @@
 import time
 
 from roslibpy import Topic
+
 from compas_fab.backends import RosClient
 
 

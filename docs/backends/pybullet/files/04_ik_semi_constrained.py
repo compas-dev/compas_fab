@@ -7,11 +7,8 @@ from compas.geometry import distance_point_point
 
 from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
-
 from compas_fab.robots import FrameTarget
-from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import RigidBodyLibrary
-from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
 
