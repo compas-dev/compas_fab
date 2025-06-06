@@ -11,6 +11,7 @@ from compas_fab.backends.ros.backend_features.move_it_inverse_kinematics import 
 from compas_fab.backends.ros.backend_features.move_it_plan_cartesian_motion import MoveItPlanCartesianMotion
 from compas_fab.backends.ros.backend_features.move_it_plan_motion import MoveItPlanMotion
 from compas_fab.backends.ros.backend_features.move_it_planning_scene import MoveItPlanningScene
+from compas_fab.backends.ros.backend_features.move_it_reset_planning_scene import MoveItResetPlanningScene
 
 __all__ = [
     "MoveItPlanner",
@@ -25,6 +26,7 @@ class MoveItPlanner(
     MoveItInverseKinematics,
     MoveItPlanMotion,
     MoveItPlanCartesianMotion,
+    MoveItResetPlanningScene,
     PlannerInterface,
 ):
     """Implement the planner backend interface based on MoveIt!"""
@@ -36,3 +38,6 @@ class MoveItPlanner(
         self._client = client
         self._current_rigid_body_hashes: dict[str, bytes] = {}
         self._current_tool_hashes: dict[str, bytes] = {}
+
+        # Reset the planning scene in the backend to clear all objects left by previous runs
+        self.reset_planning_scene()

@@ -8,7 +8,6 @@ ROS backend features
 
     MoveItSetRobotCell
     MoveItSetRobotCellState
-    MoveItPlanningScene
     MoveItForwardKinematics
     MoveItInverseKinematics
     MoveItPlanCartesianMotion
