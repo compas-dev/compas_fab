@@ -36,10 +36,12 @@ See :ref:`Core Concepts: Targets<target>` for more information on how targets
 are defined.
 
 .. _start_configuration:
+
 Starting Configuration
 ======================
 
 .. _approximation_ik:
+
 Approximation Solver
 ====================
 Approximation method is sensitive to the initial guess (the starting configuration).
@@ -54,6 +56,7 @@ different initial guess. When given sufficient number of restarts, the solver is
 likely to find a solution, if one exists.
 
 .. _analytical_ik:
+
 Analytical Solver
 =================
 
@@ -67,11 +70,13 @@ target, the generator maybe finite or infinite.
 
 Reachability
 ===========
+
 Axis joint limits
 Target too far or too close
 
 Collision
 =========
+
 Self collision, including attached objects
 Collision with obstacles
 See :ref:`collision_check`
@@ -80,7 +85,6 @@ Collision Avoidance with null space
 
 Singularities is not a problem for finding a solution, but it can be a problem
 during execution.
-
 
 
 
@@ -139,7 +143,6 @@ Backend Features for Inverse Kinematics
 =======================================
 
 .. list-table:: Backend Features for Inverse Kinematics
-
    :widths: 20 20 20 20 20
    :header-rows: 1
 
@@ -147,7 +150,7 @@ Backend Features for Inverse Kinematics
      - MoveIt Planner
      - PyBullet Planner
      - Analytical Kinematics Planner
-     - Analytical Pybullet Planner
+     - Analytical PyBullet Planner
    * - :meth:`inverse_kinematics`
      - Yes
      - Yes

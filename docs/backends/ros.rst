@@ -33,8 +33,8 @@ The typical code snippet to use the MoveIt planner is as follows:
 .. note::
 
     The following examples use the `ROS <https://www.ros.org/>`_ backend.
-    Before running them, please make sure you have the :ref:`ROS backend <ros_backend>`
-    installed and the :ref:`UR5 Demo <ros_bundles_list>` started.
+    Before running them, please make sure you have :ref:`setup_backend_ros`
+    and the :ref:`UR5 Demo <ros_bundles_list>` started.
     It maybe beneficial to :ref:`enable GUI <docker_gui>`.
 
 .. toctree::

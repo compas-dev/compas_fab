@@ -59,6 +59,7 @@ When using the PyBullet Planner, the planning groups can be changed by the user
 before :meth:`PyBulletPlanner.set_robot_cell` is called.
 
 .. currentmodule:: compas_fab.backends
+
 The planning group name is used as input to many planning functions, such as
 :meth:`compas_fab.backends.interfaces.PlannerInterface.plan_motion` and
 :meth:`compas_fab.backends.interfaces.PlannerInterface.inverse_kinematics`.

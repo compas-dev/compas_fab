@@ -25,6 +25,7 @@ your first example.
     installation/setup_frontend_viewer
     installation/setup_backend_no_backend
     installation/setup_backend_ros
+    installation/web_x11_gui
     installation/setup_backend_pybullet
 
 #. Step 1: :ref:`install_compas_fab`

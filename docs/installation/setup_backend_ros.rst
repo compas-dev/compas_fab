@@ -106,6 +106,16 @@ Creating new ROS bundles using containers is usually only a matter of combining
 them into a new ``docker-compose.yml`` file, which is relatively simple but we
 prepared some very common ones as examples.
 
+Running ROS in Docker with GUI
+------------------------------
+When using Docker or WSL to run backends, there is no visible graphical
+user interface (GUI). However, it is possible to access the GUI of RViz, see
+:ref:`this page <docker_gui>` for more details.
+
+
+
+
+
 .. _ros_bundles_list:
 
 **ROS system with example robots**

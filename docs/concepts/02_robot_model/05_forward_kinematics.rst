@@ -21,8 +21,8 @@ frame (LCF) of each link, which are important for locating the robot in 3D space
 It is the first step in many operations, such as when visualizing
 the robot, and for calculating the pose of attached tools and rigid bodies.
 
-As such, forward kinematics is often performed automatically by other functions
-in **COMPAS FAB**. However, it is also possible to calculate the forward kinematics
+Forward kinematics is often performed automatically by functions in **COMPAS FAB**.
+However, it is also possible to calculate the forward kinematics
 manually. The forward kinematics function for a robot is essentially the
 :ref:`kinematic description of the robot<kinematic_model>`, which is represented by Links and Joints
 in the :class:`~compas_robots.RobotModel`. In its general form, the forward kinematics function

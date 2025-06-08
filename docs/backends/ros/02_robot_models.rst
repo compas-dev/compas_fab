@@ -32,7 +32,7 @@ must be called to send the robot cell to the backend.
    :language: python
 
 Visualize the robot cell in RViz
-===============================
+================================
 
 If GUI is enabled, the robot cell will be visualized in RViz after calling
 :meth:`compas_fab.backends.MoveItPlanner.set_robot_cell`. However, the position
@@ -61,7 +61,7 @@ which causes the attached tool to move with the robot.
 
 
 Serializing the robot cell
-========================
+==========================
 
 Users can choose to serialize their customized robot cell, which can be used
 in another session with the same backend that have been initialized with the
