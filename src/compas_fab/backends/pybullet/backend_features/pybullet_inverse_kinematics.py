@@ -729,13 +729,14 @@ class PyBulletInverseKinematics(InverseKinematics):
         # https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/examples/inverse_kinematics.py
         # kwargs["maxNumIterations"] = max_iter
         # kwargs["residualThreshold"] = threshold
+        client_id = kwargs["physicsClientId"]
 
         for i in range(max_iter):
             joint_poses = pybullet.calculateInverseKinematics(**kwargs)
             for i in range(len(joint_ids_sorted)):
-                pybullet.resetJointState(body_id, joint_ids_sorted[i], joint_poses[i])
+                pybullet.resetJointState(body_id, joint_ids_sorted[i], joint_poses[i], physicsClientId=client_id)
             # Retrieve the last link state that contains the last link's position (index 4) and orientation (index 5)
-            link_state = pybullet.getLinkState(body_id, link_id)
+            link_state = pybullet.getLinkState(body_id, link_id, physicsClientId=client_id)
 
             # Check tolerance_position
             new_position = link_state[4]
