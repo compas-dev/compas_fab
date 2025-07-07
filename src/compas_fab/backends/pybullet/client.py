@@ -67,6 +67,7 @@ class PyBulletBase:
         color: Optional[tuple[float, float, float]] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
+        verbose: bool = False,
     ):
         """Connect from the PyBullet server.
 
@@ -96,7 +97,7 @@ class PyBulletBase:
         # Format GUI parameters for launching PyBullet
         options = self._compose_options(color, width, height)
 
-        with redirect_stdout():
+        with redirect_stdout(enabled=not verbose):
             self.client_id = pybullet.connect(const.CONNECTION_TYPE[self.connection_type], options=options)
 
         if self.client_id < 0:
@@ -130,9 +131,9 @@ class PyBulletBase:
         )
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SHADOWS, shadows, physicsClientId=self.client_id)
 
-    def disconnect(self):
+    def disconnect(self, verbose: bool = False):
         """Disconnect from the PyBullet server."""
-        with redirect_stdout():
+        with redirect_stdout(enabled=not verbose):
             return pybullet.disconnect(physicsClientId=self.client_id)
 
     @property
@@ -238,12 +239,12 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def __enter__(self):
         self._cache_dir = tempfile.TemporaryDirectory(prefix="compas_fab")
-        self.connect()
+        self.connect(verbose=self.verbose)
         return self
 
     def __exit__(self, *args):
         self._cache_dir.cleanup()
-        self.disconnect()
+        self.disconnect(verbose=self.verbose)
 
     @property
     def unordered_disabled_collisions(self) -> set:
@@ -829,8 +830,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             mesh_name += "_"
         tmp_vhacd_obj_path = os.path.join(tmp_dir, mesh_name + "vhacd_temp.obj")
         tmp_log_path = os.path.join(tmp_dir, mesh_name + "log.txt")
-        with redirect_stdout():
-            pybullet.vhacd(tmp_obj_path, tmp_vhacd_obj_path, tmp_log_path)
+        # with redirect_stdout(enabled=not self.verbose):
+        pybullet.vhacd(tmp_obj_path, tmp_vhacd_obj_path, tmp_log_path)
         return tmp_vhacd_obj_path
 
     def _body_from_obj(

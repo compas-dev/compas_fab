@@ -178,6 +178,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed `TargetMode` to be an enum instead of string.
 * Changed default values for number of planning attempts in MoveIt to 5, and the allowed planning time to 1 second.
 * Changed cartesian motion planner of MoveIt to raise an exception (including the partial trajectory) if fraction is below 1.0 (ie. the trajectory is not possible).
+* Changed `PyBulletClient.connect()` and `PyBulletClient.disconnect()` to take a `verbose` parameter.
+* Changed `PyBulletClient._handle_concavity()` to ignore the `redirect_stdout` context manager to avoid the mysterious `WinError 6: The handle is invalid.` error.
 
 ### Removed
 
