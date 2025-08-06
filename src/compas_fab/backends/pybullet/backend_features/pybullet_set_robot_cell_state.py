@@ -71,6 +71,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         # Note robot_cell_state.robot_configuration is a full configuration
         if robot_cell_state.robot_configuration:
             client._set_robot_configuration(robot_cell_state.robot_configuration)
+        client._set_base_frame(robot_cell_state.robot_base_frame, client.robot_puid)
 
         # Keep track of tool's base_frames during tool updates
         # They can be used later to update rigid body base frames that are attached to tools
@@ -105,6 +106,8 @@ class PyBulletSetRobotCellState(SetRobotCellState):
 
             # Set the frame of the tool
             client._set_tool_base_frame(tool_name, tool_base_frame)
+            if tool_state.configuration:
+                client._set_tool_configuration(tool_name, tool_state.configuration)
 
         # Update the position of RigidBody models
         for rigid_body_name, rigid_body_state in robot_cell_state.rigid_body_states.items():

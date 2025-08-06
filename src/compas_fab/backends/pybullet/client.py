@@ -672,6 +672,13 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             return self._get_base_name(body_id)
         return self._get_joint_info(link_id, body_id).linkName.decode("UTF-8")
 
+    def _get_joint_id_from_name(self, body_id, joint_name):
+        for joint_id in list(range(self._get_num_joints(body_id))):
+            parsed_jt_name = self._get_joint_name(joint_id, body_id)
+            if parsed_jt_name == joint_name:
+                return joint_id
+        raise ValueError(body_id, joint_name)
+
     # ----------------------------------------
     # Functions for configuration and frames
     # ----------------------------------------
@@ -742,6 +749,55 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                         )
                     # Note: If the joint that is being mimicked is not in the configuration, the mimic joint will not be set.
                     # This search and replace can be more elaborate in the future if needed.
+
+    def _set_tool_configuration(self, tool_name: str, configuration: Configuration):
+        """Sets the tool's pose to the given configuration.
+
+        Only the joint values in the configuration are set.
+        The other joint values are not changed.
+
+        Parameters
+        ----------
+        tool_name : :obj:`str`
+            Name of the tool to be configured.
+        configuration : :class:`compas_fab.robots.Configuration`
+            The configuration to be set, ``joint_names`` must be included in the configuration.
+
+        """
+        # Check if the tool has been loaded
+        assert (
+            tool_name in self.tools_puids
+        ), f"Tool '{tool_name}' must be loaded before setting configuration."
+
+        tool_id = self.tools_puids[tool_name]
+
+        if configuration is None or configuration.joint_names == []:
+            return
+
+        # Get the PyBullet body unique id for the tool
+        tool_uid = self.tools_puids[tool_name]
+
+        # Iterate through all joints that are considered free by PyBullet for this tool
+        for joint_name in configuration.joint_names:
+            joint_puid = self._get_joint_id_from_name(tool_uid, joint_name)
+            if joint_name in configuration:
+                self._set_joint_position(joint_puid, configuration[joint_name], tool_id)
+            else:
+                pass
+                # TODO: Add support for mimic joints
+                # # Check if this is mimic joint
+                # tool_model = self.robot_cell.tool_models[tool_name]
+                # joint = tool_model.get_joint_by_name(joint_name)
+                # mimic: Mimic = joint.mimic
+                # # Get the value of the joint that is being mimicked (works only for non-cascaded mimic)
+                # if mimic:
+                #     if mimic.joint in configuration:
+                #         mimicked_joint_position = configuration[mimic.joint]
+                #         self._set_joint_position(
+                #             joint_puid, mimic.calculate_position(mimicked_joint_position), tool_id
+                #         )
+                #     # Note: If the joint that is being mimicked is not in the configuration, the mimic joint will not be set.
+                #     # This search and replace can be more elaborate in the future if needed.
 
     def _get_robot_configuration(self) -> Configuration:
         """Gets the robot's current pose.
