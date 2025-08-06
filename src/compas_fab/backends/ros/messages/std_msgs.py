@@ -115,6 +115,11 @@ class Header(ROSmsg):
         self.stamp = stamp
         self.frame_id = frame_id
 
+    def for_ros2(self):
+        """Creates a ROS2 compatible Header class without the seq field"""
+        header2 = self.msg.copy()
+        header2.pop("seq", None)
+        return header2
 
 class String(ROSmsg):
     """https://docs.ros.org/api/std_msgs/html/msg/String.html"""

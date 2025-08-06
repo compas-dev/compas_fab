@@ -128,6 +128,10 @@ class CollisionObject(ROSmsg):
             cm = CollisionMesh(mesh.mesh, self.id, pose.frame, root_name)
             collision_meshes.append(cm)
         return collision_meshes
+    
+    def filter_fields_for_distro(self, ros_distro):
+        if ros_distro in (RosDistro.HUMBLE, RosDistro.JAZZY):
+            self.header = self.header.for_ros2()
 
 
 class AttachedCollisionObject(ROSmsg):
@@ -163,7 +167,8 @@ class AttachedCollisionObject(ROSmsg):
             acm = AttachedCollisionMesh(cm, self.link_name, self.touch_links, self.weight)
             attached_collision_meshes.append(acm)
         return attached_collision_meshes
-
+    
+    
 
 class Constraints(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/Constraints.html"""
@@ -211,7 +216,7 @@ class RobotState(ROSmsg):
         # Remove the field `pose` for distros older than NOETIC
         if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC):
             for aco in self.attached_collision_objects:
-                del aco.object.pose
+                del aco.object.pose      
 
 
 class PositionIKRequest(ROSmsg):
@@ -577,6 +582,7 @@ class PlanningSceneWorld(ROSmsg):
         if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC):
             for co in self.collision_objects:
                 del co.pose
+
 
 
 class PlanningScene(ROSmsg):

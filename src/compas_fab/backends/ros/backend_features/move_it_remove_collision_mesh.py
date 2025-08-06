@@ -50,6 +50,7 @@ class MoveItRemoveCollisionMesh(RemoveCollisionMesh):
     def remove_collision_mesh_async(self, callback, errback, id):
         co = CollisionObject()
         co.id = id
+        co.filter_fields_for_distro(self.client.ros_distro)
         co.operation = CollisionObject.REMOVE
         world = PlanningSceneWorld(collision_objects=[co])
         scene = PlanningScene(world=world, is_diff=True)

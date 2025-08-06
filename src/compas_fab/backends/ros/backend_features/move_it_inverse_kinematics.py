@@ -99,6 +99,9 @@ class MoveItInverseKinematics(InverseKinematics):
         """Asynchronous handler of MoveIt IK service."""
         base_link = options["base_link"]
         header = Header(frame_id=base_link)
+        if self.client.ros_distro in (RosDistro.HUMBLE, RosDistro.JAZZY):
+            header = header.for_ros2()
+            
         pose_stamped = PoseStamped(header, Pose.from_frame(frame_WCF))
 
         joint_state = JointState(

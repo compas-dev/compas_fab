@@ -11,6 +11,7 @@ from compas_fab.backends.ros.messages import CollisionObject
 from compas_fab.backends.ros.messages import PlanningScene
 from compas_fab.backends.ros.messages import PlanningSceneWorld
 from compas_fab.backends.ros.service_description import ServiceDescription
+from compas_fab.backends.ros.messages import RosDistro
 
 __all__ = [
     "MoveItAddCollisionMesh",
@@ -49,8 +50,14 @@ class MoveItAddCollisionMesh(AddCollisionMesh):
 
     def add_collision_mesh_async(self, callback, errback, collision_mesh):
         co = CollisionObject.from_collision_mesh(collision_mesh)
+        co.filter_fields_for_distro(self.client.ros_distro)
         co.operation = CollisionObject.ADD
         world = PlanningSceneWorld(collision_objects=[co])
+        if self.client.ros_distro in (RosDistro.HUMBLE, RosDistro.JAZZY):
+            world.octomap.filter_fields_for_ros2()
         scene = PlanningScene(world=world, is_diff=True)
+        if self.client.ros_distro in (RosDistro.HUMBLE, RosDistro.JAZZY):
+            scene.robot_state.joint_state.filter_fields_for_ros2()
+            scene.robot_state.multi_dof_joint_state.filter_fields_for_ros2()
         request = scene.to_request(self.client.ros_distro)
         self.APPLY_PLANNING_SCENE(self.client, request, callback, errback)

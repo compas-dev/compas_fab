@@ -67,6 +67,7 @@ class Pose(ROSmsg):
         position = Point.from_msg(msg["position"])
         orientation = Quaternion.from_msg(msg["orientation"])
         return cls(position, orientation)
+        """Creates a ROS2 compatible Pose class without the orientation field"""
 
 
 class PoseStamped(ROSmsg):
@@ -83,6 +84,10 @@ class PoseStamped(ROSmsg):
         header = Header.from_msg(msg["header"])
         pose = Pose.from_msg(msg["pose"])
         return cls(header, pose)
+    
+    def filter_fields_for_ros2(self):
+        if hasattr(self, "header"):
+            self.header = self.header.filter_fields_for_ros2()
 
 
 class PoseArray(ROSmsg):
@@ -99,6 +104,10 @@ class PoseArray(ROSmsg):
         header = Header.from_msg(msg["header"])
         poses = [Pose.from_msg(p) for p in msg["poses"]]
         return cls(header, poses)
+    
+    def filter_fields_for_ros2(self):
+        if hasattr(self, "header"):
+            self.header = self.header.filter_fields_for_ros2()
 
 
 class Vector3(ROSmsg):
@@ -194,6 +203,10 @@ class WrenchStamped(ROSmsg):
         header = Header.from_msg(msg["header"])
         wrench = Wrench.from_msg(msg["wrench"])
         return cls(header, wrench)
+    
+    def filter_fields_for_ros2(self):
+        if hasattr(self, "header"):
+            self.header = self.header.filter_fields_for_ros2()
 
 
 class Inertia(ROSmsg):
@@ -201,7 +214,7 @@ class Inertia(ROSmsg):
 
     Examples
     --------
-    >>> inertia = compas_fab.robots.Inertia([[0] * 3] * 3, 1., [0.1, 3.1, 4.4])
+    >>> inertia = compas_fab.robots.Inertia([[0] * 3] * 3, 1.0, [0.1, 3.1, 4.4])
     >>> ros_inertia = Inertia.from_inertia(inertia)
     >>> ros_inertia.msg
     {'m': 1.0, 'com': {'x': 0.1, 'y': 3.1, 'z': 4.4}, 'ixx': 0.0, 'ixy': 0.0, 'ixz': 0.0, 'iyy': 0.0, 'iyz': 0.0, 'izz': 0.0}

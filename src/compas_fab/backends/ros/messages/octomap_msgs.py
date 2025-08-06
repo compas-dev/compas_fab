@@ -18,7 +18,10 @@ class Octomap(ROSmsg):
         self.id = id  # Class id of the contained octree
         self.resolution = resolution  # Resolution (in m) of the smallest octree nodes
         self.data = data or []  # binary serialization of octree, use conversions.h to read and write octrees
-
+    
+    def filter_fields_for_ros2(self):
+        if hasattr(self, "header"):
+            self.header = self.header.for_ros2()
 
 class OctomapWithPose(ROSmsg):
     """https://docs.ros.org/kinetic/api/octomap_msgs/html/msg/OctomapWithPose.html"""
@@ -29,3 +32,10 @@ class OctomapWithPose(ROSmsg):
         self.header = header or Header()  # Header
         self.origin = origin or Pose()  # geometry_msgs/Pose  The pose of the octree with respect to the header frame
         self.octomap = octomap or Octomap()  # octomap_msgs/Octomap  The actual octree msg
+        
+    def filter_fields_for_ros2(self):
+        if hasattr(self, "header"):
+            self.header = self.header.for_ros2()
+        self.octomap.filter_fields_for_ros2()
+
+

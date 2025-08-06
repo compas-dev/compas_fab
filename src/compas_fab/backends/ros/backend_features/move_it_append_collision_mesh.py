@@ -49,6 +49,7 @@ class MoveItAppendCollisionMesh(AppendCollisionMesh):
 
     def append_collision_mesh_async(self, callback, errback, collision_mesh):
         co = CollisionObject.from_collision_mesh(collision_mesh)
+        co.filter_fields_for_distro(self.client.ros_distro)
         co.operation = CollisionObject.APPEND
         world = PlanningSceneWorld(collision_objects=[co])
         scene = PlanningScene(world=world, is_diff=True)

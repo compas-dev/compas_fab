@@ -36,6 +36,10 @@ class JointState(ROSmsg):
         velocity = msg["velocity"]
         effort = msg["effort"]
         return cls(header, name, position, velocity, effort)
+    
+    def filter_fields_for_ros2(self):
+        if hasattr(self, "header"):
+            self.header = self.header.for_ros2()
 
 
 class MultiDOFJointState(ROSmsg):
@@ -49,3 +53,7 @@ class MultiDOFJointState(ROSmsg):
         self.transforms = transforms if transforms else []
         self.twist = twist if twist else []
         self.wrench = wrench if wrench else []
+        
+    def filter_fields_for_ros2(self):
+        if hasattr(self, "header"):
+            self.header = self.header.for_ros2()

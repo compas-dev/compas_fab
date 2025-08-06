@@ -7,5 +7,7 @@ class RosDistro(object):
     KINETIC = "kinetic"
     MELODIC = "melodic"
     NOETIC = "noetic"
+    HUMBLE = "humble"
+    JAZZY = "jazzy"
 
-    SUPPORTED_DISTROS = tuple([KINETIC, MELODIC, NOETIC])
+    SUPPORTED_DISTROS = tuple([KINETIC, MELODIC, NOETIC, HUMBLE, JAZZY])

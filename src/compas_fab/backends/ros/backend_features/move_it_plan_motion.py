@@ -18,6 +18,7 @@ from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.messages import TrajectoryConstraints
 from compas_fab.backends.ros.service_description import ServiceDescription
+from compas_fab.backends.ros.messages import RosDistro
 
 __all__ = ["MoveItPlanMotion"]
 
@@ -99,6 +100,9 @@ class MoveItPlanMotion(PlanMotion):
 
         joints = options["joints"]
         header = Header(frame_id=options["base_link"])
+        if self.client.ros_distro in (RosDistro.HUMBLE, RosDistro.JAZZY):
+            header = header.for_ros2()
+            
         joint_state = JointState(
             header=header, name=start_configuration.joint_names, position=start_configuration.joint_values
         )
@@ -107,6 +111,7 @@ class MoveItPlanMotion(PlanMotion):
         if options.get("attached_collision_meshes"):
             for acm in options["attached_collision_meshes"]:
                 aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
+                aco.object.filter_fields_for_distro(self.client.ros_distro)
                 start_state.attached_collision_objects.append(aco)
 
         # Filter needs to happen after all objects have been added

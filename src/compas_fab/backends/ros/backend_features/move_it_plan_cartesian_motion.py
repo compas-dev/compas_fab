@@ -17,6 +17,7 @@ from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
+from compas_fab.backends.ros.messages import RosDistro
 
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import PointAxisWaypoints
@@ -119,7 +120,9 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         joints = options["joints"]
 
         header = Header(frame_id=options["base_link"])
-
+        if self.client.ros_distro in (RosDistro.HUMBLE, RosDistro.JAZZY):
+            header = header.for_ros2()
+            
         # Convert compas_fab.robots.FrameWaypoints to list of Pose for ROS
         list_of_pose = [Pose.from_frame(frame) for frame in waypoints.target_frames]
 

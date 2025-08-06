@@ -13,6 +13,7 @@ from compas_fab.backends.ros.messages import JointState
 from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
+from compas_fab.backends.ros.messages import RosDistro
 
 __all__ = [
     "MoveItForwardKinematics",
@@ -78,6 +79,9 @@ class MoveItForwardKinematics(ForwardKinematics):
         fk_link_names = [options["link"]]
 
         header = Header(frame_id=base_link)
+        if self.client.ros_distro in (RosDistro.HUMBLE, RosDistro.JAZZY):
+            header = header.for_ros2()
+            
         joint_state = JointState(name=configuration.joint_names, position=configuration.joint_values, header=header)
         robot_state = RobotState(joint_state, MultiDOFJointState(header=header))
         robot_state.filter_fields_for_distro(self.client.ros_distro)

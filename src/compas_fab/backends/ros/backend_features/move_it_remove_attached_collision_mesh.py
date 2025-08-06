@@ -51,6 +51,7 @@ class MoveItRemoveAttachedCollisionMesh(RemoveAttachedCollisionMesh):
     def remove_attached_collision_mesh_async(self, callback, errback, id):
         aco = AttachedCollisionObject()
         aco.object.id = id
+        aco.object.filter_fields_for_distro(self.client.ros_distro)
         aco.object.operation = CollisionObject.REMOVE
         robot_state = RobotState(attached_collision_objects=[aco], is_diff=True)
         scene = PlanningScene(robot_state=robot_state, is_diff=True)

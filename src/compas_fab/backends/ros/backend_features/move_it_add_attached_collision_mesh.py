@@ -50,6 +50,7 @@ class MoveItAddAttachedCollisionMesh(AddAttachedCollisionMesh):
 
     def add_attached_collision_mesh_async(self, callback, errback, attached_collision_mesh):
         aco = AttachedCollisionObject.from_attached_collision_mesh(attached_collision_mesh)
+        aco.object.filter_fields_for_distro(self.client.ros_distro)
         aco.object.operation = CollisionObject.ADD
         robot_state = RobotState(attached_collision_objects=[aco], is_diff=True)
         scene = PlanningScene(robot_state=robot_state, is_diff=True)
