@@ -42,7 +42,10 @@ if TYPE_CHECKING:
 
 
 # If Pybullet is not defined, load it from LazyLoader
-if "pybullet" not in sys.modules:
+try:
+    import pybullet  # Try to import directly
+except ImportError:
+    # Fallback to LazyLoader if import fails
     pybullet = LazyLoader("pybullet", globals(), "pybullet")  # noqa: F811
 
 __all__ = [
@@ -68,6 +71,7 @@ class PyBulletBase:
         width: Optional[int] = None,
         height: Optional[int] = None,
         verbose: bool = False,
+        enable_debug_gui: bool = False,
     ):
         """Connect from the PyBullet server.
 
@@ -81,6 +85,10 @@ class PyBulletBase:
             Set the width in pixels of the GUI. Defaults to ``None``.
         height : :obj:`int`
             Set the height in pixels of GUI. Defaults to ``None``.
+        verbose : :obj:`bool`
+            Enable verbose output. Defaults to ``False``.
+        enable_debug_gui : :obj:`bool`
+            Enable the GUI sidebar and parameter views. Defaults to ``False``.
 
         Returns
         -------
@@ -103,7 +111,7 @@ class PyBulletBase:
         if self.client_id < 0:
             raise Exception("Error in establishing connection with PyBullet.")
         if self.connection_type == "gui":
-            self._configure_debug_visualizer(shadows)
+            self._configure_debug_visualizer(shadows, enable_debug_gui)
 
     @staticmethod
     def _compose_options(
@@ -118,9 +126,9 @@ class PyBulletBase:
             options += "--height={}".format(height)
         return options
 
-    def _configure_debug_visualizer(self, shadows: bool = True):
-        # COV_ENABLE_GUI = False turns off the sidebar and parameter views in the GUI
-        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_GUI, False, physicsClientId=self.client_id)
+    def _configure_debug_visualizer(self, shadows: bool = True, enable_debug_gui: bool = False):
+        # COV_ENABLE_GUI controls the sidebar and parameter views in the GUI
+        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_GUI, enable_debug_gui, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_TINY_RENDERER, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_RGB_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(
@@ -187,9 +195,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     """
 
-    def __init__(self, connection_type: str = "gui", verbose: bool = False):
+    def __init__(self, connection_type: str = "gui", verbose: bool = False, enable_debug_gui: bool = False):
         super(PyBulletClient, self).__init__(connection_type)
         self.verbose = verbose
+        self.enable_debug_gui = enable_debug_gui
 
         # Robot Cell
         # The Pybullet client will not keep track of the Robot object directly but uses the one embedded in the RobotCell
@@ -239,7 +248,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def __enter__(self):
         self._cache_dir = tempfile.TemporaryDirectory(prefix="compas_fab")
-        self.connect(verbose=self.verbose)
+        self.connect(verbose=self.verbose, enable_debug_gui=self.enable_debug_gui)
         return self
 
     def __exit__(self, *args):
@@ -1014,7 +1023,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 class AnalyticalPyBulletClient(PyBulletClient):
     """Combination of PyBullet as the client for Collision Detection and Analytical Inverse Kinematics."""
 
-    def __init__(self, connection_type="gui", verbose=False):
+    def __init__(self, connection_type="gui", verbose=False, enable_gui=False):
         super(AnalyticalPyBulletClient, self).__init__(connection_type=connection_type, verbose=verbose)
 
     # TODO: Move the following function to AnalyticalPyBulletPlanner
