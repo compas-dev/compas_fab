@@ -804,7 +804,8 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                     tolerance_position=waypoints.tolerance_orientation,
                     tolerance_orientation=waypoints.tolerance_orientation,
                 )
-                intermediate_state.robot_configuration.joint_values = trajectory.points[-1].joint_values
+                # intermediate_state.robot_configuration.joint_values = trajectory.points[-1].joint_values
+                intermediate_state.robot_configuration.merge(trajectory.points[-1])
                 if options["verbose"]:
                     print(
                         "Segment {} of {}, j={}, t = {}, Interpolated Frame = {}".format(
