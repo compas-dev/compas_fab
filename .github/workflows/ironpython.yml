@@ -22,7 +22,7 @@ jobs:
           curl -o ironpython-pytest.tar.gz -LJO https://pypi.debian.net/ironpython-pytest/latest
 
           echo "Downloading COMPAS..."
-          curl -o compas.tar.gz -LJO https://pypi.debian.net/COMPAS/compas-2.14.1.tar.gz
+          curl -o compas.tar.gz -LJO https://pypi.debian.net/COMPAS/latest
 
           echo "Downloading roslibpy..."
           curl -o roslibpy.tar.gz -LJO https://pypi.debian.net/roslibpy/roslibpy-1.8.1.tar.gz
@@ -36,14 +36,12 @@ jobs:
           echo "Installing ironpython-pytest..."
           ipy -X:Frames -m pip install --no-deps ironpython-pytest.tar.gz
 
-          echo "Installing COMPAS..."
-          ipy -X:Frames -m pip install --no-deps compas.tar.gz
-          
           echo "Installing roslibpy..."
           ipy -X:Frames -m pip install --no-deps roslibpy.tar.gz
 
-          echo "Installing compas_robots..."
-          ipy -X:Frames -m pip install --no-deps compas_robots.tar.gz
+          rem untar and rename, these cannot be installed using ironpip because they not longer have a setup.py
+          tar -xf compas.tar.gz && for /d %%i in (compas-*) do ren "%%i" compas
+          tar -xf compas_robots.tar.gz && for /d %%i in (compas_robots-*) do ren "%%i" compas_robots
       - uses: NuGet/setup-nuget@v1.0.5
       - uses: compas-dev/compas-actions.ghpython_components@v5
         with:
@@ -54,10 +52,10 @@ jobs:
           echo "Testing import of compas_fab..."
           ipy -m compas_fab
         env:
-          IRONPYTHONPATH: ./src
+          IRONPYTHONPATH: ./src;./compas/src;./compas_robots/src
       - name: Run tests
         run: |
           echo "Running tests..."
           ipy tests/ipy_test_runner.py
         env:
-          IRONPYTHONPATH: ./src
+          IRONPYTHONPATH: ./src;./compas/src;./compas_robots/src
