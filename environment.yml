@@ -11,5 +11,19 @@ dependencies:
   - pyserial
   - pybullet
   - pip:
-      - -r requirements-dev.txt
+      - attrs >=19.3.0
+      - black
+      - bump2version >=1.0.1
+      - check-manifest >=0.36
+      - compas-invocations2
+      - ruff
+      - importlib_metadata <5.0
+      - invoke>=0.14
+      - pytest
+      - pytest_mock
+      - pytest-cov
+      - sphinx_compas2_theme
+      - sybil~=8.0.1
+      - twine
+      - tomlkit
       - -e .
