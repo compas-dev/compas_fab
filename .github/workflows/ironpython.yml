@@ -14,6 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
+        shell: cmd
         run: |
           echo "Installing IronPython..."
           choco install ironpython --version=2.7.8.1
@@ -48,12 +49,14 @@ jobs:
           source: src/compas_fab/ghpython/components
           target: src/compas_fab/ghpython/components/ghuser
       - name: Test import
+        shell: cmd
         run: |
           echo "Testing import of compas_fab..."
           ipy -m compas_fab
         env:
           IRONPYTHONPATH: ./src;./compas/src;./compas_robots/src
       - name: Run tests
+        shell: cmd
         run: |
           echo "Running tests..."
           ipy tests/ipy_test_runner.py
