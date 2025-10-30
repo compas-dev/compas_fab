@@ -22,7 +22,7 @@ jobs:
           curl -o ironpython-pytest.tar.gz -LJO https://pypi.debian.net/ironpython-pytest/latest
 
           echo "Downloading COMPAS..."
-          curl -o compas.tar.gz -LJO https://pypi.debian.net/COMPAS/COMPAS-2.1.0.tar.gz
+          curl -o compas.tar.gz -LJO https://pypi.debian.net/COMPAS/compas-2.14.1.tar.gz
 
           echo "Downloading roslibpy..."
           curl -o roslibpy.tar.gz -LJO https://pypi.debian.net/roslibpy/roslibpy-1.8.1.tar.gz
