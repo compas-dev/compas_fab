@@ -7,12 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-### Added
-
-### Changed
-
-### Removed
-
 ### Fixed
 
 * Fixed compatibility issue with `roslibpy 2.0.0` by adding upper bound `< 2` to the dependency constraint.
