@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+### Fixed
+
+* Fixed integration tests failing in CI by adding environment variable check to skip ROS-dependent tests when ROS backend is not available.
+
 
 ## [1.1.2] 2025-10-31
 

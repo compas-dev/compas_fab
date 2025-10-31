@@ -10,11 +10,31 @@ from sybil.parsers.doctest import DocTestParser
 
 LITERALPYTHON_START = re.compile(r"\.\.\s*literalinclude\s*::(.*\.py)")
 LITERALPYTHON_END = re.compile(r"(\n\Z|\n(?=\S))")
+
+# Files that should always be ignored
 IGNORES = [
     "files/01_ros_*.py",
     "files/03_robot_rhino*.py",
     "files/04_cartesian_path_analytic_pybullet.py",
 ]
+
+# Files that require ROS backend - only run in integration tests
+ROS_REQUIRED_FILES = [
+    "files/02_robot_model.py",
+    "files/02_robot_model_urdf.py",
+    "files/03_forward_kinematics.py",
+    "files/03_inverse_kinematics.py",
+    "files/03_iter_inverse_kinematics.py",
+    "files/04_plan_cartesian_motion.py",
+    "files/04_plan_motion.py",
+    "files/05_add_collision_mesh.py",
+    "files/05_append_collision_meshes.py",
+    "files/05_attach_ee.py",
+]
+
+# Add ROS-required files to ignores if not running integration tests
+if not os.environ.get("COMPAS_FAB_INTEGRATION_TESTS"):
+    IGNORES.extend(ROS_REQUIRED_FILES)
 
 
 def evaluate_literalinclude_python_blocks(block_match):
