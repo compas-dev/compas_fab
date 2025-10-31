@@ -1,7 +1,7 @@
 """
 Add an attached collision mesh to the robot.
 
-COMPAS FAB v1.1.0
+COMPAS FAB v1.1.1
 """
 
 from compas_rhino.conversions import mesh_to_compas
