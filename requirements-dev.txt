@@ -15,4 +15,3 @@ sphinx_compas2_theme
 sybil~=8.0.1
 twine
 tomlkit
--e .
