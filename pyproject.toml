@@ -50,7 +50,7 @@ include-package-data = true
 zip-safe = false
 
 [tool.setuptools.dynamic]
-version = { attr = "compas_fab.__version__" }
+version = { attr = "compas_fab.__version__.__version__" }
 dependencies = { file = "requirements.txt" }
 optional-dependencies = { dev = { file = "requirements-dev.txt" } }
 
