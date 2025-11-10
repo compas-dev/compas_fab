@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="../_static/compas.ico" type="image/x-icon">
     <title>Backend clients &#8212; COMPAS FAB</title>
   
@@ -29,28 +28,29 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/compas.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/compas.css?v=617b33e2" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script src="../_static/tabs.js"></script>
+    <script src="../_static/documentation_options.js?v=bb99e320"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/tabs.js?v=3ee01567"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js"></script>
-    <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'developer/backends';</script>
     <script>
@@ -59,7 +59,7 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ClientInterface" href="generated/compas_fab.backends.interfaces.ClientInterface.html" />
+    <link rel="next" title="Grasshopper components" href="grasshopper.html" />
     <link rel="prev" title="Contributor’s Guide" href="../contributing.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -617,8 +617,8 @@ document.write(`
 backend features.</p>
 <p>To maintain consistency from one backend client to another and to promote
 modularity, we make use of several interfaces. Any new backend client
-should inherit from <a class="reference internal" href="generated/compas_fab.backends.interfaces.ClientInterface.html" title="compas_fab.backends.interfaces.ClientInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClientInterface</span></code></a> and
-make use of the <a class="reference internal" href="generated/compas_fab.backends.interfaces.PlannerInterface.html" title="compas_fab.backends.interfaces.PlannerInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlannerInterface</span></code></a>.
+should inherit from <code class="xref py py-class docutils literal notranslate"><span class="pre">ClientInterface</span></code> and
+make use of the <code class="xref py py-class docutils literal notranslate"><span class="pre">PlannerInterface</span></code>.
 Methods for connecting, disconnecting, and generally managing the client state
 are a part of the client, while any methods for planning, scene management or
 kinematics are attached to the planner.  Eventually, methods for
@@ -633,11 +633,11 @@ feature interface from <code class="docutils literal notranslate"><span class="p
 <code class="docutils literal notranslate"><span class="pre">interfaces.py</span></code> consists of a collection of classes, any
 implementation of which is callable through its <code class="docutils literal notranslate"><span class="pre">__call__</span></code> magic
 method.  For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Frame</span>
-<span class="kn">from</span> <span class="nn">compas_fab.backends.interfaces</span> <span class="kn">import</span> <span class="n">InverseKinematics</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">compas.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Frame</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compas_fab.backends.interfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">InverseKinematics</span>
 
-<span class="k">class</span> <span class="nc">ExampleInverseKinematics</span><span class="p">(</span><span class="n">InverseKinematics</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">inverse_kinematics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExampleInverseKinematics</span><span class="p">(</span><span class="n">InverseKinematics</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inverse_kinematics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span>
                            <span class="n">frame_WCF</span><span class="p">,</span>
                            <span class="n">start_configuration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -676,146 +676,13 @@ of <code class="docutils literal notranslate"><span class="pre">ClientA</span></
 <code class="docutils literal notranslate"><span class="pre">ClientInterface</span></code> and that <code class="docutils literal notranslate"><span class="pre">ClientAInverseKinematics</span></code> and
 <code class="docutils literal notranslate"><span class="pre">ClientBPlanMotion</span></code> inherit from <code class="docutils literal notranslate"><span class="pre">InverseKinematics</span></code> and
 <code class="docutils literal notranslate"><span class="pre">PlanMotion</span></code>, resp.)</p>
-<section id="module-compas_fab.backends.interfaces">
-<span id="backend-interfaces"></span><h2>Backend interfaces</h2>
-<p>This package defines the interfaces required to integrate backends into
-the simulation, planning and execution pipeline of COMPAS FAB.</p>
-<section id="client-interfaces">
-<h3>Client interfaces</h3>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.ClientInterface.html" title="compas_fab.backends.interfaces.ClientInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClientInterface</span></code></a></p></td>
-<td><p>Interface for all backend clients.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.PlannerInterface.html" title="compas_fab.backends.interfaces.PlannerInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PlannerInterface</span></code></a></p></td>
-<td><p>Interface for all planners associated with a backend client.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="feature-interfaces">
-<h3>Feature interfaces</h3>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.BackendFeature.html" title="compas_fab.backends.interfaces.BackendFeature"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackendFeature</span></code></a></p></td>
-<td><p>Base class for all backend features that are implemented by a backend client.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.ForwardKinematics.html" title="compas_fab.backends.interfaces.ForwardKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ForwardKinematics</span></code></a></p></td>
-<td><p>Mix-in interface for implementing a planner's forward kinematics feature.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.InverseKinematics.html" title="compas_fab.backends.interfaces.InverseKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InverseKinematics</span></code></a></p></td>
-<td><p>Mix-in interface for implementing a planner's inverse kinematics feature.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.PlanMotion.html" title="compas_fab.backends.interfaces.PlanMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PlanMotion</span></code></a></p></td>
-<td><p>Mix-in interface for implementing a planner's plan motion feature.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.PlanCartesianMotion.html" title="compas_fab.backends.interfaces.PlanCartesianMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PlanCartesianMotion</span></code></a></p></td>
-<td><p>Mix-in interface for implementing a planner's plan cartesian motion feature.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="planning-scene-interfaces">
-<h3>Planning scene interfaces</h3>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.GetPlanningScene.html" title="compas_fab.backends.interfaces.GetPlanningScene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GetPlanningScene</span></code></a></p></td>
-<td><p>Mix-in interface for implementing a planner's get planning scene feature.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.AddCollisionMesh.html" title="compas_fab.backends.interfaces.AddCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AddCollisionMesh</span></code></a></p></td>
-<td><p>Mix-in interface for implementing a planner's add collision mesh feature.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.AppendCollisionMesh.html" title="compas_fab.backends.interfaces.AppendCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AppendCollisionMesh</span></code></a></p></td>
-<td><p>Mix-in interface for implementing a planner's append collision mesh feature.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.RemoveCollisionMesh.html" title="compas_fab.backends.interfaces.RemoveCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoveCollisionMesh</span></code></a></p></td>
-<td><p>Mix-in interface for implementing a planner's remove collision mesh feature.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.AddAttachedCollisionMesh.html" title="compas_fab.backends.interfaces.AddAttachedCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AddAttachedCollisionMesh</span></code></a></p></td>
-<td><p>Mix-in interface for implementing a planner's add attached collision mesh feature.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.RemoveAttachedCollisionMesh.html" title="compas_fab.backends.interfaces.RemoveAttachedCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoveAttachedCollisionMesh</span></code></a></p></td>
-<td><p>Mix-in interface for implementing a planner's remove attached collision mesh feature.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.interfaces.ResetPlanningScene.html" title="compas_fab.backends.interfaces.ResetPlanningScene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ResetPlanningScene</span></code></a></p></td>
-<td><p>Mix-in interface for implementing a planner's reset planning scene feature.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
+<section id="backend-interfaces">
+<h2>Backend interfaces</h2>
 </section>
 <section id="implemented-backend-features">
 <h2>Implemented backend features</h2>
 <p>The following backend features are implemented for the ROS backend:</p>
-<span class="target" id="module-compas_fab.backends.ros.backend_features"></span><section id="ros-backend-features">
-<h3>ROS backend features</h3>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItAddAttachedCollisionMesh.html" title="compas_fab.backends.ros.backend_features.MoveItAddAttachedCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItAddAttachedCollisionMesh</span></code></a></p></td>
-<td><p>Callable to add a collision mesh and attach it to the robot.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItAddCollisionMesh.html" title="compas_fab.backends.ros.backend_features.MoveItAddCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItAddCollisionMesh</span></code></a></p></td>
-<td><p>Callable to add a collision mesh to the planning scene.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItAppendCollisionMesh.html" title="compas_fab.backends.ros.backend_features.MoveItAppendCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItAppendCollisionMesh</span></code></a></p></td>
-<td><p>Callable to append a collision mesh to the planning scene.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItForwardKinematics.html" title="compas_fab.backends.ros.backend_features.MoveItForwardKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItForwardKinematics</span></code></a></p></td>
-<td><p>Callable to calculate the robot's forward kinematic.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItInverseKinematics.html" title="compas_fab.backends.ros.backend_features.MoveItInverseKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItInverseKinematics</span></code></a></p></td>
-<td><p>Callable to calculate the robot's inverse kinematics for a given frame.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.html" title="compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItPlanCartesianMotion</span></code></a></p></td>
-<td><p>Callable to calculate a cartesian motion path (linear in tool space).</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItPlanMotion.html" title="compas_fab.backends.ros.backend_features.MoveItPlanMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItPlanMotion</span></code></a></p></td>
-<td><p>Callable to find a path in joint space for the robot to move from its <cite>start_configuration</cite> to the <cite>target</cite>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItPlanningScene.html" title="compas_fab.backends.ros.backend_features.MoveItPlanningScene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItPlanningScene</span></code></a></p></td>
-<td><p>Callable to retrieve the planning scene.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItRemoveAttachedCollisionMesh.html" title="compas_fab.backends.ros.backend_features.MoveItRemoveAttachedCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItRemoveAttachedCollisionMesh</span></code></a></p></td>
-<td><p>Callable to remove an attached collision mesh from the robot.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItRemoveCollisionMesh.html" title="compas_fab.backends.ros.backend_features.MoveItRemoveCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItRemoveCollisionMesh</span></code></a></p></td>
-<td><p>Callable to remove a collision mesh from the planning scene.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.ros.backend_features.MoveItResetPlanningScene.html" title="compas_fab.backends.ros.backend_features.MoveItResetPlanningScene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItResetPlanningScene</span></code></a></p></td>
-<td><p>Callable to add a collision mesh to the planning scene.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
 <p>The following backend features are implemented for the PyBullet backend:</p>
-<span class="target" id="module-compas_fab.backends.pybullet.backend_features"></span><section id="pybullet-backend-features">
-<h3>PyBullet backend features</h3>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletAddAttachedCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.PyBulletAddAttachedCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletAddAttachedCollisionMesh</span></code></a></p></td>
-<td><p>Callable to add a collision mesh and attach it to the robot.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletAddCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.PyBulletAddCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletAddCollisionMesh</span></code></a></p></td>
-<td><p>Callable to add a collision mesh to the planning scene.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletAppendCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.PyBulletAppendCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletAppendCollisionMesh</span></code></a></p></td>
-<td><p>Callable to append a collision mesh to the planning scene.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletForwardKinematics.html" title="compas_fab.backends.pybullet.backend_features.PyBulletForwardKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletForwardKinematics</span></code></a></p></td>
-<td><p>Callable to calculate the robot's forward kinematic.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletInverseKinematics.html" title="compas_fab.backends.pybullet.backend_features.PyBulletInverseKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletInverseKinematics</span></code></a></p></td>
-<td><p>Callable to calculate the robot's inverse kinematics for a given frame.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletRemoveAttachedCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.PyBulletRemoveAttachedCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletRemoveAttachedCollisionMesh</span></code></a></p></td>
-<td><p>Callable to remove an attached collision mesh from the robot.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.pybullet.backend_features.PyBulletRemoveCollisionMesh.html" title="compas_fab.backends.pybullet.backend_features.PyBulletRemoveCollisionMesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletRemoveCollisionMesh</span></code></a></p></td>
-<td><p>Callable to remove a collision mesh from the planning scene.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
 </section>
 </section>
 
@@ -840,17 +707,8 @@ the simulation, planning and execution pipeline of COMPAS FAB.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compas_fab.backends.interfaces">Backend interfaces</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#client-interfaces">Client interfaces</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#feature-interfaces">Feature interfaces</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#planning-scene-interfaces">Planning scene interfaces</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implemented-backend-features">Implemented backend features</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ros-backend-features">ROS backend features</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pybullet-backend-features">PyBullet backend features</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backend-interfaces">Backend interfaces</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implemented-backend-features">Implemented backend features</a></li>
 </ul>
   </nav></div>
 
@@ -886,7 +744,7 @@ the simulation, planning and execution pipeline of COMPAS FAB.</p>
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     <br/>
   </p>
 </div>

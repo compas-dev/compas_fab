@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 
 
@@ -7,9 +6,9 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="../_static/compas.ico" type="image/x-icon">
-    <title>compas_fab.backends &#8212; COMPAS FAB</title>
+    <title>&lt;no title&gt; &#8212; COMPAS FAB</title>
   
   
   
@@ -29,28 +28,29 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/compas.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/compas.css?v=617b33e2" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script src="../_static/tabs.js"></script>
+    <script src="../_static/documentation_options.js?v=bb99e320"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/tabs.js?v=3ee01567"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js"></script>
-    <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/compas_fab.backends';</script>
     <script>
@@ -59,7 +59,7 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="RosClient" href="generated/compas_fab.backends.RosClient.html" />
+    <link rel="next" title="compas_fab.blender" href="compas_fab.blender.html" />
     <link rel="prev" title="to_radians" href="generated/compas_fab.robots.to_radians.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -518,7 +518,7 @@ document.write(`
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
-        <ul class="current nav bd-sidenav">
+        <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../backends.html">Working with backends</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -536,8 +536,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../examples/07_reachability_map.html">Planning: Reachability Map</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active"><a class="reference internal" href="compas_fab.html">compas_fab</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="compas_fab.html">compas_fab</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../contributing.html">Contributor’s Guide</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -597,7 +597,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="compas_fab.html" class="nav-link">compas_fab</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">compas_fab.backends</li>
+    <li class="breadcrumb-item active" aria-current="page">&lt;no title&gt;</li>
   </ul>
 </nav>
 </div>
@@ -614,152 +614,7 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <span class="target" id="module-compas_fab.backends"></span><section id="compas-fab-backends">
-<h1>compas_fab.backends</h1>
-<p>This package contains classes backends for simulation, planning and execution.</p>
-<section id="ros">
-<h2>ROS</h2>
-<p>Classes to interact with <a class="reference external" href="https://ros.org/">ROS</a> and the <code class="docutils literal notranslate"><span class="pre">MoveIt</span></code> planning
-framework.</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.RosClient.html" title="compas_fab.backends.RosClient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RosClient</span></code></a></p></td>
-<td><p>Interface to use ROS as backend via the <strong>rosbridge</strong>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.RosFileServerLoader.html" title="compas_fab.backends.RosFileServerLoader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RosFileServerLoader</span></code></a></p></td>
-<td><p>Allows to retrieve the mesh files specified in the robot model from the ROS File Server.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.MoveItPlanner.html" title="compas_fab.backends.MoveItPlanner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveItPlanner</span></code></a></p></td>
-<td><p>Implement the planner backend interface based on MoveIt!</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.RosError.html" title="compas_fab.backends.RosError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RosError</span></code></a></p></td>
-<td><p>Wraps an exception that occurred on the communication with ROS.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.RosValidationError.html" title="compas_fab.backends.RosValidationError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RosValidationError</span></code></a></p></td>
-<td><p>Wraps an exception that occurred on validation of a ROS response.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="pybullet">
-<h2>PyBullet</h2>
-<p>Classes to interact with <a class="reference external" href="http://pybullet.org/">PyBullet</a>.</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.PyBulletClient.html" title="compas_fab.backends.PyBulletClient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletClient</span></code></a></p></td>
-<td><p>Interface to use pybullet as backend.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.PyBulletPlanner.html" title="compas_fab.backends.PyBulletPlanner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletPlanner</span></code></a></p></td>
-<td><p>Implement the planner backend interface for PyBullet.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.PyBulletError.html" title="compas_fab.backends.PyBulletError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyBulletError</span></code></a></p></td>
-<td><p>Base case for exceptions in <code class="docutils literal notranslate"><span class="pre">compas_fab.backends.pybullet</span></code>.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.CollisionError.html" title="compas_fab.backends.CollisionError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CollisionError</span></code></a></p></td>
-<td><p>Exception raised when two objects have been found to be in collision in PyBullet.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="analytical-kinematics">
-<h2>Analytical Kinematics</h2>
-<p>Pure-python implementation of analytic IK solvers.</p>
-<section id="ik-solvers">
-<h3>IK solvers</h3>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.AnalyticalInverseKinematics.html" title="compas_fab.backends.AnalyticalInverseKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnalyticalInverseKinematics</span></code></a></p></td>
-<td><p>Callable to calculate the robot's inverse kinematics for a given frame.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.AnalyticalPlanCartesianMotion.html" title="compas_fab.backends.AnalyticalPlanCartesianMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnalyticalPlanCartesianMotion</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.OffsetWristKinematics.html" title="compas_fab.backends.OffsetWristKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OffsetWristKinematics</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.SphericalWristKinematics.html" title="compas_fab.backends.SphericalWristKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SphericalWristKinematics</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.AnalyticalPyBulletClient.html" title="compas_fab.backends.AnalyticalPyBulletClient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnalyticalPyBulletClient</span></code></a></p></td>
-<td><p>Combination of PyBullet as the client for Collision Detection and Analytical Inverse Kinematics.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="robot-specific-kinematics">
-<h3>Robot-specific kinematics</h3>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.UR3Kinematics.html" title="compas_fab.backends.UR3Kinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UR3Kinematics</span></code></a></p></td>
-<td><p>Analytical IK solver for UR3 robots.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.UR3eKinematics.html" title="compas_fab.backends.UR3eKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UR3eKinematics</span></code></a></p></td>
-<td><p>Analytical IK solver for UR3 e-Series robots.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.UR5Kinematics.html" title="compas_fab.backends.UR5Kinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UR5Kinematics</span></code></a></p></td>
-<td><p>Analytical IK solver for UR5 robots.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.UR5eKinematics.html" title="compas_fab.backends.UR5eKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UR5eKinematics</span></code></a></p></td>
-<td><p>Analytical IK solver for UR5 e-Series robots.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.UR10Kinematics.html" title="compas_fab.backends.UR10Kinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UR10Kinematics</span></code></a></p></td>
-<td><p>Analytical IK solver for UR10 e-Series robots.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.UR10eKinematics.html" title="compas_fab.backends.UR10eKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UR10eKinematics</span></code></a></p></td>
-<td><p>Analytical IK solver for UR10 e-Series robots.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.Staubli_TX260LKinematics.html" title="compas_fab.backends.Staubli_TX260LKinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Staubli_TX260LKinematics</span></code></a></p></td>
-<td><p>Analytical IK solver for the Stäubli TX2 60L robot.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.ABB_IRB4600_40_255Kinematics.html" title="compas_fab.backends.ABB_IRB4600_40_255Kinematics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ABB_IRB4600_40_255Kinematics</span></code></a></p></td>
-<td><p>Analytical IK solver for the ABB IRB4600 40/255 robot.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-<section id="long-running-tasks">
-<h2>Long-running tasks</h2>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.FutureResult.html" title="compas_fab.backends.FutureResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FutureResult</span></code></a></p></td>
-<td><p>Represents a future result value.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.CancellableFutureResult.html" title="compas_fab.backends.CancellableFutureResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CancellableFutureResult</span></code></a></p></td>
-<td><p>Represents a future result of a long-running asynchronous operation that can be cancelled.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="exceptions">
-<h2>Exceptions</h2>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.BackendError.html" title="compas_fab.backends.BackendError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackendError</span></code></a></p></td>
-<td><p>Indicates an exceptional state that caused an error within the backend engine.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.BackendFeatureNotSupportedError.html" title="compas_fab.backends.BackendFeatureNotSupportedError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackendFeatureNotSupportedError</span></code></a></p></td>
-<td><p>Indicates that the selected backend does not support the selected feature.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.CartesianMotionError.html" title="compas_fab.backends.CartesianMotionError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CartesianMotionError</span></code></a></p></td>
-<td><p>Exception raised when no path can be found.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/compas_fab.backends.InverseKinematicsError.html" title="compas_fab.backends.InverseKinematicsError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InverseKinematicsError</span></code></a></p></td>
-<td><p>Indicates that no IK solution could be found by the kinematic solver.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/compas_fab.backends.KinematicsError.html" title="compas_fab.backends.KinematicsError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KinematicsError</span></code></a></p></td>
-<td><p>Indicates a kinematic solver exception.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="interfaces">
-<h2>Interfaces</h2>
-<p>For details about integrating new backends, check
-the <a class="reference internal" href="../developer/backends.html#architecture"><span class="std std-ref">Backend clients</span></a> documentation.</p>
-</section>
-</section>
-
+  
 
                 </article>
               
@@ -780,18 +635,9 @@ the <a class="reference internal" href="../developer/backends.html#architecture"
     <i class="fa-solid fa-list"></i> On this page
   </div>
   <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ros">ROS</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pybullet">PyBullet</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analytical-kinematics">Analytical Kinematics</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ik-solvers">IK solvers</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#robot-specific-kinematics">Robot-specific kinematics</a></li>
+    <ul class="simple visible nav section-nav flex-column">
 </ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#long-running-tasks">Long-running tasks</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exceptions">Exceptions</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interfaces">Interfaces</a></li>
-</ul>
+
   </nav></div>
 
 </div></div>
@@ -826,7 +672,7 @@ the <a class="reference internal" href="../developer/backends.html#architecture"
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     <br/>
   </p>
 </div>

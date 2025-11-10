@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="../../_static/compas.ico" type="image/x-icon">
     <title>Analytical kinematics &#8212; COMPAS FAB</title>
   
@@ -29,28 +28,29 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/compas.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/compas.css?v=617b33e2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/tabs.js"></script>
+    <script src="../../_static/documentation_options.js?v=bb99e320"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/tabs.js?v=3ee01567"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../../_static/togglebutton.js"></script>
-    <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/06_backends_kinematics/01_ik_and_cartesian';</script>
     <script>
@@ -662,9 +662,9 @@ boundaries are then not removed from the list of solutions, they are set to
 <p>The inverse kinematics function calculates the joint states required for the
 end-effector to reach a certain target pose.</p>
 <p>Here is an example of using <code class="docutils literal notranslate"><span class="pre">AnalyticalInverseKinematics</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Frame</span>
-<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">RobotLibrary</span>
-<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">AnalyticalInverseKinematics</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">compas.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Frame</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compas_fab.robots</span><span class="w"> </span><span class="kn">import</span> <span class="n">RobotLibrary</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compas_fab.backends</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalyticalInverseKinematics</span>
 
 <span class="n">ik</span> <span class="o">=</span> <span class="n">AnalyticalInverseKinematics</span><span class="p">()</span>
 <span class="n">robot</span> <span class="o">=</span> <span class="n">RobotLibrary</span><span class="o">.</span><span class="n">ur5</span><span class="p">()</span>
@@ -678,9 +678,9 @@ end-effector to reach a certain target pose.</p>
 </div>
 <p>The above solutions, could however be in collision. In order to check for collisions,
 we have to use a <cite>client</cite>. See below the example for using the <code class="docutils literal notranslate"><span class="pre">PyBulletClient</span></code></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Frame</span>
-<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">AnalyticalInverseKinematics</span>
-<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">PyBulletClient</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">compas.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Frame</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compas_fab.backends</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalyticalInverseKinematics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compas_fab.backends</span><span class="w"> </span><span class="kn">import</span> <span class="n">PyBulletClient</span>
 
 <span class="n">frame_WCF</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">((</span><span class="mf">0.381</span><span class="p">,</span> <span class="mf">0.093</span><span class="p">,</span> <span class="mf">0.382</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.371</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.292</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.882</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.113</span><span class="p">,</span> <span class="mf">0.956</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.269</span><span class="p">))</span>
 
@@ -699,8 +699,8 @@ we have to use a <cite>client</cite>. See below the example for using the <code 
 </pre></div>
 </div>
 <p>Or, alternatively, use the <code class="docutils literal notranslate"><span class="pre">AnalyticalPyBulletClient</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Frame</span>
-<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">AnalyticalPyBulletClient</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">compas.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Frame</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compas_fab.backends</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalyticalPyBulletClient</span>
 
 
 <span class="k">with</span> <span class="n">AnalyticalPyBulletClient</span><span class="p">(</span><span class="n">connection_type</span><span class="o">=</span><span class="s1">&#39;direct&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
@@ -715,11 +715,11 @@ we have to use a <cite>client</cite>. See below the example for using the <code 
 </pre></div>
 </div>
 <p>We can also use the <code class="docutils literal notranslate"><span class="pre">AnalyticalPyBulletClient</span></code> to calculate a cartesian path:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">compas.geometry</span> <span class="kn">import</span> <span class="n">Frame</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compas.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Frame</span>
 
-<span class="kn">from</span> <span class="nn">compas_fab.backends</span> <span class="kn">import</span> <span class="n">AnalyticalPyBulletClient</span>
-<span class="kn">from</span> <span class="nn">compas_fab.robots</span> <span class="kn">import</span> <span class="n">FrameWaypoints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compas_fab.backends</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalyticalPyBulletClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">compas_fab.robots</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameWaypoints</span>
 
 <span class="n">frames_WCF</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">Frame</span><span class="p">((</span><span class="mf">0.407</span><span class="p">,</span> <span class="mf">0.073</span><span class="p">,</span> <span class="mf">0.320</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.922</span><span class="p">,</span> <span class="mf">0.000</span><span class="p">,</span> <span class="mf">0.388</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.113</span><span class="p">,</span> <span class="mf">0.956</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.269</span><span class="p">)),</span>
@@ -804,7 +804,7 @@ we have to use a <cite>client</cite>. See below the example for using the <code 
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     <br/>
   </p>
 </div>
