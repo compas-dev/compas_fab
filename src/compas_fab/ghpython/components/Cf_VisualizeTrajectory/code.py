@@ -4,8 +4,8 @@ Visualizes a trajectory.
 COMPAS FAB v1.1.2
 """
 
-from compas_rhino.conversions import frame_to_rhino_plane
 from compas_ghpython.sets import list_to_ghtree
+from compas_rhino.conversions import frame_to_rhino_plane
 from ghpythonlib.componentbase import executingcomponent as component
 
 

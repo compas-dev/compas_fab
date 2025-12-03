@@ -4,11 +4,10 @@ Load robot directly from ROS.
 COMPAS FAB v1.1.2
 """
 
+from compas.scene import SceneObject
 from compas_ghpython import create_id
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
-
-from compas.scene import SceneObject
 
 
 class ROSRobot(component):
