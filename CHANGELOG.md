@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+### Fixed
+* Replaced the deprecated `draw_frame` function with `frame_to_rhino_plane` in the *Visualize Trajectory* GhPython component to restore correct frame visualization.
+
 
 ## [1.1.2] 2025-10-31
 

@@ -12,13 +12,28 @@ We love pull requests from everyone! Here's a quick guide to improve the code:
 
 1. Fork `the repository <https://github.com/compas-dev/compas_fab>`_ and clone the fork.
 2. Create a virtual environment using your tool of choice (e.g. ``virtualenv``, ``conda``, etc).
-3. Install development dependencies:
+3. Install the development dependencies:
 
 ::
 
     pip install -r requirements-dev.txt
+    pip install -e .
 
-4. From the `compas_fab` directory, run the docker containers:
+.. note::
+
+   **Windows users:** The ``pybullet`` package often fails to build from source when installed
+   via ``pip`` due to missing C++ build tools.  
+   To avoid this, **comment out the ``pybullet`` line in ``requirements-dev.txt``** before running
+   ``pip install -r requirements-dev.txt`` and then install ``pybullet`` separately using:
+
+   ::
+
+       conda install -c conda-forge pybullet
+
+   This ensures that the precompiled conda-forge package is used instead of attempting
+   to compile ``pybullet`` from source.
+
+1. From the `compas_fab` directory, run the docker containers:
 
 ::
 
@@ -29,6 +44,16 @@ We love pull requests from everyone! Here's a quick guide to improve the code:
 ::
 
     invoke test --doctest --codeblock
+
+.. note::
+
+   If you see the error ``No idea what '--codeblock' is!'', it means your version of the
+   task definitions does not support the ``--codeblock`` option.  
+   In that case, simply remove ``--codeblock`` and run:
+
+   ::
+
+       invoke test --doctest
 
 6. Start making your changes to the **main** branch (or branch off of it).
 7. Make sure all tests still pass:

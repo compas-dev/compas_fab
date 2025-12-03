@@ -4,7 +4,7 @@ Visualizes a trajectory.
 COMPAS FAB v1.1.2
 """
 
-from compas_ghpython import draw_frame
+from compas_rhino.conversions import frame_to_rhino_plane
 from compas_ghpython.sets import list_to_ghtree
 from ghpythonlib.componentbase import executingcomponent as component
 
@@ -29,7 +29,7 @@ class TrajectoryVisualize(component):
                     robot.merge_group_with_full_configuration(c, trajectory.start_configuration, group)
                 )
                 frame = robot.forward_kinematics(c, group, options=dict(solver="model"))
-                planes.append(draw_frame(frame))
+                planes.append(frame_to_rhino_plane(frame))
                 positions.append(c.positions)
                 velocities.append(c.velocities)
                 accelerations.append(c.accelerations)
