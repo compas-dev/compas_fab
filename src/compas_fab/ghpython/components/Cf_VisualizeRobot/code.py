@@ -6,14 +6,14 @@ COMPAS FAB v1.1.2
 
 import time
 
+from compas.geometry import Frame
+from compas.geometry import Transformation
+from compas.scene import SceneObject
 from compas_ghpython import create_id
 from compas_rhino.conversions import frame_to_rhino_plane
 from ghpythonlib.componentbase import executingcomponent as component
 from scriptcontext import sticky as st
 
-from compas.geometry import Frame
-from compas.geometry import Transformation
-from compas.scene import SceneObject
 from compas_fab.backends import BackendFeatureNotSupportedError
 from compas_fab.robots import PlanningScene
 
