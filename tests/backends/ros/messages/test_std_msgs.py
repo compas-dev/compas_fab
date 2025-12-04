@@ -32,9 +32,9 @@ def test_subclasses_define_type_name():
 
 def test_consistent_naming():
     for cls in ROSmsg.__subclasses__():
-        assert (
-            cls.ROS_MSG_TYPE.split("/")[1] == cls.__name__
-        ), "Class {} does not match to the ROS msg type name={}".format(cls.__name__, cls.ROS_MSG_TYPE)
+        assert cls.ROS_MSG_TYPE.split("/")[1] == cls.__name__, (
+            "Class {} does not match to the ROS msg type name={}".format(cls.__name__, cls.ROS_MSG_TYPE)
+        )
 
 
 def test_uniqueness_of_msg_type():
