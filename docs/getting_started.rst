@@ -88,7 +88,7 @@ To switch to a specific version
 
 .. code-block:: bash
 
-    conda install compas_fab=1.1.3
+    conda install compas_fab=1.1.4
 
 
 Update with pip
@@ -104,7 +104,7 @@ Or to switch to a specific version
 
 .. code-block:: bash
 
-    pip install compas_fab==1.1.3
+    pip install compas_fab==1.1.4
 
 
 Working in Rhino

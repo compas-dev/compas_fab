@@ -1,7 +1,7 @@
 """
 Create a planning scene.
 
-COMPAS FAB v1.1.3
+COMPAS FAB v1.1.4
 """
 
 from compas_ghpython import create_id
