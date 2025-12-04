@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Fix CI workflow for release publishing.
+
 ### Removed
 
 
@@ -19,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+
 * Replaced the deprecated `draw_frame` function with `frame_to_rhino_plane` in the *Visualize Trajectory* GhPython component to restore correct frame visualization.
 
 ### Removed
