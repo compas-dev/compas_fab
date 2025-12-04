@@ -25,7 +25,7 @@ jobs:
     needs: build
     runs-on: windows-latest
     steps:
-      - uses: compas-dev/compas-actions.publish@v2
+      - uses: compas-dev/compas-actions.publish@v3
         with:
           pypi_token: ${{ secrets.PYPI_PASSWORD }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
