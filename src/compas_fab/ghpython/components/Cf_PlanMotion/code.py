@@ -1,7 +1,7 @@
 """
 Calculate a motion path.
 
-COMPAS FAB v1.1.2
+COMPAS FAB v1.1.3
 """
 
 from compas_ghpython import create_id

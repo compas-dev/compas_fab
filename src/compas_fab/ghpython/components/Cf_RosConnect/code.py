@@ -1,7 +1,7 @@
 """
 Connect or disconnect to ROS.
 
-COMPAS FAB v1.1.2
+COMPAS FAB v1.1.3
 """
 
 from compas_ghpython import create_id

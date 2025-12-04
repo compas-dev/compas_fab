@@ -1,7 +1,7 @@
 """
 Attach a tool to the robot.
 
-COMPAS FAB v1.1.2
+COMPAS FAB v1.1.3
 """
 
 from compas.geometry import Frame
