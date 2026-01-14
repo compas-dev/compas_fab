@@ -9,7 +9,7 @@
 [![PyPI Package latest release](https://img.shields.io/pypi/v/compas_fab.svg)](https://pypi.python.org/pypi/compas_fab)
 [![Anaconda](https://img.shields.io/conda/vn/conda-forge/compas_fab.svg)](https://anaconda.org/conda-forge/compas_fab)
 [![Supported implementations](https://img.shields.io/pypi/implementation/compas_fab.svg)](https://pypi.python.org/pypi/compas_fab)
-[![DOI](https://zenodo.org/badge/107952684.svg)](https://zenodo.org/badge/latestdoi/107952684)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17809165.svg)](https://doi.org/10.5281/zenodo.17809165)
 [![Twitter Follow](https://img.shields.io/twitter/follow/compas_dev?style=social)](https://twitter.com/compas_dev)
 
 *Robotic fabrication package for the COMPAS Framework** that facilitates the
