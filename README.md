@@ -1,5 +1,6 @@
 # COMPAS FAB: Robotic Fabrication for COMPAS
 
+[![Made with COMPAS](https://compas.dev/badge.svg)](https://compas.dev)
 [![Github Actions Build Status](https://github.com/compas-dev/compas_fab/workflows/build/badge.svg)](https://github.com/compas-dev/compas_fab/actions)
 [![Github Actions Integration Status](https://github.com/compas-dev/compas_fab/workflows/integration/badge.svg)](https://github.com/compas-dev/compas_fab/actions)
 [![License](https://img.shields.io/github/license/compas-dev/compas_fab.svg)](https://pypi.python.org/pypi/compas_fab)
