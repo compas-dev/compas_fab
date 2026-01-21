@@ -19,18 +19,18 @@ but for now, such methods and attributes will be left with the
 client.
 
 The ``PlannerInterface`` serves as a template for any client-specific
-planner, providing default behavior for each of the
-methods listed within.  When a developer wishes to override any
-of these defaults, they should make use of the appropriate backend
-feature interface from ``backends/interfaces.py``.  The file
-``interfaces.py`` consists of a collection of classes, any
-implementation of which is callable through its ``__call__`` magic
-method.  For example:
+planner and contains all unified planning function signatures.
+Developers wishing to develop new planner features should inherit from the
+appropriate backend feature interface from ``backends/interfaces/backend_features.py``.
+These features are then composed into a single class that inherits from
+``PlannerInterface``.
+For example:
 
 .. code-block:: python
 
     from compas.geometry import Frame
     from compas_fab.backends.interfaces import InverseKinematics
+    from compas_fab.backends.interfaces import PlannerInterface
 
     class ExampleInverseKinematics(InverseKinematics):
         def inverse_kinematics(self, robot,
@@ -38,18 +38,26 @@ method.  For example:
                                start_configuration=None,
                                group=None,
                                options=None):
+            # The backend features have access to the instance of the client
+            print(type(self.client))
             # insert fancy code here
             pass
 
-can be instantiated and called in the following manner:
+
+    # Now we can create a custom planner using our newly implemented backend feature
+    class ExamplePlanner(ExampleInverseKinematics, PlannerInterface):
+        pass
+
+The planner can be instantiated and called in the following manner:
 
 .. code-block:: python
 
-    calculate_example_ik = ExampleInverseKinematics()
+    # Instantiate the client and change its planner to the ExamplePlanner
+    client = MyExamplePlanner(robot)
+    client.planner = ExamplePlanner(client)
+    # Call the inverse kinematics method as usual
     frame = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
-    ik_result = calculate_example_ik(robot, frame)
-    # or equivalently:
-    ik_result = calculate_example_ik.inverse_kinematics(robot, frame)
+    ik_result = robot.inverse_kinematics(robot, frame)
 
 
 These backend feature interfaces exist in part to enforce a common
@@ -67,9 +75,16 @@ backend of ``ClientB`` is slow to compute inverse kinematics but can plan motion
 
 .. code-block:: python
 
-    with ClientA() as client_a, ClientB() as client_b:
-        inverse_kinematics = ClientAInverseKinematics(client_a)
-        plan_motion = ClientBPlanMotion(client_b)
+    with ClientA(robot) as client_a, ClientB(robot) as client_b:
+        inverse_kinematics = client_a.planner.inverse_kinematics
+        plan_motion = client_b.planner.plan_motion
+
+        frame = Frame([0, 0, 0], [1, 0, 0], [0, 1, 0])
+        ik_result = inverse_kinematics(frame)
+
+        start_configuration = robot.zero_configuration()
+        goal_configuration = robot.random_configuration()
+        motion_plan = plan_motion(start_configuration, goal_configuration)
 
 Here we can assign the inverse kinematics to be calculated by the backend
 of ``ClientA``, while the motion planning is calculated by the backend of
