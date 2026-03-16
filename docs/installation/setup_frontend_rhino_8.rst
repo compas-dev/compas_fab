@@ -41,7 +41,7 @@ Create a Python 3 script componen and paste the following code into it:
 
 .. code-block:: python
 
-    # r: compas, compas_robots, roslibpy, scipy
+    # r: compas, compas_robots, roslibpy==1.8.1, scipy
     # venv: compas_fab_dev
 
     import compas

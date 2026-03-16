@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+
+* Pinned `roslibpy` to `1.8.1` across package requirements and Rhino install paths to keep `wip_process` on the last `1.x` release and avoid incompatible `2.x` updates.
+
 ### Added
 
 * New `Target` and `Waypoints` classes to represent inputs of planning functions.

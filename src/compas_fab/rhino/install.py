@@ -4,4 +4,4 @@ import compas.plugins
 
 @compas.plugins.plugin(category="install")
 def installable_rhino_packages():
-    return ["compas_fab", "roslibpy"]
+    return ["compas_fab", "roslibpy==1.8.1"]
