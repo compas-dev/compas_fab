@@ -136,8 +136,12 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                     continue
                 # If rigid body is attached to a link, update the rigid body's base frame using the link's FK frame
                 link_name = rigid_body_state.attached_to_link
-                robot_configuration = robot_cell_state.robot_configuration
-                link_frame = client.robot_model.forward_kinematics(robot_configuration, link_name)
+                # IMPORTANT: use the live planner/PyBullet link frame so mobile-base
+                # world pose and all runtime transforms are included. Using only
+                # robot_model.forward_kinematics can yield a frame in model coordinates
+                # (base at origin), which makes attached rigid bodies appear offset/floating.
+                pcf_link_id = client.robot_link_puids[link_name]
+                link_frame = client._get_link_frame(pcf_link_id, client.robot_puid)
                 attachment_frame = rigid_body_state.attachment_frame
 
                 # Compute the RB position with its attachment frame relative to the link frame
