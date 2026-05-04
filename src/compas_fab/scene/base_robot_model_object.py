@@ -175,11 +175,6 @@ class BaseRobotModelObject(SceneObject):
                 # Update the dictionaries
                 self._links_visual_mesh_native_geometry[link_name] = new_native_geometries
                 self._links_visual_mesh_transformation[link_name] = new_transformation
-                print(
-                    "Updated visual link '{}' from previous '{}' with delta '{}' to new transformation '{}'.".format(
-                        link_name, previous_transformation, delta_transformation, new_transformation
-                    )
-                )
             if link_name in self._links_collision_mesh_native_geometry:
                 # Compute the delta transformation
                 previous_transformation = self._links_collision_mesh_transformation[link_name]
