@@ -16,10 +16,6 @@ viewer can re-use the same baked geometry across many state updates without
 re-baking the meshes.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from typing import Optional
 
 import scriptcontext as sc  # type: ignore

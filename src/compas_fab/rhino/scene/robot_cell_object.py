@@ -4,11 +4,6 @@ Mirrors :class:`compas_fab.ghpython.scene.RobotCellObject` but builds child
 scene objects against the Rhino-context :class:`RobotModelObject` /
 :class:`RigidBodyObject` so the cell's geometry can be baked once into the
 active document and then updated in place via delta transforms.
-
-The constructor accepts a ``draw_rigid_bodies`` flag (default ``True``) so
-callers that only want robot + tools (e.g. the IK keyframe preview, where
-bars/joints already exist as separately-managed Rhino geometry) can skip
-the rigid-body children without subclassing.
 """
 
 from typing import Optional
@@ -29,7 +24,6 @@ class RobotCellObject(BaseRobotCellObject):
         draw_visual: bool = True,
         draw_collision: bool = False,
         native_scale: float = 1.0,
-        draw_rigid_bodies: bool = True,
         layer: Optional[str] = None,
         *args,
         **kwargs,
@@ -41,8 +35,6 @@ class RobotCellObject(BaseRobotCellObject):
             *args,
             **kwargs,
         )
-        # Stored so child scene objects created in `_initial_draw` inherit it.
-        self._draw_rigid_bodies = draw_rigid_bodies
         self._layer = layer
 
     def _initial_draw(self) -> None:
@@ -63,18 +55,17 @@ class RobotCellObject(BaseRobotCellObject):
             **kwargs,
         )
 
-        # RigidBodies — optional; skipped when ``draw_rigid_bodies=False``.
-        self._rigid_body_scene_objects: dict = {}
-        if self._draw_rigid_bodies:
-            for id, rigid_body in self.robot_cell.rigid_body_models.items():
-                self._rigid_body_scene_objects[id] = SceneObject(
-                    item=rigid_body,
-                    sceneobject_type=RigidBodyObject,
-                    **kwargs,
-                )
+        # RigidBodies.
+        self._rigid_body_scene_objects: dict[str, RigidBodyObject] = {}
+        for id, rigid_body in self.robot_cell.rigid_body_models.items():
+            self._rigid_body_scene_objects[id] = SceneObject(
+                item=rigid_body,
+                sceneobject_type=RigidBodyObject,
+                **kwargs,
+            )
 
         # ToolModels — drawn via RobotModelObject (a ToolModel is a RobotModel).
-        self._tool_scene_objects: dict = {}
+        self._tool_scene_objects: dict[str, RobotModelObject] = {}
         for id, tool in self.robot_cell.tool_models.items():
             self._tool_scene_objects[id] = SceneObject(
                 item=tool,

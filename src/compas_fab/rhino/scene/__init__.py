@@ -38,8 +38,6 @@ if compas.RHINO:
         register(ReachabilityMap, ReachabilityMapObject, context="Rhino")
         register(RigidBody, RigidBodyObject, context="Rhino")
         register(RobotCell, RobotCellObject, context="Rhino")
-        print("compas_fab.rhino.scene: RobotCell/RigidBody/ReachabilityMap "
-              "registered for context='Rhino'")
 
 
 __all__ = [
