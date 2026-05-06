@@ -357,38 +357,46 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def _add_rigid_body(
         self, name: str, rigid_body: RigidBody, concavity: bool = False, mass: float = const.STATIC_MASS
     ) -> int:
-        # NOTE: Rigid bodies can have multiple meshes in them, at the moment we join them together as a single mesh
-        #       If there are problems with this, we can change it to exporting individual obj files per mesh to Pybullet
+        # Each Mesh in `collision_meshes` / `visual_meshes` becomes its own PyBullet body so
+        # disjoint sub-meshes are not lumped into one convex hull (which produces false-positive
+        # collisions). All sub-bodies share the same parent rigid-body name and are kept in
+        # `rigid_bodies_puids[name]` as a list; pose updates iterate the list.
+        visual_meshes = list(rigid_body.visual_meshes_in_meters or [])
+        collision_meshes = list(rigid_body.collision_meshes_in_meters or [])
 
-        # Visual Meshes
-        if rigid_body.visual_meshes is None or rigid_body.visual_meshes == []:
+        n_subs = max(len(visual_meshes), len(collision_meshes))
+        if n_subs == 0:
+            return
+
+        # Pad the shorter list with None so we can zip pair-wise. Index i pairs the i-th visual
+        # with the i-th collision mesh; if one list is shorter the remaining sub-bodies have only
+        # the available channel.
+        def _padded(lst):
+            return list(lst) + [None] * (n_subs - len(lst))
+
+        sub_body_ids = []
+        for idx, (v_mesh, c_mesh) in enumerate(zip(_padded(visual_meshes), _padded(collision_meshes))):
             visual_path = None
-        else:
-            visual_mesh = Mesh()
-            for m in rigid_body.visual_meshes_in_meters:
-                visual_mesh.join(m, precision=12)
-            visual_path = os.path.join(self._cache_dir.name, "{}_visual.obj".format(rigid_body.guid))
-            visual_mesh.to_obj(visual_path)
+            if v_mesh is not None:
+                visual_path = os.path.join(
+                    self._cache_dir.name, "{}_visual_{}.obj".format(rigid_body.guid, idx)
+                )
+                v_mesh.to_obj(visual_path)
+                visual_path = self._handle_concavity(visual_path, self._cache_dir.name, concavity, mass)
 
-            visual_path = self._handle_concavity(visual_path, self._cache_dir.name, concavity, mass)
-
-        # Collision Meshes
-        if rigid_body.collision_meshes is None or rigid_body.collision_meshes == []:
             collision_path = None
-        else:
-            collision_mesh = Mesh()
-            for m in rigid_body.collision_meshes_in_meters:
-                collision_mesh.join(m, precision=12)
-            collision_path = os.path.join(self._cache_dir.name, "{}_collision.obj".format(rigid_body.guid))
-            collision_mesh.to_obj(collision_path)
+            if c_mesh is not None:
+                collision_path = os.path.join(
+                    self._cache_dir.name, "{}_collision_{}.obj".format(rigid_body.guid, idx)
+                )
+                c_mesh.to_obj(collision_path)
+                collision_path = self._handle_concavity(collision_path, self._cache_dir.name, concavity, mass)
 
-            collision_path = self._handle_concavity(collision_path, self._cache_dir.name, concavity, mass)
+            pyb_body_id = self._body_from_obj(visual_path, collision_path, concavity=concavity, mass=mass)
+            assert not pyb_body_id == -1, "Error in creating rigid body in PyBullet. Returning ID is -1."
+            sub_body_ids.append(pyb_body_id)
 
-        pyb_body_id = self._body_from_obj(visual_path, collision_path, concavity=concavity, mass=mass)
-
-        # Record the body id in the dictionary
-        assert not pyb_body_id == -1, "Error in creating rigid body in PyBullet. Returning ID is -1."
-        self.rigid_bodies_puids[name] = [pyb_body_id]
+        self.rigid_bodies_puids[name] = sub_body_ids
 
     def _remove_rigid_body(self, name: str):
         """Remove a rigid body from the PyBullet server if it exists.
