@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Bumped `compas_robots` requirement from `>=0.6,<1` to `>=1,<2`.
 * Migrated packaging to `pyproject.toml`.
 * Cleaned up `requirements-dev.txt`.
 * Python classifiers trimmed to 3.9 (minimum, required for Rhino 8) and 3.13 (latest).

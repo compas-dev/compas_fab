@@ -1,3 +1,3 @@
 compas >= 2.3, < 3
-compas_robots >= 0.6, < 1
+compas_robots >= 1, < 2
 roslibpy >= 2.0, < 3
