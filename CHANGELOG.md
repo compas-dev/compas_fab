@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Migrated packaging to `pyproject.toml`.
+* Cleaned up `requirements-dev.txt`.
+* Python classifiers trimmed to 3.9 (minimum, required for Rhino 8) and 3.13 (latest).
 * Unpinned `roslibpy` from `1.8.1` to `>=2.0,<3` in preparation for ROS 2 support.
 * Updated `ActionClient` and `Goal` imports from `roslibpy.actionlib` to `roslibpy.ros1.actionlib` following the breaking namespace change in `roslibpy` 2.x.
 

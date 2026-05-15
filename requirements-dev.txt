@@ -1,17 +1,12 @@
-pybullet
-attrs >=19.3.0
-black
-bump2version >=1.0.1
-check-manifest >=0.36
+attrs >= 19.3.0
+bump-my-version
 compas-invocations2
-ruff
-importlib_metadata <5.0
-invoke>=0.14
+invoke >= 0.14
 pytest
-pytest_mock
 pytest-cov
-sphinx_compas2_theme
-sybil~=8.0.1
-twine
+pytest-mock
+ruff
 tomlkit
--e .
+twine
+# pybullet must be installed separately due to missing wheels for newer Python versions:
+# CFLAGS="-fno-define-target-os-macros" uv pip install pybullet
