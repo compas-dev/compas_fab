@@ -5,8 +5,8 @@ from compas_robots import RobotModel
 from roslibpy import Message
 from roslibpy import Param
 from roslibpy import Ros
-from roslibpy.actionlib import ActionClient
-from roslibpy.actionlib import Goal
+from roslibpy.ros1.actionlib import ActionClient
+from roslibpy.ros1.actionlib import Goal
 
 from compas_fab.backends.interfaces.client import ClientInterface
 from compas_fab.backends.ros.exceptions import RosError
