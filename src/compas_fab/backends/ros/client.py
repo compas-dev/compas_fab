@@ -5,6 +5,8 @@ from compas_robots import RobotModel
 from roslibpy import Message
 from roslibpy import Param
 from roslibpy import Ros
+from roslibpy import Service
+from roslibpy import ServiceRequest
 from roslibpy.ros1.actionlib import ActionClient
 from roslibpy.ros1.actionlib import Goal
 
@@ -135,11 +137,39 @@ class RosClient(Ros, ClientInterface):
 
     @property
     def ros_distro(self) -> RosDistro:
-        """Retrieves the ROS version to which the client is connected (eg. kinetic)"""
+        """Retrieves the ROS version to which the client is connected (e.g. ``noetic``, ``jazzy``).
+
+        Modern ``rosapi`` exposes ``/rosapi/get_ros_version`` for both ROS 1 and
+        ROS 2. Older ROS 1 deployments also expose a global ``/rosdistro``
+        parameter, which remains as a fallback for compatibility.
+        """
         if not self._ros_distro:
-            self._ros_distro = RosDistro(Param(self, "/rosdistro").get(timeout=1).strip())
+            value = self._get_ros_distro_from_rosapi()
+            if not value:
+                value = self._get_ros_distro_from_param()
+            if value:
+                self._ros_distro = RosDistro(value)
+            else:
+                # Last-resort default for ROS 2 rosbridge instances without the
+                # version service and without the ROS 1 global `/rosdistro` param.
+                self._ros_distro = RosDistro.JAZZY
 
         return self._ros_distro
+
+    def _get_ros_distro_from_rosapi(self) -> str:
+        try:
+            response = Service(self, "/rosapi/get_ros_version", "rosapi_msgs/GetROSVersion").call(ServiceRequest(), timeout=1)
+            value = response.get("distro", "")
+            return value.strip() if value else ""
+        except Exception:
+            return ""
+
+    def _get_ros_distro_from_param(self) -> str:
+        try:
+            value = Param(self, "/rosdistro").get(timeout=1)
+            return value.strip() if value else ""
+        except Exception:
+            return ""
 
     def load_robot_cell(
         self,
