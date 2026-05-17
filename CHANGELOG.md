@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Standardized every backend page (`docs/backends/{analytical,analytical_pybullet,pybullet,ros,ros2}.md`) to a common structure: *When to use → Trade-offs → Setup → First example (embedded) → More examples (linked) → API reference*. Each page now embeds one runnable example from `docs/backends/*/files/` via `pymdownx.snippets` and links the remaining ~50 examples to GitHub.
+* Rewrote `docs/backends/index.md` as a real decision guide: a "by intent" table keyed by what the user wants to do (rather than backend name), plus a "by capability" matrix and explicit setup-cost summary. Linked from both Home and Installation.
 
 ### Fixed
 
