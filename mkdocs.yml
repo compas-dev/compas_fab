@@ -1,0 +1,177 @@
+site_name: COMPAS FAB
+site_url: https://compas.dev/compas_fab
+repo_url: https://github.com/compas-dev/compas_fab
+repo_name: compas-dev/compas_fab
+edit_uri: blob/main/docs/
+
+copyright: Copyright &copy; 2026, Gramazio Kohler Research
+
+exclude_docs: |
+  installation/docker_files/
+  installation/ros_setup_ur.txt
+  conftest.py
+  **/files/
+  **/images/
+  analysis/
+  concepts/
+  frontends/
+
+extra:
+  homepage: https://compas.dev/compas_fab
+  version:
+    provider: mike
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  logo: _logo/compas_logo_white_transparent.png
+  favicon: _logo/favicon.ico
+  features:
+    - content.code.copy
+    - content.footnote.tooltips
+    - navigation.expand
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - toc.follow
+
+extra_css:
+  - assets/stylesheets/custom.css
+
+markdown_extensions:
+  - abbr
+  - attr_list
+  - admonition
+  - callouts:
+      strip_period: no
+  - footnotes
+  - md_in_html
+  - pymdownx.blocks.caption
+  - pymdownx.caret
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.snippets:
+      check_paths: true
+  - toc:
+      permalink: "¤"
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+          inventories:
+            - https://docs.python.org/3/objects.inv
+            - https://compas.dev/compas/latest/objects.inv
+            - https://compas.dev/compas_robots/latest/objects.inv
+            - https://compas.dev/compas_viewer/latest/objects.inv
+          options:
+            allow_inspection: true
+            backlinks: false
+            docstring_options:
+              ignore_init_summary: true
+              trim_doctest_flags: true
+            docstring_style: numpy
+            docstring_section_style: list
+            filters: public
+            group_by_category: true
+            heading_level: 2
+            inheritance_diagram_direction: TD
+            inherited_members: false
+            line_length: 88
+            merge_init_into_class: true
+            modernize_annotations: true
+            parameter_headings: false
+            preload_modules: [mkdocstrings, compas, compas_robots]
+            relative_crossrefs: true
+            scoped_crossrefs: true
+            separate_signature: true
+            show_bases: false
+            show_category_heading: true
+            show_docstring_attributes: true
+            show_docstring_functions: true
+            show_docstring_modules: false
+            show_if_no_docstring: false
+            show_inheritance_diagram: false
+            show_root_heading: true
+            show_root_full_path: true
+            show_signature: true
+            show_signature_annotations: true
+            show_signature_type_parameters: true
+            show_source: false
+            show_submodules: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            signature_crossrefs: true
+            summary:
+              modules: false
+            type_parameter_headings: true
+            unwrap_annotated: true
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Tutorial: tutorial.md
+  - Backends:
+      - backends/index.md
+      - ROS / MoveIt 1: backends/ros.md
+      - ROS 2 / MoveIt 2: backends/ros2.md
+      - PyBullet: backends/pybullet.md
+      - Analytical: backends/analytical.md
+  - API Reference:
+      - api/index.md
+      - Core:
+          - api/core/index.md
+          - compas_fab: api/compas_fab.md
+          - compas_fab.robots: api/compas_fab.robots.md
+          - compas_fab.backends: api/compas_fab.backends.md
+          - compas_fab.backends.interfaces: api/compas_fab.backends.interfaces.md
+          - compas_fab.backends.ros: api/compas_fab.backends.ros.md
+          - compas_fab.backends.ros.backend_features: api/compas_fab.backends.ros.backend_features.md
+          - compas_fab.backends.pybullet: api/compas_fab.backends.pybullet.md
+          - compas_fab.backends.pybullet.backend_features: api/compas_fab.backends.pybullet.backend_features.md
+          - compas_fab.utilities: api/compas_fab.utilities.md
+      - Integrations:
+          - api/integrations/index.md
+          - compas_fab.blender: api/compas_fab.blender.md
+          - compas_fab.ghpython: api/compas_fab.ghpython.md
+          - compas_fab.rhino: api/compas_fab.rhino.md
+  - Developer guide:
+      - developer/index.md
+      - Backend architecture: developer/architecture.md
+      - Grasshopper components: developer/grasshopper.md
+  - License: license.md
