@@ -42,7 +42,6 @@ It can also be installed using `pip`:
 
 > On Windows, you may need to install [Microsoft Visual C++ 14.0](https://www.scivision.co/python-windows-visual-c++-14-required/).
 
-
 Once the installation is completed, you can verify your setup.
 Start Python from the command prompt and run the following:
 
