@@ -19,7 +19,7 @@ from compas_fab.robots import TargetMode
 # The tolerance for the tests are set to 1e-4 meters, equivalent to 0.1 mm
 # Relative tolerance is set to 1e-3 (0.1%)
 # Angular tolerance is set to 2e-3 radians, equivalent to 0.11 degrees
-TOL = Tolerance(unit="m", absolute=1e-4, relative=1e-3, angular=2e-3)
+TOL = Tolerance(unit="M", absolute=1e-4, relative=1e-3, angular=2e-3)
 
 urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
 srdf_filename = compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf")
@@ -59,9 +59,7 @@ def test_forward_kinematics(ur5_planner_robot_only):
 def test_iter_inverse_kinematics(ur5_planner_robot_only):
     planner = ur5_planner_robot_only  # type: AnalyticalKinematicsPlanner
     # This target has eight solutions (without CC)
-    target = FrameTarget(
-        Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269)), TargetMode.ROBOT
-    )
+    target = FrameTarget(Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269)), TargetMode.ROBOT)
 
     # The `iter_inverse_kinematics` method will return an iterator that yields all possible solutions
     start_state = planner.robot_cell.default_cell_state()
@@ -74,9 +72,7 @@ def test_iter_inverse_kinematics(ur5_planner_robot_only):
 
 def test_inverse_kinematics(ur5_planner_robot_only):
     planner = ur5_planner_robot_only  # type: AnalyticalKinematicsPlanner
-    target = FrameTarget(
-        Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269)), TargetMode.ROBOT
-    )
+    target = FrameTarget(Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269)), TargetMode.ROBOT)
     start_state = planner.robot_cell.default_cell_state()
 
     # Test to confirm inverse_kinematics() return one solution at a time
