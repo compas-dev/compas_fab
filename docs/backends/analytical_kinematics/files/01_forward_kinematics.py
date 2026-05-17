@@ -1,7 +1,7 @@
 from compas_robots import Configuration
 
 from compas_fab.backends import AnalyticalKinematicsPlanner
-from compas_fab.backends.kinematics.solvers import UR5Kinematics
+from compas_fab.backends import UR5Kinematics
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
 

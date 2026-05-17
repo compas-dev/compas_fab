@@ -9,6 +9,7 @@ from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RigidBodyLibrary
+from compas_fab.robots import RigidBodyState
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
 
@@ -31,8 +32,9 @@ with PyBulletClient() as client:
     frame_WCF = Frame([0.3, 0.1, 0.5], [1, 1, 0], [0, 0, 1])
     target = FrameTarget(frame_WCF, TargetMode.ROBOT)
 
-    # Place the target marker at the target's frame
-    robot_cell_state.rigid_body_states["target_marker"].frame = frame_WCF
+    # The library state was created before the target_marker rigid body was
+    # added to the cell, so we attach a state entry for it here.
+    robot_cell_state.rigid_body_states["target_marker"] = RigidBodyState(frame_WCF)
 
     print(" ")
 

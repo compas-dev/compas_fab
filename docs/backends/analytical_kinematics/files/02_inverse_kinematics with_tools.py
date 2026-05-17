@@ -4,7 +4,7 @@ from compas_robots import ToolModel
 
 import compas_fab
 from compas_fab.backends import AnalyticalKinematicsPlanner
-from compas_fab.backends.kinematics.solvers import UR5Kinematics
+from compas_fab.backends import UR5Kinematics
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RigidBody
 from compas_fab.robots import RobotCellLibrary
@@ -28,6 +28,10 @@ robot_cell.rigid_body_models["floor"] = RigidBody.from_mesh(floor_mesh)
 tool_mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
 tool_frame = Frame([0, 0, 0.14], [1, 0, 0], [0, 1, 0])
 robot_cell.tool_models["cone"] = ToolModel(tool_mesh, tool_frame)
+
+# The cell state was created by RobotCellLibrary before the floor and tool were
+# added, so it doesn't know about them. Refresh it from the (now complete) cell.
+robot_cell_state = robot_cell.default_cell_state()
 
 # The robot cell is passed to the planner
 planner.set_robot_cell(robot_cell)

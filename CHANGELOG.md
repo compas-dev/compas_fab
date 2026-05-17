@@ -10,6 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * New backend page [Analytical IK + PyBullet](docs/backends/analytical_pybullet.md) for `AnalyticalPyBulletPlanner` — the hybrid planner that pairs closed-form analytical IK with PyBullet collision checking. Previously this backend was undocumented despite being shipped in `compas_fab.backends`.
+* `docs/backends/pybullet.md` now flags that free-space `plan_motion` is not yet implemented for `PyBulletPlanner` (Cartesian motion via `plan_cartesian_motion` works).
+
+### Fixed (examples)
+
+* Fixed three analytical/PyBullet examples that crashed at startup due to cell-state desync after objects were added to the cell:
+  * `docs/backends/analytical_kinematics/files/02_inverse_kinematics with_tools.py` — now refreshes the state from the cell after adding the cone tool.
+  * `docs/backends/analytical_kinematics/files/03_analytical_pybullet_planner.py` — rewritten to use the pre-configured `RobotCellLibrary.abb_irb4600_40_255_printing_tool()` cell (which has the correct `touch_links` semantics) and derives its target frame via FK from a chosen seed pose. Was previously crashing on `KeyError: 'cone'` and then yielding 0 IK solutions even after that.
+  * `docs/backends/pybullet/files/04_ik_semi_constrained.py` — now creates the `target_marker` rigid body state explicitly (was crashing on `KeyError: 'target_marker'`).
+* `docs/backends/analytical_kinematics/files/03_iter_ik_pybullet.py` (already covered above) now derives its target via FK for clarity.
+* `docs/backends/analytical_kinematics/files/04_cartesian_path_analytic_pybullet.py` now has a comment noting that `matplotlib` is an optional dependency that must be installed separately.
+* All analytical-backend examples now import solver classes (`UR5Kinematics`, `ABB_IRB4600_40_255Kinematics`) from `compas_fab.backends` (the public top-level path), not the private `compas_fab.backends.kinematics.solvers`.
 
 ### Changed
 

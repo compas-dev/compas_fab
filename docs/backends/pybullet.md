@@ -2,7 +2,13 @@
 
 [PyBullet](https://pybullet.org/) wraps the Bullet physics engine. It runs
 in-process — no Docker, no server — and gives you forward kinematics,
-inverse kinematics (numerical), collision checking, and motion planning.
+inverse kinematics (numerical), collision checking, and **Cartesian** motion
+planning.
+
+!!! note "Free-space `plan_motion` not yet implemented"
+    `PyBulletPlanner` does not currently implement free-space
+    `plan_motion`. Cartesian motion via `plan_cartesian_motion` works.
+    For free-space planning, use one of the ROS backends.
 
 ## When to use
 
@@ -71,7 +77,6 @@ Motion planning:
 
 - [`06_cartesian_motion_frame_waypoints.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/06_cartesian_motion_frame_waypoints.py) — Cartesian path with `FrameWaypoints`
 - [`06_cartesian_motion_point_axis_waypoints.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/06_cartesian_motion_point_axis_waypoints.py) — Cartesian path with `PointAxisWaypoints`
-- [`07_plan_motion_config_target.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/07_plan_motion_config_target.py) — point-to-point motion planning
 
 ## API reference
 

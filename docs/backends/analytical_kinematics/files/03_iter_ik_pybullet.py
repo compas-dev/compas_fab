@@ -7,7 +7,7 @@ from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
 
-with PyBulletClient(connection_type="gui") as client:
+with PyBulletClient(connection_type="direct") as client:
     robot_cell, robot_cell_state = RobotCellLibrary.ur5()
 
     planner = AnalyticalPyBulletPlanner(client, UR5Kinematics())

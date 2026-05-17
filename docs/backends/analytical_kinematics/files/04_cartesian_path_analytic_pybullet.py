@@ -1,3 +1,7 @@
+# This example plots the planned trajectory to a window using matplotlib.
+# matplotlib is not a dependency of compas_fab and must be installed separately:
+#   uv pip install matplotlib
+
 import matplotlib.pyplot as plt
 from compas.geometry import Frame
 
