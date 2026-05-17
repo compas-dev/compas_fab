@@ -145,13 +145,15 @@ plugins:
 nav:
   - Home: index.md
   - Installation: installation.md
-  - Tutorial: tutorial.md
+  - CAD front-ends: frontends.md
+  - Concepts: concepts.md
   - Backends:
-      - backends/index.md
+      - Choosing a backend: backends/index.md
+      - Analytical IK: backends/analytical.md
+      - Analytical IK + PyBullet: backends/analytical_pybullet.md
+      - PyBullet: backends/pybullet.md
       - ROS / MoveIt 1: backends/ros.md
       - ROS 2 / MoveIt 2: backends/ros2.md
-      - PyBullet: backends/pybullet.md
-      - Analytical: backends/analytical.md
   - API Reference:
       - api/index.md
       - Core:

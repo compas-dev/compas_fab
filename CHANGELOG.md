@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Rewrote `docs/backends/index.md` as a real decision guide: a "by intent" table keyed by what the user wants to do (rather than backend name), plus a "by capability" matrix and explicit setup-cost summary. Linked from both Home and Installation.
 * Split `docs/installation.md` into a focused library-install page (uv/pip/conda + verify) and a new `docs/frontends.md` covering CAD environment setup (Rhino 8, Grasshopper, Blender, COMPAS Viewer, headless). The new front-ends page also documents which CAD environments work with which backends, surfacing the limitation that PyBullet cannot run inside Rhino's interpreter.
 * Rebranded the old `tutorial.md` as `concepts.md`: a backend-agnostic walkthrough of the data model (`RobotCell`, `RobotCellState`, `Target`/`Waypoints`, `TargetMode`). No planner calls — the concepts page now reads as "this is the data; backends are how you execute it" and links out to the backends section for the actual planning calls.
+* Rewrote `docs/index.md` as a real landing page (was a 1-paragraph blurb): leads with the five-backend table, "I want to..." quick links, and a four-step what's-next list. Updated MkDocs nav to surface the new structure (Home → Installation → CAD front-ends → Concepts → Backends → API → Developer guide).
 
 ### Fixed
 
