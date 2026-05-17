@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+* All Sphinx-era documentation sources: every `docs/**/*.rst`, the `docs/conf.py` Sphinx config, the `docs/_static/` and `docs/_images/` asset folders, the `docs/developer/generated/` autosummary output, `docs/spelling_wordlist.txt` and `docs/doc_versions.txt` (the latter superseded by `mike`'s gh-pages versioning).
 * `.. autosummary::`, `.. toctree::` and `.. currentmodule::` directives from all module-level `__init__.py` docstrings (replaced with prose + intra-doc Markdown links resolved by `mkdocstrings`).
 * Removed `DirectUrActionClient` and associated `direct_ur` messages module since this UR-specific action client was outdated and unused.
 
