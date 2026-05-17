@@ -1,0 +1,6 @@
+# Lowers the ros2_control + RTDE frequency from the upstream default of 500 Hz.
+# 100 Hz is plenty for development/planning work and keeps the controller-manager
+# from emitting "Overrun detected!" warnings under Docker virtualisation.
+/**:
+  ros__parameters:
+    update_rate: 100  # Hz

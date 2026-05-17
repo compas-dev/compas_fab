@@ -1,0 +1,16 @@
+// Client-side Zenoh session config used by all ROS 2 nodes in this stack.
+// Points every client at the `zenoh-router` service, which federates traffic
+// between containers and eliminates the need for DDS multicast discovery.
+{
+  mode: "client",
+  connect: {
+    endpoints: ["tcp/zenoh-router:7447"],
+  },
+  // POSIX shared-memory transport fails under Rosetta 2 (Apple Silicon) and is
+  // unnecessary for TCP-only inter-container traffic. Disable it explicitly.
+  transport: {
+    shared_memory: {
+      enabled: false,
+    },
+  },
+}
