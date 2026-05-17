@@ -1,4 +1,4 @@
-from compas.geometry import Frame
+from compas_robots import Configuration
 
 from compas_fab.backends import AnalyticalPyBulletPlanner
 from compas_fab.backends import PyBulletClient
@@ -7,18 +7,34 @@ from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
 
-frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269))
-
-
-with PyBulletClient(connection_type="direct") as client:
+with PyBulletClient(connection_type="gui") as client:
     robot_cell, robot_cell_state = RobotCellLibrary.ur5()
 
-    kinematics = UR5Kinematics()
-    planner = AnalyticalPyBulletPlanner(client, kinematics)
+    planner = AnalyticalPyBulletPlanner(client, UR5Kinematics())
     planner.set_robot_cell(robot_cell)
+    planner.set_robot_cell_state(robot_cell_state)
 
-    options = {"check_collision": True, "keep_order": True}
+    # Pick a reachable, collision-free starting pose and use forward kinematics
+    # to derive a target frame from it. This guarantees the target is reachable
+    # by at least one configuration of this robot.
+    seed = Configuration.from_revolute_values(
+        [0.0, -1.5708, 1.5708, -1.5708, -1.5708, 0.0],
+        joint_names=("shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"),
+    )
+    robot_cell_state.robot_configuration.merge(seed)
+    frame_WCF = planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT)
+    print("Target frame (derived via FK):", frame_WCF)
 
     target = FrameTarget(frame_WCF, TargetMode.ROBOT)
-    for config in planner.iter_inverse_kinematics(target, robot_cell_state, options=options):
-        print(config)
+
+    # `keep_order=True` returns one entry per analytical IK candidate, with
+    # configurations that fail collision checking returned as `None` rather
+    # than removed. The indices stay stable across calls, which is useful when
+    # feeding adjacent IK calls into a Cartesian path solver.
+    options = {"check_collision": True, "keep_order": True}
+
+    for i, config in enumerate(planner.iter_inverse_kinematics(target, robot_cell_state, options=options)):
+        if config is None:
+            print(f"[{i}] (in collision)")
+            continue
+        print(f"[{i}] {config}")

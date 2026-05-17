@@ -109,6 +109,9 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
                     # If keep order is false, skip the solution
                     else:
                         continue
+                else:
+                    # Collision-free solution — yield it
+                    yield configuration
             else:
                 # Yield the configuration without testing CC
                 yield configuration

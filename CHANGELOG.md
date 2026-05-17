@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* `AnalyticalPybulletInverseKinematics._iter_inverse_kinematics_frame_target` was silently dropping every collision-free IK candidate. The `try`/`except CollisionCheckError` block had no `else` branch — when the collision check passed (no exception), the configuration was never yielded. Added the missing `else: yield configuration`. Verified end-to-end with the `03_iter_ik_pybullet.py` example, which now returns 6 valid + 2 colliding configurations (was: 0 valid + all 8 reported as colliding).
 * `AnalyticalInverseKinematics.iter_inverse_kinematics` and its `_iter_inverse_kinematics_frame_target` helper had `group: Optional[str]` declared without a default, while the parent `InverseKinematics` interface and all example usages treat `group` as optional. Added `= None` so calls like `planner.iter_inverse_kinematics(target, start_state)` work as documented.
 * Cleared stale docstring parameters across `compas_fab.backends` interfaces and backend feature implementations (`robot`, `client`, `solver`, `planner_type`) that no longer matched their signatures, plus a confusingly-indented continuation line in `RigidBodyState.attached_to_link`. `invoke docs` now builds with zero warnings.
 
