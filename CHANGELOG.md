@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Standardized every backend page (`docs/backends/{analytical,analytical_pybullet,pybullet,ros,ros2}.md`) to a common structure: *When to use → Trade-offs → Setup → First example (embedded) → More examples (linked) → API reference*. Each page now embeds one runnable example from `docs/backends/*/files/` via `pymdownx.snippets` and links the remaining ~50 examples to GitHub.
 * Rewrote `docs/backends/index.md` as a real decision guide: a "by intent" table keyed by what the user wants to do (rather than backend name), plus a "by capability" matrix and explicit setup-cost summary. Linked from both Home and Installation.
+* Split `docs/installation.md` into a focused library-install page (uv/pip/conda + verify) and a new `docs/frontends.md` covering CAD environment setup (Rhino 8, Grasshopper, Blender, COMPAS Viewer, headless). The new front-ends page also documents which CAD environments work with which backends, surfacing the limitation that PyBullet cannot run inside Rhino's interpreter.
 
 ### Fixed
 
