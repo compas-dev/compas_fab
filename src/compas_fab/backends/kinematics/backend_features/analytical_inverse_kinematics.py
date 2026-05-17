@@ -23,13 +23,6 @@ from ..utils import try_to_fit_configurations_between_bounds
 class AnalyticalInverseKinematics(InverseKinematics):
     """Callable to calculate the robot's inverse kinematics for a given frame.
 
-    Parameters
-    ----------
-    client : :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-        The backend client to use for communication.
-    solver : :obj:`str`, optional
-        The solver to use to calculate IK.
-
     Notes
     -----
     This works only for industrial robot arms with six revolute joints.
@@ -38,7 +31,11 @@ class AnalyticalInverseKinematics(InverseKinematics):
     """
 
     def iter_inverse_kinematics(
-        self, target: Target, start_state: RobotCellState, group: Optional[str], options: Optional[dict] = None
+        self,
+        target: Target,
+        start_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
     ) -> Generator[Optional[Configuration], None, None]:
         """Calculate the robot's inverse kinematic for a given target.
 
@@ -54,7 +51,11 @@ class AnalyticalInverseKinematics(InverseKinematics):
             raise BackendTargetNotSupportedError()
 
     def _iter_inverse_kinematics_frame_target(
-        self, target: FrameTarget, start_state: RobotCellState, group: Optional[str], options: Optional[dict] = None
+        self,
+        target: FrameTarget,
+        start_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
     ) -> Generator[Optional[Configuration], None, None]:
         """Calculate the robot's inverse kinematic for a given frame target.
 

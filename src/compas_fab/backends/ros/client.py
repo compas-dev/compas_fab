@@ -113,20 +113,12 @@ class RosClient(Ros, ClientInterface):
         Port of the ROS Bridge. Defaults to ``9090``.
     is_secure : :obj:`bool`
         ``True`` to indicate it should use a secure web socket, otherwise ``False``.
-    planner_type: type
-        Type the planner backend to use. The backend must be a sub-class of
-        :class:`compas_fab.backends.PlannerInterface`.
-        Defaults to :class:`~compas_fab.backends.MoveItPlanner`.
 
     Examples
     --------
     >>> with RosClient() as client:
     ...     print("Connected:", client.is_connected)
     Connected: True
-
-    Notes
-    -----
-    For more examples, check out the :ref:`ROS examples page <ros_examples>`.
     """
 
     def __init__(self, host="localhost", port=9090, is_secure=False):

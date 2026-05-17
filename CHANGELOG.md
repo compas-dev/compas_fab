@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+* `AnalyticalInverseKinematics.iter_inverse_kinematics` and its `_iter_inverse_kinematics_frame_target` helper had `group: Optional[str]` declared without a default, while the parent `InverseKinematics` interface and all example usages treat `group` as optional. Added `= None` so calls like `planner.iter_inverse_kinematics(target, start_state)` work as documented.
+* Cleared stale docstring parameters across `compas_fab.backends` interfaces and backend feature implementations (`robot`, `client`, `solver`, `planner_type`) that no longer matched their signatures, plus a confusingly-indented continuation line in `RigidBodyState.attached_to_link`. `invoke docs` now builds with zero warnings.
+
 ### Changed
 
 * Bumped `compas_robots` requirement from `>=0.6,<1` to `>=1,<2`.

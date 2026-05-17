@@ -15,6 +15,7 @@ with PyBulletClient(connection_type="direct") as client:
 
     kinematics = UR5Kinematics()
     planner = AnalyticalPyBulletPlanner(client, kinematics)
+    planner.set_robot_cell(robot_cell)
 
     options = {"check_collision": True, "keep_order": True}
 

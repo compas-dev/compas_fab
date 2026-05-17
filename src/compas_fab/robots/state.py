@@ -526,7 +526,7 @@ class RigidBodyState(Data):
         The base frame of the rigid body relative to the world coordinate frame.
     attached_to_link : :obj:`str`, optional
         The name of the robot link to which the rigid body is attached.
-       ``None`` if not attached to a link.
+        ``None`` if not attached to a link.
     attached_to_tool : :obj:`str`, optional
         The id of the tool to which the rigid body is attached.
         ``None`` if not attached to a tool.

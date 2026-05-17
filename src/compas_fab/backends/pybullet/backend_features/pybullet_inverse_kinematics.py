@@ -68,8 +68,6 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which inverse kinematics is being calculated.
         target : :class:`compas_fab.robots.FrameTarget` or :class:`compas_fab.robots.PointAxisTarget`
             The target to calculate the inverse kinematics for.
         robot_cell_state : :class:`compas_fab.robots.RobotCellState`
@@ -85,7 +83,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         Raises
         ------
-        :class: `compas_fab.backends.exceptions.InverseKinematicsError`
+        :class:`compas_fab.backends.exceptions.InverseKinematicsError`
             If no configuration can be found.
 
         :class:`compas_fab.backends.TargetModeMismatchError`

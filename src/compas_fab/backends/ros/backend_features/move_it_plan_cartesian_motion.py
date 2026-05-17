@@ -52,8 +52,6 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which the cartesian motion plan is being calculated.
         waypoints : :class:`compas_fab.robots.Waypoints`
             The waypoints for the robot to follow.
         start_state : :class:`compas_fab.robots.RobotCellState`

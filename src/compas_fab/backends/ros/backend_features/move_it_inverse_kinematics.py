@@ -73,8 +73,6 @@ class MoveItInverseKinematics(InverseKinematics):
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which inverse kinematics is being calculated.
         target : :class:`compas_fab.robots.FrameTarget` or :class:`compas_fab.robots.PointAxisTarget`
             The target to calculate the inverse kinematics for.
         robot_cell_state : :class:`compas_fab.robots.RobotCellState`
