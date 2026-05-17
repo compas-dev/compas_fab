@@ -1,30 +1,55 @@
-# Analytical kinematics
+# Analytical IK
 
-For well-known robot geometries (Universal Robots, Staubli) closed-form
-inverse kinematics is available without any external dependency. This is
-the fastest IK option in `compas_fab` and works fully in-process.
+Closed-form inverse kinematics for known industrial robots. Runs entirely
+in-process — no Docker, no PyBullet, no ROS — and is the fastest IK option
+in `compas_fab`.
 
 ## When to use
 
-- Prototyping reachability and inverse kinematics on a supported robot
-- IK from inside Rhino, Grasshopper or any other front-end (no Docker, no PyBullet)
-- Generating IK seeds for a downstream planner
+- Prototyping reachability and inverse kinematics on a supported robot.
+- IK from inside Rhino, Grasshopper or any other Python host.
+- Generating IK seeds for a downstream planner.
+- You don't need collision checking. (If you do, see
+  [Analytical IK + PyBullet](analytical_pybullet.md).)
 
-Analytical IK does **not** check for collisions. For full motion planning,
-chain it with a ROS or PyBullet back-end.
+## Trade-offs
+
+| What you get | What you give up |
+|---|---|
+| Closed-form IK in microseconds | Only the supported analytical robot families |
+| Zero setup beyond `pip install compas_fab` | No collision checking |
+| Works from any Python host (CAD, headless, CI) | No motion planning — IK / FK only |
+
+## Setup
+
+Nothing to install beyond `compas_fab` itself. Analytical solvers are part
+of the package.
 
 ## Supported robots
 
-- Universal Robots: UR3, UR5, UR10, UR3e, UR5e, UR10e, UR16e
-- Staubli: TX2-60, TX2-90 (see [API reference](../api/compas_fab.backends.md))
+- Universal Robots: UR3, UR3e, UR5, UR5e, UR10, UR10e, UR16e
+- Staubli: TX2-60L
+- ABB: IRB 4600 40/255
 
-## Quick start
+See [compas_fab.backends][] for the full list of solver classes.
 
-```pycon
->>> from compas_fab.backends import AnalyticalKinematicsPlanner, UR10eKinematics
->>> planner = AnalyticalKinematicsPlanner(UR10eKinematics())
+## First example
+
+Forward kinematics on a UR5:
+
+```python
+--8<-- "docs/backends/analytical_kinematics/files/01_forward_kinematics.py"
 ```
 
-See [compas_fab.backends][compas_fab.backends] for the full set of analytical
-solvers and the [RobotCellLibrary][compas_fab.robots.RobotCellLibrary] for
-ready-made robot cells to plan with.
+## More examples
+
+- [`02_inverse_kinematics.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/analytical_kinematics/files/02_inverse_kinematics.py) — IK returning 8 solutions for a UR5
+- [`02_inverse_kinematics with_tools.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/analytical_kinematics/files/02_inverse_kinematics%20with_tools.py) — IK with a tool attached to the flange
+
+For collision-aware IK and Cartesian planning, see
+[Analytical IK + PyBullet](analytical_pybullet.md).
+
+## API reference
+
+- [compas_fab.backends.AnalyticalKinematicsPlanner][]
+- [compas_fab.backends][] — all available solvers

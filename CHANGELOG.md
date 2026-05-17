@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * New backend page [Analytical IK + PyBullet](docs/backends/analytical_pybullet.md) for `AnalyticalPyBulletPlanner` — the hybrid planner that pairs closed-form analytical IK with PyBullet collision checking. Previously this backend was undocumented despite being shipped in `compas_fab.backends`.
 
+### Changed
+
+* Standardized every backend page (`docs/backends/{analytical,analytical_pybullet,pybullet,ros,ros2}.md`) to a common structure: *When to use → Trade-offs → Setup → First example (embedded) → More examples (linked) → API reference*. Each page now embeds one runnable example from `docs/backends/*/files/` via `pymdownx.snippets` and links the remaining ~50 examples to GitHub.
+
 ### Fixed
 
 * `AnalyticalInverseKinematics.iter_inverse_kinematics` and its `_iter_inverse_kinematics_frame_target` helper had `group: Optional[str]` declared without a default, while the parent `InverseKinematics` interface and all example usages treat `group` as optional. Added `= None` so calls like `planner.iter_inverse_kinematics(target, start_state)` work as documented.
