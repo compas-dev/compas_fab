@@ -1,6 +1,6 @@
 attrs >= 19.3.0
 bump-my-version
-compas-invocations2
+compas_invocations2[mkdocs]
 invoke >= 0.14
 pytest
 pytest-cov
