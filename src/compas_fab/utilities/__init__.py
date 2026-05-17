@@ -1,40 +1,8 @@
-"""
-********************************************************************************
-compas_fab.utilities
-********************************************************************************
+"""Utility functions for compas_fab.
 
-.. currentmodule:: compas_fab.utilities
-
-Package containing a set of utility functions.
-
-
-Numerical functions
-===================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    allclose
-    arange
-    clamp
-    diffs
-    map_range
-    range_geometric_row
-    sign
-
-Other functions
-===============
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    argmax
-    argmin
-    argsort
-    LazyLoader
-
+Numerical helpers (`allclose`, `arange`, `clamp`, `diffs`, `map_range`,
+`range_geometric_row`, `sign`, `argmax`, `argmin`, `argsort`) and a
+lazy-import helper (`LazyLoader`).
 """
 
 from .filesystem import (

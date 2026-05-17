@@ -1,17 +1,4 @@
-"""
-Analytical backend features
-=========================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    AnalyticalPlanCartesianMotion
-    AnalyticalInverseKinematics
-
-
-
-"""
+"""Backend feature implementations for the analytical kinematics backend."""
 
 from compas_fab.backends.kinematics.backend_features.analytical_plan_cartesian_motion import (
     AnalyticalPlanCartesianMotion,

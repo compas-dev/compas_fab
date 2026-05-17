@@ -1,107 +1,19 @@
-"""
-********************************************************************************
-compas_fab.backends
-********************************************************************************
+"""Backend classes for simulation, planning and execution.
 
-.. currentmodule:: compas_fab.backends
+Submodules group classes by backend family:
 
-This package contains classes backends for simulation, planning and execution.
+- ROS / MoveIt: [`RosClient`][compas_fab.backends.RosClient],
+  [`MoveItPlanner`][compas_fab.backends.MoveItPlanner],
+  [`RosFileServerLoader`][compas_fab.backends.RosFileServerLoader],
+  [`HttpFileServerLoader`][compas_fab.backends.HttpFileServerLoader].
+- PyBullet: [`PyBulletClient`][compas_fab.backends.PyBulletClient],
+  [`PyBulletPlanner`][compas_fab.backends.PyBulletPlanner].
+- Analytical: [`AnalyticalKinematicsPlanner`][compas_fab.backends.AnalyticalKinematicsPlanner]
+  with robot-specific solvers
+  (e.g. [`UR10eKinematics`][compas_fab.backends.UR10eKinematics]).
 
-ROS
-===
-
-Classes to interact with `ROS <https://ros.org/>`_ and the ``MoveIt`` planning
-framework.
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    RosClient
-    RosFileServerLoader
-    MoveItPlanner
-    RosError
-    RosValidationError
-
-
-PyBullet
-========
-
-Classes to interact with `PyBullet <http://pybullet.org/>`_.
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    PyBulletClient
-    PyBulletPlanner
-    PyBulletError
-
-
-Analytical Kinematics
-=====================
-
-Pure-python implementation of analytic IK solvers.
-
-IK solvers
-----------
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    AnalyticalInverseKinematics
-    AnalyticalPlanCartesianMotion
-    OffsetWristKinematics
-    SphericalWristKinematics
-    AnalyticalPyBulletClient
-
-Robot-specific kinematics
--------------------------
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    UR3Kinematics
-    UR3eKinematics
-    UR5Kinematics
-    UR5eKinematics
-    UR10Kinematics
-    UR10eKinematics
-    Staubli_TX260LKinematics
-    ABB_IRB4600_40_255Kinematics
-
-Long-running tasks
-==================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    FutureResult
-    CancellableFutureResult
-
-Exceptions
-==========
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    BackendError
-    BackendFeatureNotSupportedError
-    CollisionCheckError
-    CartesianMotionError
-    InverseKinematicsError
-    KinematicsError
-
-Interfaces
-==========
-
-For details about integrating new backends, check
-the :ref:`architecture` documentation.
-
+See the [backend architecture guide](../developer/architecture.md) for
+details about integrating new backends.
 """
 
 # Base imports
@@ -135,6 +47,7 @@ from .ros import (
     RosError,
     RosValidationError,
     RosFileServerLoader,
+    HttpFileServerLoader,
     MoveItPlanner,
 )
 
@@ -193,6 +106,7 @@ __all__ = [
     "RosError",
     "RosValidationError",
     "RosFileServerLoader",
+    "HttpFileServerLoader",
     "MoveItPlanner",
     # Kinematics
     "AnalyticalInverseKinematics",

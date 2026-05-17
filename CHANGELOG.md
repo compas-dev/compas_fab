@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+* `.. autosummary::`, `.. toctree::` and `.. currentmodule::` directives from all module-level `__init__.py` docstrings (replaced with prose + intra-doc Markdown links resolved by `mkdocstrings`).
 * Removed `DirectUrActionClient` and associated `direct_ur` messages module since this UR-specific action client was outdated and unused.
 
 ### Added

@@ -1,28 +1,8 @@
-"""
-********************************************************************************
-compas_fab.ghpython
-********************************************************************************
+"""Grasshopper (GHPython) scene objects for compas_fab.
 
-.. currentmodule:: compas_fab.ghpython
-
-Scene objects
--------------
-
-In **COMPAS**, the `scene objects` are classes that assist with the visualization
-of datastructures and models, in a way that maintains the data separated from the
-specific CAD interfaces, while providing a way to leverage native performance
-of the CAD environment.
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    ReachabilityMapObject
-    RigidBodyObject
-    RobotCellObject
-    RobotModelObject
-
-
+Scene objects expose `compas_fab` data structures to Grasshopper while
+keeping the data layer separated from CAD-specific code and leveraging
+native Rhino/Grasshopper performance.
 """
 
 import compas

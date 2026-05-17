@@ -1,19 +1,4 @@
-"""
-ROS backend features
-====================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    MoveItSetRobotCell
-    MoveItSetRobotCellState
-    MoveItForwardKinematics
-    MoveItInverseKinematics
-    MoveItPlanCartesianMotion
-    MoveItPlanMotion
-
-"""
+"""Backend feature implementations for the ROS / MoveIt backend."""
 
 from compas_fab.backends.ros.backend_features.move_it_set_robot_cell import MoveItSetRobotCell
 from compas_fab.backends.ros.backend_features.move_it_set_robot_cell_state import MoveItSetRobotCellState

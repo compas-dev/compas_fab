@@ -1,20 +1,4 @@
-"""
-PyBullet backend features
-=========================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    PyBulletCheckCollision
-    PyBulletForwardKinematics
-    PyBulletInverseKinematics
-    PyBulletPlanCartesianMotion
-    PyBulletSetRobotCell
-    PyBulletSetRobotCellState
-
-
-"""
+"""Backend feature implementations for the PyBullet backend."""
 
 from compas_fab.backends.pybullet.backend_features.pybullet_check_collision import PyBulletCheckCollision
 from compas_fab.backends.pybullet.backend_features.pybullet_forward_kinematics import PyBulletForwardKinematics

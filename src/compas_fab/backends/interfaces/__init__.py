@@ -1,43 +1,12 @@
-"""
-.. currentmodule:: compas_fab.backends.interfaces
+"""Interfaces required to integrate backends into the simulation, planning
+and execution pipeline of COMPAS FAB.
 
-This package defines the interfaces required to integrate backends into
-the simulation, planning and execution pipeline of COMPAS FAB.
-
-Client interfaces
-=================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    ClientInterface
-    PlannerInterface
-
-RobotCell interfaces
-====================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    SetRobotCell
-    SetRobotCellState
-
-Planner feature interfaces
-==========================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    BackendFeature
-    CheckCollision
-    ForwardKinematics
-    InverseKinematics
-    PlanCartesianMotion
-    PlanMotion
-
+A backend implementation pairs a [`ClientInterface`][compas_fab.backends.interfaces.ClientInterface]
+with a [`PlannerInterface`][compas_fab.backends.interfaces.PlannerInterface]
+subclass, and overrides planner methods by implementing the relevant
+[`BackendFeature`][compas_fab.backends.interfaces.BackendFeature] subclasses
+(`CheckCollision`, `ForwardKinematics`, `InverseKinematics`,
+`PlanCartesianMotion`, `PlanMotion`, `SetRobotCell`, `SetRobotCellState`).
 """
 
 from .backend_features import BackendFeature
