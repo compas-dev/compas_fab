@@ -4,6 +4,7 @@ from compas_fab.backends.ros.messages import Int8MultiArray
 from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.messages import PoseArray
 from compas_fab.backends.ros.messages import ROSmsg
+from compas_fab.backends.ros.messages import RosDistro
 from compas_fab.backends.ros.messages import String
 from compas_fab.backends.ros.messages import Time
 
@@ -23,6 +24,30 @@ def test_nested_repr():
     t = Time(80, 20)
     h = Header(seq=10, stamp=t, frame_id="/wow")
     assert repr(h) == "Header(seq=10, stamp=Time(secs=80, nsecs=20), frame_id='/wow')"
+
+
+def test_header_serializes_as_ros1_header_by_default():
+    h = Header(seq=10, stamp=Time(80, 20), frame_id="/wow")
+    assert h.msg == {"seq": 10, "stamp": {"secs": 80, "nsecs": 20}, "frame_id": "/wow"}
+
+
+def test_header_serializes_as_ros2_header_for_ros2_distro():
+    h = Header(seq=10, stamp=Time(80, 20), frame_id="/wow")
+    h.filter_fields_for_distro(RosDistro.JAZZY)
+    assert h.msg == {"stamp": {"secs": 80, "nsecs": 20}, "frame_id": "/wow"}
+    assert h.seq == 10
+
+
+def test_ros2_header_filter_accepts_ros2_time_keys():
+    h = Header.from_msg({"seq": 10, "stamp": {"sec": 80, "nanosec": 20}, "frame_id": "/wow"})
+    h.filter_fields_for_distro(RosDistro.JAZZY)
+    assert h.msg == {"stamp": {"secs": 80, "nsecs": 20}, "frame_id": "/wow"}
+
+
+def test_time_accepts_ros2_time_keys():
+    t = Time.from_msg({"sec": 80, "nanosec": 20})
+    assert t.secs == 80
+    assert t.nsecs == 20
 
 
 def test_subclasses_define_type_name():
