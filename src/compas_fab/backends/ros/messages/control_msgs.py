@@ -8,7 +8,9 @@ from .trajectory_msgs import JointTrajectoryPoint
 
 
 class JointTolerance(ROSmsg):
-    """https://docs.ros.org/api/control_msgs/html/msg/JointTolerance.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/control_msgs/html/msg/JointTolerance.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/control_msgs/interfaces/msg/JointTolerance.html
+    """
 
     ROS_MSG_TYPE = "control_msgs/JointTolerance"
 
@@ -20,7 +22,7 @@ class JointTolerance(ROSmsg):
 
 
 class FollowJointTrajectoryGoal(ROSmsg):
-    """https://docs.ros.org/en/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryGoal.html"""
+    """https://docs.ros.org/en/noetic/api/control_msgs/html/msg/FollowJointTrajectoryGoal.html"""
 
     ROS_MSG_TYPE = "control_msgs/FollowJointTrajectoryGoal"
 
@@ -32,7 +34,7 @@ class FollowJointTrajectoryGoal(ROSmsg):
 
 
 class FollowJointTrajectoryActionGoal(ROSmsg):
-    """https://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionGoal.html"""
+    """https://docs.ros.org/en/noetic/api/control_msgs/html/msg/FollowJointTrajectoryActionGoal.html"""
 
     ROS_MSG_TYPE = "control_msgs/FollowJointTrajectoryActionGoal"
 
@@ -43,7 +45,7 @@ class FollowJointTrajectoryActionGoal(ROSmsg):
 
 
 class FollowJointTrajectoryFeedback(ROSmsg):
-    """https://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryFeedback.html"""
+    """https://docs.ros.org/en/noetic/api/control_msgs/html/msg/FollowJointTrajectoryFeedback.html"""
 
     ROS_MSG_TYPE = "control_msgs/FollowJointTrajectoryFeedback"
 
@@ -56,7 +58,7 @@ class FollowJointTrajectoryFeedback(ROSmsg):
 
 
 class FollowJointTrajectoryActionFeedback(ROSmsg):
-    """https://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionFeedback.html"""
+    """https://docs.ros.org/en/noetic/api/control_msgs/html/msg/FollowJointTrajectoryActionFeedback.html"""
 
     ROS_MSG_TYPE = "control_msgs/FollowJointTrajectoryActionFeedback"
 
@@ -67,7 +69,7 @@ class FollowJointTrajectoryActionFeedback(ROSmsg):
 
 
 class FollowJointTrajectoryResult(ROSmsg):
-    """https://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryResult.html"""
+    """https://docs.ros.org/en/noetic/api/control_msgs/html/msg/FollowJointTrajectoryResult.html"""
 
     ROS_MSG_TYPE = "control_msgs/FollowJointTrajectoryResult"
 
@@ -97,7 +99,7 @@ class FollowJointTrajectoryResult(ROSmsg):
 
 
 class FollowJointTrajectoryActionResult(ROSmsg):
-    """https://docs.ros.org/fuerte/api/control_msgs/html/msg/FollowJointTrajectoryActionResult.html"""
+    """https://docs.ros.org/en/noetic/api/control_msgs/html/msg/FollowJointTrajectoryActionResult.html"""
 
     ROS_MSG_TYPE = "control_msgs/FollowJointTrajectoryActionResult"
 

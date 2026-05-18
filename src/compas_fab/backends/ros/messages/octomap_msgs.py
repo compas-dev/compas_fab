@@ -5,7 +5,9 @@ from .std_msgs import format_header_for_distro
 
 
 class Octomap(ROSmsg):
-    """https://docs.ros.org/kinetic/api/octomap_msgs/html/msg/Octomap.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/octomap_msgs/html/msg/Octomap.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/octomap_msgs/interfaces/msg/Octomap.html
+    """
 
     ROS_MSG_TYPE = "octomap_msgs/Octomap"
 
@@ -21,7 +23,9 @@ class Octomap(ROSmsg):
 
 
 class OctomapWithPose(ROSmsg):
-    """https://docs.ros.org/kinetic/api/octomap_msgs/html/msg/OctomapWithPose.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/octomap_msgs/html/msg/OctomapWithPose.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/octomap_msgs/interfaces/msg/OctomapWithPose.html
+    """
 
     ROS_MSG_TYPE = "octomap_msgs/OctomapWithPose"
 

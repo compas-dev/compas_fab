@@ -5,7 +5,9 @@ from .std_msgs import format_header_for_distro
 
 
 class JointTrajectoryPoint(ROSmsg):
-    """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectoryPoint.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/trajectory_msgs/html/msg/JointTrajectoryPoint.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/trajectory_msgs/interfaces/msg/JointTrajectoryPoint.html
+    """
 
     ROS_MSG_TYPE = "trajectory_msgs/JointTrajectoryPoint"
 
@@ -33,7 +35,9 @@ class JointTrajectoryPoint(ROSmsg):
 
 
 class JointTrajectory(ROSmsg):
-    """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectory.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/trajectory_msgs/html/msg/JointTrajectory.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/trajectory_msgs/interfaces/msg/JointTrajectory.html
+    """
 
     ROS_MSG_TYPE = "trajectory_msgs/JointTrajectory"
 
@@ -54,7 +58,9 @@ class JointTrajectory(ROSmsg):
 
 
 class MultiDOFJointTrajectoryPoint(ROSmsg):
-    """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectoryPoint.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectoryPoint.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/trajectory_msgs/interfaces/msg/MultiDOFJointTrajectoryPoint.html
+    """
 
     ROS_MSG_TYPE = "trajectory_msgs/MultiDOFJointTrajectoryPoint"
 
@@ -66,7 +72,9 @@ class MultiDOFJointTrajectoryPoint(ROSmsg):
 
 
 class MultiDOFJointTrajectory(ROSmsg):
-    """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectory.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectory.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/trajectory_msgs/interfaces/msg/MultiDOFJointTrajectory.html
+    """
 
     ROS_MSG_TYPE = "trajectory_msgs/MultiDOFJointTrajectory"
 

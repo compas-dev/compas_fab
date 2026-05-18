@@ -5,7 +5,9 @@ from .std_msgs import ROSmsg
 
 
 class Point(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Point.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Point.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Point.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/Point"
 
@@ -21,7 +23,9 @@ class Point(ROSmsg):
 
 
 class Quaternion(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Quaternion.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Quaternion.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Quaternion.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/Quaternion"
 
@@ -38,7 +42,9 @@ class Quaternion(ROSmsg):
 
 
 class Pose(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Pose.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Pose.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Pose.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/Pose"
 
@@ -71,7 +77,9 @@ class Pose(ROSmsg):
 
 
 class PoseStamped(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/PoseStamped.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PoseStamped.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/PoseStamped.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/PoseStamped"
 
@@ -87,7 +95,9 @@ class PoseStamped(ROSmsg):
 
 
 class PoseArray(ROSmsg):
-    """http://docs.ros.org/en/api/geometry_msgs/html/msg/PoseArray.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PoseArray.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/PoseArray.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/PoseArray"
 
@@ -103,7 +113,9 @@ class PoseArray(ROSmsg):
 
 
 class Vector3(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Vector3.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Vector3.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Vector3.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/Vector3"
 
@@ -119,7 +131,9 @@ class Vector3(ROSmsg):
 
 
 class Transform(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Transform.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Transform.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Transform.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/Transform"
 
@@ -129,7 +143,9 @@ class Transform(ROSmsg):
 
 
 class Twist(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Twist.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Twist.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/Twist"
 
@@ -139,7 +155,8 @@ class Twist(ROSmsg):
 
 
 class Wrench(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Wrench.html
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Wrench.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Wrench.html
 
     This represents force in free space, separated into its linear and angular parts.
 
@@ -182,7 +199,8 @@ class Wrench(ROSmsg):
 
 
 class WrenchStamped(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/WrenchStamped.html
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/WrenchStamped.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/WrenchStamped.html
 
     A wrench with reference coordinate frame and timestamp.
     """
@@ -201,7 +219,8 @@ class WrenchStamped(ROSmsg):
 
 
 class Inertia(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Inertia.html
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Inertia.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Inertia.html
 
     Examples
     --------

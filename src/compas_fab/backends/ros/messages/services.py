@@ -15,7 +15,9 @@ from .std_msgs import format_header_for_distro
 
 
 class GetPositionIKRequest(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionIK.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPositionIK.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetPositionIK.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetPositionIKRequest"
 
@@ -24,7 +26,9 @@ class GetPositionIKRequest(ROSmsg):
 
 
 class GetPositionIKResponse(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionIK.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPositionIK.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetPositionIK.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetPositionIKResponse"
 
@@ -40,7 +44,9 @@ class GetPositionIKResponse(ROSmsg):
 
 
 class GetPositionFKRequest(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPositionFK.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetPositionFK.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetPositionFKRequest"
 
@@ -55,7 +61,9 @@ class GetPositionFKRequest(ROSmsg):
 
 
 class GetPositionFKResponse(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPositionFK.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetPositionFK.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetPositionFKResponse"
 
@@ -73,7 +81,9 @@ class GetPositionFKResponse(ROSmsg):
 
 
 class GetCartesianPathRequest(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetCartesianPath.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetCartesianPath.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetCartesianPath.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetCartesianPathRequest"
 
@@ -105,7 +115,9 @@ class GetCartesianPathRequest(ROSmsg):
 
 
 class GetCartesianPathResponse(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetCartesianPath.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetCartesianPath.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetCartesianPath.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetCartesianPathResponse"
 
@@ -124,7 +136,9 @@ class GetCartesianPathResponse(ROSmsg):
 
 
 class SetPlannerParamsRequest(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/SetPlannerParams.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/SetPlannerParams.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/SetPlannerParams.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/SetPlannerParamsRequest"
 
@@ -136,7 +150,9 @@ class SetPlannerParamsRequest(ROSmsg):
 
 
 class MotionPlanRequest(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanRequest.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/MotionPlanRequest.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/MotionPlanRequest.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/MotionPlanRequest"
 
@@ -183,7 +199,9 @@ class MotionPlanRequest(ROSmsg):
 
 
 class MotionPlanResponse(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanResponse.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/MotionPlanResponse.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/MotionPlanResponse.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/MotionPlanResponse"
 
@@ -204,7 +222,9 @@ class MotionPlanResponse(ROSmsg):
 
 
 class GetPlanningSceneRequest(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPlanningScene.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetPlanningScene.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetPlanningSceneRequest"
 
@@ -213,7 +233,9 @@ class GetPlanningSceneRequest(ROSmsg):
 
 
 class GetPlanningSceneResponse(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPlanningScene.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetPlanningScene.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetPlanningSceneResponse"
 
@@ -226,7 +248,9 @@ class GetPlanningSceneResponse(ROSmsg):
 
 
 class ApplyPlanningSceneRequest(ROSmsg):
-    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/ApplyPlanningScene.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/ApplyPlanningSceneRequest"
 
@@ -235,7 +259,9 @@ class ApplyPlanningSceneRequest(ROSmsg):
 
 
 class ApplyPlanningSceneResponse(ROSmsg):
-    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/ApplyPlanningScene.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/ApplyPlanningSceneResponse"
 

@@ -114,7 +114,9 @@ class ROSmsg:
 
 
 class Time(ROSmsg):
-    """https://docs.ros.org/kinetic/api/std_msgs/html/msg/Time.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/Time.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/builtin_interfaces/interfaces/msg/Time.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/Time"
 
@@ -133,7 +135,11 @@ class Time(ROSmsg):
 
 
 class Header(ROSmsg):
-    """https://docs.ros.org/melodic/api/std_msgs/html/msg/Header.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/Header.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/Header.html
+
+    Note: ROS 2's Header drops the `seq` field that ROS 1's has.
+    """
 
     ROS_MSG_TYPE = "std_msgs/Header"
 
@@ -158,7 +164,9 @@ class Header(ROSmsg):
 
 
 class String(ROSmsg):
-    """https://docs.ros.org/api/std_msgs/html/msg/String.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/String.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/String.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/String"
 
@@ -167,7 +175,9 @@ class String(ROSmsg):
 
 
 class MultiArrayDimension(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayDimension.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/MultiArrayDimension.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/MultiArrayDimension.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/MultiArrayDimension"
 
@@ -182,7 +192,9 @@ class MultiArrayDimension(ROSmsg):
 
 
 class MultiArrayLayout(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayLayout.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/MultiArrayLayout.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/MultiArrayLayout.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/MultiArrayLayout"
 
@@ -197,7 +209,9 @@ class MultiArrayLayout(ROSmsg):
 
 
 class Int8MultiArray(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/Int8MultiArray.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/Int8MultiArray.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/Int8MultiArray.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/Int8MultiArray"
 
@@ -212,7 +226,9 @@ class Int8MultiArray(ROSmsg):
 
 
 class Float32MultiArray(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/Float32MultiArray.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/Float32MultiArray.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/Float32MultiArray.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/Float32MultiArray"
 
@@ -227,7 +243,9 @@ class Float32MultiArray(ROSmsg):
 
 
 class Int32(ROSmsg):
-    """http://docs.ros.org/en/melodic/api/std_msgs/html/msg/Int32.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/Int32.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/Int32.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/Int32"
 

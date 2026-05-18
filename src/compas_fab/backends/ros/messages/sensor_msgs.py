@@ -4,7 +4,9 @@ from .std_msgs import format_header_for_distro
 
 
 class JointState(ROSmsg):
-    """https://docs.ros.org/kinetic/api/sensor_msgs/html/msg/JointState.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/JointState.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/sensor_msgs/interfaces/msg/JointState.html
+    """
 
     ROS_MSG_TYPE = "sensor_msgs/JointState"
 
@@ -41,7 +43,9 @@ class JointState(ROSmsg):
 
 
 class MultiDOFJointState(ROSmsg):
-    """https://docs.ros.org/kinetic/api/sensor_msgs/html/msg/MultiDOFJointState.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/MultiDOFJointState.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/sensor_msgs/interfaces/msg/MultiDOFJointState.html
+    """
 
     ROS_MSG_TYPE = "sensor_msgs/MultiDOFJointState"
 

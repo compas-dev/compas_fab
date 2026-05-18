@@ -19,7 +19,9 @@ from compas_fab.backends.ros.messages.trajectory_msgs import MultiDOFJointTrajec
 
 
 class CollisionObject(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/CollisionObject.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/CollisionObject.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/CollisionObject.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/CollisionObject"
 
@@ -90,7 +92,9 @@ class CollisionObject(ROSmsg):
 
 
 class AttachedCollisionObject(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/AttachedCollisionObject.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/AttachedCollisionObject"
 
@@ -118,7 +122,9 @@ class AttachedCollisionObject(ROSmsg):
 
 
 class Constraints(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/Constraints.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/Constraints.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/Constraints.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/Constraints"
 
@@ -144,7 +150,9 @@ class Constraints(ROSmsg):
 
 
 class RobotState(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/RobotState.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/RobotState.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/RobotState.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/RobotState"
 
@@ -173,7 +181,9 @@ class RobotState(ROSmsg):
 
 
 class PositionIKRequest(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionIKRequest.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/PositionIKRequest.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/PositionIKRequest.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/PositionIKRequest"
 
@@ -197,7 +207,9 @@ class PositionIKRequest(ROSmsg):
 
 
 class RobotTrajectory(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/RobotTrajectory.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/RobotTrajectory.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/RobotTrajectory.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/RobotTrajectory"
 
@@ -213,7 +225,9 @@ class RobotTrajectory(ROSmsg):
 
 
 class MoveItErrorCodes(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MoveItErrorCodes.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/MoveItErrorCodes.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/MoveItErrorCodes.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/MoveItErrorCodes"
 
@@ -285,7 +299,9 @@ class MoveItErrorCodes(ROSmsg):
 
 
 class PlannerParams(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlannerParams.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/PlannerParams.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/PlannerParams.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/PlannerParams"
 
@@ -296,7 +312,9 @@ class PlannerParams(ROSmsg):
 
 
 class WorkspaceParameters(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/WorkspaceParameters.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/WorkspaceParameters.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/WorkspaceParameters.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/WorkspaceParameters"
 
@@ -310,7 +328,9 @@ class WorkspaceParameters(ROSmsg):
 
 
 class TrajectoryConstraints(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/TrajectoryConstraints.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/TrajectoryConstraints.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/TrajectoryConstraints.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/TrajectoryConstraints"
 
@@ -323,7 +343,9 @@ class TrajectoryConstraints(ROSmsg):
 
 
 class JointConstraint(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/JointConstraint.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/JointConstraint.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/JointConstraint.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/JointConstraint"
 
@@ -342,7 +364,9 @@ class JointConstraint(ROSmsg):
 
 
 class VisibilityConstraint(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/VisibilityConstraint.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/VisibilityConstraint.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/VisibilityConstraint.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/VisibilityConstraint"
 
@@ -351,7 +375,9 @@ class VisibilityConstraint(ROSmsg):
 
 
 class BoundingVolume(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/BoundingVolume.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/BoundingVolume.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/BoundingVolume.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/BoundingVolume"
 
@@ -416,7 +442,9 @@ class BoundingVolume(ROSmsg):
 
 
 class PositionConstraint(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionConstraint.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/PositionConstraint.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/PositionConstraint.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/PositionConstraint"
 
@@ -438,7 +466,9 @@ class PositionConstraint(ROSmsg):
 
 
 class OrientationConstraint(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/OrientationConstraint.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/OrientationConstraint.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/OrientationConstraint.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/OrientationConstraint"
 
@@ -491,7 +521,9 @@ class OrientationConstraint(ROSmsg):
 
 
 class PlanningSceneComponents(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PlanningSceneComponents.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/PlanningSceneComponents.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/PlanningSceneComponents.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/PlanningSceneComponents"
 
@@ -525,7 +557,9 @@ class PlanningSceneComponents(ROSmsg):
 
 
 class AllowedCollisionMatrix(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/msg/AllowedCollisionMatrix.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/AllowedCollisionMatrix.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/AllowedCollisionMatrix.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/AllowedCollisionMatrix"
 
@@ -537,7 +571,9 @@ class AllowedCollisionMatrix(ROSmsg):
 
 
 class PlanningSceneWorld(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningSceneWorld.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/PlanningSceneWorld.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/PlanningSceneWorld.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/PlanningSceneWorld"
 
@@ -567,7 +603,9 @@ class PlanningSceneWorld(ROSmsg):
 
 
 class PlanningScene(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningScene.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/PlanningScene.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/PlanningScene.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/PlanningScene"
 
@@ -627,7 +665,9 @@ class PlanningScene(ROSmsg):
 
 
 class ExecuteTrajectoryGoal(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/action/ExecuteTrajectory.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/action/ExecuteTrajectory.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/action/ExecuteTrajectory.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/ExecuteTrajectoryGoal"
 
@@ -636,7 +676,9 @@ class ExecuteTrajectoryGoal(ROSmsg):
 
 
 class ExecuteTrajectoryFeedback(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/action/ExecuteTrajectory.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/action/ExecuteTrajectory.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/action/ExecuteTrajectory.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/ExecuteTrajectoryFeedback"
 
@@ -649,7 +691,9 @@ class ExecuteTrajectoryFeedback(ROSmsg):
 
 
 class ExecuteTrajectoryResult(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/action/ExecuteTrajectory.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/action/ExecuteTrajectory.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/action/ExecuteTrajectory.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/ExecuteTrajectoryResult"
 
