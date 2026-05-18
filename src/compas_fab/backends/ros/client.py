@@ -13,6 +13,7 @@ from roslibpy.ros1.actionlib import Goal
 from compas_fab.backends.interfaces.client import ClientInterface
 from compas_fab.backends.ros.exceptions import RosError
 from compas_fab.backends.ros.fileserver_loader import RosFileServerLoader
+from compas_fab.backends.ros.http_fileserver_loader import HttpFileServerLoader
 from compas_fab.backends.ros.messages import ExecuteTrajectoryFeedback
 from compas_fab.backends.ros.messages import ExecuteTrajectoryGoal
 from compas_fab.backends.ros.messages import ExecuteTrajectoryResult
@@ -124,7 +125,16 @@ class RosClient(Ros, ClientInterface):
     """
 
     def __init__(self, host="localhost", port=9090, is_secure=False):
+        # `Ros.__init__` is called via super, but `ClientInterface.__init__`
+        # is bypassed because `Ros` is the first base in the MRO and does
+        # not call `super().__init__()`. We initialise the ClientInterface
+        # attributes manually so `self.robot_cell` etc. work before any
+        # `load_robot_cell` call.
         super(RosClient, self).__init__(host, port, is_secure)
+        ClientInterface.__init__(self)
+        self.host = host
+        self.port = port
+        self.is_secure = is_secure
         self._ros_distro = None
 
     def __enter__(self):
@@ -178,6 +188,7 @@ class RosClient(Ros, ClientInterface):
         srdf_param_name: str = "/robot_description_semantic",
         precision: int = None,
         local_cache_directory: Optional[str] = None,
+        http_file_server_base_url: Optional[str] = None,
     ):
         """Load the robot cell (including model and semantics) from ROS.
         The robot celL is set in `client.robot_cell` and returned.
@@ -197,6 +208,9 @@ class RosClient(Ros, ClientInterface):
             This differs from the directory taken as parameter by the :class:`RosFileServerLoader`
             in that it points directly to the specific robot package, not to a global workspace storage
             for all robots. If not assigned, the robot will not be cached locally.
+        http_file_server_base_url : str, optional
+            Base URL of the HTTP file server used by ROS 2 to resolve ``package://`` mesh URLs.
+            Defaults to ``http://<rosbridge-host>:9091``.
 
         Examples
         --------
@@ -213,7 +227,7 @@ class RosClient(Ros, ClientInterface):
         robot_name = cache_info.robot_name
         local_cache_directory = cache_info.local_cache_directory
 
-        loader = RosFileServerLoader(self, use_local_cache, local_cache_directory)
+        loader = self._get_robot_cell_loader(use_local_cache, local_cache_directory, http_file_server_base_url)
 
         if robot_name:
             loader.robot_name = robot_name
@@ -231,6 +245,20 @@ class RosClient(Ros, ClientInterface):
         self._robot_cell_state = self._robot_cell.default_cell_state()
 
         return self._robot_cell
+
+    def _get_robot_cell_loader(self, use_local_cache=False, local_cache_directory=None, http_file_server_base_url=None):
+        if self.ros_distro.is_ros2:
+            return HttpFileServerLoader(
+                http_file_server_base_url or self._default_http_file_server_base_url(),
+                ros=self,
+                local_cache=use_local_cache,
+                local_cache_directory=local_cache_directory,
+            )
+
+        return RosFileServerLoader(self, use_local_cache, local_cache_directory)
+
+    def _default_http_file_server_base_url(self):
+        return "http://{}:9091".format(self.host)
 
     # ==========================================================================
     # executing
