@@ -1,4 +1,3 @@
-import os
 import threading
 
 import pytest
@@ -11,7 +10,6 @@ from roslibpy import Topic
 from compas_fab.backends import InverseKinematicsError
 from compas_fab.backends import MotionPlanningError
 from compas_fab.backends import MoveItPlanner
-from compas_fab.backends import RosClient
 from compas_fab.robots import ConfigurationTarget
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import FrameWaypoints
@@ -21,57 +19,35 @@ from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
 from compas_fab.robots import ToolLibrary
 
-
-RUN_ENV_VAR = "COMPAS_FAB_RUN_ROS_INTEGRATION_TESTS"
-ROS_HOST_ENV_VAR = "COMPAS_FAB_ROS_HOST"
-ROS_PORT_ENV_VAR = "COMPAS_FAB_ROS_PORT"
-
-
-@pytest.fixture(scope="module")
-def ros_client():
-    if os.environ.get(RUN_ENV_VAR) != "1":
-        pytest.skip(
-            "ROS integration tests are opt-in. Set {0}=1 and connect to a running stack.\n"
-            "ROS 1: `docker compose -f tests/integration_setup/docker-compose.yml up -d` "
-            "(rosbridge on COMPAS_FAB_ROS_PORT=9090).\n"
-            "ROS 2: `docker compose -f docs/installation/docker_files/ros2-ur10e-demo/docker-compose.yml up -d` "
-            "(rosbridge on COMPAS_FAB_ROS_PORT=9091).\n"
-            "See tests/integration_setup/README.md for the parallel-run pattern.".format(RUN_ENV_VAR)
-        )
-
-    host = os.environ.get(ROS_HOST_ENV_VAR, "localhost")
-    port = int(os.environ.get(ROS_PORT_ENV_VAR, "9090"))
-    client = RosClient(host=host, port=port)
-
-    try:
-        client.run(timeout=5)
-    except Exception as e:
-        pytest.skip("Could not connect to rosbridge at {}:{}: {}".format(host, port, e))
-
-    yield client
-    client.close()
+# The shared `ros1_client` / `ros2_client` fixtures live in conftest.py;
+# tests in this file target the ROS 2 stack because their assertions check
+# ROS-2-specific URDF/SRDF shapes (`world` root, `ur_manipulator` group).
 
 
 @pytest.fixture()
-def ur5_robot_cell(ros_client):
-    robot_cell = ros_client.load_robot_cell(load_geometry=False)
+def ur5_robot_cell(ros2_client):
+    robot_cell = ros2_client.load_robot_cell(load_geometry=False)
     if robot_cell.robot_model.name != "ur5":
-        pytest.skip("The ROS docs examples target the ROS 2 Jazzy UR5 stack; connected to {!r} instead.".format(robot_cell.robot_model.name))
+        pytest.skip(
+            "The ROS docs examples target the ROS 2 Jazzy UR5 stack; connected to {!r} instead.".format(
+                robot_cell.robot_model.name
+            )
+        )
     return robot_cell
 
 
 @pytest.fixture()
-def planner(ros_client):
-    return MoveItPlanner(ros_client)
+def planner(ros2_client):
+    return MoveItPlanner(ros2_client)
 
 
 def assert_frame_close(frame, expected_point, tolerance=1e-2):
     assert frame.point.distance_to_point(expected_point) <= tolerance
 
 
-def test_01_ros_connection_example(ros_client):
-    assert ros_client.is_connected
-    assert ros_client.ros_distro.value
+def test_01_ros_connection_example(ros2_client):
+    assert ros2_client.is_connected
+    assert ros2_client.ros_distro.value
 
 
 def test_02_load_robot_cell_example(ur5_robot_cell, planner):
@@ -148,9 +124,9 @@ def test_03_forward_kinematics_examples(ur5_robot_cell, planner):
         assert isinstance(link_frame, Frame)
 
 
-def test_03_forward_kinematics_target_mode_example(ros_client, ur5_robot_cell, planner):
-    robot_cell, robot_cell_state = RobotCellLibrary.ur5_gripper_one_beam(ros_client)
-    ros_loaded_cell = ros_client.load_robot_cell(False)
+def test_03_forward_kinematics_target_mode_example(ros2_client, ur5_robot_cell, planner):
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5_gripper_one_beam(ros2_client)
+    ros_loaded_cell = ros2_client.load_robot_cell(False)
     # The library cell carries a client-side UR5 description that diverges
     # from the URDF MoveIt 2 loads at launch: different root link (`base_link`
     # vs `world`) and different robot-tag name (`ur5_robot` vs `ur5`). Only
@@ -355,9 +331,9 @@ def test_06_cartesian_motion_partial_example(ur5_robot_cell, planner):
     assert 0 < error.value.partial_trajectory.fraction < 1
 
 
-def test_06_cartesian_motion_target_mode_example(ros_client, ur5_robot_cell, planner):
-    robot_cell, robot_cell_state = RobotCellLibrary.ur5_gripper_one_beam(ros_client)
-    ros_loaded_cell = ros_client.load_robot_cell(False)
+def test_06_cartesian_motion_target_mode_example(ros2_client, ur5_robot_cell, planner):
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5_gripper_one_beam(ros2_client)
+    ros_loaded_cell = ros2_client.load_robot_cell(False)
     # See note in test_03_forward_kinematics_target_mode_example.
     assert ros_loaded_cell.robot_model is not None
     assert robot_cell.robot_model is not None
@@ -395,7 +371,7 @@ def test_06_cartesian_motion_target_mode_example(ros_client, ur5_robot_cell, pla
     assert trajectory.fraction == pytest.approx(1.0)
 
 
-def test_10_ros_hello_world_pubsub_example(ros_client):
+def test_10_ros_hello_world_pubsub_example(ros2_client):
     received = []
     received_event = threading.Event()
 
@@ -403,8 +379,8 @@ def test_10_ros_hello_world_pubsub_example(ros_client):
         received.append(message["data"])
         received_event.set()
 
-    listener = Topic(ros_client, "/chatter", "std_msgs/String")
-    talker = Topic(ros_client, "/chatter", "std_msgs/String")
+    listener = Topic(ros2_client, "/chatter", "std_msgs/String")
+    talker = Topic(ros2_client, "/chatter", "std_msgs/String")
     listener.subscribe(receive_message)
 
     try:
