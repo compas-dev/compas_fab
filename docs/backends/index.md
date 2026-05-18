@@ -10,7 +10,7 @@ Pick the one that matches what you want to do.
 | Just compute IK on a robot (e.g., UR, Staubli, ABB, etc) | [Analytical IK](analytical.md) | Closed-form, microsecond IK, no Docker, no PyBullet |
 | Compute IK *and* check collisions | [Analytical IK + PyBullet](analytical_pybullet.md) | Analytical-fast IK filtered against a real collision scene |
 | Plan motion (collisions + trajectory smoothing) without ROS | [PyBullet](pybullet.md) | In-process motion planning; runs anywhere Python runs |
-| Plan motion against a simulated UR via ROS 2 / MoveIt 2 | [ROS 2 / MoveIt 2](ros2.md) | Current ROS LTS; the recommended starting point for new ROS work |
+| Plan motion via ROS 2 / MoveIt 2 | [ROS 2 / MoveIt 2](ros2.md) | Current ROS LTS; the recommended starting point for new ROS work |
 | Drive an existing ROS 1 / MoveIt 1 setup | [ROS 1 / MoveIt 1](ros.md) | Legacy stack; only use if you must |
 | Just model / visualize a robot cell in a CAD environment | *no backend* | The core data model works without any planner. See [Concepts](../concepts.md) |
 
@@ -43,7 +43,7 @@ Even without a planning back-end, the core of `compas_fab` is useful for:
   and rigid bodies
 - Modelling cell state via [`RobotCellState`][compas_fab.robots.RobotCellState]
 - Authoring [`Target`s][compas_fab.robots.Target] and
-  [`Waypoints`][compas_fab.robots.Waypoints] and serialising them for
+  [`Waypoints`][compas_fab.robots.Waypoints] and serializing them for
   planning elsewhere
 - Visualising in a CAD front-end
 - Forward kinematics via
