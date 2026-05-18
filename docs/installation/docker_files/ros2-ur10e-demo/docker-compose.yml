@@ -14,7 +14,7 @@ services:
     platform: linux/amd64
     environment:
       # UR10 in the e-series image means UR10e. Other valid values: UR3, UR5, UR16.
-      - ROBOT_MODEL=UR10
+      - ROBOT_MODEL=UR5
     ports:
       - "5900:5900"   # VNC for the simulated teach pendant
       - "6080:6080"   # noVNC web view of the simulated teach pendant
@@ -24,7 +24,7 @@ services:
   # at this router via /etc/zenoh/session.json5.
   zenoh-router:
     build: .
-    image: compas-fab/ros-jazzy-moveit2-ur10e
+    image: compas-fab/ros-jazzy-moveit2
     container_name: zenoh-router
     environment:
       <<: *ros-env
@@ -34,7 +34,7 @@ services:
       - source /opt/ros/jazzy/setup.bash && exec ros2 run rmw_zenoh_cpp rmw_zenohd
 
   ur-driver:
-    image: compas-fab/ros-jazzy-moveit2-ur10e
+    image: compas-fab/ros-jazzy-moveit2
     container_name: ur-driver
     environment:
       <<: *ros-env
@@ -46,10 +46,10 @@ services:
     command:
       - bash
       - -lc
-      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur10e robot_ip:=ur-sim launch_rviz:=false initial_joint_controller:=joint_trajectory_controller update_rate_config_file:=/etc/compas_fab/update_rate.yaml
+      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur5 robot_ip:=ur-sim launch_rviz:=false initial_joint_controller:=joint_trajectory_controller update_rate_config_file:=/etc/compas_fab/update_rate.yaml
 
   moveit-demo:
-    image: compas-fab/ros-jazzy-moveit2-ur10e
+    image: compas-fab/ros-jazzy-moveit2
     container_name: moveit-demo
     environment:
       <<: *ros-env
@@ -66,10 +66,10 @@ services:
     command:
       - bash
       - -lc
-      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur10e launch_rviz:=true
+      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur5 launch_rviz:=true
 
   ros-bridge:
-    image: compas-fab/ros-jazzy-moveit2-ur10e
+    image: compas-fab/ros-jazzy-moveit2
     container_name: ros-bridge
     environment:
       <<: *ros-env
@@ -84,7 +84,7 @@ services:
       - source /opt/ros/jazzy/setup.bash && ros2 launch rosbridge_server rosbridge_websocket_launch.xml
 
   file-server:
-    image: compas-fab/ros-jazzy-moveit2-ur10e
+    image: compas-fab/ros-jazzy-moveit2
     container_name: file-server
     ports:
       - "9091:9091"
