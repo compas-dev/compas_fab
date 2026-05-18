@@ -1,22 +1,22 @@
 # Choosing a backend
 
-`compas_fab` is one library that drives five different planning back-ends.
+**COMPAS FAB** is one library that drives five different planning back-ends.
 Pick the one that matches what you want to do.
 
 ## By intent
 
 | I want to… | Use | Why |
 |---|---|---|
-| Just compute IK on a UR/Staubli/ABB IRB4600 | [Analytical IK](analytical.md) | Closed-form, microsecond IK, no Docker, no PyBullet |
-| Compute IK *and* check collisions, on supported robots | [Analytical IK + PyBullet](analytical_pybullet.md) | Analytical-fast IK filtered against a real collision scene |
+| Just compute IK on a robot (e.g., UR, Staubli, ABB, etc) | [Analytical IK](analytical.md) | Closed-form, microsecond IK, no Docker, no PyBullet |
+| Compute IK *and* check collisions | [Analytical IK + PyBullet](analytical_pybullet.md) | Analytical-fast IK filtered against a real collision scene |
 | Plan motion (collisions + trajectory smoothing) without ROS | [PyBullet](pybullet.md) | In-process motion planning; runs anywhere Python runs |
 | Plan motion against a simulated UR via ROS 2 / MoveIt 2 | [ROS 2 / MoveIt 2](ros2.md) | Current ROS LTS; the recommended starting point for new ROS work |
-| Drive an existing ROS 1 / MoveIt 1 setup | [ROS / MoveIt 1](ros.md) | Legacy stack; only use if you must |
-| Just model / visualize a robot cell in a CAD environment | *no backend* | The core data model works without any planner — see [Concepts](../concepts.md) |
+| Drive an existing ROS 1 / MoveIt 1 setup | [ROS 1 / MoveIt 1](ros.md) | Legacy stack; only use if you must |
+| Just model / visualize a robot cell in a CAD environment | *no backend* | The core data model works without any planner. See [Concepts](../concepts.md) |
 
 ## By capability
 
-| Capability | Analytical | Analytical + PyBullet | PyBullet | ROS / MoveIt 1 | ROS 2 / MoveIt 2 |
+| Capability | Analytical | Analytical + PyBullet | PyBullet | ROS 1 / MoveIt 1 | ROS 2 / MoveIt 2 |
 |---|:-:|:-:|:-:|:-:|:-:|
 | Forward kinematics | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Inverse kinematics | ✓ (closed-form) | ✓ (closed-form) | ✓ (numerical) | ✓ | ✓ |
@@ -29,10 +29,10 @@ Pick the one that matches what you want to do.
 
 ## Setup cost in plain words
 
-- **Analytical IK** — nothing to install beyond `compas_fab` itself.
-- **PyBullet / Analytical + PyBullet** — one `pip install pybullet` (with a
+- **Analytical IK**: nothing to install beyond `compas_fab` itself.
+- **PyBullet / Analytical + PyBullet**: one `pip install pybullet` (with a
   small workaround on macOS, see the per-backend pages).
-- **ROS / ROS 2** — Docker Desktop + the per-robot compose stack in
+- **ROS 1 / ROS 2**: Docker Desktop + the per-robot compose stack in
   [`docs/installation/docker_files/`](https://github.com/compas-dev/compas_fab/tree/main/docs/installation/docker_files).
 
 ## Without a backend

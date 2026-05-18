@@ -152,7 +152,7 @@ nav:
       - Analytical IK: backends/analytical.md
       - Analytical IK + PyBullet: backends/analytical_pybullet.md
       - PyBullet: backends/pybullet.md
-      - ROS / MoveIt 1: backends/ros.md
+      - ROS 1 / MoveIt 1: backends/ros.md
       - ROS 2 / MoveIt 2: backends/ros2.md
   - API Reference:
       - api/index.md

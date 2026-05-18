@@ -1,6 +1,6 @@
 # CAD front-ends
 
-`compas_fab` is CAD-independent. The core API works in any Python
+**COMPAS FAB** is CAD-independent. The core API works in any Python
 environment; host bindings are provided for several CAD environments and
 viewers.
 
@@ -21,17 +21,9 @@ minimum Python version.
 
 ## Grasshopper
 
-The Grasshopper components are bundled with `compas_fab`. After installing
-in a Rhino 8-compatible environment, the components appear in the
-Grasshopper toolbar.
-
-Grasshopper examples that ship with the repo:
-
-- [`gh_forward_kinematics.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/ros/files/gh_forward_kinematics.py)
-- [`gh_inverse_kinematics.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/ros/files/gh_inverse_kinematics.py)
-- [`gh_plan_motion.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/ros/files/gh_plan_motion.py)
-- [`gh_plan_cartesian_motion.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/ros/files/gh_plan_cartesian_motion.py)
-- [`gh_robot_visualisation.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/ros/files/gh_robot_visualisation.py)
+The Grasshopper components are installed via the Rhino Package Manager. Search for 
+`compas_fab` in the Rhino Package Manager and install it. After installing it, the
+components appear in the Grasshopper toolbar.
 
 For developing the components, see
 [Developer guide › Grasshopper components](developer/grasshopper.md).
@@ -53,17 +45,12 @@ uv pip install compas_viewer
 ```
 
 Robot scene objects come from
-[`compas_robots.viewer`](https://compas.dev/compas_robots/latest/api/compas_robots.viewer/);
-`compas_fab` itself does not ship a separate viewer module.
+[`compas_robots.viewer`](https://compas.dev/compas_robots/latest/api/compas_robots.viewer/).
 
 ## Headless / VS Code
 
 `compas_fab` is fully usable from a plain Python script without any CAD
-host — useful for headless planning, batch jobs, CI, and PyBullet GUIs.
-
-This is the recommended environment for the
-[PyBullet](backends/pybullet.md), [Analytical + PyBullet](backends/analytical_pybullet.md)
-and ROS-based backends, none of which run inside Rhino's Python.
+host, which is useful for headless planning, batch jobs, CI, and more.
 
 ## Which front-end works with which backend?
 
@@ -75,7 +62,10 @@ and ROS-based backends, none of which run inside Rhino's Python.
 | COMPAS Viewer | ✓ | ✓ | ✓ | ✓ |
 | Headless / VS Code | ✓ | ✓ | ✓ | ✓ |
 
-PyBullet (and the Analytical + PyBullet hybrid) cannot run inside Rhino's
-Python because PyBullet ships native binaries that Rhino's interpreter
-cannot load. From Rhino, serialise the planning problem and run PyBullet
-from an outside Python process.
+PyBullet are notoriously difficult to run inside Rhino's
+Python because PyBullet ships no wheels for newer Python
+versions and doesn't compile easily. For Rhino users
+who want collision checking, the recommended option is
+to set up a separate Python environment with PyBullet
+and run collision checks in a subprocess, communicating
+with the main Rhino process over a local socket or similar.

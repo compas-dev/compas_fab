@@ -1,8 +1,8 @@
 # Concepts
 
-`compas_fab` is built on a small data model that is shared across every
+**COMPAS FAB** is built on a small data model that is shared across every
 backend: you describe **what** you want, then any backend can execute it.
-This page walks through the core types. It is backend-agnostic — none of
+This page walks through the core types. It is backend-agnostic. None of
 the code on this page calls a planner.
 
 For planning, see [Choosing a backend](backends/index.md).
@@ -34,7 +34,7 @@ cell at one moment: the robot's joint
 attached where, and their poses.
 
 A cell tells you *what exists*. A state tells you *where everything is*.
-You plan **from** a state and **to** a state (or to a target — next section).
+You plan **from** a state and **to** a state (or to a target → next section).
 
 You can mutate state freely between planning calls:
 
@@ -48,14 +48,14 @@ You can mutate state freely between planning calls:
 A [`Target`][compas_fab.robots.Target] specifies a single goal pose. The
 common variants:
 
-- [`FrameTarget`][compas_fab.robots.FrameTarget] — a full Cartesian pose
+- [`FrameTarget`][compas_fab.robots.FrameTarget]: a full Cartesian pose
   for the tool or robot flange.
-- [`PointAxisTarget`][compas_fab.robots.PointAxisTarget] — a point plus an
+- [`PointAxisTarget`][compas_fab.robots.PointAxisTarget]: a point plus an
   axis, leaving the rotation around the axis free. Useful for drilling,
   milling, 3D printing — anything with a cylindrical tool.
-- [`ConfigurationTarget`][compas_fab.robots.ConfigurationTarget] — joint
+- [`ConfigurationTarget`][compas_fab.robots.ConfigurationTarget]: joint
   values directly.
-- [`ConstraintSetTarget`][compas_fab.robots.ConstraintSetTarget] — for
+- [`ConstraintSetTarget`][compas_fab.robots.ConstraintSetTarget]: for
   region/constraint based targets.
 
 A [`Waypoints`][compas_fab.robots.Waypoints] is a sequence of targets to
@@ -70,11 +70,11 @@ A target says "go here", but **where** is "here" measured? At the robot's
 flange? At the tip of the attached tool? At the workpiece grasped by the
 tool? [`TargetMode`][compas_fab.robots.TargetMode] makes that explicit:
 
-- `TargetMode.ROBOT` — the target frame is at the planner coordinate frame
+- `TargetMode.ROBOT`: the target frame is at the planner coordinate frame
   (PCF) of the robot (typically the `tool0` link).
-- `TargetMode.TOOL` — the target is the tool's coordinate frame (TCF).
+- `TargetMode.TOOL`: the target is the tool's coordinate frame (TCF).
   The planner does the math to figure out the corresponding PCF.
-- `TargetMode.WORKPIECE` — the target is on the attached workpiece. The
+- `TargetMode.WORKPIECE`: the target is on the attached workpiece. The
   planner accounts for both the tool and the workpiece grasp frame.
 
 ```pycon
@@ -106,9 +106,9 @@ The next step is to [choose a backend](backends/index.md) and run the call.
 
 ## Where things live
 
-- [`compas_fab.robots`][compas_fab.robots] — every type on this page lives
+- [`compas_fab.robots`][compas_fab.robots]: every type on this page lives
   here.
-- [`compas_fab.backends`][compas_fab.backends] — the planners.
-- [`compas_robots`](https://compas.dev/compas_robots/latest/) — the
+- [`compas_fab.backends`][compas_fab.backends]: the planners.
+- [`compas_robots`](https://compas.dev/compas_robots/latest/): the
   underlying `RobotModel`, `Configuration`, `Joint`, `Link` types come
   from this lower-level package.

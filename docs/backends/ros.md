@@ -1,4 +1,4 @@
-# ROS / MoveIt 1
+# ROS 1 / MoveIt 1
 
 The ROS 1 / MoveIt 1 back-end is the legacy planning stack for `compas_fab`.
 For new projects we recommend the [ROS 2 / MoveIt 2](ros2.md) back-end —
