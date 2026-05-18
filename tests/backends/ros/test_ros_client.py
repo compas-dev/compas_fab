@@ -148,3 +148,103 @@ def test_ros1_robot_cell_loader_uses_ros_file_server(monkeypatch):
 
     assert isinstance(loader, FakeRosFileServerLoader)
     assert calls == [("ros", client, True, "/tmp/cache")]
+
+
+def _trajectory_with_single_point():
+    from compas_fab.backends.ros.messages import Header
+    from compas_fab.backends.ros.messages import JointTrajectory
+    from compas_fab.backends.ros.messages import JointTrajectoryPoint
+    from compas_fab.backends.ros.messages import Time
+
+    point = JointTrajectoryPoint(positions=[0.0, 0.0], velocities=[0.0, 0.0], time_from_start=Time(1, 0))
+    return JointTrajectory(Header(), ["a", "b"], [point])
+
+
+def test_follow_joint_trajectory_uses_ros2_action_for_ros2_distro(monkeypatch):
+    sent = {}
+
+    class FakeRos2ActionClient:
+        def __init__(self, ros, name, action_type):
+            sent["name"] = name
+            sent["action_type"] = action_type
+
+        def send_goal(self, goal, resultback, feedback, errback):
+            sent["goal"] = goal
+            sent["resultback"] = resultback
+            sent["feedback"] = feedback
+            sent["errback"] = errback
+            return "goal-id-1"
+
+        def cancel_goal(self, goal_id):
+            sent["cancelled"] = goal_id
+
+    class FakeRos1ActionClient:
+        def __init__(self, *a, **k):
+            raise AssertionError("ROS 1 ActionClient should not be used for ROS 2 distros")
+
+    monkeypatch.setattr(client_module, "Ros2ActionClient", FakeRos2ActionClient)
+    monkeypatch.setattr(client_module, "ActionClient", FakeRos1ActionClient)
+
+    client = RosClient(host="example.com")
+    client._ros_distro = RosDistro.JAZZY
+
+    result = client.follow_joint_trajectory(_trajectory_with_single_point())
+
+    assert sent["name"] == "/joint_trajectory_action"
+    assert sent["action_type"] == "control_msgs/action/FollowJointTrajectory"
+    assert "trajectory" in sent["goal"]
+    assert result.goal.goal_id == "goal-id-1"
+
+
+def test_execute_joint_trajectory_uses_ros2_action_for_ros2_distro(monkeypatch):
+    sent = {}
+
+    class FakeRos2ActionClient:
+        def __init__(self, ros, name, action_type):
+            sent["name"] = name
+            sent["action_type"] = action_type
+
+        def send_goal(self, goal, resultback, feedback, errback):
+            sent["goal"] = goal
+            return "exec-goal-id"
+
+        def cancel_goal(self, goal_id):
+            sent["cancelled"] = goal_id
+
+    monkeypatch.setattr(client_module, "Ros2ActionClient", FakeRos2ActionClient)
+
+    client = RosClient(host="example.com")
+    client._ros_distro = RosDistro.HUMBLE
+
+    result = client.execute_joint_trajectory(_trajectory_with_single_point())
+
+    assert sent["name"] == "/execute_trajectory"
+    assert sent["action_type"] == "moveit_msgs/action/ExecuteTrajectory"
+    assert "trajectory" in sent["goal"]
+    assert result.goal.goal_id == "exec-goal-id"
+
+
+def test_ros2_goal_handle_marks_finished_on_result():
+    from compas_fab.backends.ros.client import _Ros2GoalHandle
+
+    received = []
+
+    class FakeActionClient:
+        def send_goal(self, goal, resultback, feedback, errback):
+            self._resultback = resultback
+            return "g-1"
+
+        def cancel_goal(self, goal_id):
+            received.append(("cancel", goal_id))
+
+    fake = FakeActionClient()
+    handle = _Ros2GoalHandle(fake)
+    handle.send({"trajectory": None}, on_result=lambda r: received.append(("result", r)))
+
+    assert handle.is_finished is False
+    fake._resultback({"ok": True})
+    assert handle.is_finished is True
+    assert received == [("result", {"ok": True})]
+
+    handle.cancel()
+    assert received[-1] == ("cancel", "g-1")

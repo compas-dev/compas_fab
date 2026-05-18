@@ -7,6 +7,7 @@ from roslibpy import Param
 from roslibpy import Ros
 from roslibpy import Service
 from roslibpy import ServiceRequest
+from roslibpy import ActionClient as Ros2ActionClient
 from roslibpy.ros1.actionlib import ActionClient
 from roslibpy.ros1.actionlib import Goal
 
@@ -58,6 +59,45 @@ class CancellableRosActionResult(CancellableFutureResult):
 
         # NOTE: Check if we can output more meaning results than just "we tried to cancel"
         return True
+
+
+class _Ros2GoalHandle(object):
+    """Thin Goal-like adapter over `roslibpy.ActionClient` (ROS 2 actions).
+
+    `roslibpy.ros1.actionlib.Goal` is a topic-driven state machine; the ROS 2
+    `ActionClient` is a single ``send_goal`` call with result/feedback/error
+    callbacks and a separately-tracked ``goal_id``. To keep the public
+    `CancellableRosActionResult` interface unchanged, this wrapper exposes
+    the few attributes that wrapper reads (`is_finished`, `cancel`) and lets
+    the existing `follow_joint_trajectory` / `execute_joint_trajectory`
+    plumbing stay distro-agnostic.
+    """
+
+    def __init__(self, action_client):
+        self.action_client = action_client
+        self.goal_id = None
+        self.is_finished = False
+
+    def send(self, goal_dict, on_result, on_feedback=None, on_error=None):
+        def _resultback(result):
+            self.is_finished = True
+            on_result(result)
+
+        def _errback(error):
+            self.is_finished = True
+            if on_error:
+                on_error(error)
+
+        self.goal_id = self.action_client.send_goal(
+            goal_dict,
+            _resultback,
+            on_feedback if on_feedback is not None else (lambda _msg: None),
+            _errback,
+        )
+
+    def cancel(self):
+        if self.goal_id is not None:
+            self.action_client.cancel_goal(self.goal_id)
 
 
 class LocalCacheInfo:
@@ -347,10 +387,6 @@ class RosClient(Ros, ClientInterface):
         joint_trajectory = self._convert_to_ros_trajectory(joint_trajectory)
         trajectory_goal = FollowJointTrajectoryGoal(trajectory=joint_trajectory)
 
-        action_client = ActionClient(self, action_name, "control_msgs/FollowJointTrajectoryAction")
-        goal = Goal(action_client, Message(trajectory_goal.msg))
-        action_result = CancellableRosActionResult(goal)
-
         def handle_result(msg):
             result = FollowJointTrajectoryResult.from_msg(msg)
             if result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:
@@ -366,6 +402,22 @@ class RosClient(Ros, ClientInterface):
         def handle_feedback(msg):
             feedback = FollowJointTrajectoryFeedback.from_msg(msg)
             feedback_callback(feedback)
+
+        if self.ros_distro.is_ros2:
+            action_client = Ros2ActionClient(self, action_name, "control_msgs/action/FollowJointTrajectory")
+            goal = _Ros2GoalHandle(action_client)
+            action_result = CancellableRosActionResult(goal)
+            goal.send(
+                trajectory_goal.msg,
+                on_result=handle_result,
+                on_feedback=handle_feedback if feedback_callback else None,
+                on_error=errback,
+            )
+            return action_result
+
+        action_client = ActionClient(self, action_name, "control_msgs/FollowJointTrajectoryAction")
+        goal = Goal(action_client, Message(trajectory_goal.msg))
+        action_result = CancellableRosActionResult(goal)
 
         def handle_failure(error):
             errback(error)
@@ -424,10 +476,6 @@ class RosClient(Ros, ClientInterface):
         trajectory = RobotTrajectory(joint_trajectory=joint_trajectory)
         trajectory_goal = ExecuteTrajectoryGoal(trajectory=trajectory)
 
-        action_client = ActionClient(self, action_name, "moveit_msgs/ExecuteTrajectoryAction")
-        goal = Goal(action_client, Message(trajectory_goal.msg))
-        action_result = CancellableRosActionResult(goal)
-
         def handle_result(msg):
             result = ExecuteTrajectoryResult.from_msg(msg)
             if result.error_code != MoveItErrorCodes.SUCCESS:
@@ -446,6 +494,22 @@ class RosClient(Ros, ClientInterface):
         def handle_feedback(msg):
             feedback = ExecuteTrajectoryFeedback.from_msg(msg)
             feedback_callback(feedback)
+
+        if self.ros_distro.is_ros2:
+            action_client = Ros2ActionClient(self, action_name, "moveit_msgs/action/ExecuteTrajectory")
+            goal = _Ros2GoalHandle(action_client)
+            action_result = CancellableRosActionResult(goal)
+            goal.send(
+                trajectory_goal.msg,
+                on_result=handle_result,
+                on_feedback=handle_feedback if feedback_callback else None,
+                on_error=errback,
+            )
+            return action_result
+
+        action_client = ActionClient(self, action_name, "moveit_msgs/ExecuteTrajectoryAction")
+        goal = Goal(action_client, Message(trajectory_goal.msg))
+        action_result = CancellableRosActionResult(goal)
 
         def handle_failure(error):
             errback(error)
