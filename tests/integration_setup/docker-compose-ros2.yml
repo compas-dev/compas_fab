@@ -1,0 +1,82 @@
+# Lightweight ROS 2 / MoveIt 2 stack for integration tests.
+#
+# Just enough MoveIt to answer `/compute_ik`, `/compute_fk`,
+# `/compute_cartesian_path` and `/plan_kinematic_path` over rosbridge, plus
+# an HTTP file server so `HttpFileServerLoader` can resolve `package://`
+# mesh URLs. No URSim, no robot driver, no GUI — those live in the full
+# demo at `docs/installation/docker_files/ros2-ur10e-demo/`.
+#
+# Shares the Dockerfile + zenoh / update_rate configs with the full demo;
+# `build:` points at that directory so a fresh checkout can bring this
+# stack up without first running the demo.
+
+x-ros-env: &ros-env
+  ROS_DOMAIN_ID: "42"
+  RMW_IMPLEMENTATION: rmw_zenoh_cpp
+  # Despite the *_URI name, this wants a plain filesystem path, not a file:// URI.
+  ZENOH_SESSION_CONFIG_URI: /etc/zenoh/session.json5
+  # Wait forever for the zenoh-router to come up rather than failing fast.
+  ZENOH_ROUTER_CHECK_ATTEMPTS: "-1"
+
+services:
+  # Zenoh router that federates traffic for all ROS 2 nodes in this stack,
+  # replacing DDS discovery.
+  zenoh-router:
+    build: ../../docs/installation/docker_files/ros2-ur10e-demo
+    image: compas-fab/ros-jazzy-moveit2
+    container_name: zenoh-router
+    environment:
+      <<: *ros-env
+    command:
+      - bash
+      - -lc
+      - source /opt/ros/jazzy/setup.bash && exec ros2 run rmw_zenoh_cpp rmw_zenohd
+
+  # MoveIt 2 planning node — exposes /compute_ik, /compute_fk,
+  # /compute_cartesian_path, /plan_kinematic_path, /get_planning_scene,
+  # /apply_planning_scene.
+  moveit2-demo:
+    image: compas-fab/ros-jazzy-moveit2
+    container_name: moveit2-demo
+    environment:
+      <<: *ros-env
+    depends_on:
+      - zenoh-router
+    command:
+      - bash
+      - -lc
+      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur5 launch_rviz:=false
+
+  # rosbridge — WebSocket bridge that compas_fab's RosClient connects to.
+  ros2-bridge:
+    image: compas-fab/ros-jazzy-moveit2
+    container_name: ros2-bridge
+    environment:
+      <<: *ros-env
+    ports:
+      # Default 9091 so this stack can run alongside the ROS 1 test stack
+      # (which defaults to 9090). Override with `ROS2_BRIDGE_PORT=...` if
+      # needed. See `README.md`.
+      - "${ROS2_BRIDGE_PORT:-9091}:9090"
+    depends_on:
+      - zenoh-router
+    command:
+      - bash
+      - -lc
+      - source /opt/ros/jazzy/setup.bash && ros2 launch rosbridge_server rosbridge_websocket_launch.xml
+
+  # HTTP file server for serving URDF / mesh assets to `HttpFileServerLoader`.
+  file-server:
+    image: compas-fab/ros-jazzy-moveit2
+    container_name: file-server
+    ports:
+      # Default 9092 so this stack can run alongside another HTTP file server
+      # on the host. The container-internal port stays 9091, which is what
+      # other services in this stack hit via `file-server:9091`.
+      - "${ROS2_HTTP_PORT:-9092}:9091"
+    working_dir: /opt/ros/jazzy/share
+    command:
+      - python3
+      - -m
+      - http.server
+      - "9091"

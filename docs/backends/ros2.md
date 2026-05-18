@@ -50,29 +50,48 @@ host-OS boundaries.
 
 ## Setup
 
-```bash
-cd docs/installation/docker_files/ros2-ur10e-demo
-docker compose up
-```
+Two compose files ship with the project, sharing the same Dockerfile and
+image (`compas-fab/ros-jazzy-moveit2`):
 
-This starts seven services:
+### Lightweight test stack
+
+For integration tests and headless service calls: just MoveIt + rosbridge
++ file server, no robot driver, no simulator, no GUI.
+
+```bash
+docker compose -f tests/integration_setup/docker-compose-ros2.yml up
+```
 
 | Service | Purpose | Port |
 |---|---|---|
-| `ur-sim` | URSim simulator (UR10e) | 5900 (VNC), 6080 (noVNC pendant) |
 | `zenoh-router` | Zenoh router federating ROS 2 traffic | — |
+| `moveit2-demo` | MoveIt 2 planning node | — |
+| `ros2-bridge` | rosbridge WebSocket | 9091 |
+| `file-server` | HTTP server for URDF/mesh assets | 9092 |
+
+### Full demo stack (URSim + GUI)
+
+For end-to-end demos. It adds URSim, the real UR ROS 2 driver, and a
+noVNC RViz viewport on top of the test stack.
+
+```bash
+docker compose -f docs/installation/docker_files/ros2-ur10e-demo/docker-compose.yml up
+```
+
+This adds:
+
+| Service | Purpose | Port |
+|---|---|---|
+| `ur-sim` | URSim simulator (UR5) | 5900 (VNC), 6080 (noVNC pendant) |
 | `ur-driver` | UR ROS 2 driver | — |
-| `moveit-demo` | MoveIt 2 planning + RViz | — |
-| `ros-bridge` | rosbridge WebSocket | 9090 |
-| `file-server` | HTTP server for URDF/mesh assets | 9091 |
-| `gui` | noVNC web X11 server (RViz viewport) | 8080 |
+| `gui` | noVNC web X11 server for RViz | 8080 |
 
 Open the **simulated teach pendant** at <http://localhost:6080/vnc.html>
 and power on the robot (Initialise → Brake release → Play) before issuing
 motion commands.
 
 Open the **RViz viewport** at <http://localhost:8080/vnc.html> to see the
-planning scene rendered from the `moveit-demo` container.
+planning scene rendered from the `moveit2-demo` container.
 
 ## First example
 

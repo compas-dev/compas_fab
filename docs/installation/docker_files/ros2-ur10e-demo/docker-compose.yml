@@ -1,3 +1,10 @@
+# Full ROS 2 / MoveIt 2 demo stack — URSim, the UR ROS 2 driver, MoveIt 2,
+# rosbridge, an HTTP file server, and a web-based RViz viewport via noVNC.
+# Use this when you want to actually drive a simulated robot end-to-end.
+#
+# For the trimmed-down version used by the integration tests (no URSim,
+# no driver, no GUI), see `tests/integration_setup/docker-compose-ros2.yml`.
+
 x-ros-env: &ros-env
   ROS_DOMAIN_ID: "42"
   RMW_IMPLEMENTATION: rmw_zenoh_cpp
@@ -7,21 +14,23 @@ x-ros-env: &ros-env
   ZENOH_ROUTER_CHECK_ATTEMPTS: "-1"
 
 services:
-  # ur-sim:
-  #   image: universalrobots/ursim_e-series:latest
-  #   container_name: ur-sim
-  #   # URSim ships amd64-only. Apple Silicon runs it under emulation.
-  #   platform: linux/amd64
-  #   environment:
-  #     # UR10 in the e-series image means UR10e. Other valid values: UR3, UR5, UR16.
-  #     - ROBOT_MODEL=UR5
-  #   ports:
-  #     - "5900:5900"   # VNC for the simulated teach pendant
-  #     - "6080:6080"   # noVNC web view of the simulated teach pendant
+  # URSim — Polyscope simulator that the ROS 2 driver talks to. Open the
+  # simulated teach pendant at http://localhost:6080/vnc.html and run
+  # Initialise → Brake release → Play before issuing motion commands.
+  ur-sim:
+    image: universalrobots/ursim_e-series:latest
+    container_name: ur-sim
+    # URSim ships amd64-only. Apple Silicon runs it under emulation.
+    platform: linux/amd64
+    environment:
+      # `UR10` in the e-series image means UR10e. Other valid values: UR3, UR5, UR16.
+      - ROBOT_MODEL=UR5
+    ports:
+      - "5900:5900"   # VNC for the simulated teach pendant
+      - "6080:6080"   # noVNC web view of the simulated teach pendant
 
-  # Zenoh router that federates traffic for all ROS 2 nodes in this stack.
-  # Replaces DDS discovery — every ROS service is a Zenoh client pointing
-  # at this router via /etc/zenoh/session.json5.
+  # Zenoh router that federates traffic for all ROS 2 nodes in this stack,
+  # replacing DDS discovery.
   zenoh-router:
     build: .
     image: compas-fab/ros-jazzy-moveit2
@@ -33,66 +42,70 @@ services:
       - -lc
       - source /opt/ros/jazzy/setup.bash && exec ros2 run rmw_zenoh_cpp rmw_zenohd
 
-  # ur-driver:
-  #   image: compas-fab/ros-jazzy-moveit2
-  #   container_name: ur-driver
-  #   environment:
-  #     <<: *ros-env
-  #   depends_on:
-  #     - ur-sim
-  #     - zenoh-router
-  #   # `launch_rviz:=false` here disables the driver's bare-bones RViz — we get a
-  #   # richer planning-scene RViz from `ur_moveit.launch.py` in `moveit-demo`.
-  #   command:
-  #     - bash
-  #     - -lc
-  #     - source /opt/ros/jazzy/setup.bash && ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur5 robot_ip:=ur-sim launch_rviz:=false initial_joint_controller:=joint_trajectory_controller update_rate_config_file:=/etc/compas_fab/update_rate.yaml
-
-  moveit-demo:
+  # UR ROS 2 driver — talks to URSim's RTDE interface and republishes the
+  # robot state / accepts trajectory goals. `update_rate.yaml` lowers the
+  # control loop from the default 500 Hz to 100 Hz so the controller
+  # manager doesn't spam "Overrun detected!" warnings under Docker.
+  ur-driver:
     image: compas-fab/ros-jazzy-moveit2
-    container_name: moveit-demo
+    container_name: ur-driver
     environment:
       <<: *ros-env
-      # RViz is rendered into the `gui` service's X11 server (see below) and viewable
-      # at http://localhost:8080/vnc.html. To use a native X server instead (XQuartz on
-      # macOS, VcXsrv on Windows, native on Linux), comment the line below and uncomment
-      # this one:
-      # DISPLAY: host.docker.internal:0.0
-      # DISPLAY: gui:0.0
     depends_on:
-      # - ur-driver
+      - ur-sim
+      - zenoh-router
+    # `launch_rviz:=false` here disables the driver's bare-bones RViz — we get a
+    # richer planning-scene RViz from `ur_moveit.launch.py` in `moveit2-demo`.
+    command:
+      - bash
+      - -lc
+      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur5 robot_ip:=ur-sim launch_rviz:=false initial_joint_controller:=joint_trajectory_controller update_rate_config_file:=/etc/compas_fab/update_rate.yaml
+
+  # MoveIt 2 planning node + RViz. Renders into the `gui` service's X11
+  # server (viewable at http://localhost:8080/vnc.html). To use a native
+  # X server instead (XQuartz on macOS, VcXsrv on Windows, native on Linux),
+  # comment the `DISPLAY: gui:0.0` line and uncomment the host one.
+  moveit2-demo:
+    image: compas-fab/ros-jazzy-moveit2
+    container_name: moveit2-demo
+    environment:
+      <<: *ros-env
+      # DISPLAY: host.docker.internal:0.0
+      DISPLAY: gui:0.0
+    depends_on:
+      - ur-driver
       - zenoh-router
       - gui
     command:
       - bash
       - -lc
-      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur5 launch_rviz:=false
+      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur5 launch_rviz:=true
 
-  ros-bridge:
+  # rosbridge — WebSocket bridge that compas_fab's RosClient connects to.
+  ros2-bridge:
     image: compas-fab/ros-jazzy-moveit2
-    container_name: ros-bridge
+    container_name: ros2-bridge
     environment:
       <<: *ros-env
     ports:
-      # Default 9091 so this stack can run alongside the ROS 1 test stack
-      # (which defaults to 9090). Override with `ROS2_BRIDGE_PORT=...` if
-      # needed. See `tests/integration_setup/README.md`.
+      # Default 9091 so this stack can run alongside the ROS 1 test stack.
+      # Override with `ROS2_BRIDGE_PORT=...`.
       - "${ROS2_BRIDGE_PORT:-9091}:9090"
     depends_on:
-      # - ur-driver
+      - ur-driver
       - zenoh-router
     command:
       - bash
       - -lc
       - source /opt/ros/jazzy/setup.bash && ros2 launch rosbridge_server rosbridge_websocket_launch.xml
 
+  # HTTP file server for serving URDF / mesh assets to `HttpFileServerLoader`.
   file-server:
     image: compas-fab/ros-jazzy-moveit2
     container_name: file-server
     ports:
       # Default 9092 so this stack can run alongside another HTTP file server
-      # on the host. The container-internal port stays 9091, which is what
-      # other services in this stack hit via `file-server:9091`.
+      # on the host. Container-internal stays 9091.
       - "${ROS2_HTTP_PORT:-9092}:9091"
     working_dir: /opt/ros/jazzy/share
     command:
@@ -101,9 +114,9 @@ services:
       - http.server
       - "9091"
 
-  # Web-based X11 server. Reachable as `gui` on the Docker network so other services
-  # can render into it via `DISPLAY=gui:0.0`. The noVNC web client is at
-  # http://localhost:8080/vnc.html.
+  # Web-based X11 server. Reachable as `gui` on the Docker network so other
+  # services can render into it via `DISPLAY=gui:0.0`. The noVNC web client
+  # is at http://localhost:8080/vnc.html.
   gui:
     image: theasp/novnc:latest
     container_name: gui

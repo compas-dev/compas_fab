@@ -54,7 +54,7 @@ def _skip_if_not_opted_in():
             "ROS integration tests are opt-in. Set {0}=1 and start at least one stack:\n"
             "  ROS 1: docker compose -f tests/integration_setup/docker-compose.yml up -d\n"
             "         (rosbridge on {1}, default {2})\n"
-            "  ROS 2: docker compose -f docs/installation/docker_files/ros2-ur10e-demo/docker-compose.yml up -d\n"
+            "  ROS 2: docker compose -f tests/integration_setup/docker-compose-ros2.yml up -d\n"
             "         (rosbridge on {3}, default {4})\n"
             "See tests/integration_setup/README.md.".format(
                 RUN_ENV_VAR,
